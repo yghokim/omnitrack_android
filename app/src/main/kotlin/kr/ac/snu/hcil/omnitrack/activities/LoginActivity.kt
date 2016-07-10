@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack
+package kr.ac.snu.hcil.omnitrack.activities
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
@@ -31,6 +31,7 @@ import android.widget.TextView
 import java.util.ArrayList
 
 import android.Manifest.permission.READ_CONTACTS
+import kr.ac.snu.hcil.omnitrack.R
 
 /**
  * A login screen that offers login via email/password.
