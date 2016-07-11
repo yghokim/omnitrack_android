@@ -9,11 +9,11 @@ package kr.ac.snu.hcil.omnitrack.utils.events
 open class Event<T> () {
     private var handlers = listOf<(sender: Any, args: T) -> Unit>()
 
-    fun plusAssign(handler: (sender: Any, args: T) -> Unit) {
+    operator fun plusAssign(handler: (sender: Any, args: T) -> Unit) {
         handlers += handler
     }
 
-    fun minusAssign(handler: (sender: Any, args: T) -> Unit) {
+    operator fun minusAssign(handler: (sender: Any, args: T) -> Unit) {
         handlers -= handler
     }
 

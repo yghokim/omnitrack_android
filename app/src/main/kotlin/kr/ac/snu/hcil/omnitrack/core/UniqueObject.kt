@@ -7,19 +7,24 @@ import kotlin.properties.Delegates
 /**
  * Created by Young-Ho on 7/11/2016.
  */
-abstract class UniqueObject(id: String?, name: String) {
+abstract class UniqueObject(objectId: String?, dbId: Long?,  name: String) {
 
     val nameChangeEvent = Event<String>()
 
     val objectId: String by lazy {
-        id ?: UUID.randomUUID().toString()
+        objectId ?: UUID.randomUUID().toString()
     }
+
+    var dbId : Long? = dbId
+        protected set
+        get
 
 
     var name: String by Delegates.observable(name){
         prop, old, new -> nameChangeEvent.invoke(this, new)
     }
 
-    constructor() : this(null, "Nomame")
+    constructor() : this(null, null, "Noname")
+
 
 }
