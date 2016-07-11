@@ -6,3 +6,11 @@
 .DS_Store
 /build
 /captures
+app/app.iml
+*.iml
+
+.idea/misc.xml
+.idea/vcs.xml
+.idea/modules.xml
+
+Thumbs.db
