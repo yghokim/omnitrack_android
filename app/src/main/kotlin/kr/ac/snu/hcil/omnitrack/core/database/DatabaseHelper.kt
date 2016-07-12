@@ -6,6 +6,8 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
+import kr.ac.snu.hcil.omnitrack.core.OTProject
+import kr.ac.snu.hcil.omnitrack.core.OTUser
 import java.util.*
 import kotlin.properties.Delegates
 
@@ -66,7 +68,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
 
         override fun getCreationColumnContentString() : String
         {
-            return  super.getCreationColumnContentString() + ", ${USER_ID} INTEGER ${POSITION} INTEGER"
+            return  super.getCreationColumnContentString() + ", ${USER_ID} INTEGER, ${POSITION} INTEGER"
         }
     }
 
@@ -84,7 +86,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    fun findUserById(id: Long) : UserEntity?{
+    fun findUserById(id: Long) : OTUser?{
         val result = queryById(id, UserScheme)
         if(result.count == 0)
         {
@@ -93,23 +95,16 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         }
         else{
             val id = result.getLong(result.getColumnIndex(UserScheme._ID));
+            val objectId = result.getString(result.getColumnIndex(UserScheme.OBJECT_ID));
             val name = result.getString(result.getColumnIndex(UserScheme.NAME));
             val email = result.getString(result.getColumnIndex(UserScheme.EMAIL));
-            val entity = UserEntity(id, name, email, findProjectsOfUser(id) ?: ArrayList<ProjectEntity>() )
+            val entity = OTUser(objectId, id, name, email, findProjectsOfUser(id))
             result.close()
             return entity
         }
     }
 
-    fun makeNewUser(name: String, email: String) : UserEntity{
-        val values = ContentValues()
-        values.put(UserScheme.NAME, name)
-        values.put(UserScheme.EMAIL, email)
-        val newRowId = writableDatabase.insert(UserScheme.tableName, null, values)
-        return UserEntity(newRowId, name, email, ArrayList<ProjectEntity>())
-    }
-
-    fun findProjectsOfUser(userId : Long) : List<ProjectEntity>? {
+    fun findProjectsOfUser(userId : Long) : List<OTProject>? {
 
         val query : Cursor = readableDatabase.query(ProjectScheme.tableName, ProjectScheme.columnNames,  "${ProjectScheme.USER_ID}=?", arrayOf(userId.toString()), null, null, "${ProjectScheme.POSITION} ASC")
         query.moveToFirst()
@@ -119,7 +114,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
             return null;
         }
         else{
-            val result = ArrayList<ProjectEntity>()
+            val result = ArrayList<OTProject>()
             while(query.moveToNext())
             {
                 result.add(extractProjectEntity(query))
@@ -130,15 +125,13 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         }
     }
 
-    fun extractProjectEntity(cursor: Cursor) : ProjectEntity
+    fun extractProjectEntity(cursor: Cursor) : OTProject
     {
         val id = cursor.getLong(cursor.getColumnIndex(ProjectScheme._ID))
         val name = cursor.getString(cursor.getColumnIndex(ProjectScheme.NAME))
         val objectId = cursor.getString(cursor.getColumnIndex(ProjectScheme.OBJECT_ID))
-        val position = cursor.getInt(cursor.getColumnIndex(ProjectScheme.POSITION))
-        val userId = cursor.getLong(cursor.getColumnIndex(ProjectScheme.USER_ID))
 
-        return ProjectEntity(id, objectId, name, userId, position, ArrayList<TrackerEntity>());
+        return OTProject(objectId, id, name); //TODO: implement putting trackers
     }
 
     private fun queryById(id: Long, table: TableScheme) : Cursor
@@ -148,25 +141,63 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         return query
     }
 
-    fun add(project: ProjectEntity)
+    fun save(project: OTProject, position: Int)
     {
         val values = ContentValues()
         values.put(ProjectScheme.OBJECT_ID, project.objectId)
         values.put(ProjectScheme.NAME, project.name)
-        values.put(ProjectScheme.POSITION, project.position)
-        values.put(ProjectScheme.USER_ID, project.userId)
+        values.put(ProjectScheme.POSITION, position)
+        values.put(ProjectScheme.USER_ID, project.owner?.dbId ?: null)
 
-        val newRowId = writableDatabase.insert(ProjectScheme.tableName, null, values)
-        project.id = newRowId
+        if(project.dbId != null) // update
+        {
+            val numAffected = writableDatabase.update(ProjectScheme.tableName, values, "${ProjectScheme._ID}=?", arrayOf(project.dbId.toString()))
+            if(numAffected==1)
+            {
+
+            }
+            else{ // something wrong
+                throw Exception("Something is wrong saving project in Db")
+            }
+
+        }else{ // create new
+            val newRowId = writableDatabase.insert(ProjectScheme.tableName, null, values)
+            project.dbId = newRowId
+        }
+
+        //TODO store trackers
     }
 
-    fun update(project:ProjectEntity, changedColumns: Array<String>)
+    fun save(user : OTUser)
     {
+        val values = ContentValues()
+        values.put(UserScheme.NAME, user.name)
+        values.put(UserScheme.EMAIL, user.email)
+        values.put(UserScheme.OBJECT_ID, user.objectId)
 
-    }
+        if(user.dbId != null) // update
+        {
+            val numAffected = writableDatabase.update(UserScheme.tableName, values, "${UserScheme._ID}=?", arrayOf(user.dbId.toString()))
+            if(numAffected==1)
+            {
 
-    fun update(user: UserEntity, changedColumns: Array<String>)
-    {
+            }
+            else{ // something wrong
+                throw Exception("Something is wrong saving user in Db")
+            }
+        }
+        else{ //create
+
+            val newRowId = writableDatabase.insert(UserScheme.tableName, null, values)
+            user.dbId = newRowId
+        }
+
+        writableDatabase.delete(ProjectScheme.tableName, "${ProjectScheme._ID}=?", user.fetchRemovedProjectIds().map{ it.toString() }.toTypedArray())
+
+        for(child in user.projects.iterator().withIndex())
+        {
+            save(child.value, child.index)
+        }
 
     }
 

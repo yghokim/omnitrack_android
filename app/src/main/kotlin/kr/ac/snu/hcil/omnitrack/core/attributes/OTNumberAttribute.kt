@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes
 
 import kr.ac.snu.hcil.omnitrack.core.OTAttribute
+import kr.ac.snu.hcil.omnitrack.core.OTSettingProperty
 import kotlin.properties.Delegates
 
 /**
@@ -8,6 +9,8 @@ import kotlin.properties.Delegates
  */
 
 class OTNumberAttribute : OTAttribute(){
+    override val settingsProperties: Array<OTSettingProperty<Any>>
+        get() = throw UnsupportedOperationException()
     override val layoutId: Int
         get() = throw UnsupportedOperationException()
 

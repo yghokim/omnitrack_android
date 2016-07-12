@@ -48,11 +48,11 @@ class ObservableList<T>(){
         }
     }
 
-    fun iterator(): MutableIterator<T> {
+    operator fun iterator(): MutableIterator<T> {
         return list.iterator()
     }
 
-   fun toArray(): Array<out Any> {
+    fun toArray(): Array<out Any> {
         return list.toArray()
     }
 

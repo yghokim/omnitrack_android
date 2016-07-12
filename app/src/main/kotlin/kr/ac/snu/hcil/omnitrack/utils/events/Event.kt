@@ -9,6 +9,9 @@ package kr.ac.snu.hcil.omnitrack.utils.events
 open class Event<T> () {
     private var handlers = listOf<(sender: Any, args: T) -> Unit>()
 
+    var suspend: Boolean = false
+
+
     operator fun plusAssign(handler: (sender: Any, args: T) -> Unit) {
         handlers += handler
     }
@@ -18,8 +21,10 @@ open class Event<T> () {
     }
 
     fun invoke(sender: Any, args: T) {
-        for (subscriber in handlers) {
-            subscriber(sender, args)
+        if(!suspend) {
+            for (subscriber in handlers) {
+                subscriber(sender, args)
+            }
         }
     }
 }

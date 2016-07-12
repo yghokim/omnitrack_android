@@ -16,18 +16,13 @@ import android.widget.ListView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTProject
 import kr.ac.snu.hcil.omnitrack.core.OTUser
-import kr.ac.snu.hcil.omnitrack.core.OmniTrackApplication
+import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 
 class ProjectsActivity : AppCompatActivity() {
 
     lateinit private var listView : ListView
 
     lateinit private var projectListAdapter : ProjectListAdapter
-
-    private val onProjectChangedHandler = {
-        sender: Any, args: Pair<OTProject, Int>->
-
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,7 +34,7 @@ class ProjectsActivity : AppCompatActivity() {
         val fab = findViewById(R.id.fab) as FloatingActionButton?
         fab!!.setOnClickListener { view ->
             //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show()
-            (application as OmniTrackApplication).currentUser.projects.add(OTProject())
+           (application as OmniTrackApplication).syncUserToDb()
         }
 
         //attach events
@@ -47,9 +42,14 @@ class ProjectsActivity : AppCompatActivity() {
         user.projectAdded += onProjectChangedHandler
         user.projectRemoved += onProjectChangedHandler
 
-        listView = this.findViewById(R.id.ui_project_list_view) as ListView
+        val content = this.findViewById(R.id.layout_projects) as ViewGroup
+
+
+        listView = findViewById(R.id.ui_project_list_view) as ListView
 
         projectListAdapter = ProjectListAdapter(this, user)
+
+        listView.adapter = projectListAdapter
     }
 
     override fun onDestroy() {
@@ -61,9 +61,13 @@ class ProjectsActivity : AppCompatActivity() {
         user.projectRemoved -= onProjectChangedHandler
     }
 
+    private val onProjectChangedHandler = {
+        sender: Any, args: Pair<OTProject, Int>->
+        listView.deferNotifyDataSetChanged()
+    }
+
+
     class ProjectListAdapter(context: Context, val user: OTUser) : BaseAdapter(){
-
-
 
         override fun getCount(): Int {
             return user.projects.size
@@ -80,8 +84,6 @@ class ProjectsActivity : AppCompatActivity() {
         init{
 
         }
-
-
 
         override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
             throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.

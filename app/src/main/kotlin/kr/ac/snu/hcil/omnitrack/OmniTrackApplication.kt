@@ -1,9 +1,11 @@
-package kr.ac.snu.hcil.omnitrack.core
+package kr.ac.snu.hcil.omnitrack
 
 import android.app.Application
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
+import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.database.*;
+import java.util.*
 
 /**
  * Created by Young-Ho Kim on 2016-07-11.
@@ -20,6 +22,9 @@ class OmniTrackApplication : Application() {
     lateinit var dbHelper : DatabaseHelper
         private set
 
+
+    private val removedProjectIds = ArrayList<Long>()
+
     val currentUser: OTUser
         get(){
             return _currentUser
@@ -28,19 +33,31 @@ class OmniTrackApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
+        //deleteDatabase("omnitrack.db")
+
         app = this
 
         dbHelper = DatabaseHelper(this)
 
-        val user: UserEntity = dbHelper.findUserById(1) ?: dbHelper.makeNewUser("Young-Ho Kim", "yhkim@hcil.snu.ac.kr")
+        _currentUser = dbHelper.findUserById(1) ?: OTUser("Young-Ho Kim", "yhkim@hcil.snu.ac.kr")
+        _currentUser.projectRemoved += {
+            sender, args->
+                if(args.first.dbId != null)
+                {
+                    removedProjectIds.add(args.first.dbId as Long)
+                }
+        }
 
-        println(user)
+    }
 
-        _currentUser = OTUser(user)
+    fun syncUserToDb(){
+        dbHelper.save(_currentUser)
     }
 
     override fun onTerminate() {
         super.onTerminate()
+
+        syncUserToDb()
 
         dbHelper.close()
     }

@@ -16,7 +16,16 @@ abstract class UniqueObject(objectId: String?, dbId: Long?,  name: String) {
     }
 
     var dbId : Long? = dbId
-        protected set
+        set(value){
+            if(field!= null)
+            {
+                throw Exception("dbId is already assigned once.")
+            }
+            else{
+                field = value
+                println("Item newly added to database : id = ${value}")
+            }
+        }
         get
 
 

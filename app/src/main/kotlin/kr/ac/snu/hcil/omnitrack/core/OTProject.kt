@@ -1,8 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core
 
-import kr.ac.snu.hcil.omnitrack.core.database.DatabaseHelper
-import kr.ac.snu.hcil.omnitrack.core.database.ProjectEntity
-import kr.ac.snu.hcil.omnitrack.core.database.TrackerEntity
+import android.support.annotation.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.ObservableList
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import java.util.*
@@ -11,11 +9,11 @@ import kotlin.properties.Delegates
 /**
  * Created by Young-Ho on 7/11/2016.
  */
-class OTProject(objectId: String?, dbId: Long?,  name: String, owner: OTUser?=null) : UniqueObject(objectId, dbId, name) {
+class OTProject(objectId: String?, dbId: Long?,  name: String, _trackers: ArrayList<OTTracker>?=null) : UniqueObject(objectId, dbId, name) {
 
     private var trackers = ObservableList<OTTracker>()
 
-    var owner: OTUser? by Delegates.observable(owner){
+    var owner: OTUser? by Delegates.observable(null as OTUser?){
         prop, old, new ->
             if (old != null) {
                 removedFromUser.invoke(this, old)
@@ -26,21 +24,13 @@ class OTProject(objectId: String?, dbId: Long?,  name: String, owner: OTUser?=nu
     }
 
     //Public properties
-    val trackerAddedEvent = Event<Pair<OTTracker, Int>>()
-    val trackerRemovedEvent = Event<Pair<OTTracker, Int>>()
-    val trackerIndexChangedEvent = Event<Pair<OTTracker, Int>>()
+    val trackerAdded = Event<Pair<OTTracker, Int>>()
+    val trackerRemoved = Event<Pair<OTTracker, Int>>()
+    val trackerIndexChanged = Event<Pair<OTTracker, Int>>()
     val removedFromUser = Event<OTUser>()
     val addedToUser = Event<OTUser>()
 
     constructor() : this(null, null, "New Project")
-
-    constructor(dbObject: ProjectEntity) : this(dbObject.objectId, dbObject.id, dbObject.name ?: "Noname")
-    {
-        /*
-        for( trackerDbObj: TrackerEntity in dbObject.trackers ) {
-            trackers.unObservedList.add(OTTracker(trackerDbObj))
-        }*/
-    }
 
     init{
         trackers.elementAdded += {
@@ -57,11 +47,6 @@ class OTProject(objectId: String?, dbId: Long?,  name: String, owner: OTUser?=nu
     override fun onNameChanged(newName: String)
     {
         super.onNameChanged(newName)
-        OmniTrackApplication.app.dbHelper.update(makeEntity(), arrayOf(DatabaseHelper.ProjectScheme.NAME))
-    }
-
-    fun makeEntity(): ProjectEntity{
-        return ProjectEntity(dbId?:-1, objectId, name, owner?.dbId ?: null, owner?.projects?.indexOf(this) ?: -1, ArrayList<TrackerEntity>())
     }
 
     open fun addTracker(tracker: OTTracker): Boolean{
@@ -74,12 +59,12 @@ class OTProject(objectId: String?, dbId: Long?,  name: String, owner: OTUser?=nu
 
     private fun onTrackerAdded(tracker: OTTracker, index: Int)
     {
-        trackerAddedEvent.invoke(this, Pair(tracker, index));
+        trackerAdded.invoke(this, Pair(tracker, index));
     }
 
     private fun onTrackerRemoved(tracker: OTTracker, index: Int)
     {
-        trackerRemovedEvent.invoke(this, Pair(tracker, index));
+        trackerRemoved.invoke(this, Pair(tracker, index));
     }
 
 }
