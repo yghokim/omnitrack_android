@@ -19,6 +19,8 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
 
         abstract val tableName : String
 
+        abstract val columnNames: Array<String>
+
         val creationQueryString: String by lazy{
             "CREATE TABLE ${tableName} (${getCreationColumnContentString()})"
         }
@@ -31,9 +33,10 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
 
     abstract class TableWithNameScheme : TableScheme(){
         val NAME = "name"
+        val OBJECT_ID = "object_id"
         override fun getCreationColumnContentString() : String
         {
-            return  super.getCreationColumnContentString() + ", ${NAME} TEXT"
+            return  super.getCreationColumnContentString() + ", ${NAME} TEXT, ${OBJECT_ID} TEXT UNIQUE"
         }
     }
 
@@ -43,7 +46,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
 
         val EMAIL = "email"
 
-        val columnNames = arrayOf(_ID, NAME, EMAIL)
+        override val columnNames = arrayOf(_ID, NAME, OBJECT_ID, EMAIL)
 
         override fun getCreationColumnContentString() : String
         {
@@ -56,13 +59,14 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
             get() = "omnitrack_projects"
 
         val USER_ID = "user_id"
+        val POSITION = "position"
 
 
-        val columnNames = arrayOf(_ID, NAME, USER_ID)
+        override val columnNames = arrayOf(_ID, NAME, OBJECT_ID, USER_ID, POSITION)
 
         override fun getCreationColumnContentString() : String
         {
-            return  super.getCreationColumnContentString() + ", ${USER_ID} INTEGER"
+            return  super.getCreationColumnContentString() + ", ${USER_ID} INTEGER ${POSITION} INTEGER"
         }
     }
 
@@ -80,31 +84,88 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    fun findUserById(id: Long, database: SQLiteDatabase) : UserEntity?{
-        val result : Cursor = database.query(UserScheme.tableName, UserScheme.columnNames,  "${UserScheme._ID}=?", arrayOf(id.toString()), null, null, "_id ASC");
-        result.moveToFirst()
+    fun findUserById(id: Long) : UserEntity?{
+        val result = queryById(id, UserScheme)
         if(result.count == 0)
         {
+            result.close()
             return null
         }
         else{
             val id = result.getLong(result.getColumnIndex(UserScheme._ID));
             val name = result.getString(result.getColumnIndex(UserScheme.NAME));
             val email = result.getString(result.getColumnIndex(UserScheme.EMAIL));
-            val entity = UserEntity(id, name, email, ArrayList<ProjectEntity>() )
+            val entity = UserEntity(id, name, email, findProjectsOfUser(id) ?: ArrayList<ProjectEntity>() )
+            result.close()
             return entity
         }
     }
 
-    fun makeNewUser(name: String, email: String, database: SQLiteDatabase) : UserEntity{
+    fun makeNewUser(name: String, email: String) : UserEntity{
         val values = ContentValues()
         values.put(UserScheme.NAME, name)
         values.put(UserScheme.EMAIL, email)
-        val newRowId = database.insert(UserScheme.tableName, null, values)
+        val newRowId = writableDatabase.insert(UserScheme.tableName, null, values)
         return UserEntity(newRowId, name, email, ArrayList<ProjectEntity>())
     }
 
-    fun save(user: UserEntity)
+    fun findProjectsOfUser(userId : Long) : List<ProjectEntity>? {
+
+        val query : Cursor = readableDatabase.query(ProjectScheme.tableName, ProjectScheme.columnNames,  "${ProjectScheme.USER_ID}=?", arrayOf(userId.toString()), null, null, "${ProjectScheme.POSITION} ASC")
+        query.moveToFirst()
+        if(query.count == 0)
+        {
+            query.close()
+            return null;
+        }
+        else{
+            val result = ArrayList<ProjectEntity>()
+            while(query.moveToNext())
+            {
+                result.add(extractProjectEntity(query))
+            }
+
+            query.close()
+            return result
+        }
+    }
+
+    fun extractProjectEntity(cursor: Cursor) : ProjectEntity
+    {
+        val id = cursor.getLong(cursor.getColumnIndex(ProjectScheme._ID))
+        val name = cursor.getString(cursor.getColumnIndex(ProjectScheme.NAME))
+        val objectId = cursor.getString(cursor.getColumnIndex(ProjectScheme.OBJECT_ID))
+        val position = cursor.getInt(cursor.getColumnIndex(ProjectScheme.POSITION))
+        val userId = cursor.getLong(cursor.getColumnIndex(ProjectScheme.USER_ID))
+
+        return ProjectEntity(id, objectId, name, userId, position, ArrayList<TrackerEntity>());
+    }
+
+    private fun queryById(id: Long, table: TableScheme) : Cursor
+    {
+        val query = readableDatabase.query(table.tableName, table.columnNames, "${table._ID}=?", arrayOf(id.toString()), null, null, "${table._ID} ASC")
+        query.moveToFirst()
+        return query
+    }
+
+    fun add(project: ProjectEntity)
+    {
+        val values = ContentValues()
+        values.put(ProjectScheme.OBJECT_ID, project.objectId)
+        values.put(ProjectScheme.NAME, project.name)
+        values.put(ProjectScheme.POSITION, project.position)
+        values.put(ProjectScheme.USER_ID, project.userId)
+
+        val newRowId = writableDatabase.insert(ProjectScheme.tableName, null, values)
+        project.id = newRowId
+    }
+
+    fun update(project:ProjectEntity, changedColumns: Array<String>)
+    {
+
+    }
+
+    fun update(user: UserEntity, changedColumns: Array<String>)
     {
 
     }

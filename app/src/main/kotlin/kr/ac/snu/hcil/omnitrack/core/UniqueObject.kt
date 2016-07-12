@@ -21,10 +21,13 @@ abstract class UniqueObject(objectId: String?, dbId: Long?,  name: String) {
 
 
     var name: String by Delegates.observable(name){
-        prop, old, new -> nameChangeEvent.invoke(this, new)
+        prop, old, new ->onNameChanged(new)
     }
 
     constructor() : this(null, null, "Noname")
 
 
+    protected open fun onNameChanged(newName: String){
+        nameChangeEvent.invoke(this, newName)
+    }
 }

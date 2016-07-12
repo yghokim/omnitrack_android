@@ -25,8 +25,8 @@ object TrackerTable: IntIdTable(){
 }
 */
 
-data class UserEntity(var id: Long, var name: String?, val email: String?, val projects: List<ProjectEntity>)
+data class UserEntity(var id: Long = -1, var name: String?, val email: String?, val projects: List<ProjectEntity>)
 
-data class ProjectEntity(var id: Long, var objectId: String?, var name: String?, var user: UserEntity?, var position: Int?, val trackers: List<TrackerEntity>)
+data class ProjectEntity(var id: Long = -1, var objectId: String?, var name: String?, var userId: Long?, var position: Int?, val trackers: List<TrackerEntity>)
 
-data class TrackerEntity(var id: Long, var objectId: String?, var name: String?, var project: ProjectEntity?, var position: Int?)
+data class TrackerEntity(var id: Long = -1, var objectId: String?, var name: String?, var projectId: Long?, var position: Int?)

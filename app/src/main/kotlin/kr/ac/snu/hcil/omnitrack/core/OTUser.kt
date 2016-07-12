@@ -20,10 +20,10 @@ class OTUser(email: String, name: String, val dbId: Long?) {
 
     }
 
-    val projectAddedEvent = Event<Pair<OTProject, Int>>()
-    val projectRemovedEvent = Event<Pair<OTProject, Int>>()
+    val projectAdded = Event<Pair<OTProject, Int>>()
+    val projectRemoved = Event<Pair<OTProject, Int>>()
 
-    private val projects = ObservableList<OTProject>()
+    val projects = ObservableList<OTProject>()
 
     init{
         projects.elementAdded += {sender, args->
@@ -36,30 +36,25 @@ class OTUser(email: String, name: String, val dbId: Long?) {
     }
 
     constructor(dbObject : UserEntity) : this(dbObject.email ?: "", dbObject.name ?: "", dbObject.id){
-        /*
+
         for(projectObj : ProjectEntity in dbObject.projects)
         {
             projects.unObservedList.add(OTProject(projectObj))
-        }*/
-    }
-
-    fun addProject(new : OTProject): Boolean
-    {
-        return projects.add(new)
-    }
-
-    fun removeProject(prj: OTProject): Boolean
-    {
-        return projects.remove(prj)
+        }
     }
 
     private fun onProjectAdded(new: OTProject, index: Int)
     {
-        projectAddedEvent.invoke(this, Pair(new, index))
+        new.owner = this
+
+        projectAdded.invoke(this, Pair(new, index))
+        OmniTrackApplication.app.dbHelper.add(new.makeEntity())
     }
 
     private fun onProjectRemoved(prj: OTProject, index: Int)
     {
-        projectRemovedEvent.invoke(this, Pair(prj, index))
+        prj.owner = null
+
+        projectRemoved.invoke(this, Pair(prj, index))
     }
 }

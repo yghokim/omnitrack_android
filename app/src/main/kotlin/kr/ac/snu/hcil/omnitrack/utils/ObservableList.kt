@@ -14,6 +14,8 @@ class ObservableList<T>(){
     val elementRemoved = Event<Pair<T, Int>>()
     val elementIndexChanged = Event<Void>()
 
+    val size: Int
+        get() = list.size
 
     fun add(element: T): Boolean {
         if(list.add(element)) {
@@ -25,7 +27,7 @@ class ObservableList<T>(){
         }
     }
 
-    fun get(index: Int): T {
+    operator fun get(index: Int): T {
         return list[index]
     }
 

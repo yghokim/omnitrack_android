@@ -8,12 +8,17 @@ import kr.ac.snu.hcil.omnitrack.core.database.*;
 /**
  * Created by Young-Ho Kim on 2016-07-11.
  */
-// The annotated class is not used, but the package name is used to place the OrmaDatabase class.
-public class DatabaseConfiguration { }
 
 class OmniTrackApplication : Application() {
+    companion object{
+        lateinit var app : OmniTrackApplication
+            private set
+    }
 
     private lateinit var _currentUser : OTUser
+
+    lateinit var dbHelper : DatabaseHelper
+        private set
 
     val currentUser: OTUser
         get(){
@@ -23,19 +28,20 @@ class OmniTrackApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        val dbHelper = DatabaseHelper(this)
+        app = this
 
-        val db : SQLiteDatabase = dbHelper.writableDatabase
+        dbHelper = DatabaseHelper(this)
 
-        val user: UserEntity = dbHelper.findUserById(1, db) ?: dbHelper.makeNewUser("Young-Ho Kim", "yhkim@hcil.snu.ac.kr", db)
+        val user: UserEntity = dbHelper.findUserById(1) ?: dbHelper.makeNewUser("Young-Ho Kim", "yhkim@hcil.snu.ac.kr")
 
         println(user)
 
         _currentUser = OTUser(user)
-
     }
 
     override fun onTerminate() {
         super.onTerminate()
+
+        dbHelper.close()
     }
 }
