@@ -32,6 +32,8 @@ class OTProject(objectId: String?, dbId: Long?,  name: String, _trackers: ArrayL
 
     constructor() : this(null, null, "New Project")
 
+    constructor(name: String): this(null,null, name)
+
     init{
         trackers.elementAdded += {
             sender, args->

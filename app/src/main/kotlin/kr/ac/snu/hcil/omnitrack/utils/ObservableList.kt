@@ -56,6 +56,10 @@ class ObservableList<T>(){
         return list.toArray()
     }
 
+    fun filter( func: (T)-> Boolean): List<T>{
+        return list.filter(func)
+    }
+
     val unObservedList : ArrayList<T>
         get(){
             return list

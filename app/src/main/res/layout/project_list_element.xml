@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="@dimen/project_list_element_min_height">
+<!--
+    <View
+        android:id="@+id/color_bar"
+        android:layout_width="@dimen/project_list_color_bar_width"
+        android:layout_height="match_parent"
+        android:background="#ff8e38"
+        android:layout_alignParentStart="true" />-->
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Project"
+        android:id="@+id/name"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="10dp"/>
+</RelativeLayout>

@@ -13,6 +13,20 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
-    <string name="title_activity_projects">ProjectsActivity</string>
+    <string name="title_activity_projects">My Projects</string>
     <string name="title_activity_project_settings">Project Settings</string>
+
+    <string name="msg_change_project_name">Change project name</string>
+    <string name="msg_change_project_settings">Change project settings</string>
+    <string name="msg_remove_project">Remove project</string>
+    <string name="msg_yes">Yes</string>
+    <string name="msg_no">No</string>
+    <string name="msg_confirm_remove_project">Remove this project?</string>
+    <string name="msg_confirm_apply_settings">Apply settings?</string>
+
+
+    <string name="msg_ok">Okay</string>
+    <string name="msg_cancel">Cancel</string>
+
+
 </resources>
