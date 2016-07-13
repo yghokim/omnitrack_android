@@ -13,6 +13,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import jp.wasabeef.recyclerview.animators.SlideInRightAnimator
 
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTProject
@@ -52,8 +53,8 @@ class ProjectsActivity : UserSyncedActivity() {
         }
 
         //attach events
-        user.projectAdded += onProjectChangedHandler
-        user.projectRemoved += onProjectChangedHandler
+        user.projectAdded += onProjectAddedHandler
+        user.projectRemoved += onProjectRemovedHandler
 
         val content = this.findViewById(R.id.layout_projects) as ViewGroup
 
@@ -66,6 +67,7 @@ class ProjectsActivity : UserSyncedActivity() {
         listView.adapter = projectListAdapter
 
         popupMessages = arrayOf(getString(R.string.msg_change_project_settings), getString(R.string.msg_remove_project))
+        listView.itemAnimator = SlideInRightAnimator()
         listView.addItemDecoration(VerticalSpaceItemDecoration(resources.getDimensionPixelOffset(R.dimen.list_element_vertical_space)));
     }
 
@@ -77,13 +79,18 @@ class ProjectsActivity : UserSyncedActivity() {
     override fun onDestroy() {
         super.onDestroy()
         //dettach events
-        user.projectAdded -= onProjectChangedHandler
-        user.projectRemoved -= onProjectChangedHandler
+        user.projectAdded -= onProjectAddedHandler
+        user.projectRemoved -= onProjectRemovedHandler
     }
 
-    private val onProjectChangedHandler = {
+    private val onProjectAddedHandler = {
         sender: Any, args: Pair<OTProject, Int>->
-        projectListAdapter.notifyDataSetChanged();
+        projectListAdapter.notifyItemInserted(args.second)
+    }
+
+    private val onProjectRemovedHandler = {
+        sender: Any, args: Pair<OTProject, Int>->
+        projectListAdapter.notifyItemRemoved(args.second)
     }
 
     private fun handleProjectClick(project: OTProject)
