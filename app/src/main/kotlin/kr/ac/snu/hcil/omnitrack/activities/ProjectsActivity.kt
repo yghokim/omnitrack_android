@@ -18,6 +18,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTProject
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
+import kr.ac.snu.hcil.omnitrack.ui.VerticalSpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 
 class ProjectsActivity : UserSyncedActivity() {
@@ -35,7 +36,6 @@ class ProjectsActivity : UserSyncedActivity() {
     override fun onStart(){
         super.onStart()
 
-        popupMessages = arrayOf(getString(R.string.msg_change_project_settings), getString(R.string.msg_remove_project))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,6 +64,9 @@ class ProjectsActivity : UserSyncedActivity() {
         projectListAdapter = ProjectListAdapter(user)
 
         listView.adapter = projectListAdapter
+
+        popupMessages = arrayOf(getString(R.string.msg_change_project_settings), getString(R.string.msg_remove_project))
+        listView.addItemDecoration(VerticalSpaceItemDecoration(resources.getDimensionPixelOffset(R.dimen.list_element_vertical_space)));
     }
 
     override fun onResume() {

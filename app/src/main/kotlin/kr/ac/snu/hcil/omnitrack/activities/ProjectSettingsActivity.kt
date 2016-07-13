@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.activities
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.widget.Toolbar
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTProject
 import kr.ac.snu.hcil.omnitrack.ui.components.ShortTextPropertyView
@@ -16,6 +17,8 @@ class ProjectSettingsActivity : UserSyncedActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_project_settings)
+        val toolbar = findViewById(R.id.toolbar) as Toolbar?
+        setSupportActionBar(toolbar)
 
         namePropertyView = findViewById(R.id.nameProperty) as ShortTextPropertyView
 

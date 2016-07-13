@@ -192,7 +192,11 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
             user.dbId = newRowId
         }
 
-        writableDatabase.delete(ProjectScheme.tableName, "${ProjectScheme._ID}=?", user.fetchRemovedProjectIds().map{ it.toString() }.toTypedArray())
+        val ids = user.fetchRemovedProjectIds().map{ "${ProjectScheme._ID}=${it.toString()}" }.toTypedArray()
+        if(ids.size > 0)
+        {
+            writableDatabase.delete(ProjectScheme.tableName, ids.joinToString(" OR "), null)
+        }
 
         for(child in user.projects.iterator().withIndex())
         {

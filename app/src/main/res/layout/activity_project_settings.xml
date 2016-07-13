@@ -1,25 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     tools:context="kr.ac.snu.hcil.omnitrack.activities.ProjectSettingsActivity">
 
-    <LinearLayout
+    <include layout="@layout/common_appbar_menu"/>
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
-        android:layout_above="@+id/bottom_buttons">
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:context="kr.ac.snu.hcil.omnitrack.activities.ProjectSettingsActivity">
 
-
-        <kr.ac.snu.hcil.omnitrack.ui.components.ShortTextPropertyView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/nameProperty" />
-    </LinearLayout>
+            android:layout_height="match_parent"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:layout_above="@+id/bottom_buttons">
 
-    <include layout="@layout/common_twobuttons_bottom"
-        android:id="@+id/bottom_buttons"
-        ></include>
-</RelativeLayout>
+
+            <kr.ac.snu.hcil.omnitrack.ui.components.ShortTextPropertyView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/nameProperty" />
+        </LinearLayout>
+
+        <include layout="@layout/common_twobuttons_bottom"
+            android:id="@+id/bottom_buttons"
+            ></include>
+    </RelativeLayout>
+</android.support.design.widget.CoordinatorLayout>
