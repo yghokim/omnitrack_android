@@ -2,7 +2,12 @@
 <resources>
     <color name="colorPrimary">#6c314a</color>
     <color name="colorPrimaryDark">#6c314a</color>
+    <color name="colorPrimaryLight">#8c4563</color>
     <color name="colorAccent">#ff8940</color>
+
+    <color name="buttonIconColorDark">#252525</color>
+
+    <color name="cardHeader">#efefef</color>
 
     <color name="titleTextColor">#666666</color>
     <color name="outerBackground">#eae7e3</color>

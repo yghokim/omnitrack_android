@@ -15,7 +15,7 @@ import jp.wasabeef.recyclerview.animators.SlideInRightAnimator
 import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.activities.HomeActivity
-import kr.ac.snu.hcil.omnitrack.activities.TrackerSettingsActivity
+import kr.ac.snu.hcil.omnitrack.activities.TrackerDetailActivity
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.ui.VerticalSpaceItemDecoration
@@ -61,7 +61,9 @@ class TrackerListFragment : Fragment() {
         fab!!.setOnClickListener { view ->
             //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show()
             //(application as OmniTrackApplication).syncUserToDb()
-            user.trackers.add(OTTracker("Hihi"))
+            //user.trackers.add(OTTracker("Hihi"))
+            val intent = Intent(context, TrackerDetailActivity::class.java)
+            startActivity(intent)
         }
 
         listView = rootView.findViewById(R.id.ui_tracker_list_view) as RecyclerView
@@ -88,6 +90,7 @@ class TrackerListFragment : Fragment() {
         sender: Any, args: Pair<OTTracker, Int>->
         println("tracker added - ${args.second}")
         trackerListAdapter.notifyItemInserted(args.second)
+        listView.scrollToPosition(args.second)
     }
 
     private val onTrackerRemovedHandler = {
@@ -108,7 +111,7 @@ class TrackerListFragment : Fragment() {
             dialog, which ->
             when(which) {
                 CHANGE_TRACKER_SETTINGS -> {
-                    val intent = Intent(context, TrackerSettingsActivity::class.java)
+                    val intent = Intent(context, TrackerDetailActivity::class.java)
                     intent.putExtra("trackerId", tracker.objectId)
                     startActivity(intent)
 

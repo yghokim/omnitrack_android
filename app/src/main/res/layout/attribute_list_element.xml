@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="@dimen/attribute_list_element_min_height"
+    android:background="@color/frontalBackground"
+    android:layout_margin="10dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/attribute_list_element_header_height"
+        android:paddingLeft="@dimen/attribute_list_element_horizontal_padding"
+        android:id="@+id/ui_attribute_card_header"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            style="@style/ListElementTitle"
+            android:text="Column Name"
+            android:id="@+id/ui_column_name"
+            android:layout_alignParentTop="false"
+            android:layout_alignParentEnd="false"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/ui_column_name"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="15dp"
+            style="@style/BadgeText"
+            android:text="Number"
+            android:id="@+id/ui_attribute_type"
+            android:textAllCaps="true"
+            android:layout_alignParentTop="false"
+            android:layout_alignParentEnd="false"
+            />
+
+
+
+        <ImageButton
+            android:layout_width="@dimen/attribute_list_element_header_height"
+            android:layout_height="match_parent"
+            android:id="@+id/ui_button_edit"
+            android:layout_alignParentEnd="true"
+            android:background="@drawable/transparent_button_background"
+            android:src="@drawable/ic_create_black_24dp"/>
+
+    </RelativeLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_alignBottom="@+id/ui_attribute_card_header"
+        android:background="#dadada">
+
+    </View>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="15dp"
+        android:layout_below="@+id/ui_attribute_card_header"
+        >
+
+    </RelativeLayout>
+</RelativeLayout>

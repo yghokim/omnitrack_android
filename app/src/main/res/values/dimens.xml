@@ -13,7 +13,18 @@
 
     <dimen name="project_list_color_bar_width">10dp</dimen>
     <dimen name="project_list_element_min_height">120dp</dimen>
+
+
+    <dimen name="attribute_list_element_min_height">120dp</dimen>
+    <dimen name="attribute_list_element_header_height">45dp</dimen>
+
+    <dimen name="attribute_list_element_horizontal_padding">10dp</dimen>
+
+
+
     <dimen name="appbar_padding_top">8dp</dimen>
+    <dimen name="app_bar_height">180dp</dimen>
+    <dimen name="text_margin">16dp</dimen>
 
 
 </resources>
