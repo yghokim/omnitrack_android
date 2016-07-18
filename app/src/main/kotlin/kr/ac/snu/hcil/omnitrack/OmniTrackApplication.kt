@@ -22,9 +22,6 @@ class OmniTrackApplication : Application() {
     lateinit var dbHelper : DatabaseHelper
         private set
 
-
-    private val removedProjectIds = ArrayList<Long>()
-
     val currentUser: OTUser
         get(){
             return _currentUser
@@ -33,21 +30,11 @@ class OmniTrackApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        //deleteDatabase("omnitrack.db")
-
         app = this
 
         dbHelper = DatabaseHelper(this)
 
         _currentUser = dbHelper.findUserById(1) ?: OTUser("Young-Ho Kim", "yhkim@hcil.snu.ac.kr")
-        _currentUser.projectRemoved += {
-            sender, args->
-                if(args.first.dbId != null)
-                {
-                    removedProjectIds.add(args.first.dbId as Long)
-                }
-        }
-
     }
 
     fun syncUserToDb(){

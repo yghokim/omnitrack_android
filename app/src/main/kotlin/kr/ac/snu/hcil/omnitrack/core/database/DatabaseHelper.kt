@@ -6,7 +6,7 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
-import kr.ac.snu.hcil.omnitrack.core.OTProject
+import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import java.util.*
 import kotlin.properties.Delegates
@@ -56,19 +56,20 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         }
     }
 
-    object ProjectScheme : TableWithNameScheme(){
+    object TrackerScheme : TableWithNameScheme(){
         override val tableName: String
-            get() = "omnitrack_projects"
+            get() = "omnitrack_trackers"
 
         val USER_ID = "user_id"
         val POSITION = "position"
+        val COLOR = "color"
 
 
-        override val columnNames = arrayOf(_ID, NAME, OBJECT_ID, USER_ID, POSITION)
+        override val columnNames = arrayOf(_ID, NAME, OBJECT_ID, USER_ID, POSITION, COLOR)
 
         override fun getCreationColumnContentString() : String
         {
-            return  super.getCreationColumnContentString() + ", ${USER_ID} INTEGER, ${POSITION} INTEGER"
+            return  super.getCreationColumnContentString() + ", ${USER_ID} INTEGER, ${COLOR} INTEGER, ${POSITION} INTEGER"
         }
     }
 
@@ -78,7 +79,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         Log.d("OMNITRACK", "Create Database Tables")
 
         db.execSQL(UserScheme.creationQueryString)
-        db.execSQL(ProjectScheme.creationQueryString)
+        db.execSQL(TrackerScheme.creationQueryString)
 
     }
 
@@ -98,15 +99,15 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
             val objectId = result.getString(result.getColumnIndex(UserScheme.OBJECT_ID));
             val name = result.getString(result.getColumnIndex(UserScheme.NAME));
             val email = result.getString(result.getColumnIndex(UserScheme.EMAIL));
-            val entity = OTUser(objectId, id, name, email, findProjectsOfUser(id))
+            val entity = OTUser(objectId, id, name, email, findTrackersOfUser(id))
             result.close()
             return entity
         }
     }
 
-    fun findProjectsOfUser(userId : Long) : List<OTProject>? {
+    fun findTrackersOfUser(userId : Long) : List<OTTracker>? {
 
-        val query : Cursor = readableDatabase.query(ProjectScheme.tableName, ProjectScheme.columnNames,  "${ProjectScheme.USER_ID}=?", arrayOf(userId.toString()), null, null, "${ProjectScheme.POSITION} ASC")
+        val query : Cursor = readableDatabase.query(TrackerScheme.tableName, TrackerScheme.columnNames,  "${TrackerScheme.USER_ID}=?", arrayOf(userId.toString()), null, null, "${TrackerScheme.POSITION} ASC")
         query.moveToFirst()
         if(query.count == 0)
         {
@@ -114,10 +115,10 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
             return null;
         }
         else{
-            val result = ArrayList<OTProject>()
+            val result = ArrayList<OTTracker>()
             while(query.moveToNext())
             {
-                result.add(extractProjectEntity(query))
+                result.add(extractTrackerEntity(query))
             }
 
             query.close()
@@ -125,13 +126,14 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         }
     }
 
-    fun extractProjectEntity(cursor: Cursor) : OTProject
+    fun extractTrackerEntity(cursor: Cursor) : OTTracker
     {
-        val id = cursor.getLong(cursor.getColumnIndex(ProjectScheme._ID))
-        val name = cursor.getString(cursor.getColumnIndex(ProjectScheme.NAME))
-        val objectId = cursor.getString(cursor.getColumnIndex(ProjectScheme.OBJECT_ID))
+        val id = cursor.getLong(cursor.getColumnIndex(TrackerScheme._ID))
+        val name = cursor.getString(cursor.getColumnIndex(TrackerScheme.NAME))
+        val objectId = cursor.getString(cursor.getColumnIndex(TrackerScheme.OBJECT_ID))
+        val color = cursor.getInt(cursor.getColumnIndex(TrackerScheme.COLOR))
 
-        return OTProject(objectId, id, name); //TODO: implement putting trackers
+        return OTTracker(objectId, id, name, color); //TODO: implement putting attributes
     }
 
     private fun queryById(id: Long, table: TableScheme) : Cursor
@@ -141,31 +143,31 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         return query
     }
 
-    fun save(project: OTProject, position: Int)
+    fun save(tracker: OTTracker, position: Int)
     {
         val values = ContentValues()
-        values.put(ProjectScheme.OBJECT_ID, project.objectId)
-        values.put(ProjectScheme.NAME, project.name)
-        values.put(ProjectScheme.POSITION, position)
-        values.put(ProjectScheme.USER_ID, project.owner?.dbId ?: null)
+        values.put(TrackerScheme.OBJECT_ID, tracker.objectId)
+        values.put(TrackerScheme.NAME, tracker.name)
+        values.put(TrackerScheme.POSITION, position)
+        values.put(TrackerScheme.USER_ID, tracker.owner?.dbId ?: null)
 
-        if(project.dbId != null) // update
+        if(tracker.dbId != null) // update
         {
-            val numAffected = writableDatabase.update(ProjectScheme.tableName, values, "${ProjectScheme._ID}=?", arrayOf(project.dbId.toString()))
+            val numAffected = writableDatabase.update(TrackerScheme.tableName, values, "${TrackerScheme._ID}=?", arrayOf(tracker.dbId.toString()))
             if(numAffected==1)
             {
 
             }
             else{ // something wrong
-                throw Exception("Something is wrong saving project in Db")
+                throw Exception("Something is wrong saving tracker in Db")
             }
 
         }else{ // create new
-            val newRowId = writableDatabase.insert(ProjectScheme.tableName, null, values)
-            project.dbId = newRowId
+            val newRowId = writableDatabase.insert(TrackerScheme.tableName, null, values)
+            tracker.dbId = newRowId
         }
 
-        //TODO store trackers
+        //TODO store attributes
     }
 
     fun save(user : OTUser)
@@ -192,13 +194,13 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
             user.dbId = newRowId
         }
 
-        val ids = user.fetchRemovedProjectIds().map{ "${ProjectScheme._ID}=${it.toString()}" }.toTypedArray()
+        val ids = user.fetchRemovedTrackerIds().map{ "${TrackerScheme._ID}=${it.toString()}" }.toTypedArray()
         if(ids.size > 0)
         {
-            writableDatabase.delete(ProjectScheme.tableName, ids.joinToString(" OR "), null)
+            writableDatabase.delete(TrackerScheme.tableName, ids.joinToString(" OR "), null)
         }
 
-        for(child in user.projects.iterator().withIndex())
+        for(child in user.trackers.iterator().withIndex())
         {
             save(child.value, child.index)
         }

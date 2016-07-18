@@ -10,27 +10,26 @@ import kotlin.properties.Delegates
 /**
  * Created by Young-Ho Kim on 2016-07-11.
  */
-class OTUser(objectId: String?, dbId: Long?, name: String, email: String, _projects: List<OTProject>?) : UniqueObject(objectId, dbId, name) {
+class OTUser(objectId: String?, dbId: Long?, name: String, email: String, _trackers: List<OTTracker>?) : UniqueObject(objectId, dbId, name) {
 
     val email: String by Delegates.observable(email){
         prop, old, new->
 
     }
 
-    val projectAdded = Event<Pair<OTProject, Int>>()
-    val projectRemoved = Event<Pair<OTProject, Int>>()
+    val trackers = ObservableList<OTTracker>()
 
-    val projects = ObservableList<OTProject>()
-
-    private val _removedProjectIds = ArrayList<Long>()
-    fun fetchRemovedProjectIds() : Array<Long>
+    private val _removedTrackerIds = ArrayList<Long>()
+    fun fetchRemovedTrackerIds() : Array<Long>
     {
-        val result = _removedProjectIds.toTypedArray()
-        _removedProjectIds.clear()
+        val result = _removedTrackerIds.toTypedArray()
+        _removedTrackerIds.clear()
         return result;
     }
 
-
+    val trackerAdded = Event<Pair<OTTracker, Int>>()
+    val trackerRemoved = Event<Pair<OTTracker, Int>>()
+    val trackerIndexChanged = Event<Pair<OTTracker, Int>>()
 
     constructor(name: String, email: String) : this(null, null, name, email, null){
 
@@ -38,40 +37,40 @@ class OTUser(objectId: String?, dbId: Long?, name: String, email: String, _proje
 
     init{
 
-        if(_projects != null) {
-            for (project: OTProject in _projects) {
-                projects.unObservedList.add(project)
+        if(_trackers != null) {
+            for (tracker: OTTracker in _trackers) {
+                trackers.unObservedList.add(tracker)
 
-                project.addedToUser.suspend = true
-                project.owner = this
-                project.addedToUser.suspend = false
+                tracker.addedToUser.suspend = true
+                tracker.owner = this
+                tracker.addedToUser.suspend = false
 
             }
         }
 
-        projects.elementAdded += {sender, args->
-            onProjectAdded(args.first, args.second)
+        trackers.elementAdded += {sender, args->
+            onTrackerAdded(args.first, args.second)
         }
 
-        projects.elementRemoved += { sender, args->
-            onProjectRemoved(args.first, args.second)
+        trackers.elementRemoved += { sender, args->
+            onTrackerRemoved(args.first, args.second)
         }
     }
 
-    private fun onProjectAdded(new: OTProject, index: Int)
+    private fun onTrackerAdded(new: OTTracker, index: Int)
     {
         new.owner = this
 
-        projectAdded.invoke(this, Pair(new, index))
+        trackerAdded.invoke(this, Pair(new, index))
     }
 
-    private fun onProjectRemoved(prj: OTProject, index: Int)
+    private fun onTrackerRemoved(tracker: OTTracker, index: Int)
     {
-        prj.owner = null
+        tracker.owner = null
 
-        if(prj.dbId!= null)
-            _removedProjectIds.add(prj.dbId as Long)
+        if(tracker.dbId!= null)
+            _removedTrackerIds.add(tracker.dbId as Long)
 
-        projectRemoved.invoke(this, Pair(prj, index))
+        trackerRemoved.invoke(this, Pair(tracker, index))
     }
 }

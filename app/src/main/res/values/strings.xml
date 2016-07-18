@@ -16,17 +16,25 @@
     <string name="title_activity_projects">My Projects</string>
     <string name="title_activity_project_settings">Project Settings</string>
 
-    <string name="msg_change_project_name">Change project name</string>
-    <string name="msg_change_project_settings">Change project settings</string>
-    <string name="msg_remove_project">Remove project</string>
+    <string name="msg_change_tracker_name">Change tracker name</string>
+    <string name="msg_change_tracker_settings">Change tracker settings</string>
+    <string name="msg_remove_tracker">Remove tracker</string>
     <string name="msg_yes">Yes</string>
     <string name="msg_no">No</string>
-    <string name="msg_confirm_remove_project">Remove this project?</string>
+    <string name="msg_confirm_remove_tracker">Remove this tracker?</string>
     <string name="msg_confirm_apply_settings">Apply settings?</string>
 
 
     <string name="msg_ok">Okay</string>
     <string name="msg_cancel">Cancel</string>
+
+    <string name="msg_tab_trackers">Trackers</string>
+    <string name="msg_tab_services">Services</string>
+    <string name="msg_tab_settings">Settings</string>
+
+    <string name="title_activity_home">HomeActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
 
 
 </resources>

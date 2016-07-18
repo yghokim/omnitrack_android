@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay"
+            android:contentInsetLeft="0dp"
+            android:contentInsetStart="0dp"
+            app:contentInsetLeft="0dp"
+            app:contentInsetStart="0dp"
+            android:contentInsetRight="0dp"
+            android:contentInsetEnd="0dp"
+            app:contentInsetRight="0dp"
+            app:contentInsetEnd="0dp">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/action_bar_button_back"
+                    android:src="@drawable/cancel"
+                    android:background="@drawable/transparent_button_background"
+                    android:minWidth="?attr/actionBarSize"
+                    android:layout_alignParentStart="true"/>
+
+                <TextView
+                    android:id="@+id/action_bar_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@+id/action_bar_button_back"
+                    android:text="Title"
+                    style="@style/TextAppearance.Widget.AppCompat.Toolbar.Title"
+                    android:textColor="#ffffff"
+                    android:layout_marginLeft="8dp" />
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/action_bar_button_done"
+                    android:src="@drawable/done"
+                    android:background="@drawable/transparent_button_background"
+                    android:minWidth="?attr/actionBarSize"
+                    android:layout_alignParentEnd="true"/>
+            </RelativeLayout>
+        </android.support.v7.widget.Toolbar>
+</merge>

@@ -1,3 +1,4 @@
+/*
 package kr.ac.snu.hcil.omnitrack.activities
 
 import android.content.Context
@@ -16,12 +17,12 @@ import android.widget.*
 import jp.wasabeef.recyclerview.animators.SlideInRightAnimator
 
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.OTProject
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.ui.VerticalSpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 
+@Deprecated("no longer used")
 class ProjectsActivity : UserSyncedActivity() {
 
     lateinit private var listView : RecyclerView
@@ -160,3 +161,4 @@ class ProjectsActivity : UserSyncedActivity() {
     }
 
 }
+*/
