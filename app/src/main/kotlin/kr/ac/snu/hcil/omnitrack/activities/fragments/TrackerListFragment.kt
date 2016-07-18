@@ -42,6 +42,10 @@ class TrackerListFragment : Fragment() {
         super.onCreate(savedInstanceState)
 
         user = OmniTrackApplication.app.currentUser
+
+        //attach events
+        user.trackerAdded += onTrackerAddedHandler
+        user.trackerRemoved += onTrackerRemovedHandler
     }
 
     override fun onResume() {
@@ -59,10 +63,6 @@ class TrackerListFragment : Fragment() {
             //(application as OmniTrackApplication).syncUserToDb()
             user.trackers.add(OTTracker("Hihi"))
         }
-
-        //attach events
-        user.trackerAdded += onTrackerAddedHandler
-        user.trackerRemoved += onTrackerRemovedHandler
 
         listView = rootView.findViewById(R.id.ui_tracker_list_view) as RecyclerView
         val layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
@@ -86,11 +86,13 @@ class TrackerListFragment : Fragment() {
 
     private val onTrackerAddedHandler = {
         sender: Any, args: Pair<OTTracker, Int>->
+        println("tracker added - ${args.second}")
         trackerListAdapter.notifyItemInserted(args.second)
     }
 
     private val onTrackerRemovedHandler = {
         sender: Any, args: Pair<OTTracker, Int>->
+        println("tracker removed - ${args.second}")
         trackerListAdapter.notifyItemRemoved(args.second)
     }
 

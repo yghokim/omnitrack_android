@@ -11,7 +11,7 @@ import kotlin.properties.Delegates
  * Created by Young-Ho on 7/11/2016.
  */
 class OTTracker(objectId:String?, dbId: Long?, name: String, color: Int=Color.WHITE) : UniqueObject(objectId, dbId, name) {
-    private var attributes = ObservableList<OTAttribute>()
+    private val attributes = ObservableList<OTAttribute>()
 
     var owner: OTUser? by Delegates.observable(null as OTUser?){
         prop, old, new ->
@@ -23,7 +23,7 @@ class OTTracker(objectId:String?, dbId: Long?, name: String, color: Int=Color.WH
         }
     }
 
-    val color: Int = color
+    var color: Int = color
 
     val removedFromUser = Event<OTUser>()
     val addedToUser = Event<OTUser>()
