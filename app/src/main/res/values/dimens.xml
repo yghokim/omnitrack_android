@@ -10,6 +10,7 @@
     <dimen name="property_bottom_padding">15dp</dimen>
 
     <dimen name="list_element_vertical_space">7dp</dimen>
+    <dimen name="attribute_list_element_vertical_space">15dp</dimen>
 
     <dimen name="project_list_color_bar_width">10dp</dimen>
     <dimen name="project_list_element_min_height">120dp</dimen>

@@ -39,13 +39,13 @@ class TrackerDetailActivity : OkCancelActivity() {
 
         namePropertyView = findViewById(R.id.nameProperty) as ShortTextPropertyView
         namePropertyView.title = resources.getString(R.string.msg_name)
-
+        namePropertyView.addNewValidator("Name cannot be empty.", ShortTextPropertyView.NOT_EMPTY_VALIDATOR)
 
         listView = findViewById(R.id.ui_attribute_list) as RecyclerView
         val layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         listView.layoutManager = layoutManager
         listView.itemAnimator = SlideInRightAnimator()
-        //listView.addItemDecoration(VerticalSpaceItemDecoration(resources.getDimensionPixelOffset(R.dimen.list_element_vertical_space)));
+        listView.addItemDecoration(VerticalSpaceItemDecoration(resources.getDimensionPixelOffset(R.dimen.attribute_list_element_vertical_space)));
     }
 
 
@@ -65,6 +65,8 @@ class TrackerDetailActivity : OkCancelActivity() {
             //new mode
             isEditMode = false
             title = resources.getString(R.string.title_activity_tracker_new)
+
+            namePropertyView.focus()
         }
 
         attributeListAdapter = AttributeListAdapter()
@@ -85,9 +87,11 @@ class TrackerDetailActivity : OkCancelActivity() {
         }
         else{
             //add
-            val newTracker = OTTracker(namePropertyView.value)
-            OmniTrackApplication.app.currentUser.trackers.add(newTracker)
-            finish()
+            if(namePropertyView.validate()) {
+                val newTracker = OTTracker(namePropertyView.value)
+                OmniTrackApplication.app.currentUser.trackers.add(newTracker)
+                finish()
+            }
         }
     }
 

@@ -31,6 +31,21 @@ class ShortTextPropertyView(context: Context, attrs: AttributeSet) : APropertyVi
         valueView = findViewById(R.id.value) as TextView
     }
 
+    override fun focus() {
+        valueView.requestFocus()
+    }
 
+    override fun onValidated(result: Boolean)
+    {
+        if(result == false)
+        {
+            valueView.error = validationErrorMessageList.joinToString("\n")
+        }
+    }
+
+    fun setError(message: CharSequence)
+    {
+        valueView.error = message
+    }
 
 }

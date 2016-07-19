@@ -6,6 +6,10 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:background="@color/outerBackground"
+
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true"
+
     tools:context="kr.ac.snu.hcil.omnitrack.activities.TrackerDetailActivity">
 
     <android.support.design.widget.AppBarLayout

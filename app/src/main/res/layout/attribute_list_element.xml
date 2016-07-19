@@ -3,8 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:minHeight="@dimen/attribute_list_element_min_height"
-    android:background="@color/frontalBackground"
-    android:layout_margin="10dp">
+    android:background="@drawable/attribute_card_frame"
+    >
 
     <RelativeLayout
         android:layout_width="match_parent"

@@ -32,6 +32,10 @@
     <string name="msg_tab_services">Services</string>
     <string name="msg_tab_settings">Settings</string>
 
+    <string name="msg_basic_information">Basic Information</string>
+    <string name="msg_attributes">Attributes</string>
+
+
     <string name="msg_name">Name</string>
 
     <string name="title_activity_tracker_new">New Tracker</string>

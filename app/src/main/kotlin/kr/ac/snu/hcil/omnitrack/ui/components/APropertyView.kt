@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.widget.FrameLayout
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
+import java.util.*
 
 /**
  * Created by Young-Ho Kim on 2016-07-13.
@@ -14,7 +15,10 @@ abstract class APropertyView<T>(layoutId: Int, context: Context, attrs: Attribut
 
     protected lateinit var titleView: TextView
 
-    var validationFunc : ((T)->Boolean)? = null
+
+    private val validators : ArrayList<Pair<CharSequence?, (T)->Boolean>> = ArrayList<Pair<CharSequence?, (T)->Boolean>>()
+
+    protected val validationErrorMessageList = ArrayList<CharSequence>()
 
     var title : CharSequence
         get() = titleView.text
@@ -32,14 +36,35 @@ abstract class APropertyView<T>(layoutId: Int, context: Context, attrs: Attribut
 
     }
 
-    fun validation(func: (T)->Boolean){
-        validationFunc = func
+    fun addNewValidator(failedMessage: CharSequence?, func: (T)->Boolean){
+        validators.add(Pair<CharSequence?, (T)->Boolean>(failedMessage, func))
     }
 
     fun validate(): Boolean{
-        return validationFunc?.invoke(value) ?: true
+        validationErrorMessageList.clear()
+
+        var passed = true
+        for(entry in validators)
+        {
+            if(entry.second(value) == false)
+            {
+                passed = false
+                if( entry.first != null) {
+                    validationErrorMessageList.add(entry.first!!)
+                }
+            }
+        }
+
+        onValidated(passed)
+        return passed
+    }
+
+    open fun onValidated(result: Boolean)
+    {
+        ;
     }
 
     abstract var value : T
 
+    abstract fun focus(): Unit
 }
