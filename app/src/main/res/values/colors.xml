@@ -12,4 +12,15 @@
     <color name="titleTextColor">#666666</color>
     <color name="outerBackground">#eae7e3</color>
     <color name="frontalBackground">#ffffff</color>
+
+    <string-array name="colorPaletteArray">
+        <item>#f75555</item>
+        <item>#ffab19</item>
+        <item>#bbe84f</item>
+        <item>#42c595</item>
+        <item>#42c7ff</item>
+        <item>#5d88ec</item>
+        <item>#9f5cf2</item>
+        <item>#ff6ac5</item>
+    </string-array>
 </resources>
