@@ -16,12 +16,12 @@
     <string name="title_activity_projects">My Projects</string>
     <string name="title_activity_project_settings">Project Settings</string>
 
-    <string name="msg_change_tracker_name">Change tracker name</string>
-    <string name="msg_change_tracker_settings">Change tracker settings</string>
-    <string name="msg_remove_tracker">Remove tracker</string>
+    <string name="msg_change_tracker_name">Change attribute name</string>
+    <string name="msg_change_tracker_settings">Change attribute settings</string>
+    <string name="msg_remove_tracker">Remove attribute</string>
     <string name="msg_yes">Yes</string>
     <string name="msg_no">No</string>
-    <string name="msg_confirm_remove_tracker">Remove this tracker?</string>
+    <string name="msg_confirm_remove_tracker">Remove this attribute?</string>
     <string name="msg_confirm_apply_settings">Apply settings?</string>
 
 

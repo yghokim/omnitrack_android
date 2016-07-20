@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.activities
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
@@ -17,7 +18,9 @@ import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
 import kr.ac.snu.hcil.omnitrack.ui.SpaceItemDecoration
+import kr.ac.snu.hcil.omnitrack.ui.components.AttributeFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.properties.ColorPalettePropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.properties.ShortTextPropertyView
 
@@ -25,7 +28,7 @@ class TrackerDetailActivity : OkCancelActivity() {
 
     private var isEditMode = false
 
-    private var tracker: OTTracker? = null
+    private lateinit var tracker: OTTracker
 
     lateinit private var listView : RecyclerView
     lateinit private var attributeListAdapter : AttributeListAdapter
@@ -39,6 +42,15 @@ class TrackerDetailActivity : OkCancelActivity() {
         setContentView(R.layout.activity_tracker_detail)
         val toolbar = findViewById(R.id.toolbar) as Toolbar?
         setSupportActionBar(toolbar)
+
+        val fab = findViewById(R.id.fab) as FloatingActionButton?
+        fab!!.setOnClickListener { view ->
+            //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show()
+            //(application as OmniTrackApplication).syncUserToDb()
+            //user.trackers.add(OTTracker("Hihi"))
+            tracker.attributes.add(OTNumberAttribute("Step Count"))
+            attributeListAdapter.notifyItemInserted(tracker.attributes.size - 1)
+        }
 
         namePropertyView = findViewById(R.id.nameProperty) as ShortTextPropertyView
         namePropertyView.title = resources.getString(R.string.msg_name)
@@ -65,16 +77,18 @@ class TrackerDetailActivity : OkCancelActivity() {
             title = resources.getString(R.string.title_activity_tracker_edit)
             tracker = OmniTrackApplication.app.currentUser.trackers.filter{ it.objectId == intent.getStringExtra("trackerId") }.first()
 
-            namePropertyView.value = tracker!!.name
-            colorPropertyView.value = tracker!!.color
 
         } else {
             //new mode
             isEditMode = false
             title = resources.getString(R.string.title_activity_tracker_new)
 
-            namePropertyView.focus()
+            tracker = OTTracker("New Tracker")
         }
+
+
+        namePropertyView.value = tracker.name
+        colorPropertyView.value = tracker.color
 
         attributeListAdapter = AttributeListAdapter()
         listView.adapter = attributeListAdapter
@@ -86,61 +100,47 @@ class TrackerDetailActivity : OkCancelActivity() {
     }
 
     override fun onOk() {
-        if(isEditMode)
-        {
-            //modify
-            tracker?.name = namePropertyView.value
-            finish()
-        }
-        else{
             //add
             if(namePropertyView.validate()) {
-                val newTracker = OTTracker(namePropertyView.value)
-                newTracker.color = colorPropertyView.value
-                OmniTrackApplication.app.currentUser.trackers.add(newTracker)
+                //modify
+                tracker.name = namePropertyView.value
+
+                if (!isEditMode) OmniTrackApplication.app.currentUser.trackers.add(tracker)
                 finish()
             }
-        }
     }
 
 
     inner class AttributeListAdapter() : RecyclerView.Adapter<AttributeListAdapter.ViewHolder>(){
 
-        private val attributes = arrayOf("Sleep Time", "Date", "Logged at", "Step Count", "Coffee Cups")
-
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            var view = LayoutInflater.from(parent.context).inflate(R.layout.attribute_list_element, parent, false)
+            val view = LayoutInflater.from(parent.context).inflate(R.layout.attribute_list_element, parent, false) as AttributeFrameLayout
             return ViewHolder(view)
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             //holder.bindTracker(tracker.attributes[position])
-            holder.bindAttribute(attributes[position])
+            holder.bindAttribute(tracker.attributes[position])
         }
 
         override fun getItemCount(): Int {
-            return attributes.size
+            return tracker.attributes.size
         }
 
         override fun getItemId(position: Int): Long {
-            return position as Long;
+            return position.toLong()
         }
 
 
-        inner class ViewHolder(view : View) : RecyclerView.ViewHolder(view){
-
-            private lateinit var name: TextView
+        inner class ViewHolder(val view: AttributeFrameLayout) : RecyclerView.ViewHolder(view) {
 
             init{
-                name = view.findViewById(R.id.ui_column_name) as TextView
 
             }
 
-            fun bindAttribute(value: String){
-                name.text = value
-            }
-
-            fun bindAttribute(attribute: OTAttribute){
+            fun bindAttribute(attribute: OTAttribute<out Any>) {
+                view.typeNameView.text = attribute.typeName
+                view.columnNameView.text = attribute.name
             }
         }
     }

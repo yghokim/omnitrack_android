@@ -43,7 +43,7 @@ class SelectionView(context: Context, attrs: AttributeSet?, defStyle: Int) : Rec
 
     val onSelectedIndexChanged = Event<Int>()
 
-    fun setValues(newValues: Collection<String>) {
+    fun setValues(newValues: Array<String>) {
         values.clear()
         values.addAll(newValues)
         adapter.notifyDataSetChanged()

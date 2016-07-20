@@ -26,7 +26,7 @@ class SelectionPropertyView(context: Context, attrs: AttributeSet?) : APropertyV
         selectionView = findViewById(R.id.value) as SelectionView
     }
 
-    fun setValues(values: Collection<String>) {
+    fun setValues(values: Array<String>) {
         selectionView.setValues(values)
     }
 
