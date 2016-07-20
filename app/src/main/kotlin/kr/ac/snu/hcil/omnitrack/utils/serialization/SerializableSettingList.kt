@@ -36,9 +36,12 @@ class SerializableGenericList(data: String?) {
         values.push(Entry(key, value.javaClass.simpleName, value.toString()))
     }
 
+<<<<<<< HEAD
     val size: Int
         get() = values.size
 
+=======
+>>>>>>> origin/master
     //Key/Value
     fun get(): Pair<Int, Any> {
         val entry = values.pop()
