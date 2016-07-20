@@ -5,6 +5,7 @@ import com.google.gson.Gson
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTProperty
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
+import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableGenericList
 import java.util.*
 import kotlin.properties.Delegates
 
@@ -46,14 +47,25 @@ open abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, column
     init {
         createProperties()
         if (settingData != null) {
-            //TODO assign values
+
+            val s = SerializableGenericList(settingData)
+            while (s.size > 0) {
+                val last = s.get()
+                setPropertyValue(last.first, last.second)
+            }
         }
     }
 
     protected abstract fun createProperties()
 
     fun getSerializedProperties(): String {
-        return ""
+        val s = SerializableGenericList(null)
+
+        for (key in keys) {
+            s.addValue(key, getPropertyValue(key))
+        }
+
+        return s.getSerializedString()
     }
 
     var owner: OTTracker? by Delegates.observable(null as OTTracker?) {

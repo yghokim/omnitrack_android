@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.attributes.properties
 import android.content.Context
 import kr.ac.snu.hcil.omnitrack.ui.components.properties.APropertyView
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
+import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableGenericList
 import kotlin.properties.Delegates
 
 /**
@@ -21,5 +22,4 @@ abstract class OTProperty<T>(initialValue: T, val key: Int, val title: String) {
     }
 
     abstract fun buildView(context: Context): APropertyView<T>
-
 }

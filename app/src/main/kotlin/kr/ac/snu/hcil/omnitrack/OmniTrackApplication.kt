@@ -29,7 +29,6 @@ class OmniTrackApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-
         app = this
 
         dbHelper = DatabaseHelper(this)
