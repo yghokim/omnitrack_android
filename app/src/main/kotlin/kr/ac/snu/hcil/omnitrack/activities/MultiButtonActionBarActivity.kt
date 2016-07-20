@@ -18,7 +18,7 @@ abstract class MultiButtonActionBarActivity(val layoutId: Int) : AppCompatActivi
 
     protected var leftActionBarButton: ImageButton?=null
     protected var rightActionBarButton: ImageButton?=null
-
+    protected var titleView: TextView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,7 +44,13 @@ abstract class MultiButtonActionBarActivity(val layoutId: Int) : AppCompatActivi
             onRightButtonClicked()
         }
 
-        val titleView = findViewById(R.id.action_bar_title) as TextView?
+        titleView = findViewById(R.id.action_bar_title) as TextView?
+        titleView?.setText(title)
+
+    }
+
+    override fun onTitleChanged(title: CharSequence?, color: Int) {
+        super.onTitleChanged(title, color)
         titleView?.setText(title)
     }
 
