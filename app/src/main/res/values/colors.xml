@@ -13,6 +13,10 @@
     <color name="outerBackground">#eae7e3</color>
     <color name="frontalBackground">#ffffff</color>
 
+
+    <color name="selection_view_button_selected_text_color">#ffffff</color>
+    <color name="selection_view_button_unselected_text_color">@color/buttonIconColorDark</color>
+
     <string-array name="colorPaletteArray">
         <item>#f75555</item>
         <item>#ffab19</item>

@@ -27,5 +27,14 @@
     <dimen name="app_bar_height">180dp</dimen>
     <dimen name="text_margin">16dp</dimen>
 
+    <dimen name="selection_view_button_padding_left">17dp</dimen>
+    <dimen name="selection_view_button_padding_right">17dp</dimen>
+    <dimen name="selection_view_button_padding_top">10dp</dimen>
+    <dimen name="selection_view_button_padding_bottom">10dp</dimen>
+    <dimen name="selection_view_button_text_size">16dp</dimen>
+
+
+    <dimen name="selection_view_button_spacing">2dp</dimen>
+
 
 </resources>

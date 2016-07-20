@@ -18,7 +18,7 @@ import kr.ac.snu.hcil.omnitrack.activities.HomeActivity
 import kr.ac.snu.hcil.omnitrack.activities.TrackerDetailActivity
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
-import kr.ac.snu.hcil.omnitrack.ui.VerticalSpaceItemDecoration
+import kr.ac.snu.hcil.omnitrack.ui.SpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 
 /**
@@ -75,7 +75,7 @@ class TrackerListFragment : Fragment() {
 
         popupMessages = arrayOf(getString(R.string.msg_change_tracker_settings), getString(R.string.msg_remove_tracker))
         listView.itemAnimator = SlideInRightAnimator()
-        listView.addItemDecoration(VerticalSpaceItemDecoration(resources.getDimensionPixelOffset(R.dimen.list_element_vertical_space)));
+        listView.addItemDecoration(SpaceItemDecoration(LinearLayoutManager.VERTICAL, resources.getDimensionPixelOffset(R.dimen.list_element_vertical_space)));
         return rootView
     }
 

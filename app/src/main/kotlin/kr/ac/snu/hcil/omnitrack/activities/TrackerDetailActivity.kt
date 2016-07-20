@@ -17,7 +17,7 @@ import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
-import kr.ac.snu.hcil.omnitrack.ui.VerticalSpaceItemDecoration
+import kr.ac.snu.hcil.omnitrack.ui.SpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.properties.ColorPalettePropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.properties.ShortTextPropertyView
 
@@ -51,7 +51,7 @@ class TrackerDetailActivity : OkCancelActivity() {
         val layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         listView.layoutManager = layoutManager
         listView.itemAnimator = SlideInRightAnimator()
-        listView.addItemDecoration(VerticalSpaceItemDecoration(resources.getDimensionPixelOffset(R.dimen.attribute_list_element_vertical_space)));
+        listView.addItemDecoration(SpaceItemDecoration(LinearLayoutManager.VERTICAL, resources.getDimensionPixelOffset(R.dimen.attribute_list_element_vertical_space)));
     }
 
 

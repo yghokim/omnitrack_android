@@ -63,5 +63,4 @@
         <item name="android:layout_width">@dimen/color_selection_button_size</item>
         <item name="android:layout_height">@dimen/color_selection_button_size</item>
     </style>
-
 </resources>

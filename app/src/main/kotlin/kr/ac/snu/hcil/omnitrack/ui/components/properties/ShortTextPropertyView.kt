@@ -12,7 +12,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.properties.APropertyView
 /**
  * Created by Young-Ho Kim on 2016-07-13.
  */
-class ShortTextPropertyView(context: Context, attrs: AttributeSet) : APropertyView<String>(R.layout.component_property_shorttext, context, attrs) {
+class ShortTextPropertyView(context: Context, attrs: AttributeSet?) : APropertyView<String>(R.layout.component_property_shorttext, context, attrs) {
 
     companion object{
          val NOT_EMPTY_VALIDATOR : ((String)->Boolean) = { it != "" }

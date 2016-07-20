@@ -28,7 +28,7 @@ open abstract class OTAttribute() {
 */
     abstract val layoutId: Int
 
-    abstract val settingsProperties : Array<OTSettingProperty<Any>>
+    abstract val settingsProperties: Array<OTProperty<Any>>
 
     val propertyChanged = Event<PropertyChangedEventArgs>()
 
