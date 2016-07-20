@@ -18,7 +18,8 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.ui.VerticalSpaceItemDecoration
-import kr.ac.snu.hcil.omnitrack.ui.components.ShortTextPropertyView
+import kr.ac.snu.hcil.omnitrack.ui.components.properties.ColorPalettePropertyView
+import kr.ac.snu.hcil.omnitrack.ui.components.properties.ShortTextPropertyView
 
 class TrackerDetailActivity : OkCancelActivity() {
 
@@ -30,6 +31,8 @@ class TrackerDetailActivity : OkCancelActivity() {
     lateinit private var attributeListAdapter : AttributeListAdapter
 
     private lateinit var namePropertyView : ShortTextPropertyView
+    private lateinit var colorPropertyView: ColorPalettePropertyView
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +43,9 @@ class TrackerDetailActivity : OkCancelActivity() {
         namePropertyView = findViewById(R.id.nameProperty) as ShortTextPropertyView
         namePropertyView.title = resources.getString(R.string.msg_name)
         namePropertyView.addNewValidator("Name cannot be empty.", ShortTextPropertyView.NOT_EMPTY_VALIDATOR)
+
+        colorPropertyView = findViewById(R.id.colorProperty) as ColorPalettePropertyView
+        colorPropertyView.title = resources.getString(R.string.msg_color)
 
         listView = findViewById(R.id.ui_attribute_list) as RecyclerView
         val layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
@@ -60,6 +66,7 @@ class TrackerDetailActivity : OkCancelActivity() {
             tracker = OmniTrackApplication.app.currentUser.trackers.filter{ it.objectId == intent.getStringExtra("trackerId") }.first()
 
             namePropertyView.value = tracker!!.name
+            colorPropertyView.value = tracker!!.color
 
         } else {
             //new mode
@@ -89,6 +96,7 @@ class TrackerDetailActivity : OkCancelActivity() {
             //add
             if(namePropertyView.validate()) {
                 val newTracker = OTTracker(namePropertyView.value)
+                newTracker.color = colorPropertyView.value
                 OmniTrackApplication.app.currentUser.trackers.add(newTracker)
                 finish()
             }

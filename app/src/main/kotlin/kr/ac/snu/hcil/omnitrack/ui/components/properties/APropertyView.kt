@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.components
+package kr.ac.snu.hcil.omnitrack.ui.components.properties
 
 import android.content.Context
 import android.util.AttributeSet
@@ -16,7 +16,7 @@ abstract class APropertyView<T>(layoutId: Int, context: Context, attrs: Attribut
     protected lateinit var titleView: TextView
 
 
-    private val validators : ArrayList<Pair<CharSequence?, (T)->Boolean>> = ArrayList<Pair<CharSequence?, (T)->Boolean>>()
+    private val validators: ArrayList<Pair<CharSequence?, (T) -> Boolean>> = ArrayList<Pair<CharSequence?, (T) -> Boolean>>()
 
     protected val validationErrorMessageList = ArrayList<CharSequence>()
 

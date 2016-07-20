@@ -44,8 +44,24 @@ class ColorPaletteView(context: Context, attrs: AttributeSet?, defStyle: Int) : 
         addItemDecoration(OffsetDecoration())
     }
 
-    fun getSelectedColor(): Int {
-        return colors[selectedIndex]
+    var selectedColor: Int
+        get() {
+            return colors[selectedIndex]
+        }
+        set(value) {
+            val index = findColorIndex(value)
+            if (index >= 0) {
+                if (index != selectedIndex) {
+                    val oldSelected = selectedIndex
+                    selectedIndex = index
+                    adapter.notifyItemChanged(selectedIndex)
+                    adapter.notifyItemChanged(oldSelected)
+                }
+            }
+        }
+
+    fun findColorIndex(color: Int): Int {
+        return colors.indexOf(color)
     }
 
     inner class Adapter() : RecyclerView.Adapter<Adapter.ViewHolder>(){

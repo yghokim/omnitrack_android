@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.components
+package kr.ac.snu.hcil.omnitrack.ui.components.properties
 
 import android.content.Context
 import android.util.AttributeSet
@@ -7,6 +7,7 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.ui.components.properties.APropertyView
 
 /**
  * Created by Young-Ho Kim on 2016-07-13.
@@ -41,11 +42,6 @@ class ShortTextPropertyView(context: Context, attrs: AttributeSet) : APropertyVi
         {
             valueView.error = validationErrorMessageList.joinToString("\n")
         }
-    }
-
-    fun setError(message: CharSequence)
-    {
-        valueView.error = message
     }
 
 }

@@ -7,8 +7,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="kr.ac.snu.hcil.omnitrack.activities.TrackerDetailActivity"
-    tools:showIn="@layout/activity_tracker_detail"
-    >
+    tools:showIn="@layout/activity_tracker_detail">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -17,40 +16,41 @@
 
         <TextView
             style="@style/SubTitle"
-            android:text="@string/msg_basic_information"
             android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:text="@string/msg_basic_information" />
+
+        <kr.ac.snu.hcil.omnitrack.ui.components.properties.ShortTextPropertyView
+            android:id="@+id/nameProperty"
+            style="@style/propertyElementStyle"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
 
             android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin"
-            />
+            android:paddingRight="@dimen/activity_horizontal_margin" />
 
-            <kr.ac.snu.hcil.omnitrack.ui.components.ShortTextPropertyView
-                android:id="@+id/nameProperty"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"/>
-
-        <kr.ac.snu.hcil.omnitrack.ui.components.ColorPaletteView
+        <kr.ac.snu.hcil.omnitrack.ui.components.properties.ColorPalettePropertyView
+            android:id="@+id/colorProperty"
+            style="@style/propertyElementStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/view"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:layout_marginRight="@dimen/activity_horizontal_margin" />
 
-        <View style="@style/HorizontalSeparator"/>
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin" />
+
+        <View style="@style/HorizontalSeparator" />
 
         <TextView
             style="@style/SubTitle"
-            android:text="@string/msg_attributes"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
             android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin"/>
+
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:text="@string/msg_attributes" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/ui_attribute_list"
