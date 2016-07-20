@@ -168,7 +168,6 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         val name = cursor.getString(cursor.getColumnIndex(TrackerScheme.NAME))
         val objectId = cursor.getString(cursor.getColumnIndex(TrackerScheme.OBJECT_ID))
         val color = cursor.getInt(cursor.getColumnIndex(TrackerScheme.COLOR))
-        println("Tracker color: ${color}")
 
         return OTTracker(objectId, id, name, color, findAttributesOfTracker(id))
     }
@@ -179,6 +178,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         val objectId = cursor.getString(cursor.getColumnIndex(AttributeScheme.OBJECT_ID))
         val type = cursor.getString(cursor.getColumnIndex(AttributeScheme.TYPE))
         val settingData = cursor.getString(cursor.getColumnIndex(AttributeScheme.SETTING_DATA))
+        println("settingData - ${settingData}")
 
         return OTAttribute.CreateAttribute(objectId, id, name, type, settingData)
     }
@@ -244,6 +244,8 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         val ids = tracker.fetchRemovedTrackerIds().map { "${AttributeScheme._ID}=${it.toString()}" }.toTypedArray()
         if (ids.size > 0) {
             writableDatabase.delete(AttributeScheme.tableName, ids.joinToString(" OR "), null)
+
+
         }
 
         for (child in tracker.attributes.iterator().withIndex()) {

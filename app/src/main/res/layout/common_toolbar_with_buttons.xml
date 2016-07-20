@@ -22,7 +22,7 @@
                 <ImageButton
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:id="@+id/action_bar_button_back"
+                    android:id="@+id/action_bar_button_left"
                     android:src="@drawable/cancel"
                     android:background="@drawable/transparent_button_background"
                     android:minWidth="?attr/actionBarSize"
@@ -33,7 +33,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:layout_toRightOf="@+id/action_bar_button_back"
+                    android:layout_toRightOf="@+id/action_bar_button_left"
                     android:text="Title"
                     style="@style/TextAppearance.Widget.AppCompat.Toolbar.Title"
                     android:textColor="#ffffff"
@@ -42,7 +42,7 @@
                 <ImageButton
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:id="@+id/action_bar_button_done"
+                    android:id="@+id/action_bar_button_right"
                     android:src="@drawable/done"
                     android:background="@drawable/transparent_button_background"
                     android:minWidth="?attr/actionBarSize"
