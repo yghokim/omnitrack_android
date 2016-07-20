@@ -10,11 +10,11 @@ import kotlin.properties.Delegates
  * Created by Young-Ho Kim on 2016-07-11.
  */
 
-class OTNumberAttribute(objectId: String?, dbId: Long?, columnName: String, settingData: String?) : OTAttribute<Float>(objectId, dbId, columnName, "Number", settingData) {
+class OTNumberAttribute(objectId: String?, dbId: Long?, columnName: String, settingData: String?) : OTAttribute<Float>(objectId, dbId, columnName, OTAttribute.TYPE_NUMBER, settingData) {
 
 
     override val keys: Array<Int>
-        get() = arrayOf(UNIT, DECIMAL_POINTS)
+        get() = arrayOf(DECIMAL_POINTS)
 
     constructor(columnName: String) : this(null, null, columnName, null)
 
