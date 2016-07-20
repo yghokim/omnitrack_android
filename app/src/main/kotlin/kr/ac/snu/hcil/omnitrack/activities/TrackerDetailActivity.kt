@@ -104,6 +104,7 @@ class TrackerDetailActivity : OkCancelActivity() {
             if(namePropertyView.validate()) {
                 //modify
                 tracker.name = namePropertyView.value
+                tracker.color = colorPropertyView.value
 
                 if (!isEditMode) OmniTrackApplication.app.currentUser.trackers.add(tracker)
                 finish()

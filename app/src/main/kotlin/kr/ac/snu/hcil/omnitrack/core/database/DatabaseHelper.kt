@@ -168,6 +168,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         val name = cursor.getString(cursor.getColumnIndex(TrackerScheme.NAME))
         val objectId = cursor.getString(cursor.getColumnIndex(TrackerScheme.OBJECT_ID))
         val color = cursor.getInt(cursor.getColumnIndex(TrackerScheme.COLOR))
+        println("Tracker color: ${color}")
 
         return OTTracker(objectId, id, name, color, findAttributesOfTracker(id))
     }
@@ -220,6 +221,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         values.put(TrackerScheme.OBJECT_ID, tracker.objectId)
         values.put(TrackerScheme.NAME, tracker.name)
         values.put(TrackerScheme.POSITION, position)
+        values.put(TrackerScheme.COLOR, tracker.color)
         values.put(TrackerScheme.USER_ID, tracker.owner?.dbId ?: null)
 
         if(tracker.dbId != null) // update
