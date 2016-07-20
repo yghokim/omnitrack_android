@@ -49,11 +49,7 @@ open abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, column
         if (settingData != null) {
 
             val s = SerializableGenericList(settingData)
-<<<<<<< HEAD
             while (s.size > 0) {
-=======
-            for (key in keys) {
->>>>>>> origin/master
                 val last = s.get()
                 setPropertyValue(last.first, last.second)
             }
