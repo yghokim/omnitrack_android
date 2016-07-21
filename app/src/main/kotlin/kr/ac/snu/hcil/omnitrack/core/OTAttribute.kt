@@ -17,7 +17,7 @@ open abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, column
     companion object {
 
         const val TYPE_NUMBER = "Number"
-        const val TYPE_TIME = "Time"
+        const val TYPE_TIME = "TimePoint"
         const val TYPE_TIMESPAN = "Timespan"
         const val TYPE_LOCATION = "Location"
 
@@ -39,7 +39,7 @@ open abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, column
 
     abstract val keys: Array<Int>
 
-    val onPropertyChanged = Event<OTProperty.PropertyChangedEventArgs<out Any>>()
+    val propertyValueChanged = Event<OTProperty.PropertyChangedEventArgs<out Any>>()
     private val settingsProperties = SparseArray<OTProperty<out Any>>()
 
     constructor(columnName: String, typeName: String) : this(null, null, columnName, typeName, null)
@@ -81,10 +81,14 @@ open abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, column
     protected fun assignProperty(property: OTProperty<out Any>) {
         property.onValueChanged += {
             sender, args ->
-            onPropertyChanged.invoke(this, args)
+            onPropertyValueChanged(args)
         }
 
         settingsProperties.put(property.key, property)
+    }
+
+    protected open fun onPropertyValueChanged(args: OTProperty.PropertyChangedEventArgs<out Any>) {
+        propertyValueChanged.invoke(this, args)
     }
 
     protected fun <T> getProperty(key: Int): OTProperty<T> {
@@ -98,6 +102,10 @@ open abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, column
     protected fun setPropertyValue(key: Int, value: Any) {
         getProperty<Any>(key).value = value
     }
+
+    abstract fun parseAttributeValue(storedValue: String): DataType
+
+    abstract fun formatAttributeValue(value: DataType): String
 
 
 }

@@ -12,7 +12,6 @@ import kotlin.properties.Delegates
 
 class OTNumberAttribute(objectId: String?, dbId: Long?, columnName: String, settingData: String?) : OTAttribute<Float>(objectId, dbId, columnName, OTAttribute.TYPE_NUMBER, settingData) {
 
-
     override val keys: Array<Int>
         get() = arrayOf(DECIMAL_POINTS)
 
@@ -34,5 +33,22 @@ class OTNumberAttribute(objectId: String?, dbId: Long?, columnName: String, sett
     var unit: String
         get() = getPropertyValue<String>(UNIT)
         set(value) = setPropertyValue(UNIT, value)
+
+
+    override fun parseAttributeValue(storedValue: String): Float {
+        return storedValue.toFloat()
+    }
+
+    override fun formatAttributeValue(value: Float): String {
+
+        val power = Math.pow(10.0, numDigitsUnderDecimalPoint.toDouble())
+        val numberStr = (Math.floor(power * value) / power).toString()
+
+        return if (unit.isNullOrBlank()) {
+            numberStr
+        } else {
+            "${numberStr} ${unit}"
+        }
+    }
 
 }
