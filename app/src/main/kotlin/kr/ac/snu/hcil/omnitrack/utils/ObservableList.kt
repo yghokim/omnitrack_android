@@ -27,8 +27,30 @@ class ObservableList<T>(){
         }
     }
 
+    fun addAt(element: T, position: Int): Boolean {
+        try {
+            list.add(position, element)
+            elementAdded.invoke(this, Pair(element, position))
+            return true
+        } catch(e: Exception) {
+            return false
+        }
+    }
+
     operator fun get(index: Int): T {
         return list[index]
+    }
+
+    fun moveItem(fromPosition: Int, toPosition: Int) {
+        if (fromPosition < toPosition) {
+            for (i in fromPosition..toPosition - 1) {
+                Collections.swap(list, i, i + 1)
+            }
+        } else {
+            for (i in fromPosition downTo toPosition + 1) {
+                Collections.swap(list, i, i - 1)
+            }
+        }
     }
 
     fun indexOf(element: T): Int {

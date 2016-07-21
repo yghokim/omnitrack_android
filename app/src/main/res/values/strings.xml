@@ -37,6 +37,9 @@
     <string name="msg_basic_information">Basic Information</string>
     <string name="msg_attributes">Attributes</string>
 
+    <string name="msg_attribute_removed_message">Attribute was removed</string>
+
+    <string name="msg_undo">Undo</string>
 
     <string name="msg_color">Color</string>
 
