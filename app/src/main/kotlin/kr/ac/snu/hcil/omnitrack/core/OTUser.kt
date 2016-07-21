@@ -60,6 +60,7 @@ class OTUser(objectId: String?, dbId: Long?, name: String, email: String, _track
     private fun onTrackerAdded(new: OTTracker, index: Int)
     {
         new.owner = this
+        _removedTrackerIds.remove(new.dbId)
 
         trackerAdded.invoke(this, Pair(new, index))
     }

@@ -16,6 +16,10 @@ import kr.ac.snu.hcil.omnitrack.R
  */
 abstract class MultiButtonActionBarActivity(val layoutId: Int) : AppCompatActivity()  {
 
+    enum class Mode {
+        OKCancel, Back, BackAndMenu, None
+    }
+
     protected var leftActionBarButton: ImageButton?=null
     protected var rightActionBarButton: ImageButton?=null
     protected var titleView: TextView? = null
@@ -61,4 +65,24 @@ abstract class MultiButtonActionBarActivity(val layoutId: Int) : AppCompatActivi
     abstract protected fun onLeftButtonClicked()
 
     abstract protected fun onRightButtonClicked()
+
+    protected fun setActionBarButtonMode(mode: Mode) {
+        when (mode) {
+            Mode.Back -> {
+                rightActionBarButton?.visibility = View.GONE
+                leftActionBarButton?.visibility = View.VISIBLE
+                leftActionBarButton?.setImageResource(R.drawable.back_rhombus)
+            }
+            Mode.OKCancel -> {
+                rightActionBarButton?.visibility = View.VISIBLE
+                leftActionBarButton?.visibility = View.VISIBLE
+                rightActionBarButton?.setImageResource(R.drawable.done)
+                leftActionBarButton?.setImageResource(R.drawable.cancel)
+            }
+            Mode.None -> {
+                rightActionBarButton?.visibility = View.GONE
+                leftActionBarButton?.visibility = View.GONE
+            }
+        }
+    }
 }

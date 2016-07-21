@@ -14,7 +14,7 @@ class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color
     val attributes = ObservableList<OTAttribute<out Any>>()
 
     private val _removedAttributeIds = ArrayList<Long>()
-    fun fetchRemovedTrackerIds(): Array<Long> {
+    fun fetchRemovedAttributeIds(): Array<Long> {
         val result = _removedAttributeIds.toTypedArray()
         _removedAttributeIds.clear()
         return result;
@@ -68,7 +68,7 @@ class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color
 
     private fun onAttributeAdded(new: OTAttribute<out Any>, index: Int) {
         new.owner = this
-
+        _removedAttributeIds.remove(new.dbId)
         attributeAdded.invoke(this, Pair(new, index))
     }
 

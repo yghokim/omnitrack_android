@@ -241,7 +241,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         }
 
 
-        val ids = tracker.fetchRemovedTrackerIds().map { "${AttributeScheme._ID}=${it.toString()}" }.toTypedArray()
+        val ids = tracker.fetchRemovedAttributeIds().map { "${AttributeScheme._ID}=${it.toString()}" }.toTypedArray()
         if (ids.size > 0) {
             writableDatabase.delete(AttributeScheme.tableName, ids.joinToString(" OR "), null)
 

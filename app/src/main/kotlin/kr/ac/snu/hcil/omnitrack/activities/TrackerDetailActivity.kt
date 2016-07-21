@@ -40,6 +40,9 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
     private lateinit var namePropertyView : ShortTextPropertyView
     private lateinit var colorPropertyView: ColorPalettePropertyView
 
+    private lateinit var attributeListGroupView: View
+    private lateinit var fab: FloatingActionButton
+
     private lateinit var removalSnackbar: Snackbar
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,8 +50,8 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
 
         val toolbar = findViewById(R.id.toolbar) as Toolbar?
         setSupportActionBar(toolbar)
-        val fab = findViewById(R.id.fab) as FloatingActionButton?
-        fab!!.setOnClickListener { view ->
+        fab = findViewById(R.id.fab) as FloatingActionButton
+        fab.setOnClickListener { view ->
             removalSnackbar.dismiss()
             val dialogFragment = AttributeTypeListDialogFragment()
             dialogFragment.showDialog(supportFragmentManager) {
@@ -67,6 +70,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
         colorPropertyView = findViewById(R.id.colorProperty) as ColorPalettePropertyView
         colorPropertyView.title = resources.getString(R.string.msg_color)
 
+        attributeListGroupView = findViewById(R.id.ui_group_attribute_list) as View
 
         listView = findViewById(R.id.ui_attribute_list) as RecyclerView
         val layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
@@ -109,26 +113,28 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
         if (intent.getStringExtra("trackerId") != null) {
             //edit
             //instant update
-            rightActionBarButton?.visibility = View.GONE
-            leftActionBarButton?.setImageResource(R.drawable.back_rhombus)
+
+            setActionBarButtonMode(Mode.Back)
 
             isEditMode = true
             title = resources.getString(R.string.title_activity_tracker_edit)
             tracker = OmniTrackApplication.app.currentUser.trackers.filter{ it.objectId == intent.getStringExtra("trackerId") }.first()
 
+            attributeListGroupView.visibility = View.VISIBLE
+            fab.visibility = View.VISIBLE
 
         } else {
             //new mode
             isEditMode = false
 
-
-            rightActionBarButton?.visibility = View.VISIBLE
-            leftActionBarButton?.setImageResource(R.drawable.cancel)
-
+            setActionBarButtonMode(Mode.OKCancel)
 
             title = resources.getString(R.string.title_activity_tracker_new)
 
             tracker = OTTracker("New Tracker")
+
+            attributeListGroupView.visibility = View.GONE
+            fab.visibility = View.GONE
         }
 
 
@@ -164,6 +170,11 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
             }
     }
 
+    fun openAttributeDetailActivity(position: Int) {
+        val intent = Intent(this, AttributeDetailActivity::class.java)
+        intent.putExtra("attributeId", tracker.attributes[position].objectId)
+        startActivity(intent)
+    }
 
     inner class AttributeListAdapter() : RecyclerView.Adapter<AttributeListAdapter.ViewHolder>(), DragItemTouchHelperCallback.ItemDragHelperAdapter {
 
@@ -215,7 +226,10 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
         inner class ViewHolder(val view: AttributeFrameLayout) : RecyclerView.ViewHolder(view) {
 
             init{
-
+                view.editButtonClicked += {
+                    sender, args ->
+                    openAttributeDetailActivity(adapterPosition)
+                }
             }
 
             fun bindAttribute(attribute: OTAttribute<out Any>) {

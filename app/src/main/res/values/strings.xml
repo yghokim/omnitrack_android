@@ -34,6 +34,10 @@
     <string name="msg_tab_services">Services</string>
     <string name="msg_tab_settings">Settings</string>
 
+    <string name="msg_tab_attribute_basic">Properties</string>
+    <string name="msg_tab_attribute_connection">Connections</string>
+
+
     <string name="msg_basic_information">Basic Information</string>
     <string name="msg_attributes">Attributes</string>
 
@@ -57,4 +61,5 @@
 
     <string name="type_number_name">Number</string>
     <string name="type_number_desc">An integer or real number with unit</string>
+    <string name="title_activity_attribute_detail">Attribute Detail</string>
 </resources>
