@@ -16,6 +16,8 @@
     <string name="title_activity_projects">My Projects</string>
     <string name="title_activity_project_settings">Project Settings</string>
 
+    <string name="msg_select_attribute_type">Select attribute type</string>
+
     <string name="msg_change_tracker_name">Change attribute name</string>
     <string name="msg_change_tracker_settings">Change attribute settings</string>
     <string name="msg_remove_tracker">Remove attribute</string>
@@ -47,5 +49,9 @@
     <string name="action_settings">Settings</string>
     <string name="section_format">Hello World from section: %1$d</string>
 
+    <string name="type_timepoint_name">Time Point</string>
+    <string name="type_timepoint_desc">A specific time point</string>
 
+    <string name="type_number_name">Number</string>
+    <string name="type_number_desc">An integer or real number with unit</string>
 </resources>

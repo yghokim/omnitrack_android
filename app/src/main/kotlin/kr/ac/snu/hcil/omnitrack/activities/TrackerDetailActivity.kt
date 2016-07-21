@@ -21,6 +21,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
 import kr.ac.snu.hcil.omnitrack.ui.SpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.AttributeFrameLayout
+import kr.ac.snu.hcil.omnitrack.ui.components.AttributeTypeListDialogFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.properties.ColorPalettePropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.properties.ShortTextPropertyView
 
@@ -47,8 +48,16 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
             //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show()
             //(application as OmniTrackApplication).syncUserToDb()
             //user.trackers.add(OTTracker("Hihi"))
-            tracker.attributes.add(OTNumberAttribute("Step Count"))
-            attributeListAdapter.notifyItemInserted(tracker.attributes.size - 1)
+            //tracker.attributes.add(OTNumberAttribute("Step Count"))
+            //attributeListAdapter.notifyItemInserted(tracker.attributes.size - 1)
+
+            val dialogFragment = AttributeTypeListDialogFragment()
+            dialogFragment.showDialog(supportFragmentManager) {
+                entry ->
+                tracker.attributes.add(OTAttribute.createAttribute("New Column", entry.typeName))
+                attributeListAdapter.notifyItemInserted(tracker.attributes.size - 1)
+            }
+
         }
 
         namePropertyView = findViewById(R.id.nameProperty) as ShortTextPropertyView

@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core
 import android.util.SparseArray
 import com.google.gson.Gson
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTProperty
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableGenericList
@@ -22,16 +23,20 @@ open abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, column
         const val TYPE_LOCATION = "Location"
 
 
-        fun CreateAttribute(objectId: String?, dbId: Long?, columnName: String, typeName: String, settingData: String): OTAttribute<out Any> {
+        fun createAttribute(objectId: String?, dbId: Long?, columnName: String, typeName: String, settingData: String?): OTAttribute<out Any> {
             val attr = when (typeName) {
                 TYPE_NUMBER -> OTNumberAttribute(objectId, dbId, columnName, settingData)
+                TYPE_TIME -> OTTimeAttribute(objectId, dbId, columnName, settingData)
                 else -> OTNumberAttribute(objectId, dbId, columnName, settingData)
             }
-
-
-
             return attr
         }
+
+        fun createAttribute(columnName: String, typeName: String): OTAttribute<out Any> {
+            return createAttribute(null, null, columnName, typeName, null)
+        }
+
+
     }
 
     val removedFromTracker = Event<OTTracker>()

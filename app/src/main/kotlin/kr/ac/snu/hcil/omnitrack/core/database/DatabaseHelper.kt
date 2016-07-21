@@ -180,7 +180,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         val settingData = cursor.getString(cursor.getColumnIndex(AttributeScheme.SETTING_DATA))
         println("settingData - ${settingData}")
 
-        return OTAttribute.CreateAttribute(objectId, id, name, type, settingData)
+        return OTAttribute.createAttribute(objectId, id, name, type, settingData)
     }
 
     private fun queryById(id: Long, table: TableScheme) : Cursor
