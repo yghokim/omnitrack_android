@@ -5,7 +5,10 @@
     android:id="@+id/main_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:descendantFocusability="beforeDescendants"
     android:fitsSystemWindows="true"
+    android:focusableInTouchMode="true"
+
     tools:context="kr.ac.snu.hcil.omnitrack.activities.AttributeDetailActivity">
 
     <android.support.design.widget.AppBarLayout

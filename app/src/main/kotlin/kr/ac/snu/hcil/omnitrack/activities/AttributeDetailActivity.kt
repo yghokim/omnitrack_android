@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.activities
 
+import android.content.res.Configuration
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
@@ -11,17 +12,34 @@ import android.support.v4.app.FragmentPagerAdapter
 import android.support.v4.view.ViewPager
 import android.os.Bundle
 import android.support.design.widget.TabLayout
+import android.util.SparseArray
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 
 import android.widget.TextView
+import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.activities.fragments.AttributeDetailBasicFragment
+import kr.ac.snu.hcil.omnitrack.core.OTAttribute
+import kr.ac.snu.hcil.omnitrack.ui.components.properties.ShortTextPropertyView
+import java.util.*
+import kotlin.properties.Delegates
 
 class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_attribute_detail) {
+
+    interface ChildFragment {
+        var parent: AttributeDetailActivity?
+        fun refresh()
+    }
+
+    private val childFragments = Hashtable<Int, ChildFragment>()
+
+    var attribute: OTAttribute<out Any>? = null
 
     private var mSectionsPagerAdapter: SectionsPagerAdapter? = null
     private var mViewPager: ViewPager? = null
@@ -30,13 +48,34 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
         super.onCreate(savedInstanceState)
         setActionBarButtonMode(Mode.Back)
 
-        mSectionsPagerAdapter = SectionsPagerAdapter(supportFragmentManager)
+        mSectionsPagerAdapter = SectionsPagerAdapter(supportFragmentManager, this)
 
         mViewPager = findViewById(R.id.container) as ViewPager?
         mViewPager!!.adapter = mSectionsPagerAdapter
 
         val tabLayout = findViewById(R.id.tabs) as TabLayout?
         tabLayout!!.setupWithViewPager(mViewPager)
+
+        tabLayout.setOnTabSelectedListener(
+                object : TabLayout.ViewPagerOnTabSelectedListener(mViewPager) {
+                    override fun onTabSelected(tab: TabLayout.Tab): Unit {
+                        super.onTabSelected(tab)
+                        println("tab selected")
+                        if (tab.position == 0) {
+
+                        }
+                    }
+                })
+    }
+
+    override fun onStart() {
+        super.onStart()
+        if (intent.getStringExtra("attributeId") != null) {
+            attribute = OmniTrackApplication.app.currentUser.findAttributeByObjectId(intent.getStringExtra("attributeId"))
+            for (child in childFragments) {
+                child.value.refresh()
+            }
+        }
     }
 
     override fun onLeftButtonClicked() {
@@ -46,7 +85,11 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
     override fun onRightButtonClicked() {
     }
 
-    class PlaceholderFragment : Fragment() {
+    class PlaceholderFragment : Fragment(), ChildFragment {
+        override var parent: AttributeDetailActivity? = null
+
+        override fun refresh() {
+        }
 
         override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                                   savedInstanceState: Bundle?): View? {
@@ -77,17 +120,33 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
         }
     }
 
+
     /**
      * A [FragmentPagerAdapter] that returns a fragment corresponding to
      * one of the sections/tabs/pages.
      */
-    inner class SectionsPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
+    inner class SectionsPagerAdapter(fm: FragmentManager, val parent: AttributeDetailActivity) : FragmentPagerAdapter(fm) {
+
+        override fun instantiateItem(container: ViewGroup?, position: Int): Any {
+            val fragment = super.instantiateItem(container, position) as ChildFragment
+            fragment.parent = parent
+            childFragments[position] = fragment
+            return fragment
+        }
+
+        override fun destroyItem(container: ViewGroup?, position: Int, `object`: Any?) {
+            childFragments.remove(position)
+            super.destroyItem(container, position, `object`)
+        }
 
         override fun getItem(position: Int): Fragment {
-            // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(position + 1)
+            return when (position) {
+                0 -> AttributeDetailBasicFragment()
+                1 -> PlaceholderFragment.newInstance(position + 1)
+                else -> PlaceholderFragment.newInstance(position + 1)
+            }
         }
+
 
         override fun getCount(): Int {
             // Show 3 total pages.

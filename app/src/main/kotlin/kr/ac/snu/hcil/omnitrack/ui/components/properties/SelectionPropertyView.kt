@@ -24,6 +24,10 @@ class SelectionPropertyView(context: Context, attrs: AttributeSet?) : APropertyV
 
     init {
         selectionView = findViewById(R.id.value) as SelectionView
+        selectionView.onSelectedIndexChanged += {
+            sender, index ->
+            onValueChanged(index)
+        }
     }
 
     fun setValues(values: Array<String>) {

@@ -24,6 +24,10 @@ class ColorPalettePropertyView(context: Context, attrs: AttributeSet?) : AProper
 
     init {
         paletteView = findViewById(R.id.value) as ColorPaletteView
+        paletteView.colorChanged += {
+            sender, value ->
+            onValueChanged(value)
+        }
     }
 
 

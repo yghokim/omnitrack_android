@@ -49,6 +49,8 @@
 
     <string name="msg_name">Name</string>
 
+    <string name="msg_column_name">Column Name</string>
+
     <string name="title_activity_tracker_new">New Tracker</string>
     <string name="title_activity_tracker_edit">Edit Tracker</string>
 

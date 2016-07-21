@@ -43,11 +43,7 @@
         <activity
             android:name=".activities.AttributeDetailActivity"
             android:label="@string/title_activity_attribute_detail"
-            android:parentActivityName=".activities.TrackerDetailActivity"
             android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="kr.ac.snu.hcil.omnitrack.activities.TrackerDetailActivity" />
         </activity>
     </application>
 

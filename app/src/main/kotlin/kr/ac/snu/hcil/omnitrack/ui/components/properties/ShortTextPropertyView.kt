@@ -44,6 +44,7 @@ class ShortTextPropertyView(context: Context, attrs: AttributeSet?) : APropertyV
 
             override fun afterTextChanged(s: Editable?) {
                 validate(s.toString())
+                onValueChanged(s.toString())
             }
         })
     }

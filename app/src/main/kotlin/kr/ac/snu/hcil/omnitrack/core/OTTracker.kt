@@ -68,7 +68,9 @@ class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color
 
     private fun onAttributeAdded(new: OTAttribute<out Any>, index: Int) {
         new.owner = this
-        _removedAttributeIds.remove(new.dbId)
+        if (new.dbId != null)
+            _removedAttributeIds.removeAll { it == new.dbId }
+
         attributeAdded.invoke(this, Pair(new, index))
     }
 

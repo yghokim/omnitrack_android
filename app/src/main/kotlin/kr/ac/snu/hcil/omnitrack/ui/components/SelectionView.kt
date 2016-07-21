@@ -36,9 +36,12 @@ class SelectionView(context: Context, attrs: AttributeSet?, defStyle: Int) : Rec
 
     var selectedIndex: Int by Delegates.observable(0) {
         prop, old, new ->
-        adapter.notifyItemChanged(old)
-        adapter.notifyItemChanged(new)
-        onSelectedIndexChanged.invoke(this, new)
+        if (old != new) {
+            println("selected Index changed - $new")
+            adapter.notifyItemChanged(old)
+            adapter.notifyItemChanged(new)
+            onSelectedIndexChanged.invoke(this, new)
+        }
     }
 
     val onSelectedIndexChanged = Event<Int>()

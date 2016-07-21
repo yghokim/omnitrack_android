@@ -3,7 +3,6 @@ package kr.ac.snu.hcil.omnitrack.core.attributes.properties
 import android.content.Context
 import kr.ac.snu.hcil.omnitrack.ui.components.properties.APropertyView
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
-import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableGenericList
 import kotlin.properties.Delegates
 
 /**
@@ -18,7 +17,16 @@ abstract class OTProperty<T>(initialValue: T, val key: Int, val title: String) {
     var value: T by Delegates.observable(initialValue)
     {
         prop, old, new ->
-        onValueChanged.invoke(this, PropertyChangedEventArgs(key, old, new))
+        if (old != new) {
+            onValueChanged.invoke(this, PropertyChangedEventArgs(key, old, new))
+        }
+    }
+
+    abstract fun getSerializedValue(): String
+    abstract fun parseValue(serialized: String): T
+
+    fun setSerializedValue(serializedValue: String) {
+        value = parseValue(serializedValue)
     }
 
     abstract fun buildView(context: Context): APropertyView<T>

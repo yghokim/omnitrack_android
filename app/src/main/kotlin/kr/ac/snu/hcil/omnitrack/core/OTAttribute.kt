@@ -1,12 +1,13 @@
 package kr.ac.snu.hcil.omnitrack.core
 
+import android.content.Context
 import android.util.SparseArray
+import android.view.View
 import com.google.gson.Gson
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTProperty
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
-import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableGenericList
 import java.util.*
 import kotlin.properties.Delegates
 
@@ -14,6 +15,7 @@ import kotlin.properties.Delegates
  * Created by Young-Ho on 7/11/2016.
  */
 open abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName: String, val typeName: String, settingData: String?) : UniqueObject(objectId, dbId, columnName) {
+    data class SerializedEntry(val key: Int, val value: String)
 
     companion object {
 
@@ -21,7 +23,6 @@ open abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, column
         const val TYPE_TIME = "TimePoint"
         const val TYPE_TIMESPAN = "Timespan"
         const val TYPE_LOCATION = "Location"
-
 
         fun createAttribute(objectId: String?, dbId: Long?, columnName: String, typeName: String, settingData: String?): OTAttribute<out Any> {
             val attr = when (typeName) {
@@ -53,10 +54,11 @@ open abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, column
         createProperties()
         if (settingData != null) {
 
-            val s = SerializableGenericList(settingData)
-            while (s.size > 0) {
-                val last = s.get()
-                setPropertyValue(last.first, last.second)
+            val parser = Gson()
+            val s = parser.fromJson(settingData, Array<String>::class.java).map { parser.fromJson(it, SerializedEntry::class.java) }
+
+            for (entry in s) {
+                setPropertyValueFromSerializedString(entry.key, entry.value)
             }
         }
     }
@@ -64,13 +66,13 @@ open abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, column
     protected abstract fun createProperties()
 
     fun getSerializedProperties(): String {
-        val s = SerializableGenericList(null)
-
+        val s = ArrayList<String>()
+        val parser = Gson()
         for (key in keys) {
-            s.addValue(key, getPropertyValue(key))
+            s.add(parser.toJson(SerializedEntry(key, getProperty<Any>(key).getSerializedValue())))
         }
 
-        return s.getSerializedString()
+        return parser.toJson(s.toTypedArray())
     }
 
     var owner: OTTracker? by Delegates.observable(null as OTTracker?) {
@@ -96,21 +98,31 @@ open abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, column
         propertyValueChanged.invoke(this, args)
     }
 
-    protected fun <T> getProperty(key: Int): OTProperty<T> {
+    fun <T> getProperty(key: Int): OTProperty<T> {
         return settingsProperties[key]!! as OTProperty<T>
     }
 
-    protected fun <T> getPropertyValue(key: Int): T {
+    fun <T> getPropertyValue(key: Int): T {
         return getProperty<T>(key).value
     }
 
-    protected fun setPropertyValue(key: Int, value: Any) {
+    fun setPropertyValue(key: Int, value: Any) {
         getProperty<Any>(key).value = value
+    }
+
+    fun setPropertyValueFromSerializedString(key: Int, serializedValue: String) {
+        getProperty<Any>(key).setSerializedValue(serializedValue)
     }
 
     abstract fun parseAttributeValue(storedValue: String): DataType
 
     abstract fun formatAttributeValue(value: DataType): String
 
-
+    open fun makePropertyViews(context: Context): Collection<Pair<Int?, View>> {
+        val result = ArrayList<Pair<Int?, View>>()
+        for (key in keys) {
+            result.add(Pair(key, getProperty<Any>(key).buildView(context)))
+        }
+        return result
+    }
 }

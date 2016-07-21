@@ -109,7 +109,6 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
     override fun onStart(){
         super.onStart()
 
-
         if (intent.getStringExtra("trackerId") != null) {
             //edit
             //instant update
@@ -126,6 +125,8 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
         } else {
             //new mode
             isEditMode = false
+
+            namePropertyView.focus()
 
             setActionBarButtonMode(Mode.OKCancel)
 
