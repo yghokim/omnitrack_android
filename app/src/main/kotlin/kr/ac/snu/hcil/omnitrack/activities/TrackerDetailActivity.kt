@@ -24,7 +24,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.AttributeFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.properties.ColorPalettePropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.properties.ShortTextPropertyView
 
-class TrackerDetailActivity : OkCancelActivity() {
+class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tracker_detail) {
 
     private var isEditMode = false
 
@@ -39,10 +39,9 @@ class TrackerDetailActivity : OkCancelActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_tracker_detail)
+
         val toolbar = findViewById(R.id.toolbar) as Toolbar?
         setSupportActionBar(toolbar)
-
         val fab = findViewById(R.id.fab) as FloatingActionButton?
         fab!!.setOnClickListener { view ->
             //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show()
@@ -59,13 +58,29 @@ class TrackerDetailActivity : OkCancelActivity() {
         colorPropertyView = findViewById(R.id.colorProperty) as ColorPalettePropertyView
         colorPropertyView.title = resources.getString(R.string.msg_color)
 
+
         listView = findViewById(R.id.ui_attribute_list) as RecyclerView
         val layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         listView.layoutManager = layoutManager
         listView.itemAnimator = SlideInRightAnimator()
         listView.addItemDecoration(SpaceItemDecoration(LinearLayoutManager.VERTICAL, resources.getDimensionPixelOffset(R.dimen.attribute_list_element_vertical_space)));
+
     }
 
+
+    override fun onPause(){
+        super.onPause()
+
+        if(isEditMode) {
+            if (namePropertyView.validate()) {
+                tracker.name = namePropertyView.value
+            }
+
+            if(colorPropertyView.validate()){
+                tracker.color = colorPropertyView.value
+            }
+        }
+    }
 
     override fun onStart(){
         super.onStart()
@@ -73,6 +88,10 @@ class TrackerDetailActivity : OkCancelActivity() {
 
         if (intent.getStringExtra("trackerId") != null) {
             //edit
+            //instant update
+            rightActionBarButton?.visibility = View.GONE
+            leftActionBarButton?.setImageResource(R.drawable.back_rhombus)
+
             isEditMode = true
             title = resources.getString(R.string.title_activity_tracker_edit)
             tracker = OmniTrackApplication.app.currentUser.trackers.filter{ it.objectId == intent.getStringExtra("trackerId") }.first()
@@ -81,6 +100,12 @@ class TrackerDetailActivity : OkCancelActivity() {
         } else {
             //new mode
             isEditMode = false
+
+
+            rightActionBarButton?.visibility = View.VISIBLE
+            leftActionBarButton?.setImageResource(R.drawable.cancel)
+
+
             title = resources.getString(R.string.title_activity_tracker_new)
 
             tracker = OTTracker("New Tracker")
@@ -95,11 +120,15 @@ class TrackerDetailActivity : OkCancelActivity() {
         attributeListAdapter.notifyDataSetChanged()
     }
 
-    override fun onCanceled() {
-        finish()
+    override fun onLeftButtonClicked() {
+        if(isEditMode)
+            finish()
+        else{
+            navigateUpTo(parentActivityIntent)
+        }
     }
 
-    override fun onOk() {
+    override fun onRightButtonClicked() {
             //add
             if(namePropertyView.validate()) {
                 //modify

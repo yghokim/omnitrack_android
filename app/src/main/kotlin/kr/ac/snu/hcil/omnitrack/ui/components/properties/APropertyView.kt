@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.widget.FrameLayout
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import java.util.*
 
 /**
@@ -15,6 +16,7 @@ abstract class APropertyView<T>(layoutId: Int, context: Context, attrs: Attribut
 
     protected lateinit var titleView: TextView
 
+    val valueChanged = Event<T>()
 
     private val validators: ArrayList<Pair<CharSequence?, (T) -> Boolean>> = ArrayList<Pair<CharSequence?, (T) -> Boolean>>()
 
@@ -40,7 +42,11 @@ abstract class APropertyView<T>(layoutId: Int, context: Context, attrs: Attribut
         validators.add(Pair<CharSequence?, (T)->Boolean>(failedMessage, func))
     }
 
-    fun validate(): Boolean{
+    fun validate(): Boolean {
+        return validate(value)
+    }
+
+    fun validate(value: T): Boolean{
         validationErrorMessageList.clear()
 
         var passed = true
@@ -62,6 +68,11 @@ abstract class APropertyView<T>(layoutId: Int, context: Context, attrs: Attribut
     open fun onValidated(result: Boolean)
     {
         ;
+    }
+
+    protected fun onValueChanged(newValue: T){
+        validate()
+        valueChanged.invoke(this, newValue)
     }
 
     abstract var value : T
