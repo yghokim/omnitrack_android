@@ -12,7 +12,7 @@ abstract class UniqueObject(objectId: String?, dbId: Long?,  name: String) {
     val nameChangeEvent = Event<String>()
 
     val objectId: String by lazy {
-        objectId ?: UUID.randomUUID().toString()
+        objectId ?: makeNewObjectId()
     }
 
     var dbId : Long? = dbId
@@ -35,6 +35,9 @@ abstract class UniqueObject(objectId: String?, dbId: Long?,  name: String) {
 
     constructor() : this(null, null, "Noname")
 
+    open fun makeNewObjectId(): String {
+        return UUID.randomUUID().toString()
+    }
 
     protected open fun onNameChanged(newName: String){
         nameChangeEvent.invoke(this, newName)

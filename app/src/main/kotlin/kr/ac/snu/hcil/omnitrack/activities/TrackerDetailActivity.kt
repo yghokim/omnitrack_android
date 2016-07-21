@@ -56,7 +56,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
             val dialogFragment = AttributeTypeListDialogFragment()
             dialogFragment.showDialog(supportFragmentManager) {
                 entry ->
-                tracker.attributes.add(OTAttribute.createAttribute("New Column", entry.typeName))
+                tracker.attributes.add(OTAttribute.createAttribute(OmniTrackApplication.app.currentUser, "New Column", entry.typeName))
                 attributeListAdapter.notifyItemInserted(tracker.attributes.size - 1)
                 attributeListAdapter.clearTrashcan()
             }

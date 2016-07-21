@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core
 
 //import kr.ac.snu.hcil.omnitrack.core.database.TrackerEntity
 import android.graphics.Color
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeAttribute
 import kr.ac.snu.hcil.omnitrack.utils.ObservableList
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import java.util.*
@@ -38,11 +39,14 @@ class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color
     val attributeAdded = Event<Pair<OTAttribute<out Any>, Int>>()
     val attributeRemoved = Event<Pair<OTAttribute<out Any>, Int>>()
 
+    private val loggedAtAttribute = OTTimeAttribute("Logged At")
+
     constructor(): this(null, null, "New Tracker")
 
     constructor(name: String): this(null,null, name)
 
     init{
+        loggedAtAttribute.granularity = 0
 
         if (_attributes != null) {
             for (attribute in _attributes) {
@@ -83,5 +87,19 @@ class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color
         attributeRemoved.invoke(this, Pair(attribute, index))
     }
 
+    fun getTotalAttributes(): Array<OTAttribute<out Any>> {
+        attributes.unObservedList.toTypedArray()
+        val result = Array<OTAttribute<out Any>>(attributes.size + 1)
+        {
+            index ->
+            if (index < attributes.size) {
+                attributes[index]
+            } else {
+                loggedAtAttribute
+            }
+        }
+
+        return result
+    }
 
 }

@@ -15,6 +15,10 @@ import kotlin.properties.Delegates
  * Created by Young-Ho on 7/11/2016.
  */
 open abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName: String, val typeName: String, settingData: String?) : UniqueObject(objectId, dbId, columnName) {
+    override fun makeNewObjectId(): String {
+        return owner?.owner?.makeNewObjectId() ?: UUID.randomUUID().toString()
+    }
+
     data class SerializedEntry(val key: Int, val value: String)
 
     companion object {
@@ -33,8 +37,8 @@ open abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, column
             return attr
         }
 
-        fun createAttribute(columnName: String, typeName: String): OTAttribute<out Any> {
-            return createAttribute(null, null, columnName, typeName, null)
+        fun createAttribute(user: OTUser, columnName: String, typeName: String): OTAttribute<out Any> {
+            return createAttribute(user.getNewAttributeObjectId().toString(), null, columnName, typeName, null)
         }
 
 

@@ -10,7 +10,12 @@ import kotlin.properties.Delegates
 /**
  * Created by Young-Ho Kim on 2016-07-11.
  */
-class OTUser(objectId: String?, dbId: Long?, name: String, email: String, _trackers: List<OTTracker>?) : UniqueObject(objectId, dbId, name) {
+class OTUser(objectId: String?, dbId: Long?, name: String, email: String, attributeIdSeed: Long = 0, _trackers: List<OTTracker>? = null) : UniqueObject(objectId, dbId, name) {
+
+
+    var attributeIdSeed: Long = attributeIdSeed
+        private set
+
 
     val email: String by Delegates.observable(email) {
         prop, old, new ->
@@ -30,7 +35,7 @@ class OTUser(objectId: String?, dbId: Long?, name: String, email: String, _track
     val trackerRemoved = Event<Pair<OTTracker, Int>>()
     val trackerIndexChanged = Event<Pair<OTTracker, Int>>()
 
-    constructor(name: String, email: String) : this(null, null, name, email, null) {
+    constructor(name: String, email: String) : this(null, null, name, email) {
 
     }
 
@@ -81,5 +86,9 @@ class OTUser(objectId: String?, dbId: Long?, name: String, email: String, _track
             } else continue
         }
         return null
+    }
+
+    fun getNewAttributeObjectId(): Long {
+        return ++attributeIdSeed
     }
 }

@@ -49,12 +49,13 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
             get() = "omnitrack_users"
 
         val EMAIL = "email"
+        val ATTR_ID_SEED = "attribute_id_seed"
 
-        override val columnNames = arrayOf(_ID, NAME, OBJECT_ID, EMAIL)
+        override val columnNames = arrayOf(_ID, NAME, OBJECT_ID, EMAIL, ATTR_ID_SEED)
 
         override fun getCreationColumnContentString() : String
         {
-            return  super.getCreationColumnContentString() + ", ${EMAIL} TEXT UNIQUE"
+            return super.getCreationColumnContentString() + ", ${EMAIL} TEXT UNIQUE, ${ATTR_ID_SEED} INTEGER"
         }
     }
 
@@ -117,7 +118,8 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
             val objectId = result.getString(result.getColumnIndex(UserScheme.OBJECT_ID));
             val name = result.getString(result.getColumnIndex(UserScheme.NAME));
             val email = result.getString(result.getColumnIndex(UserScheme.EMAIL));
-            val entity = OTUser(objectId, id, name, email, findTrackersOfUser(id))
+            val seed = result.getLong(result.getColumnIndex(UserScheme.ATTR_ID_SEED))
+            val entity = OTUser(objectId, id, name, email, seed, findTrackersOfUser(id))
             result.close()
             return entity
         }
@@ -169,6 +171,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         val objectId = cursor.getString(cursor.getColumnIndex(TrackerScheme.OBJECT_ID))
         val color = cursor.getInt(cursor.getColumnIndex(TrackerScheme.COLOR))
 
+
         return OTTracker(objectId, id, name, color, findAttributesOfTracker(id))
     }
 
@@ -191,6 +194,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
     }
 
     fun save(attribute: OTAttribute<out Any>, position: Int) {
+        println("saving attribute ${attribute.objectId}, db: ${attribute.dbId}")
         val values = ContentValues()
         values.put(AttributeScheme.OBJECT_ID, attribute.objectId)
         values.put(AttributeScheme.NAME, attribute.name)
@@ -259,6 +263,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         values.put(UserScheme.NAME, user.name)
         values.put(UserScheme.EMAIL, user.email)
         values.put(UserScheme.OBJECT_ID, user.objectId)
+        values.put(UserScheme.ATTR_ID_SEED, user.attributeIdSeed)
 
         if(user.dbId != null) // update
         {
