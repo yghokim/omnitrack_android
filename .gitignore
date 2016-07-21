@@ -11,6 +11,7 @@ app/app.iml
 
 .idea/misc.xml
 .idea/vcs.xml
+.idea/gradle.xml
 .idea/modules.xml
 
 Thumbs.db
