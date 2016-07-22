@@ -87,7 +87,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         override val columnNames: Array<String> = arrayOf(_ID, NAME, OBJECT_ID, TRACKER_ID, TYPE, POSITION, SETTING_DATA)
 
         override fun getCreationColumnContentString(): String {
-            return super.getCreationColumnContentString() + ", ${AttributeScheme.TRACKER_ID} INTEGER, ${AttributeScheme.POSITION} INTEGER, ${AttributeScheme.TYPE} TEXT, ${AttributeScheme.SETTING_DATA} TEXT"
+            return super.getCreationColumnContentString() + ", ${AttributeScheme.TRACKER_ID} INTEGER, ${AttributeScheme.POSITION} INTEGER, ${AttributeScheme.TYPE} INTEGER, ${AttributeScheme.SETTING_DATA} TEXT"
         }
     }
 
@@ -179,7 +179,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         val id = cursor.getLong(cursor.getColumnIndex(AttributeScheme._ID))
         val name = cursor.getString(cursor.getColumnIndex(AttributeScheme.NAME))
         val objectId = cursor.getString(cursor.getColumnIndex(AttributeScheme.OBJECT_ID))
-        val type = cursor.getString(cursor.getColumnIndex(AttributeScheme.TYPE))
+        val type = cursor.getInt(cursor.getColumnIndex(AttributeScheme.TYPE))
         val settingData = cursor.getString(cursor.getColumnIndex(AttributeScheme.SETTING_DATA))
         println("settingData - ${settingData}")
 
@@ -199,7 +199,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         values.put(AttributeScheme.OBJECT_ID, attribute.objectId)
         values.put(AttributeScheme.NAME, attribute.name)
         values.put(AttributeScheme.POSITION, position)
-        values.put(AttributeScheme.TYPE, attribute.typeName)
+        values.put(AttributeScheme.TYPE, attribute.typeId)
         values.put(AttributeScheme.TRACKER_ID, attribute.owner?.dbId ?: null)
         values.put(AttributeScheme.SETTING_DATA, attribute.getSerializedProperties())
 

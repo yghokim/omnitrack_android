@@ -30,7 +30,7 @@ class OmniTrackApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        //deleteDatabase("omnitrack.db")
+        deleteDatabase("omnitrack.db")
 
         app = this
 

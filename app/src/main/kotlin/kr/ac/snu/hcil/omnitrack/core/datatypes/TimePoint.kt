@@ -11,9 +11,12 @@ class TimePoint : IStringSerializable {
     var timestamp: Long = 0
     var timezone: TimeZone = TimeZone.getDefault()
 
-    constructor(timestamp: Long, timezoneName: String) {
-
+    constructor(timestamp: Long, timezoneId: String) {
+        this.timestamp = timestamp
+        this.timezone = TimeZone.getTimeZone(timezoneId)
     }
+
+    constructor() : this(Calendar.getInstance().timeInMillis, TimeZone.getDefault().id)
 
     constructor(serialized: String) {
         fromSerializedString(serialized)

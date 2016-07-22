@@ -18,6 +18,8 @@
 
     <dimen name="attribute_list_element_min_height">120dp</dimen>
     <dimen name="attribute_list_element_header_height">45dp</dimen>
+    <dimen name="attribute_list_horizontal_padding">11dp</dimen>
+    <dimen name="attribute_list_element_spacing">2dp</dimen>
 
     <dimen name="attribute_list_element_horizontal_padding">10dp</dimen>
 
@@ -36,5 +38,6 @@
 
     <dimen name="selection_view_button_spacing">2dp</dimen>
 
+    <dimen name="button_height_normal">50dp</dimen>
 
 </resources>

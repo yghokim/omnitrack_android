@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <include layout="@layout/common_subheader" />
+    <include layout="@layout/common_property_subheader" />
 
 
     <kr.ac.snu.hcil.omnitrack.ui.components.ColorPaletteView
+        android:id="@+id/value"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/value"
         android:layout_marginTop="9dp" />
 
 </LinearLayout>

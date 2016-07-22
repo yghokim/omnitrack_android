@@ -24,8 +24,9 @@ import kr.ac.snu.hcil.omnitrack.ui.DragItemTouchHelperCallback
 import kr.ac.snu.hcil.omnitrack.ui.SpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.AttributeFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.AttributeTypeListDialogFragment
-import kr.ac.snu.hcil.omnitrack.ui.components.properties.ColorPalettePropertyView
-import kr.ac.snu.hcil.omnitrack.ui.components.properties.ShortTextPropertyView
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ColorPalettePropertyView
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ShortTextPropertyView
 import java.util.*
 
 class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tracker_detail) {
@@ -56,7 +57,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
             val dialogFragment = AttributeTypeListDialogFragment()
             dialogFragment.showDialog(supportFragmentManager) {
                 entry ->
-                tracker.attributes.add(OTAttribute.createAttribute(OmniTrackApplication.app.currentUser, "New Column", entry.typeName))
+                tracker.attributes.add(OTAttribute.createAttribute(OmniTrackApplication.app.currentUser, "New Column", entry.typeId))
                 attributeListAdapter.notifyItemInserted(tracker.attributes.size - 1)
                 attributeListAdapter.clearTrashcan()
             }
@@ -234,8 +235,10 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
             }
 
             fun bindAttribute(attribute: OTAttribute<out Any>) {
-                view.typeNameView.text = attribute.typeName
+                view.typeNameView.text = resources.getString(attribute.typeNameResourceId)
                 view.columnNameView.text = attribute.name
+
+                view.preview = attribute.makePreviewInstance(this@TrackerDetailActivity) as AAttributeInputView<out Any>
             }
         }
     }

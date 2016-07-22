@@ -1,15 +1,20 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes
 
+import android.content.Context
+import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTProperty
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTSelectionProperty
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.TimePointInputView
 import java.util.*
 
 /**
  * Created by Young-Ho Kim on 2016-07-20.
  */
 class OTTimeAttribute : OTAttribute<TimePoint> {
+    override val typeNameResourceId: Int = R.string.type_timepoint_name
 
     companion object {
         const val GRANULARITY = 0
@@ -68,5 +73,13 @@ class OTTimeAttribute : OTAttribute<TimePoint> {
 
             return calendar.toString()
         } else return ""
+    }
+
+    override fun makeDefaultValue(): TimePoint {
+        return TimePoint()
+    }
+
+    override fun makeControlViewInstance(context: Context): AAttributeInputView<TimePoint> {
+        return TimePointInputView(context)
     }
 }

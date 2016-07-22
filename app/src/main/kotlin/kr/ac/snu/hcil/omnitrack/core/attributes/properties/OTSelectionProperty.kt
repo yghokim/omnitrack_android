@@ -2,8 +2,8 @@ package kr.ac.snu.hcil.omnitrack.core.attributes.properties
 
 import android.content.Context
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTProperty
-import kr.ac.snu.hcil.omnitrack.ui.components.properties.APropertyView
-import kr.ac.snu.hcil.omnitrack.ui.components.properties.SelectionPropertyView
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.SelectionPropertyView
 
 /**
  * Created by younghokim on 16. 7. 12..

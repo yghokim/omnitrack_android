@@ -8,8 +8,8 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.activities.AttributeDetailActivity
-import kr.ac.snu.hcil.omnitrack.ui.components.properties.APropertyView
-import kr.ac.snu.hcil.omnitrack.ui.components.properties.ShortTextPropertyView
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ShortTextPropertyView
 import java.util.*
 import kotlin.properties.Delegates
 

@@ -4,11 +4,18 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <include layout="@layout/common_property_subheader" />
+    <android.support.v7.widget.ViewStubCompat
+        android:id="@+id/header_stub"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout="@layout/common_attribute_input_subheader" />
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.SelectionView
+    <EditText
         android:id="@+id/value"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp" />
+        android:ems="10"
+        android:inputType="time" />
+
+
 </LinearLayout>

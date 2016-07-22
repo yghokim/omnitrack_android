@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:orientation="vertical"
     >
 
-    <include layout="@layout/common_subheader"/>
+    <include layout="@layout/common_property_subheader" />
 
     <EditText
+        android:id="@+id/value"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/value"
-        android:maxLines="1"
+        android:layout_gravity="center_horizontal"
         android:inputType="textShortMessage"
-        android:layout_gravity="center_horizontal" />
+        android:maxLines="1" />
 </LinearLayout>

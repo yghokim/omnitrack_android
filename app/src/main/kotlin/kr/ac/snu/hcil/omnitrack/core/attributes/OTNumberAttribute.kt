@@ -1,9 +1,14 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes
 
+import android.content.Context
 import android.util.SparseArray
+import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTProperty
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTSelectionProperty
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.NumberInputView
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.TimePointInputView
 import kotlin.properties.Delegates
 
 /**
@@ -11,6 +16,7 @@ import kotlin.properties.Delegates
  */
 
 class OTNumberAttribute(objectId: String?, dbId: Long?, columnName: String, settingData: String?) : OTAttribute<Float>(objectId, dbId, columnName, OTAttribute.TYPE_NUMBER, settingData) {
+    override val typeNameResourceId: Int = R.string.type_number_name
 
     override val keys: Array<Int>
         get() = arrayOf(DECIMAL_POINTS)
@@ -52,6 +58,14 @@ class OTNumberAttribute(objectId: String?, dbId: Long?, columnName: String, sett
         } else {
             return ""
         }
+    }
+
+    override fun makeDefaultValue(): Float {
+        return 0.0f
+    }
+
+    override fun makeControlViewInstance(context: Context): AAttributeInputView<out Any> {
+        return NumberInputView(context)
     }
 
 }
