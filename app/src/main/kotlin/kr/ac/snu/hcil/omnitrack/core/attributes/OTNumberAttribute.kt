@@ -39,15 +39,18 @@ class OTNumberAttribute(objectId: String?, dbId: Long?, columnName: String, sett
         return storedValue.toFloat()
     }
 
-    override fun formatAttributeValue(value: Float): String {
+    override fun formatAttributeValue(value: Any): String {
+        if (value is Float) {
+            val power = Math.pow(10.0, numDigitsUnderDecimalPoint.toDouble())
+            val numberStr = (Math.floor(power * value) / power).toString()
 
-        val power = Math.pow(10.0, numDigitsUnderDecimalPoint.toDouble())
-        val numberStr = (Math.floor(power * value) / power).toString()
-
-        return if (unit.isNullOrBlank()) {
-            numberStr
+            return if (unit.isNullOrBlank()) {
+                numberStr
+            } else {
+                "${numberStr} ${unit}"
+            }
         } else {
-            "${numberStr} ${unit}"
+            return ""
         }
     }
 

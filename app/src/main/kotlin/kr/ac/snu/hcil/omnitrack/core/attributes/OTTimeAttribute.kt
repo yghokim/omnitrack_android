@@ -45,26 +45,28 @@ class OTTimeAttribute : OTAttribute<TimePoint> {
         return TimePoint(storedValue)
     }
 
-    override fun formatAttributeValue(value: TimePoint): String {
-        calendar.timeInMillis = value.timestamp
-        calendar.timeZone = value.timezone
+    override fun formatAttributeValue(value: Any): String {
+        if (value is TimePoint) {
+            calendar.timeInMillis = value.timestamp
+            calendar.timeZone = value.timezone
 
-        calendar.set(Calendar.MILLISECOND, 0)
+            calendar.set(Calendar.MILLISECOND, 0)
 
-        when (granularity) {
-            GRANULARITY_MINUTE -> calendar.set(Calendar.SECOND, 0)
-            GRANULARITY_HOUR -> {
-                calendar.set(Calendar.SECOND, 0)
-                calendar.set(Calendar.MINUTE, 0)
+            when (granularity) {
+                GRANULARITY_MINUTE -> calendar.set(Calendar.SECOND, 0)
+                GRANULARITY_HOUR -> {
+                    calendar.set(Calendar.SECOND, 0)
+                    calendar.set(Calendar.MINUTE, 0)
+                }
+
+                GRANULARITY_DAY -> {
+                    calendar.set(Calendar.SECOND, 0)
+                    calendar.set(Calendar.MINUTE, 0)
+                    calendar.set(Calendar.HOUR, 0)
+                }
             }
 
-            GRANULARITY_DAY -> {
-                calendar.set(Calendar.SECOND, 0)
-                calendar.set(Calendar.MINUTE, 0)
-                calendar.set(Calendar.HOUR, 0)
-            }
-        }
-
-        return calendar.toString()
+            return calendar.toString()
+        } else return ""
     }
 }

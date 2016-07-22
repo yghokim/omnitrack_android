@@ -115,12 +115,14 @@ open abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, column
     }
 
     fun setPropertyValueFromSerializedString(key: Int, serializedValue: String) {
-        getProperty<Any>(key).setSerializedValue(serializedValue)
+        getProperty<Any>(key).setValueFromSerializedString(serializedValue)
     }
 
     abstract fun parseAttributeValue(storedValue: String): DataType
 
-    abstract fun formatAttributeValue(value: DataType): String
+    abstract fun formatAttributeValue(value: Any): String
+
+
 
     open fun makePropertyViews(context: Context): Collection<Pair<Int?, View>> {
         val result = ArrayList<Pair<Int?, View>>()
