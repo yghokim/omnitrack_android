@@ -26,7 +26,7 @@ import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.activities.fragments.AttributeDetailBasicFragment
 import kr.ac.snu.hcil.omnitrack.core.OTAttribute
-import kr.ac.snu.hcil.omnitrack.ui.components.properties.ShortTextPropertyView
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ShortTextPropertyView
 import java.util.*
 import kotlin.properties.Delegates
 

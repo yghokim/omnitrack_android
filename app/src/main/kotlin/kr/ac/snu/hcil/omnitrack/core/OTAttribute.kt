@@ -7,6 +7,7 @@ import com.google.gson.Gson
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTProperty
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import java.util.*
 import kotlin.properties.Delegates
@@ -14,7 +15,7 @@ import kotlin.properties.Delegates
 /**
  * Created by Young-Ho on 7/11/2016.
  */
-open abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName: String, val typeName: String, settingData: String?) : UniqueObject(objectId, dbId, columnName) {
+open abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName: String, val typeId: Int, settingData: String?) : UniqueObject(objectId, dbId, columnName) {
     override fun makeNewObjectId(): String {
         return owner?.owner?.makeNewObjectId() ?: UUID.randomUUID().toString()
     }
@@ -23,13 +24,13 @@ open abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, column
 
     companion object {
 
-        const val TYPE_NUMBER = "Number"
-        const val TYPE_TIME = "TimePoint"
-        const val TYPE_TIMESPAN = "Timespan"
-        const val TYPE_LOCATION = "Location"
+        const val TYPE_NUMBER = 0
+        const val TYPE_TIME = 1
+        const val TYPE_TIMESPAN = 2
+        const val TYPE_LOCATION = 3
 
-        fun createAttribute(objectId: String?, dbId: Long?, columnName: String, typeName: String, settingData: String?): OTAttribute<out Any> {
-            val attr = when (typeName) {
+        fun createAttribute(objectId: String?, dbId: Long?, columnName: String, typeId: Int, settingData: String?): OTAttribute<out Any> {
+            val attr = when (typeId) {
                 TYPE_NUMBER -> OTNumberAttribute(objectId, dbId, columnName, settingData)
                 TYPE_TIME -> OTTimeAttribute(objectId, dbId, columnName, settingData)
                 else -> OTNumberAttribute(objectId, dbId, columnName, settingData)
@@ -37,8 +38,8 @@ open abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, column
             return attr
         }
 
-        fun createAttribute(user: OTUser, columnName: String, typeName: String): OTAttribute<out Any> {
-            return createAttribute(user.getNewAttributeObjectId().toString(), null, columnName, typeName, null)
+        fun createAttribute(user: OTUser, columnName: String, typeId: Int): OTAttribute<out Any> {
+            return createAttribute(user.getNewAttributeObjectId().toString(), null, columnName, typeId, null)
         }
 
 
@@ -49,10 +50,13 @@ open abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, column
 
     abstract val keys: Array<Int>
 
+    abstract val typeNameResourceId: Int
+        get
+
     val propertyValueChanged = Event<OTProperty.PropertyChangedEventArgs<out Any>>()
     private val settingsProperties = SparseArray<OTProperty<out Any>>()
 
-    constructor(columnName: String, typeName: String) : this(null, null, columnName, typeName, null)
+    constructor(columnName: String, typeId: Int) : this(null, null, columnName, typeId, null)
 
     init {
         createProperties()
@@ -122,7 +126,7 @@ open abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, column
 
     abstract fun formatAttributeValue(value: Any): String
 
-
+    abstract fun makeDefaultValue(): DataType
 
     open fun makePropertyViews(context: Context): Collection<Pair<Int?, View>> {
         val result = ArrayList<Pair<Int?, View>>()
@@ -130,5 +134,13 @@ open abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, column
             result.add(Pair(key, getProperty<Any>(key).buildView(context)))
         }
         return result
+    }
+
+    abstract fun makeControlViewInstance(context: Context): AAttributeInputView<out Any>
+    open fun makePreviewInstance(context: Context): View {
+        val view = makeControlViewInstance(context)
+        view.previewMode = true
+
+        return view
     }
 }

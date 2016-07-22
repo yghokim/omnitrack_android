@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.components.properties
+package kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties
 
 import android.content.Context
 import android.util.AttributeSet

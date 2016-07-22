@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes.properties
 
 import android.content.Context
-import kr.ac.snu.hcil.omnitrack.ui.components.properties.APropertyView
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kr.ac.snu.hcil.omnitrack.utils.serialization.ISerializableValueContainer
 import kotlin.properties.Delegates

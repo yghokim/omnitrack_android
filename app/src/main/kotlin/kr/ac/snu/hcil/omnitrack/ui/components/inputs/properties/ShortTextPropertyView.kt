@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.components.properties
+package kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties
 
 import android.content.Context
 import android.text.Editable
@@ -9,7 +9,7 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.ui.components.properties.APropertyView
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
 
 /**
  * Created by Young-Ho Kim on 2016-07-13.

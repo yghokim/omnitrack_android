@@ -22,7 +22,7 @@ import java.text.AttributedCharacterIterator
  */
 class AttributeTypeListDialogFragment : DialogFragment() {
 
-    data class AttributeTypeEntry(val typeName: String, val iconId: Int, val name: String, val description: String?)
+    data class AttributeTypeEntry(val typeId: Int, val iconId: Int, val name: String, val description: String?)
 
     private var currentItemSelectedListener: ((AttributeTypeEntry) -> Unit)? = null
 

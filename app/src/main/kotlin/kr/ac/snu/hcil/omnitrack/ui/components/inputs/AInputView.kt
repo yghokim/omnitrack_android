@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.components.properties
+package kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties
 
 import android.content.Context
 import android.util.AttributeSet
@@ -12,9 +12,7 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 2016-07-13.
  */
-abstract class APropertyView<T>(layoutId: Int, context: Context, attrs: AttributeSet?)  : FrameLayout(context, attrs) {
-
-    protected lateinit var titleView: TextView
+abstract class AInputView<T>(layoutId: Int, context: Context, attrs: AttributeSet?) : FrameLayout(context, attrs) {
 
     val valueChanged = Event<T>()
 
@@ -22,20 +20,11 @@ abstract class APropertyView<T>(layoutId: Int, context: Context, attrs: Attribut
 
     protected val validationErrorMessageList = ArrayList<CharSequence>()
 
-    var title : CharSequence
-        get() = titleView.text
-        set(value){
-            titleView.text = value
-        }
-
     constructor(layoutId: Int, context: Context): this(layoutId, context, null)
 
     init{
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         addView(inflater.inflate(layoutId, this, false))
-
-        titleView = findViewById(R.id.title) as TextView
-
     }
 
     fun addNewValidator(failedMessage: CharSequence?, func: (T)->Boolean){

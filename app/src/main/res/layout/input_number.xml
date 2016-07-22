@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.ViewStubCompat
+        android:id="@+id/header_stub"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout="@layout/common_attribute_input_subheader" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/editText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/ui_button_minus"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@+id/ui_button_minus"
+            android:ems="10"
+            android:inputType="numberDecimal" />
+
+        <ImageButton
+            android:id="@+id/ui_button_minus"
+            android:layout_width="@dimen/button_height_normal"
+            android:layout_height="@dimen/button_height_normal"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="8dp"
+            android:layout_toStartOf="@+id/ui_button_plus"
+            android:background="@drawable/round_button_background"
+            android:padding="17dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/minus_dark" />
+
+        <ImageButton
+            android:id="@+id/ui_button_plus"
+            android:layout_width="@dimen/button_height_normal"
+            android:layout_height="@dimen/button_height_normal"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dp"
+            android:background="@drawable/round_button_background"
+            android:padding="17dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/plus_dark" />
+    </RelativeLayout>
+</LinearLayout>
