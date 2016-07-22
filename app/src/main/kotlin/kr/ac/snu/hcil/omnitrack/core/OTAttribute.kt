@@ -136,11 +136,6 @@ open abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, column
         return result
     }
 
-    abstract fun makeControlViewInstance(context: Context): AAttributeInputView<out Any>
-    open fun makePreviewInstance(context: Context): View {
-        val view = makeControlViewInstance(context)
-        view.previewMode = true
-
-        return view
-    }
+    //reuse recycled view if possible.
+    abstract fun getInputView(context: Context, recycledView: AAttributeInputView<out Any>?): AAttributeInputView<out Any>
 }

@@ -57,7 +57,7 @@
 
     </View>
 
-    <FrameLayout
+    <kr.ac.snu.hcil.omnitrack.ui.components.LockableFrameLayout
         android:id="@+id/ui_preview_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -70,5 +70,5 @@
         android:paddingTop="@dimen/activity_vertical_margin"
         >
 
-    </FrameLayout>
+    </kr.ac.snu.hcil.omnitrack.ui.components.LockableFrameLayout>
 </kr.ac.snu.hcil.omnitrack.ui.components.AttributeFrameLayout>

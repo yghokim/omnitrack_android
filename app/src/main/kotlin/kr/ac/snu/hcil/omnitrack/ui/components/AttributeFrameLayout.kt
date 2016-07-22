@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.ui.components
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewParent
@@ -26,7 +27,7 @@ class AttributeFrameLayout : RelativeLayout {
 
     val editButtonClicked = Event<View>()
 
-    lateinit var previewContainer: ViewGroup
+    lateinit var previewContainer: LockableFrameLayout
     lateinit var columnNameView: TextView
     lateinit var typeNameView: TextView
 
@@ -35,17 +36,21 @@ class AttributeFrameLayout : RelativeLayout {
     var preview: AAttributeInputView<out Any>? = null
         get
         set(value) {
-            field = value
-            if (value != null) {
-                previewContainer.addView(value, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
-            } else {
+            if (field !== value) {
                 previewContainer.removeAllViews()
+                if (value != null) {
+                    previewContainer.addView(value, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+                }
+
+                field = value
             }
         }
 
     override fun onFinishInflate() {
         super.onFinishInflate()
-        previewContainer = findViewById(R.id.ui_preview_container) as ViewGroup
+        previewContainer = findViewById(R.id.ui_preview_container) as LockableFrameLayout
+        previewContainer.locked = true
+
         columnNameView = findViewById(R.id.ui_column_name) as TextView
         typeNameView = findViewById(R.id.ui_attribute_type) as TextView
         editButton = findViewById(R.id.ui_button_edit) as ImageButton
@@ -53,6 +58,5 @@ class AttributeFrameLayout : RelativeLayout {
             editButtonClicked.invoke(this, this)
         }
     }
-
 
 }

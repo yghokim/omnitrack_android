@@ -104,6 +104,8 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
             if(colorPropertyView.validate()){
                 tracker.color = colorPropertyView.value
             }
+
+            OmniTrackApplication.app.syncUserToDb()
         }
     }
 
@@ -238,7 +240,9 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
                 view.typeNameView.text = resources.getString(attribute.typeNameResourceId)
                 view.columnNameView.text = attribute.name
 
-                view.preview = attribute.makePreviewInstance(this@TrackerDetailActivity) as AAttributeInputView<out Any>
+                val preview = attribute.getInputView(this@TrackerDetailActivity, view.preview)
+                preview.previewMode = true
+                view.preview = preview
             }
         }
     }

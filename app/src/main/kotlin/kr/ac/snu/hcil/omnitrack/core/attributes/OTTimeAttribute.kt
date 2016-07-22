@@ -79,7 +79,17 @@ class OTTimeAttribute : OTAttribute<TimePoint> {
         return TimePoint()
     }
 
-    override fun makeControlViewInstance(context: Context): AAttributeInputView<TimePoint> {
-        return TimePointInputView(context)
+    override fun getInputView(context: Context, recycledView: AAttributeInputView<out Any>?): AAttributeInputView<out Any> {
+        val view =
+                if ((recycledView?.typeId == TYPE_TIME)) {
+                    recycledView!!
+                } else {
+                    TimePointInputView(context)
+                }
+
+        //TODO settings
+
+        return view
     }
+
 }
