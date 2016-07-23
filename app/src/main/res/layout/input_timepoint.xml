@@ -10,12 +10,10 @@
         android:layout_height="wrap_content"
         android:layout="@layout/common_attribute_input_subheader" />
 
-    <EditText
+    <kr.ac.snu.hcil.omnitrack.ui.components.DateTimePicker
         android:id="@+id/value"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="time" />
+        android:layout_height="wrap_content" />
 
 
 </LinearLayout>

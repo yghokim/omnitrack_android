@@ -6,6 +6,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTProperty
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTSelectionProperty
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
+import kr.ac.snu.hcil.omnitrack.ui.components.DateTimePicker
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.TimePointInputView
 import java.util.*
@@ -19,10 +20,8 @@ class OTTimeAttribute : OTAttribute<TimePoint> {
     companion object {
         const val GRANULARITY = 0
 
-        const val GRANULARITY_SECOND = 0
-        const val GRANULARITY_MINUTE = 1
-        const val GRANULARITY_HOUR = 2
-        const val GRANULARITY_DAY = 3
+        const val GRANULARITY_DAY = 0
+        const val GRANULARITY_TIME = 1
     }
 
     private val calendar = GregorianCalendar()
@@ -43,7 +42,7 @@ class OTTimeAttribute : OTAttribute<TimePoint> {
         get() = arrayOf(GRANULARITY)
 
     override fun createProperties() {
-        assignProperty(OTSelectionProperty(GRANULARITY, "TimePoint Granularity", arrayOf("Second", "Minute", "Hour", "Day"))) //TODO: I18N
+        assignProperty(OTSelectionProperty(GRANULARITY, "TimePoint Granularity", arrayOf("Day", "Time"))) //TODO: I18N
     }
 
     override fun parseAttributeValue(storedValue: String): TimePoint {
@@ -57,18 +56,10 @@ class OTTimeAttribute : OTAttribute<TimePoint> {
 
             calendar.set(Calendar.MILLISECOND, 0)
 
-            when (granularity) {
-                GRANULARITY_MINUTE -> calendar.set(Calendar.SECOND, 0)
-                GRANULARITY_HOUR -> {
-                    calendar.set(Calendar.SECOND, 0)
-                    calendar.set(Calendar.MINUTE, 0)
-                }
-
-                GRANULARITY_DAY -> {
-                    calendar.set(Calendar.SECOND, 0)
-                    calendar.set(Calendar.MINUTE, 0)
-                    calendar.set(Calendar.HOUR, 0)
-                }
+            if (granularity == GRANULARITY_DAY) {
+                calendar.set(Calendar.SECOND, 0)
+                calendar.set(Calendar.MINUTE, 0)
+                calendar.set(Calendar.HOUR, 0)
             }
 
             return calendar.toString()
@@ -82,12 +73,15 @@ class OTTimeAttribute : OTAttribute<TimePoint> {
     override fun getInputView(context: Context, recycledView: AAttributeInputView<out Any>?): AAttributeInputView<out Any> {
         val view =
                 if ((recycledView?.typeId == TYPE_TIME)) {
-                    recycledView!!
+                    recycledView!! as TimePointInputView
                 } else {
                     TimePointInputView(context)
                 }
 
-        //TODO settings
+        when (granularity) {
+            GRANULARITY_DAY -> view.setPickerMode(DateTimePicker.DATE)
+            GRANULARITY_TIME -> view.setPickerMode(DateTimePicker.TIME)
+        }
 
         return view
     }

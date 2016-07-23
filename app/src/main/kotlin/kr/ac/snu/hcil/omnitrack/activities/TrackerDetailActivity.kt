@@ -85,7 +85,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
         listItemTouchHelper.attachToRecyclerView(listView)
 
 
-        removalSnackbar = Snackbar.make(findViewById(R.id.root)!!, resources.getText(R.string.msg_attribute_removed_message), Snackbar.LENGTH_INDEFINITE)
+        removalSnackbar = Snackbar.make(findViewById(R.id.root)!!, resources.getText(R.string.msg_attribute_removed_message), Snackbar.LENGTH_LONG)
         removalSnackbar.setAction(resources.getText(R.string.msg_undo)) {
             view ->
             attributeListAdapter.undoRemove()

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="dateformat_ymd">yyyy년 M월 d일, E요일</string>
+</resources>
