@@ -49,8 +49,6 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val toolbar = findViewById(R.id.toolbar) as Toolbar?
-        setSupportActionBar(toolbar)
         fab = findViewById(R.id.fab) as FloatingActionButton
         fab.setOnClickListener { view ->
             removalSnackbar.dismiss()
@@ -112,7 +110,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
     override fun onStart(){
         super.onStart()
 
-        if (intent.getStringExtra("trackerId") != null) {
+        if (intent.getStringExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER) != null) {
             //edit
             //instant update
 
@@ -120,7 +118,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
 
             isEditMode = true
             title = resources.getString(R.string.title_activity_tracker_edit)
-            tracker = OmniTrackApplication.app.currentUser.trackers.filter{ it.objectId == intent.getStringExtra("trackerId") }.first()
+            tracker = OmniTrackApplication.app.currentUser.trackers.filter { it.objectId == intent.getStringExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER) }.first()
 
             attributeListGroupView.visibility = View.VISIBLE
             fab.visibility = View.VISIBLE
@@ -176,7 +174,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
 
     fun openAttributeDetailActivity(position: Int) {
         val intent = Intent(this, AttributeDetailActivity::class.java)
-        intent.putExtra("attributeId", tracker.attributes[position].objectId)
+        intent.putExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_ATTRIBUTE, tracker.attributes[position].objectId)
         startActivity(intent)
     }
 
@@ -191,7 +189,6 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            //holder.bindTracker(tracker.attributes[position])
             holder.bindAttribute(tracker.attributes[position])
         }
 
@@ -240,9 +237,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
                 view.typeNameView.text = resources.getString(attribute.typeNameResourceId)
                 view.columnNameView.text = attribute.name
 
-                val preview = attribute.getInputView(this@TrackerDetailActivity, view.preview)
-                preview.previewMode = true
-                view.preview = preview
+                view.preview = attribute.getInputView(this@TrackerDetailActivity, true, view.preview)
             }
         }
     }

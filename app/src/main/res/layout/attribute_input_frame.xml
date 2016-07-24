@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/frontalBackground"
+    android:orientation="vertical"
+    android:paddingBottom="30dp"
+    android:paddingRight="@dimen/activity_horizontal_margin">
+
+    <RelativeLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_marginTop="5dp">
+
+        <FrameLayout
+            android:layout_width="?attr/actionBarSize"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true">
+
+            <View
+                android:id="@+id/ui_validation_indicator"
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:layout_gravity="center"
+                android:background="@drawable/green_circle" />
+        </FrameLayout>
+
+
+        <TextView
+            android:id="@+id/title"
+            style="@style/PropertyHeaderStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="?attr/actionBarSize"
+            android:text="Text" />
+
+        <TextView
+            android:id="@+id/ui_attribute_type"
+            style="@style/BadgeText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="15dp"
+            android:text="Attribute Type"
+            android:textAllCaps="true" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:id="@+id/sidebar"
+            android:layout_width="?attr/actionBarSize"
+            android:layout_height="match_parent"
+            android:layout_alignBottom="@+id/inputViewContainer">
+
+        </RelativeLayout>
+
+        <FrameLayout
+            android:id="@+id/inputViewContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_toRightOf="@+id/sidebar"></FrameLayout>
+    </RelativeLayout>
+
+</LinearLayout>

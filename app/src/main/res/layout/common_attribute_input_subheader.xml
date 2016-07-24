@@ -2,8 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/header"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginBottom="15dp">
+    android:layout_height="wrap_content">
     <TextView
         android:id="@+id/title"
         style="@style/PropertyHeaderStyle"
@@ -18,11 +17,9 @@
         style="@style/BadgeText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="false"
-        android:layout_alignParentTop="false"
+        android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
         android:layout_marginStart="15dp"
-        android:layout_toEndOf="@+id/title"
         android:text="Attribute Type"
         android:textAllCaps="true" />
 

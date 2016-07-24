@@ -70,8 +70,8 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
     override fun onStart() {
         super.onStart()
-        if (intent.getStringExtra("attributeId") != null) {
-            attribute = OmniTrackApplication.app.currentUser.findAttributeByObjectId(intent.getStringExtra("attributeId"))
+        if (intent.getStringExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_ATTRIBUTE) != null) {
+            attribute = OmniTrackApplication.app.currentUser.findAttributeByObjectId(intent.getStringExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_ATTRIBUTE))
             for (child in childFragments) {
                 child.value.refresh()
             }

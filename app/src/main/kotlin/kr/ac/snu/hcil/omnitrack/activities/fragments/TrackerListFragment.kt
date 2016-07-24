@@ -15,6 +15,7 @@ import jp.wasabeef.recyclerview.animators.SlideInRightAnimator
 import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.activities.HomeActivity
+import kr.ac.snu.hcil.omnitrack.activities.NewItemActivity
 import kr.ac.snu.hcil.omnitrack.activities.TrackerDetailActivity
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
@@ -101,6 +102,9 @@ class TrackerListFragment : Fragment() {
 
     private fun handleTrackerClick(tracker: OTTracker)
     {
+        val intent = Intent(context, NewItemActivity::class.java)
+        intent.putExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
+        startActivity(intent)
     }
 
     private fun handleTrackerLongClick(tracker: OTTracker)
@@ -112,7 +116,7 @@ class TrackerListFragment : Fragment() {
             when(which) {
                 CHANGE_TRACKER_SETTINGS -> {
                     val intent = Intent(context, TrackerDetailActivity::class.java)
-                    intent.putExtra("trackerId", tracker.objectId)
+                    intent.putExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
                     startActivity(intent)
 
                 }

@@ -11,6 +11,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTProperty
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.NumberInputView
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import java.util.*
 import kotlin.properties.Delegates
@@ -135,6 +136,8 @@ open abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, column
 
     abstract fun makeDefaultValue(): DataType
 
+    abstract fun getInputViewType(previewMode: Boolean = false): Int
+
     open fun makePropertyViews(context: Context): Collection<Pair<Int?, View>> {
         val result = ArrayList<Pair<Int?, View>>()
         for (key in keys) {
@@ -144,5 +147,17 @@ open abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, column
     }
 
     //reuse recycled view if possible.
-    abstract fun getInputView(context: Context, recycledView: AAttributeInputView<out Any>?): AAttributeInputView<out Any>
+    open fun getInputView(context: Context, previewMode: Boolean, recycledView: AAttributeInputView<out Any>?): AAttributeInputView<out Any> {
+        val view =
+                if ((recycledView?.typeId == getInputViewType(previewMode))) {
+                    recycledView!!
+                } else {
+                    AAttributeInputView.makeInstance(getInputViewType(previewMode), context)
+                }
+
+        view.previewMode = previewMode
+        return view
+    }
+
+
 }

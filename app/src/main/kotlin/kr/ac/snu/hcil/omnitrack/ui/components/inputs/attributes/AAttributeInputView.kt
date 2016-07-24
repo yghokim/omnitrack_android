@@ -22,24 +22,20 @@ abstract class AAttributeInputView<DataType>(layoutId: Int, context: Context, at
         const val VIEW_TYPE_TIME_POINT = 1
         const val VIEW_TYPE_LONG_TEXT = 2
 
+        fun makeInstance(type: Int, context: Context): AAttributeInputView<out Any> {
+            return when (type) {
+                VIEW_TYPE_NUMBER -> NumberInputView(context)
+                VIEW_TYPE_TIME_POINT -> TimePointInputView(context)
+                VIEW_TYPE_LONG_TEXT -> LongTextInputView(context)
+                else -> throw IllegalArgumentException("attribute view data type ${type} is not supported yet.")
+            }
+        }
     }
 
     abstract val typeId: Int
         get
 
-    private lateinit var columnNameView: TextView
-    private lateinit var attributeTypeView: TextView
-
-    private lateinit var headerView: View
-    private var headerStub: ViewStubCompat? = null
-
-    private var attribute: OTAttribute<out Any>? = null
-
     init {
-
-        headerStub = findViewById(R.id.header_stub) as ViewStubCompat
-
-        onSetPreviewMode(true)
     }
 
     var previewMode: Boolean by Delegates.observable(true) {
@@ -50,43 +46,11 @@ abstract class AAttributeInputView<DataType>(layoutId: Int, context: Context, at
 
     protected open fun onSetPreviewMode(mode: Boolean) {
         if (mode) {
-            if (headerStub == null) {
-                headerView.visibility = View.GONE
-            }
-
             isEnabled = false
             alpha = 0.5f
         } else {
-            if (headerStub != null) {
-                inflateHeader()
-            } else {
-                headerView.visibility = View.VISIBLE
-            }
-
-
             isEnabled = true
             alpha = 1.0f
         }
     }
-
-    open fun bindAttribute(attribute: OTAttribute<out Any>) {
-        this.attribute = attribute
-        if (headerStub != null) {
-            columnNameView.text = attribute.name
-            attributeTypeView.text = resources.getString(attribute.typeNameResourceId)
-        }
-    }
-
-    private fun inflateHeader() {
-        if (headerStub != null) {
-            headerView = headerStub!!.inflate()
-            columnNameView = findViewById(R.id.title) as TextView
-            attributeTypeView = findViewById(R.id.ui_attribute_type) as TextView
-            if (attribute != null) {
-                columnNameView.text = attribute!!.name
-                attributeTypeView.text = resources.getString(attribute!!.typeNameResourceId)
-            }
-        }
-    }
-
 }

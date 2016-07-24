@@ -15,6 +15,11 @@ import java.util.*
  * Created by Young-Ho Kim on 2016-07-20.
  */
 class OTTimeAttribute : OTAttribute<TimePoint> {
+
+    override fun getInputViewType(previewMode: Boolean): Int {
+        return AAttributeInputView.VIEW_TYPE_TIME_POINT
+    }
+
     override val typeNameResourceId: Int = R.string.type_timepoint_name
 
     companion object {
@@ -70,13 +75,8 @@ class OTTimeAttribute : OTAttribute<TimePoint> {
         return TimePoint()
     }
 
-    override fun getInputView(context: Context, recycledView: AAttributeInputView<out Any>?): AAttributeInputView<out Any> {
-        val view =
-                if ((recycledView?.typeId == AAttributeInputView.VIEW_TYPE_TIME_POINT)) {
-                    recycledView!! as TimePointInputView
-                } else {
-                    TimePointInputView(context)
-                }
+    override fun getInputView(context: Context, previewMode: Boolean, recycledView: AAttributeInputView<out Any>?): AAttributeInputView<out Any> {
+        val view = super.getInputView(context, previewMode, recycledView) as TimePointInputView
 
         when (granularity) {
             GRANULARITY_DAY -> view.setPickerMode(DateTimePicker.DATE)

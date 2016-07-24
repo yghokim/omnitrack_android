@@ -13,6 +13,8 @@
     <color name="outerBackground">#eae7e3</color>
     <color name="frontalBackground">#ffffff</color>
 
+    <color name="colorGreen">#9fea75</color>
+
     <color name="editTextLine">#cfcfcf</color>
 
     <color name="selection_view_button_selected_text_color">#ffffff</color>

@@ -124,7 +124,7 @@ class DateTimePicker(context: Context, attrs: AttributeSet? = null) : FrameLayou
                 }
             }
 
-            println(calendar.toString())
+            //println(calendar.toString())
         }
     }
 

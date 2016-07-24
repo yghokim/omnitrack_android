@@ -13,8 +13,6 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
-    <string name="title_activity_projects">My Projects</string>
-    <string name="title_activity_project_settings">Project Settings</string>
 
     <string name="msg_select_attribute_type">Select attribute type</string>
 
@@ -50,6 +48,8 @@
 
     <string name="msg_column_name">Column Name</string>
 
+    <string name="hind_long_text">Write text here</string>
+
     <string name="dateformat_ymd">MM d, yyyy, EE</string>
 
     <string name="title_activity_tracker_new">New Tracker</string>
@@ -69,5 +69,8 @@
     <string name="type_number_desc">An integer or real number with unit</string>
 
 
+    <string name="title_activity_projects">My Projects</string>
+    <string name="title_activity_project_settings">Project Settings</string>
     <string name="title_activity_attribute_detail">Attribute Detail</string>
+    <string name="title_activity_new_item">New [%1$s] Item</string>
 </resources>

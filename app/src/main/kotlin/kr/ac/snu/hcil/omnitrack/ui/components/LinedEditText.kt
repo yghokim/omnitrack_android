@@ -37,9 +37,9 @@ class LinedEditText(context: Context, attrs: AttributeSet? = null, defStyleAttr:
 
             canvas.drawLine(lineBounds.left.toFloat(), baseline.toFloat(), lineBounds.right.toFloat(), baseline.toFloat(), linePaint);
             baseline += lineHeight
-
-            super.onDraw(canvas);
         }
+
+        super.onDraw(canvas);
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {

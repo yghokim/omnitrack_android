@@ -15,6 +15,12 @@ class OmniTrackApplication : Application() {
     companion object{
         lateinit var app : OmniTrackApplication
             private set
+
+        const val INTENT_EXTRA_OBJECT_ID_TRACKER = "trackerObjectId"
+        const val INTENT_EXTRA_OBJECT_ID_ATTRIBUTE = "attributeObjectId"
+        const val INTENT_EXTRA_OBJECT_ID_USER = "userObjectId"
+        const val INTENT_EXTRA_ITEMBUILDER = "itemBuilderId"
+
     }
 
     private lateinit var _currentUser : OTUser

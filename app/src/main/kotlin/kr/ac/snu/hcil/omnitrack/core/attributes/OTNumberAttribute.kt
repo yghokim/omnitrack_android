@@ -17,6 +17,10 @@ import kotlin.properties.Delegates
 
 class OTNumberAttribute(objectId: String?, dbId: Long?, columnName: String, settingData: String?) : OTAttribute<Float>(objectId, dbId, columnName, OTAttribute.TYPE_NUMBER, settingData) {
 
+    override fun getInputViewType(previewMode: Boolean): Int {
+        return AAttributeInputView.VIEW_TYPE_NUMBER
+    }
+
     override val typeNameResourceId: Int = R.string.type_number_name
 
     override val keys: Array<Int>
@@ -63,17 +67,6 @@ class OTNumberAttribute(objectId: String?, dbId: Long?, columnName: String, sett
 
     override fun makeDefaultValue(): Float {
         return 0.0f
-    }
-
-    override fun getInputView(context: Context, recycledView: AAttributeInputView<out Any>?): AAttributeInputView<out Any> {
-        val view =
-                if ((recycledView?.typeId == AAttributeInputView.VIEW_TYPE_NUMBER)) {
-                    recycledView!!
-                } else {
-                    NumberInputView(context)
-                }
-
-        return view
     }
 
 }
