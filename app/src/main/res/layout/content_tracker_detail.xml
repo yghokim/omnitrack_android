@@ -63,10 +63,7 @@
             android:id="@+id/ui_attribute_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="@dimen/activity_vertical_margin"
-
-            android:paddingLeft="@dimen/attribute_list_horizontal_padding"
-            android:paddingRight="@dimen/attribute_list_horizontal_padding" />
+            android:paddingBottom="@dimen/activity_vertical_margin" />
 
         </LinearLayout>
 
