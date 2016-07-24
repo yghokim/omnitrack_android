@@ -12,7 +12,7 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.OTAttribute
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.ui.SpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import java.text.AttributedCharacterIterator
@@ -71,7 +71,8 @@ class AttributeTypeListDialogFragment : DialogFragment() {
         init {
             types = arrayOf(
                     AttributeTypeEntry(OTAttribute.TYPE_NUMBER, R.drawable.field_icon_number, context.getString(R.string.type_number_name), context.getString(R.string.type_number_desc)),
-                    AttributeTypeEntry(OTAttribute.TYPE_TIME, R.drawable.field_icon_time, context.getString(R.string.type_timepoint_name), context.getString(R.string.type_timepoint_desc))
+                    AttributeTypeEntry(OTAttribute.TYPE_TIME, R.drawable.field_icon_time, context.getString(R.string.type_timepoint_name), context.getString(R.string.type_timepoint_desc)),
+                    AttributeTypeEntry(OTAttribute.TYPE_LONG_TEXT, R.drawable.field_icon_longtext, context.getString(R.string.type_longtext_name), context.getString(R.string.type_longtext_desc))
             )
         }
 

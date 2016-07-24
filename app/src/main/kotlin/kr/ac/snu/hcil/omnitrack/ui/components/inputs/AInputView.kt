@@ -24,7 +24,11 @@ abstract class AInputView<T>(layoutId: Int, context: Context, attrs: AttributeSe
 
     init{
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        addView(inflater.inflate(layoutId, this, false))
+        try {
+            addView(inflater.inflate(layoutId, this, false))
+        } catch(e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     fun addNewValidator(failedMessage: CharSequence?, func: (T)->Boolean){

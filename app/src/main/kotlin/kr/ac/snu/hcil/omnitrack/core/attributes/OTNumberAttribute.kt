@@ -3,7 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.attributes
 import android.content.Context
 import android.util.SparseArray
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.OTAttribute
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTProperty
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTSelectionProperty
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
@@ -67,7 +67,7 @@ class OTNumberAttribute(objectId: String?, dbId: Long?, columnName: String, sett
 
     override fun getInputView(context: Context, recycledView: AAttributeInputView<out Any>?): AAttributeInputView<out Any> {
         val view =
-                if ((recycledView?.typeId == TYPE_NUMBER)) {
+                if ((recycledView?.typeId == AAttributeInputView.VIEW_TYPE_NUMBER)) {
                     recycledView!!
                 } else {
                     NumberInputView(context)

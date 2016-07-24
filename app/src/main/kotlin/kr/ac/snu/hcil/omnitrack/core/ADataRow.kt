@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core
 
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.utils.serialization.IStringSerializable
 
 /**

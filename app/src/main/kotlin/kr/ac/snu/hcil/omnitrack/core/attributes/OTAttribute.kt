@@ -1,9 +1,12 @@
-package kr.ac.snu.hcil.omnitrack.core
+package kr.ac.snu.hcil.omnitrack.core.attributes
 
 import android.content.Context
 import android.util.SparseArray
 import android.view.View
 import com.google.gson.Gson
+import kr.ac.snu.hcil.omnitrack.core.OTTracker
+import kr.ac.snu.hcil.omnitrack.core.OTUser
+import kr.ac.snu.hcil.omnitrack.core.UniqueObject
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTProperty
@@ -27,12 +30,16 @@ open abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, column
         const val TYPE_NUMBER = 0
         const val TYPE_TIME = 1
         const val TYPE_TIMESPAN = 2
-        const val TYPE_LOCATION = 3
+        const val TYPE_SHORT_TEXT = 3
+        const val TYPE_LONG_TEXT = 4
+        const val TYPE_LOCATION = 5
+
 
         fun createAttribute(objectId: String?, dbId: Long?, columnName: String, typeId: Int, settingData: String?): OTAttribute<out Any> {
             val attr = when (typeId) {
                 TYPE_NUMBER -> OTNumberAttribute(objectId, dbId, columnName, settingData)
                 TYPE_TIME -> OTTimeAttribute(objectId, dbId, columnName, settingData)
+                TYPE_LONG_TEXT -> OTLongTextAttribute(objectId, dbId, columnName, settingData)
                 else -> OTNumberAttribute(objectId, dbId, columnName, settingData)
             }
             return attr

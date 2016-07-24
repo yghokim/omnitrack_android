@@ -8,7 +8,7 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.OTAttribute
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.AInputView
 import kotlin.properties.Delegates
 
@@ -18,8 +18,9 @@ import kotlin.properties.Delegates
 abstract class AAttributeInputView<DataType>(layoutId: Int, context: Context, attrs: AttributeSet? = null) : AInputView<DataType>(layoutId, context, attrs) {
 
     companion object {
-        const val TYPE_NUMBER = 0
-        const val TYPE_TIME_POINT = 1
+        const val VIEW_TYPE_NUMBER = 0
+        const val VIEW_TYPE_TIME_POINT = 1
+        const val VIEW_TYPE_LONG_TEXT = 2
 
     }
 

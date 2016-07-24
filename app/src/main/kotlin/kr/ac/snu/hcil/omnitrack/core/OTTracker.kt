@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core
 
 //import kr.ac.snu.hcil.omnitrack.core.database.TrackerEntity
 import android.graphics.Color
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeAttribute
 import kr.ac.snu.hcil.omnitrack.utils.ObservableList
 import kr.ac.snu.hcil.omnitrack.utils.events.Event

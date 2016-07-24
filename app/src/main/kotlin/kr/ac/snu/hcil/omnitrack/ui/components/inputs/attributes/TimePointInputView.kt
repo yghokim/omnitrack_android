@@ -11,7 +11,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.DateTimePicker
  * Created by Young-Ho Kim on 2016-07-22.
  */
 class TimePointInputView(context: Context, attrs: AttributeSet? = null) : AAttributeInputView<TimePoint>(R.layout.input_timepoint, context, attrs) {
-    override val typeId: Int = TYPE_TIME_POINT
+    override val typeId: Int = VIEW_TYPE_TIME_POINT
 
     private lateinit var valueView: DateTimePicker
 

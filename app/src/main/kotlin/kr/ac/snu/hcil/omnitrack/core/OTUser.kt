@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core
 
 import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.utils.ObservableList
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import java.io.Serializable

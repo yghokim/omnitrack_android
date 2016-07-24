@@ -2,7 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.attributes
 
 import android.content.Context
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.OTAttribute
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTProperty
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTSelectionProperty
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
@@ -72,7 +72,7 @@ class OTTimeAttribute : OTAttribute<TimePoint> {
 
     override fun getInputView(context: Context, recycledView: AAttributeInputView<out Any>?): AAttributeInputView<out Any> {
         val view =
-                if ((recycledView?.typeId == TYPE_TIME)) {
+                if ((recycledView?.typeId == AAttributeInputView.VIEW_TYPE_TIME_POINT)) {
                     recycledView!! as TimePointInputView
                 } else {
                     TimePointInputView(context)

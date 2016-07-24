@@ -62,7 +62,12 @@
     <string name="type_timepoint_name">Time Point</string>
     <string name="type_timepoint_desc">A specific time point</string>
 
+    <string name="type_longtext_name">Long Text</string>
+    <string name="type_longtext_desc">A multiline text</string>
+
     <string name="type_number_name">Number</string>
     <string name="type_number_desc">An integer or real number with unit</string>
+
+
     <string name="title_activity_attribute_detail">Attribute Detail</string>
 </resources>
