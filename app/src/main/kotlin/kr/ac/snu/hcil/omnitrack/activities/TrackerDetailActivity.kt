@@ -237,6 +237,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
                 view.typeNameView.text = resources.getString(attribute.typeNameResourceId)
                 view.columnNameView.text = attribute.name
 
+                view.previewContainer.alpha = 0.5f
                 view.preview = attribute.getInputView(this@TrackerDetailActivity, true, view.preview)
             }
         }

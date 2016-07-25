@@ -38,7 +38,7 @@ abstract class AAttributeInputView<DataType>(layoutId: Int, context: Context, at
     init {
     }
 
-    var previewMode: Boolean by Delegates.observable(true) {
+    var previewMode: Boolean by Delegates.observable(false) {
         prop, old, new ->
         if (old != new)
             onSetPreviewMode(new)
@@ -47,10 +47,10 @@ abstract class AAttributeInputView<DataType>(layoutId: Int, context: Context, at
     protected open fun onSetPreviewMode(mode: Boolean) {
         if (mode) {
             isEnabled = false
-            alpha = 0.5f
+            //alpha = 0.5f
         } else {
             isEnabled = true
-            alpha = 1.0f
+            //alpha = 1.0f
         }
     }
 }

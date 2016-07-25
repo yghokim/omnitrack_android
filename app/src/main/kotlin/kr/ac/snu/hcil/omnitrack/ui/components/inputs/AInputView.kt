@@ -25,9 +25,10 @@ abstract class AInputView<T>(layoutId: Int, context: Context, attrs: AttributeSe
     init{
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         try {
-            addView(inflater.inflate(layoutId, this, false))
+            inflater.inflate(layoutId, this, true)
         } catch(e: Exception) {
             e.printStackTrace()
+            throw Exception("Inflation failed")
         }
     }
 

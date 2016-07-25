@@ -68,6 +68,8 @@
     <string name="type_number_name">Number</string>
     <string name="type_number_desc">An integer or real number with unit</string>
 
+    <string name="format_hour_am">AM %I</string>
+    <string name="format_hour_pm">PM %I</string>
 
     <string name="title_activity_projects">My Projects</string>
     <string name="title_activity_project_settings">Project Settings</string>

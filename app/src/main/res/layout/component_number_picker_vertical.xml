@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ImageButton
+        android:id="@+id/ui_button_plus"
+        style="@style/whiteButtonLongStyle"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/number_button_height"
+        android:layout_marginLeft="7dp"
+        android:layout_marginRight="7dp"
+        android:background="@drawable/capsule_button_background"
+        android:minWidth="@dimen/number_button_width"
+        android:src="@drawable/plus_dark" />
+
+    <EditText
+        android:id="@+id/valueField"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/transparent_button_background"
+        android:ems="10"
+        android:inputType="numberDecimal"
+        android:textAlignment="center"
+        android:textColor="@color/buttonIconColorDark"
+        android:textSize="15sp"
+        android:textStyle="bold" />
+
+    <ImageButton
+        android:id="@+id/ui_button_minus"
+        style="@style/whiteButtonLongStyle"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/number_button_height"
+        android:layout_marginLeft="7dp"
+        android:layout_marginRight="7dp"
+        android:background="@drawable/capsule_button_background"
+        android:minWidth="@dimen/number_button_width"
+        android:src="@drawable/minus_dark" />
+</merge>

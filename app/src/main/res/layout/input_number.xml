@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -20,26 +18,20 @@
 
         <ImageButton
             android:id="@+id/ui_button_minus"
+            style="@style/whiteMinusButtonStyle"
             android:layout_width="@dimen/button_height_normal"
             android:layout_height="@dimen/button_height_normal"
             android:layout_centerVertical="true"
             android:layout_marginLeft="8dp"
-            android:layout_toStartOf="@+id/ui_button_plus"
-            android:background="@drawable/round_button_background"
-            android:padding="17dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/minus_dark" />
+            android:layout_toStartOf="@+id/ui_button_plus" />
 
         <ImageButton
             android:id="@+id/ui_button_plus"
+            style="@style/whitePlusButtonStyle"
             android:layout_width="@dimen/button_height_normal"
             android:layout_height="@dimen/button_height_normal"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="5dp"
-            android:background="@drawable/round_button_background"
-            android:padding="17dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/plus_dark" />
+            android:layout_marginLeft="5dp" />
     </RelativeLayout>
-</FrameLayout>
+</merge>
