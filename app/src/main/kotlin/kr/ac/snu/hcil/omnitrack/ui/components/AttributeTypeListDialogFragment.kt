@@ -90,7 +90,7 @@ class AttributeTypeListDialogFragment : DialogFragment() {
         }
 
         override fun getItemId(position: Int): Long {
-            return position as Long;
+            return position.toLong();
         }
 
 

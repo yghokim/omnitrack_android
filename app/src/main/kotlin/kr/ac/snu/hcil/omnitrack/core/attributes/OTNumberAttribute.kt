@@ -15,7 +15,7 @@ import kotlin.properties.Delegates
  * Created by Young-Ho Kim on 2016-07-11.
  */
 
-class OTNumberAttribute(objectId: String?, dbId: Long?, columnName: String, settingData: String?) : OTAttribute<Float>(objectId, dbId, columnName, OTAttribute.TYPE_NUMBER, settingData) {
+class OTNumberAttribute(objectId: String?, dbId: Long?, columnName: String, settingData: String?) : OTAttribute<Double>(objectId, dbId, columnName, OTAttribute.TYPE_NUMBER, settingData) {
 
     override fun getInputViewType(previewMode: Boolean): Int {
         return AAttributeInputView.VIEW_TYPE_NUMBER
@@ -46,8 +46,8 @@ class OTNumberAttribute(objectId: String?, dbId: Long?, columnName: String, sett
         set(value) = setPropertyValue(UNIT, value)
 
 
-    override fun parseAttributeValue(storedValue: String): Float {
-        return storedValue.toFloat()
+    override fun parseAttributeValue(storedValue: String): Double {
+        return storedValue.toDouble()
     }
 
     override fun formatAttributeValue(value: Any): String {
@@ -65,11 +65,13 @@ class OTNumberAttribute(objectId: String?, dbId: Long?, columnName: String, sett
         }
     }
 
-    override fun makeDefaultValue(): Float {
-        return 0.0f
+    override fun makeDefaultValue(): Double {
+        return 0.0
     }
 
     override fun refreshInputViewContents(inputView: AAttributeInputView<out Any>) {
-
+        if (inputView is NumberInputView) {
+            inputView.value = this.makeDefaultValue()
+        }
     }
 }

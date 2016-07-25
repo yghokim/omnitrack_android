@@ -1,7 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes
 
 import android.content.Context
-import android.support.v4.app.ActionBarDrawerToggle
 import android.support.v7.widget.ViewStubCompat
 import android.util.AttributeSet
 import android.view.View

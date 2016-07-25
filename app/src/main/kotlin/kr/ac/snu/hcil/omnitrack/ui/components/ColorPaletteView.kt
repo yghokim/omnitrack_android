@@ -81,7 +81,7 @@ class ColorPaletteView(context: Context, attrs: AttributeSet?, defStyle: Int) : 
         }
 
         override fun getItemId(position: Int): Long {
-            return colors[position] as Long;
+            return colors[position].toLong()
         }
 
 
@@ -106,7 +106,7 @@ class ColorPaletteView(context: Context, attrs: AttributeSet?, defStyle: Int) : 
 
             fun bind(position: Int){
                 (view as ColorSelectionButton).color = colors[position]
-                (view as ColorSelectionButton).isChecked = selectedIndex == position
+                view.isChecked = selectedIndex == position
             }
         }
     }

@@ -5,16 +5,31 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <EditText
-            android:id="@+id/editText"
-            android:layout_width="wrap_content"
+        <FrameLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/ui_button_minus"
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
-            android:layout_toStartOf="@+id/ui_button_minus"
-            android:ems="10"
-            android:inputType="numberDecimal" />
+            android:layout_toStartOf="@+id/ui_button_minus">
+
+            <EditText
+                android:id="@+id/valueField"
+                style="@style/numberPropertyDigitViewStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="numberDecimal|numberSigned"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/valueStatic"
+                style="@style/numberPropertyDigitViewStyle"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="?editTextBackground"
+                android:gravity="center_vertical" />
+
+        </FrameLayout>
 
         <ImageButton
             android:id="@+id/ui_button_minus"

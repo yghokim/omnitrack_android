@@ -100,4 +100,10 @@
         <item name="android:scaleType">fitCenter</item>
     </style>
 
+    <style name="numberPropertyDigitViewStyle">
+        <item name="android:textSize">25sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/colorPrimary</item>
+    </style>
+
 </resources>
