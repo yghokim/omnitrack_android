@@ -135,7 +135,7 @@ class NumberInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
         }
 
         valueField.setOnEditorActionListener { textView, actionId, keyEvent ->
-            if (actionId == EditorInfo.IME_ACTION_DONE || keyEvent.action == KeyEvent.ACTION_DOWN && keyEvent.keyCode == KeyEvent.KEYCODE_ENTER) {
+            if (actionId == EditorInfo.IME_ACTION_DONE || keyEvent?.action == KeyEvent.ACTION_DOWN && keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
                 applyFieldValue()
                 typingMode = false
                 true
@@ -154,7 +154,6 @@ class NumberInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
         valueStatic.text = format.format(value)
         var bigDecimalString = BigDecimal(value).toPlainString()
         val decimalPointIndex = bigDecimalString.indexOfFirst { it == '.' }
-        println("before: $bigDecimalString")
         if (decimalPointIndex != -1) {
             bigDecimalString = bigDecimalString.substring(0, Math.min(decimalPointIndex + numDigitsUnderPoint + 1, bigDecimalString.length))
         }
@@ -162,8 +161,6 @@ class NumberInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
         if (bigDecimalString.last() == '.') {
             bigDecimalString.substring(0, bigDecimalString.length)
         }
-
-        println("after: $bigDecimalString")
 
         valueField.setText(bigDecimalString)
     }
