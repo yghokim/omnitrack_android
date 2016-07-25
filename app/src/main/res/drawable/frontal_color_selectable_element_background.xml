@@ -1,13 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_pressed="false">
         <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
-            <solid android:color="#00ffffff" />
+            <solid android:color="@color/frontalBackground" />
+        </shape>
+    </item>
+    <item android:state_pressed="true">
+        <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+            <solid android:color="?colorControlHighlight" />
         </shape>
     </item>
 
-    <item android:state_pressed="true">
-        <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
-            <solid android:color="#30000000" />
-        </shape>
-    </item>
 </selector>

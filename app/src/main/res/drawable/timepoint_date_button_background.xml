@@ -1,4 +1,14 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@drawable/timepoint_date_button_normal" android:state_pressed="false" />
-    <item android:drawable="@drawable/timepoint_date_button_pressed" android:state_pressed="true" />
+    <item android:state_pressed="false">
+        <shape xmlns:android="http://schemas.android.com/apk/res/android">
+            <stroke android:width="0.8dp" android:color="#757575" />
+            <corners android:radius="6dp" />
+        </shape>
+    </item>
+    <item android:state_pressed="true">
+        <shape xmlns:android="http://schemas.android.com/apk/res/android">
+            <solid android:color="#44000000" />
+            <corners android:radius="6dp" />
+        </shape>
+    </item>
 </selector>

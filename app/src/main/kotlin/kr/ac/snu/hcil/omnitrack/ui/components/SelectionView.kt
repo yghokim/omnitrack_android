@@ -119,7 +119,7 @@ class SelectionView(context: Context, attrs: AttributeSet?, defStyle: Int) : Rec
                     button.setBackgroundResource(R.drawable.capsule_frame)
                     button.setTextColor(selectedTextColor)
                 } else {
-                    button.setBackgroundResource(R.drawable.background_transparent)
+                    button.setBackgroundResource(R.drawable.transparent_button_background)
                     button.setTextColor(unSelectedTextColor)
                 }
 

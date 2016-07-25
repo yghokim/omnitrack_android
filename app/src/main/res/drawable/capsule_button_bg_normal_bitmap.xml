@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<bitmap xmlns:android="http://schemas.android.com/apk/res/android"
-    android:gravity="fill_vertical|center_horizontal|fill"
-    android:src="@drawable/capsule_button_bg_normal" />
