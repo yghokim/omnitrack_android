@@ -13,6 +13,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilder
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
+import kr.ac.snu.hcil.omnitrack.ui.HorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.SpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 
@@ -37,7 +38,7 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
         val listView = findViewById(R.id.ui_attribute_list) as RecyclerView
         val layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         listView.layoutManager = layoutManager
-        listView.addItemDecoration(SpaceItemDecoration(LinearLayoutManager.VERTICAL, resources.getDimensionPixelOffset(R.dimen.attribute_list_element_vertical_space)));
+        listView.addItemDecoration(HorizontalImageDividerItemDecoration(R.drawable.horizontal_separator_pattern, this))
 
         listView.adapter = attributeListAdapter
     }

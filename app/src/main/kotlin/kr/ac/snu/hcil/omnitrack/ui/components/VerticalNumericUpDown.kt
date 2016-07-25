@@ -1,11 +1,17 @@
 package kr.ac.snu.hcil.omnitrack.ui.components
 
 import android.content.Context
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.AttributeSet
+import android.view.Display
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.widget.*
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
+import java.text.ParseException
 import java.util.*
 import kotlin.properties.Delegates
 
@@ -47,8 +53,7 @@ class VerticalNumericUpDown(context: Context, attrs: AttributeSet?) : LinearLayo
     private lateinit var upButton: ImageButton
     private lateinit var downButton: ImageButton
 
-    private lateinit var field: EditText
-
+    private lateinit var field: TextView
     init {
         orientation = LinearLayout.VERTICAL
 
@@ -74,7 +79,7 @@ class VerticalNumericUpDown(context: Context, attrs: AttributeSet?) : LinearLayo
             }
         }
 
-        field = findViewById(R.id.valueField) as EditText
+        field = findViewById(R.id.valueField) as TextView
 
         invalidateViews()
     }
