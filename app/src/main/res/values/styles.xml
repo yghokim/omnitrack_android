@@ -70,8 +70,10 @@
 
     <style name="LongTextStyle">
         <item name="android:gravity">top</item>
-        <item name="android:inputType">textMultiLine</item>
-        <item name="android:textIsSelectable">true</item>
+        <item name="android:background">@null</item>
+        <item name="android:inputType">text|textMultiLine</item>
+        <item name="android:ems">10</item>
+        <item name="android:imeOptions">actionDone</item>
         <item name="android:hint">@string/hind_long_text</item>
         <item name="android:textColorHint">#33000000</item>
         <item name="android:textSize">18dp</item>
