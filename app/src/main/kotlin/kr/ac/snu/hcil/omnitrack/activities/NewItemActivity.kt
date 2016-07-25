@@ -84,7 +84,7 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
 
             fun bind(attribute: OTAttribute<out Any>) {
                 //inputView.bindAttribute(attribute)
-
+                attribute.refreshInputViewContents(inputView)
                 columnNameView.text = attribute.name
                 attributeTypeView.text = resources.getString(attribute.typeNameResourceId)
             }

@@ -89,7 +89,7 @@ class DateTimePicker(context: Context, attrs: AttributeSet? = null) : FrameLayou
                     }
                     middlePicker -> { //month
                         calendar.set(Calendar.DAY_OF_MONTH, Math.min(calendar.get(Calendar.DAY_OF_MONTH), calendar.getActualMaximum(Calendar.DAY_OF_MONTH)))
-                        calendar.set(Calendar.MONTH, newVal + 1)
+                        calendar.set(Calendar.MONTH, newVal)
                     }
                     rightPicker -> { //day
                         calendar.set(Calendar.DAY_OF_MONTH, newVal)
@@ -183,7 +183,7 @@ class DateTimePicker(context: Context, attrs: AttributeSet? = null) : FrameLayou
 
                 middlePicker.minValue = 0
                 middlePicker.maxValue = 11
-                middlePicker.value = calendar.get(Calendar.MONTH) - 1
+                middlePicker.value = calendar.get(Calendar.MONTH)
                 middlePicker.displayedValues = monthNames
 
                 rightPicker.minValue = 1

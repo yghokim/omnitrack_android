@@ -69,4 +69,7 @@ class OTNumberAttribute(objectId: String?, dbId: Long?, columnName: String, sett
         return 0.0f
     }
 
+    override fun refreshInputViewContents(inputView: AAttributeInputView<out Any>) {
+
+    }
 }

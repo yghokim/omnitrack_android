@@ -80,7 +80,7 @@ class VerticalNumericUpDown(context: Context, attrs: AttributeSet?) : LinearLayo
     }
 
     private fun getDisplayedValue(value: Int): String {
-        return displayedValues?.get(minValue + value) ?: value.toString()
+        return displayedValues?.get(value - minValue) ?: value.toString()
     }
 
     private fun invalidateViews() {

@@ -155,9 +155,12 @@ open abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, column
                     AAttributeInputView.makeInstance(getInputViewType(previewMode), context)
                 }
 
+        refreshInputViewContents(view)
         view.previewMode = previewMode
         return view
     }
+
+    abstract fun refreshInputViewContents(inputView: AAttributeInputView<out Any>);
 
 
 }
