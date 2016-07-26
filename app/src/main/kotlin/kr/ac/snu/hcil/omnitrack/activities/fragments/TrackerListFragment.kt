@@ -22,6 +22,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.ui.HorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.SpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
+import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 
 /**
  * Created by Young-Ho Kim on 2016-07-18.
@@ -89,14 +90,14 @@ class TrackerListFragment : Fragment() {
     }
 
     private val onTrackerAddedHandler = {
-        sender: Any, args: Pair<OTTracker, Int>->
+        sender: Any, args: ReadOnlyPair<OTTracker, Int> ->
         println("tracker added - ${args.second}")
         trackerListAdapter.notifyItemInserted(args.second)
         listView.scrollToPosition(args.second)
     }
 
     private val onTrackerRemovedHandler = {
-        sender: Any, args: Pair<OTTracker, Int>->
+        sender: Any, args: ReadOnlyPair<OTTracker, Int> ->
         println("tracker removed - ${args.second}")
         trackerListAdapter.notifyItemRemoved(args.second)
     }

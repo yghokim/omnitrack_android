@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.widget.FrameLayout
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import java.util.*
 
@@ -16,7 +17,7 @@ abstract class AInputView<T>(layoutId: Int, context: Context, attrs: AttributeSe
 
     val valueChanged = Event<T>()
 
-    private val validators: ArrayList<Pair<CharSequence?, (T) -> Boolean>> = ArrayList<Pair<CharSequence?, (T) -> Boolean>>()
+    private val validators: ArrayList<ReadOnlyPair<CharSequence?, (T) -> Boolean>> = ArrayList<ReadOnlyPair<CharSequence?, (T) -> Boolean>>()
 
     protected val validationErrorMessageList = ArrayList<CharSequence>()
 
@@ -33,7 +34,7 @@ abstract class AInputView<T>(layoutId: Int, context: Context, attrs: AttributeSe
     }
 
     fun addNewValidator(failedMessage: CharSequence?, func: (T)->Boolean){
-        validators.add(Pair<CharSequence?, (T)->Boolean>(failedMessage, func))
+        validators.add(ReadOnlyPair<CharSequence?, (T) -> Boolean>(failedMessage, func))
     }
 
     fun validate(): Boolean {
@@ -49,8 +50,9 @@ abstract class AInputView<T>(layoutId: Int, context: Context, attrs: AttributeSe
             if(entry.second(value) == false)
             {
                 passed = false
-                if( entry.first != null) {
-                    validationErrorMessageList.add(entry.first!!)
+                val msg = entry.first
+                if (msg != null) {
+                    validationErrorMessageList.add(msg)
                 }
             }
         }

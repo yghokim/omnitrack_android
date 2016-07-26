@@ -10,6 +10,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.activities.AttributeDetailActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ShortTextPropertyView
+import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 import java.util.*
 import kotlin.properties.Delegates
 
@@ -23,7 +24,7 @@ class AttributeDetailBasicFragment : Fragment(), AttributeDetailActivity.ChildFr
 
     private lateinit var columnNameView: ShortTextPropertyView
 
-    private val propertyViewList = ArrayList<Pair<Int?, View>>()
+    private val propertyViewList = ArrayList<ReadOnlyPair<Int?, View>>()
 
     init {
 
@@ -55,7 +56,7 @@ class AttributeDetailBasicFragment : Fragment(), AttributeDetailActivity.ChildFr
     override fun refresh() {
         val attr = parent?.attribute
         if (attr != null) {
-            columnNameView.value = attr.name ?: ""
+            columnNameView.value = attr.name
 
             propertyViewContainer.removeAllViewsInLayout()
 
@@ -66,13 +67,17 @@ class AttributeDetailBasicFragment : Fragment(), AttributeDetailActivity.ChildFr
 
                 if (entry.first != null) {
                     propertyViewList.add(entry)
+
+                    @Suppress("UNCHECKED_CAST")
                     val propView: APropertyView<Any> = entry.second as APropertyView<Any>
 
-                    propView.value = attr.getPropertyValue(entry.first!!)
+                    propView.value = attr.getPropertyValue(entry.first)
                     propView.valueChanged += {
                         sender, value ->
-                        if ((sender as APropertyView<out Any>).validate()) {
-                            attr.setPropertyValue(entry.first as Int, value)
+                        if (sender is APropertyView<*>) {
+                            if (sender.validate()) {
+                                attr.setPropertyValue(entry.first, value)
+                            }
                         }
                     }
                 }

@@ -93,7 +93,7 @@ class ColorSelectionButton : ToggleButton {
                 paddingLeft = 0.0f
             }
 
-            frameBounds.set(paddingLeft,paddingTop, paddingLeft +contentSize as Float, paddingTop + contentSize as Float)
+            frameBounds.set(paddingLeft, paddingTop, paddingLeft + contentSize, paddingTop + contentSize)
             val paddingSize = Math.round(contentSize * 0.07f)
             val drawableSize = Math.round(paddingSize + contentSize - 2*paddingSize)
             checkedDrawable.setBounds(Math.round(paddingLeft + paddingSize), Math.round(paddingTop + paddingSize), drawableSize, drawableSize)

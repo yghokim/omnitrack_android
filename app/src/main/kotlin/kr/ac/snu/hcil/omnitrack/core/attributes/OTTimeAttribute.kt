@@ -75,14 +75,14 @@ class OTTimeAttribute : OTAttribute<TimePoint> {
         return TimePoint()
     }
 
-    override fun refreshInputViewContents(view: AAttributeInputView<out Any>) {
+    override fun refreshInputViewContents(inputView: AAttributeInputView<out Any>) {
 
-        if (view is TimePointInputView) {
+        if (inputView is TimePointInputView) {
             when (granularity) {
-                GRANULARITY_DAY -> view.setPickerMode(DateTimePicker.DATE)
-                GRANULARITY_TIME -> view.setPickerMode(DateTimePicker.TIME)
+                GRANULARITY_DAY -> inputView.setPickerMode(DateTimePicker.DATE)
+                GRANULARITY_TIME -> inputView.setPickerMode(DateTimePicker.TIME)
             }
-            view.value = this.makeDefaultValue()
+            inputView.value = this.makeDefaultValue()
         }
     }
 

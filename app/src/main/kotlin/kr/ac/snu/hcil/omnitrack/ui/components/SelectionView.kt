@@ -98,7 +98,7 @@ class SelectionView(context: Context, attrs: AttributeSet?, defStyle: Int) : Rec
         }
 
         override fun getItemId(position: Int): Long {
-            return position as Long
+            return position.toLong()
         }
 
 

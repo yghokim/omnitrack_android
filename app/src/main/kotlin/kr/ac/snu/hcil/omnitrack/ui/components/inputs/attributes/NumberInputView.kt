@@ -21,7 +21,7 @@ import kotlin.properties.Delegates
 /**
  * Created by Young-Ho Kim on 2016-07-22.
  */
-class NumberInputView(context: Context, attrs: AttributeSet? = null) : AAttributeInputView<Double>(R.layout.input_number, context, attrs) {
+class NumberInputView(context: Context, attrs: AttributeSet? = null) : AAttributeInputView<BigDecimal>(R.layout.input_number, context, attrs) {
     companion object {
         const val UNIT_POSITOIN_NONE = 0
         const val UNIT_POSITOIN_FRONT = 1
@@ -29,7 +29,7 @@ class NumberInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
     }
 
     override val typeId: Int = VIEW_TYPE_NUMBER
-    override var value: Double = 0.0
+    override var value: BigDecimal = BigDecimal("0")
         set(value) {
             if (field != value) {
                 field = value
@@ -37,7 +37,7 @@ class NumberInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
             }
         }
 
-    private var moveUnit: Int = 1
+    private var moveUnit: BigDecimal = BigDecimal(1)
 
     private lateinit var increaseButton: View
     private lateinit var decreaseButton: View
@@ -152,7 +152,7 @@ class NumberInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
 
     fun applyValueToView() {
         valueStatic.text = format.format(value)
-        var bigDecimalString = BigDecimal(value).toPlainString()
+        var bigDecimalString = value.toPlainString()
         val decimalPointIndex = bigDecimalString.indexOfFirst { it == '.' }
         if (decimalPointIndex != -1) {
             bigDecimalString = bigDecimalString.substring(0, Math.min(decimalPointIndex + numDigitsUnderPoint + 1, bigDecimalString.length))
@@ -167,7 +167,7 @@ class NumberInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
 
     fun applyFieldValue() {
         try {
-            value = valueField.text.toString().toDouble()
+            value = BigDecimal(valueField.text.toString())
         } catch(e: Exception) {
             e.printStackTrace()
         }
@@ -179,7 +179,7 @@ class NumberInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
         format.maximumFractionDigits = numDigitsUnderPoint
         format.isDecimalSeparatorAlwaysShown = if(commasPerDigit > 0){true}else{false}
 */
-        format.roundingMode = RoundingMode.CEILING
+        format.roundingMode = RoundingMode.FLOOR
     }
 
     override fun focus() {

@@ -5,6 +5,7 @@ import android.graphics.Color
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeAttribute
 import kr.ac.snu.hcil.omnitrack.utils.ObservableList
+import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import java.util.*
 import kotlin.properties.Delegates
@@ -37,8 +38,8 @@ class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color
     val removedFromUser = Event<OTUser>()
     val addedToUser = Event<OTUser>()
 
-    val attributeAdded = Event<Pair<OTAttribute<out Any>, Int>>()
-    val attributeRemoved = Event<Pair<OTAttribute<out Any>, Int>>()
+    val attributeAdded = Event<ReadOnlyPair<OTAttribute<out Any>, Int>>()
+    val attributeRemoved = Event<ReadOnlyPair<OTAttribute<out Any>, Int>>()
 
     private val loggedAtAttribute = OTTimeAttribute("Logged At")
 
@@ -76,7 +77,7 @@ class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color
         if (new.dbId != null)
             _removedAttributeIds.removeAll { it == new.dbId }
 
-        attributeAdded.invoke(this, Pair(new, index))
+        attributeAdded.invoke(this, ReadOnlyPair(new, index))
     }
 
     private fun onAttributeRemoved(attribute: OTAttribute<out Any>, index: Int) {
@@ -85,7 +86,7 @@ class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color
         if (attribute.dbId != null)
             _removedAttributeIds.add(attribute.dbId as Long)
 
-        attributeRemoved.invoke(this, Pair(attribute, index))
+        attributeRemoved.invoke(this, ReadOnlyPair(attribute, index))
     }
 
     fun getTotalAttributes(): Array<OTAttribute<out Any>> {

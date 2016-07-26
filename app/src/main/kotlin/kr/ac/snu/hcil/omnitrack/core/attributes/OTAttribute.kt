@@ -12,6 +12,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTProperty
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.NumberInputView
+import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import java.util.*
 import kotlin.properties.Delegates
@@ -19,7 +20,7 @@ import kotlin.properties.Delegates
 /**
  * Created by Young-Ho on 7/11/2016.
  */
-open abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName: String, val typeId: Int, settingData: String?) : UniqueObject(objectId, dbId, columnName) {
+abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName: String, val typeId: Int, settingData: String?) : UniqueObject(objectId, dbId, columnName) {
     override fun makeNewObjectId(): String {
         return owner?.owner?.makeNewObjectId() ?: UUID.randomUUID().toString()
     }
@@ -115,6 +116,7 @@ open abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, column
     }
 
     fun <T> getProperty(key: Int): OTProperty<T> {
+        @Suppress("UNCHECKED_CAST")
         return settingsProperties[key]!! as OTProperty<T>
     }
 
@@ -138,10 +140,10 @@ open abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, column
 
     abstract fun getInputViewType(previewMode: Boolean = false): Int
 
-    open fun makePropertyViews(context: Context): Collection<Pair<Int?, View>> {
-        val result = ArrayList<Pair<Int?, View>>()
+    open fun makePropertyViews(context: Context): Collection<ReadOnlyPair<Int?, View>> {
+        val result = ArrayList<ReadOnlyPair<Int?, View>>()
         for (key in keys) {
-            result.add(Pair(key, getProperty<Any>(key).buildView(context)))
+            result.add(ReadOnlyPair(key, getProperty<Any>(key).buildView(context)))
         }
         return result
     }

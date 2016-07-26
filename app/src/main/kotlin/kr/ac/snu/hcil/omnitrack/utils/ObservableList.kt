@@ -10,8 +10,8 @@ class ObservableList<T>(){
 
     private val list = ArrayList<T>()
 
-    val elementAdded = Event<Pair<T, Int>>()
-    val elementRemoved = Event<Pair<T, Int>>()
+    val elementAdded = Event<ReadOnlyPair<T, Int>>()
+    val elementRemoved = Event<ReadOnlyPair<T, Int>>()
     val elementIndexChanged = Event<Void>()
 
     val size: Int
@@ -19,7 +19,7 @@ class ObservableList<T>(){
 
     fun add(element: T): Boolean {
         if(list.add(element)) {
-            elementAdded.invoke(this, Pair(element, list.size - 1))
+            elementAdded.invoke(this, ReadOnlyPair(element, list.size - 1))
             return true
         }
         else{
@@ -30,7 +30,7 @@ class ObservableList<T>(){
     fun addAt(element: T, position: Int): Boolean {
         try {
             list.add(position, element)
-            elementAdded.invoke(this, Pair(element, position))
+            elementAdded.invoke(this, ReadOnlyPair(element, position))
             return true
         } catch(e: Exception) {
             return false
@@ -62,7 +62,7 @@ class ObservableList<T>(){
         if(index >= 0)
         {
             list.removeAt(index)
-            elementRemoved.invoke(this, Pair(element, index))
+            elementRemoved.invoke(this, ReadOnlyPair(element, index))
             return true
         }
         else{

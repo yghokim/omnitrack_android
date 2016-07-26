@@ -83,6 +83,9 @@ abstract class MultiButtonActionBarActivity(val layoutId: Int) : AppCompatActivi
                 rightActionBarButton?.visibility = View.GONE
                 leftActionBarButton?.visibility = View.GONE
             }
+            Mode.BackAndMenu -> {
+
+            }
         }
     }
 }

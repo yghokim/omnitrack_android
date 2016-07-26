@@ -25,8 +25,8 @@ abstract class OTProperty<T>(initialValue: T, val key: Int, val title: String) :
 
     abstract fun parseValue(serialized: String): T
 
-    override fun setValueFromSerializedString(serializedValue: String) {
-        value = parseValue(serializedValue)
+    override fun setValueFromSerializedString(serialized: String) {
+        value = parseValue(serialized)
     }
 
     abstract fun buildView(context: Context): APropertyView<T>

@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core
 import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.utils.ObservableList
+import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import java.io.Serializable
 import java.util.*
@@ -32,9 +33,9 @@ class OTUser(objectId: String?, dbId: Long?, name: String, email: String, attrib
         return result;
     }
 
-    val trackerAdded = Event<Pair<OTTracker, Int>>()
-    val trackerRemoved = Event<Pair<OTTracker, Int>>()
-    val trackerIndexChanged = Event<Pair<OTTracker, Int>>()
+    val trackerAdded = Event<ReadOnlyPair<OTTracker, Int>>()
+    val trackerRemoved = Event<ReadOnlyPair<OTTracker, Int>>()
+    val trackerIndexChanged = Event<ReadOnlyPair<OTTracker, Int>>()
 
     constructor(name: String, email: String) : this(null, null, name, email) {
 
@@ -66,7 +67,7 @@ class OTUser(objectId: String?, dbId: Long?, name: String, email: String, attrib
         new.owner = this
         _removedTrackerIds.remove(new.dbId)
 
-        trackerAdded.invoke(this, Pair(new, index))
+        trackerAdded.invoke(this, ReadOnlyPair(new, index))
     }
 
     private fun onTrackerRemoved(tracker: OTTracker, index: Int) {
@@ -75,7 +76,7 @@ class OTUser(objectId: String?, dbId: Long?, name: String, email: String, attrib
         if (tracker.dbId != null)
             _removedTrackerIds.add(tracker.dbId as Long)
 
-        trackerRemoved.invoke(this, Pair(tracker, index))
+        trackerRemoved.invoke(this, ReadOnlyPair(tracker, index))
     }
 
     fun findAttributeByObjectId(id: String): OTAttribute<out Any>? {

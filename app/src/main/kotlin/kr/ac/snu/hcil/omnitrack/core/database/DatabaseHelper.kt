@@ -114,7 +114,6 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
             return null
         }
         else{
-            val id = result.getLong(result.getColumnIndex(UserScheme._ID));
             val objectId = result.getString(result.getColumnIndex(UserScheme.OBJECT_ID));
             val name = result.getString(result.getColumnIndex(UserScheme.NAME));
             val email = result.getString(result.getColumnIndex(UserScheme.EMAIL));

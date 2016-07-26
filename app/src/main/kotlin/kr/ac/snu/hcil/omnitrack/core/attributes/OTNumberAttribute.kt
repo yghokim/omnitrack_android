@@ -9,13 +9,14 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTSelectionProperty
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.NumberInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.TimePointInputView
+import java.math.BigDecimal
 import kotlin.properties.Delegates
 
 /**
  * Created by Young-Ho Kim on 2016-07-11.
  */
 
-class OTNumberAttribute(objectId: String?, dbId: Long?, columnName: String, settingData: String?) : OTAttribute<Double>(objectId, dbId, columnName, OTAttribute.TYPE_NUMBER, settingData) {
+class OTNumberAttribute(objectId: String?, dbId: Long?, columnName: String, settingData: String?) : OTAttribute<BigDecimal>(objectId, dbId, columnName, OTAttribute.TYPE_NUMBER, settingData) {
 
     override fun getInputViewType(previewMode: Boolean): Int {
         return AAttributeInputView.VIEW_TYPE_NUMBER
@@ -46,12 +47,14 @@ class OTNumberAttribute(objectId: String?, dbId: Long?, columnName: String, sett
         set(value) = setPropertyValue(UNIT, value)
 
 
-    override fun parseAttributeValue(storedValue: String): Double {
-        return storedValue.toDouble()
+    override fun parseAttributeValue(storedValue: String): BigDecimal {
+        return BigDecimal(storedValue)
     }
 
     override fun formatAttributeValue(value: Any): String {
-        if (value is Float) {
+        /*
+        if (value is BigDecimal) {
+
             val power = Math.pow(10.0, numDigitsUnderDecimalPoint.toDouble())
             val numberStr = (Math.floor(power * value) / power).toString()
 
@@ -62,11 +65,12 @@ class OTNumberAttribute(objectId: String?, dbId: Long?, columnName: String, sett
             }
         } else {
             return ""
-        }
+        }*/
+        return ""
     }
 
-    override fun makeDefaultValue(): Double {
-        return 0.0
+    override fun makeDefaultValue(): BigDecimal {
+        return BigDecimal(0)
     }
 
     override fun refreshInputViewContents(inputView: AAttributeInputView<out Any>) {
