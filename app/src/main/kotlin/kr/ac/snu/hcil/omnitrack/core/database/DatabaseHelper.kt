@@ -18,48 +18,73 @@ import kotlin.properties.Delegates
  */
 class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db", null, 1) {
 
-    abstract class TableScheme{
+    abstract class TableScheme {
         val _ID = "_id"
+        val LOGGED_AT = "logged_at"
+        val UPDATED_AT = "updated_at"
 
-        abstract val tableName : String
+        abstract val tableName: String
 
-        abstract val columnNames: Array<String>
+        abstract val intrinsicColumnNames: Array<String>
 
-        val creationQueryString: String by lazy{
-            "CREATE TABLE ${tableName} (${getCreationColumnContentString()})"
+        val columnNames: Array<String> by lazy {
+            Array<String>((intrinsicColumnNames?.size ?: 0) + 3) {
+                index ->
+                when (index) {
+                    0 -> _ID
+                    1 -> LOGGED_AT
+                    2 -> UPDATED_AT
+                    else -> intrinsicColumnNames[index - 3]
+                }
+            }
         }
 
-        open fun getCreationColumnContentString() : String
-        {
-                return "${_ID} INTEGER PRIMARY KEY"
+
+        val creationQueryString: String by lazy {
+            "CREATE TABLE ${tableName} (${_ID} INTEGER PRIMARY KEY, ${creationColumnContentString}, ${LOGGED_AT} INTEGER, ${UPDATED_AT} INTEGER);"
+        }
+
+        abstract val creationColumnContentString: String
+
+        open val indexCreationQueryString: String = ""
+
+        fun makeIndexQueryString(unique: Boolean, name: String, vararg columns: String): String {
+            return "CREATE${if (unique) {
+                " UNIQUE"
+            } else {
+                ""
+            }} INDEX ${tableName}_$name ON $tableName (${columns.joinToString(", ")});"
+        }
+
+        fun makeForeignKeyStatementString(column: String, foreignTable: String): String {
+            return "$column INTEGER REFERENCES $foreignTable"
         }
     }
 
-    abstract class TableWithNameScheme : TableScheme(){
+    abstract class TableWithNameScheme : TableScheme() {
         val NAME = "name"
         val OBJECT_ID = "object_id"
-        override fun getCreationColumnContentString() : String
-        {
-            return  super.getCreationColumnContentString() + ", ${NAME} TEXT, ${OBJECT_ID} TEXT UNIQUE"
-        }
+
+        override val intrinsicColumnNames: Array<String> = arrayOf(NAME, OBJECT_ID)
+
+        override val creationColumnContentString: String = "${NAME} TEXT, ${OBJECT_ID} TEXT"
+
+        override val indexCreationQueryString: String = makeIndexQueryString(true, name = "obj_id_unique", columns = OBJECT_ID)
     }
 
-    object UserScheme : TableWithNameScheme(){
+    object UserScheme : TableWithNameScheme() {
         override val tableName: String
             get() = "omnitrack_users"
 
         val EMAIL = "email"
         val ATTR_ID_SEED = "attribute_id_seed"
 
-        override val columnNames = arrayOf(_ID, NAME, OBJECT_ID, EMAIL, ATTR_ID_SEED)
+        override val intrinsicColumnNames = super.intrinsicColumnNames + arrayOf(EMAIL, ATTR_ID_SEED)
 
-        override fun getCreationColumnContentString() : String
-        {
-            return super.getCreationColumnContentString() + ", ${EMAIL} TEXT UNIQUE, ${ATTR_ID_SEED} INTEGER"
-        }
+        override val creationColumnContentString: String = super.creationColumnContentString + ", ${EMAIL} TEXT, ${ATTR_ID_SEED} INTEGER"
     }
 
-    object TrackerScheme : TableWithNameScheme(){
+    object TrackerScheme : TableWithNameScheme() {
         override val tableName: String
             get() = "omnitrack_trackers"
 
@@ -67,13 +92,9 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         val POSITION = "position"
         val COLOR = "color"
 
+        override val intrinsicColumnNames = super.intrinsicColumnNames + arrayOf(USER_ID, POSITION, COLOR)
 
-        override val columnNames = arrayOf(_ID, NAME, OBJECT_ID, USER_ID, POSITION, COLOR)
-
-        override fun getCreationColumnContentString() : String
-        {
-            return  super.getCreationColumnContentString() + ", ${USER_ID} INTEGER, ${COLOR} INTEGER, ${POSITION} INTEGER"
-        }
+        override val creationColumnContentString: String = super.creationColumnContentString + ", ${makeForeignKeyStatementString(USER_ID, UserScheme.tableName)}, ${COLOR} INTEGER, ${POSITION} INTEGER"
     }
 
     object AttributeScheme : TableWithNameScheme() {
@@ -84,36 +105,52 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         val SETTING_DATA = "setting_data"
         val TYPE = "type"
 
-        override val columnNames: Array<String> = arrayOf(_ID, NAME, OBJECT_ID, TRACKER_ID, TYPE, POSITION, SETTING_DATA)
+        override val intrinsicColumnNames: Array<String> = super.intrinsicColumnNames + arrayOf(TRACKER_ID, TYPE, POSITION, SETTING_DATA)
 
-        override fun getCreationColumnContentString(): String {
-            return super.getCreationColumnContentString() + ", ${AttributeScheme.TRACKER_ID} INTEGER, ${AttributeScheme.POSITION} INTEGER, ${AttributeScheme.TYPE} INTEGER, ${AttributeScheme.SETTING_DATA} TEXT"
-        }
+        override val creationColumnContentString = super.creationColumnContentString + ", ${makeForeignKeyStatementString(TRACKER_ID, TrackerScheme.tableName)}, ${AttributeScheme.POSITION} INTEGER, ${AttributeScheme.TYPE} INTEGER, ${AttributeScheme.SETTING_DATA} TEXT"
     }
 
+    object ItemScheme : TableScheme() {
+        override val tableName: String = "omnitrack_items"
+
+        val TRACKER_ID = "tracker_id"
+        val VALUES_JSON = "values_json"
+
+        val KEY_TIME_TIMESTAMP = "key_time_timestamp"
+        val KEY_TIME_GRANULARITY = "key_time_granularity"
+        val KEY_TIME_TIMEZONE = "key_time_timezone"
+
+        override val intrinsicColumnNames: Array<String> = arrayOf(TRACKER_ID, VALUES_JSON, KEY_TIME_TIMESTAMP, KEY_TIME_GRANULARITY, KEY_TIME_TIMEZONE)
+        override val creationColumnContentString: String = "${makeForeignKeyStatementString(TRACKER_ID, TrackerScheme.tableName)}, $VALUES_JSON TEXT, $KEY_TIME_TIMESTAMP INTEGER, $KEY_TIME_GRANULARITY TEXT, $KEY_TIME_TIMEZONE TEXT"
+
+        override val indexCreationQueryString: String =
+                makeIndexQueryString(false, "tracker_and_timestamp", TRACKER_ID, KEY_TIME_TIMESTAMP)
+    }
 
     override fun onCreate(db: SQLiteDatabase) {
         println("Create Database Tables")
         Log.d("OMNITRACK", "Create Database Tables")
 
-        db.execSQL(UserScheme.creationQueryString)
-        db.execSQL(TrackerScheme.creationQueryString)
-        db.execSQL(AttributeScheme.creationQueryString)
+        val tables = arrayOf(UserScheme, TrackerScheme, AttributeScheme, ItemScheme)
 
+        for (scheme in tables) {
+            println(scheme.creationQueryString)
+            println(scheme.indexCreationQueryString)
+            db.execSQL(scheme.creationQueryString)
+            db.execSQL(scheme.indexCreationQueryString)
+        }
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
         throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    fun findUserById(id: Long) : OTUser?{
+    fun findUserById(id: Long): OTUser? {
         val result = queryById(id, UserScheme)
-        if(result.count == 0)
-        {
+        if (result.count == 0) {
             result.close()
             return null
-        }
-        else{
+        } else {
             val objectId = result.getString(result.getColumnIndex(UserScheme.OBJECT_ID));
             val name = result.getString(result.getColumnIndex(UserScheme.NAME));
             val email = result.getString(result.getColumnIndex(UserScheme.EMAIL));
@@ -124,19 +161,16 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         }
     }
 
-    fun findTrackersOfUser(userId : Long) : List<OTTracker>? {
+    fun findTrackersOfUser(userId: Long): List<OTTracker>? {
 
-        val query : Cursor = readableDatabase.query(TrackerScheme.tableName, TrackerScheme.columnNames,  "${TrackerScheme.USER_ID}=?", arrayOf(userId.toString()), null, null, "${TrackerScheme.POSITION} ASC")
+        val query: Cursor = readableDatabase.query(TrackerScheme.tableName, TrackerScheme.columnNames, "${TrackerScheme.USER_ID}=?", arrayOf(userId.toString()), null, null, "${TrackerScheme.POSITION} ASC")
         query.moveToFirst()
-        if(query.count == 0)
-        {
+        if (query.count == 0) {
             query.close()
             return null;
-        }
-        else{
+        } else {
             val result = ArrayList<OTTracker>()
-            while(query.moveToNext())
-            {
+            while (query.moveToNext()) {
                 result.add(extractTrackerEntity(query))
             }
 
@@ -163,8 +197,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         }
     }
 
-    fun extractTrackerEntity(cursor: Cursor) : OTTracker
-    {
+    fun extractTrackerEntity(cursor: Cursor): OTTracker {
         val id = cursor.getLong(cursor.getColumnIndex(TrackerScheme._ID))
         val name = cursor.getString(cursor.getColumnIndex(TrackerScheme.NAME))
         val objectId = cursor.getString(cursor.getColumnIndex(TrackerScheme.OBJECT_ID))
@@ -185,8 +218,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         return OTAttribute.createAttribute(objectId, id, name, type, settingData)
     }
 
-    private fun queryById(id: Long, table: TableScheme) : Cursor
-    {
+    private fun queryById(id: Long, table: TableScheme): Cursor {
         val query = readableDatabase.query(table.tableName, table.columnNames, "${table._ID}=?", arrayOf(id.toString()), null, null, "${table._ID} ASC")
         query.moveToFirst()
         return query
@@ -217,8 +249,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
 
     }
 
-    fun save(tracker: OTTracker, position: Int)
-    {
+    fun save(tracker: OTTracker, position: Int) {
         val values = ContentValues()
         values.put(TrackerScheme.OBJECT_ID, tracker.objectId)
         values.put(TrackerScheme.NAME, tracker.name)
@@ -226,18 +257,16 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         values.put(TrackerScheme.COLOR, tracker.color)
         values.put(TrackerScheme.USER_ID, tracker.owner?.dbId ?: null)
 
-        if(tracker.dbId != null) // update
+        if (tracker.dbId != null) // update
         {
             val numAffected = writableDatabase.update(TrackerScheme.tableName, values, "${TrackerScheme._ID}=?", arrayOf(tracker.dbId.toString()))
-            if(numAffected==1)
-            {
+            if (numAffected == 1) {
 
-            }
-            else{ // something wrong
+            } else { // something wrong
                 throw Exception("Something is wrong saving tracker in Db")
             }
 
-        }else{ // create new
+        } else { // create new
             val newRowId = writableDatabase.insert(TrackerScheme.tableName, null, values)
             tracker.dbId = newRowId
         }
@@ -255,8 +284,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         }
     }
 
-    fun save(user : OTUser)
-    {
+    fun save(user: OTUser) {
         val values = ContentValues()
         values.put(UserScheme.NAME, user.name)
         values.put(UserScheme.EMAIL, user.email)
@@ -290,8 +318,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
                 save(child.value, child.index)
             }
             db.setTransactionSuccessful()
-        } catch(e: Exception)
-        {
+        } catch(e: Exception) {
             e.printStackTrace()
 
         } finally {
