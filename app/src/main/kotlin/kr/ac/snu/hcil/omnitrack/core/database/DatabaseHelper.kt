@@ -194,7 +194,6 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
     }
 
     fun save(attribute: OTAttribute<out Any>, position: Int) {
-        println("saving attribute ${attribute.objectId}, db: ${attribute.dbId}")
         val values = ContentValues()
         values.put(AttributeScheme.OBJECT_ID, attribute.objectId)
         values.put(AttributeScheme.NAME, attribute.name)
@@ -265,34 +264,40 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         values.put(UserScheme.OBJECT_ID, user.objectId)
         values.put(UserScheme.ATTR_ID_SEED, user.attributeIdSeed)
 
-        if(user.dbId != null) // update
-        {
-            val numAffected = writableDatabase.update(UserScheme.tableName, values, "${UserScheme._ID}=?", arrayOf(user.dbId.toString()))
-            if(numAffected==1)
+        val db = writableDatabase
+        db.beginTransaction()
+        try {
+            if (user.dbId != null) // update
             {
+                val numAffected = db.update(UserScheme.tableName, values, "${UserScheme._ID}=?", arrayOf(user.dbId.toString()))
+                if (numAffected == 1) {
 
+                } else { // something wrong
+                    db.endTransaction()
+                    throw Exception("Something is wrong saving user in Db")
+                }
+            } else { //create
+
+                val newRowId = db.insert(UserScheme.tableName, null, values)
+                user.dbId = newRowId
             }
-            else{ // something wrong
-                throw Exception("Something is wrong saving user in Db")
+
+            val ids = user.fetchRemovedTrackerIds().map { "${TrackerScheme._ID}=${it.toString()}" }.toTypedArray()
+            if (ids.size > 0) {
+                db.delete(TrackerScheme.tableName, ids.joinToString(" OR "), null)
             }
-        }
-        else{ //create
 
-            val newRowId = writableDatabase.insert(UserScheme.tableName, null, values)
-            user.dbId = newRowId
-        }
-
-        val ids = user.fetchRemovedTrackerIds().map{ "${TrackerScheme._ID}=${it.toString()}" }.toTypedArray()
-        if(ids.size > 0)
+            for (child in user.trackers.iterator().withIndex()) {
+                save(child.value, child.index)
+            }
+            db.setTransactionSuccessful()
+        } catch(e: Exception)
         {
-            writableDatabase.delete(TrackerScheme.tableName, ids.joinToString(" OR "), null)
-        }
+            e.printStackTrace()
 
-        for(child in user.trackers.iterator().withIndex())
-        {
-            save(child.value, child.index)
+        } finally {
+            db.endTransaction()
         }
-
     }
 
 
