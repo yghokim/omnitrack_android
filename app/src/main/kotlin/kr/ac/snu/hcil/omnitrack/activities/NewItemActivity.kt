@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.activities
 
+import android.content.Context
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -10,6 +11,7 @@ import android.widget.TextView
 import jp.wasabeef.recyclerview.animators.SlideInRightAnimator
 import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilder
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
@@ -52,11 +54,20 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
             if (tracker != null) {
                 title = String.format(resources.getString(R.string.title_activity_new_item), tracker?.name)
 
-                //TODO check pended builder and retreive it if exists.
-
+                builder = tryRestoreItemBuilderCache(tracker!!) ?: OTItemBuilder(tracker!!, OTItemBuilder.MODE_FOREGROUND)
             }
         }
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+        builder = tryRestoreItemBuilderCache(tracker!!)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        storeItemBuilderCache()
     }
 
     override fun onLeftButtonClicked() {
@@ -67,6 +78,26 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
         //push item to db
     }
 
+    private fun makeTrackerPreferenceKey(tracker: OTTracker): String {
+        return "tracker_${tracker.objectId}"
+    }
+
+    private fun storeItemBuilderCache() {
+        if (tracker != null) {
+            val preferences = getSharedPreferences(OmniTrackApplication.PREFERENCE_KEY_FOREGROUND_ITEM_BUILDER_STORAGE, Context.MODE_PRIVATE)
+            val editor = preferences.edit()
+            editor.putString(makeTrackerPreferenceKey(tracker!!), builder?.getSerializedString())
+            editor.commit()
+        }
+    }
+
+    private fun tryRestoreItemBuilderCache(tracker: OTTracker): OTItemBuilder? {
+        val preferences = getSharedPreferences(OmniTrackApplication.PREFERENCE_KEY_FOREGROUND_ITEM_BUILDER_STORAGE, Context.MODE_PRIVATE)
+        val serialized = preferences.getString(makeTrackerPreferenceKey(tracker), null)
+        if (serialized != null) {
+            return OTItemBuilder(serialized)
+        } else return null
+    }
 
     inner class AttributeListAdapter : RecyclerView.Adapter<AttributeListAdapter.ViewHolder>() {
 

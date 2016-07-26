@@ -28,7 +28,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         abstract val intrinsicColumnNames: Array<String>
 
         val columnNames: Array<String> by lazy {
-            Array<String>((intrinsicColumnNames?.size ?: 0) + 3) {
+            Array<String>((intrinsicColumnNames?.size) + 3) {
                 index ->
                 when (index) {
                     0 -> _ID

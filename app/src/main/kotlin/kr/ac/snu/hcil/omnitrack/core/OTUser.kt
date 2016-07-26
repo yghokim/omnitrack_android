@@ -90,6 +90,10 @@ class OTUser(objectId: String?, dbId: Long?, name: String, email: String, attrib
         return null
     }
 
+    operator fun get(trackerId: String): OTTracker? {
+        return trackers.unObservedList.find { it.objectId == trackerId }
+    }
+
     fun getNewAttributeObjectId(): Long {
         return ++attributeIdSeed
     }

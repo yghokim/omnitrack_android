@@ -21,6 +21,10 @@ class OmniTrackApplication : Application() {
         const val INTENT_EXTRA_OBJECT_ID_USER = "userObjectId"
         const val INTENT_EXTRA_ITEMBUILDER = "itemBuilderId"
 
+
+        const val PREFERENCE_KEY_FOREGROUND_ITEM_BUILDER_STORAGE = "item_builder_storage_foreground"
+
+        const val PREFERENCE_KEY_BACKGROUND_ITEM_BUILDER_STORAGE = "item_builder_storage_background"
     }
 
     private lateinit var _currentUser : OTUser

@@ -47,9 +47,7 @@ class OTNumberAttribute(objectId: String?, dbId: Long?, columnName: String, sett
         set(value) = setPropertyValue(UNIT, value)
 
 
-    override fun parseAttributeValue(storedValue: String): BigDecimal {
-        return BigDecimal(storedValue)
-    }
+
 
     override fun formatAttributeValue(value: Any): String {
         /*
@@ -78,4 +76,13 @@ class OTNumberAttribute(objectId: String?, dbId: Long?, columnName: String, sett
             inputView.value = this.makeDefaultValue()
         }
     }
+
+    override fun deserializeAttributeValue(storedValue: String): BigDecimal {
+        return BigDecimal(storedValue)
+    }
+
+    override fun serializeAttributeValue(value: Any): String {
+        return (value as BigDecimal).toPlainString()
+    }
+
 }

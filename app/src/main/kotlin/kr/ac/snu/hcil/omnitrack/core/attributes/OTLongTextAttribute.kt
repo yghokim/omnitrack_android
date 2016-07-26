@@ -25,7 +25,7 @@ class OTLongTextAttribute(objectId: String?, dbId: Long?, columnName: String, se
     override fun createProperties() {
     }
 
-    override fun parseAttributeValue(storedValue: String): CharSequence {
+    override fun deserializeAttributeValue(storedValue: String): CharSequence {
         return storedValue
     }
 
@@ -39,5 +39,9 @@ class OTLongTextAttribute(objectId: String?, dbId: Long?, columnName: String, se
 
     override fun refreshInputViewContents(inputView: AAttributeInputView<out Any>) {
 
+    }
+
+    override fun serializeAttributeValue(value: Any): String {
+        return value.toString()
     }
 }

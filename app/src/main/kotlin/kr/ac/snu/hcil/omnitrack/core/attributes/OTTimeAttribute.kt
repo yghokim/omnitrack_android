@@ -50,8 +50,12 @@ class OTTimeAttribute : OTAttribute<TimePoint> {
         assignProperty(OTSelectionProperty(GRANULARITY, "TimePoint Granularity", arrayOf("Day", "Time"))) //TODO: I18N
     }
 
-    override fun parseAttributeValue(storedValue: String): TimePoint {
+    override fun deserializeAttributeValue(storedValue: String): TimePoint {
         return TimePoint(storedValue)
+    }
+
+    override fun serializeAttributeValue(value: Any): String {
+        return (value as TimePoint).getSerializedString()
     }
 
     override fun formatAttributeValue(value: Any): String {

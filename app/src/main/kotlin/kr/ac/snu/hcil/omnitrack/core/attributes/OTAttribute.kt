@@ -14,6 +14,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputV
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.NumberInputView
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
+import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializedIntegerKeyEntry
 import java.util.*
 import kotlin.properties.Delegates
 
@@ -24,8 +25,6 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
     override fun makeNewObjectId(): String {
         return owner?.owner?.makeNewObjectId() ?: UUID.randomUUID().toString()
     }
-
-    data class SerializedEntry(val key: Int, val value: String)
 
     companion object {
 
@@ -72,7 +71,7 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
         if (settingData != null) {
 
             val parser = Gson()
-            val s = parser.fromJson(settingData, Array<String>::class.java).map { parser.fromJson(it, SerializedEntry::class.java) }
+            val s = parser.fromJson(settingData, Array<String>::class.java).map { parser.fromJson(it, SerializedIntegerKeyEntry::class.java) }
 
             for (entry in s) {
                 setPropertyValueFromSerializedString(entry.key, entry.value)
@@ -86,7 +85,7 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
         val s = ArrayList<String>()
         val parser = Gson()
         for (key in keys) {
-            s.add(parser.toJson(SerializedEntry(key, getProperty<Any>(key).getSerializedValue())))
+            s.add(parser.toJson(SerializedIntegerKeyEntry(key, getProperty<Any>(key).getSerializedValue())))
         }
 
         return parser.toJson(s.toTypedArray())
@@ -132,7 +131,9 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
         getProperty<Any>(key).setValueFromSerializedString(serializedValue)
     }
 
-    abstract fun parseAttributeValue(storedValue: String): DataType
+    abstract fun deserializeAttributeValue(storedValue: String): DataType
+
+    abstract fun serializeAttributeValue(value: Any): String
 
     abstract fun formatAttributeValue(value: Any): String
 

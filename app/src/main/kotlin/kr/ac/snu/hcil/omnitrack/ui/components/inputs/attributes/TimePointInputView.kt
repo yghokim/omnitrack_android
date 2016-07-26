@@ -23,6 +23,11 @@ class TimePointInputView(context: Context, attrs: AttributeSet? = null) : AAttri
 
     init {
         valueView = findViewById(R.id.value) as DateTimePicker
+
+        valueView.timeChanged += {
+            sender, arg ->
+            onValueChanged(arg)
+        }
     }
 
     fun setPickerMode(mode: Int) {

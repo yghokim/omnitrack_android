@@ -6,17 +6,17 @@ import java.util.*
 /**
  * Created by younghokim on 16. 7. 22..
  */
-class OTItem(parent: OTTracker) : ADataRow(parent) {
+class OTItem(parent: OTTracker) : ADataRow() {
 
     var timestamp: Long = 0
     private var data = Hashtable<Long, String>()
 
     override fun getValueOf(attribute: OTAttribute<out Any>): Any {
-        return attribute.parseAttributeValue(data[attribute.objectId.toLong()]!!)
+        return attribute.deserializeAttributeValue(data[attribute.objectId.toLong()]!!)
     }
 
     override fun <T> getCastedValueOf(attribute: OTAttribute<T>): T {
-        return attribute.parseAttributeValue(data[attribute.objectId.toLong()]!!)
+        return attribute.deserializeAttributeValue(data[attribute.objectId.toLong()]!!)
     }
 
     override fun hasValueOf(attribute: OTAttribute<out Any>): Boolean {

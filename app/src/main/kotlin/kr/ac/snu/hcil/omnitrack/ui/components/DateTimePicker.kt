@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.*
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
+import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.properties.Delegates
@@ -52,18 +53,25 @@ class DateTimePicker(context: Context, attrs: AttributeSet? = null) : FrameLayou
         }
     }
 
-    var time: TimePoint
+    var time: TimePoint = TimePoint()
         get() {
             return TimePoint(calendar.timeInMillis, calendar.timeZone.id)
         }
         set(value) {
-            calendar.timeInMillis = value.timestamp
-            refresh()
+            if (field != value) {
+                field = value
+                calendar.timeInMillis = value.timestamp
+                refresh()
+                timeChanged.invoke(this, value)
+            }
         }
 
 
     private val pickerValueChangedHandler = {
         picker: Any, newVal: Int ->
+
+        val before = time
+
         when (mode) {
             TIME -> {
                 when (picker) {
@@ -99,8 +107,13 @@ class DateTimePicker(context: Context, attrs: AttributeSet? = null) : FrameLayou
         }
 
         refresh()
+        val current = time
+        if (before != current) {
+            timeChanged.invoke(this, current)
+        }
     }
 
+    val timeChanged = Event<TimePoint>()
 
     init {
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater

@@ -34,6 +34,7 @@ class NumberInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
             if (field != value) {
                 field = value
                 applyValueToView()
+                onValueChanged(value)
             }
         }
 
