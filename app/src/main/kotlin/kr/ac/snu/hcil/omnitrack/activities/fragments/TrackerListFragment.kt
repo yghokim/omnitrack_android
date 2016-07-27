@@ -25,6 +25,7 @@ import kr.ac.snu.hcil.omnitrack.ui.HorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.SpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
+import kr.ac.snu.hcil.omnitrack.utils.startActivityOnDelay
 
 /**
  * Created by Young-Ho Kim on 2016-07-18.
@@ -68,7 +69,7 @@ class TrackerListFragment : Fragment() {
             //(application as OmniTrackApplication).syncUserToDb()
             //user.trackers.add(OTTracker("Hihi"))
             val intent = Intent(context, TrackerDetailActivity::class.java)
-            startActivity(intent)
+            startActivityOnDelay(intent)
         }
 
         listView = rootView.findViewById(R.id.ui_tracker_list_view) as RecyclerView
@@ -108,7 +109,7 @@ class TrackerListFragment : Fragment() {
     {
         val intent = Intent(context, NewItemActivity::class.java)
         intent.putExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
-        startActivity(intent)
+        startActivityOnDelay(intent)
     }
 
     private fun handleTrackerLongClick(tracker: OTTracker)
@@ -121,7 +122,7 @@ class TrackerListFragment : Fragment() {
                 CHANGE_TRACKER_SETTINGS -> {
                     val intent = Intent(context, TrackerDetailActivity::class.java)
                     intent.putExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
-                    startActivity(intent)
+                    startActivityOnDelay(intent)
 
                 }
                 REMOVE_TRACKER -> DialogHelper.makeYesNoDialogBuilder(context, tracker.name, getString(R.string.msg_confirm_remove_tracker), {->user.trackers.remove(tracker)}).show()
@@ -177,7 +178,7 @@ class TrackerListFragment : Fragment() {
                     view ->
                     val intent = Intent(context, ItemBrowserActivity::class.java)
                     intent.putExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, user.trackers[adapterPosition].objectId)
-                    startActivity(intent)
+                    startActivityOnDelay(intent)
                 }
             }
 

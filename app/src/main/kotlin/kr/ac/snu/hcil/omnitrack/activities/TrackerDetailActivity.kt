@@ -27,6 +27,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.AttributeTypeListDialogFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ColorPalettePropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ShortTextPropertyView
+import kr.ac.snu.hcil.omnitrack.utils.startActivityOnDelay
 import java.util.*
 
 class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tracker_detail) {
@@ -175,7 +176,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
     fun openAttributeDetailActivity(position: Int) {
         val intent = Intent(this, AttributeDetailActivity::class.java)
         intent.putExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_ATTRIBUTE, tracker.attributes[position].objectId)
-        startActivity(intent)
+        startActivityOnDelay(intent)
     }
 
     inner class AttributeListAdapter() : RecyclerView.Adapter<AttributeListAdapter.ViewHolder>(), DragItemTouchHelperCallback.ItemDragHelperAdapter {

@@ -48,7 +48,14 @@ class OTItem : ADataRow, IDatabaseStorable {
     }
 
     override fun extractFormattedStringArray(scheme: OTTracker): Array<String?> {
-        return scheme.attributes.unObservedList.map { it.formatAttributeValue(getCastedValueOf(it)!!) }.toTypedArray()
+        return scheme.attributes.unObservedList.map {
+            val value = getCastedValueOf(it)
+            if (value != null) {
+                it.formatAttributeValue(value)
+            } else {
+                null
+            }
+        }.toTypedArray()
     }
 
     override fun extractValueArray(scheme: OTTracker): Array<Any?> {
