@@ -99,7 +99,7 @@ class OTItemBuilder : ADataRow {
     }
 
     override fun hasValueOf(attribute: OTAttribute<out Any>): Boolean {
-        return valueTable.contains(attribute.objectId)
+        return valueTable.containsKey(attribute.objectId)
     }
 
     override fun getNumColumns(): Int {

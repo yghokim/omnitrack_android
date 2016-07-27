@@ -97,8 +97,6 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
                 builder?.setValueOf(attribute, attributeValueExtractors[attribute.objectId]?.invoke() ?: attribute.makeDefaultValue())
             }
 
-            println(builder?.getSerializedString())
-
             val preferences = getSharedPreferences(OmniTrackApplication.PREFERENCE_KEY_FOREGROUND_ITEM_BUILDER_STORAGE, Context.MODE_PRIVATE)
             val editor = preferences.edit()
             editor.putString(makeTrackerPreferenceKey(tracker!!), builder?.getSerializedString())
@@ -110,9 +108,11 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
         val preferences = getSharedPreferences(OmniTrackApplication.PREFERENCE_KEY_FOREGROUND_ITEM_BUILDER_STORAGE, Context.MODE_PRIVATE)
         val serialized = preferences.getString(makeTrackerPreferenceKey(tracker), null)
         if (serialized != null) {
+            println("stored ItemBuilder was restored.")
             builder = OTItemBuilder(serialized)
             return true
         } else {
+            println("new ItemBuilder created.")
             builder = OTItemBuilder(tracker, OTItemBuilder.MODE_FOREGROUND)
             return false
         }
@@ -146,6 +146,8 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
             }
 
             fun bind(attribute: OTAttribute<out Any>) {
+                println("bind attribute")
+
                 attribute.refreshInputViewContents(inputView)
                 attributeId = attribute.objectId
                 columnNameView.text = attribute.name
@@ -153,9 +155,7 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
 
                 if (builder?.hasValueOf(attribute) ?: false) {
                     inputView.valueChanged.suspend = true
-
                     if (builder != null) {
-                        println("apply itembuilder value to inputView")
                         inputView.setAnyValue(builder!!.getValueOf(attribute)!!)
                     }
                     inputView.valueChanged.suspend = false
