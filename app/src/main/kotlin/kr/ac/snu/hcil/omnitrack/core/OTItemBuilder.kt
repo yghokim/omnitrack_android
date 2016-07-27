@@ -5,16 +5,17 @@ import com.google.gson.*
 import com.google.gson.annotations.Expose
 import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
+import kr.ac.snu.hcil.omnitrack.utils.serialization.IStringSerializable
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializedIntegerKeyEntry
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializedStringKeyEntry
+import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import java.lang.reflect.Type
 import java.util.*
 
 /**
  * Created by younghokim on 16. 7. 25..
  */
-class OTItemBuilder : ADataRow {
-
+class OTItemBuilder : ADataRow, IStringSerializable {
     companion object {
         const val MODE_FOREGROUND = 1
         const val MODE_BACKGOUND = 0
@@ -56,21 +57,9 @@ class OTItemBuilder : ADataRow {
         val s = parcel.valueTable.map { parser.fromJson(it, SerializedStringKeyEntry::class.java) }
 
         for (entry in s) {
-            valueTable[entry.key] = entry.value
+            valueTable[entry.key] = TypeStringSerializationHelper.deserialize(entry.value)
         }
         syncFromTrackerScheme()
-
-        for (attribute in tracker.attributes) {
-            val tableValue = valueTable[attribute.objectId]
-            if (tableValue is String) {
-                valueTable[attribute.objectId] = attribute.deserializeAttributeValue(tableValue)
-            }
-        }
-
-        println("[Restored ItemBuilder]")
-        for (key in valueTable) {
-            println("key : ${key.key}, value : ${key.value}")
-        }
     }
 
     fun reloadTracker() {
@@ -120,15 +109,7 @@ class OTItemBuilder : ADataRow {
 
     override fun getSerializedString(): String {
 
-        val s = ArrayList<String>()
         val parser = Gson()
-
-        for (attribute in tracker.attributes) {
-            if (valueTable[attribute.objectId] != null) {
-                s.add(parser.toJson(SerializedStringKeyEntry(attribute.objectId, attribute.serializeAttributeValue(valueTable[attribute.objectId]!!))))
-            }
-        }
-
-        return parser.toJson(Parcel(trackerObjectId, mode, s.toTypedArray()))
+        return parser.toJson(Parcel(trackerObjectId, mode, tableToSerializedEntryArray(valueTable, tracker)))
     }
 }

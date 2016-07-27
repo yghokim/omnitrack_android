@@ -9,12 +9,15 @@ import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
 import kr.ac.snu.hcil.omnitrack.ui.components.DateTimePicker
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.TimePointInputView
+import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import java.util.*
 
 /**
  * Created by Young-Ho Kim on 2016-07-20.
  */
 class OTTimeAttribute : OTAttribute<TimePoint> {
+    override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_TIMEPOINT
+
 
     override fun getInputViewType(previewMode: Boolean): Int {
         return AAttributeInputView.VIEW_TYPE_TIME_POINT
@@ -48,14 +51,6 @@ class OTTimeAttribute : OTAttribute<TimePoint> {
 
     override fun createProperties() {
         assignProperty(OTSelectionProperty(GRANULARITY, "TimePoint Granularity", arrayOf("Day", "Time"))) //TODO: I18N
-    }
-
-    override fun deserializeAttributeValue(storedValue: String): TimePoint {
-        return TimePoint(storedValue)
-    }
-
-    override fun serializeAttributeValue(value: Any): String {
-        return (value as TimePoint).getSerializedString()
     }
 
     override fun formatAttributeValue(value: Any): String {

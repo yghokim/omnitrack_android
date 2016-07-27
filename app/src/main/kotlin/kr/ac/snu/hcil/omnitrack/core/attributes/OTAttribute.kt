@@ -91,6 +91,8 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
         return parser.toJson(s.toTypedArray())
     }
 
+    abstract val typeNameForSerialization: String
+
     var owner: OTTracker? by Delegates.observable(null as OTTracker?) {
         prop, old, new ->
         if (old != null) {
@@ -130,10 +132,6 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
     fun setPropertyValueFromSerializedString(key: Int, serializedValue: String) {
         getProperty<Any>(key).setValueFromSerializedString(serializedValue)
     }
-
-    abstract fun deserializeAttributeValue(storedValue: String): DataType
-
-    abstract fun serializeAttributeValue(value: Any): String
 
     abstract fun formatAttributeValue(value: Any): String
 

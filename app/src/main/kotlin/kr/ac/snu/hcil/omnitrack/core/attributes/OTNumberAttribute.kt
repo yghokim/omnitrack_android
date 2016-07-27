@@ -9,6 +9,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTSelectionProperty
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.NumberInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.TimePointInputView
+import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import java.math.BigDecimal
 import kotlin.properties.Delegates
 
@@ -17,6 +18,7 @@ import kotlin.properties.Delegates
  */
 
 class OTNumberAttribute(objectId: String?, dbId: Long?, columnName: String, settingData: String?) : OTAttribute<BigDecimal>(objectId, dbId, columnName, OTAttribute.TYPE_NUMBER, settingData) {
+    override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_BIGDECIMAL
 
     override fun getInputViewType(previewMode: Boolean): Int {
         return AAttributeInputView.VIEW_TYPE_NUMBER
@@ -75,14 +77,6 @@ class OTNumberAttribute(objectId: String?, dbId: Long?, columnName: String, sett
         if (inputView is NumberInputView) {
             inputView.value = this.makeDefaultValue()
         }
-    }
-
-    override fun deserializeAttributeValue(storedValue: String): BigDecimal {
-        return BigDecimal(storedValue)
-    }
-
-    override fun serializeAttributeValue(value: Any): String {
-        return (value as BigDecimal).toPlainString()
     }
 
 }

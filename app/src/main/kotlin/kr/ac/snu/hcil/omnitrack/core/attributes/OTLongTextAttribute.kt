@@ -6,11 +6,13 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.LongTextInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.NumberInputView
+import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 
 /**
  * Created by younghokim on 16. 7. 24..
  */
 class OTLongTextAttribute(objectId: String?, dbId: Long?, columnName: String, settingData: String?) : OTAttribute<CharSequence>(objectId, dbId, columnName, Companion.TYPE_LONG_TEXT, settingData) {
+    override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_STRING
 
     override fun getInputViewType(previewMode: Boolean): Int {
         return AAttributeInputView.VIEW_TYPE_LONG_TEXT
@@ -25,10 +27,6 @@ class OTLongTextAttribute(objectId: String?, dbId: Long?, columnName: String, se
     override fun createProperties() {
     }
 
-    override fun deserializeAttributeValue(storedValue: String): CharSequence {
-        return storedValue
-    }
-
     override fun formatAttributeValue(value: Any): String {
         return value.toString()
     }
@@ -39,9 +37,5 @@ class OTLongTextAttribute(objectId: String?, dbId: Long?, columnName: String, se
 
     override fun refreshInputViewContents(inputView: AAttributeInputView<out Any>) {
 
-    }
-
-    override fun serializeAttributeValue(value: Any): String {
-        return value.toString()
     }
 }
