@@ -12,7 +12,7 @@ import kotlin.properties.Delegates
 /**
  * Created by Young-Ho Kim on 2016-07-11.
  */
-class OTUser(objectId: String?, dbId: Long?, name: String, email: String, attributeIdSeed: Long = 0, _trackers: List<OTTracker>? = null) : UniqueObject(objectId, dbId, name) {
+class OTUser(objectId: String?, dbId: Long?, name: String, email: String, attributeIdSeed: Long = 0, _trackers: List<OTTracker>? = null) : NamedObject(objectId, dbId, name) {
 
 
     var attributeIdSeed: Long = attributeIdSeed

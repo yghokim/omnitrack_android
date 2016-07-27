@@ -10,11 +10,13 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.TextView
 import jp.wasabeef.recyclerview.animators.SlideInRightAnimator
 import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.activities.HomeActivity
+import kr.ac.snu.hcil.omnitrack.activities.ItemBrowserActivity
 import kr.ac.snu.hcil.omnitrack.activities.NewItemActivity
 import kr.ac.snu.hcil.omnitrack.activities.TrackerDetailActivity
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
@@ -132,7 +134,7 @@ class TrackerListFragment : Fragment() {
     inner class TrackerListAdapter(val user: OTUser) : RecyclerView.Adapter<TrackerListAdapter.ViewHolder>(){
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            var view = LayoutInflater.from(parent.context).inflate(R.layout.tracker_list_element, parent, false)
+            val view = LayoutInflater.from(parent.context).inflate(R.layout.tracker_list_element, parent, false)
             return ViewHolder(view)
         }
 
@@ -151,9 +153,13 @@ class TrackerListFragment : Fragment() {
 
         inner class ViewHolder(view : View) : RecyclerView.ViewHolder(view){
             lateinit var name: TextView
+            lateinit var color: View
+            lateinit var expandButton: ImageButton
 
             init{
                 name = view.findViewById(R.id.name) as TextView
+                color = view.findViewById(R.id.color_bar) as View
+                expandButton = view.findViewById(R.id.expandButton) as ImageButton
 
                 view.setOnClickListener {
                     handleTrackerClick(user.trackers[adapterPosition])
@@ -164,10 +170,20 @@ class TrackerListFragment : Fragment() {
                     handleTrackerLongClick(user.trackers[adapterPosition])
                     true
                 }
+
+
+
+                expandButton.setOnClickListener {
+                    view ->
+                    val intent = Intent(context, ItemBrowserActivity::class.java)
+                    intent.putExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, user.trackers[adapterPosition].objectId)
+                    startActivity(intent)
+                }
             }
 
             fun bindTracker(tracker: OTTracker){
                 name.text = tracker.name
+                color.setBackgroundColor(tracker.color)
             }
         }
     }

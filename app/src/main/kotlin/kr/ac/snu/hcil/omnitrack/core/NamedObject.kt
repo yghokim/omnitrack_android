@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core
 
+import kr.ac.snu.hcil.omnitrack.core.database.IDatabaseStorable
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import java.util.UUID;
 import kotlin.properties.Delegates
@@ -7,7 +8,7 @@ import kotlin.properties.Delegates
 /**
  * Created by Young-Ho on 7/11/2016.
  */
-abstract class UniqueObject(objectId: String?, dbId: Long?,  name: String) {
+abstract class NamedObject(objectId: String?, dbId: Long?, name: String) : IDatabaseStorable {
 
     val nameChangeEvent = Event<String>()
 
@@ -15,7 +16,7 @@ abstract class UniqueObject(objectId: String?, dbId: Long?,  name: String) {
         objectId ?: makeNewObjectId()
     }
 
-    var dbId : Long? = dbId
+    override var dbId: Long? = dbId
         set(value){
             if(field!= null)
             {

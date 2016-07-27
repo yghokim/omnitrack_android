@@ -17,6 +17,9 @@ abstract class ADataRow() {
 
     protected val valueTable = Hashtable<String, Any>()
 
+    val isEmpty: Boolean
+        get() = valueTable.isEmpty
+
     fun getValueOf(attribute: OTAttribute<out Any>): Any? {
         return valueTable[attribute.objectId]
     }

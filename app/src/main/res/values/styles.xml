@@ -37,7 +37,7 @@
 
     <style name="ListElementTitle">
         <item name="android:textStyle">bold</item>
-        <item name="android:textSize">16dp</item>
+        <item name="android:textSize">18dp</item>
         <item name="android:textColor">@color/titleTextColor</item>
     </style>
 

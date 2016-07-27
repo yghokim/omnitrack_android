@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core
 import com.google.gson.Gson
 import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
+import kr.ac.snu.hcil.omnitrack.core.database.IDatabaseStorable
 import kr.ac.snu.hcil.omnitrack.utils.serialization.MapSerializer
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializedStringKeyEntry
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
@@ -11,11 +12,16 @@ import java.util.*
 /**
  * Created by younghokim on 16. 7. 22..
  */
-class OTItem : ADataRow {
+class OTItem : ADataRow, IDatabaseStorable {
 
-    private val trackerObjectId: String
+    val trackerObjectId: String
 
-    val dbId: Long?
+    override var dbId: Long?
+        set(value) {
+            if (field != null) {
+                throw Exception("dbId already assigned.")
+            }
+        }
 
     var timestamp: Long = -1
         private set
@@ -37,8 +43,12 @@ class OTItem : ADataRow {
         }
     }
 
+    fun getSerializedValueTable(scheme: OTTracker): String {
+        return Gson().toJson(tableToSerializedEntryArray(scheme))
+    }
+
     override fun extractFormattedStringArray(scheme: OTTracker): Array<String?> {
-        throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return scheme.attributes.unObservedList.map { it.formatAttributeValue(getCastedValueOf(it)!!) }.toTypedArray()
     }
 
     override fun extractValueArray(scheme: OTTracker): Array<Any?> {

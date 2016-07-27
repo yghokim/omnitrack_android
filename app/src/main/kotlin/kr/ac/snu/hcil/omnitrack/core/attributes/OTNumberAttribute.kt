@@ -52,21 +52,9 @@ class OTNumberAttribute(objectId: String?, dbId: Long?, columnName: String, sett
 
 
     override fun formatAttributeValue(value: Any): String {
-        /*
         if (value is BigDecimal) {
-
-            val power = Math.pow(10.0, numDigitsUnderDecimalPoint.toDouble())
-            val numberStr = (Math.floor(power * value) / power).toString()
-
-            return if (unit.isNullOrBlank()) {
-                numberStr
-            } else {
-                "${numberStr} ${unit}"
-            }
-        } else {
-            return ""
-        }*/
-        return ""
+            return value.toPlainString()
+        } else return value.toString()
     }
 
     override fun makeDefaultValue(): BigDecimal {

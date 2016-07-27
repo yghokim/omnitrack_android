@@ -13,7 +13,7 @@ import kotlin.properties.Delegates
 /**
  * Created by Young-Ho on 7/11/2016.
  */
-class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color.WHITE, _attributes: Collection<OTAttribute<out Any>>? = null) : UniqueObject(objectId, dbId, name) {
+class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color.WHITE, _attributes: Collection<OTAttribute<out Any>>? = null) : NamedObject(objectId, dbId, name) {
     val attributes = ObservableList<OTAttribute<out Any>>()
 
     private val _removedAttributeIds = ArrayList<Long>()

@@ -6,7 +6,7 @@ import android.view.View
 import com.google.gson.Gson
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
-import kr.ac.snu.hcil.omnitrack.core.UniqueObject
+import kr.ac.snu.hcil.omnitrack.core.NamedObject
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTProperty
@@ -21,7 +21,7 @@ import kotlin.properties.Delegates
 /**
  * Created by Young-Ho on 7/11/2016.
  */
-abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName: String, val typeId: Int, settingData: String?) : UniqueObject(objectId, dbId, columnName) {
+abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName: String, val typeId: Int, settingData: String?) : NamedObject(objectId, dbId, columnName) {
     override fun makeNewObjectId(): String {
         return owner?.owner?.makeNewObjectId() ?: UUID.randomUUID().toString()
     }

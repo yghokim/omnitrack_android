@@ -6,10 +6,11 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
+import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
-import kr.ac.snu.hcil.omnitrack.core.UniqueObject
+import kr.ac.snu.hcil.omnitrack.core.NamedObject
 import java.text.AttributedCharacterIterator
 import java.util.*
 import kotlin.properties.Delegates
@@ -219,7 +220,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         return query
     }
 
-    private fun saveUniqueObject(objRef: UniqueObject, values: ContentValues, scheme: TableScheme): Boolean {
+    private fun saveObject(objRef: IDatabaseStorable, values: ContentValues, scheme: TableScheme): Boolean {
         val now = System.currentTimeMillis()
         values.put(scheme.UPDATED_AT, now)
 
@@ -238,7 +239,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
                     throw Exception("Something is wrong saving user in Db")
                 }
             } else { //new
-                values.put(scheme.LOGGED_AT, now)
+                if (!values.containsKey(scheme.LOGGED_AT)) values.put(scheme.LOGGED_AT, now)
                 val newRowId = db.insert(scheme.tableName, null, values)
                 if (newRowId != -1L) {
                     objRef.dbId = newRowId
@@ -260,7 +261,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         }
     }
 
-    private fun baseContentValuesOfNamed(objRef: UniqueObject, scheme: TableWithNameScheme): ContentValues {
+    private fun baseContentValuesOfNamed(objRef: NamedObject, scheme: TableWithNameScheme): ContentValues {
         val values = ContentValues()
         values.put(scheme.NAME, objRef.name)
         values.put(scheme.OBJECT_ID, objRef.objectId)
@@ -276,7 +277,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         values.put(AttributeScheme.TRACKER_ID, attribute.owner?.dbId ?: null)
         values.put(AttributeScheme.SETTING_DATA, attribute.getSerializedProperties())
 
-        saveUniqueObject(attribute, values, AttributeScheme)
+        saveObject(attribute, values, AttributeScheme)
     }
 
     fun save(tracker: OTTracker, position: Int) {
@@ -285,7 +286,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         values.put(TrackerScheme.COLOR, tracker.color)
         values.put(TrackerScheme.USER_ID, tracker.owner?.dbId ?: null)
 
-        if (saveUniqueObject(tracker, values, TrackerScheme)) {
+        if (saveObject(tracker, values, TrackerScheme)) {
             writableDatabase.beginTransaction()
             val ids = tracker.fetchRemovedAttributeIds().map { "${AttributeScheme._ID}=${it.toString()}" }.toTypedArray()
             if (ids.size > 0) {
@@ -307,7 +308,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         values.put(UserScheme.ATTR_ID_SEED, user.attributeIdSeed)
 
 
-        if (saveUniqueObject(user, values, UserScheme)) {
+        if (saveObject(user, values, UserScheme)) {
 
             writableDatabase.beginTransaction()
             val ids = user.fetchRemovedTrackerIds().map { "${TrackerScheme._ID}=${it.toString()}" }.toTypedArray()
@@ -323,5 +324,44 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         }
     }
 
+    //Item API===============================
 
+    fun save(item: OTItem, tracker: OTTracker) {
+        val values = ContentValues()
+
+        values.put(ItemScheme.TRACKER_ID, tracker.dbId)
+        values.put(ItemScheme.VALUES_JSON, item.getSerializedValueTable(tracker))
+        if (item.timestamp != -1L) {
+            values.put(ItemScheme.LOGGED_AT, item.timestamp)
+        }
+
+        saveObject(item, values, ItemScheme)
+    }
+
+    fun getItems(tracker: OTTracker, listOut: ArrayList<OTItem>): Int {
+        val cursor = readableDatabase.query(ItemScheme.tableName, ItemScheme.columnNames, "${ItemScheme.TRACKER_ID}=?", arrayOf(tracker.dbId.toString()), null, null, "${ItemScheme.LOGGED_AT} DESC")
+
+        var count = 0
+        if (cursor.moveToFirst()) {
+            do {
+                listOut.add(extractItemEntity(cursor, tracker))
+                count++
+            } while (cursor.moveToNext())
+        }
+
+        return count
+    }
+
+
+    fun extractItemEntity(cursor: Cursor, tracker: OTTracker): OTItem {
+        val id = cursor.getLong(cursor.getColumnIndex(ItemScheme._ID))
+        val serializedValues = cursor.getString(cursor.getColumnIndex(ItemScheme.VALUES_JSON))
+        //TODO keytime columns
+        //val KEY_TIME_TIMESTAMP = "key_time_timestamp"
+        //val KEY_TIME_GRANULARITY = "key_time_granularity"
+        //val KEY_TIME_TIMEZONE = "key_time_timezone"
+        val timestamp = cursor.getLong(cursor.getColumnIndex(ItemScheme.LOGGED_AT))
+
+        return OTItem(id, tracker.objectId, serializedValues, timestamp)
+    }
 }

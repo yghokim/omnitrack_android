@@ -37,6 +37,8 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
 
     private val attributeValueExtractors = Hashtable<String, () -> Any>()
 
+    private var skipViewValueCaching = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         rightActionBarButton?.visibility = View.VISIBLE
@@ -79,7 +81,11 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
 
     override fun onPause() {
         super.onPause()
-        storeItemBuilderCache()
+        if (!skipViewValueCaching) {
+            storeItemBuilderCache()
+        } else {
+            skipViewValueCaching = false
+        }
     }
 
     override fun onLeftButtonClicked() {
@@ -90,7 +96,14 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
     override fun onRightButtonClicked() {
         //push item to db
         syncViewStateToBuilder()
-        println("Will push ${builder.makeItem()}")
+        val item = builder.makeItem()
+        println("Will push $item")
+
+        OmniTrackApplication.app.dbHelper.save(item, tracker!!)
+        builder.clear()
+        println(builder.getSerializedString())
+        clearBuilderCache()
+        skipViewValueCaching = true
         finish()
     }
 
@@ -104,6 +117,15 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
         }
     }
 
+    private fun clearBuilderCache() {
+        if (tracker != null) {
+            val preferences = getSharedPreferences(OmniTrackApplication.PREFERENCE_KEY_FOREGROUND_ITEM_BUILDER_STORAGE, Context.MODE_PRIVATE)
+            val editor = preferences.edit();
+            editor.remove(makeTrackerPreferenceKey(tracker!!))
+            editor.apply()
+        }
+    }
+
     private fun storeItemBuilderCache() {
         if (tracker != null) {
 
@@ -111,10 +133,13 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
                 builder.setValueOf(attribute, attributeValueExtractors[attribute.objectId]?.invoke() ?: attribute.makeDefaultValue())
             }
 
-            val preferences = getSharedPreferences(OmniTrackApplication.PREFERENCE_KEY_FOREGROUND_ITEM_BUILDER_STORAGE, Context.MODE_PRIVATE)
-            val editor = preferences.edit()
-            editor.putString(makeTrackerPreferenceKey(tracker!!), builder.getSerializedString())
-            editor.apply()
+            if (!builder.isEmpty) {
+
+                val preferences = getSharedPreferences(OmniTrackApplication.PREFERENCE_KEY_FOREGROUND_ITEM_BUILDER_STORAGE, Context.MODE_PRIVATE)
+                val editor = preferences.edit()
+                editor.putString(makeTrackerPreferenceKey(tracker!!), builder.getSerializedString())
+                editor.apply()
+            }
         }
     }
 

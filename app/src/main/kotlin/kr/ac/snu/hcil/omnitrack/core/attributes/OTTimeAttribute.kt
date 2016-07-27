@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes
 
 import android.content.Context
+import android.util.SparseArray
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTProperty
@@ -10,6 +11,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.DateTimePicker
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.TimePointInputView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
+import java.text.SimpleDateFormat
 import java.util.*
 
 /**
@@ -30,6 +32,11 @@ class OTTimeAttribute : OTAttribute<TimePoint> {
 
         const val GRANULARITY_DAY = 0
         const val GRANULARITY_TIME = 1
+
+        val formats = mapOf<Int, SimpleDateFormat>(
+                Pair(GRANULARITY_DAY, SimpleDateFormat("yyyy/MM/d")),
+                Pair(GRANULARITY_TIME, SimpleDateFormat("yyyy/MM/d h:mm:ss a"))
+        )
     }
 
     private val calendar = GregorianCalendar()
@@ -66,7 +73,7 @@ class OTTimeAttribute : OTAttribute<TimePoint> {
                 calendar.set(Calendar.HOUR, 0)
             }
 
-            return calendar.toString()
+            return formats[granularity]!!.format(calendar.time)
         } else return ""
     }
 
