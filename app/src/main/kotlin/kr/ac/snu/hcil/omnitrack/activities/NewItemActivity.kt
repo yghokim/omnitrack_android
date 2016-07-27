@@ -18,6 +18,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.ui.HorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.SpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
+import java.util.*
 
 /**
  * Created by younghokim on 16. 7. 24..
@@ -30,6 +31,10 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
 
     private var builder: OTItemBuilder? = null
 
+    private val layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+
+    private val attributeValueExtractors = Hashtable<String, () -> Any>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         rightActionBarButton?.visibility = View.VISIBLE
@@ -38,7 +43,6 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
         rightActionBarButton?.setImageResource(R.drawable.done)
 
         val listView = findViewById(R.id.ui_attribute_list) as RecyclerView
-        val layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         listView.layoutManager = layoutManager
         listView.addItemDecoration(HorizontalImageDividerItemDecoration(R.drawable.horizontal_separator_pattern, this))
 
@@ -48,13 +52,17 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
     override fun onStart() {
         super.onStart()
 
+        attributeValueExtractors.clear()
+
         val trackerId = intent.getStringExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
         if (trackerId != null) {
             tracker = OmniTrackApplication.app.currentUser.trackers.unObservedList.find { it.objectId == trackerId }
             if (tracker != null) {
                 title = String.format(resources.getString(R.string.title_activity_new_item), tracker?.name)
 
-                builder = tryRestoreItemBuilderCache(tracker!!) ?: OTItemBuilder(tracker!!, OTItemBuilder.MODE_FOREGROUND)
+                if (tryRestoreItemBuilderCache(tracker!!)) {
+
+                }
             }
         }
 
@@ -62,7 +70,7 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
 
     override fun onResume() {
         super.onResume()
-        builder = tryRestoreItemBuilderCache(tracker!!)
+        tryRestoreItemBuilderCache(tracker!!)
     }
 
     override fun onPause() {
@@ -84,19 +92,34 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
 
     private fun storeItemBuilderCache() {
         if (tracker != null) {
+
+            for (attribute in tracker!!.attributes.unObservedList) {
+                builder?.setValueOf(attribute, attributeValueExtractors[attribute.objectId]?.invoke() ?: attribute.makeDefaultValue())
+            }
+
+            println(builder?.getSerializedString())
+
             val preferences = getSharedPreferences(OmniTrackApplication.PREFERENCE_KEY_FOREGROUND_ITEM_BUILDER_STORAGE, Context.MODE_PRIVATE)
             val editor = preferences.edit()
             editor.putString(makeTrackerPreferenceKey(tracker!!), builder?.getSerializedString())
-            editor.commit()
+            editor.apply()
         }
     }
 
-    private fun tryRestoreItemBuilderCache(tracker: OTTracker): OTItemBuilder? {
+    private fun tryRestoreItemBuilderCache(tracker: OTTracker): Boolean {
         val preferences = getSharedPreferences(OmniTrackApplication.PREFERENCE_KEY_FOREGROUND_ITEM_BUILDER_STORAGE, Context.MODE_PRIVATE)
         val serialized = preferences.getString(makeTrackerPreferenceKey(tracker), null)
         if (serialized != null) {
-            return OTItemBuilder(serialized)
-        } else return null
+            builder = OTItemBuilder(serialized)
+            return true
+        } else {
+            builder = OTItemBuilder(tracker, OTItemBuilder.MODE_FOREGROUND)
+            return false
+        }
+    }
+
+    private fun onAttributeValueChanged(attributeId: String, newVal: Any) {
+
     }
 
     inner class AttributeListAdapter : RecyclerView.Adapter<AttributeListAdapter.ViewHolder>() {
@@ -106,19 +129,42 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
             private lateinit var columnNameView: TextView
             private lateinit var attributeTypeView: TextView
 
+            private var attributeId: String? = null
+
 
             init {
                 columnNameView = frame.findViewById(R.id.title) as TextView
                 attributeTypeView = frame.findViewById(R.id.ui_attribute_type) as TextView
                 val container = frame.findViewById(R.id.inputViewContainer) as ViewGroup
                 container.addView(inputView)
+
+                inputView.valueChanged += {
+                    sender, newVal ->
+                    if (attributeId != null)
+                        onAttributeValueChanged(attributeId!!, newVal)
+                }
             }
 
             fun bind(attribute: OTAttribute<out Any>) {
-                //inputView.bindAttribute(attribute)
                 attribute.refreshInputViewContents(inputView)
+                attributeId = attribute.objectId
                 columnNameView.text = attribute.name
                 attributeTypeView.text = resources.getString(attribute.typeNameResourceId)
+
+                if (builder?.hasValueOf(attribute) ?: false) {
+                    inputView.valueChanged.suspend = true
+
+                    if (builder != null) {
+                        println("apply itembuilder value to inputView")
+                        inputView.setAnyValue(builder!!.getValueOf(attribute)!!)
+                    }
+                    inputView.valueChanged.suspend = false
+
+                }
+
+                attributeValueExtractors[attributeId] = {
+                    inputView.value
+                }
             }
         }
 

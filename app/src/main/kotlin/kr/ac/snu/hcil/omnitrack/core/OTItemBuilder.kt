@@ -66,6 +66,11 @@ class OTItemBuilder : ADataRow {
                 valueTable[attribute.objectId] = attribute.deserializeAttributeValue(tableValue)
             }
         }
+
+        println("[Restored ItemBuilder]")
+        for (key in valueTable) {
+            println("key : ${key.key}, value : ${key.value}")
+        }
     }
 
     fun reloadTracker() {
@@ -87,6 +92,10 @@ class OTItemBuilder : ADataRow {
 
     override fun <T> getCastedValueOf(attribute: OTAttribute<T>): T? {
         return valueTable[attribute.objectId] as? T
+    }
+
+    fun setValueOf(attribute: OTAttribute<out Any>, value: Any) {
+        valueTable[attribute.objectId] = value
     }
 
     override fun hasValueOf(attribute: OTAttribute<out Any>): Boolean {

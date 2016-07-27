@@ -73,5 +73,9 @@ abstract class AInputView<T>(layoutId: Int, context: Context, attrs: AttributeSe
 
     abstract var value : T
 
+    fun setAnyValue(value: Any) {
+        this.value = value as T
+    }
+
     abstract fun focus(): Unit
 }

@@ -9,6 +9,7 @@ import android.util.Log
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
+import kr.ac.snu.hcil.omnitrack.core.UniqueObject
 import java.text.AttributedCharacterIterator
 import java.util.*
 import kotlin.properties.Delegates
@@ -19,6 +20,7 @@ import kotlin.properties.Delegates
 class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db", null, 1) {
 
     abstract class TableScheme {
+
         val _ID = "_id"
         val LOGGED_AT = "logged_at"
         val UPDATED_AT = "updated_at"
@@ -224,105 +226,107 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         return query
     }
 
-    fun save(attribute: OTAttribute<out Any>, position: Int) {
+    private fun saveUniqueObject(objRef: UniqueObject, values: ContentValues, scheme: TableScheme): Boolean {
+        val now = System.currentTimeMillis()
+        values.put(scheme.UPDATED_AT, now)
+
+        val db = writableDatabase
+        val transactionMode = !db.inTransaction()
+
+        if (transactionMode) db.beginTransaction()
+
+        try {
+            if (objRef.dbId != null) //update
+            {
+                val numAffected = db.update(scheme.tableName, values, "${scheme._ID}=?", arrayOf(objRef.dbId.toString()))
+                if (numAffected == 1) {
+                    println("updated db object : ${scheme.tableName}, updated at ${now}")
+                } else { // something wrong
+                    throw Exception("Something is wrong saving user in Db")
+                }
+            } else { //new
+                values.put(scheme.LOGGED_AT, now)
+                val newRowId = db.insert(scheme.tableName, null, values)
+                if (newRowId != -1L) {
+                    objRef.dbId = newRowId
+                    println("added db object : ${scheme.tableName}, logged at ${now}")
+                } else {
+                    throw Exception("Object insertion failed - ${scheme.tableName}")
+                }
+            }
+
+            if (transactionMode)
+                db.setTransactionSuccessful()
+            return true
+        } catch(e: Exception) {
+            e.printStackTrace()
+            return false
+        } finally {
+            if (transactionMode)
+                db.endTransaction()
+        }
+    }
+
+    private fun baseContentValuesOfNamed(objRef: UniqueObject, scheme: TableWithNameScheme): ContentValues {
         val values = ContentValues()
-        values.put(AttributeScheme.OBJECT_ID, attribute.objectId)
-        values.put(AttributeScheme.NAME, attribute.name)
+        values.put(scheme.NAME, objRef.name)
+        values.put(scheme.OBJECT_ID, objRef.objectId)
+
+        return values
+    }
+
+    fun save(attribute: OTAttribute<out Any>, position: Int) {
+        val values = baseContentValuesOfNamed(attribute, AttributeScheme)
+
         values.put(AttributeScheme.POSITION, position)
         values.put(AttributeScheme.TYPE, attribute.typeId)
         values.put(AttributeScheme.TRACKER_ID, attribute.owner?.dbId ?: null)
         values.put(AttributeScheme.SETTING_DATA, attribute.getSerializedProperties())
 
-
-        if (attribute.dbId != null) // update
-        {
-            val numAffected = writableDatabase.update(AttributeScheme.tableName, values, "${AttributeScheme._ID}=?", arrayOf(attribute.dbId.toString()))
-            if (numAffected == 1) {
-
-            } else { // something wrong
-                throw Exception("Something is wrong saving tracker in Db")
-            }
-        } else { // create new
-            val newRowId = writableDatabase.insert(AttributeScheme.tableName, null, values)
-            attribute.dbId = newRowId
-        }
-
+        saveUniqueObject(attribute, values, AttributeScheme)
     }
 
     fun save(tracker: OTTracker, position: Int) {
-        val values = ContentValues()
-        values.put(TrackerScheme.OBJECT_ID, tracker.objectId)
-        values.put(TrackerScheme.NAME, tracker.name)
+        val values = baseContentValuesOfNamed(tracker, TrackerScheme)
         values.put(TrackerScheme.POSITION, position)
         values.put(TrackerScheme.COLOR, tracker.color)
         values.put(TrackerScheme.USER_ID, tracker.owner?.dbId ?: null)
 
-        if (tracker.dbId != null) // update
-        {
-            val numAffected = writableDatabase.update(TrackerScheme.tableName, values, "${TrackerScheme._ID}=?", arrayOf(tracker.dbId.toString()))
-            if (numAffected == 1) {
-
-            } else { // something wrong
-                throw Exception("Something is wrong saving tracker in Db")
+        if (saveUniqueObject(tracker, values, TrackerScheme)) {
+            writableDatabase.beginTransaction()
+            val ids = tracker.fetchRemovedAttributeIds().map { "${AttributeScheme._ID}=${it.toString()}" }.toTypedArray()
+            if (ids.size > 0) {
+                writableDatabase.delete(AttributeScheme.tableName, ids.joinToString(" OR "), null)
             }
 
-        } else { // create new
-            val newRowId = writableDatabase.insert(TrackerScheme.tableName, null, values)
-            tracker.dbId = newRowId
-        }
+            for (child in tracker.attributes.iterator().withIndex()) {
+                save(child.value, child.index)
+            }
 
-
-        val ids = tracker.fetchRemovedAttributeIds().map { "${AttributeScheme._ID}=${it.toString()}" }.toTypedArray()
-        if (ids.size > 0) {
-            writableDatabase.delete(AttributeScheme.tableName, ids.joinToString(" OR "), null)
-
-
-        }
-
-        for (child in tracker.attributes.iterator().withIndex()) {
-            save(child.value, child.index)
+            writableDatabase.setTransactionSuccessful()
+            writableDatabase.endTransaction()
         }
     }
 
     fun save(user: OTUser) {
-        val values = ContentValues()
-        values.put(UserScheme.NAME, user.name)
+        val values = baseContentValuesOfNamed(user, UserScheme)
         values.put(UserScheme.EMAIL, user.email)
-        values.put(UserScheme.OBJECT_ID, user.objectId)
         values.put(UserScheme.ATTR_ID_SEED, user.attributeIdSeed)
 
-        val db = writableDatabase
-        db.beginTransaction()
-        try {
-            if (user.dbId != null) // update
-            {
-                val numAffected = db.update(UserScheme.tableName, values, "${UserScheme._ID}=?", arrayOf(user.dbId.toString()))
-                if (numAffected == 1) {
 
-                } else { // something wrong
-                    db.endTransaction()
-                    throw Exception("Something is wrong saving user in Db")
-                }
-            } else { //create
+        if (saveUniqueObject(user, values, UserScheme)) {
 
-                val newRowId = db.insert(UserScheme.tableName, null, values)
-                user.dbId = newRowId
-            }
-
+            writableDatabase.beginTransaction()
             val ids = user.fetchRemovedTrackerIds().map { "${TrackerScheme._ID}=${it.toString()}" }.toTypedArray()
             if (ids.size > 0) {
-                db.delete(TrackerScheme.tableName, ids.joinToString(" OR "), null)
+                writableDatabase.delete(TrackerScheme.tableName, ids.joinToString(" OR "), null)
             }
 
             for (child in user.trackers.iterator().withIndex()) {
                 save(child.value, child.index)
             }
-            db.setTransactionSuccessful()
-        } catch(e: Exception) {
-            e.printStackTrace()
-
-        } finally {
-            db.endTransaction()
+            writableDatabase.setTransactionSuccessful()
+            writableDatabase.endTransaction()
         }
     }
 
