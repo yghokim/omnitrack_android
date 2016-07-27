@@ -23,7 +23,6 @@ abstract class UniqueObject(objectId: String?, dbId: Long?,  name: String) {
             }
             else{
                 field = value
-                println("Item newly added to database : id = ${value}")
             }
         }
         get

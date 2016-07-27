@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core
 
 import com.google.gson.Gson
+import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.utils.serialization.IStringSerializable
 import kr.ac.snu.hcil.omnitrack.utils.serialization.MapSerializer
@@ -13,25 +14,51 @@ import java.util.*
  */
 abstract class ADataRow() {
 
-    abstract fun getValueOf(attribute: OTAttribute<out Any>): Any?
-    abstract fun <T> getCastedValueOf(attribute: OTAttribute<T>): T?
-    abstract fun hasValueOf(attribute: OTAttribute<out Any>): Boolean
-    abstract fun getNumColumns(): Int
+
+    protected val valueTable = Hashtable<String, Any>()
+
+    fun getValueOf(attribute: OTAttribute<out Any>): Any? {
+        return valueTable[attribute.objectId]
+    }
+
+    fun <T> getCastedValueOf(attribute: OTAttribute<T>): T? {
+        return valueTable[attribute.objectId] as? T
+    }
+
+    fun setValueOf(attribute: OTAttribute<out Any>, value: Any) {
+        valueTable[attribute.objectId] = value
+    }
+
+    fun hasValueOf(attribute: OTAttribute<out Any>): Boolean {
+        return valueTable.containsKey(attribute.objectId)
+    }
+
+    fun getNumStoredAttributes(): Int {
+        return valueTable.keys.size
+    }
+
+    fun clear() {
+        valueTable.clear()
+    }
 
     abstract fun extractFormattedStringArray(scheme: OTTracker): Array<String?>
 
     abstract fun extractValueArray(scheme: OTTracker): Array<Any?>
 
-    protected fun tableToSerializedEntryArray(table: Map<String, out Any>, scheme: OTTracker): Array<String> {
+    protected fun tableToSerializedEntryArray(scheme: OTTracker): Array<String> {
         val s = ArrayList<String>()
         val parser = Gson()
 
         for (attribute in scheme.attributes) {
-            if (table[attribute.objectId] != null) {
-                s.add(parser.toJson(SerializedStringKeyEntry(attribute.objectId, TypeStringSerializationHelper.serialize(attribute.typeNameForSerialization, table[attribute.objectId]!!))))
+            if (valueTable[attribute.objectId] != null) {
+                s.add(parser.toJson(SerializedStringKeyEntry(attribute.objectId, TypeStringSerializationHelper.serialize(attribute.typeNameForSerialization, valueTable[attribute.objectId]!!))))
             }
         }
 
         return s.toTypedArray()
+    }
+
+    override fun toString(): String {
+        return valueTable.map { "${it.key}: ${it.value}" }.joinToString(", ")
     }
 }

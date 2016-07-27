@@ -13,7 +13,8 @@ open class Event<T> () {
 
 
     operator fun plusAssign(handler: (sender: Any, args: T) -> Unit) {
-        handlers += handler
+        if (!handlers.contains(handler))
+            handlers += handler
     }
 
     operator fun minusAssign(handler: (sender: Any, args: T) -> Unit) {

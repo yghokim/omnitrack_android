@@ -5,10 +5,7 @@ import com.google.gson.*
 import com.google.gson.annotations.Expose
 import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
-import kr.ac.snu.hcil.omnitrack.utils.serialization.IStringSerializable
-import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializedIntegerKeyEntry
-import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializedStringKeyEntry
-import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
+import kr.ac.snu.hcil.omnitrack.utils.serialization.*
 import java.lang.reflect.Type
 import java.util.*
 
@@ -27,8 +24,6 @@ class OTItemBuilder : ADataRow, IStringSerializable {
     private lateinit var tracker: OTTracker
 
     private val mode: Int
-
-    private val valueTable = Hashtable<String, Any>()
 
     constructor(tracker: OTTracker, mode: Int) {
         this.trackerObjectId = tracker.objectId
@@ -75,26 +70,6 @@ class OTItemBuilder : ADataRow, IStringSerializable {
         }
     }
 
-    override fun getValueOf(attribute: OTAttribute<out Any>): Any? {
-        return valueTable[attribute.objectId]
-    }
-
-    override fun <T> getCastedValueOf(attribute: OTAttribute<T>): T? {
-        return valueTable[attribute.objectId] as? T
-    }
-
-    fun setValueOf(attribute: OTAttribute<out Any>, value: Any) {
-        valueTable[attribute.objectId] = value
-    }
-
-    override fun hasValueOf(attribute: OTAttribute<out Any>): Boolean {
-        return valueTable.containsKey(attribute.objectId)
-    }
-
-    override fun getNumColumns(): Int {
-        return valueTable.keys.size
-    }
-
     override fun extractFormattedStringArray(scheme: OTTracker): Array<String?> {
         throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
@@ -108,8 +83,23 @@ class OTItemBuilder : ADataRow, IStringSerializable {
     }
 
     override fun getSerializedString(): String {
-
         val parser = Gson()
-        return parser.toJson(Parcel(trackerObjectId, mode, tableToSerializedEntryArray(valueTable, tracker)))
+        return parser.toJson(Parcel(trackerObjectId, mode, tableToSerializedEntryArray(tracker)))
+    }
+
+    fun makeItem(): OTItem {
+        val item = OTItem(tracker.objectId)
+
+        for (attribute in tracker.attributes) {
+            if (hasValueOf(attribute)) {
+                item.setValueOf(attribute, getValueOf(attribute)!!)
+            }
+        }
+
+        return item
+    }
+
+    fun addItemToDatabase() {
+
     }
 }

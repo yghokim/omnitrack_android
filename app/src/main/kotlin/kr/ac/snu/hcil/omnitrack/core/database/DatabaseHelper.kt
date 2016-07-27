@@ -166,37 +166,31 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
     fun findTrackersOfUser(userId: Long): List<OTTracker>? {
 
         val query: Cursor = readableDatabase.query(TrackerScheme.tableName, TrackerScheme.columnNames, "${TrackerScheme.USER_ID}=?", arrayOf(userId.toString()), null, null, "${TrackerScheme.POSITION} ASC")
-        query.moveToFirst()
-        if (query.count == 0) {
-            query.close()
-            return null;
-        } else {
-            val result = ArrayList<OTTracker>()
-            while (query.moveToNext()) {
+        val result = ArrayList<OTTracker>()
+        if (query.moveToFirst()) {
+            do {
                 result.add(extractTrackerEntity(query))
-            }
+            } while (query.moveToNext())
 
             query.close()
             return result
-        }
+        } else return null
     }
+
 
     fun findAttributesOfTracker(trackerId: Long): List<OTAttribute<out Any>>? {
 
         val query: Cursor = readableDatabase.query(AttributeScheme.tableName, AttributeScheme.columnNames, "${AttributeScheme.TRACKER_ID}=?", arrayOf(trackerId.toString()), null, null, "${AttributeScheme.POSITION} ASC")
-        query.moveToFirst()
-        if (query.count == 0) {
-            query.close()
-            return null;
-        } else {
+
+        if (query.moveToFirst()) {
             val result = ArrayList<OTAttribute<out Any>>()
-            while (query.moveToNext()) {
+            do {
                 result.add(extractAttributeEntity(query))
-            }
+            } while (query.moveToNext())
 
             query.close()
             return result
-        }
+        } else return null
     }
 
     fun extractTrackerEntity(cursor: Cursor): OTTracker {
@@ -215,7 +209,6 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         val objectId = cursor.getString(cursor.getColumnIndex(AttributeScheme.OBJECT_ID))
         val type = cursor.getInt(cursor.getColumnIndex(AttributeScheme.TYPE))
         val settingData = cursor.getString(cursor.getColumnIndex(AttributeScheme.SETTING_DATA))
-        println("settingData - ${settingData}")
 
         return OTAttribute.createAttribute(objectId, id, name, type, settingData)
     }
@@ -240,7 +233,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
             {
                 val numAffected = db.update(scheme.tableName, values, "${scheme._ID}=?", arrayOf(objRef.dbId.toString()))
                 if (numAffected == 1) {
-                    println("updated db object : ${scheme.tableName}, updated at ${now}")
+                    println("updated db object : ${scheme.tableName}, id: ${objRef.dbId}, updated at ${now}")
                 } else { // something wrong
                     throw Exception("Something is wrong saving user in Db")
                 }
@@ -249,7 +242,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
                 val newRowId = db.insert(scheme.tableName, null, values)
                 if (newRowId != -1L) {
                     objRef.dbId = newRowId
-                    println("added db object : ${scheme.tableName}, logged at ${now}")
+                    println("added db object : ${scheme.tableName}, id: $newRowId, logged at ${now}")
                 } else {
                     throw Exception("Object insertion failed - ${scheme.tableName}")
                 }

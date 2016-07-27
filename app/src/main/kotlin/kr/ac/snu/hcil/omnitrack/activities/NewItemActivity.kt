@@ -18,6 +18,8 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.ui.HorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.SpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.AInputView
+import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import java.util.*
 
 /**
@@ -29,7 +31,7 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
 
     private var tracker: OTTracker? = null
 
-    private var builder: OTItemBuilder? = null
+    private lateinit var builder: OTItemBuilder
 
     private val layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
 
@@ -70,7 +72,9 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
 
     override fun onResume() {
         super.onResume()
-        tryRestoreItemBuilderCache(tracker!!)
+        if (tracker == null) {
+            tryRestoreItemBuilderCache(tracker!!)
+        }
     }
 
     override fun onPause() {
@@ -80,26 +84,36 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
 
     override fun onLeftButtonClicked() {
         //back button
+        finish()
     }
 
     override fun onRightButtonClicked() {
         //push item to db
+        syncViewStateToBuilder()
+        println("Will push ${builder.makeItem()}")
+        finish()
     }
 
     private fun makeTrackerPreferenceKey(tracker: OTTracker): String {
         return "tracker_${tracker.objectId}"
     }
 
+    private fun syncViewStateToBuilder() {
+        for (attribute in tracker!!.attributes.unObservedList) {
+            builder.setValueOf(attribute, attributeValueExtractors[attribute.objectId]?.invoke() ?: attribute.makeDefaultValue())
+        }
+    }
+
     private fun storeItemBuilderCache() {
         if (tracker != null) {
 
             for (attribute in tracker!!.attributes.unObservedList) {
-                builder?.setValueOf(attribute, attributeValueExtractors[attribute.objectId]?.invoke() ?: attribute.makeDefaultValue())
+                builder.setValueOf(attribute, attributeValueExtractors[attribute.objectId]?.invoke() ?: attribute.makeDefaultValue())
             }
 
             val preferences = getSharedPreferences(OmniTrackApplication.PREFERENCE_KEY_FOREGROUND_ITEM_BUILDER_STORAGE, Context.MODE_PRIVATE)
             val editor = preferences.edit()
-            editor.putString(makeTrackerPreferenceKey(tracker!!), builder?.getSerializedString())
+            editor.putString(makeTrackerPreferenceKey(tracker!!), builder.getSerializedString())
             editor.apply()
         }
     }
@@ -118,8 +132,8 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
         }
     }
 
-    private fun onAttributeValueChanged(attributeId: String, newVal: Any) {
-
+    private fun onAttributeValueChangedHandler(attributeId: String, newVal: Any) {
+        println("Attribute $attributeId was changed to $newVal")
     }
 
     inner class AttributeListAdapter : RecyclerView.Adapter<AttributeListAdapter.ViewHolder>() {
@@ -139,9 +153,14 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
                 container.addView(inputView)
 
                 inputView.valueChanged += {
-                    sender, newVal ->
-                    if (attributeId != null)
-                        onAttributeValueChanged(attributeId!!, newVal)
+                    sender, args ->
+                    onInputViewValueChanged(sender as AInputView<out Any>, args)
+                }
+            }
+
+            private fun onInputViewValueChanged(sender: AInputView<out Any>, newVal: Any) {
+                if (attributeId != null) {
+                    onAttributeValueChangedHandler(attributeId!!, newVal)
                 }
             }
 
@@ -153,11 +172,9 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
                 columnNameView.text = attribute.name
                 attributeTypeView.text = resources.getString(attribute.typeNameResourceId)
 
-                if (builder?.hasValueOf(attribute) ?: false) {
+                if (builder.hasValueOf(attribute)) {
                     inputView.valueChanged.suspend = true
-                    if (builder != null) {
-                        inputView.setAnyValue(builder!!.getValueOf(attribute)!!)
-                    }
+                    inputView.setAnyValue(builder.getValueOf(attribute)!!)
                     inputView.valueChanged.suspend = false
 
                 }
@@ -190,8 +207,5 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
         override fun getItemCount(): Int {
             return tracker?.attributes?.size ?: 0
         }
-
     }
-
-
 }

@@ -13,7 +13,11 @@ class LongTextInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
     override var value: CharSequence
         get() = valueView.text
         set(value) {
-            valueView.setText(value, TextView.BufferType.EDITABLE)
+            if (value != valueView.text.toString()) {
+                valueView.setText(value, TextView.BufferType.EDITABLE)
+                onValueChanged(value)
+            }
+
         }
 
     override val typeId: Int = VIEW_TYPE_LONG_TEXT
