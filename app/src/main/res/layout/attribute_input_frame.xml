@@ -57,16 +57,16 @@
             android:id="@+id/sidebar"
             android:layout_width="?attr/actionBarSize"
             android:layout_height="match_parent"
-            android:layout_alignBottom="@+id/inputViewContainer">
+            android:layout_alignBottom="@+id/ui_input_view_container">
 
         </RelativeLayout>
 
         <FrameLayout
-            android:id="@+id/inputViewContainer"
+            android:id="@+id/ui_input_view_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:layout_toRightOf="@+id/sidebar"></FrameLayout>
+            android:layout_toRightOf="@+id/sidebar" />
     </RelativeLayout>
 
 </LinearLayout>

@@ -32,7 +32,7 @@ abstract class MultiButtonActionBarActivity(val layoutId: Int) : AppCompatActivi
         val toolbar = findViewById(R.id.toolbar) as Toolbar?
         setSupportActionBar(toolbar)
 
-        leftActionBarButton = findViewById(R.id.action_bar_button_left) as ImageButton
+        leftActionBarButton = findViewById(R.id.ui_appbar_button_left) as ImageButton
         leftActionBarButton?.setOnClickListener {
 
             super.setResult(leftButtonResultCode)
@@ -40,7 +40,7 @@ abstract class MultiButtonActionBarActivity(val layoutId: Int) : AppCompatActivi
         }
 
 
-        rightActionBarButton = findViewById(R.id.action_bar_button_right) as ImageButton
+        rightActionBarButton = findViewById(R.id.ui_appbar_button_right) as ImageButton
 
         rightActionBarButton?.setOnClickListener {
 
@@ -48,7 +48,7 @@ abstract class MultiButtonActionBarActivity(val layoutId: Int) : AppCompatActivi
             onRightButtonClicked()
         }
 
-        titleView = findViewById(R.id.action_bar_title) as TextView?
+        titleView = findViewById(R.id.ui_appbar_title) as TextView?
         titleView?.setText(title)
 
     }

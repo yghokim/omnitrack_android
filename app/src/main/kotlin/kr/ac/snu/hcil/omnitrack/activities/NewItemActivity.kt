@@ -174,7 +174,7 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
             init {
                 columnNameView = frame.findViewById(R.id.title) as TextView
                 attributeTypeView = frame.findViewById(R.id.ui_attribute_type) as TextView
-                val container = frame.findViewById(R.id.inputViewContainer) as ViewGroup
+                val container = frame.findViewById(R.id.ui_input_view_container) as ViewGroup
                 container.addView(inputView)
 
                 inputView.valueChanged += {

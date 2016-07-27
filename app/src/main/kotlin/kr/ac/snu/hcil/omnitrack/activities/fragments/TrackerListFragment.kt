@@ -159,7 +159,7 @@ class TrackerListFragment : Fragment() {
             init{
                 name = view.findViewById(R.id.name) as TextView
                 color = view.findViewById(R.id.color_bar) as View
-                expandButton = view.findViewById(R.id.expandButton) as ImageButton
+                expandButton = view.findViewById(R.id.ui_expand_button) as ImageButton
 
                 view.setOnClickListener {
                     handleTrackerClick(user.trackers[adapterPosition])

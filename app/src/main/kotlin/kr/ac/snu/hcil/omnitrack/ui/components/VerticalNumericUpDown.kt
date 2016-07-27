@@ -79,7 +79,7 @@ class VerticalNumericUpDown(context: Context, attrs: AttributeSet?) : LinearLayo
             }
         }
 
-        field = findViewById(R.id.valueField) as TextView
+        field = findViewById(R.id.ui_value_field) as TextView
 
         invalidateViews()
     }

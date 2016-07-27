@@ -119,9 +119,9 @@ class DateTimePicker(context: Context, attrs: AttributeSet? = null) : FrameLayou
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         addView(inflater.inflate(R.layout.component_timepoint, this, false))
 
-        leftPicker = findViewById(R.id.leftPicker) as VerticalNumericUpDown
-        middlePicker = findViewById(R.id.middlePicker) as VerticalNumericUpDown
-        rightPicker = findViewById(R.id.rightPicker) as VerticalNumericUpDown
+        leftPicker = findViewById(R.id.ui_left_picker) as VerticalNumericUpDown
+        middlePicker = findViewById(R.id.ui_middle_picker) as VerticalNumericUpDown
+        rightPicker = findViewById(R.id.ui_right_picker) as VerticalNumericUpDown
 
         leftPicker.valueChanged += pickerValueChangedHandler
         middlePicker.valueChanged += pickerValueChangedHandler

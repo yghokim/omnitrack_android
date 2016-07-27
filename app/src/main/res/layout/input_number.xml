@@ -13,7 +13,7 @@
             android:layout_toStartOf="@+id/ui_button_minus">
 
             <EditText
-                android:id="@+id/valueField"
+                android:id="@+id/ui_value_field"
                 style="@style/numberPropertyDigitViewStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -22,7 +22,7 @@
                 android:visibility="gone" />
 
             <TextView
-                android:id="@+id/valueStatic"
+                android:id="@+id/ui_value_static"
                 style="@style/numberPropertyDigitViewStyle"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

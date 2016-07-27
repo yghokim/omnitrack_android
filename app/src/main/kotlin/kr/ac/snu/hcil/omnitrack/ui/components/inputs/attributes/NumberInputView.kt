@@ -118,8 +118,8 @@ class NumberInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
         increaseButton = findViewById(R.id.ui_button_plus)
         decreaseButton = findViewById(R.id.ui_button_minus)
 
-        valueField = findViewById(R.id.valueField) as EditText
-        valueStatic = findViewById(R.id.valueStatic) as TextView
+        valueField = findViewById(R.id.ui_value_field) as EditText
+        valueStatic = findViewById(R.id.ui_value_static) as TextView
 
         valueField.visibility = GONE
 
