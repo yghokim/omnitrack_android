@@ -1,0 +1,2 @@
+configurations.maybeCreate("default")
+artifacts.add("default", file('microsoft-band-1.3.20307.2.aar'))
