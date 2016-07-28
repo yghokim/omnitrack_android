@@ -8,7 +8,7 @@ import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 /**
  * Created by younghokim on 16. 7. 28..
  */
-class OmniTrackSystemReceiver : BroadcastReceiver() {
+class OTSystemReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
 

@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core
 import android.widget.Toast
 import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
+import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
 import java.util.*
 
 /**
@@ -84,7 +85,7 @@ class OTTriggerManager(val user: OTUser) {
             _removedTriggerIds.add(trigger.dbId!!)
 
 
-        //TODO handler dependencies associated with the trigge
+        //TODO handler dependencies associated with the trigger
 
 
         if (trackerPivotedTriggerListCache.containsKey(trigger.trackerObjectId)) {
@@ -98,6 +99,7 @@ class OTTriggerManager(val user: OTUser) {
                 println("trigger fired - loggin in background")
 
                 Toast.makeText(OmniTrackApplication.app, "Logged!", Toast.LENGTH_SHORT).show()
+                OTBackgroundLoggingService.startLogging(OmniTrackApplication.app, trigger.tracker)
             }
             OTTrigger.ACTION_NOTIFICATION -> {
                 println("trigger fired - send notification")

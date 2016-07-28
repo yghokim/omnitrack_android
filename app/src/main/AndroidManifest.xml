@@ -15,11 +15,16 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <receiver android:name=".receivers.OmniTrackSystemReceiver">
+        <receiver android:name=".receivers.OTSystemReceiver">
             <intent-filter>
                 <action android:name="kr.ac.snu.hcil.omnitrack.action.ALARM" />
             </intent-filter>
         </receiver>
+
+        <service
+            android:name=".services.OTBackgroundLoggingService"
+            android:exported="false"></service>
+
 
         <activity
             android:name=".activities.LoginActivity"
@@ -46,12 +51,13 @@
         <activity
             android:name=".activities.AttributeDetailActivity"
             android:label="@string/title_activity_attribute_detail"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activities.NewItemActivity"
             android:label="@string/title_activity_new_item"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".activities.ItemBrowserActivity"></activity>
+        <activity android:name=".activities.ItemBrowserActivity" />
+
     </application>
 
 </manifest>

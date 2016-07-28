@@ -8,7 +8,7 @@ import android.os.SystemClock
 import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
-import kr.ac.snu.hcil.omnitrack.receivers.OmniTrackSystemReceiver
+import kr.ac.snu.hcil.omnitrack.receivers.OTSystemReceiver
 
 /**
  * Created by younghokim on 16. 7. 27..
@@ -27,7 +27,7 @@ class OTPeriodicTrigger : OTTrigger {
     constructor(objectId: String?, dbId: Long?, name: String, trackerObjectId: String, isOn: Boolean, serializedProperties: String? = null) : super(objectId, dbId, name, trackerObjectId, isOn, serializedProperties)
 
     private fun makeIntent(context: Context, alarmId: Int): PendingIntent {
-        val intent = Intent(context, OmniTrackSystemReceiver::class.java)
+        val intent = Intent(context, OTSystemReceiver::class.java)
         intent.action = OmniTrackApplication.BROADCAST_ACTION_ALARM
         intent.putExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRIGGER, this.objectId)
         intent.putExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_USER, OmniTrackApplication.app.currentUser.objectId)

@@ -15,7 +15,7 @@ import java.util.*
 class OTItemBuilder : ADataRow, IStringSerializable {
     companion object {
         const val MODE_FOREGROUND = 1
-        const val MODE_BACKGOUND = 0
+        const val MODE_BACKGROUND = 0
     }
 
     internal data class Parcel(val trackerObjectId: String, val mode: Int, val valueTable: Array<String>)
@@ -32,7 +32,7 @@ class OTItemBuilder : ADataRow, IStringSerializable {
         //reloadTracker()
         syncFromTrackerScheme()
 
-        if (mode == MODE_BACKGOUND)
+        if (mode == MODE_BACKGROUND)
             autoComplete()
     }
 
@@ -72,9 +72,14 @@ class OTItemBuilder : ADataRow, IStringSerializable {
     }
 
     fun syncFromTrackerScheme() {
-        for (key in valueTable.keys) {
-            if (tracker.attributes.unObservedList.find { it.objectId == key } == null) {
-                valueTable.remove(key)
+
+        val it = valueTable.entries.iterator()
+
+        while (it.hasNext()) {
+            val entry = it.next()
+
+            if (tracker.attributes.unObservedList.find { it.objectId == entry.key } == null) {
+                it.remove()
             }
         }
     }
@@ -106,9 +111,5 @@ class OTItemBuilder : ADataRow, IStringSerializable {
         }
 
         return item
-    }
-
-    fun addItemToDatabase() {
-
     }
 }
