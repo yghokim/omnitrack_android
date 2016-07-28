@@ -11,7 +11,22 @@ import java.util.*
  */
 class OTTriggerManager(val user: OTUser) {
 
+    init {
+        user.trackerAdded += {
+            sender, args ->
+
+        }
+
+        user.trackerRemoved += {
+            sender, args ->
+            for (trigger in getAttachedTriggers(args.first).clone()) {
+                removeTrigger(trigger)
+            }
+        }
+    }
+
     constructor(user: OTUser, loadedTriggers: List<OTTrigger>?) : this(user) {
+
         if (loadedTriggers != null) {
             triggers += loadedTriggers
 
