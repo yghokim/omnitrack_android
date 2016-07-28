@@ -21,6 +21,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.activities.fragments.ServiceListFragment
 import kr.ac.snu.hcil.omnitrack.activities.fragments.TrackerListFragment
 
 class HomeActivity : UserSyncedActivity() {
@@ -124,7 +125,7 @@ class HomeActivity : UserSyncedActivity() {
         override fun getItem(position: Int): Fragment {
             when (position) {
                 0 -> return TrackerListFragment()
-                1 -> return PlaceholderFragment.newInstance(position)
+                1 -> return ServiceListFragment()
                 2 -> return PlaceholderFragment.newInstance(position)
                 else -> return PlaceholderFragment.newInstance(position)
             }

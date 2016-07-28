@@ -24,15 +24,15 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.4.0'
     compile 'com.android.support:design:23.4.0'
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-
     compile 'jp.wasabeef:recyclerview-animators:2.2.3'
     compile 'com.google.code.gson:gson:2.7'
     compile 'de.codecrafters.tableview:tableview:2.2.0'
+    compile project(':microsoft-band-1.3.20307.2')
 }
 
 kapt{

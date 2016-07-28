@@ -74,6 +74,13 @@
     <string name="trigger_periodic_desc">Fires by specific periods.</string>
 
 
+    <string name="service_microsoft_band_name">Microsoft Band</string>
+    <string name="service_microsoft_band_desc">Microsoft Band and Band2</string>
+    <string name="measure_microsoft_band_heart_rate_name">Heart Rate</string>
+    <string name="measure_microsoft_band_heart_rate_desc">Receives user\'s heart rate bpm</string>
+
+
+
     <string name="format_hour_am">AM %I</string>
     <string name="format_hour_pm">PM %I</string>
 
