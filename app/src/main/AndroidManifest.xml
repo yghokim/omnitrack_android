@@ -61,6 +61,10 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".activities.ItemBrowserActivity" />
 
+
+        <uses-permission android:name="android.permission.BLUETOOTH"/>
+        <uses-permission android:name="com.microsoft.band.service.access.BIND_BAND_SERVICE" />
+
     </application>
 
 </manifest>
