@@ -121,10 +121,11 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         val POSITION = "position"
         val PROPERTIES = "properties"
         val TYPE = "type"
+        val IS_ON = "is_on"
 
-        override val intrinsicColumnNames: Array<String> = super.intrinsicColumnNames + arrayOf(TRACKER_OBJECT_ID, TYPE, POSITION, PROPERTIES)
+        override val intrinsicColumnNames: Array<String> = super.intrinsicColumnNames + arrayOf(TRACKER_OBJECT_ID, TYPE, POSITION, IS_ON, PROPERTIES)
 
-        override val creationColumnContentString = super.creationColumnContentString + ", ${makeForeignKeyStatementString(USER_ID, UserScheme.tableName)}, ${TriggerScheme.TRACKER_OBJECT_ID} TEXT, ${TriggerScheme.POSITION} INTEGER, ${TriggerScheme.TYPE} INTEGER, ${TriggerScheme.PROPERTIES} TEXT"
+        override val creationColumnContentString = super.creationColumnContentString + ", ${makeForeignKeyStatementString(USER_ID, UserScheme.tableName)}, ${TriggerScheme.TRACKER_OBJECT_ID} TEXT, ${TriggerScheme.POSITION} INTEGER, ${TriggerScheme.IS_ON} INTEGER, ${TriggerScheme.TYPE} INTEGER, ${TriggerScheme.PROPERTIES} TEXT"
     }
 
     object ItemScheme : TableScheme() {
@@ -226,8 +227,12 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         val type = cursor.getInt(cursor.getColumnIndex(TriggerScheme.TYPE))
         val trackerObjectId = cursor.getString(cursor.getColumnIndex(TriggerScheme.TRACKER_OBJECT_ID))
         val serializedProperties = cursor.getString(cursor.getColumnIndex(TriggerScheme.PROPERTIES))
+        val isOn = when (cursor.getInt(cursor.getColumnIndex(TriggerScheme.IS_ON))) {0 -> false
+            1 -> true
+            else -> false
+        }
 
-        return OTTrigger.makeInstance(objectId, id, type, name, trackerObjectId, serializedProperties)
+        return OTTrigger.makeInstance(objectId, id, type, name, trackerObjectId, isOn, serializedProperties)
     }
 
     fun extractTrackerEntity(cursor: Cursor): OTTracker {
@@ -320,6 +325,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         values.put(TriggerScheme.PROPERTIES, trigger.getSerializedProperties())
         values.put(TriggerScheme.TRACKER_OBJECT_ID, trigger.trackerObjectId)
         values.put(TriggerScheme.POSITION, position)
+        values.put(TriggerScheme.IS_ON, trigger.isOn)
 
         saveObject(trigger, values, TriggerScheme)
     }

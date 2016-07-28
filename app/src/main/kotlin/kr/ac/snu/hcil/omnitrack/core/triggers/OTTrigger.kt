@@ -26,15 +26,15 @@ abstract class OTTrigger : NamedObject {
         const val TYPE_NEW_ENTRY = 1
         const val TYPE_SERVICE_EVENT = 2
 
-        fun makeInstance(objectId: String?, dbId: Long?, typeId: Int, name: String, trackerObjectId: String, serializedProperties: String?): OTTrigger {
+        fun makeInstance(objectId: String?, dbId: Long?, typeId: Int, name: String, trackerObjectId: String, isOn: Boolean, serializedProperties: String?): OTTrigger {
             return when (typeId) {
-                TYPE_PERIODIC -> OTPeriodicTrigger(objectId, dbId, name, trackerObjectId, serializedProperties)
+                TYPE_PERIODIC -> OTPeriodicTrigger(objectId, dbId, name, trackerObjectId, isOn, serializedProperties)
                 else -> throw Exception("wrong trigger type : $typeId")
             }
         }
 
         fun makeInstance(typeId: Int, name: String, tracker: OTTracker): OTTrigger {
-            return makeInstance(null, null, typeId, name, tracker.objectId, null)
+            return makeInstance(null, null, typeId, name, tracker.objectId, true, null)
         }
     }
 
@@ -75,7 +75,7 @@ abstract class OTTrigger : NamedObject {
         this.tracker = tracker
     }
 
-    constructor(objectId: String?, dbId: Long?, name: String, trackerObjectId: String, serializedProperties: String?=null) : super(objectId, dbId, name) {
+    constructor(objectId: String?, dbId: Long?, name: String, trackerObjectId: String, isOn: Boolean, serializedProperties: String? = null) : super(objectId, dbId, name) {
         this.trackerObjectId = trackerObjectId
         this.tracker = OmniTrackApplication.app.currentUser[trackerObjectId]!!
 
@@ -88,6 +88,8 @@ abstract class OTTrigger : NamedObject {
                 properties[entry.key] = TypeStringSerializationHelper.deserialize(entry.value)
             }
         }
+
+        this.isOn = isOn
     }
 
     fun getSerializedProperties(): String{
@@ -117,7 +119,7 @@ abstract class OTTrigger : NamedObject {
         }
     }
 
-    abstract fun handleActivationOnSystem(context: Context);
+    abstract fun handleActivationOnSystem(context: Context)
 
     open fun handleFire() {
     }

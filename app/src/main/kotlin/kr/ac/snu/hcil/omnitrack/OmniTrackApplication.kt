@@ -20,7 +20,11 @@ class OmniTrackApplication : Application() {
         const val INTENT_EXTRA_OBJECT_ID_TRACKER = "trackerObjectId"
         const val INTENT_EXTRA_OBJECT_ID_ATTRIBUTE = "attributeObjectId"
         const val INTENT_EXTRA_OBJECT_ID_USER = "userObjectId"
+        const val INTENT_EXTRA_OBJECT_ID_TRIGGER = "triggerObjectId"
+
         const val INTENT_EXTRA_ITEMBUILDER = "itemBuilderId"
+
+        const val BROADCAST_ACTION_ALARM = "kr.ac.snu.hcil.omnitrack.action.ALARM"
 
 
         const val PREFERENCE_KEY_FOREGROUND_ITEM_BUILDER_STORAGE = "item_builder_storage_foreground"

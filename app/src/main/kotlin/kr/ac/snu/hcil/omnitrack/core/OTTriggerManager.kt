@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core
 
+import android.widget.Toast
 import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import java.util.*
@@ -35,6 +36,10 @@ class OTTriggerManager(val user: OTUser) {
     private val triggerFiredHandler = {
         sender: Any, action: Int ->
         onTriggerFired(sender as OTTrigger, action)
+    }
+
+    fun getTriggerWithId(objId: String): OTTrigger? {
+        return triggers.find { it.objectId == objId }
     }
 
     fun getAttachedTriggers(tracker: OTTracker): Array<OTTrigger> {
@@ -91,6 +96,8 @@ class OTTriggerManager(val user: OTUser) {
         when (action) {
             OTTrigger.ACTION_BACKGROUND_LOGGING -> {
                 println("trigger fired - loggin in background")
+
+                Toast.makeText(OmniTrackApplication.app, "Logged!", Toast.LENGTH_SHORT).show()
             }
             OTTrigger.ACTION_NOTIFICATION -> {
                 println("trigger fired - send notification")

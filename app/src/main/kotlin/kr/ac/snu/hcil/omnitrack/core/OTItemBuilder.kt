@@ -31,6 +31,9 @@ class OTItemBuilder : ADataRow, IStringSerializable {
         this.mode = mode
         //reloadTracker()
         syncFromTrackerScheme()
+
+        if (mode == MODE_BACKGOUND)
+            autoComplete()
     }
 
     @SuppressWarnings("NotUsed")
@@ -55,6 +58,12 @@ class OTItemBuilder : ADataRow, IStringSerializable {
             valueTable[entry.key] = TypeStringSerializationHelper.deserialize(entry.value)
         }
         syncFromTrackerScheme()
+    }
+
+    fun autoComplete() {
+        for (attribute in tracker.attributes) {
+            setValueOf(attribute, attribute.makeDefaultValue())
+        }
     }
 
     fun reloadTracker() {
