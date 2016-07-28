@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<kr.ac.snu.hcil.omnitrack.ui.components.ExpandableFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:ex_collapseButtonId="@+id/ui_button_collapse"
+    app:ex_collapsed="true"
+    app:ex_collapsedContainerId="@+id/ui_collapsed_view"
+    app:ex_expandButtonId="@+id/ui_button_expand"
+    app:ex_expandedContainerId="@+id/ui_expanded_view">
+
+    <RelativeLayout
+        android:id="@+id/ui_collapsed_view"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_marginLeft="@dimen/attribute_list_element_horizontal_padding"
+        android:layout_marginRight="@dimen/attribute_list_element_horizontal_padding"
+        android:background="@drawable/attribute_card"
+        android:paddingLeft="@dimen/activity_horizontal_margin">
+
+        <TextView
+            android:id="@+id/ui_summary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="3 triggers" />
+
+        <ImageView
+            android:layout_width="@dimen/button_height_normal"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:background="@drawable/transparent_button_background"
+            android:padding="10dp"
+            android:src="@drawable/down_dark" />
+
+        <Button
+            android:id="@+id/ui_button_expand"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/transparent_button_background" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/ui_expanded_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/expanded_view_background"
+        android:orientation="vertical"
+
+        android:visibility="gone">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/ui_trigger_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/expanded_view_background_bottom_panel"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/ui_button_new_trigger"
+                android:layout_width="@dimen/button_height_normal"
+                android:layout_height="@dimen/button_height_normal"
+                android:background="@drawable/transparent_button_background"
+                android:padding="16dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/plus" />
+
+            <ImageButton
+                android:id="@+id/ui_button_remove_trigger"
+                android:layout_width="@dimen/button_height_normal"
+                android:layout_height="@dimen/button_height_normal"
+                android:layout_toRightOf="@+id/ui_button_new_trigger"
+                android:background="@drawable/transparent_button_background"
+                android:padding="16dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/minus" />
+
+            <Button
+                android:id="@+id/ui_button_collapse"
+                style="@style/textButtonTransparentLight"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/button_height_normal"
+                android:layout_alignParentEnd="true"
+                android:text="Collapse" />
+        </RelativeLayout>
+    </LinearLayout>
+
+</kr.ac.snu.hcil.omnitrack.ui.components.ExpandableFrameLayout>

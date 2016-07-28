@@ -48,6 +48,8 @@
 
     <string name="msg_column_name">Column Name</string>
 
+    <string name="msg_triggers">Triggers</string>
+
     <string name="hind_long_text">Write text here</string>
 
     <string name="dateformat_ymd">MM d, yyyy, EE</string>
@@ -68,7 +70,7 @@
     <string name="type_number_name">Number</string>
     <string name="type_number_desc">An integer or real number with unit</string>
 
-    <string name="trigger_periodic_name">Periodic Trigger</string>
+    <string name="trigger_periodic_name">Time Trigger</string>
     <string name="trigger_periodic_desc">Fires by specific periods.</string>
 
 

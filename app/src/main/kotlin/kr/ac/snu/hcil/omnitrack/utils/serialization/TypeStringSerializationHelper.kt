@@ -17,8 +17,8 @@ object TypeStringSerializationHelper {
     const val TYPENAME_STRING = "S"
 
     val classNameDictionary = mapOf(
-            Int.javaClass.name to TYPENAME_INT,
-            Long.javaClass.name to TYPENAME_LONG,
+            Int::class.java.name to TYPENAME_INT,
+            Long::class.java.name to TYPENAME_LONG,
             BigDecimal::class.java.name to TYPENAME_BIGDECIMAL,
             TimePoint::class.java.name to TYPENAME_TIMEPOINT,
             String::class.java.name to TYPENAME_STRING

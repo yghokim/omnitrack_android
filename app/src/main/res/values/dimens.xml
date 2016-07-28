@@ -47,5 +47,6 @@
     <dimen name="tracker_list_element_collapsed_height">110dp</dimen>
     <dimen name="tracker_list_element_expanded_height">160dp</dimen>
 
+    <dimen name="trigger_list_element_divider_height">1dp</dimen>
 
 </resources>

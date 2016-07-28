@@ -27,8 +27,8 @@ class OTUser(objectId: String?, dbId: Long?, name: String, email: String, attrib
     val trackers = ObservableList<OTTracker>()
 
     private val _removedTrackerIds = ArrayList<Long>()
-    fun fetchRemovedTrackerIds(): Array<Long> {
-        val result = _removedTrackerIds.toTypedArray()
+    fun fetchRemovedTrackerIds(): LongArray {
+        val result = _removedTrackerIds.toLongArray()
         _removedTrackerIds.clear()
         return result;
     }

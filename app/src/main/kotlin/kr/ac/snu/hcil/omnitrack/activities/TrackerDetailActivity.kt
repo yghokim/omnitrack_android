@@ -24,6 +24,8 @@ import kr.ac.snu.hcil.omnitrack.ui.DragItemTouchHelperCallback
 import kr.ac.snu.hcil.omnitrack.ui.SpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.AttributeFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.AttributeTypeListDialogFragment
+import kr.ac.snu.hcil.omnitrack.ui.components.ExpandableFrameLayout
+import kr.ac.snu.hcil.omnitrack.ui.components.TriggerPanel
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ColorPalettePropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ShortTextPropertyView
@@ -41,6 +43,8 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
 
     private lateinit var namePropertyView : ShortTextPropertyView
     private lateinit var colorPropertyView: ColorPalettePropertyView
+
+    private lateinit var triggerPanelView: TriggerPanel
 
     private lateinit var attributeListGroupView: View
     private lateinit var fab: FloatingActionButton
@@ -71,6 +75,8 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
         colorPropertyView.title = resources.getString(R.string.msg_color)
 
         attributeListGroupView = findViewById(R.id.ui_group_attribute_list) as View
+
+        triggerPanelView = findViewById(R.id.ui_trigger_panel) as TriggerPanel
 
         listView = findViewById(R.id.ui_attribute_list) as RecyclerView
         val layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
@@ -121,6 +127,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
             title = resources.getString(R.string.title_activity_tracker_edit)
             tracker = OmniTrackApplication.app.currentUser.trackers.filter { it.objectId == intent.getStringExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER) }.first()
 
+            triggerPanelView.attachTracker(tracker)
             attributeListGroupView.visibility = View.VISIBLE
             fab.visibility = View.VISIBLE
 

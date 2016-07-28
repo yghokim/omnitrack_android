@@ -31,10 +31,14 @@ abstract class OTTrigger : NamedObject {
                 else -> throw Exception("wrong trigger type : $typeId")
             }
         }
+
+        fun makeInstance(typeId: Int, name: String, tracker: OTTracker): OTTrigger {
+            return makeInstance(null, null, typeId, name, tracker.objectId, null)
+        }
     }
 
     abstract val typeId: Int
-    abstract val nameResourceId: Int
+    abstract val typeNameResourceId: Int
     abstract val descriptionResourceId: Int
 
     val trackerObjectId: String

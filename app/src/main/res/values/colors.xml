@@ -2,7 +2,9 @@
 <resources>
     <color name="colorPrimary">#6c314a</color>
     <color name="colorPrimaryDark">#6c314a</color>
-    <color name="colorPrimaryLight">#8c4563</color>
+    <color name="colorPrimarySemiLight">#8c4563</color>
+    <color name="colorPrimaryLight">#a36881</color>
+
     <color name="colorAccent">#ff8940</color>
 
     <color name="buttonIconColorDark">#757575</color>
@@ -12,6 +14,8 @@
     <color name="titleTextColor">#666666</color>
     <color name="outerBackground">#eae7e3</color>
     <color name="frontalBackground">#ffffff</color>
+
+    <color name="dividerColor">#bcbcbc</color>
 
     <color name="colorGreen">#9fea75</color>
 

@@ -9,7 +9,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTTracker
 class OTPeriodicTrigger : OTTrigger {
     override val typeId: Int = TYPE_PERIODIC
 
-    override val nameResourceId: Int = R.string.trigger_periodic_name
+    override val typeNameResourceId: Int = R.string.trigger_periodic_name
     override val descriptionResourceId: Int = R.string.trigger_periodic_desc
 
     var period: Long by properties

@@ -51,6 +51,10 @@
         <item name="android:layout_marginBottom">15dp</item>
     </style>
 
+    <style name="SubTitleWithoutSeparatorAbove" parent="SubTitle">
+        <item name="android:layout_marginTop">23dp</item>
+    </style>
+
     <style name="BadgeText">
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">11dp</item>
@@ -106,6 +110,11 @@
         <item name="android:textSize">25sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@color/colorPrimary</item>
+    </style>
+
+    <style name="textButtonTransparentLight">
+        <item name="android:textColor">#ffffff</item>
+        <item name="android:background">@drawable/transparent_button_background</item>
     </style>
 
 </resources>

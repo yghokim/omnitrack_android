@@ -124,7 +124,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
 
         override val intrinsicColumnNames: Array<String> = super.intrinsicColumnNames + arrayOf(TRACKER_OBJECT_ID, TYPE, POSITION, PROPERTIES)
 
-        override val creationColumnContentString = super.creationColumnContentString + ", ${makeForeignKeyStatementString(USER_ID, UserScheme.tableName)} ${TriggerScheme.TRACKER_OBJECT_ID} TEXT, ${TriggerScheme.POSITION} INTEGER, ${TriggerScheme.TYPE} INTEGER, ${TriggerScheme.PROPERTIES} TEXT"
+        override val creationColumnContentString = super.creationColumnContentString + ", ${makeForeignKeyStatementString(USER_ID, UserScheme.tableName)}, ${TriggerScheme.TRACKER_OBJECT_ID} TEXT, ${TriggerScheme.POSITION} INTEGER, ${TriggerScheme.TYPE} INTEGER, ${TriggerScheme.PROPERTIES} TEXT"
     }
 
     object ItemScheme : TableScheme() {
@@ -256,6 +256,13 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         return query
     }
 
+    fun deleteObjects(scheme: TableScheme, vararg ids: Long) {
+        val ids = ids.map { "${scheme._ID}=${it.toString()}" }.toTypedArray()
+        if (ids.size > 0) {
+            writableDatabase.delete(scheme.tableName, ids.joinToString(" OR "), null)
+        }
+    }
+
     private fun saveObject(objRef: IDatabaseStorable, values: ContentValues, scheme: TableScheme): Boolean {
         val now = System.currentTimeMillis()
         values.put(scheme.UPDATED_AT, now)
@@ -336,10 +343,8 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
 
         if (saveObject(tracker, values, TrackerScheme)) {
             writableDatabase.beginTransaction()
-            val ids = tracker.fetchRemovedAttributeIds().map { "${AttributeScheme._ID}=${it.toString()}" }.toTypedArray()
-            if (ids.size > 0) {
-                writableDatabase.delete(AttributeScheme.tableName, ids.joinToString(" OR "), null)
-            }
+
+            deleteObjects(AttributeScheme, *tracker.fetchRemovedAttributeIds())
 
             for (child in tracker.attributes.iterator().withIndex()) {
                 save(child.value, child.index)
@@ -359,10 +364,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         if (saveObject(user, values, UserScheme)) {
 
             writableDatabase.beginTransaction()
-            val ids = user.fetchRemovedTrackerIds().map { "${TrackerScheme._ID}=${it.toString()}" }.toTypedArray()
-            if (ids.size > 0) {
-                writableDatabase.delete(TrackerScheme.tableName, ids.joinToString(" OR "), null)
-            }
+            deleteObjects(TrackerScheme, *user.fetchRemovedTrackerIds())
 
             for (child in user.trackers.iterator().withIndex()) {
                 save(child.value, child.index)

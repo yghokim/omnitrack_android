@@ -32,5 +32,5 @@
         android:background="@drawable/transparent_button_background"
         android:padding="5dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/ic_keyboard_arrow_down_dark" />
+        android:src="@drawable/down_dark" />
 </RelativeLayout>

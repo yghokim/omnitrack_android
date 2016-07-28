@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ExpandableFrameLayout">
+        <attr name="ex_collapsedContainerId" format="reference" />
+        <attr name="ex_expandedContainerId" format="reference" />
+        <attr name="ex_collapseButtonId" format="reference" />
+        <attr name="ex_expandButtonId" format="reference" />
+        <attr name="ex_collapsed" format="boolean" />
+    </declare-styleable>
+</resources>

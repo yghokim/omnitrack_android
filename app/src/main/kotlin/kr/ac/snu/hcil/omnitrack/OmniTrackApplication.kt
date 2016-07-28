@@ -63,6 +63,7 @@ class OmniTrackApplication : Application() {
         for (triggerEntry in triggerManager.withIndex()) {
             dbHelper.save(triggerEntry.value, _currentUser, triggerEntry.index)
         }
+        dbHelper.deleteObjects(DatabaseHelper.TriggerScheme, *triggerManager.fetchRemovedTriggerIds())
     }
 
     override fun onTerminate() {

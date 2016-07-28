@@ -16,6 +16,14 @@ class OTTriggerManager(val user: OTUser) {
         }
     }
 
+
+    private val _removedTriggerIds = ArrayList<Long>()
+    fun fetchRemovedTriggerIds(): LongArray {
+        val result = _removedTriggerIds.toLongArray()
+        _removedTriggerIds.clear()
+        return result;
+    }
+
     private val triggers = ArrayList<OTTrigger>()
 
     private val trackerPivotedTriggerListCache = Hashtable<String, Array<OTTrigger>>()
@@ -42,6 +50,10 @@ class OTTriggerManager(val user: OTUser) {
             triggers.add(trigger)
             trigger.fired += triggerFiredHandler
 
+            if (_removedTriggerIds.contains(trigger.dbId)) {
+                _removedTriggerIds.remove(trigger.dbId)
+            }
+
             if (trackerPivotedTriggerListCache.containsKey(trigger.trackerObjectId)) {
                 trackerPivotedTriggerListCache[trigger.trackerObjectId] =
                         trackerPivotedTriggerListCache[trigger.trackerObjectId]!! + trigger
@@ -52,6 +64,15 @@ class OTTriggerManager(val user: OTUser) {
     fun removeTrigger(trigger: OTTrigger) {
         triggers.remove(trigger)
         trigger.fired -= triggerFiredHandler
+
+        trigger.isActive = false
+
+        if (trigger.dbId != null)
+            _removedTriggerIds.add(trigger.dbId!!)
+
+
+        //TODO handler dependencies associated with the trigge
+
 
         if (trackerPivotedTriggerListCache.containsKey(trigger.trackerObjectId)) {
             trackerPivotedTriggerListCache[trigger.trackerObjectId] = trackerPivotedTriggerListCache[trigger.trackerObjectId]!!.filter { it != trigger }.toTypedArray()
