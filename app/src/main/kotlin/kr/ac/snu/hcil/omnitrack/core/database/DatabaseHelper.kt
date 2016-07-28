@@ -11,6 +11,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.NamedObject
+import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import java.text.AttributedCharacterIterator
 import java.util.*
 import kotlin.properties.Delegates
@@ -113,6 +114,19 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         override val creationColumnContentString = super.creationColumnContentString + ", ${makeForeignKeyStatementString(TRACKER_ID, TrackerScheme.tableName)}, ${AttributeScheme.POSITION} INTEGER, ${AttributeScheme.TYPE} INTEGER, ${AttributeScheme.SETTING_DATA} TEXT"
     }
 
+    object TriggerScheme : TableWithNameScheme() {
+        override val tableName: String = "omnitrack_triggers"
+        val USER_ID = "user_id"
+        val TRACKER_OBJECT_ID = "tracker_object_id"
+        val POSITION = "position"
+        val PROPERTIES = "properties"
+        val TYPE = "type"
+
+        override val intrinsicColumnNames: Array<String> = super.intrinsicColumnNames + arrayOf(TRACKER_OBJECT_ID, TYPE, POSITION, PROPERTIES)
+
+        override val creationColumnContentString = super.creationColumnContentString + ", ${makeForeignKeyStatementString(USER_ID, UserScheme.tableName)} ${TriggerScheme.TRACKER_OBJECT_ID} TEXT, ${TriggerScheme.POSITION} INTEGER, ${TriggerScheme.TYPE} INTEGER, ${TriggerScheme.PROPERTIES} TEXT"
+    }
+
     object ItemScheme : TableScheme() {
         override val tableName: String = "omnitrack_items"
 
@@ -134,11 +148,9 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         println("Create Database Tables")
         Log.d("OMNITRACK", "Create Database Tables")
 
-        val tables = arrayOf(UserScheme, TrackerScheme, AttributeScheme, ItemScheme)
+        val tables = arrayOf(UserScheme, TrackerScheme, AttributeScheme, TriggerScheme, ItemScheme)
 
         for (scheme in tables) {
-            println(scheme.creationQueryString)
-            println(scheme.indexCreationQueryString)
             db.execSQL(scheme.creationQueryString)
             db.execSQL(scheme.indexCreationQueryString)
         }
@@ -267,6 +279,18 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         values.put(scheme.OBJECT_ID, objRef.objectId)
 
         return values
+    }
+
+    fun save(trigger: OTTrigger, owner: OTUser, position: Int) {
+        val values = baseContentValuesOfNamed(trigger, TriggerScheme)
+
+        values.put(TriggerScheme.USER_ID, owner.dbId)
+        values.put(TriggerScheme.TYPE, trigger.typeId)
+        values.put(TriggerScheme.PROPERTIES, trigger.getSerializedProperties())
+        values.put(TriggerScheme.TRACKER_OBJECT_ID, trigger.trackerObjectId)
+        values.put(TriggerScheme.POSITION, position)
+
+        saveObject(trigger, values, TriggerScheme)
     }
 
     fun save(attribute: OTAttribute<out Any>, position: Int) {

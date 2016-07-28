@@ -24,12 +24,10 @@ abstract class OTTrigger : NamedObject {
         const val TYPE_NEW_ENTRY = 1
         const val TYPE_SERVICE_EVENT = 2
 
-        fun makeInstance(objectId: String?, dbId: Long?, typeId: Int, name: String, trackerObjectId: String, serializedProperties: String?) : OTTrigger
-        {
-            return when(typeId)
-            {
-                TYPE_PERIODIC->OTPeriodicTrigger(objectId, dbId, name, trackerObjectId, serializedProperties)
-                else->throw Exception("wrong trigger type : $typeId")
+        fun makeInstance(objectId: String?, dbId: Long?, typeId: Int, name: String, trackerObjectId: String, serializedProperties: String?): OTTrigger {
+            return when (typeId) {
+                TYPE_PERIODIC -> OTPeriodicTrigger(objectId, dbId, name, trackerObjectId, serializedProperties)
+                else -> throw Exception("wrong trigger type : $typeId")
             }
         }
     }
