@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core
 
+import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import java.util.*
 
@@ -12,7 +13,10 @@ class OTTriggerManager(val user: OTUser) {
         if (loadedTriggers != null) {
             triggers += loadedTriggers
 
-            triggers.forEach { it.fired += triggerFiredHandler }
+            triggers.forEach {
+                it.fired += triggerFiredHandler
+                it.activateOnSystem(OmniTrackApplication.app.applicationContext)
+            }
         }
     }
 
@@ -29,15 +33,15 @@ class OTTriggerManager(val user: OTUser) {
     private val trackerPivotedTriggerListCache = Hashtable<String, Array<OTTrigger>>()
 
     private val triggerFiredHandler = {
-        sender: Any, args: OTTracker ->
-        onTriggerFired(sender as OTTrigger)
+        sender: Any, action: Int ->
+        onTriggerFired(sender as OTTrigger, action)
     }
 
     fun getAttachedTriggers(tracker: OTTracker): Array<OTTrigger> {
         if (trackerPivotedTriggerListCache.containsKey(tracker.objectId)) {
-            println("triggers cache hit")
+            //println("triggers cache hit")
         } else {
-            println("triggers cache miss")
+            //println("triggers cache miss")
             trackerPivotedTriggerListCache.set(tracker.objectId,
                     triggers.filter { it.trackerObjectId == tracker.objectId }.toTypedArray())
         }
@@ -49,6 +53,10 @@ class OTTriggerManager(val user: OTUser) {
         if (triggers.find { it.objectId == trigger.objectId } == null) {
             triggers.add(trigger)
             trigger.fired += triggerFiredHandler
+
+            if (trigger.isOn) {
+                trigger.activateOnSystem(OmniTrackApplication.app.applicationContext)
+            }
 
             if (_removedTriggerIds.contains(trigger.dbId)) {
                 _removedTriggerIds.remove(trigger.dbId)
@@ -65,7 +73,7 @@ class OTTriggerManager(val user: OTUser) {
         triggers.remove(trigger)
         trigger.fired -= triggerFiredHandler
 
-        trigger.isActive = false
+        trigger.isOn = false
 
         if (trigger.dbId != null)
             _removedTriggerIds.add(trigger.dbId!!)
@@ -79,8 +87,17 @@ class OTTriggerManager(val user: OTUser) {
         }
     }
 
-    private fun onTriggerFired(trigger: OTTrigger) {
-        println("trigger fired!")
+    private fun onTriggerFired(trigger: OTTrigger, action: Int) {
+        when (action) {
+            OTTrigger.ACTION_BACKGROUND_LOGGING -> {
+                println("trigger fired - loggin in background")
+            }
+            OTTrigger.ACTION_NOTIFICATION -> {
+                println("trigger fired - send notification")
+            }
+        }
+
+
     }
 
     operator fun iterator(): MutableIterator<OTTrigger> {

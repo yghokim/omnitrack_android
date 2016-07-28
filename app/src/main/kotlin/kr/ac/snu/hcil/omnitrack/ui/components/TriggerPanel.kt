@@ -128,14 +128,14 @@ class TriggerPanel : FrameLayout {
                 }
 
                 triggerSwitch.setOnClickListener {
-                    getTriggers()[adapterPosition].isActive = triggerSwitch.isChecked
+                    getTriggers()[adapterPosition].isOn = triggerSwitch.isChecked
                 }
             }
 
             fun bind(trigger: OTTrigger) {
                 typeView.text = context.resources.getString(trigger.typeNameResourceId)
                 nameView.text = trigger.name
-                triggerSwitch.isChecked = trigger.isActive
+                triggerSwitch.isChecked = trigger.isOn
             }
         }
     }

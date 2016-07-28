@@ -4,6 +4,9 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.ScaleAnimation
+import android.view.animation.Transformation
 import android.widget.FrameLayout
 import kr.ac.snu.hcil.omnitrack.R
 
@@ -102,5 +105,28 @@ class ExpandableFrameLayout : FrameLayout {
         expandedView.visibility = View.GONE
     }
 
+
+    inner class ResizeAnim(private val view: View, private val initialHeight: Int, private val targetHeight: Int, private val down: Boolean) : Animation() {
+
+        override fun applyTransformation(interpolatedTime: Float, t: Transformation) {
+            val newHeight: Int
+            if (down) {
+                newHeight = ((targetHeight - initialHeight) * interpolatedTime + initialHeight).toInt()
+            } else {
+                newHeight = ((targetHeight - initialHeight) * (1 - interpolatedTime) + initialHeight).toInt()
+            }
+            view.layoutParams.height = newHeight
+            view.requestLayout()
+        }
+
+        override fun initialize(width: Int, height: Int, parentWidth: Int,
+                                parentHeight: Int) {
+            super.initialize(width, height, parentWidth, parentHeight)
+        }
+
+        override fun willChangeBounds(): Boolean {
+            return true
+        }
+    }
 
 }

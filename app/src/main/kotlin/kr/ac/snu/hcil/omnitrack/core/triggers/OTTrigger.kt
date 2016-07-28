@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.triggers
 
+import android.content.Context
 import com.google.gson.Gson
 import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.core.NamedObject
@@ -45,16 +46,25 @@ abstract class OTTrigger : NamedObject {
 
     val tracker: OTTracker
 
-    val fired = Event<OTTracker>()
+    val fired = Event<Int>()
 
-    var action: Int by Delegates.observable(ACTION_NOTIFICATION)
+    var isActivatedOnSystem: Boolean = false
+        private set
+
+    var action: Int by Delegates.observable(ACTION_BACKGROUND_LOGGING)
     {
         prop, old, new ->
-
+        if (new < ACTION_NOTIFICATION && new > ACTION_BACKGROUND_LOGGING) {
+            throw Exception("Wrong trigger action code.")
+        }
     }
-    var isActive: Boolean by Delegates.observable(true) {
+    var isOn: Boolean by Delegates.observable(true) {
         prop, old, new ->
-
+        if (new) {
+            handleOn()
+        } else {
+            handleOff()
+        }
     }
 
     protected val properties = HashMap<String, Any?>()
@@ -92,5 +102,30 @@ abstract class OTTrigger : NamedObject {
 
         return Gson().toJson(list.toTypedArray())
     }
+
+
+    fun fire() {
+        handleFire()
+
+        fired.invoke(this, action)
+    }
+
+    fun activateOnSystem(context: Context) {
+        if (!isActivatedOnSystem) {
+            handleActivationOnSystem(context)
+            isActivatedOnSystem = true
+        }
+    }
+
+    abstract fun handleActivationOnSystem(context: Context);
+
+    open fun handleFire() {
+    }
+
+
+    abstract fun handleOn();
+    abstract fun handleOff();
+
+
 
 }
