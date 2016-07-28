@@ -190,7 +190,6 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         } else return null
     }
 
-
     fun findAttributesOfTracker(trackerId: Long): List<OTAttribute<out Any>>? {
 
         val query: Cursor = readableDatabase.query(AttributeScheme.tableName, AttributeScheme.columnNames, "${AttributeScheme.TRACKER_ID}=?", arrayOf(trackerId.toString()), null, null, "${AttributeScheme.POSITION} ASC")
@@ -204,6 +203,31 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
             query.close()
             return result
         } else return null
+    }
+
+    fun findTriggersOfUser(userId: Long): List<OTTrigger>? {
+        val query: Cursor = readableDatabase.query(TriggerScheme.tableName, TriggerScheme.columnNames, "${TriggerScheme.USER_ID}=?", arrayOf(userId.toString()), null, null, "${TriggerScheme.POSITION} ASC")
+        if (query.moveToFirst()) {
+            val result = ArrayList<OTTrigger>()
+            do {
+                result.add(extractTriggerEntity(query))
+            } while (query.moveToNext())
+
+            query.close()
+            return result
+        } else return null
+
+    }
+
+    fun extractTriggerEntity(cursor: Cursor): OTTrigger {
+        val id = cursor.getLong(cursor.getColumnIndex(TriggerScheme._ID))
+        val name = cursor.getString(cursor.getColumnIndex(TriggerScheme.NAME))
+        val objectId = cursor.getString(cursor.getColumnIndex(TriggerScheme.OBJECT_ID))
+        val type = cursor.getInt(cursor.getColumnIndex(TriggerScheme.TYPE))
+        val trackerObjectId = cursor.getString(cursor.getColumnIndex(TriggerScheme.TRACKER_OBJECT_ID))
+        val serializedProperties = cursor.getString(cursor.getColumnIndex(TriggerScheme.PROPERTIES))
+
+        return OTTrigger.makeInstance(objectId, id, type, name, trackerObjectId, serializedProperties)
     }
 
     fun extractTrackerEntity(cursor: Cursor): OTTracker {

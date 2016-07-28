@@ -5,6 +5,7 @@ import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.core.NamedObject
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.database.IDatabaseStorable
+import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializedStringKeyEntry
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import java.util.*
@@ -39,6 +40,8 @@ abstract class OTTrigger : NamedObject {
     val trackerObjectId: String
 
     val tracker: OTTracker
+
+    val fired = Event<OTTracker>()
 
     var action: Int by Delegates.observable(ACTION_NOTIFICATION)
     {

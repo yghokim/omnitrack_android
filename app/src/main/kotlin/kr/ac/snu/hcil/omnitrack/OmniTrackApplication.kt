@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack
 import android.app.Application
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
+import kr.ac.snu.hcil.omnitrack.core.OTTriggerManager
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.database.*;
 import java.util.*
@@ -12,8 +13,8 @@ import java.util.*
  */
 
 class OmniTrackApplication : Application() {
-    companion object{
-        lateinit var app : OmniTrackApplication
+    companion object {
+        lateinit var app: OmniTrackApplication
             private set
 
         const val INTENT_EXTRA_OBJECT_ID_TRACKER = "trackerObjectId"
@@ -27,15 +28,19 @@ class OmniTrackApplication : Application() {
         const val PREFERENCE_KEY_BACKGROUND_ITEM_BUILDER_STORAGE = "item_builder_storage_background"
     }
 
-    private lateinit var _currentUser : OTUser
+    private lateinit var _currentUser: OTUser
 
-    lateinit var dbHelper : DatabaseHelper
+    lateinit var dbHelper: DatabaseHelper
         private set
 
     val currentUser: OTUser
-        get(){
+        get() {
             return _currentUser
         }
+
+
+    lateinit var triggerManager: OTTriggerManager
+        private set
 
     override fun onCreate() {
         super.onCreate()
@@ -45,10 +50,19 @@ class OmniTrackApplication : Application() {
         dbHelper = DatabaseHelper(this)
 
         _currentUser = dbHelper.findUserById(1) ?: OTUser("Young-Ho Kim", "yhkim@hcil.snu.ac.kr")
+
+        triggerManager = OTTriggerManager(_currentUser, if (_currentUser.dbId != null) {
+            dbHelper.findTriggersOfUser(_currentUser.dbId!!)
+        } else {
+            null
+        })
     }
 
     fun syncUserToDb(){
         dbHelper.save(_currentUser)
+        for (triggerEntry in triggerManager.withIndex()) {
+            dbHelper.save(triggerEntry.value, _currentUser, triggerEntry.index)
+        }
     }
 
     override fun onTerminate() {
