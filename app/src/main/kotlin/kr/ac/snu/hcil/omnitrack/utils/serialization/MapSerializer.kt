@@ -8,9 +8,6 @@ import java.util.*
  */
 object MapSerializer {
 
-    const val KEY_TYPE_LONG = 0
-    const val KEY_TYPE_STRING = 1
-
     interface SerializationHelper<T> {
         fun serialize(key: T, value: Any): String
         fun deserialize(key: T, serialized: String): Any

@@ -16,6 +16,13 @@ object TypeStringSerializationHelper {
     const val TYPENAME_TIMEPOINT = "T"
     const val TYPENAME_STRING = "S"
 
+    val classNameDictionary = mapOf(
+            Int.javaClass.name to TYPENAME_INT,
+            Long.javaClass.name to TYPENAME_LONG,
+            BigDecimal::class.java.name to TYPENAME_BIGDECIMAL,
+            TimePoint::class.java.name to TYPENAME_TIMEPOINT,
+            String::class.java.name to TYPENAME_STRING
+    )
 
     private val parcelCache = ParcelWithType("", "")
     private val gson = Gson()
@@ -29,6 +36,14 @@ object TypeStringSerializationHelper {
         }
 
         return gson.toJson(parcelCache)
+    }
+
+    fun serialize(value: Any): String {
+        if(classNameDictionary.containsKey(value.javaClass.name))
+        {
+            return serialize(classNameDictionary[value.javaClass.name]!!, value)
+        }
+        else throw Exception("Serialization of this type [${value.javaClass.name}] is not implemented.")
     }
 
     fun deserialize(serialized: String): Any {
