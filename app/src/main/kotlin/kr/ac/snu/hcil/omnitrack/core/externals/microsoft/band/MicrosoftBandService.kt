@@ -1,8 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.microsoft.band
 
-import android.app.Application
+import android.app.Activity
 import android.os.AsyncTask
-import android.support.v4.content.PermissionChecker
 import com.microsoft.band.BandClient
 import com.microsoft.band.BandClientManager
 import com.microsoft.band.BandException
@@ -14,7 +13,12 @@ import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 /**
  * Created by younghokim on 16. 7. 28..
  */
-object MicrosoftBandService : OTExternalService("MicrosoftBandService") {
+object MicrosoftBandService : OTExternalService("MicrosoftBandService", 19) {
+    override var permissionGranted: Boolean = false
+
+    override fun grantPermissions(activity: Activity, handler: ((Boolean) -> Unit)?) {
+
+    }
 
     override val nameResourceId: Int = R.string.service_microsoft_band_name
     override val descResourceId: Int = R.string.service_microsoft_band_desc

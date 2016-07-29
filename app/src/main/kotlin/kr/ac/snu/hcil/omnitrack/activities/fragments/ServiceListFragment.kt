@@ -5,9 +5,8 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.externals.microsoft.band.MicrosoftBandService
+import kr.ac.snu.hcil.omnitrack.core.externals.shaomi.miband.MiBandService
 
 /**
  * Created by Young-Ho on 7/29/2016.
@@ -28,6 +27,12 @@ class ServiceListFragment : Fragment() {
         val connectButton = rootView.findViewById(R.id.connect)
 
         connectButton?.setOnClickListener {
+
+            MiBandService.grantPermissions(activity)
+            MiBandService.connectAsync {
+
+            }
+/*
             MicrosoftBandService.connectAsync {
                 connected ->
                 if (MicrosoftBandService.measureFactories[0].permissionGranted) {
@@ -50,9 +55,8 @@ class ServiceListFragment : Fragment() {
                         }
                     }
                 }
-            }
+            }*/
         }
-
 
         return rootView
     }
