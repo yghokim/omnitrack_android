@@ -5,6 +5,8 @@
     <color name="colorPrimarySemiLight">#8c4563</color>
     <color name="colorPrimaryLight">#a36881</color>
 
+    <color name="colorSecondary">#ac5c6a</color>
+
     <color name="colorAccent">#ff8940</color>
 
     <color name="buttonIconColorDark">#757575</color>

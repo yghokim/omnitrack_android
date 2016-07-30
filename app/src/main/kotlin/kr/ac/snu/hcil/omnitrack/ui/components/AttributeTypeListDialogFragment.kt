@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
+import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.ui.SpaceItemDecoration
@@ -22,9 +23,7 @@ import java.text.AttributedCharacterIterator
  */
 class AttributeTypeListDialogFragment : DialogFragment() {
 
-    data class AttributeTypeEntry(val typeId: Int, val iconId: Int, val name: String, val description: String?)
-
-    private var currentItemSelectedListener: ((AttributeTypeEntry) -> Unit)? = null
+    private var currentItemSelectedListener: ((OTAttribute.AttributeTypeInfo) -> Unit)? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,12 +46,12 @@ class AttributeTypeListDialogFragment : DialogFragment() {
         return view;
     }
 
-    fun showDialog(fragmentManager: FragmentManager, itemSelectedListener: (AttributeTypeEntry) -> Unit) {
+    fun showDialog(fragmentManager: FragmentManager, itemSelectedListener: (OTAttribute.AttributeTypeInfo) -> Unit) {
         currentItemSelectedListener = itemSelectedListener
         show(fragmentManager, "dialog")
     }
 
-    private fun onItemClicked(entry: AttributeTypeEntry) {
+    private fun onItemClicked(entry: OTAttribute.AttributeTypeInfo) {
         if (currentItemSelectedListener != null) {
             currentItemSelectedListener?.invoke(entry)
         }
@@ -66,27 +65,17 @@ class AttributeTypeListDialogFragment : DialogFragment() {
 
     inner class ListAdapter() : RecyclerView.Adapter<ListAdapter.ViewHolder>() {
 
-        lateinit var types: Array<AttributeTypeEntry>
-
-        init {
-            types = arrayOf(
-                    AttributeTypeEntry(OTAttribute.TYPE_NUMBER, R.drawable.field_icon_number, context.getString(R.string.type_number_name), context.getString(R.string.type_number_desc)),
-                    AttributeTypeEntry(OTAttribute.TYPE_TIME, R.drawable.field_icon_time, context.getString(R.string.type_timepoint_name), context.getString(R.string.type_timepoint_desc)),
-                    AttributeTypeEntry(OTAttribute.TYPE_LONG_TEXT, R.drawable.field_icon_longtext, context.getString(R.string.type_longtext_name), context.getString(R.string.type_longtext_desc))
-            )
-        }
-
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             var view = LayoutInflater.from(parent.context).inflate(R.layout.attribute_type_list_element, parent, false)
             return ViewHolder(view)
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.bind(types[position])
+            holder.bind(OmniTrackApplication.app.supportedAttributeTypes[position])
         }
 
         override fun getItemCount(): Int {
-            return types.size
+            return OmniTrackApplication.app.supportedAttributeTypes.size
         }
 
         override fun getItemId(position: Int): Long {
@@ -97,22 +86,22 @@ class AttributeTypeListDialogFragment : DialogFragment() {
         inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             lateinit var name: TextView
             lateinit var desc: TextView
-            lateinit var icon: ImageView
+            lateinit var typeIcon: ImageView
 
             init {
                 name = view.findViewById(R.id.name) as TextView
                 desc = view.findViewById(R.id.description) as TextView
-                icon = view.findViewById(R.id.icon) as ImageView
+                typeIcon = view.findViewById(R.id.type_icon) as ImageView
 
                 view.setOnClickListener {
-                    onItemClicked(types[adapterPosition])
+                    onItemClicked(OmniTrackApplication.app.supportedAttributeTypes[adapterPosition])
                 }
             }
 
-            fun bind(entry: AttributeTypeEntry) {
+            fun bind(entry: OTAttribute.AttributeTypeInfo) {
                 name.text = entry.name
                 desc.text = entry.description
-                icon.setImageResource(entry.iconId)
+                typeIcon.setImageResource(entry.iconId)
             }
         }
     }

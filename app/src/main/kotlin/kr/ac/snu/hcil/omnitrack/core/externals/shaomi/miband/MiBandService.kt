@@ -129,12 +129,12 @@ object MiBandService : OTExternalService("ShaomiMiBand", 21) {
             }*/
 
             if (device != null) {
-                storeDeviceMac(device!!.address)
+                storeDeviceMac(device.address)
 
                 var connecting = true
                 var success = false
 
-                band.connect(device!!, object : ActionCallback {
+                band.connect(device, object : ActionCallback {
                     override fun onSuccess(data: Any?) {
                         println("Mi Band is successfully connected.")
                         _connected = true

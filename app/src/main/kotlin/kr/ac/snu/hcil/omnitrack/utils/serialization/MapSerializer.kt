@@ -13,7 +13,7 @@ object MapSerializer {
         fun deserialize(key: T, serialized: String): Any
     }
 
-    fun <T> serializeMap(map: Map<T, out Any>, helper: SerializationHelper<T>): String {
+    fun <T> serializeMap(map: Map<T, Any>, helper: SerializationHelper<T>): String {
         val list = ArrayList<String>()
 
         val builder = Gson()

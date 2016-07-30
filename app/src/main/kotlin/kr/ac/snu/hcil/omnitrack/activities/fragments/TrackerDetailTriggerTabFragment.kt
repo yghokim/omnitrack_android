@@ -33,7 +33,7 @@ class TrackerDetailTriggerTabFragment : TrackerDetailActivity.ChildFragment() {
         listView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         adapter = Adapter()
         listView.adapter = adapter
-        listView.addItemDecoration(HorizontalDividerItemDecoration(resources.getColor(R.color.dividerColor, null), resources.getDimensionPixelSize(R.dimen.trigger_list_element_divider_height), context))
+        listView.addItemDecoration(HorizontalDividerItemDecoration(resources.getColor(R.color.dividerColor, null), resources.getDimensionPixelSize(R.dimen.trigger_list_element_divider_height)))
 
         return rootView
     }

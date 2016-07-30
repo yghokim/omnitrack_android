@@ -13,7 +13,7 @@ import kr.ac.snu.hcil.omnitrack.R
 /**
  * Created by Young-Ho Kim on 2016-07-25.
  */
-class HorizontalDividerItemDecoration(val color: Int, val height: Int, context: Context) : RecyclerView.ItemDecoration() {
+class HorizontalDividerItemDecoration(val color: Int, val height: Int) : RecyclerView.ItemDecoration() {
 
     val paint = Paint(Paint.ANTI_ALIAS_FLAG)
 

@@ -5,12 +5,17 @@ import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
+import android.support.v4.widget.NestedScrollView
+import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.TextView
 import jp.wasabeef.recyclerview.animators.SlideInRightAnimator
 import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.R
@@ -22,7 +27,9 @@ import kr.ac.snu.hcil.omnitrack.ui.DragItemTouchHelperCallback
 import kr.ac.snu.hcil.omnitrack.ui.SpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.AttributeFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.AttributeTypeListDialogFragment
+import kr.ac.snu.hcil.omnitrack.ui.components.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.TriggerPanel
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ColorPalettePropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ShortTextPropertyView
 import kr.ac.snu.hcil.omnitrack.utils.startActivityOnDelay
@@ -32,32 +39,26 @@ import kr.ac.snu.hcil.omnitrack.utils.startActivityOnDelay
  */
 class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() {
 
-    companion object {
-        const val IS_EDIT_MODE = "editMode"
+    lateinit private var rootScrollView: NestedScrollView
 
-        fun makeInstance(tracker: OTTracker, isEditMode: Boolean): TrackerDetailStructureTabFragment {
-            val bundle = Bundle()
-            bundle.putString(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
-            bundle.putBoolean(IS_EDIT_MODE, isEditMode)
-
-            val fragment = TrackerDetailStructureTabFragment()
-            fragment.arguments = bundle
-
-            return fragment
-        }
-    }
-
-    lateinit private var listView: RecyclerView
+    lateinit private var attributeListView: RecyclerView
     lateinit private var attributeListAdapter: TrackerDetailStructureTabFragment.AttributeListAdapter
+
+    lateinit private var attributeListItemTouchHelper: ItemTouchHelper
 
     private lateinit var namePropertyView: ShortTextPropertyView
     private lateinit var colorPropertyView: ColorPalettePropertyView
-
-    private lateinit var attributeListGroupView: View
     //private lateinit var fab: FloatingActionButton
-    private lateinit var newAttributeButton: View
+
+    private lateinit var contentContainer: ViewGroup
+
+    private lateinit var newAttributePanel: ViewGroup
+
+    private lateinit var newAttributeGrid: RecyclerView
 
     private lateinit var removalSnackbar: Snackbar
+
+    private var scrollToBottomReserved = false
 
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -76,6 +77,7 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
             }
 
         }*/
+        /*
         newAttributeButton = rootView.findViewById(R.id.ui_button_new_attribute)
         newAttributeButton.setOnClickListener { view ->
             removalSnackbar.dismiss()
@@ -87,8 +89,11 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
                 attributeListAdapter.notifyItemInserted(tracker.attributes.size - 1)
                 attributeListAdapter.clearTrashcan()
             }
-        }
+        }*/
+        rootScrollView = rootView.findViewById(R.id.scroll_root) as NestedScrollView
 
+        contentContainer = rootView.findViewById(R.id.ui_content_container) as ViewGroup
+        newAttributePanel = rootView.findViewById(R.id.ui_new_attribute_panel) as ViewGroup
 
         namePropertyView = rootView.findViewById(R.id.nameProperty) as ShortTextPropertyView
         namePropertyView.title = resources.getString(R.string.msg_name)
@@ -97,19 +102,39 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
         colorPropertyView = rootView.findViewById(R.id.colorProperty) as ColorPalettePropertyView
         colorPropertyView.title = resources.getString(R.string.msg_color)
 
-        attributeListGroupView = rootView.findViewById(R.id.ui_group_attribute_list) as View
+        attributeListView = rootView.findViewById(R.id.ui_attribute_list) as RecyclerView
+        val layoutManager = object : LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false) {
+            override fun canScrollVertically(): Boolean {
+                return false
+            }
 
+            override fun onItemsAdded(recyclerView: RecyclerView?, positionStart: Int, itemCount: Int) {
+                super.onItemsAdded(recyclerView, positionStart, itemCount)
+                println("$positionStart $itemCount")
+                scrollToBottom()
+            }
+        }
 
-        listView = rootView.findViewById(R.id.ui_attribute_list) as RecyclerView
-        val layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        listView.layoutManager = layoutManager
-        listView.itemAnimator = SlideInRightAnimator()
-        listView.addItemDecoration(SpaceItemDecoration(LinearLayoutManager.VERTICAL, resources.getDimensionPixelOffset(R.dimen.attribute_list_element_vertical_space)));
+        attributeListView.addOnLayoutChangeListener { view, a, b, c, d, e, f, g, h ->
+            if (scrollToBottomReserved) {
+                scrollToBottom()
+                scrollToBottomReserved = false
+            }
+        }
+
+        attributeListView.layoutManager = layoutManager
+        attributeListView.itemAnimator = SlideInRightAnimator()
+        attributeListView.addItemDecoration(SpaceItemDecoration(LinearLayoutManager.VERTICAL, resources.getDimensionPixelOffset(R.dimen.attribute_list_element_vertical_space)));
 
         attributeListAdapter = AttributeListAdapter()
-        listView.adapter = attributeListAdapter
-        val listItemTouchHelper = ItemTouchHelper(DragItemTouchHelperCallback(attributeListAdapter))
-        listItemTouchHelper.attachToRecyclerView(listView)
+        attributeListView.adapter = attributeListAdapter
+        attributeListItemTouchHelper = ItemTouchHelper(DragItemTouchHelperCallback(attributeListAdapter, true, false))
+        attributeListItemTouchHelper.attachToRecyclerView(attributeListView)
+
+
+        newAttributeGrid = rootView.findViewById(R.id.ui_new_attribute_grid) as RecyclerView
+        newAttributeGrid.layoutManager = GridLayoutManager(context, 5)
+        newAttributeGrid.adapter = GridAdapter()
 
 
         removalSnackbar = Snackbar.make(rootView, resources.getText(R.string.msg_attribute_removed_message), Snackbar.LENGTH_LONG)
@@ -129,22 +154,6 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
         super.onViewCreated(view, savedInstanceState)
         refresh()
     }
-/*
-    override fun init(tracker: OTTracker, editMode: Boolean) {
-        this.tracker = tracker
-        this.isEditMode = editMode
-    }
-
-    override fun onClose() {
-        if (namePropertyView.validate()) {
-            tracker?.name = namePropertyView.value
-        }
-
-        if (colorPropertyView.validate()) {
-            tracker?.color = colorPropertyView.value
-        }
-    }
-*/
 
     fun refresh() {
         if (isEditMode) {
@@ -168,6 +177,7 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
 
     override fun onResume() {
         super.onResume()
+        refresh()
     }
 
     override fun onPause() {
@@ -194,14 +204,21 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
         startActivityOnDelay(intent)
     }
 
+    fun scrollToBottom() {
+        rootScrollView.scrollTo(0, contentContainer.measuredHeight)
+    }
+
 
     inner class AttributeListAdapter() : RecyclerView.Adapter<AttributeListAdapter.ViewHolder>(), DragItemTouchHelperCallback.ItemDragHelperAdapter {
 
         private var removed: OTAttribute<out Any>? = null
         private var removedPosition: Int = -1
 
+        init {
+        }
+
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            val view = LayoutInflater.from(parent.context).inflate(R.layout.attribute_list_element, parent, false) as AttributeFrameLayout
+            val view = LayoutInflater.from(parent.context).inflate(R.layout.attribute_list_element, parent, false)
             return ViewHolder(view)
         }
 
@@ -234,30 +251,105 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
         }
 
         override fun onItemDismiss(position: Int) {
-            removed = tracker.attributes[position]
-            removedPosition = position
-            tracker.attributes.remove(tracker.attributes[position])
-            notifyItemRemoved(position)
-            showRemovalSnackbar()
         }
 
-        inner class ViewHolder(val view: AttributeFrameLayout) : RecyclerView.ViewHolder(view) {
+        inner class ViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
+
+            lateinit var previewContainer: LockableFrameLayout
+            lateinit var columnNameView: TextView
+            lateinit var typeNameView: TextView
+
+            lateinit var editButton: ImageButton
+            lateinit var removeButton: ImageButton
+
+            var preview: AAttributeInputView<out Any>? = null
+                get
+                set(value) {
+                    if (field !== value) {
+                        previewContainer.removeAllViews()
+                        if (value != null) {
+                            previewContainer.addView(value, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+                        }
+
+                        field = value
+                    }
+                }
 
             init {
-                view.editButtonClicked += {
-                    sender, args ->
+
+                previewContainer = view.findViewById(R.id.ui_preview_container) as LockableFrameLayout
+                previewContainer.locked = true
+
+                columnNameView = view.findViewById(R.id.ui_column_name) as TextView
+                typeNameView = view.findViewById(R.id.ui_attribute_type) as TextView
+                editButton = view.findViewById(R.id.ui_button_edit) as ImageButton
+                removeButton = view.findViewById(R.id.ui_button_remove) as ImageButton
+
+                editButton.setOnClickListener {
                     openAttributeDetailActivity(adapterPosition)
+                }
+
+                removeButton.setOnClickListener {
+                    removed = tracker.attributes[adapterPosition]
+                    removedPosition = adapterPosition
+                    tracker.attributes.remove(tracker.attributes[adapterPosition])
+                    notifyItemRemoved(adapterPosition)
+                    showRemovalSnackbar()
                 }
             }
 
             fun bindAttribute(attribute: OTAttribute<out Any>) {
-                view.typeNameView.text = resources.getString(attribute.typeNameResourceId)
-                view.columnNameView.text = attribute.name
+                typeNameView.text = resources.getString(attribute.typeNameResourceId)
+                columnNameView.text = attribute.name
 
-                view.previewContainer.alpha = 0.5f
-                view.preview = attribute.getInputView(context, true, view.preview)
+                previewContainer.alpha = 0.5f
+                preview = attribute.getInputView(context, true, preview)
             }
         }
 
+    }
+
+
+    inner class GridAdapter() : RecyclerView.Adapter<GridAdapter.ViewHolder>() {
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+            var view = LayoutInflater.from(parent.context).inflate(R.layout.attribute_type_grid_element, parent, false)
+            return ViewHolder(view)
+        }
+
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            holder.bind(OmniTrackApplication.app.supportedAttributeTypes[position])
+        }
+
+        override fun getItemCount(): Int {
+            return OmniTrackApplication.app.supportedAttributeTypes.size
+        }
+
+        override fun getItemId(position: Int): Long {
+            return position.toLong();
+        }
+
+
+        inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+            lateinit var name: TextView
+            lateinit var typeIcon: ImageView
+
+            init {
+                name = view.findViewById(R.id.name) as TextView
+                typeIcon = view.findViewById(R.id.type_icon) as ImageView
+
+                view.setOnClickListener {
+                    tracker.attributes.add(OTAttribute.createAttribute(OmniTrackApplication.app.currentUser, "New Column", OmniTrackApplication.app.supportedAttributeTypes[adapterPosition].typeId))
+
+                    attributeListAdapter.notifyItemInserted(tracker.attributes.size - 1)
+                    scrollToBottomReserved = true
+                }
+            }
+
+            fun bind(entry: OTAttribute.AttributeTypeInfo) {
+                name.text = entry.name
+                typeIcon.setImageResource(entry.iconId)
+            }
+        }
     }
 }

@@ -17,7 +17,7 @@ class OTSystemReceiver : BroadcastReceiver() {
             OmniTrackApplication.BROADCAST_ACTION_ALARM -> {
                 //triggerId: String, UserId: String, alarmId: Int
                 val triggerId = intent.getStringExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRIGGER)
-                val userId = intent.getStringExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_USER)
+                //val userId = intent.getStringExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_USER)
 
                 println("alarm of ${OmniTrackApplication.app.triggerManager.getTriggerWithId(triggerId)?.name}")
                 OmniTrackApplication.app.triggerManager.getTriggerWithId(triggerId)?.fire()

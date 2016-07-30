@@ -43,6 +43,10 @@ import java.util.*
 
 class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tracker_detail) {
 
+    companion object {
+        const val IS_EDIT_MODE = "isEditMode"
+    }
+
     /*
         interface IChild{
             fun init(tracker: OTTracker, editMode: Boolean)
@@ -143,7 +147,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
             val args = arguments
             val trackerObjectId = args.getString(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
 
-            isEditMode = args.getBoolean(TrackerDetailStructureTabFragment.IS_EDIT_MODE, true)
+            isEditMode = args.getBoolean(IS_EDIT_MODE, true)
             if (trackerObjectId != null) {
                 tracker = OmniTrackApplication.app.currentUser[trackerObjectId]!!
             }
@@ -169,13 +173,13 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
 
             val bundle = Bundle()
             bundle.putString(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
-            bundle.putBoolean(TrackerDetailStructureTabFragment.IS_EDIT_MODE, isEditMode)
+            bundle.putBoolean(IS_EDIT_MODE, isEditMode)
 
             val fragment =
                     (when (position) {
                         0 -> TrackerDetailStructureTabFragment()
                         1 -> TrackerDetailTriggerTabFragment()
-                        else -> TrackerDetailStructureTabFragment()
+                        else -> TrackerDetailTriggerTabFragment()
                     }) as Fragment
 
             fragment.arguments = bundle

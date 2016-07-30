@@ -117,4 +117,8 @@
         <item name="android:background">@drawable/transparent_button_background</item>
     </style>
 
+    <style name="SubTitleInverse" parent="SubTitle">
+        <item name="android:textColor">#eeffffff</item>
+    </style>
+
 </resources>

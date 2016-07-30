@@ -5,6 +5,7 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import kr.ac.snu.hcil.omnitrack.core.OTTriggerManager
 import kr.ac.snu.hcil.omnitrack.core.OTUser
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.database.*;
 import java.util.*
 
@@ -13,6 +14,7 @@ import java.util.*
  */
 
 class OmniTrackApplication : Application() {
+
     companion object {
         lateinit var app: OmniTrackApplication
             private set
@@ -46,6 +48,10 @@ class OmniTrackApplication : Application() {
     lateinit var triggerManager: OTTriggerManager
         private set
 
+
+    lateinit var supportedAttributeTypes: Array<OTAttribute.AttributeTypeInfo>
+        private set
+
     override fun onCreate() {
         super.onCreate()
 
@@ -60,6 +66,12 @@ class OmniTrackApplication : Application() {
         } else {
             null
         })
+
+
+        supportedAttributeTypes = arrayOf(
+                OTAttribute.AttributeTypeInfo(OTAttribute.TYPE_NUMBER, R.drawable.field_icon_number, this.getString(R.string.type_number_name), this.getString(R.string.type_number_desc)),
+                OTAttribute.AttributeTypeInfo(OTAttribute.TYPE_TIME, R.drawable.field_icon_time, this.getString(R.string.type_timepoint_name), this.getString(R.string.type_timepoint_desc)),
+                OTAttribute.AttributeTypeInfo(OTAttribute.TYPE_LONG_TEXT, R.drawable.field_icon_longtext, this.getString(R.string.type_longtext_name), this.getString(R.string.type_longtext_desc)))
     }
 
     fun syncUserToDb(){

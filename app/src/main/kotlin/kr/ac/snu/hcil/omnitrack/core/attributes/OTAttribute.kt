@@ -22,6 +22,10 @@ import kotlin.properties.Delegates
  * Created by Young-Ho on 7/11/2016.
  */
 abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName: String, val typeId: Int, settingData: String?) : NamedObject(objectId, dbId, columnName) {
+
+    data class AttributeTypeInfo(val typeId: Int, val iconId: Int, val name: String, val description: String?)
+
+
     override fun makeNewObjectId(): String {
         return owner?.owner?.makeNewObjectId() ?: UUID.randomUUID().toString()
     }

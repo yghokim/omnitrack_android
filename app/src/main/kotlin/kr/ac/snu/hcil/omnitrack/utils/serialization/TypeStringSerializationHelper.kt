@@ -57,13 +57,13 @@ object TypeStringSerializationHelper {
     fun deserialize(serialized: String): Any {
         val parcel = gson.fromJson(serialized, ParcelWithType::class.java)
         return when (parcel.t) {
-            TYPENAME_INT -> return parcel.v.toInt()
-            TYPENAME_LONG -> return parcel.v.toLong()
-            TYPENAME_STRING -> return parcel.v
-            TYPENAME_BIGDECIMAL -> return BigDecimal(parcel.v)
-            TYPENAME_TIMEPOINT -> return TimePoint(parcel.v)
-            TYPENAME_INT_ARRAY -> return parcel.v.split(",").map { it.toInt() }.toIntArray()
-            TYPENAME_LONG_ARRAY -> return parcel.v.split(",").map { it.toLong() }.toLongArray()
+            TYPENAME_INT -> parcel.v.toInt()
+            TYPENAME_LONG -> parcel.v.toLong()
+            TYPENAME_STRING -> parcel.v
+            TYPENAME_BIGDECIMAL -> BigDecimal(parcel.v)
+            TYPENAME_TIMEPOINT -> TimePoint(parcel.v)
+            TYPENAME_INT_ARRAY -> parcel.v.split(",").map { it.toInt() }.toIntArray()
+            TYPENAME_LONG_ARRAY -> parcel.v.split(",").map { it.toLong() }.toLongArray()
 
             else -> return parcel.v
         }

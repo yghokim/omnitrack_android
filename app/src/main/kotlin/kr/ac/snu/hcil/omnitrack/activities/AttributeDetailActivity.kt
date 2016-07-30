@@ -55,17 +55,6 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
         val tabLayout = findViewById(R.id.tabs) as TabLayout?
         tabLayout!!.setupWithViewPager(mViewPager)
-
-        tabLayout.setOnTabSelectedListener(
-                object : TabLayout.ViewPagerOnTabSelectedListener(mViewPager) {
-                    override fun onTabSelected(tab: TabLayout.Tab): Unit {
-                        super.onTabSelected(tab)
-                        println("tab selected")
-                        if (tab.position == 0) {
-
-                        }
-                    }
-                })
     }
 
     override fun onStart() {

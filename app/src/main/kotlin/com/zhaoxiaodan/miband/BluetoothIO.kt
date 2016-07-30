@@ -35,7 +35,7 @@ internal class BluetoothIO : BluetoothGattCallback() {
     fun writeAndRead(uuid: UUID, valueToWrite: ByteArray, callback: ActionCallback) {
         val readCallback = object : ActionCallback {
 
-            override fun onSuccess(characteristic: Any?) {
+            override fun onSuccess(data: Any?) {
                 this@BluetoothIO.readCharacteristic(uuid, callback)
             }
 

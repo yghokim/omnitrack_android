@@ -19,6 +19,7 @@ import kr.ac.snu.hcil.omnitrack.utils.events.Event
 /**
  * Created by Young-Ho Kim on 2016-07-20.
  */
+@Deprecated("ViewHolder pattern is used instead.")
 class AttributeFrameLayout : RelativeLayout {
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
