@@ -4,6 +4,11 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
+import android.support.design.widget.TabLayout
+import android.support.v4.app.Fragment
+import android.support.v4.app.FragmentManager
+import android.support.v4.app.FragmentPagerAdapter
+import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -17,6 +22,10 @@ import jp.wasabeef.recyclerview.animators.SlideInRightAnimator
 import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.activities.fragments.ServiceListFragment
+import kr.ac.snu.hcil.omnitrack.activities.fragments.TrackerDetailStructureTabFragment
+import kr.ac.snu.hcil.omnitrack.activities.fragments.TrackerDetailTriggerTabFragment
+import kr.ac.snu.hcil.omnitrack.activities.fragments.TrackerListFragment
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
@@ -34,142 +43,83 @@ import java.util.*
 
 class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tracker_detail) {
 
-    private var isEditMode = false
+    /*
+        interface IChild{
+            fun init(tracker: OTTracker, editMode: Boolean)
+            fun onClose()
+        }
 
+        private val childFragments = Hashtable<Int, IChild>()
+    */
     private lateinit var tracker: OTTracker
+    private var isEditMode = true
 
-    lateinit private var listView : RecyclerView
-    lateinit private var attributeListAdapter : AttributeListAdapter
+    private var mSectionsPagerAdapter: TrackerDetailActivity.SectionsPagerAdapter? = null
 
-    private lateinit var namePropertyView : ShortTextPropertyView
-    private lateinit var colorPropertyView: ColorPalettePropertyView
-
-    private lateinit var triggerPanelView: TriggerPanel
-
-    private lateinit var attributeListGroupView: View
-    private lateinit var fab: FloatingActionButton
-
-    private lateinit var removalSnackbar: Snackbar
+    /**
+     * The [ViewPager] that will host the section contents.
+     */
+    private var mViewPager: ViewPager? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        fab = findViewById(R.id.fab) as FloatingActionButton
-        fab.setOnClickListener { view ->
-            removalSnackbar.dismiss()
-            val dialogFragment = AttributeTypeListDialogFragment()
-            dialogFragment.showDialog(supportFragmentManager) {
-                entry ->
-                tracker.attributes.add(OTAttribute.createAttribute(OmniTrackApplication.app.currentUser, "New Column", entry.typeId))
-                attributeListAdapter.notifyItemInserted(tracker.attributes.size - 1)
-                attributeListAdapter.clearTrashcan()
-            }
+        mSectionsPagerAdapter = SectionsPagerAdapter(supportFragmentManager)
 
-        }
+        // Set up the ViewPager with the sections adapter.
+        mViewPager = findViewById(R.id.container) as ViewPager?
+        mViewPager!!.adapter = mSectionsPagerAdapter
 
-        namePropertyView = findViewById(R.id.nameProperty) as ShortTextPropertyView
-        namePropertyView.title = resources.getString(R.string.msg_name)
-        namePropertyView.addNewValidator("Name cannot be empty.", ShortTextPropertyView.NOT_EMPTY_VALIDATOR)
-
-        colorPropertyView = findViewById(R.id.colorProperty) as ColorPalettePropertyView
-        colorPropertyView.title = resources.getString(R.string.msg_color)
-
-        attributeListGroupView = findViewById(R.id.ui_group_attribute_list) as View
-
-        triggerPanelView = findViewById(R.id.ui_trigger_panel) as TriggerPanel
-
-        listView = findViewById(R.id.ui_attribute_list) as RecyclerView
-        val layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        listView.layoutManager = layoutManager
-        listView.itemAnimator = SlideInRightAnimator()
-        listView.addItemDecoration(SpaceItemDecoration(LinearLayoutManager.VERTICAL, resources.getDimensionPixelOffset(R.dimen.attribute_list_element_vertical_space)));
-
-        attributeListAdapter = AttributeListAdapter()
-        listView.adapter = attributeListAdapter
-        val listItemTouchHelper = ItemTouchHelper(DragItemTouchHelperCallback(attributeListAdapter))
-        listItemTouchHelper.attachToRecyclerView(listView)
+        val tabLayout = findViewById(R.id.tabs) as TabLayout?
+        tabLayout!!.setupWithViewPager(mViewPager)
 
 
-        removalSnackbar = Snackbar.make(findViewById(R.id.root)!!, resources.getText(R.string.msg_attribute_removed_message), Snackbar.LENGTH_LONG)
-        removalSnackbar.setAction(resources.getText(R.string.msg_undo)) {
-            view ->
-            attributeListAdapter.undoRemove()
-        }
+        setActionBarButtonMode(Mode.Back)
+        title = resources.getString(R.string.title_activity_tracker_edit)
     }
 
 
     override fun onPause(){
         super.onPause()
+        /*
+        for(child in childFragments)
+        {
+            child.value.onClose()
+        }*/
 
-        if(isEditMode) {
-            if (namePropertyView.validate()) {
-                tracker.name = namePropertyView.value
-            }
-
-            if(colorPropertyView.validate()){
-                tracker.color = colorPropertyView.value
-            }
-
-            OmniTrackApplication.app.syncUserToDb()
-        }
+        OmniTrackApplication.app.syncUserToDb()
     }
 
     override fun onStart(){
         super.onStart()
 
+        println("tracker detail activity started")
         if (intent.getStringExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER) != null) {
             //edit
             //instant update
-
-            setActionBarButtonMode(Mode.Back)
-
-            isEditMode = true
-            title = resources.getString(R.string.title_activity_tracker_edit)
             tracker = OmniTrackApplication.app.currentUser.trackers.filter { it.objectId == intent.getStringExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER) }.first()
-
-            triggerPanelView.attachTracker(tracker)
-            attributeListGroupView.visibility = View.VISIBLE
-            fab.visibility = View.VISIBLE
+            isEditMode = true
 
         } else {
-            //new mode
+            tracker = OTTracker("Tracker ${System.currentTimeMillis()}")
+            OmniTrackApplication.app.currentUser.trackers.add(tracker)
             isEditMode = false
-
-            namePropertyView.focus()
-
-            setActionBarButtonMode(Mode.OKCancel)
-
-            title = resources.getString(R.string.title_activity_tracker_new)
-
-            tracker = OTTracker("New Tracker")
-
-            attributeListGroupView.visibility = View.GONE
-            fab.visibility = View.GONE
         }
-
-
-        namePropertyView.value = tracker.name
-        colorPropertyView.value = tracker.color
-
-        attributeListAdapter.notifyDataSetChanged()
-    }
-
-    fun showRemovalSnackbar() {
-        if (!removalSnackbar.isShown) {
-            removalSnackbar.show()
-        }
+/*
+        for(child in childFragments)
+        {
+            child.value.init(tracker, isEditMode)
+        }*/
     }
 
     override fun onLeftButtonClicked() {
-        if(isEditMode)
-            finish()
-        else{
-            navigateUpTo(parentActivityIntent)
-        }
+
+        finish()
     }
 
     override fun onRightButtonClicked() {
             //add
+        /*
             if(namePropertyView.validate()) {
                 //modify
                 tracker.name = namePropertyView.value
@@ -177,77 +127,72 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
 
                 if (!isEditMode) OmniTrackApplication.app.currentUser.trackers.add(tracker)
                 finish()
-            }
+            }*/
     }
 
-    fun openAttributeDetailActivity(position: Int) {
-        val intent = Intent(this, AttributeDetailActivity::class.java)
-        intent.putExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_ATTRIBUTE, tracker.attributes[position].objectId)
-        startActivityOnDelay(intent)
+
+    abstract class ChildFragment : Fragment() {
+        protected var isEditMode = false
+            private set
+        protected lateinit var tracker: OTTracker
+            private set
+
+        override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+            super.onViewCreated(view, savedInstanceState)
+
+            val args = arguments
+            val trackerObjectId = args.getString(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
+
+            isEditMode = args.getBoolean(TrackerDetailStructureTabFragment.IS_EDIT_MODE, true)
+            if (trackerObjectId != null) {
+                tracker = OmniTrackApplication.app.currentUser[trackerObjectId]!!
+            }
+        }
     }
 
-    inner class AttributeListAdapter() : RecyclerView.Adapter<AttributeListAdapter.ViewHolder>(), DragItemTouchHelperCallback.ItemDragHelperAdapter {
+    inner class SectionsPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
 
-        private var removed: OTAttribute<out Any>? = null
-        private var removedPosition: Int = -1
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            val view = LayoutInflater.from(parent.context).inflate(R.layout.attribute_list_element, parent, false) as AttributeFrameLayout
-            return ViewHolder(view)
+        /*
+        override fun instantiateItem(container: ViewGroup?, position: Int): Any {
+            val fragment = super.instantiateItem(container, position) as IChild
+            childFragments[position] = fragment
+            fragment.init(tracker, isEditMode)
+            return fragment
         }
 
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.bindAttribute(tracker.attributes[position])
+        override fun destroyItem(container: ViewGroup?, position: Int, `object`: Any?) {
+            childFragments.remove(position)
+            super.destroyItem(container, position, `object`)
+        }*/
+
+        override fun getItem(position: Int): Fragment {
+
+            val bundle = Bundle()
+            bundle.putString(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
+            bundle.putBoolean(TrackerDetailStructureTabFragment.IS_EDIT_MODE, isEditMode)
+
+            val fragment =
+                    (when (position) {
+                        0 -> TrackerDetailStructureTabFragment()
+                        1 -> TrackerDetailTriggerTabFragment()
+                        else -> TrackerDetailStructureTabFragment()
+                    }) as Fragment
+
+            fragment.arguments = bundle
+
+            return fragment
         }
 
-        override fun getItemCount(): Int {
-            return tracker.attributes.size
+        override fun getCount(): Int {
+            return 2
         }
 
-        override fun getItemId(position: Int): Long {
-            return position.toLong()
-        }
-
-        fun undoRemove() {
-            if (removed != null) {
-                tracker.attributes.addAt(removed!!, removedPosition)
-                notifyItemInserted(removedPosition)
+        override fun getPageTitle(position: Int): CharSequence? {
+            when (position) {
+                0 -> return resources.getString(R.string.msg_tab_tracker_detail_structure)
+                1 -> return resources.getString(R.string.msg_tab_tracker_detail_triggers)
             }
-        }
-
-        fun clearTrashcan() {
-            removed = null
-        }
-
-        override fun onItemMove(fromPosition: Int, toPosition: Int) {
-            tracker.attributes.moveItem(fromPosition, toPosition)
-            notifyItemMoved(fromPosition, toPosition)
-        }
-
-        override fun onItemDismiss(position: Int) {
-            removed = tracker.attributes[position]
-            removedPosition = position
-            tracker.attributes.remove(tracker.attributes[position])
-            notifyItemRemoved(position)
-            showRemovalSnackbar()
-        }
-
-        inner class ViewHolder(val view: AttributeFrameLayout) : RecyclerView.ViewHolder(view) {
-
-            init{
-                view.editButtonClicked += {
-                    sender, args ->
-                    openAttributeDetailActivity(adapterPosition)
-                }
-            }
-
-            fun bindAttribute(attribute: OTAttribute<out Any>) {
-                view.typeNameView.text = resources.getString(attribute.typeNameResourceId)
-                view.columnNameView.text = attribute.name
-
-                view.previewContainer.alpha = 0.5f
-                view.preview = attribute.getInputView(this@TrackerDetailActivity, true, view.preview)
-            }
+            return null
         }
     }
 }

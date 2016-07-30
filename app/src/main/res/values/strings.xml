@@ -34,6 +34,9 @@
     <string name="msg_tab_attribute_basic">Properties</string>
     <string name="msg_tab_attribute_connection">Connections</string>
 
+    <string name="msg_tab_tracker_detail_structure">Structure</string>
+    <string name="msg_tab_tracker_detail_triggers">Triggers</string>
+
 
     <string name="msg_basic_information">Basic Information</string>
     <string name="msg_attributes">Attributes</string>
