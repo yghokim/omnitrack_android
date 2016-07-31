@@ -1,11 +1,12 @@
 package kr.ac.snu.hcil.omnitrack.core
 
-import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
+import android.content.Context
+import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
+import kr.ac.snu.hcil.omnitrack.utils.DefaultNameGenerator
 import kr.ac.snu.hcil.omnitrack.utils.ObservableList
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
-import java.io.Serializable
 import java.util.*
 import kotlin.properties.Delegates
 
@@ -96,5 +97,9 @@ class OTUser(objectId: String?, dbId: Long?, name: String, email: String, attrib
 
     fun getNewAttributeObjectId(): Long {
         return ++attributeIdSeed
+    }
+
+    fun generateNewTrackerName(context: Context): String {
+        return DefaultNameGenerator.generateName("${context.resources.getString(R.string.msg_new_tracker_prefix)}", trackers.unObservedList.map { it.name })
     }
 }

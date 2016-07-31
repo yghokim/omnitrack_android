@@ -1,7 +1,5 @@
 package kr.ac.snu.hcil.omnitrack.activities
 
-import android.content.Context
-import android.net.Uri
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import kr.ac.snu.hcil.omnitrack.OmniTrackApplication

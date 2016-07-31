@@ -17,6 +17,13 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/frontalBackground"
+                android:orientation="vertical"
+                android:paddingBottom="12dp">
+
             <TextView
                 style="@style/SubTitle"
                 android:layout_width="wrap_content"
@@ -45,16 +52,18 @@
                 android:paddingLeft="@dimen/activity_horizontal_margin"
                 android:paddingRight="@dimen/activity_horizontal_margin" />
 
+            </LinearLayout>
+
             <LinearLayout
                 android:id="@+id/ui_group_attribute_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@drawable/expanded_view_inner_shadow"
+
                 android:orientation="vertical">
 
-                <View style="@style/HorizontalSeparator" />
-
                 <TextView
-                    style="@style/SubTitle"
+                    style="@style/SubTitleWithoutSeparatorAbove"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingLeft="@dimen/activity_horizontal_margin"

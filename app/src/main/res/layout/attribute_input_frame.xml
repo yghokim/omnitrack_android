@@ -34,7 +34,8 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginLeft="?attr/actionBarSize"
-            android:text="Text" />
+            android:text="Text"
+            android:textSize="17dp" />
 
         <TextView
             android:id="@+id/ui_attribute_type"

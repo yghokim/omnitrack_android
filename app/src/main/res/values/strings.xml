@@ -51,6 +51,10 @@
 
     <string name="msg_name">Name</string>
 
+    <string name="msg_attribute">Field</string>
+    <string name="msg_new_tracker_prefix">My Tracker</string>
+
+
     <string name="msg_column_name">Column Name</string>
 
     <string name="msg_triggers">Triggers</string>

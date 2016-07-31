@@ -1,45 +1,17 @@
 package kr.ac.snu.hcil.omnitrack.activities
 
-import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.FloatingActionButton
-import android.support.design.widget.Snackbar
 import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
 import android.support.v4.view.ViewPager
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.Toolbar
-import android.support.v7.widget.helper.ItemTouchHelper
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.TextView
-import jp.wasabeef.recyclerview.animators.SlideInRightAnimator
 import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
-
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.activities.fragments.ServiceListFragment
 import kr.ac.snu.hcil.omnitrack.activities.fragments.TrackerDetailStructureTabFragment
 import kr.ac.snu.hcil.omnitrack.activities.fragments.TrackerDetailTriggerTabFragment
-import kr.ac.snu.hcil.omnitrack.activities.fragments.TrackerListFragment
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
-import kr.ac.snu.hcil.omnitrack.ui.DragItemTouchHelperCallback
-import kr.ac.snu.hcil.omnitrack.ui.SpaceItemDecoration
-import kr.ac.snu.hcil.omnitrack.ui.components.AttributeFrameLayout
-import kr.ac.snu.hcil.omnitrack.ui.components.AttributeTypeListDialogFragment
-import kr.ac.snu.hcil.omnitrack.ui.components.ExpandableFrameLayout
-import kr.ac.snu.hcil.omnitrack.ui.components.TriggerPanel
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ColorPalettePropertyView
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ShortTextPropertyView
-import kr.ac.snu.hcil.omnitrack.utils.startActivityOnDelay
-import java.util.*
 
 class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tracker_detail) {
 
@@ -105,7 +77,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
             isEditMode = true
 
         } else {
-            tracker = OTTracker("Tracker ${System.currentTimeMillis()}")
+            tracker = OTTracker(OmniTrackApplication.app.currentUser.generateNewTrackerName(this))
             OmniTrackApplication.app.currentUser.trackers.add(tracker)
             isEditMode = false
         }

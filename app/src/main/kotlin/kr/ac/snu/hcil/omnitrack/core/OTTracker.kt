@@ -1,9 +1,12 @@
 package kr.ac.snu.hcil.omnitrack.core
 
 //import kr.ac.snu.hcil.omnitrack.core.database.TrackerEntity
+import android.content.Context
 import android.graphics.Color
+import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeAttribute
+import kr.ac.snu.hcil.omnitrack.utils.DefaultNameGenerator
 import kr.ac.snu.hcil.omnitrack.utils.ObservableList
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
@@ -102,6 +105,10 @@ class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color
         }
 
         return result
+    }
+
+    fun generateNewAttributeName(typeName: String, context: Context): String {
+        return DefaultNameGenerator.generateName("${typeName} ${context.resources.getString(R.string.msg_attribute)}", attributes.unObservedList.map { it.name })
     }
 
 }

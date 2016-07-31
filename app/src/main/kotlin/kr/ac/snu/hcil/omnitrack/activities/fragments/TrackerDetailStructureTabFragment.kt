@@ -2,9 +2,7 @@ package kr.ac.snu.hcil.omnitrack.activities.fragments
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
-import android.support.v4.app.Fragment
 import android.support.v4.widget.NestedScrollView
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
@@ -21,14 +19,10 @@ import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.activities.AttributeDetailActivity
 import kr.ac.snu.hcil.omnitrack.activities.TrackerDetailActivity
-import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.ui.DragItemTouchHelperCallback
 import kr.ac.snu.hcil.omnitrack.ui.SpaceItemDecoration
-import kr.ac.snu.hcil.omnitrack.ui.components.AttributeFrameLayout
-import kr.ac.snu.hcil.omnitrack.ui.components.AttributeTypeListDialogFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.LockableFrameLayout
-import kr.ac.snu.hcil.omnitrack.ui.components.TriggerPanel
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ColorPalettePropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ShortTextPropertyView
@@ -339,7 +333,8 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
                 typeIcon = view.findViewById(R.id.type_icon) as ImageView
 
                 view.setOnClickListener {
-                    tracker.attributes.add(OTAttribute.createAttribute(OmniTrackApplication.app.currentUser, "New Column", OmniTrackApplication.app.supportedAttributeTypes[adapterPosition].typeId))
+                    val typeInfo = OmniTrackApplication.app.supportedAttributeTypes[adapterPosition]
+                    tracker.attributes.add(OTAttribute.createAttribute(OmniTrackApplication.app.currentUser, tracker.generateNewAttributeName(typeInfo.name, context), typeInfo.typeId))
 
                     attributeListAdapter.notifyItemInserted(tracker.attributes.size - 1)
                     scrollToBottomReserved = true
