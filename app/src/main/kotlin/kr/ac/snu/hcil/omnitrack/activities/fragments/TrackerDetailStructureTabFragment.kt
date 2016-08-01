@@ -9,21 +9,19 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
-import com.h6ah4i.android.widget.advrecyclerview.draggable.DraggableItemAdapter
-import com.h6ah4i.android.widget.advrecyclerview.draggable.ItemDraggableRange
-import com.h6ah4i.android.widget.advrecyclerview.draggable.RecyclerViewDragDropManager
-import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractDraggableItemViewHolder
 import jp.wasabeef.recyclerview.animators.SlideInRightAnimator
 import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.activities.AttributeDetailActivity
 import kr.ac.snu.hcil.omnitrack.activities.TrackerDetailActivity
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
+import kr.ac.snu.hcil.omnitrack.ui.DragItemTouchHelperCallback
 import kr.ac.snu.hcil.omnitrack.ui.SpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
@@ -125,12 +123,17 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
 
         attributeListAdapter = AttributeListAdapter()
 
+        attributeListView.adapter = attributeListAdapter
+
+        attributeListItemTouchHelper = ItemTouchHelper(DragItemTouchHelperCallback(attributeListAdapter, true, false))
+        attributeListItemTouchHelper.attachToRecyclerView(attributeListView)
+
+
+        /*
         val mRecyclerViewDragDropManager = RecyclerViewDragDropManager()
-        //mRecyclerViewDragDropManager.setDraggingItemShadowDrawable(
-        //       Context.getDrawable(context, android.R.drawable.material_shadow_z3) as NinePatchDrawable)
         attributeListView.adapter = mRecyclerViewDragDropManager.createWrappedAdapter(attributeListAdapter)
         mRecyclerViewDragDropManager.attachRecyclerView(attributeListView)
-
+           */
 
 
         newAttributeGrid = rootView.findViewById(R.id.ui_new_attribute_grid) as RecyclerView
@@ -210,7 +213,7 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
     }
 
 
-    inner class AttributeListAdapter() : RecyclerView.Adapter<AttributeListAdapter.ViewHolder>(), DraggableItemAdapter<AttributeListAdapter.ViewHolder> {
+    inner class AttributeListAdapter() : RecyclerView.Adapter<AttributeListAdapter.ViewHolder>(), DragItemTouchHelperCallback.ItemDragHelperAdapter {
 
         private var removed: OTAttribute<out Any>? = null
         private var removedPosition: Int = -1
@@ -252,19 +255,26 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
             notifyItemMoved(fromPosition, toPosition)
         }
 
+        /*
         override fun onCheckCanDrop(draggingPosition: Int, dropPosition: Int): Boolean {
+            println("check can drop $draggingPosition $dropPosition")
             return true
         }
 
         override fun onCheckCanStartDrag(holder: AttributeListAdapter.ViewHolder?, position: Int, x: Int, y: Int): Boolean {
+            println("check can start drag $position $x, $y")
             return true
         }
 
         override fun onGetItemDraggableRange(holder: AttributeListAdapter.ViewHolder?, position: Int): ItemDraggableRange? {
             return null
+        }*/
+
+        override fun onRemoveItem(position: Int) {
         }
 
-        inner class ViewHolder(val view: View) : AbstractDraggableItemViewHolder(view) {
+
+        inner class ViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
 
             lateinit var previewContainer: LockableFrameLayout
             lateinit var columnNameView: TextView
@@ -272,6 +282,8 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
 
             lateinit var editButton: ImageButton
             lateinit var removeButton: ImageButton
+
+            lateinit var draggableZone: View
 
             var preview: AAttributeInputView<out Any>? = null
                 get
@@ -295,6 +307,7 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
                 typeNameView = view.findViewById(R.id.ui_attribute_type) as TextView
                 editButton = view.findViewById(R.id.ui_button_edit) as ImageButton
                 removeButton = view.findViewById(R.id.ui_button_remove) as ImageButton
+                draggableZone = view.findViewById(R.id.ui_drag_handle)
 
                 editButton.setOnClickListener {
                     openAttributeDetailActivity(adapterPosition)
@@ -306,6 +319,13 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
                     tracker.attributes.remove(tracker.attributes[adapterPosition])
                     notifyItemRemoved(adapterPosition)
                     showRemovalSnackbar()
+                }
+
+                draggableZone.setOnTouchListener { view, motionEvent ->
+                    if (motionEvent.action == MotionEvent.ACTION_DOWN) {
+                        attributeListItemTouchHelper.startDrag(this@ViewHolder)
+                    }
+                    true
                 }
             }
 

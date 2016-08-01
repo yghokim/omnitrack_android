@@ -79,6 +79,13 @@ class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color
             sender, args->
             onAttributeRemoved(args.first, args.second)
         }
+
+        attributes.elementReordered += {
+            sender, range ->
+            for (i in range) {
+                attributes[i].isDirtySinceLastSync = true
+            }
+        }
     }
 
     private fun onAttributeAdded(new: OTAttribute<out Any>, index: Int) {

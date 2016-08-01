@@ -14,43 +14,43 @@
         <LinearLayout
             android:id="@+id/ui_content_container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:background="@color/frontalBackground"
                 android:orientation="vertical"
                 android:paddingBottom="12dp">
 
-            <TextView
-                style="@style/SubTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/activity_vertical_margin"
-                android:paddingLeft="@dimen/activity_horizontal_margin"
+                <TextView
+                    style="@style/SubTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/activity_vertical_margin"
+                    android:paddingLeft="@dimen/activity_horizontal_margin"
 
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:text="@string/msg_basic_information" />
+                    android:paddingRight="@dimen/activity_horizontal_margin"
+                    android:text="@string/msg_basic_information" />
 
-            <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ShortTextPropertyView
-                android:id="@+id/nameProperty"
-                style="@style/propertyElementStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ShortTextPropertyView
+                    android:id="@+id/nameProperty"
+                    style="@style/propertyElementStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
 
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin" />
+                    android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:paddingRight="@dimen/activity_horizontal_margin" />
 
-            <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ColorPalettePropertyView
-                android:id="@+id/colorProperty"
-                style="@style/propertyElementStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ColorPalettePropertyView
+                    android:id="@+id/colorProperty"
+                    style="@style/propertyElementStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
 
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin" />
+                    android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:paddingRight="@dimen/activity_horizontal_margin" />
 
             </LinearLayout>
 

@@ -17,12 +17,19 @@ class OTUser(objectId: String?, dbId: Long?, name: String, email: String, attrib
 
 
     var attributeIdSeed: Long = attributeIdSeed
-        private set
+        private set(value) {
+            if (field != value) {
+                isDirtySinceLastSync = true
+                field = value
+            }
+        }
 
 
     val email: String by Delegates.observable(email) {
         prop, old, new ->
-
+        if (old != new) {
+            isDirtySinceLastSync = true
+        }
     }
 
     val trackers = ObservableList<OTTracker>()
@@ -36,7 +43,7 @@ class OTUser(objectId: String?, dbId: Long?, name: String, email: String, attrib
 
     val trackerAdded = Event<ReadOnlyPair<OTTracker, Int>>()
     val trackerRemoved = Event<ReadOnlyPair<OTTracker, Int>>()
-    val trackerIndexChanged = Event<ReadOnlyPair<OTTracker, Int>>()
+    val trackerIndexChanged = Event<IntRange>()
 
     constructor(name: String, email: String) : this(null, null, name, email) {
 
@@ -61,6 +68,13 @@ class OTUser(objectId: String?, dbId: Long?, name: String, email: String, attrib
 
         trackers.elementRemoved += { sender, args ->
             onTrackerRemoved(args.first, args.second)
+        }
+
+        trackers.elementReordered += {
+            sender, range ->
+            for (i in range) {
+                trackers[i].isDirtySinceLastSync = true
+            }
         }
     }
 

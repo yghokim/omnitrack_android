@@ -16,23 +16,38 @@ class OTItemBuilder : ADataRow, IStringSerializable {
         const val MODE_BACKGROUND = 0
     }
 
-    internal data class Parcel(val trackerObjectId: String, val mode: Int, val valueTable: Array<String>)
+    internal data class Parcel(val trackerObjectId: String, val mode: Int, val connectedItemDbId: Long, val valueTable: Array<String>)
 
-    val trackerObjectId: String
     private lateinit var tracker: OTTracker
 
-
-    private var connectedItemDbId: Long = -1
-    private var connectedItem: OTItem? = null
-
+    private val connectedItemDbId: Long
 
     private val mode: Int
 
+
+    /**
+     * Used when editing item.
+     * @param item: item should be already stored in DB. (Every item is immediately stored in DB when created.)
+     */
+    constructor(item: OTItem, tracker: OTTracker) {
+        this.tracker = tracker
+        this.mode = MODE_EDIT
+        connectedItemDbId = item.dbId!!
+        syncFromTrackerScheme()
+
+        for (attribute in tracker.attributes) {
+            setValueOf(attribute, item.getValueOf(attribute)!!)
+        }
+    }
+
+
+    /**
+     * Used when new item input mode
+     */
     constructor(tracker: OTTracker, mode: Int) {
-        this.trackerObjectId = tracker.objectId
         this.tracker = tracker
         this.mode = mode
-        //reloadTracker()
+        connectedItemDbId = -1
         syncFromTrackerScheme()
 
         if (mode == MODE_BACKGROUND)
@@ -41,19 +56,23 @@ class OTItemBuilder : ADataRow, IStringSerializable {
 
     @SuppressWarnings("NotUsed")
     constructor(trackerId: String, mode: Int) {
-        this.trackerObjectId = tracker.objectId
         this.mode = mode
-        reloadTracker()
+        connectedItemDbId = -1
+        reloadTracker(trackerId)
     }
 
+    /**
+     * used when deserializing
+     */
     constructor(serialized: String) {
 
         val parser = Gson()
         val parcel = parser.fromJson(serialized, Parcel::class.java)
 
-        this.trackerObjectId = parcel.trackerObjectId
         this.mode = parcel.mode
-        reloadTracker()
+        this.connectedItemDbId = parcel.connectedItemDbId
+
+        reloadTracker(parcel.trackerObjectId)
 
         val s = parcel.valueTable.map { parser.fromJson(it, SerializedStringKeyEntry::class.java) }
 
@@ -69,7 +88,7 @@ class OTItemBuilder : ADataRow, IStringSerializable {
         }
     }
 
-    fun reloadTracker() {
+    fun reloadTracker(trackerObjectId: String) {
         tracker = OmniTrackApplication.app.currentUser[trackerObjectId]!!
         syncFromTrackerScheme()
     }
@@ -101,7 +120,7 @@ class OTItemBuilder : ADataRow, IStringSerializable {
 
     override fun getSerializedString(): String {
         val parser = Gson()
-        return parser.toJson(Parcel(trackerObjectId, mode, tableToSerializedEntryArray(tracker)))
+        return parser.toJson(Parcel(tracker.objectId, mode, connectedItemDbId, tableToSerializedEntryArray(tracker)))
     }
 
     fun makeItem(): OTItem {

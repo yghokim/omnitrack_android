@@ -8,6 +8,15 @@ import android.support.v7.widget.helper.ItemTouchHelper
  * codes by https://medium.com/@ipaulpro/drag-and-swipe-with-recyclerview-b9456d2b1aaf#.z8t5ugen2
  */
 class DragItemTouchHelperCallback(private val adapter: ItemDragHelperAdapter, private val orderChangeAvailable: Boolean = true, private val swipeAvailable: Boolean = true) : ItemTouchHelper.Callback() {
+
+    interface ItemDragHelperAdapter {
+
+        fun onMoveItem(fromPosition: Int, toPosition: Int)
+
+        fun onRemoveItem(position: Int)
+    }
+
+
     override fun isItemViewSwipeEnabled(): Boolean {
         return swipeAvailable
     }
@@ -17,14 +26,6 @@ class DragItemTouchHelperCallback(private val adapter: ItemDragHelperAdapter, pr
         return orderChangeAvailable
     }
 
-    interface ItemDragHelperAdapter {
-
-        fun onItemMove(fromPosition: Int, toPosition: Int)
-
-        fun onItemDismiss(position: Int)
-    }
-
-
     override fun getMovementFlags(recyclerView: RecyclerView?, viewHolder: RecyclerView.ViewHolder?): Int {
         val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN
         val swipeFlags = ItemTouchHelper.START or ItemTouchHelper.END
@@ -32,12 +33,12 @@ class DragItemTouchHelperCallback(private val adapter: ItemDragHelperAdapter, pr
     }
 
     override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
-        adapter.onItemMove(viewHolder.adapterPosition, target.adapterPosition);
+        adapter.onMoveItem(viewHolder.adapterPosition, target.adapterPosition);
         return true;
     }
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-        adapter.onItemDismiss(viewHolder.adapterPosition)
+        adapter.onRemoveItem(viewHolder.adapterPosition)
     }
 
 
