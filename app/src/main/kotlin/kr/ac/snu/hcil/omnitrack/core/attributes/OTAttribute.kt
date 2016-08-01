@@ -4,14 +4,11 @@ import android.content.Context
 import android.util.SparseArray
 import android.view.View
 import com.google.gson.Gson
+import kr.ac.snu.hcil.omnitrack.core.NamedObject
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
-import kr.ac.snu.hcil.omnitrack.core.NamedObject
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTProperty
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.NumberInputView
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializedIntegerKeyEntry
@@ -44,6 +41,7 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
             val attr = when (typeId) {
                 TYPE_NUMBER -> OTNumberAttribute(objectId, dbId, columnName, settingData)
                 TYPE_TIME -> OTTimeAttribute(objectId, dbId, columnName, settingData)
+                TYPE_SHORT_TEXT -> OTShortTextAttribute(objectId, dbId, columnName, settingData)
                 TYPE_LONG_TEXT -> OTLongTextAttribute(objectId, dbId, columnName, settingData)
                 else -> OTNumberAttribute(objectId, dbId, columnName, settingData)
             }

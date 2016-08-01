@@ -17,6 +17,8 @@
     <color name="outerBackground">#edebe7</color>
     <color name="frontalBackground">#ffffff</color>
 
+    <color name="inputTextColor">#404040</color>
+
     <color name="dividerColor">#bcbcbc</color>
 
     <color name="colorGreen">#9fea75</color>

@@ -16,6 +16,5 @@
         android:background="@drawable/text_field_singleline"
         android:inputType="textShortMessage"
 
-        android:maxLines="1"
-        android:text="Short Text Property Input" />
+        android:maxLines="1" />
 </LinearLayout>

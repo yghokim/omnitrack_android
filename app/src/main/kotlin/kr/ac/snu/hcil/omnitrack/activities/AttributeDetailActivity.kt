@@ -31,7 +31,6 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
         propertyViewContainer = findViewById(R.id.ui_list) as LinearLayout
 
         columnNameView = findViewById(R.id.nameProperty) as ShortTextPropertyView
-
         columnNameView.title = resources.getString(R.string.msg_column_name)
 
         columnNameView.addNewValidator(String.format(resources.getString(R.string.msg_format_cannot_be_blank), resources.getString(R.string.msg_column_name)), ShortTextPropertyView.NOT_EMPTY_VALIDATOR)
@@ -51,7 +50,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
         super.onStart()
         if (intent.getStringExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_ATTRIBUTE) != null) {
             attribute = OmniTrackApplication.app.currentUser.findAttributeByObjectId(intent.getStringExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_ATTRIBUTE))
-
+            refresh()
         }
     }
 

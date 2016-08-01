@@ -29,6 +29,6 @@ class OTShortTextAttribute(objectId: String?, dbId: Long?, columnName: String, s
     }
 
     override fun getInputViewType(previewMode: Boolean): Int {
-        return AAttributeInputView.VIEW_TYPE_LONG_TEXT
+        return AAttributeInputView.VIEW_TYPE_SHORT_TEXT
     }
 }

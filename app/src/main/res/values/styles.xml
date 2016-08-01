@@ -84,7 +84,8 @@
         <item name="android:imeOptions">actionDone</item>
         <item name="android:hint">@string/hint_short_text</item>
         <item name="android:textColorHint">#66000000</item>
-        <item name="android:textSize">20dp</item>
+        <item name="android:textSize">17dp</item>
+        <item name="android:textColor">@color/inputTextColor</item>
         <item name="android:typeface">serif</item>
         <item name="android:lineSpacingExtra">0dp</item>
         <item name="android:lines">1</item>
@@ -101,6 +102,7 @@
         <item name="android:imeOptions">actionDone</item>
         <item name="android:hint">@string/hint_long_text</item>
         <item name="android:textColorHint">#33000000</item>
+        <item name="android:textColor">@color/inputTextColor</item>
         <item name="android:textSize">18dp</item>
         <item name="android:typeface">serif</item>
         <item name="android:lineSpacingExtra">12dp</item>
