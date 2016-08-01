@@ -5,22 +5,16 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputV
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 
 /**
- * Created by younghokim on 16. 7. 24..
+ * Created by younghokim on 16. 8. 1..
  */
-class OTLongTextAttribute(objectId: String?, dbId: Long?, columnName: String, settingData: String?) : OTAttribute<CharSequence>(objectId, dbId, columnName, Companion.TYPE_LONG_TEXT, settingData) {
+class OTShortTextAttribute(objectId: String?, dbId: Long?, columnName: String, settingData: String?) : OTAttribute<CharSequence>(objectId, dbId, columnName, Companion.TYPE_SHORT_TEXT, settingData) {
     override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_STRING
-
-    override fun getInputViewType(previewMode: Boolean): Int {
-        return AAttributeInputView.VIEW_TYPE_LONG_TEXT
-    }
-
-    override val keys: Array<Int> = Array<Int>(0) { index -> 0 }
-
-    override val typeNameResourceId: Int
-        get() = R.string.type_longtext_name
+    override val typeNameResourceId: Int = R.string.type_shorttext_name
 
     override fun createProperties() {
     }
+
+    override val keys: Array<Int> = Array<Int>(0) { index -> 0 }
 
     override fun formatAttributeValue(value: Any): String {
         return value.toString()
@@ -32,5 +26,9 @@ class OTLongTextAttribute(objectId: String?, dbId: Long?, columnName: String, se
 
     override fun refreshInputViewContents(inputView: AAttributeInputView<out Any>) {
 
+    }
+
+    override fun getInputViewType(previewMode: Boolean): Int {
+        return AAttributeInputView.VIEW_TYPE_LONG_TEXT
     }
 }

@@ -76,13 +76,30 @@
         <item name="android:layout_height">@dimen/color_selection_button_size</item>
     </style>
 
-    <style name="LongTextStyle">
+
+    <style name="ShortTextInputStyle">
+        <item name="android:background">@drawable/text_field_singleline</item>
+        <item name="android:inputType">text|textShortMessage</item>
+        <item name="android:ems">10</item>
+        <item name="android:imeOptions">actionDone</item>
+        <item name="android:hint">@string/hint_short_text</item>
+        <item name="android:textColorHint">#66000000</item>
+        <item name="android:textSize">20dp</item>
+        <item name="android:typeface">serif</item>
+        <item name="android:lineSpacingExtra">0dp</item>
+        <item name="android:lines">1</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingBottom">12dp</item>
+
+    </style>
+
+    <style name="LongTextInputStyle">
         <item name="android:gravity">top</item>
         <item name="android:background">@null</item>
         <item name="android:inputType">text|textMultiLine</item>
         <item name="android:ems">10</item>
         <item name="android:imeOptions">actionDone</item>
-        <item name="android:hint">@string/hind_long_text</item>
+        <item name="android:hint">@string/hint_long_text</item>
         <item name="android:textColorHint">#33000000</item>
         <item name="android:textSize">18dp</item>
         <item name="android:typeface">serif</item>

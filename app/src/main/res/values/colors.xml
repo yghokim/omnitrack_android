@@ -23,6 +23,8 @@
 
     <color name="editTextLine">#cfcfcf</color>
 
+    <color name="editTextFormBackground">#f3f5f5</color>
+
     <color name="selection_view_button_selected_text_color">#ffffff</color>
     <color name="selection_view_button_unselected_text_color">@color/buttonIconColorDark</color>
 

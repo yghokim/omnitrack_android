@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android"
+    android:paddingBottom="10dp"
+    android:paddingLeft="6dp"
+    android:paddingRight="6dp"
+    android:paddingTop="8dp">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/editTextFormBackground" />
+
+        </shape>
+    </item>
+
+    <item
+        android:height="1dp"
+        android:bottom="0dp"
+        android:gravity="bottom">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/editTextLine" />
+        </shape>
+    </item>
+    <item
+        android:height="2.5dp"
+        android:bottom="0dp"
+        android:gravity="bottom">
+        <selector>
+            <item android:state_focused="true">
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/colorAccent" />
+                </shape>
+            </item>
+        </selector>
+    </item>
+</layer-list>
