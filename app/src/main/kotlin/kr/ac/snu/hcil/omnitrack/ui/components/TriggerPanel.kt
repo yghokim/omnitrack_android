@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import android.widget.ListView
 import android.widget.Switch
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
@@ -16,7 +15,6 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.ui.HorizontalDividerItemDecoration
-import org.w3c.dom.Text
 
 /**
  * Created by Young-Ho Kim on 2016-07-28.
@@ -104,7 +102,7 @@ class TriggerPanel : FrameLayout {
         }
 
         override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
-            var view = LayoutInflater.from(context).inflate(R.layout.trigger_list_element, parent, false)
+            val view = LayoutInflater.from(context).inflate(R.layout.trigger_list_element, parent, false)
             return ViewHolder(view)
         }
 

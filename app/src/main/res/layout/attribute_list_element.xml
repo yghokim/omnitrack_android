@@ -5,14 +5,14 @@
     android:layout_marginLeft="@dimen/attribute_list_element_horizontal_padding"
     android:layout_marginRight="@dimen/attribute_list_element_horizontal_padding"
     android:background="@drawable/attribute_card"
-    android:minHeight="@dimen/attribute_list_element_min_height"
     >
 
     <ImageView
         android:id="@+id/ui_drag_handle"
         android:layout_width="@dimen/attribute_list_element_drag_area_width"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
+        android:layout_alignBottom="@+id/ui_preview_container"
+        android:layout_alignParentTop="true"
         android:padding="12dp"
         android:scaleType="fitCenter"
         android:src="@drawable/drag_handle" />

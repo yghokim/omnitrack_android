@@ -116,6 +116,7 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
 
     protected open fun onPropertyValueChanged(args: OTProperty.PropertyChangedEventArgs<out Any>) {
         propertyValueChanged.invoke(this, args)
+        isDirtySinceLastSync = true
     }
 
     fun <T> getProperty(key: Int): OTProperty<T> {

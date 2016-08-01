@@ -36,7 +36,13 @@ class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color
         }
     }
 
-    var color: Int = color
+    var color: Int by Delegates.observable(color)
+    {
+        prop, old, new ->
+        if (old != new) {
+            isDirtySinceLastSync = true
+        }
+    }
 
     val removedFromUser = Event<OTUser>()
     val addedToUser = Event<OTUser>()

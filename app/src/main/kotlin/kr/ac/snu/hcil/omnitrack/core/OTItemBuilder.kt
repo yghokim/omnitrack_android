@@ -1,19 +1,17 @@
 package kr.ac.snu.hcil.omnitrack.core
 
-import android.os.Parcelable
-import com.google.gson.*
-import com.google.gson.annotations.Expose
+import com.google.gson.Gson
 import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
-import kr.ac.snu.hcil.omnitrack.utils.serialization.*
-import java.lang.reflect.Type
-import java.util.*
+import kr.ac.snu.hcil.omnitrack.utils.serialization.IStringSerializable
+import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializedStringKeyEntry
+import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 
 /**
  * Created by younghokim on 16. 7. 25..
  */
 class OTItemBuilder : ADataRow, IStringSerializable {
     companion object {
+        const val MODE_EDIT = 2
         const val MODE_FOREGROUND = 1
         const val MODE_BACKGROUND = 0
     }
@@ -22,6 +20,11 @@ class OTItemBuilder : ADataRow, IStringSerializable {
 
     val trackerObjectId: String
     private lateinit var tracker: OTTracker
+
+
+    private var connectedItemDbId: Long = -1
+    private var connectedItem: OTItem? = null
+
 
     private val mode: Int
 

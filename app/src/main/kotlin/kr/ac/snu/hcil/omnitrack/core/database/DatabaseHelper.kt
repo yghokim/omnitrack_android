@@ -6,16 +6,13 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
-import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
+import kr.ac.snu.hcil.omnitrack.core.NamedObject
 import kr.ac.snu.hcil.omnitrack.core.OTItem
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
-import kr.ac.snu.hcil.omnitrack.core.NamedObject
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
-import java.text.AttributedCharacterIterator
 import java.util.*
-import kotlin.properties.Delegates
 
 /**
  * Created by Young-Ho Kim on 2016-07-11.
@@ -319,66 +316,71 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
     }
 
     fun save(trigger: OTTrigger, owner: OTUser, position: Int) {
-        val values = baseContentValuesOfNamed(trigger, TriggerScheme)
+        if (trigger.isDirtySinceLastSync) {
+            val values = baseContentValuesOfNamed(trigger, TriggerScheme)
 
-        values.put(TriggerScheme.USER_ID, owner.dbId)
-        values.put(TriggerScheme.TYPE, trigger.typeId)
-        values.put(TriggerScheme.PROPERTIES, trigger.getSerializedProperties())
-        values.put(TriggerScheme.TRACKER_OBJECT_ID, trigger.trackerObjectId)
-        values.put(TriggerScheme.POSITION, position)
-        values.put(TriggerScheme.IS_ON, trigger.isOn)
+            values.put(TriggerScheme.USER_ID, owner.dbId)
+            values.put(TriggerScheme.TYPE, trigger.typeId)
+            values.put(TriggerScheme.PROPERTIES, trigger.getSerializedProperties())
+            values.put(TriggerScheme.TRACKER_OBJECT_ID, trigger.trackerObjectId)
+            values.put(TriggerScheme.POSITION, position)
+            values.put(TriggerScheme.IS_ON, trigger.isOn)
 
-        saveObject(trigger, values, TriggerScheme)
+            saveObject(trigger, values, TriggerScheme)
+        }
     }
 
     fun save(attribute: OTAttribute<out Any>, position: Int) {
-        val values = baseContentValuesOfNamed(attribute, AttributeScheme)
+        if (attribute.isDirtySinceLastSync) {
+            val values = baseContentValuesOfNamed(attribute, AttributeScheme)
 
-        values.put(AttributeScheme.POSITION, position)
-        values.put(AttributeScheme.TYPE, attribute.typeId)
-        values.put(AttributeScheme.TRACKER_ID, attribute.owner?.dbId ?: null)
-        values.put(AttributeScheme.SETTING_DATA, attribute.getSerializedProperties())
+            values.put(AttributeScheme.POSITION, position)
+            values.put(AttributeScheme.TYPE, attribute.typeId)
+            values.put(AttributeScheme.TRACKER_ID, attribute.owner?.dbId ?: null)
+            values.put(AttributeScheme.SETTING_DATA, attribute.getSerializedProperties())
 
-        saveObject(attribute, values, AttributeScheme)
+            saveObject(attribute, values, AttributeScheme)
+        }
     }
 
     fun save(tracker: OTTracker, position: Int) {
-        val values = baseContentValuesOfNamed(tracker, TrackerScheme)
-        values.put(TrackerScheme.POSITION, position)
-        values.put(TrackerScheme.COLOR, tracker.color)
-        values.put(TrackerScheme.USER_ID, tracker.owner?.dbId ?: null)
+        if (tracker.isDirtySinceLastSync) {
+            val values = baseContentValuesOfNamed(tracker, TrackerScheme)
+            values.put(TrackerScheme.POSITION, position)
+            values.put(TrackerScheme.COLOR, tracker.color)
+            values.put(TrackerScheme.USER_ID, tracker.owner?.dbId ?: null)
 
-        if (saveObject(tracker, values, TrackerScheme)) {
-            writableDatabase.beginTransaction()
-
-            deleteObjects(AttributeScheme, *tracker.fetchRemovedAttributeIds())
-
-            for (child in tracker.attributes.iterator().withIndex()) {
-                save(child.value, child.index)
-            }
-
-            writableDatabase.setTransactionSuccessful()
-            writableDatabase.endTransaction()
+            saveObject(tracker, values, TrackerScheme)
         }
+        writableDatabase.beginTransaction()
+
+        deleteObjects(AttributeScheme, *tracker.fetchRemovedAttributeIds())
+
+        for (child in tracker.attributes.iterator().withIndex()) {
+            save(child.value, child.index)
+        }
+
+        writableDatabase.setTransactionSuccessful()
+        writableDatabase.endTransaction()
     }
 
     fun save(user: OTUser) {
-        val values = baseContentValuesOfNamed(user, UserScheme)
-        values.put(UserScheme.EMAIL, user.email)
-        values.put(UserScheme.ATTR_ID_SEED, user.attributeIdSeed)
+        if (user.isDirtySinceLastSync) {
+            val values = baseContentValuesOfNamed(user, UserScheme)
+            values.put(UserScheme.EMAIL, user.email)
+            values.put(UserScheme.ATTR_ID_SEED, user.attributeIdSeed)
 
 
-        if (saveObject(user, values, UserScheme)) {
-
-            writableDatabase.beginTransaction()
-            deleteObjects(TrackerScheme, *user.fetchRemovedTrackerIds())
-
-            for (child in user.trackers.iterator().withIndex()) {
-                save(child.value, child.index)
-            }
-            writableDatabase.setTransactionSuccessful()
-            writableDatabase.endTransaction()
+            saveObject(user, values, UserScheme)
         }
+        writableDatabase.beginTransaction()
+        deleteObjects(TrackerScheme, *user.fetchRemovedTrackerIds())
+
+        for (child in user.trackers.iterator().withIndex()) {
+            save(child.value, child.index)
+        }
+        writableDatabase.setTransactionSuccessful()
+        writableDatabase.endTransaction()
     }
 
     //Item API===============================
