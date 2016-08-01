@@ -8,18 +8,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import jp.wasabeef.recyclerview.animators.SlideInRightAnimator
 import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilder
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.ui.HorizontalImageDividerItemDecoration
-import kr.ac.snu.hcil.omnitrack.ui.SpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.AInputView
-import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import java.util.*
 
 /**
@@ -190,7 +186,6 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
             }
 
             fun bind(attribute: OTAttribute<out Any>) {
-                println("bind attribute")
 
                 attribute.refreshInputViewContents(inputView)
                 attributeId = attribute.objectId

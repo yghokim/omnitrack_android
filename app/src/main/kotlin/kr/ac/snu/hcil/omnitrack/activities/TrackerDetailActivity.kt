@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.activities
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
@@ -52,8 +53,44 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
 
         setActionBarButtonMode(Mode.Back)
         title = resources.getString(R.string.title_activity_tracker_edit)
+
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)) {
+                this.intent.putExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, savedInstanceState.getString(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER))
+            }
+
+            this.intent.putExtra(IS_EDIT_MODE, savedInstanceState.getBoolean(IS_EDIT_MODE, true))
+        }
+
+        if (intent.getStringExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER) != null) {
+            //edit
+            //instant update
+            val tracker = OmniTrackApplication.app.currentUser[intent.getStringExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)]
+
+            if (tracker != null) {
+                this.tracker = tracker
+                isEditMode = intent.getBooleanExtra(IS_EDIT_MODE, true)
+            } else {
+                tossToHome()
+            }
+
+        } else {
+            tossToHome()
+        }
     }
 
+    private fun tossToHome() {
+
+        val homeActivityIntent = Intent(this, HomeActivity::class.java)
+        homeActivityIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(homeActivityIntent)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
+        outState.putBoolean(IS_EDIT_MODE, true)
+    }
 
     override fun onPause(){
         super.onPause()
@@ -68,24 +105,6 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
 
     override fun onStart(){
         super.onStart()
-
-        println("tracker detail activity started")
-        if (intent.getStringExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER) != null) {
-            //edit
-            //instant update
-            tracker = OmniTrackApplication.app.currentUser.trackers.filter { it.objectId == intent.getStringExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER) }.first()
-            isEditMode = true
-
-        } else {
-            tracker = OTTracker(OmniTrackApplication.app.currentUser.generateNewTrackerName(this))
-            OmniTrackApplication.app.currentUser.trackers.add(tracker)
-            isEditMode = false
-        }
-/*
-        for(child in childFragments)
-        {
-            child.value.init(tracker, isEditMode)
-        }*/
     }
 
     override fun onLeftButtonClicked() {

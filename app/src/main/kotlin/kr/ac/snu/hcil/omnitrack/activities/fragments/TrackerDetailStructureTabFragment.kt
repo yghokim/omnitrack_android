@@ -107,7 +107,6 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
 
             override fun onItemsAdded(recyclerView: RecyclerView?, positionStart: Int, itemCount: Int) {
                 super.onItemsAdded(recyclerView, positionStart, itemCount)
-                println("$positionStart $itemCount")
                 scrollToBottom()
             }
         }

@@ -327,6 +327,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
             values.put(TriggerScheme.IS_ON, trigger.isOn)
 
             saveObject(trigger, values, TriggerScheme)
+            trigger.isDirtySinceLastSync = false
         }
     }
 
@@ -340,6 +341,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
             values.put(AttributeScheme.SETTING_DATA, attribute.getSerializedProperties())
 
             saveObject(attribute, values, AttributeScheme)
+            attribute.isDirtySinceLastSync = false
         }
     }
 
@@ -351,6 +353,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
             values.put(TrackerScheme.USER_ID, tracker.owner?.dbId ?: null)
 
             saveObject(tracker, values, TrackerScheme)
+            tracker.isDirtySinceLastSync = false
         }
         writableDatabase.beginTransaction()
 
@@ -372,6 +375,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
 
 
             saveObject(user, values, UserScheme)
+            user.isDirtySinceLastSync = false
         }
         writableDatabase.beginTransaction()
         deleteObjects(TrackerScheme, *user.fetchRemovedTrackerIds())

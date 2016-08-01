@@ -15,14 +15,12 @@ import android.widget.TextView
 import jp.wasabeef.recyclerview.animators.SlideInRightAnimator
 import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.activities.HomeActivity
 import kr.ac.snu.hcil.omnitrack.activities.ItemBrowserActivity
 import kr.ac.snu.hcil.omnitrack.activities.NewItemActivity
 import kr.ac.snu.hcil.omnitrack.activities.TrackerDetailActivity
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.ui.HorizontalImageDividerItemDecoration
-import kr.ac.snu.hcil.omnitrack.ui.SpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 import kr.ac.snu.hcil.omnitrack.utils.startActivityOnDelay
@@ -68,7 +66,11 @@ class TrackerListFragment : Fragment() {
             //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show()
             //(application as OmniTrackApplication).syncUserToDb()
             //user.trackers.add(OTTracker("Hihi"))
+            val newTracker = OTTracker(OmniTrackApplication.app.currentUser.generateNewTrackerName(context))
+            OmniTrackApplication.app.currentUser.trackers.add(newTracker)
+
             val intent = Intent(context, TrackerDetailActivity::class.java)
+            intent.putExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, newTracker.objectId)
             startActivityOnDelay(intent)
         }
 
