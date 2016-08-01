@@ -14,13 +14,16 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import com.h6ah4i.android.widget.advrecyclerview.draggable.DraggableItemAdapter
+import com.h6ah4i.android.widget.advrecyclerview.draggable.ItemDraggableRange
+import com.h6ah4i.android.widget.advrecyclerview.draggable.RecyclerViewDragDropManager
+import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractDraggableItemViewHolder
 import jp.wasabeef.recyclerview.animators.SlideInRightAnimator
 import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.activities.AttributeDetailActivity
 import kr.ac.snu.hcil.omnitrack.activities.TrackerDetailActivity
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
-import kr.ac.snu.hcil.omnitrack.ui.DragItemTouchHelperCallback
 import kr.ac.snu.hcil.omnitrack.ui.SpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
@@ -121,9 +124,13 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
         attributeListView.addItemDecoration(SpaceItemDecoration(LinearLayoutManager.VERTICAL, resources.getDimensionPixelOffset(R.dimen.attribute_list_element_vertical_space)));
 
         attributeListAdapter = AttributeListAdapter()
-        attributeListView.adapter = attributeListAdapter
-        attributeListItemTouchHelper = ItemTouchHelper(DragItemTouchHelperCallback(attributeListAdapter, true, false))
-        attributeListItemTouchHelper.attachToRecyclerView(attributeListView)
+
+        val mRecyclerViewDragDropManager = RecyclerViewDragDropManager()
+        //mRecyclerViewDragDropManager.setDraggingItemShadowDrawable(
+        //       Context.getDrawable(context, android.R.drawable.material_shadow_z3) as NinePatchDrawable)
+        attributeListView.adapter = mRecyclerViewDragDropManager.createWrappedAdapter(attributeListAdapter)
+        mRecyclerViewDragDropManager.attachRecyclerView(attributeListView)
+
 
 
         newAttributeGrid = rootView.findViewById(R.id.ui_new_attribute_grid) as RecyclerView
@@ -203,12 +210,13 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
     }
 
 
-    inner class AttributeListAdapter() : RecyclerView.Adapter<AttributeListAdapter.ViewHolder>(), DragItemTouchHelperCallback.ItemDragHelperAdapter {
+    inner class AttributeListAdapter() : RecyclerView.Adapter<AttributeListAdapter.ViewHolder>(), DraggableItemAdapter<AttributeListAdapter.ViewHolder> {
 
         private var removed: OTAttribute<out Any>? = null
         private var removedPosition: Int = -1
 
         init {
+            setHasStableIds(true)
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -225,7 +233,7 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
         }
 
         override fun getItemId(position: Int): Long {
-            return position.toLong()
+            return tracker.attributes[position].objectId.toLong()
         }
 
         fun undoRemove() {
@@ -239,15 +247,24 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
             removed = null
         }
 
-        override fun onItemMove(fromPosition: Int, toPosition: Int) {
+        override fun onMoveItem(fromPosition: Int, toPosition: Int) {
             tracker.attributes.moveItem(fromPosition, toPosition)
             notifyItemMoved(fromPosition, toPosition)
         }
 
-        override fun onItemDismiss(position: Int) {
+        override fun onCheckCanDrop(draggingPosition: Int, dropPosition: Int): Boolean {
+            return true
         }
 
-        inner class ViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
+        override fun onCheckCanStartDrag(holder: AttributeListAdapter.ViewHolder?, position: Int, x: Int, y: Int): Boolean {
+            return true
+        }
+
+        override fun onGetItemDraggableRange(holder: AttributeListAdapter.ViewHolder?, position: Int): ItemDraggableRange? {
+            return null
+        }
+
+        inner class ViewHolder(val view: View) : AbstractDraggableItemViewHolder(view) {
 
             lateinit var previewContainer: LockableFrameLayout
             lateinit var columnNameView: TextView

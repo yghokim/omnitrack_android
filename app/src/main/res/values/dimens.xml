@@ -15,6 +15,7 @@
     <dimen name="project_list_color_bar_width">3dp</dimen>
     <dimen name="project_list_element_min_height">120dp</dimen>
 
+    <dimen name="attribute_list_element_drag_area_width">35dp</dimen>
 
     <dimen name="attribute_list_element_min_height">120dp</dimen>
     <dimen name="attribute_list_element_header_height">45dp</dimen>
