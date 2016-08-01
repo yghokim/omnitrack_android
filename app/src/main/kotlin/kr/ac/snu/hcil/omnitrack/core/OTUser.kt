@@ -17,12 +17,18 @@ class OTUser(objectId: String?, dbId: Long?, name: String, email: String, attrib
 
 
     var attributeIdSeed: Long = attributeIdSeed
-        private set
+        private set(value) {
+            if (field != value) {
+                isDirtySinceLastSync = true
+            }
+        }
 
 
     val email: String by Delegates.observable(email) {
         prop, old, new ->
-
+        if (old != new) {
+            isDirtySinceLastSync = true
+        }
     }
 
     val trackers = ObservableList<OTTracker>()

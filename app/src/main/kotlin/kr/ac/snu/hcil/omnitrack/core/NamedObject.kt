@@ -14,7 +14,7 @@ abstract class NamedObject(objectId: String?, dbId: Long?, name: String) : IData
 
     val nameChangeEvent = Event<String>()
 
-    val objectId: String by lazy {
+    open val objectId: String by lazy {
         objectId ?: makeNewObjectId()
     }
 
