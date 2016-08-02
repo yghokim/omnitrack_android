@@ -26,8 +26,8 @@ class OTLongTextAttribute(objectId: String?, dbId: Long?, columnName: String, se
         return value.toString()
     }
 
-    override fun makeDefaultValue(): CharSequence {
-        return ""
+    override fun getAutoCompleteValueAsync(resultHandler: (CharSequence) -> Unit) {
+        resultHandler("")
     }
 
     override fun refreshInputViewContents(inputView: AAttributeInputView<out Any>) {

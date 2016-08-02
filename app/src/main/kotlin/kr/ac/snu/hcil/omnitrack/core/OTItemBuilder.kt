@@ -36,7 +36,7 @@ class OTItemBuilder : ADataRow, IStringSerializable {
         syncFromTrackerScheme()
 
         if (mode == MODE_BACKGROUND)
-            autoComplete()
+            autoCompleteAsync()
     }
 
     @SuppressWarnings("NotUsed")
@@ -63,9 +63,24 @@ class OTItemBuilder : ADataRow, IStringSerializable {
         syncFromTrackerScheme()
     }
 
-    fun autoComplete() {
-        for (attribute in tracker.attributes) {
-            setValueOf(attribute, attribute.makeDefaultValue())
+    fun autoCompleteAsync(finished: (() -> Unit)? = null) {
+
+        Thread().run {
+
+            var remain = tracker.attributes.size
+            for (attribute in tracker.attributes) {
+                attribute.getAutoCompleteValueAsync {
+                    result ->
+                    remain--
+                    setValueOf(attribute, result)
+
+                    if (remain == 0) {
+                        //finish
+                        finished?.invoke()
+                        println("finished autocompleting builder")
+                    }
+                }
+            }
         }
     }
 

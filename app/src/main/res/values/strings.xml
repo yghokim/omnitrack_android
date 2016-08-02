@@ -80,6 +80,9 @@
     <string name="type_longtext_name">Long Text</string>
     <string name="type_longtext_desc">A multiline text</string>
 
+    <string name="type_location_name">Location</string>
+    <string name="type_location_desc">A location on map</string>
+
     <string name="type_shorttext_name">Short Text</string>
     <string name="type_shorttext_desc">A single-lined text</string>
 
@@ -109,4 +112,5 @@
     <string name="title_activity_project_settings">Project Settings</string>
     <string name="title_activity_attribute_detail">Attribute Detail</string>
     <string name="title_activity_new_item">New [%1$s] Item</string>
+    <string name="title_activity_maps">Map</string>
 </resources>

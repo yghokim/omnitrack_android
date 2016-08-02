@@ -1,17 +1,11 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes
 
-import android.content.Context
-import android.util.SparseArray
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
-import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTProperty
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTSelectionProperty
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.NumberInputView
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.TimePointInputView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import java.math.BigDecimal
-import kotlin.properties.Delegates
 
 /**
  * Created by Young-Ho Kim on 2016-07-11.
@@ -57,13 +51,16 @@ class OTNumberAttribute(objectId: String?, dbId: Long?, columnName: String, sett
         } else return value.toString()
     }
 
-    override fun makeDefaultValue(): BigDecimal {
-        return BigDecimal(0)
+    override fun getAutoCompleteValueAsync(resultHandler: (BigDecimal) -> Unit) {
+        resultHandler(BigDecimal(0))
     }
 
     override fun refreshInputViewContents(inputView: AAttributeInputView<out Any>) {
         if (inputView is NumberInputView) {
-            inputView.value = this.makeDefaultValue()
+            this.getAutoCompleteValueAsync {
+                result ->
+                inputView.value = result
+            }
         }
     }
 

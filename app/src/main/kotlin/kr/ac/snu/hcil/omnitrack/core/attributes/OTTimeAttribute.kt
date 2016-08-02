@@ -1,9 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes
 
-import android.content.Context
-import android.util.SparseArray
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTProperty
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTSelectionProperty
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
@@ -77,8 +74,8 @@ class OTTimeAttribute : OTAttribute<TimePoint> {
         } else return ""
     }
 
-    override fun makeDefaultValue(): TimePoint {
-        return TimePoint()
+    override fun getAutoCompleteValueAsync(resultHandler: (TimePoint) -> Unit) {
+        resultHandler(TimePoint())
     }
 
     override fun refreshInputViewContents(inputView: AAttributeInputView<out Any>) {
@@ -88,7 +85,8 @@ class OTTimeAttribute : OTAttribute<TimePoint> {
                 GRANULARITY_DAY -> inputView.setPickerMode(DateTimePicker.DATE)
                 GRANULARITY_TIME -> inputView.setPickerMode(DateTimePicker.TIME)
             }
-            inputView.value = this.makeDefaultValue()
+
+            getAutoCompleteValueAsync { result -> inputView.value = result }
         }
     }
 

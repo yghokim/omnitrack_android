@@ -91,25 +91,48 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
 
     override fun onRightButtonClicked() {
         //push item to db
-        syncViewStateToBuilder()
-        val item = builder.makeItem()
-        println("Will push $item")
+        syncViewStateToBuilderAsync {
+            val item = builder.makeItem()
+            println("Will push $item")
 
-        OmniTrackApplication.app.dbHelper.save(item, tracker!!)
-        builder.clear()
-        println(builder.getSerializedString())
-        clearBuilderCache()
-        skipViewValueCaching = true
-        finish()
+            OmniTrackApplication.app.dbHelper.save(item, tracker!!)
+            builder.clear()
+            println(builder.getSerializedString())
+            clearBuilderCache()
+            skipViewValueCaching = true
+            finish()
+        }
     }
 
     private fun makeTrackerPreferenceKey(tracker: OTTracker): String {
         return "tracker_${tracker.objectId}"
     }
 
-    private fun syncViewStateToBuilder() {
-        for (attribute in tracker!!.attributes.unObservedList) {
-            builder.setValueOf(attribute, attributeValueExtractors[attribute.objectId]?.invoke() ?: attribute.makeDefaultValue())
+    private fun syncViewStateToBuilderAsync(finished: (() -> Unit)?) {
+        Thread().run {
+            var waitingAttributes = ArrayList<OTAttribute<out Any>>()
+            for (attribute in tracker!!.attributes.unObservedList) {
+                val valueExtractor = attributeValueExtractors[attribute.objectId]
+                if (valueExtractor != null) {
+                    builder.setValueOf(attribute, valueExtractor())
+                } else {
+                    waitingAttributes.add(attribute)
+                }
+            }
+
+            var remain = waitingAttributes.size
+            for (attribute in waitingAttributes) {
+                attribute.getAutoCompleteValueAsync {
+                    result ->
+                    remain--
+                    builder.setValueOf(attribute, result)
+
+                    if (remain == 0) {
+                        //finish
+                        finished?.invoke()
+                    }
+                }
+            }
         }
     }
 
@@ -125,17 +148,16 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
     private fun storeItemBuilderCache() {
         if (tracker != null) {
 
-            for (attribute in tracker!!.attributes.unObservedList) {
-                builder.setValueOf(attribute, attributeValueExtractors[attribute.objectId]?.invoke() ?: attribute.makeDefaultValue())
+            syncViewStateToBuilderAsync {
+                if (!builder.isEmpty) {
+
+                    val preferences = getSharedPreferences(OmniTrackApplication.PREFERENCE_KEY_FOREGROUND_ITEM_BUILDER_STORAGE, Context.MODE_PRIVATE)
+                    val editor = preferences.edit()
+                    editor.putString(makeTrackerPreferenceKey(tracker!!), builder.getSerializedString())
+                    editor.apply()
+                }
             }
 
-            if (!builder.isEmpty) {
-
-                val preferences = getSharedPreferences(OmniTrackApplication.PREFERENCE_KEY_FOREGROUND_ITEM_BUILDER_STORAGE, Context.MODE_PRIVATE)
-                val editor = preferences.edit()
-                editor.putString(makeTrackerPreferenceKey(tracker!!), builder.getSerializedString())
-                editor.apply()
-            }
         }
     }
 

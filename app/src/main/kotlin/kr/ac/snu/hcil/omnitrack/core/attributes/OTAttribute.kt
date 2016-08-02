@@ -138,7 +138,7 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
 
     abstract fun formatAttributeValue(value: Any): String
 
-    abstract fun makeDefaultValue(): DataType
+    abstract fun getAutoCompleteValueAsync(resultHandler: (result: DataType) -> Unit)
 
     abstract fun getInputViewType(previewMode: Boolean = false): Int
 

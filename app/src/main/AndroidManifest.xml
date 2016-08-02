@@ -6,13 +6,12 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
-    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="com.microsoft.band.service.access.BIND_BAND_SERVICE" />
-
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:name=".OmniTrackApplication"
@@ -21,7 +20,6 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <receiver android:name=".receivers.OTSystemReceiver">
             <intent-filter>
                 <action android:name="kr.ac.snu.hcil.omnitrack.action.ALARM" />
@@ -30,18 +28,17 @@
 
         <service
             android:name=".services.OTBackgroundLoggingService"
-            android:exported="false"></service>
-
+            android:exported="false" />
 
         <activity
             android:name=".activities.SplashScreenActivity"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".activities.LoginActivity"
             android:label="@string/app_name" />
@@ -68,10 +65,20 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".activities.ItemBrowserActivity" />
 
-
         <uses-permission android:name="android.permission.BLUETOOTH" />
         <uses-permission android:name="com.microsoft.band.service.access.BIND_BAND_SERVICE" />
 
+        <!--
+             The API key for Google Maps-based APIs is defined as a string resource.
+             (See the file "res/values/google_maps_api.xml").
+             Note that the API key is linked to the encryption key used to sign the APK.
+             You need a different API key for each encryption key, including the release key that is used to
+             sign the APK for publishing.
+             You can define the keys for the debug and release targets in src/debug/ and src/release/. 
+        -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key" />
     </application>
 
 </manifest>
