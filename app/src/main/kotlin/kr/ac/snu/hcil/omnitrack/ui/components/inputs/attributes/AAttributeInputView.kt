@@ -15,6 +15,7 @@ abstract class AAttributeInputView<DataType>(layoutId: Int, context: Context, at
         const val VIEW_TYPE_TIME_POINT = 1
         const val VIEW_TYPE_LONG_TEXT = 2
         const val VIEW_TYPE_SHORT_TEXT = 3
+        const val VIEW_TYPE_LOCATION = 4
 
 
         fun makeInstance(type: Int, context: Context): AAttributeInputView<out Any> {
@@ -23,6 +24,7 @@ abstract class AAttributeInputView<DataType>(layoutId: Int, context: Context, at
                 VIEW_TYPE_TIME_POINT -> TimePointInputView(context)
                 VIEW_TYPE_LONG_TEXT -> LongTextInputView(context)
                 VIEW_TYPE_SHORT_TEXT -> ShortTextInputView(context)
+                VIEW_TYPE_LOCATION -> LocationInputView(context)
                 else -> throw IllegalArgumentException("attribute view data type ${type} is not supported yet.")
             }
         }

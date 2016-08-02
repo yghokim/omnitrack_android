@@ -109,7 +109,6 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
     }
 
     private fun syncViewStateToBuilderAsync(finished: (() -> Unit)?) {
-        Thread().run {
             var waitingAttributes = ArrayList<OTAttribute<out Any>>()
             for (attribute in tracker!!.attributes.unObservedList) {
                 val valueExtractor = attributeValueExtractors[attribute.objectId]
@@ -133,7 +132,6 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
                     }
                 }
             }
-        }
     }
 
     private fun clearBuilderCache() {

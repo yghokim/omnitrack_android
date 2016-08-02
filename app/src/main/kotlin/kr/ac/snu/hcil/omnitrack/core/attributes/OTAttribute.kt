@@ -22,7 +22,6 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
 
     data class AttributeTypeInfo(val typeId: Int, val iconId: Int, val name: String, val description: String?)
 
-
     override fun makeNewObjectId(): String {
         return owner?.owner?.makeNewObjectId() ?: UUID.randomUUID().toString()
     }
@@ -43,6 +42,7 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
                 TYPE_TIME -> OTTimeAttribute(objectId, dbId, columnName, settingData)
                 TYPE_SHORT_TEXT -> OTShortTextAttribute(objectId, dbId, columnName, settingData)
                 TYPE_LONG_TEXT -> OTLongTextAttribute(objectId, dbId, columnName, settingData)
+                TYPE_LOCATION -> OTLocationAttribute(objectId, dbId, columnName, settingData)
                 else -> OTNumberAttribute(objectId, dbId, columnName, settingData)
             }
             return attr

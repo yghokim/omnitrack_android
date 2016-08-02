@@ -83,9 +83,6 @@ class OTItemBuilder : ADataRow, IStringSerializable {
     }
 
     fun autoCompleteAsync(finished: (() -> Unit)? = null) {
-
-        Thread().run {
-
             var remain = tracker.attributes.size
             for (attribute in tracker.attributes) {
                 attribute.getAutoCompleteValueAsync {
@@ -100,7 +97,6 @@ class OTItemBuilder : ADataRow, IStringSerializable {
                     }
                 }
             }
-        }
     }
 
     fun reloadTracker(trackerObjectId: String) {

@@ -1,25 +1,19 @@
 package kr.ac.snu.hcil.omnitrack.activities
 
+import android.content.pm.PackageManager
+import android.os.Bundle
 import android.support.design.widget.TabLayout
-import android.support.design.widget.FloatingActionButton
-import android.support.design.widget.Snackbar
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
-
+import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
-import android.support.v4.app.FragmentStatePagerAdapter
-import android.support.v4.view.ViewPager
-import android.os.Bundle
 import android.support.v4.app.FragmentPagerAdapter
+import android.support.v4.content.ContextCompat
+import android.support.v4.view.ViewPager
+import android.support.v7.widget.Toolbar
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-
 import android.widget.TextView
-
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.activities.fragments.ServiceListFragment
 import kr.ac.snu.hcil.omnitrack.activities.fragments.TrackerListFragment
@@ -57,6 +51,12 @@ class HomeActivity : UserSyncedActivity() {
 
         val tabLayout = findViewById(R.id.tabs) as TabLayout?
         tabLayout!!.setupWithViewPager(mViewPager)
+
+
+        //TODO do permission checks some other place
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) !== PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION), 10)
+        }
     }
 
 /*
