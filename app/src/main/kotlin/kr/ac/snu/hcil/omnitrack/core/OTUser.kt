@@ -43,7 +43,7 @@ class OTUser(objectId: String?, dbId: Long?, name: String, email: String, attrib
 
     val trackerAdded = Event<ReadOnlyPair<OTTracker, Int>>()
     val trackerRemoved = Event<ReadOnlyPair<OTTracker, Int>>()
-    val trackerIndexChanged = Event<ReadOnlyPair<OTTracker, Int>>()
+    val trackerIndexChanged = Event<IntRange>()
 
     constructor(name: String, email: String) : this(null, null, name, email) {
 
@@ -68,6 +68,13 @@ class OTUser(objectId: String?, dbId: Long?, name: String, email: String, attrib
 
         trackers.elementRemoved += { sender, args ->
             onTrackerRemoved(args.first, args.second)
+        }
+
+        trackers.elementReordered += {
+            sender, range ->
+            for (i in range) {
+                trackers[i].isDirtySinceLastSync = true
+            }
         }
     }
 

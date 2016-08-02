@@ -12,7 +12,7 @@ class ObservableList<T>(){
 
     val elementAdded = Event<ReadOnlyPair<T, Int>>()
     val elementRemoved = Event<ReadOnlyPair<T, Int>>()
-    val elementIndexChanged = Event<Void>()
+    val elementReordered = Event<IntRange>()
 
     val size: Int
         get() = list.size
@@ -42,14 +42,22 @@ class ObservableList<T>(){
     }
 
     fun moveItem(fromPosition: Int, toPosition: Int) {
-        if (fromPosition < toPosition) {
-            for (i in fromPosition..toPosition - 1) {
-                Collections.swap(list, i, i + 1)
+        if (fromPosition != toPosition) {
+            if (fromPosition < toPosition) {
+                for (i in fromPosition..toPosition - 1) {
+                    Collections.swap(list, i, i + 1)
+                }
+
+                elementReordered.invoke(this, IntRange(fromPosition, toPosition - 1))
+
+            } else {
+                for (i in fromPosition downTo toPosition + 1) {
+                    Collections.swap(list, i, i - 1)
+                }
+
+                elementReordered.invoke(this, IntRange(toPosition + 1, fromPosition))
             }
-        } else {
-            for (i in fromPosition downTo toPosition + 1) {
-                Collections.swap(list, i, i - 1)
-            }
+
         }
     }
 
