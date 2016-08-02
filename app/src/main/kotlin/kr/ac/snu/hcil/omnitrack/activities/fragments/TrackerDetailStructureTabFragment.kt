@@ -125,7 +125,7 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
 
         attributeListView.adapter = attributeListAdapter
 
-        attributeListItemTouchHelper = ItemTouchHelper(DragItemTouchHelperCallback(attributeListAdapter, true, false))
+        attributeListItemTouchHelper = ItemTouchHelper(DragItemTouchHelperCallback(attributeListAdapter, context, true, false))
         attributeListItemTouchHelper.attachToRecyclerView(attributeListView)
 
 
