@@ -84,6 +84,11 @@ class OTItemBuilder : ADataRow, IStringSerializable {
 
     fun autoCompleteAsync(finished: (() -> Unit)? = null) {
             var remain = tracker.attributes.size
+        if (remain == 0) {
+            finished?.invoke()
+            return
+        }
+
             for (attribute in tracker.attributes) {
                 attribute.getAutoCompleteValueAsync {
                     result ->

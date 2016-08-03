@@ -120,6 +120,11 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
             }
 
             var remain = waitingAttributes.size
+        if (remain == 0) {
+            finished?.invoke()
+            return
+        }
+
             for (attribute in waitingAttributes) {
                 attribute.getAutoCompleteValueAsync {
                     result ->
