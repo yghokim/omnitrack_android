@@ -2,7 +2,9 @@ package kr.ac.snu.hcil.omnitrack.utils.serialization
 
 import com.google.android.gms.maps.model.LatLng
 import com.google.gson.Gson
+import kr.ac.snu.hcil.omnitrack.core.datatypes.Route
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
+import kr.ac.snu.hcil.omnitrack.core.datatypes.Timespan
 import java.math.BigDecimal
 
 /**
@@ -29,6 +31,9 @@ object TypeStringSerializationHelper {
     const val TYPENAME_INT_ARRAY = "I[]"
     const val TYPENAME_LONG_ARRAY = "L[]"
     const val TYPENAME_LATITUDE_LONGITUDE = "Crd"
+    const val TYPENAME_ROUTE = "R"
+    const val TYPENAME_TIMESPAN = "TS"
+
 
 
     val classNameDictionary: Map<String, String> = mapOf(
@@ -36,10 +41,12 @@ object TypeStringSerializationHelper {
             Long::class.java.name to TYPENAME_LONG,
             BigDecimal::class.java.name to TYPENAME_BIGDECIMAL,
             TimePoint::class.java.name to TYPENAME_TIMEPOINT,
+            Timespan::class.java.name to TYPENAME_TIMESPAN,
             String::class.java.name to TYPENAME_STRING,
             IntArray::class.java.name to TYPENAME_INT_ARRAY,
             LongArray::class.java.name to TYPENAME_LONG_ARRAY,
-            LatLng::class.java.name to TYPENAME_LATITUDE_LONGITUDE
+            LatLng::class.java.name to TYPENAME_LATITUDE_LONGITUDE,
+            Route::class.java.name to TYPENAME_ROUTE
     )
 
     private val parcelCache = ParcelWithType("", "")
@@ -51,9 +58,11 @@ object TypeStringSerializationHelper {
         parcelCache.v = when (parcelCache.t) {
             TYPENAME_BIGDECIMAL -> (value as BigDecimal).toPlainString()
             TYPENAME_TIMEPOINT -> (value as TimePoint).getSerializedString()
+            TYPENAME_TIMESPAN -> (value as Timespan).getSerializedString()
             TYPENAME_INT_ARRAY -> (value as IntArray).joinToString(",")
             TYPENAME_LONG_ARRAY -> (value as IntArray).joinToString(",")
             TYPENAME_LATITUDE_LONGITUDE -> (value as LatLng).serialize()
+            TYPENAME_ROUTE -> (value as Route).getSerializedString()
             else -> value.toString()
         }
 
@@ -76,9 +85,11 @@ object TypeStringSerializationHelper {
             TYPENAME_STRING -> parcel.v
             TYPENAME_BIGDECIMAL -> BigDecimal(parcel.v)
             TYPENAME_TIMEPOINT -> TimePoint(parcel.v)
+            TYPENAME_TIMESPAN -> Timespan(parcel.v)
             TYPENAME_INT_ARRAY -> parcel.v.split(",").map { it.toInt() }.toIntArray()
             TYPENAME_LONG_ARRAY -> parcel.v.split(",").map { it.toLong() }.toLongArray()
             TYPENAME_LATITUDE_LONGITUDE -> deserializeLatLng(parcel.v)
+            TYPENAME_ROUTE -> Route(parcel.v)
             else -> return parcel.v
         }
     }

@@ -9,11 +9,11 @@ import java.util.*
 class TimePoint : IStringSerializable {
 
     var timestamp: Long = 0
-    var timezone: TimeZone = TimeZone.getDefault()
+    var timeZone: TimeZone = TimeZone.getDefault()
 
     constructor(timestamp: Long, timezoneId: String) {
         this.timestamp = timestamp
-        this.timezone = TimeZone.getTimeZone(timezoneId)
+        this.timeZone = TimeZone.getTimeZone(timezoneId)
     }
 
     constructor() : this(Calendar.getInstance().timeInMillis, TimeZone.getDefault().id)
@@ -23,14 +23,14 @@ class TimePoint : IStringSerializable {
     }
 
     override fun getSerializedString(): String {
-        return "${timestamp}@${timezone.id}"
+        return "${timestamp}@${timeZone.id}"
     }
 
     override fun fromSerializedString(serialized: String): Boolean {
         try {
             val parts = serialized.split("@")
             timestamp = parts[0].toLong()
-            timezone = TimeZone.getTimeZone(parts[1])
+            timeZone = TimeZone.getTimeZone(parts[1])
             return true
         } catch(e: Exception) {
             return false
