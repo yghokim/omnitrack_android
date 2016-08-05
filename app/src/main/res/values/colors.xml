@@ -13,6 +13,10 @@
 
     <color name="cardHeader">#efefef</color>
 
+    <color name="textColorDark">#252525</color>
+    <color name="textColorLight">#aaaaaa</color>
+
+
     <color name="titleTextColor">#666666</color>
     <color name="outerBackground">#edebe7</color>
     <color name="frontalBackground">#ffffff</color>
@@ -22,6 +26,7 @@
     <color name="dividerColor">#bcbcbc</color>
 
     <color name="colorGreen">#9fea75</color>
+    <color name="colorRed">#ee695f</color>
 
     <color name="editTextLine">#cfcfcf</color>
 

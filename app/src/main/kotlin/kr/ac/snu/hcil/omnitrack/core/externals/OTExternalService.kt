@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.externals
 
 import android.app.Activity
+import android.support.v4.app.Fragment
 import kr.ac.snu.hcil.omnitrack.core.externals.device.AndroidDeviceService
 import kr.ac.snu.hcil.omnitrack.core.externals.microsoft.band.MicrosoftBandService
 import kr.ac.snu.hcil.omnitrack.core.externals.shaomi.miband.MiBandService
@@ -18,8 +19,11 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
         }
     }
 
-    abstract var permissionGranted: Boolean
-        protected set
+    enum class ServiceState {
+        DEACTIVATED, ACTIVATING, ACTIVATED
+    }
+
+    abstract val permissionGranted: Boolean
 
     protected val _measureFactories = ArrayList<OTMeasureFactory<out Any>>()
 
@@ -27,9 +31,7 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
         return _measureFactories
     }
 
-    abstract fun isActivated(): Boolean
-
-    abstract fun isActivating(): Boolean
+    abstract fun getState(): ServiceState
 
     abstract fun activateAsync(connectedHandler: ((Boolean) -> Unit)? = null)
     abstract fun deactivate()
@@ -37,6 +39,9 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
     val activated = Event<Any>()
     val deactivated = Event<Any>()
 
-    abstract fun grantPermissions(activity: Activity, handler: ((Boolean) -> Unit)? = null)
+    abstract val thumbResourceId: Int
+
+    abstract fun grantPermissions(caller: Fragment, requestCode: Int)
+    abstract fun grantPermissions(caller: Activity, requestCode: Int)
 
 }

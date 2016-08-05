@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.device
 
 import android.app.Activity
+import android.support.v4.app.Fragment
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 
@@ -9,31 +10,30 @@ import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
  */
 object AndroidDeviceService : OTExternalService("AndroidDeviceService", 19) {
 
-    override var permissionGranted: Boolean
-        get() = throw UnsupportedOperationException()
-        set(value) {
-        }
 
-    override fun isActivated(): Boolean {
-        return false
-    }
-
-    override fun isActivating(): Boolean {
-        return false
-    }
+    override val permissionGranted: Boolean
+        get() = true
 
     override fun activateAsync(connectedHandler: ((Boolean) -> Unit)?) {
 
     }
 
+    override fun getState(): ServiceState {
+        return ServiceState.DEACTIVATED
+    }
+
     override fun deactivate() {
-        throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
+
     }
 
-    override fun grantPermissions(activity: Activity, handler: ((Boolean) -> Unit)?) {
-        throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun grantPermissions(caller: Activity, requestCode: Int) {
     }
 
+    override fun grantPermissions(caller: Fragment, requestCode: Int) {
+    }
+
+
+    override val thumbResourceId: Int = R.drawable.service_thumb_androiddevice
     override val nameResourceId: Int = R.string.service_device_name
     override val descResourceId: Int = R.string.service_device_desc
 

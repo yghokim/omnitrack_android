@@ -44,7 +44,7 @@ class TrackerDetailTriggerTabFragment : TrackerDetailActivity.ChildFragment() {
     }*/
 
     private fun getTriggers(): Array<OTTrigger> {
-        return OmniTrackApplication.app.triggerManager.getAttachedTriggers(tracker!!)
+        return OmniTrackApplication.app.triggerManager.getAttachedTriggers(tracker)
     }
 
     fun openTriggerDetailActivity(triggerIndex: Int) {

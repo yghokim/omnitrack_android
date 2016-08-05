@@ -6,10 +6,10 @@ import android.bluetooth.BluetoothDevice
 import android.content.Context
 import android.content.pm.PackageManager
 import android.support.v4.app.ActivityCompat
+import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import com.zhaoxiaodan.miband.ActionCallback
 import com.zhaoxiaodan.miband.MiBand
-import com.zhaoxiaodan.miband.listeners.HeartRateNotifyListener
 import com.zhaoxiaodan.miband.model.UserInfo
 import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.R
@@ -26,53 +26,43 @@ object MiBandService : OTExternalService("ShaomiMiBand", 21) {
     const val PREFERENCE_KEY = "OmniTrack_MiBandService"
     const val PREFERENCE_VALUE_MAC = "deviceMac"
 
+    override val thumbResourceId: Int = R.drawable.service_thumb_miband
     override val nameResourceId: Int = R.string.service_mi_band_name
     override val descResourceId: Int = R.string.service_mi_band_desc
 
-    override var permissionGranted: Boolean = false
+    override val permissionGranted: Boolean
+        get() = OmniTrackApplication.app.applicationContext.checkCallingOrSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
 
     private var device: BluetoothDevice? = null
 
-    private var _connected = false
+    private var state: ServiceState = ServiceState.DEACTIVATED
 
     val band: MiBand by lazy {
         MiBand(OmniTrackApplication.app)
     }
 
-    override fun isActivated(): Boolean {
-        return _connected
-    }
-
-    override fun isActivating(): Boolean {
-        return false
+    override fun getState(): ServiceState {
+        return state
     }
 
     override fun activateAsync(connectedHandler: ((Boolean) -> Unit)?) {
-        if (!isActivated()) {
             val task = ConnectionTask(connectedHandler)
             task.execute()
-        } else {
-            band.setHeartRateScanListener(object : HeartRateNotifyListener {
-                override fun onNotify(heartRate: Int) {
-                    println("heart rate: $heartRate")
-                }
-
-            })
-
-            band.startHeartRateScan()
-        }
     }
 
     override fun deactivate() {
 
     }
 
-    override fun grantPermissions(activity: Activity, handler: ((Boolean) -> Unit)?) {
+    override fun grantPermissions(activity: Activity, requestCode: Int) {
         if (ContextCompat.checkSelfPermission(activity, android.Manifest.permission.ACCESS_COARSE_LOCATION) !== PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(activity, arrayOf(android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION), 10)
+            ActivityCompat.requestPermissions(activity, arrayOf(android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION), requestCode)
         }
     }
 
+    override fun grantPermissions(caller: Fragment, requestCode: Int) {
+        caller.requestPermissions(arrayOf(android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION), requestCode)
+    }
 
     private fun storeDeviceMac(address: String) {
         val pref = OmniTrackApplication.app.getSharedPreferences(PREFERENCE_KEY, Context.MODE_PRIVATE)
@@ -132,14 +122,14 @@ object MiBandService : OTExternalService("ShaomiMiBand", 21) {
                 storeDeviceMac(device.address)
 
                 var connecting = true
-                var success = false
+                state = ServiceState.ACTIVATING
+
 
                 band.connect(device, object : ActionCallback {
                     override fun onSuccess(data: Any?) {
                         println("Mi Band is successfully connected.")
-                        _connected = true
+                        state = ServiceState.ACTIVATED
                         connecting = false
-                        success = true
                     }
 
                     override fun onFail(errorCode: Int, msg: String) {

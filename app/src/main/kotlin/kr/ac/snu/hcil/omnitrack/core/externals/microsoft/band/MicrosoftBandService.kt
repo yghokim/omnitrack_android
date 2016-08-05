@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.externals.microsoft.band
 
 import android.app.Activity
 import android.os.AsyncTask
+import android.support.v4.app.Fragment
 import com.microsoft.band.BandClient
 import com.microsoft.band.BandClientManager
 import com.microsoft.band.BandException
@@ -14,12 +15,19 @@ import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
  * Created by younghokim on 16. 7. 28..
  */
 object MicrosoftBandService : OTExternalService("MicrosoftBandService", 19) {
-    override var permissionGranted: Boolean = false
 
-    override fun grantPermissions(activity: Activity, handler: ((Boolean) -> Unit)?) {
+    override val permissionGranted: Boolean = true
+
+    override fun grantPermissions(caller: Activity, requestCode: Int) {
 
     }
 
+    override fun grantPermissions(caller: Fragment, requestCode: Int) {
+
+    }
+
+
+    override val thumbResourceId: Int = R.drawable.service_thumb_microsoftband
     override val nameResourceId: Int = R.string.service_microsoft_band_name
     override val descResourceId: Int = R.string.service_microsoft_band_desc
 
@@ -31,16 +39,16 @@ object MicrosoftBandService : OTExternalService("MicrosoftBandService", 19) {
         _measureFactories += MicrosoftBandHeartRateFactory()
     }
 
-    override fun isActivated(): Boolean {
-        return connectionState == ConnectionState.CONNECTED
+    override fun getState(): ServiceState {
+        if (connectionState == ConnectionState.CONNECTED) {
+            return ServiceState.ACTIVATED
+        } else if (connectionTask != null) {
+            return ServiceState.ACTIVATING
+        } else return ServiceState.DEACTIVATED
     }
 
-    override fun isActivating(): Boolean {
-        return connectionTask!=null
-    }
 
     override fun activateAsync(connectedHandler: ((Boolean) -> Unit)?) {
-        if (!isActivating()) {
             val client = getClient()
             if(client!=null)
             {
@@ -49,7 +57,6 @@ object MicrosoftBandService : OTExternalService("MicrosoftBandService", 19) {
                 connectionTask = ConnectionTask(client, connectedHandler)
                 connectionTask?.execute(null);
             }
-        }
 
     }
 

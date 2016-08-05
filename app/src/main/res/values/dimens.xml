@@ -50,4 +50,8 @@
 
     <dimen name="trigger_list_element_divider_height">1dp</dimen>
 
+
+    <dimen name="service_list_element_vertical_padding">20dp</dimen>
+    <dimen name="service_list_element_horizontal_padding">16dp</dimen>
+
 </resources>

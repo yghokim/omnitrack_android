@@ -1,10 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core
 
 import com.google.gson.Gson
-import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
-import kr.ac.snu.hcil.omnitrack.utils.serialization.IStringSerializable
-import kr.ac.snu.hcil.omnitrack.utils.serialization.MapSerializer
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializedStringKeyEntry
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import java.util.*
@@ -24,6 +21,7 @@ abstract class ADataRow() {
         return valueTable[attribute.objectId]
     }
 
+    @SuppressWarnings("UNCHECKED CAST")
     fun <T> getCastedValueOf(attribute: OTAttribute<T>): T? {
         return valueTable[attribute.objectId] as? T
     }

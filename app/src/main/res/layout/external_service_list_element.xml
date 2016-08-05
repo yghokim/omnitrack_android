@@ -1,30 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="200dp"
-    android:background="@drawable/attribute_card">
+    android:layout_height="wrap_content"
+    android:background="@drawable/no_round_card"
+    android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/name"
-        android:layout_width="wrap_content"
+    <ImageView
+        android:id="@+id/thumb"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:adjustViewBounds="true"
+        android:scaleType="centerInside"
+        android:src="@drawable/service_thumb_miband" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/description"
-        android:layout_alignParentStart="true"
-        android:text="Microsoft Band" />
+        android:layout_marginBottom="25dp">
 
-    <TextView
-        android:id="@+id/description"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/ui_button_activate"
-        android:layout_alignParentStart="true"
-        android:text="ms band description" />
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="@dimen/service_list_element_horizontal_padding"
+            android:layout_marginTop="@dimen/service_list_element_vertical_padding"
+            android:layout_toStartOf="@+id/ui_button_activate"
+            android:text="Microsoft Band"
+            android:textColor="@color/textColorDark"
+            android:textSize="20dp" />
 
+        <TextView
+            android:id="@+id/description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_alignStart="@+id/name"
+            android:layout_below="@+id/name"
+            android:layout_toStartOf="@+id/ui_button_activate"
+            android:text="ms band description"
+            android:textColor="@color/textColorLight"
+            android:textSize="14dp" />
+
+        <Button
+            android:id="@+id/ui_button_activate"
+            style="@style/flatGreenButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginEnd="@dimen/service_list_element_horizontal_padding"
+            android:layout_marginTop="@dimen/service_list_element_vertical_padding"
+            android:text="@string/msg_activate" />
+    </RelativeLayout>
+
+
+    <View
+        style="@style/HorizontalSeparator"
+        android:layout_marginBottom="0dp" />
     <Button
-        android:id="@+id/ui_button_activate"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true"
-        android:text="@string/msg_activate" />
-</RelativeLayout>
+        android:background="@drawable/transparent_button_background"
+        android:drawableLeft="@drawable/down_dark"
+        android:paddingLeft="4dp"
+        android:text="Show available measures"
+        android:textAlignment="viewStart"
+        android:textColor="@color/buttonIconColorDark" />
+
+</LinearLayout>
