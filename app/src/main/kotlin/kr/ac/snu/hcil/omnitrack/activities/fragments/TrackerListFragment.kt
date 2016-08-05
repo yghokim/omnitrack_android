@@ -22,7 +22,6 @@ import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.ui.HorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
-import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 import kr.ac.snu.hcil.omnitrack.utils.startActivityOnDelay
 
 /**
@@ -48,8 +47,8 @@ class TrackerListFragment : Fragment() {
         user = OmniTrackApplication.app.currentUser
 
         //attach events
-        user.trackerAdded += onTrackerAddedHandler
-        user.trackerRemoved += onTrackerRemovedHandler
+        // user.trackerAdded += onTrackerAddedHandler
+        //  user.trackerRemoved += onTrackerRemovedHandler
     }
 
     override fun onResume() {
@@ -63,10 +62,8 @@ class TrackerListFragment : Fragment() {
 
         val fab = rootView.findViewById(R.id.fab) as FloatingActionButton?
         fab!!.setOnClickListener { view ->
-            //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show()
-            //(application as OmniTrackApplication).syncUserToDb()
-            //user.trackers.add(OTTracker("Hihi"))
             val newTracker = OTTracker(OmniTrackApplication.app.currentUser.generateNewTrackerName(context))
+
             OmniTrackApplication.app.currentUser.trackers.add(newTracker)
 
             val intent = Intent(context, TrackerDetailActivity::class.java)
@@ -90,9 +87,11 @@ class TrackerListFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
         //dettach events
-        user.trackerAdded -= onTrackerAddedHandler
-        user.trackerRemoved -= onTrackerRemovedHandler
+        //    user.trackerAdded -= onTrackerAddedHandler
+        //    user.trackerRemoved -= onTrackerRemovedHandler
     }
+
+    /*
 
     private val onTrackerAddedHandler = {
         sender: Any, args: ReadOnlyPair<OTTracker, Int> ->
@@ -105,7 +104,7 @@ class TrackerListFragment : Fragment() {
         sender: Any, args: ReadOnlyPair<OTTracker, Int> ->
         println("tracker removed - ${args.second}")
         trackerListAdapter.notifyItemRemoved(args.second)
-    }
+    }*/
 
     private fun handleTrackerClick(tracker: OTTracker)
     {
@@ -136,6 +135,8 @@ class TrackerListFragment : Fragment() {
 
     inner class TrackerListAdapter(val user: OTUser) : RecyclerView.Adapter<TrackerListAdapter.ViewHolder>(){
 
+        var currentlyExpandedIndex = -1
+
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val view = LayoutInflater.from(parent.context).inflate(R.layout.tracker_list_element, parent, false)
             return ViewHolder(view)
@@ -159,34 +160,95 @@ class TrackerListFragment : Fragment() {
             lateinit var color: View
             lateinit var expandButton: ImageButton
 
+            lateinit var expandedView: View
+
+            lateinit var editButton: View
+            lateinit var listButton: View
+            lateinit var removeButton: View
+
+            private var collapsed = true
+
             init{
                 name = view.findViewById(R.id.name) as TextView
                 color = view.findViewById(R.id.color_bar) as View
                 expandButton = view.findViewById(R.id.ui_expand_button) as ImageButton
 
+                expandedView = view.findViewById(R.id.ui_expanded_view)
+
+                editButton = view.findViewById(R.id.ui_button_edit)
+                listButton = view.findViewById(R.id.ui_button_list)
+                removeButton = view.findViewById(R.id.ui_button_remove)
+
                 view.setOnClickListener {
                     handleTrackerClick(user.trackers[adapterPosition])
                 }
 
-                view.setOnLongClickListener {
-                    view->
-                    handleTrackerLongClick(user.trackers[adapterPosition])
-                    true
+                editButton.setOnClickListener {
+                    val intent = Intent(context, TrackerDetailActivity::class.java)
+                    intent.putExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, user.trackers[adapterPosition].objectId)
+                    startActivityOnDelay(intent)
                 }
 
-
-
-                expandButton.setOnClickListener {
-                    view ->
+                listButton.setOnClickListener {
                     val intent = Intent(context, ItemBrowserActivity::class.java)
                     intent.putExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, user.trackers[adapterPosition].objectId)
                     startActivityOnDelay(intent)
                 }
+
+                removeButton.setOnClickListener {
+                    val tracker = user.trackers[adapterPosition]
+                    DialogHelper.makeYesNoDialogBuilder(context, tracker.name, getString(R.string.msg_confirm_remove_tracker), { -> user.trackers.remove(tracker); notifyItemRemoved(adapterPosition) }).show()
+                }
+
+
+                expandButton.setOnClickListener {
+                    view ->
+                    if (collapsed) {
+                        expand()
+                        if (currentlyExpandedIndex != -1) {
+                            val close = currentlyExpandedIndex
+                            currentlyExpandedIndex = adapterPosition
+
+                            notifyItemChanged(close)
+                        } else {
+                            currentlyExpandedIndex = adapterPosition
+                        }
+                    } else {
+                        collapse()
+                        currentlyExpandedIndex = -1
+                    }
+                }
+
+                collapse()
             }
 
             fun bindTracker(tracker: OTTracker){
                 name.text = tracker.name
                 color.setBackgroundColor(tracker.color)
+
+                if (currentlyExpandedIndex == adapterPosition) {
+                    expand()
+                } else {
+                    collapse()
+                }
+            }
+
+            fun collapse() {
+                expandedView.visibility = View.GONE
+                expandButton.setImageResource(R.drawable.down_dark)
+                val lp = itemView.layoutParams
+                lp.height = resources.getDimensionPixelSize(R.dimen.tracker_list_element_collapsed_height)
+                itemView.layoutParams = lp
+                collapsed = true
+            }
+
+            fun expand() {
+                expandedView.visibility = View.VISIBLE
+                expandButton.setImageResource(R.drawable.up_dark)
+                val lp = itemView.layoutParams
+                lp.height = resources.getDimensionPixelSize(R.dimen.tracker_list_element_expanded_height)
+                itemView.layoutParams = lp
+                collapsed = false
             }
         }
     }

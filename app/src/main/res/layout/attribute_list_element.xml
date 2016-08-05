@@ -56,7 +56,7 @@
             android:layout_height="match_parent"
             android:layout_toLeftOf="@+id/ui_button_remove"
             android:background="@drawable/transparent_button_background"
-            android:src="@drawable/ic_create_black_24dp"/>
+            android:src="@drawable/pen_dark" />
 
         <ImageButton
             android:id="@+id/ui_button_remove"
