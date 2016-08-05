@@ -218,7 +218,6 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
         private var removedPosition: Int = -1
 
         init {
-            setHasStableIds(true)
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

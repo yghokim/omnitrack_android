@@ -20,6 +20,7 @@ import kotlin.properties.Delegates
  */
 abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName: String, val typeId: Int, settingData: String?) : NamedObject(objectId, dbId, columnName) {
 
+
     data class AttributeTypeInfo(val typeId: Int, val iconId: Int, val name: String, val description: String?)
 
     override fun makeNewObjectId(): String {
@@ -51,8 +52,6 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
         fun createAttribute(user: OTUser, columnName: String, typeId: Int): OTAttribute<out Any> {
             return createAttribute(user.getNewAttributeObjectId().toString(), null, columnName, typeId, null)
         }
-
-
     }
 
     val removedFromTracker = Event<OTTracker>()

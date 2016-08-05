@@ -55,12 +55,13 @@ class OTTimeAttribute : OTAttribute<TimePoint> {
 
     override fun createProperties() {
         assignProperty(OTSelectionProperty(GRANULARITY, "TimePoint Granularity", arrayOf("Day", "Time"))) //TODO: I18N
+        setPropertyValue(GRANULARITY, GRANULARITY_TIME)
     }
 
     override fun formatAttributeValue(value: Any): String {
         if (value is TimePoint) {
             calendar.timeInMillis = value.timestamp
-            calendar.timeZone = value.timezone
+            calendar.timeZone = value.timeZone
 
             calendar.set(Calendar.MILLISECOND, 0)
 

@@ -61,6 +61,8 @@
 
     <string name="msg_triggers">Triggers</string>
 
+    <string name="msg_activate">Activate</string>
+
     <string name="hint_long_text">Write text here</string>
     <string name="hint_short_text">Type in short text here</string>
 
@@ -103,6 +105,9 @@
     <string name="service_mi_band_desc">Mi Band and Band2</string>
     <string name="measure_mi_band_heart_rate_name">Heart Rate</string>
     <string name="measure_mi_band_heart_rate_desc">Receives user\'s heart rate bpm</string>
+
+    <string name="service_device_name">Android Device</string>
+    <string name="service_device_desc">Android device events and measures</string>
 
 
     <string name="format_hour_am">AM %I</string>

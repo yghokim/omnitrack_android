@@ -1,7 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.core.externals
 
 import android.app.Activity
+import kr.ac.snu.hcil.omnitrack.core.externals.device.AndroidDeviceService
 import kr.ac.snu.hcil.omnitrack.core.externals.microsoft.band.MicrosoftBandService
+import kr.ac.snu.hcil.omnitrack.core.externals.shaomi.miband.MiBandService
 import kr.ac.snu.hcil.omnitrack.utils.INameDescriptionResourceProvider
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import java.util.*
@@ -11,8 +13,8 @@ import java.util.*
  */
 abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : INameDescriptionResourceProvider {
     companion object {
-        fun getAvailableServices(): Array<OTExternalService> {
-            return arrayOf(MicrosoftBandService)
+        val availableServices: Array<OTExternalService> by lazy {
+            arrayOf(AndroidDeviceService, MicrosoftBandService, MiBandService)
         }
     }
 
@@ -25,16 +27,15 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
         return _measureFactories
     }
 
-    abstract fun isConnected(): Boolean
+    abstract fun isActivated(): Boolean
 
-    abstract fun isConnecting(): Boolean
+    abstract fun isActivating(): Boolean
 
-    abstract fun connectAsync(connectedHandler: ((Boolean)->Unit)?=null)
-    abstract fun disconnect()
+    abstract fun activateAsync(connectedHandler: ((Boolean) -> Unit)? = null)
+    abstract fun deactivate()
 
-    val connected = Event<Any>()
-    val disconnected = Event<Any>()
-
+    val activated = Event<Any>()
+    val deactivated = Event<Any>()
 
     abstract fun grantPermissions(activity: Activity, handler: ((Boolean) -> Unit)? = null)
 

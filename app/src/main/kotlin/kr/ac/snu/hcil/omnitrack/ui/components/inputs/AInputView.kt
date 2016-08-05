@@ -4,8 +4,6 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
-import android.widget.TextView
-import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import java.util.*
@@ -24,12 +22,14 @@ abstract class AInputView<T>(layoutId: Int, context: Context, attrs: AttributeSe
     constructor(layoutId: Int, context: Context): this(layoutId, context, null)
 
     init{
-        val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        try {
-            inflater.inflate(layoutId, this, true)
-        } catch(e: Exception) {
-            e.printStackTrace()
-            throw Exception("Inflation failed")
+        if (layoutId != 0) {
+            val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+            try {
+                inflater.inflate(layoutId, this, true)
+            } catch(e: Exception) {
+                e.printStackTrace()
+                throw Exception("Inflation failed")
+            }
         }
     }
 

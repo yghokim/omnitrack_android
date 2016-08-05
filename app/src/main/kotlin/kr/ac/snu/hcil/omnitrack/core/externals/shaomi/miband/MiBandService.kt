@@ -39,16 +39,16 @@ object MiBandService : OTExternalService("ShaomiMiBand", 21) {
         MiBand(OmniTrackApplication.app)
     }
 
-    override fun isConnected(): Boolean {
+    override fun isActivated(): Boolean {
         return _connected
     }
 
-    override fun isConnecting(): Boolean {
+    override fun isActivating(): Boolean {
         return false
     }
 
-    override fun connectAsync(connectedHandler: ((Boolean) -> Unit)?) {
-        if (!isConnected()) {
+    override fun activateAsync(connectedHandler: ((Boolean) -> Unit)?) {
+        if (!isActivated()) {
             val task = ConnectionTask(connectedHandler)
             task.execute()
         } else {
@@ -63,7 +63,7 @@ object MiBandService : OTExternalService("ShaomiMiBand", 21) {
         }
     }
 
-    override fun disconnect() {
+    override fun deactivate() {
 
     }
 

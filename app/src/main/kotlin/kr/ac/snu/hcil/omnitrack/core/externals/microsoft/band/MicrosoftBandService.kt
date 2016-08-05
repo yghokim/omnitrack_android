@@ -31,16 +31,16 @@ object MicrosoftBandService : OTExternalService("MicrosoftBandService", 19) {
         _measureFactories += MicrosoftBandHeartRateFactory()
     }
 
-    override fun isConnected(): Boolean {
+    override fun isActivated(): Boolean {
         return connectionState == ConnectionState.CONNECTED
     }
 
-    override fun isConnecting(): Boolean {
+    override fun isActivating(): Boolean {
         return connectionTask!=null
     }
 
-    override fun connectAsync(connectedHandler: ((Boolean)->Unit)?) {
-        if(!isConnecting()){
+    override fun activateAsync(connectedHandler: ((Boolean) -> Unit)?) {
+        if (!isActivating()) {
             val client = getClient()
             if(client!=null)
             {
@@ -53,7 +53,7 @@ object MicrosoftBandService : OTExternalService("MicrosoftBandService", 19) {
 
     }
 
-    override fun disconnect() {
+    override fun deactivate() {
 
     }
 
