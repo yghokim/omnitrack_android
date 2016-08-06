@@ -38,7 +38,7 @@ class OTTimeSpanAttribute(objectId: String?, dbId: Long?, columnName: String, se
     }
 
     override fun getInputViewType(previewMode: Boolean): Int {
-        return 0
+        return AAttributeInputView.VIEW_TYPE_TIME_RANGE_PICKER
     }
 
     override fun refreshInputViewContents(inputView: AAttributeInputView<out Any>) {

@@ -41,6 +41,7 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
             val attr = when (typeId) {
                 TYPE_NUMBER -> OTNumberAttribute(objectId, dbId, columnName, settingData)
                 TYPE_TIME -> OTTimeAttribute(objectId, dbId, columnName, settingData)
+                TYPE_TIMESPAN -> OTTimeSpanAttribute(objectId, dbId, columnName, settingData)
                 TYPE_SHORT_TEXT -> OTShortTextAttribute(objectId, dbId, columnName, settingData)
                 TYPE_LONG_TEXT -> OTLongTextAttribute(objectId, dbId, columnName, settingData)
                 TYPE_LOCATION -> OTLocationAttribute(objectId, dbId, columnName, settingData)
