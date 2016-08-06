@@ -66,19 +66,19 @@
                 android:id="@+id/ui_button_edit"
                 style="@style/expandedPanelButton"
                 android:drawableStart="@drawable/pen"
-                android:text="Edit" />
+                android:text="@string/msg_edit" />
 
             <Button
                 android:id="@+id/ui_button_list"
                 style="@style/expandedPanelButton"
                 android:drawableStart="@drawable/list"
-                android:text="Data List" />
+                android:text="@string/msg_data_list" />
 
             <Button
                 android:id="@+id/ui_button_remove"
                 style="@style/expandedPanelButton"
                 android:drawableStart="@drawable/ex"
-                android:text="Remove" />
+                android:text="@string/msg_remove" />
         </LinearLayout>
     </RelativeLayout>
 

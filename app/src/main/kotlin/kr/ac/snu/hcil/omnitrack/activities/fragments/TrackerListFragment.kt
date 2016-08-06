@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -204,19 +205,20 @@ class TrackerListFragment : Fragment() {
                 expandButton.setOnClickListener {
                     view ->
                     if (collapsed) {
-                        expand()
                         if (currentlyExpandedIndex != -1) {
                             val close = currentlyExpandedIndex
                             currentlyExpandedIndex = adapterPosition
-
-                            notifyItemChanged(close)
+                            //notifyItemChanged(close)
                         } else {
                             currentlyExpandedIndex = adapterPosition
                         }
                     } else {
-                        collapse()
                         currentlyExpandedIndex = -1
                     }
+
+
+                    TransitionManager.beginDelayedTransition(listView)
+                    notifyDataSetChanged()
                 }
 
                 collapse()

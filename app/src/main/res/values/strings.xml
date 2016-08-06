@@ -37,6 +37,10 @@
     <string name="msg_tab_tracker_detail_structure">Structure</string>
     <string name="msg_tab_tracker_detail_triggers">Triggers</string>
 
+    <string name="msg_edit">Edit</string>
+    <string name="msg_data_list">Data List</string>
+    <string name="msg_remove">Remove</string>
+
 
     <string name="msg_basic_information">Basic Information</string>
     <string name="msg_attributes">Fields</string>
