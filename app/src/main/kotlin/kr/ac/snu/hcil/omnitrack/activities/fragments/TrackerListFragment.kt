@@ -85,11 +85,10 @@ class TrackerListFragment : Fragment() {
         return rootView
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        //dettach events
-        //    user.trackerAdded -= onTrackerAddedHandler
-        //    user.trackerRemoved -= onTrackerRemovedHandler
+    override fun onPause() {
+        super.onPause()
+
+        trackerListAdapter.currentlyExpandedIndex = -1
     }
 
     /*

@@ -1,13 +1,16 @@
 package kr.ac.snu.hcil.omnitrack.activities
 
+import android.animation.Animator
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
+import android.support.v4.graphics.ColorUtils
 import android.support.v4.view.ViewPager
 import android.view.View
+import at.markushi.ui.RevealColorView
 import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.activities.fragments.TrackerDetailStructureTabFragment
@@ -33,6 +36,8 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
 
     private var mSectionsPagerAdapter: TrackerDetailActivity.SectionsPagerAdapter? = null
 
+    private lateinit var appBarRevealView: RevealColorView
+
     /**
      * The [ViewPager] that will host the section contents.
      */
@@ -49,6 +54,8 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
 
         val tabLayout = findViewById(R.id.tabs) as TabLayout?
         tabLayout!!.setupWithViewPager(mViewPager)
+
+        appBarRevealView = findViewById(R.id.ui_appbar_reveal) as RevealColorView
 
 
         setActionBarButtonMode(Mode.Back)
@@ -69,6 +76,8 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
 
             if (tracker != null) {
                 this.tracker = tracker
+
+                transitionToColor(this.tracker.color, false)
                 isEditMode = intent.getBooleanExtra(IS_EDIT_MODE, true)
             } else {
                 tossToHome()
@@ -123,6 +132,40 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
                 if (!isEditMode) OmniTrackApplication.app.currentUser.trackers.add(tracker)
                 finish()
             }*/
+    }
+
+    fun calculateBlendedColor(color: Int): Int {
+        return ColorUtils.blendARGB(resources.getColor(R.color.colorPrimary, null), color, 0.6f)
+
+    }
+
+    fun transitionToColor(color: Int, animate: Boolean = true) {
+        val blendedColor = calculateBlendedColor(color)
+
+        if (android.os.Build.VERSION.SDK_INT >= 21) {
+            window.statusBarColor = blendedColor
+        }
+
+        if (animate) {
+            appBarRevealView.reveal(0, appBarRevealView.measuredHeight / 2, blendedColor, 0, 400, object : Animator.AnimatorListener {
+                override fun onAnimationRepeat(p0: Animator?) {
+
+                }
+
+                override fun onAnimationEnd(p0: Animator?) {
+                }
+
+                override fun onAnimationCancel(p0: Animator?) {
+                }
+
+                override fun onAnimationStart(p0: Animator?) {
+                }
+
+            }
+            )
+        } else {
+            appBarRevealView.setBackgroundColor(blendedColor)
+        }
     }
 
 

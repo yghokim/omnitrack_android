@@ -97,6 +97,13 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
         colorPropertyView = rootView.findViewById(R.id.colorProperty) as ColorPalettePropertyView
         colorPropertyView.title = resources.getString(R.string.msg_color)
 
+        colorPropertyView.valueChanged += {
+            sender, colorIndex ->
+            if (activity is TrackerDetailActivity) {
+                (activity as TrackerDetailActivity).transitionToColor(colorPropertyView.value)
+            }
+        }
+
         attributeListView = rootView.findViewById(R.id.ui_attribute_list) as RecyclerView
         val layoutManager = object : LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false) {
             override fun canScrollVertically(): Boolean {

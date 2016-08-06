@@ -41,6 +41,7 @@ dependencies {
     compile 'jp.wasabeef:recyclerview-animators:2.2.3'
     compile 'com.google.code.gson:gson:2.7'
     compile 'de.codecrafters.tableview:tableview:2.2.0'
+    compile 'com.github.markushi:android-ui:1.2'
 }
 
 kapt {
