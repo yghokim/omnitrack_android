@@ -2,7 +2,6 @@ package kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes
 
 import android.content.Context
 import android.util.AttributeSet
-import android.widget.EditText
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
 import kr.ac.snu.hcil.omnitrack.ui.components.DateTimePicker
@@ -10,7 +9,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.DateTimePicker
 /**
  * Created by Young-Ho Kim on 2016-07-22.
  */
-class TimePointInputView(context: Context, attrs: AttributeSet? = null) : AAttributeInputView<TimePoint>(R.layout.input_timepoint, context, attrs) {
+class TimePointInputView(context: Context, attrs: AttributeSet? = null) : AAttributeInputView<TimePoint>(R.layout.input_time_picker, context, attrs) {
     override val typeId: Int = VIEW_TYPE_TIME_POINT
 
     private lateinit var valueView: DateTimePicker

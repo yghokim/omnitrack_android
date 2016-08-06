@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <View
+        android:id="@+id/ui_process_bullet_from"
+        style="@style/timeRangePickerBulletStyle"
+        android:layout_marginTop="@dimen/time_range_picker_bullet_vertical_margin" />
+
+    <View
+        android:id="@+id/ui_process_bullet_to"
+        style="@style/timeRangePickerBulletStyle"
+        android:layout_alignBottom="@+id/ui_button_to"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="@dimen/time_range_picker_bullet_vertical_margin" />
+
+
+    <kr.ac.snu.hcil.omnitrack.ui.components.ProcessArrowIndicator
+        android:id="@+id/view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/ui_process_bullet_to"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/ui_process_bullet_from"
+        android:layout_toStartOf="@+id/ui_button_from" />
+
+    <Button
+        android:id="@+id/ui_button_from"
+        style="@style/timeRangePickerButtonStyle"
+        android:layout_width="match_parent"
+        android:layout_alignParentEnd="true"
+        android:layout_toRightOf="@+id/ui_process_bullet_from"
+        android:text="8:00:00 AM, Aug 5, 2016"
+        android:textStyle="normal" />
+
+
+    <TextView
+        android:id="@+id/ui_interval_indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/ui_button_from"
+        android:layout_below="@+id/ui_button_from"
+        android:layout_marginBottom="16dp"
+        android:layout_marginTop="16dp"
+        android:text="8 hrs 40 mins 2 secs"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/ui_button_to"
+        style="@style/timeRangePickerButtonStyle"
+        android:layout_width="match_parent"
+        android:layout_alignParentEnd="true"
+        android:layout_alignStart="@+id/ui_interval_indicator"
+        android:layout_below="@+id/ui_interval_indicator"
+        android:text="8:00:00 AM, Aug 5, 2016" />
+
+</RelativeLayout>
