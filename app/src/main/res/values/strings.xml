@@ -58,6 +58,8 @@
     <string name="msg_attribute">Field</string>
     <string name="msg_new_tracker_prefix">My Tracker</string>
 
+    <string name="msg_value_autocompletion">Value Autocompletion</string>
+
 
     <string name="msg_column_name">Field Name</string>
 
@@ -79,6 +81,10 @@
     <string name="title_activity_home">HomeActivity</string>
     <string name="action_settings">Settings</string>
     <string name="section_format">Hello World from section: %1$d</string>
+
+    <string name="type_timespan_name">Time Range</string>
+    <string name="type_timespan_desc">A timespan data designated by start and end</string>
+
 
     <string name="type_timepoint_name">Time Point</string>
     <string name="type_timepoint_desc">A specific time point</string>

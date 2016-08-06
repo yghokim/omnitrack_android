@@ -7,7 +7,7 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 2016-07-11.
  */
-class Timespan : IStringSerializable {
+class TimeSpan : IStringSerializable {
 
     var from: Long = 0
     var duration: Int = 0

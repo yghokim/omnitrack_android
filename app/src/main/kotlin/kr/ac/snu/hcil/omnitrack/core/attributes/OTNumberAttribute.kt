@@ -20,7 +20,7 @@ class OTNumberAttribute(objectId: String?, dbId: Long?, columnName: String, sett
 
     override val typeNameResourceId: Int = R.string.type_number_name
 
-    override val keys: Array<Int>
+    override val propertyKeys: Array<Int>
         get() = arrayOf(DECIMAL_POINTS)
 
     constructor(columnName: String) : this(null, null, columnName, null)
