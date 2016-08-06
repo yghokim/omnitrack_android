@@ -1,23 +1,22 @@
 package kr.ac.snu.hcil.omnitrack.ui.components
 
+import android.animation.ValueAnimator
 import android.content.Context
-import android.content.res.TypedArray
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
 import android.graphics.drawable.Drawable
-import android.text.TextPaint
 import android.util.AttributeSet
-import android.view.View
-import android.widget.ToggleButton
-
+import android.view.animation.DecelerateInterpolator
+import android.widget.Button
 import kr.ac.snu.hcil.omnitrack.R
 
 /**
  * TODO: document your custom view class.
  */
-class ColorSelectionButton : ToggleButton {
+class ColorSelectionButton : Button, ValueAnimator.AnimatorUpdateListener {
+
     var color:Int = Color.RED // TODO: use a default from R.color...
         set(value){
             if(field != value) {
@@ -27,17 +26,6 @@ class ColorSelectionButton : ToggleButton {
             }
         }
 
-    /**
-     * Gets the example drawable attribute value.
-
-     * @return The example drawable attribute value.
-     */
-    /**
-     * Sets the view's example drawable attribute value. In the example view, this drawable is
-     * drawn above the text.
-
-     * @param exampleDrawable The example drawable attribute value to use.
-     */
     lateinit var checkedDrawable: Drawable
 
     private val frameBounds = RectF()
@@ -46,7 +34,17 @@ class ColorSelectionButton : ToggleButton {
 
     private var contentSize : Float = 0.0f
 
+    private var cornerRadius: Float = 0.0f
+
     val shapePaint : Paint = Paint()
+
+    private var toSelectionAnimator: ValueAnimator? = null
+    private var toUnselectionAnimator: ValueAnimator? = null
+
+    companion object {
+        val interpolator = DecelerateInterpolator(2.0f)
+    }
+
 
     constructor(context: Context) : super(context) {
         init(null, 0)
@@ -97,18 +95,59 @@ class ColorSelectionButton : ToggleButton {
             val paddingSize = Math.round(contentSize * 0.07f)
             val drawableSize = Math.round(paddingSize + contentSize - 2*paddingSize)
             checkedDrawable.setBounds(Math.round(paddingLeft + paddingSize), Math.round(paddingTop + paddingSize), drawableSize, drawableSize)
+
+            if (isSelected) {
+                cornerRadius = contentSize * .2f
+            } else {
+                cornerRadius = contentSize * .5f
+            }
+
+            toSelectionAnimator = ValueAnimator.ofFloat(contentSize * 0.5f, contentSize * 0.2f)
+            toUnselectionAnimator = ValueAnimator.ofFloat(contentSize * 0.2f, contentSize * 0.5f)
+
+            toSelectionAnimator?.interpolator = interpolator
+            toUnselectionAnimator?.interpolator = interpolator
+
+            toSelectionAnimator?.duration = 200
+            toUnselectionAnimator?.duration = 150
+
+            toSelectionAnimator?.addUpdateListener(this)
+            toUnselectionAnimator?.addUpdateListener(this)
         }
     }
 
+    override fun setSelected(selected: Boolean) {
+        if (isSelected != selected) {
+            if (selected) {
+                if (toUnselectionAnimator?.isRunning ?: false) {
+                    toUnselectionAnimator?.end()
+                }
+
+                toSelectionAnimator?.start()
+            } else {
+                if (toSelectionAnimator?.isRunning ?: false) {
+                    toSelectionAnimator?.end()
+                }
+
+                toUnselectionAnimator?.start()
+            }
+        }
+        super.setSelected(selected)
+    }
+
+    override fun onAnimationUpdate(p0: ValueAnimator) {
+        cornerRadius = p0.animatedValue as Float
+        invalidate()
+    }
+
     override fun onDraw(canvas: Canvas) {
-        if(isChecked)
+        canvas.drawRoundRect(frameBounds, cornerRadius, cornerRadius, shapePaint)
+
+
+        if (isSelected)
         {
-            canvas.drawRoundRect(frameBounds, contentSize*0.2f, contentSize*0.2f, shapePaint)
             checkedDrawable.draw(canvas)
 
-        }else{
-            canvas.drawCircle(paddingLeft + contentSize*.5f, paddingTop + contentSize*.5f, contentSize*.5f, shapePaint)
         }
-
     }
 }
