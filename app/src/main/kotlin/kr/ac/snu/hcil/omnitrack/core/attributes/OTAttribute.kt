@@ -57,7 +57,7 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
     val removedFromTracker = Event<OTTracker>()
     val addedToTracker = Event<OTTracker>()
 
-    abstract val keys: Array<Int>
+    abstract val propertyKeys: Array<Int>
 
     abstract val typeNameResourceId: Int
         get
@@ -85,7 +85,7 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
     fun getSerializedProperties(): String {
         val s = ArrayList<String>()
         val parser = Gson()
-        for (key in keys) {
+        for (key in propertyKeys) {
             s.add(parser.toJson(SerializedIntegerKeyEntry(key, getProperty<Any>(key).getSerializedValue())))
         }
 
@@ -143,7 +143,7 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
 
     open fun makePropertyViews(context: Context): Collection<ReadOnlyPair<Int?, View>> {
         val result = ArrayList<ReadOnlyPair<Int?, View>>()
-        for (key in keys) {
+        for (key in propertyKeys) {
             result.add(ReadOnlyPair(key, getProperty<Any>(key).buildView(context)))
         }
         return result
@@ -164,6 +164,10 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
     }
 
     abstract fun refreshInputViewContents(inputView: AAttributeInputView<out Any>);
+
+
+    //pending apis
+    open val isPending: Boolean = false
 
 
 }

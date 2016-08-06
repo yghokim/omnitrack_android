@@ -14,7 +14,7 @@ class OTLongTextAttribute(objectId: String?, dbId: Long?, columnName: String, se
         return AAttributeInputView.VIEW_TYPE_LONG_TEXT
     }
 
-    override val keys: Array<Int> = Array<Int>(0) { index -> 0 }
+    override val propertyKeys: Array<Int> = Array<Int>(0) { index -> 0 }
 
     override val typeNameResourceId: Int
         get() = R.string.type_longtext_name

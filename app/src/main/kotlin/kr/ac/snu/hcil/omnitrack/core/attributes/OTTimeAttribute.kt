@@ -50,7 +50,7 @@ class OTTimeAttribute : OTAttribute<TimePoint> {
         super.onPropertyValueChanged(args)
     }
 
-    override val keys: Array<Int>
+    override val propertyKeys: Array<Int>
         get() = arrayOf(GRANULARITY)
 
     override fun createProperties() {

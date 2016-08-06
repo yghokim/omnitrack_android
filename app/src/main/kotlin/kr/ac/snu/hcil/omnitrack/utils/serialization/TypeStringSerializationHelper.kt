@@ -4,7 +4,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.gson.Gson
 import kr.ac.snu.hcil.omnitrack.core.datatypes.Route
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
-import kr.ac.snu.hcil.omnitrack.core.datatypes.Timespan
+import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import java.math.BigDecimal
 
 /**
@@ -41,7 +41,7 @@ object TypeStringSerializationHelper {
             Long::class.java.name to TYPENAME_LONG,
             BigDecimal::class.java.name to TYPENAME_BIGDECIMAL,
             TimePoint::class.java.name to TYPENAME_TIMEPOINT,
-            Timespan::class.java.name to TYPENAME_TIMESPAN,
+            TimeSpan::class.java.name to TYPENAME_TIMESPAN,
             String::class.java.name to TYPENAME_STRING,
             IntArray::class.java.name to TYPENAME_INT_ARRAY,
             LongArray::class.java.name to TYPENAME_LONG_ARRAY,
@@ -58,7 +58,7 @@ object TypeStringSerializationHelper {
         parcelCache.v = when (parcelCache.t) {
             TYPENAME_BIGDECIMAL -> (value as BigDecimal).toPlainString()
             TYPENAME_TIMEPOINT -> (value as TimePoint).getSerializedString()
-            TYPENAME_TIMESPAN -> (value as Timespan).getSerializedString()
+            TYPENAME_TIMESPAN -> (value as TimeSpan).getSerializedString()
             TYPENAME_INT_ARRAY -> (value as IntArray).joinToString(",")
             TYPENAME_LONG_ARRAY -> (value as IntArray).joinToString(",")
             TYPENAME_LATITUDE_LONGITUDE -> (value as LatLng).serialize()
@@ -85,7 +85,7 @@ object TypeStringSerializationHelper {
             TYPENAME_STRING -> parcel.v
             TYPENAME_BIGDECIMAL -> BigDecimal(parcel.v)
             TYPENAME_TIMEPOINT -> TimePoint(parcel.v)
-            TYPENAME_TIMESPAN -> Timespan(parcel.v)
+            TYPENAME_TIMESPAN -> TimeSpan(parcel.v)
             TYPENAME_INT_ARRAY -> parcel.v.split(",").map { it.toInt() }.toIntArray()
             TYPENAME_LONG_ARRAY -> parcel.v.split(",").map { it.toLong() }.toLongArray()
             TYPENAME_LATITUDE_LONGITUDE -> deserializeLatLng(parcel.v)
