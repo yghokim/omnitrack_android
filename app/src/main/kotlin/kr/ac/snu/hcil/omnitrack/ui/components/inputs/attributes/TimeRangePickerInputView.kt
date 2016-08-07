@@ -15,8 +15,9 @@ class TimeRangePickerInputView(context: Context, attrs: AttributeSet? = null) : 
     private lateinit var valueView: TimeRangePicker
 
     override var value: TimeSpan
-        get() = TimeSpan()
+        get() = valueView.getTimeSpan()
         set(value) {
+            valueView.setTimeSpan(value)
         }
 
     init {
@@ -26,5 +27,9 @@ class TimeRangePickerInputView(context: Context, attrs: AttributeSet? = null) : 
 
     override fun focus() {
         valueView.requestFocus()
+    }
+
+    fun setGranularity(value: TimeRangePicker.Granularity) {
+        valueView.granularity = value
     }
 }

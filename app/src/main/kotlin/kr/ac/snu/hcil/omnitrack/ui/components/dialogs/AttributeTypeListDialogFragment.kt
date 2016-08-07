@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.components
+package kr.ac.snu.hcil.omnitrack.ui.components.dialogs
 
 import android.os.Bundle
 import android.support.v4.app.DialogFragment
@@ -8,15 +8,12 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.ui.SpaceItemDecoration
-import kr.ac.snu.hcil.omnitrack.utils.events.Event
-import java.text.AttributedCharacterIterator
 
 /**
  * Created by Young-Ho Kim on 2016-07-21.
@@ -28,7 +25,7 @@ class AttributeTypeListDialogFragment : DialogFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setStyle(DialogFragment.STYLE_NORMAL, R.style.CustomDialog)
+        setStyle(STYLE_NORMAL, R.style.CustomDialog)
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {

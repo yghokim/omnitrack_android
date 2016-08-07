@@ -1,16 +1,16 @@
 package kr.ac.snu.hcil.omnitrack.ui.components
 
 import android.content.Context
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.*
+import android.widget.Button
+import android.widget.FrameLayout
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
+import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.CalendarPickerDialogFragment
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
+import kr.ac.snu.hcil.omnitrack.utils.getActivity
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.properties.Delegates
@@ -128,6 +128,17 @@ class DateTimePicker(context: Context, attrs: AttributeSet? = null) : FrameLayou
         rightPicker.valueChanged += pickerValueChangedHandler
 
         dateButton = findViewById(R.id.ui_button_date) as Button
+
+        dateButton.setOnClickListener {
+            val activity = getActivity()
+            if (activity != null) {
+                CalendarPickerDialogFragment.getInstance(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).showDialog(activity.supportFragmentManager) {
+                    t, y, m, d ->
+                    calendar.set(y, m, d)
+                    refresh()
+                }
+            }
+        }
 
         dateFormat = SimpleDateFormat(resources.getString(R.string.dateformat_ymd))
 
