@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="timeRangePickerButtonStyle">
+    <style name="timeRangePickerButtonStyle" parent="Widget.AppCompat.Button.Borderless">
         <item name="android:layout_height">@dimen/time_range_picker_button_height</item>
         <item name="android:background">@drawable/white_rect_button_background</item>
         <item name="android:textStyle">normal</item>
@@ -14,7 +14,14 @@
         <item name="android:layout_width">@dimen/time_range_picker_bullet_size</item>
         <item name="android:layout_height">@dimen/time_range_picker_bullet_size</item>
         <item name="android:background">@drawable/process_bullet</item>
-        <item name="android:layout_marginRight">8dp</item>
+        <item name="android:layout_marginRight">@dimen/time_range_picker_indicator_marginRight
+        </item>
     </style>
+
+
+    <dimen name="time_range_picker_button_height">50dp</dimen>
+    <dimen name="time_range_picker_bullet_size">20dp</dimen>
+    <dimen name="time_range_picker_bullet_vertical_margin">15dp</dimen>
+    <dimen name="time_range_picker_indicator_marginRight">8dp</dimen>
 
 </resources>

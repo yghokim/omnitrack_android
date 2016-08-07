@@ -54,9 +54,6 @@
     <dimen name="service_list_element_vertical_padding">20dp</dimen>
     <dimen name="service_list_element_horizontal_padding">16dp</dimen>
 
-    <dimen name="time_range_picker_button_height">50dp</dimen>
-    <dimen name="time_range_picker_bullet_size">20dp</dimen>
-    <dimen name="time_range_picker_bullet_vertical_margin">15dp</dimen>
 
 
 </resources>

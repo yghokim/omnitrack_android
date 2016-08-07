@@ -22,7 +22,11 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/ui_process_bullet_to"
         android:layout_alignParentStart="true"
+
         android:layout_below="@+id/ui_process_bullet_from"
+        android:layout_marginBottom="5dp"
+        android:layout_marginRight="@dimen/time_range_picker_indicator_marginRight"
+        android:layout_marginTop="5dp"
         android:layout_toStartOf="@+id/ui_button_from" />
 
     <Button
@@ -44,6 +48,7 @@
         android:layout_marginBottom="16dp"
         android:layout_marginTop="16dp"
         android:text="8 hrs 40 mins 2 secs"
+        android:textColor="@color/textColorLight"
         android:textStyle="bold" />
 
     <Button
