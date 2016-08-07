@@ -26,6 +26,10 @@ object TimeHelper {
         return cal.timeInMillis
     }
 
+    fun cutMillisecond(timestamp: Long): Long {
+        return timestamp / 1000 * 1000
+    }
+
     fun durationToText(duration: Long, useShortUnits: Boolean, context: Context): String {
         if (duration.equals(0)) {
             return context.getString(R.string.time_duration_no_difference)

@@ -69,6 +69,7 @@ class DateTimePickerDialogFragment : DialogFragment() {
 
         val calendar = GregorianCalendar(TimeZone.getDefault())
         calendar.timeInMillis = arguments?.getLong("timestamp", System.currentTimeMillis()) ?: System.currentTimeMillis()
+        calendar.set(Calendar.MILLISECOND, 0)
 
         year = calendar.get(Calendar.YEAR)
         zeroBasedMonth = calendar.get(Calendar.MONTH)
@@ -129,6 +130,7 @@ class DateTimePickerDialogFragment : DialogFragment() {
                 .setView(view)
                 .setPositiveButton(R.string.msg_ok) { a, b ->
                     val cal = GregorianCalendar(TimeZone.getDefault())
+                    cal.set(Calendar.MILLISECOND, 0)
                     cal.set(year, zeroBasedMonth, day, (hourPicker.value % 12) + 12 * ampmPicker.value, minutePicker.value, secondPicker.value)
                     listener?.invoke(cal.timeInMillis)
                 }

@@ -33,7 +33,7 @@ class TimeRangePicker : FrameLayout, View.OnClickListener {
     private lateinit var toButton: Button
     private lateinit var durationIndicator: TextView
 
-    private var from: Long = System.currentTimeMillis()
+    private var from: Long = TimeHelper.cutMillisecond(System.currentTimeMillis())
         set(value) {
             val processed: Long
             if (granularity == Granularity.DATE) {
@@ -53,7 +53,7 @@ class TimeRangePicker : FrameLayout, View.OnClickListener {
         }
 
 
-    private var to: Long = System.currentTimeMillis()
+    private var to: Long = TimeHelper.cutMillisecond(System.currentTimeMillis())
         set(value) {
             val processed: Long
             if (granularity == Granularity.DATE) {
@@ -128,6 +128,9 @@ class TimeRangePicker : FrameLayout, View.OnClickListener {
         if (granularity == Granularity.DATE) {
             from = TimeHelper.cutTimePartFromEpoch(from)
             to = TimeHelper.cutTimePartFromEpoch(to)
+        } else if (granularity == Granularity.TIME) {
+            from = TimeHelper.cutMillisecond(from)
+            to = TimeHelper.cutMillisecond(to)
         }
 
     }
