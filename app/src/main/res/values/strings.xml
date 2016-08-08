@@ -74,6 +74,8 @@
     <string name="hint_long_text">Write text here</string>
     <string name="hint_short_text">Type in short text here</string>
 
+    <string name="sentence_new_tracker_added">Tracker \'%1$s\' was added</string>
+
 
     <string name="dateformat_ymd">MM d, yyyy, EE</string>
     <string name="dateformat_full">h:m:s a, MM d, yyyy</string>
@@ -162,6 +164,10 @@
     <string name="service_mi_band_desc">Mi Band and Band2</string>
     <string name="measure_mi_band_heart_rate_name">Heart Rate</string>
     <string name="measure_mi_band_heart_rate_desc">Receives user\'s heart rate bpm</string>
+
+
+    <string name="service_googlefit_name">Google Fit</string>
+    <string name="service_googlefit_desc">Get measured data from Google health platform</string>
 
     <string name="service_device_name">Android Device</string>
     <string name="service_device_desc">Android device events and measures</string>

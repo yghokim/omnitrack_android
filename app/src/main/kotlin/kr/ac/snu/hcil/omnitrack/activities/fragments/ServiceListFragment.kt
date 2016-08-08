@@ -58,7 +58,7 @@ class ServiceListFragment : Fragment() {
         println("permission result: $requestCode ${pendedActivations.size()}")
         if (pendedActivations[requestCode] != null) {
             if (grantResults.indexOf(PackageManager.PERMISSION_DENIED) == -1) {
-                OTExternalService.availableServices[requestCode].activateAsync {
+                OTExternalService.availableServices[requestCode].activateAsync(context) {
                     success ->
                     if (success) {
                         pendedActivations[requestCode].applyState(OTExternalService.ServiceState.ACTIVATED)
@@ -128,7 +128,7 @@ class ServiceListFragment : Fragment() {
                                 pendedActivations.setValueAt(adapterPosition, this@ViewHolder)
                                 service.grantPermissions(this@ServiceListFragment, adapterPosition)
                             } else {
-                                service.activateAsync {
+                                service.activateAsync(context) {
                                     success ->
                                     if (success) {
                                         applyState(OTExternalService.ServiceState.ACTIVATED)

@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.device
 
 import android.app.Activity
+import android.content.Context
 import android.support.v4.app.Fragment
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
@@ -9,12 +10,15 @@ import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
  * Created by younghokim on 16. 8. 4..
  */
 object AndroidDeviceService : OTExternalService("AndroidDeviceService", 19) {
+    override fun prepareService() {
+
+    }
 
 
     override val permissionGranted: Boolean
         get() = true
 
-    override fun activateAsync(connectedHandler: ((Boolean) -> Unit)?) {
+    override fun activateAsync(context: Context, connectedHandler: ((Boolean) -> Unit)?) {
 
     }
 

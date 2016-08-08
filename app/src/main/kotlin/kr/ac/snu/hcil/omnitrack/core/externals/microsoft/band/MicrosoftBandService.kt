@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.microsoft.band
 
 import android.app.Activity
+import android.content.Context
 import android.os.AsyncTask
 import android.support.v4.app.Fragment
 import com.microsoft.band.BandClient
@@ -15,6 +16,9 @@ import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
  * Created by younghokim on 16. 7. 28..
  */
 object MicrosoftBandService : OTExternalService("MicrosoftBandService", 19) {
+    override fun prepareService() {
+
+    }
 
     override val permissionGranted: Boolean = true
 
@@ -48,7 +52,7 @@ object MicrosoftBandService : OTExternalService("MicrosoftBandService", 19) {
     }
 
 
-    override fun activateAsync(connectedHandler: ((Boolean) -> Unit)?) {
+    override fun activateAsync(context: Context, connectedHandler: ((Boolean) -> Unit)?) {
             val client = getClient()
             if(client!=null)
             {

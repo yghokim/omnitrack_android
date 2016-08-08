@@ -22,6 +22,9 @@ import kr.ac.snu.hcil.omnitrack.utils.AsyncTaskWithResultHandler
 
 //@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 object MiBandService : OTExternalService("ShaomiMiBand", 21) {
+    override fun prepareService() {
+
+    }
 
     const val PREFERENCE_KEY = "OmniTrack_MiBandService"
     const val PREFERENCE_VALUE_MAC = "deviceMac"
@@ -45,7 +48,7 @@ object MiBandService : OTExternalService("ShaomiMiBand", 21) {
         return state
     }
 
-    override fun activateAsync(connectedHandler: ((Boolean) -> Unit)?) {
+    override fun activateAsync(context: Context, connectedHandler: ((Boolean) -> Unit)?) {
             val task = ConnectionTask(connectedHandler)
             task.execute()
     }

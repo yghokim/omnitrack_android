@@ -7,12 +7,14 @@ import android.support.v4.app.Fragment
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.transition.AutoTransition
 import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
+import android.widget.Toast
 import jp.wasabeef.recyclerview.animators.SlideInRightAnimator
 import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.R
@@ -37,9 +39,16 @@ class TrackerListFragment : Fragment() {
     lateinit private var trackerListAdapter : TrackerListAdapter
 
     lateinit private var popupMessages : Array<String>
+
     companion object{
         const val CHANGE_TRACKER_SETTINGS = 0
         const val REMOVE_TRACKER = 1
+
+        val transition = AutoTransition()
+
+        init {
+            transition.duration = 200
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,6 +77,9 @@ class TrackerListFragment : Fragment() {
             val intent = Intent(context, TrackerDetailActivity::class.java)
             intent.putExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, newTracker.objectId)
             startActivityOnDelay(intent)
+            Toast.makeText(context,
+                    String.format(resources.getString(R.string.sentence_new_tracker_added), newTracker.name), Toast.LENGTH_LONG).show()
+
         }
 
         listView = rootView.findViewById(R.id.ui_tracker_list_view) as RecyclerView
@@ -134,6 +146,10 @@ class TrackerListFragment : Fragment() {
     inner class TrackerListAdapter(val user: OTUser) : RecyclerView.Adapter<TrackerListAdapter.ViewHolder>(){
 
         var currentlyExpandedIndex = -1
+
+        init {
+            hasStableIds()
+        }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val view = LayoutInflater.from(parent.context).inflate(R.layout.tracker_list_element, parent, false)
@@ -214,7 +230,7 @@ class TrackerListFragment : Fragment() {
                     }
 
 
-                    TransitionManager.beginDelayedTransition(listView)
+                    TransitionManager.beginDelayedTransition(listView, transition)
                     notifyDataSetChanged()
                 }
 

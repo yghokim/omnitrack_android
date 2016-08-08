@@ -6,6 +6,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTTriggerManager
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.database.DatabaseHelper
+import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 
 /**
  * Created by Young-Ho Kim on 2016-07-11.
@@ -88,6 +89,13 @@ class OmniTrackApplication : Application() {
         })
 
 
+        for (service in OTExternalService.availableServices) {
+            if (service.getState() == OTExternalService.ServiceState.ACTIVATED) {
+                service.prepareService()
+            }
+        }
+
+
         supportedAttributeTypes = arrayOf(
                 OTAttribute.AttributeTypeInfo(OTAttribute.TYPE_SHORT_TEXT, R.drawable.field_icon_shorttext, this.getString(R.string.type_shorttext_name), this.getString(R.string.type_shorttext_desc)),
                 OTAttribute.AttributeTypeInfo(OTAttribute.TYPE_LONG_TEXT, R.drawable.field_icon_longtext, this.getString(R.string.type_longtext_name), this.getString(R.string.type_longtext_desc)),
@@ -95,6 +103,8 @@ class OmniTrackApplication : Application() {
                 OTAttribute.AttributeTypeInfo(OTAttribute.TYPE_TIME, R.drawable.field_icon_time, this.getString(R.string.type_timepoint_name), this.getString(R.string.type_timepoint_desc)),
                 OTAttribute.AttributeTypeInfo(OTAttribute.TYPE_LOCATION, R.drawable.field_icon_location, this.getString(R.string.type_location_name), this.getString(R.string.type_location_desc)),
                 OTAttribute.AttributeTypeInfo(OTAttribute.TYPE_TIMESPAN, R.drawable.field_icon_timer, this.getString(R.string.type_timespan_name), this.getString(R.string.type_timespan_desc)))
+
+
     }
 
     fun syncUserToDb(){
