@@ -6,6 +6,7 @@ import android.os.Handler
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.view.View
+import java.util.*
 
 /**
  * Created by younghokim on 16. 7. 28..
@@ -40,4 +41,36 @@ fun View.getActivity(): AppCompatActivity? {
         currentContext = currentContext.baseContext
     }
     return null
+}
+
+fun Calendar.getYear(): Int {
+    return get(Calendar.YEAR)
+}
+
+fun Calendar.getZeroBasedMonth(): Int {
+    return get(Calendar.MONTH)
+}
+
+fun Calendar.getDayOfMonth(): Int {
+    return get(Calendar.DAY_OF_MONTH)
+}
+
+fun Calendar.getHour(): Int {
+    return get(Calendar.HOUR)
+}
+
+fun Calendar.getHourOfDay(): Int {
+    return get(Calendar.HOUR_OF_DAY)
+}
+
+fun Calendar.getMinute(): Int {
+    return get(Calendar.MINUTE)
+}
+
+fun Calendar.getSecond(): Int {
+    return get(Calendar.SECOND)
+}
+
+fun Calendar.getAmPm(): Int {
+    return get(Calendar.AM_PM)
 }

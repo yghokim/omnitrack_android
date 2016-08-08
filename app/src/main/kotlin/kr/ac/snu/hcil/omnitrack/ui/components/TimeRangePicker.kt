@@ -39,7 +39,7 @@ class TimeRangePicker : FrameLayout, View.OnClickListener {
             if (granularity == Granularity.DATE) {
                 processed = TimeHelper.cutTimePartFromEpoch(value)
             } else {
-                processed = value
+                processed = TimeHelper.cutMillisecond(value)
             }
 
             if (field != processed) {
@@ -59,7 +59,7 @@ class TimeRangePicker : FrameLayout, View.OnClickListener {
             if (granularity == Granularity.DATE) {
                 processed = TimeHelper.cutTimePartFromEpoch(value)
             } else {
-                processed = value
+                processed = TimeHelper.cutMillisecond(value)
             }
 
             if (field != processed) {

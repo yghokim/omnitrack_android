@@ -10,6 +10,7 @@ import android.widget.NumberPicker
 import android.widget.TabHost
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.utils.*
 import java.util.*
 
 /**
@@ -21,6 +22,15 @@ class DateTimePickerDialogFragment : DialogFragment() {
         private fun setDateLabel(tabHost: TabHost, year: Int, zeroBasedMonth: Int, day: Int) {
             val labelView = tabHost.tabWidget.getChildAt(0).findViewById(android.R.id.title) as TextView
             labelView.text = "${year}-${zeroBasedMonth + 1}-${day}"
+        }
+
+        private fun setTimeLabel(tabHost: TabHost, hour: Int, minute: Int, second: Int, ampm: Int) {
+            val labelView = tabHost.tabWidget.getChildAt(1).findViewById(android.R.id.title) as TextView
+            labelView.text = "${if (ampm == 0) {
+                "AM"
+            } else {
+                "PM"
+            }} ${String.format("%02d", hour)}:${String.format("%02d", minute)}:${String.format("%02d", second)}"
         }
 
         fun getInstance(timestamp: Long): DateTimePickerDialogFragment {
@@ -71,11 +81,14 @@ class DateTimePickerDialogFragment : DialogFragment() {
         calendar.timeInMillis = arguments?.getLong("timestamp", System.currentTimeMillis()) ?: System.currentTimeMillis()
         calendar.set(Calendar.MILLISECOND, 0)
 
-        year = calendar.get(Calendar.YEAR)
-        zeroBasedMonth = calendar.get(Calendar.MONTH)
-        day = calendar.get(Calendar.DAY_OF_MONTH)
+        year = calendar.getYear()
+        zeroBasedMonth = calendar.getZeroBasedMonth()
+        day = calendar.getDayOfMonth()
 
+
+        //apply labels
         setDateLabel(tabHost, year, zeroBasedMonth, day)
+        setTimeLabel(tabHost, calendar.getHour(), calendar.getMinute(), calendar.getSecond(), calendar.getAmPm())
 
         val calendarView = view.findViewById(R.id.ui_calendar_view) as CalendarView
 
@@ -92,6 +105,15 @@ class DateTimePickerDialogFragment : DialogFragment() {
         minutePicker = view.findViewById(R.id.ui_minute_picker) as NumberPicker
         secondPicker = view.findViewById(R.id.ui_second_picker) as NumberPicker
         ampmPicker = view.findViewById(R.id.ui_ampm_picker) as NumberPicker
+
+        val onPickerValueChanged = NumberPicker.OnValueChangeListener { numberPicker, old, new ->
+            setTimeLabel(tabHost, hourPicker.value, minutePicker.value, secondPicker.value, ampmPicker.value)
+        }
+
+        hourPicker.setOnValueChangedListener(onPickerValueChanged)
+        minutePicker.setOnValueChangedListener(onPickerValueChanged)
+        secondPicker.setOnValueChangedListener(onPickerValueChanged)
+        ampmPicker.setOnValueChangedListener(onPickerValueChanged)
 
         hourPicker.minValue = 1
         hourPicker.maxValue = 12

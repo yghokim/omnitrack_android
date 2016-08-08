@@ -28,6 +28,8 @@ class OTTimeSpanAttribute(objectId: String?, dbId: Long?, columnName: String, se
         //TODO I18n
         assignProperty(OTSelectionProperty(PROPERTY_GRANULARITY, "Granularity", arrayOf("Date", "Time")))
         assignProperty(OTSelectionProperty(PROPERTY_TYPE, "Interface Type", arrayOf("Range Picker", "Stopwatch")))
+
+        setPropertyValue(PROPERTY_GRANULARITY, 0)
     }
 
 

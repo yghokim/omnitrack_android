@@ -5,7 +5,6 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import android.util.Log
 import kr.ac.snu.hcil.omnitrack.core.NamedObject
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
@@ -145,7 +144,6 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
 
     override fun onCreate(db: SQLiteDatabase) {
         println("Create Database Tables")
-        Log.d("OMNITRACK", "Create Database Tables")
 
         val tables = arrayOf(UserScheme, TrackerScheme, AttributeScheme, TriggerScheme, ItemScheme)
 

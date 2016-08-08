@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack
 
 import android.app.Application
+import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTTriggerManager
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
@@ -56,7 +57,30 @@ class OmniTrackApplication : Application() {
 
         dbHelper = DatabaseHelper(this)
 
-        _currentUser = dbHelper.findUserById(1) ?: OTUser("Young-Ho Kim", "yhkim@hcil.snu.ac.kr")
+        val user = dbHelper.findUserById(1)
+        if (user == null) {
+            val defaultUser = OTUser("Young-Ho Kim", "yhkim@hcil.snu.ac.kr")
+            val coffeeTracker = OTTracker("Coffee")
+            coffeeTracker.attributes.add(OTAttribute.Companion.createAttribute(defaultUser, "Name", OTAttribute.TYPE_SHORT_TEXT))
+            coffeeTracker.attributes.add(OTAttribute.Companion.createAttribute(defaultUser, "Drank At", OTAttribute.TYPE_TIME))
+
+            val waterTracker = OTTracker("Water")
+            waterTracker.attributes.add(OTAttribute.Companion.createAttribute(defaultUser, "Drank At", OTAttribute.TYPE_TIME))
+
+            val sleepTracker = OTTracker("Manual Sleep")
+            sleepTracker.attributes.add(OTAttribute.Companion.createAttribute(defaultUser, "When to Bed", OTAttribute.TYPE_TIME))
+            sleepTracker.attributes.add(OTAttribute.Companion.createAttribute(defaultUser, "Slept for", OTAttribute.TYPE_TIMESPAN))
+            sleepTracker.attributes.add(OTAttribute.Companion.createAttribute(defaultUser, "Memo", OTAttribute.TYPE_LONG_TEXT))
+
+            defaultUser.trackers.add(sleepTracker)
+            defaultUser.trackers.add(waterTracker)
+            defaultUser.trackers.add(coffeeTracker)
+
+            _currentUser = defaultUser
+        } else {
+            _currentUser = user
+        }
+
 
         triggerManager = OTTriggerManager(_currentUser, if (_currentUser.dbId != null) {
             dbHelper.findTriggersOfUser(_currentUser.dbId!!)
