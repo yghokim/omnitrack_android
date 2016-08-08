@@ -85,17 +85,13 @@ class OTUser(objectId: String?, dbId: Long?, name: String, email: String, attrib
 
     fun newTracker(name: String, add: Boolean): OTTracker {
         val tracker = OTTracker(name)
-        println(OmniTrackApplication.app.colorPalette.map { it.toString() }.joinToString(", "))
         val unOccupied = OmniTrackApplication.app.colorPalette.filter {
             color ->
-            println(color)
             trackers.unObservedList.find {
                 tracker ->
                 tracker.color == color
             } == null
         }
-
-        println(unOccupied)
 
         tracker.color = if (unOccupied.size > 0) {
             unOccupied.first()

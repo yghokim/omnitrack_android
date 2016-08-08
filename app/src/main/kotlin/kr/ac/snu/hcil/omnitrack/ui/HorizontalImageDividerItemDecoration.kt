@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
-import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import kr.ac.snu.hcil.omnitrack.R
@@ -33,8 +32,7 @@ class HorizontalImageDividerItemDecoration(resId: Int = R.drawable.horizontal_se
             val child = parent.getChildAt(i)
 
             val params = child.layoutParams as RecyclerView.LayoutParams
-
-            val top = child.bottom + params.bottomMargin
+            val top = Math.round(child.bottom + child.translationY + params.bottomMargin)
             val bottom = top + dividerHeight
 
             divider.setBounds(left, top, right, bottom)

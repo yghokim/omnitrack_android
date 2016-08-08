@@ -30,7 +30,7 @@ class HorizontalDividerItemDecoration(val color: Int, val height: Int) : Recycle
 
                 val params = child.layoutParams as RecyclerView.LayoutParams
 
-                val top = child.bottom + params.bottomMargin
+                val top = child.bottom + child.translationY + params.bottomMargin
                 val bottom = top + height
 
                 c.drawLine(left.toFloat(), (top + bottom) * .5f, right.toFloat(), (top + bottom) * .5f, paint)
