@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack
 
 import android.app.Application
-import kr.ac.snu.hcil.omnitrack.core.OTTracker
+import android.graphics.Color
 import kr.ac.snu.hcil.omnitrack.core.OTTriggerManager
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
@@ -42,6 +42,9 @@ class OmniTrackApplication : Application() {
             return _currentUser
         }
 
+    val colorPalette: IntArray by lazy {
+        this.resources.getStringArray(R.array.colorPaletteArray).map { Color.parseColor(it) }.toIntArray()
+    }
 
     lateinit var triggerManager: OTTriggerManager
         private set
@@ -60,21 +63,17 @@ class OmniTrackApplication : Application() {
         val user = dbHelper.findUserById(1)
         if (user == null) {
             val defaultUser = OTUser("Young-Ho Kim", "yhkim@hcil.snu.ac.kr")
-            val coffeeTracker = OTTracker("Coffee")
+            val coffeeTracker = defaultUser.newTracker("Coffee", true)
             coffeeTracker.attributes.add(OTAttribute.Companion.createAttribute(defaultUser, "Name", OTAttribute.TYPE_SHORT_TEXT))
             coffeeTracker.attributes.add(OTAttribute.Companion.createAttribute(defaultUser, "Drank At", OTAttribute.TYPE_TIME))
 
-            val waterTracker = OTTracker("Water")
+            val waterTracker = defaultUser.newTracker("Water", true)
             waterTracker.attributes.add(OTAttribute.Companion.createAttribute(defaultUser, "Drank At", OTAttribute.TYPE_TIME))
 
-            val sleepTracker = OTTracker("Manual Sleep")
+            val sleepTracker = defaultUser.newTracker("Manual Sleep", true)
             sleepTracker.attributes.add(OTAttribute.Companion.createAttribute(defaultUser, "When to Bed", OTAttribute.TYPE_TIME))
             sleepTracker.attributes.add(OTAttribute.Companion.createAttribute(defaultUser, "Slept for", OTAttribute.TYPE_TIMESPAN))
             sleepTracker.attributes.add(OTAttribute.Companion.createAttribute(defaultUser, "Memo", OTAttribute.TYPE_LONG_TEXT))
-
-            defaultUser.trackers.add(sleepTracker)
-            defaultUser.trackers.add(waterTracker)
-            defaultUser.trackers.add(coffeeTracker)
 
             _currentUser = defaultUser
         } else {

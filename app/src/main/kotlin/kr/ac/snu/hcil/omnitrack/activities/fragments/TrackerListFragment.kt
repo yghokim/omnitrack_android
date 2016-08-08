@@ -63,9 +63,7 @@ class TrackerListFragment : Fragment() {
 
         val fab = rootView.findViewById(R.id.fab) as FloatingActionButton?
         fab!!.setOnClickListener { view ->
-            val newTracker = OTTracker(OmniTrackApplication.app.currentUser.generateNewTrackerName(context))
-
-            OmniTrackApplication.app.currentUser.trackers.add(newTracker)
+            val newTracker = OmniTrackApplication.app.currentUser.newTrackerWithDefaultName(context, true)
 
             val intent = Intent(context, TrackerDetailActivity::class.java)
             intent.putExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, newTracker.objectId)
