@@ -70,13 +70,20 @@
 
             <Button
                 android:id="@+id/ui_button_new_connection"
-                style="@style/Widget.AppCompat.Button.Borderless"
+                style="@style/timeRangePickerButtonStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/activity_horizontal_margin"
                 android:layout_marginStart="@dimen/activity_horizontal_margin"
-                android:background="@color/buttonIconColorDark"
-                android:text="@string/msg_set_new_connection" />
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:drawablePadding="8dp"
+                android:drawableStart="@drawable/link_dark"
+                android:paddingBottom="14dp"
+                android:paddingStart="17dp"
+
+                android:paddingTop="14dp"
+                android:text="@string/msg_set_new_connection"
+                android:textAlignment="viewStart" />
 
 
         </LinearLayout>

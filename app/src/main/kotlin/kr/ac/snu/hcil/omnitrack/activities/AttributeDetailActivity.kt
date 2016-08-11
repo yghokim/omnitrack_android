@@ -3,16 +3,19 @@ package kr.ac.snu.hcil.omnitrack.activities
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.LinearLayout
 import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ShortTextPropertyView
+import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 import java.util.*
 
-class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_attribute_detail) {
+class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_attribute_detail), View.OnClickListener {
+
 
     var attribute: OTAttribute<out Any>? = null
 
@@ -20,6 +23,8 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
     private lateinit var propertyViewContainer: LinearLayout
 
     private lateinit var columnNameView: ShortTextPropertyView
+
+    private lateinit var newConnectionButton: Button
 
     private val propertyViewList = ArrayList<ReadOnlyPair<Int?, View>>()
 
@@ -40,6 +45,12 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
             if (columnNameView.validate())
                 attribute?.name = value
         }
+
+        newConnectionButton = findViewById(R.id.ui_button_new_connection) as Button
+
+        InterfaceHelper.removeButtonTextDecoration(newConnectionButton)
+
+        newConnectionButton.setOnClickListener(this)
 
         refresh()
 
@@ -100,6 +111,12 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
                 propertyViewContainer.addView(entry.second, layoutParams)
             }
+        }
+    }
+
+    override fun onClick(view: View?) {
+        if (view === newConnectionButton) {
+
         }
     }
 }
