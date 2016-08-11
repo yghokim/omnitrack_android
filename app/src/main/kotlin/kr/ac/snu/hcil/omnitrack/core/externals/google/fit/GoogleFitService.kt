@@ -1,12 +1,14 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.google.fit
 
-import android.app.Activity
 import android.content.Context
-import android.support.v4.app.Fragment
+import com.google.android.gms.common.api.Api
 import com.google.android.gms.common.api.GoogleApiClient
+import com.google.android.gms.common.api.Scope
 import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
+import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
+import java.util.*
 
 /**
  * Created by younghokim on 16. 8. 8..
@@ -20,6 +22,34 @@ object GoogleFitService : OTExternalService("GoogleFitService", 19) {
     override val permissionGranted: Boolean = true
 
     private var client: GoogleApiClient? = null
+
+    val usedApis: Array<Api<out Api.ApiOptions.NotRequiredOptions>> by lazy {
+
+        val set = HashSet<Api<out Api.ApiOptions.NotRequiredOptions>>()
+        for (m in _measureFactories) {
+            if (m is GoogleFitMeasureFactory) {
+                set.add(m.usedAPI)
+            }
+        }
+
+        set.toTypedArray()
+    }
+
+    val usedScopes: Array<Scope> by lazy {
+
+        val set = HashSet<Scope>()
+        for (m in _measureFactories) {
+            if (m is GoogleFitMeasureFactory) {
+                set.add(m.usedScope)
+            }
+        }
+
+        set.toTypedArray()
+    }
+
+    init {
+        _measureFactories.add(GoogleFitStepsFactory())
+    }
 
     override fun getState(): ServiceState {
         return if (client != null) {
@@ -37,20 +67,27 @@ object GoogleFitService : OTExternalService("GoogleFitService", 19) {
 
     }
 
-    override fun grantPermissions(caller: Fragment, requestCode: Int) {
-
-    }
-
-    override fun grantPermissions(caller: Activity, requestCode: Int) {
-
-    }
-
     override fun prepareService() {
 
     }
 
     private fun buildClientBuilderBase(context: Context = OmniTrackApplication.app): GoogleApiClient.Builder {
-        return GoogleApiClient.Builder(context)
+        val builder = GoogleApiClient.Builder(context)
 
+        for (api in usedApis) {
+            builder.addApi(api)
+        }
+
+        for (scope in usedScopes) {
+            builder.addScope(scope)
+        }
+
+
+        return builder
+    }
+
+    abstract class GoogleFitMeasureFactory<T> : OTMeasureFactory<T>() {
+        abstract val usedAPI: Api<out Api.ApiOptions.NotRequiredOptions>
+        abstract val usedScope: Scope
     }
 }

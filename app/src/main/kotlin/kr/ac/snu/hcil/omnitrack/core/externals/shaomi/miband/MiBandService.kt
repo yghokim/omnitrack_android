@@ -1,13 +1,8 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.shaomi.miband
 
-import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.content.Context
-import android.content.pm.PackageManager
-import android.support.v4.app.ActivityCompat
-import android.support.v4.app.Fragment
-import android.support.v4.content.ContextCompat
 import com.zhaoxiaodan.miband.ActionCallback
 import com.zhaoxiaodan.miband.MiBand
 import com.zhaoxiaodan.miband.model.UserInfo
@@ -33,8 +28,7 @@ object MiBandService : OTExternalService("ShaomiMiBand", 21) {
     override val nameResourceId: Int = R.string.service_mi_band_name
     override val descResourceId: Int = R.string.service_mi_band_desc
 
-    override val permissionGranted: Boolean
-        get() = OmniTrackApplication.app.applicationContext.checkCallingOrSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+    override val requiredPermissions = arrayOf(android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION)
 
     private var device: BluetoothDevice? = null
 
@@ -55,16 +49,6 @@ object MiBandService : OTExternalService("ShaomiMiBand", 21) {
 
     override fun deactivate() {
 
-    }
-
-    override fun grantPermissions(activity: Activity, requestCode: Int) {
-        if (ContextCompat.checkSelfPermission(activity, android.Manifest.permission.ACCESS_COARSE_LOCATION) !== PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(activity, arrayOf(android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION), requestCode)
-        }
-    }
-
-    override fun grantPermissions(caller: Fragment, requestCode: Int) {
-        caller.requestPermissions(arrayOf(android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION), requestCode)
     }
 
     private fun storeDeviceMac(address: String) {

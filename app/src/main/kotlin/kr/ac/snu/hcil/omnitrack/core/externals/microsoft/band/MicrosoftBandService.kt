@@ -1,9 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.microsoft.band
 
-import android.app.Activity
 import android.content.Context
 import android.os.AsyncTask
-import android.support.v4.app.Fragment
 import com.microsoft.band.BandClient
 import com.microsoft.band.BandClientManager
 import com.microsoft.band.BandException
@@ -21,15 +19,6 @@ object MicrosoftBandService : OTExternalService("MicrosoftBandService", 19) {
     }
 
     override val permissionGranted: Boolean = true
-
-    override fun grantPermissions(caller: Activity, requestCode: Int) {
-
-    }
-
-    override fun grantPermissions(caller: Fragment, requestCode: Int) {
-
-    }
-
 
     override val thumbResourceId: Int = R.drawable.service_thumb_microsoftband
     override val nameResourceId: Int = R.string.service_microsoft_band_name

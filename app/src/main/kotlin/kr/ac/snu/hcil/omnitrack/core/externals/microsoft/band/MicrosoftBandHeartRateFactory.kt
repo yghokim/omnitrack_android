@@ -1,12 +1,8 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.microsoft.band
 
-import android.app.Activity
 import android.os.AsyncTask
-import android.support.v7.app.AppCompatActivity
-import com.microsoft.band.UserConsent
 import com.microsoft.band.sensors.BandHeartRateEvent
 import com.microsoft.band.sensors.BandHeartRateEventListener
-import com.microsoft.band.sensors.HeartRateConsentListener
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 
@@ -29,7 +25,7 @@ class MicrosoftBandHeartRateFactory : OTMeasureFactory<Int>() {
     init {
         val sensorManager = MicrosoftBandService.getClient()?.sensorManager
         if (sensorManager != null) {
-            permissionGranted = sensorManager.currentHeartRateConsent == UserConsent.GRANTED
+            //permissionGranted = sensorManager.currentHeartRateConsent == UserConsent.GRANTED
         }
     }
 
@@ -64,6 +60,7 @@ class MicrosoftBandHeartRateFactory : OTMeasureFactory<Int>() {
         SensorReceptionTask(handler).execute()
     }
 
+    /*
     override fun grantPermissions(activity: Activity, handler: ((Boolean) -> Unit)?) {
         super.grantPermissions(activity, handler)
 
@@ -79,7 +76,7 @@ class MicrosoftBandHeartRateFactory : OTMeasureFactory<Int>() {
                 }
             }
         }
-    }
+    }*/
 
     inner class SensorListener : BandHeartRateEventListener {
         override fun onBandHeartRateChanged(p0: BandHeartRateEvent?) {
