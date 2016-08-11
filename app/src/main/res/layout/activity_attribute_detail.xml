@@ -68,22 +68,35 @@
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:text="@string/msg_value_autocompletion" />
 
-            <Button
-                android:id="@+id/ui_button_new_connection"
-                style="@style/timeRangePickerButtonStyle"
+            <FrameLayout
+                android:id="@+id/ui_attribute_connection_frame"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/activity_horizontal_margin"
-                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:layout_marginEnd="@dimen/attribute_list_element_horizontal_padding"
+                android:layout_marginStart="@dimen/attribute_list_element_horizontal_padding"
                 android:layout_marginTop="@dimen/activity_vertical_margin"
-                android:drawablePadding="8dp"
-                android:drawableStart="@drawable/link_dark"
-                android:paddingBottom="14dp"
-                android:paddingStart="17dp"
+                android:background="@drawable/attribute_card">
 
-                android:paddingTop="14dp"
-                android:text="@string/msg_set_new_connection"
-                android:textAlignment="viewStart" />
+                <Button
+                    android:id="@+id/ui_button_new_connection"
+                    style="@style/Base.Widget.AppCompat.Button.Borderless"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="8dp"
+                    android:drawableStart="@drawable/link_dark"
+                    android:paddingBottom="14dp"
+                    android:paddingStart="12dp"
+
+                    android:paddingTop="14dp"
+                    android:text="@string/msg_set_new_connection"
+                    android:textAlignment="viewStart" />
+
+                <kr.ac.snu.hcil.omnitrack.ui.components.AttributeConnectionView
+                    android:id="@+id/ui_attribute_connection"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone" />
+            </FrameLayout>
 
 
         </LinearLayout>
