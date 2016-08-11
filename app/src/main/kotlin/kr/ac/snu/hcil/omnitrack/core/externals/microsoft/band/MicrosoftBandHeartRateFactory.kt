@@ -5,12 +5,22 @@ import com.microsoft.band.sensors.BandHeartRateEventListener
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
+import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 
 /**
  * Created by younghokim on 16. 7. 28..
  */
 class MicrosoftBandHeartRateFactory : OTMeasureFactory() {
+    override val service: OTExternalService = MicrosoftBandService
+
+    override fun makeMeasure(serialized: String): OTMeasure {
+        throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun makeMeasure(): OTMeasure {
+        throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 
     override fun isAttachableTo(attribute: OTAttribute<out Any>): Boolean {
         if (attribute is OTNumberAttribute) {

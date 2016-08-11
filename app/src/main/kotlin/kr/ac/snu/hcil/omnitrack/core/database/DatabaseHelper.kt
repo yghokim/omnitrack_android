@@ -340,6 +340,9 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
             values.put(AttributeScheme.TRACKER_ID, attribute.owner?.dbId ?: null)
             values.put(AttributeScheme.PROPERTY_DATA, attribute.getSerializedProperties())
 
+            if (attribute.valueConnection != null) {
+                values.put(AttributeScheme.CONNECTION_DATA, attribute.valueConnection!!.getSerializedString())
+            }
             saveObject(attribute, values, AttributeScheme)
             attribute.isDirtySinceLastSync = false
         }

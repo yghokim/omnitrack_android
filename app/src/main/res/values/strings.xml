@@ -19,10 +19,14 @@
     <string name="msg_change_tracker_name">Change attribute name</string>
     <string name="msg_change_tracker_settings">Change attribute settings</string>
     <string name="msg_remove_tracker">Remove attribute</string>
+
     <string name="msg_yes">Yes</string>
     <string name="msg_no">No</string>
     <string name="msg_confirm_remove_tracker">Remove this attribute?</string>
     <string name="msg_confirm_apply_settings">Apply settings?</string>
+
+    <string name="msg_confirm_remove_connection">Disconnect with the external source?</string>
+
 
     <string name="msg_ok">Okay</string>
     <string name="msg_cancel">Cancel</string>

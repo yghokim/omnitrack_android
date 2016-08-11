@@ -1,15 +1,21 @@
 package kr.ac.snu.hcil.omnitrack.activities
 
 import android.os.Bundle
+import android.transition.TransitionManager
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
+import kr.ac.snu.hcil.omnitrack.core.externals.google.fit.GoogleFitStepsFactory
+import kr.ac.snu.hcil.omnitrack.ui.components.AttributeConnectionView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ShortTextPropertyView
+import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 import java.util.*
@@ -26,7 +32,9 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
     private lateinit var columnNameView: ShortTextPropertyView
 
+    private lateinit var connectionFrame: FrameLayout
     private lateinit var newConnectionButton: Button
+    private lateinit var connectionView: AttributeConnectionView
 
     private val propertyViewList = ArrayList<ReadOnlyPair<Int?, View>>()
 
@@ -49,14 +57,21 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
                 attribute?.name = value
         }
 
+        connectionFrame = findViewById(R.id.ui_attribute_connection_frame) as FrameLayout
+        connectionView = findViewById(R.id.ui_attribute_connection) as AttributeConnectionView
+        connectionView.onRemoveButtonClicked += {
+            sender, arg ->
+            DialogHelper.makeYesNoDialogBuilder(this, "OmniTrack", resources.getString(R.string.msg_confirm_remove_connection), {
+                attribute?.valueConnection = null
+                refreshConnection(true)
+            }).show()
+        }
+
         newConnectionButton = findViewById(R.id.ui_button_new_connection) as Button
 
         InterfaceHelper.removeButtonTextDecoration(newConnectionButton)
 
         newConnectionButton.setOnClickListener(this)
-
-        refresh()
-
 
     }
 
@@ -78,6 +93,8 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
     fun refresh() {
         val attr = attribute
         if (attr != null) {
+            //refresh properties===============================================================================================================
+
             columnNameView.value = attr.name
 
             propertyViewContainer.removeAllViewsInLayout()
@@ -114,6 +131,12 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
                 propertyViewContainer.addView(entry.second, layoutParams)
             }
+            //end: refresh properties==================================================================================
+            refreshConnection(false)
+
+            //refresh connections======================================================================================
+
+
         }
 
         if (attr == null || attr.propertyKeys.size == 0) {
@@ -123,9 +146,29 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
         }
     }
 
-    override fun onClick(view: View?) {
-        if (view === newConnectionButton) {
+    private fun refreshConnection(animated: Boolean) {
+        if (animated) {
+            TransitionManager.beginDelayedTransition(connectionFrame)
+        }
 
+        if (attribute?.valueConnection != null) {
+            newConnectionButton.visibility = View.GONE
+            connectionView.visibility = View.VISIBLE
+            connectionView.connection = attribute?.valueConnection
+        } else {
+            connectionView.visibility = View.GONE
+            newConnectionButton.visibility = View.VISIBLE
+        }
+    }
+
+    override fun onClick(view: View?) {
+        println(view === newConnectionButton)
+        if (view === newConnectionButton) {
+            val connection = OTConnection()
+            connection.source = GoogleFitStepsFactory.makeMeasure()
+
+            attribute?.valueConnection = connection
+            refreshConnection(true)
         }
     }
 }

@@ -7,16 +7,23 @@ import com.google.android.gms.fitness.data.DataType
 import com.google.android.gms.fitness.data.Field
 import com.google.android.gms.fitness.request.DataReadRequest
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
+import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
+import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.AsyncTaskWithResultHandler
+import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableTypedQueue
+import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import java.util.concurrent.TimeUnit
 
 /**
  * Created by Young-Ho on 8/11/2016.
  */
 
-class GoogleFitStepsFactory : GoogleFitService.GoogleFitMeasureFactory() {
+object GoogleFitStepsFactory : GoogleFitService.GoogleFitMeasureFactory() {
+    override val service: OTExternalService = GoogleFitService
+
     override val isRangedQueryAvailable: Boolean = true
 
     override val nameResourceId: Int = R.string.measure_googlefit_steps_name
@@ -30,6 +37,42 @@ class GoogleFitStepsFactory : GoogleFitService.GoogleFitMeasureFactory() {
         if (attribute is OTNumberAttribute) {
             return true
         } else return false
+    }
+
+    override fun makeMeasure(): OTMeasure {
+        return Measure()
+    }
+
+    override fun makeMeasure(serialized: String): OTMeasure {
+        return Measure(serialized)
+    }
+
+    class Measure : OTMeasure {
+        override val dataTypeName = TypeStringSerializationHelper.TYPENAME_INT
+
+        override val factoryCode: String = GoogleFitStepsFactory.typeCode
+
+        override val factory: OTMeasureFactory = GoogleFitStepsFactory
+
+        constructor() : super()
+        constructor(serialized: String) : super(serialized)
+
+        override fun awaitRequestValue(query: OTTimeRangeQuery?): Any {
+            throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+
+        override fun requestValueAsync(query: OTTimeRangeQuery?, handler: (Any) -> Unit) {
+
+        }
+
+        override fun onSerialize(typedQueue: SerializableTypedQueue) {
+
+        }
+
+        override fun onDeserialize(typedQueue: SerializableTypedQueue) {
+
+        }
+
     }
 
     class Task(handler: ((Boolean) -> Unit)?) : AsyncTaskWithResultHandler(handler) {

@@ -5,8 +5,8 @@
 
     <ImageView
         android:id="@+id/ui_icon"
-        android:layout_width="18dp"
-        android:layout_height="18dp"
+        android:layout_width="19dp"
+        android:layout_height="19dp"
         android:layout_gravity="center_vertical"
         android:layout_marginRight="8dp"
         android:src="@drawable/convert_dark"></ImageView>
@@ -17,6 +17,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:text="Convert Result"
-        android:textSize="12dp"
+        android:textSize="13dp"
         android:textStyle="bold" />
 </merge>

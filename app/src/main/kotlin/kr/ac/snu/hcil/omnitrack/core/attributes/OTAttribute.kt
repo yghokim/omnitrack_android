@@ -66,8 +66,12 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
     val propertyValueChanged = Event<OTProperty.PropertyChangedEventArgs<out Any>>()
     private val settingsProperties = SparseArray<OTProperty<out Any>>()
 
-    var valueSource: OTConnection? = null
-        private set
+    var valueConnection: OTConnection? by Delegates.observable(null as OTConnection?) {
+        prop, old, new ->
+        if (old != new) {
+            isDirtySinceLastSync = true
+        }
+    }
 
     constructor(columnName: String, typeId: Int) : this(null, null, columnName, typeId, null, null)
 
@@ -84,7 +88,7 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
         }
 
         if (connectionData != null) {
-
+            valueConnection = OTConnection(connectionData)
         }
     }
 

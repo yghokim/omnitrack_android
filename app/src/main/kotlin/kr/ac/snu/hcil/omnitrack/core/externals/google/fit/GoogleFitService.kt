@@ -89,7 +89,7 @@ object GoogleFitService : OTExternalService("GoogleFitService", 19) {
 
 
     init {
-        _measureFactories.add(GoogleFitStepsFactory())
+        _measureFactories.add(GoogleFitStepsFactory)
     }
 
     override fun onActivateAsync(context: Context, connectedHandler: ((Boolean) -> Unit)?) {

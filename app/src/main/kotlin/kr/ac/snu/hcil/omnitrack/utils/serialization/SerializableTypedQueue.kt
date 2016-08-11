@@ -19,7 +19,6 @@ class SerializableTypedQueue() : IStringSerializable {
         for (entry in gson.fromJson(serialized, Array<String>::class.java)) {
             serializedQueue.push(entry)
         }
-
         return true
     }
 
@@ -31,7 +30,39 @@ class SerializableTypedQueue() : IStringSerializable {
         serializedQueue.push(TypeStringSerializationHelper.serialize(typeName, value))
     }
 
+    fun putInt(value: Int) {
+        putValue(TypeStringSerializationHelper.TYPENAME_INT, value)
+    }
+
+    fun putString(value: String) {
+        putValue(TypeStringSerializationHelper.TYPENAME_STRING, value)
+    }
+
+    fun putBoolean(value: Boolean) {
+        putValue(TypeStringSerializationHelper.TYPENAME_INT, if (value) {
+            1
+        } else {
+            0
+        })
+    }
+
     fun getValue(typeName: String): Any {
         return TypeStringSerializationHelper.deserialize(serializedQueue.poll())
+    }
+
+    fun getInt(): Int {
+        return getValue(TypeStringSerializationHelper.TYPENAME_INT) as Int
+    }
+
+    fun getString(): String {
+        return getValue(TypeStringSerializationHelper.TYPENAME_STRING) as String
+    }
+
+    fun getBoolean(): Boolean {
+        return if (getValue(TypeStringSerializationHelper.TYPENAME_INT) == 1) {
+            true
+        } else {
+            false
+        }
     }
 }

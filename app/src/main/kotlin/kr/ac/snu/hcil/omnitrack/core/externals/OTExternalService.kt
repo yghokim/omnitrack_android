@@ -21,12 +21,27 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
 
         const val REQUEST_CODE_GOOGLE_FIT = 0
 
+        private val factoryCodeDict = HashMap<String, OTMeasureFactory>()
+
         val availableServices: Array<OTExternalService> by lazy {
             arrayOf(AndroidDeviceService, GoogleFitService, MicrosoftBandService, MiBandService)
         }
 
+        fun getMeasureFactoryByCode(typeCode: String): OTMeasureFactory? {
+            return factoryCodeDict[typeCode]
+        }
+
         private val preferences: SharedPreferences
             get() = OmniTrackApplication.app.getSharedPreferences("ExternalServices", Context.MODE_PRIVATE)
+
+
+        init {
+            for (service in availableServices) {
+                for (factory in service.measureFactories) {
+                    factoryCodeDict.put(factory.typeCode, factory)
+                }
+            }
+        }
 
 
         /***

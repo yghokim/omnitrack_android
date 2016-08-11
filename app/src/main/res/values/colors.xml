@@ -16,6 +16,8 @@
     <color name="textColorDark">#252525</color>
     <color name="textColorLight">#aaaaaa</color>
 
+    <color name="colorEditable">#16afa3</color>
+
 
     <color name="titleTextColor">#666666</color>
     <color name="outerBackground">#edebe7</color>
