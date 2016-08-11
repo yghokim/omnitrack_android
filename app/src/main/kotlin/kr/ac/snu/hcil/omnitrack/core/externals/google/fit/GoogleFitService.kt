@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.google.fit
 
 import android.content.Context
+import android.os.Bundle
 import com.google.android.gms.common.api.Api
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.common.api.Scope
@@ -14,6 +15,7 @@ import java.util.*
  * Created by younghokim on 16. 8. 8..
  */
 object GoogleFitService : OTExternalService("GoogleFitService", 19) {
+
 
     override val nameResourceId: Int = R.string.service_googlefit_name
     override val descResourceId: Int = R.string.service_googlefit_desc
@@ -47,6 +49,48 @@ object GoogleFitService : OTExternalService("GoogleFitService", 19) {
         set.toTypedArray()
     }
 
+
+    //===================================================================================================
+    private var currentActivationHandler: ((Boolean) -> Unit)? = null
+
+    private var currentPreparationHandler: ((Boolean) -> Unit)? = null
+
+
+    private val activationConnectionCallbacks = object : GoogleApiClient.ConnectionCallbacks {
+        override fun onConnectionSuspended(reason: Int) {
+
+        }
+
+        override fun onConnected(reason: Bundle?) {
+            currentActivationHandler?.invoke(true)
+        }
+    }
+
+    private val activationConnectionFailedListener = GoogleApiClient.OnConnectionFailedListener {
+        result ->
+        println(result.errorMessage)
+        currentActivationHandler?.invoke(false)
+    }
+
+    private val preparationConnectionFailedListener = GoogleApiClient.OnConnectionFailedListener {
+        result ->
+        println(result.errorMessage)
+        currentPreparationHandler?.invoke(false)
+    }
+
+    private val preparationConnectionCallbacks = object : GoogleApiClient.ConnectionCallbacks {
+        override fun onConnectionSuspended(reason: Int) {
+
+        }
+
+        override fun onConnected(reason: Bundle?) {
+            currentPreparationHandler?.invoke(true)
+        }
+    }
+
+    //==================================================================================================
+
+
     init {
         _measureFactories.add(GoogleFitStepsFactory())
     }
@@ -60,15 +104,29 @@ object GoogleFitService : OTExternalService("GoogleFitService", 19) {
     }
 
     override fun activateAsync(context: Context, connectedHandler: ((Boolean) -> Unit)?) {
-
+        if (client == null) {
+            currentActivationHandler = connectedHandler
+            client = buildClientBuilderBase(context)
+                    .addConnectionCallbacks(activationConnectionCallbacks)
+                    .addOnConnectionFailedListener(activationConnectionFailedListener)
+                    .build()
+        } else connectedHandler?.invoke(true)
     }
 
     override fun deactivate() {
 
     }
 
-    override fun prepareService() {
-
+    override fun prepareServiceAsync(preparedHandler: ((Boolean) -> Unit)?) {
+        if (client == null) {
+            currentPreparationHandler = preparedHandler
+            client = buildClientBuilderBase()
+                    .addConnectionCallbacks(preparationConnectionCallbacks)
+                    .addOnConnectionFailedListener(preparationConnectionFailedListener)
+                    .build()
+        } else {
+            preparedHandler?.invoke(true)
+        }
     }
 
     private fun buildClientBuilderBase(context: Context = OmniTrackApplication.app): GoogleApiClient.Builder {

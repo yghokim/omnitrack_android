@@ -64,7 +64,7 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
         caller.requestPermissions(requiredPermissionsRecursive, requestCode)
     }
 
-    abstract fun prepareService()
+    abstract fun prepareServiceAsync(preparedHandler: ((Boolean) -> Unit)?)
 
     protected val requiredPermissionsRecursive: Array<String> by lazy {
         val result = HashSet<String>()

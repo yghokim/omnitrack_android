@@ -17,7 +17,7 @@ import kr.ac.snu.hcil.omnitrack.utils.AsyncTaskWithResultHandler
 
 //@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 object MiBandService : OTExternalService("ShaomiMiBand", 21) {
-    override fun prepareService() {
+    override fun prepareServiceAsync(preparedHandler: ((Boolean) -> Unit)?) {
 
     }
 

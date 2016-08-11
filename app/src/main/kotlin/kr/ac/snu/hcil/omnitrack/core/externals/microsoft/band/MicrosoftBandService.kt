@@ -14,7 +14,7 @@ import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
  * Created by younghokim on 16. 7. 28..
  */
 object MicrosoftBandService : OTExternalService("MicrosoftBandService", 19) {
-    override fun prepareService() {
+    override fun prepareServiceAsync(preparedHandler: ((Boolean) -> Unit)?) {
 
     }
 

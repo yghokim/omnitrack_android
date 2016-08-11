@@ -10,7 +10,7 @@ import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
  * Created by younghokim on 16. 8. 4..
  */
 object AndroidDeviceService : OTExternalService("AndroidDeviceService", 19) {
-    override fun prepareService() {
+    override fun prepareServiceAsync(preparedHandler: ((Boolean) -> Unit)?) {
 
     }
 
