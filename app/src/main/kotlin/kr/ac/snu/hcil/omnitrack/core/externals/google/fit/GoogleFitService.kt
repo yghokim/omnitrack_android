@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.google.fit
 
+import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import com.google.android.gms.common.api.Api
@@ -16,12 +17,9 @@ import java.util.*
  */
 object GoogleFitService : OTExternalService("GoogleFitService", 19) {
 
-
     override val nameResourceId: Int = R.string.service_googlefit_name
     override val descResourceId: Int = R.string.service_googlefit_desc
     override val thumbResourceId: Int = R.drawable.service_thumb_googlefit
-
-    override val permissionGranted: Boolean = true
 
     private var client: GoogleApiClient? = null
 
@@ -58,34 +56,33 @@ object GoogleFitService : OTExternalService("GoogleFitService", 19) {
 
     private val activationConnectionCallbacks = object : GoogleApiClient.ConnectionCallbacks {
         override fun onConnectionSuspended(reason: Int) {
-
+            println("Google Fit activation connection is pending.. - $reason")
         }
 
         override fun onConnected(reason: Bundle?) {
+            println("activation success.")
             currentActivationHandler?.invoke(true)
         }
     }
 
-    private val activationConnectionFailedListener = GoogleApiClient.OnConnectionFailedListener {
-        result ->
-        println(result.errorMessage)
-        currentActivationHandler?.invoke(false)
+    private val preparationConnectionCallbacks = object : GoogleApiClient.ConnectionCallbacks {
+        override fun onConnectionSuspended(reason: Int) {
+            println("Google Fit preparation connection is pending.. - $reason")
+        }
+
+        override fun onConnected(reason: Bundle?) {
+
+            println("preparation success.")
+            currentPreparationHandler?.invoke(true)
+
+        }
     }
 
     private val preparationConnectionFailedListener = GoogleApiClient.OnConnectionFailedListener {
         result ->
+        println("Google fit preparation connection failed - ${result.toString()}")
         println(result.errorMessage)
         currentPreparationHandler?.invoke(false)
-    }
-
-    private val preparationConnectionCallbacks = object : GoogleApiClient.ConnectionCallbacks {
-        override fun onConnectionSuspended(reason: Int) {
-
-        }
-
-        override fun onConnected(reason: Bundle?) {
-            currentPreparationHandler?.invoke(true)
-        }
     }
 
     //==================================================================================================
@@ -95,26 +92,31 @@ object GoogleFitService : OTExternalService("GoogleFitService", 19) {
         _measureFactories.add(GoogleFitStepsFactory())
     }
 
-    override fun getState(): ServiceState {
-        return if (client != null) {
-            ServiceState.ACTIVATED
-        } else {
-            ServiceState.DEACTIVATED
-        }
-    }
-
-    override fun activateAsync(context: Context, connectedHandler: ((Boolean) -> Unit)?) {
+    override fun onActivateAsync(context: Context, connectedHandler: ((Boolean) -> Unit)?) {
+        println("activate Google Fit...")
         if (client == null) {
             currentActivationHandler = connectedHandler
             client = buildClientBuilderBase(context)
                     .addConnectionCallbacks(activationConnectionCallbacks)
-                    .addOnConnectionFailedListener(activationConnectionFailedListener)
+                    .addOnConnectionFailedListener {
+                        result ->
+                        if (result.hasResolution()) {
+                            result.startResolutionForResult(context as Activity, REQUEST_CODE_GOOGLE_FIT)
+                        }
+                    }
                     .build()
+            client?.connect()
         } else connectedHandler?.invoke(true)
     }
 
-    override fun deactivate() {
+    override fun onDeactivate() {
+        client?.disconnect()
+        client = null
+    }
 
+    override fun handleActivityActivationResult(resultCode: Int) {
+        println(resultCode)
+        prepareServiceAsync(currentActivationHandler)
     }
 
     override fun prepareServiceAsync(preparedHandler: ((Boolean) -> Unit)?) {
@@ -124,8 +126,24 @@ object GoogleFitService : OTExternalService("GoogleFitService", 19) {
                     .addConnectionCallbacks(preparationConnectionCallbacks)
                     .addOnConnectionFailedListener(preparationConnectionFailedListener)
                     .build()
+            client?.connect()
         } else {
             preparedHandler?.invoke(true)
+        }
+    }
+
+    fun getClientAsync(handler: (client: GoogleApiClient?) -> Unit) {
+        if (client != null) {
+            handler.invoke(client)
+        } else {
+            prepareServiceAsync {
+                success ->
+                if (success == true) {
+                    handler.invoke(client)
+                } else {
+                    handler.invoke(null)
+                }
+            }
         }
     }
 
@@ -139,12 +157,10 @@ object GoogleFitService : OTExternalService("GoogleFitService", 19) {
         for (scope in usedScopes) {
             builder.addScope(scope)
         }
-
-
         return builder
     }
 
-    abstract class GoogleFitMeasureFactory<T> : OTMeasureFactory<T>() {
+    abstract class GoogleFitMeasureFactory : OTMeasureFactory() {
         abstract val usedAPI: Api<out Api.ApiOptions.NotRequiredOptions>
         abstract val usedScope: Scope
     }

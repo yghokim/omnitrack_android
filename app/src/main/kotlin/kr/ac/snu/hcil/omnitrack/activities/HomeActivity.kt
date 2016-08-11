@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.activities
 
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.support.design.widget.TabLayout
@@ -17,6 +18,8 @@ import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.activities.fragments.ServiceListFragment
 import kr.ac.snu.hcil.omnitrack.activities.fragments.TrackerListFragment
+import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
+import kr.ac.snu.hcil.omnitrack.core.externals.google.fit.GoogleFitService
 
 class HomeActivity : UserSyncedActivity() {
 
@@ -143,6 +146,14 @@ class HomeActivity : UserSyncedActivity() {
                 2 -> return resources.getString(R.string.msg_tab_settings)
             }
             return null
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        when (requestCode) {
+            OTExternalService.REQUEST_CODE_GOOGLE_FIT -> GoogleFitService.handleActivityActivationResult(resultCode)
         }
     }
 }

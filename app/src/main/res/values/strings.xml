@@ -71,6 +71,8 @@
 
     <string name="msg_pick_date">Pick a date</string>
 
+    <string name="msg_set_new_connection">Connect to External Source</string>
+
     <string name="hint_long_text">Write text here</string>
     <string name="hint_short_text">Type in short text here</string>
 

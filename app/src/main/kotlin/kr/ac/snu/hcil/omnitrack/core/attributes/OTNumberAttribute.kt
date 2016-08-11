@@ -11,7 +11,7 @@ import java.math.BigDecimal
  * Created by Young-Ho Kim on 2016-07-11.
  */
 
-class OTNumberAttribute(objectId: String?, dbId: Long?, columnName: String, settingData: String?) : OTAttribute<BigDecimal>(objectId, dbId, columnName, OTAttribute.TYPE_NUMBER, settingData) {
+class OTNumberAttribute(objectId: String?, dbId: Long?, columnName: String, settingData: String?, connectionData: String?) : OTAttribute<BigDecimal>(objectId, dbId, columnName, OTAttribute.TYPE_NUMBER, settingData, connectionData) {
     override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_BIGDECIMAL
 
     override fun getInputViewType(previewMode: Boolean): Int {
@@ -22,8 +22,6 @@ class OTNumberAttribute(objectId: String?, dbId: Long?, columnName: String, sett
 
     override val propertyKeys: Array<Int>
         get() = arrayOf(DECIMAL_POINTS)
-
-    constructor(columnName: String) : this(null, null, columnName, null)
 
     companion object{
         const val UNIT = 0

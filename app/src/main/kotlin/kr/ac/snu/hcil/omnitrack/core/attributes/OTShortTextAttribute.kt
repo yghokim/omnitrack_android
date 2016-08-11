@@ -7,7 +7,7 @@ import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelpe
 /**
  * Created by younghokim on 16. 8. 1..
  */
-class OTShortTextAttribute(objectId: String?, dbId: Long?, columnName: String, settingData: String?) : OTAttribute<CharSequence>(objectId, dbId, columnName, Companion.TYPE_SHORT_TEXT, settingData) {
+class OTShortTextAttribute(objectId: String?, dbId: Long?, columnName: String, settingData: String?, connectionData: String?) : OTAttribute<CharSequence>(objectId, dbId, columnName, Companion.TYPE_SHORT_TEXT, settingData, connectionData) {
     override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_STRING
     override val typeNameResourceId: Int = R.string.type_shorttext_name
 

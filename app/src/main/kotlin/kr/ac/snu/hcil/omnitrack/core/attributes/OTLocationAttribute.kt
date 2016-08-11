@@ -14,7 +14,7 @@ import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelpe
 /**
  * Created by Young-Ho on 8/2/2016.
  */
-class OTLocationAttribute(objectId: String?, dbId: Long?, columnName: String, settingData: String?) : OTAttribute<LatLng>(objectId, dbId, columnName, TYPE_LOCATION, settingData) {
+class OTLocationAttribute(objectId: String?, dbId: Long?, columnName: String, settingData: String?, connectionData: String?) : OTAttribute<LatLng>(objectId, dbId, columnName, TYPE_LOCATION, settingData, connectionData) {
 
     companion object {
         fun getCachedLocation(lm: LocationManager, enabledOnly: Boolean): Location? {

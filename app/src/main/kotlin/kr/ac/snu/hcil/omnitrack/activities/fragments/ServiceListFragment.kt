@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.activities.fragments
 
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Bundle
@@ -76,6 +77,10 @@ class ServiceListFragment : Fragment() {
         }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+    }
+
     private inner class Adapter : RecyclerView.Adapter<Adapter.ViewHolder>() {
 
 
@@ -114,9 +119,10 @@ class ServiceListFragment : Fragment() {
 
                 activationButton.setOnClickListener {
                     val service = getService(adapterPosition)
-                    when (service.getState()) {
+                    when (service.state) {
                         OTExternalService.ServiceState.ACTIVATED -> {
                             service.deactivate()
+                            applyState(OTExternalService.ServiceState.DEACTIVATED)
                         }
                         OTExternalService.ServiceState.ACTIVATING -> {
 
@@ -174,7 +180,7 @@ class ServiceListFragment : Fragment() {
                 descriptionView.text = context.resources.getString(service.descResourceId)
                 thumbView.setImageResource(service.thumbResourceId)
 
-                applyState(service.getState())
+                applyState(service.state)
             }
 
         }

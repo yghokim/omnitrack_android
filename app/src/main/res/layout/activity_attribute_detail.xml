@@ -68,17 +68,16 @@
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:text="@string/msg_value_autocompletion" />
 
-
-            <TextView
-                android:id="@+id/ui_no_method_message"
-                android:layout_width="wrap_content"
-
+            <Button
+                android:id="@+id/ui_button_new_connection"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:background="@color/buttonIconColorDark"
+                android:text="@string/msg_set_new_connection" />
 
-                android:layout_marginRight="@dimen/activity_horizontal_margin"
-                android:layout_marginTop="10dp"
-                android:text="New Text" />
 
         </LinearLayout>
 

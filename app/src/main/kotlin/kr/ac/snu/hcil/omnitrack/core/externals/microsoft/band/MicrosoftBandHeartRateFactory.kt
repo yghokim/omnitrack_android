@@ -1,15 +1,24 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.microsoft.band
 
-import android.os.AsyncTask
 import com.microsoft.band.sensors.BandHeartRateEvent
 import com.microsoft.band.sensors.BandHeartRateEventListener
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 
 /**
  * Created by younghokim on 16. 7. 28..
  */
-class MicrosoftBandHeartRateFactory : OTMeasureFactory<Int>() {
+class MicrosoftBandHeartRateFactory : OTMeasureFactory() {
+
+    override fun isAttachableTo(attribute: OTAttribute<out Any>): Boolean {
+        if (attribute is OTNumberAttribute) {
+            return true
+        } else return false
+    }
+
+    override val isRangedQueryAvailable: Boolean = false
 
     override val nameResourceId: Int = R.string.measure_microsoft_band_heart_rate_name
     override val descResourceId: Int = R.string.measure_microsoft_band_heart_rate_desc
@@ -28,7 +37,7 @@ class MicrosoftBandHeartRateFactory : OTMeasureFactory<Int>() {
             //permissionGranted = sensorManager.currentHeartRateConsent == UserConsent.GRANTED
         }
     }
-
+/*
     override fun awaitRequestValue(): Int {
 
         val sensorManager = MicrosoftBandService.getClient()?.sensorManager
@@ -58,7 +67,7 @@ class MicrosoftBandHeartRateFactory : OTMeasureFactory<Int>() {
 
     override fun requestValueAsync(handler: (Int) -> Unit) {
         SensorReceptionTask(handler).execute()
-    }
+    }*/
 
     /*
     override fun grantPermissions(activity: Activity, handler: ((Boolean) -> Unit)?) {
@@ -89,6 +98,7 @@ class MicrosoftBandHeartRateFactory : OTMeasureFactory<Int>() {
 
     }
 
+    /*
     inner class SensorReceptionTask(val handler: ((Int) -> Unit)?) : AsyncTask<Void?, Void?, Int>() {
         override fun doInBackground(vararg params: Void?): Int {
             return awaitRequestValue()
@@ -98,6 +108,6 @@ class MicrosoftBandHeartRateFactory : OTMeasureFactory<Int>() {
             super.onPostExecute(result)
             handler?.invoke(result)
         }
-    }
+    }*/
 
 }

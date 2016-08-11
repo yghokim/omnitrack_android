@@ -103,12 +103,13 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
 
         val TRACKER_ID = "tracker_id"
         val POSITION = "position"
-        val SETTING_DATA = "setting_data"
+        val PROPERTY_DATA = "property_data"
+        val CONNECTION_DATA = "connection_data"
         val TYPE = "type"
 
-        override val intrinsicColumnNames: Array<String> = super.intrinsicColumnNames + arrayOf(TRACKER_ID, TYPE, POSITION, SETTING_DATA)
+        override val intrinsicColumnNames: Array<String> = super.intrinsicColumnNames + arrayOf(TRACKER_ID, TYPE, POSITION, PROPERTY_DATA, CONNECTION_DATA)
 
-        override val creationColumnContentString = super.creationColumnContentString + ", ${makeForeignKeyStatementString(TRACKER_ID, TrackerScheme.tableName)}, ${AttributeScheme.POSITION} INTEGER, ${AttributeScheme.TYPE} INTEGER, ${AttributeScheme.SETTING_DATA} TEXT"
+        override val creationColumnContentString = super.creationColumnContentString + ", ${makeForeignKeyStatementString(TRACKER_ID, TrackerScheme.tableName)}, ${AttributeScheme.POSITION} INTEGER, ${AttributeScheme.TYPE} INTEGER, ${AttributeScheme.PROPERTY_DATA} TEXT, ${AttributeScheme.CONNECTION_DATA} TEXT"
     }
 
     object TriggerScheme : TableWithNameScheme() {
@@ -246,9 +247,10 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         val name = cursor.getString(cursor.getColumnIndex(AttributeScheme.NAME))
         val objectId = cursor.getString(cursor.getColumnIndex(AttributeScheme.OBJECT_ID))
         val type = cursor.getInt(cursor.getColumnIndex(AttributeScheme.TYPE))
-        val settingData = cursor.getString(cursor.getColumnIndex(AttributeScheme.SETTING_DATA))
+        val settingData = cursor.getString(cursor.getColumnIndex(AttributeScheme.PROPERTY_DATA))
+        val connectionData = cursor.getString(cursor.getColumnIndex(AttributeScheme.CONNECTION_DATA))
 
-        return OTAttribute.createAttribute(objectId, id, name, type, settingData)
+        return OTAttribute.createAttribute(objectId, id, name, type, settingData, connectionData)
     }
 
     private fun queryById(id: Long, table: TableScheme): Cursor {
@@ -336,7 +338,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
             values.put(AttributeScheme.POSITION, position)
             values.put(AttributeScheme.TYPE, attribute.typeId)
             values.put(AttributeScheme.TRACKER_ID, attribute.owner?.dbId ?: null)
-            values.put(AttributeScheme.SETTING_DATA, attribute.getSerializedProperties())
+            values.put(AttributeScheme.PROPERTY_DATA, attribute.getSerializedProperties())
 
             saveObject(attribute, values, AttributeScheme)
             attribute.isDirtySinceLastSync = false

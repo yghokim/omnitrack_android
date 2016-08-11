@@ -90,8 +90,11 @@ class OmniTrackApplication : Application() {
 
 
         for (service in OTExternalService.availableServices) {
-            if (service.getState() == OTExternalService.ServiceState.ACTIVATED) {
-                service.prepareServiceAsync()
+            if (service.state == OTExternalService.ServiceState.ACTIVATED) {
+                service.prepareServiceAsync({
+                    result ->
+
+                })
             }
         }
 

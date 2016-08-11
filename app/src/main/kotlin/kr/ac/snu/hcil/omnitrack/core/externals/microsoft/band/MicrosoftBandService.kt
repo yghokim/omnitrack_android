@@ -14,6 +14,10 @@ import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
  * Created by younghokim on 16. 7. 28..
  */
 object MicrosoftBandService : OTExternalService("MicrosoftBandService", 19) {
+    override fun handleActivityActivationResult(resultCode: Int) {
+
+    }
+
     override fun prepareServiceAsync(preparedHandler: ((Boolean) -> Unit)?) {
 
     }
@@ -32,16 +36,17 @@ object MicrosoftBandService : OTExternalService("MicrosoftBandService", 19) {
         _measureFactories += MicrosoftBandHeartRateFactory()
     }
 
+    /*
     override fun getState(): ServiceState {
         if (connectionState == ConnectionState.CONNECTED) {
             return ServiceState.ACTIVATED
         } else if (connectionTask != null) {
             return ServiceState.ACTIVATING
         } else return ServiceState.DEACTIVATED
-    }
+    }*/
 
 
-    override fun activateAsync(context: Context, connectedHandler: ((Boolean) -> Unit)?) {
+    override fun onActivateAsync(context: Context, connectedHandler: ((Boolean) -> Unit)?) {
             val client = getClient()
             if(client!=null)
             {
@@ -53,7 +58,7 @@ object MicrosoftBandService : OTExternalService("MicrosoftBandService", 19) {
 
     }
 
-    override fun deactivate() {
+    override fun onDeactivate() {
 
     }
 

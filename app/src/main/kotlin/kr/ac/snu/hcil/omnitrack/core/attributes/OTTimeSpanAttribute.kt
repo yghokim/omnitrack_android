@@ -11,7 +11,7 @@ import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelpe
 /**
  * Created by younghokim on 16. 8. 6..
  */
-class OTTimeSpanAttribute(objectId: String?, dbId: Long?, columnName: String, settingData: String?) : OTAttribute<TimeSpan>(objectId, dbId, columnName, TYPE_TIMESPAN, settingData) {
+class OTTimeSpanAttribute(objectId: String?, dbId: Long?, columnName: String, settingData: String?, connectionData: String?) : OTAttribute<TimeSpan>(objectId, dbId, columnName, TYPE_TIMESPAN, settingData, connectionData) {
 
     companion object {
         const val PROPERTY_GRANULARITY = 0

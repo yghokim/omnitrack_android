@@ -17,6 +17,10 @@ import kr.ac.snu.hcil.omnitrack.utils.AsyncTaskWithResultHandler
 
 //@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 object MiBandService : OTExternalService("ShaomiMiBand", 21) {
+    override fun handleActivityActivationResult(resultCode: Int) {
+        throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override fun prepareServiceAsync(preparedHandler: ((Boolean) -> Unit)?) {
 
     }
@@ -32,22 +36,16 @@ object MiBandService : OTExternalService("ShaomiMiBand", 21) {
 
     private var device: BluetoothDevice? = null
 
-    private var state: ServiceState = ServiceState.DEACTIVATED
-
     val band: MiBand by lazy {
         MiBand(OmniTrackApplication.app)
     }
 
-    override fun getState(): ServiceState {
-        return state
-    }
-
-    override fun activateAsync(context: Context, connectedHandler: ((Boolean) -> Unit)?) {
+    override fun onActivateAsync(context: Context, connectedHandler: ((Boolean) -> Unit)?) {
             val task = ConnectionTask(connectedHandler)
             task.execute()
     }
 
-    override fun deactivate() {
+    override fun onDeactivate() {
 
     }
 

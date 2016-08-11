@@ -1,9 +1,8 @@
 package kr.ac.snu.hcil.omnitrack.core.externals
 
-import android.app.Activity
 import android.content.Context
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
-import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.core.externals.device.AndroidDeviceService
@@ -19,8 +18,30 @@ import java.util.*
  */
 abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : INameDescriptionResourceProvider {
     companion object {
+
+        const val REQUEST_CODE_GOOGLE_FIT = 0
+
         val availableServices: Array<OTExternalService> by lazy {
             arrayOf(AndroidDeviceService, GoogleFitService, MicrosoftBandService, MiBandService)
+        }
+
+        private val preferences: SharedPreferences
+            get() = OmniTrackApplication.app.getSharedPreferences("ExternalServices", Context.MODE_PRIVATE)
+
+
+        /***
+         * Get whether the service's activation state stored in system
+         */
+        fun getIsActivatedFlag(service: OTExternalService): Boolean {
+            return getIsActivatedFlag(service.identifier)
+        }
+
+        fun getIsActivatedFlag(serviceIdentifier: String): Boolean {
+            return preferences.getBoolean(serviceIdentifier + "_activated", false)
+        }
+
+        fun setIsActivatedFlag(service: OTExternalService, isActivated: Boolean) {
+            preferences.edit().putBoolean(service.identifier + "_activated", isActivated).apply()
         }
     }
 
@@ -38,16 +59,48 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
             return true
         }
 
-    protected open val _measureFactories = ArrayList<OTMeasureFactory<out Any>>()
+    protected open val _measureFactories = ArrayList<OTMeasureFactory>()
 
-    val measureFactories: List<OTMeasureFactory<out Any>> get() {
+    val measureFactories: List<OTMeasureFactory> get() {
         return _measureFactories
     }
 
-    abstract fun getState(): ServiceState
+    var state: ServiceState = ServiceState.DEACTIVATED
+        protected set
 
-    abstract fun activateAsync(context: Context, connectedHandler: ((Boolean) -> Unit)? = null)
-    abstract fun deactivate()
+
+    init {
+        state = if (getIsActivatedFlag(identifier) == true) {
+            ServiceState.ACTIVATED
+        } else {
+            ServiceState.DEACTIVATED
+        }
+    }
+
+    fun activateAsync(context: Context, connectedHandler: ((Boolean) -> Unit)? = null) {
+        state = ServiceState.ACTIVATING
+
+        onActivateAsync(context, {
+            result ->
+            if (result == true) {
+                setIsActivatedFlag(this, true)
+                state = ServiceState.ACTIVATED
+            }
+
+            connectedHandler?.invoke(result)
+        })
+    }
+
+    abstract fun onActivateAsync(context: Context, connectedHandler: ((Boolean) -> Unit)? = null)
+
+
+    fun deactivate() {
+        setIsActivatedFlag(this, false)
+        state = ServiceState.DEACTIVATED
+        onDeactivate()
+    }
+
+    abstract fun onDeactivate()
 
     val activated = Event<Any>()
     val deactivated = Event<Any>()
@@ -55,10 +108,6 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
     open val requiredPermissions: Array<String> = arrayOf()
 
     abstract val thumbResourceId: Int
-
-    fun grantPermissions(activity: Activity, requestCode: Int) {
-        ActivityCompat.requestPermissions(activity, requiredPermissionsRecursive, requestCode)
-    }
 
     fun grantPermissions(caller: Fragment, requestCode: Int) {
         caller.requestPermissions(requiredPermissionsRecursive, requestCode)
@@ -76,5 +125,7 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
 
         result.toTypedArray()
     }
+
+    abstract fun handleActivityActivationResult(resultCode: Int)
 
 }

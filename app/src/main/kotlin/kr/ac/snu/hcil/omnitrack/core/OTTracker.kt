@@ -5,7 +5,6 @@ import android.content.Context
 import android.graphics.Color
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeAttribute
 import kr.ac.snu.hcil.omnitrack.utils.DefaultNameGenerator
 import kr.ac.snu.hcil.omnitrack.utils.ObservableList
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
@@ -50,14 +49,11 @@ class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color
     val attributeAdded = Event<ReadOnlyPair<OTAttribute<out Any>, Int>>()
     val attributeRemoved = Event<ReadOnlyPair<OTAttribute<out Any>, Int>>()
 
-    private val loggedAtAttribute = OTTimeAttribute("Logged At")
-
     constructor(): this(null, null, "New Tracker")
 
     constructor(name: String): this(null,null, name)
 
     init{
-        loggedAtAttribute.granularity = 0
 
         if (_attributes != null) {
             for (attribute in _attributes) {
@@ -103,21 +99,6 @@ class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color
             _removedAttributeIds.add(attribute.dbId as Long)
 
         attributeRemoved.invoke(this, ReadOnlyPair(attribute, index))
-    }
-
-    fun getTotalAttributes(): Array<OTAttribute<out Any>> {
-        attributes.unObservedList.toTypedArray()
-        val result = Array<OTAttribute<out Any>>(attributes.size + 1)
-        {
-            index ->
-            if (index < attributes.size) {
-                attributes[index]
-            } else {
-                loggedAtAttribute
-            }
-        }
-
-        return result
     }
 
     fun generateNewAttributeName(typeName: String, context: Context): String {

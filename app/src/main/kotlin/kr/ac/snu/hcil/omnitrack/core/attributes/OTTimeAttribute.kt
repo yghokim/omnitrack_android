@@ -38,9 +38,7 @@ class OTTimeAttribute : OTAttribute<TimePoint> {
 
     private val calendar = GregorianCalendar()
 
-    constructor(objectId: String?, dbId: Long?, columnName: String, settingData: String?) : super(objectId, dbId, columnName, OTAttribute.TYPE_TIME, settingData)
-
-    constructor(columnName: String) : this(null, null, columnName, null)
+    constructor(objectId: String?, dbId: Long?, columnName: String, settingData: String?, connectionData: String?) : super(objectId, dbId, columnName, OTAttribute.TYPE_TIME, settingData, connectionData)
 
     var granularity: Int
         get() = getPropertyValue<Int>(GRANULARITY)

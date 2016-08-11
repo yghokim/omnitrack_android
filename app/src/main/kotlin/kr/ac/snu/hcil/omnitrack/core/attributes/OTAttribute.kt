@@ -5,6 +5,7 @@ import android.util.SparseArray
 import android.view.View
 import com.google.gson.Gson
 import kr.ac.snu.hcil.omnitrack.core.NamedObject
+import kr.ac.snu.hcil.omnitrack.core.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTProperty
@@ -18,8 +19,7 @@ import kotlin.properties.Delegates
 /**
  * Created by Young-Ho on 7/11/2016.
  */
-abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName: String, val typeId: Int, settingData: String?) : NamedObject(objectId, dbId, columnName) {
-
+abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName: String, val typeId: Int, propertyData: String?, connectionData: String?) : NamedObject(objectId, dbId, columnName) {
 
     data class AttributeTypeInfo(val typeId: Int, val iconId: Int, val name: String, val description: String?)
 
@@ -37,21 +37,21 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
         const val TYPE_LOCATION = 5
 
 
-        fun createAttribute(objectId: String?, dbId: Long?, columnName: String, typeId: Int, settingData: String?): OTAttribute<out Any> {
+        fun createAttribute(objectId: String?, dbId: Long?, columnName: String, typeId: Int, propertyData: String?, connectionData: String?): OTAttribute<out Any> {
             val attr = when (typeId) {
-                TYPE_NUMBER -> OTNumberAttribute(objectId, dbId, columnName, settingData)
-                TYPE_TIME -> OTTimeAttribute(objectId, dbId, columnName, settingData)
-                TYPE_TIMESPAN -> OTTimeSpanAttribute(objectId, dbId, columnName, settingData)
-                TYPE_SHORT_TEXT -> OTShortTextAttribute(objectId, dbId, columnName, settingData)
-                TYPE_LONG_TEXT -> OTLongTextAttribute(objectId, dbId, columnName, settingData)
-                TYPE_LOCATION -> OTLocationAttribute(objectId, dbId, columnName, settingData)
-                else -> OTNumberAttribute(objectId, dbId, columnName, settingData)
+                TYPE_NUMBER -> OTNumberAttribute(objectId, dbId, columnName, propertyData, connectionData)
+                TYPE_TIME -> OTTimeAttribute(objectId, dbId, columnName, propertyData, connectionData)
+                TYPE_TIMESPAN -> OTTimeSpanAttribute(objectId, dbId, columnName, propertyData, connectionData)
+                TYPE_SHORT_TEXT -> OTShortTextAttribute(objectId, dbId, columnName, propertyData, connectionData)
+                TYPE_LONG_TEXT -> OTLongTextAttribute(objectId, dbId, columnName, propertyData, connectionData)
+                TYPE_LOCATION -> OTLocationAttribute(objectId, dbId, columnName, propertyData, connectionData)
+                else -> OTNumberAttribute(objectId, dbId, columnName, propertyData, connectionData)
             }
             return attr
         }
 
         fun createAttribute(user: OTUser, columnName: String, typeId: Int): OTAttribute<out Any> {
-            return createAttribute(user.getNewAttributeObjectId().toString(), null, columnName, typeId, null)
+            return createAttribute(user.getNewAttributeObjectId().toString(), null, columnName, typeId, null, null)
         }
     }
 
@@ -66,18 +66,25 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
     val propertyValueChanged = Event<OTProperty.PropertyChangedEventArgs<out Any>>()
     private val settingsProperties = SparseArray<OTProperty<out Any>>()
 
-    constructor(columnName: String, typeId: Int) : this(null, null, columnName, typeId, null)
+    var valueSource: OTConnection? = null
+        private set
+
+    constructor(columnName: String, typeId: Int) : this(null, null, columnName, typeId, null, null)
 
     init {
         createProperties()
-        if (settingData != null) {
+        if (propertyData != null) {
 
             val parser = Gson()
-            val s = parser.fromJson(settingData, Array<String>::class.java).map { parser.fromJson(it, SerializedIntegerKeyEntry::class.java) }
+            val s = parser.fromJson(propertyData, Array<String>::class.java).map { parser.fromJson(it, SerializedIntegerKeyEntry::class.java) }
 
             for (entry in s) {
                 setPropertyValueFromSerializedString(entry.key, entry.value)
             }
+        }
+
+        if (connectionData != null) {
+
         }
     }
 

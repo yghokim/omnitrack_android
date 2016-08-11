@@ -69,9 +69,11 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
             propertyViewContainer.removeAllViewsInLayout()
 
             val layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            layoutParams.bottomMargin = (15 * resources.displayMetrics.density).toInt()
 
             propertyViewList.clear()
-            for (entry in attr.makePropertyViews(this)) {
+            for (entryWithIndex in attr.makePropertyViews(this).withIndex()) {
+                val entry = entryWithIndex.value
 
                 if (entry.first != null) {
                     propertyViewList.add(entry)
@@ -88,6 +90,12 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
                             }
                         }
                     }
+                }
+
+                if (entryWithIndex.index == 0) {
+                    layoutParams.topMargin = 0
+                } else {
+                    layoutParams.topMargin = (15 * resources.displayMetrics.density).toInt()
                 }
 
                 propertyViewContainer.addView(entry.second, layoutParams)
