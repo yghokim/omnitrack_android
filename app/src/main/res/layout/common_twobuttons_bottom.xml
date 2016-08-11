@@ -3,23 +3,28 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_alignParentBottom="true"
+    android:background="@color/colorPrimarySemiLight"
     android:orientation="horizontal">
 
     <Button
-        android:id="@+id/button_ok"
+        android:id="@+id/ui_button_bottom_left"
+        style="@style/Base.Widget.AppCompat.Button.Borderless.Colored"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
         android:layout_weight="1"
-        android:text="@string/msg_ok" />
+        android:text="@string/msg_cancel"
+        android:textColor="#FFF" />
 
     <Button
-        android:id="@+id/button_cancel"
+        android:id="@+id/ui_button_bottom_right"
+        style="@style/Base.Widget.AppCompat.Button.Borderless.Colored"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
         android:layout_weight="1"
-        android:text="@string/msg_cancel" />
+        android:text="@string/msg_ok"
+        android:textColor="#FFF" />
 </LinearLayout>

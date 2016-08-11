@@ -64,7 +64,6 @@
 
     <string name="msg_value_autocompletion">Value Autocompletion</string>
 
-
     <string name="msg_column_name">Field Name</string>
 
     <string name='msg_format_cannot_be_blank'>%1$s cannot be blank.</string>
@@ -190,4 +189,5 @@
     <string name="title_activity_attribute_detail">Attribute Detail</string>
     <string name="title_activity_new_item">New [%1$s] Item</string>
     <string name="title_activity_maps">Map</string>
+    <string name="title_activity_new_connection">New Conection</string>
 </resources>

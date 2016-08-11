@@ -116,12 +116,12 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
         super.onStart()
     }
 
-    override fun onLeftButtonClicked() {
+    override fun onToolbarLeftButtonClicked() {
 
         finish()
     }
 
-    override fun onRightButtonClicked() {
+    override fun onToolbarRightButtonClicked() {
             //add
         /*
             if(namePropertyView.validate()) {

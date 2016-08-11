@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.google.fit
 
+import android.os.AsyncTask
 import com.google.android.gms.common.api.Api
 import com.google.android.gms.common.api.Scope
 import com.google.android.gms.fitness.Fitness
@@ -7,12 +8,12 @@ import com.google.android.gms.fitness.data.DataType
 import com.google.android.gms.fitness.data.Field
 import com.google.android.gms.fitness.request.DataReadRequest
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.OTItemBuilder
 import kr.ac.snu.hcil.omnitrack.core.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
-import kr.ac.snu.hcil.omnitrack.utils.AsyncTaskWithResultHandler
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableTypedQueue
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import java.util.concurrent.TimeUnit
@@ -61,8 +62,13 @@ object GoogleFitStepsFactory : GoogleFitService.GoogleFitMeasureFactory() {
             throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
         }
 
-        override fun requestValueAsync(query: OTTimeRangeQuery?, handler: (Any) -> Unit) {
-
+        override fun requestValueAsync(builder: OTItemBuilder, query: OTTimeRangeQuery?, handler: (Any) -> Unit) {
+            val range = query?.getRange(builder)
+            Task(range!!.first, range.second) {
+                steps ->
+                println("result step: $steps")
+                handler.invoke(steps)
+            }.execute()
         }
 
         override fun onSerialize(typedQueue: SerializableTypedQueue) {
@@ -73,39 +79,48 @@ object GoogleFitStepsFactory : GoogleFitService.GoogleFitMeasureFactory() {
 
         }
 
-    }
+        class Task(val from: Long, val to: Long, val handler: ((Int) -> Unit)?) : AsyncTask<Void?, Void?, Int>() {
 
-    class Task(handler: ((Boolean) -> Unit)?) : AsyncTaskWithResultHandler(handler) {
-        override fun doInBackground(vararg p0: Void?): Boolean {
-            val request = DataReadRequest.Builder()
-                    .aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
-                    .bucketByTime(1, TimeUnit.DAYS)
-                    .setTimeRange(System.currentTimeMillis() - 2 * 24 * 60 * 60 * 1000, System.currentTimeMillis(), TimeUnit.MILLISECONDS)
-                    .build()
+            override fun doInBackground(vararg p0: Void?): Int {
+                val request = DataReadRequest.Builder()
+                        .aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
+                        .bucketByTime(1, TimeUnit.DAYS)
+                        .setTimeRange(from, to, TimeUnit.MILLISECONDS)
+                        .build()
 
-            var finish = false
+                var finish = false
 
-            GoogleFitService.getClientAsync {
-                client ->
-                val result = Fitness.HistoryApi.readData(client!!, request).await()
+                var steps = 0
 
-                println("buckets = ${result.buckets.size}")
+                GoogleFitService.getClientAsync {
+                    client ->
+                    val result = Fitness.HistoryApi.readData(client!!, request).await()
 
-                for (bucket in result.buckets) {
-                    for (dataset in bucket.dataSets) {
-                        for (dataPoint in dataset.dataPoints) {
-                            println(dataPoint.getValue(Field.FIELD_STEPS))
+
+                    for (bucket in result.buckets) {
+                        for (dataset in bucket.dataSets) {
+                            for (dataPoint in dataset.dataPoints) {
+                                steps += dataPoint.getValue(Field.FIELD_STEPS).asInt()
+                                println(dataPoint.getValue(Field.FIELD_STEPS))
+                            }
                         }
                     }
+
+                    finish = true
                 }
 
-                finish = true
+                while (!finish) {
+                }
+                println("retreived steps")
+
+                return steps
             }
 
-            while (!finish) {
+            override fun onPostExecute(result: Int) {
+                super.onPostExecute(result)
+                handler?.invoke(result)
             }
 
-            return true
         }
 
     }

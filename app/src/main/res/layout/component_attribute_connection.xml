@@ -10,7 +10,8 @@
     <RelativeLayout
         android:id="@+id/ui_group_connected_with_indicator"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/button_height_normal"
+        android:layout_height="wrap_content"
+        android:minHeight="@dimen/button_height_normal"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin">
 
@@ -26,11 +27,10 @@
         <TextView
             android:id="@+id/ui_source"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:layout_toEndOf="@+id/ui_header1"
-            android:gravity="right|center_vertical"
+            android:gravity="left|center_vertical"
             android:text="Step Count | Google Fit"
             android:textColor="@color/colorEditable" />
     </RelativeLayout>
@@ -39,7 +39,8 @@
     <RelativeLayout
         android:id="@+id/ui_group_time_query"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/button_height_normal"
+        android:layout_height="wrap_content"
+        android:minHeight="@dimen/button_height_normal"
         android:orientation="horizontal"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin">
@@ -52,13 +53,28 @@
             android:layout_centerVertical="true"
             app:icon="@drawable/timelapse_dark"
             app:label="Time Query" />
+
+
+        <TextView
+            android:id="@+id/ui_query"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:layout_centerVertical="true"
+            android:gravity="left|center_vertical"
+            android:lineSpacingMultiplier="1.2"
+            android:text="Step Count | Google Fit"
+            android:textColor="@color/colorEditable" />
+
     </RelativeLayout>
 
 
     <RelativeLayout
         android:id="@+id/ui_group_convert"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/button_height_normal"
+        android:layout_height="wrap_content"
+        android:minHeight="@dimen/button_height_normal"
         android:orientation="horizontal"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin">

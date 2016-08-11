@@ -63,7 +63,14 @@
             android:name=".activities.NewItemActivity"
             android:label="@string/title_activity_new_item"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".activities.ItemBrowserActivity" />
+
+        <activity
+            android:name=".activities.ItemBrowserActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".activities.connectionwizard.ConnectionWizardActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <uses-permission android:name="android.permission.BLUETOOTH" />
         <uses-permission android:name="com.microsoft.band.service.access.BIND_BAND_SERVICE" />

@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.externals
 
+import kr.ac.snu.hcil.omnitrack.core.OTItemBuilder
 import kr.ac.snu.hcil.omnitrack.core.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.utils.INameDescriptionResourceProvider
@@ -41,6 +42,6 @@ abstract class OTMeasureFactory() : INameDescriptionResourceProvider {
 
 
         abstract fun awaitRequestValue(query: OTTimeRangeQuery?): Any
-        abstract fun requestValueAsync(query: OTTimeRangeQuery?, handler: ((Any) -> Unit))
+        abstract fun requestValueAsync(builder: OTItemBuilder, query: OTTimeRangeQuery?, handler: (Any) -> Unit)
     }
 }

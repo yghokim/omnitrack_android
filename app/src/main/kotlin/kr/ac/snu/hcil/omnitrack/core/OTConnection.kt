@@ -22,23 +22,46 @@ class OTConnection : ATypedQueueSerializable {
             if (field != value) {
                 field = value
             }
+
+            if (isRangedQueryAvailable) {
+                if (rangedQuery == null) {
+                    rangedQuery = OTTimeRangeQuery()
+                }
+            }
         }
 
-    val isTimeQueryAvailable: Boolean
+    val isRangedQueryAvailable: Boolean
         get() = if (source != null) {
             source?.factory?.isRangedQueryAvailable ?: false
         } else false
+
+
+    var rangedQuery: OTTimeRangeQuery? = null
+        private set
 
 
     constructor() : super()
     constructor(serialized: String) : super(serialized)
 
 
+    fun requestValueAsync(builder: OTItemBuilder, handler: (Any?) -> Unit) {
+        if (source != null) {
+            source!!.requestValueAsync(builder, rangedQuery, handler)
+        } else {
+            handler.invoke(null)
+        }
+    }
+
     override fun onSerialize(typedQueue: SerializableTypedQueue) {
         typedQueue.putBoolean(source != null)
         if (source != null) {
             typedQueue.putString(source!!.factoryCode)
             typedQueue.putString(source!!.getSerializedString())
+        }
+
+        typedQueue.putBoolean(rangedQuery != null)
+        if (rangedQuery != null) {
+            rangedQuery?.onSerialize(typedQueue)
         }
     }
 
@@ -52,6 +75,11 @@ class OTConnection : ATypedQueueSerializable {
             } else {
                 source = factory.makeMeasure(typedQueue.getString())
             }
+        }
+
+        if (typedQueue.getBoolean()) {
+            rangedQuery = OTTimeRangeQuery()
+            rangedQuery?.onDeserialize(typedQueue)
         }
     }
 

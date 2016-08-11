@@ -74,7 +74,7 @@ abstract class AInputView<T>(layoutId: Int, context: Context, attrs: AttributeSe
     abstract var value : T
 
     @Suppress("UNCHECKED_CAST")
-    fun setAnyValue(value: Any) {
+    open fun setAnyValue(value: Any) {
         this.value = value as T
     }
 

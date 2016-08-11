@@ -4,18 +4,14 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.KeyEvent
 import android.view.View
-import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
-import kr.ac.snu.hcil.omnitrack.ui.components.NumericFormatTextWatcher
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.DecimalFormat
-import java.text.ParseException
 import kotlin.properties.Delegates
 
 /**
@@ -185,6 +181,15 @@ class NumberInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
 
     override fun focus() {
 
+    }
+
+    override fun setAnyValue(value: Any) {
+        println(value)
+        if (value is Int) {
+            this.value = BigDecimal(value)
+        } else {
+            super.setAnyValue(value)
+        }
     }
 
 }

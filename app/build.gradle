@@ -44,6 +44,7 @@ dependencies {
     compile 'de.codecrafters.tableview:tableview:2.2.0'
     compile 'com.github.markushi:android-ui:1.2'
     compile 'com.kovachcode:timePickerWithSeconds:1.0.0'
+    compile 'com.github.TechFreak:WizardPager:1.0.3'
 }
 
 kapt {
@@ -55,4 +56,5 @@ repositories {
     maven {
         url "http://dl.bintray.com/kotlin/exposed"
     }
+    maven { url "https://jitpack.io" }
 }

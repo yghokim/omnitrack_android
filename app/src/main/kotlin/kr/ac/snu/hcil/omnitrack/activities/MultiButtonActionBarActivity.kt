@@ -1,8 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.activities
 
 import android.app.Activity
-import android.content.Context
-import android.opengl.Visibility
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
@@ -36,7 +34,7 @@ abstract class MultiButtonActionBarActivity(val layoutId: Int) : AppCompatActivi
         leftActionBarButton?.setOnClickListener {
 
             super.setResult(leftButtonResultCode)
-            onLeftButtonClicked()
+            onToolbarLeftButtonClicked()
         }
 
 
@@ -45,7 +43,7 @@ abstract class MultiButtonActionBarActivity(val layoutId: Int) : AppCompatActivi
         rightActionBarButton?.setOnClickListener {
 
             super.setResult(rightButtonResultCode)
-            onRightButtonClicked()
+            onToolbarRightButtonClicked()
         }
 
         titleView = findViewById(R.id.ui_appbar_title) as TextView?
@@ -62,9 +60,9 @@ abstract class MultiButtonActionBarActivity(val layoutId: Int) : AppCompatActivi
     protected open val rightButtonResultCode = Activity.RESULT_OK
 
 
-    abstract protected fun onLeftButtonClicked()
+    abstract protected fun onToolbarLeftButtonClicked()
 
-    abstract protected fun onRightButtonClicked()
+    abstract protected fun onToolbarRightButtonClicked()
 
     protected fun setActionBarButtonMode(mode: Mode) {
         when (mode) {

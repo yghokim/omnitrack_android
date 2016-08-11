@@ -90,15 +90,43 @@ class OTItemBuilder : ADataRow, IStringSerializable {
         }
 
             for (attribute in tracker.attributes) {
-                attribute.getAutoCompleteValueAsync {
-                    result ->
-                    remain--
-                    setValueOf(attribute, result)
+                if (attribute.valueConnection == null) {
+                    attribute.getAutoCompleteValueAsync {
+                        result ->
+                        remain--
+                        setValueOf(attribute, result)
 
-                    if (remain == 0) {
-                        //finish
-                        finished?.invoke()
-                        println("finished autocompleting builder")
+                        if (remain == 0) {
+                            //finish
+                            finished?.invoke()
+                            println("finished autocompleting builder")
+                        }
+                    }
+                } else {
+                    println("request value connection")
+                    attribute.valueConnection?.requestValueAsync(this) {
+                        value: Any? ->
+                        if (value != null) {
+                            remain--
+                            setValueOf(attribute, value)
+                            if (remain == 0) {
+                                //finish
+                                finished?.invoke()
+                                println("finished autocompleting builder")
+                            }
+                        } else {
+                            attribute.getAutoCompleteValueAsync {
+                                result ->
+                                remain--
+                                setValueOf(attribute, result)
+
+                                if (remain == 0) {
+                                    //finish
+                                    finished?.invoke()
+                                    println("finished autocompleting builder")
+                                }
+                            }
+                        }
                     }
                 }
             }

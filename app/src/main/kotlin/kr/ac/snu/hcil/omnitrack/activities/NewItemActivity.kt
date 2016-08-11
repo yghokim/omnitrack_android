@@ -62,6 +62,11 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
 
                 if (tryRestoreItemBuilderCache(tracker!!)) {
 
+                } else {
+                    //new builder was created
+                    builder.autoCompleteAsync {
+                        attributeListAdapter.notifyDataSetChanged()
+                    }
                 }
             }
         }
@@ -84,12 +89,12 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
         }
     }
 
-    override fun onLeftButtonClicked() {
+    override fun onToolbarLeftButtonClicked() {
         //back button
         finish()
     }
 
-    override fun onRightButtonClicked() {
+    override fun onToolbarRightButtonClicked() {
         //push item to db
         syncViewStateToBuilderAsync {
             val item = builder.makeItem()

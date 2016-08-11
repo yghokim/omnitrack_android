@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.activities
 
+import android.content.Intent
 import android.os.Bundle
 import android.transition.TransitionManager
 import android.view.View
@@ -83,11 +84,11 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
         }
     }
 
-    override fun onLeftButtonClicked() {
+    override fun onToolbarLeftButtonClicked() {
         finish()
     }
 
-    override fun onRightButtonClicked() {
+    override fun onToolbarRightButtonClicked() {
     }
 
     fun refresh() {
@@ -164,11 +165,22 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
     override fun onClick(view: View?) {
         println(view === newConnectionButton)
         if (view === newConnectionButton) {
-            val connection = OTConnection()
-            connection.source = GoogleFitStepsFactory.makeMeasure()
-
-            attribute?.valueConnection = connection
+            /*
+            val intent = Intent(this, ConnectionWizardActivity::class.java)
+            startActivityForResult(intent, 0)*/
+            val newConnection = OTConnection()
+            newConnection.source = GoogleFitStepsFactory.makeMeasure()
+            attribute?.valueConnection = newConnection
             refreshConnection(true)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 0) {
+            if (resultCode == RESULT_OK) {
+                println("result: Ok")
+            }
         }
     }
 }

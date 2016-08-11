@@ -5,6 +5,8 @@ import android.graphics.Color
 import kr.ac.snu.hcil.omnitrack.core.OTTriggerManager
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeAttribute
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeSpanAttribute
 import kr.ac.snu.hcil.omnitrack.core.database.DatabaseHelper
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 
@@ -72,8 +74,17 @@ class OmniTrackApplication : Application() {
             waterTracker.attributes.add(OTAttribute.Companion.createAttribute(defaultUser, "Drank At", OTAttribute.TYPE_TIME))
 
             val sleepTracker = defaultUser.newTracker("Manual Sleep", true)
+
+            val stepAttribute = OTAttribute.Companion.createAttribute(defaultUser, "Steps of the day", OTAttribute.TYPE_NUMBER)
+
+            sleepTracker.attributes.add(stepAttribute)
+
             sleepTracker.attributes.add(OTAttribute.Companion.createAttribute(defaultUser, "When to Bed", OTAttribute.TYPE_TIME))
-            sleepTracker.attributes.add(OTAttribute.Companion.createAttribute(defaultUser, "Slept for", OTAttribute.TYPE_TIMESPAN))
+
+            val sleepTimeAttribute = OTAttribute.Companion.createAttribute(defaultUser, "Slept for", OTAttribute.TYPE_TIMESPAN)
+            sleepTimeAttribute.setPropertyValue(OTTimeSpanAttribute.PROPERTY_GRANULARITY, OTTimeAttribute.GRANULARITY_TIME)
+
+            sleepTracker.attributes.add(sleepTimeAttribute)
             sleepTracker.attributes.add(OTAttribute.Companion.createAttribute(defaultUser, "Memo", OTAttribute.TYPE_LONG_TEXT))
 
             _currentUser = defaultUser
