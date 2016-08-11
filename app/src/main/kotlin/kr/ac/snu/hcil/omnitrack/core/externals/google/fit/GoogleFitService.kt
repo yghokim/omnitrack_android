@@ -116,7 +116,11 @@ object GoogleFitService : OTExternalService("GoogleFitService", 19) {
 
     override fun handleActivityActivationResult(resultCode: Int) {
         println(resultCode)
-        prepareServiceAsync(currentActivationHandler)
+        if (resultCode == Activity.RESULT_OK) {
+            prepareServiceAsync(currentActivationHandler)
+        } else {
+            currentActivationHandler?.invoke(false)
+        }
     }
 
     override fun prepareServiceAsync(preparedHandler: ((Boolean) -> Unit)?) {

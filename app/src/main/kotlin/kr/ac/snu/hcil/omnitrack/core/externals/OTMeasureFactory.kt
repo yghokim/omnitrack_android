@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.externals
 
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.utils.INameDescriptionResourceProvider
+import kr.ac.snu.hcil.omnitrack.utils.serialization.ATypedQueueSerializable
 
 /**
  * Created by younghokim on 16. 7. 28..
@@ -19,7 +20,7 @@ abstract class OTMeasureFactory() : INameDescriptionResourceProvider {
     abstract val isRangedQueryAvailable: Boolean
 
 
-    abstract class OTMeasure() {
+    abstract class OTMeasure : ATypedQueueSerializable() {
 
         abstract val dataTypeName: Int
         abstract val factoryCode: String

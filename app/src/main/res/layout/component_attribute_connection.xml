@@ -1,77 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/attribute_card"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:showIn="@layout/simple_linear_layout">
 
-    <LinearLayout
+    <RelativeLayout
+        android:id="@+id/ui_group_connected_with_indicator"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/button_height_normal"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin">
+
+        <kr.ac.snu.hcil.omnitrack.ui.components.AttributeConnectionViewSubHeader
+            android:id="@+id/ui_header1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            app:icon="@drawable/link_dark"
+            app:label="Connected with" />
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@+id/ui_header1"
+            android:gravity="right|center_vertical"
+            android:text="Step Count | Google Fit" />
+
+
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/ui_group_time_query"
         android:layout_width="match_parent"
         android:layout_height="@dimen/button_height_normal"
         android:orientation="horizontal"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin">
 
-        <ImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_gravity="center_vertical"
-            android:layout_marginRight="8dp"
-            android:src="@drawable/link_dark"></ImageView>
-
-        <TextView
+        <kr.ac.snu.hcil.omnitrack.ui.components.AttributeConnectionViewSubHeader
+            android:id="@+id/ui_header2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:text="Connected with" />
-    </LinearLayout>
-
-    <android.support.v7.widget.AppCompatSpinner
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"></android.support.v7.widget.AppCompatSpinner>
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            app:icon="@drawable/timelapse_dark"
+            app:label="Time Query" />
+    </RelativeLayout>
 
 
-    <LinearLayout
+    <RelativeLayout
+        android:id="@+id/ui_group_convert"
         android:layout_width="match_parent"
         android:layout_height="@dimen/button_height_normal"
         android:orientation="horizontal"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin">
 
-        <ImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_gravity="center_vertical"
-            android:layout_marginRight="8dp"
-            android:src="@drawable/timelapse_dark"></ImageView>
-
-        <TextView
+        <kr.ac.snu.hcil.omnitrack.ui.components.AttributeConnectionViewSubHeader
+            android:id="@+id/ui_header3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:text="Time Query" />
-    </LinearLayout>
-
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/button_height_normal"
-        android:orientation="horizontal"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin">
-
-        <ImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_gravity="center_vertical"
-            android:layout_marginRight="8dp"
-            android:src="@drawable/convert_dark"></ImageView>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:text="Convert Result" />
-    </LinearLayout>
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            app:icon="@drawable/convert_dark"
+            app:label="Convert Result" />
+    </RelativeLayout>
 
 </merge>

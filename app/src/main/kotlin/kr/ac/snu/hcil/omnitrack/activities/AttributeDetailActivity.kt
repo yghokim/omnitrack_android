@@ -22,18 +22,21 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
     private lateinit var propertyViewContainer: LinearLayout
 
+    private lateinit var propertyViewContainerSeparator: View
+
     private lateinit var columnNameView: ShortTextPropertyView
 
     private lateinit var newConnectionButton: Button
 
     private val propertyViewList = ArrayList<ReadOnlyPair<Int?, View>>()
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setActionBarButtonMode(Mode.Back)
 
         propertyViewContainer = findViewById(R.id.ui_list) as LinearLayout
+
+        propertyViewContainerSeparator = findViewById(R.id.ui_separator_list)
 
         columnNameView = findViewById(R.id.nameProperty) as ShortTextPropertyView
         columnNameView.title = resources.getString(R.string.msg_column_name)
@@ -111,6 +114,12 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
                 propertyViewContainer.addView(entry.second, layoutParams)
             }
+        }
+
+        if (attr == null || attr.propertyKeys.size == 0) {
+            propertyViewContainerSeparator.visibility = View.GONE
+        } else {
+            propertyViewContainerSeparator.visibility = View.VISIBLE
         }
     }
 

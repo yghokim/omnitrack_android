@@ -1,0 +1,6 @@
+<resources>
+    <declare-styleable name="AttributeConnectionViewSubHeader">
+        <attr name="icon" format="reference" />
+        <attr name="label" format="string" />
+    </declare-styleable>
+</resources>

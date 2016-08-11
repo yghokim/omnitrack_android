@@ -44,7 +44,9 @@
                 android:paddingLeft="@dimen/activity_horizontal_margin"
                 android:paddingRight="@dimen/activity_horizontal_margin" />
 
-            <View style="@style/HorizontalSeparator" />
+            <View
+                android:id="@+id/ui_separator_list"
+                style="@style/HorizontalSeparator" />
 
             <LinearLayout
                 android:id="@+id/ui_list"
@@ -89,7 +91,8 @@
 
                     android:paddingTop="14dp"
                     android:text="@string/msg_set_new_connection"
-                    android:textAlignment="viewStart" />
+                    android:textAlignment="viewStart"
+                    android:textColor="@color/buttonIconColorDark" />
 
                 <kr.ac.snu.hcil.omnitrack.ui.components.AttributeConnectionView
                     android:id="@+id/ui_attribute_connection"
