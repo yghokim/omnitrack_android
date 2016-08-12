@@ -94,19 +94,19 @@ object GoogleFitStepsFactory : GoogleFitService.GoogleFitMeasureFactory() {
 
                 GoogleFitService.getClientAsync {
                     client ->
-                    val result = Fitness.HistoryApi.readData(client!!, request).await()
-
-
-                    for (bucket in result.buckets) {
-                        for (dataset in bucket.dataSets) {
-                            for (dataPoint in dataset.dataPoints) {
-                                steps += dataPoint.getValue(Field.FIELD_STEPS).asInt()
-                                println(dataPoint.getValue(Field.FIELD_STEPS))
+                    Fitness.HistoryApi.readData(client!!, request).setResultCallback {
+                        result ->
+                        for (bucket in result.buckets) {
+                            for (dataset in bucket.dataSets) {
+                                for (dataPoint in dataset.dataPoints) {
+                                    steps += dataPoint.getValue(Field.FIELD_STEPS).asInt()
+                                    println(dataPoint.getValue(Field.FIELD_STEPS))
+                                }
                             }
                         }
-                    }
 
-                    finish = true
+                        finish = true
+                    }
                 }
 
                 while (!finish) {

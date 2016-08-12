@@ -2,7 +2,6 @@ package kr.ac.snu.hcil.omnitrack.activities.fragments
 
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
@@ -11,8 +10,9 @@ import android.util.SparseArray
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ImageView
+import android.widget.ProgressBar
+import android.widget.Switch
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
@@ -108,17 +108,30 @@ class ServiceListFragment : Fragment() {
             val nameView: TextView
             val descriptionView: TextView
 
-            val activationButton: Button
+            val activationButton: Switch
+            val progressBar: ProgressBar
+
+            val activationSwitchGroup: ViewGroup
+            val activationIndicator: TextView
 
             init {
                 thumbView = view.findViewById(R.id.thumb) as ImageView
                 nameView = view.findViewById(R.id.name) as TextView
                 descriptionView = view.findViewById(R.id.description) as TextView
 
-                activationButton = view.findViewById(R.id.ui_button_activate) as Button
+                progressBar = view.findViewById(R.id.ui_progress_bar) as ProgressBar
+
+                activationSwitchGroup = view.findViewById(R.id.ui_activation_switch_group) as ViewGroup
+
+                activationIndicator = view.findViewById(R.id.ui_activation_indicator_text) as TextView
+
+
+                activationButton = view.findViewById(R.id.ui_button_activate) as Switch
 
                 activationButton.setOnClickListener {
                     val service = getService(adapterPosition)
+
+                    println("service state: ${service.state}")
                     when (service.state) {
                         OTExternalService.ServiceState.ACTIVATED -> {
                             service.deactivate()
@@ -152,25 +165,22 @@ class ServiceListFragment : Fragment() {
             fun applyState(state: OTExternalService.ServiceState) {
                 when (state) {
                     OTExternalService.ServiceState.ACTIVATED -> {
-                        activationButton.text = "Deactivate"
-                        activationButton.setTextColor(Color.WHITE)
-                        activationButton.setBackgroundResource(R.drawable.button_background_red)
-                        activationButton.isEnabled = true
+                        progressBar.visibility = View.GONE
+                        activationIndicator.visibility = View.GONE
+                        activationButton.visibility = View.VISIBLE
+                        activationButton.isChecked = true
                     }
                     OTExternalService.ServiceState.ACTIVATING -> {
-
-                        activationButton.text = "Activating..."
-                        activationButton.setTextColor(Color.parseColor("#ff252525"))
-                        activationButton.setBackgroundResource(R.drawable.transparent_button_background)
-                        activationButton.isEnabled = false
-
+                        activationButton.visibility = View.GONE
+                        progressBar.visibility = View.VISIBLE
+                        activationButton.isChecked = false
+                        activationIndicator.visibility = View.VISIBLE
                     }
                     OTExternalService.ServiceState.DEACTIVATED -> {
-
-                        activationButton.text = "Activate"
-                        activationButton.setTextColor(Color.WHITE)
-                        activationButton.setBackgroundResource(R.drawable.button_background_green)
-                        activationButton.isEnabled = true
+                        progressBar.visibility = View.GONE
+                        activationIndicator.visibility = View.GONE
+                        activationButton.visibility = View.VISIBLE
+                        activationButton.isChecked = false
                     }
                 }
             }

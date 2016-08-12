@@ -100,6 +100,9 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
             if (result == true) {
                 setIsActivatedFlag(this, true)
                 state = ServiceState.ACTIVATED
+            } else {
+                setIsActivatedFlag(this, false)
+                state = ServiceState.DEACTIVATED
             }
 
             connectedHandler?.invoke(result)
