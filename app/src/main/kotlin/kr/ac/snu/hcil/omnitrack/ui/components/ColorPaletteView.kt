@@ -9,7 +9,6 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
 import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
-import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 
 /**
@@ -26,7 +25,7 @@ class ColorPaletteView(context: Context, attrs: AttributeSet?, defStyle: Int) : 
 
     init{
 
-        buttonSize = context.resources.getDimensionPixelSize(R.dimen.color_selection_button_size)
+        //buttonSize = //context.resources.getDimensionPixelSize(R.dimen.color_selection_button_size)
 
         layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
 
@@ -65,7 +64,7 @@ class ColorPaletteView(context: Context, attrs: AttributeSet?, defStyle: Int) : 
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             var view = ColorSelectionButton(context)
-            view.setPadding(10, 10, 10, 10)
+            buttonSize = ((parent.measuredWidth - parent.paddingLeft - parent.paddingRight) / itemCount - 4 * resources.displayMetrics.density).toInt()
             view.layoutParams = LayoutParams(buttonSize, buttonSize)
             return ViewHolder(view)
         }
@@ -121,4 +120,5 @@ class ColorPaletteView(context: Context, attrs: AttributeSet?, defStyle: Int) : 
             }
         }
     }
+
 }

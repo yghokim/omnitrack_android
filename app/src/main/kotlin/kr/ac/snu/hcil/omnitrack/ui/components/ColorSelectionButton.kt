@@ -35,11 +35,18 @@ class ColorSelectionButton : Button, ValueAnimator.AnimatorUpdateListener {
     private var contentSize : Float = 0.0f
 
     private var cornerRadius: Float = 0.0f
+    private var contentPadding: Float = 0.0f
+
 
     val shapePaint : Paint = Paint()
 
-    private var toSelectionAnimator: ValueAnimator? = null
-    private var toUnselectionAnimator: ValueAnimator? = null
+    private var toSelectionRoundingAnimator: ValueAnimator? = null
+    private var toUnselectionRoundingAnimator: ValueAnimator? = null
+
+    private var toSelectionRadiusAnimator: ValueAnimator? = null
+    private var toUnselectionRadiusAnimator: ValueAnimator? = null
+
+
 
     companion object {
         val interpolator = DecelerateInterpolator(2.0f)
@@ -98,51 +105,71 @@ class ColorSelectionButton : Button, ValueAnimator.AnimatorUpdateListener {
 
             if (isSelected) {
                 cornerRadius = contentSize * .2f
+                contentPadding = 0.0f
             } else {
                 cornerRadius = contentSize * .5f
+                contentPadding = contentSize * 0.1f
             }
 
-            toSelectionAnimator = ValueAnimator.ofFloat(contentSize * 0.5f, contentSize * 0.2f)
-            toUnselectionAnimator = ValueAnimator.ofFloat(contentSize * 0.2f, contentSize * 0.5f)
+            toSelectionRoundingAnimator = ValueAnimator.ofFloat(contentSize * 0.5f, contentSize * 0.2f)
+            toUnselectionRoundingAnimator = ValueAnimator.ofFloat(contentSize * 0.2f, contentSize * 0.5f)
 
-            toSelectionAnimator?.interpolator = interpolator
-            toUnselectionAnimator?.interpolator = interpolator
+            toSelectionRadiusAnimator = ValueAnimator.ofFloat(contentSize * 0.1f, 0.0f)
+            toUnselectionRadiusAnimator = ValueAnimator.ofFloat(0.0f, contentSize * 0.1f)
 
-            toSelectionAnimator?.duration = 200
-            toUnselectionAnimator?.duration = 150
 
-            toSelectionAnimator?.addUpdateListener(this)
-            toUnselectionAnimator?.addUpdateListener(this)
+            toSelectionRoundingAnimator?.interpolator = interpolator
+            toUnselectionRoundingAnimator?.interpolator = interpolator
+
+            toSelectionRoundingAnimator?.duration = 200
+            toSelectionRadiusAnimator?.duration = 200
+            toUnselectionRoundingAnimator?.duration = 150
+            toUnselectionRadiusAnimator?.duration = 150
+
+            toSelectionRoundingAnimator?.addUpdateListener(this)
+            toUnselectionRoundingAnimator?.addUpdateListener(this)
+
+            toSelectionRadiusAnimator?.addUpdateListener(this)
+            toUnselectionRadiusAnimator?.addUpdateListener(this)
         }
     }
 
     override fun setSelected(selected: Boolean) {
         if (isSelected != selected) {
             if (selected) {
-                if (toUnselectionAnimator?.isRunning ?: false) {
-                    toUnselectionAnimator?.end()
+                if (toUnselectionRoundingAnimator?.isRunning ?: false) {
+                    toUnselectionRoundingAnimator?.end()
                 }
 
-                toSelectionAnimator?.start()
+                toSelectionRadiusAnimator?.start()
+                toSelectionRoundingAnimator?.start()
             } else {
-                if (toSelectionAnimator?.isRunning ?: false) {
-                    toSelectionAnimator?.end()
+                if (toSelectionRoundingAnimator?.isRunning ?: false) {
+                    toSelectionRoundingAnimator?.end()
                 }
 
-                toUnselectionAnimator?.start()
+                toUnselectionRadiusAnimator?.start()
+                toUnselectionRoundingAnimator?.start()
             }
         }
         super.setSelected(selected)
     }
 
     override fun onAnimationUpdate(p0: ValueAnimator) {
-        cornerRadius = p0.animatedValue as Float
+        if (p0 === toUnselectionRoundingAnimator || p0 === toSelectionRoundingAnimator) {
+            cornerRadius = p0.animatedValue as Float
+        } else {
+            contentPadding = p0.animatedValue as Float
+        }
+
         invalidate()
     }
 
     override fun onDraw(canvas: Canvas) {
-        canvas.drawRoundRect(frameBounds, cornerRadius, cornerRadius, shapePaint)
 
+        frameBounds.set(paddingLeft, paddingTop, paddingLeft + contentSize, paddingTop + contentSize)
+        frameBounds.inset(contentPadding, contentPadding)
+        canvas.drawRoundRect(frameBounds, cornerRadius, cornerRadius, shapePaint)
 
         if (isSelected)
         {
