@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.transition.TransitionManager
 import android.util.SparseArray
 import android.view.LayoutInflater
 import android.view.View
@@ -163,6 +164,8 @@ class ServiceListFragment : Fragment() {
             }
 
             fun applyState(state: OTExternalService.ServiceState) {
+
+                TransitionManager.beginDelayedTransition(view as ViewGroup)
                 when (state) {
                     OTExternalService.ServiceState.ACTIVATED -> {
                         progressBar.visibility = View.GONE

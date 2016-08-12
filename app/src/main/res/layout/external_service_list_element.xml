@@ -79,11 +79,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/button_height_normal"
                 android:layout_gravity="center"
-                android:gravity="center_vertical|right"
+                android:gravity="center_vertical|end"
                 android:paddingEnd="@dimen/service_list_element_horizontal_padding"
                 android:paddingLeft="@dimen/service_list_element_horizontal_padding"
-                android:showText="false"
-                android:splitTrack="false" />
+                android:switchMinWidth="60dp" />
 
         </FrameLayout>
 
