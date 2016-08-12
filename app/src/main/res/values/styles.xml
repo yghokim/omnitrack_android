@@ -130,7 +130,7 @@
 
     <style name="whiteButtonLongStyle">
         <item name="android:background">@drawable/capsule_button_background</item>
-        <item name="android:padding">15dp</item>
+        <item name="android:padding">10dp</item>
         <item name="android:scaleType">fitCenter</item>
     </style>
 

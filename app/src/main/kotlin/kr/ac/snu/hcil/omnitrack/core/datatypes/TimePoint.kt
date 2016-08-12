@@ -16,7 +16,7 @@ class TimePoint : IStringSerializable {
         this.timeZone = TimeZone.getTimeZone(timezoneId)
     }
 
-    constructor() : this(Calendar.getInstance().timeInMillis, TimeZone.getDefault().id)
+    constructor() : this(System.currentTimeMillis(), TimeZone.getDefault().id)
 
     constructor(serialized: String) {
         fromSerializedString(serialized)

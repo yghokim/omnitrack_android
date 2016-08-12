@@ -29,11 +29,14 @@ class OTTimeAttribute : OTAttribute<TimePoint> {
         const val GRANULARITY = 0
 
         const val GRANULARITY_DAY = 0
-        const val GRANULARITY_TIME = 1
+        const val GRANULARITY_MINUTE = 1
+        const val GRANULARITY_SECOND = 2
+
 
         val formats = mapOf<Int, SimpleDateFormat>(
                 Pair(GRANULARITY_DAY, SimpleDateFormat("yyyy/MM/d")),
-                Pair(GRANULARITY_TIME, SimpleDateFormat("yyyy/MM/d h:mm:ss a"))
+                Pair(GRANULARITY_MINUTE, SimpleDateFormat("yyyy/MM/d h:mm a")),
+                Pair(GRANULARITY_SECOND, SimpleDateFormat("yyyy/MM/d h:mm:ss a"))
         )
     }
 
@@ -53,8 +56,8 @@ class OTTimeAttribute : OTAttribute<TimePoint> {
         get() = arrayOf(GRANULARITY)
 
     override fun createProperties() {
-        assignProperty(OTSelectionProperty(GRANULARITY, "TimePoint Granularity", arrayOf("Day", "Time"))) //TODO: I18N
-        setPropertyValue(GRANULARITY, GRANULARITY_TIME)
+        assignProperty(OTSelectionProperty(GRANULARITY, "TimePoint Granularity", arrayOf("Day", "Minute", "Second"))) //TODO: I18N
+        setPropertyValue(GRANULARITY, GRANULARITY_MINUTE)
     }
 
     override fun formatAttributeValue(value: Any): String {
@@ -67,7 +70,7 @@ class OTTimeAttribute : OTAttribute<TimePoint> {
             if (granularity == GRANULARITY_DAY) {
                 calendar.set(Calendar.SECOND, 0)
                 calendar.set(Calendar.MINUTE, 0)
-                calendar.set(Calendar.HOUR, 0)
+                calendar.set(Calendar.HOUR_OF_DAY, 0)
             }
 
             return formats[granularity]!!.format(calendar.time)
@@ -83,10 +86,13 @@ class OTTimeAttribute : OTAttribute<TimePoint> {
         if (inputView is TimePointInputView) {
             when (granularity) {
                 GRANULARITY_DAY -> inputView.setPickerMode(DateTimePicker.DATE)
-                GRANULARITY_TIME -> inputView.setPickerMode(DateTimePicker.TIME)
+                GRANULARITY_MINUTE -> inputView.setPickerMode(DateTimePicker.MINUTE)
+                GRANULARITY_SECOND -> inputView.setPickerMode(DateTimePicker.SECOND)
             }
 
-            getAutoCompleteValueAsync { result -> inputView.value = result }
+            getAutoCompleteValueAsync { result ->
+                inputView.value = result
+            }
         }
     }
 

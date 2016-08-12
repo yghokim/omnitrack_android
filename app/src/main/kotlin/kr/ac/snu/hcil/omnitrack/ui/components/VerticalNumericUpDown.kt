@@ -1,24 +1,24 @@
 package kr.ac.snu.hcil.omnitrack.ui.components
 
 import android.content.Context
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.AttributeSet
-import android.view.Display
 import android.view.LayoutInflater
-import android.view.MotionEvent
-import android.widget.*
+import android.widget.ImageButton
+import android.widget.LinearLayout
+import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
-import java.text.ParseException
-import java.util.*
-import kotlin.properties.Delegates
 
 /**
  * Created by Young-Ho Kim on 2016-07-25.
  */
 class VerticalNumericUpDown(context: Context, attrs: AttributeSet?) : LinearLayout(context, attrs) {
+
+    companion object {
+        const val MODE_PLUS_MINUS = 0
+        const val MODE_UP_DOWN = 1
+
+    }
 
     var minValue: Int = 0
         set(value) {

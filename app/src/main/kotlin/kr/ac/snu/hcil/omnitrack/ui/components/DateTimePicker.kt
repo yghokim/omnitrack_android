@@ -11,6 +11,9 @@ import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.CalendarPickerDialogFragment
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kr.ac.snu.hcil.omnitrack.utils.getActivity
+import kr.ac.snu.hcil.omnitrack.utils.getAmPm
+import kr.ac.snu.hcil.omnitrack.utils.getHour
+import kr.ac.snu.hcil.omnitrack.utils.getMinute
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.properties.Delegates
@@ -22,7 +25,8 @@ class DateTimePicker(context: Context, attrs: AttributeSet? = null) : FrameLayou
 
     companion object {
         const val DATE = 0
-        const val TIME = 1
+        const val MINUTE = 1
+        const val SECOND = 2
         /*
                 val availableTimeZones = TimeZone.getAvailableIDs().map {
                     TimeZone.getTimeZone(it)
@@ -73,9 +77,9 @@ class DateTimePicker(context: Context, attrs: AttributeSet? = null) : FrameLayou
         val before = time
 
         when (mode) {
-            TIME -> {
+            SECOND -> {
                 when (picker) {
-                    leftPicker -> //hour
+                    leftPicker -> //hour_of_day
                     {
                         calendar.set(Calendar.HOUR_OF_DAY, newVal)
                     }
@@ -86,6 +90,23 @@ class DateTimePicker(context: Context, attrs: AttributeSet? = null) : FrameLayou
                     rightPicker -> //second
                     {
                         calendar.set(Calendar.SECOND, newVal)
+                    }
+                }
+            }
+
+            MINUTE -> {
+                when (picker) {
+                    leftPicker -> //hour
+                    {
+                        calendar.set(Calendar.HOUR_OF_DAY, (newVal % 12) + 12 * rightPicker.value)
+                    }
+                    middlePicker -> //minute
+                    {
+                        calendar.set(Calendar.MINUTE, newVal)
+                    }
+                    rightPicker -> //ampm
+                    {
+                        calendar.set(Calendar.AM_PM, newVal)
                     }
                 }
             }
@@ -122,10 +143,6 @@ class DateTimePicker(context: Context, attrs: AttributeSet? = null) : FrameLayou
         leftPicker = findViewById(R.id.ui_left_picker) as VerticalNumericUpDown
         middlePicker = findViewById(R.id.ui_middle_picker) as VerticalNumericUpDown
         rightPicker = findViewById(R.id.ui_right_picker) as VerticalNumericUpDown
-
-        leftPicker.valueChanged += pickerValueChangedHandler
-        middlePicker.valueChanged += pickerValueChangedHandler
-        rightPicker.valueChanged += pickerValueChangedHandler
 
         dateButton = findViewById(R.id.ui_button_date) as Button
 
@@ -164,7 +181,11 @@ class DateTimePicker(context: Context, attrs: AttributeSet? = null) : FrameLayou
         timeZoneSpinner.adapter = timeZoneAdapter
         timeZoneSpinner.setSelection(availableTimeZones.indices.maxBy { availableTimeZones[it].id == TimeZone.getDefault().id }!!)*/
 
-        mode = TIME
+        mode = MINUTE
+
+        leftPicker.valueChanged += pickerValueChangedHandler
+        middlePicker.valueChanged += pickerValueChangedHandler
+        rightPicker.valueChanged += pickerValueChangedHandler
     }
 
 
@@ -174,8 +195,13 @@ class DateTimePicker(context: Context, attrs: AttributeSet? = null) : FrameLayou
     }
 
     private fun refresh() {
+
+        leftPicker.displayedValues = null
+        middlePicker.displayedValues = null
+        rightPicker.displayedValues = null
+
         when (mode) {
-            TIME -> {
+            SECOND -> {
                 //button shown, pickers are hour/minute/second
                 dateButton.visibility = View.VISIBLE
                 dateButton.text = dateFormat.format(calendar.time)
@@ -186,7 +212,6 @@ class DateTimePicker(context: Context, attrs: AttributeSet? = null) : FrameLayou
 
                 leftPicker.value = calendar.get(Calendar.HOUR_OF_DAY)
 
-                middlePicker.displayedValues = null
                 middlePicker.minValue = 0
                 middlePicker.maxValue = 59
                 middlePicker.value = calendar.get(Calendar.MINUTE)
@@ -196,11 +221,34 @@ class DateTimePicker(context: Context, attrs: AttributeSet? = null) : FrameLayou
                 rightPicker.value = calendar.get(Calendar.SECOND)
             }
 
+            MINUTE -> {
+                dateButton.visibility = View.VISIBLE
+                dateButton.text = dateFormat.format(calendar.time)
+
+                leftPicker.minValue = 1
+                leftPicker.maxValue = 12
+
+                val hour = calendar.getHour()
+                leftPicker.value = if (hour == 0) {
+                    12
+                } else {
+                    hour
+                }
+
+                middlePicker.minValue = 0
+                middlePicker.maxValue = 59
+                middlePicker.value = calendar.getMinute()
+
+                rightPicker.minValue = 0
+                rightPicker.maxValue = 1
+                rightPicker.displayedValues = arrayOf("AM", "PM")
+                rightPicker.value = calendar.getAmPm()
+            }
+
             DATE -> {
                 //button removed, pickers are year/month/day
                 dateButton.visibility = View.GONE
 
-                leftPicker.displayedValues = null
                 leftPicker.minValue = 1950
                 leftPicker.maxValue = 2050
                 leftPicker.value = calendar.get(Calendar.YEAR)
