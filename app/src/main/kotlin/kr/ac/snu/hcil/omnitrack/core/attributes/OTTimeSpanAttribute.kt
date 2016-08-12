@@ -21,7 +21,7 @@ class OTTimeSpanAttribute(objectId: String?, dbId: Long?, columnName: String, se
     override val propertyKeys: Array<Int> = arrayOf(PROPERTY_GRANULARITY, PROPERTY_TYPE)
 
     override val typeNameResourceId: Int = R.string.type_timespan_name
-
+    override val typeSmallIconResourceId: Int = R.drawable.icon_small_timer
     override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_TIMESPAN
 
     override fun createProperties() {

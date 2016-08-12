@@ -21,7 +21,7 @@ import kotlin.properties.Delegates
  */
 abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName: String, val typeId: Int, propertyData: String?, connectionData: String?) : NamedObject(objectId, dbId, columnName) {
 
-    data class AttributeTypeInfo(val typeId: Int, val iconId: Int, val name: String, val description: String?)
+    class AttributeTypeInfo(val typeId: Int, val iconId: Int, val name: String, val description: String?)
 
     override fun makeNewObjectId(): String {
         return owner?.owner?.makeNewObjectId() ?: UUID.randomUUID().toString()
@@ -61,7 +61,8 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
     abstract val propertyKeys: Array<Int>
 
     abstract val typeNameResourceId: Int
-        get
+
+    abstract val typeSmallIconResourceId: Int
 
     val propertyValueChanged = Event<OTProperty.PropertyChangedEventArgs<out Any>>()
     private val settingsProperties = SparseArray<OTProperty<out Any>>()

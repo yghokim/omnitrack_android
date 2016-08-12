@@ -23,6 +23,7 @@ class OTTimeAttribute : OTAttribute<TimePoint> {
     }
 
     override val typeNameResourceId: Int = R.string.type_timepoint_name
+    override val typeSmallIconResourceId: Int = R.drawable.icon_small_time
 
     companion object {
         const val GRANULARITY = 0

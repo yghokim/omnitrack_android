@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v4.widget.NestedScrollView
+import android.support.v7.widget.AppCompatImageView
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -283,7 +284,7 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
 
             lateinit var previewContainer: LockableFrameLayout
             lateinit var columnNameView: TextView
-            lateinit var typeNameView: TextView
+            lateinit var typeIconView: AppCompatImageView
 
             lateinit var editButton: ImageButton
             lateinit var removeButton: ImageButton
@@ -309,7 +310,7 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
                 previewContainer.locked = true
 
                 columnNameView = view.findViewById(R.id.ui_column_name) as TextView
-                typeNameView = view.findViewById(R.id.ui_attribute_type) as TextView
+                typeIconView = view.findViewById(R.id.ui_attribute_type) as AppCompatImageView
                 editButton = view.findViewById(R.id.ui_button_edit) as ImageButton
                 removeButton = view.findViewById(R.id.ui_button_remove) as ImageButton
                 draggableZone = view.findViewById(R.id.ui_drag_handle)
@@ -335,7 +336,7 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
             }
 
             fun bindAttribute(attribute: OTAttribute<out Any>) {
-                typeNameView.text = resources.getString(attribute.typeNameResourceId)
+                typeIconView.setImageResource(attribute.typeSmallIconResourceId)
                 columnNameView.text = attribute.name
 
                 previewContainer.alpha = 0.5f

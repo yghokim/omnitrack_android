@@ -16,8 +16,10 @@ class OTLongTextAttribute(objectId: String?, dbId: Long?, columnName: String, se
 
     override val propertyKeys: Array<Int> = Array<Int>(0) { index -> 0 }
 
-    override val typeNameResourceId: Int
-        get() = R.string.type_longtext_name
+    override val typeNameResourceId: Int = R.string.type_longtext_name
+
+    override val typeSmallIconResourceId: Int = R.drawable.icon_small_longtext
+
 
     override fun createProperties() {
     }

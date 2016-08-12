@@ -34,6 +34,8 @@ class OTLocationAttribute(objectId: String?, dbId: Long?, columnName: String, se
 
     override val typeNameResourceId: Int = R.string.type_location_name
 
+    override val typeSmallIconResourceId: Int = R.drawable.icon_small_location
+
     override fun createProperties() {
 
     }

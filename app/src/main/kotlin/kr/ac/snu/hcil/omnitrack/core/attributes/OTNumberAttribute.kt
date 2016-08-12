@@ -20,6 +20,8 @@ class OTNumberAttribute(objectId: String?, dbId: Long?, columnName: String, sett
 
     override val typeNameResourceId: Int = R.string.type_number_name
 
+    override val typeSmallIconResourceId: Int = R.drawable.icon_small_number
+
     override val propertyKeys: Array<Int>
         get() = arrayOf(DECIMAL_POINTS)
 

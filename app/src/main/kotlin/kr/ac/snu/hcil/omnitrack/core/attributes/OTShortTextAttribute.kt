@@ -10,6 +10,7 @@ import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelpe
 class OTShortTextAttribute(objectId: String?, dbId: Long?, columnName: String, settingData: String?, connectionData: String?) : OTAttribute<CharSequence>(objectId, dbId, columnName, Companion.TYPE_SHORT_TEXT, settingData, connectionData) {
     override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_STRING
     override val typeNameResourceId: Int = R.string.type_shorttext_name
+    override val typeSmallIconResourceId: Int = R.drawable.icon_small_shorttext
 
     override fun createProperties() {
     }
