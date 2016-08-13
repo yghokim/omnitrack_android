@@ -43,6 +43,13 @@ fun View.getActivity(): AppCompatActivity? {
     return null
 }
 
+fun View.setPaddingLeft(padding: Int) {
+    setPadding(padding, paddingTop, paddingRight, paddingBottom)
+}
+
+fun View.setPaddingRight(padding: Int) {
+    setPadding(paddingLeft, paddingTop, padding, paddingBottom)
+}
 
 fun List<*>.move(fromPosition: Int, toPosition: Int): Boolean {
     if (fromPosition != toPosition) {

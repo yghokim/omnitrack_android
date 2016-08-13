@@ -14,7 +14,6 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
-import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.DragItemTouchHelperCallback
 import kr.ac.snu.hcil.omnitrack.utils.move
@@ -63,7 +62,8 @@ class ChoiceEntryListEditor : LinearLayout, View.OnClickListener {
 
         entryListView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
 
-        entryListView.itemAnimator = SlideInLeftAnimator()
+        entryListView.itemAnimator = null
+        //entryListView.itemAnimator = SlideInLeftAnimator()
 
         entryListAdapter = Adapter()
         entryListView.adapter = entryListAdapter

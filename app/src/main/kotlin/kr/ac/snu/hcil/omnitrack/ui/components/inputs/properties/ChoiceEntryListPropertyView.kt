@@ -20,6 +20,7 @@ class ChoiceEntryListPropertyView(context: Context, attrs: AttributeSet?) : APro
 
     init {
         valueView = findViewById(R.id.value) as ChoiceEntryListEditor
+        useIntrinsicPadding = true
     }
 
 

@@ -16,9 +16,7 @@ import kr.ac.snu.hcil.omnitrack.core.externals.google.fit.GoogleFitStepsFactory
 import kr.ac.snu.hcil.omnitrack.ui.components.AttributeConnectionView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ShortTextPropertyView
-import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
-import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
-import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
+import kr.ac.snu.hcil.omnitrack.utils.*
 import java.util.*
 
 class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_attribute_detail), View.OnClickListener {
@@ -29,13 +27,13 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
     private lateinit var propertyViewContainer: LinearLayout
 
-    private lateinit var propertyViewContainerSeparator: View
-
     private lateinit var columnNameView: ShortTextPropertyView
 
     private lateinit var connectionFrame: FrameLayout
     private lateinit var newConnectionButton: Button
     private lateinit var connectionView: AttributeConnectionView
+
+    private var propertyViewHorizontalMargin: Int = 0
 
     private val propertyViewList = ArrayList<ReadOnlyPair<Int?, View>>()
 
@@ -43,9 +41,9 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
         super.onCreate(savedInstanceState)
         setActionBarButtonMode(Mode.Back)
 
-        propertyViewContainer = findViewById(R.id.ui_list) as LinearLayout
+        propertyViewHorizontalMargin = resources.getDimensionPixelSize(R.dimen.activity_horizontal_margin)
 
-        propertyViewContainerSeparator = findViewById(R.id.ui_separator_list)
+        propertyViewContainer = findViewById(R.id.ui_list) as LinearLayout
 
         columnNameView = findViewById(R.id.nameProperty) as ShortTextPropertyView
         columnNameView.title = resources.getString(R.string.msg_column_name)
@@ -97,7 +95,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
             if (entry.first != null) {
                 if (entry.second is APropertyView<*>) {
                     if (entry.second.validate()) {
-                        attribute?.setPropertyValue(entry.first, entry.second.value!!)
+                        attribute?.setPropertyValue(entry.first!!, entry.second.value!!)
                     }
                 }
             }
@@ -114,7 +112,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
             propertyViewContainer.removeAllViewsInLayout()
 
             val layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-            layoutParams.bottomMargin = (15 * resources.displayMetrics.density).toInt()
+
 
             propertyViewList.clear()
             for (entryWithIndex in attr.makePropertyViews(this).withIndex()) {
@@ -125,6 +123,10 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
                     @Suppress("UNCHECKED_CAST")
                     val propView: APropertyView<Any> = entry.second as APropertyView<Any>
+                    if (!propView.useIntrinsicPadding) {
+                        propView.setPaddingLeft(propertyViewHorizontalMargin)
+                        propView.setPaddingRight(propertyViewHorizontalMargin)
+                    }
 
                     propView.value = attr.getPropertyValue(entry.first)
                     propView.valueChanged += {
@@ -135,12 +137,6 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
                             }
                         }
                     }
-                }
-
-                if (entryWithIndex.index == 0) {
-                    layoutParams.topMargin = 0
-                } else {
-                    layoutParams.topMargin = (15 * resources.displayMetrics.density).toInt()
                 }
 
                 propertyViewContainer.addView(entry.second, layoutParams)
@@ -154,9 +150,14 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
         }
 
         if (attr == null || attr.propertyKeys.size == 0) {
-            propertyViewContainerSeparator.visibility = View.GONE
+            //no property
+            propertyViewContainer.setBackgroundResource(R.drawable.bottom_separator_light)
+        } else if (attr.propertyKeys.size == 1) {
+            //single property
+            propertyViewContainer.setBackgroundResource(R.drawable.top_bottom_separator_light)
         } else {
-            propertyViewContainerSeparator.visibility = View.VISIBLE
+            //multiple properties
+            propertyViewContainer.setBackgroundResource(R.drawable.expanded_view_inner_shadow)
         }
     }
 

@@ -5,12 +5,13 @@
 
     <android.support.v7.widget.AppCompatImageView
         android:id="@+id/ui_drag_handle"
-        android:layout_width="@dimen/attribute_list_element_drag_area_width"
+        android:layout_width="wrap_content"
         android:layout_height="@dimen/button_height_normal"
         android:layout_marginEnd="5dp"
-        android:paddingRight="7dp"
+        android:paddingEnd="7dp"
+        android:paddingStart="@dimen/activity_horizontal_margin"
         android:src="@drawable/icon_drag_handle"
-        android:tint="@color/buttonIconColorDark" />
+        android:tint="@color/textColorLight" />
 
     <EditText
         android:id="@+id/ui_text"
@@ -21,7 +22,9 @@
         android:layout_toEndOf="@+id/ui_drag_handle"
         android:layout_toStartOf="@+id/ui_button_remove"
         android:background="@drawable/text_field_singleline"
-        android:hint="Type in entry text" />
+        android:hint="Type in entry text"
+        android:textColor="@color/inputTextColor"
+        android:textColorHint="@color/textColorLight" />
 
 
     <android.support.v7.widget.AppCompatImageButton
@@ -34,4 +37,5 @@
         android:scaleType="fitCenter"
         android:src="@drawable/rounded_minus"
         android:tint="@color/colorRed.Light" />
+
 </RelativeLayout>

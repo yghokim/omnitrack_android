@@ -1,13 +1,16 @@
 <resources>
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_horizontal_margin.Negative">-16dp</dimen>
+
+
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
 
     <dimen name="property_left_padding">5dp</dimen>
     <dimen name="property_right_padding">5dp</dimen>
-    <dimen name="property_top_padding">5dp</dimen>
-    <dimen name="property_bottom_padding">15dp</dimen>
+    <dimen name="property_top_padding">15.5dp</dimen>
+    <dimen name="property_bottom_padding">18dp</dimen>
 
     <dimen name="list_element_vertical_space">7dp</dimen>
     <dimen name="attribute_list_element_vertical_space">15dp</dimen>
@@ -54,6 +57,5 @@
 
     <dimen name="service_list_element_vertical_padding">12dp</dimen>
     <dimen name="service_list_element_horizontal_padding">16dp</dimen>
-
 
 </resources>

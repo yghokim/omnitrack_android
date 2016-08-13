@@ -1,10 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/propertyElementStyle"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:paddingBottom="8dp">
 
-    <include layout="@layout/common_property_subheader" />
+
+    <TextView
+        android:id="@+id/title"
+        style="@style/PropertyHeaderStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:text="Text" />
 
 
     <kr.ac.snu.hcil.omnitrack.ui.components.ChoiceEntryListEditor
