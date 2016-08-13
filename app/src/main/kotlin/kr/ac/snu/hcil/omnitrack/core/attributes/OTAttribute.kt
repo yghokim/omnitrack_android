@@ -21,8 +21,6 @@ import kotlin.properties.Delegates
  */
 abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName: String, val typeId: Int, propertyData: String?, connectionData: String?) : NamedObject(objectId, dbId, columnName) {
 
-    class AttributeTypeInfo(val typeId: Int, val iconId: Int, val name: String, val description: String?)
-
     override fun makeNewObjectId(): String {
         return owner?.owner?.makeNewObjectId() ?: UUID.randomUUID().toString()
     }
@@ -35,6 +33,7 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
         const val TYPE_SHORT_TEXT = 3
         const val TYPE_LONG_TEXT = 4
         const val TYPE_LOCATION = 5
+        const val TYPE_CHOICE = 6
 
 
         fun createAttribute(objectId: String?, dbId: Long?, columnName: String, typeId: Int, propertyData: String?, connectionData: String?): OTAttribute<out Any> {
@@ -45,6 +44,7 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
                 TYPE_SHORT_TEXT -> OTShortTextAttribute(objectId, dbId, columnName, propertyData, connectionData)
                 TYPE_LONG_TEXT -> OTLongTextAttribute(objectId, dbId, columnName, propertyData, connectionData)
                 TYPE_LOCATION -> OTLocationAttribute(objectId, dbId, columnName, propertyData, connectionData)
+                TYPE_CHOICE -> OTChoiceAttribute(objectId, dbId, columnName, propertyData, connectionData)
                 else -> OTNumberAttribute(objectId, dbId, columnName, propertyData, connectionData)
             }
             return attr

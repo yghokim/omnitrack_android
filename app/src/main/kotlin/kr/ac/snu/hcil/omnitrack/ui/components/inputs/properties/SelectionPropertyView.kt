@@ -30,7 +30,7 @@ class SelectionPropertyView(context: Context, attrs: AttributeSet?) : APropertyV
         }
     }
 
-    fun setValues(values: Array<String>) {
+    fun setEntries(values: Array<String>) {
         selectionView.setValues(values)
     }
 

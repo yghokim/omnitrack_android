@@ -4,9 +4,7 @@ import android.app.Application
 import android.graphics.Color
 import kr.ac.snu.hcil.omnitrack.core.OTTriggerManager
 import kr.ac.snu.hcil.omnitrack.core.OTUser
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeAttribute
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeSpanAttribute
+import kr.ac.snu.hcil.omnitrack.core.attributes.*
 import kr.ac.snu.hcil.omnitrack.core.database.DatabaseHelper
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 
@@ -53,7 +51,7 @@ class OmniTrackApplication : Application() {
         private set
 
 
-    lateinit var supportedAttributeTypes: Array<OTAttribute.AttributeTypeInfo>
+    lateinit var supportedAttributePresets: Array<AttributePresetInfo>
         private set
 
     override fun onCreate() {
@@ -110,18 +108,33 @@ class OmniTrackApplication : Application() {
         }
 
 
-        supportedAttributeTypes = arrayOf(
-                OTAttribute.AttributeTypeInfo(OTAttribute.TYPE_SHORT_TEXT, R.drawable.field_icon_shorttext, this.getString(R.string.type_shorttext_name), this.getString(R.string.type_shorttext_desc)),
-                OTAttribute.AttributeTypeInfo(OTAttribute.TYPE_LONG_TEXT, R.drawable.field_icon_longtext, this.getString(R.string.type_longtext_name), this.getString(R.string.type_longtext_desc)),
-                OTAttribute.AttributeTypeInfo(OTAttribute.TYPE_NUMBER, R.drawable.field_icon_number, this.getString(R.string.type_number_name), this.getString(R.string.type_number_desc)),
-                OTAttribute.AttributeTypeInfo(OTAttribute.TYPE_TIME, R.drawable.field_icon_time, this.getString(R.string.type_timepoint_name), this.getString(R.string.type_timepoint_desc)),
-                OTAttribute.AttributeTypeInfo(OTAttribute.TYPE_LOCATION, R.drawable.field_icon_location, this.getString(R.string.type_location_name), this.getString(R.string.type_location_desc)),
-                OTAttribute.AttributeTypeInfo(OTAttribute.TYPE_TIMESPAN, R.drawable.field_icon_timer, this.getString(R.string.type_timespan_name), this.getString(R.string.type_timespan_desc)))
+        supportedAttributePresets = arrayOf(
+                SimpleAttributePresetInfo(OTAttribute.TYPE_SHORT_TEXT, R.drawable.field_icon_shorttext, this.getString(R.string.type_shorttext_name), this.getString(R.string.type_shorttext_desc)),
+                SimpleAttributePresetInfo(OTAttribute.TYPE_LONG_TEXT, R.drawable.field_icon_longtext, this.getString(R.string.type_longtext_name), this.getString(R.string.type_longtext_desc)),
+                SimpleAttributePresetInfo(OTAttribute.TYPE_NUMBER, R.drawable.field_icon_number, this.getString(R.string.type_number_name), this.getString(R.string.type_number_desc)),
+                SimpleAttributePresetInfo(OTAttribute.TYPE_TIME, R.drawable.field_icon_time, this.getString(R.string.type_timepoint_name), this.getString(R.string.type_timepoint_desc)),
+                SimpleAttributePresetInfo(OTAttribute.TYPE_LOCATION, R.drawable.field_icon_location, this.getString(R.string.type_location_name), this.getString(R.string.type_location_desc)),
+                SimpleAttributePresetInfo(OTAttribute.TYPE_TIMESPAN, R.drawable.field_icon_timer, this.getString(R.string.type_timespan_name), this.getString(R.string.type_timespan_desc)),
+                AttributePresetInfo(R.drawable.field_icon_singlechoice, this.getString(R.string.type_single_choice_name), this.getString(R.string.type_single_choice_desc),
+                        { user, columnName ->
+                            val attr = OTAttribute.createAttribute(user, columnName, OTAttribute.TYPE_CHOICE) as OTChoiceAttribute
+                            attr.allowedMultiselection = false
+                            attr
+                        }),
+
+                AttributePresetInfo(R.drawable.field_icon_multiplechoice, this.getString(R.string.type_multiple_choices_name), this.getString(R.string.type_multiple_choices_desc),
+                        { user, columnName ->
+                            val attr = OTAttribute.createAttribute(user, columnName, OTAttribute.TYPE_CHOICE) as OTChoiceAttribute
+                            attr.allowedMultiselection = true
+                            attr
+                        })
+
+        )
 
 
     }
 
-    fun syncUserToDb(){
+    fun syncUserToDb() {
         dbHelper.save(_currentUser)
         for (triggerEntry in triggerManager.withIndex()) {
             dbHelper.save(triggerEntry.value, _currentUser, triggerEntry.index)

@@ -21,6 +21,7 @@ import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.activities.AttributeDetailActivity
 import kr.ac.snu.hcil.omnitrack.activities.TrackerDetailActivity
+import kr.ac.snu.hcil.omnitrack.core.attributes.AttributePresetInfo
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.ui.DragItemTouchHelperCallback
 import kr.ac.snu.hcil.omnitrack.ui.SpaceItemDecoration
@@ -60,32 +61,6 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val rootView = inflater!!.inflate(R.layout.fragment_tracker_detail_structure, container, false)
 
-        /*
-        fab = rootView.findViewById(R.id.fab) as FloatingActionButton
-        fab.setOnClickListener { view ->
-            removalSnackbar.dismiss()
-            val dialogFragment = AttributeTypeListDialogFragment()
-            dialogFragment.showDialog(fragmentManager) {
-                entry ->
-                tracker.attributes.add(OTAttribute.createAttribute(OmniTrackApplication.app.currentUser, "New Column", entry.typeId))
-                attributeListAdapter.notifyItemInserted(tracker.attributes.size - 1)
-                attributeListAdapter.clearTrashcan()
-            }
-
-        }*/
-        /*
-        newAttributeButton = rootView.findViewById(R.id.ui_button_new_attribute)
-        newAttributeButton.setOnClickListener { view ->
-            removalSnackbar.dismiss()
-            val dialogFragment = AttributeTypeListDialogFragment()
-            dialogFragment.showDialog(fragmentManager) {
-                entry ->
-                val tracker = this.tracker!!
-                tracker.attributes.add(OTAttribute.createAttribute(OmniTrackApplication.app.currentUser, "New Column", entry.typeId))
-                attributeListAdapter.notifyItemInserted(tracker.attributes.size - 1)
-                attributeListAdapter.clearTrashcan()
-            }
-        }*/
         rootScrollView = rootView.findViewById(R.id.scroll_root) as NestedScrollView
 
         contentContainer = rootView.findViewById(R.id.ui_content_container) as ViewGroup
@@ -134,14 +109,6 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
 
         attributeListItemTouchHelper = ItemTouchHelper(DragItemTouchHelperCallback(attributeListAdapter, context, true, false))
         attributeListItemTouchHelper.attachToRecyclerView(attributeListView)
-
-
-        /*
-        val mRecyclerViewDragDropManager = RecyclerViewDragDropManager()
-        attributeListView.adapter = mRecyclerViewDragDropManager.createWrappedAdapter(attributeListAdapter)
-        mRecyclerViewDragDropManager.attachRecyclerView(attributeListView)
-           */
-
 
         newAttributeGrid = rootView.findViewById(R.id.ui_new_attribute_grid) as RecyclerView
         newAttributeGrid.layoutManager = GridLayoutManager(context, 5)
@@ -355,11 +322,11 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.bind(OmniTrackApplication.app.supportedAttributeTypes[position])
+            holder.bind(OmniTrackApplication.app.supportedAttributePresets[position])
         }
 
         override fun getItemCount(): Int {
-            return OmniTrackApplication.app.supportedAttributeTypes.size
+            return OmniTrackApplication.app.supportedAttributePresets.size
         }
 
         override fun getItemId(position: Int): Long {
@@ -376,15 +343,15 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
                 typeIcon = view.findViewById(R.id.type_icon) as ImageView
 
                 view.setOnClickListener {
-                    val typeInfo = OmniTrackApplication.app.supportedAttributeTypes[adapterPosition]
-                    tracker.attributes.add(OTAttribute.createAttribute(OmniTrackApplication.app.currentUser, tracker.generateNewAttributeName(typeInfo.name, context), typeInfo.typeId))
+                    val typeInfo = OmniTrackApplication.app.supportedAttributePresets[adapterPosition]
+                    tracker.attributes.add(typeInfo.creater(OmniTrackApplication.app.currentUser, tracker.generateNewAttributeName(typeInfo.name, context)))
 
                     attributeListAdapter.notifyItemInserted(tracker.attributes.size - 1)
                     scrollToBottomReserved = true
                 }
             }
 
-            fun bind(entry: OTAttribute.AttributeTypeInfo) {
+            fun bind(entry: AttributePresetInfo) {
                 name.text = entry.name
                 typeIcon.setImageResource(entry.iconId)
             }

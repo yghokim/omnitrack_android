@@ -29,6 +29,8 @@
 
     <color name="colorGreen">#9fea75</color>
     <color name="colorRed">#ee695f</color>
+    <color name="colorRed.Light">#fc8370</color>
+
 
     <color name="editTextLine">#cfcfcf</color>
 

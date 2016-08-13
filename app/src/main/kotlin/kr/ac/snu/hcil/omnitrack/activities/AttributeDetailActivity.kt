@@ -91,6 +91,19 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
     override fun onToolbarRightButtonClicked() {
     }
 
+    override fun onPause() {
+        super.onPause()
+        for (entry in propertyViewList) {
+            if (entry.first != null) {
+                if (entry.second is APropertyView<*>) {
+                    if (entry.second.validate()) {
+                        attribute?.setPropertyValue(entry.first, entry.second.value!!)
+                    }
+                }
+            }
+        }
+    }
+
     fun refresh() {
         val attr = attribute
         if (attr != null) {
@@ -118,7 +131,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
                         sender, value ->
                         if (sender is APropertyView<*>) {
                             if (sender.validate()) {
-                                attr.setPropertyValue(entry.first, value)
+                                //attr.setPropertyValue(entry.first, value)
                             }
                         }
                     }

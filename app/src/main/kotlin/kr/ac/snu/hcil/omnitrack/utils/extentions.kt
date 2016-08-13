@@ -43,6 +43,25 @@ fun View.getActivity(): AppCompatActivity? {
     return null
 }
 
+
+fun List<*>.move(fromPosition: Int, toPosition: Int): Boolean {
+    if (fromPosition != toPosition) {
+        if (fromPosition < toPosition) {
+            for (i in fromPosition..toPosition - 1) {
+                Collections.swap(this, i, i + 1)
+            }
+        } else {
+            for (i in fromPosition downTo toPosition + 1) {
+                Collections.swap(this, i, i - 1)
+            }
+        }
+
+        return true
+    }
+    return false
+}
+
+
 fun Calendar.getYear(): Int {
     return get(Calendar.YEAR)
 }

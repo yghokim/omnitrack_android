@@ -155,6 +155,15 @@
     <string name="type_number_name">Number</string>
     <string name="type_number_desc">An integer or real number with unit</string>
 
+    <string name="type_choice_name">Choice</string>
+    <string name="type_choice_desc">choose single or multiple values from list</string>
+
+    <string name="type_single_choice_name">Single Choice</string>
+    <string name="type_single_choice_desc">choose a single value from list</string>
+
+    <string name="type_multiple_choices_name">Multiple Choices</string>
+    <string name="type_multiple_choices_desc">choose multiple values from list</string>
+
     <string name="trigger_periodic_name">Time Trigger</string>
     <string name="trigger_periodic_desc">Fires by specific periods.</string>
 
@@ -175,7 +184,6 @@
     <string name="service_googlefit_desc">Get measured data from Google health platform</string>
     <string name="measure_googlefit_steps_name">Step Count</string>
     <string name="measure_googlefit_steps_desc">Get step count during specific range</string>
-
 
     <string name="service_device_name">Android Device</string>
     <string name="service_device_desc">Android device events and measures</string>

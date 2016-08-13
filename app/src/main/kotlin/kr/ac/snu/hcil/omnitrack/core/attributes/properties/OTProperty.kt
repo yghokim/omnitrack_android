@@ -29,5 +29,12 @@ abstract class OTProperty<T>(initialValue: T, val key: Int, val title: String) :
         value = parseValue(serialized)
     }
 
-    abstract fun buildView(context: Context): APropertyView<T>
+    fun buildView(context: Context): APropertyView<T> {
+        val view = onBuildView(context)
+        view.title = title
+        view.value = value
+        return view
+    }
+
+    abstract protected fun onBuildView(context: Context): APropertyView<T>
 }

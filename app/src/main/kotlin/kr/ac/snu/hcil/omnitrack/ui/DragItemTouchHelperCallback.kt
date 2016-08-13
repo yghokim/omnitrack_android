@@ -11,12 +11,13 @@ import kr.ac.snu.hcil.omnitrack.R
  * Created by Young-Ho Kim on 2016-07-21.
  * codes by https://medium.com/@ipaulpro/drag-and-swipe-with-recyclerview-b9456d2b1aaf#.z8t5ugen2
  */
-class DragItemTouchHelperCallback(private val adapter: ItemDragHelperAdapter, context: Context, private val orderChangeAvailable: Boolean = true, private val swipeAvailable: Boolean = true) : ItemTouchHelper.Callback() {
+class DragItemTouchHelperCallback(private val adapter: ItemDragHelperAdapter, context: Context, private val orderChangeAvailable: Boolean = true, private val swipeAvailable: Boolean = true, private val showDragShadow: Boolean = true) : ItemTouchHelper.Callback() {
 
-    private val shadow: Drawable
+    private var shadow: Drawable? = null
 
     init {
-        shadow = context.resources.getDrawable(R.drawable.shadow, null)
+        if (showDragShadow)
+            shadow = context.resources.getDrawable(R.drawable.shadow, null)
     }
 
     interface ItemDragHelperAdapter {
@@ -48,9 +49,11 @@ class DragItemTouchHelperCallback(private val adapter: ItemDragHelperAdapter, co
 
             c.translate(dX - 40, dY - 40)
 
-            shadow.bounds = c.clipBounds
+            if (showDragShadow) {
+                shadow?.bounds = c.clipBounds
 
-            shadow.draw(c)
+                shadow?.draw(c)
+            }
 
             c.restore()
         }

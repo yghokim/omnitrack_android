@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <android.support.v7.widget.AppCompatImageView
+        android:id="@+id/ui_drag_handle"
+        android:layout_width="@dimen/attribute_list_element_drag_area_width"
+        android:layout_height="@dimen/button_height_normal"
+        android:layout_marginEnd="5dp"
+        android:paddingRight="7dp"
+        android:src="@drawable/icon_drag_handle"
+        android:tint="@color/buttonIconColorDark" />
+
+    <EditText
+        android:id="@+id/ui_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/ui_button_remove"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/ui_drag_handle"
+        android:layout_toStartOf="@+id/ui_button_remove"
+        android:background="@drawable/text_field_singleline"
+        android:hint="Type in entry text" />
+
+
+    <android.support.v7.widget.AppCompatImageButton
+        android:id="@+id/ui_button_remove"
+        style="@style/Base.Widget.AppCompat.Button.Borderless"
+        android:layout_width="@dimen/button_height_normal"
+        android:layout_height="@dimen/button_height_normal"
+        android:layout_alignParentEnd="true"
+        android:padding="12dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/rounded_minus"
+        android:tint="@color/colorRed.Light" />
+</RelativeLayout>

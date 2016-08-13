@@ -18,6 +18,7 @@ abstract class AAttributeInputView<DataType>(layoutId: Int, context: Context, at
         const val VIEW_TYPE_LOCATION = 4
         const val VIEW_TYPE_TIME_RANGE_PICKER = 5
         const val VIEW_TYPE_STOPWATCH = 6
+        const val VIEW_TYPE_CHOICE = 7
 
 
 

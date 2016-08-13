@@ -42,22 +42,13 @@ class ObservableList<T>(){
     }
 
     fun moveItem(fromPosition: Int, toPosition: Int) {
-        if (fromPosition != toPosition) {
+        if (unObservedList.move(fromPosition, toPosition)) {
             if (fromPosition < toPosition) {
-                for (i in fromPosition..toPosition - 1) {
-                    Collections.swap(list, i, i + 1)
-                }
-
                 elementReordered.invoke(this, IntRange(fromPosition, toPosition - 1))
 
             } else {
-                for (i in fromPosition downTo toPosition + 1) {
-                    Collections.swap(list, i, i - 1)
-                }
-
                 elementReordered.invoke(this, IntRange(toPosition + 1, fromPosition))
             }
-
         }
     }
 
