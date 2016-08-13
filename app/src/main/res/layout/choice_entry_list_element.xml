@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/button_height_normal"
+    android:background="@drawable/transparent_button_background">
+
+    <ImageView
+        android:id="@+id/ui_checked"
+        android:layout_width="@dimen/choice_indicator_size"
+        android:layout_height="@dimen/choice_indicator_size"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="@dimen/choice_indicator_spacing"
+        android:scaleType="fitStart"
+        android:src="@drawable/toggle_checked" />
+
+    <TextView
+        android:id="@+id/ui_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toEndOf="@+id/ui_checked"
+        android:text="Choice Entry 1"
+        android:textColor="@color/textColorMid"
+        android:textSize="16dp"
+        android:textStyle="bold" />
+</RelativeLayout>

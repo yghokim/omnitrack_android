@@ -9,20 +9,21 @@ import android.view.View
 /**
  * Created by Young-Ho Kim on 2016-07-25.
  */
-class HorizontalDividerItemDecoration(val color: Int, val height: Int) : RecyclerView.ItemDecoration() {
+class HorizontalDividerItemDecoration(val color: Int, val height: Int, val leftPadding: Int = 0, val rightPadding: Int = 0) : RecyclerView.ItemDecoration() {
 
     val paint = Paint(Paint.ANTI_ALIAS_FLAG)
 
     init {
         paint.style = Paint.Style.STROKE
         paint.color = color
+        paint.strokeWidth = height.toFloat()
     }
 
     override fun onDrawOver(c: Canvas, parent: RecyclerView, state: RecyclerView.State?) {
 
         if (paint.color != 0) {
-            val left = parent.paddingLeft
-            val right = parent.width - parent.paddingRight
+            val left = parent.paddingLeft + leftPadding
+            val right = parent.width - parent.paddingRight + rightPadding
 
             val childCount = parent.childCount
             for (i in 0..childCount - 2) {

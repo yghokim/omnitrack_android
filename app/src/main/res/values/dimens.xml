@@ -41,6 +41,9 @@
     <dimen name="selection_view_button_padding_bottom">10dp</dimen>
     <dimen name="selection_view_button_text_size">16dp</dimen>
 
+    <dimen name="choice_indicator_size">25dp</dimen>
+    <dimen name="choice_indicator_spacing">8dp</dimen>
+
 
     <dimen name="selection_view_button_spacing">2dp</dimen>
 

@@ -198,4 +198,10 @@
     <string name="title_activity_new_item">New [%1$s] Item</string>
     <string name="title_activity_maps">Map</string>
     <string name="title_activity_new_connection">New Conection</string>
+
+    <string-array name="choice_preview_entries">
+        <item>Choice entry 1</item>
+        <item>Choice entry 2</item>
+        <item>Choice entry 3</item>
+    </string-array>
 </resources>

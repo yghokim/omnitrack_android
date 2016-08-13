@@ -31,6 +31,7 @@ abstract class AAttributeInputView<DataType>(layoutId: Int, context: Context, at
                 VIEW_TYPE_SHORT_TEXT -> ShortTextInputView(context)
                 VIEW_TYPE_LOCATION -> LocationInputView(context)
                 VIEW_TYPE_TIME_RANGE_PICKER -> TimeRangePickerInputView(context)
+                VIEW_TYPE_CHOICE -> ChoiceInputView(context)
                 else -> throw IllegalArgumentException("attribute view data type ${type} is not supported yet.")
             }
         }

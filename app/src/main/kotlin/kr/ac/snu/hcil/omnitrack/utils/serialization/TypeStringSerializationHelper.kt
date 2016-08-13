@@ -86,8 +86,16 @@ object TypeStringSerializationHelper {
             TYPENAME_BIGDECIMAL -> BigDecimal(parcel.v)
             TYPENAME_TIMEPOINT -> TimePoint(parcel.v)
             TYPENAME_TIMESPAN -> TimeSpan(parcel.v)
-            TYPENAME_INT_ARRAY -> parcel.v.split(",").map { it.toInt() }.toIntArray()
-            TYPENAME_LONG_ARRAY -> parcel.v.split(",").map { it.toLong() }.toLongArray()
+            TYPENAME_INT_ARRAY -> if (parcel.v.isNullOrEmpty()) {
+                intArrayOf()
+            } else {
+                parcel.v.split(",").map { it.toInt() }.toIntArray()
+            }
+            TYPENAME_LONG_ARRAY -> if (parcel.v.isNullOrEmpty()) {
+                longArrayOf()
+            } else {
+                parcel.v.split(",").map { it.toLong() }.toLongArray()
+            }
             TYPENAME_LATITUDE_LONGITUDE -> deserializeLatLng(parcel.v)
             TYPENAME_ROUTE -> Route(parcel.v)
             else -> return parcel.v
