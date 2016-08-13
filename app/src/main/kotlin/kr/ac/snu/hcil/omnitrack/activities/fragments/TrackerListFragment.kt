@@ -243,8 +243,10 @@ class TrackerListFragment : Fragment() {
 
                 if (currentlyExpandedIndex == adapterPosition) {
                     expand()
+                    setIsRecyclable(false)
                 } else {
                     collapse()
+                    setIsRecyclable(true)
                 }
             }
 
