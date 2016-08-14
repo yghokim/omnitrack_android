@@ -48,6 +48,8 @@
     <dimen name="selection_view_button_spacing">2dp</dimen>
 
     <dimen name="button_height_normal">50dp</dimen>
+    <dimen name="button_height_small">40dp</dimen>
+
 
     <dimen name="number_button_height">45dp</dimen>
     <dimen name="number_button_width">70dp</dimen>

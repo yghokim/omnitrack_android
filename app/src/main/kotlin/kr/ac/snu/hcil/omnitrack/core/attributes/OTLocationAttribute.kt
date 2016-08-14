@@ -8,7 +8,7 @@ import com.google.android.gms.maps.model.LatLng
 import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.ShortTextInputView
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.LocationInputView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 
 /**
@@ -102,11 +102,11 @@ class OTLocationAttribute(objectId: String?, dbId: Long?, columnName: String, se
     }
 
     override fun refreshInputViewContents(inputView: AAttributeInputView<out Any>) {
-        if (inputView is ShortTextInputView) {
+        if (inputView is LocationInputView) {
             getAutoCompleteValueAsync {
                 result ->
                 println("location: $result")
-                inputView.value = result.toString()
+                inputView.value = result
             }
         }
     }

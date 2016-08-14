@@ -30,6 +30,7 @@ class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
 
         listView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         listView.adapter = adapter
+        listView.itemAnimator.changeDuration = 200
         listView.addItemDecoration(HorizontalDividerItemDecoration(resources.getColor(R.color.separator_Light, null), (0.8f * (resources.displayMetrics.density + 0.5f)).toInt(), resources.getDimensionPixelSize(R.dimen.choice_indicator_size) + resources.getDimensionPixelSize(R.dimen.choice_indicator_spacing)))
 
     }
@@ -106,10 +107,10 @@ class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
                         indicator.setImageResource(R.drawable.toggle_selected)
                     }
 
-                    textView.setTextColor(resources.getColor(R.color.textColorMid, null))
+                    //textView.setTextColor(resources.getColor(R.color.textColorMid, null))
                 } else {
                     indicator.setImageResource(R.drawable.toggle_empty)
-                    textView.setTextColor(resources.getColor(R.color.textColorLight, null))
+                    //textView.setTextColor(resources.getColor(R.color.textColorLight, null))
                 }
             }
 

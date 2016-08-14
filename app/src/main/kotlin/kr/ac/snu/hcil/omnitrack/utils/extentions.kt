@@ -31,6 +31,13 @@ fun Fragment.startActivityOnDelay(intent: Intent, delay: Long = 50) {
     }, delay)
 }
 
+fun View.contains(x: Float, y: Float): Boolean {
+    if (x < left || x > right || y < top || y > bottom) {
+        return false
+    }
+    return true
+}
+
 fun View.getActivity(): AppCompatActivity? {
 
     var currentContext = context

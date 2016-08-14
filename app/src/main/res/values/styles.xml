@@ -177,4 +177,16 @@
         <item name="android:paddingRight">12dp</item>
 
     </style>
+
+    <style name="mapViewOverlayButton">
+
+        <item name="android:layout_width">45dp</item>
+        <item name="android:layout_height">45dp</item>
+        <item name="android:tint">@color/textColorMid</item>
+        <item name="android:padding">15dp</item>
+        <item name="android:background">@drawable/round_rectangle_button_for_overlay</item>
+
+        <item name="android:scaleGravity">center</item>
+        <item name="android:scaleType">fitCenter</item>
+    </style>
 </resources>
