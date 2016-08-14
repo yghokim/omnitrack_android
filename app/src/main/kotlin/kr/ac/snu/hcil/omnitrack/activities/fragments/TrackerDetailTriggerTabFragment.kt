@@ -12,7 +12,7 @@ import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.activities.TrackerDetailActivity
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
-import kr.ac.snu.hcil.omnitrack.ui.HorizontalDividerItemDecoration
+import kr.ac.snu.hcil.omnitrack.ui.decorations.HorizontalDividerItemDecoration
 
 /**
  * Created by younghokim on 16. 7. 30..

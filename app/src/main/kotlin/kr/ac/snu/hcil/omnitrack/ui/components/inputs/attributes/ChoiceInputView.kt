@@ -10,7 +10,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.ui.HorizontalDividerItemDecoration
+import kr.ac.snu.hcil.omnitrack.ui.decorations.HorizontalDividerItemDecoration
 import java.util.*
 import kotlin.properties.Delegates
 

@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui
+package kr.ac.snu.hcil.omnitrack.ui.decorations
 
 import android.graphics.Rect
 import android.support.v7.widget.LinearLayoutManager

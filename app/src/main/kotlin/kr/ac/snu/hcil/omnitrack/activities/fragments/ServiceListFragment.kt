@@ -17,7 +17,7 @@ import android.widget.Switch
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
-import kr.ac.snu.hcil.omnitrack.ui.HorizontalDividerItemDecoration
+import kr.ac.snu.hcil.omnitrack.ui.decorations.HorizontalDividerItemDecoration
 
 /**
  * Created by Young-Ho on 7/29/2016.

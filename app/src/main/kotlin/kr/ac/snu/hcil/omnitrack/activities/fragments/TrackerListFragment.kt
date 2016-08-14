@@ -8,14 +8,15 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.transition.AutoTransition
+import android.transition.Fade
 import android.transition.TransitionManager
+import android.transition.TransitionSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
-import jp.wasabeef.recyclerview.animators.SlideInRightAnimator
 import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.activities.ItemBrowserActivity
@@ -23,7 +24,8 @@ import kr.ac.snu.hcil.omnitrack.activities.NewItemActivity
 import kr.ac.snu.hcil.omnitrack.activities.TrackerDetailActivity
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
-import kr.ac.snu.hcil.omnitrack.ui.HorizontalImageDividerItemDecoration
+import kr.ac.snu.hcil.omnitrack.ui.decorations.DrawableListBottomSpaceItemDecoration
+import kr.ac.snu.hcil.omnitrack.ui.decorations.HorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.startActivityOnDelay
 
@@ -38,16 +40,26 @@ class TrackerListFragment : Fragment() {
 
     lateinit private var trackerListAdapter : TrackerListAdapter
 
+    lateinit private var trackerListLayoutManager: LinearLayoutManager
+
     lateinit private var popupMessages : Array<String>
 
     companion object{
         const val CHANGE_TRACKER_SETTINGS = 0
         const val REMOVE_TRACKER = 1
 
-        val transition = AutoTransition()
+        //val transition = AutoTransition()
+        val transition = TransitionSet()
+
+        //val transition = ChangeBounds()
 
         init {
-            transition.duration = 200
+            //transition.addTransition(ChangeBounds())
+            transition.addTransition(Fade())
+            // transition.ordering = TransitionSet.ORDERING_TOGETHER
+
+            transition.ordering = AutoTransition.ORDERING_TOGETHER
+            transition.duration = 300
         }
     }
 
@@ -83,15 +95,17 @@ class TrackerListFragment : Fragment() {
         }
 
         listView = rootView.findViewById(R.id.ui_tracker_list_view) as RecyclerView
-        val layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        listView.layoutManager = layoutManager
+        trackerListLayoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        listView.layoutManager = trackerListLayoutManager
         trackerListAdapter = TrackerListAdapter(user)
 
         listView.adapter = trackerListAdapter
 
         popupMessages = arrayOf(getString(R.string.msg_change_tracker_settings), getString(R.string.msg_remove_tracker))
-        listView.itemAnimator = SlideInRightAnimator()
+        //listView.itemAnimator = SlideInRightAnimator()
         listView.addItemDecoration(HorizontalImageDividerItemDecoration(R.drawable.horizontal_separator_pattern, context, 1.5f))
+        listView.addItemDecoration(DrawableListBottomSpaceItemDecoration(R.drawable.expanded_view_inner_shadow_top, resources.getDimensionPixelSize(R.dimen.tracker_list_bottom_space)))
+
         return rootView
     }
 
@@ -148,7 +162,6 @@ class TrackerListFragment : Fragment() {
         var currentlyExpandedIndex = -1
 
         init {
-            hasStableIds()
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -169,7 +182,8 @@ class TrackerListFragment : Fragment() {
         }
 
 
-        inner class ViewHolder(view : View) : RecyclerView.ViewHolder(view){
+        inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view), View.OnClickListener {
+
             lateinit var name: TextView
             lateinit var color: View
             lateinit var expandButton: ImageButton
@@ -193,33 +207,34 @@ class TrackerListFragment : Fragment() {
                 listButton = view.findViewById(R.id.ui_button_list)
                 removeButton = view.findViewById(R.id.ui_button_remove)
 
-                view.setOnClickListener {
-                    handleTrackerClick(user.trackers[adapterPosition])
-                }
+                view.setOnClickListener(this)
+                editButton.setOnClickListener(this)
+                listButton.setOnClickListener(this)
+                removeButton.setOnClickListener(this)
+                expandButton.setOnClickListener(this)
 
-                editButton.setOnClickListener {
+                collapse()
+            }
+
+            override fun onClick(view: View) {
+                if (view === itemView) {
+                    handleTrackerClick(user.trackers[adapterPosition])
+                } else if (view === editButton) {
                     val intent = Intent(context, TrackerDetailActivity::class.java)
                     intent.putExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, user.trackers[adapterPosition].objectId)
                     startActivityOnDelay(intent)
-                }
-
-                listButton.setOnClickListener {
+                } else if (view === listButton) {
                     val intent = Intent(context, ItemBrowserActivity::class.java)
                     intent.putExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, user.trackers[adapterPosition].objectId)
                     startActivityOnDelay(intent)
-                }
-
-                removeButton.setOnClickListener {
+                } else if (view === removeButton) {
                     val tracker = user.trackers[adapterPosition]
-                    DialogHelper.makeYesNoDialogBuilder(context, tracker.name, getString(R.string.msg_confirm_remove_tracker), { -> user.trackers.remove(tracker); notifyItemRemoved(adapterPosition) }).show()
-                }
-
-
-                expandButton.setOnClickListener {
-                    view ->
+                    DialogHelper.makeYesNoDialogBuilder(context, tracker.name, getString(R.string.msg_confirm_remove_tracker), { -> user.trackers.remove(tracker); notifyItemRemoved(adapterPosition); listView.invalidateItemDecorations(); }).show()
+                } else if (view === expandButton) {
+                    var toClose = -1
                     if (collapsed) {
                         if (currentlyExpandedIndex != -1) {
-                            val close = currentlyExpandedIndex
+                            toClose = currentlyExpandedIndex
                             currentlyExpandedIndex = adapterPosition
                             //notifyItemChanged(close)
                         } else {
@@ -229,24 +244,26 @@ class TrackerListFragment : Fragment() {
                         currentlyExpandedIndex = -1
                     }
 
+                    if (toClose >= 0 && (trackerListLayoutManager.findFirstVisibleItemPosition() > toClose || trackerListLayoutManager.findLastVisibleItemPosition() < toClose)) {
+                        //item to close is outside the screen
+                        println("$toClose is out of the screen.")
+                    }
 
                     TransitionManager.beginDelayedTransition(listView, transition)
                     notifyDataSetChanged()
                 }
-
-                collapse()
             }
 
+
             fun bindTracker(tracker: OTTracker){
+
                 name.text = tracker.name
                 color.setBackgroundColor(tracker.color)
 
                 if (currentlyExpandedIndex == adapterPosition) {
                     expand()
-                    setIsRecyclable(false)
                 } else {
                     collapse()
-                    setIsRecyclable(true)
                 }
             }
 

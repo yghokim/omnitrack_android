@@ -24,11 +24,11 @@ import kr.ac.snu.hcil.omnitrack.activities.TrackerDetailActivity
 import kr.ac.snu.hcil.omnitrack.core.attributes.AttributePresetInfo
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.ui.DragItemTouchHelperCallback
-import kr.ac.snu.hcil.omnitrack.ui.SpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ColorPalettePropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ShortTextPropertyView
+import kr.ac.snu.hcil.omnitrack.ui.decorations.SpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.utils.startActivityOnDelay
 
 /**
@@ -247,7 +247,7 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
         }
 
 
-        inner class ViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
+        inner class ViewHolder(val view: View) : RecyclerView.ViewHolder(view), View.OnClickListener, View.OnTouchListener {
 
             lateinit var previewContainer: LockableFrameLayout
             lateinit var columnNameView: TextView
@@ -282,24 +282,30 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
                 removeButton = view.findViewById(R.id.ui_button_remove) as ImageButton
                 draggableZone = view.findViewById(R.id.ui_drag_handle)
 
-                editButton.setOnClickListener {
-                    openAttributeDetailActivity(adapterPosition)
-                }
+                editButton.setOnClickListener(this)
+                removeButton.setOnClickListener(this)
+                draggableZone.setOnTouchListener(this)
 
-                removeButton.setOnClickListener {
+            }
+
+            override fun onClick(view: View) {
+                if (view === editButton) {
+                    openAttributeDetailActivity(adapterPosition)
+                } else if (view === removeButton) {
                     removed = tracker.attributes[adapterPosition]
                     removedPosition = adapterPosition
                     tracker.attributes.remove(tracker.attributes[adapterPosition])
                     notifyItemRemoved(adapterPosition)
                     showRemovalSnackbar()
                 }
+            }
 
-                draggableZone.setOnTouchListener { view, motionEvent ->
-                    if (motionEvent.action == MotionEvent.ACTION_DOWN) {
-                        attributeListItemTouchHelper.startDrag(this@ViewHolder)
-                    }
-                    true
-                }
+            override fun onTouch(view: View, motionEvent: MotionEvent): Boolean {
+
+                if (motionEvent.action == MotionEvent.ACTION_DOWN) {
+                    attributeListItemTouchHelper.startDrag(this@ViewHolder)
+                    return true
+                } else return false
             }
 
             fun bindAttribute(attribute: OTAttribute<out Any>) {
