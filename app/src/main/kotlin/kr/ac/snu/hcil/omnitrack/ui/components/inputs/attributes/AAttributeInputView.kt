@@ -1,14 +1,17 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes
 
 import android.content.Context
+import android.os.Bundle
 import android.util.AttributeSet
+import kr.ac.snu.hcil.omnitrack.ui.IActivityLifeCycle
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.AInputView
 import kotlin.properties.Delegates
 
 /**
  * Created by Young-Ho Kim on 2016-07-22.
  */
-abstract class AAttributeInputView<DataType>(layoutId: Int, context: Context, attrs: AttributeSet? = null) : AInputView<DataType>(layoutId, context, attrs) {
+abstract class AAttributeInputView<DataType>(layoutId: Int, context: Context, attrs: AttributeSet? = null) : AInputView<DataType>(layoutId, context, attrs), IActivityLifeCycle {
+
 
     companion object {
         const val VIEW_TYPE_NUMBER = 0
@@ -17,10 +20,7 @@ abstract class AAttributeInputView<DataType>(layoutId: Int, context: Context, at
         const val VIEW_TYPE_SHORT_TEXT = 3
         const val VIEW_TYPE_LOCATION = 4
         const val VIEW_TYPE_TIME_RANGE_PICKER = 5
-        const val VIEW_TYPE_STOPWATCH = 6
         const val VIEW_TYPE_CHOICE = 7
-
-
 
 
         fun makeInstance(type: Int, context: Context): AAttributeInputView<out Any> {
@@ -57,5 +57,23 @@ abstract class AAttributeInputView<DataType>(layoutId: Int, context: Context, at
             isEnabled = true
             //alpha = 1.0f
         }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?) {
+    }
+
+    override fun onResume() {
+    }
+
+    override fun onPause() {
+    }
+
+    override fun onDestroy() {
+    }
+
+    override fun onLowMemory() {
     }
 }

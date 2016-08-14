@@ -14,6 +14,7 @@ import kr.ac.snu.hcil.omnitrack.R
 /**
  * Created by younghokim on 16. 8. 3..
  */
+
 class LocationPickerFragment : Fragment(), OnMapReadyCallback {
 
     private var mapView: MapView? = null
@@ -24,7 +25,7 @@ class LocationPickerFragment : Fragment(), OnMapReadyCallback {
 
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        val rootView = inflater!!.inflate(R.layout.fragment_location_picker, container, false)
+        val rootView = inflater!!.inflate(R.layout.component_location_picker, container, false)
 
         mapView = rootView.findViewById(R.id.ui_map) as MapView
 

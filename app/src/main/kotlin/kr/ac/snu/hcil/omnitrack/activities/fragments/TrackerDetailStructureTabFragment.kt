@@ -126,6 +126,8 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
     }
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {

@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.activities
 
 import android.content.Context
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -25,10 +26,12 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
 
     private val attributeListAdapter = AttributeListAdapter()
 
+
     private var tracker: OTTracker? = null
 
     private lateinit var builder: OTItemBuilder
 
+    private lateinit var attributeListView: RecyclerView
     private val layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
 
     private val attributeValueExtractors = Hashtable<String, () -> Any>()
@@ -42,11 +45,11 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
         leftActionBarButton?.setImageResource(R.drawable.back_rhombus)
         rightActionBarButton?.setImageResource(R.drawable.done)
 
-        val listView = findViewById(R.id.ui_attribute_list) as RecyclerView
-        listView.layoutManager = layoutManager
-        listView.addItemDecoration(HorizontalImageDividerItemDecoration(R.drawable.horizontal_separator_pattern, this))
+        attributeListView = findViewById(R.id.ui_attribute_list) as RecyclerView
+        attributeListView.layoutManager = layoutManager
+        attributeListView.addItemDecoration(HorizontalImageDividerItemDecoration(R.drawable.horizontal_separator_pattern, this))
 
-        listView.adapter = attributeListAdapter
+        attributeListView.adapter = attributeListAdapter
     }
 
     override fun onStart() {
@@ -86,6 +89,27 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
             storeItemBuilderCache()
         } else {
             skipViewValueCaching = false
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?, outPersistentState: PersistableBundle?) {
+        super.onSaveInstanceState(outState, outPersistentState)
+        for (inputView in attributeListAdapter.inputViews) {
+            inputView.onSaveInstanceState(outState)
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        for (inputView in attributeListAdapter.inputViews) {
+            inputView.onDestroy()
+        }
+    }
+
+    override fun onLowMemory() {
+        super.onLowMemory()
+        for (inputView in attributeListAdapter.inputViews) {
+            inputView.onLowMemory()
         }
     }
 
@@ -189,6 +213,36 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
 
     inner class AttributeListAdapter : RecyclerView.Adapter<AttributeListAdapter.ViewHolder>() {
 
+        val inputViews = HashSet<AAttributeInputView<*>>()
+
+        fun getItem(position: Int): OTAttribute<out Any> {
+            return tracker?.attributes?.get(position) ?: throw IllegalAccessException("Tracker is not attached to the activity.")
+        }
+
+        override fun getItemViewType(position: Int): Int {
+            return getItem(position).getInputViewType(false)
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): AttributeListAdapter.ViewHolder {
+
+            val frame = LayoutInflater.from(this@NewItemActivity).inflate(R.layout.attribute_input_frame, parent, false);
+
+            val inputView = AAttributeInputView.makeInstance(viewType, this@NewItemActivity)
+            inputViews.add(inputView)
+
+            inputView.onCreate(null)
+
+            return ViewHolder(inputView, frame)
+        }
+
+        override fun onBindViewHolder(holder: AttributeListAdapter.ViewHolder, position: Int) {
+            holder.bind(getItem(position))
+        }
+
+        override fun getItemCount(): Int {
+            return tracker?.attributes?.size ?: 0
+        }
+
         inner class ViewHolder(val inputView: AAttributeInputView<out Any>, val frame: View) : RecyclerView.ViewHolder(frame) {
 
             private lateinit var columnNameView: TextView
@@ -232,30 +286,9 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
                 attributeValueExtractors[attributeId] = {
                     inputView.value
                 }
+
+                inputView.onResume()
             }
-        }
-
-        fun getItem(position: Int): OTAttribute<out Any> {
-            return tracker?.attributes?.get(position) ?: throw IllegalAccessException("Tracker is not attached to the activity.")
-        }
-
-        override fun getItemViewType(position: Int): Int {
-            return getItem(position).getInputViewType(false)
-        }
-
-        override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): AttributeListAdapter.ViewHolder {
-
-            val frame = LayoutInflater.from(this@NewItemActivity).inflate(R.layout.attribute_input_frame, parent, false);
-
-            return ViewHolder(AAttributeInputView.makeInstance(viewType, this@NewItemActivity), frame)
-        }
-
-        override fun onBindViewHolder(holder: AttributeListAdapter.ViewHolder, position: Int) {
-            holder.bind(getItem(position))
-        }
-
-        override fun getItemCount(): Int {
-            return tracker?.attributes?.size ?: 0
         }
     }
 }
