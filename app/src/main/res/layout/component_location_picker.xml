@@ -8,8 +8,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:layout_marginEnd="5dp"
-        android:layout_marginStart="5dp"
         android:background="@drawable/search_frame"
         android:drawablePadding="5dp"
         android:drawableStart="@drawable/search"
@@ -23,47 +21,74 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="230dp">
-    <com.google.android.gms.maps.MapView
-        android:id="@+id/ui_map"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+
+        <com.google.android.gms.maps.MapView
+            android:id="@+id/ui_map"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <RelativeLayout
+            android:id="@+id/ui_control_panel"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="8dp"
+            android:paddingEnd="7dp"
+            android:paddingStart="7dp"
+            android:paddingTop="8dp">
+
+            <android.support.v7.widget.AppCompatImageButton
+                android:id="@+id/ui_button_zoom_in"
+                style="@style/mapViewOverlayButton"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentTop="true"
+                android:src="@drawable/plus_dark" />
+
+            <android.support.v7.widget.AppCompatImageButton
+                android:id="@+id/ui_button_zoom_out"
+                style="@style/mapViewOverlayButton"
+                android:layout_alignEnd="@id/ui_button_zoom_in"
+                android:layout_below="@+id/ui_button_zoom_in"
+                android:src="@drawable/minus_dark" />
+
+
+            <android.support.v7.widget.AppCompatImageButton
+                android:id="@+id/ui_button_fit"
+
+                style="@style/mapViewOverlayButton"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:padding="12dp"
+                android:src="@drawable/fit" />
+
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/ui_button_adjust"
+
+                style="@style/mapViewOverlayButton"
+                android:layout_width="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="true"
+                android:drawableStart="@drawable/edit_location"
+                android:padding="10dp"
+                android:text="Adjust"
+                android:textColor="@color/textColorMid" />
+        </RelativeLayout>
+
+        <ViewStub
+            android:id="@+id/ui_adjust_panel_stub"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:inflatedId="@+id/ui_adjust_panel"
+            android:layout="@layout/layout_location_picker_adjust_panel" />
 
         <View
+            android:id="@+id/ui_mapview_frame"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@drawable/map_view_frame"
             android:clickable="false"
             android:longClickable="false" />
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_marginEnd="7dp"
-            android:layout_marginTop="8dp"
-            android:orientation="vertical">
-
-            <android.support.v7.widget.AppCompatImageButton
-                android:id="@+id/ui_button_zoom_in"
-                style="@style/mapViewOverlayButton"
-                android:src="@drawable/plus_dark" />
-
-            <android.support.v7.widget.AppCompatImageButton
-                android:id="@+id/ui_button_zoom_out"
-                style="@style/mapViewOverlayButton"
-                android:src="@drawable/minus_dark" />
-        </LinearLayout>
-
-
-        <android.support.v7.widget.AppCompatImageButton
-            android:id="@+id/ui_button_fit"
-
-            style="@style/mapViewOverlayButton"
-            android:layout_gravity="end|bottom"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="7dp"
-            android:padding="12dp"
-            android:src="@drawable/fit" />
     </FrameLayout>
 
 </LinearLayout>

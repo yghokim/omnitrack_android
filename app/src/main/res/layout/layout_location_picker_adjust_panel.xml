@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/mapview_frame_thickness"
+        android:layout_marginStart="@dimen/mapview_frame_thickness"
+        android:layout_marginTop="@dimen/mapview_frame_thickness"
+        android:background="@color/editModeOverlay"
+        android:paddingBottom="4dp"
+        android:text="Adjust location to center"
+        android:textAlignment="center"
+        android:textColor="#fff"
+        android:textSize="13dp"
+
+        android:textStyle="bold" />
+
+
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/ui_button_apply"
+        style="@style/mapViewOverlayButton"
+        android:layout_width="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="7dp"
+        android:drawableStart="@drawable/done_dark"
+        android:padding="10dp"
+        android:text="Apply"
+        android:textColor="@color/textColorMid" />
+
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/ui_button_cancel"
+
+        style="@style/mapViewOverlayButton"
+        android:layout_width="wrap_content"
+        android:layout_alignTop="@+id/ui_button_apply"
+        android:layout_toStartOf="@+id/ui_button_apply"
+        android:drawableStart="@drawable/ex_dark"
+        android:padding="10dp"
+        android:text="Cancel"
+        android:textColor="@color/textColorMid" />
+</RelativeLayout>

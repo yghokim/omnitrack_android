@@ -66,4 +66,6 @@
     <dimen name="service_list_element_vertical_padding">12dp</dimen>
     <dimen name="service_list_element_horizontal_padding">16dp</dimen>
 
+    <dimen name="mapview_frame_thickness">5dp</dimen>
+
 </resources>

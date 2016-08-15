@@ -3,5 +3,5 @@
     android:shape="rectangle">
     <stroke
         android:width="@dimen/mapview_frame_thickness"
-        android:color="#c1ffffff" />
+        android:color="@color/editModeOverlay" />
 </shape>

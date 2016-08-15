@@ -7,6 +7,7 @@
 
     <color name="colorSecondary">#ac5c6a</color>
 
+
     <color name="colorAccent">#ff8940</color>
 
     <color name="buttonIconColorDark">#757575</color>
@@ -19,6 +20,7 @@
     <color name="textColorLight">#aaaaaa</color>
 
     <color name="colorEditable">#16afa3</color>
+    <color name="editModeOverlay">#c116afa3</color>
 
 
     <color name="titleTextColor">#666666</color>
