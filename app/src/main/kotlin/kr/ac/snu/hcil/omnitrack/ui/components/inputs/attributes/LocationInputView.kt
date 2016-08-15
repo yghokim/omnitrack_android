@@ -24,12 +24,16 @@ import kr.ac.snu.hcil.omnitrack.utils.contains
  */
 class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttributeInputView<LatLng>(R.layout.component_location_picker, context, attrs), OnMapReadyCallback, View.OnClickListener {
 
+
     override val typeId: Int = VIEW_TYPE_LOCATION
 
     override var value: LatLng = LatLng(0.0, 0.0)
         set(value) {
-            field = value
-            fitToValueLocation()
+            if (field != value) {
+                field = value
+                fitToValueLocation()
+                onValueChanged(value)
+            }
         }
 
     private val mapView: MapView
@@ -53,6 +57,7 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
 
                     colorFrame.setBackgroundResource(R.drawable.map_view_frame_adjust_mode)
 
+
                 } else {
                     controlPanel.visibility = View.VISIBLE
 
@@ -62,6 +67,8 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
 
                     colorFrame.setBackgroundResource(R.drawable.map_view_frame)
                 }
+
+                refreshMap()
             }
         }
 
@@ -80,13 +87,12 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
     private var adjustOkButton: View? = null
     private var adjustCancelButton: View? = null
 
-
     private var googleMap: GoogleMap? = null
 
-
-    private var marker: Marker? = null
+    private var valueMarker: Marker? = null
 
     init {
+
         mapView = findViewById(R.id.ui_map) as MapView
 
         colorFrame = findViewById(R.id.ui_mapview_frame)
@@ -127,9 +133,15 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
         } else if (view === adjustButton) {
             isAdjustMode = true
         } else if (view === adjustOkButton) {
+
+            if (googleMap != null)
+                value = googleMap!!.cameraPosition.target
+
             isAdjustMode = false
+
         } else if (view === adjustCancelButton) {
             isAdjustMode = false
+            fitToValueLocation()
         }
     }
 
@@ -137,11 +149,19 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
         if (googleMap != null) {
             googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(value, 14.0f));
 
-            if (marker == null) {
-                googleMap?.addMarker(MarkerOptions().position(value).draggable(false))
+            if (valueMarker == null) {
+                valueMarker = googleMap?.addMarker(MarkerOptions().position(value).draggable(false))
             } else {
-                marker?.position = value
+                valueMarker?.position = value
             }
+        }
+    }
+
+    private fun refreshMap() {
+        if (isAdjustMode) {
+            valueMarker?.alpha = 0.5f
+        } else {
+            valueMarker?.alpha = 1.0f
         }
     }
 
@@ -167,6 +187,7 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
         this.googleMap?.setMinZoomPreference(3.0f)
         this.googleMap?.setMaxZoomPreference(17.0f)
 
+        fitToValueLocation()
     }
 
 

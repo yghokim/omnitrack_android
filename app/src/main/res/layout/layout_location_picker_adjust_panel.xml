@@ -43,4 +43,12 @@
         android:padding="10dp"
         android:text="Cancel"
         android:textColor="@color/textColorMid" />
+
+    <ImageView
+        android:layout_width="@dimen/mapview_adjust_marker_size"
+        android:layout_height="@dimen/mapview_adjust_marker_size"
+        android:layout_centerInParent="true"
+        android:src="@drawable/icon_location_marker"
+        android:translationY="@dimen/mapview_adjust_marker_translationY" />
+
 </RelativeLayout>

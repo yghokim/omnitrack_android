@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilder
@@ -64,9 +65,10 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
                 title = String.format(resources.getString(R.string.title_activity_new_item), tracker?.name)
 
                 if (tryRestoreItemBuilderCache(tracker!!)) {
-
+                    Toast.makeText(this, "Past inputs were restored.", Toast.LENGTH_SHORT).show()
                 } else {
                     //new builder was created
+
                     builder.autoCompleteAsync {
                         attributeListAdapter.notifyDataSetChanged()
                     }
@@ -87,6 +89,8 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
         super.onPause()
         if (!skipViewValueCaching) {
             storeItemBuilderCache()
+            Toast.makeText(this, "Filled form content was stored.", Toast.LENGTH_SHORT).show()
+
         } else {
             skipViewValueCaching = false
         }
@@ -271,16 +275,15 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
 
             fun bind(attribute: OTAttribute<out Any>) {
 
-                attribute.refreshInputViewContents(inputView)
                 attributeId = attribute.objectId
                 columnNameView.text = attribute.name
                 attributeTypeView.text = resources.getString(attribute.typeNameResourceId)
 
                 if (builder.hasValueOf(attribute)) {
+
                     inputView.valueChanged.suspend = true
                     inputView.setAnyValue(builder.getValueOf(attribute)!!)
                     inputView.valueChanged.suspend = false
-
                 }
 
                 attributeValueExtractors[attributeId] = {
