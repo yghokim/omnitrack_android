@@ -6,6 +6,7 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewStub
+import android.widget.ProgressBar
 import android.widget.TextView
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -15,6 +16,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.utils.LatLngToAddressTask
 import kr.ac.snu.hcil.omnitrack.utils.contains
 
 /**
@@ -23,7 +25,7 @@ import kr.ac.snu.hcil.omnitrack.utils.contains
  * https://github.com/googlesamples/android-play-places/blob/master/PlaceCompleteFragment/Application/src/main/java/com/example/google/playservices/placecompletefragment/MainActivity.java
  *
  */
-class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttributeInputView<LatLng>(R.layout.component_location_picker, context, attrs), OnMapReadyCallback, View.OnClickListener {
+class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttributeInputView<LatLng>(R.layout.component_location_picker, context, attrs), OnMapReadyCallback, View.OnClickListener, LatLngToAddressTask.OnFinishListener, GoogleMap.OnCameraIdleListener {
 
     override val typeId: Int = VIEW_TYPE_LOCATION
 
@@ -34,6 +36,7 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
                 fitToValueLocation()
                 onValueChanged(value)
                 //addressView.text = value.getAddress(context)?.getAddressLine(0)
+                reserveAddressChange(value)
             }
         }
 
@@ -83,6 +86,8 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
 
     private val colorFrame: View
 
+    private val addressBusyIndicator: ProgressBar
+
     private val adjustPanelStub: ViewStub
 
     private var adjustPanel: View? = null
@@ -94,11 +99,17 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
 
     private var valueMarker: Marker? = null
 
+    private var isLocationConversionTaskRunning = false
+    private var queuedLocationToConvert: LatLng? = null
+
     init {
 
         mapView = findViewById(R.id.ui_map) as MapView
 
         addressView = findViewById(R.id.ui_address) as TextView
+
+        addressBusyIndicator = findViewById(R.id.ui_address_busy_indicator) as ProgressBar
+        addressBusyIndicator.visibility = View.INVISIBLE
 
         colorFrame = findViewById(R.id.ui_mapview_frame)
 
@@ -146,6 +157,7 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
 
         } else if (view === adjustCancelButton) {
             isAdjustMode = false
+            reserveAddressChange(value)
             fitToValueLocation()
         }
     }
@@ -170,6 +182,38 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
         }
     }
 
+    override fun onCameraIdle() {
+        if (isAdjustMode) {
+            reserveAddressChange(googleMap!!.cameraPosition.target)
+        }
+    }
+
+
+    private fun reserveAddressChange(location: LatLng) {
+        if (isLocationConversionTaskRunning) {
+            queuedLocationToConvert = location
+        } else {
+            isLocationConversionTaskRunning = true
+            LatLngToAddressTask(this, this).execute(location)
+            addressBusyIndicator.visibility = View.VISIBLE
+        }
+    }
+
+    override fun onAddressReceived(address: String?) {
+        if (queuedLocationToConvert == null) {
+            addressBusyIndicator.visibility = View.INVISIBLE
+            isLocationConversionTaskRunning = false
+            if (address != null)
+                addressView.text = address
+        }
+
+        if (queuedLocationToConvert != null) {
+            LatLngToAddressTask(this, this).execute(queuedLocationToConvert)
+            queuedLocationToConvert = null
+        }
+    }
+
+
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
 
         //find parent recyclerview
@@ -191,6 +235,8 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
         this.googleMap = map
         this.googleMap?.setMinZoomPreference(3.0f)
         this.googleMap?.setMaxZoomPreference(17.0f)
+
+        this.googleMap?.setOnCameraIdleListener(this)
 
         fitToValueLocation()
     }
@@ -220,6 +266,4 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
     override fun onDestroy() {
         mapView.onDestroy()
     }
-
-
 }
