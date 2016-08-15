@@ -6,6 +6,7 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewStub
+import android.widget.TextView
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
@@ -24,7 +25,6 @@ import kr.ac.snu.hcil.omnitrack.utils.contains
  */
 class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttributeInputView<LatLng>(R.layout.component_location_picker, context, attrs), OnMapReadyCallback, View.OnClickListener {
 
-
     override val typeId: Int = VIEW_TYPE_LOCATION
 
     override var value: LatLng = LatLng(0.0, 0.0)
@@ -33,6 +33,7 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
                 field = value
                 fitToValueLocation()
                 onValueChanged(value)
+                //addressView.text = value.getAddress(context)?.getAddressLine(0)
             }
         }
 
@@ -78,6 +79,8 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
 
     private val fitButton: View
 
+    private val addressView: TextView
+
     private val colorFrame: View
 
     private val adjustPanelStub: ViewStub
@@ -94,6 +97,8 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
     init {
 
         mapView = findViewById(R.id.ui_map) as MapView
+
+        addressView = findViewById(R.id.ui_address) as TextView
 
         colorFrame = findViewById(R.id.ui_mapview_frame)
 

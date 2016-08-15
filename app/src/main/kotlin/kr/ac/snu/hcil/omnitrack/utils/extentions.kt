@@ -1,11 +1,15 @@
 package kr.ac.snu.hcil.omnitrack.utils
 
+import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
+import android.location.Address
+import android.location.Geocoder
 import android.os.Handler
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.view.View
+import com.google.android.gms.maps.model.LatLng
 import java.util.*
 
 /**
@@ -106,4 +110,19 @@ fun Calendar.getSecond(): Int {
 
 fun Calendar.getAmPm(): Int {
     return get(Calendar.AM_PM)
+}
+
+fun LatLng.getAddress(context: Context): Address? {
+
+    val geocoder = Geocoder(context)
+    try {
+        // 세번째 인수는 최대결과값인데 하나만 리턴받도록 설정했다
+        val addresses = geocoder.getFromLocation(latitude, longitude, 1);
+        // 설정한 데이터로 주소가 리턴된 데이터가 있으면
+        return addresses?.firstOrNull()
+    } catch(e: Exception) {
+        e.printStackTrace()
+
+        return null
+    }
 }

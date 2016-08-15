@@ -4,19 +4,26 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <EditText
+    <TextView
+        android:id="@+id/ui_address"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:background="@drawable/search_frame"
-        android:drawablePadding="5dp"
-        android:drawableStart="@drawable/search"
-        android:hint="Search with address"
-        android:paddingBottom="12dp"
-        android:paddingEnd="13dp"
+        android:background="@color/editTextFormBackground"
+        android:drawablePadding="4dp"
+        android:drawableStart="@drawable/map_dark"
+        android:ellipsize="marquee"
+        android:gravity="center_vertical"
+        android:lines="1"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:maxLines="1"
+        android:paddingBottom="6dp"
+        android:paddingEnd="8dp"
         android:paddingStart="8dp"
-        android:paddingTop="12dp"
-        android:textColorHint="@color/textColorLight" />
+        android:paddingTop="6dp"
+        android:text="dfas fdfas fds"
+        android:textColor="@color/textColorMid"
+
+        />
 
     <FrameLayout
         android:layout_width="match_parent"
