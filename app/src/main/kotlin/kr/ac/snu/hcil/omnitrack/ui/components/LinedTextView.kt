@@ -2,15 +2,13 @@ package kr.ac.snu.hcil.omnitrack.ui.components
 
 import android.content.Context
 import android.graphics.Canvas
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.AttributeSet
-import android.widget.EditText
+import android.widget.TextView
 
 /**
- * Created by younghokim on 16. 7. 24..
+ * Created by younghokim on 16. 8. 16..
  */
-class LinedEditText : EditText {
+class LinedTextView : TextView {
 
     constructor(context: Context?) : super(context) {
     }
@@ -25,21 +23,6 @@ class LinedEditText : EditText {
 
     init {
         base = LinedTextBase(this)
-
-        addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-
-            }
-
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                this@LinedEditText.setLineSpacing(0f, 1f)
-                this@LinedEditText.setLineSpacing(base.lineSpacingExtra, base.lineSpacingMultiplier)
-            }
-
-        })
     }
 
     override fun onDraw(canvas: Canvas) {

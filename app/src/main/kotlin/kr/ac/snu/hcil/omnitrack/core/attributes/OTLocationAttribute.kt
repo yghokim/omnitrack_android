@@ -112,4 +112,6 @@ class OTLocationAttribute(objectId: String?, dbId: Long?, columnName: String, se
             }
         }*/
     }
+
+    override fun getViewForItemListContainerType(): Int = VIEW_FOR_ITEM_LIST_CONTAINER_TYPE_MULTILINE
 }

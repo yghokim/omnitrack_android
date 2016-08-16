@@ -5,6 +5,7 @@ import android.util.SparseArray
 import android.view.View
 import android.widget.TextView
 import com.google.gson.Gson
+import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.NamedObject
 import kr.ac.snu.hcil.omnitrack.core.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
@@ -12,6 +13,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTProperty
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
+import kr.ac.snu.hcil.omnitrack.utils.TextHelper
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializedIntegerKeyEntry
 import java.util.*
@@ -191,12 +193,18 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
         return VIEW_FOR_ITEM_LIST_CONTAINER_TYPE_SINGLELINE
     }
 
-    fun getViewForItemList(context: Context, recycledView: View?): View {
+    open fun getViewForItemList(context: Context, recycledView: View?): View {
 
-        val target: View
-        if (recycledView is TextView) {
-            target = recycledView
-        } else target = TextView(context)
+        val target: TextView = if (recycledView is TextView) {
+            recycledView
+        } else TextView(context)
+
+
+        if (android.os.Build.VERSION.SDK_INT < 23) {
+            target.setTextAppearance(context, R.style.viewForItemListTextAppearance)
+        } else {
+            target.setTextAppearance(R.style.viewForItemListTextAppearance)
+        }
 
         return target
     }
@@ -204,7 +212,7 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
     open fun applyValueToViewForItemList(value: Any?, view: View): Boolean {
         if (view is TextView) {
             if (value != null) {
-                view.text = formatAttributeValue(value)
+                view.text = TextHelper.stringWithFallback(formatAttributeValue(value), "-")
             } else {
                 view.text = "No value"
             }

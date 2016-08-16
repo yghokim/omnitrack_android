@@ -3,19 +3,21 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:minHeight="@dimen/item_list_element_singleline_row_minHeight"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/item_list_element_vertical_padding"
+    android:paddingTop="@dimen/item_list_element_vertical_padding">
 
     <TextView
         android:id="@+id/ui_attribute_name"
         style="@style/itemListAttributeName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
+        android:layout_marginBottom="8dp"
         android:text="attribute" />
 
     <TextView
         android:id="@+id/ui_value_view_replace"
-        style="@style/viewForItemListTextStyle"
+        style="@style/viewForItemListTextAppearance"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="value" />

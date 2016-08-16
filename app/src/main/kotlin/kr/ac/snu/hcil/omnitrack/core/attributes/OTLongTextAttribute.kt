@@ -1,6 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes
 
+import android.content.Context
+import android.view.View
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.ui.components.LinedTextView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 
@@ -36,4 +39,20 @@ class OTLongTextAttribute(objectId: String?, dbId: Long?, columnName: String, se
     override fun refreshInputViewUI(inputView: AAttributeInputView<out Any>) {
 
     }
+
+    override fun getViewForItemList(context: Context, recycledView: View?): View {
+        val target = if (recycledView is LinedTextView) {
+            recycledView
+        } else LinedTextView(context)
+
+        if (android.os.Build.VERSION.SDK_INT < 23) {
+            target.setTextAppearance(context, R.style.longTextForItemListTextAppearance)
+        } else {
+            target.setTextAppearance(R.style.longTextForItemListTextAppearance)
+        }
+
+        return target
+    }
+
+    override fun getViewForItemListContainerType(): Int = VIEW_FOR_ITEM_LIST_CONTAINER_TYPE_MULTILINE
 }
