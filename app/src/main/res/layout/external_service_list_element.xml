@@ -10,17 +10,13 @@
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:adjustViewBounds="true"
-        android:scaleType="centerInside"
-        android:src="@drawable/service_thumb_miband" />
+        android:scaleType="centerInside" />
 
     <ProgressBar
         android:id="@+id/ui_progress_bar"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
         android:indeterminate="false"
         android:indeterminateOnly="true"
         android:visibility="gone" />
@@ -72,7 +68,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:paddingEnd="@dimen/service_list_element_horizontal_padding"
-                android:text="Activating..." />
+                android:text="Activating..."
+                android:visibility="gone" />
 
             <kr.ac.snu.hcil.omnitrack.ui.components.ManualSwitch
                 android:id="@+id/ui_button_activate"
@@ -81,7 +78,7 @@
                 android:layout_gravity="center"
                 android:gravity="center_vertical|end"
                 android:paddingEnd="@dimen/service_list_element_horizontal_padding"
-                android:paddingLeft="@dimen/service_list_element_horizontal_padding"
+                android:paddingStart="@dimen/service_list_element_horizontal_padding"
                 android:switchMinWidth="60dp" />
 
         </FrameLayout>
@@ -96,8 +93,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/transparent_button_background"
-        android:drawableLeft="@drawable/down_dark"
-        android:paddingLeft="4dp"
+        android:drawableStart="@drawable/down_dark"
+        android:paddingStart="4dp"
         android:text="Show available measures"
         android:textAlignment="viewStart"
         android:textColor="@color/buttonIconColorDark" />

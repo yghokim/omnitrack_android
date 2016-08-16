@@ -1,6 +1,5 @@
 package kr.ac.snu.hcil.omnitrack.activities.fragments
 
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -17,7 +16,6 @@ import android.widget.Switch
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
-import kr.ac.snu.hcil.omnitrack.ui.decorations.HorizontalDividerItemDecoration
 
 /**
  * Created by Young-Ho on 7/29/2016.
@@ -45,7 +43,7 @@ class ServiceListFragment : Fragment() {
         listView = rootView.findViewById(R.id.ui_list) as RecyclerView
 
         listView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        listView.addItemDecoration(HorizontalDividerItemDecoration(0, 20))
+        //listView.addItemDecoration(HorizontalDividerItemDecoration(0, 20))
 
         adapter = Adapter()
 
@@ -63,23 +61,19 @@ class ServiceListFragment : Fragment() {
                 OTExternalService.availableServices[requestCode].activateAsync(context) {
                     success ->
                     if (success) {
-                        pendedActivations[requestCode].applyState(OTExternalService.ServiceState.ACTIVATED)
+                        pendedActivations[requestCode].holderState = OTExternalService.ServiceState.ACTIVATED
                     } else {
-                        pendedActivations[requestCode].applyState(OTExternalService.ServiceState.DEACTIVATED)
+                        pendedActivations[requestCode].holderState = OTExternalService.ServiceState.DEACTIVATED
                     }
                     pendedActivations.removeAt(requestCode)
                 }
             } else {
                 //activation failed.
                 println("some permissions not granted. activation failed.")
-                pendedActivations[requestCode].applyState(OTExternalService.ServiceState.DEACTIVATED)
+                pendedActivations[requestCode].holderState = OTExternalService.ServiceState.DEACTIVATED
                 pendedActivations.removeAt(requestCode)
             }
         }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
     }
 
     private inner class Adapter : RecyclerView.Adapter<Adapter.ViewHolder>() {
@@ -115,6 +109,15 @@ class ServiceListFragment : Fragment() {
             val activationSwitchGroup: ViewGroup
             val activationIndicator: TextView
 
+            var holderState: OTExternalService.ServiceState = OTExternalService.ServiceState.DEACTIVATED
+                set(value) {
+                    if (field != value) {
+                        field = value
+                        applyState(field)
+                    }
+                }
+
+
             init {
                 thumbView = view.findViewById(R.id.thumb) as ImageView
                 nameView = view.findViewById(R.id.name) as TextView
@@ -136,13 +139,13 @@ class ServiceListFragment : Fragment() {
                     when (service.state) {
                         OTExternalService.ServiceState.ACTIVATED -> {
                             service.deactivate()
-                            applyState(OTExternalService.ServiceState.DEACTIVATED)
+                            holderState = OTExternalService.ServiceState.DEACTIVATED
                         }
                         OTExternalService.ServiceState.ACTIVATING -> {
 
                         }
                         OTExternalService.ServiceState.DEACTIVATED -> {
-                            applyState(OTExternalService.ServiceState.ACTIVATING)
+                            holderState = OTExternalService.ServiceState.ACTIVATING
 
                             if (!service.permissionGranted) {
                                 pendedActivations.setValueAt(adapterPosition, this@ViewHolder)
@@ -151,9 +154,9 @@ class ServiceListFragment : Fragment() {
                                 service.activateAsync(context) {
                                     success ->
                                     if (success) {
-                                        applyState(OTExternalService.ServiceState.ACTIVATED)
+                                        holderState = OTExternalService.ServiceState.ACTIVATED
                                     } else {
-                                        applyState(OTExternalService.ServiceState.DEACTIVATED)
+                                        holderState = OTExternalService.ServiceState.DEACTIVATED
                                     }
                                 }
                             }
@@ -163,8 +166,7 @@ class ServiceListFragment : Fragment() {
 
             }
 
-            fun applyState(state: OTExternalService.ServiceState) {
-
+            private fun applyState(state: OTExternalService.ServiceState) {
                 TransitionManager.beginDelayedTransition(view as ViewGroup)
                 when (state) {
                     OTExternalService.ServiceState.ACTIVATED -> {
@@ -193,7 +195,7 @@ class ServiceListFragment : Fragment() {
                 descriptionView.text = context.resources.getString(service.descResourceId)
                 thumbView.setImageResource(service.thumbResourceId)
 
-                applyState(service.state)
+                holderState = service.state
             }
 
         }
