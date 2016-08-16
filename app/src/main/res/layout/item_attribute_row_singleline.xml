@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="@dimen/item_list_element_singleline_row_minHeight"
+    android:paddingBottom="@dimen/item_list_element_vertical_padding"
+    android:paddingTop="@dimen/item_list_element_vertical_padding">
+
+    <TextView
+        android:id="@+id/ui_attribute_name"
+        style="@style/itemListAttributeName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:text="Attribute" />
+
+    <TextView
+        android:id="@+id/ui_value_view_replace"
+        style="@style/viewForItemListTextStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:text="No value" />
+</RelativeLayout>

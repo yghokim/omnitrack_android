@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.attributes
 import android.content.Context
 import android.util.SparseArray
 import android.view.View
+import android.widget.TextView
 import com.google.gson.Gson
 import kr.ac.snu.hcil.omnitrack.core.NamedObject
 import kr.ac.snu.hcil.omnitrack.core.OTConnection
@@ -26,6 +27,10 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
     }
 
     companion object {
+
+        const val VIEW_FOR_ITEM_LIST_CONTAINER_TYPE_MULTILINE = 0
+        const val VIEW_FOR_ITEM_LIST_CONTAINER_TYPE_SINGLELINE = 1
+
 
         const val TYPE_NUMBER = 0
         const val TYPE_TIME = 1
@@ -182,9 +187,28 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
 
     abstract fun refreshInputViewUI(inputView: AAttributeInputView<out Any>);
 
+    open fun getViewForItemListContainerType(): Int {
+        return VIEW_FOR_ITEM_LIST_CONTAINER_TYPE_SINGLELINE
+    }
 
-    //pending apis
-    open val isPending: Boolean = false
+    fun getViewForItemList(context: Context, recycledView: View?): View {
 
+        val target: View
+        if (recycledView is TextView) {
+            target = recycledView
+        } else target = TextView(context)
 
+        return target
+    }
+
+    open fun applyValueToViewForItemList(value: Any?, view: View): Boolean {
+        if (view is TextView) {
+            if (value != null) {
+                view.text = formatAttributeValue(value)
+            } else {
+                view.text = "No value"
+            }
+            return true
+        } else return false
+    }
 }

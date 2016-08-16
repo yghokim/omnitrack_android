@@ -189,4 +189,16 @@
         <item name="android:scaleGravity">center</item>
         <item name="android:scaleType">fitCenter</item>
     </style>
+
+    <style name="itemListAttributeName">
+        <item name="android:textSize">15dp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/textColorLight</item>
+    </style>
+
+    <style name="viewForItemListTextStyle">
+        <item name="android:textColor">@color/textColorMid</item>
+        <item name="android:textSize">16dp</item>
+        <item name="android:textStyle">normal</item>
+    </style>
 </resources>

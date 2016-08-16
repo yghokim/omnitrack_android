@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/no_round_card"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/relativeLayout"
+        android:layout_width="@dimen/item_list_element_left_column_width"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/ui_list"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/right_to_left_shadow">
+
+        <!--
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/colorEditable"
+            android:paddingBottom="4dp">
+            <TextView
+                android:layout_gravity="center_horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="AUG"
+                android:id="@+id/ui_text_month"
+                android:layout_below="@+id/color_bar"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="6dp"
+                android:textSize="14dp"
+                android:textColor="#fff"
+                android:textAllCaps="true"/>
+
+            <TextView
+                android:layout_gravity="center_horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="31"
+                android:textStyle="bold"
+                android:textSize="27dp"
+                android:textColor="#fff"
+                android:id="@+id/ui_text_day"
+                android:layout_below="@+id/ui_text_month"
+                android:layout_centerHorizontal="true" />
+        </LinearLayout>-->
+
+        <View
+            android:id="@+id/color_bar"
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:background="@color/colorAccent"
+            android:visibility="invisible" />
+
+        <TextView
+            android:id="@+id/ui_text_month"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/color_bar"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="6dp"
+            android:text="AUG"
+            android:textAllCaps="true"
+            android:textColor="@color/textColorMid"
+            android:textSize="13dp" />
+
+        <TextView
+            android:id="@+id/ui_text_day"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ui_text_month"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="-3dp"
+            android:text="31"
+            android:textColor="@color/textColorMid"
+            android:textSize="25dp"
+            android:textStyle="bold" />
+
+
+        <android.support.v7.widget.AppCompatImageButton
+            android:id="@+id/ui_button_more"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_height_normal"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true"
+            android:background="@drawable/transparent_button_background"
+            android:src="@drawable/more"
+            android:tint="@color/buttonIconColorDark" />
+    </RelativeLayout>
+
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/ui_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_toEndOf="@+id/relativeLayout"
+        android:paddingLeft="@dimen/activity_horizontal_margin" />
+
+</RelativeLayout>

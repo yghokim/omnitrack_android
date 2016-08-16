@@ -3,12 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/outerBackground"
     tools:context="kr.ac.snu.hcil.omnitrack.activities.ItemBrowserActivity">
 
-    <de.codecrafters.tableview.TableView
-        android:id="@+id/ui_table"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/ui_item_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-    </de.codecrafters.tableview.TableView>
+        android:layout_height="match_parent" />
 </RelativeLayout>

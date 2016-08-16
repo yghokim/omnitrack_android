@@ -70,4 +70,9 @@
     <dimen name="mapview_adjust_marker_size">60dp</dimen>
     <dimen name="mapview_adjust_marker_translationY">-30dp</dimen>
 
+    <dimen name="item_list_element_singleline_row_minHeight">45dp</dimen>
+    <dimen name="item_list_element_vertical_padding">12dp</dimen>
+    <dimen name="item_list_element_left_column_width">60dp</dimen>
+
+
 </resources>

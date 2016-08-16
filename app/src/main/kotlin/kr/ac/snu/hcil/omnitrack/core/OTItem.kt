@@ -2,12 +2,9 @@ package kr.ac.snu.hcil.omnitrack.core
 
 import com.google.gson.Gson
 import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.database.IDatabaseStorable
-import kr.ac.snu.hcil.omnitrack.utils.serialization.MapSerializer
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializedStringKeyEntry
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
-import java.util.*
 
 /**
  * Created by younghokim on 16. 7. 22..
@@ -20,6 +17,8 @@ class OTItem : ADataRow, IDatabaseStorable {
         set(value) {
             if (field != null) {
                 throw Exception("dbId already assigned.")
+            } else {
+                field = value
             }
         }
 
