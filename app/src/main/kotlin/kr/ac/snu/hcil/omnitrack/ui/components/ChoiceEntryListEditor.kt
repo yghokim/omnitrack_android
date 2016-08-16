@@ -42,6 +42,12 @@ class ChoiceEntryListEditor : LinearLayout, View.OnClickListener {
         set(value) {
             entryList.clear()
             entryList.addAll(value)
+
+            if (value.isEmpty()) {
+                entryList.add("")
+                entryList.add("")
+            }
+
             entryListAdapter.notifyDataSetChanged()
         }
 
