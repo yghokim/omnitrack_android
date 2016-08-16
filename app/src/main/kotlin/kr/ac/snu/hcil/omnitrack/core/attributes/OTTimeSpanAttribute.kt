@@ -37,15 +37,16 @@ class OTTimeSpanAttribute(objectId: String?, dbId: Long?, columnName: String, se
         return ""
     }
 
-    override fun getAutoCompleteValueAsync(resultHandler: (TimeSpan) -> Unit) {
+    override fun getAutoCompleteValueAsync(resultHandler: (TimeSpan) -> Unit): Boolean {
         resultHandler.invoke(TimeSpan())
+        return true
     }
 
     override fun getInputViewType(previewMode: Boolean): Int {
         return AAttributeInputView.VIEW_TYPE_TIME_RANGE_PICKER
     }
 
-    override fun refreshInputViewContents(inputView: AAttributeInputView<out Any>) {
+    override fun refreshInputViewUI(inputView: AAttributeInputView<out Any>) {
         if(inputView is TimeRangePickerInputView)
         {
             val granularity = when(getPropertyValue<Int>(PROPERTY_GRANULARITY))

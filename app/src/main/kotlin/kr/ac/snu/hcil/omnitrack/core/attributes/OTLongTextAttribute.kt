@@ -28,11 +28,12 @@ class OTLongTextAttribute(objectId: String?, dbId: Long?, columnName: String, se
         return value.toString()
     }
 
-    override fun getAutoCompleteValueAsync(resultHandler: (CharSequence) -> Unit) {
+    override fun getAutoCompleteValueAsync(resultHandler: (CharSequence) -> Unit): Boolean {
         resultHandler("")
+        return true
     }
 
-    override fun refreshInputViewContents(inputView: AAttributeInputView<out Any>) {
+    override fun refreshInputViewUI(inputView: AAttributeInputView<out Any>) {
 
     }
 }

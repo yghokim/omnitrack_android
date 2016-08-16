@@ -274,6 +274,7 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
             }
 
             fun bind(attribute: OTAttribute<out Any>) {
+                attribute.refreshInputViewUI(inputView)
 
                 attributeId = attribute.objectId
                 columnNameView.text = attribute.name

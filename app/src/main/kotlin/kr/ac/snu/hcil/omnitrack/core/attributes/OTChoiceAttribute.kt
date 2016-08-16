@@ -70,15 +70,16 @@ class OTChoiceAttribute(objectId: String?, dbId: Long?, columnName: String, prop
         } else return "No selection"
     }
 
-    override fun getAutoCompleteValueAsync(resultHandler: (IntArray) -> Unit) {
+    override fun getAutoCompleteValueAsync(resultHandler: (IntArray) -> Unit): Boolean {
         resultHandler.invoke(IntArray(0))
+        return true
     }
 
     override fun getInputViewType(previewMode: Boolean): Int {
         return AAttributeInputView.VIEW_TYPE_CHOICE
     }
 
-    override fun refreshInputViewContents(inputView: AAttributeInputView<out Any>) {
+    override fun refreshInputViewUI(inputView: AAttributeInputView<out Any>) {
         if (inputView is ChoiceInputView) {
             inputView.entries = entries
             inputView.multiSelectionMode = allowedMultiselection

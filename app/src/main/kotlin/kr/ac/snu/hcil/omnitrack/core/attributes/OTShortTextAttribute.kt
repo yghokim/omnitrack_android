@@ -21,11 +21,12 @@ class OTShortTextAttribute(objectId: String?, dbId: Long?, columnName: String, s
         return value.toString()
     }
 
-    override fun getAutoCompleteValueAsync(resultHandler: (CharSequence) -> Unit) {
+    override fun getAutoCompleteValueAsync(resultHandler: (CharSequence) -> Unit): Boolean {
         resultHandler("")
+        return true
     }
 
-    override fun refreshInputViewContents(inputView: AAttributeInputView<out Any>) {
+    override fun refreshInputViewUI(inputView: AAttributeInputView<out Any>) {
 
     }
 

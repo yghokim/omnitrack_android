@@ -150,7 +150,11 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
 
     abstract fun formatAttributeValue(value: Any): String
 
-    abstract fun getAutoCompleteValueAsync(resultHandler: (result: DataType) -> Unit)
+    /***
+     * Autocompleted values based on attribute-specific settings.
+     * [return] whether the method finished synchronously.
+     */
+    abstract fun getAutoCompleteValueAsync(resultHandler: (result: DataType) -> Unit): Boolean
 
     abstract fun getInputViewType(previewMode: Boolean = false): Int
 
@@ -171,12 +175,12 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
                     AAttributeInputView.makeInstance(getInputViewType(previewMode), context)
                 }
 
-        refreshInputViewContents(view)
+        refreshInputViewUI(view)
         view.previewMode = previewMode
         return view
     }
 
-    abstract fun refreshInputViewContents(inputView: AAttributeInputView<out Any>);
+    abstract fun refreshInputViewUI(inputView: AAttributeInputView<out Any>);
 
 
     //pending apis

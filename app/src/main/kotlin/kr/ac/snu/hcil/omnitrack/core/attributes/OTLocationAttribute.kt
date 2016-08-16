@@ -8,7 +8,6 @@ import com.google.android.gms.maps.model.LatLng
 import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.LocationInputView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 
 /**
@@ -46,7 +45,7 @@ class OTLocationAttribute(objectId: String?, dbId: Long?, columnName: String, se
         return value.toString()
     }
 
-    override fun getAutoCompleteValueAsync(resultHandler: (LatLng) -> Unit) {
+    override fun getAutoCompleteValueAsync(resultHandler: (LatLng) -> Unit): Boolean {
         val locationManager = OmniTrackApplication.app.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         val gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
         val networkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
@@ -94,6 +93,8 @@ class OTLocationAttribute(objectId: String?, dbId: Long?, columnName: String, se
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0.0f, listener)
 
         }
+
+        return false
     }
 
 
@@ -101,13 +102,14 @@ class OTLocationAttribute(objectId: String?, dbId: Long?, columnName: String, se
         return AAttributeInputView.VIEW_TYPE_LOCATION
     }
 
-    override fun refreshInputViewContents(inputView: AAttributeInputView<out Any>) {
+    override fun refreshInputViewUI(inputView: AAttributeInputView<out Any>) {
+        /*
         if (inputView is LocationInputView) {
             getAutoCompleteValueAsync {
                 result ->
                 println("location: $result")
                 inputView.value = result
             }
-        }
+        }*/
     }
 }

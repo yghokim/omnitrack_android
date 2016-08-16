@@ -3,7 +3,6 @@ package kr.ac.snu.hcil.omnitrack.core.attributes
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTSelectionProperty
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.NumberInputView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import java.math.BigDecimal
 
@@ -51,17 +50,18 @@ class OTNumberAttribute(objectId: String?, dbId: Long?, columnName: String, sett
         } else return value.toString()
     }
 
-    override fun getAutoCompleteValueAsync(resultHandler: (BigDecimal) -> Unit) {
+    override fun getAutoCompleteValueAsync(resultHandler: (BigDecimal) -> Unit): Boolean {
         resultHandler(BigDecimal(0))
+        return true
     }
 
-    override fun refreshInputViewContents(inputView: AAttributeInputView<out Any>) {
-        if (inputView is NumberInputView) {
+    override fun refreshInputViewUI(inputView: AAttributeInputView<out Any>) {
+        /*if (inputView is NumberInputView) {
             this.getAutoCompleteValueAsync {
                 result ->
                 inputView.value = result
             }
-        }
+        }*/
     }
 
 }

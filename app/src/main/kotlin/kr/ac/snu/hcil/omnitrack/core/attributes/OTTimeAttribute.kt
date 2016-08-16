@@ -77,11 +77,12 @@ class OTTimeAttribute : OTAttribute<TimePoint> {
         } else return ""
     }
 
-    override fun getAutoCompleteValueAsync(resultHandler: (TimePoint) -> Unit) {
+    override fun getAutoCompleteValueAsync(resultHandler: (TimePoint) -> Unit): Boolean {
         resultHandler(TimePoint())
+        return true
     }
 
-    override fun refreshInputViewContents(inputView: AAttributeInputView<out Any>) {
+    override fun refreshInputViewUI(inputView: AAttributeInputView<out Any>) {
 
         if (inputView is TimePointInputView) {
             when (granularity) {
@@ -90,9 +91,10 @@ class OTTimeAttribute : OTAttribute<TimePoint> {
                 GRANULARITY_SECOND -> inputView.setPickerMode(DateTimePicker.SECOND)
             }
 
+            /*
             getAutoCompleteValueAsync { result ->
                 inputView.value = result
-            }
+            }*/
         }
     }
 
