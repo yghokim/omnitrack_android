@@ -7,12 +7,12 @@ import android.view.View
 import android.widget.EditText
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
+import kotlin.properties.Delegates
 
 /**
  * Created by younghokim on 16. 8. 16..
  */
 class LinedTextBase(val textView: View) {
-
 
     private var numLines: Int = 1
     private val lineBounds = Rect()
@@ -26,11 +26,34 @@ class LinedTextBase(val textView: View) {
 
     private var lineHeight: Int = 0
 
+    var lineColor: Int
+        get() = linePaint.color
+        set(value) {
+            if (linePaint.color != value) {
+                linePaint.color = value
+                textView.invalidate()
+            }
+        }
+
+    var drawOuterLines: Boolean by Delegates.observable(true) {
+        prop, old, new ->
+        if (old != new) {
+            textView.invalidate()
+        }
+    }
+
+
     init {
         linePaint.style = Paint.Style.STROKE
         linePaint.strokeWidth = 2.0f
         linePaint.color = textView.resources.getColor(R.color.editTextLine, null)
 
+        lineOffset = 5 * textView.resources.displayMetrics.density
+        refresh()
+
+    }
+
+    fun refresh() {
         lineSpacingExtra = if (textView is TextView) {
             textView.lineSpacingExtra
         } else if (textView is EditText) {
@@ -42,15 +65,11 @@ class LinedTextBase(val textView: View) {
             textView.lineSpacingMultiplier
         } else 0.0f
 
-        lineOffset = 5 * textView.resources.displayMetrics.density
-
         lineHeight = if (textView is TextView) {
             textView.lineHeight
         } else if (textView is EditText) {
             textView.lineHeight
         } else 0
-
-
     }
 
     private fun getLineBounds(index: Int, bounds: Rect): Int {
@@ -65,10 +84,20 @@ class LinedTextBase(val textView: View) {
     fun onDraw(canvas: Canvas) {
         var baseline = getLineBounds(0, lineBounds) + lineOffset - lineHeight; // start from upline
 
-        for (i in 0..numLines) {
+        val start = if (drawOuterLines) {
+            0
+        } else {
+            1
+        }
+        val end = if (drawOuterLines) {
+            numLines
+        } else {
+            numLines - 1
+        }
 
-            canvas.drawLine(lineBounds.left.toFloat(), baseline.toFloat(), lineBounds.right.toFloat(), baseline.toFloat(), linePaint);
-            baseline += lineHeight
+        for (i in start..end) {
+            val y = (baseline + i * lineHeight).toFloat()
+            canvas.drawLine(lineBounds.left.toFloat(), y, lineBounds.right.toFloat(), y, linePaint);
         }
     }
 

@@ -41,6 +41,7 @@ class OTLongTextAttribute(objectId: String?, dbId: Long?, columnName: String, se
     }
 
     override fun getViewForItemList(context: Context, recycledView: View?): View {
+
         val target = if (recycledView is LinedTextView) {
             recycledView
         } else LinedTextView(context)
@@ -50,6 +51,13 @@ class OTLongTextAttribute(objectId: String?, dbId: Long?, columnName: String, se
         } else {
             target.setTextAppearance(R.style.longTextForItemListTextAppearance)
         }
+
+        target.setLineSpacing(context.resources.getDimension(R.dimen.item_list_element_LongText_LineSpacingExtra), 1.2f)
+
+        target.base.drawOuterLines = false
+
+        target.setBackgroundResource(R.drawable.longtext_item_list_background)
+        //target.lineColor = context.resources.getColor(R.color.)
 
         return target
     }

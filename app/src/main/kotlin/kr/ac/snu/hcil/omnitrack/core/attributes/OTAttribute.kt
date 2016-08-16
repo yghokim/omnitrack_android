@@ -206,6 +206,8 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
             target.setTextAppearance(R.style.viewForItemListTextAppearance)
         }
 
+        target.background = null
+
         return target
     }
 

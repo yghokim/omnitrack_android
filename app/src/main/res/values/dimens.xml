@@ -74,5 +74,7 @@
     <dimen name="item_list_element_vertical_padding">12dp</dimen>
     <dimen name="item_list_element_left_column_width">60dp</dimen>
 
+    <dimen name="item_list_element.LongText.LineSpacingExtra">3dp</dimen>
+
 
 </resources>
