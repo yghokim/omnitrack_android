@@ -13,7 +13,9 @@ import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.database.DatabaseHelper
+import kr.ac.snu.hcil.omnitrack.ui.decorations.DrawableListBottomSpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.decorations.HorizontalDividerItemDecoration
+import kr.ac.snu.hcil.omnitrack.ui.decorations.HorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.getDayOfMonth
 import java.util.*
@@ -35,6 +37,8 @@ class ItemBrowserActivity : AppCompatActivity() {
         itemListView = findViewById(R.id.ui_item_list) as RecyclerView
 
         itemListView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        itemListView.addItemDecoration(HorizontalImageDividerItemDecoration(context = this))
+        itemListView.addItemDecoration(DrawableListBottomSpaceItemDecoration(R.drawable.expanded_view_inner_shadow_top, 0))
 
         itemListViewAdapter = ItemListViewAdapter()
 

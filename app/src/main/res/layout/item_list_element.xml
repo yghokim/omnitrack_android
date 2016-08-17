@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/no_round_card"
+    android:background="#fff"
     android:orientation="vertical">
 
     <RelativeLayout
@@ -50,8 +50,7 @@
             android:id="@+id/color_bar"
             android:layout_width="match_parent"
             android:layout_height="5dp"
-            android:background="@color/colorAccent"
-            android:visibility="invisible" />
+            android:background="@drawable/colored_bar_with_right_inner_shadow" />
 
         <TextView
             android:id="@+id/ui_text_month"
@@ -60,7 +59,7 @@
             android:layout_below="@+id/color_bar"
             android:layout_centerHorizontal="true"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="6dp"
+            android:layout_marginTop="9dp"
             android:text="AUG"
             android:textAllCaps="true"
             android:textColor="@color/textColorMid"

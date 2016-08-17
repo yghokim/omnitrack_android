@@ -8,7 +8,7 @@ import android.view.View
 /**
  * Created by Young-Ho Kim on 2016-07-25.
  */
-abstract class AListBottomSpaceItemDecoration(val height: Int) : RecyclerView.ItemDecoration() {
+abstract class AListBottomSpaceItemDecoration(var height: Int) : RecyclerView.ItemDecoration() {
 
 
     override fun onDrawOver(c: Canvas, parent: RecyclerView, state: RecyclerView.State?) {

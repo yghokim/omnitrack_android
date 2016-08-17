@@ -13,6 +13,9 @@ class DrawableListBottomSpaceItemDecoration(drawableResourceId: Int, height: Int
 
     init {
         drawable = OmniTrackApplication.app.resources.getDrawable(drawableResourceId, null)
+        if (super.height == 0) {
+            super.height = drawable.intrinsicHeight
+        }
     }
 
     override fun onDrawBottomSpace(c: Canvas, left: Float, right: Float, top: Float, bottom: Float) {

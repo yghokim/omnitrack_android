@@ -85,6 +85,21 @@ class OmniTrackApplication : Application() {
             sleepTracker.attributes.add(sleepTimeAttribute)
             sleepTracker.attributes.add(OTAttribute.Companion.createAttribute(defaultUser, "Memo", OTAttribute.TYPE_LONG_TEXT))
 
+            val diaryTracker = defaultUser.newTracker("Diary", true)
+            val dateAttribute = OTAttribute.createAttribute(defaultUser, "Date", OTAttribute.TYPE_TIME)
+            dateAttribute.setPropertyValue(OTTimeAttribute.GRANULARITY, OTTimeAttribute.GRANULARITY_DAY)
+            diaryTracker.attributes.add(dateAttribute)
+
+            val moodAttribute = OTAttribute.createAttribute(defaultUser, "Mood", OTAttribute.TYPE_CHOICE)
+            moodAttribute.setPropertyValue(OTChoiceAttribute.PROPERTY_ENTRIES, arrayOf("Wonderful", "Sad", "Good", "Insomnia", "Depressed", "Angry", "Fatigued", "Happy"))
+            moodAttribute.setPropertyValue(OTChoiceAttribute.PROPERTY_MULTISELECTION, true)
+            diaryTracker.attributes.add(moodAttribute)
+
+            diaryTracker.attributes.add(OTAttribute.Companion.createAttribute(defaultUser, "Title", OTAttribute.TYPE_SHORT_TEXT))
+            diaryTracker.attributes.add(OTAttribute.Companion.createAttribute(defaultUser, "Content", OTAttribute.TYPE_LONG_TEXT))
+
+
+
             _currentUser = defaultUser
         } else {
             _currentUser = user
