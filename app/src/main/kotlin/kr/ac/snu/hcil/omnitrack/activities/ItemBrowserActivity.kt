@@ -89,6 +89,12 @@ class ItemBrowserActivity : AppCompatActivity() {
 
 
             init {
+
+                val leftBar = view.findViewById(R.id.ui_left_bar)
+
+                leftBar.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
+                view.minimumHeight = leftBar.measuredHeight
+
                 colorBar = view.findViewById(R.id.color_bar)
                 /*
                 if(tracker!=null)
