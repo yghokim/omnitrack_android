@@ -3,7 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.attributes
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTSelectionProperty
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
-import kr.ac.snu.hcil.omnitrack.ui.components.TimeRangePicker
+import kr.ac.snu.hcil.omnitrack.ui.components.common.TimeRangePicker
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.TimeRangePickerInputView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
@@ -51,9 +51,9 @@ class OTTimeSpanAttribute(objectId: String?, dbId: Long?, columnName: String, se
         {
             val granularity = when(getPropertyValue<Int>(PROPERTY_GRANULARITY))
             {
-                0->TimeRangePicker.Granularity.DATE
-                1->TimeRangePicker.Granularity.TIME
-                else->TimeRangePicker.Granularity.TIME
+                0 -> TimeRangePicker.Granularity.DATE
+                1 -> TimeRangePicker.Granularity.TIME
+                else -> TimeRangePicker.Granularity.TIME
             }
 
             inputView.setGranularity(granularity)

@@ -31,7 +31,7 @@
             android:exported="false" />
 
         <activity
-            android:name=".activities.SplashScreenActivity"
+            android:name=".ui.activities.SplashScreenActivity"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -40,36 +40,36 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.LoginActivity"
+            android:name=".ui.activities.LoginActivity"
             android:label="@string/app_name" />
         <activity
-            android:name=".activities.HomeActivity"
+            android:name=".ui.pages.home.HomeActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activities.TrackerDetailActivity"
+            android:name=".ui.pages.tracker.TrackerDetailActivity"
             android:label="@string/title_activity_tracker_new"
-            android:parentActivityName=".activities.HomeActivity"
+            android:parentActivityName=".ui.pages.home.HomeActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="kr.ac.snu.hcil.omnitrack.activities.HomeActivity" />
+                android:value=".ui.pages.home.HomeActivity" />
         </activity>
         <activity
-            android:name=".activities.AttributeDetailActivity"
+            android:name=".ui.pages.attribute.AttributeDetailActivity"
             android:label="@string/title_activity_attribute_detail"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activities.NewItemActivity"
+            android:name=".ui.pages.items.NewItemActivity"
             android:label="@string/title_activity_new_item"
             android:theme="@style/AppTheme.NoActionBar" />
 
         <activity
-            android:name=".activities.ItemBrowserActivity"
+            android:name=".ui.pages.items.ItemBrowserActivity"
             android:theme="@style/AppTheme.NoActionBar" />
 
         <activity
-            android:name=".activities.connectionwizard.ConnectionWizardActivity"
+            android:name=".ui.pages.connectionwizard.ConnectionWizardActivity"
             android:theme="@style/AppTheme.NoActionBar" />
 
         <uses-permission android:name="android.permission.BLUETOOTH" />

@@ -16,7 +16,7 @@
         android:text="Text" />
 
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.ChoiceEntryListEditor
+    <kr.ac.snu.hcil.omnitrack.ui.components.common.ChoiceEntryListEditor
         android:id="@+id/value"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

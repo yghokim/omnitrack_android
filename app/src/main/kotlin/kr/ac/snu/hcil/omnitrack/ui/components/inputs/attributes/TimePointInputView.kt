@@ -4,7 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
-import kr.ac.snu.hcil.omnitrack.ui.components.DateTimePicker
+import kr.ac.snu.hcil.omnitrack.ui.components.common.DateTimePicker
 
 /**
  * Created by Young-Ho Kim on 2016-07-22.

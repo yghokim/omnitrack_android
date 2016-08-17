@@ -4,7 +4,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTProperty
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTSelectionProperty
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
-import kr.ac.snu.hcil.omnitrack.ui.components.DateTimePicker
+import kr.ac.snu.hcil.omnitrack.ui.components.common.DateTimePicker
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.TimePointInputView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper

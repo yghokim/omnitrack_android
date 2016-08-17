@@ -9,7 +9,7 @@
     android:fitsSystemWindows="true"
     android:focusableInTouchMode="true"
 
-    tools:context="kr.ac.snu.hcil.omnitrack.activities.AttributeDetailActivity">
+    tools:context=".ui.pages.attribute.AttributeDetailActivity">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar"
@@ -89,7 +89,7 @@
                     android:textAlignment="viewStart"
                     android:textColor="@color/buttonIconColorDark" />
 
-                <kr.ac.snu.hcil.omnitrack.ui.components.AttributeConnectionView
+                <kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeConnectionView
                     android:id="@+id/ui_attribute_connection"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

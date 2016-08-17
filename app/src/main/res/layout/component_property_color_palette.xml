@@ -8,7 +8,7 @@
     <include layout="@layout/common_property_subheader" />
 
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.ColorPaletteView
+    <kr.ac.snu.hcil.omnitrack.ui.components.common.ColorPaletteView
         android:id="@+id/value"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

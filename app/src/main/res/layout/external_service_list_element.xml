@@ -71,7 +71,7 @@
                 android:text="Activating..."
                 android:visibility="gone" />
 
-            <kr.ac.snu.hcil.omnitrack.ui.components.ManualSwitch
+            <kr.ac.snu.hcil.omnitrack.ui.components.common.ManualSwitch
                 android:id="@+id/ui_button_activate"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/button_height_normal"

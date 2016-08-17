@@ -23,7 +23,7 @@
         android:orientation="horizontal">
 
 
-        <kr.ac.snu.hcil.omnitrack.ui.components.VerticalNumericUpDown
+        <kr.ac.snu.hcil.omnitrack.ui.components.common.VerticalNumericUpDown
             android:id="@+id/ui_left_picker"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -35,7 +35,7 @@
             android:layout_gravity="center_vertical"
             android:src="@drawable/time_digit_separator" />
 
-        <kr.ac.snu.hcil.omnitrack.ui.components.VerticalNumericUpDown
+        <kr.ac.snu.hcil.omnitrack.ui.components.common.VerticalNumericUpDown
             android:id="@+id/ui_middle_picker"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -47,7 +47,7 @@
             android:layout_gravity="center_vertical"
             android:src="@drawable/time_digit_separator" />
 
-        <kr.ac.snu.hcil.omnitrack.ui.components.VerticalNumericUpDown
+        <kr.ac.snu.hcil.omnitrack.ui.components.common.VerticalNumericUpDown
             android:id="@+id/ui_right_picker"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

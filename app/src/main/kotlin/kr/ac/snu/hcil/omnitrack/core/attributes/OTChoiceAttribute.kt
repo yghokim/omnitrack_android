@@ -6,7 +6,7 @@ import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTBooleanProperty
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTChoiceEntryListProperty
-import kr.ac.snu.hcil.omnitrack.ui.components.WordListView
+import kr.ac.snu.hcil.omnitrack.ui.components.common.WordListView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.ChoiceInputView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper

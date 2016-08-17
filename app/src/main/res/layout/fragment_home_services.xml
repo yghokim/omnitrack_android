@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="kr.ac.snu.hcil.omnitrack.activities.HomeActivity$PlaceholderFragment">
+    tools:context=".ui.pages.home.HomeActivity$PlaceholderFragment">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/ui_list"

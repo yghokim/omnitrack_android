@@ -83,7 +83,7 @@
 
     </View>
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.LockableFrameLayout
+    <kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
         android:id="@+id/ui_preview_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

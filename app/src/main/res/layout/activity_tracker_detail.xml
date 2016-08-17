@@ -10,7 +10,7 @@
     android:fitsSystemWindows="true"
     android:focusableInTouchMode="true"
 
-    tools:context="kr.ac.snu.hcil.omnitrack.activities.TrackerDetailActivity">
+    tools:context=".ui.pages.tracker.TrackerDetailActivity">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar"

@@ -16,7 +16,7 @@
         android:layout_marginBottom="@dimen/time_range_picker_bullet_vertical_margin" />
 
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.ProcessArrowIndicator
+    <kr.ac.snu.hcil.omnitrack.ui.components.common.ProcessArrowIndicator
         android:id="@+id/view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
