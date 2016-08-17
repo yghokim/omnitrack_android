@@ -11,15 +11,23 @@
         style="@style/itemListAttributeName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
         android:layout_centerVertical="true"
+        android:paddingTop="1dp"
         android:text="Attribute" />
 
-    <TextView
-        android:id="@+id/ui_value_view_replace"
-        style="@style/viewForItemListTextAppearance"
-        android:layout_width="wrap_content"
+    <FrameLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_centerVertical="true"
-        android:text="No value" />
+        android:layout_marginStart="12dp"
+        android:layout_toEndOf="@+id/ui_attribute_name">
+
+        <TextView
+            android:id="@+id/ui_value_view_replace"
+            style="@style/viewForItemListTextAppearance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:text="No Value" />
+    </FrameLayout>
 </RelativeLayout>

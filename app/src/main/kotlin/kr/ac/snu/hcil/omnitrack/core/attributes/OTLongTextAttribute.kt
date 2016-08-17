@@ -5,6 +5,7 @@ import android.view.View
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.LinedTextView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
+import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 
 /**
@@ -46,11 +47,7 @@ class OTLongTextAttribute(objectId: String?, dbId: Long?, columnName: String, se
             recycledView
         } else LinedTextView(context)
 
-        if (android.os.Build.VERSION.SDK_INT < 23) {
-            target.setTextAppearance(context, R.style.longTextForItemListTextAppearance)
-        } else {
-            target.setTextAppearance(R.style.longTextForItemListTextAppearance)
-        }
+        InterfaceHelper.setTextAppearance(target, R.style.longTextForItemListTextAppearance)
 
         target.setLineSpacing(context.resources.getDimension(R.dimen.item_list_element_LongText_LineSpacingExtra), 1.2f)
 

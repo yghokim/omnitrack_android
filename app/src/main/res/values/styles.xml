@@ -211,5 +211,10 @@
 
     </style>
 
+    <style name="tagTextAppearance">
+        <item name="android:textColor">#efffffff</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
 
 </resources>

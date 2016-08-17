@@ -32,7 +32,7 @@
             android:layout_centerVertical="true"
             android:gravity="left|center_vertical"
             android:text="Step Count | Google Fit"
-            android:textColor="@color/colorEditable" />
+            android:textColor="@color/colorPointed" />
     </RelativeLayout>
 
 
@@ -65,7 +65,7 @@
             android:gravity="left|center_vertical"
             android:lineSpacingMultiplier="1.2"
             android:text="Step Count | Google Fit"
-            android:textColor="@color/colorEditable" />
+            android:textColor="@color/colorPointed" />
 
     </RelativeLayout>
 

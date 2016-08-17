@@ -197,10 +197,13 @@ class ItemBrowserActivity : AppCompatActivity() {
                         val newValueView = attribute.getViewForItemList(this@ItemBrowserActivity, valueView)
                         if (newValueView !== valueView) {
                             val lp = valueView.layoutParams
-                            val index = view.indexOfChild(valueView)
-                            view.removeView(valueView)
+
+                            val container = valueView.parent as ViewGroup
+
+                            val index = container.indexOfChild(valueView)
+                            container.removeView(valueView)
                             newValueView.layoutParams = lp
-                            view.addView(newValueView, index)
+                            container.addView(newValueView, index)
                             valueView = newValueView
                         }
 

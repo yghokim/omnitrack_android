@@ -62,6 +62,14 @@ fun View.setPaddingRight(padding: Int) {
     setPadding(paddingLeft, paddingTop, padding, paddingBottom)
 }
 
+fun View.setPaddingTop(padding: Int) {
+    setPadding(paddingLeft, padding, paddingRight, paddingBottom)
+}
+
+fun View.setPaddingBottom(padding: Int) {
+    setPadding(paddingLeft, paddingTop, paddingRight, padding)
+}
+
 fun List<*>.move(fromPosition: Int, toPosition: Int): Boolean {
     if (fromPosition != toPosition) {
         if (fromPosition < toPosition) {

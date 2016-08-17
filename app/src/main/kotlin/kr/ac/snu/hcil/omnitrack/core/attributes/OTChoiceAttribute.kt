@@ -1,13 +1,16 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes
 
 import android.content.Context
+import android.view.View
 import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTBooleanProperty
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTChoiceEntryListProperty
+import kr.ac.snu.hcil.omnitrack.ui.components.WordListView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.ChoiceInputView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
+import java.util.*
 
 /**
  * Created by younghokim on 16. 8. 12..
@@ -95,6 +98,36 @@ class OTChoiceAttribute(objectId: String?, dbId: Long?, columnName: String, prop
         }
 
         return inputView
+    }
+
+    override fun applyValueToViewForItemList(value: Any?, view: View): Boolean {
+        if (view is WordListView) {
+            if (value is IntArray && value.size > 0) {
+                val list = ArrayList <String>()
+                for (e in value.withIndex()) {
+                    if (e.value < entries.size) {
+                        list.add(entries[e.value])
+                    }
+                }
+
+                view.words = list.toTypedArray()
+                return true
+            } else {
+                view.words = arrayOf()
+                return true
+            }
+        } else return super.applyValueToViewForItemList(value, view)
+    }
+
+    override fun getViewForItemListContainerType(): Int = OTAttribute.VIEW_FOR_ITEM_LIST_CONTAINER_TYPE_SINGLELINE
+
+    override fun getViewForItemList(context: Context, recycledView: View?): View {
+
+        val target: WordListView = if (recycledView is WordListView) {
+            recycledView
+        } else WordListView(context)
+
+        return target
     }
 
 

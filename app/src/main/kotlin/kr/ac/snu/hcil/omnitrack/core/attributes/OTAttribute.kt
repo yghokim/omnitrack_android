@@ -12,6 +12,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTProperty
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
+import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 import kr.ac.snu.hcil.omnitrack.utils.TextHelper
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
@@ -199,12 +200,7 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
             recycledView
         } else TextView(context)
 
-
-        if (android.os.Build.VERSION.SDK_INT < 23) {
-            target.setTextAppearance(context, R.style.viewForItemListTextAppearance)
-        } else {
-            target.setTextAppearance(R.style.viewForItemListTextAppearance)
-        }
+        InterfaceHelper.setTextAppearance(target, R.style.viewForItemListTextAppearance)
 
         target.background = null
 
