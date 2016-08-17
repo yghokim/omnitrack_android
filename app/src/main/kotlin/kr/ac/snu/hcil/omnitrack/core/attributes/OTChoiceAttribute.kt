@@ -102,15 +102,18 @@ class OTChoiceAttribute(objectId: String?, dbId: Long?, columnName: String, prop
 
     override fun applyValueToViewForItemList(value: Any?, view: View): Boolean {
         if (view is WordListView) {
+            view.colorIndexList.clear()
             if (value is IntArray && value.size > 0) {
                 val list = ArrayList <String>()
                 for (e in value.withIndex()) {
                     if (e.value < entries.size) {
                         list.add(entries[e.value])
+                        view.colorIndexList.add(e.value)
                     }
                 }
 
                 view.words = list.toTypedArray()
+
                 return true
             } else {
                 view.words = arrayOf()
@@ -126,6 +129,12 @@ class OTChoiceAttribute(objectId: String?, dbId: Long?, columnName: String, prop
         val target: WordListView = if (recycledView is WordListView) {
             recycledView
         } else WordListView(context)
+
+        if (allowedMultiselection) {
+            target.useColors = true
+        } else {
+            target.useColors = false
+        }
 
         return target
     }

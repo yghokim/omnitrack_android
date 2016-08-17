@@ -3,6 +3,7 @@
 
 
     <item
+        android:id="@+id/layer_color_shape"
         android:bottom="4dp"
         android:top="4dp">
         <shape android:shape="rectangle">

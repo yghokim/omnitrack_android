@@ -59,4 +59,16 @@
         <item>#9f5cf2</item>
         <item>#ff6ac5</item>
     </string-array>
+
+    <string-array name="choiceColorPaletteArray">
+        <item>#66c6b3</item>
+        <item>#f4a85d</item>
+        <item>#bd71c2</item>
+        <item>#e18066</item>
+        <item>#759dc9</item>
+        <item>#aec988</item>
+        <item>#ed86af</item>
+        <item>#988578</item>
+        <item>#70a979</item>
+    </string-array>
 </resources>

@@ -1,12 +1,16 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.common
 
 import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.LayerDrawable
 import android.util.AttributeSet
 import android.view.ViewGroup
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import org.apmem.tools.layouts.FlowLayout
+import java.util.*
 import kotlin.properties.Delegates
 
 /**
@@ -14,10 +18,26 @@ import kotlin.properties.Delegates
  */
 open class WordListView : FlowLayout {
 
+    companion object {
+        private var _colorPalette: IntArray? = null
+
+        protected fun getColorPalette(context: Context): IntArray {
+            if (_colorPalette == null) {
+                _colorPalette = context.resources.getStringArray(R.array.choiceColorPaletteArray).map { Color.parseColor(it) }.toIntArray()
+            }
+
+            return _colorPalette!!
+        }
+    }
+
     var words: Array<String> by Delegates.observable(arrayOf()) {
         prop, old, new ->
         refresh()
     }
+
+    var useColors = false
+
+    val colorIndexList = ArrayList<Int>()
 
     var textAppearanceId: Int = R.style.tagTextAppearance
         set(value) {
@@ -37,14 +57,14 @@ open class WordListView : FlowLayout {
     constructor(context: Context, attributeSet: AttributeSet) : super(context, attributeSet)
     constructor(context: Context, attributeSet: AttributeSet, defStyle: Int) : super(context, attributeSet, defStyle)
 
-    private fun refresh() {
+    fun refresh() {
         val numChildViewToAdd = words.size - childCount
         if (numChildViewToAdd < 0) {
             removeViews(childCount + numChildViewToAdd, -numChildViewToAdd)
         } else if (numChildViewToAdd > 0) {
 
             for (i in 0..numChildViewToAdd - 1) {
-                addView(makeChildView())
+                addView(makeChildView(i))
             }
         }
 
@@ -53,12 +73,19 @@ open class WordListView : FlowLayout {
         }
     }
 
-    protected open fun makeChildView(): TextView {
+    protected open fun makeChildView(position: Int): TextView {
         val view = TextView(context)
 
         InterfaceHelper.setTextAppearance(view, textAppearanceId)
 
         view.setBackgroundResource(R.drawable.word_list_element_frame)
+
+        if (useColors) {
+
+            val shape = (view.background as LayerDrawable).findDrawableByLayerId(R.id.layer_color_shape) as GradientDrawable
+            shape.setColor(getColorPalette(context)[colorIndexList[position]])
+
+        }
 
         val lp = FlowLayout.LayoutParams(LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         lp.leftMargin = 20
