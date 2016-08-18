@@ -42,6 +42,7 @@ dependencies {
     compile 'com.github.TechFreak:WizardPager:1.0.3'
     compile files('libs/libDaumMapAndroid.jar')
     compile 'org.apmem.tools:layouts:1.10@aar'
+    compile 'com.koushikdutta.ion:ion:2.1.8'
 
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }

@@ -47,6 +47,10 @@ class OmniTrackApplication : Application() {
         this.resources.getStringArray(R.array.colorPaletteArray).map { Color.parseColor(it) }.toIntArray()
     }
 
+    val googleApiKey: String by lazy {
+        this.resources.getString(R.string.google_maps_key)
+    }
+
     lateinit var triggerManager: OTTriggerManager
         private set
 

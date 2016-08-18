@@ -4,9 +4,11 @@ import android.content.Context
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
+import android.view.View
 import com.google.android.gms.maps.model.LatLng
 import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.ui.components.common.MapImageView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 
@@ -114,4 +116,26 @@ class OTLocationAttribute(objectId: String?, dbId: Long?, columnName: String, se
     }
 
     override fun getViewForItemListContainerType(): Int = VIEW_FOR_ITEM_LIST_CONTAINER_TYPE_MULTILINE
+
+    override fun getViewForItemList(context: Context, recycledView: View?): View {
+
+        val target = if (recycledView is MapImageView) {
+            recycledView
+        } else {
+            MapImageView(context)
+        }
+
+
+
+        return target
+    }
+
+    override fun applyValueToViewForItemList(value: Any?, view: View): Boolean {
+        if (view is MapImageView && value != null) {
+            if (value is LatLng) {
+                view.location = value
+                return true
+            } else return false
+        } else return super.applyValueToViewForItemList(value, view)
+    }
 }
