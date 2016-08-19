@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.AttributeSet
 import kr.ac.snu.hcil.omnitrack.ui.IActivityLifeCycle
@@ -35,6 +36,19 @@ abstract class AAttributeInputView<DataType>(layoutId: Int, context: Context, at
                 else -> throw IllegalArgumentException("attribute view data type ${type} is not supported yet.")
             }
         }
+
+        fun makeActivityForResultRequestCode(position: Int, requestType: Int): Int {
+            //key is stored in upper 16 bit, type in under 16 bit
+            return (position shl 16) or requestType
+        }
+
+        fun getPositionFromRequestCode(requestCode: Int): Int {
+            return (requestCode shr 16) and 0xFFFF
+        }
+
+        fun getRequestTypeFromRequestCode(requestCode: Int): Int {
+            return requestCode and 0xFFFF
+        }
     }
 
     abstract val typeId: Int
@@ -42,6 +56,8 @@ abstract class AAttributeInputView<DataType>(layoutId: Int, context: Context, at
 
     init {
     }
+
+    var position: Int = -1
 
     var previewMode: Boolean by Delegates.observable(false) {
         prop, old, new ->
@@ -75,5 +91,12 @@ abstract class AAttributeInputView<DataType>(layoutId: Int, context: Context, at
     }
 
     override fun onLowMemory() {
+    }
+
+    /***
+     * apply value from external activity result
+     */
+    open fun setValueFromActivityResult(intent: Intent, requestType: Int): Boolean {
+        return false
     }
 }

@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.AttributeSet
 import android.view.MotionEvent
@@ -8,6 +9,7 @@ import android.view.View
 import android.view.ViewStub
 import android.widget.ProgressBar
 import android.widget.TextView
+import com.google.android.gms.location.places.ui.PlacePicker
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
@@ -18,6 +20,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.LatLngToAddressTask
 import kr.ac.snu.hcil.omnitrack.utils.contains
+import kr.ac.snu.hcil.omnitrack.utils.getActivity
 
 /**
  * Created by Young-Ho on 8/3/2016.
@@ -26,6 +29,10 @@ import kr.ac.snu.hcil.omnitrack.utils.contains
  *
  */
 class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttributeInputView<LatLng>(R.layout.component_location_picker, context, attrs), OnMapReadyCallback, View.OnClickListener, LatLngToAddressTask.OnFinishListener, GoogleMap.OnCameraIdleListener {
+
+    companion object {
+        const val REQUEST_TYPE_GOOGLE_PLACE_PICKER = 256
+    }
 
     override val typeId: Int = VIEW_TYPE_LOCATION
 
@@ -39,10 +46,6 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
                 reserveAddressChange(value)
             }
         }
-
-    private val mapView: MapView
-
-    private val controlPanel: View
 
     private var isAdjustMode: Boolean = false
         set(value) {
@@ -76,6 +79,12 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
             }
         }
 
+
+    private val mapView: MapView
+
+    private val controlPanel: View
+
+    private val searchButton: View
     private val zoomInButton: View
     private val zoomOutButton: View
     private val adjustButton: View
@@ -121,10 +130,13 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
         fitButton = findViewById(R.id.ui_button_fit)
         adjustButton = findViewById(R.id.ui_button_adjust)
 
+        searchButton = findViewById(R.id.ui_button_search)
+
         zoomInButton.setOnClickListener(this)
         zoomOutButton.setOnClickListener(this)
         fitButton.setOnClickListener(this)
         adjustButton.setOnClickListener(this)
+        searchButton.setOnClickListener(this)
     }
 
     private fun inflateAdjustPanel(): View {
@@ -159,7 +171,25 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
             isAdjustMode = false
             reserveAddressChange(value)
             fitToValueLocation()
+        } else if (view === searchButton) {
+            val activity = getActivity()
+            if (activity != null) {
+                if (position >= 0) {
+                    val intent = PlacePicker.IntentBuilder().build(activity)
+                    activity.startActivityForResult(intent, makeActivityForResultRequestCode(position, REQUEST_TYPE_GOOGLE_PLACE_PICKER))
+                }
+            }
+            //getActivity()?.startActivityForResult()
+
         }
+    }
+
+    override fun setValueFromActivityResult(intent: Intent, requestType: Int): Boolean {
+        if (requestType == REQUEST_TYPE_GOOGLE_PLACE_PICKER) {
+            val place = PlacePicker.getPlace(this.context, intent)
+            value = place.latLng
+            return true
+        } else return false
     }
 
     private fun fitToValueLocation() {
@@ -215,7 +245,6 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
 
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
-
         //find parent recyclerview
         if (ev.action == MotionEvent.ACTION_DOWN) {
             if (mapView.contains(ev.x, ev.y)) {

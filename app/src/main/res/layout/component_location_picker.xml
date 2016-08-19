@@ -1,18 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
     <FrameLayout
+        android:id="@+id/frameLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp">
+        android:layout_alignBottom="@+id/ui_button_search"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="4dp"
+        android:layout_toStartOf="@+id/ui_button_search"
+        android:paddingBottom="3.5dp"
+        android:paddingTop="1dp">
 
         <TextView
             android:id="@+id/ui_address"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:background="@color/editTextFormBackground"
             android:drawablePadding="4dp"
             android:drawableStart="@drawable/map_dark"
@@ -26,7 +32,6 @@
             android:paddingStart="8dp"
             android:paddingTop="6dp"
             android:textColor="@color/textColorMid"
-
             />
 
         <ProgressBar
@@ -42,9 +47,28 @@
             android:visibility="invisible" />
     </FrameLayout>
 
+    <Button
+        android:id="@+id/ui_button_search"
+        style="@style/mapViewOverlayButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:height="@dimen/button_height_small"
+
+        android:drawableLeft="@drawable/search_dark"
+        android:paddingEnd="12dp"
+        android:paddingStart="8dp"
+        android:text="Search..."
+        android:textColor="@color/buttonIconColorDark"
+
+        android:textSize="13dp" />
+
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="230dp">
+        android:layout_height="230dp"
+        android:layout_below="@+id/frameLayout"
+        android:layout_marginTop="5dp">
 
         <com.google.android.gms.maps.MapView
             android:id="@+id/ui_map"
@@ -115,4 +139,4 @@
 
     </FrameLayout>
 
-</LinearLayout>
+</RelativeLayout>

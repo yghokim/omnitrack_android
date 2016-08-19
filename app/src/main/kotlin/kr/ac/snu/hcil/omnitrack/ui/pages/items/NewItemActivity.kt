@@ -1,6 +1,8 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.items
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.support.v7.widget.LinearLayoutManager
@@ -27,7 +29,6 @@ import java.util.*
 class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item) {
 
     private val attributeListAdapter = AttributeListAdapter()
-
 
     private var tracker: OTTracker? = null
 
@@ -216,6 +217,13 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
         println("Attribute $attributeId was changed to $newVal")
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (resultCode == Activity.RESULT_OK && data != null) {
+            val inputView = attributeListAdapter.inputViews.find { it.position == AAttributeInputView.getPositionFromRequestCode(requestCode) }
+            inputView?.setValueFromActivityResult(data, AAttributeInputView.getRequestTypeFromRequestCode(requestCode))
+        }
+    }
+
     inner class AttributeListAdapter : RecyclerView.Adapter<AttributeListAdapter.ViewHolder>() {
 
         val inputViews = HashSet<AAttributeInputView<*>>()
@@ -242,6 +250,7 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             holder.bind(getItem(position))
+            holder.inputView.position = position
         }
 
         override fun getItemCount(): Int {
