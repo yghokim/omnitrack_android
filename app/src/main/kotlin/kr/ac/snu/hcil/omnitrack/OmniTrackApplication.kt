@@ -5,6 +5,7 @@ import android.graphics.Color
 import kr.ac.snu.hcil.omnitrack.core.OTTriggerManager
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.*
+import kr.ac.snu.hcil.omnitrack.core.database.CacheHelper
 import kr.ac.snu.hcil.omnitrack.core.database.DatabaseHelper
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 
@@ -37,6 +38,10 @@ class OmniTrackApplication : Application() {
 
     lateinit var dbHelper: DatabaseHelper
         private set
+
+    val cacheHelper: CacheHelper by lazy {
+        CacheHelper(this)
+    }
 
     val currentUser: OTUser
         get() {

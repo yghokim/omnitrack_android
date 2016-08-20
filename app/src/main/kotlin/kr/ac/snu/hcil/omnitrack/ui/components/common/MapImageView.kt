@@ -1,17 +1,17 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.common
 
 import android.content.Context
+import android.net.Uri
 import android.util.AttributeSet
 import android.widget.ImageView
 import com.google.android.gms.maps.model.LatLng
-import com.koushikdutta.async.future.FutureCallback
-import com.koushikdutta.ion.Ion
 import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
+import kr.ac.snu.hcil.omnitrack.core.database.CacheHelper
 
 /**
  * Created by younghokim on 16. 8. 18..
  */
-class MapImageView : ImageView, FutureCallback<ImageView> {
+class MapImageView : ImageView, CacheHelper.ICachedBitmapListener /*FutureCallback<ImageView>*/ {
 
     companion object {
 
@@ -46,6 +46,12 @@ class MapImageView : ImageView, FutureCallback<ImageView> {
         }
 
     private var isLoadingMap = false
+    private var ongoingZoom: Int = -1
+    private var ongoingLocation: LatLng = LatLng(0.0, 0.0)
+    private var ongoingWidth: Int = -1
+    private var ongoingHeight: Int = -1
+
+
     private var reservedReloading = false
 
     constructor(context: Context) : super(context)
@@ -66,16 +72,47 @@ class MapImageView : ImageView, FutureCallback<ImageView> {
     private var suspendReloading = false
 
     private fun reloadMap(location: LatLng, zoom: Int) {
-        if (isLoadingMap) {
-            reservedReloading = true
-        } else {
-            isLoadingMap = true
+        if ((width > 0 && height > 0)) {
+            if (isLoadingMap) {
+                if (ongoingLocation != location || ongoingZoom != zoom || ongoingWidth != width || ongoingHeight != height)
+                    reservedReloading = true
+            } else {
+                isLoadingMap = true
+                ongoingLocation = location
+                ongoingZoom = zoom
+                ongoingWidth = width
+                ongoingHeight = height
+
+                OmniTrackApplication.app.cacheHelper.downloadBitmapAsync(this.context,
+                        makeGoogleMapQuery(location, zoom, width, height),
+                        this)
+                /*
             Ion.with(this)
-                    .load(makeGoogleMapQuery(location, zoom, width, height)).setCallback(this)
+                    .load(makeGoogleMapQuery(location, zoom, width, height)).setCallback(this)*/
+            }
         }
     }
 
+
+    override fun onBitmapRetrieved(uri: Uri?) {
+        setImageURI(uri)
+
+        isLoadingMap = false
+
+        ongoingZoom = 0
+        ongoingHeight = 0
+        ongoingWidth = 0
+        ongoingLocation = LatLng(0.0, 0.0)
+
+        if (reservedReloading) {
+            reservedReloading = false
+            reloadMap()
+        }
+    }
+
+    /*
     override fun onCompleted(e: Exception?, result: ImageView?) {
+
 
         isLoadingMap = false
 
@@ -84,7 +121,7 @@ class MapImageView : ImageView, FutureCallback<ImageView> {
             reloadMap()
         }
     }
-
+*/
 
     fun reloadMap() {
         reloadMap(location, zoom)
@@ -93,6 +130,8 @@ class MapImageView : ImageView, FutureCallback<ImageView> {
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
         if (changed) {
+            val width = right - left
+            val height = bottom - top
             reloadMap()
         }
     }
