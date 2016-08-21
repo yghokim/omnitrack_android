@@ -26,7 +26,7 @@ import java.util.*
 /**
  * Created by younghokim on 16. 7. 24..
  */
-class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item) {
+class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item), OTItemBuilder.AttributeStateChangedListener {
 
     private val attributeListAdapter = AttributeListAdapter()
 
@@ -71,7 +71,7 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
                 } else {
                     //new builder was created
 
-                    builder.autoCompleteAsync {
+                    builder.autoCompleteAsync(this) {
                         attributeListAdapter.notifyDataSetChanged()
                     }
                 }
@@ -213,6 +213,12 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
         }
     }
 
+    override fun onAttributeStateChanged(attribute: OTAttribute<*>, position: Int, state: OTItemBuilder.EAttributeValueState) {
+        println("attribute ${attribute.name} state was changed to $state")
+        attributeListAdapter.notifyItemChanged(position)
+    }
+
+
     private fun onAttributeValueChangedHandler(attributeId: String, newVal: Any) {
         println("Attribute $attributeId was changed to $newVal")
     }
@@ -299,6 +305,11 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
 
                 attributeValueExtractors[attributeId] = {
                     inputView.value
+                }
+
+                when (builder.getAttributeValueState(adapterPosition)) {
+                    OTItemBuilder.EAttributeValueState.Idle -> itemView.alpha = 1.0f
+                    OTItemBuilder.EAttributeValueState.Loading -> itemView.alpha = 0.2f
                 }
 
                 inputView.onResume()
