@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="kr.ac.snu.hcil.omnitrack">
 
     <!-- To auto-complete the email text field in the login form with the user's emails -->
@@ -71,10 +72,6 @@
         <activity
             android:name=".ui.pages.connectionwizard.ConnectionWizardActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-
-        <uses-permission android:name="android.permission.BLUETOOTH" />
-        <uses-permission android:name="com.microsoft.band.service.access.BIND_BAND_SERVICE" />
-
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -86,6 +83,11 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version"
+            tools:replace="android:value" />
     </application>
 
 </manifest>

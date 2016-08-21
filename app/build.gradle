@@ -26,8 +26,8 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:24.1.1'
-    compile 'com.android.support:design:24.1.1'
+    compile 'com.android.support:appcompat-v7:24.2.0'
+    compile 'com.android.support:design:24.2.0'
     compile 'com.google.android.gms:play-services-maps:9.4.0'
     compile 'com.google.android.gms:play-services-places:9.4.0'
     compile 'com.google.android.gms:play-services-fitness:9.4.0'
@@ -46,6 +46,7 @@ dependencies {
     compile files('libs/libDaumMapAndroid.jar')
     compile 'org.apmem.tools:layouts:1.10@aar'
     compile 'com.koushikdutta.ion:ion:2.1.8'
+    compile 'io.nlopez.smartlocation:library:3.2.5'
 
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }

@@ -3,13 +3,12 @@ package kr.ac.snu.hcil.omnitrack.core.attributes
 import android.content.Context
 import android.location.Location
 import android.location.LocationManager
-import android.os.Bundle
 import android.view.View
 import com.google.android.gms.maps.model.LatLng
-import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.common.MapImageView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
+import kr.ac.snu.hcil.omnitrack.utils.LocationRetrievalTask
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 
 /**
@@ -48,53 +47,8 @@ class OTLocationAttribute(objectId: String?, dbId: Long?, columnName: String, se
     }
 
     override fun getAutoCompleteValueAsync(resultHandler: (LatLng) -> Unit): Boolean {
-        val locationManager = OmniTrackApplication.app.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        val gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-        val networkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
 
-        if (!gpsEnabled && !networkEnabled) {
-            val cached = getCachedLocation(locationManager, false)
-            resultHandler.invoke(if (cached == null) {
-                LatLng(318693.57301624, 4147876.8541539) //Seoul National University
-            } else LatLng(cached.latitude, cached.longitude))
-        } else {
-            var updatedLocation: Location? = null
-            var updateCount = 0
-            val listener = object : android.location.LocationListener {
-                override fun onLocationChanged(p0: Location) {
-                    if (updatedLocation != null) {
-                        updatedLocation = if (updatedLocation!!.accuracy > p0.accuracy) {
-                            updatedLocation
-                        } else {
-                            p0
-                        }
-                    } else updatedLocation = p0
-
-                    updateCount++
-                    if (updatedLocation != null) {
-
-                        locationManager.removeUpdates(this)
-                        resultHandler(LatLng(updatedLocation!!.latitude, updatedLocation!!.longitude))
-                    }
-                }
-
-                override fun onProviderDisabled(p0: String?) {
-
-                }
-
-                override fun onStatusChanged(p0: String?, p1: Int, p2: Bundle?) {
-
-                }
-
-                override fun onProviderEnabled(p0: String?) {
-
-                }
-
-            }
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0.0f, listener)
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0.0f, listener)
-
-        }
+        LocationRetrievalTask(resultHandler).execute()
 
         return false
     }
