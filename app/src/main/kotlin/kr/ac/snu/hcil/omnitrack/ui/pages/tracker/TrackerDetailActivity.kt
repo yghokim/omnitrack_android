@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.tracker
 
 import android.animation.Animator
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -22,6 +23,12 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
 
     companion object {
         const val IS_EDIT_MODE = "isEditMode"
+
+        fun makeIntent(trackerId: String, context: Context): Intent {
+            val intent = Intent(context, TrackerDetailActivity::class.java)
+            intent.putExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
+            return intent
+        }
     }
 
     /*

@@ -78,6 +78,8 @@
 
     <string name="msg_set_new_connection">Connect to External Source</string>
 
+    <string name="msg_item_list_empty_message">No items collected yet.</string>
+
     <string name="hint_long_text">Write text here</string>
     <string name="hint_short_text">Type in short text here</string>
 

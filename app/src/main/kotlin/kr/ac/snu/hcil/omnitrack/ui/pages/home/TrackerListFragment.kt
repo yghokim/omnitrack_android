@@ -86,9 +86,7 @@ class TrackerListFragment : Fragment() {
         fab!!.setOnClickListener { view ->
             val newTracker = OmniTrackApplication.app.currentUser.newTrackerWithDefaultName(context, true)
 
-            val intent = Intent(context, TrackerDetailActivity::class.java)
-            intent.putExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, newTracker.objectId)
-            startActivityOnDelay(intent)
+            startActivityOnDelay(TrackerDetailActivity.makeIntent(newTracker.objectId, context))
             Toast.makeText(context,
                     String.format(resources.getString(R.string.sentence_new_tracker_added), newTracker.name), Toast.LENGTH_LONG).show()
 
@@ -132,9 +130,7 @@ class TrackerListFragment : Fragment() {
 
     private fun handleTrackerClick(tracker: OTTracker)
     {
-        val intent = Intent(context, NewItemActivity::class.java)
-        intent.putExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
-        startActivityOnDelay(intent)
+        startActivityOnDelay(NewItemActivity.makeIntent(tracker.objectId, context))
     }
 
     private fun handleTrackerLongClick(tracker: OTTracker)
@@ -220,9 +216,7 @@ class TrackerListFragment : Fragment() {
                 if (view === itemView) {
                     handleTrackerClick(user.trackers[adapterPosition])
                 } else if (view === editButton) {
-                    val intent = Intent(context, TrackerDetailActivity::class.java)
-                    intent.putExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, user.trackers[adapterPosition].objectId)
-                    startActivityOnDelay(intent)
+                    startActivityOnDelay(TrackerDetailActivity.makeIntent(user.trackers[adapterPosition].objectId, this@TrackerListFragment.context))
                 } else if (view === listButton) {
                     val intent = Intent(context, ItemBrowserActivity::class.java)
                     intent.putExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, user.trackers[adapterPosition].objectId)

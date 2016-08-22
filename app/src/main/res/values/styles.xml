@@ -215,5 +215,11 @@
         <item name="android:textStyle">bold</item>
     </style>
 
+    <style name="listEmptyMessage">
+        <item name="android:textColor">#ababab</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">16dp</item>
+    </style>
+
 
 </resources>

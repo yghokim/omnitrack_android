@@ -1,7 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.items
 
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.*
@@ -13,6 +12,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.database.DatabaseHelper
+import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.DrawableListBottomSpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
@@ -20,7 +20,7 @@ import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.getDayOfMonth
 import java.util.*
 
-class ItemBrowserActivity : AppCompatActivity() {
+class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_browser) {
 
     private var tracker: OTTracker? = null
 
@@ -30,15 +30,23 @@ class ItemBrowserActivity : AppCompatActivity() {
 
     private lateinit var itemListViewAdapter: ItemListViewAdapter
 
+    private lateinit var emptyListMessageView: TextView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_item_browser)
+
+        rightActionBarButton?.visibility = View.VISIBLE
+        rightActionBarButton?.setImageResource(R.drawable.ic_add_box)
+        leftActionBarButton?.visibility = View.VISIBLE
+        leftActionBarButton?.setImageResource(R.drawable.back_rhombus)
 
         itemListView = findViewById(R.id.ui_item_list) as RecyclerView
 
         itemListView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         itemListView.addItemDecoration(HorizontalImageDividerItemDecoration(context = this))
         itemListView.addItemDecoration(DrawableListBottomSpaceItemDecoration(R.drawable.expanded_view_inner_shadow_top, 0))
+
+        emptyListMessageView = findViewById(R.id.ui_empty_list_message) as TextView
 
         itemListViewAdapter = ItemListViewAdapter()
 
@@ -54,7 +62,37 @@ class ItemBrowserActivity : AppCompatActivity() {
 
             OmniTrackApplication.app.dbHelper.getItems(tracker!!, items)
 
-            itemListViewAdapter.notifyDataSetChanged()
+            onItemListChanged()
+        }
+    }
+
+    private fun onItemListChanged() {
+        itemListViewAdapter.notifyDataSetChanged()
+        onListChanged()
+    }
+
+    private fun onItemChanged(position: Int) {
+        itemListViewAdapter.notifyItemChanged(position)
+        onListChanged()
+    }
+
+    private fun onItemRemoved(position: Int) {
+        itemListViewAdapter.notifyItemRemoved(position)
+        onListChanged()
+    }
+
+    private fun onListChanged() {
+        emptyListMessageView.visibility = if (items.size != 0) View.GONE else View.VISIBLE
+
+    }
+
+    override fun onToolbarLeftButtonClicked() {
+        finish()
+    }
+
+    override fun onToolbarRightButtonClicked() {
+        if (tracker != null) {
+            startActivity(NewItemActivity.makeIntent(tracker!!.objectId, this))
         }
     }
 
@@ -136,7 +174,7 @@ class ItemBrowserActivity : AppCompatActivity() {
                         DialogHelper.makeYesNoDialogBuilder(this@ItemBrowserActivity, "OmniTrack", resources.getString(R.string.msg_item_remove_confirm), {
                             OmniTrackApplication.app.dbHelper.deleteObjects(DatabaseHelper.ItemScheme, items[adapterPosition].dbId!!)
                             items.removeAt(adapterPosition)
-                            itemListViewAdapter.notifyItemRemoved(adapterPosition)
+                            onItemRemoved(adapterPosition)
                         }).show()
                         return true
                     }

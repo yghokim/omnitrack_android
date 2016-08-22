@@ -29,6 +29,15 @@ import java.util.*
  */
 class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item), OTItemBuilder.AttributeStateChangedListener {
 
+    companion object {
+
+        fun makeIntent(trackerId: String, context: Context): Intent {
+            val intent = Intent(context, NewItemActivity::class.java)
+            intent.putExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
+            return intent
+        }
+    }
+
     private val attributeListAdapter = AttributeListAdapter()
 
     private var tracker: OTTracker? = null
