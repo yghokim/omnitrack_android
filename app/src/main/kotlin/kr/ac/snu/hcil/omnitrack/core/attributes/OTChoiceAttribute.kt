@@ -9,6 +9,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTChoiceEntryListProp
 import kr.ac.snu.hcil.omnitrack.ui.components.common.WordListView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.ChoiceInputView
+import kr.ac.snu.hcil.omnitrack.utils.UniqueStringEntryList
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import java.util.*
 
@@ -21,10 +22,13 @@ class OTChoiceAttribute(objectId: String?, dbId: Long?, columnName: String, prop
         const val PROPERTY_MULTISELECTION = 0
         const val PROPERTY_ENTRIES = 1
 
-        val PREVIEW_ENTRIES: Array<String>
+        val PREVIEW_ENTRIES: Array<UniqueStringEntryList.Entry>
 
         init {
-            PREVIEW_ENTRIES = OmniTrackApplication.app.resources.getStringArray(R.array.choice_preview_entries)
+            PREVIEW_ENTRIES = OmniTrackApplication.app.resources.getStringArray(R.array.choice_preview_entries).mapIndexed {
+                i, s ->
+                UniqueStringEntryList.Entry(i, s)
+            }.toTypedArray()
         }
     }
 
@@ -53,11 +57,12 @@ class OTChoiceAttribute(objectId: String?, dbId: Long?, columnName: String, prop
         get() = getPropertyValue(PROPERTY_MULTISELECTION)
         set(value) = setPropertyValue(PROPERTY_MULTISELECTION, value)
 
-    var entries: Array<String>
+    var entries: UniqueStringEntryList
         get() = getPropertyValue(PROPERTY_ENTRIES)
         set(value) = setPropertyValue(PROPERTY_ENTRIES, value)
 
     override fun formatAttributeValue(value: Any): String {
+        val entries = this.entries
         if (value is IntArray && value.size > 0) {
             val builder = StringBuilder()
             for (e in value.withIndex()) {
@@ -84,7 +89,7 @@ class OTChoiceAttribute(objectId: String?, dbId: Long?, columnName: String, prop
 
     override fun refreshInputViewUI(inputView: AAttributeInputView<out Any>) {
         if (inputView is ChoiceInputView) {
-            inputView.entries = entries
+            inputView.entries = entries.toArray()
             inputView.multiSelectionMode = allowedMultiselection
         }
     }
@@ -103,12 +108,15 @@ class OTChoiceAttribute(objectId: String?, dbId: Long?, columnName: String, prop
     override fun applyValueToViewForItemList(value: Any?, view: View): Boolean {
         if (view is WordListView) {
             view.colorIndexList.clear()
+
             if (value is IntArray && value.size > 0) {
                 val list = ArrayList <String>()
-                for (e in value.withIndex()) {
-                    if (e.value < entries.size) {
-                        list.add(entries[e.value])
-                        view.colorIndexList.add(e.value)
+                for (idEntry in value.withIndex()) {
+
+                    val indexInEntries = entries.indexOf(idEntry.value)
+                    if (indexInEntries >= 0) {
+                        list.add(entries[indexInEntries].text)
+                        view.colorIndexList.add(indexInEntries)
                     }
                 }
 
@@ -130,11 +138,8 @@ class OTChoiceAttribute(objectId: String?, dbId: Long?, columnName: String, prop
             recycledView
         } else WordListView(context)
 
-        if (allowedMultiselection) {
-            target.useColors = true
-        } else {
-            target.useColors = false
-        }
+
+        target.useColors = true
 
         return target
     }

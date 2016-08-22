@@ -4,18 +4,19 @@ import android.content.Context
 import android.util.AttributeSet
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.common.ChoiceEntryListEditor
+import kr.ac.snu.hcil.omnitrack.utils.UniqueStringEntryList
 
 /**
  * Created by younghokim on 16. 8. 13..
  */
-class ChoiceEntryListPropertyView(context: Context, attrs: AttributeSet?) : APropertyView<Array<String>>(R.layout.component_property_choice_entry_list, context, attrs) {
+class ChoiceEntryListPropertyView(context: Context, attrs: AttributeSet?) : APropertyView<UniqueStringEntryList>(R.layout.component_property_choice_entry_list, context, attrs) {
 
     private val valueView: ChoiceEntryListEditor
 
-    override var value: Array<String>
-        get() = valueView.entries
+    override var value: UniqueStringEntryList
+        get() = valueView.getNotBlankEntryList()
         set(value) {
-            valueView.entries = value
+            valueView.setEntryList(value)
         }
 
     init {

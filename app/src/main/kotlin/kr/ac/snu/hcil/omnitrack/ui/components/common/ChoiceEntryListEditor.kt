@@ -16,8 +16,7 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.DragItemTouchHelperCallback
-import kr.ac.snu.hcil.omnitrack.utils.move
-import java.util.*
+import kr.ac.snu.hcil.omnitrack.utils.UniqueStringEntryList
 
 /**
  * Created by younghokim on 16. 8. 13..
@@ -27,13 +26,16 @@ class ChoiceEntryListEditor : LinearLayout, View.OnClickListener {
     private val newEntryButton: Button
     private val entryListView: RecyclerView
 
-    private val entryList: ArrayList<String> = arrayListOf("")
+    private val entryList: UniqueStringEntryList
+
 
     private val entryListAdapter: Adapter
 
     private val touchHelper: ItemTouchHelper
 
-    var entries: Array<String>
+
+    /*
+    var entries: Array<Entry>
         get() {
             val array = entryList.filter { !it.isNullOrEmpty() }.toTypedArray()
             println(array)
@@ -50,6 +52,7 @@ class ChoiceEntryListEditor : LinearLayout, View.OnClickListener {
 
             entryListAdapter.notifyDataSetChanged()
         }
+        */
 
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
@@ -76,15 +79,38 @@ class ChoiceEntryListEditor : LinearLayout, View.OnClickListener {
 
         touchHelper = ItemTouchHelper(DragItemTouchHelperCallback(entryListAdapter, context, true, false, false))
         touchHelper.attachToRecyclerView(entryListView)
+
+        entryList = UniqueStringEntryList()
     }
 
     override fun onClick(p0: View?) {
         if (p0 === newEntryButton) {
             //add new entry
-            entryList.add("")
+            entryList.appendNewEntry()
             entryListAdapter.notifyItemInserted(entryList.size - 1)
         }
     }
+
+    fun getNotBlankEntryList(): UniqueStringEntryList {
+
+        val clone = entryList.clone()
+        clone.filterSelf { !it.text.isNullOrBlank() }
+        return clone
+    }
+
+    fun setEntryList(newList: UniqueStringEntryList) {
+        if (entryList !== newList) {
+            entryList.set(newList)
+            if (entryList.isEmpty()) {
+                entryList.appendNewEntry()
+                entryList.appendNewEntry()
+            }
+
+            entryListAdapter.notifyDataSetChanged()
+
+        }
+    }
+
 
     inner class Adapter : RecyclerView.Adapter<Adapter.ViewHolder>(), DragItemTouchHelperCallback.ItemDragHelperAdapter {
 
@@ -135,8 +161,8 @@ class ChoiceEntryListEditor : LinearLayout, View.OnClickListener {
             }
 
 
-            fun bind(entry: String) {
-                entryInputView.setText(entry)
+            fun bind(entry: UniqueStringEntryList.Entry) {
+                entryInputView.setText(entry.text)
             }
 
             override fun onTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
@@ -148,7 +174,7 @@ class ChoiceEntryListEditor : LinearLayout, View.OnClickListener {
             }
 
             override fun afterTextChanged(s: Editable) {
-                entryList[adapterPosition] = s.toString()
+                entryList[adapterPosition].text = s.toString()
             }
 
             override fun onTouch(view: View, mv: MotionEvent): Boolean {

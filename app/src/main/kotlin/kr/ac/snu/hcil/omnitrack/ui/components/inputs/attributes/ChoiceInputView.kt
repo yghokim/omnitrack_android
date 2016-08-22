@@ -4,6 +4,7 @@ import android.content.Context
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
+import android.util.SparseArray
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +12,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
+import kr.ac.snu.hcil.omnitrack.utils.UniqueStringEntryList
 import java.util.*
 import kotlin.properties.Delegates
 
@@ -22,7 +24,9 @@ class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
     private val listView: RecyclerView
     private val adapter: Adapter
 
-    private val selectedIndices = ArrayList<Int>()
+    private val selectedIds = ArrayList<Int>()
+
+    private val idPivotedEntryIndexTable = SparseArray<Int>()
 
     init {
         listView = findViewById(R.id.ui_list) as RecyclerView
@@ -35,19 +39,27 @@ class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
 
     }
 
-    var entries: Array<String> = arrayOf("Entry 1", "Entry 2", "Entry 3")
+    var entries: Array<UniqueStringEntryList.Entry> = arrayOf(
+            UniqueStringEntryList.Entry(0, "Entry 1"),
+            UniqueStringEntryList.Entry(1, "Entry 2"),
+            UniqueStringEntryList.Entry(2, "Entry 3"))
         set(value) {
             if (field != value) {
                 field = value
+                idPivotedEntryIndexTable.clear()
+                for (entry in value.withIndex()) {
+                    idPivotedEntryIndexTable.put(entry.value.id, entry.index)
+                }
+
                 adapter.notifyDataSetChanged()
             }
         }
 
     override var value: IntArray
-        get() = selectedIndices.toIntArray()
+        get() = selectedIds.toIntArray()
         set(value) {
-            selectedIndices.clear()
-            selectedIndices.addAll(value.toTypedArray())
+            selectedIds.clear()
+            selectedIds.addAll(value.toTypedArray())
             adapter.notifyDataSetChanged()
         }
 
@@ -55,10 +67,10 @@ class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
     var multiSelectionMode: Boolean by Delegates.observable(false) {
         prop, old, new ->
         if (old != new) {
-            if (new == false && selectedIndices.size > 1) {
-                val first = selectedIndices.first()
-                selectedIndices.clear()
-                selectedIndices.add(first)
+            if (new == false && selectedIds.size > 1) {
+                val first = selectedIds.first()
+                selectedIds.clear()
+                selectedIds.add(first)
             }
 
             adapter.notifyDataSetChanged()
@@ -90,6 +102,9 @@ class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
             private val indicator: ImageView
             private val textView: TextView
 
+            private var id: Int = -1
+
+
             init {
                 indicator = view.findViewById(R.id.ui_checked) as ImageView
                 textView = view.findViewById(R.id.ui_text) as TextView
@@ -97,9 +112,10 @@ class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
                 view.setOnClickListener(this)
             }
 
-            fun bind(entry: String) {
-                textView.text = entry
-                if (selectedIndices.contains(adapterPosition)) {
+            fun bind(entry: UniqueStringEntryList.Entry) {
+                textView.text = entry.text
+                id = entry.id
+                if (selectedIds.contains(entry.id)) {
                     //checked or selected
                     if (multiSelectionMode) {
                         indicator.setImageResource(R.drawable.toggle_checked)
@@ -114,30 +130,50 @@ class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
                 }
             }
 
+            val comparer = object : Comparator<Int> {
+                override fun compare(a: Int, b: Int): Int {
+                    return if (idPivotedEntryIndexTable[a] > idPivotedEntryIndexTable[b]) {
+                        1
+                    } else if (idPivotedEntryIndexTable[a] == idPivotedEntryIndexTable[b]) {
+                        0
+                    } else -1
+                }
+            }
+
+            private fun sortSelectedIdsByEntryPosition() {
+                Collections.sort(selectedIds, comparer)
+            }
+
 
             override fun onClick(view: View?) {
                 if (multiSelectionMode) {
-                    if (selectedIndices.contains(adapterPosition)) {
-                        selectedIndices.remove(adapterPosition)
+                    if (selectedIds.contains(id)) {
+                        selectedIds.remove(id)
                     } else {
-                        selectedIndices.add(adapterPosition)
+                        selectedIds.add(id)
+                        sortSelectedIdsByEntryPosition()
                     }
 
                     notifyItemChanged(adapterPosition)
                 } else {
 
-                    if (!selectedIndices.contains(adapterPosition)) {
-                        if (selectedIndices.size > 0) {
-                            for (i in selectedIndices.size - 1..0) {
-                                val item = selectedIndices[i]
-                                selectedIndices.removeAt(i)
+                    if (!selectedIds.contains(id)) {
+                        if (selectedIds.size > 0) {
+                            for (i in selectedIds.size - 1..0) {
+                                val selectedId = selectedIds[i]
+                                selectedIds.removeAt(i)
 
-                                if (item < entries.size)
-                                    notifyItemChanged(item)
+                                for (entry in entries.withIndex()) {
+                                    if (entry.value.id == selectedId) {
+                                        notifyItemChanged(entry.index)
+                                        break
+                                    }
+                                }
                             }
                         }
 
-                        selectedIndices.add(adapterPosition)
+                        selectedIds.add(id)
+                        sortSelectedIdsByEntryPosition()
                         notifyItemChanged(adapterPosition)
                     }
                 }
