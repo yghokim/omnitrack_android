@@ -358,6 +358,8 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
             values.put(ItemScheme.LOGGED_AT, item.timestamp)
         }
 
+        println("item id: ${item.dbId}")
+
         saveObject(item, values, ItemScheme)
     }
 

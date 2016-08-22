@@ -220,7 +220,8 @@ class OTItemBuilder : ADataRow, IStringSerializable {
 
     fun makeItem(): OTItem {
         val item = OTItem(tracker.objectId)
-        if (!connectedItemDbId.equals(-1)) {
+        if (connectedItemDbId != -1L) {
+            println("assigned db id : $connectedItemDbId")
             item.dbId = connectedItemDbId
         }
 

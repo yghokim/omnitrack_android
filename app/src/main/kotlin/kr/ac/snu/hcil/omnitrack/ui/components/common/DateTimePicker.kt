@@ -228,6 +228,18 @@ class DateTimePicker(context: Context, attrs: AttributeSet? = null) : FrameLayou
                 leftPicker.minValue = 1
                 leftPicker.maxValue = 12
 
+                middlePicker.minValue = 0
+                middlePicker.maxValue = 59
+
+                rightPicker.minValue = 0
+                rightPicker.maxValue = 1
+                rightPicker.displayedValues = arrayOf("AM", "PM")
+
+
+                rightPicker.value = calendar.getAmPm()
+
+                middlePicker.value = calendar.getMinute()
+
                 val hour = calendar.getHour()
                 leftPicker.value = if (hour == 0) {
                     12
@@ -235,14 +247,6 @@ class DateTimePicker(context: Context, attrs: AttributeSet? = null) : FrameLayou
                     hour
                 }
 
-                middlePicker.minValue = 0
-                middlePicker.maxValue = 59
-                middlePicker.value = calendar.getMinute()
-
-                rightPicker.minValue = 0
-                rightPicker.maxValue = 1
-                rightPicker.displayedValues = arrayOf("AM", "PM")
-                rightPicker.value = calendar.getAmPm()
             }
 
             DATE -> {
