@@ -14,6 +14,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
@@ -195,7 +196,11 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
     private fun fitToValueLocation(animate: Boolean) {
         if (googleMap != null) {
 
-            val update = CameraUpdateFactory.newLatLngZoom(value, 14.0f)
+            val update = CameraUpdateFactory.newCameraPosition(CameraPosition.builder()
+                    .target(value)
+                    .zoom(14.0f)
+                    .bearing(0f)
+                    .build())
 
             if (animate) {
                 googleMap?.animateCamera(update);
