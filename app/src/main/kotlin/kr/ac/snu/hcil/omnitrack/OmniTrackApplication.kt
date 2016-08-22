@@ -8,6 +8,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.*
 import kr.ac.snu.hcil.omnitrack.core.database.CacheHelper
 import kr.ac.snu.hcil.omnitrack.core.database.DatabaseHelper
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
+import kr.ac.snu.hcil.omnitrack.utils.UniqueStringEntryList
 
 /**
  * Created by Young-Ho Kim on 2016-07-11.
@@ -100,7 +101,7 @@ class OmniTrackApplication : Application() {
             diaryTracker.attributes.add(dateAttribute)
 
             val moodAttribute = OTAttribute.createAttribute(defaultUser, "Mood", OTAttribute.TYPE_CHOICE)
-            moodAttribute.setPropertyValue(OTChoiceAttribute.PROPERTY_ENTRIES, arrayOf("Wonderful", "Sad", "Good", "Insomnia", "Depressed", "Angry", "Fatigued", "Happy"))
+            moodAttribute.setPropertyValue(OTChoiceAttribute.PROPERTY_ENTRIES, UniqueStringEntryList("Wonderful", "Sad", "Good", "Insomnia", "Depressed", "Angry", "Fatigued", "Happy"))
             moodAttribute.setPropertyValue(OTChoiceAttribute.PROPERTY_MULTISELECTION, true)
             diaryTracker.attributes.add(moodAttribute)
 

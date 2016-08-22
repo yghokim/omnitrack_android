@@ -37,6 +37,11 @@ class UniqueStringEntryList : IStringSerializable {
         list.addAll(parcel.entries)
     }
 
+    constructor(vararg entryNames: String) {
+        list = ArrayList<Entry>(entryNames.size)
+        entryNames.map { Entry(getNewId, it) }.toCollection(list)
+    }
+
     fun set(from: UniqueStringEntryList) {
         this.increment = from.increment
         this.list.clear()
