@@ -19,7 +19,7 @@ class OTItemBuilder : ADataRow, IStringSerializable {
     }
 
     enum class EAttributeValueState {
-        Loading, Idle
+        Processing, GettingExternalValue, Idle
     }
 
     interface AttributeStateChangedListener {
@@ -113,8 +113,8 @@ class OTItemBuilder : ADataRow, IStringSerializable {
         for (attributeEntry in tracker.attributes.unObservedList.withIndex()) {
             val attribute = attributeEntry.value
 
-            attributeStateList[attributeEntry.index] = EAttributeValueState.Loading
                 if (attribute.valueConnection == null) {
+                    attributeStateList[attributeEntry.index] = EAttributeValueState.Processing
                     val isSynchronous = attribute.getAutoCompleteValueAsync {
                         result ->
                         synchronized(remain)
@@ -134,12 +134,14 @@ class OTItemBuilder : ADataRow, IStringSerializable {
                     }
 
                     if (!isSynchronous) {
-                        onAttributeStateChangedListener?.onAttributeStateChanged(attribute, attributeEntry.index, EAttributeValueState.Loading)
+                        onAttributeStateChangedListener?.onAttributeStateChanged(attribute, attributeEntry.index, EAttributeValueState.Processing)
                     }
 
                 } else {
                     println("request value connection")
-                    onAttributeStateChangedListener?.onAttributeStateChanged(attribute, attributeEntry.index, EAttributeValueState.Loading)
+
+                    attributeStateList[attributeEntry.index] = EAttributeValueState.GettingExternalValue
+                    onAttributeStateChangedListener?.onAttributeStateChanged(attribute, attributeEntry.index, EAttributeValueState.GettingExternalValue)
 
                     attribute.valueConnection?.requestValueAsync(this) {
                         value: Any? ->

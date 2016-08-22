@@ -27,7 +27,9 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:24.2.0'
+    compile 'com.android.support:recyclerview-v7:24.2.0'
     compile 'com.android.support:design:24.2.0'
+
     compile 'com.google.android.gms:play-services-maps:9.4.0'
     compile 'com.google.android.gms:play-services-places:9.4.0'
     compile 'com.google.android.gms:play-services-fitness:9.4.0'
@@ -47,6 +49,7 @@ dependencies {
     compile 'org.apmem.tools:layouts:1.10@aar'
     compile 'com.koushikdutta.ion:ion:2.1.8'
     compile 'io.nlopez.smartlocation:library:3.2.5'
+    compile 'com.github.ybq:Android-SpinKit:1.0.5'
 
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }

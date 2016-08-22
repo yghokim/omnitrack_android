@@ -18,6 +18,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTItemBuilder
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
+import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.AInputView
@@ -265,8 +266,12 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
 
         inner class ViewHolder(val inputView: AAttributeInputView<out Any>, val frame: View) : RecyclerView.ViewHolder(frame) {
 
-            private lateinit var columnNameView: TextView
-            private lateinit var attributeTypeView: TextView
+            private val columnNameView: TextView
+            private val attributeTypeView: TextView
+
+            private val container: LockableFrameLayout
+
+            private val indicatorInContainer: View
 
             private var attributeId: String? = null
 
@@ -274,8 +279,10 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
             init {
                 columnNameView = frame.findViewById(R.id.title) as TextView
                 attributeTypeView = frame.findViewById(R.id.ui_attribute_type) as TextView
-                val container = frame.findViewById(R.id.ui_input_view_container) as ViewGroup
-                container.addView(inputView)
+                container = frame.findViewById(R.id.ui_input_view_container) as LockableFrameLayout
+                container.addView(inputView, 0)
+
+                indicatorInContainer = frame.findViewById(R.id.ui_container_indicator)
 
                 inputView.valueChanged += {
                     sender, args ->
@@ -307,9 +314,26 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
                     inputView.value
                 }
 
+                val state = builder.getAttributeValueState(adapterPosition)
+
+                if (state == OTItemBuilder.EAttributeValueState.Idle) {
+                    container.locked = false
+                    inputView.alpha = 1.0f
+                } else {
+                    container.locked = true
+                    inputView.alpha = 0.12f
+                }
+
                 when (builder.getAttributeValueState(adapterPosition)) {
-                    OTItemBuilder.EAttributeValueState.Idle -> itemView.alpha = 1.0f
-                    OTItemBuilder.EAttributeValueState.Loading -> itemView.alpha = 0.2f
+                    OTItemBuilder.EAttributeValueState.Idle -> {
+                        indicatorInContainer.visibility = View.GONE
+                    }
+                    OTItemBuilder.EAttributeValueState.Processing -> {
+                        indicatorInContainer.visibility = View.VISIBLE
+                    }
+                    OTItemBuilder.EAttributeValueState.GettingExternalValue -> {
+                        indicatorInContainer.visibility = View.VISIBLE
+                    }
                 }
 
                 inputView.onResume()
