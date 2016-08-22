@@ -40,7 +40,7 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
         set(value) {
             if (field != value) {
                 field = value
-                fitToValueLocation()
+                fitToValueLocation(false)
                 onValueChanged(value)
                 //addressView.text = value.getAddress(context)?.getAddressLine(0)
                 reserveAddressChange(value)
@@ -157,7 +157,7 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
         } else if (view === zoomOutButton) {
             googleMap?.animateCamera(CameraUpdateFactory.zoomBy(-1.0f))
         } else if (view === fitButton) {
-            fitToValueLocation()
+            fitToValueLocation(animate = true)
         } else if (view === adjustButton) {
             isAdjustMode = true
         } else if (view === adjustOkButton) {
@@ -170,7 +170,7 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
         } else if (view === adjustCancelButton) {
             isAdjustMode = false
             reserveAddressChange(value)
-            fitToValueLocation()
+            fitToValueLocation(animate = true)
         } else if (view === searchButton) {
             val activity = getActivity()
             if (activity != null) {
@@ -192,9 +192,16 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
         } else return false
     }
 
-    private fun fitToValueLocation() {
+    private fun fitToValueLocation(animate: Boolean) {
         if (googleMap != null) {
-            googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(value, 14.0f));
+
+            val update = CameraUpdateFactory.newLatLngZoom(value, 14.0f)
+
+            if (animate) {
+                googleMap?.animateCamera(update);
+            } else {
+                googleMap?.moveCamera(update);
+            }
 
             if (valueMarker == null) {
                 valueMarker = googleMap?.addMarker(MarkerOptions().position(value).draggable(false))
@@ -267,7 +274,7 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
 
         this.googleMap?.setOnCameraIdleListener(this)
 
-        fitToValueLocation()
+        fitToValueLocation(false)
     }
 
 
