@@ -6,7 +6,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.*
 import android.widget.PopupMenu
 import android.widget.TextView
-import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
@@ -57,10 +57,10 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
         super.onStart()
 
         items.clear()
-        if (intent.getStringExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER) != null) {
-            tracker = OmniTrackApplication.app.currentUser.trackers.filter { it.objectId == intent.getStringExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER) }.first()
+        if (intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER) != null) {
+            tracker = OTApplication.app.currentUser.trackers.filter { it.objectId == intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER) }.first()
 
-            OmniTrackApplication.app.dbHelper.getItems(tracker!!, items)
+            OTApplication.app.dbHelper.getItems(tracker!!, items)
 
             onItemListChanged()
         }
@@ -92,7 +92,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
     override fun onToolbarRightButtonClicked() {
         if (tracker != null) {
-            startActivity(NewItemActivity.makeIntent(tracker!!.objectId, this))
+            startActivity(ItemEditingActivity.makeIntent(tracker!!.objectId, this))
         }
     }
 
@@ -168,11 +168,12 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                 println(p0.itemId)
                 when (p0.itemId) {
                     R.id.action_edit -> {
+                        startActivity(ItemEditingActivity.makeIntent(items[adapterPosition], tracker!!, this@ItemBrowserActivity))
                         return true
                     }
                     R.id.action_remove -> {
                         DialogHelper.makeYesNoDialogBuilder(this@ItemBrowserActivity, "OmniTrack", resources.getString(R.string.msg_item_remove_confirm), {
-                            OmniTrackApplication.app.dbHelper.deleteObjects(DatabaseHelper.ItemScheme, items[adapterPosition].dbId!!)
+                            OTApplication.app.dbHelper.deleteObjects(DatabaseHelper.ItemScheme, items[adapterPosition].dbId!!)
                             items.removeAt(adapterPosition)
                             onItemRemoved(adapterPosition)
                         }).show()

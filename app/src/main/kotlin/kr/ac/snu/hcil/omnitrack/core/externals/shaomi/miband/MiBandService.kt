@@ -6,7 +6,7 @@ import android.content.Context
 import com.zhaoxiaodan.miband.ActionCallback
 import com.zhaoxiaodan.miband.MiBand
 import com.zhaoxiaodan.miband.model.UserInfo
-import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.utils.AsyncTaskWithResultHandler
@@ -37,7 +37,7 @@ object MiBandService : OTExternalService("ShaomiMiBand", 21) {
     private var device: BluetoothDevice? = null
 
     val band: MiBand by lazy {
-        MiBand(OmniTrackApplication.app)
+        MiBand(OTApplication.app)
     }
 
     override fun onActivateAsync(context: Context, connectedHandler: ((Boolean) -> Unit)?) {
@@ -50,14 +50,14 @@ object MiBandService : OTExternalService("ShaomiMiBand", 21) {
     }
 
     private fun storeDeviceMac(address: String) {
-        val pref = OmniTrackApplication.app.getSharedPreferences(PREFERENCE_KEY, Context.MODE_PRIVATE)
+        val pref = OTApplication.app.getSharedPreferences(PREFERENCE_KEY, Context.MODE_PRIVATE)
         val editor = pref.edit()
         editor.putString(PREFERENCE_VALUE_MAC, address)
         editor.apply()
     }
 
     private fun restoreDeviceMac(): String? {
-        val pref = OmniTrackApplication.app.getSharedPreferences(PREFERENCE_KEY, Context.MODE_PRIVATE)
+        val pref = OTApplication.app.getSharedPreferences(PREFERENCE_KEY, Context.MODE_PRIVATE)
         if (pref.contains(PREFERENCE_VALUE_MAC)) {
             return pref.getString(PREFERENCE_VALUE_MAC, "")
         } else return null

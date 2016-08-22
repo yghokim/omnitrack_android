@@ -375,6 +375,13 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         return count
     }
 
+    fun getItem(id: Long, tracker: OTTracker): OTItem? {
+        val cursor = readableDatabase.query(ItemScheme.tableName, ItemScheme.columnNames, "${ItemScheme._ID}=?", arrayOf(id.toString()), null, null, null, "1")
+        if (cursor.moveToFirst()) {
+            return extractItemEntity(cursor, tracker)
+        } else return null
+    }
+
 
     fun extractItemEntity(cursor: Cursor, tracker: OTTracker): OTItem {
         val id = cursor.getLong(cursor.getColumnIndex(ItemScheme._ID))

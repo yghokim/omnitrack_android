@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core
 
 import com.google.gson.Gson
-import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.database.IDatabaseStorable
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializedStringKeyEntry
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
@@ -62,6 +62,6 @@ class OTItem : ADataRow, IDatabaseStorable {
     }
 
     override fun toString(): String {
-        return "Item for [${OmniTrackApplication.app.currentUser[trackerObjectId]?.name}] ${super.toString()}"
+        return "Item for [${OTApplication.app.currentUser[trackerObjectId]?.name}] ${super.toString()}"
     }
 }

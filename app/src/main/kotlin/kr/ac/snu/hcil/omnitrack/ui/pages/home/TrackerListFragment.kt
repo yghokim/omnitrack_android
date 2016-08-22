@@ -17,14 +17,14 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
-import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.DrawableListBottomSpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemBrowserActivity
-import kr.ac.snu.hcil.omnitrack.ui.pages.items.NewItemActivity
+import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemEditingActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.tracker.TrackerDetailActivity
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.startActivityOnDelay
@@ -66,7 +66,7 @@ class TrackerListFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        user = OmniTrackApplication.app.currentUser
+        user = OTApplication.app.currentUser
 
         //attach events
         // user.trackerAdded += onTrackerAddedHandler
@@ -84,7 +84,7 @@ class TrackerListFragment : Fragment() {
 
         val fab = rootView.findViewById(R.id.fab) as FloatingActionButton?
         fab!!.setOnClickListener { view ->
-            val newTracker = OmniTrackApplication.app.currentUser.newTrackerWithDefaultName(context, true)
+            val newTracker = OTApplication.app.currentUser.newTrackerWithDefaultName(context, true)
 
             startActivityOnDelay(TrackerDetailActivity.makeIntent(newTracker.objectId, context))
             Toast.makeText(context,
@@ -130,7 +130,7 @@ class TrackerListFragment : Fragment() {
 
     private fun handleTrackerClick(tracker: OTTracker)
     {
-        startActivityOnDelay(NewItemActivity.makeIntent(tracker.objectId, context))
+        startActivityOnDelay(ItemEditingActivity.makeIntent(tracker.objectId, context))
     }
 
     private fun handleTrackerLongClick(tracker: OTTracker)
@@ -142,7 +142,7 @@ class TrackerListFragment : Fragment() {
             when(which) {
                 CHANGE_TRACKER_SETTINGS -> {
                     val intent = Intent(context, TrackerDetailActivity::class.java)
-                    intent.putExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
+                    intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
                     startActivityOnDelay(intent)
 
                 }
@@ -219,7 +219,7 @@ class TrackerListFragment : Fragment() {
                     startActivityOnDelay(TrackerDetailActivity.makeIntent(user.trackers[adapterPosition].objectId, this@TrackerListFragment.context))
                 } else if (view === listButton) {
                     val intent = Intent(context, ItemBrowserActivity::class.java)
-                    intent.putExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, user.trackers[adapterPosition].objectId)
+                    intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, user.trackers[adapterPosition].objectId)
                     startActivityOnDelay(intent)
                 } else if (view === removeButton) {
                     val tracker = user.trackers[adapterPosition]

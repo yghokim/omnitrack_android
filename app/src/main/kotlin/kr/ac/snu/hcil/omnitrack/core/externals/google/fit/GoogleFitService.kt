@@ -6,7 +6,7 @@ import android.os.Bundle
 import com.google.android.gms.common.api.Api
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.common.api.Scope
-import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
@@ -151,7 +151,7 @@ object GoogleFitService : OTExternalService("GoogleFitService", 19) {
         }
     }
 
-    private fun buildClientBuilderBase(context: Context = OmniTrackApplication.app): GoogleApiClient.Builder {
+    private fun buildClientBuilderBase(context: Context = OTApplication.app): GoogleApiClient.Builder {
         val builder = GoogleApiClient.Builder(context)
 
         for (api in usedApis) {

@@ -12,8 +12,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
-import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilder
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
@@ -27,15 +28,28 @@ import java.util.*
 /**
  * Created by younghokim on 16. 7. 24..
  */
-class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item), OTItemBuilder.AttributeStateChangedListener {
+class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_item), OTItemBuilder.AttributeStateChangedListener {
 
     companion object {
 
         fun makeIntent(trackerId: String, context: Context): Intent {
-            val intent = Intent(context, NewItemActivity::class.java)
-            intent.putExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
+            val intent = Intent(context, ItemEditingActivity::class.java)
+            intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
             return intent
         }
+
+        fun makeIntent(item: OTItem, tracker: OTTracker, context: Context): Intent {
+
+            val intent = Intent(context, ItemEditingActivity::class.java)
+            intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
+            intent.putExtra(OTApplication.INTENT_EXTRA_DB_ID_ITEM, item.dbId)
+            return intent
+        }
+    }
+
+
+    private enum class Mode {
+        Edit, New
     }
 
     private val attributeListAdapter = AttributeListAdapter()
@@ -50,6 +64,8 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
     private val attributeValueExtractors = Hashtable<String, () -> Any>()
 
     private var skipViewValueCaching = false
+
+    private var mode: Mode = Mode.New
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,19 +86,33 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
 
         attributeValueExtractors.clear()
 
-        val trackerId = intent.getStringExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
+        val trackerId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
         if (trackerId != null) {
-            tracker = OmniTrackApplication.app.currentUser.trackers.unObservedList.find { it.objectId == trackerId }
+            tracker = OTApplication.app.currentUser.trackers.unObservedList.find { it.objectId == trackerId }
+
             if (tracker != null) {
                 title = String.format(resources.getString(R.string.title_activity_new_item), tracker?.name)
 
-                if (tryRestoreItemBuilderCache(tracker!!)) {
-                    Toast.makeText(this, "Past inputs were restored.", Toast.LENGTH_SHORT).show()
+                if (intent.hasExtra(OTApplication.INTENT_EXTRA_DB_ID_ITEM)) {
+                    //contains item. Edit mode
+                    val item = OTApplication.app.dbHelper.getItem(intent.getLongExtra(OTApplication.INTENT_EXTRA_DB_ID_ITEM, -1), tracker!!)
+                    if (item != null) {
+                        mode = Mode.Edit
+                        println("started activity with edit mode")
+                        builder = OTItemBuilder(item, tracker!!)
+                    } else mode = Mode.New
                 } else {
-                    //new builder was created
+                    mode = Mode.New
+                }
 
-                    builder.autoCompleteAsync(this) {
-                        attributeListAdapter.notifyDataSetChanged()
+                if (mode == Mode.New) {
+                    if (tryRestoreItemBuilderCache(tracker!!)) {
+                        Toast.makeText(this, "Past inputs were restored.", Toast.LENGTH_SHORT).show()
+                    } else {
+                        //new builder was created
+                        builder.autoCompleteAsync(this) {
+                            attributeListAdapter.notifyDataSetChanged()
+                        }
                     }
                 }
             }
@@ -92,19 +122,23 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
 
     override fun onResume() {
         super.onResume()
-        if (tracker == null) {
-            tryRestoreItemBuilderCache(tracker!!)
+        if (mode == Mode.New) {
+            if (tracker == null) {
+                tryRestoreItemBuilderCache(tracker!!)
+            }
         }
     }
 
     override fun onPause() {
         super.onPause()
-        if (!skipViewValueCaching) {
-            storeItemBuilderCache()
-            Toast.makeText(this, "Filled form content was stored.", Toast.LENGTH_SHORT).show()
+        if (mode == Mode.New) {
+            if (!skipViewValueCaching) {
+                storeItemBuilderCache()
+                Toast.makeText(this, "Filled form content was stored.", Toast.LENGTH_SHORT).show()
 
-        } else {
-            skipViewValueCaching = false
+            } else {
+                skipViewValueCaching = false
+            }
         }
     }
 
@@ -140,7 +174,7 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
             val item = builder.makeItem()
             println("Will push $item")
 
-            OmniTrackApplication.app.dbHelper.save(item, tracker!!)
+            OTApplication.app.dbHelper.save(item, tracker!!)
             builder.clear()
             println(builder.getSerializedString())
             clearBuilderCache()
@@ -154,39 +188,39 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
     }
 
     private fun syncViewStateToBuilderAsync(finished: (() -> Unit)?) {
-            var waitingAttributes = ArrayList<OTAttribute<out Any>>()
-            for (attribute in tracker!!.attributes.unObservedList) {
-                val valueExtractor = attributeValueExtractors[attribute.objectId]
-                if (valueExtractor != null) {
-                    builder.setValueOf(attribute, valueExtractor())
-                } else {
-                    waitingAttributes.add(attribute)
-                }
+        var waitingAttributes = ArrayList<OTAttribute<out Any>>()
+        for (attribute in tracker!!.attributes.unObservedList) {
+            val valueExtractor = attributeValueExtractors[attribute.objectId]
+            if (valueExtractor != null) {
+                builder.setValueOf(attribute, valueExtractor())
+            } else {
+                waitingAttributes.add(attribute)
             }
+        }
 
-            var remain = waitingAttributes.size
+        var remain = waitingAttributes.size
         if (remain == 0) {
             finished?.invoke()
             return
         }
 
-            for (attribute in waitingAttributes) {
-                attribute.getAutoCompleteValueAsync {
-                    result ->
-                    remain--
-                    builder.setValueOf(attribute, result)
+        for (attribute in waitingAttributes) {
+            attribute.getAutoCompleteValueAsync {
+                result ->
+                remain--
+                builder.setValueOf(attribute, result)
 
-                    if (remain == 0) {
-                        //finish
-                        finished?.invoke()
-                    }
+                if (remain == 0) {
+                    //finish
+                    finished?.invoke()
                 }
             }
+        }
     }
 
     private fun clearBuilderCache() {
         if (tracker != null) {
-            val preferences = getSharedPreferences(OmniTrackApplication.PREFERENCE_KEY_FOREGROUND_ITEM_BUILDER_STORAGE, Context.MODE_PRIVATE)
+            val preferences = getSharedPreferences(OTApplication.PREFERENCE_KEY_FOREGROUND_ITEM_BUILDER_STORAGE, Context.MODE_PRIVATE)
             val editor = preferences.edit();
             editor.remove(makeTrackerPreferenceKey(tracker!!))
             editor.apply()
@@ -199,7 +233,7 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
             syncViewStateToBuilderAsync {
                 if (!builder.isEmpty) {
 
-                    val preferences = getSharedPreferences(OmniTrackApplication.PREFERENCE_KEY_FOREGROUND_ITEM_BUILDER_STORAGE, Context.MODE_PRIVATE)
+                    val preferences = getSharedPreferences(OTApplication.PREFERENCE_KEY_FOREGROUND_ITEM_BUILDER_STORAGE, Context.MODE_PRIVATE)
                     val editor = preferences.edit()
                     editor.putString(makeTrackerPreferenceKey(tracker!!), builder.getSerializedString())
                     editor.apply()
@@ -210,7 +244,7 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
     }
 
     private fun tryRestoreItemBuilderCache(tracker: OTTracker): Boolean {
-        val preferences = getSharedPreferences(OmniTrackApplication.PREFERENCE_KEY_FOREGROUND_ITEM_BUILDER_STORAGE, Context.MODE_PRIVATE)
+        val preferences = getSharedPreferences(OTApplication.PREFERENCE_KEY_FOREGROUND_ITEM_BUILDER_STORAGE, Context.MODE_PRIVATE)
         val serialized = preferences.getString(makeTrackerPreferenceKey(tracker), null)
         if (serialized != null) {
             println("stored ItemBuilder was restored.")
@@ -254,9 +288,9 @@ class NewItemActivity : MultiButtonActionBarActivity(R.layout.activity_new_item)
 
         override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
 
-            val frame = LayoutInflater.from(this@NewItemActivity).inflate(R.layout.attribute_input_frame, parent, false);
+            val frame = LayoutInflater.from(this@ItemEditingActivity).inflate(R.layout.attribute_input_frame, parent, false);
 
-            val inputView = AAttributeInputView.makeInstance(viewType, this@NewItemActivity)
+            val inputView = AAttributeInputView.makeInstance(viewType, this@ItemEditingActivity)
             inputViews.add(inputView)
 
             inputView.onCreate(null)

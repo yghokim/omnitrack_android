@@ -2,7 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.attributes
 
 import android.content.Context
 import android.view.View
-import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTBooleanProperty
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTChoiceEntryListProperty
@@ -25,7 +25,7 @@ class OTChoiceAttribute(objectId: String?, dbId: Long?, columnName: String, prop
         val PREVIEW_ENTRIES: Array<UniqueStringEntryList.Entry>
 
         init {
-            PREVIEW_ENTRIES = OmniTrackApplication.app.resources.getStringArray(R.array.choice_preview_entries).mapIndexed {
+            PREVIEW_ENTRIES = OTApplication.app.resources.getStringArray(R.array.choice_preview_entries).mapIndexed {
                 i, s ->
                 UniqueStringEntryList.Entry(i, s)
             }.toTypedArray()

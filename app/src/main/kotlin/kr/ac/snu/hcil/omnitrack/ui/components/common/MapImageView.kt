@@ -5,7 +5,7 @@ import android.net.Uri
 import android.util.AttributeSet
 import android.widget.ImageView
 import com.google.android.gms.maps.model.LatLng
-import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.database.CacheHelper
 
 /**
@@ -16,7 +16,7 @@ class MapImageView : ImageView, CacheHelper.ICachedBitmapListener /*FutureCallba
     companion object {
 
         fun makeGoogleMapQuery(location: LatLng, zoom: Int, width: Int, height: Int): String {
-            return "https://maps.googleapis.com/maps/api/staticmap?center=${location.latitude},${location.longitude}&zoom=$zoom&size=${width / 3}x${height / 3}&markers=size:small|${location.latitude},${location.longitude}&scale=2&key=${OmniTrackApplication.app.googleApiKey}"
+            return "https://maps.googleapis.com/maps/api/staticmap?center=${location.latitude},${location.longitude}&zoom=$zoom&size=${width / 3}x${height / 3}&markers=size:small|${location.latitude},${location.longitude}&scale=2&key=${OTApplication.app.googleApiKey}"
         }
     }
 
@@ -83,7 +83,7 @@ class MapImageView : ImageView, CacheHelper.ICachedBitmapListener /*FutureCallba
                 ongoingWidth = width
                 ongoingHeight = height
 
-                OmniTrackApplication.app.cacheHelper.downloadBitmapAsync(this.context,
+                OTApplication.app.cacheHelper.downloadBitmapAsync(this.context,
                         makeGoogleMapQuery(location, zoom, width, height),
                         this)
                 /*

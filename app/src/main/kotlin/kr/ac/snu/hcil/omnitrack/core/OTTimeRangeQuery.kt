@@ -1,6 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core
 
-import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeSpanAttribute
 import kr.ac.snu.hcil.omnitrack.utils.serialization.ATypedQueueSerializable
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableTypedQueue
@@ -53,7 +53,7 @@ class OTTimeRangeQuery : ATypedQueueSerializable() {
             binOffset = typedQueue.getInt()
         } else if (mode == TYPE_LINK_TIMESPAN) {
             val attrId = typedQueue.getString()
-            linkedAttribute = OmniTrackApplication.app.currentUser.findAttributeByObjectId(attrId) as OTTimeSpanAttribute
+            linkedAttribute = OTApplication.app.currentUser.findAttributeByObjectId(attrId) as OTTimeSpanAttribute
         }
     }
 

@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core
 
 import android.content.Context
-import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.utils.DefaultNameGenerator
@@ -80,12 +80,12 @@ class OTUser(objectId: String?, dbId: Long?, name: String, email: String, attrib
     }
 
     fun newTrackerWithDefaultName(context: Context, add: Boolean): OTTracker {
-        return newTracker(OmniTrackApplication.app.currentUser.generateNewTrackerName(context), add)
+        return newTracker(OTApplication.app.currentUser.generateNewTrackerName(context), add)
     }
 
     fun newTracker(name: String, add: Boolean): OTTracker {
         val tracker = OTTracker(name)
-        val unOccupied = OmniTrackApplication.app.colorPalette.filter {
+        val unOccupied = OTApplication.app.colorPalette.filter {
             color ->
             trackers.unObservedList.find {
                 tracker ->
@@ -96,7 +96,7 @@ class OTUser(objectId: String?, dbId: Long?, name: String, email: String, attrib
         tracker.color = if (unOccupied.size > 0) {
             unOccupied.first()
         } else {
-            OmniTrackApplication.app.colorPalette.first()
+            OTApplication.app.colorPalette.first()
         }
 
         if (add) {

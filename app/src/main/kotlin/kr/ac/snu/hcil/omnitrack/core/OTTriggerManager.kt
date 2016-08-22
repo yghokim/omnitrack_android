@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core
 
 import android.widget.Toast
-import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
 import java.util.*
@@ -32,7 +32,7 @@ class OTTriggerManager(val user: OTUser) {
 
             triggers.forEach {
                 it.fired += triggerFiredHandler
-                it.activateOnSystem(OmniTrackApplication.app.applicationContext)
+                it.activateOnSystem(OTApplication.app.applicationContext)
             }
         }
     }
@@ -76,7 +76,7 @@ class OTTriggerManager(val user: OTUser) {
             trigger.fired += triggerFiredHandler
 
             if (trigger.isOn) {
-                trigger.activateOnSystem(OmniTrackApplication.app.applicationContext)
+                trigger.activateOnSystem(OTApplication.app.applicationContext)
             }
 
             if (_removedTriggerIds.contains(trigger.dbId)) {
@@ -113,8 +113,8 @@ class OTTriggerManager(val user: OTUser) {
             OTTrigger.ACTION_BACKGROUND_LOGGING -> {
                 println("trigger fired - loggin in background")
 
-                Toast.makeText(OmniTrackApplication.app, "Logged!", Toast.LENGTH_SHORT).show()
-                OTBackgroundLoggingService.startLogging(OmniTrackApplication.app, trigger.tracker)
+                Toast.makeText(OTApplication.app, "Logged!", Toast.LENGTH_SHORT).show()
+                OTBackgroundLoggingService.startLogging(OTApplication.app, trigger.tracker)
             }
             OTTrigger.ACTION_NOTIFICATION -> {
                 println("trigger fired - send notification")

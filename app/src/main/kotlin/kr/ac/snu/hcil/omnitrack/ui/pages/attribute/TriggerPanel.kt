@@ -10,7 +10,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.Switch
 import android.widget.TextView
-import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
@@ -64,14 +64,14 @@ class TriggerPanel : FrameLayout {
 
         newTriggerButton.setOnClickListener {
             if (tracker != null) {
-                OmniTrackApplication.app.triggerManager.putNewTrigger(OTTrigger.makeInstance(OTTrigger.TYPE_PERIODIC, "Trigger ${System.currentTimeMillis()}", tracker!!))
+                OTApplication.app.triggerManager.putNewTrigger(OTTrigger.makeInstance(OTTrigger.TYPE_PERIODIC, "Trigger ${System.currentTimeMillis()}", tracker!!))
                 notifyTriggerSetChanged()
             }
         }
 
         findViewById(R.id.ui_button_remove_trigger).setOnClickListener {
             if (tracker != null) {
-                OmniTrackApplication.app.triggerManager.removeTrigger(getTriggers().last())
+                OTApplication.app.triggerManager.removeTrigger(getTriggers().last())
                 notifyTriggerSetChanged()
             }
         }
@@ -83,12 +83,12 @@ class TriggerPanel : FrameLayout {
     }
 
     private fun getTriggers(): Array<OTTrigger> {
-        return OmniTrackApplication.app.triggerManager.getAttachedTriggers(tracker!!)
+        return OTApplication.app.triggerManager.getAttachedTriggers(tracker!!)
     }
 
     fun notifyTriggerSetChanged() {
 
-        summaryView.text = "${OmniTrackApplication.app.triggerManager.getAttachedTriggers(tracker!!).size} Triggers"
+        summaryView.text = "${OTApplication.app.triggerManager.getAttachedTriggers(tracker!!).size} Triggers"
 
         adapter.notifyDataSetChanged()
     }

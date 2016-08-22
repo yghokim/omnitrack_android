@@ -17,7 +17,7 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import jp.wasabeef.recyclerview.animators.SlideInRightAnimator
-import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.AttributePresetInfo
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
@@ -179,7 +179,7 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
 
     fun openAttributeDetailActivity(position: Int) {
         val intent = Intent(activity, AttributeDetailActivity::class.java)
-        intent.putExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_ATTRIBUTE, tracker!!.attributes[position].objectId)
+        intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ATTRIBUTE, tracker!!.attributes[position].objectId)
         startActivityOnDelay(intent)
     }
 
@@ -329,11 +329,11 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.bind(OmniTrackApplication.app.supportedAttributePresets[position])
+            holder.bind(OTApplication.app.supportedAttributePresets[position])
         }
 
         override fun getItemCount(): Int {
-            return OmniTrackApplication.app.supportedAttributePresets.size
+            return OTApplication.app.supportedAttributePresets.size
         }
 
         override fun getItemId(position: Int): Long {
@@ -350,8 +350,8 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
                 typeIcon = view.findViewById(R.id.type_icon) as ImageView
 
                 view.setOnClickListener {
-                    val typeInfo = OmniTrackApplication.app.supportedAttributePresets[adapterPosition]
-                    tracker.attributes.add(typeInfo.creater(OmniTrackApplication.app.currentUser, tracker.generateNewAttributeName(typeInfo.name, context)))
+                    val typeInfo = OTApplication.app.supportedAttributePresets[adapterPosition]
+                    tracker.attributes.add(typeInfo.creater(OTApplication.app.currentUser, tracker.generateNewAttributeName(typeInfo.name, context)))
 
                     attributeListAdapter.notifyItemInserted(tracker.attributes.size - 1)
                     scrollToBottomReserved = true

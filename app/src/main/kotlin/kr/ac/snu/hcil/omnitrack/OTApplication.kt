@@ -14,16 +14,18 @@ import kr.ac.snu.hcil.omnitrack.utils.UniqueStringEntryList
  * Created by Young-Ho Kim on 2016-07-11.
  */
 
-class OmniTrackApplication : Application() {
+class OTApplication : Application() {
 
     companion object {
-        lateinit var app: OmniTrackApplication
+        lateinit var app: OTApplication
             private set
 
         const val INTENT_EXTRA_OBJECT_ID_TRACKER = "trackerObjectId"
         const val INTENT_EXTRA_OBJECT_ID_ATTRIBUTE = "attributeObjectId"
         const val INTENT_EXTRA_OBJECT_ID_USER = "userObjectId"
         const val INTENT_EXTRA_OBJECT_ID_TRIGGER = "triggerObjectId"
+        const val INTENT_EXTRA_DB_ID_ITEM = "itemDbId"
+
 
         const val INTENT_EXTRA_ITEMBUILDER = "itemBuilderId"
 

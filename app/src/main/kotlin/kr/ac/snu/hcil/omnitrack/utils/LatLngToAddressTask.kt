@@ -4,7 +4,7 @@ import android.location.Address
 import android.os.AsyncTask
 import android.view.View
 import com.google.android.gms.maps.model.LatLng
-import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import net.daum.mf.map.api.MapPoint
 import net.daum.mf.map.api.MapReverseGeoCoder
 
@@ -24,7 +24,7 @@ class LatLngToAddressTask(private val listener: OnFinishListener, private val vi
     override fun doInBackground(vararg args: LatLng): String? {
         var googleAddress: Address? = null
         while (googleAddress == null) {
-            googleAddress = args.first().getAddress(OmniTrackApplication.app)
+            googleAddress = args.first().getAddress(OTApplication.app)
         }
 
         if (googleAddress.countryCode == "KR") {

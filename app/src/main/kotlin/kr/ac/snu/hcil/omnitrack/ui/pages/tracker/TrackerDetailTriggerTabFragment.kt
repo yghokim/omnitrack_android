@@ -8,7 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Switch
 import android.widget.TextView
-import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
@@ -43,7 +43,7 @@ class TrackerDetailTriggerTabFragment : TrackerDetailActivity.ChildFragment() {
     }*/
 
     private fun getTriggers(): Array<OTTrigger> {
-        return OmniTrackApplication.app.triggerManager.getAttachedTriggers(tracker)
+        return OTApplication.app.triggerManager.getAttachedTriggers(tracker)
     }
 
     fun openTriggerDetailActivity(triggerIndex: Int) {

@@ -5,7 +5,7 @@ import android.os.AsyncTask
 import com.google.android.gms.maps.model.LatLng
 import io.nlopez.smartlocation.OnLocationUpdatedListener
 import io.nlopez.smartlocation.SmartLocation
-import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
+import kr.ac.snu.hcil.omnitrack.OTApplication
 
 /**
  * Created by younghokim on 16. 8. 21..
@@ -17,10 +17,10 @@ class LocationRetrievalTask(val listener: (LatLng) -> Unit) : AsyncTask<Void?, V
 
     override fun doInBackground(vararg args: Void?): LatLng {
         location = null
-        SmartLocation.with(OmniTrackApplication.app).location().oneFix().start(this)
+        SmartLocation.with(OTApplication.app).location().oneFix().start(this)
         while (location == null && !isCancelled) {
             if (isCancelled) {
-                val last = SmartLocation.with(OmniTrackApplication.app).location().lastLocation
+                val last = SmartLocation.with(OTApplication.app).location().lastLocation
                 return LatLng(last?.latitude ?: 0.0, last?.longitude ?: 0.0)
             }
         }

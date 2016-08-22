@@ -2,7 +2,7 @@ package kr.ac.snu.hcil.omnitrack.ui.activities
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 
 /**
@@ -15,11 +15,11 @@ open class UserSyncedActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        user = (application as OmniTrackApplication).currentUser
+        user = (application as OTApplication).currentUser
     }
 
     override fun onPause() {
         super.onPause()
-        (application as OmniTrackApplication).syncUserToDb()
+        (application as OTApplication).syncUserToDb()
     }
 }

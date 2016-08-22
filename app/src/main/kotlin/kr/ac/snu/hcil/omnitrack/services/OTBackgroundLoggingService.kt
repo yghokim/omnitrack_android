@@ -1,9 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.services
 
 import android.app.IntentService
-import android.content.Intent
 import android.content.Context
-import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
+import android.content.Intent
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilder
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 
@@ -20,7 +20,7 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
         fun startLogging(context: Context, tracker: OTTracker) {
             val intent = Intent(context, OTBackgroundLoggingService::class.java)
             intent.action = ACTION_LOG
-            intent.putExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
+            intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
             context.startService(intent)
         }
     }
@@ -30,17 +30,17 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
         if (intent != null) {
             val action = intent.action
             if (ACTION_LOG == action) {
-                val trackerId = intent.getStringExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
+                val trackerId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
                 handleLogging(trackerId)
             }
         }
     }
 
     private fun handleLogging(trackerId: String) {
-        val tracker = OmniTrackApplication.app.currentUser[trackerId]
+        val tracker = OTApplication.app.currentUser[trackerId]
         if (tracker != null) {
             val builder = OTItemBuilder(tracker, OTItemBuilder.MODE_BACKGROUND)
-            OmniTrackApplication.app.dbHelper.save(builder.makeItem(), tracker)
+            OTApplication.app.dbHelper.save(builder.makeItem(), tracker)
         }
     }
 }

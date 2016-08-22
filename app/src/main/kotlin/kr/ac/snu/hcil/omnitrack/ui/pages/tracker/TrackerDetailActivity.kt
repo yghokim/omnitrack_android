@@ -13,7 +13,7 @@ import android.support.v4.graphics.ColorUtils
 import android.support.v4.view.ViewPager
 import android.view.View
 import at.markushi.ui.RevealColorView
-import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
@@ -26,7 +26,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
 
         fun makeIntent(trackerId: String, context: Context): Intent {
             val intent = Intent(context, TrackerDetailActivity::class.java)
-            intent.putExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
+            intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
             return intent
         }
     }
@@ -70,17 +70,17 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
         title = resources.getString(R.string.title_activity_tracker_edit)
 
         if (savedInstanceState != null) {
-            if (savedInstanceState.containsKey(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)) {
-                this.intent.putExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, savedInstanceState.getString(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER))
+            if (savedInstanceState.containsKey(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)) {
+                this.intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, savedInstanceState.getString(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER))
             }
 
             this.intent.putExtra(IS_EDIT_MODE, savedInstanceState.getBoolean(IS_EDIT_MODE, true))
         }
 
-        if (intent.getStringExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER) != null) {
+        if (intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER) != null) {
             //edit
             //instant update
-            val tracker = OmniTrackApplication.app.currentUser[intent.getStringExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)]
+            val tracker = OTApplication.app.currentUser[intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)]
 
             if (tracker != null) {
                 this.tracker = tracker
@@ -105,7 +105,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putString(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
+        outState.putString(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
         outState.putBoolean(IS_EDIT_MODE, true)
     }
 
@@ -117,7 +117,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
             child.value.onClose()
         }*/
 
-        OmniTrackApplication.app.syncUserToDb()
+        OTApplication.app.syncUserToDb()
     }
 
     override fun onStart(){
@@ -137,7 +137,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
                 tracker.name = namePropertyView.value
                 tracker.color = colorPropertyView.value
 
-                if (!isEditMode) OmniTrackApplication.app.currentUser.trackers.add(tracker)
+                if (!isEditMode) OTApplication.app.currentUser.trackers.add(tracker)
                 finish()
             }*/
     }
@@ -187,11 +187,11 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
             super.onViewCreated(view, savedInstanceState)
 
             val args = arguments
-            val trackerObjectId = args.getString(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
+            val trackerObjectId = args.getString(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
 
             isEditMode = args.getBoolean(IS_EDIT_MODE, true)
             if (trackerObjectId != null) {
-                tracker = OmniTrackApplication.app.currentUser[trackerObjectId]!!
+                tracker = OTApplication.app.currentUser[trackerObjectId]!!
             }
         }
     }
@@ -214,7 +214,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
         override fun getItem(position: Int): Fragment {
 
             val bundle = Bundle()
-            bundle.putString(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
+            bundle.putString(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
             bundle.putBoolean(IS_EDIT_MODE, isEditMode)
 
             val fragment =

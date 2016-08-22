@@ -4,8 +4,7 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.os.SystemClock
-import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.receivers.OTSystemReceiver
@@ -28,9 +27,9 @@ class OTPeriodicTrigger : OTTrigger {
 
     private fun makeIntent(context: Context, alarmId: Int): PendingIntent {
         val intent = Intent(context, OTSystemReceiver::class.java)
-        intent.action = OmniTrackApplication.BROADCAST_ACTION_ALARM
-        intent.putExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_TRIGGER, this.objectId)
-        intent.putExtra(OmniTrackApplication.INTENT_EXTRA_OBJECT_ID_USER, OmniTrackApplication.app.currentUser.objectId)
+        intent.action = OTApplication.BROADCAST_ACTION_ALARM
+        intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRIGGER, this.objectId)
+        intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_USER, OTApplication.app.currentUser.objectId)
 
         return PendingIntent.getBroadcast(context, alarmId, intent, 0)
     }
@@ -56,9 +55,9 @@ class OTPeriodicTrigger : OTTrigger {
 
             println("next alarm will be fired at $nextAlarmTime")
 
-            val alarmManager = OmniTrackApplication.app.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            val alarmManager = OTApplication.app.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-            alarmManager.set(AlarmManager.RTC, nextAlarmTime, makeIntent(OmniTrackApplication.app, 0))
+            alarmManager.set(AlarmManager.RTC, nextAlarmTime, makeIntent(OTApplication.app, 0))
             return true
         } else {
             return false
@@ -74,8 +73,8 @@ class OTPeriodicTrigger : OTTrigger {
     }
 
     override fun handleOff() {
-        val alarmManager = OmniTrackApplication.app.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val alarmManager = OTApplication.app.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-        alarmManager.cancel(makeIntent(OmniTrackApplication.app, 0))
+        alarmManager.cancel(makeIntent(OTApplication.app, 0))
     }
 }

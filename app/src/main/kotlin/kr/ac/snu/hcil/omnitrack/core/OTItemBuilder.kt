@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core
 
 import com.google.gson.Gson
-import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.utils.serialization.IStringSerializable
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializedStringKeyEntry
@@ -66,13 +66,6 @@ class OTItemBuilder : ADataRow, IStringSerializable {
 
         if (mode == MODE_BACKGROUND)
             autoCompleteAsync()
-    }
-
-    @SuppressWarnings("NotUsed")
-    constructor(trackerId: String, mode: Int) {
-        this.mode = mode
-        connectedItemDbId = -1
-        reloadTracker(trackerId)
     }
 
     /**
@@ -191,7 +184,7 @@ class OTItemBuilder : ADataRow, IStringSerializable {
     }
 
     fun reloadTracker(trackerObjectId: String) {
-        setTracker(OmniTrackApplication.app.currentUser[trackerObjectId]!!)
+        setTracker(OTApplication.app.currentUser[trackerObjectId]!!)
         syncFromTrackerScheme()
     }
 
@@ -227,6 +220,9 @@ class OTItemBuilder : ADataRow, IStringSerializable {
 
     fun makeItem(): OTItem {
         val item = OTItem(tracker.objectId)
+        if (!connectedItemDbId.equals(-1)) {
+            item.dbId = connectedItemDbId
+        }
 
         for (attribute in tracker.attributes) {
             if (hasValueOf(attribute)) {

@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.support.v4.app.Fragment
-import kr.ac.snu.hcil.omnitrack.OmniTrackApplication
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.externals.device.AndroidDeviceService
 import kr.ac.snu.hcil.omnitrack.core.externals.google.fit.GoogleFitService
 import kr.ac.snu.hcil.omnitrack.core.externals.microsoft.band.MicrosoftBandService
@@ -32,7 +32,7 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
         }
 
         private val preferences: SharedPreferences
-            get() = OmniTrackApplication.app.getSharedPreferences("ExternalServices", Context.MODE_PRIVATE)
+            get() = OTApplication.app.getSharedPreferences("ExternalServices", Context.MODE_PRIVATE)
 
 
         init {
@@ -67,7 +67,7 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
     open val permissionGranted: Boolean
         get() {
             for (permission in requiredPermissionsRecursive) {
-                if (OmniTrackApplication.app.checkCallingOrSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
+                if (OTApplication.app.checkCallingOrSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
                     return false
                 }
             }
