@@ -1,0 +1,31 @@
+package kr.ac.snu.hcil.omnitrack.utils
+
+/**
+ * Created by younghokim on 16. 8. 23..
+ */
+object BitwiseOperationHelper {
+
+
+    fun setBooleanAt(integer: Int, value: Boolean, leftShift: Int): Int {
+        if (value == true) {
+            return integer or (0b1 shl leftShift)
+        } else {
+            return integer and (0b1 shl leftShift).inv()
+        }
+    }
+
+    fun getBooleanAt(integer: Int, shift: Int): Boolean {
+        return ((integer shr shift) or 1) == 1
+    }
+
+    fun getIntAt(integer: Int, shift: Int, mask: Int): Int {
+
+        return ((integer shr shift) or mask)
+    }
+
+    fun setIntAt(integer: Int, value: Int, shift: Int, mask: Int): Int {
+        val cleared = integer and (mask shl shift).inv()
+        return cleared or (value shl shift)
+    }
+
+}

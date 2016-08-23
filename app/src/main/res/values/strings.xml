@@ -91,6 +91,11 @@
 
     <string name="time_duration_no_difference">Same time</string>
 
+    <string name="time_duration_hour">h</string>
+    <string name="time_duration_minute">m</string>
+    <string name="time_duration_second">s</string>
+
+
     <plurals name="time_duration_day">
         <item quantity="zero">0 days</item>
         <item quantity="one">one day</item>

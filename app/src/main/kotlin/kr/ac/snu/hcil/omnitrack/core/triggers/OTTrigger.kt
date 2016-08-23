@@ -21,13 +21,13 @@ abstract class OTTrigger : NamedObject {
         const val ACTION_NOTIFICATION = 0
         const val ACTION_BACKGROUND_LOGGING = 1
 
-        const val TYPE_PERIODIC = 0
+        const val TYPE_TIME = 0
         const val TYPE_NEW_ENTRY = 1
         const val TYPE_SERVICE_EVENT = 2
 
         fun makeInstance(objectId: String?, dbId: Long?, typeId: Int, name: String, trackerObjectId: String, isOn: Boolean, serializedProperties: String?): OTTrigger {
             return when (typeId) {
-                TYPE_PERIODIC -> OTPeriodicTrigger(objectId, dbId, name, trackerObjectId, isOn, serializedProperties)
+                TYPE_TIME -> OTTimeTrigger(objectId, dbId, name, trackerObjectId, isOn, serializedProperties)
                 else -> throw Exception("wrong trigger type : $typeId")
             }
         }

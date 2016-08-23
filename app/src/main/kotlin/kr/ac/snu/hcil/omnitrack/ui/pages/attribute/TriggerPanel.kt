@@ -64,7 +64,7 @@ class TriggerPanel : FrameLayout {
 
         newTriggerButton.setOnClickListener {
             if (tracker != null) {
-                OTApplication.app.triggerManager.putNewTrigger(OTTrigger.makeInstance(OTTrigger.TYPE_PERIODIC, "Trigger ${System.currentTimeMillis()}", tracker!!))
+                OTApplication.app.triggerManager.putNewTrigger(OTTrigger.makeInstance(OTTrigger.TYPE_TIME, "Trigger ${System.currentTimeMillis()}", tracker!!))
                 notifyTriggerSetChanged()
             }
         }
