@@ -1,40 +1,119 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="100dp"
-    android:background="@drawable/transparent_button_background"
-    android:orientation="vertical"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-
-    >
-
-    <TextView
-        android:id="@+id/type"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/name"
-        android:text="Large Text"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
-
-    <TextView
-        android:id="@+id/name"
-        style="@style/ListElementTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:text="Large Text" />
-
-    <Switch
-        android:id="@+id/ui_trigger_switch"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_alignParentEnd="true"
-        android:layout_centerVertical="true"
+        android:background="@drawable/transparent_button_background"
+        android:orientation="vertical"
         android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
-        android:textOff="Inactive"
-        android:textOn="Active"
-        android:textStyle="bold" />
 
-</RelativeLayout>
+        android:paddingTop="12dp">
+
+        <LinearLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/wappen_frame_dark"
+            android:orientation="horizontal"
+            android:paddingLeft="4dp">
+
+            <android.support.v7.widget.AppCompatImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_centerVertical="true"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/alarm_dark"
+                android:tint="#FFF" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="6dp"
+                android:text="Reserved Time"
+                android:textColor="#fff"
+                android:textSize="12dp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/ui_header_view_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/linearLayout"
+            android:layout_toStartOf="@+id/ui_trigger_switch"
+            android:paddingBottom="8dp"
+            android:paddingTop="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="06:00"
+                android:textSize="40dp" />
+        </FrameLayout>
+
+
+        <Switch
+            android:id="@+id/ui_trigger_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/ui_header_view_container"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:textOff="Inactive"
+            android:textOn="Active"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
+
+    <FrameLayout
+        android:id="@+id/ui_expanded_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    </FrameLayout>
+
+    <View
+        style="@style/HorizontalSeparator.NoVerticalMargin"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:background="@color/separator.Light"
+        android:visibility="gone" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.v7.widget.AppCompatImageButton
+            android:layout_width="@dimen/button_height_normal"
+            android:layout_height="@dimen/button_height_normal"
+            android:layout_gravity="start"
+            android:background="@drawable/transparent_button_background"
+            android:src="@drawable/trashcan"
+            android:tint="@color/buttonIconColorDark"
+            android:visibility="invisible" />
+
+        <android.support.v7.widget.AppCompatImageButton
+            android:layout_width="@dimen/button_height_normal"
+            android:layout_height="@dimen/button_height_normal"
+            android:layout_gravity="end"
+            android:background="@drawable/transparent_button_background"
+            android:src="@drawable/down_dark"
+            android:tint="@color/buttonIconColorDark" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|start"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:fontFamily="sans-serif-light"
+            android:text="Summary Content"
+            android:textColor="@color/textColorMid" />
+    </FrameLayout>
+</LinearLayout>

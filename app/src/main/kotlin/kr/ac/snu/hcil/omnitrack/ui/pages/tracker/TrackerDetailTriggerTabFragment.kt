@@ -71,6 +71,11 @@ class TrackerDetailTriggerTabFragment : TrackerDetailActivity.ChildFragment() {
     }
 
     inner class Adapter : RecyclerView.Adapter<Adapter.ViewHolder>() {
+
+        override fun getItemViewType(position: Int): Int {
+            return getTriggers()[position].typeId
+        }
+
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             holder.bind(getTriggers()[position])
         }
