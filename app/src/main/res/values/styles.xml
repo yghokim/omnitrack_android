@@ -49,6 +49,14 @@
         <item name="android:textColor">@color/titleTextColor</item>
     </style>
 
+    <style name="AttributeDetailFieldName">
+        <item name="android:textSize">18dp</item>
+        <item name="android:textStyle">italic</item>
+        <item name="android:fontFamily">sans-serif-normal</item>
+        <item name="android:textColor">@color/titleTextColor</item>
+    </style>
+
+
     <style name="SubTitle">
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">14dp</item>
@@ -136,9 +144,10 @@
     </style>
 
     <style name="numberPropertyDigitViewStyle">
-        <item name="android:textSize">25sp</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:textSize">35sp</item>
+        <item name="android:textStyle">italic</item>
+        <item name="android:textColor">@color/colorSecondary</item>
+        <item name="android:fontFamily">sans-serif-light</item>
     </style>
 
     <style name="textButtonTransparentLight">
