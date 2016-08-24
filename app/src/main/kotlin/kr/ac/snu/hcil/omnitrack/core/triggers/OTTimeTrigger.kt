@@ -169,6 +169,15 @@ class OTTimeTrigger : OTTrigger {
         return PendingIntent.getBroadcast(context, alarmId, intent, 0)
     }
 
+    val isRangeSpecified: Boolean get() = OTTimeTrigger.Range.isSpecified(rangeVariables)
+    val isConfigSpecified: Boolean get() {
+        return when (configType) {
+            CONFIG_TYPE_ALARM -> AlarmConfig.isSpecified(configVariables)
+            CONFIG_TYPE_INTERVAL -> IntervalConfig.isSpecified(configVariables)
+            else -> false
+        }
+    }
+
     fun getNextAlarmTime(): Long {
         if (isOn) {
             return System.currentTimeMillis() + 1000
