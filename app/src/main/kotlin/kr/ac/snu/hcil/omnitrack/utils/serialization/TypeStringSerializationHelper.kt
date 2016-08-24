@@ -38,7 +38,9 @@ object TypeStringSerializationHelper {
 
     val classNameDictionary: Map<String, String> = mapOf(
             Int::class.java.name to TYPENAME_INT,
+            "java.lang.Integer" to TYPENAME_INT,
             Long::class.java.name to TYPENAME_LONG,
+            "java.lang.Long" to TYPENAME_LONG,
             BigDecimal::class.java.name to TYPENAME_BIGDECIMAL,
             TimePoint::class.java.name to TYPENAME_TIMEPOINT,
             TimeSpan::class.java.name to TYPENAME_TIMESPAN,
@@ -73,8 +75,7 @@ object TypeStringSerializationHelper {
         if(classNameDictionary.containsKey(value.javaClass.name))
         {
             return serialize(classNameDictionary[value.javaClass.name]!!, value)
-        }
-        else throw Exception("Serialization of this type [${value.javaClass.name}] is not implemented.")
+        } else throw Exception("Serialization of this type [${value.javaClass.name}] is not implemented, value: $value")
     }
 
     fun deserialize(serialized: String): Any {

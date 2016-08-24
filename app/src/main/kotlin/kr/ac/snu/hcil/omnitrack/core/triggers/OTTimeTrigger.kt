@@ -50,6 +50,9 @@ class OTTimeTrigger : OTTrigger {
         const val TIME_OF_DAY_START_SHIFT = 19
         const val TIME_OF_DAY_END_SHIFT = 14
 
+        fun isAllDayUsed(range: Int): Boolean {
+            return BitwiseOperationHelper.getIntAt(range, DAYS_OF_WEEK_FLAGS_SHIFT, DAYS_OF_WEEK_FLAGS_MASK) == DAYS_OF_WEEK_FLAGS_MASK
+        }
 
         fun isDayOfWeekUsed(range: Int, dayOfWeek: Int): Boolean {
             return BitwiseOperationHelper.getBooleanAt(range, DAYS_OF_WEEK_FLAGS_SHIFT + (7 - dayOfWeek))
@@ -152,6 +155,7 @@ class OTTimeTrigger : OTTrigger {
     var configType: Int by properties
 
     var rangeVariables: Int by properties
+
     var configVariables: Int by properties
 
     constructor(objectId: String?, dbId: Long?, name: String, trackerObjectId: String, isOn: Boolean, serializedProperties: String? = null) : super(objectId, dbId, name, trackerObjectId, isOn, serializedProperties) {
@@ -176,6 +180,12 @@ class OTTimeTrigger : OTTrigger {
             CONFIG_TYPE_INTERVAL -> IntervalConfig.isSpecified(configVariables)
             else -> false
         }
+    }
+
+    val isTriggeredOnce: Boolean get() {
+        if (isRangeSpecified) {
+            return BitwiseOperationHelper.getIntAt(rangeVariables, Range.DAYS_OF_WEEK_FLAGS_SHIFT, Range.DAYS_OF_WEEK_FLAGS_MASK) == 0
+        } else return true
     }
 
     fun getNextAlarmTime(): Long {

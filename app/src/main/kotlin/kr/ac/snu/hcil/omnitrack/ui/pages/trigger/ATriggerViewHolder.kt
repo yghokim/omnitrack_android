@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 
+import android.app.ActionBar
 import android.content.Context
 import android.support.v7.widget.AppCompatImageButton
 import android.support.v7.widget.AppCompatImageView
@@ -8,6 +9,7 @@ import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.Switch
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
@@ -28,7 +30,7 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
     protected lateinit var trigger: T
         private set
 
-    var isExpanded: Boolean = false
+    var isExpanded: Boolean = true
         private set
 
     private val triggerSwitch: Switch
@@ -62,6 +64,8 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
         expandedView = itemView.findViewById(R.id.ui_expanded_view) as ViewGroup
 
         headerViewContainer = itemView.findViewById(R.id.ui_header_view_container) as ViewGroup
+
+        setIsExpanded(false, false)
     }
 
     private fun setIsExpanded(isExpanded: Boolean, animate: Boolean) {
@@ -76,7 +80,8 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
                 configSummaryView.visibility = View.INVISIBLE
                 expandToggleButton.setImageResource(R.drawable.up_dark)
                 if (expandedView.childCount == 0) {
-                    expandedView.addView(initExpandedViewContent())
+                    val lp = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT)
+                    expandedView.addView(initExpandedViewContent(), lp)
                 }
                 updateExpandedViewContent(trigger)
                 expandedView.visibility = View.VISIBLE
@@ -91,14 +96,19 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
 
     fun bind(trigger: OTTrigger) {
         this.trigger = trigger as T
+
+        syncViewStateToTrigger()
+    }
+
+    protected fun syncViewStateToTrigger() {
+        triggerSwitch.isChecked = trigger.isOn
+
         configSummaryView.text = getConfigSummary(trigger)
 
-        onBind(trigger)
+        onSyncViewStateToTrigger(trigger)
     }
 
-    protected open fun onBind(trigger: OTTrigger) {
-
-    }
+    protected abstract fun onSyncViewStateToTrigger(trigger: T);
 
     protected abstract fun initExpandedViewContent(): View
 
@@ -113,6 +123,9 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
             setIsExpanded(!isExpanded, true)
         } else if (view === triggerSwitch) {
             trigger?.isOn = triggerSwitch.isChecked
+            if (isExpanded) {
+                setIsExpanded(false, true)
+            }
         }
     }
 

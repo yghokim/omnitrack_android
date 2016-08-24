@@ -186,6 +186,8 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
             else -> false
         }
 
+        println("restored isOn : $isOn")
+
         return OTTrigger.makeInstance(objectId, id, type, name, trackerObjectId, isOn, serializedProperties)
     }
 
@@ -281,7 +283,11 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
             values.put(TriggerScheme.PROPERTIES, trigger.getSerializedProperties())
             values.put(TriggerScheme.TRACKER_OBJECT_ID, trigger.trackerObjectId)
             values.put(TriggerScheme.POSITION, position)
-            values.put(TriggerScheme.IS_ON, trigger.isOn)
+            values.put(TriggerScheme.IS_ON, if (trigger.isOn) 1 else 0)
+
+
+
+            println("storing isOn : ${trigger.isOn}")
 
             saveObject(trigger, values, TriggerScheme)
             trigger.isDirtySinceLastSync = false

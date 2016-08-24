@@ -138,6 +138,28 @@
         <item quantity="other">%d secs</item>
     </plurals>
 
+    <string name="msg_everyday">Everyday</string>
+    <string name="msg_once">Once</string>
+
+    <string name="sunday_short">sun</string>
+    <string name="monday_short">mon</string>
+    <string name="tuesday_short">tue</string>
+    <string name="wednesday_short">wed</string>
+    <string name="thursday_short">thu</string>
+    <string name="friday_short">fri</string>
+    <string name="saturday_short">sat</string>
+
+    <string-array name="days_of_week_short">
+        <item>@string/sunday_short</item>
+        <item>@string/monday_short</item>
+        <item>@string/tuesday_short</item>
+        <item>@string/wednesday_short</item>
+        <item>@string/thursday_short</item>
+        <item>@string/friday_short</item>
+        <item>@string/saturday_short</item>
+    </string-array>
+
+
     <string name="title_activity_tracker_new">New Tracker</string>
     <string name="title_activity_tracker_edit">Edit Tracker</string>
 
@@ -214,6 +236,8 @@
     <string name="trigger_name_event">Event Trigger</string>
     <string name="trigger_desc_time">Fires by time-related conditions</string>
     <string name="trigger_desc_event">Fires when specific event occurs</string>
+
+    <string name="msg_trigger_time_config_type">Period Type</string>
 
 
     <string-array name="choice_preview_entries">

@@ -33,7 +33,7 @@ abstract class OTTrigger : NamedObject {
         }
 
         fun makeInstance(typeId: Int, name: String, tracker: OTTracker): OTTrigger {
-            return makeInstance(null, null, typeId, name, tracker.objectId, true, null)
+            return makeInstance(null, null, typeId, name, tracker.objectId, false, null)
         }
     }
 
@@ -57,12 +57,15 @@ abstract class OTTrigger : NamedObject {
             throw Exception("Wrong trigger action code.")
         }
     }
-    var isOn: Boolean by Delegates.observable(true) {
+    var isOn: Boolean by Delegates.observable(false) {
         prop, old, new ->
         if (new) {
             handleOn()
         } else {
             handleOff()
+        }
+        if (old != new) {
+            isDirtySinceLastSync = true
         }
     }
 

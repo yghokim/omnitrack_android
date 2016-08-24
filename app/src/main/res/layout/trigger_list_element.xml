@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@color/frontalBackground"
     android:orientation="vertical">
 
     <RelativeLayout
@@ -77,7 +78,8 @@
     <FrameLayout
         android:id="@+id/ui_expanded_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@drawable/expanded_view_inner_shadow_top">
 
     </FrameLayout>
 
@@ -119,6 +121,7 @@
             android:layout_marginLeft="@dimen/activity_horizontal_margin"
             android:fontFamily="sans-serif-light"
             android:text="Summary Content"
-            android:textColor="@color/textColorMid" />
+            android:textColor="@color/textColorMid"
+            android:textSize="14dp" />
     </FrameLayout>
 </LinearLayout>

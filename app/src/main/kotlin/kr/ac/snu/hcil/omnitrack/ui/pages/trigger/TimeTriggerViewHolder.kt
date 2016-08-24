@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
+import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTrigger
 
 /**
@@ -17,15 +18,34 @@ class TimeTriggerViewHolder : ATriggerViewHolder<OTTimeTrigger> {
 
         }
 
-        if (trigger.isRangeSpecified) {
+        if (trigger.isRangeSpecified && !trigger.isTriggeredOnce) {
+            //display only days of weeks
+            if (OTTimeTrigger.Range.isAllDayUsed(trigger.rangeVariables)) {
+                return itemView.context.resources.getString(R.string.msg_everyday)
+            } else {
 
-        }
+                val names = itemView.context.resources.getStringArray(R.array.days_of_week_short)
 
-        return ""
+                val stringBuilder = StringBuilder()
+
+                for (day in 0..6) {
+                    if (OTTimeTrigger.Range.isDayOfWeekUsed(trigger.rangeVariables, day)) {
+                        stringBuilder.append(names[day], " ")
+                    }
+                }
+
+                return stringBuilder.trim()
+            }
+        } else return itemView.context.resources.getString(R.string.msg_once)
     }
 
+    override fun onSyncViewStateToTrigger(trigger: OTTimeTrigger) {
+
+    }
+
+
     override fun initExpandedViewContent(): View {
-        return View(itemView.context)
+        return TimeTriggerConfigurationPanel(context = itemView.context)
     }
 
     override fun updateExpandedViewContent(trigger: OTTimeTrigger) {
