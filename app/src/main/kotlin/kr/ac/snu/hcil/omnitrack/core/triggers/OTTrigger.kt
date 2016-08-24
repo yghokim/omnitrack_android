@@ -50,6 +50,10 @@ abstract class OTTrigger : NamedObject {
     var isActivatedOnSystem: Boolean = false
         private set
 
+    abstract val configIconId: Int
+    abstract val configTitleId: Int
+
+
     var action: Int by Delegates.observable(ACTION_BACKGROUND_LOGGING)
     {
         prop, old, new ->

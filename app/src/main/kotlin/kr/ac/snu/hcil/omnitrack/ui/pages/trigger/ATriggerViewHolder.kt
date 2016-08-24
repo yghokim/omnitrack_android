@@ -83,7 +83,7 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
                     val lp = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT)
                     expandedView.addView(initExpandedViewContent(), lp)
                 }
-                updateExpandedViewContent(trigger)
+                updateExpandedViewContent(expandedView.getChildAt(0), trigger)
                 expandedView.visibility = View.VISIBLE
             } else {
                 removeButton.visibility = View.INVISIBLE
@@ -105,6 +105,9 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
 
         configSummaryView.text = getConfigSummary(trigger)
 
+        typeIconView.setImageResource(trigger.configIconId)
+        typeDescriptionView.setText(trigger.configTitleId)
+
         onSyncViewStateToTrigger(trigger)
     }
 
@@ -112,7 +115,7 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
 
     protected abstract fun initExpandedViewContent(): View
 
-    protected abstract fun updateExpandedViewContent(trigger: T): Unit
+    protected abstract fun updateExpandedViewContent(expandedView: View, trigger: T): Unit
 
     protected abstract fun getConfigSummary(trigger: T): CharSequence
 

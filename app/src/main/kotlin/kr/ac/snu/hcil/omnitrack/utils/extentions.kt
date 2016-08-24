@@ -124,9 +124,7 @@ fun LatLng.getAddress(context: Context): Address? {
 
     val geocoder = Geocoder(context)
     try {
-        // 세번째 인수는 최대결과값인데 하나만 리턴받도록 설정했다
         val addresses = geocoder.getFromLocation(latitude, longitude, 1);
-        // 설정한 데이터로 주소가 리턴된 데이터가 있으면
         return addresses?.firstOrNull()
     } catch(e: Exception) {
         e.printStackTrace()

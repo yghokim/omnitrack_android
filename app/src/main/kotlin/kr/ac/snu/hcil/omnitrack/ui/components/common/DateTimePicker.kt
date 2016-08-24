@@ -35,6 +35,17 @@ class DateTimePicker(context: Context, attrs: AttributeSet? = null) : FrameLayou
         val monthNames = arrayOf("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
     }
 
+    var isDayUsed: Boolean by Delegates.observable(true)
+    {
+        prop, old, new ->
+        if (new == true) {
+            if (mode != DATE)
+                dateButton.visibility = VISIBLE
+        } else {
+            dateButton.visibility = GONE
+        }
+    }
+
     private lateinit var leftPicker: VerticalNumericUpDown
     private lateinit var middlePicker: VerticalNumericUpDown
     private lateinit var rightPicker: VerticalNumericUpDown
@@ -67,6 +78,36 @@ class DateTimePicker(context: Context, attrs: AttributeSet? = null) : FrameLayou
                 calendar.timeInMillis = value.timestamp
                 refresh()
                 timeChanged.invoke(this, value)
+            }
+        }
+
+    var hour: Int
+        get() = calendar.getHour()
+        set(value) {
+            if (hour != value) {
+                calendar.set(Calendar.HOUR, value)
+                refresh()
+                timeChanged.invoke(this, time)
+            }
+        }
+
+    var minute: Int
+        get() = calendar.getMinute()
+        set(value) {
+            if (minute != value) {
+                calendar.set(Calendar.MINUTE, value)
+                refresh()
+                timeChanged.invoke(this, time)
+            }
+        }
+
+    var amPm: Int
+        get() = calendar.getAmPm()
+        set(value) {
+            if (amPm != value) {
+                calendar.set(Calendar.AM_PM, value)
+                refresh()
+                timeChanged.invoke(this, time)
             }
         }
 
@@ -203,7 +244,11 @@ class DateTimePicker(context: Context, attrs: AttributeSet? = null) : FrameLayou
         when (mode) {
             SECOND -> {
                 //button shown, pickers are hour/minute/second
-                dateButton.visibility = View.VISIBLE
+                if (isDayUsed)
+                    dateButton.visibility = View.VISIBLE
+                else
+                    dateButton.visibility = View.GONE
+
                 dateButton.text = dateFormat.format(calendar.time)
 
                 leftPicker.minValue = 0
@@ -222,7 +267,11 @@ class DateTimePicker(context: Context, attrs: AttributeSet? = null) : FrameLayou
             }
 
             MINUTE -> {
-                dateButton.visibility = View.VISIBLE
+                if (isDayUsed)
+                    dateButton.visibility = View.VISIBLE
+                else
+                    dateButton.visibility = View.GONE
+
                 dateButton.text = dateFormat.format(calendar.time)
 
                 leftPicker.minValue = 1

@@ -8,6 +8,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.receivers.OTSystemReceiver
 import kr.ac.snu.hcil.omnitrack.utils.BitwiseOperationHelper
+import kr.ac.snu.hcil.omnitrack.utils.ObservableMapDelegate
 
 /**
  * Created by younghokim on 16. 7. 27..
@@ -17,6 +18,22 @@ class OTTimeTrigger : OTTrigger {
     companion object {
         const val CONFIG_TYPE_ALARM = 0
         const val CONFIG_TYPE_INTERVAL = 1
+
+        fun configIconId(configType: Int): Int {
+            return when (configType) {
+                CONFIG_TYPE_ALARM -> R.drawable.alarm_dark
+                CONFIG_TYPE_INTERVAL -> R.drawable.repeat_dark
+                else -> R.drawable.alarm_dark
+            }
+        }
+
+        fun configNameId(configType: Int): Int {
+            return when (configType) {
+                CONFIG_TYPE_ALARM -> R.string.msg_trigger_time_config_type_name_alram
+                CONFIG_TYPE_INTERVAL -> R.string.msg_trigger_time_config_type_name_interval
+                else -> R.string.msg_trigger_time_config_type_name_alram
+            }
+        }
     }
 
 
@@ -145,23 +162,35 @@ class OTTimeTrigger : OTTrigger {
         fun makeConfig(hours: Int, minutes: Int, seconds: Int): Int {
             return 1 shl IS_SPECIFIED_SHIFT or (hours * 3600 + minutes * 60 + seconds) shl TIME_SHIFT
         }
+
+        fun makeConfig(durationSeconds: Int): Int {
+            return 1 shl IS_SPECIFIED_SHIFT or durationSeconds shl TIME_SHIFT
+        }
     }
+
+    override val configIconId: Int get() = configIconId(configType)
+
+    override val configTitleId: Int get() = configNameId(configType)
 
     override val typeId: Int = TYPE_TIME
 
     override val typeNameResourceId: Int = R.string.trigger_periodic_name
     override val descriptionResourceId: Int = R.string.trigger_periodic_desc
 
-    var configType: Int by properties
+    var configType: Int by ObservableMapDelegate(CONFIG_TYPE_ALARM, properties) {
+        isDirtySinceLastSync = true
+    }
 
-    var rangeVariables: Int by properties
+    var rangeVariables: Int by ObservableMapDelegate(0, properties) {
+        isDirtySinceLastSync = true
+    }
 
-    var configVariables: Int by properties
+    var configVariables: Int by ObservableMapDelegate(0, properties) {
+        isDirtySinceLastSync = true
+    }
 
     constructor(objectId: String?, dbId: Long?, name: String, trackerObjectId: String, isOn: Boolean, serializedProperties: String? = null) : super(objectId, dbId, name, trackerObjectId, isOn, serializedProperties) {
-        configType = CONFIG_TYPE_ALARM
-        rangeVariables = 0
-        configVariables = 0
+
     }
 
     private fun makeIntent(context: Context, alarmId: Int): PendingIntent {

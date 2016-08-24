@@ -239,6 +239,14 @@
 
     <string name="msg_trigger_time_config_type">Period Type</string>
 
+    <string name="msg_trigger_time_config_interval">Interval</string>
+
+    <string name="msg_trigger_time_config_repeat_range">Repeat Range</string>
+
+
+    <string name="msg_trigger_time_config_type_name_alram">Triggered at specific time</string>
+    <string name="msg_trigger_time_config_type_name_interval">Repeatedly triggered with interval</string>
+
 
     <string-array name="choice_preview_entries">
         <item>Choice entry 1</item>
