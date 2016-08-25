@@ -123,6 +123,17 @@ class TrackerDetailTriggerTabFragment : TrackerDetailActivity.ChildFragment() {
         }
 
         override fun onTriggerRemove(position: Int) {
+
+            if (expandedTriggerPosition == position) {
+                val lastExpandedIndex = expandedTriggerPosition
+                expandedTriggerPosition = -1
+                for (triggerEntry in getTriggers().withIndex()) {
+                    if (triggerEntry.index != lastExpandedIndex) {
+                        this.notifyItemChanged(triggerEntry.index)
+                    }
+                }
+            }
+
             OTApplication.app.triggerManager.removeTrigger(getTriggers()[position])
             this.notifyItemRemoved(position)
         }
