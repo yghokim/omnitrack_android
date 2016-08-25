@@ -13,6 +13,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.DateTimePicker
 import kr.ac.snu.hcil.omnitrack.ui.components.common.DayOfWeekSelector
 import kr.ac.snu.hcil.omnitrack.ui.components.common.DurationPicker
 import kr.ac.snu.hcil.omnitrack.ui.components.common.HourRangePicker
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.BooleanPropertyView
 import kr.ac.snu.hcil.omnitrack.utils.IconNameEntryArrayAdapter
 
 /**
@@ -31,6 +32,10 @@ class TimeTriggerConfigurationPanel : LinearLayout, AdapterView.OnItemSelectedLi
     private val timeSpanCheckBox: CheckBox
     private val timeSpanPicker: HourRangePicker
 
+    private val isRepeatedView: BooleanPropertyView
+
+    private val repetitionConfigGroup: ViewGroup
+
     private var refreshingViews = false
 
     var configMode: Int = OTTimeTrigger.CONFIG_TYPE_ALARM
@@ -39,6 +44,14 @@ class TimeTriggerConfigurationPanel : LinearLayout, AdapterView.OnItemSelectedLi
                 field = value
                 applyConfigMode(value, true)
             }
+        }
+
+    var IsRepeated: Boolean get() = isRepeatedView.value
+        set(value) {
+            isRepeatedView.valueChanged.suspend = true
+            isRepeatedView.value = value
+            isRepeatedView.valueChanged.suspend = false
+            applyIsRepeated(value, true)
         }
 
 
@@ -63,7 +76,7 @@ class TimeTriggerConfigurationPanel : LinearLayout, AdapterView.OnItemSelectedLi
 
         configSpinner.setSelection(0)
 
-        configSpinner.setOnItemSelectedListener(this)
+        configSpinner.onItemSelectedListener = this
 
         intervalConfigGroup = findViewById(R.id.ui_interval_group) as ViewGroup
         alarmConfigGroup = findViewById(R.id.ui_alarm_group) as ViewGroup
@@ -82,7 +95,26 @@ class TimeTriggerConfigurationPanel : LinearLayout, AdapterView.OnItemSelectedLi
 
         timeSpanPicker = findViewById(R.id.ui_range_timespan_picker) as HourRangePicker
 
+        repetitionConfigGroup = findViewById(R.id.ui_repetition_config_group) as ViewGroup
+
+        isRepeatedView = findViewById(R.id.ui_is_repeated) as BooleanPropertyView
+
+        isRepeatedView.valueChanged += {
+            sender, value ->
+            applyIsRepeated(value, true)
+        }
+
         applyConfigMode(OTTimeTrigger.CONFIG_TYPE_ALARM, false)
+        applyIsRepeated(IsRepeated, false)
+    }
+
+    private fun applyIsRepeated(isRepeated: Boolean, animate: Boolean) {
+        println("isRepeatedValue changed")
+        TransitionManager.beginDelayedTransition(this)
+        if (isRepeated)
+            repetitionConfigGroup.visibility = View.VISIBLE
+        else
+            repetitionConfigGroup.visibility = View.GONE
     }
 
 

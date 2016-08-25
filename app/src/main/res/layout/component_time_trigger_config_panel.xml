@@ -69,39 +69,51 @@
 
     <LinearLayout
         style="@style/propertyGroupMultilineStyle"
-        android:layout_gravity="center_horizontal">
+        android:layout_gravity="center_horizontal"
+        android:paddingTop="0dp">
 
-        <TextView
-            style="@style/propertyMultilineHeaderStyle"
-            android:layout_gravity="center_vertical"
-            android:text="@string/msg_trigger_time_config_repeat_range" />
-
-
-        <CheckBox
-            android:id="@+id/ui_checkbox_range_use_timespan"
-            style="@style/checkboxTextStyle"
+        <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.BooleanPropertyView
+            android:id="@+id/ui_is_repeated"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginLeft="8dp"
-            android:text="Use Time Range" />
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:text="@string/msg_trigger_time_is_repeated" />
 
-        <kr.ac.snu.hcil.omnitrack.ui.components.common.HourRangePicker
-            android:id="@+id/ui_range_timespan_picker"
+        <LinearLayout
+            android:id="@+id/ui_repetition_config_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="15dp"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:layout_marginRight="@dimen/activity_horizontal_margin" />
+            android:layout_gravity="center_horizontal"
+            android:orientation="vertical"
+            android:visibility="gone">
 
-        <kr.ac.snu.hcil.omnitrack.ui.components.common.DayOfWeekSelector
-            android:id="@+id/ui_day_of_week_selector"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="12dp"
-            android:layout_marginRight="12dp"
-            android:layout_marginTop="6dp" />
+            <CheckBox
+                android:id="@+id/ui_checkbox_range_use_timespan"
+                style="@style/checkboxTextStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginLeft="8dp"
+                android:text="Use Time Range" />
 
+            <kr.ac.snu.hcil.omnitrack.ui.components.common.HourRangePicker
+                android:id="@+id/ui_range_timespan_picker"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin" />
+
+            <kr.ac.snu.hcil.omnitrack.ui.components.common.DayOfWeekSelector
+                android:id="@+id/ui_day_of_week_selector"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"
+                android:layout_marginTop="6dp" />
+
+        </LinearLayout>
     </LinearLayout>
 
 </LinearLayout>

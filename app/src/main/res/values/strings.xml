@@ -249,6 +249,8 @@
     <string name="msg_trigger_time_config_type_name_alram">Triggered at specific time</string>
     <string name="msg_trigger_time_config_type_name_interval">Repeatedly triggered with interval</string>
 
+    <string name="msg_trigger_time_is_repeated">Repeat</string>
+
 
     <string-array name="choice_preview_entries">
         <item>Choice entry 1</item>

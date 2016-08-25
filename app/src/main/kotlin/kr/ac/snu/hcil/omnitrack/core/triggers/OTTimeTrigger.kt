@@ -111,6 +111,7 @@ class OTTimeTrigger : OTTrigger {
             1bit : ampm (0~1)
             4bits : hour (0~11)
             6bits : minute(0~59)
+            1bit: useRepeatRange
 
             last 1 bit : isSpecified
          */
@@ -214,6 +215,20 @@ class OTTimeTrigger : OTTrigger {
         isDirtySinceLastSync = true
     }
 
+    var isRepeated: Boolean
+        get() = if (_isRepeated > 0) {
+            true
+        } else false
+        set(value) {
+            _isRepeated = if (value == true) 1 else 0
+        }
+
+    private var _isRepeated: Int by ObservableMapDelegate(0, properties) {
+        isDirtySinceLastSync = true
+    }
+
+
+
     constructor(objectId: String?, dbId: Long?, name: String, trackerObjectId: String, isOn: Boolean, serializedProperties: String? = null) : super(objectId, dbId, name, trackerObjectId, isOn, serializedProperties) {
 
     }
@@ -236,11 +251,13 @@ class OTTimeTrigger : OTTrigger {
         }
     }
 
+    /*
+
     val isTriggeredOnce: Boolean get() {
         if (isRangeSpecified) {
             return BitwiseOperationHelper.getIntAt(rangeVariables, Range.DAYS_OF_WEEK_FLAGS_SHIFT, Range.DAYS_OF_WEEK_FLAGS_MASK) == 0
         } else return true
-    }
+    }*/
 
     fun getNextAlarmTime(): Long {
         if (isOn) {

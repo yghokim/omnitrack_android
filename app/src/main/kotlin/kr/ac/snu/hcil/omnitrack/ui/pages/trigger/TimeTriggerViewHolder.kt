@@ -18,7 +18,7 @@ class TimeTriggerViewHolder : ATriggerViewHolder<OTTimeTrigger> {
 
         }
 
-        if (trigger.isRangeSpecified && !trigger.isTriggeredOnce) {
+        if (trigger.isRangeSpecified && trigger.isRepeated) {
             //display only days of weeks
             if (OTTimeTrigger.Range.isAllDayUsed(trigger.rangeVariables)) {
                 return itemView.context.resources.getString(R.string.msg_everyday)
@@ -30,7 +30,7 @@ class TimeTriggerViewHolder : ATriggerViewHolder<OTTimeTrigger> {
 
                 for (day in 0..6) {
                     if (OTTimeTrigger.Range.isDayOfWeekUsed(trigger.rangeVariables, day)) {
-                        stringBuilder.append(names[day], " ")
+                        stringBuilder.append(names[day].toUpperCase(), "  ")
                     }
                 }
 
@@ -51,6 +51,7 @@ class TimeTriggerViewHolder : ATriggerViewHolder<OTTimeTrigger> {
     override fun updateExpandedViewContent(expandedView: View, trigger: OTTimeTrigger) {
         if (expandedView is TimeTriggerConfigurationPanel) {
             expandedView.configMode = trigger.configType
+            expandedView.IsRepeated = trigger.isRepeated
             expandedView.applyConfigVariables(trigger.configVariables)
             expandedView.applyRangeVariables(trigger.rangeVariables)
         }
@@ -62,6 +63,7 @@ class TimeTriggerViewHolder : ATriggerViewHolder<OTTimeTrigger> {
             trigger.configType = expandedView.configMode
             trigger.configVariables = expandedView.extractConfigVariables()
             trigger.rangeVariables = expandedView.extractRangeVariables()
+            trigger.isRepeated = expandedView.IsRepeated
         }
     }
 

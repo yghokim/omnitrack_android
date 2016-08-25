@@ -29,4 +29,13 @@
         android:minHeight="50dp"
         android:paddingLeft="50dp"
         android:switchMinWidth="50dp" />
+
+    <ImageButton
+        android:id="@+id/ui_button_proxy"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/value"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/transparent_button_background" />
+
 </RelativeLayout>
