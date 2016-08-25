@@ -39,10 +39,22 @@ class TimeTriggerViewHolder : ATriggerViewHolder<OTTimeTrigger> {
         } else return itemView.context.resources.getString(R.string.msg_once)
     }
 
-    override fun onSyncViewStateToTrigger(trigger: OTTimeTrigger) {
 
+    override fun getHeaderView(current: View?, trigger: OTTimeTrigger): View {
+        val view = if (current is TimeTriggerDisplayView) current else TimeTriggerDisplayView(itemView.context)
+
+        when (trigger.configType) {
+            OTTimeTrigger.CONFIG_TYPE_ALARM ->
+                view.setAlarmInformation(OTTimeTrigger.AlarmConfig.getHour(trigger.configVariables),
+                        OTTimeTrigger.AlarmConfig.getMinute(trigger.configVariables),
+                        OTTimeTrigger.AlarmConfig.getAmPm(trigger.configVariables))
+
+            OTTimeTrigger.CONFIG_TYPE_INTERVAL ->
+                view.setIntervalInformation(OTTimeTrigger.IntervalConfig.getIntervalSeconds(trigger.configVariables))
+        }
+
+        return view
     }
-
 
     override fun initExpandedViewContent(): View {
         return TimeTriggerConfigurationPanel(context = itemView.context)

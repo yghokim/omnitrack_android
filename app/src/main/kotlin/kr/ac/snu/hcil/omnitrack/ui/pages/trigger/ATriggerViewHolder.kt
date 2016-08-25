@@ -59,6 +59,8 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
     private val bottomBar: LockableFrameLayout
 
     init {
+        itemView.setOnClickListener(this)
+
         triggerSwitch = itemView.findViewById(R.id.ui_trigger_switch) as Switch
         triggerSwitch.setOnClickListener(this)
 
@@ -124,7 +126,7 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
                 collapsedView.visibility = View.VISIBLE
 
                 bottomBar.locked = true
-                bottomBar.setBackgroundColor(Color.TRANSPARENT)
+                bottomBar.setBackgroundColor(itemView.resources.getColor(R.color.editTextFormBackground, null))
                 removeButton.setColorFilter(itemView.resources.getColor(R.color.buttonIconColorDark, null))
                 applyButtonGroup.visibility = View.INVISIBLE
                 expandToggleButton.visibility = View.VISIBLE
@@ -146,11 +148,19 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
         typeIconView.setImageResource(trigger.configIconId)
         typeDescriptionView.setText(trigger.configTitleId)
 
-        onSyncViewStateToTrigger(trigger)
+        if (headerViewContainer.childCount > 0) {
+            val headerView = getHeaderView(headerViewContainer.getChildAt(0), trigger)
+            if (headerView !== headerViewContainer.getChildAt(0)) {
+                headerViewContainer.removeAllViews()
+                headerViewContainer.addView(headerView)
+            }
+        } else {
+            headerViewContainer.addView(getHeaderView(null, trigger))
+        }
     }
 
 
-    protected abstract fun onSyncViewStateToTrigger(trigger: T);
+    protected abstract fun getHeaderView(current: View?, trigger: T): View
 
     protected abstract fun initExpandedViewContent(): View
 
@@ -160,13 +170,14 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
     protected abstract fun getConfigSummary(trigger: T): CharSequence
 
     override fun onClick(view: View?) {
+
         if (view === removeButton) {
             listener.onTriggerRemove(adapterPosition)
         } else if (view === expandToggleButton) {
             listener.onTriggerCollapse(adapterPosition)
         } else if (view === triggerSwitch) {
-            trigger?.isOn = triggerSwitch.isChecked
-        } else if (view === bottomBar) {
+            trigger.isOn = triggerSwitch.isChecked
+        } else if (view === bottomBar || view === itemView) {
             if (!isExpanded) {
                 listener.onTriggerExpand(adapterPosition)
             }

@@ -234,7 +234,7 @@
     </style>
 
     <style name="durationPickerDigitViewStyle">
-        <item name="android:textSize">50sp</item>
+        <item name="android:textSize">@dimen/number_digit_size</item>
         <item name="android:textStyle">italic</item>
         <item name="android:fontFamily">sans-serif-thin</item>
         <item name="android:textColor">@color/colorSecondary</item>

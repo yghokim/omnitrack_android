@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/frontalBackground"
+    android:clickable="true"
     android:orientation="vertical">
 
     <RelativeLayout
@@ -12,7 +13,6 @@
         android:background="@drawable/transparent_button_background"
         android:orientation="vertical"
         android:paddingLeft="@dimen/activity_horizontal_margin"
-
         android:paddingTop="12dp">
 
         <LinearLayout
@@ -53,11 +53,6 @@
             android:paddingBottom="8dp"
             android:paddingTop="8dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="06:00"
-                android:textSize="40dp" />
         </FrameLayout>
 
 

@@ -76,5 +76,8 @@
 
     <dimen name="item_list_element.LongText.LineSpacingExtra">3dp</dimen>
 
+    <dimen name="number_digit_size">50sp</dimen>
+    <dimen name="number_unit_size">20sp</dimen>
+    <dimen name="number_unit_size_small">16sp</dimen>
 
 </resources>

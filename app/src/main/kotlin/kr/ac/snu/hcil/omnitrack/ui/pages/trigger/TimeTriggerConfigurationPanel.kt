@@ -109,7 +109,6 @@ class TimeTriggerConfigurationPanel : LinearLayout, AdapterView.OnItemSelectedLi
     }
 
     private fun applyIsRepeated(isRepeated: Boolean, animate: Boolean) {
-        println("isRepeatedValue changed")
         TransitionManager.beginDelayedTransition(this)
         if (isRepeated)
             repetitionConfigGroup.visibility = View.VISIBLE
