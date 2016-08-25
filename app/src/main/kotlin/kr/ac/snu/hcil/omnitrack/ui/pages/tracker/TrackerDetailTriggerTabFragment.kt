@@ -11,7 +11,7 @@ import android.view.ViewGroup
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
-import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
+import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.ATriggerViewHolder
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.NewTriggerTypeSelectionDialogHelper
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.TimeTriggerViewHolder
@@ -50,8 +50,9 @@ class TrackerDetailTriggerTabFragment : TrackerDetailActivity.ChildFragment() {
         listView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         adapter = Adapter()
         listView.adapter = adapter
-        listView.addItemDecoration(HorizontalDividerItemDecoration(resources.getColor(R.color.dividerColor, null), resources.getDimensionPixelSize(R.dimen.trigger_list_element_divider_height)))
+        //listView.addItemDecoration(HorizontalDividerItemDecoration(resources.getColor(R.color.dividerColor, null), resources.getDimensionPixelSize(R.dimen.trigger_list_element_divider_height)))
 
+        listView.addItemDecoration(HorizontalImageDividerItemDecoration(context = this.context))
 
         newTriggerButton = rootView.findViewById(R.id.ui_button_new_trigger) as FloatingActionButton
 
@@ -89,6 +90,15 @@ class TrackerDetailTriggerTabFragment : TrackerDetailActivity.ChildFragment() {
                 holder.setIsExpanded(true, false)
             } else {
                 holder.setIsExpanded(false, false)
+                if (expandedTriggerPosition != -1) {
+                    holder.itemView.alpha = 0.2f
+                    holder.itemView.setBackgroundColor(resources.getColor(R.color.outerBackground, null))
+                }
+            }
+
+            if (expandedTriggerPosition == position || expandedTriggerPosition == -1) {
+                holder.itemView.alpha = 1.0f
+                holder.itemView.setBackgroundColor(resources.getColor(R.color.frontalBackground, null))
             }
         }
 
