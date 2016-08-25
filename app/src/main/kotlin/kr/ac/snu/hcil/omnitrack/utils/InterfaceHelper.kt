@@ -21,4 +21,13 @@ object InterfaceHelper {
         }
 
     }
+
+    fun setTextAppearance(tv: Button, style: Int) {
+        if (android.os.Build.VERSION.SDK_INT < 23) {
+            tv.setTextAppearance(tv.context, style)
+        } else {
+            tv.setTextAppearance(style)
+        }
+
+    }
 }

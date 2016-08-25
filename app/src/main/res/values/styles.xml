@@ -265,13 +265,44 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:orientation">horizontal</item>
-        <item name="android:paddingTop">8dp</item>
-        <item name="android:paddingBottom">8dp</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingBottom">12dp</item>
     </style>
 
     <style name="propertyGroupMultilineStyle" parent="propertyGroupSinglelineStyle">
         <item name="android:orientation">vertical</item>
+        <item name="android:paddingBottom">18dp</item>
 
+    </style>
+
+    <style name="dayOfWeekSelectorLetterAppearance">
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textSize">27sp</item>
+    </style>
+
+    <style name="dayOfWeekSelectorLetterAppearance.Unselected" parent="dayOfWeekSelectorLetterAppearance">
+        <item name="android:textColor">@color/textColorMid</item>
+    </style>
+
+    <style name="dayOfWeekSelectorLetterAppearance.Selected" parent="dayOfWeekSelectorLetterAppearance">
+        <item name="android:textColor">#FFF</item>
+        <item name="android:fontFamily">sans-serif-normal</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="checkboxTextStyle">
+        <item name="android:textColor">@color/textColorMid</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+
+    <style name="hourPickerHourStyle" parent="durationPickerDigitViewStyle">
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="hourPickerAmPmStyle" parent="durationPickerUnitViewStyle">
+        <item name="android:textSize">16dp</item>
+        <item name="android:textColor">@color/textColorMid</item>
     </style>
 
 </resources>

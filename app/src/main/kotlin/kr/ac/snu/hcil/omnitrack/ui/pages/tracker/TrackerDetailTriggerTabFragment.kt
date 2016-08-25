@@ -28,6 +28,8 @@ class TrackerDetailTriggerTabFragment : TrackerDetailActivity.ChildFragment() {
 
     private lateinit var newTriggerButton: FloatingActionButton
 
+    private var expandedTriggerPosition: Int = -1
+
     private val triggerTypeDialog: AlertDialog by lazy {
         NewTriggerTypeSelectionDialogHelper.builder(context) {
             type ->
@@ -83,6 +85,11 @@ class TrackerDetailTriggerTabFragment : TrackerDetailActivity.ChildFragment() {
 
         override fun onBindViewHolder(holder: ATriggerViewHolder<out OTTrigger>, position: Int) {
             holder.bind(getTriggers()[position])
+            if (expandedTriggerPosition == position) {
+                holder.setIsExpanded(true, false)
+            } else {
+                holder.setIsExpanded(false, false)
+            }
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ATriggerViewHolder<out OTTrigger> {
@@ -108,6 +115,16 @@ class TrackerDetailTriggerTabFragment : TrackerDetailActivity.ChildFragment() {
         override fun onTriggerRemove(position: Int) {
             OTApplication.app.triggerManager.removeTrigger(getTriggers()[position])
             this.notifyItemRemoved(position)
+        }
+
+        override fun onTriggerExpand(position: Int) {
+            expandedTriggerPosition = position
+            adapter.notifyDataSetChanged()
+        }
+
+        override fun onTriggerCollapse(position: Int) {
+            expandedTriggerPosition = -1
+            adapter.notifyDataSetChanged()
         }
     }
 

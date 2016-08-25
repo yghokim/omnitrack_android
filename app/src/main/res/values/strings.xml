@@ -149,16 +149,13 @@
     <string name="friday_short">fri</string>
     <string name="saturday_short">sat</string>
 
-    <string-array name="days_of_week_short">
-        <item>@string/sunday_short</item>
-        <item>@string/monday_short</item>
-        <item>@string/tuesday_short</item>
-        <item>@string/wednesday_short</item>
-        <item>@string/thursday_short</item>
-        <item>@string/friday_short</item>
-        <item>@string/saturday_short</item>
-    </string-array>
-
+    <string name="sunday_oneletter">S</string>
+    <string name="monday_oneletter">M</string>
+    <string name="tuesday_oneletter">T</string>
+    <string name="wednesday_oneletter">W</string>
+    <string name="thursday_oneletter">T</string>
+    <string name="friday_oneletter">F</string>
+    <string name="saturday_oneletter">S</string>
 
     <string name="title_activity_tracker_new">New Tracker</string>
     <string name="title_activity_tracker_edit">Edit Tracker</string>
@@ -223,6 +220,10 @@
     <string name="format_hour_am">AM %I</string>
     <string name="format_hour_pm">PM %I</string>
 
+    <string name="time_am">AM</string>
+    <string name="time_pm">PM</string>
+
+
     <string name="title_activity_projects">My Projects</string>
     <string name="title_activity_project_settings">Project Settings</string>
     <string name="title_activity_attribute_detail">Attribute Detail</string>
@@ -240,6 +241,7 @@
     <string name="msg_trigger_time_config_type">Period Type</string>
 
     <string name="msg_trigger_time_config_interval">Interval</string>
+    <string name="msg_trigger_time_config_alarm_time">Trigger time</string>
 
     <string name="msg_trigger_time_config_repeat_range">Repeat Range</string>
 

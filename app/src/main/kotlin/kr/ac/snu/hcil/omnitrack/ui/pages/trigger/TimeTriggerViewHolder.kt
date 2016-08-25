@@ -56,4 +56,13 @@ class TimeTriggerViewHolder : ATriggerViewHolder<OTTimeTrigger> {
         }
     }
 
+
+    override fun updateTriggerWithViewSettings(expandedView: View, trigger: OTTimeTrigger) {
+        if (expandedView is TimeTriggerConfigurationPanel) {
+            trigger.configType = expandedView.configMode
+            trigger.configVariables = expandedView.extractConfigVariables()
+            trigger.rangeVariables = expandedView.extractRangeVariables()
+        }
+    }
+
 }

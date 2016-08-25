@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <android.support.v7.widget.AppCompatImageButton
+        android:id="@+id/ui_button_up"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/button_height_small"
+        android:layout_alignEnd="@+id/ui_value_group"
+        android:layout_alignParentStart="true"
+        android:background="@drawable/button_background_formlike"
+        android:src="@drawable/up_dark"
+        android:tint="@color/textColorLight" />
+
+    <RelativeLayout
+        android:id="@+id/ui_value_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ui_button_up"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal"
+        android:paddingLeft="5dp"
+
+        android:paddingRight="5dp">
+
+        <TextView
+            android:id="@+id/ui_hour"
+            style="@style/hourPickerHourStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:focusable="true"
+            android:text="09:00" />
+
+        <Button
+            android:id="@+id/ui_ampm"
+            style="@style/hourPickerAmPmStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/ui_hour"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/ui_hour"
+            android:background="@drawable/transparent_button_background"
+            android:gravity="bottom"
+            android:paddingBottom="6dp"
+            android:text="AM" />
+
+    </RelativeLayout>
+
+    <android.support.v7.widget.AppCompatImageButton
+
+        android:id="@+id/ui_button_down"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/button_height_small"
+        android:layout_alignEnd="@+id/ui_value_group"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/ui_value_group"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/button_background_formlike"
+        android:src="@drawable/down_dark"
+        android:tint="@color/textColorLight" />
+
+</merge>

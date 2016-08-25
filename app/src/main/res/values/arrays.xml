@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="days_of_week_short">
+        <item>@string/sunday_short</item>
+        <item>@string/monday_short</item>
+        <item>@string/tuesday_short</item>
+        <item>@string/wednesday_short</item>
+        <item>@string/thursday_short</item>
+        <item>@string/friday_short</item>
+        <item>@string/saturday_short</item>
+    </string-array>
+
+    <string-array name="days_of_week_oneletter">
+        <item>@string/sunday_oneletter</item>
+        <item>@string/monday_oneletter</item>
+        <item>@string/tuesday_oneletter</item>
+        <item>@string/wednesday_oneletter</item>
+        <item>@string/thursday_oneletter</item>
+        <item>@string/friday_oneletter</item>
+        <item>@string/saturday_oneletter</item>
+    </string-array>
+
+</resources>

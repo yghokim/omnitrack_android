@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:divider="@android:drawable/divider_horizontal_bright"
+    android:divider="@drawable/bottom_separator_light"
+    android:dividerPadding="@dimen/activity_horizontal_margin"
     android:orientation="vertical"
     android:showDividers="middle">
 
@@ -13,7 +14,7 @@
         <TextView
             style="@style/PropertyHeaderStyle"
             android:layout_gravity="center_vertical"
-            android:layout_marginRight="8dp"
+            android:layout_marginRight="12dp"
             android:paddingLeft="@dimen/activity_horizontal_margin"
             android:text="@string/msg_trigger_time_config_type" />
 
@@ -21,7 +22,9 @@
             android:id="@+id/ui_spinner_config_type"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_weight="1"
+            android:background="@drawable/spinner_background" />
     </LinearLayout>
 
 
@@ -41,12 +44,27 @@
             android:layout_height="wrap_content" />
     </LinearLayout>
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.common.DateTimePicker
-        android:id="@+id/ui_time_picker"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:numbersBackgroundColor="@color/colorSecondary"
-        android:numbersSelectorColor="@color/colorSecondary" />
+    <LinearLayout
+        android:id="@+id/ui_alarm_group"
+        style="@style/propertyGroupMultilineStyle"
+        android:layout_gravity="center_horizontal">
+
+        <TextView
+            style="@style/propertyMultilineHeaderStyle"
+            android:layout_gravity="center_vertical"
+            android:text="@string/msg_trigger_time_config_alarm_time" />
+
+        <kr.ac.snu.hcil.omnitrack.ui.components.common.DateTimePicker
+            android:id="@+id/ui_time_picker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="12dp"
+            android:numbersBackgroundColor="@color/colorSecondary"
+            android:numbersSelectorColor="@color/colorSecondary" />
+
+    </LinearLayout>
 
 
     <LinearLayout
@@ -58,10 +76,30 @@
             android:layout_gravity="center_vertical"
             android:text="@string/msg_trigger_time_config_repeat_range" />
 
-        <kr.ac.snu.hcil.omnitrack.ui.components.common.SelectionView
+
+        <CheckBox
+            android:id="@+id/ui_checkbox_range_use_timespan"
+            style="@style/checkboxTextStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="8dp"
+            android:text="Use Time Range" />
+
+        <kr.ac.snu.hcil.omnitrack.ui.components.common.HourRangePicker
+            android:id="@+id/ui_range_timespan_picker"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin" />
+
+        <kr.ac.snu.hcil.omnitrack.ui.components.common.DayOfWeekSelector
             android:id="@+id/ui_day_of_week_selector"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="12dp"
             android:layout_marginTop="6dp" />
 
     </LinearLayout>

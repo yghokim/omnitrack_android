@@ -81,35 +81,14 @@ class DateTimePicker(context: Context, attrs: AttributeSet? = null) : FrameLayou
             }
         }
 
-    var hour: Int
+    val hour: Int
         get() = calendar.getHour()
-        set(value) {
-            if (hour != value) {
-                calendar.set(Calendar.HOUR, value)
-                refresh()
-                timeChanged.invoke(this, time)
-            }
-        }
 
-    var minute: Int
+    val minute: Int
         get() = calendar.getMinute()
-        set(value) {
-            if (minute != value) {
-                calendar.set(Calendar.MINUTE, value)
-                refresh()
-                timeChanged.invoke(this, time)
-            }
-        }
 
-    var amPm: Int
+    val amPm: Int
         get() = calendar.getAmPm()
-        set(value) {
-            if (amPm != value) {
-                calendar.set(Calendar.AM_PM, value)
-                refresh()
-                timeChanged.invoke(this, time)
-            }
-        }
 
 
     private val pickerValueChangedHandler = {
@@ -233,6 +212,16 @@ class DateTimePicker(context: Context, attrs: AttributeSet? = null) : FrameLayou
     fun setToCurrent() {
         calendar = Calendar.getInstance()
         refresh()
+    }
+
+    fun setTime(hour: Int, minute: Int, amPm: Int) {
+        if (this.hour != hour || this.minute != minute || this.amPm != amPm) {
+            calendar.set(Calendar.HOUR, hour)
+            calendar.set(Calendar.MINUTE, minute)
+            calendar.set(Calendar.AM_PM, amPm)
+            refresh()
+            timeChanged.invoke(this, time)
+        }
     }
 
     private fun refresh() {

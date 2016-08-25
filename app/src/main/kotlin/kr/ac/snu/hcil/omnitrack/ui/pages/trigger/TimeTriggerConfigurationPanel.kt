@@ -6,25 +6,30 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.LinearLayout
-import android.widget.Spinner
+import android.widget.*
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTrigger
 import kr.ac.snu.hcil.omnitrack.ui.components.common.DateTimePicker
+import kr.ac.snu.hcil.omnitrack.ui.components.common.DayOfWeekSelector
 import kr.ac.snu.hcil.omnitrack.ui.components.common.DurationPicker
-import kr.ac.snu.hcil.omnitrack.ui.components.common.SelectionView
+import kr.ac.snu.hcil.omnitrack.ui.components.common.HourRangePicker
 import kr.ac.snu.hcil.omnitrack.utils.IconNameEntryArrayAdapter
 
 /**
  * Created by Young-Ho Kim on 2016-08-24.
  */
-class TimeTriggerConfigurationPanel : LinearLayout, AdapterView.OnItemSelectedListener {
+class TimeTriggerConfigurationPanel : LinearLayout, AdapterView.OnItemSelectedListener, CompoundButton.OnCheckedChangeListener {
+
     private val configSpinner: Spinner
     private val intervalConfigGroup: ViewGroup
+    private val alarmConfigGroup: ViewGroup
+
     private val durationPicker: DurationPicker
     private val timePicker: DateTimePicker
-    private val dayOfWeekPicker: SelectionView
+    private val dayOfWeekPicker: DayOfWeekSelector
+
+    private val timeSpanCheckBox: CheckBox
+    private val timeSpanPicker: HourRangePicker
 
     private var refreshingViews = false
 
@@ -61,15 +66,21 @@ class TimeTriggerConfigurationPanel : LinearLayout, AdapterView.OnItemSelectedLi
         configSpinner.setOnItemSelectedListener(this)
 
         intervalConfigGroup = findViewById(R.id.ui_interval_group) as ViewGroup
+        alarmConfigGroup = findViewById(R.id.ui_alarm_group) as ViewGroup
+
 
         durationPicker = findViewById(R.id.ui_duration_picker) as DurationPicker
         timePicker = findViewById(R.id.ui_time_picker) as DateTimePicker
         timePicker.mode = DateTimePicker.MINUTE
         timePicker.isDayUsed = false
 
-        dayOfWeekPicker = findViewById(R.id.ui_day_of_week_selector) as SelectionView
-        dayOfWeekPicker.setValues(resources.getStringArray(R.array.days_of_week_short))
+        dayOfWeekPicker = findViewById(R.id.ui_day_of_week_selector) as DayOfWeekSelector
+        dayOfWeekPicker.allowNoneSelection = false
 
+        timeSpanCheckBox = findViewById(R.id.ui_checkbox_range_use_timespan) as CheckBox
+        timeSpanCheckBox.setOnCheckedChangeListener(this)
+
+        timeSpanPicker = findViewById(R.id.ui_range_timespan_picker) as HourRangePicker
 
         applyConfigMode(OTTimeTrigger.CONFIG_TYPE_ALARM, false)
     }
@@ -84,53 +95,94 @@ class TimeTriggerConfigurationPanel : LinearLayout, AdapterView.OnItemSelectedLi
         when (mode) {
             OTTimeTrigger.CONFIG_TYPE_ALARM -> {
                 configSpinner.setSelection(0)
-                timePicker.visibility = VISIBLE
+                alarmConfigGroup.visibility = VISIBLE
                 intervalConfigGroup.visibility = GONE
+                timeSpanCheckBox.visibility = GONE
+                timeSpanPicker.visibility = GONE
             }
 
             OTTimeTrigger.CONFIG_TYPE_INTERVAL -> {
                 configSpinner.setSelection(1)
-                timePicker.visibility = GONE
+                alarmConfigGroup.visibility = GONE
                 intervalConfigGroup.visibility = VISIBLE
+                timeSpanCheckBox.visibility = VISIBLE
             }
         }
         refreshingViews = false
     }
 
     fun applyConfigVariables(variables: Int) {
-        when (configMode) {
-            OTTimeTrigger.CONFIG_TYPE_ALARM -> {
-                timePicker.hour = OTTimeTrigger.AlarmConfig.getHour(variables)
-                timePicker.minute = OTTimeTrigger.AlarmConfig.getMinute(variables)
-            }
 
-            OTTimeTrigger.CONFIG_TYPE_INTERVAL -> {
-                durationPicker.durationSeconds = OTTimeTrigger.IntervalConfig.getIntervalSeconds(variables)
+        if (OTTimeTrigger.IntervalConfig.isSpecified(variables)) {
+            when (configMode) {
+                OTTimeTrigger.CONFIG_TYPE_ALARM -> {
+                    timePicker.setTime(OTTimeTrigger.AlarmConfig.getHour(variables), OTTimeTrigger.AlarmConfig.getMinute(variables), OTTimeTrigger.AlarmConfig.getAmPm(variables))
+                }
+
+                OTTimeTrigger.CONFIG_TYPE_INTERVAL -> {
+                    durationPicker.durationSeconds = OTTimeTrigger.IntervalConfig.getIntervalSeconds(variables)
+                }
             }
         }
     }
 
     fun applyRangeVariables(variables: Int) {
+        if (OTTimeTrigger.Range.isAllDayUsed(variables)) {
+            dayOfWeekPicker.checkedFlagsInteger = 0b1111111
+        } else {
+            dayOfWeekPicker.checkedFlagsInteger = OTTimeTrigger.Range.getAllDayOfWeekFlags(variables)
+        }
 
+        if (configMode == OTTimeTrigger.CONFIG_TYPE_INTERVAL) {
+            if (OTTimeTrigger.Range.getStartHour(variables) == OTTimeTrigger.Range.getEndHour(variables)) // all day
+            {
+                timeSpanCheckBox.isChecked = false
+                timeSpanPicker.fromHourOfDay = 9
+                timeSpanPicker.toHourOfDay = 22
+            } else {
+                timeSpanCheckBox.isChecked = true
+                timeSpanPicker.fromHourOfDay = OTTimeTrigger.Range.getStartHour(variables)
+                timeSpanPicker.toHourOfDay = OTTimeTrigger.Range.getEndHour(variables)
 
+            }
+        }
     }
 
     fun extractConfigVariables(): Int {
 
-        return when (configMode) {
+        val result = when (configMode) {
             OTTimeTrigger.CONFIG_TYPE_ALARM ->
                 OTTimeTrigger.AlarmConfig.makeConfig(timePicker.hour, timePicker.minute, timePicker.amPm)
             OTTimeTrigger.CONFIG_TYPE_INTERVAL ->
                 OTTimeTrigger.IntervalConfig.makeConfig(durationPicker.durationSeconds)
+            else -> 0
+        }
+        return result
+    }
 
+    fun extractRangeVariables(): Int {
+        return when (configMode) {
+            OTTimeTrigger.CONFIG_TYPE_ALARM ->
+                OTTimeTrigger.Range.makeConfig(dayOfWeekPicker.checkedFlagsInteger)
+            OTTimeTrigger.CONFIG_TYPE_INTERVAL ->
+                if (timeSpanCheckBox.isChecked)
+                    OTTimeTrigger.Range.makeConfig(dayOfWeekPicker.checkedFlagsInteger, timeSpanPicker.fromHourOfDay, timeSpanPicker.toHourOfDay)
+                else OTTimeTrigger.Range.makeConfig(dayOfWeekPicker.checkedFlagsInteger)
             else -> 0
         }
     }
 
-    fun extractRangeVariables(): Int {
-        return 0
-    }
 
+    override fun onCheckedChanged(view: CompoundButton, p1: Boolean) {
+        if (view === timeSpanCheckBox) {
+            TransitionManager.beginDelayedTransition(this)
+            if (timeSpanCheckBox.isChecked) {
+                timeSpanPicker.visibility = View.VISIBLE
+            } else {
+                timeSpanPicker.visibility = View.GONE
+            }
+        }
+    }
 
     override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
         if (!refreshingViews) {

@@ -186,8 +186,6 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
             else -> false
         }
 
-        println("restored isOn : $isOn")
-
         return OTTrigger.makeInstance(objectId, id, type, name, trackerObjectId, isOn, serializedProperties)
     }
 

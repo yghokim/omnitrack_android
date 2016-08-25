@@ -38,9 +38,9 @@ class OTTimeTrigger : OTTrigger {
 
 
     open class Config {
-        // 1 top bit is specified flag
+        // 1 bottom bit is specified flag
         companion object {
-            const val IS_SPECIFIED_SHIFT = 31
+            const val IS_SPECIFIED_SHIFT = 0
         }
 
         fun isSpecified(config: Int): Boolean {
@@ -50,11 +50,14 @@ class OTTimeTrigger : OTTrigger {
         fun setIsSpecified(config: Int, specified: Boolean): Int {
             return BitwiseOperationHelper.setBooleanAt(config, specified, IS_SPECIFIED_SHIFT)
         }
+
+        open fun toHumanReadableString(config: Int): String {
+            return Integer.toBinaryString(config)
+        }
     }
 
     object Range : Config() {
         /**32bit Integer
-         * 1 bit : isRangeUsed flag
          * 7 bits : days of week flags
          * 5 bits : time of day(0~24) - start
          * 5 bits : time of day(0~24) - end
@@ -63,20 +66,24 @@ class OTTimeTrigger : OTTrigger {
         const val DAYS_OF_WEEK_FLAGS_MASK = 0b1111111 //1111111
         const val TIME_OF_DAY_MASK = 0b11111 // 11111
 
-        const val DAYS_OF_WEEK_FLAGS_SHIFT = 24
-        const val TIME_OF_DAY_START_SHIFT = 19
-        const val TIME_OF_DAY_END_SHIFT = 14
+        const val DAYS_OF_WEEK_FLAGS_SHIFT = 25
+        const val TIME_OF_DAY_START_SHIFT = 20
+        const val TIME_OF_DAY_END_SHIFT = 15
 
         fun isAllDayUsed(range: Int): Boolean {
             return BitwiseOperationHelper.getIntAt(range, DAYS_OF_WEEK_FLAGS_SHIFT, DAYS_OF_WEEK_FLAGS_MASK) == DAYS_OF_WEEK_FLAGS_MASK
         }
 
         fun isDayOfWeekUsed(range: Int, dayOfWeek: Int): Boolean {
-            return BitwiseOperationHelper.getBooleanAt(range, DAYS_OF_WEEK_FLAGS_SHIFT + (7 - dayOfWeek))
+            return BitwiseOperationHelper.getBooleanAt(range, DAYS_OF_WEEK_FLAGS_SHIFT + (6 - dayOfWeek))
+        }
+
+        fun getAllDayOfWeekFlags(range: Int): Int {
+            return BitwiseOperationHelper.getIntAt(range, DAYS_OF_WEEK_FLAGS_SHIFT, DAYS_OF_WEEK_FLAGS_MASK)
         }
 
         fun setIsDayOfWeekUsed(range: Int, dayOfWeek: Int, isUsed: Boolean): Int {
-            return BitwiseOperationHelper.setBooleanAt(range, isUsed, DAYS_OF_WEEK_FLAGS_SHIFT + (7 - dayOfWeek))
+            return BitwiseOperationHelper.setBooleanAt(range, isUsed, DAYS_OF_WEEK_FLAGS_SHIFT + (6 - dayOfWeek))
         }
 
         fun getStartHour(range: Int): Int {
@@ -86,24 +93,34 @@ class OTTimeTrigger : OTTrigger {
         fun getEndHour(range: Int): Int {
             return BitwiseOperationHelper.getIntAt(range, TIME_OF_DAY_END_SHIFT, TIME_OF_DAY_MASK)
         }
+
+        fun makeConfig(dayOfWeekFlags: Int): Int {
+            return makeConfig(dayOfWeekFlags, 0, 0)
+        }
+
+        fun makeConfig(dayOfWeekFlags: Int, startHour: Int, endHour: Int): Int {
+            return (1 shl IS_SPECIFIED_SHIFT) or (dayOfWeekFlags shl DAYS_OF_WEEK_FLAGS_SHIFT) or (startHour shl TIME_OF_DAY_START_SHIFT) or (endHour shl TIME_OF_DAY_END_SHIFT)
+        }
+
     }
 
     object AlarmConfig : Config() {
 
         /*
             32bit integer
-            1bit : isSpecified
             1bit : ampm (0~1)
             4bits : hour (0~11)
             6bits : minute(0~59)
+
+            last 1 bit : isSpecified
          */
         const val AM_PM_MASK = 0b1
-        const val HOUR_MASK = 0b11111
+        const val HOUR_MASK = 0b1111
         const val MINUTE_MASK = 0b111111
 
-        const val AM_PM_SHIFT = 30
-        const val HOUR_SHIFT = 26
-        const val MINUTE_SHIFT = 20
+        const val AM_PM_SHIFT = 31
+        const val HOUR_SHIFT = 27
+        const val MINUTE_SHIFT = 21
 
 
         fun getHour(config: Int): Int {
@@ -136,6 +153,10 @@ class OTTimeTrigger : OTTrigger {
                     (minute shl MINUTE_SHIFT) or
                     (amPm shl AM_PM_SHIFT)
         }
+
+        override fun toHumanReadableString(config: Int): String {
+            return super.toHumanReadableString(config) + " - hour: ${getHour(config)}, minute: ${getMinute(config)}, amPm: ${getAmPm(config)}"
+        }
     }
 
     object IntervalConfig : Config() {
@@ -146,7 +167,7 @@ class OTTimeTrigger : OTTrigger {
             16 bits: seconds
          */
 
-        const val TIME_SHIFT = 17
+        const val TIME_SHIFT = 16
 
         const val TIME_MASK = 0xFFFF
 
@@ -160,11 +181,15 @@ class OTTimeTrigger : OTTrigger {
         }
 
         fun makeConfig(hours: Int, minutes: Int, seconds: Int): Int {
-            return 1 shl IS_SPECIFIED_SHIFT or (hours * 3600 + minutes * 60 + seconds) shl TIME_SHIFT
+            return 1 shl IS_SPECIFIED_SHIFT or ((hours * 3600 + minutes * 60 + seconds) shl TIME_SHIFT)
         }
 
         fun makeConfig(durationSeconds: Int): Int {
-            return 1 shl IS_SPECIFIED_SHIFT or durationSeconds shl TIME_SHIFT
+            return (1 shl IS_SPECIFIED_SHIFT) or (durationSeconds shl TIME_SHIFT)
+        }
+
+        override fun toHumanReadableString(config: Int): String {
+            return super.toHumanReadableString(config) + "| duration seconds : ${getIntervalSeconds(config)}"
         }
     }
 
@@ -185,7 +210,7 @@ class OTTimeTrigger : OTTrigger {
         isDirtySinceLastSync = true
     }
 
-    var configVariables: Int by ObservableMapDelegate(0, properties) {
+    var configVariables: Int by ObservableMapDelegate(AlarmConfig.makeConfig(9, 0, 1), properties) {
         isDirtySinceLastSync = true
     }
 

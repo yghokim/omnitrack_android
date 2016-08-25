@@ -16,7 +16,7 @@ class ObservableMapDelegate<OWNER, TYPE : Any>(val initialValue: TYPE, val map: 
     }
 
     override fun setValue(thisRef: OWNER, property: KProperty<*>, value: TYPE) {
-        if (map[property.name] == value) {
+        if (map[property.name] != value) {
             map[property.name] = value
             changedListener.invoke(value)
         }

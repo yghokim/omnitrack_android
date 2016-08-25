@@ -164,6 +164,8 @@ class DurationPicker : FrameLayout, View.OnClickListener {
 
         durationSeconds = getNumberFromDigitArray(0) * 3600 + getNumberFromDigitArray(2) * 60 + getNumberFromDigitArray(4)
 
+        println("durationSeconds: $durationSeconds, ${getNumberFromDigitArray(0)}:${getNumberFromDigitArray(2)}:${getNumberFromDigitArray(4)}")
+
         suspendRefreshDigits = false
     }
 

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android"
+    android:paddingEnd="2dp">
+    <item android:drawable="@drawable/form_rounded" />
+
+    <item
+        android:drawable="@drawable/down_dark"
+        android:gravity="center_vertical|right" />
+</layer-list>

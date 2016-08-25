@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <kr.ac.snu.hcil.omnitrack.ui.components.common.HourPicker
+        android:id="@+id/ui_picker_from"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="6dp"
+        android:layout_marginRight="6dp"
+        android:text="~"
+        android:textAlignment="center"
+        android:textColor="@color/textColorMid"
+        android:textSize="24dp" />
+
+    <kr.ac.snu.hcil.omnitrack.ui.components.common.HourPicker
+        android:id="@+id/ui_picker_to"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1" />
+</merge>

@@ -15,12 +15,12 @@ object BitwiseOperationHelper {
     }
 
     fun getBooleanAt(integer: Int, shift: Int): Boolean {
-        return ((integer shr shift) or 1) == 1
+        return ((integer shr shift) and 1) == 1
     }
 
     fun getIntAt(integer: Int, shift: Int, mask: Int): Int {
 
-        return ((integer shr shift) or mask)
+        return ((integer shr shift) and mask)
     }
 
     fun setIntAt(integer: Int, value: Int, shift: Int, mask: Int): Int {

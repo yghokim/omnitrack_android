@@ -4,6 +4,7 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:paddingBottom="8dp"
+    android:paddingEnd="12dp"
     android:paddingStart="8dp"
     android:paddingTop="8dp">
 
@@ -26,8 +27,10 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="6dp"
-        android:fontFamily="sans-serif-normal"
+        android:fontFamily="sans-serif-light"
         android:text="Repeat with Interval"
         android:textColor="@color/textColorDark"
-        android:textSize="16dp" />
+
+        android:textSize="16dp"
+        android:textStyle="italic" />
 </LinearLayout>
