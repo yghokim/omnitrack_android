@@ -12,7 +12,7 @@
         android:layout_centerVertical="true"
         android:layout_marginRight="@dimen/choice_indicator_spacing"
         android:scaleType="fitStart"
-        android:src="@drawable/toggle_checked" />
+        android:src="@drawable/checkbox_checked" />
 
     <TextView
         android:id="@+id/ui_text"

@@ -117,15 +117,20 @@ class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
                 id = entry.id
                 if (selectedIds.contains(entry.id)) {
                     //checked or selected
-                    if (multiSelectionMode) {
-                        indicator.setImageResource(R.drawable.toggle_checked)
+                    indicator.setImageResource(if (multiSelectionMode) {
+                        R.drawable.checkbox_checked
                     } else {
-                        indicator.setImageResource(R.drawable.toggle_selected)
-                    }
+                        R.drawable.radiobutton_selected
+                    })
 
                     //textView.setTextColor(resources.getColor(R.color.textColorMid, null))
                 } else {
-                    indicator.setImageResource(R.drawable.toggle_empty)
+                    indicator.setImageResource(
+                            if (multiSelectionMode) {
+                                R.drawable.checkbox_empty
+                            } else {
+                                R.drawable.radiobutton_empty
+                            })
                     //textView.setTextColor(resources.getColor(R.color.textColorLight, null))
                 }
             }
