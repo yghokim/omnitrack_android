@@ -42,6 +42,26 @@
             android:id="@+id/ui_duration_picker"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
+
+
+        <CheckBox
+            android:id="@+id/ui_checkbox_interval_use_timespan"
+            style="@style/checkboxTextStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="8dp"
+            android:text="Use Time Range" />
+
+        <kr.ac.snu.hcil.omnitrack.ui.components.common.HourRangePicker
+            android:id="@+id/ui_trigger_interval_timespan_picker"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:visibility="gone" />
+
     </LinearLayout>
 
     <LinearLayout
@@ -85,25 +105,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:orientation="vertical"
-            android:visibility="gone">
+            android:orientation="vertical">
 
-            <CheckBox
-                android:id="@+id/ui_checkbox_range_use_timespan"
-                style="@style/checkboxTextStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:layout_marginLeft="8dp"
-                android:text="Use Time Range" />
-
-            <kr.ac.snu.hcil.omnitrack.ui.components.common.HourRangePicker
-                android:id="@+id/ui_range_timespan_picker"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="15dp"
-                android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                android:layout_marginRight="@dimen/activity_horizontal_margin" />
 
             <kr.ac.snu.hcil.omnitrack.ui.components.common.DayOfWeekSelector
                 android:id="@+id/ui_day_of_week_selector"
@@ -113,6 +116,39 @@
                 android:layout_marginRight="12dp"
                 android:layout_marginTop="6dp" />
 
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/button_height_normal"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal">
+
+                <CheckBox
+                    android:id="@+id/ui_checkbox_range_specify_end"
+                    style="@style/checkboxTextStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="left"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginLeft="8dp"
+                    android:gravity="center_vertical"
+                    android:text="Finish on End Date" />
+
+                <Button
+                    android:id="@+id/ui_button_end_date"
+                    style="@style/Base.Widget.AppCompat.Button.Borderless"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="right"
+                    android:background="@drawable/button_background_formlike"
+                    android:paddingLeft="12dp"
+                    android:paddingRight="12dp"
+                    android:text="Aug 8 2016"
+                    android:textColor="@color/textColorMid"
+                    android:visibility="gone" />
+            </FrameLayout>
         </LinearLayout>
     </LinearLayout>
 

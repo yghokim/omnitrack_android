@@ -59,16 +59,23 @@ class OTTimeTrigger : OTTrigger {
     object Range : Config() {
         /**32bit Integer
          * 7 bits : days of week flags
-         * 5 bits : time of day(0~24) - start
-         * 5 bits : time of day(0~24) - end
-         *
+         * 1 bit: isLimitDateSpecified
+         * 5bit:  years from 2016 ( max +32)
+         * 4bit: zeroBasedMonth (0~11)
+         * 5bit: dayOfMonth(1~31)
          */
+
         const val DAYS_OF_WEEK_FLAGS_MASK = 0b1111111 //1111111
-        const val TIME_OF_DAY_MASK = 0b11111 // 11111
+
+        const val YEAR_MASK = 0b11111 //1111111
+        const val MONTH_MASK = 0b1111
+        const val DAY_MASK = 0b11111
 
         const val DAYS_OF_WEEK_FLAGS_SHIFT = 25
-        const val TIME_OF_DAY_START_SHIFT = 20
-        const val TIME_OF_DAY_END_SHIFT = 15
+        const val IS_END_SPECIFIED_SHIFT = 24
+        const val YEAR_SHIFT = 19
+        const val MONTH_SHIFT = 15
+        const val DAY_SHIFT = 10
 
         fun isAllDayUsed(range: Int): Boolean {
             return BitwiseOperationHelper.getIntAt(range, DAYS_OF_WEEK_FLAGS_SHIFT, DAYS_OF_WEEK_FLAGS_MASK) == DAYS_OF_WEEK_FLAGS_MASK
@@ -86,22 +93,50 @@ class OTTimeTrigger : OTTrigger {
             return BitwiseOperationHelper.setBooleanAt(range, isUsed, DAYS_OF_WEEK_FLAGS_SHIFT + (6 - dayOfWeek))
         }
 
-        fun getStartHour(range: Int): Int {
-            return BitwiseOperationHelper.getIntAt(range, TIME_OF_DAY_START_SHIFT, TIME_OF_DAY_MASK)
+        fun getEndYear(range: Int): Int {
+            return 2016 + BitwiseOperationHelper.getIntAt(range, YEAR_SHIFT, YEAR_MASK)
         }
 
-        fun getEndHour(range: Int): Int {
-            return BitwiseOperationHelper.getIntAt(range, TIME_OF_DAY_END_SHIFT, TIME_OF_DAY_MASK)
+        fun setEndYear(range: Int, year: Int): Int {
+            if (year - 2016 < 0 || year - 2016 > YEAR_MASK) {
+                throw Exception("year range exceeded.")
+            }
+
+            return BitwiseOperationHelper.setIntAt(range, year - 2016, YEAR_SHIFT, YEAR_MASK)
+        }
+
+        fun getEndZeroBasedMonth(range: Int): Int {
+            return BitwiseOperationHelper.getIntAt(range, MONTH_SHIFT, MONTH_MASK)
+        }
+
+        fun setEndZeroBasedMonth(range: Int, month: Int): Int {
+
+            return BitwiseOperationHelper.setIntAt(range, month, MONTH_SHIFT, MONTH_MASK)
+        }
+
+        fun getEndDay(range: Int): Int {
+            return BitwiseOperationHelper.getIntAt(range, DAY_SHIFT, DAY_MASK)
+        }
+
+        fun setEndDay(range: Int, day: Int): Int {
+
+            return BitwiseOperationHelper.setIntAt(range, day, DAY_SHIFT, DAY_MASK)
+        }
+
+        fun isEndSpecified(range: Int): Boolean {
+            return BitwiseOperationHelper.getBooleanAt(range, IS_END_SPECIFIED_SHIFT)
         }
 
         fun makeConfig(dayOfWeekFlags: Int): Int {
-            return makeConfig(dayOfWeekFlags, 0, 0)
+            return (1 shl IS_SPECIFIED_SHIFT) or (dayOfWeekFlags shl DAYS_OF_WEEK_FLAGS_SHIFT) or
+                    (0 shl IS_END_SPECIFIED_SHIFT)
         }
 
-        fun makeConfig(dayOfWeekFlags: Int, startHour: Int, endHour: Int): Int {
-            return (1 shl IS_SPECIFIED_SHIFT) or (dayOfWeekFlags shl DAYS_OF_WEEK_FLAGS_SHIFT) or (startHour shl TIME_OF_DAY_START_SHIFT) or (endHour shl TIME_OF_DAY_END_SHIFT)
+        fun makeConfig(dayOfWeekFlags: Int, endYear: Int, endMonth: Int, endDay: Int): Int {
+            return (1 shl IS_SPECIFIED_SHIFT) or (dayOfWeekFlags shl DAYS_OF_WEEK_FLAGS_SHIFT) or
+                    (1 shl IS_END_SPECIFIED_SHIFT) or
+                    ((endYear - 2016) shl YEAR_SHIFT) or (endMonth shl MONTH_SHIFT) or (endDay shl DAY_SHIFT)
         }
-
     }
 
     object AlarmConfig : Config() {
@@ -111,7 +146,6 @@ class OTTimeTrigger : OTTrigger {
             1bit : ampm (0~1)
             4bits : hour (0~11)
             6bits : minute(0~59)
-            1bit: useRepeatRange
 
             last 1 bit : isSpecified
          */
@@ -166,27 +200,40 @@ class OTTimeTrigger : OTTrigger {
 
         32 bit integer
             16 bits: seconds
+            5 bits : time of day(0~24) - start
+            5 bits : time of day(0~24) - end
          */
 
-        const val TIME_SHIFT = 16
+        const val DURATION_SHIFT = 16
+        const val TIME_OF_DAY_START_SHIFT = 11
+        const val TIME_OF_DAY_END_SHIFT = 6
+
 
         const val TIME_MASK = 0xFFFF
-
+        const val TIME_OF_DAY_MASK = 0b11111 // 11111
 
         fun getIntervalSeconds(config: Int): Int {
-            return BitwiseOperationHelper.getIntAt(config, TIME_SHIFT, TIME_MASK)
+            return BitwiseOperationHelper.getIntAt(config, DURATION_SHIFT, TIME_MASK)
         }
 
         fun setIntervalSeconds(config: Int, interval: Int): Int {
-            return BitwiseOperationHelper.setIntAt(config, interval, TIME_SHIFT, TIME_MASK)
+            return BitwiseOperationHelper.setIntAt(config, interval, DURATION_SHIFT, TIME_MASK)
         }
 
-        fun makeConfig(hours: Int, minutes: Int, seconds: Int): Int {
-            return 1 shl IS_SPECIFIED_SHIFT or ((hours * 3600 + minutes * 60 + seconds) shl TIME_SHIFT)
+        fun getStartHour(range: Int): Int {
+            return BitwiseOperationHelper.getIntAt(range, TIME_OF_DAY_START_SHIFT, TIME_OF_DAY_MASK)
+        }
+
+        fun getEndHour(range: Int): Int {
+            return BitwiseOperationHelper.getIntAt(range, TIME_OF_DAY_END_SHIFT, TIME_OF_DAY_MASK)
         }
 
         fun makeConfig(durationSeconds: Int): Int {
-            return (1 shl IS_SPECIFIED_SHIFT) or (durationSeconds shl TIME_SHIFT)
+            return makeConfig(durationSeconds, 0, 0)
+        }
+
+        fun makeConfig(durationSeconds: Int, startHour: Int, endHour: Int): Int {
+            return (1 shl IS_SPECIFIED_SHIFT) or (durationSeconds shl DURATION_SHIFT) or (startHour shl TIME_OF_DAY_START_SHIFT) or (endHour shl TIME_OF_DAY_END_SHIFT)
         }
 
         override fun toHumanReadableString(config: Int): String {

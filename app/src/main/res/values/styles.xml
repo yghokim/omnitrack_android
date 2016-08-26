@@ -292,7 +292,7 @@
 
     <style name="checkboxTextStyle">
         <item name="android:textColor">@color/textColorMid</item>
-        <item name="android:textSize">14sp</item>
+        <item name="android:textSize">16sp</item>
         <item name="android:fontFamily">sans-serif-light</item>
     </style>
 

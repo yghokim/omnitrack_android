@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 
+import android.app.DatePickerDialog
 import android.content.Context
 import android.transition.TransitionManager
 import android.util.AttributeSet
@@ -14,12 +15,17 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.DayOfWeekSelector
 import kr.ac.snu.hcil.omnitrack.ui.components.common.DurationPicker
 import kr.ac.snu.hcil.omnitrack.ui.components.common.HourRangePicker
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.BooleanPropertyView
-import kr.ac.snu.hcil.omnitrack.utils.IconNameEntryArrayAdapter
+import kr.ac.snu.hcil.omnitrack.utils.*
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.util.*
 
 /**
  * Created by Young-Ho Kim on 2016-08-24.
  */
-class TimeTriggerConfigurationPanel : LinearLayout, AdapterView.OnItemSelectedListener, CompoundButton.OnCheckedChangeListener {
+class TimeTriggerConfigurationPanel : LinearLayout, AdapterView.OnItemSelectedListener, CompoundButton.OnCheckedChangeListener, DatePickerDialog.OnDateSetListener, View.OnClickListener {
+
+    private val dateFormat: DateFormat
 
     private val configSpinner: Spinner
     private val intervalConfigGroup: ViewGroup
@@ -34,7 +40,12 @@ class TimeTriggerConfigurationPanel : LinearLayout, AdapterView.OnItemSelectedLi
 
     private val isRepeatedView: BooleanPropertyView
 
+    private val isEndSpecifiedCheckBox: CheckBox
+    private val endDateButton: Button
+
     private val repetitionConfigGroup: ViewGroup
+
+    private val repeatEndDate: Calendar
 
     private var refreshingViews = false
 
@@ -64,6 +75,9 @@ class TimeTriggerConfigurationPanel : LinearLayout, AdapterView.OnItemSelectedLi
         addView(inflater.inflate(R.layout.component_time_trigger_config_panel, this, false))
         orientation = LinearLayout.VERTICAL
 
+        dateFormat = SimpleDateFormat(resources.getString(R.string.dateformat_ymd))
+        repeatEndDate = GregorianCalendar(2016, 1, 1)
+
         configSpinner = findViewById(R.id.ui_spinner_config_type) as Spinner
 
         configSpinner.adapter = IconNameEntryArrayAdapter(context,
@@ -90,10 +104,10 @@ class TimeTriggerConfigurationPanel : LinearLayout, AdapterView.OnItemSelectedLi
         dayOfWeekPicker = findViewById(R.id.ui_day_of_week_selector) as DayOfWeekSelector
         dayOfWeekPicker.allowNoneSelection = false
 
-        timeSpanCheckBox = findViewById(R.id.ui_checkbox_range_use_timespan) as CheckBox
+        timeSpanCheckBox = findViewById(R.id.ui_checkbox_interval_use_timespan) as CheckBox
         timeSpanCheckBox.setOnCheckedChangeListener(this)
 
-        timeSpanPicker = findViewById(R.id.ui_range_timespan_picker) as HourRangePicker
+        timeSpanPicker = findViewById(R.id.ui_trigger_interval_timespan_picker) as HourRangePicker
 
         repetitionConfigGroup = findViewById(R.id.ui_repetition_config_group) as ViewGroup
 
@@ -104,8 +118,15 @@ class TimeTriggerConfigurationPanel : LinearLayout, AdapterView.OnItemSelectedLi
             applyIsRepeated(value, true)
         }
 
+        endDateButton = findViewById(R.id.ui_button_end_date) as Button
+        InterfaceHelper.removeButtonTextDecoration(endDateButton)
+        endDateButton.setOnClickListener(this)
+        isEndSpecifiedCheckBox = findViewById(R.id.ui_checkbox_range_specify_end) as CheckBox
+        isEndSpecifiedCheckBox.setOnCheckedChangeListener(this)
+
         applyConfigMode(OTTimeTrigger.CONFIG_TYPE_ALARM, false)
         applyIsRepeated(IsRepeated, false)
+        applyRepeatEndDateToDayOffset(1)
     }
 
     private fun applyIsRepeated(isRepeated: Boolean, animate: Boolean) {
@@ -128,15 +149,12 @@ class TimeTriggerConfigurationPanel : LinearLayout, AdapterView.OnItemSelectedLi
                 configSpinner.setSelection(0)
                 alarmConfigGroup.visibility = VISIBLE
                 intervalConfigGroup.visibility = GONE
-                timeSpanCheckBox.visibility = GONE
-                timeSpanPicker.visibility = GONE
             }
 
             OTTimeTrigger.CONFIG_TYPE_INTERVAL -> {
                 configSpinner.setSelection(1)
                 alarmConfigGroup.visibility = GONE
                 intervalConfigGroup.visibility = VISIBLE
-                timeSpanCheckBox.visibility = VISIBLE
             }
         }
         refreshingViews = false
@@ -152,6 +170,19 @@ class TimeTriggerConfigurationPanel : LinearLayout, AdapterView.OnItemSelectedLi
 
                 OTTimeTrigger.CONFIG_TYPE_INTERVAL -> {
                     durationPicker.durationSeconds = OTTimeTrigger.IntervalConfig.getIntervalSeconds(variables)
+
+                    if (OTTimeTrigger.IntervalConfig.getStartHour(variables) == OTTimeTrigger.IntervalConfig.getEndHour(variables)) // all day
+                    {
+                        timeSpanCheckBox.isChecked = false
+                        timeSpanPicker.fromHourOfDay = 9
+                        timeSpanPicker.toHourOfDay = 22
+                    } else {
+                        timeSpanCheckBox.isChecked = true
+                        timeSpanPicker.fromHourOfDay = OTTimeTrigger.IntervalConfig.getStartHour(variables)
+                        timeSpanPicker.toHourOfDay = OTTimeTrigger.IntervalConfig.getEndHour(variables)
+
+                    }
+
                 }
             }
         }
@@ -164,18 +195,9 @@ class TimeTriggerConfigurationPanel : LinearLayout, AdapterView.OnItemSelectedLi
             dayOfWeekPicker.checkedFlagsInteger = OTTimeTrigger.Range.getAllDayOfWeekFlags(variables)
         }
 
-        if (configMode == OTTimeTrigger.CONFIG_TYPE_INTERVAL) {
-            if (OTTimeTrigger.Range.getStartHour(variables) == OTTimeTrigger.Range.getEndHour(variables)) // all day
-            {
-                timeSpanCheckBox.isChecked = false
-                timeSpanPicker.fromHourOfDay = 9
-                timeSpanPicker.toHourOfDay = 22
-            } else {
-                timeSpanCheckBox.isChecked = true
-                timeSpanPicker.fromHourOfDay = OTTimeTrigger.Range.getStartHour(variables)
-                timeSpanPicker.toHourOfDay = OTTimeTrigger.Range.getEndHour(variables)
-
-            }
+        if (OTTimeTrigger.Range.isEndSpecified(variables)) {
+            isEndSpecifiedCheckBox.isChecked = true
+            applyRepeatEndDate(OTTimeTrigger.Range.getEndYear(variables), OTTimeTrigger.Range.getEndZeroBasedMonth(variables), OTTimeTrigger.Range.getEndDay(variables))
         }
     }
 
@@ -185,24 +207,52 @@ class TimeTriggerConfigurationPanel : LinearLayout, AdapterView.OnItemSelectedLi
             OTTimeTrigger.CONFIG_TYPE_ALARM ->
                 OTTimeTrigger.AlarmConfig.makeConfig(timePicker.hour, timePicker.minute, timePicker.amPm)
             OTTimeTrigger.CONFIG_TYPE_INTERVAL ->
-                OTTimeTrigger.IntervalConfig.makeConfig(durationPicker.durationSeconds)
+                if (timeSpanCheckBox.isChecked) {
+                    OTTimeTrigger.IntervalConfig.makeConfig(durationPicker.durationSeconds, timeSpanPicker.fromHourOfDay, timeSpanPicker.toHourOfDay)
+                } else {
+                    OTTimeTrigger.IntervalConfig.makeConfig(durationPicker.durationSeconds)
+                }
             else -> 0
         }
         return result
     }
 
     fun extractRangeVariables(): Int {
-        return when (configMode) {
-            OTTimeTrigger.CONFIG_TYPE_ALARM ->
-                OTTimeTrigger.Range.makeConfig(dayOfWeekPicker.checkedFlagsInteger)
-            OTTimeTrigger.CONFIG_TYPE_INTERVAL ->
-                if (timeSpanCheckBox.isChecked)
-                    OTTimeTrigger.Range.makeConfig(dayOfWeekPicker.checkedFlagsInteger, timeSpanPicker.fromHourOfDay, timeSpanPicker.toHourOfDay)
-                else OTTimeTrigger.Range.makeConfig(dayOfWeekPicker.checkedFlagsInteger)
-            else -> 0
+
+        return if (isEndSpecifiedCheckBox.isChecked) {
+            OTTimeTrigger.Range.makeConfig(dayOfWeekPicker.checkedFlagsInteger, repeatEndDate.getYear(), repeatEndDate.getZeroBasedMonth(), repeatEndDate.getDayOfMonth())
+        } else {
+            OTTimeTrigger.Range.makeConfig(dayOfWeekPicker.checkedFlagsInteger)
         }
     }
 
+    override fun onClick(view: View) {
+        if (view === endDateButton) {
+            val dialog = DatePickerDialog(context, this, repeatEndDate.getYear(), repeatEndDate.getZeroBasedMonth(), repeatEndDate.getDayOfMonth())
+            dialog.datePicker.minDate = System.currentTimeMillis()
+            dialog.datePicker.maxDate = System.currentTimeMillis() + 10 * 365 * 24 * 3600 * 1000L
+            dialog.show()
+        }
+    }
+
+    override fun onDateSet(p0: DatePicker?, year: Int, month: Int, day: Int) {
+        applyRepeatEndDate(year, month, day)
+    }
+
+
+    private fun applyRepeatEndDate(year: Int, zeroBasedMonth: Int, day: Int) {
+        repeatEndDate.set(Calendar.YEAR, year)
+        repeatEndDate.set(Calendar.MONTH, zeroBasedMonth)
+        repeatEndDate.set(Calendar.DAY_OF_MONTH, day)
+
+        endDateButton.text = dateFormat.format(repeatEndDate.time)
+    }
+
+    private fun applyRepeatEndDateToDayOffset(days: Int) {
+        repeatEndDate.timeInMillis = System.currentTimeMillis() + days * 24 * 3600 * 1000L
+
+        endDateButton.text = dateFormat.format(repeatEndDate.time)
+    }
 
     override fun onCheckedChanged(view: CompoundButton, p1: Boolean) {
         if (view === timeSpanCheckBox) {
@@ -211,6 +261,13 @@ class TimeTriggerConfigurationPanel : LinearLayout, AdapterView.OnItemSelectedLi
                 timeSpanPicker.visibility = View.VISIBLE
             } else {
                 timeSpanPicker.visibility = View.GONE
+            }
+        } else if (view === isEndSpecifiedCheckBox) {
+            TransitionManager.beginDelayedTransition(this)
+            if (isEndSpecifiedCheckBox.isChecked) {
+                endDateButton.visibility = View.VISIBLE
+            } else {
+                endDateButton.visibility = View.INVISIBLE
             }
         }
     }
