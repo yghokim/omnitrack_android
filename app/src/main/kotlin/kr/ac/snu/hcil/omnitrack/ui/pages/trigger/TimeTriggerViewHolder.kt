@@ -79,4 +79,12 @@ class TimeTriggerViewHolder : ATriggerViewHolder<OTTimeTrigger> {
         }
     }
 
+
+    override fun validateExpandedViewInputs(expandedView: View, errorMessagesOut: MutableList<String>): Boolean {
+        if (expandedView is TimeTriggerConfigurationPanel) {
+            return expandedView.validateExpandedViewInputs(errorMessagesOut)
+        } else return true
+    }
+
+
 }

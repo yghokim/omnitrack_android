@@ -285,5 +285,24 @@ class TimeTriggerConfigurationPanel : LinearLayout, AdapterView.OnItemSelectedLi
 
     }
 
+    fun validateExpandedViewInputs(errorMessagesOut: MutableList<String>): Boolean {
+
+        var validated = true
+        when (configMode) {
+            OTTimeTrigger.CONFIG_TYPE_INTERVAL -> {
+                if (durationPicker.durationSeconds == 0) {
+                    errorMessagesOut.add(resources.getString(R.string.msg_trigger_error_interval_not_0))
+                    validated = false
+                }
+            }
+
+            OTTimeTrigger.CONFIG_TYPE_ALARM -> {
+
+            }
+        }
+
+        return validated
+    }
+
 
 }

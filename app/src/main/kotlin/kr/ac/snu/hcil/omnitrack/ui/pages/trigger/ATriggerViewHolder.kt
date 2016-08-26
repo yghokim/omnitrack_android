@@ -16,6 +16,8 @@ import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
+import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
+import java.util.*
 
 /**
  * Created by younghokim on 16. 8. 24..
@@ -58,7 +60,12 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
 
     private val bottomBar: LockableFrameLayout
 
+    private val errorMessages: ArrayList<String>
+
     init {
+
+        errorMessages = ArrayList<String>()
+
         itemView.setOnClickListener(this)
 
         triggerSwitch = itemView.findViewById(R.id.ui_trigger_switch) as Switch
@@ -169,6 +176,8 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
 
     protected abstract fun getConfigSummary(trigger: T): CharSequence
 
+    protected abstract fun validateExpandedViewInputs(expandedView: View, errorMessagesOut: MutableList<String>): Boolean
+
     override fun onClick(view: View?) {
 
         if (view === removeButton) {
@@ -182,8 +191,13 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
                 listener.onTriggerExpand(adapterPosition)
             }
         } else if (view === applyButton) {
-            updateTriggerWithViewSettings(expandedView.getChildAt(0), trigger)
-            listener.onTriggerCollapse(adapterPosition)
+            if (validateExpandedViewInputs(expandedView.getChildAt(0), errorMessages)) {
+                updateTriggerWithViewSettings(expandedView.getChildAt(0), trigger)
+                listener.onTriggerCollapse(adapterPosition)
+            } else {
+                //validation failed
+                DialogHelper.makeSimpleAlertBuilder(itemView.context, errorMessages.joinToString("\n")).show()
+            }
         } else if (view === cancelButton) {
             listener.onTriggerCollapse(adapterPosition)
         }

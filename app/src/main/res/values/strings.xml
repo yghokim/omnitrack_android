@@ -251,6 +251,8 @@
 
     <string name="msg_trigger_time_is_repeated">Repeat</string>
 
+    <string name="msg_trigger_error_interval_not_0">Interval must not be zero.</string>
+
 
     <string-array name="choice_preview_entries">
         <item>Choice entry 1</item>
