@@ -220,8 +220,8 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
             val fragment =
                     (when (position) {
                         0 -> TrackerDetailStructureTabFragment()
-                        1 -> TrackerDetailTriggerTabFragment()
-                        else -> TrackerDetailTriggerTabFragment()
+                        1 -> TrackerDetailReminderTabFragment()
+                        else -> TrackerDetailReminderTabFragment()
                     }) as Fragment
 
             fragment.arguments = bundle
@@ -236,7 +236,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
         override fun getPageTitle(position: Int): CharSequence? {
             when (position) {
                 0 -> return resources.getString(R.string.msg_tab_tracker_detail_structure)
-                1 -> return resources.getString(R.string.msg_tab_tracker_detail_triggers)
+                1 -> return resources.getString(R.string.msg_tab_tracker_detail_reminders)
             }
             return null
         }

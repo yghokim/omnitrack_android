@@ -8,7 +8,7 @@ import android.view.View
 /**
  * Created by Young-Ho Kim on 2016-07-25.
  */
-abstract class AListBottomSpaceItemDecoration(var height: Int) : RecyclerView.ItemDecoration() {
+abstract class AListBottomSpaceItemDecoration(var height: Int, var reversed: Boolean = false) : RecyclerView.ItemDecoration() {
 
 
     override fun onDrawOver(c: Canvas, parent: RecyclerView, state: RecyclerView.State?) {
@@ -17,7 +17,11 @@ abstract class AListBottomSpaceItemDecoration(var height: Int) : RecyclerView.It
             val left = parent.paddingLeft.toFloat()
             val right = parent.width - parent.paddingRight.toFloat()
 
-            val child = parent.getChildAt(parent.childCount - 1)
+            val child = parent.getChildAt(if (reversed) {
+                0
+            } else {
+                parent.childCount - 1
+            })
 
             val params = child.layoutParams as RecyclerView.LayoutParams
 
@@ -32,7 +36,11 @@ abstract class AListBottomSpaceItemDecoration(var height: Int) : RecyclerView.It
 
     override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State?) {
         super.getItemOffsets(outRect, view, parent, state)
-        if (parent.getChildAdapterPosition(view) == parent.adapter.itemCount - 1)
+        if (parent.getChildAdapterPosition(view) == if (reversed) {
+            0
+        } else {
+            parent.adapter.itemCount - 1
+        })
             outRect.bottom = height
     }
 }

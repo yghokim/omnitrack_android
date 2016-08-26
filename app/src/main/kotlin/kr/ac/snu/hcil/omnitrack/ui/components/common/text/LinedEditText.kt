@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.components.common
+package kr.ac.snu.hcil.omnitrack.ui.components.common.text
 
 import android.annotation.TargetApi
 import android.content.Context

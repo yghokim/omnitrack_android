@@ -10,10 +10,10 @@ import android.view.ViewGroup
 import android.widget.*
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTrigger
-import kr.ac.snu.hcil.omnitrack.ui.components.common.DateTimePicker
-import kr.ac.snu.hcil.omnitrack.ui.components.common.DayOfWeekSelector
-import kr.ac.snu.hcil.omnitrack.ui.components.common.DurationPicker
-import kr.ac.snu.hcil.omnitrack.ui.components.common.HourRangePicker
+import kr.ac.snu.hcil.omnitrack.ui.components.common.time.DateTimePicker
+import kr.ac.snu.hcil.omnitrack.ui.components.common.time.DayOfWeekSelector
+import kr.ac.snu.hcil.omnitrack.ui.components.common.time.DurationPicker
+import kr.ac.snu.hcil.omnitrack.ui.components.common.time.HourRangePicker
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.BooleanPropertyView
 import kr.ac.snu.hcil.omnitrack.utils.*
 import java.text.DateFormat

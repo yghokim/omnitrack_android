@@ -3,7 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties
 import android.content.Context
 import android.util.AttributeSet
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.ui.components.common.SelectionView
+import kr.ac.snu.hcil.omnitrack.ui.components.common.choice.SelectionView
 
 /**
  * Created by Young-Ho Kim on 2016-07-20.

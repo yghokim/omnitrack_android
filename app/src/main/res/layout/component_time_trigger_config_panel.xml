@@ -38,7 +38,7 @@
             android:layout_gravity="center_vertical"
             android:text="@string/msg_trigger_time_config_interval" />
 
-        <kr.ac.snu.hcil.omnitrack.ui.components.common.DurationPicker
+        <kr.ac.snu.hcil.omnitrack.ui.components.common.time.DurationPicker
             android:id="@+id/ui_duration_picker"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
@@ -53,7 +53,7 @@
             android:layout_marginLeft="8dp"
             android:text="Use Time Range" />
 
-        <kr.ac.snu.hcil.omnitrack.ui.components.common.HourRangePicker
+        <kr.ac.snu.hcil.omnitrack.ui.components.common.time.HourRangePicker
             android:id="@+id/ui_trigger_interval_timespan_picker"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -74,7 +74,7 @@
             android:layout_gravity="center_vertical"
             android:text="@string/msg_trigger_time_config_alarm_time" />
 
-        <kr.ac.snu.hcil.omnitrack.ui.components.common.DateTimePicker
+        <kr.ac.snu.hcil.omnitrack.ui.components.common.time.DateTimePicker
             android:id="@+id/ui_time_picker"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -108,7 +108,7 @@
             android:orientation="vertical">
 
 
-            <kr.ac.snu.hcil.omnitrack.ui.components.common.DayOfWeekSelector
+            <kr.ac.snu.hcil.omnitrack.ui.components.common.time.DayOfWeekSelector
                 android:id="@+id/ui_day_of_week_selector"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

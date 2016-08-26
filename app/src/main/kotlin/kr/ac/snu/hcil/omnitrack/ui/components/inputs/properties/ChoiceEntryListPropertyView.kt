@@ -3,7 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties
 import android.content.Context
 import android.util.AttributeSet
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.ui.components.common.ChoiceEntryListEditor
+import kr.ac.snu.hcil.omnitrack.ui.components.common.choice.ChoiceEntryListEditor
 import kr.ac.snu.hcil.omnitrack.utils.UniqueStringEntryList
 
 /**

@@ -39,7 +39,7 @@
     <string name="msg_tab_attribute_connection">Connections</string>
 
     <string name="msg_tab_tracker_detail_structure">Structure</string>
-    <string name="msg_tab_tracker_detail_triggers">Triggers</string>
+    <string name="msg_tab_tracker_detail_reminders">Reminders</string>
 
     <string name="msg_edit">Edit</string>
     <string name="msg_data_list">Data List</string>

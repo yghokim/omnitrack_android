@@ -7,7 +7,7 @@
 
     <include layout="@layout/common_property_subheader" />
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.common.SelectionView
+    <kr.ac.snu.hcil.omnitrack.ui.components.common.choice.SelectionView
         android:id="@+id/value"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

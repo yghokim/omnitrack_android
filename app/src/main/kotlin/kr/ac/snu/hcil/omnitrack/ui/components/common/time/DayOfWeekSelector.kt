@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.components.common
+package kr.ac.snu.hcil.omnitrack.ui.components.common.time
 
 import android.animation.ValueAnimator
 import android.content.Context
@@ -64,7 +64,7 @@ class DayOfWeekSelector : LinearLayout, View.OnClickListener {
             index ->
             val button = CircleBackgroundButton(context)
 
-            val lp = LinearLayout.LayoutParams(0, resources.getDimensionPixelSize(R.dimen.button_height_normal))
+            val lp = LayoutParams(0, resources.getDimensionPixelSize(R.dimen.button_height_normal))
             lp.weight = 1f
             lp.gravity = Gravity.CENTER_VERTICAL
             button.inset = 3 * resources.displayMetrics.density

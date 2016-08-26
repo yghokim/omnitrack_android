@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.components.common
+package kr.ac.snu.hcil.omnitrack.ui.components.common.choice
 
 import android.content.Context
 import android.graphics.Color
@@ -87,7 +87,7 @@ open class WordListView : FlowLayout {
 
         }
 
-        val lp = FlowLayout.LayoutParams(LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        val lp = LayoutParams(LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         lp.leftMargin = 20
         view.layoutParams = lp
 

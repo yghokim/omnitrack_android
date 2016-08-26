@@ -8,9 +8,12 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.DecelerateInterpolator
+import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
+import kr.ac.snu.hcil.omnitrack.ui.components.decorations.DrawableListBottomSpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.ATriggerViewHolder
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.NewTriggerTypeSelectionDialogHelper
@@ -19,7 +22,7 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.TimeTriggerViewHolder
 /**
  * Created by younghokim on 16. 7. 30..
  */
-class TrackerDetailTriggerTabFragment : TrackerDetailActivity.ChildFragment() {
+class TrackerDetailReminderTabFragment : TrackerDetailActivity.ChildFragment() {
 
 
     private lateinit var adapter: Adapter
@@ -34,10 +37,13 @@ class TrackerDetailTriggerTabFragment : TrackerDetailActivity.ChildFragment() {
         NewTriggerTypeSelectionDialogHelper.builder(context) {
             type ->
             println("trigger type selected - $type")
+
+            adapter.notifyItemChanged(adapter.itemCount - 1)
             OTApplication.app.triggerManager.putNewTrigger(
                     OTTrigger.makeInstance(type, "My Trigger", tracker)
             )
             adapter.notifyItemInserted(adapter.itemCount - 1)
+            listView.smoothScrollToPosition(adapter.itemCount - 1)
             triggerTypeDialog.dismiss()
         }.create()
     }
@@ -47,12 +53,18 @@ class TrackerDetailTriggerTabFragment : TrackerDetailActivity.ChildFragment() {
 
         listView = rootView.findViewById(R.id.ui_trigger_list) as RecyclerView
 
-        listView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        val layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        //layoutManager.reverseLayout = true
+
+        listView.layoutManager = layoutManager
         adapter = Adapter()
         listView.adapter = adapter
         //listView.addItemDecoration(HorizontalDividerItemDecoration(resources.getColor(R.color.dividerColor, null), resources.getDimensionPixelSize(R.dimen.trigger_list_element_divider_height)))
 
         listView.addItemDecoration(HorizontalImageDividerItemDecoration(context = this.context))
+        listView.addItemDecoration(DrawableListBottomSpaceItemDecoration(R.drawable.expanded_view_inner_shadow_top, resources.getDimensionPixelSize(R.dimen.tracker_list_bottom_space), false))
+
+        listView.itemAnimator = SlideInLeftAnimator(DecelerateInterpolator(2.0f))
 
         newTriggerButton = rootView.findViewById(R.id.ui_button_new_trigger) as FloatingActionButton
 
@@ -106,9 +118,9 @@ class TrackerDetailTriggerTabFragment : TrackerDetailActivity.ChildFragment() {
 
             return when (viewType) {
                 OTTrigger.TYPE_TIME ->
-                    TimeTriggerViewHolder(parent, this, this@TrackerDetailTriggerTabFragment.context)
+                    TimeTriggerViewHolder(parent, this, this@TrackerDetailReminderTabFragment.context)
                 else ->
-                    TimeTriggerViewHolder(parent, this, this@TrackerDetailTriggerTabFragment.context)
+                    TimeTriggerViewHolder(parent, this, this@TrackerDetailReminderTabFragment.context)
 
             }
         }
@@ -138,13 +150,19 @@ class TrackerDetailTriggerTabFragment : TrackerDetailActivity.ChildFragment() {
             this.notifyItemRemoved(position)
         }
 
-        override fun onTriggerExpand(position: Int) {
-            expandedTriggerPosition = position
-            adapter.notifyDataSetChanged()
+        override fun onTriggerExpandRequested(position: Int) {
+            if (expandedTriggerPosition == -1) {
+                expandedTriggerPosition = position
+                newTriggerButton.visibility = View.INVISIBLE
+                adapter.notifyDataSetChanged()
+            } else {
+                onTriggerCollapse(expandedTriggerPosition)
+            }
         }
 
         override fun onTriggerCollapse(position: Int) {
             expandedTriggerPosition = -1
+            newTriggerButton.visibility = View.VISIBLE
             adapter.notifyDataSetChanged()
         }
     }

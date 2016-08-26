@@ -7,7 +7,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 /**
  * Created by younghokim on 16. 8. 14..
  */
-class DrawableListBottomSpaceItemDecoration(drawableResourceId: Int, height: Int) : AListBottomSpaceItemDecoration(height) {
+class DrawableListBottomSpaceItemDecoration(drawableResourceId: Int, height: Int, reversed: Boolean = false) : AListBottomSpaceItemDecoration(height, reversed) {
 
     private val drawable: Drawable
 

@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal">
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.common.HourPicker
+    <kr.ac.snu.hcil.omnitrack.ui.components.common.time.HourPicker
         android:id="@+id/ui_picker_from"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -21,7 +21,7 @@
         android:textColor="@color/textColorMid"
         android:textSize="24dp" />
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.common.HourPicker
+    <kr.ac.snu.hcil.omnitrack.ui.components.common.time.HourPicker
         android:id="@+id/ui_picker_to"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

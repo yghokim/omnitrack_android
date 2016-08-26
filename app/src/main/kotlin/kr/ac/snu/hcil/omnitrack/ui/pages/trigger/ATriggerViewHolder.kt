@@ -29,7 +29,7 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
     interface ITriggerControlListener {
         fun onTriggerRemove(position: Int)
         fun onTriggerEdited(position: Int)
-        fun onTriggerExpand(position: Int)
+        fun onTriggerExpandRequested(position: Int)
         fun onTriggerCollapse(position: Int)
     }
 
@@ -188,7 +188,7 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
             trigger.isOn = triggerSwitch.isChecked
         } else if (view === bottomBar || view === itemView) {
             if (!isExpanded) {
-                listener.onTriggerExpand(adapterPosition)
+                listener.onTriggerExpandRequested(adapterPosition)
             }
         } else if (view === applyButton) {
             if (validateExpandedViewInputs(expandedView.getChildAt(0), errorMessages)) {
