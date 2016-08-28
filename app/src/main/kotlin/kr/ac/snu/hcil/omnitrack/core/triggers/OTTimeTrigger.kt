@@ -7,8 +7,8 @@ import android.content.Intent
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.receivers.OTSystemReceiver
-import kr.ac.snu.hcil.omnitrack.utils.BitwiseOperationHelper
-import kr.ac.snu.hcil.omnitrack.utils.ObservableMapDelegate
+import kr.ac.snu.hcil.omnitrack.utils.*
+import java.util.*
 
 /**
  * Created by younghokim on 16. 7. 27..
@@ -18,6 +18,10 @@ class OTTimeTrigger : OTTrigger {
     companion object {
         const val CONFIG_TYPE_ALARM = 0
         const val CONFIG_TYPE_INTERVAL = 1
+
+        const val INTENT_EXTRA_TRIGGER_TIME = "triggerTime"
+
+        const val MILLISECOND_TOLERANCE = 1000L
 
         fun configIconId(configType: Int): Int {
             return when (configType) {
@@ -80,6 +84,11 @@ class OTTimeTrigger : OTTrigger {
         fun isAllDayUsed(range: Int): Boolean {
             return BitwiseOperationHelper.getIntAt(range, DAYS_OF_WEEK_FLAGS_SHIFT, DAYS_OF_WEEK_FLAGS_MASK) == DAYS_OF_WEEK_FLAGS_MASK
         }
+
+        fun isAllDayNotUsed(range: Int): Boolean {
+            return BitwiseOperationHelper.getIntAt(range, DAYS_OF_WEEK_FLAGS_SHIFT, DAYS_OF_WEEK_FLAGS_MASK) == 0
+        }
+
 
         fun isDayOfWeekUsed(range: Int, dayOfWeek: Int): Boolean {
             return BitwiseOperationHelper.getBooleanAt(range, DAYS_OF_WEEK_FLAGS_SHIFT + (6 - dayOfWeek))
@@ -160,6 +169,10 @@ class OTTimeTrigger : OTTrigger {
 
         fun getHour(config: Int): Int {
             return BitwiseOperationHelper.getIntAt(config, HOUR_SHIFT, HOUR_MASK)
+        }
+
+        fun getHourOfDay(config: Int): Int {
+            return getHour(config) + 12 * getAmPm(config)
         }
 
         fun setHour(config: Int, hour: Int): Int {
@@ -252,39 +265,54 @@ class OTTimeTrigger : OTTrigger {
 
     var configType: Int by ObservableMapDelegate(CONFIG_TYPE_ALARM, properties) {
         isDirtySinceLastSync = true
+        onConfigChanged()
     }
 
     var rangeVariables: Int by ObservableMapDelegate(0, properties) {
         isDirtySinceLastSync = true
+        onRangeChanged()
     }
 
-    var configVariables: Int by ObservableMapDelegate(AlarmConfig.makeConfig(9, 0, 1), properties) {
+    private val configVariablesDelegate = ObservableMapDelegate<OTTimeTrigger, Int>(AlarmConfig.makeConfig(9, 0, 1), properties) {
         isDirtySinceLastSync = true
+        onConfigChanged()
     }
+    var configVariables: Int by configVariablesDelegate
+
+    private val isRepeatedDelegate = ObservableMapDelegate<OTTimeTrigger, Int>(0, properties) {
+        isDirtySinceLastSync = true
+        onRangeChanged()
+    }
+    private var _isRepeated: Int by isRepeatedDelegate
+
 
     var isRepeated: Boolean
-        get() = if (_isRepeated > 0) {
-            true
-        } else false
+        get() {
+            println(properties)
+            println(isRepeatedDelegate)
+            return if (_isRepeated > 0) {
+                true
+            } else false
+        }
         set(value) {
             _isRepeated = if (value == true) 1 else 0
         }
 
-    private var _isRepeated: Int by ObservableMapDelegate(0, properties) {
-        isDirtySinceLastSync = true
+
+    private var cacheCalendar = Calendar.getInstance()
+    private var cacheCalendar2 = Calendar.getInstance()
+
+
+    constructor(objectId: String?, dbId: Long?, name: String, trackerObjectId: String, isOn: Boolean, lastTriggeredTime: Long, serializedProperties: String? = null) : super(objectId, dbId, name, trackerObjectId, isOn, lastTriggeredTime, serializedProperties) {
+
     }
 
-
-
-    constructor(objectId: String?, dbId: Long?, name: String, trackerObjectId: String, isOn: Boolean, serializedProperties: String? = null) : super(objectId, dbId, name, trackerObjectId, isOn, serializedProperties) {
-
-    }
-
-    private fun makeIntent(context: Context, alarmId: Int): PendingIntent {
+    private fun makeIntent(context: Context, triggerTime: Long, alarmId: Int): PendingIntent {
         val intent = Intent(context, OTSystemReceiver::class.java)
         intent.action = OTApplication.BROADCAST_ACTION_ALARM
         intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRIGGER, this.objectId)
         intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_USER, OTApplication.app.currentUser.objectId)
+        intent.putExtra(INTENT_EXTRA_TRIGGER_TIME, triggerTime)
 
         return PendingIntent.getBroadcast(context, alarmId, intent, 0)
     }
@@ -306,47 +334,260 @@ class OTTimeTrigger : OTTrigger {
         } else return true
     }*/
 
-    fun getNextAlarmTime(): Long {
+    fun getNextAlarmTime(pivot: Long): Long {
         if (isOn) {
-            return System.currentTimeMillis() + 1000
+
+            val now = System.currentTimeMillis()
+
+            val limitExclusive = if (isRepeated) {
+                cacheCalendar.set(Range.getEndYear(rangeVariables), Range.getEndZeroBasedMonth(rangeVariables), Range.getEndDay(rangeVariables) + 1)
+                cacheCalendar.timeInMillis
+            } else Long.MAX_VALUE
+
+            val intrinsicNext = when (configType) {
+                CONFIG_TYPE_ALARM -> {
+
+                    cacheCalendar.timeInMillis = now
+                    cacheCalendar2.set(0, 0, 0, AlarmConfig.getHourOfDay(configVariables), AlarmConfig.getMinute(configVariables), 0)
+                    cacheCalendar2.set(Calendar.YEAR, cacheCalendar.getYear())
+                    cacheCalendar2.set(Calendar.MONTH, cacheCalendar.getZeroBasedMonth())
+                    cacheCalendar2.set(Calendar.DAY_OF_MONTH, cacheCalendar.getDayOfMonth())
+
+                    if (!isRepeated) {
+                        if (pivot == TRIGGER_TIME_NEVER_TRIGGERED) {
+
+                            if (TimeHelper.compareTimePortions(cacheCalendar, cacheCalendar2) >= -MILLISECOND_TOLERANCE) {
+                                //next day
+                                cacheCalendar2.add(Calendar.DAY_OF_YEAR, 1)
+
+                            }
+
+                            cacheCalendar2.timeInMillis
+                        } else 0L
+                    } else if (!Range.isAllDayNotUsed(rangeVariables)) {
+                        //repetition
+
+                        var closestDayOfWeek = cacheCalendar2.getDayOfWeek() // today
+                        while (!Range.isDayOfWeekUsed(rangeVariables, closestDayOfWeek)) {
+                            closestDayOfWeek = (closestDayOfWeek + 1) % 7
+                        }
+
+                        val leftDays = if (closestDayOfWeek == cacheCalendar2.getDayOfWeek() && TimeHelper.compareTimePortions(cacheCalendar, cacheCalendar2) >= -MILLISECOND_TOLERANCE) {
+                            7
+                        } else TimeHelper.getDaysLeftToClosestDayOfWeek(cacheCalendar2, closestDayOfWeek)
+
+                        cacheCalendar2.add(Calendar.DAY_OF_YEAR, leftDays)
+                        cacheCalendar2.timeInMillis
+                    } else 0L
+                }
+                CONFIG_TYPE_INTERVAL -> {
+                    val intervalMillis = IntervalConfig.getIntervalSeconds(configVariables) * 1000
+                    val startBoundHourOfDay = IntervalConfig.getStartHour(configVariables)
+                    val endBoundHourOfDay = IntervalConfig.getEndHour(configVariables)
+
+                    val realPivot = if (pivot == TRIGGER_TIME_NEVER_TRIGGERED) {
+                        now
+                    } else pivot
+
+
+                    //extract hour range of today
+                    cacheCalendar.timeInMillis = now
+
+                    cacheCalendar.setHourOfDay(startBoundHourOfDay, cutUnder = true)
+                    val lowerBoundToday = cacheCalendar.timeInMillis
+
+                    cacheCalendar.setHourOfDay(endBoundHourOfDay, cutUnder = true)
+                    if (startBoundHourOfDay >= endBoundHourOfDay) {
+                        cacheCalendar.add(Calendar.DAY_OF_YEAR, 1)
+                    }
+                    val upperBoundToday = cacheCalendar.timeInMillis
+
+                    val upperBoundLastDay = TimeHelper.addDays(upperBoundToday, -1)
+
+
+                    val intrinsicNextTime =
+                            if (now < upperBoundLastDay) {
+                                if (isRepeated) {
+                                    cacheCalendar.timeInMillis = now
+                                    cacheCalendar.add(Calendar.DAY_OF_YEAR, -1)
+                                    if (Range.isDayOfWeekUsed(rangeVariables, cacheCalendar.getDayOfWeek())) {
+                                        //yesterday is used
+                                        val intrinsic = getIntrinsicNextIntervalTime(realPivot, now, intervalMillis)
+                                        if (intrinsic < upperBoundLastDay) {
+                                            intrinsic
+                                        } else {
+                                            getClosestLowerBoundOfInterval(now, startBoundHourOfDay)
+                                        }
+                                    } else {
+                                        getClosestLowerBoundOfInterval(now, startBoundHourOfDay)
+                                    }
+                                } else {
+
+                                    val intrinsic = getIntrinsicNextIntervalTime(realPivot, now, intervalMillis)
+                                    if (intrinsic < upperBoundLastDay) {
+                                        intrinsic
+                                    } else {
+                                        if (pivot == TRIGGER_TIME_NEVER_TRIGGERED) {
+                                            lowerBoundToday
+                                        } else 0L
+                                    }
+                                }
+                            } else if (upperBoundLastDay <= now && now < lowerBoundToday) {
+                                if (isRepeated) {
+                                    getClosestLowerBoundOfInterval(now, startBoundHourOfDay)
+                                } else {
+                                    if (pivot == TRIGGER_TIME_NEVER_TRIGGERED) {
+                                        lowerBoundToday
+                                    } else {
+                                        0L
+                                    }
+                                }
+                            } else if (lowerBoundToday <= now && now < upperBoundToday) {
+                                //now is later than upperBound
+                                if (isRepeated) {
+                                    cacheCalendar.timeInMillis = now
+                                    if (Range.isDayOfWeekUsed(rangeVariables, cacheCalendar.getDayOfWeek())) {
+                                        //yesterday is used
+                                        val intrinsic = getIntrinsicNextIntervalTime(realPivot, now, intervalMillis)
+                                        if (intrinsic < upperBoundToday) {
+                                            intrinsic
+                                        } else {
+                                            getClosestLowerBoundOfInterval(now, startBoundHourOfDay)
+                                        }
+                                    } else {
+                                        getClosestLowerBoundOfInterval(now, startBoundHourOfDay)
+                                    }
+                                } else {
+                                    val intrinsic = getIntrinsicNextIntervalTime(realPivot, now, intervalMillis)
+                                    if (intrinsic < upperBoundToday) {
+                                        intrinsic
+                                    } else {
+                                        if (pivot == TRIGGER_TIME_NEVER_TRIGGERED) {
+                                            TimeHelper.addDays(lowerBoundToday, 1)
+                                        } else 0L
+                                    }
+                                }
+                            } else {
+                                if (isRepeated) {
+                                    getClosestLowerBoundOfInterval(now, startBoundHourOfDay)
+                                } else {
+                                    if (pivot == TRIGGER_TIME_NEVER_TRIGGERED) {
+                                        TimeHelper.addDays(lowerBoundToday, 1)
+                                    } else {
+                                        0L
+                                    }
+                                }
+                            }
+                    intrinsicNextTime
+                }
+                else -> 0L
+            }
+
+            if (intrinsicNext < limitExclusive) {
+                return intrinsicNext
+            } else {
+                return 0
+            }
+
         } else return 0
     }
+
+    private fun getIntrinsicNextIntervalTime(pivot: Long, now: Long, interval: Int): Long {
+        val skipIntervalCount = (now - pivot) / interval
+
+        println("$skipIntervalCount intervals skipped.")
+
+        return pivot + (skipIntervalCount + 1) * interval
+    }
+
+
+    private fun getClosestLowerBoundOfInterval(from: Long, lowerBoundHourOfDay: Int): Long {
+        cacheCalendar.timeInMillis = from
+
+        val pivotDayOfWeek = cacheCalendar.getDayOfWeek()
+
+
+        if (Range.isDayOfWeekUsed(rangeVariables, pivotDayOfWeek) && cacheCalendar.getHourOfDay() < lowerBoundHourOfDay) {
+            cacheCalendar.timeInMillis = from
+            cacheCalendar.set(Calendar.HOUR_OF_DAY, lowerBoundHourOfDay)
+            return cacheCalendar.timeInMillis
+        } else {
+            var daysLeft = 1
+            while (!Range.isDayOfWeekUsed(rangeVariables, (pivotDayOfWeek + daysLeft) % 7)) {
+                daysLeft++
+            }
+
+            cacheCalendar.timeInMillis = from
+            cacheCalendar.set(Calendar.HOUR_OF_DAY, lowerBoundHourOfDay)
+            cacheCalendar.add(Calendar.DAY_OF_YEAR, daysLeft)
+            return cacheCalendar.timeInMillis
+        }
+    }
+
+    private fun onConfigChanged() {
+
+        val alarmManager = OTApplication.app.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+        alarmManager.cancel(makeIntent(OTApplication.app, 0, 0))
+        if (!reserveNextAlarmToSystem(lastTriggeredTime)) {
+            isOn = false
+        }
+    }
+
+    private fun onRangeChanged() {
+        val alarmManager = OTApplication.app.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+        alarmManager.cancel(makeIntent(OTApplication.app, 0, 0))
+        if (!reserveNextAlarmToSystem(lastTriggeredTime)) {
+            isOn = false
+        }
+    }
+
 
     override fun handleActivationOnSystem(context: Context) {
         println("trigger activated")
         if (isOn) {
-            setNextAlarm()
+            //TODO need to check current alarmmanager to avoid duplicate alarm
+            if (!reserveNextAlarmToSystem(lastTriggeredTime)) {
+                isOn = false
+            }
         }
     }
 
-    private fun setNextAlarm(): Boolean {
+    private fun reserveNextAlarmToSystem(currentTriggerTime: Long): Boolean {
 
-        val nextAlarmTime = getNextAlarmTime()
+        val nextAlarmTime = getNextAlarmTime(currentTriggerTime)
 
         if (nextAlarmTime > 0L) {
 
-            println("next alarm will be fired at $nextAlarmTime")
+            cacheCalendar.timeInMillis = nextAlarmTime
+            println("next alarm will be fired at $cacheCalendar")
 
             val alarmManager = OTApplication.app.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-            alarmManager.set(AlarmManager.RTC, nextAlarmTime, makeIntent(OTApplication.app, 0))
+            alarmManager.set(AlarmManager.RTC, nextAlarmTime, makeIntent(OTApplication.app, nextAlarmTime, 0))
             return true
         } else {
+            println("Finish trigger. Do not repeat.")
             return false
         }
     }
 
-    override fun handleFire() {
-        setNextAlarm()
+    override fun handleFire(triggerTime: Long) {
+        if (!reserveNextAlarmToSystem(triggerTime)) {
+            isOn = false
+        }
     }
 
     override fun handleOn() {
-        setNextAlarm()
+        if (!reserveNextAlarmToSystem(TRIGGER_TIME_NEVER_TRIGGERED)) {
+            isOn = false
+        }
     }
 
     override fun handleOff() {
         val alarmManager = OTApplication.app.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-        alarmManager.cancel(makeIntent(OTApplication.app, 0))
+        alarmManager.cancel(makeIntent(OTApplication.app, 0, 0))
     }
 }

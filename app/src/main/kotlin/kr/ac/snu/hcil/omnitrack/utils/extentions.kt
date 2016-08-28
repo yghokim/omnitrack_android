@@ -100,6 +100,10 @@ fun Calendar.getDayOfMonth(): Int {
     return get(Calendar.DAY_OF_MONTH)
 }
 
+fun Calendar.getDayOfWeek(): Int {
+    return get(Calendar.DAY_OF_WEEK)
+}
+
 fun Calendar.getHour(): Int {
     return get(Calendar.HOUR)
 }
@@ -118,6 +122,15 @@ fun Calendar.getSecond(): Int {
 
 fun Calendar.getAmPm(): Int {
     return get(Calendar.AM_PM)
+}
+
+fun Calendar.setHourOfDay(hour: Int, cutUnder: Boolean = false) {
+    set(Calendar.HOUR_OF_DAY, hour)
+    if (cutUnder) {
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
+    }
 }
 
 fun LatLng.getAddress(context: Context): Address? {

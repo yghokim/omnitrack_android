@@ -77,10 +77,11 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         val PROPERTIES = "properties"
         val TYPE = "type"
         val IS_ON = "is_on"
+        val LAST_TRIGGERED_TIME = "last_triggered_time"
 
-        override val intrinsicColumnNames: Array<String> = super.intrinsicColumnNames + arrayOf(TRACKER_OBJECT_ID, TYPE, POSITION, IS_ON, PROPERTIES)
+        override val intrinsicColumnNames: Array<String> = super.intrinsicColumnNames + arrayOf(TRACKER_OBJECT_ID, TYPE, POSITION, IS_ON, LAST_TRIGGERED_TIME, PROPERTIES)
 
-        override val creationColumnContentString = super.creationColumnContentString + ", ${makeForeignKeyStatementString(USER_ID, UserScheme.tableName)}, ${TriggerScheme.TRACKER_OBJECT_ID} TEXT, ${TriggerScheme.POSITION} INTEGER, ${TriggerScheme.IS_ON} INTEGER, ${TriggerScheme.TYPE} INTEGER, ${TriggerScheme.PROPERTIES} TEXT"
+        override val creationColumnContentString = super.creationColumnContentString + ", ${makeForeignKeyStatementString(USER_ID, UserScheme.tableName)}, ${TriggerScheme.TRACKER_OBJECT_ID} TEXT, ${TriggerScheme.POSITION} INTEGER, ${TriggerScheme.IS_ON} INTEGER, ${TriggerScheme.LAST_TRIGGERED_TIME} INTEGER, ${TriggerScheme.TYPE} INTEGER, ${TriggerScheme.PROPERTIES} TEXT"
     }
 
     object ItemScheme : TableScheme() {
@@ -186,7 +187,9 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
             else -> false
         }
 
-        return OTTrigger.makeInstance(objectId, id, type, name, trackerObjectId, isOn, serializedProperties)
+        val lastTriggeredTime = cursor.getLong(cursor.getColumnIndex(TriggerScheme.LAST_TRIGGERED_TIME))
+
+        return OTTrigger.makeInstance(objectId, id, type, name, trackerObjectId, isOn, lastTriggeredTime, serializedProperties)
     }
 
     fun extractTrackerEntity(cursor: Cursor): OTTracker {

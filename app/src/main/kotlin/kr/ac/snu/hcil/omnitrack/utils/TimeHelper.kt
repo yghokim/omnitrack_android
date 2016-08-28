@@ -10,11 +10,15 @@ import java.util.*
  **/
 object TimeHelper {
 
-    val secondsInMilli: Long = 1000
-    val minutesInMilli = secondsInMilli * 60
-    val hoursInMilli = minutesInMilli * 60
-    val daysInMilli = hoursInMilli * 24
+    const val secondsInMilli: Long = 1000
+    const val minutesInMilli = secondsInMilli * 60
+    const val hoursInMilli = minutesInMilli * 60
+    const val daysInMilli = hoursInMilli * 24
 
+
+    fun addDays(timestamp: Long, days: Int): Long {
+        return timestamp + days * daysInMilli
+    }
 
     fun cutTimePartFromEpoch(timestamp: Long): Long {
         val cal = Calendar.getInstance()       // get calendar instance
@@ -84,4 +88,26 @@ object TimeHelper {
 
         return builder.trim().toString()
     }
+
+
+    fun compareTimePortions(c1: Calendar, c2: Calendar): Int {
+        return compareTimePortions(c1.timeInMillis, c2.timeInMillis)
+    }
+
+    fun compareTimePortions(d1: Date, d2: Date): Int {
+        return compareTimePortions(d1.time, d2.time)
+    }
+
+    fun compareTimePortions(d1: Long, d2: Long): Int {
+        val t1 = (d1 % daysInMilli).toInt()
+        val t2 = (d2 % daysInMilli).toInt()
+        return t1 - t2
+    }
+
+    fun getDaysLeftToClosestDayOfWeek(pivot: Calendar, dayOfWeek: Int): Int {
+
+        return (dayOfWeek + 7 - pivot.getDayOfWeek()) % 7
+    }
+
+
 }

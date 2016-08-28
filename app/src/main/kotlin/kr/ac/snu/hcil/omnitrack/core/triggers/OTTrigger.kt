@@ -14,7 +14,11 @@ import kotlin.properties.Delegates
 /**
  * Created by younghokim on 16. 7. 27..
  */
-abstract class OTTrigger : NamedObject {
+abstract class OTTrigger(objectId: String?, dbId: Long?, name: String,
+                         trackerObjectId: String,
+                         isOn: Boolean,
+                         lastTriggeredTime: Long,
+                         serializedProperties: String? = null) : NamedObject(objectId, dbId, name) {
 
 
     companion object {
@@ -25,15 +29,17 @@ abstract class OTTrigger : NamedObject {
         const val TYPE_NEW_ENTRY = 1
         const val TYPE_SERVICE_EVENT = 2
 
-        fun makeInstance(objectId: String?, dbId: Long?, typeId: Int, name: String, trackerObjectId: String, isOn: Boolean, serializedProperties: String?): OTTrigger {
+        const val TRIGGER_TIME_NEVER_TRIGGERED = -1L
+
+        fun makeInstance(objectId: String?, dbId: Long?, typeId: Int, name: String, trackerObjectId: String, isOn: Boolean, lastTriggeredTime: Long, serializedProperties: String?): OTTrigger {
             return when (typeId) {
-                TYPE_TIME -> OTTimeTrigger(objectId, dbId, name, trackerObjectId, isOn, serializedProperties)
+                TYPE_TIME -> OTTimeTrigger(objectId, dbId, name, trackerObjectId, isOn, lastTriggeredTime, serializedProperties)
                 else -> throw Exception("wrong trigger type : $typeId")
             }
         }
 
         fun makeInstance(typeId: Int, name: String, tracker: OTTracker): OTTrigger {
-            return makeInstance(null, null, typeId, name, tracker.objectId, false, null)
+            return makeInstance(null, null, typeId, name, tracker.objectId, false, TRIGGER_TIME_NEVER_TRIGGERED, null)
         }
     }
 
@@ -61,7 +67,8 @@ abstract class OTTrigger : NamedObject {
             throw Exception("Wrong trigger action code.")
         }
     }
-    var isOn: Boolean by Delegates.observable(false) {
+
+    var isOn: Boolean by Delegates.observable(isOn) {
         prop, old, new ->
         if (new) {
             handleOn()
@@ -73,15 +80,17 @@ abstract class OTTrigger : NamedObject {
         }
     }
 
+    var lastTriggeredTime: Long by Delegates.observable(lastTriggeredTime) {
+        prop, old, new ->
+        if (old != new) {
+            isDirtySinceLastSync = true
+        }
+    }
+
     protected val properties = HashMap<String, Any?>()
 
 
-    constructor(name: String, tracker: OTTracker) : super(null, null, name) {
-        trackerObjectId = tracker.objectId
-        this.tracker = tracker
-    }
-
-    constructor(objectId: String?, dbId: Long?, name: String, trackerObjectId: String, isOn: Boolean, serializedProperties: String? = null) : super(objectId, dbId, name) {
+    init {
         this.trackerObjectId = trackerObjectId
         this.tracker = OTApplication.app.currentUser[trackerObjectId]!!
 
@@ -95,7 +104,7 @@ abstract class OTTrigger : NamedObject {
             }
         }
 
-        this.isOn = isOn
+        isDirtySinceLastSync = false
     }
 
     fun getSerializedProperties(): String{
@@ -112,10 +121,11 @@ abstract class OTTrigger : NamedObject {
     }
 
 
-    fun fire() {
-        handleFire()
+    fun fire(triggerTime: Long) {
+        handleFire(triggerTime)
 
         fired.invoke(this, action)
+        this.lastTriggeredTime = triggerTime
     }
 
     fun activateOnSystem(context: Context) {
@@ -127,7 +137,7 @@ abstract class OTTrigger : NamedObject {
 
     abstract fun handleActivationOnSystem(context: Context)
 
-    open fun handleFire() {
+    open fun handleFire(triggerTime: Long) {
     }
 
 
