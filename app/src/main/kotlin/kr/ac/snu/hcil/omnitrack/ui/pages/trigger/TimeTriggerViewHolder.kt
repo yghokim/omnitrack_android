@@ -43,6 +43,8 @@ class TimeTriggerViewHolder : ATriggerViewHolder<OTTimeTrigger> {
     override fun getHeaderView(current: View?, trigger: OTTimeTrigger): View {
         val view = if (current is TimeTriggerDisplayView) current else TimeTriggerDisplayView(itemView.context)
 
+        view.nextTriggerTime = trigger.getNextAlarmTime(trigger.lastTriggeredTime)
+
         when (trigger.configType) {
             OTTimeTrigger.CONFIG_TYPE_ALARM ->
                 view.setAlarmInformation(OTTimeTrigger.AlarmConfig.getHour(trigger.configVariables),

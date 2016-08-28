@@ -62,7 +62,7 @@ class OTTimeTrigger : OTTrigger {
 
     object Range : Config() {
         /**32bit Integer
-         * 7 bits : days of week flags
+         * 7 bits : days of week flags.
          * 1 bit: isLimitDateSpecified
          * 5bit:  years from 2016 ( max +32)
          * 4bit: zeroBasedMonth (0~11)
@@ -91,7 +91,7 @@ class OTTimeTrigger : OTTrigger {
 
 
         fun isDayOfWeekUsed(range: Int, dayOfWeek: Int): Boolean {
-            return BitwiseOperationHelper.getBooleanAt(range, DAYS_OF_WEEK_FLAGS_SHIFT + (6 - dayOfWeek))
+            return BitwiseOperationHelper.getBooleanAt(range, DAYS_OF_WEEK_FLAGS_SHIFT + (6 - (dayOfWeek - 1)))
         }
 
         fun getAllDayOfWeekFlags(range: Int): Int {
@@ -99,7 +99,7 @@ class OTTimeTrigger : OTTrigger {
         }
 
         fun setIsDayOfWeekUsed(range: Int, dayOfWeek: Int, isUsed: Boolean): Int {
-            return BitwiseOperationHelper.setBooleanAt(range, isUsed, DAYS_OF_WEEK_FLAGS_SHIFT + (6 - dayOfWeek))
+            return BitwiseOperationHelper.setBooleanAt(range, isUsed, DAYS_OF_WEEK_FLAGS_SHIFT + (6 - (dayOfWeek - 1)))
         }
 
         fun getEndYear(range: Int): Int {
@@ -288,8 +288,6 @@ class OTTimeTrigger : OTTrigger {
 
     var isRepeated: Boolean
         get() {
-            println(properties)
-            println(isRepeatedDelegate)
             return if (_isRepeated > 0) {
                 true
             } else false
@@ -339,7 +337,7 @@ class OTTimeTrigger : OTTrigger {
 
             val now = System.currentTimeMillis()
 
-            val limitExclusive = if (isRepeated) {
+            val limitExclusive = if (isRepeated && Range.isEndSpecified(rangeVariables)) {
                 cacheCalendar.set(Range.getEndYear(rangeVariables), Range.getEndZeroBasedMonth(rangeVariables), Range.getEndDay(rangeVariables) + 1)
                 cacheCalendar.timeInMillis
             } else Long.MAX_VALUE
@@ -355,7 +353,6 @@ class OTTimeTrigger : OTTrigger {
 
                     if (!isRepeated) {
                         if (pivot == TRIGGER_TIME_NEVER_TRIGGERED) {
-
                             if (TimeHelper.compareTimePortions(cacheCalendar, cacheCalendar2) >= -MILLISECOND_TOLERANCE) {
                                 //next day
                                 cacheCalendar2.add(Calendar.DAY_OF_YEAR, 1)
@@ -363,20 +360,29 @@ class OTTimeTrigger : OTTrigger {
                             }
 
                             cacheCalendar2.timeInMillis
-                        } else 0L
+                        } else {
+                            0L
+                        }
                     } else if (!Range.isAllDayNotUsed(rangeVariables)) {
                         //repetition
+                        if (TimeHelper.compareTimePortions(cacheCalendar, cacheCalendar2) >= MILLISECOND_TOLERANCE) {
 
-                        var closestDayOfWeek = cacheCalendar2.getDayOfWeek() // today
-                        while (!Range.isDayOfWeekUsed(rangeVariables, closestDayOfWeek)) {
-                            closestDayOfWeek = (closestDayOfWeek + 1) % 7
+                            var closestDayOfWeek = cacheCalendar2.getDayOfWeek() // today
+
+                            while (!Range.isDayOfWeekUsed(rangeVariables, closestDayOfWeek)) {
+                                closestDayOfWeek = (closestDayOfWeek + 1) % 7
+                            }
+
+
+                            val leftDays = if (closestDayOfWeek == cacheCalendar2.getDayOfWeek()) {
+                                7
+                            } else TimeHelper.getDaysLeftToClosestDayOfWeek(cacheCalendar2, closestDayOfWeek)
+
+                            println(leftDays)
+
+                            cacheCalendar2.add(Calendar.DAY_OF_YEAR, leftDays)
                         }
 
-                        val leftDays = if (closestDayOfWeek == cacheCalendar2.getDayOfWeek() && TimeHelper.compareTimePortions(cacheCalendar, cacheCalendar2) >= -MILLISECOND_TOLERANCE) {
-                            7
-                        } else TimeHelper.getDaysLeftToClosestDayOfWeek(cacheCalendar2, closestDayOfWeek)
-
-                        cacheCalendar2.add(Calendar.DAY_OF_YEAR, leftDays)
                         cacheCalendar2.timeInMillis
                     } else 0L
                 }
@@ -482,7 +488,6 @@ class OTTimeTrigger : OTTrigger {
                 }
                 else -> 0L
             }
-
             if (intrinsicNext < limitExclusive) {
                 return intrinsicNext
             } else {

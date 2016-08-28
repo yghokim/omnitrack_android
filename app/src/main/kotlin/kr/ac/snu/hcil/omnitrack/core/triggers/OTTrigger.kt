@@ -53,6 +53,8 @@ abstract class OTTrigger(objectId: String?, dbId: Long?, name: String,
 
     val fired = Event<Int>()
 
+    val switchTurned = Event<Boolean>()
+
     var isActivatedOnSystem: Boolean = false
         private set
 
@@ -68,22 +70,27 @@ abstract class OTTrigger(objectId: String?, dbId: Long?, name: String,
         }
     }
 
-    var isOn: Boolean by Delegates.observable(isOn) {
+    var lastTriggeredTime: Long by Delegates.observable(lastTriggeredTime) {
         prop, old, new ->
-        if (new) {
-            handleOn()
-        } else {
-            handleOff()
-        }
         if (old != new) {
             isDirtySinceLastSync = true
         }
     }
 
-    var lastTriggeredTime: Long by Delegates.observable(lastTriggeredTime) {
+    var isOn: Boolean by Delegates.observable(isOn) {
         prop, old, new ->
+        if (new) {
+            this.lastTriggeredTime = -1L
+            handleOn()
+        } else {
+            handleOff()
+        }
+
         if (old != new) {
+
             isDirtySinceLastSync = true
+
+            switchTurned.invoke(this, new)
         }
     }
 

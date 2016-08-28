@@ -15,6 +15,7 @@ import kr.ac.snu.hcil.omnitrack.utils.getActivity
 import kr.ac.snu.hcil.omnitrack.utils.getAmPm
 import kr.ac.snu.hcil.omnitrack.utils.getHour
 import kr.ac.snu.hcil.omnitrack.utils.getMinute
+import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.properties.Delegates
@@ -57,7 +58,7 @@ class DateTimePicker(context: Context, attrs: AttributeSet? = null) : FrameLayou
 
     private var calendar = Calendar.getInstance()
 
-    private lateinit var dateFormat: SimpleDateFormat
+    private lateinit var dateFormat: DateFormat
 
     private lateinit var hourNames: Array<String>
 
@@ -179,7 +180,7 @@ class DateTimePicker(context: Context, attrs: AttributeSet? = null) : FrameLayou
         }
 
         dateFormat = SimpleDateFormat(resources.getString(R.string.dateformat_ymd))
-
+        //android.text.format.DateFormat.getMediumDateFormat()
 
         hourNames = Array<String>(24) {
             index ->
@@ -187,11 +188,11 @@ class DateTimePicker(context: Context, attrs: AttributeSet? = null) : FrameLayou
                 R.string.format_hour_am
             } else {
                 R.string.format_hour_pm
-            }), if (index == 12) {
+            }), String.format("%02d", if (index == 12) {
                 12
             } else {
                 index % 12
-            })
+            }))
         }
 
         /*
@@ -203,6 +204,12 @@ class DateTimePicker(context: Context, attrs: AttributeSet? = null) : FrameLayou
         timeZoneSpinner.setSelection(availableTimeZones.indices.maxBy { availableTimeZones[it].id == TimeZone.getDefault().id }!!)*/
 
         mode = MINUTE
+
+
+        leftPicker.zeroPad = 2
+        middlePicker.zeroPad = 2
+        rightPicker.zeroPad = 2
+
 
         leftPicker.valueChanged += pickerValueChangedHandler
         middlePicker.valueChanged += pickerValueChangedHandler

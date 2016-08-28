@@ -8,6 +8,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
+import kotlin.properties.Delegates
 
 /**
  * Created by Young-Ho Kim on 2016-07-25.
@@ -48,6 +49,13 @@ class VerticalNumericUpDown(context: Context, attrs: AttributeSet?) : LinearLayo
             invalidateViews()
         }
 
+    var zeroPad: Int by Delegates.observable(0) {
+        prop, old, new ->
+        if (old != new) {
+            invalidateViews()
+        }
+    }
+
     val valueChanged = Event<Int>()
 
     private lateinit var upButton: ImageButton
@@ -85,7 +93,9 @@ class VerticalNumericUpDown(context: Context, attrs: AttributeSet?) : LinearLayo
     }
 
     private fun getDisplayedValue(value: Int): String {
-        return displayedValues?.get(value - minValue) ?: value.toString()
+        return displayedValues?.get(value - minValue) ?: if (zeroPad > 1) {
+            String.format("%0${zeroPad}d", value)
+        } else value.toString()
     }
 
     private fun invalidateViews() {

@@ -8,7 +8,6 @@ import kotlin.reflect.KProperty
  */
 class ObservableMapDelegate<OWNER, TYPE : Any>(private val initialValue: TYPE, private val map: MutableMap<String, Any?>, private val changedListener: (value: TYPE) -> Unit) : ReadWriteProperty<OWNER, TYPE> {
     operator override fun getValue(thisRef: OWNER, property: KProperty<*>): TYPE {
-        println("get dictionary value: ${property.name}")
         if (!map.containsKey(property.name)) {
             map[property.name] = initialValue
         }

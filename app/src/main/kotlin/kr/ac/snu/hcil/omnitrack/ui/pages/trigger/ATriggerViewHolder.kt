@@ -33,6 +33,8 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
         fun onTriggerCollapse(position: Int)
     }
 
+    private var isFirstBinding = true
+
     protected lateinit var trigger: T
         private set
 
@@ -61,6 +63,11 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
     private val bottomBar: LockableFrameLayout
 
     private val errorMessages: ArrayList<String>
+
+    private val onTriggerSwitchTurned: ((sender: Any, isOn: Boolean) -> Unit) = {
+        sender, isOn ->
+        applyTriggerStateToView()
+    }
 
     init {
 
@@ -142,8 +149,15 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
     }
 
     fun bind(trigger: OTTrigger) {
+        if (!isFirstBinding) {
+            this.trigger.switchTurned -= onTriggerSwitchTurned
+        } else {
+            isFirstBinding = false
+        }
+
         this.trigger = trigger as T
 
+        this.trigger.switchTurned += onTriggerSwitchTurned
         applyTriggerStateToView()
     }
 

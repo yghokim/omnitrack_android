@@ -3,31 +3,24 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 import android.content.Context
 import android.text.Spannable
 import android.text.SpannableString
+import android.text.format.DateUtils
 import android.text.style.AbsoluteSizeSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.TypefaceSpan
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 import java.util.regex.Pattern
+import kotlin.properties.Delegates
 
 /**
  * Created by Young-Ho on 8/25/2016.
  */
 class TimeTriggerDisplayView : LinearLayout {
-
-    private val mainView: TextView
-    private val nextTriggerView: TextView
-
-    private var nextTriggerTime: Long = 0
-
-    constructor(context: Context?) : super(context)
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
-
     init {
         orientation = VERTICAL
 
@@ -36,9 +29,28 @@ class TimeTriggerDisplayView : LinearLayout {
 
         mainView = findViewById(R.id.value) as TextView
         nextTriggerView = findViewById(R.id.ui_next_trigger) as TextView
-
         nextTriggerView.visibility = GONE
     }
+
+    private val mainView: TextView
+    private val nextTriggerView: TextView
+
+    var nextTriggerTime: Long by Delegates.observable(0L) {
+        prop, old, new ->
+
+        if (old != new) {
+            if (new != 0L) {
+                nextTriggerView.text = DateUtils.getRelativeTimeSpanString(new, System.currentTimeMillis(), 0, DateUtils.FORMAT_ABBREV_ALL)
+                nextTriggerView.visibility = View.VISIBLE
+            } else {
+                nextTriggerView.visibility = View.GONE
+            }
+        }
+    }
+
+    constructor(context: Context?) : super(context)
+    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
+    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
     fun setAlarmInformation(hour: Int, minute: Int, amPm: Int) {
         val amPmText = " " + if (amPm == 0) {
