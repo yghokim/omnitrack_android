@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.utils
 
 import android.content.Context
 import kr.ac.snu.hcil.omnitrack.R
+import java.text.SimpleDateFormat
 import java.util.*
 
 /**
@@ -10,10 +11,17 @@ import java.util.*
  **/
 object TimeHelper {
 
+    enum class Length {
+        FULL, SHORT, SHORTEST
+    }
+
     const val secondsInMilli: Long = 1000
     const val minutesInMilli = secondsInMilli * 60
     const val hoursInMilli = minutesInMilli * 60
     const val daysInMilli = hoursInMilli * 24
+
+    val DAY_OF_WEEK_FULL_FORMAT: SimpleDateFormat by lazy { SimpleDateFormat("EEEE") }
+    val DAY_OF_WEEK_SHORT_FORMAT: SimpleDateFormat by lazy { SimpleDateFormat("EEE") }
 
 
     fun addDays(timestamp: Long, days: Int): Long {
@@ -109,5 +117,11 @@ object TimeHelper {
         return (dayOfWeek + 7 - pivot.getDayOfWeek()) % 7
     }
 
-
+    fun getDayOfWeekName(date: Date, length: Length): CharSequence {
+        return when (length) {
+            Length.FULL -> DAY_OF_WEEK_FULL_FORMAT.format(date)
+            Length.SHORT -> DAY_OF_WEEK_SHORT_FORMAT.format(date)
+            Length.SHORTEST -> DAY_OF_WEEK_SHORT_FORMAT.format(date)
+        }
+    }
 }

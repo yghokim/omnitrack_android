@@ -28,9 +28,9 @@ class TimeTriggerViewHolder : ATriggerViewHolder<OTTimeTrigger> {
 
                 val stringBuilder = StringBuilder()
 
-                for (day in 0..6) {
+                for (day in 1..7) {
                     if (OTTimeTrigger.Range.isDayOfWeekUsed(trigger.rangeVariables, day)) {
-                        stringBuilder.append(names[day].toUpperCase(), "  ")
+                        stringBuilder.append(names[day - 1].toUpperCase(), "  ")
                     }
                 }
 

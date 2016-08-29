@@ -91,7 +91,7 @@ class OTTimeTrigger : OTTrigger {
 
 
         fun isDayOfWeekUsed(range: Int, dayOfWeek: Int): Boolean {
-            return BitwiseOperationHelper.getBooleanAt(range, DAYS_OF_WEEK_FLAGS_SHIFT + (6 - (dayOfWeek - 1)))
+            return BitwiseOperationHelper.getBooleanAt(range, DAYS_OF_WEEK_FLAGS_SHIFT + (7 - dayOfWeek))
         }
 
         fun getAllDayOfWeekFlags(range: Int): Int {
@@ -99,7 +99,7 @@ class OTTimeTrigger : OTTrigger {
         }
 
         fun setIsDayOfWeekUsed(range: Int, dayOfWeek: Int, isUsed: Boolean): Int {
-            return BitwiseOperationHelper.setBooleanAt(range, isUsed, DAYS_OF_WEEK_FLAGS_SHIFT + (6 - (dayOfWeek - 1)))
+            return BitwiseOperationHelper.setBooleanAt(range, isUsed, DAYS_OF_WEEK_FLAGS_SHIFT + (7 - dayOfWeek - 1))
         }
 
         fun getEndYear(range: Int): Int {
@@ -365,12 +365,12 @@ class OTTimeTrigger : OTTrigger {
                         }
                     } else if (!Range.isAllDayNotUsed(rangeVariables)) {
                         //repetition
-                        if (TimeHelper.compareTimePortions(cacheCalendar, cacheCalendar2) >= MILLISECOND_TOLERANCE) {
+                        if (TimeHelper.compareTimePortions(cacheCalendar, cacheCalendar2) >= -MILLISECOND_TOLERANCE) {
 
-                            var closestDayOfWeek = cacheCalendar2.getDayOfWeek() // today
+                            var closestDayOfWeek = cacheCalendar2.getDayOfWeek() + 1 // today
 
                             while (!Range.isDayOfWeekUsed(rangeVariables, closestDayOfWeek)) {
-                                closestDayOfWeek = (closestDayOfWeek + 1) % 7
+                                closestDayOfWeek = ((closestDayOfWeek - 1) + 1 % 7) + 1
                             }
 
 
@@ -506,6 +506,7 @@ class OTTimeTrigger : OTTrigger {
     }
 
 
+
     private fun getClosestLowerBoundOfInterval(from: Long, lowerBoundHourOfDay: Int): Long {
         cacheCalendar.timeInMillis = from
 
@@ -518,7 +519,7 @@ class OTTimeTrigger : OTTrigger {
             return cacheCalendar.timeInMillis
         } else {
             var daysLeft = 1
-            while (!Range.isDayOfWeekUsed(rangeVariables, (pivotDayOfWeek + daysLeft) % 7)) {
+            while (!Range.isDayOfWeekUsed(rangeVariables, (((pivotDayOfWeek - 1) + daysLeft) % 7) + 1)) {
                 daysLeft++
             }
 
