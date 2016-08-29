@@ -76,10 +76,10 @@
 
         <kr.ac.snu.hcil.omnitrack.ui.components.common.time.DateTimePicker
             android:id="@+id/ui_time_picker"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
             android:layout_marginTop="12dp"
             android:numbersBackgroundColor="@color/colorSecondary"
             android:numbersSelectorColor="@color/colorSecondary" />

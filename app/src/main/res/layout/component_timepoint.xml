@@ -29,11 +29,12 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.3" />
 
-        <ImageView
+        <android.support.v7.widget.AppCompatImageView
             android:layout_width="18dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:src="@drawable/time_digit_separator" />
+            android:src="@drawable/time_digit_separator"
+            android:tint="@color/textColorLight" />
 
         <kr.ac.snu.hcil.omnitrack.ui.components.common.VerticalNumericUpDown
             android:id="@+id/ui_middle_picker"
@@ -41,11 +42,12 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.3" />
 
-        <ImageView
+        <android.support.v7.widget.AppCompatImageView
             android:layout_width="18dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:src="@drawable/time_digit_separator" />
+            android:src="@drawable/time_digit_separator"
+            android:tint="@color/textColorLight" />
 
         <kr.ac.snu.hcil.omnitrack.ui.components.common.VerticalNumericUpDown
             android:id="@+id/ui_right_picker"
