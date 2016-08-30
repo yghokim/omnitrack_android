@@ -69,6 +69,12 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
         applyTriggerStateToView()
     }
 
+    private val onTriggerFired: ((Any, Int) -> Unit) = {
+        sender, triggeredTime ->
+        applyTriggerStateToView()
+    }
+
+
     init {
 
         errorMessages = ArrayList<String>()
@@ -151,6 +157,7 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
     fun bind(trigger: OTTrigger) {
         if (!isFirstBinding) {
             this.trigger.switchTurned -= onTriggerSwitchTurned
+            this.trigger.fired -= onTriggerFired
         } else {
             isFirstBinding = false
         }
@@ -158,6 +165,7 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
         this.trigger = trigger as T
 
         this.trigger.switchTurned += onTriggerSwitchTurned
+        this.trigger.fired += onTriggerFired
         applyTriggerStateToView()
     }
 

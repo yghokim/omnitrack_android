@@ -148,6 +148,7 @@ class TrackerDetailReminderTabFragment : TrackerDetailActivity.ChildFragment() {
 
             OTApplication.app.triggerManager.removeTrigger(getTriggers()[position])
             this.notifyItemRemoved(position)
+            newTriggerButton.visibility = View.VISIBLE
         }
 
         override fun onTriggerExpandRequested(position: Int) {

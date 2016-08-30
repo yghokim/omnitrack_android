@@ -48,6 +48,7 @@ class FillingIntegerIdReservationTable<T> {
     fun removeKey(key: T) {
         val id = keyPivotedTable[key]
         if (id != null) {
+            println("remove Key $key from fillingIdTable. id: $id")
             idTable.removeAt(id)
             keyPivotedTable.remove(key)
         }

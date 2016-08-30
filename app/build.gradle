@@ -50,6 +50,7 @@ dependencies {
     compile 'com.koushikdutta.ion:ion:2.1.8'
     compile 'io.nlopez.smartlocation:library:3.2.5'
     compile 'com.github.ybq:Android-SpinKit:1.0.5'
+    compile 'com.badoo.mobile:android-weak-handler:1.1'
 
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }
@@ -64,4 +65,10 @@ repositories {
         url "http://dl.bintray.com/kotlin/exposed"
     }
     maven { url "https://jitpack.io" }
+
+    maven {
+        repositories {
+            url 'https://oss.sonatype.org/content/repositories/releases/'
+        }
+    }
 }

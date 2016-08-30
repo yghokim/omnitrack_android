@@ -149,7 +149,7 @@ object OTTimeTriggerAlarmManager {
             val alarmId = idTable[result.first]
             println("new alarm is needed for timestamp ${result.first}. alarmId is $alarmId")
 
-            alarmManager.set(AlarmManager.RTC, result.first, makeIntent(OTApplication.app, result.first, alarmId))
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, result.first, makeIntent(OTApplication.app, result.first, alarmId))
         } else {
             println("System alarm is already registered at ${result.first}.")
         }
@@ -160,9 +160,10 @@ object OTTimeTriggerAlarmManager {
         val reservedTime = triggerTable[trigger.objectId]
         if (reservedTime != null) {
             if (reservationTable.removeValueAndCheckIsTimestampEmpty(reservedTime, trigger.objectId)) {
-                alarmManager.cancel(makeIntent(OTApplication.app, reservedTime, idTable[reservedTime]))
+                val alarmId = idTable[reservedTime]
+                alarmManager.cancel(makeIntent(OTApplication.app, reservedTime, alarmId))
                 idTable.removeKey(reservedTime)
-                println("all triggers at $reservedTime was canceled. System alarm is canceled.")
+                println("all triggers at $reservedTime was canceled. System alarm is canceled - ${alarmId}.")
             } else {
                 println("only this trigger was excluded at $reservedTime. There are still ${reservationTable[reservedTime]?.size ?: 0} triggers reserved at that time. System alarm persists.")
             }
@@ -182,6 +183,9 @@ object OTTimeTriggerAlarmManager {
             println("${reservationTable[intentTriggerTime]?.size ?: 0} triggers are reserved for this alarm.")
 
             val reservedTriggers = reservationTable[intentTriggerTime]
+            reservationTable.clearTimestamp(timestamp = intentTriggerTime)
+            idTable.removeKey(intentTriggerTime)
+
             if (reservedTriggers != null) {
                 for (triggerId in reservedTriggers) {
                     triggerTable.remove(triggerId)
@@ -189,9 +193,6 @@ object OTTimeTriggerAlarmManager {
                     trigger?.fire(intentTriggerTime)
                 }
             }
-
-            reservationTable.clearTimestamp(timestamp = intentTriggerTime)
-            idTable.removeKey(intentTriggerTime)
         }
 
     }
@@ -203,7 +204,7 @@ object OTTimeTriggerAlarmManager {
         intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_USER, OTApplication.app.currentUser.objectId)
         intent.putExtra(INTENT_EXTRA_ALARM_ID, alarmId)
         intent.putExtra(INTENT_EXTRA_TRIGGER_TIME, triggerTime)
-        return PendingIntent.getBroadcast(context, alarmId, intent, 0)
+        return PendingIntent.getBroadcast(context, alarmId, intent, PendingIntent.FLAG_CANCEL_CURRENT)
     }
 
 }

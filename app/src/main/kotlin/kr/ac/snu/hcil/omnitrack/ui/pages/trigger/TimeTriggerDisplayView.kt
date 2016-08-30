@@ -13,7 +13,9 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.utils.Ticker
 import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
+import java.util.*
 import java.util.regex.Pattern
 import kotlin.properties.Delegates
 
@@ -21,6 +23,22 @@ import kotlin.properties.Delegates
  * Created by Young-Ho on 8/25/2016.
  */
 class TimeTriggerDisplayView : LinearLayout {
+
+    companion object {
+        private val ticker: Ticker by lazy {
+            val instance = Ticker()
+            instance.tick += {
+                sender, time ->
+                for (view in shownInstances) {
+                    view.refreshNextTriggerTimeTextWithNow(time)
+                }
+            }
+            instance
+        }
+
+        private var shownInstances = HashSet<TimeTriggerDisplayView>()
+    }
+
     init {
         orientation = VERTICAL
 
@@ -51,6 +69,11 @@ class TimeTriggerDisplayView : LinearLayout {
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+
+    fun refreshNextTriggerTimeTextWithNow(now: Long) {
+        if (nextTriggerTime != 0L)
+            nextTriggerView.text = DateUtils.getRelativeTimeSpanString(nextTriggerTime, now, 0, DateUtils.FORMAT_ABBREV_ALL)
+    }
 
     fun setAlarmInformation(hour: Int, minute: Int, amPm: Int) {
         val amPmText = " " + if (amPm == 0) {
@@ -86,6 +109,25 @@ class TimeTriggerDisplayView : LinearLayout {
         }
 
         mainView.text = text
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        shownInstances.add(this)
+        println("${shownInstances.size} instances")
+        if (shownInstances.size > 0) {
+            ticker.start()
+        }
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        shownInstances.remove(this)
+        println("${shownInstances.size} instances")
+        if (shownInstances.size == 0) {
+            println("stop ticker")
+            ticker.stop()
+        }
     }
 
 }
