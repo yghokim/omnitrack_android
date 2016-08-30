@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.attribute
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.transition.TransitionManager
@@ -10,12 +11,11 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
-import kr.ac.snu.hcil.omnitrack.core.externals.google.fit.GoogleFitStepsFactory
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ShortTextPropertyView
+import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.wizard.ConnectionWizardView
 import kr.ac.snu.hcil.omnitrack.utils.*
 import java.util.*
 
@@ -182,10 +182,21 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
             /*
             val intent = Intent(this, ConnectionWizardActivity::class.java)
             startActivityForResult(intent, 0)*/
+            /*
             val newConnection = OTConnection()
             newConnection.source = GoogleFitStepsFactory.makeMeasure()
             attribute?.valueConnection = newConnection
             refreshConnection(true)
+            */
+
+            val view = ConnectionWizardView(this)
+            view.init(attribute!!)
+
+            val wizardDialog = AlertDialog.Builder(this)
+                    .setView(view)
+                    .create()
+
+            wizardDialog.show()
         }
     }
 

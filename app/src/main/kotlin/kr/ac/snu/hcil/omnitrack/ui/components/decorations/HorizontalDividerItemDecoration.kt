@@ -23,7 +23,7 @@ class HorizontalDividerItemDecoration(val color: Int, val height: Int, val leftP
 
         if (paint.color != 0) {
             val left = parent.paddingLeft + leftPadding
-            val right = parent.width - parent.paddingRight + rightPadding
+            val right = parent.width - parent.paddingRight - rightPadding
 
             val childCount = parent.childCount
             for (i in 0..childCount - 2) {

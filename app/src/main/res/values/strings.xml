@@ -252,6 +252,9 @@
 
     <string name="msg_trigger_error_interval_not_0">Interval must not be zero.</string>
 
+    <string name="msg_connection_wizard_title_source_selection">Choose a data source</string>
+    <string name="msg_connection_wizard_title_time_query">Config time query</string>
+
 
     <string-array name="choice_preview_entries">
         <item>Choice entry 1</item>

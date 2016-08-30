@@ -51,6 +51,7 @@ dependencies {
     compile 'io.nlopez.smartlocation:library:3.2.5'
     compile 'com.github.ybq:Android-SpinKit:1.0.5'
     compile 'com.badoo.mobile:android-weak-handler:1.1'
+    compile 'me.relex:circleindicator:1.2.1@aar'
 
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <me.relex.circleindicator.CircleIndicator
+        android:id="@+id/ui_wizard_indicator"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        app:ci_height="5dp"
+        app:ci_margin="3dp"
+        app:ci_width="5dp" />
+
+    <TextView
+        android:id="@+id/ui_wizard_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:layout_marginBottom="16dp"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:fontFamily="sans-serif-light"
+        android:gravity="center"
+        android:text="Select Type"
+        android:textColor="@color/colorPointed"
+        android:textSize="22.5sp" />
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/ui_wizard_pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@drawable/expanded_view_inner_shadow_top" />
+
+</LinearLayout>
