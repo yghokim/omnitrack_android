@@ -63,9 +63,6 @@ class OTItemBuilder : ADataRow, IStringSerializable {
         this.mode = mode
         connectedItemDbId = -1
         syncFromTrackerScheme()
-
-        if (mode == MODE_BACKGROUND)
-            autoCompleteAsync()
     }
 
     /**

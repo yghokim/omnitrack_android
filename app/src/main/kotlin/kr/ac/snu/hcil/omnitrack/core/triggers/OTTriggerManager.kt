@@ -1,8 +1,9 @@
-package kr.ac.snu.hcil.omnitrack.core
+package kr.ac.snu.hcil.omnitrack.core.triggers
 
 import android.widget.Toast
 import kr.ac.snu.hcil.omnitrack.OTApplication
-import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
+import kr.ac.snu.hcil.omnitrack.core.OTTracker
+import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
 import java.util.*
 
@@ -101,6 +102,9 @@ class OTTriggerManager(val user: OTUser) {
 
 
         //TODO handler dependencies associated with the trigger
+        if (trigger is OTTimeTrigger) {
+            OTTimeTriggerAlarmManager.cancelTrigger(trigger)
+        }
 
 
         if (trackerPivotedTriggerListCache.containsKey(trigger.trackerObjectId)) {

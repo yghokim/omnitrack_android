@@ -2,12 +2,13 @@ package kr.ac.snu.hcil.omnitrack
 
 import android.app.Application
 import android.graphics.Color
-import kr.ac.snu.hcil.omnitrack.core.OTTriggerManager
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.*
 import kr.ac.snu.hcil.omnitrack.core.database.CacheHelper
 import kr.ac.snu.hcil.omnitrack.core.database.DatabaseHelper
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
+import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTriggerAlarmManager
+import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerManager
 import kr.ac.snu.hcil.omnitrack.utils.UniqueStringEntryList
 
 /**
@@ -167,6 +168,8 @@ class OTApplication : Application() {
             dbHelper.save(triggerEntry.value, _currentUser, triggerEntry.index)
         }
         dbHelper.deleteObjects(DatabaseHelper.TriggerScheme, *triggerManager.fetchRemovedTriggerIds())
+
+        OTTimeTriggerAlarmManager.storeTableToPreferences()
     }
 
     override fun onTerminate() {

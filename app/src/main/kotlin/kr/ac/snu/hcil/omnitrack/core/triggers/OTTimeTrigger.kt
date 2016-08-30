@@ -1,12 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.core.triggers
 
 import android.app.AlarmManager
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.receivers.OTSystemReceiver
 import kr.ac.snu.hcil.omnitrack.utils.*
 import java.util.*
 
@@ -18,8 +15,6 @@ class OTTimeTrigger : OTTrigger {
     companion object {
         const val CONFIG_TYPE_ALARM = 0
         const val CONFIG_TYPE_INTERVAL = 1
-
-        const val INTENT_EXTRA_TRIGGER_TIME = "triggerTime"
 
         const val MILLISECOND_TOLERANCE = 1000L
 
@@ -305,16 +300,6 @@ class OTTimeTrigger : OTTrigger {
 
     }
 
-    private fun makeIntent(context: Context, triggerTime: Long, alarmId: Int): PendingIntent {
-        val intent = Intent(context, OTSystemReceiver::class.java)
-        intent.action = OTApplication.BROADCAST_ACTION_ALARM
-        intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRIGGER, this.objectId)
-        intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_USER, OTApplication.app.currentUser.objectId)
-        intent.putExtra(INTENT_EXTRA_TRIGGER_TIME, triggerTime)
-
-        return PendingIntent.getBroadcast(context, alarmId, intent, 0)
-    }
-
     val isRangeSpecified: Boolean get() = OTTimeTrigger.Range.isSpecified(rangeVariables)
     val isConfigSpecified: Boolean get() {
         return when (configType) {
@@ -347,6 +332,7 @@ class OTTimeTrigger : OTTrigger {
 
                     cacheCalendar.timeInMillis = now
                     cacheCalendar2.set(0, 0, 0, AlarmConfig.getHourOfDay(configVariables), AlarmConfig.getMinute(configVariables), 0)
+                    cacheCalendar2.set(Calendar.MILLISECOND, 0)
                     cacheCalendar2.set(Calendar.YEAR, cacheCalendar.getYear())
                     cacheCalendar2.set(Calendar.MONTH, cacheCalendar.getZeroBasedMonth())
                     cacheCalendar2.set(Calendar.DAY_OF_MONTH, cacheCalendar.getDayOfMonth())
@@ -534,7 +520,7 @@ class OTTimeTrigger : OTTrigger {
 
         val alarmManager = OTApplication.app.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-        alarmManager.cancel(makeIntent(OTApplication.app, 0, 0))
+        OTTimeTriggerAlarmManager.cancelTrigger(this)
         if (!reserveNextAlarmToSystem(lastTriggeredTime)) {
             isOn = false
         }
@@ -543,7 +529,7 @@ class OTTimeTrigger : OTTrigger {
     private fun onRangeChanged() {
         val alarmManager = OTApplication.app.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-        alarmManager.cancel(makeIntent(OTApplication.app, 0, 0))
+        OTTimeTriggerAlarmManager.cancelTrigger(this)
         if (!reserveNextAlarmToSystem(lastTriggeredTime)) {
             isOn = false
         }
@@ -569,9 +555,7 @@ class OTTimeTrigger : OTTrigger {
             cacheCalendar.timeInMillis = nextAlarmTime
             println("next alarm will be fired at $cacheCalendar")
 
-            val alarmManager = OTApplication.app.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-
-            alarmManager.set(AlarmManager.RTC, nextAlarmTime, makeIntent(OTApplication.app, nextAlarmTime, 0))
+            OTTimeTriggerAlarmManager.reserveAlarm(this, nextAlarmTime)
             return true
         } else {
             println("Finish trigger. Do not repeat.")
@@ -592,8 +576,6 @@ class OTTimeTrigger : OTTrigger {
     }
 
     override fun handleOff() {
-        val alarmManager = OTApplication.app.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-
-        alarmManager.cancel(makeIntent(OTApplication.app, 0, 0))
+        OTTimeTriggerAlarmManager.cancelTrigger(this)
     }
 }

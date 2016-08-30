@@ -40,7 +40,10 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
         val tracker = OTApplication.app.currentUser[trackerId]
         if (tracker != null) {
             val builder = OTItemBuilder(tracker, OTItemBuilder.MODE_BACKGROUND)
-            OTApplication.app.dbHelper.save(builder.makeItem(), tracker)
+
+            builder.autoCompleteAsync {
+                OTApplication.app.dbHelper.save(builder.makeItem(), tracker)
+            }
         }
     }
 }
