@@ -8,6 +8,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.externals.device.AndroidDeviceService
 import kr.ac.snu.hcil.omnitrack.core.externals.google.fit.GoogleFitService
 import kr.ac.snu.hcil.omnitrack.core.externals.microsoft.band.MicrosoftBandService
+import kr.ac.snu.hcil.omnitrack.core.externals.misfit.MisfitService
 import kr.ac.snu.hcil.omnitrack.core.externals.shaomi.miband.MiBandService
 import kr.ac.snu.hcil.omnitrack.utils.INameDescriptionResourceProvider
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
@@ -24,15 +25,14 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
         private val factoryCodeDict = HashMap<String, OTMeasureFactory>()
 
         val availableServices: Array<OTExternalService> by lazy {
-            arrayOf(AndroidDeviceService, GoogleFitService, MicrosoftBandService, MiBandService)
+            arrayOf(AndroidDeviceService, GoogleFitService, MicrosoftBandService, MisfitService, MiBandService)
         }
 
         fun getMeasureFactoryByCode(typeCode: String): OTMeasureFactory? {
             return factoryCodeDict[typeCode]
         }
 
-        private val preferences: SharedPreferences
-            get() = OTApplication.app.getSharedPreferences("ExternalServices", Context.MODE_PRIVATE)
+        protected val preferences: SharedPreferences by lazy { OTApplication.app.getSharedPreferences("ExternalServices", Context.MODE_PRIVATE) }
 
 
         init {

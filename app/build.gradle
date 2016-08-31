@@ -52,6 +52,7 @@ dependencies {
     compile 'com.github.ybq:Android-SpinKit:1.0.5'
     compile 'com.badoo.mobile:android-weak-handler:1.1'
     compile 'me.relex:circleindicator:1.2.1@aar'
+    compile 'com.wu-man:android-oauth-client:0.4.5@aar'
 
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }

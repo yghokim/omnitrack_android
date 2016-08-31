@@ -20,7 +20,8 @@
         android:icon="@drawable/icon"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        tools:replace="android:allowBackup">
         <receiver android:name=".receivers.OTSystemReceiver">
             <intent-filter>
                 <action android:name="kr.ac.snu.hcil.omnitrack.action.ALARM" />

@@ -212,6 +212,12 @@
     <string name="measure_googlefit_steps_name">Step Count</string>
     <string name="measure_googlefit_steps_desc">Get step count during specific range</string>
 
+
+    <string name="service_misfit_name">Misfit</string>
+    <string name="service_misfit_desc">Get data from Misfit server</string>
+    <string name="measure_misfit_sleeps_name">Sleep Time</string>
+    <string name="measure_misfit_sleeps_desc">Get sleep time range</string>
+
     <string name="service_device_name">Android Device</string>
     <string name="service_device_desc">Android device events and measures</string>
 
