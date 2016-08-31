@@ -15,7 +15,9 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.time.DayOfWeekSelector
 import kr.ac.snu.hcil.omnitrack.ui.components.common.time.DurationPicker
 import kr.ac.snu.hcil.omnitrack.ui.components.common.time.HourRangePicker
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.BooleanPropertyView
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ComboBoxPropertyView
 import kr.ac.snu.hcil.omnitrack.utils.*
+import kr.ac.snu.hcil.omnitrack.utils.events.IEventListener
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -23,11 +25,12 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 2016-08-24.
  */
-class TimeTriggerConfigurationPanel : LinearLayout, AdapterView.OnItemSelectedListener, CompoundButton.OnCheckedChangeListener, DatePickerDialog.OnDateSetListener, View.OnClickListener {
+class TimeTriggerConfigurationPanel : LinearLayout, IEventListener<Int>, CompoundButton.OnCheckedChangeListener, DatePickerDialog.OnDateSetListener, View.OnClickListener {
+
 
     private val dateFormat: DateFormat
 
-    private val configSpinner: Spinner
+    private val configTypePropertyView: ComboBoxPropertyView
     private val intervalConfigGroup: ViewGroup
     private val alarmConfigGroup: ViewGroup
 
@@ -78,9 +81,9 @@ class TimeTriggerConfigurationPanel : LinearLayout, AdapterView.OnItemSelectedLi
         dateFormat = SimpleDateFormat(resources.getString(R.string.dateformat_ymd))
         repeatEndDate = GregorianCalendar(2016, 1, 1)
 
-        configSpinner = findViewById(R.id.ui_spinner_config_type) as Spinner
+        configTypePropertyView = findViewById(R.id.ui_time_trigger_type) as ComboBoxPropertyView
 
-        configSpinner.adapter = IconNameEntryArrayAdapter(context,
+        configTypePropertyView.adapter = IconNameEntryArrayAdapter(context,
                 arrayOf(
                         IconNameEntryArrayAdapter.Entry(OTTimeTrigger.configIconId(OTTimeTrigger.CONFIG_TYPE_ALARM),
                                 OTTimeTrigger.configNameId(OTTimeTrigger.CONFIG_TYPE_ALARM)),
@@ -88,9 +91,7 @@ class TimeTriggerConfigurationPanel : LinearLayout, AdapterView.OnItemSelectedLi
                                 OTTimeTrigger.configNameId(OTTimeTrigger.CONFIG_TYPE_INTERVAL))
                 ))
 
-        configSpinner.setSelection(0)
-
-        configSpinner.onItemSelectedListener = this
+        configTypePropertyView.valueChanged += this
 
         intervalConfigGroup = findViewById(R.id.ui_interval_group) as ViewGroup
         alarmConfigGroup = findViewById(R.id.ui_alarm_group) as ViewGroup
@@ -146,13 +147,13 @@ class TimeTriggerConfigurationPanel : LinearLayout, AdapterView.OnItemSelectedLi
 
         when (mode) {
             OTTimeTrigger.CONFIG_TYPE_ALARM -> {
-                configSpinner.setSelection(0)
+                configTypePropertyView.value = 0
                 alarmConfigGroup.visibility = VISIBLE
                 intervalConfigGroup.visibility = GONE
             }
 
             OTTimeTrigger.CONFIG_TYPE_INTERVAL -> {
-                configSpinner.setSelection(1)
+                configTypePropertyView.value = 1
                 alarmConfigGroup.visibility = GONE
                 intervalConfigGroup.visibility = VISIBLE
             }
@@ -235,6 +236,18 @@ class TimeTriggerConfigurationPanel : LinearLayout, AdapterView.OnItemSelectedLi
         }
     }
 
+    override fun onEvent(sender: Any, args: Int) {
+        println("onEvent: $sender")
+        if (sender === configTypePropertyView) {
+            if (!refreshingViews) {
+                when (args) {
+                    0 -> configMode = OTTimeTrigger.CONFIG_TYPE_ALARM
+                    1 -> configMode = OTTimeTrigger.CONFIG_TYPE_INTERVAL
+                }
+            }
+        }
+    }
+
     override fun onDateSet(p0: DatePicker?, year: Int, month: Int, day: Int) {
         applyRepeatEndDate(year, month, day)
     }
@@ -270,19 +283,6 @@ class TimeTriggerConfigurationPanel : LinearLayout, AdapterView.OnItemSelectedLi
                 endDateButton.visibility = View.INVISIBLE
             }
         }
-    }
-
-    override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-        if (!refreshingViews) {
-            when (position) {
-                0 -> configMode = OTTimeTrigger.CONFIG_TYPE_ALARM
-                1 -> configMode = OTTimeTrigger.CONFIG_TYPE_INTERVAL
-            }
-        }
-    }
-
-    override fun onNothingSelected(p0: AdapterView<*>?) {
-
     }
 
     fun validateExpandedViewInputs(errorMessagesOut: MutableList<String>): Boolean {

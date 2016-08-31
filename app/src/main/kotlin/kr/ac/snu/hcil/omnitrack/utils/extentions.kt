@@ -8,7 +8,9 @@ import android.location.Geocoder
 import android.os.Handler
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import com.google.android.gms.maps.model.LatLng
 import java.util.*
 
@@ -69,6 +71,12 @@ fun View.setPaddingTop(padding: Int) {
 fun View.setPaddingBottom(padding: Int) {
     setPadding(paddingLeft, paddingTop, paddingRight, padding)
 }
+
+fun ViewGroup.inflateContent(layout: Int, attach: Boolean): View {
+    val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+    return inflater.inflate(layout, this, attach)
+}
+
 
 fun List<*>.move(fromPosition: Int, toPosition: Int): Boolean {
     if (fromPosition != toPosition) {

@@ -8,7 +8,7 @@ import android.widget.Button
 import android.widget.FrameLayout
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
-import kr.ac.snu.hcil.omnitrack.ui.components.common.VerticalNumericUpDown
+import kr.ac.snu.hcil.omnitrack.ui.components.common.NumericUpDown
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.CalendarPickerDialogFragment
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kr.ac.snu.hcil.omnitrack.utils.getActivity
@@ -48,9 +48,9 @@ class DateTimePicker(context: Context, attrs: AttributeSet? = null) : FrameLayou
         }
     }
 
-    private lateinit var leftPicker: VerticalNumericUpDown
-    private lateinit var middlePicker: VerticalNumericUpDown
-    private lateinit var rightPicker: VerticalNumericUpDown
+    private lateinit var leftPicker: NumericUpDown
+    private lateinit var middlePicker: NumericUpDown
+    private lateinit var rightPicker: NumericUpDown
 
     private lateinit var dateButton: Button
 
@@ -162,9 +162,9 @@ class DateTimePicker(context: Context, attrs: AttributeSet? = null) : FrameLayou
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         addView(inflater.inflate(R.layout.component_timepoint, this, false))
 
-        leftPicker = findViewById(R.id.ui_left_picker) as VerticalNumericUpDown
-        middlePicker = findViewById(R.id.ui_middle_picker) as VerticalNumericUpDown
-        rightPicker = findViewById(R.id.ui_right_picker) as VerticalNumericUpDown
+        leftPicker = findViewById(R.id.ui_left_picker) as NumericUpDown
+        middlePicker = findViewById(R.id.ui_middle_picker) as NumericUpDown
+        rightPicker = findViewById(R.id.ui_right_picker) as NumericUpDown
 
         dateButton = findViewById(R.id.ui_button_date) as Button
 

@@ -7,6 +7,7 @@
     android:orientation="vertical"
     android:showDividers="middle">
 
+    <!--
     <LinearLayout
         style="@style/propertyGroupSinglelineStyle"
         android:layout_gravity="center_horizontal">
@@ -25,7 +26,15 @@
             android:layout_marginRight="@dimen/activity_horizontal_margin"
             android:layout_weight="1"
             android:background="@drawable/spinner_background" />
-    </LinearLayout>
+    </LinearLayout>-->
+    <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ComboBoxPropertyView
+        android:id="@+id/ui_time_trigger_type"
+        style="@style/propertyGroupSinglelineStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:text="@string/msg_trigger_time_config_type" />
 
 
     <LinearLayout

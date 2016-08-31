@@ -15,6 +15,7 @@ abstract class AInputView<T>(layoutId: Int, context: Context, attrs: AttributeSe
 
     val valueChanged = Event<T>()
 
+
     private val validators: ArrayList<ReadOnlyPair<CharSequence?, (T) -> Boolean>> = ArrayList<ReadOnlyPair<CharSequence?, (T) -> Boolean>>()
 
     protected val validationErrorMessageList = ArrayList<CharSequence>()

@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.attribute.wizard
 
 import android.content.Context
 import android.util.AttributeSet
+import kr.ac.snu.hcil.omnitrack.core.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.AWizardPage
 import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.AWizardViewPagerAdapter
@@ -19,6 +20,12 @@ class ConnectionWizardView : WizardView {
         const val PAGE_INDEX_POST_PROCESSING = 2
     }
 
+    private lateinit var pendingConnection: OTConnection
+
+    val connection: OTConnection
+        get() = pendingConnection
+
+
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
 
@@ -26,13 +33,38 @@ class ConnectionWizardView : WizardView {
     }
 
     fun init(attribute: OTAttribute<out Any>) {
-        setAdapter(Adapter(attribute))
+        init(attribute, OTConnection())
     }
 
+    /**
+     * used to modify existing connection
+     */
+    fun init(attribute: OTAttribute<out Any>, connection: OTConnection) {
+        setAdapter(Adapter(attribute))
+        pendingConnection = connection
+    }
+
+
     override fun onEnterPage(page: AWizardPage, position: Int) {
+        when (position) {
+            PAGE_INDEX_SOURCE_SELECTION ->
+                return
+            PAGE_INDEX_TIME_QUERY ->
+                if (!pendingConnection.isRangedQueryAvailable) {
+                    throw Exception("This source do not support Time Query. Wrong wizard page.")
+                }
+        }
     }
 
     override fun onLeavePage(page: AWizardPage, position: Int) {
+        when (position) {
+            PAGE_INDEX_SOURCE_SELECTION ->
+                pendingConnection.source = (page as SourceSelectionPage).selectedInformation?.getSource()
+            PAGE_INDEX_TIME_QUERY ->
+                if (!pendingConnection.isRangedQueryAvailable) {
+                    throw Exception("This source do not support Time Query. Wrong wizard page.")
+                }
+        }
     }
 
 

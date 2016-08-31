@@ -38,7 +38,7 @@ abstract class WizardView : FrameLayout, AWizardViewPagerAdapter.IWizardPageList
 
     init {
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        val view = inflater.inflate(R.layout.layout_wizard_view_parent, this, true)
+        inflater.inflate(R.layout.layout_wizard_view_parent, this, true)
 
         indicator = findViewById(R.id.ui_wizard_indicator) as CircleIndicator
 

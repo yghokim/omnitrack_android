@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ImageButton
+        android:id="@+id/ui_button_plus"
+        style="@style/roundButtonStyle"
+        android:src="@drawable/right_dark" />
+    <!--
+        <EditText
+            android:id="@+id/valueField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/transparent_button_background"
+            android:ems="10"
+            android:inputType="numberDecimal"
+            android:textAlignment="center"
+            android:textColor="@color/buttonIconColorDark"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+    -->
+
+    <TextView
+        android:id="@+id/ui_value_field"
+        style="@style/hourPickerHourStyle"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/button_height_normal"
+        android:layout_marginEnd="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_weight="1"
+        android:background="@drawable/button_background_formlike"
+        android:fontFamily="sans-serif-light"
+        android:gravity="center"
+        android:textAlignment="center"
+        android:textSize="20sp" />
+
+
+    <ImageButton
+        android:id="@+id/ui_button_minus"
+        style="@style/roundButtonStyle"
+        android:src="@drawable/left_dark" />
+</merge>
