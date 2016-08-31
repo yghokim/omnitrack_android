@@ -1,5 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.externals
 
+import android.text.Html
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilder
 import kr.ac.snu.hcil.omnitrack.core.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
@@ -26,6 +28,14 @@ abstract class OTMeasureFactory() : INameDescriptionResourceProvider {
     abstract fun makeMeasure(): OTMeasure
     abstract fun makeMeasure(serialized: String): OTMeasure
 
+    open fun getFormattedName(): CharSequence {
+        val html = "<b>${OTApplication.app.resources.getString(nameResourceId)}</b> | ${OTApplication.app.getString(service.nameResourceId)}"
+        return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY)
+        } else {
+            Html.fromHtml(html)
+        }
+    }
 
     abstract class OTMeasure : ATypedQueueSerializable {
 

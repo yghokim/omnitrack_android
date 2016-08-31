@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingRight="12dp">
+
+    <android.support.v7.widget.AppCompatImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:scaleType="fitCenter"
+        android:scaleX="0.9"
+        android:scaleY="0.9"
+        android:src="@drawable/link_dark"
+
+
+        android:tint="@color/textColorLight" />
+
+    <TextView
+        android:id="@+id/ui_connection_source_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="6dp"
+        android:text="Step Count | Google Fit"
+        android:textColor="@color/colorPointed" />
+</LinearLayout>

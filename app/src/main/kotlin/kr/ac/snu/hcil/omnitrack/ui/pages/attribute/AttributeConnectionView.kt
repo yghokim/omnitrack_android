@@ -2,7 +2,6 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.attribute
 
 import android.content.Context
 import android.text.Html
-import android.text.Spanned
 import android.util.AttributeSet
 import android.view.View
 import android.widget.Button
@@ -65,14 +64,7 @@ class AttributeConnectionView : LinearLayout, View.OnClickListener {
         if (source == null) {
             sourceView.text = "No source"
         } else {
-            val html = "<b>${resources.getString(source.factory.nameResourceId)}</b> | ${resources.getString(source.factory.service.nameResourceId)}"
-            val content: Spanned = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY)
-            } else {
-                Html.fromHtml(html)
-            }
-
-            sourceView.text = content
+            sourceView.text = source.factory.getFormattedName()
         }
 
         if (connection?.isRangedQueryAvailable ?: false) {

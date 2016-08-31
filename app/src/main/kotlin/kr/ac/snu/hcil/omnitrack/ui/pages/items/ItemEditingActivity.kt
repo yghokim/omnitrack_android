@@ -10,6 +10,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewStub
 import android.widget.TextView
 import android.widget.Toast
 import kr.ac.snu.hcil.omnitrack.OTApplication
@@ -314,7 +315,12 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
 
             private val container: LockableFrameLayout
 
-            private val indicatorInContainer: View
+            private val connectionIndicatorStub: ViewStub
+            private var connectionIndicator: View? = null
+            private var connectionIndicatorSourceNameView: TextView? = null
+
+
+            private val loadingIndicatorInContainer: View
 
             private var attributeId: String? = null
 
@@ -325,7 +331,9 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
                 container = frame.findViewById(R.id.ui_input_view_container) as LockableFrameLayout
                 container.addView(inputView, 0)
 
-                indicatorInContainer = frame.findViewById(R.id.ui_container_indicator)
+                loadingIndicatorInContainer = frame.findViewById(R.id.ui_container_indicator)
+
+                connectionIndicatorStub = frame.findViewById(R.id.ui_connection_indicator_stub) as ViewStub
 
                 inputView.valueChanged += {
                     sender, args ->
@@ -345,6 +353,21 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
                 attributeId = attribute.objectId
                 columnNameView.text = attribute.name
                 attributeTypeView.text = resources.getString(attribute.typeNameResourceId)
+
+                val connectionSource = attribute.valueConnection?.source
+                if (connectionSource != null) {
+                    if (connectionIndicator == null) {
+                        connectionIndicator = connectionIndicatorStub.inflate()
+                        connectionIndicatorSourceNameView = connectionIndicator?.findViewById(R.id.ui_connection_source_name) as TextView
+                    } else {
+                        connectionIndicator?.visibility = View.VISIBLE
+                    }
+
+                    connectionIndicatorSourceNameView?.text = connectionSource.factory.getFormattedName()
+                } else {
+                    connectionIndicator?.visibility = View.GONE
+                }
+
 
                 if (builder.hasValueOf(attribute)) {
 
@@ -369,13 +392,13 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
 
                 when (builder.getAttributeValueState(adapterPosition)) {
                     OTItemBuilder.EAttributeValueState.Idle -> {
-                        indicatorInContainer.visibility = View.GONE
+                        loadingIndicatorInContainer.visibility = View.GONE
                     }
                     OTItemBuilder.EAttributeValueState.Processing -> {
-                        indicatorInContainer.visibility = View.VISIBLE
+                        loadingIndicatorInContainer.visibility = View.VISIBLE
                     }
                     OTItemBuilder.EAttributeValueState.GettingExternalValue -> {
-                        indicatorInContainer.visibility = View.VISIBLE
+                        loadingIndicatorInContainer.visibility = View.VISIBLE
                     }
                 }
 

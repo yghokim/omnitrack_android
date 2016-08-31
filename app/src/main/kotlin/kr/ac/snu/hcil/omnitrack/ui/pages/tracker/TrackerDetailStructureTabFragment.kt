@@ -9,10 +9,7 @@ import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
-import android.view.LayoutInflater
-import android.view.MotionEvent
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
@@ -250,14 +247,19 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
 
         inner class ViewHolder(val view: View) : RecyclerView.ViewHolder(view), View.OnClickListener, View.OnTouchListener {
 
-            lateinit var previewContainer: LockableFrameLayout
-            lateinit var columnNameView: TextView
-            lateinit var typeIconView: AppCompatImageView
+            private val previewContainer: LockableFrameLayout
+            private val columnNameView: TextView
+            private val typeIconView: AppCompatImageView
 
-            lateinit var editButton: ImageButton
-            lateinit var removeButton: ImageButton
+            private val editButton: ImageButton
+            private val removeButton: ImageButton
 
-            lateinit var draggableZone: View
+            private val draggableZone: View
+
+            private val connectionIndicatorStub: ViewStub
+
+            private var connectionIndicator: View? = null
+            private var connectionSourceNameView: TextView? = null
 
             var preview: AAttributeInputView<out Any>? = null
                 get
@@ -282,11 +284,11 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
                 editButton = view.findViewById(R.id.ui_button_edit) as ImageButton
                 removeButton = view.findViewById(R.id.ui_button_remove) as ImageButton
                 draggableZone = view.findViewById(R.id.ui_drag_handle)
+                connectionIndicatorStub = view.findViewById(R.id.ui_connection_indicator_stub) as ViewStub
 
                 editButton.setOnClickListener(this)
                 removeButton.setOnClickListener(this)
                 draggableZone.setOnTouchListener(this)
-
             }
 
             override fun onClick(view: View) {
@@ -315,6 +317,21 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
 
                 previewContainer.alpha = 0.5f
                 preview = attribute.getInputView(context, true, preview)
+
+                val connectionSource = attribute.valueConnection?.source
+                if (connectionSource != null) {
+                    if (connectionIndicator == null) {
+                        val inflatedIndicator = connectionIndicatorStub.inflate()
+                        connectionSourceNameView = inflatedIndicator.findViewById(R.id.ui_connection_source_name) as TextView
+                        this.connectionIndicator = inflatedIndicator
+                    } else {
+                        connectionIndicator?.visibility = View.VISIBLE
+                    }
+
+                    connectionSourceNameView?.text = connectionSource.factory.getFormattedName()
+                } else {
+                    connectionIndicator?.visibility = View.GONE
+                }
             }
         }
 

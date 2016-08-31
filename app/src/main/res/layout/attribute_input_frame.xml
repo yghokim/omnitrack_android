@@ -59,26 +59,43 @@
             android:id="@+id/sidebar"
             android:layout_width="?attr/actionBarSize"
             android:layout_height="match_parent"
-            android:layout_alignBottom="@+id/ui_input_view_container">
+            android:layout_alignBottom="@+id/ui_content_container">
 
         </RelativeLayout>
 
-        <kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
-            android:id="@+id/ui_input_view_container"
+        <LinearLayout
+            android:id="@+id/ui_content_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:layout_toEndOf="@+id/sidebar">
+            android:layout_toEndOf="@+id/sidebar"
+            android:orientation="vertical">
 
-            <com.github.ybq.android.spinkit.SpinKitView
-                android:id="@+id/ui_container_indicator"
+            <kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
+                android:id="@+id/ui_input_view_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.github.ybq.android.spinkit.SpinKitView
+                    android:id="@+id/ui_container_indicator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:visibility="gone"
+                    app:SpinKit_Color="@color/colorPointed"
+                    app:SpinKit_Style="ThreeBounce" />
+            </kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout>
+
+            <ViewStub
+                android:id="@+id/ui_connection_indicator_stub"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:visibility="gone"
-                app:SpinKit_Color="@color/colorPointed"
-                app:SpinKit_Style="ThreeBounce" />
-        </kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout>
+                android:layout_gravity="left"
+                android:layout_marginTop="12dp"
+                android:inflatedId="@+id/ui_connection_indicator"
+                android:layout="@layout/layout_connection_indicator_light" />
+        </LinearLayout>
+
 
     </RelativeLayout>
 
