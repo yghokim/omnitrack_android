@@ -31,7 +31,7 @@ class TimeQueryPage(val attribute: OTAttribute<out Any>) : AWizardPage() {
     }
 
     override fun onLeave() {
-
+        view?.refreshQueryFromViewValues()
     }
 
     override fun onEnter() {

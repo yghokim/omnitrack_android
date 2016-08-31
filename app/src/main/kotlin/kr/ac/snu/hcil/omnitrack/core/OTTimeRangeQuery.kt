@@ -42,7 +42,7 @@ class OTTimeRangeQuery : ATypedQueueSerializable() {
     /*** not used in LINK_TIMESPAN mode.
      *
      */
-    var binOffset: Int = -1
+    var binOffset: Int = 0
 
     var linkedAttribute: OTAttribute<out Any>? = null
 

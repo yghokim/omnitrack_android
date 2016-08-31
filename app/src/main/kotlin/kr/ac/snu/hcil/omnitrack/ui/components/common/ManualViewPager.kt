@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.utils
+package kr.ac.snu.hcil.omnitrack.ui.components.common
 
 import android.content.Context
 import android.support.v4.view.ViewPager
@@ -46,7 +46,7 @@ class ManualViewPager : ViewPager {
     inner class MyScroller(context: Context) : Scroller(context, DecelerateInterpolator()) {
 
         override fun startScroll(startX: Int, startY: Int, dx: Int, dy: Int, duration: Int) {
-            super.startScroll(startX, startY, dx, dy, 500 /*1 secs*/)
+            super.startScroll(startX, startY, dx, dy, 250 /*1 secs*/)
         }
     }
 

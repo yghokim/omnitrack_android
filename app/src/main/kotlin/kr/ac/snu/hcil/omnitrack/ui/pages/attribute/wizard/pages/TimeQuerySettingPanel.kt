@@ -127,6 +127,12 @@ class TimeQuerySettingPanel : LinearLayout, IEventListener<Int> {
         }
     }
 
+    fun refreshQueryFromViewValues() {
+        onEvent(pivotTimeComboBox, pivotTimeComboBox.value)
+        onEvent(scopeView, scopeView.value)
+        onEvent(offsetView, offsetView.value)
+    }
+
 
     inner open class PivotEntry(val name: String, val mode: Int) {
         constructor(nameResId: Int, mode: Int) : this(resources.getString(nameResId), mode)

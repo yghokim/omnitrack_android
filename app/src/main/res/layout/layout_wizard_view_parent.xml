@@ -27,7 +27,7 @@
         android:textColor="@color/colorPointed"
         android:textSize="22.5sp" />
 
-    <kr.ac.snu.hcil.omnitrack.utils.ManualViewPager
+    <kr.ac.snu.hcil.omnitrack.ui.components.common.ManualViewPager
         android:id="@+id/ui_wizard_pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
