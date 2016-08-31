@@ -13,6 +13,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
+import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.WizardView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ShortTextPropertyView
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.wizard.ConnectionWizardView
@@ -190,11 +191,26 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
             */
 
             val view = ConnectionWizardView(this)
-            view.init(attribute!!)
 
             val wizardDialog = AlertDialog.Builder(this)
                     .setView(view)
                     .create()
+
+            view.init(attribute!!)
+
+            view.setWizardListener(object : WizardView.IWizardListener {
+                override fun onComplete(wizard: WizardView) {
+                    attribute?.valueConnection = view.connection
+                    refreshConnection(true)
+                    println("new connection refreshed.")
+                    wizardDialog.dismiss()
+                }
+
+                override fun onCanceled(wizard: WizardView) {
+                    wizardDialog.dismiss()
+                }
+
+            })
 
             wizardDialog.show()
         }

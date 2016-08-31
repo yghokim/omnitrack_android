@@ -1,7 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/linearLayoutWithHorizontalDivider"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:paddingTop="7dp">
+
+    <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ComboBoxPropertyView
+        android:id="@+id/ui_pivot_selection"
+        style="@style/propertyGroupElement"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/msg_connection_wizard_time_query_pivot_time" />
+
+    <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.SelectionPropertyView
+        android:id="@+id/ui_bin_size"
+        style="@style/propertyGroupElement"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="0dp"
+        android:layout_marginTop="0dp"
+
+        android:text="@string/msg_connection_wizard_time_query_scope" />
+
+    <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.NumericUpDownPropertyView
+        android:id="@+id/ui_bin_offset"
+        style="@style/propertyGroupElement"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/msg_connection_wizard_time_query_offset" />
+
 
 </LinearLayout>

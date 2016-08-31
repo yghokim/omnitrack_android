@@ -255,6 +255,20 @@
     <string name="msg_connection_wizard_title_source_selection">Choose a data source</string>
     <string name="msg_connection_wizard_title_time_query">Config time query</string>
 
+    <string name="msg_connection_wizard_time_query_pivot_time">Reference time</string>
+
+    <string name="msg_connection_wizard_time_query_scope">Scope size</string>
+
+    <string name="msg_connection_wizard_time_query_offset">Offset</string>
+
+    <string name="msg_connection_wizard_time_query_scope_hour">Hour</string>
+    <string name="msg_connection_wizard_time_query_scope_day">Day</string>
+    <string name="msg_connection_wizard_time_query_scope_week">Week</string>
+
+    <string name="msg_connection_wizard_time_query_pivot_present">Present time</string>
+
+    <string name="msg_connection_wizard_time_query_pivot_field_format">\'%1$s\' Field</string>
+
 
     <string-array name="choice_preview_entries">
         <item>Choice entry 1</item>

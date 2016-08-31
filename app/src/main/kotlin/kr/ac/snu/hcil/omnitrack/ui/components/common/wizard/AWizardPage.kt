@@ -8,10 +8,20 @@ import kr.ac.snu.hcil.omnitrack.utils.events.Event
  * Created by Young-Ho Kim on 2016-08-30.
  */
 abstract class AWizardPage {
-    val goNextAvailableChanged = Event<Pair<Long, Boolean>>()
-    val goBackAvailableChanged = Event<Pair<Long, Boolean>>()
+    val goNextAvailableChanged = Event<Pair<Int, Boolean>>()
+    val goBackAvailableChanged = Event<Pair<Int, Boolean>>()
+    val isCompleteButtonAvailableChanged = Event<Boolean>()
+
     val goNextRequested = Event<Int>()
     val goBackRequested = Event<Int>()
+
+    var isCompleteButtonAvailable: Boolean = false
+        protected set(value) {
+            if (field != value) {
+                field = value
+                isCompleteButtonAvailableChanged.invoke(this, value)
+            }
+        }
 
     abstract val canGoBack: Boolean
     abstract val canGoNext: Boolean

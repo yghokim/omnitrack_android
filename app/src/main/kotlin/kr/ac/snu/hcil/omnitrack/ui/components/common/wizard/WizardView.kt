@@ -4,6 +4,7 @@ import android.content.Context
 import android.support.v4.view.ViewPager
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
@@ -12,7 +13,8 @@ import me.relex.circleindicator.CircleIndicator
 /**
  * Created by Young-Ho Kim on 2016-08-30.
  */
-abstract class WizardView : FrameLayout, AWizardViewPagerAdapter.IWizardPageListener, ViewPager.OnPageChangeListener {
+abstract class WizardView : FrameLayout, AWizardViewPagerAdapter.IWizardPageListener, ViewPager.OnPageChangeListener, View.OnClickListener {
+
 
     interface IWizardListener {
         fun onComplete(wizard: WizardView)
@@ -22,6 +24,10 @@ abstract class WizardView : FrameLayout, AWizardViewPagerAdapter.IWizardPageList
     private val indicator: CircleIndicator
     private val titleView: TextView
     private val viewPager: ViewPager
+
+    private val cancelButton: View
+    private val okButton: View
+
 
     private lateinit var adapter: AWizardViewPagerAdapter
 
@@ -48,6 +54,12 @@ abstract class WizardView : FrameLayout, AWizardViewPagerAdapter.IWizardPageList
         viewPager.addOnPageChangeListener(this)
         indicator.setViewPager(viewPager)
 
+        cancelButton = findViewById(R.id.ui_button_cancel)
+        okButton = findViewById(R.id.ui_button_ok)
+
+        cancelButton.setOnClickListener(this)
+        okButton.setOnClickListener(this)
+
     }
 
     fun setAdapter(value: AWizardViewPagerAdapter) {
@@ -59,6 +71,14 @@ abstract class WizardView : FrameLayout, AWizardViewPagerAdapter.IWizardPageList
         onPageSelected(0)
     }
 
+    override fun onClick(view: View) {
+        if (view === cancelButton) {
+            listener?.onCanceled(this)
+        } else if (view === okButton) {
+            complete()
+        }
+    }
+
     override fun onPageScrollStateChanged(state: Int) {
     }
 
@@ -66,7 +86,6 @@ abstract class WizardView : FrameLayout, AWizardViewPagerAdapter.IWizardPageList
     }
 
     override fun onPageSelected(position: Int) {
-        println("Wizard page $position selected")
         titleView.text = adapter.getPageTitle(position)
         onEnterPage(adapter.getPageAt(position), position)
     }
@@ -75,20 +94,32 @@ abstract class WizardView : FrameLayout, AWizardViewPagerAdapter.IWizardPageList
         adapter.getPageAt(currentPosition).onLeave()
         onLeavePage(adapter.getPageAt(currentPosition), currentPosition)
 
-        if (!adapter.canComplete() && nextPosition != -1) {
+        if (nextPosition != -1) {
 
             adapter.getPageAt(nextPosition).onEnter()
             onEnterPage(adapter.getPageAt(nextPosition), nextPosition)
 
             viewPager.setCurrentItem(nextPosition, true)
         } else {
-            if (adapter.canComplete())
                 listener?.onComplete(this)
-            else listener?.onCanceled(this)
         }
     }
 
-    abstract fun onEnterPage(page: AWizardPage, position: Int)
+    fun complete() {
+        val currentPage = adapter.getPageAt(viewPager.currentItem)
+        currentPage.onLeave()
+        onLeavePage(currentPage, viewPager.currentItem)
+
+        listener?.onComplete(this)
+    }
+
+    open fun onEnterPage(page: AWizardPage, position: Int) {
+        if (page.isCompleteButtonAvailable) {
+            okButton.visibility = View.VISIBLE
+        } else {
+            okButton.visibility = View.INVISIBLE
+        }
+    }
 
 
     abstract fun onLeavePage(page: AWizardPage, position: Int)

@@ -6,70 +6,143 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     tools:showIn="@layout/simple_linear_layout">
+    <!--
+        <RelativeLayout
+            android:id="@+id/ui_group_connected_with_indicator"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="@dimen/button_height_normal"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin">
 
-    <RelativeLayout
-        android:id="@+id/ui_group_connected_with_indicator"
+            <kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeConnectionViewSubHeader
+                android:id="@+id/ui_header1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                app:icon="@drawable/link_dark"
+                app:label="Connected with" />
+
+            <TextView
+                android:id="@+id/ui_source"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:gravity="left|center_vertical"
+                android:text="Step Count | Google Fit"
+                android:textColor="@color/colorPointed" />
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            android:id="@+id/ui_group_time_query"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="@dimen/button_height_normal"
+            android:orientation="horizontal"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin">
+
+            <kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeConnectionViewSubHeader
+                android:id="@+id/ui_header2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                app:icon="@drawable/timelapse_dark"
+                app:label="Time Query" />
+
+
+            <TextView
+                android:id="@+id/ui_query"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentTop="true"
+                android:layout_centerVertical="true"
+                android:gravity="left|center_vertical"
+                android:lineSpacingMultiplier="1.2"
+                android:text="Step Count | Google Fit"
+                android:textColor="@color/colorPointed"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="12dp"
+
+                />
+
+        </RelativeLayout>
+    -->
+
+    <TableLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="@dimen/button_height_normal"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin">
+        android:stretchColumns="*">
 
-        <kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeConnectionViewSubHeader
-            android:id="@+id/ui_header1"
-            android:layout_width="wrap_content"
+        <TableRow
+            android:id="@+id/ui_group_connected_with_indicator"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            app:icon="@drawable/link_dark"
-            app:label="Connected with" />
+            android:minHeight="@dimen/button_height_normal"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin">
 
-        <TextView
-            android:id="@+id/ui_source"
-            android:layout_width="wrap_content"
+            <kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeConnectionViewSubHeader
+                android:id="@+id/ui_header1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                app:icon="@drawable/link_dark"
+                app:label="Connected with" />
+
+            <TextView
+                android:id="@+id/ui_source"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:layout_gravity="center_vertical"
+                android:gravity="left|center_vertical"
+                android:text="Step Count | Google Fit"
+                android:textColor="@color/colorPointed" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/ui_group_time_query"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:gravity="left|center_vertical"
-            android:text="Step Count | Google Fit"
-            android:textColor="@color/colorPointed" />
-    </RelativeLayout>
+            android:minHeight="@dimen/button_height_normal"
+            android:orientation="horizontal"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin">
+
+            <kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeConnectionViewSubHeader
+                android:id="@+id/ui_header2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                app:icon="@drawable/timelapse_dark"
+                app:label="Time Query" />
 
 
-    <RelativeLayout
-        android:id="@+id/ui_group_time_query"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="@dimen/button_height_normal"
-        android:orientation="horizontal"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin">
+            <TextView
+                android:id="@+id/ui_query"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginBottom="12dp"
+                android:layout_marginTop="12dp"
+                android:gravity="left|center_vertical"
+                android:lineSpacingMultiplier="1.2"
+                android:text="Pivot: Present time"
+                android:textColor="@color/colorPointed"
 
-        <kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeConnectionViewSubHeader
-            android:id="@+id/ui_header2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            app:icon="@drawable/timelapse_dark"
-            app:label="Time Query" />
+                />
 
+        </TableRow>
 
-        <TextView
-            android:id="@+id/ui_query"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentTop="true"
-            android:layout_centerVertical="true"
-            android:gravity="left|center_vertical"
-            android:lineSpacingMultiplier="1.2"
-            android:text="Step Count | Google Fit"
-            android:textColor="@color/colorPointed" />
+    </TableLayout>
 
-    </RelativeLayout>
-
-
+    <!--
     <RelativeLayout
         android:id="@+id/ui_group_convert"
         android:layout_width="match_parent"
@@ -87,7 +160,7 @@
             android:layout_centerVertical="true"
             app:icon="@drawable/convert_dark"
             app:label="Convert Result" />
-    </RelativeLayout>
+    </RelativeLayout>-->
 
     <View
         style="@style/HorizontalSeparator.NoVerticalMargin"

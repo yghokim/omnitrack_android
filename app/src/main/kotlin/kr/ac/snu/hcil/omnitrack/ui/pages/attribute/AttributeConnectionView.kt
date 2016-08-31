@@ -4,15 +4,14 @@ import android.content.Context
 import android.text.Html
 import android.text.Spanned
 import android.util.AttributeSet
-import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTConnection
-import kr.ac.snu.hcil.omnitrack.core.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
+import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 
 /**
  * Created by younghokim on 16. 8. 11..
@@ -43,8 +42,7 @@ class AttributeConnectionView : LinearLayout, View.OnClickListener {
     init {
         this.orientation = VERTICAL
 
-        val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        inflater.inflate(R.layout.component_attribute_connection, this, true)
+        inflateContent(R.layout.component_attribute_connection, true)
 
         sourceView = findViewById(R.id.ui_source) as TextView
         queryView = findViewById(R.id.ui_query) as TextView
@@ -82,13 +80,13 @@ class AttributeConnectionView : LinearLayout, View.OnClickListener {
             val query = connection?.rangedQuery
             if (query != null) {
                 val builder = StringBuilder()
-                builder.append("<b>Pivot</b> : ${when (query.mode) {OTTimeRangeQuery.TYPE_PIVOT_TIMESTAMP -> "Present Time"; else -> "None"
-                }}<br>")
-                if (query.mode == OTTimeRangeQuery.TYPE_PIVOT_TIMESTAMP || query.mode == OTTimeRangeQuery.TYPE_PIVOT_KEY_TIME) {
-                    builder.append("<b>Scope</b> : ${when (query.binSize) {OTTimeRangeQuery.BIN_SIZE_DAY -> "Day"; OTTimeRangeQuery.BIN_SIZE_HOUR -> "Hour"; else -> "None"
-                    }}<br>")
-                    builder.append("<b>Offset</b> : ${query.binOffset} ${when (query.binSize) {OTTimeRangeQuery.BIN_SIZE_DAY -> "Day"; OTTimeRangeQuery.BIN_SIZE_HOUR -> "Hour"; else -> "None"
-                    }}<br>")
+
+                if (!query.isBinAndOffsetAvailable) {
+                    builder.append(query.getModeName(context))
+                } else {
+                    builder.append("<b>${context.resources.getString(R.string.msg_connection_wizard_time_query_pivot_time)}</b> : ${query.getModeName(context)}<br>")
+                    builder.append("<b>${context.resources.getString(R.string.msg_connection_wizard_time_query_scope)}</b> : ${query.getScopeName(context)}<br>")
+                    builder.append("<b>${context.resources.getString(R.string.msg_connection_wizard_time_query_offset)}</b> : ${query.binOffset}")
                 }
 
                 queryView.text = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {

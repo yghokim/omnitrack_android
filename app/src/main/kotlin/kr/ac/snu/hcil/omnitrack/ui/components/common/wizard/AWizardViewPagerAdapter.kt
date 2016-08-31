@@ -23,7 +23,6 @@ abstract class AWizardViewPagerAdapter() : PagerAdapter() {
     }
 
     override fun instantiateItem(container: ViewGroup, position: Int): Any {
-        println("make new wizard page")
         val page = getPageAt(position)
 
         page.goNextRequested += {
@@ -46,8 +45,6 @@ abstract class AWizardViewPagerAdapter() : PagerAdapter() {
     override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
         container.removeView(`object` as View)
     }
-
-    abstract fun canComplete(): Boolean
 
     override fun isViewFromObject(view: View, obj: Any): Boolean {
         return obj === view

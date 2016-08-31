@@ -14,6 +14,7 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.wizard.pages.TimeQueryPage
  * Created by Young-Ho Kim on 2016-08-30.
  */
 class ConnectionWizardView : WizardView {
+
     companion object {
         const val PAGE_INDEX_SOURCE_SELECTION = 0
         const val PAGE_INDEX_TIME_QUERY = 1
@@ -46,6 +47,7 @@ class ConnectionWizardView : WizardView {
 
 
     override fun onEnterPage(page: AWizardPage, position: Int) {
+        super.onEnterPage(page, position)
         when (position) {
             PAGE_INDEX_SOURCE_SELECTION ->
                 return
@@ -60,10 +62,15 @@ class ConnectionWizardView : WizardView {
         when (position) {
             PAGE_INDEX_SOURCE_SELECTION ->
                 pendingConnection.source = (page as SourceSelectionPage).selectedInformation?.getSource()
-            PAGE_INDEX_TIME_QUERY ->
+            PAGE_INDEX_TIME_QUERY -> {
                 if (!pendingConnection.isRangedQueryAvailable) {
                     throw Exception("This source do not support Time Query. Wrong wizard page.")
+                } else {
+                    val tq = (page as TimeQueryPage).timeQuery
+                    println(tq)
+                    pendingConnection.rangedQuery = tq
                 }
+            }
         }
     }
 
@@ -73,7 +80,7 @@ class ConnectionWizardView : WizardView {
             index ->
             when (index) {
                 PAGE_INDEX_SOURCE_SELECTION -> SourceSelectionPage(attribute)
-                PAGE_INDEX_TIME_QUERY -> TimeQueryPage()
+                PAGE_INDEX_TIME_QUERY -> TimeQueryPage(attribute)
                 else -> throw Exception("wrong index")
             }
         }
@@ -84,10 +91,6 @@ class ConnectionWizardView : WizardView {
 
         override fun getPageAt(position: Int): AWizardPage {
             return pages[position]
-        }
-
-        override fun canComplete(): Boolean {
-            return false
         }
     }
 

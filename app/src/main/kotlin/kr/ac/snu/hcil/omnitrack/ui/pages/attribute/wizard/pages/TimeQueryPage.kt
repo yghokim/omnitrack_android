@@ -1,15 +1,16 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.attribute.wizard.pages
 
 import android.content.Context
-import android.util.AttributeSet
-import android.widget.LinearLayout
+import android.view.View
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.OTTimeRangeQuery
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.AWizardPage
 
 /**
  * Created by Young-Ho Kim on 2016-08-30.
  */
-class TimeQueryPage : AWizardPage() {
+class TimeQueryPage(val attribute: OTAttribute<out Any>) : AWizardPage() {
 
     override val getTitleResourceId: Int = R.string.msg_connection_wizard_title_time_query
 
@@ -19,6 +20,16 @@ class TimeQueryPage : AWizardPage() {
             return true
         }
 
+    private var view: TimeQuerySettingPanel? = null
+
+    val timeQuery: OTTimeRangeQuery?
+        get() = view?.timeQuery
+
+
+    init {
+        isCompleteButtonAvailable = true
+    }
+
     override fun onLeave() {
 
     }
@@ -27,13 +38,8 @@ class TimeQueryPage : AWizardPage() {
     }
 
     override fun makeViewInstance(context: Context): View {
-        return View(context)
-    }
-
-
-    inner class View : LinearLayout {
-        constructor(context: Context?) : super(context)
-        constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
-
+        view = TimeQuerySettingPanel(context)
+        view?.init(attribute)
+        return view!!
     }
 }

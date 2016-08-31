@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="6dp"
             android:text="Step Count"
-            android:textColor="@color/textColorMid"
+            android:textColor="@color/textColorDark"
             android:textSize="18dp" />
 
         <TextView

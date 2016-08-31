@@ -18,7 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
 
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="26dp"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:fontFamily="sans-serif-light"
@@ -27,11 +27,39 @@
         android:textColor="@color/colorPointed"
         android:textSize="22.5sp" />
 
-    <android.support.v4.view.ViewPager
+    <kr.ac.snu.hcil.omnitrack.utils.ManualViewPager
         android:id="@+id/ui_wizard_pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:background="@drawable/expanded_view_inner_shadow_top" />
+        android:background="@drawable/expanded_view_inner_shadow" />
 
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/button_height_tall"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/ui_button_cancel"
+            style="@style/Base.Widget.AppCompat.Button.Borderless.Colored"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true"
+            android:layout_weight="1"
+            android:text="@string/msg_cancel"
+            android:textColor="@color/colorRed.Light" />
+
+        <Button
+            android:id="@+id/ui_button_ok"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true"
+            android:layout_weight="1"
+            android:background="@drawable/transparent_button_background"
+            android:text="@string/msg_ok"
+            android:textColor="@color/colorPointed" />
+    </LinearLayout>
 </LinearLayout>

@@ -37,7 +37,6 @@ class OTConnection : ATypedQueueSerializable {
 
 
     var rangedQuery: OTTimeRangeQuery? = null
-        private set
 
 
     constructor() : super()
