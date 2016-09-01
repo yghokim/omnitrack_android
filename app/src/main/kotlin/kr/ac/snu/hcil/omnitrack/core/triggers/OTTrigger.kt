@@ -17,6 +17,7 @@ import kotlin.properties.Delegates
 abstract class OTTrigger(objectId: String?, dbId: Long?, name: String,
                          trackerObjectId: String,
                          isOn: Boolean,
+                         action: Int,
                          lastTriggeredTime: Long,
                          serializedProperties: String? = null) : NamedObject(objectId, dbId, name) {
 
@@ -31,15 +32,15 @@ abstract class OTTrigger(objectId: String?, dbId: Long?, name: String,
 
         const val TRIGGER_TIME_NEVER_TRIGGERED = -1L
 
-        fun makeInstance(objectId: String?, dbId: Long?, typeId: Int, name: String, trackerObjectId: String, isOn: Boolean, lastTriggeredTime: Long, serializedProperties: String?): OTTrigger {
+        fun makeInstance(objectId: String?, dbId: Long?, typeId: Int, name: String, trackerObjectId: String, isOn: Boolean, action: Int, lastTriggeredTime: Long, serializedProperties: String?): OTTrigger {
             return when (typeId) {
-                TYPE_TIME -> OTTimeTrigger(objectId, dbId, name, trackerObjectId, isOn, lastTriggeredTime, serializedProperties)
+                TYPE_TIME -> OTTimeTrigger(objectId, dbId, name, trackerObjectId, isOn, action, lastTriggeredTime, serializedProperties)
                 else -> throw Exception("wrong trigger type : $typeId")
             }
         }
 
-        fun makeInstance(typeId: Int, name: String, tracker: OTTracker): OTTrigger {
-            return makeInstance(null, null, typeId, name, tracker.objectId, false, TRIGGER_TIME_NEVER_TRIGGERED, null)
+        fun makeInstance(typeId: Int, name: String, action: Int, tracker: OTTracker): OTTrigger {
+            return makeInstance(null, null, typeId, name, tracker.objectId, false, action, TRIGGER_TIME_NEVER_TRIGGERED, null)
         }
     }
 
@@ -51,7 +52,7 @@ abstract class OTTrigger(objectId: String?, dbId: Long?, name: String,
 
     val tracker: OTTracker
 
-    val fired = Event<Int>()
+    val fired = Event<Long>()
 
     val switchTurned = Event<Boolean>()
 
@@ -62,10 +63,10 @@ abstract class OTTrigger(objectId: String?, dbId: Long?, name: String,
     abstract val configTitleId: Int
 
 
-    var action: Int by Delegates.observable(ACTION_BACKGROUND_LOGGING)
+    var action: Int by Delegates.observable(action)
     {
         prop, old, new ->
-        if (new < ACTION_NOTIFICATION && new > ACTION_BACKGROUND_LOGGING) {
+        if (new < ACTION_NOTIFICATION || new > ACTION_BACKGROUND_LOGGING) {
             throw Exception("Wrong trigger action code.")
         }
     }
@@ -131,7 +132,7 @@ abstract class OTTrigger(objectId: String?, dbId: Long?, name: String,
     fun fire(triggerTime: Long) {
         handleFire(triggerTime)
 
-        fired.invoke(this, action)
+        fired.invoke(this, triggerTime)
         this.lastTriggeredTime = triggerTime
     }
 
@@ -150,7 +151,5 @@ abstract class OTTrigger(objectId: String?, dbId: Long?, name: String,
 
     abstract fun handleOn();
     abstract fun handleOff();
-
-
 
 }

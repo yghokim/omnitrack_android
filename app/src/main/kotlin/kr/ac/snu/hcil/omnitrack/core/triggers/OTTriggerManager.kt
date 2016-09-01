@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.triggers
 
 import android.widget.Toast
 import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.core.OTNotificationManager
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
@@ -51,8 +52,8 @@ class OTTriggerManager(val user: OTUser) {
     private val trackerPivotedTriggerListCache = Hashtable<String, Array<OTTrigger>>()
 
     private val triggerFiredHandler = {
-        sender: Any, action: Int ->
-        onTriggerFired(sender as OTTrigger, action)
+        sender: Any, triggerTime: Long ->
+        onTriggerFired(sender as OTTrigger, triggerTime)
     }
 
     fun getTriggerWithId(objId: String): OTTrigger? {
@@ -112,8 +113,8 @@ class OTTriggerManager(val user: OTUser) {
         }
     }
 
-    private fun onTriggerFired(trigger: OTTrigger, action: Int) {
-        when (action) {
+    private fun onTriggerFired(trigger: OTTrigger, triggerTime: Long) {
+        when (trigger.action) {
             OTTrigger.ACTION_BACKGROUND_LOGGING -> {
                 println("trigger fired - loggin in background")
 
@@ -122,6 +123,7 @@ class OTTriggerManager(val user: OTUser) {
             }
             OTTrigger.ACTION_NOTIFICATION -> {
                 println("trigger fired - send notification")
+                OTNotificationManager.pushReminderNotification(OTApplication.app, trigger.tracker, triggerTime)
             }
         }
 

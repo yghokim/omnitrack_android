@@ -69,7 +69,7 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
         applyTriggerStateToView()
     }
 
-    private val onTriggerFired: ((Any, Int) -> Unit) = {
+    private val onTriggerFired: ((Any, Long) -> Unit) = {
         sender, triggeredTime ->
         applyTriggerStateToView()
     }

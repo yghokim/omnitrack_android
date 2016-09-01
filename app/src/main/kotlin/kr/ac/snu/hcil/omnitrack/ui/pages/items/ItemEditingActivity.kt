@@ -17,6 +17,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilder
+import kr.ac.snu.hcil.omnitrack.core.OTNotificationManager
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
@@ -33,9 +34,18 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
 
     companion object {
 
+        const val INTENT_EXTRA_REMINDER_TIME = "reminderTime"
+
         fun makeIntent(trackerId: String, context: Context): Intent {
             val intent = Intent(context, ItemEditingActivity::class.java)
             intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
+            return intent
+        }
+
+        fun makeIntent(trackerId: String, reminderTime: Long, context: Context): Intent {
+            val intent = Intent(context, ItemEditingActivity::class.java)
+            intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
+            intent.putExtra(INTENT_EXTRA_REMINDER_TIME, reminderTime)
             return intent
         }
 
@@ -106,8 +116,16 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
                     mode = Mode.New
                 }
 
+                //if(intent.hasExtra(INTENT_EXTRA_REMINDER_TIME))
+                //{
+                //TODO need more rich design for Notifications. Currently, dismiss all notifications for the tracker when opening the activity.
+                //this is from the reminder.
+                OTNotificationManager.notifyReminderChecked(trackerId, intent.getLongExtra(INTENT_EXTRA_REMINDER_TIME, 0))
+                //}
+
                 if (mode == Mode.New) {
                     if (tryRestoreItemBuilderCache(tracker!!)) {
+
                         Toast.makeText(this, "Past inputs were restored.", Toast.LENGTH_SHORT).show()
                     } else {
                         //new builder was created

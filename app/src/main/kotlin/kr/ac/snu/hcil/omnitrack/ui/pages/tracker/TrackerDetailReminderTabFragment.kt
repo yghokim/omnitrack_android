@@ -40,7 +40,7 @@ class TrackerDetailReminderTabFragment : TrackerDetailActivity.ChildFragment() {
 
             adapter.notifyItemChanged(adapter.itemCount - 1)
             OTApplication.app.triggerManager.putNewTrigger(
-                    OTTrigger.makeInstance(type, "My Trigger", tracker)
+                    OTTrigger.makeInstance(type, "My Trigger", OTTrigger.ACTION_NOTIFICATION, tracker)
             )
             adapter.notifyItemInserted(adapter.itemCount - 1)
             listView.smoothScrollToPosition(adapter.itemCount - 1)
