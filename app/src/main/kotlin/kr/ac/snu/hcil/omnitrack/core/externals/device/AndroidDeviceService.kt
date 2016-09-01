@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.device
 
 import android.content.Context
+import android.content.Intent
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 
@@ -8,7 +9,7 @@ import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
  * Created by younghokim on 16. 8. 4..
  */
 object AndroidDeviceService : OTExternalService("AndroidDeviceService", 19) {
-    override fun handleActivityActivationResult(resultCode: Int) {
+    override fun handleActivityActivationResultOk(resultData: Intent?) {
     }
 
     override fun prepareServiceAsync(preparedHandler: ((Boolean) -> Unit)?) {

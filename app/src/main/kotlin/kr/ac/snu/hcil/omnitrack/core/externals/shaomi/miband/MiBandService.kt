@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.externals.shaomi.miband
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.content.Context
+import android.content.Intent
 import com.zhaoxiaodan.miband.ActionCallback
 import com.zhaoxiaodan.miband.MiBand
 import com.zhaoxiaodan.miband.model.UserInfo
@@ -17,7 +18,7 @@ import kr.ac.snu.hcil.omnitrack.utils.AsyncTaskWithResultHandler
 
 //@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 object MiBandService : OTExternalService("ShaomiMiBand", 21) {
-    override fun handleActivityActivationResult(resultCode: Int) {
+    override fun handleActivityActivationResultOk(resultData: Intent?) {
         throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 

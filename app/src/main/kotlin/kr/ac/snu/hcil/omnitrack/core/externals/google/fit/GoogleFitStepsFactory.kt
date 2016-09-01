@@ -62,7 +62,7 @@ object GoogleFitStepsFactory : GoogleFitService.GoogleFitMeasureFactory() {
             throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
         }
 
-        override fun requestValueAsync(builder: OTItemBuilder, query: OTTimeRangeQuery?, handler: (Any) -> Unit) {
+        override fun requestValueAsync(builder: OTItemBuilder, query: OTTimeRangeQuery?, handler: (Any?) -> Unit) {
             val range = query?.getRange(builder)
             Task(range!!.first, range.second) {
                 steps ->

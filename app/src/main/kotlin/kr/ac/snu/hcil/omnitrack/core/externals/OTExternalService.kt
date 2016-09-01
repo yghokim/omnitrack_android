@@ -1,6 +1,8 @@
 package kr.ac.snu.hcil.omnitrack.core.externals
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.support.v4.app.Fragment
@@ -10,6 +12,7 @@ import kr.ac.snu.hcil.omnitrack.core.externals.google.fit.GoogleFitService
 import kr.ac.snu.hcil.omnitrack.core.externals.microsoft.band.MicrosoftBandService
 import kr.ac.snu.hcil.omnitrack.core.externals.misfit.MisfitService
 import kr.ac.snu.hcil.omnitrack.core.externals.shaomi.miband.MiBandService
+import kr.ac.snu.hcil.omnitrack.utils.FillingIntegerIdReservationTable
 import kr.ac.snu.hcil.omnitrack.utils.INameDescriptionResourceProvider
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import java.util.*
@@ -20,7 +23,11 @@ import java.util.*
 abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : INameDescriptionResourceProvider {
     companion object {
 
-        const val REQUEST_CODE_GOOGLE_FIT = 0
+        val requestCodeDict = FillingIntegerIdReservationTable<OTExternalService>()
+
+        fun assignRequestCode(service: OTExternalService) {
+            requestCodeDict[service]
+        }
 
         private val factoryCodeDict = HashMap<String, OTMeasureFactory>()
 
@@ -32,8 +39,10 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
             return factoryCodeDict[typeCode]
         }
 
-        protected val preferences: SharedPreferences by lazy { OTApplication.app.getSharedPreferences("ExternalServices", Context.MODE_PRIVATE) }
+        val preferences: SharedPreferences by lazy { OTApplication.app.getSharedPreferences("ExternalServices", Context.MODE_PRIVATE) }
 
+
+        var pendingConnectionListener: ((Boolean) -> Unit)? = null
 
         init {
             for (service in availableServices) {
@@ -95,7 +104,7 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
     fun activateAsync(context: Context, connectedHandler: ((Boolean) -> Unit)? = null) {
         state = ServiceState.ACTIVATING
 
-        onActivateAsync(context, {
+        pendingConnectionListener = {
             result ->
             if (result == true) {
                 setIsActivatedFlag(this, true)
@@ -106,7 +115,10 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
             }
 
             connectedHandler?.invoke(result)
-        })
+            pendingConnectionListener = null
+        }
+
+        onActivateAsync(context, pendingConnectionListener)
     }
 
     abstract fun onActivateAsync(context: Context, connectedHandler: ((Boolean) -> Unit)? = null)
@@ -144,6 +156,18 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
         result.toTypedArray()
     }
 
-    abstract fun handleActivityActivationResult(resultCode: Int)
+    protected fun cancelActivationProcess() {
+        pendingConnectionListener?.invoke(false)
+        pendingConnectionListener = null
+    }
+
+    fun onActivityActivationResult(resultCode: Int, resultData: Intent?) {
+        if (resultCode != Activity.RESULT_OK) {
+            cancelActivationProcess()
+        } else handleActivityActivationResultOk(resultData)
+    }
+
+
+    abstract fun handleActivityActivationResultOk(resultData: Intent?)
 
 }

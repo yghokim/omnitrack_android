@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.externals.google.fit
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import com.google.android.gms.common.api.Api
 import com.google.android.gms.common.api.GoogleApiClient
@@ -90,6 +91,7 @@ object GoogleFitService : OTExternalService("GoogleFitService", 19) {
 
     init {
         _measureFactories.add(GoogleFitStepsFactory)
+        assignRequestCode(this)
     }
 
     override fun onActivateAsync(context: Context, connectedHandler: ((Boolean) -> Unit)?) {
@@ -101,7 +103,7 @@ object GoogleFitService : OTExternalService("GoogleFitService", 19) {
                     .addOnConnectionFailedListener {
                         result ->
                         if (result.hasResolution()) {
-                            result.startResolutionForResult(context as Activity, REQUEST_CODE_GOOGLE_FIT)
+                            result.startResolutionForResult(context as Activity, requestCodeDict[this])
                         }
                     }
                     .build()
@@ -114,13 +116,8 @@ object GoogleFitService : OTExternalService("GoogleFitService", 19) {
         client = null
     }
 
-    override fun handleActivityActivationResult(resultCode: Int) {
-        println(resultCode)
-        if (resultCode == Activity.RESULT_OK) {
-            prepareServiceAsync(currentActivationHandler)
-        } else {
-            currentActivationHandler?.invoke(false)
-        }
+    override fun handleActivityActivationResultOk(data: Intent?) {
+        prepareServiceAsync(currentActivationHandler)
     }
 
     override fun prepareServiceAsync(preparedHandler: ((Boolean) -> Unit)?) {

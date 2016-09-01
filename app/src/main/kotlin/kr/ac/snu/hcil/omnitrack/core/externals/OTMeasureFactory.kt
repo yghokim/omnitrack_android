@@ -52,6 +52,6 @@ abstract class OTMeasureFactory() : INameDescriptionResourceProvider {
 
 
         abstract fun awaitRequestValue(query: OTTimeRangeQuery?): Any
-        abstract fun requestValueAsync(builder: OTItemBuilder, query: OTTimeRangeQuery?, handler: (Any) -> Unit)
+        abstract fun requestValueAsync(builder: OTItemBuilder, query: OTTimeRangeQuery?, handler: (Any?) -> Unit)
     }
 }

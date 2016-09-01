@@ -71,6 +71,10 @@
         <activity
             android:name=".ui.pages.connectionwizard.ConnectionWizardActivity"
             android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".ui.components.common.activity.WebServiceLoginActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").

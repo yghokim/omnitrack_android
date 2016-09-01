@@ -335,4 +335,11 @@
         <item name="android:showDividers">middle</item>
     </style>
 
+    <style name="popupTitle">
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:text">Select Type</item>
+        <item name="android:textColor">@color/colorPointed</item>
+        <item name="android:textSize">22.5sp</item>
+    </style>
+
 </resources>

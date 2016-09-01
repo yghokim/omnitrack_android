@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.microsoft.band
 
 import android.content.Context
+import android.content.Intent
 import android.os.AsyncTask
 import com.microsoft.band.BandClient
 import com.microsoft.band.BandClientManager
@@ -14,7 +15,7 @@ import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
  * Created by younghokim on 16. 7. 28..
  */
 object MicrosoftBandService : OTExternalService("MicrosoftBandService", 19) {
-    override fun handleActivityActivationResult(resultCode: Int) {
+    override fun handleActivityActivationResultOk(resultData: Intent?) {
 
     }
 

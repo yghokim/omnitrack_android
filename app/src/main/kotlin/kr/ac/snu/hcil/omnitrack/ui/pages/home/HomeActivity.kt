@@ -18,7 +18,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
-import kr.ac.snu.hcil.omnitrack.core.externals.google.fit.GoogleFitService
 import kr.ac.snu.hcil.omnitrack.ui.activities.UserSyncedActivity
 
 class HomeActivity : UserSyncedActivity() {
@@ -152,8 +151,7 @@ class HomeActivity : UserSyncedActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        when (requestCode) {
-            OTExternalService.REQUEST_CODE_GOOGLE_FIT -> GoogleFitService.handleActivityActivationResult(resultCode)
-        }
+        val requester = OTExternalService.requestCodeDict.getKeyFromId(requestCode)
+        requester?.onActivityActivationResult(resultCode, data)
     }
 }

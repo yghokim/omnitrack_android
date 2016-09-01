@@ -15,17 +15,14 @@
 
     <TextView
         android:id="@+id/ui_wizard_title"
+        style="@style/popupTitle"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
 
+        android:layout_height="wrap_content"
         android:layout_marginBottom="26dp"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:fontFamily="sans-serif-light"
-        android:gravity="center"
-        android:text="Select Type"
-        android:textColor="@color/colorPointed"
-        android:textSize="22.5sp" />
+        android:gravity="center" />
 
     <kr.ac.snu.hcil.omnitrack.ui.components.common.ManualViewPager
         android:id="@+id/ui_wizard_pager"
