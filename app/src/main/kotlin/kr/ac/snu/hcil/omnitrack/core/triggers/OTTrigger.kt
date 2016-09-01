@@ -39,8 +39,8 @@ abstract class OTTrigger(objectId: String?, dbId: Long?, name: String,
             }
         }
 
-        fun makeInstance(typeId: Int, name: String, action: Int, tracker: OTTracker): OTTrigger {
-            return makeInstance(null, null, typeId, name, arrayOf(tracker.objectId), false, action, TRIGGER_TIME_NEVER_TRIGGERED, null)
+        fun makeInstance(typeId: Int, name: String, action: Int, vararg trackers: OTTracker): OTTrigger {
+            return makeInstance(null, null, typeId, name, trackers.map { it.objectId }.toTypedArray(), false, action, TRIGGER_TIME_NEVER_TRIGGERED, null)
         }
     }
 

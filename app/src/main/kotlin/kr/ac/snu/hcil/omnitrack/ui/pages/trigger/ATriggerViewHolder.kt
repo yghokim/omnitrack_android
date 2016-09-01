@@ -181,7 +181,7 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
 
 
         //attached tracker list
-        if (this.trigger.action == OTTrigger.ACTION_NOTIFICATION) {
+        if (this.trigger.action == OTTrigger.ACTION_BACKGROUND_LOGGING) {
             if (attachedTrackerListView == null) {
                 attachedTrackerListView = attachedTrackerListStub.inflate()
                 attachedTrackerList = attachedTrackerListView?.findViewById(R.id.ui_attached_tracker_list) as ViewGroup
