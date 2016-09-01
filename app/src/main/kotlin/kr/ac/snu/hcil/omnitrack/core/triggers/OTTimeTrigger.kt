@@ -296,7 +296,7 @@ class OTTimeTrigger : OTTrigger {
     private var cacheCalendar2 = Calendar.getInstance()
 
 
-    constructor(objectId: String?, dbId: Long?, name: String, trackerObjectId: String, isOn: Boolean, action: Int, lastTriggeredTime: Long, serializedProperties: String? = null) : super(objectId, dbId, name, trackerObjectId, isOn, action, lastTriggeredTime, serializedProperties) {
+    constructor(objectId: String?, dbId: Long?, name: String, trackerObjectIds: Array<String>, isOn: Boolean, action: Int, lastTriggeredTime: Long, serializedProperties: String? = null) : super(objectId, dbId, name, trackerObjectIds, isOn, action, lastTriggeredTime, serializedProperties) {
 
     }
 

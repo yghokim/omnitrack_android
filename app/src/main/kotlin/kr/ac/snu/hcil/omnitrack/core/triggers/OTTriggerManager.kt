@@ -66,10 +66,14 @@ class OTTriggerManager(val user: OTUser) {
         } else {
             //println("triggers cache miss")
             trackerPivotedTriggerListCache.set(tracker.objectId,
-                    triggers.filter { it.trackerObjectId == tracker.objectId }.toTypedArray())
+                    triggers.filter { it.trackers.contains(tracker) }.toTypedArray())
         }
 
         return trackerPivotedTriggerListCache[tracker.objectId]!!
+    }
+
+    fun getAttachedTriggers(tracker: OTTracker, action: Int): Array<OTTrigger> {
+        return getAttachedTriggers(tracker).filter { it.action == action }.toTypedArray()
     }
 
     fun putNewTrigger(trigger: OTTrigger) {
@@ -85,9 +89,11 @@ class OTTriggerManager(val user: OTUser) {
                 _removedTriggerIds.remove(trigger.dbId)
             }
 
-            if (trackerPivotedTriggerListCache.containsKey(trigger.trackerObjectId)) {
-                trackerPivotedTriggerListCache[trigger.trackerObjectId] =
-                        trackerPivotedTriggerListCache[trigger.trackerObjectId]!! + trigger
+            for (tracker in trigger.trackers) {
+                if (trackerPivotedTriggerListCache.containsKey(tracker.objectId)) {
+                    trackerPivotedTriggerListCache[tracker.objectId] =
+                            trackerPivotedTriggerListCache[tracker.objectId]!! + trigger
+                }
             }
         }
     }
@@ -107,9 +113,10 @@ class OTTriggerManager(val user: OTUser) {
             OTTimeTriggerAlarmManager.cancelTrigger(trigger)
         }
 
-
-        if (trackerPivotedTriggerListCache.containsKey(trigger.trackerObjectId)) {
-            trackerPivotedTriggerListCache[trigger.trackerObjectId] = trackerPivotedTriggerListCache[trigger.trackerObjectId]!!.filter { it != trigger }.toTypedArray()
+        for (tracker in trigger.trackers) {
+            if (trackerPivotedTriggerListCache.containsKey(tracker.objectId)) {
+                trackerPivotedTriggerListCache[tracker.objectId] = trackerPivotedTriggerListCache[tracker.objectId]!!.filter { it != trigger }.toTypedArray()
+            }
         }
     }
 
@@ -119,11 +126,13 @@ class OTTriggerManager(val user: OTUser) {
                 println("trigger fired - loggin in background")
 
                 Toast.makeText(OTApplication.app, "Logged!", Toast.LENGTH_SHORT).show()
-                OTBackgroundLoggingService.startLogging(OTApplication.app, trigger.tracker)
+
+                for (tracker in trigger.trackers)
+                    OTBackgroundLoggingService.startLogging(OTApplication.app, tracker)
             }
             OTTrigger.ACTION_NOTIFICATION -> {
                 println("trigger fired - send notification")
-                OTNotificationManager.pushReminderNotification(OTApplication.app, trigger.tracker, triggerTime)
+                OTNotificationManager.pushReminderNotification(OTApplication.app, trigger.trackers[0], triggerTime)
             }
         }
 

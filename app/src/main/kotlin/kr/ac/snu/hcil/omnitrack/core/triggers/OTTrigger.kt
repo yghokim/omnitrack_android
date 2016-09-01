@@ -15,7 +15,7 @@ import kotlin.properties.Delegates
  * Created by younghokim on 16. 7. 27..
  */
 abstract class OTTrigger(objectId: String?, dbId: Long?, name: String,
-                         trackerObjectId: String,
+                         trackerObjectIds: Array<String>,
                          isOn: Boolean,
                          action: Int,
                          lastTriggeredTime: Long,
@@ -32,15 +32,15 @@ abstract class OTTrigger(objectId: String?, dbId: Long?, name: String,
 
         const val TRIGGER_TIME_NEVER_TRIGGERED = -1L
 
-        fun makeInstance(objectId: String?, dbId: Long?, typeId: Int, name: String, trackerObjectId: String, isOn: Boolean, action: Int, lastTriggeredTime: Long, serializedProperties: String?): OTTrigger {
+        fun makeInstance(objectId: String?, dbId: Long?, typeId: Int, name: String, trackerObjectIds: Array<String>, isOn: Boolean, action: Int, lastTriggeredTime: Long, serializedProperties: String?): OTTrigger {
             return when (typeId) {
-                TYPE_TIME -> OTTimeTrigger(objectId, dbId, name, trackerObjectId, isOn, action, lastTriggeredTime, serializedProperties)
+                TYPE_TIME -> OTTimeTrigger(objectId, dbId, name, trackerObjectIds, isOn, action, lastTriggeredTime, serializedProperties)
                 else -> throw Exception("wrong trigger type : $typeId")
             }
         }
 
         fun makeInstance(typeId: Int, name: String, action: Int, tracker: OTTracker): OTTrigger {
-            return makeInstance(null, null, typeId, name, tracker.objectId, false, action, TRIGGER_TIME_NEVER_TRIGGERED, null)
+            return makeInstance(null, null, typeId, name, arrayOf(tracker.objectId), false, action, TRIGGER_TIME_NEVER_TRIGGERED, null)
         }
     }
 
@@ -48,9 +48,10 @@ abstract class OTTrigger(objectId: String?, dbId: Long?, name: String,
     abstract val typeNameResourceId: Int
     abstract val descriptionResourceId: Int
 
-    val trackerObjectId: String
+    val trackers: List<OTTracker>
+        get() = _trackerList
 
-    val tracker: OTTracker
+    private val _trackerList = ArrayList<OTTracker>()
 
     val fired = Event<Long>()
 
@@ -63,13 +64,7 @@ abstract class OTTrigger(objectId: String?, dbId: Long?, name: String,
     abstract val configTitleId: Int
 
 
-    var action: Int by Delegates.observable(action)
-    {
-        prop, old, new ->
-        if (new < ACTION_NOTIFICATION || new > ACTION_BACKGROUND_LOGGING) {
-            throw Exception("Wrong trigger action code.")
-        }
-    }
+    val action: Int = action
 
     var lastTriggeredTime: Long by Delegates.observable(lastTriggeredTime) {
         prop, old, new ->
@@ -99,8 +94,12 @@ abstract class OTTrigger(objectId: String?, dbId: Long?, name: String,
 
 
     init {
-        this.trackerObjectId = trackerObjectId
-        this.tracker = OTApplication.app.currentUser[trackerObjectId]!!
+        for (trackerId in trackerObjectIds) {
+            val tracker = OTApplication.app.currentUser[trackerId]
+            if (tracker != null) {
+                _trackerList.add(tracker)
+            }
+        }
 
         if(serializedProperties!=null)
         {

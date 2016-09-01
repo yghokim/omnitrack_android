@@ -127,8 +127,8 @@ class HomeActivity : UserSyncedActivity() {
         override fun getItem(position: Int): Fragment {
             when (position) {
                 0 -> return TrackerListFragment()
-                1 -> return ServiceListFragment()
-                2 -> return PlaceholderFragment.newInstance(position)
+                1 -> return PlaceholderFragment.newInstance(position)
+                2 -> return ServiceListFragment()
                 else -> return PlaceholderFragment.newInstance(position)
             }
         }
@@ -141,8 +141,8 @@ class HomeActivity : UserSyncedActivity() {
         override fun getPageTitle(position: Int): CharSequence? {
             when (position) {
                 0 -> return resources.getString(R.string.msg_tab_trackers)
-                1 -> return resources.getString(R.string.msg_tab_services)
-                2 -> return resources.getString(R.string.msg_tab_settings)
+                1 -> return resources.getString(R.string.msg_tab_background_loggers)
+                2 -> return resources.getString(R.string.msg_tab_services)
             }
             return null
         }

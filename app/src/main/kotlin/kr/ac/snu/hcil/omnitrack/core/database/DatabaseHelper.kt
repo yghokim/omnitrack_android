@@ -5,6 +5,7 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import com.google.gson.Gson
 import kr.ac.snu.hcil.omnitrack.core.NamedObject
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
@@ -72,7 +73,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
     object TriggerScheme : TableWithNameScheme() {
         override val tableName: String = "omnitrack_triggers"
         val USER_ID = "user_id"
-        val TRACKER_OBJECT_ID = "tracker_object_id"
+        val TRACKER_OBJECT_IDS = "tracker_object_ids"
         val POSITION = "position"
         val PROPERTIES = "properties"
         val TYPE = "type"
@@ -80,9 +81,9 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         val ACTION = "action"
         val LAST_TRIGGERED_TIME = "last_triggered_time"
 
-        override val intrinsicColumnNames: Array<String> = super.intrinsicColumnNames + arrayOf(TRACKER_OBJECT_ID, TYPE, POSITION, IS_ON, ACTION, LAST_TRIGGERED_TIME, PROPERTIES)
+        override val intrinsicColumnNames: Array<String> = super.intrinsicColumnNames + arrayOf(TRACKER_OBJECT_IDS, TYPE, POSITION, IS_ON, ACTION, LAST_TRIGGERED_TIME, PROPERTIES)
 
-        override val creationColumnContentString = super.creationColumnContentString + ", ${makeForeignKeyStatementString(USER_ID, UserScheme.tableName)}, ${TriggerScheme.TRACKER_OBJECT_ID} TEXT, ${TriggerScheme.POSITION} INTEGER, ${TriggerScheme.IS_ON} INTEGER, ${TriggerScheme.ACTION} INTEGER, ${TriggerScheme.LAST_TRIGGERED_TIME} INTEGER, ${TriggerScheme.TYPE} INTEGER, ${TriggerScheme.PROPERTIES} TEXT"
+        override val creationColumnContentString = super.creationColumnContentString + ", ${makeForeignKeyStatementString(USER_ID, UserScheme.tableName)}, ${TriggerScheme.TRACKER_OBJECT_IDS} TEXT, ${TriggerScheme.POSITION} INTEGER, ${TriggerScheme.IS_ON} INTEGER, ${TriggerScheme.ACTION} INTEGER, ${TriggerScheme.LAST_TRIGGERED_TIME} INTEGER, ${TriggerScheme.TYPE} INTEGER, ${TriggerScheme.PROPERTIES} TEXT"
     }
 
     object ItemScheme : TableScheme() {
@@ -181,7 +182,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         val name = cursor.getString(cursor.getColumnIndex(TriggerScheme.NAME))
         val objectId = cursor.getString(cursor.getColumnIndex(TriggerScheme.OBJECT_ID))
         val type = cursor.getInt(cursor.getColumnIndex(TriggerScheme.TYPE))
-        val trackerObjectId = cursor.getString(cursor.getColumnIndex(TriggerScheme.TRACKER_OBJECT_ID))
+        val trackerObjectIds = cursor.getString(cursor.getColumnIndex(TriggerScheme.TRACKER_OBJECT_IDS))
         val serializedProperties = cursor.getString(cursor.getColumnIndex(TriggerScheme.PROPERTIES))
         val isOn = when (cursor.getInt(cursor.getColumnIndex(TriggerScheme.IS_ON))) {0 -> false
             1 -> true
@@ -192,7 +193,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
 
         val lastTriggeredTime = cursor.getLong(cursor.getColumnIndex(TriggerScheme.LAST_TRIGGERED_TIME))
 
-        return OTTrigger.makeInstance(objectId, id, type, name, trackerObjectId, isOn, action, lastTriggeredTime, serializedProperties)
+        return OTTrigger.makeInstance(objectId, id, type, name, Gson().fromJson(trackerObjectIds, Array<String>::class.java), isOn, action, lastTriggeredTime, serializedProperties)
     }
 
     fun extractTrackerEntity(cursor: Cursor): OTTracker {
@@ -285,11 +286,9 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
             values.put(TriggerScheme.USER_ID, owner.dbId)
             values.put(TriggerScheme.TYPE, trigger.typeId)
             values.put(TriggerScheme.PROPERTIES, trigger.getSerializedProperties())
-            values.put(TriggerScheme.TRACKER_OBJECT_ID, trigger.trackerObjectId)
+            values.put(TriggerScheme.TRACKER_OBJECT_IDS, Gson().toJson(trigger.trackers.map { it.objectId }.toTypedArray()))
             values.put(TriggerScheme.POSITION, position)
             values.put(TriggerScheme.IS_ON, if (trigger.isOn) 1 else 0)
-
-
 
             println("storing isOn : ${trigger.isOn}")
 

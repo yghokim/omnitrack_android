@@ -83,7 +83,7 @@ class TrackerDetailReminderTabFragment : TrackerDetailActivity.ChildFragment() {
     }*/
 
     private fun getTriggers(): Array<OTTrigger> {
-        return OTApplication.app.triggerManager.getAttachedTriggers(tracker)
+        return OTApplication.app.triggerManager.getAttachedTriggers(tracker, OTTrigger.ACTION_NOTIFICATION)
     }
 
     fun openTriggerDetailActivity(triggerIndex: Int) {
