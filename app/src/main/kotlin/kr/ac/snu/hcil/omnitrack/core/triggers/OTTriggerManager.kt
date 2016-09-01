@@ -30,6 +30,9 @@ class OTTriggerManager(val user: OTUser) {
     constructor(user: OTUser, loadedTriggers: List<OTTrigger>?) : this(user) {
 
         if (loadedTriggers != null) {
+
+            println("${loadedTriggers.size} triggers are loaded.")
+
             triggers += loadedTriggers
 
             triggers.forEach {

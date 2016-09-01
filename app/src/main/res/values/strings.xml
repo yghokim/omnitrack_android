@@ -278,7 +278,11 @@
 
     <string name="msg_noti_tap_for_tracking_format">Tap to log new %1$s record.</string>
 
-    <string name="msg_no_trackers_are_assigned">No trackers are attached.</string>
+    <string name="msg_no_trackers_are_assigned">No trackers are assigned.</string>
+
+    <string name="msg_trigger_attached_trackers">Assigned Trackers</string>
+
+    <string name="msg_pick_tracker">Pick a tracker</string>
 
     <string-array name="choice_preview_entries">
         <item>Choice entry 1</item>

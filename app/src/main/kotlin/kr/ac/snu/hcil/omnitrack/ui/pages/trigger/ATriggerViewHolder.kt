@@ -54,6 +54,7 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
 
     private val configSummaryView: TextView
     private val expandedView: ViewGroup
+    private val controlPanelContainer: ViewGroup
     private val collapsedView: ViewGroup
     private val headerViewContainer: ViewGroup
 
@@ -67,6 +68,9 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
 
     private val attachedTrackerListStub: ViewStub
 
+    private val trackerAssignPanelStub: ViewStub
+    private var trackerAssignPanelContainer: View? = null
+    private var trackerAssignPanel: TrackerAssignPanel? = null
 
     private val bottomBar: LockableFrameLayout
 
@@ -107,6 +111,7 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
 
         configSummaryView = itemView.findViewById(R.id.ui_config_summary) as TextView
         expandedView = itemView.findViewById(R.id.ui_expanded_view) as ViewGroup
+        controlPanelContainer = itemView.findViewById(R.id.ui_control_panel) as ViewGroup
         collapsedView = itemView.findViewById(R.id.ui_collapsed_view) as ViewGroup
 
         headerViewContainer = itemView.findViewById(R.id.ui_header_view_container) as ViewGroup
@@ -120,6 +125,7 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
 
         attachedTrackerListStub = itemView.findViewById(R.id.ui_attached_tracker_list_stub) as ViewStub
 
+        trackerAssignPanelStub = itemView.findViewById(R.id.ui_tracker_assign_panel_stub) as ViewStub
 
         setIsExpanded(false, false)
     }
@@ -136,11 +142,11 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
                 configSummaryView.visibility = View.INVISIBLE
                 expandToggleButton.setImageResource(R.drawable.up_dark)
                 collapsedView.visibility = View.GONE
-                if (expandedView.childCount == 0) {
+                if (controlPanelContainer.childCount == 0) {
                     val lp = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT)
-                    expandedView.addView(initExpandedViewContent(), lp)
+                    controlPanelContainer.addView(initExpandedViewContent(), lp)
                 }
-                updateExpandedViewContent(expandedView.getChildAt(0), trigger)
+                updateExpandedViewContent(controlPanelContainer.getChildAt(0), trigger)
                 expandedView.visibility = View.VISIBLE
 
                 bottomBar.locked = false
@@ -189,10 +195,18 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
             } else {
                 attachedTrackerListView?.visibility = View.VISIBLE
             }
-        } else {
-            if (attachedTrackerListView != null) {
-                attachedTrackerListView?.visibility = View.GONE
+
+            if (trackerAssignPanelContainer == null) {
+                trackerAssignPanelContainer = trackerAssignPanelStub.inflate()
+                trackerAssignPanel = trackerAssignPanelContainer?.findViewById(R.id.ui_tracker_assign_list) as TrackerAssignPanel
+                trackerAssignPanel?.init(trigger.trackers)
+            } else {
+                trackerAssignPanelContainer?.visibility = View.VISIBLE
             }
+
+        } else {
+            attachedTrackerListView?.visibility = View.GONE
+            trackerAssignPanelContainer?.visibility = View.GONE
         }
 
 
@@ -229,7 +243,9 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
                 val differ = trigger.trackers.size - listView.childCount
                 if (differ > 0) {
                     for (i in 1..differ) {
-                        listView.inflateContent(R.layout.layout_attached_tracker_list_element, true)
+                        val newView = listView.inflateContent(R.layout.layout_attached_tracker_list_element, false)
+                        newView.tag = AttachedTrackerViewHolder(newView)
+                        listView.addView(newView, 0)
                     }
                 } else if (differ < 0) {
                     for (i in 1..-differ) {
@@ -238,7 +254,9 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
                 }
 
                 for (tracker in trigger.trackers.withIndex()) {
-                    (listView.getChildAt(tracker.index) as TextView).text = tracker.value.name
+                    val vh = (listView.getChildAt(tracker.index).tag as AttachedTrackerViewHolder)
+                    vh.textView.text = tracker.value.name
+                    vh.colorBar.setBackgroundColor(tracker.value.color)
                 }
             }
         }
@@ -269,8 +287,22 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
                 listener.onTriggerExpandRequested(adapterPosition)
             }
         } else if (view === applyButton) {
-            if (validateExpandedViewInputs(expandedView.getChildAt(0), errorMessages)) {
-                updateTriggerWithViewSettings(expandedView.getChildAt(0), trigger)
+            if (validateExpandedViewInputs(controlPanelContainer.getChildAt(0), errorMessages)) {
+                updateTriggerWithViewSettings(controlPanelContainer.getChildAt(0), trigger)
+
+                if (trackerAssignPanel != null) {
+                    for (trackerId in trackerAssignPanel!!.trackerIds) {
+                        trigger.addTracker(trackerId)
+                    }
+
+                    for (tracker in trigger.trackers) {
+                        if (!trackerAssignPanel!!.trackerIds.contains(tracker.objectId)) {
+                            trigger.removeTracker(tracker)
+                        }
+                    }
+
+                }
+
                 listener.onTriggerCollapse(adapterPosition)
             } else {
                 //validation failed
@@ -280,5 +312,17 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
             listener.onTriggerCollapse(adapterPosition)
         }
     }
+
+    open class AttachedTrackerViewHolder(val view: View) {
+        val textView: TextView
+        val colorBar: View
+
+        init {
+            textView = view.findViewById(R.id.text) as TextView
+            colorBar = view.findViewById(R.id.color_bar)
+        }
+    }
+
+
 
 }

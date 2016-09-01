@@ -86,13 +86,25 @@
 
     </RelativeLayout>
 
-    <FrameLayout
+
+    <LinearLayout
         android:id="@+id/ui_expanded_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/expanded_view_inner_shadow">
+        android:background="@drawable/expanded_view_inner_shadow"
+        android:orientation="vertical">
 
-    </FrameLayout>
+        <FrameLayout
+            android:id="@+id/ui_control_panel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"></FrameLayout>
+
+        <ViewStub
+            android:id="@+id/ui_tracker_assign_panel_stub"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout="@layout/layout_tracker_assign_panel" />
+    </LinearLayout>
 
     <View
         style="@style/HorizontalSeparator.NoVerticalMargin"

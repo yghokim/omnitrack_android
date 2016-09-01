@@ -127,6 +127,25 @@ abstract class OTTrigger(objectId: String?, dbId: Long?, name: String,
         return Gson().toJson(list.toTypedArray())
     }
 
+    fun addTracker(tracker: OTTracker) {
+        if (!_trackerList.contains(tracker)) {
+            _trackerList.add(tracker)
+            isDirtySinceLastSync = true
+        }
+    }
+
+    fun addTracker(trackerId: String) {
+        val tracker = OTApplication.app.currentUser[trackerId]
+        if (tracker != null) {
+            addTracker(tracker)
+        }
+    }
+
+    fun removeTracker(tracker: OTTracker) {
+        if (_trackerList.remove(tracker)) {
+            isDirtySinceLastSync = true
+        }
+    }
 
     fun fire(triggerTime: Long) {
         handleFire(triggerTime)
