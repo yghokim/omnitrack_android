@@ -10,6 +10,7 @@ import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewStub
 import android.widget.FrameLayout
 import android.widget.Switch
 import android.widget.TextView
@@ -17,6 +18,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
+import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 import java.util.*
 
 /**
@@ -58,6 +60,12 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
     private val applyButtonGroup: ViewGroup
     private val applyButton: View
     private val cancelButton: View
+
+    private var attachedTrackerListView: View? = null
+    private var attachedTrackerList: ViewGroup? = null
+    private var attachedTrackerNoTrackerFallbackView: View? = null
+
+    private val attachedTrackerListStub: ViewStub
 
 
     private val bottomBar: LockableFrameLayout
@@ -109,6 +117,9 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
 
         cancelButton = itemView.findViewById(R.id.ui_button_cancel)
         cancelButton.setOnClickListener(this)
+
+        attachedTrackerListStub = itemView.findViewById(R.id.ui_attached_tracker_list_stub) as ViewStub
+
 
         setIsExpanded(false, false)
     }
@@ -164,8 +175,27 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
 
         this.trigger = trigger as T
 
+
         this.trigger.switchTurned += onTriggerSwitchTurned
         this.trigger.fired += onTriggerFired
+
+
+        //attached tracker list
+        if (this.trigger.action == OTTrigger.ACTION_NOTIFICATION) {
+            if (attachedTrackerListView == null) {
+                attachedTrackerListView = attachedTrackerListStub.inflate()
+                attachedTrackerList = attachedTrackerListView?.findViewById(R.id.ui_attached_tracker_list) as ViewGroup
+                attachedTrackerNoTrackerFallbackView = attachedTrackerListView?.findViewById(R.id.ui_attached_tracker_list_empty_fallback)
+            } else {
+                attachedTrackerListView?.visibility = View.VISIBLE
+            }
+        } else {
+            if (attachedTrackerListView != null) {
+                attachedTrackerListView?.visibility = View.GONE
+            }
+        }
+
+
         applyTriggerStateToView()
     }
 
@@ -185,6 +215,32 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
             }
         } else {
             headerViewContainer.addView(getHeaderView(null, trigger))
+        }
+
+        val listView = attachedTrackerList
+        if (listView != null) {
+            if (trigger.trackers.isEmpty()) {
+                attachedTrackerNoTrackerFallbackView?.visibility = View.VISIBLE
+                listView.visibility = View.GONE
+            } else {
+                attachedTrackerNoTrackerFallbackView?.visibility = View.INVISIBLE
+                listView.visibility = View.VISIBLE
+                //sync
+                val differ = trigger.trackers.size - listView.childCount
+                if (differ > 0) {
+                    for (i in 1..differ) {
+                        listView.inflateContent(R.layout.layout_attached_tracker_list_element, true)
+                    }
+                } else if (differ < 0) {
+                    for (i in 1..-differ) {
+                        listView.removeViewAt(listView.childCount - 1)
+                    }
+                }
+
+                for (tracker in trigger.trackers.withIndex()) {
+                    (listView.getChildAt(tracker.index) as TextView).text = tracker.value.name
+                }
+            }
         }
     }
 

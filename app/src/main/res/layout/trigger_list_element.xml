@@ -16,51 +16,66 @@
         android:paddingTop="12dp">
 
         <LinearLayout
-            android:id="@+id/ui_wappen_type"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/wappen_frame_dark"
-            android:orientation="horizontal"
-            android:paddingLeft="4dp">
-
-            <android.support.v7.widget.AppCompatImageView
-                android:id="@+id/ui_type_icon"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_centerVertical="true"
-                android:layout_gravity="center_vertical"
-                android:src="@drawable/alarm_dark"
-                android:tint="#FFF" />
-
-            <TextView
-                android:id="@+id/ui_type_description"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginLeft="6dp"
-                android:text="Reserved Time"
-                android:textColor="#fff"
-                android:textSize="12dp"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-        <FrameLayout
-            android:id="@+id/ui_header_view_container"
+            android:id="@+id/ui_left"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/ui_wappen_type"
             android:layout_toStartOf="@+id/ui_trigger_switch"
-            android:paddingBottom="8dp"
-            android:paddingTop="8dp">
+            android:orientation="vertical">
 
-        </FrameLayout>
+            <LinearLayout
+                android:id="@+id/ui_wappen_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/wappen_frame_dark"
+                android:orientation="horizontal"
+                android:paddingLeft="4dp">
 
+                <android.support.v7.widget.AppCompatImageView
+                    android:id="@+id/ui_type_icon"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_centerVertical="true"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/alarm_dark"
+                    android:tint="#FFF" />
+
+                <TextView
+                    android:id="@+id/ui_type_description"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="6dp"
+                    android:text="Reserved Time"
+                    android:textColor="#fff"
+                    android:textSize="12dp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <FrameLayout
+                android:id="@+id/ui_header_view_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/ui_wappen_type"
+                android:layout_toStartOf="@+id/ui_trigger_switch"
+                android:paddingBottom="8dp"
+                android:paddingTop="8dp">
+
+            </FrameLayout>
+
+            <ViewStub
+                android:id="@+id/ui_attached_tracker_list_stub"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inflatedId="@+id/ui_attached_tracker_list_view"
+                android:layout="@layout/layout_attached_tracker_list" />
+
+        </LinearLayout>
 
         <Switch
             android:id="@+id/ui_trigger_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/ui_header_view_container"
+            android:layout_alignBottom="@+id/ui_left"
             android:layout_alignParentEnd="true"
             android:layout_alignParentTop="true"
             android:paddingLeft="@dimen/activity_horizontal_margin"

@@ -132,7 +132,8 @@ class OTTriggerManager(val user: OTUser) {
             }
             OTTrigger.ACTION_NOTIFICATION -> {
                 println("trigger fired - send notification")
-                OTNotificationManager.pushReminderNotification(OTApplication.app, trigger.trackers[0], triggerTime)
+                for (tracker in trigger.trackers)
+                    OTNotificationManager.pushReminderNotification(OTApplication.app, tracker, triggerTime)
             }
         }
 
