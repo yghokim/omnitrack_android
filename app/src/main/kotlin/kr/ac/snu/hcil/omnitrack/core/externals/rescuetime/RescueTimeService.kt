@@ -54,5 +54,4 @@ object RescueTimeService : OTExternalService("RescueTimeService", 0) {
         })
                 .show()
     }
-
 }

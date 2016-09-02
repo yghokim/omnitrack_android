@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+
+    <!-- microsoft band -->
+    <string name="service_microsoft_band_name">Microsoft Band</string>
+    <string name="service_microsoft_band_desc">Microsoft Band and Band2</string>
+    <string name="measure_microsoft_band_heart_rate_name">Heart Rate</string>
+    <string name="measure_microsoft_band_heart_rate_desc">Receives user\'s heart rate bpm</string>
+
+
+    <!-- mi band -->
+    <string name="service_mi_band_name">Mi Band</string>
+    <string name="service_mi_band_desc">Mi Band and Band2</string>
+    <string name="measure_mi_band_heart_rate_name">Heart Rate</string>
+    <string name="measure_mi_band_heart_rate_desc">Receives user\'s heart rate bpm</string>
+
+
+    <!-- google fit -->
+    <string name="service_googlefit_name">Google Fit</string>
+    <string name="service_googlefit_desc">Get measured data from Google health platform</string>
+    <string name="measure_googlefit_steps_name">Step Count</string>
+    <string name="measure_googlefit_steps_desc">Get step count during specific range</string>
+
+
+    <!-- misfit -->
+    <string name="service_misfit_name">Misfit</string>
+    <string name="service_misfit_desc">Get data from Misfit server</string>
+
+    <string name="measure_misfit_sleeps_name">Sleep Time</string>
+    <string name="measure_misfit_sleeps_desc">Get sleep time range</string>
+
+    <string name="measure_misfit_steps_name">Step Count</string>
+    <string name="measure_misfit_steps_desc">Get step count during specific range</string>
+
+
+    <!-- device -->
+    <string name="service_device_name">Android Device</string>
+    <string name="service_device_desc">Android device events and measures</string>
+
+
+    <!-- rescuetime -->
+    <string name="service_rescuetime_name">RescueTime</string>
+    <string name="service_rescuetime_desc">Get productivity data of personal computer usage</string>
+
+    <string name="measure_rescuetime_computer_usage_name">Computer Usage Duration</string>
+    <string name="measure_rescuetime_computer_usage_desc">Get a duration of total computer usage</string>
+
+    <string name="measure_rescuetime_productivity_name">Productivity Score</string>
+    <string name="measure_rescuetime_productivity_desc">Get a productivity score of computer usage</string>
+
+
+    <!-- fitbit -->
+    <string name="service_fitbit_name">Fitbit</string>
+    <string name="service_fitbit_desc">Get data from Fitbit server</string>
+
+    <string name="measure_fitbit_sleeps_name">Sleep Time</string>
+    <string name="measure_fitbit_sleeps_desc">Get sleep time range</string>
+
+    <string name="measure_fitbit_steps_name">Step Count</string>
+    <string name="measure_fitbit_steps_desc">Get step count during specific range</string>
+
+
+</resources>

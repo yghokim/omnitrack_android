@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="format_hour_am">AM %1$s</string>
+    <string name="format_hour_pm">PM %1$s</string>
+
+    <string name="time_am">AM</string>
+    <string name="time_pm">PM</string>
+
+    <string name="dateformat_ymd">MMM d, EEEE, yyyy</string>
+    <string name="dateformat_full">h:m:s a, MM d, yyyy</string>
+
+    <string name="time_duration_no_difference">Same time</string>
+
+    <string name="time_duration_hour">h</string>
+    <string name="time_duration_minute">m</string>
+    <string name="time_duration_second">s</string>
+
+
+    <plurals name="time_duration_day">
+        <item quantity="zero">0 days</item>
+        <item quantity="one">one day</item>
+        <item quantity="other">%d days</item>
+    </plurals>
+
+    <plurals name="time_duration_hour">
+        <item quantity="zero">0 hours</item>
+        <item quantity="one">one hour</item>
+        <item quantity="other">%d hours</item>
+    </plurals>
+
+    <plurals name="time_duration_minute">
+        <item quantity="zero">0 minutes</item>
+        <item quantity="one">one minute</item>
+        <item quantity="other">%d minutes</item>
+    </plurals>
+
+    <plurals name="time_duration_second">
+        <item quantity="zero">0 seconds</item>
+        <item quantity="one">one second</item>
+        <item quantity="other">%d seconds</item>
+    </plurals>
+
+    <plurals name="time_duration_hour_short">
+        <item quantity="zero">0 hrs</item>
+        <item quantity="one">one hr</item>
+        <item quantity="other">%d hrs</item>
+    </plurals>
+
+    <plurals name="time_duration_minute_short">
+        <item quantity="zero">0 mins</item>
+        <item quantity="one">one min</item>
+        <item quantity="other">%d mins</item>
+    </plurals>
+
+    <plurals name="time_duration_second_short">
+        <item quantity="zero">0 secs</item>
+        <item quantity="one">one sec</item>
+        <item quantity="other">%d secs</item>
+    </plurals>
+
+    <string name="msg_everyday">Everyday</string>
+    <string name="msg_once">Once</string>
+
+    <string name="sunday_short">sun</string>
+    <string name="monday_short">mon</string>
+    <string name="tuesday_short">tue</string>
+    <string name="wednesday_short">wed</string>
+    <string name="thursday_short">thu</string>
+    <string name="friday_short">fri</string>
+    <string name="saturday_short">sat</string>
+
+    <string name="sunday_oneletter">S</string>
+    <string name="monday_oneletter">M</string>
+    <string name="tuesday_oneletter">T</string>
+    <string name="wednesday_oneletter">W</string>
+    <string name="thursday_oneletter">T</string>
+    <string name="friday_oneletter">F</string>
+    <string name="saturday_oneletter">S</string>
+
+</resources>

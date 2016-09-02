@@ -86,77 +86,6 @@
 
     <string name="sentence_new_tracker_added">Tracker \'%1$s\' was added</string>
 
-    <string name="dateformat_ymd">MMM d, EEEE, yyyy</string>
-    <string name="dateformat_full">h:m:s a, MM d, yyyy</string>
-
-    <string name="time_duration_no_difference">Same time</string>
-
-    <string name="time_duration_hour">h</string>
-    <string name="time_duration_minute">m</string>
-    <string name="time_duration_second">s</string>
-
-
-    <plurals name="time_duration_day">
-        <item quantity="zero">0 days</item>
-        <item quantity="one">one day</item>
-        <item quantity="other">%d days</item>
-    </plurals>
-
-    <plurals name="time_duration_hour">
-        <item quantity="zero">0 hours</item>
-        <item quantity="one">one hour</item>
-        <item quantity="other">%d hours</item>
-    </plurals>
-
-    <plurals name="time_duration_minute">
-        <item quantity="zero">0 minutes</item>
-        <item quantity="one">one minute</item>
-        <item quantity="other">%d minutes</item>
-    </plurals>
-
-    <plurals name="time_duration_second">
-        <item quantity="zero">0 seconds</item>
-        <item quantity="one">one second</item>
-        <item quantity="other">%d seconds</item>
-    </plurals>
-
-    <plurals name="time_duration_hour_short">
-        <item quantity="zero">0 hrs</item>
-        <item quantity="one">one hr</item>
-        <item quantity="other">%d hrs</item>
-    </plurals>
-
-    <plurals name="time_duration_minute_short">
-        <item quantity="zero">0 mins</item>
-        <item quantity="one">one min</item>
-        <item quantity="other">%d mins</item>
-    </plurals>
-
-    <plurals name="time_duration_second_short">
-        <item quantity="zero">0 secs</item>
-        <item quantity="one">one sec</item>
-        <item quantity="other">%d secs</item>
-    </plurals>
-
-    <string name="msg_everyday">Everyday</string>
-    <string name="msg_once">Once</string>
-
-    <string name="sunday_short">sun</string>
-    <string name="monday_short">mon</string>
-    <string name="tuesday_short">tue</string>
-    <string name="wednesday_short">wed</string>
-    <string name="thursday_short">thu</string>
-    <string name="friday_short">fri</string>
-    <string name="saturday_short">sat</string>
-
-    <string name="sunday_oneletter">S</string>
-    <string name="monday_oneletter">M</string>
-    <string name="tuesday_oneletter">T</string>
-    <string name="wednesday_oneletter">W</string>
-    <string name="thursday_oneletter">T</string>
-    <string name="friday_oneletter">F</string>
-    <string name="saturday_oneletter">S</string>
-
     <string name="title_activity_tracker_new">New Tracker</string>
     <string name="title_activity_tracker_edit">Edit Tracker</string>
 
@@ -194,49 +123,6 @@
 
     <string name="trigger_periodic_name">Time Trigger</string>
     <string name="trigger_periodic_desc">Fires by specific periods.</string>
-
-
-    <string name="service_microsoft_band_name">Microsoft Band</string>
-    <string name="service_microsoft_band_desc">Microsoft Band and Band2</string>
-    <string name="measure_microsoft_band_heart_rate_name">Heart Rate</string>
-    <string name="measure_microsoft_band_heart_rate_desc">Receives user\'s heart rate bpm</string>
-
-
-    <string name="service_mi_band_name">Mi Band</string>
-    <string name="service_mi_band_desc">Mi Band and Band2</string>
-    <string name="measure_mi_band_heart_rate_name">Heart Rate</string>
-    <string name="measure_mi_band_heart_rate_desc">Receives user\'s heart rate bpm</string>
-
-
-    <string name="service_googlefit_name">Google Fit</string>
-    <string name="service_googlefit_desc">Get measured data from Google health platform</string>
-    <string name="measure_googlefit_steps_name">Step Count</string>
-    <string name="measure_googlefit_steps_desc">Get step count during specific range</string>
-
-
-    <string name="service_misfit_name">Misfit</string>
-    <string name="service_misfit_desc">Get data from Misfit server</string>
-    <string name="measure_misfit_sleeps_name">Sleep Time</string>
-    <string name="measure_misfit_sleeps_desc">Get sleep time range</string>
-
-    <string name="service_device_name">Android Device</string>
-    <string name="service_device_desc">Android device events and measures</string>
-
-    <string name="service_rescuetime_name">RescueTime</string>
-    <string name="service_rescuetime_desc">Get productivity data of personal computer usage</string>
-
-    <string name="measure_rescuetime_computer_usage_name">Computer Usage Duration</string>
-    <string name="measure_rescuetime_computer_usage_desc">Get a duration of total computer usage</string>
-
-    <string name="measure_rescuetime_productivity_name">Productivity Score</string>
-    <string name="measure_rescuetime_productivity_desc">Get a productivity score of computer usage</string>
-
-
-    <string name="format_hour_am">AM %1$s</string>
-    <string name="format_hour_pm">PM %1$s</string>
-
-    <string name="time_am">AM</string>
-    <string name="time_pm">PM</string>
 
 
     <string name="title_activity_projects">My Projects</string>

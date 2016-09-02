@@ -1,12 +1,12 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.rescuetime
 
-import android.os.Looper
-import com.badoo.mobile.util.WeakHandler
+import android.os.AsyncTask
 import kr.ac.snu.hcil.omnitrack.utils.auth.AuthConstants
-import okhttp3.*
+import okhttp3.HttpUrl
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import org.json.JSONArray
 import org.json.JSONObject
-import java.io.IOException
 import java.util.*
 
 /**
@@ -27,41 +27,75 @@ object RescueTimeApi {
     const val SUMMARY_VARIABLE_PRODUCTIVITY = "productivity_pulse"
     const val SUMMARY_VARIABLE_TOTAL_HOURS = "total_hours"
 
-    val mainHandler: WeakHandler by lazy {
-        WeakHandler(Looper.getMainLooper())
+    val usageDurationCalculator = object : ISummaryCalculator<Double> {
+        override fun calculate(list: List<JSONObject>, startDate: Date, endDate: Date): Double? {
+            return if (list.size > 0)
+                list.map { it.getDouble(SUMMARY_VARIABLE_TOTAL_HOURS) }.sum()
+            else null
+        }
+
+    }
+
+    val productivityCalculator = object : ISummaryCalculator<Double> {
+        override fun calculate(list: List<JSONObject>, startDate: Date, endDate: Date): Double? {
+            return if (list.size > 0) {
+                list.map { it.getDouble(SUMMARY_VARIABLE_PRODUCTIVITY) }.sum() / list.size
+            } else null
+        }
+
     }
 
     fun queryUsageDuration(mode: Mode, startDate: Date, endDate: Date, resultHandler: (Double?) -> Unit) {
-        querySummary(mode, startDate, endDate)
-        {
-            resultList ->
-            if (resultList.size > 0) {
-                val sum = resultList.map { it.getDouble(SUMMARY_VARIABLE_TOTAL_HOURS) }.sum()
-                resultHandler.invoke(sum)
-            } else {
-                resultHandler.invoke(null)
-            }
-        }
+        SummaryCalculationTask<Double>(makeQueryRequest(mode, SUBURL_SUMMARY), startDate, endDate, usageDurationCalculator, resultHandler)
+                .execute()
     }
 
 
     fun queryProductivityScore(mode: Mode, startDate: Date, endDate: Date, resultHandler: (Double?) -> Unit) {
-        querySummary(mode, startDate, endDate)
-        {
-            resultList ->
-            if (resultList.size > 0) {
-                val average = resultList.map { it.getDouble(SUMMARY_VARIABLE_PRODUCTIVITY) }.sum() / resultList.size
-                resultHandler.invoke(average)
-            } else {
-                resultHandler.invoke(null)
-            }
-        }
+        SummaryCalculationTask<Double>(makeQueryRequest(mode, SUBURL_SUMMARY), startDate, endDate, productivityCalculator, resultHandler)
+                .execute()
     }
 
-    fun querySummary(mode: Mode, startDate: Date, endDate: Date, resultHandler: (List<JSONObject>) -> Unit) {
-        query(mode, SUBURL_SUMMARY, mapOf()) {
-            resultJsonString ->
+    private fun makeQueryRequest(mode: Mode, subUrl: String, parameters: Map<String, String> = mapOf()): Request {
+        val uriBuilder = HttpUrl.Builder().scheme("https").host(URL_ROOT).addPathSegment(SUBURL_ANALYTICS_API).addPathSegments(subUrl)
+
+        for (paramEntry in parameters) {
+            uriBuilder.addQueryParameter(paramEntry.key, paramEntry.value)
+        }
+
+        if (mode == Mode.ApiKey)
+            uriBuilder.addQueryParameter(PARAM_API_KEY, RescueTimeService.getStoredApiKey())
+
+        println("query ${uriBuilder.build().toString()}")
+
+        return Request.Builder()
+                .url(uriBuilder.build())
+                .get()
+                .build()
+    }
+
+    interface ISummaryCalculator<T> {
+        fun calculate(list: List<JSONObject>, startDate: Date, endDate: Date): T?
+    }
+
+    class SummaryCalculationTask<T>(val request: Request, val startDate: Date, val endDate: Date, val converter: ISummaryCalculator<T>, val resultHandler: (T?) -> Unit) : AsyncTask<Void?, Void?, T?>() {
+        override fun onCancelled() {
+            super.onCancelled()
+            resultHandler.invoke(null)
+        }
+
+        override fun onPostExecute(result: T?) {
+            super.onPostExecute(result)
+            resultHandler.invoke(result)
+        }
+
+        override fun doInBackground(vararg p0: Void?): T? {
+
+            val result = OkHttpClient().newCall(request).execute()
+
+            val resultJsonString = result.body().string()
             if (resultJsonString != null) {
+                println(resultJsonString)
                 //find data of encompassing
                 try {
                     val array = JSONArray(resultJsonString)
@@ -76,45 +110,13 @@ object RescueTimeApi {
                         }
                     }
 
-                    resultHandler.invoke(list)
+                    return converter.calculate(list, startDate, endDate)
                 } catch(e: Exception) {
                     e.printStackTrace()
-                    resultHandler.invoke(listOf())
+                    return null
                 }
-            }
-        }
-    }
-
-    private fun query(mode: Mode, subUrl: String, parameters: Map<String, String>, resultHandler: (String?) -> Unit) {
-        val uriBuilder = HttpUrl.Builder().scheme("https").host(URL_ROOT).addPathSegment(SUBURL_ANALYTICS_API).addPathSegments(subUrl)
-
-        for (paramEntry in parameters) {
-            uriBuilder.addQueryParameter(paramEntry.key, paramEntry.value)
+            } else return null
         }
 
-        if (mode == Mode.ApiKey)
-            uriBuilder.addQueryParameter(PARAM_API_KEY, RescueTimeService.getStoredApiKey())
-
-        println("query ${uriBuilder.build().toString()}")
-
-        val request = Request.Builder()
-                .url(uriBuilder.build())
-                .get()
-                .build()
-
-        OkHttpClient().newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call?, e: IOException?) {
-                mainHandler.post {
-                    resultHandler.invoke(null)
-                }
-            }
-
-            override fun onResponse(call: Call?, response: Response?) {
-                mainHandler.post {
-                    resultHandler.invoke(response?.body()?.string())
-                }
-            }
-
-        })
     }
 }
