@@ -80,6 +80,28 @@ object MisfitApi {
         }.execute(token)
     }
 
+    fun getStepsOnDayAsync(token: String, start:Date, end: Date, handler: (Int?)->Unit)
+    {
+        APIRequestTask(
+                mapOf(
+                        QUERY_START_DATE to AuthConstants.DATE_TIME_FORMAT.format(start),
+                        QUERY_END_DATE to AuthConstants.DATE_TIME_FORMAT.format(end)
+                ),
+                SUBURL_ACTIVITY_SUMMARY)
+        {
+            resultObject ->
+                try{
+                    val steps = resultObject!!.getInt("steps")
+                    handler.invoke(steps)
+                }
+                catch(e: Exception) {
+                    e.printStackTrace()
+                    println("misfit step count failed")
+                    handler.invoke(null)
+                }
+        }.execute(token)
+    }
+
     private class APIRequestTask(val parameters: Map<String, String>, val activity: String, val handler: ((JSONObject?) -> Unit)? = null) : AsyncTask<String, Void?, String?>() {
 
         override fun doInBackground(vararg p0: String): String {

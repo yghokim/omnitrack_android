@@ -15,7 +15,8 @@ object MisfitService : OTExternalService("MisfitService", 0) {
     const val PREFERENCE_ACCESS_TOKEN = "misfit_access_token"
 
     init {
-        _measureFactories.add(MisfitSleepFactory)
+        _measureFactories.add(MisfitSleepMeasureFactory)
+        _measureFactories.add(MisfitStepMeasureFactory)
         assignRequestCode(this)
     }
 
