@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.utils.auth
 
 import okhttp3.MediaType
+import java.text.SimpleDateFormat
 
 /**
  * Created by Young-Ho Kim on 2016-09-01.
@@ -21,4 +22,9 @@ object AuthConstants {
     const val VALUE_RESPONSE_TYPE_TOKEN = "token"
 
     val CONTENT_TYPE_JSON = MediaType.parse("application/json; charset=utf-8")
+
+
+    val DATE_TIME_FORMAT = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
+
+    val DATE_FORMAT = SimpleDateFormat("yyyy-MM-dd")
 }

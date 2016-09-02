@@ -33,7 +33,7 @@
 
     <string name="msg_tab_trackers">Trackers</string>
     <string name="msg_tab_services">Services</string>
-    <string name="msg_tab_background_loggers">Auto Logging</string>
+    <string name="msg_tab_background_loggers">Auto Triggers</string>
 
     <string name="msg_tab_attribute_basic">Properties</string>
     <string name="msg_tab_attribute_connection">Connections</string>
@@ -222,6 +222,15 @@
     <string name="service_device_name">Android Device</string>
     <string name="service_device_desc">Android device events and measures</string>
 
+    <string name="service_rescuetime_name">RescueTime</string>
+    <string name="service_rescuetime_desc">Get productivity data of personal computer usage</string>
+
+    <string name="measure_rescuetime_computer_usage_name">Computer Usage Duration</string>
+    <string name="measure_rescuetime_computer_usage_desc">Get a duration of total computer usage</string>
+
+    <string name="measure_rescuetime_productivity_name">Productivity Score</string>
+    <string name="measure_rescuetime_productivity_desc">Get a productivity score of computer usage</string>
+
 
     <string name="format_hour_am">AM %1$s</string>
     <string name="format_hour_pm">PM %1$s</string>
@@ -283,6 +292,9 @@
     <string name="msg_trigger_attached_trackers">Assigned Trackers</string>
 
     <string name="msg_pick_tracker">Pick a tracker</string>
+
+    <string name="msg_rescuetime_api_key_input_title">Input RescueTime API key</string>
+    <string name="msg_rescuetime_api_key_input_hint">Paste RescueTime api key here.</string>
 
     <string-array name="choice_preview_entries">
         <item>Choice entry 1</item>

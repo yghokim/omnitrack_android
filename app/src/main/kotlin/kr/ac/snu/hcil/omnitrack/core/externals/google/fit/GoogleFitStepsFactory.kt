@@ -51,8 +51,6 @@ object GoogleFitStepsFactory : GoogleFitService.GoogleFitMeasureFactory() {
     class Measure : OTMeasure {
         override val dataTypeName = TypeStringSerializationHelper.TYPENAME_INT
 
-        override val factoryCode: String = GoogleFitStepsFactory.typeCode
-
         override val factory: OTMeasureFactory = GoogleFitStepsFactory
 
         constructor() : super()
