@@ -13,7 +13,6 @@ import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject
-import java.text.SimpleDateFormat
 import java.util.*
 
 /**
@@ -28,8 +27,6 @@ object MisfitApi {
     const val SUBURL_ACTIVITY = "move/resource/v1/user/me/activity"
     const val SUBURL_ACTIVITY_SUMMARY = "summary"
     const val SUBURL_ACTIVITY_SLEEP = "sleeps"
-
-    val DATE_TIME_FORMAT = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
 
     const val QUERY_START_DATE = "start_date"
     const val QUERY_END_DATE = "end_date"
@@ -62,8 +59,8 @@ object MisfitApi {
     fun getLatestSleepOnDayAsync(token: String, start: Date, end: Date, handler: (TimeSpan?) -> Unit) {
         APIRequestTask(
                 mapOf(
-                        QUERY_START_DATE to DATE_TIME_FORMAT.format(start),
-                        QUERY_END_DATE to DATE_TIME_FORMAT.format(end)
+                        QUERY_START_DATE to AuthConstants.DATE_TIME_FORMAT.format(start),
+                        QUERY_END_DATE to AuthConstants.DATE_TIME_FORMAT.format(end)
                 ),
                 SUBURL_ACTIVITY_SLEEP)
         {
@@ -75,7 +72,7 @@ object MisfitApi {
                     val startTimeString = last.getString("startTime")
                     val duration = last.getInt("duration")
 
-                    val startTime = DATE_TIME_FORMAT.parse(startTimeString)
+                    val startTime = AuthConstants.DATE_TIME_FORMAT.parse(startTimeString)
                     handler.invoke(TimeSpan(startTime.time, startTime.time + duration * 1000))
 
                 } else handler.invoke(null)

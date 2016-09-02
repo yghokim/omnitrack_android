@@ -9,6 +9,8 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.utils.isNumericPrimitive
+import kr.ac.snu.hcil.omnitrack.utils.toBigDecimal
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.DecimalFormat
@@ -185,8 +187,8 @@ class NumberInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
 
     override fun setAnyValue(value: Any) {
         println(value)
-        if (value is Int) {
-            this.value = BigDecimal(value)
+        if (isNumericPrimitive(value)) {
+            this.value = toBigDecimal(value)
         } else {
             super.setAnyValue(value)
         }

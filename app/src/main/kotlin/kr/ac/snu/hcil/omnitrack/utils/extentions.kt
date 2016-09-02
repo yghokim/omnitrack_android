@@ -12,6 +12,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.google.android.gms.maps.model.LatLng
+import java.math.BigDecimal
 import java.util.*
 
 /**
@@ -77,6 +78,21 @@ fun ViewGroup.inflateContent(layout: Int, attach: Boolean): View {
     return inflater.inflate(layout, this, attach)
 }
 
+fun isNumericPrimitive(value: Any): Boolean {
+    return value is Int || value is Float || value is Double || value is Long
+}
+
+fun toBigDecimal(value: Any): BigDecimal {
+    if (value is Int) {
+        return BigDecimal(value)
+    } else if (value is Long) {
+        return BigDecimal(value)
+    } else if (value is Double) {
+        return BigDecimal(value)
+    } else if (value is Float) {
+        return BigDecimal(value.toDouble())
+    } else throw Exception("value is not number primitive.")
+}
 
 fun List<*>.move(fromPosition: Int, toPosition: Int): Boolean {
     if (fromPosition != toPosition) {

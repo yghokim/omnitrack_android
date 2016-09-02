@@ -44,7 +44,7 @@ abstract class OTMeasureFactory() : INameDescriptionResourceProvider {
          */
         abstract val dataTypeName: String
 
-        abstract val factoryCode: String
+        val factoryCode: String get() = factory.typeCode
         abstract val factory: OTMeasureFactory
 
         constructor() : super()
