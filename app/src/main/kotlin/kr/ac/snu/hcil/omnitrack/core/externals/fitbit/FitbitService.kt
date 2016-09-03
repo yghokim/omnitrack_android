@@ -8,21 +8,24 @@ import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 /**
  * Created by younghokim on 16. 9. 2..
  */
-class FitbitService : OTExternalService("FitbitService", 0) {
+object FitbitService : OTExternalService("FitbitService", 0) {
+
+    const val SCOPE_ACTIVITY = "activity"
+    const val SCOPE_HEARTRATE = "heartrate"
+    const val SCOPE_SLEEP = "sleep"
+
+    val DEFAULT_SCOPES = arrayOf(SCOPE_ACTIVITY, SCOPE_SLEEP, SCOPE_HEARTRATE)
+
     override fun handleActivityActivationResultOk(resultData: Intent?) {
-        throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun onActivateAsync(context: Context, connectedHandler: ((Boolean) -> Unit)?) {
-        throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun onDeactivate() {
-        throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun prepareServiceAsync(preparedHandler: ((Boolean) -> Unit)?) {
-        throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override val thumbResourceId: Int = R.drawable.service_thumb_googlefit

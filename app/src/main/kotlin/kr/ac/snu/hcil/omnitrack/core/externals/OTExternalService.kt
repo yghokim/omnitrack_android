@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.support.v4.app.Fragment
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.externals.device.AndroidDeviceService
+import kr.ac.snu.hcil.omnitrack.core.externals.fitbit.FitbitService
 import kr.ac.snu.hcil.omnitrack.core.externals.google.fit.GoogleFitService
 import kr.ac.snu.hcil.omnitrack.core.externals.microsoft.band.MicrosoftBandService
 import kr.ac.snu.hcil.omnitrack.core.externals.misfit.MisfitService
@@ -33,7 +34,15 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
         private val factoryCodeDict = HashMap<String, OTMeasureFactory>()
 
         val availableServices: Array<OTExternalService> by lazy {
-            arrayOf(AndroidDeviceService, GoogleFitService, MisfitService, RescueTimeService, MicrosoftBandService, MiBandService)
+            arrayOf(
+                    //AndroidDeviceService,
+                    GoogleFitService
+                    ,FitbitService
+                    ,MisfitService
+                    ,RescueTimeService
+                    ,MicrosoftBandService
+                    ,MiBandService
+            )
         }
 
         fun getMeasureFactoryByCode(typeCode: String): OTMeasureFactory? {
