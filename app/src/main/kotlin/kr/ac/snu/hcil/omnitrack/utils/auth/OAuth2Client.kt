@@ -5,10 +5,7 @@ import android.content.SharedPreferences
 import android.os.AsyncTask
 import android.support.v4.app.FragmentActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.activity.WebServiceLoginActivity
-import okhttp3.FormBody
-import okhttp3.HttpUrl
-import okhttp3.OkHttpClient
-import okhttp3.Request
+import okhttp3.*
 import org.json.JSONObject
 
 /**
@@ -30,6 +27,14 @@ class OAuth2Client(val config: OAuth2Config, val activityRequestCode: Int) {
         fun onFailed(error: String?)
 
         fun onSuccess(credential: Credential)
+    }
+
+    interface OAuth2CredentialRefreshedListener {
+        fun onCredentialRefreshed(newCredential: Credential)
+    }
+
+    interface OAuth2RequestConverter<T> {
+        fun process(requestResultString: String): T
     }
 
     data class Credential(val accessToken: String, val refreshToken: String, val expiresIn: Int){
@@ -100,10 +105,67 @@ class OAuth2Client(val config: OAuth2Config, val activityRequestCode: Int) {
         }.execute(code)
     }
 
+
     private fun makeRequestBuilderWithAuthHeader(url: HttpUrl): Request.Builder {
+        return makeRequestBuilderWithAuthHeader(url.toString())
+    }
+
+    private fun makeRequestBuilderWithAuthHeader(url: String): Request.Builder {
         return Request.Builder()
                 .url(url)
                 .addHeader(AuthConstants.HEADER_AUTHORIZATION, AuthConstants.makeBasicHeader(config.clientId, config.clientSecret))
+    }
+
+    private fun makeRequestBuilderWithTokenHeader(url: String, credential: Credential): Request.Builder {
+        return Request.Builder()
+                .url(url)
+                .addHeader(AuthConstants.HEADER_AUTHORIZATION, "Bearer ${credential.accessToken}")
+    }
+
+    fun <T> request(credential: Credential, requestUrl: String, converter: OAuth2RequestConverter<T>, credentialRefreshedListener: OAuth2CredentialRefreshedListener?, handler: ((T?) -> Unit)?) {
+        RequestTask<T>(requestUrl, converter, credentialRefreshedListener, handler).execute(credential)
+    }
+
+
+    inner class RequestTask<T>(val requestUrl: String, val converter: OAuth2RequestConverter<T>, val credentialRefreshedListener: OAuth2CredentialRefreshedListener?, val handler: ((T?) -> Unit)?) : AsyncTask<Credential, Void?, T?>() {
+        override fun onPostExecute(result: T?) {
+            super.onPostExecute(result)
+            handler?.invoke(result)
+        }
+
+        override fun doInBackground(vararg credentials: Credential): T? {
+            try {
+                var response = requestAwait(credentials[0])
+                if (response.code() == 401) {
+
+                    //token expired
+                    println("token expired. try refreshing..")
+                    val newCredential = TokenRefreshTask(null).execute(credentials[0]).get()
+
+                    if (newCredential != null) {
+                        println("token was refreshed successfully. Made new credential.")
+                        credentialRefreshedListener?.onCredentialRefreshed(newCredential)
+                        response = requestAwait(newCredential)
+                    } else return null
+                }
+
+                val resultString = response.body().string()
+
+                println(resultString)
+
+                return converter.process(resultString)
+            } catch(e: Exception) {
+                e.printStackTrace()
+                return null
+            }
+        }
+
+        private fun requestAwait(credential: Credential): Response {
+            val request = makeRequestBuilderWithTokenHeader(requestUrl, credential)
+                    .get()
+                    .build()
+            return OkHttpClient().newCall(request).execute()
+        }
     }
 
     inner class RevokeTask(val handler: (Boolean) -> Unit) : AsyncTask<Credential, Void?, Boolean>() {
@@ -134,9 +196,14 @@ class OAuth2Client(val config: OAuth2Config, val activityRequestCode: Int) {
 
     }
 
-    inner class TokenRefreshTask(val handler: (Credential?) -> Unit) : AsyncTask<Credential, Void?, Credential?>() {
+    inner class TokenRefreshTask(val handler: ((Credential?) -> Unit)?) : AsyncTask<Credential, Void?, Credential?>() {
 
-        override fun doInBackground(vararg credential: Credential): Credential {
+        override fun onPostExecute(result: Credential?) {
+            super.onPostExecute(result)
+            handler?.invoke(result)
+        }
+
+        override fun doInBackground(vararg credential: Credential): Credential? {
             val uri = HttpUrl.parse(config.tokenRequestUrl)
 
             val requestBody = FormBody.Builder()
@@ -148,7 +215,7 @@ class OAuth2Client(val config: OAuth2Config, val activityRequestCode: Int) {
                     .post(requestBody)
                     .build()
 
-/*
+
             try {
                 val response = OkHttpClient().newCall(request).execute()
                 val json = JSONObject(response.body().string())
@@ -161,8 +228,7 @@ class OAuth2Client(val config: OAuth2Config, val activityRequestCode: Int) {
             }catch(e: Exception)
             {
                 return null
-            }*/
-            return Credential("", "", 0)
+            }
         }
 
     }

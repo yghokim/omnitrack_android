@@ -3,7 +3,9 @@ package kr.ac.snu.hcil.omnitrack.core.externals.fitbit
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OAuth2BasedExternalService
+import kr.ac.snu.hcil.omnitrack.utils.auth.AuthConstants
 import kr.ac.snu.hcil.omnitrack.utils.auth.OAuth2Client
+import java.util.*
 
 /**
  * Created by younghokim on 16. 9. 2..
@@ -18,11 +20,21 @@ object FitbitService : OAuth2BasedExternalService("FitbitService", 0) {
     const val TOKEN_REQUEST_URL = "https://api.fitbit.com/oauth2/token"
     const val REVOKE_URL = "https://api.fitbit.com/oauth2/revoke"
 
+    const val REQUEST_URL_SIMPLE_COMMAND_DATE_FORMAT = "https://api.fitbit.com/1/user/-/%s/date/%s.json"
+
+    const val REQUEST_COMMAND_SUMMARY = "activities"
+
+
     val DEFAULT_SCOPES = arrayOf(SCOPE_ACTIVITY, SCOPE_SLEEP, SCOPE_HEARTRATE).joinToString(" ")
 
     override val thumbResourceId: Int = R.drawable.service_thumb_fitbit
     override val descResourceId: Int = R.string.service_fitbit_desc
     override val nameResourceId: Int = R.string.service_fitbit_name
+
+    init {
+        _measureFactories.add(FitbitStepCountMeasureFactory)
+        assignRequestCode(this)
+    }
 
     override fun makeNewAuth2Client(requestCode: Int): OAuth2Client {
         val config = OAuth2Client.OAuth2Config()
@@ -36,5 +48,8 @@ object FitbitService : OAuth2BasedExternalService("FitbitService", 0) {
         return OAuth2Client(config, requestCode)
     }
 
+    fun makeRequestUrlWithCommandAndDate(command: String, date: Date): String {
+        return String.format(REQUEST_URL_SIMPLE_COMMAND_DATE_FORMAT, command, AuthConstants.DATE_FORMAT.format(date))
+    }
 
 }

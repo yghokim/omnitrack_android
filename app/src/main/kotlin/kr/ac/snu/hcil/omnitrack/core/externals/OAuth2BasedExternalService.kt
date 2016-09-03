@@ -8,7 +8,7 @@ import kr.ac.snu.hcil.omnitrack.utils.auth.OAuth2Client
 /**
  * Created by younghokim on 16. 9. 3..
  */
-abstract class OAuth2BasedExternalService(identifier: String, minimumSDK: Int) : OTExternalService(identifier, minimumSDK), OAuth2Client.OAuth2ResultListener {
+abstract class OAuth2BasedExternalService(identifier: String, minimumSDK: Int) : OTExternalService(identifier, minimumSDK), OAuth2Client.OAuth2ResultListener, OAuth2Client.OAuth2CredentialRefreshedListener {
 
     private val authClient: OAuth2Client by lazy {
         makeNewAuth2Client(OTExternalService.requestCodeDict[this])
@@ -59,6 +59,19 @@ abstract class OAuth2BasedExternalService(identifier: String, minimumSDK: Int) :
     override fun onSuccess(credential: OAuth2Client.Credential) {
         credential.store(preferences, identifier)
         pendingConnectionListener?.invoke(true)
+    }
+
+    override fun onCredentialRefreshed(newCredential: OAuth2Client.Credential) {
+        credential = newCredential
+    }
+
+    fun <T> request(requestUrl: String, converter: OAuth2Client.OAuth2RequestConverter<T>, resultHandler: ((T?) -> Unit)) {
+        val credential = credential
+        if (credential != null) {
+            authClient.request(credential, requestUrl, converter, this, resultHandler)
+        } else {
+            resultHandler.invoke(null)
+        }
     }
 
     override fun handleActivityActivationResultOk(resultData: Intent?) {
