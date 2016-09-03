@@ -5,6 +5,8 @@ import com.google.gson.Gson
 import kr.ac.snu.hcil.omnitrack.core.datatypes.Route
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
+import kr.ac.snu.hcil.omnitrack.utils.isNumericPrimitive
+import kr.ac.snu.hcil.omnitrack.utils.toBigDecimal
 import java.math.BigDecimal
 
 /**
@@ -25,6 +27,8 @@ object TypeStringSerializationHelper {
 
     const val TYPENAME_INT = "I"
     const val TYPENAME_LONG = "L"
+    const val TYPENAME_FLOAT = "F"
+    const val TYPENAME_DOUBLE = "d"
     const val TYPENAME_BIGDECIMAL = "D"
     const val TYPENAME_TIMEPOINT = "T"
     const val TYPENAME_STRING = "S"
@@ -41,6 +45,8 @@ object TypeStringSerializationHelper {
             "java.lang.Integer" to TYPENAME_INT,
             Long::class.java.name to TYPENAME_LONG,
             "java.lang.Long" to TYPENAME_LONG,
+            "java.lang.Float" to TYPENAME_FLOAT,
+            "java.lang.Double" to TYPENAME_DOUBLE,
             BigDecimal::class.java.name to TYPENAME_BIGDECIMAL,
             TimePoint::class.java.name to TYPENAME_TIMEPOINT,
             TimeSpan::class.java.name to TYPENAME_TIMESPAN,
@@ -58,7 +64,15 @@ object TypeStringSerializationHelper {
     fun serialize(typeName: String, value: Any): String {
         parcelCache.t = typeName
         parcelCache.v = when (parcelCache.t) {
-            TYPENAME_BIGDECIMAL -> (value as BigDecimal).toPlainString()
+            TYPENAME_BIGDECIMAL -> {
+                if (value is BigDecimal) {
+                    value.toPlainString()
+                } else {
+                    if (isNumericPrimitive(value)) {
+                        toBigDecimal(value).toPlainString()
+                    } else throw IllegalArgumentException("input value $value is not convertible to BigDecimal.")
+                }
+            }
             TYPENAME_TIMEPOINT -> (value as TimePoint).getSerializedString()
             TYPENAME_TIMESPAN -> (value as TimeSpan).getSerializedString()
             TYPENAME_INT_ARRAY -> (value as IntArray).joinToString(",")
@@ -82,6 +96,8 @@ object TypeStringSerializationHelper {
         val parcel = gson.fromJson(serialized, ParcelWithType::class.java)
         return when (parcel.t) {
             TYPENAME_INT -> parcel.v.toInt()
+            TYPENAME_FLOAT -> parcel.v.toFloat()
+            TYPENAME_DOUBLE -> parcel.v.toDouble()
             TYPENAME_LONG -> parcel.v.toLong()
             TYPENAME_STRING -> parcel.v
             TYPENAME_BIGDECIMAL -> BigDecimal(parcel.v)

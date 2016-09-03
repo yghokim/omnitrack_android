@@ -36,7 +36,7 @@ object MisfitStepMeasureFactory: OTMeasureFactory() {
 
     class MisfitStepMeasure : OTMeasure{
 
-        override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_BIGDECIMAL
+        override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_INT
 
         override val factory: OTMeasureFactory = MisfitStepMeasureFactory
 

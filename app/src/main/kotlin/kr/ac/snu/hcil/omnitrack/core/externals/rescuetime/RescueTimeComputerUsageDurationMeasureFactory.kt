@@ -35,7 +35,7 @@ object RescueTimeComputerUsageDurationMeasureFactory : OTMeasureFactory() {
 
 
     class ComputerUsageDurationMeasure : OTMeasure {
-        override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_BIGDECIMAL
+        override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_DOUBLE
         override val factory: OTMeasureFactory = RescueTimeComputerUsageDurationMeasureFactory
 
         override fun awaitRequestValue(query: OTTimeRangeQuery?): Any {

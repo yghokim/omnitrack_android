@@ -38,7 +38,7 @@ object FitbitStepCountMeasureFactory : OTMeasureFactory() {
 
     class FitbitStepMeasure : OTMeasure {
 
-        override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_BIGDECIMAL
+        override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_INT
 
         override val factory: OTMeasureFactory = FitbitStepCountMeasureFactory
 

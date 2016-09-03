@@ -34,7 +34,7 @@ object RescueTimeProductivityMeasureFactory : OTMeasureFactory() {
     override val descResourceId: Int = R.string.measure_rescuetime_productivity_desc
 
     class ProductivityMeasure : OTMeasure {
-        override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_BIGDECIMAL
+        override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_DOUBLE
         override val factory: OTMeasureFactory = RescueTimeProductivityMeasureFactory
 
         constructor() : super()
@@ -53,7 +53,7 @@ object RescueTimeProductivityMeasureFactory : OTMeasureFactory() {
                 RescueTimeApi.queryProductivityScore(RescueTimeApi.Mode.ApiKey, Date(range.first), Date(range.second - 20))
                 {
                     result ->
-                    println(result)
+
                     handler.invoke(result)
                 }
             } else {
