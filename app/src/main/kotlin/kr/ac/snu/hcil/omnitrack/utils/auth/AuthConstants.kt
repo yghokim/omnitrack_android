@@ -35,6 +35,9 @@ object AuthConstants {
 
 
     val DATE_TIME_FORMAT = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
+    val DATE_TIME_FORMAT_WITHOUT_TIMEZONE = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+
 
     val DATE_FORMAT = SimpleDateFormat("yyyy-MM-dd")
+    val TIME_FORMAT = SimpleDateFormat("HH:mm:ss")
 }

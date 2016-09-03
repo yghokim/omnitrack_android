@@ -54,8 +54,8 @@
     <string name="service_fitbit_name">Fitbit</string>
     <string name="service_fitbit_desc">Get data from Fitbit server</string>
 
-    <string name="measure_fitbit_sleeps_name">Sleep Time</string>
-    <string name="measure_fitbit_sleeps_desc">Get sleep time range</string>
+    <string name="measure_fitbit_sleep_time_name">Sleep Time</string>
+    <string name="measure_fitbit_sleep_time_desc">Get sleep time range</string>
 
     <string name="measure_fitbit_steps_name">Step Count</string>
     <string name="measure_fitbit_steps_desc">Get step count during specific range</string>

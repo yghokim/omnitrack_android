@@ -23,6 +23,7 @@ object FitbitService : OAuth2BasedExternalService("FitbitService", 0) {
     const val REQUEST_URL_SIMPLE_COMMAND_DATE_FORMAT = "https://api.fitbit.com/1/user/-/%s/date/%s.json"
 
     const val REQUEST_COMMAND_SUMMARY = "activities"
+    const val REQUEST_COMMAND_SLEEP = "sleep"
 
 
     val DEFAULT_SCOPES = arrayOf(SCOPE_ACTIVITY, SCOPE_SLEEP, SCOPE_HEARTRATE).joinToString(" ")
@@ -33,6 +34,8 @@ object FitbitService : OAuth2BasedExternalService("FitbitService", 0) {
 
     init {
         _measureFactories.add(FitbitStepCountMeasureFactory)
+        _measureFactories.add(FitbitRecentSleepTimeMeasureFactory)
+
         assignRequestCode(this)
     }
 
