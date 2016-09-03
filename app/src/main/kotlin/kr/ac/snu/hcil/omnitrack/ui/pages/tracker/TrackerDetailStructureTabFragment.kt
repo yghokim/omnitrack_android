@@ -22,6 +22,7 @@ import kr.ac.snu.hcil.omnitrack.ui.DragItemTouchHelperCallback
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.SpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.BooleanPropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ColorPalettePropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ShortTextPropertyView
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeDetailActivity
@@ -41,6 +42,7 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
 
     private lateinit var namePropertyView: ShortTextPropertyView
     private lateinit var colorPropertyView: ColorPalettePropertyView
+    private lateinit var isOnShortcutPropertyView: BooleanPropertyView
     //private lateinit var fab: FloatingActionButton
 
     private lateinit var contentContainer: ViewGroup
@@ -63,17 +65,21 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
         newAttributePanel = rootView.findViewById(R.id.ui_new_attribute_panel) as ViewGroup
 
         namePropertyView = rootView.findViewById(R.id.nameProperty) as ShortTextPropertyView
-        namePropertyView.title = resources.getString(R.string.msg_name)
         namePropertyView.addNewValidator("Name cannot be empty.", ShortTextPropertyView.NOT_EMPTY_VALIDATOR)
 
         colorPropertyView = rootView.findViewById(R.id.colorProperty) as ColorPalettePropertyView
-        colorPropertyView.title = resources.getString(R.string.msg_color)
 
         colorPropertyView.valueChanged += {
             sender, colorIndex ->
             if (activity is TrackerDetailActivity) {
                 (activity as TrackerDetailActivity).transitionToColor(colorPropertyView.value)
             }
+        }
+
+        isOnShortcutPropertyView = rootView.findViewById(R.id.isOnShortcutProperty) as BooleanPropertyView
+        isOnShortcutPropertyView.valueChanged += {
+            sender, isOnShortcut->
+                tracker.isOnShortcut = isOnShortcut
         }
 
         attributeListView = rootView.findViewById(R.id.ui_attribute_list) as RecyclerView
@@ -141,6 +147,7 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
 
         namePropertyView.value = tracker.name
         colorPropertyView.value = tracker.color
+        isOnShortcutPropertyView.value = tracker.isOnShortcut
 
         attributeListAdapter.notifyDataSetChanged()
     }

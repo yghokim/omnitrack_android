@@ -12,6 +12,8 @@ import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
+import kr.ac.snu.hcil.omnitrack.utils.toBoolean
+import kr.ac.snu.hcil.omnitrack.utils.toInt
 import java.util.*
 
 /**
@@ -50,10 +52,11 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         val USER_ID = "user_id"
         val POSITION = "position"
         val COLOR = "color"
+        val IS_ON_SHORTCUT = "is_on_shortcut"
 
-        override val intrinsicColumnNames = super.intrinsicColumnNames + arrayOf(USER_ID, POSITION, COLOR)
+        override val intrinsicColumnNames = super.intrinsicColumnNames + arrayOf(USER_ID, POSITION, COLOR, IS_ON_SHORTCUT)
 
-        override val creationColumnContentString: String = super.creationColumnContentString + ", ${makeForeignKeyStatementString(USER_ID, UserScheme.tableName)}, ${COLOR} INTEGER, ${POSITION} INTEGER"
+        override val creationColumnContentString: String = super.creationColumnContentString + ", ${makeForeignKeyStatementString(USER_ID, UserScheme.tableName)}, ${COLOR} INTEGER, ${POSITION} INTEGER, ${IS_ON_SHORTCUT} INTEGER"
     }
 
     object AttributeScheme : TableWithNameScheme() {
@@ -184,10 +187,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         val type = cursor.getInt(cursor.getColumnIndex(TriggerScheme.TYPE))
         val trackerObjectIds = cursor.getString(cursor.getColumnIndex(TriggerScheme.TRACKER_OBJECT_IDS))
         val serializedProperties = cursor.getString(cursor.getColumnIndex(TriggerScheme.PROPERTIES))
-        val isOn = when (cursor.getInt(cursor.getColumnIndex(TriggerScheme.IS_ON))) {0 -> false
-            1 -> true
-            else -> false
-        }
+        val isOn = cursor.getInt(cursor.getColumnIndex(TriggerScheme.IS_ON)).toBoolean()
 
         val action = cursor.getInt(cursor.getColumnIndex(TriggerScheme.ACTION))
 
@@ -201,9 +201,9 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         val name = cursor.getString(cursor.getColumnIndex(TrackerScheme.NAME))
         val objectId = cursor.getString(cursor.getColumnIndex(TrackerScheme.OBJECT_ID))
         val color = cursor.getInt(cursor.getColumnIndex(TrackerScheme.COLOR))
+        val isOnShortcut = cursor.getInt(cursor.getColumnIndex(TrackerScheme.IS_ON_SHORTCUT))
 
-
-        return OTTracker(objectId, id, name, color, findAttributesOfTracker(id))
+        return OTTracker(objectId, id, name, color, isOnShortcut.toBoolean(), findAttributesOfTracker(id))
     }
 
     fun extractAttributeEntity(cursor: Cursor): OTAttribute<out Any> {
@@ -290,7 +290,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
             values.put(TriggerScheme.TRACKER_OBJECT_IDS, Gson().toJson(trigger.trackers.map { it.objectId }.toTypedArray()))
             values.put(TriggerScheme.POSITION, position)
             values.put(TriggerScheme.ACTION, trigger.action)
-            values.put(TriggerScheme.IS_ON, if (trigger.isOn) 1 else 0)
+            values.put(TriggerScheme.IS_ON, trigger.isOn.toInt())
 
             println("storing isOn : ${trigger.isOn}")
 
@@ -324,6 +324,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
             values.put(TrackerScheme.POSITION, position)
             values.put(TrackerScheme.COLOR, tracker.color)
             values.put(TrackerScheme.USER_ID, tracker.owner?.dbId ?: null)
+            values.put(TrackerScheme.IS_ON_SHORTCUT, tracker.isOnShortcut.toInt())
 
             saveObject(tracker, values, TrackerScheme)
             tracker.isDirtySinceLastSync = false

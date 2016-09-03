@@ -19,6 +19,14 @@ import java.util.*
  * Created by younghokim on 16. 7. 28..
  */
 
+fun Boolean.toInt(): Int{
+    return if(this==true) 1 else 0
+}
+
+fun Int.toBoolean(): Boolean{
+    return if(this==0) false else true
+}
+
 fun AppCompatActivity.startActivityOnDelay(intent: Intent, delay: Long = 50) {
     val handler = Handler()
     handler.postDelayed(object : Runnable {

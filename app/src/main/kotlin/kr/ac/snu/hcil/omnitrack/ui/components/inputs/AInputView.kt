@@ -15,6 +15,7 @@ abstract class AInputView<T>(layoutId: Int, context: Context, attrs: AttributeSe
 
     val valueChanged = Event<T>()
 
+    val validationFailed = Event<String>()
 
     private val validators: ArrayList<ReadOnlyPair<CharSequence?, (T) -> Boolean>> = ArrayList<ReadOnlyPair<CharSequence?, (T) -> Boolean>>()
 
@@ -58,6 +59,10 @@ abstract class AInputView<T>(layoutId: Int, context: Context, attrs: AttributeSe
             }
         }
 
+        if(passed==false)
+        {
+            validationFailed.invoke(this, validationErrorMessageList.joinToString("\n"))
+        }
         onValidated(passed)
         return passed
     }

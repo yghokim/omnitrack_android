@@ -21,8 +21,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/frontalBackground"
-                android:orientation="vertical"
-                android:paddingBottom="12dp">
+                android:orientation="vertical">
 
                 <TextView
                     style="@style/SubTitle"
@@ -38,7 +37,7 @@
                     android:id="@+id/nameProperty"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-
+                    android:text="@string/msg_name"
                     android:paddingLeft="@dimen/activity_horizontal_margin"
                     android:paddingRight="@dimen/activity_horizontal_margin" />
 
@@ -46,9 +45,18 @@
                     android:id="@+id/colorProperty"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-
+                    android:text="@string/msg_color"
                     android:paddingLeft="@dimen/activity_horizontal_margin"
                     android:paddingRight="@dimen/activity_horizontal_margin" />
+
+                <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.BooleanPropertyView
+                    android:id="@+id/isOnShortcutProperty"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/msg_show_on_shortcut"
+                    android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:paddingRight="@dimen/activity_horizontal_margin"
+                    />
 
             </LinearLayout>
 

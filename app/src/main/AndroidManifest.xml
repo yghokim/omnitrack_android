@@ -71,7 +71,6 @@
         <activity
             android:name=".ui.pages.connectionwizard.ConnectionWizardActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
             android:name=".ui.components.common.activity.WebServiceLoginActivity"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -90,6 +89,11 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version"
             tools:replace="android:value" />
+
+        <service
+            android:name=".services.OTShortcutManagerService"
+            android:enabled="true"
+            android:exported="false"></service>
     </application>
 
 </manifest>

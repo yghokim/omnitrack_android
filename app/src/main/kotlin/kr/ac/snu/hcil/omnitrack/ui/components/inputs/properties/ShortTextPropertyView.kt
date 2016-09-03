@@ -32,7 +32,6 @@ class ShortTextPropertyView(context: Context, attrs: AttributeSet?) : APropertyV
     lateinit private var valueView : TextView
 
     init{
-        title = "Short Text Property"
         valueView = findViewById(R.id.value) as TextView
         valueView.addTextChangedListener(object : TextWatcher {
 
@@ -55,6 +54,7 @@ class ShortTextPropertyView(context: Context, attrs: AttributeSet?) : APropertyV
 
     override fun onValidated(result: Boolean)
     {
+        super.onValidated(result)
         if(result == false)
         {
             valueView.error = validationErrorMessageList.joinToString("\n")

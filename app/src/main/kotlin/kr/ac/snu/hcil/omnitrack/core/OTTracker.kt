@@ -15,7 +15,7 @@ import kotlin.properties.Delegates
 /**
  * Created by Young-Ho on 7/11/2016.
  */
-class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color.WHITE, _attributes: Collection<OTAttribute<out Any>>? = null) : NamedObject(objectId, dbId, name) {
+class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color.WHITE, isOnShortcut: Boolean=false, _attributes: Collection<OTAttribute<out Any>>? = null) : NamedObject(objectId, dbId, name) {
     val attributes = ObservableList<OTAttribute<out Any>>()
 
     private val _removedAttributeIds = ArrayList<Long>()
@@ -39,6 +39,14 @@ class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color
     {
         prop, old, new ->
         if (old != new) {
+            isDirtySinceLastSync = true
+        }
+    }
+
+    var isOnShortcut: Boolean by Delegates.observable(isOnShortcut){
+        prop, old, new->
+        if(old!=new)
+        {
             isDirtySinceLastSync = true
         }
     }
