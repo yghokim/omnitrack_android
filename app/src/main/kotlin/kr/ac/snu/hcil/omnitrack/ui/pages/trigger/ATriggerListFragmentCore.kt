@@ -40,9 +40,10 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
             println("trigger type selected - $type")
 
             adapter.notifyItemChanged(adapter.itemCount - 1)
-            OTApplication.app.triggerManager.putNewTrigger(
-                    makeNewTriggerInstance(type)
-            )
+            val newTrigger = makeNewTriggerInstance(type)
+            newTrigger.isDirtySinceLastSync = true
+            OTApplication.app.triggerManager.putNewTrigger(newTrigger)
+
             adapter.notifyItemInserted(adapter.itemCount - 1)
             listView.smoothScrollToPosition(adapter.itemCount - 1)
             triggerTypeDialog.dismiss()

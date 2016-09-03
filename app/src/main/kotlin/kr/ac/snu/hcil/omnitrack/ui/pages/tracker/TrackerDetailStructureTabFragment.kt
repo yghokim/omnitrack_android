@@ -368,7 +368,9 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
 
                 view.setOnClickListener {
                     val typeInfo = OTApplication.app.supportedAttributePresets[adapterPosition]
-                    tracker.attributes.add(typeInfo.creater(OTApplication.app.currentUser, tracker.generateNewAttributeName(typeInfo.name, context)))
+                    val newAttribute = typeInfo.creater(OTApplication.app.currentUser, tracker.generateNewAttributeName(typeInfo.name, context))
+                    newAttribute.isDirtySinceLastSync = true
+                    tracker.attributes.add(newAttribute)
 
                     attributeListAdapter.notifyItemInserted(tracker.attributes.size - 1)
                     scrollToBottomReserved = true

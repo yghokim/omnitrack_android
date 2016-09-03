@@ -284,16 +284,20 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
             val values = baseContentValuesOfNamed(trigger, TriggerScheme)
 
             values.put(TriggerScheme.USER_ID, owner.dbId)
+            println("saving trigger with user id ${owner.dbId}")
             values.put(TriggerScheme.TYPE, trigger.typeId)
             values.put(TriggerScheme.PROPERTIES, trigger.getSerializedProperties())
             values.put(TriggerScheme.TRACKER_OBJECT_IDS, Gson().toJson(trigger.trackers.map { it.objectId }.toTypedArray()))
             values.put(TriggerScheme.POSITION, position)
+            values.put(TriggerScheme.ACTION, trigger.action)
             values.put(TriggerScheme.IS_ON, if (trigger.isOn) 1 else 0)
 
             println("storing isOn : ${trigger.isOn}")
 
             saveObject(trigger, values, TriggerScheme)
             trigger.isDirtySinceLastSync = false
+        }else{
+            println("trigger is not dirty. Do not save. $position")
         }
     }
 

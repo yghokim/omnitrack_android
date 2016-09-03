@@ -99,6 +99,8 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
         if (connectionData != null) {
             valueConnection = OTConnection(connectionData)
         }
+
+        isDirtySinceLastSync = false
     }
 
     protected abstract fun createProperties()

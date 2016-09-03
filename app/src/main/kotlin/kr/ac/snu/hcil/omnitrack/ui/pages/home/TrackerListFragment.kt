@@ -85,6 +85,7 @@ class TrackerListFragment : Fragment() {
         val fab = rootView.findViewById(R.id.fab) as FloatingActionButton?
         fab!!.setOnClickListener { view ->
             val newTracker = OTApplication.app.currentUser.newTrackerWithDefaultName(context, true)
+            newTracker.isDirtySinceLastSync = true
 
             startActivityOnDelay(TrackerDetailActivity.makeIntent(newTracker.objectId, context))
             Toast.makeText(context,
