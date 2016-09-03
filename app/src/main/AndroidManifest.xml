@@ -22,9 +22,37 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup">
+
+        <!--
+             The API key for Google Maps-based APIs is defined as a string resource.
+             (See the file "res/values/google_maps_api.xml").
+             Note that the API key is linked to the encryption key used to sign the APK.
+             You need a different API key for each encryption key, including the release key that is used to
+             sign the APK for publishing.
+             You can define the keys for the debug and release targets in src/debug/ and src/release/.
+        -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key" />
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version"
+            tools:replace="android:value" />
+
         <receiver android:name=".receivers.OTSystemReceiver">
             <intent-filter>
                 <action android:name="kr.ac.snu.hcil.omnitrack.action.ALARM" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".receivers.OTShortcutReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="kr.ac.snu.hcil.omnitrack.action.SHORTCUT_PUSH_NOW" />
+                <action android:name="kr.ac.snu.hcil.omnitrack.action.SHORTCUT_OPEN_TRACKER" />
+                <action android:name="kr.ac.snu.hcil.omnitrack.action.SHORTCUT_INCLUDE_TRACKER" />
+                <action android:name="kr.ac.snu.hcil.omnitrack.action.SHORTCUT_EXCLUDE_TRACKER" />
             </intent-filter>
         </receiver>
 
@@ -74,26 +102,7 @@
         <activity
             android:name=".ui.components.common.activity.WebServiceLoginActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <!--
-             The API key for Google Maps-based APIs is defined as a string resource.
-             (See the file "res/values/google_maps_api.xml").
-             Note that the API key is linked to the encryption key used to sign the APK.
-             You need a different API key for each encryption key, including the release key that is used to
-             sign the APK for publishing.
-             You can define the keys for the debug and release targets in src/debug/ and src/release/. 
-        -->
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key" />
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version"
-            tools:replace="android:value" />
 
-        <service
-            android:name=".services.OTShortcutManagerService"
-            android:enabled="true"
-            android:exported="false"></service>
     </application>
 
 </manifest>

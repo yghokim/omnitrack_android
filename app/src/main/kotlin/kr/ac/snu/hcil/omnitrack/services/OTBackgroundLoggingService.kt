@@ -18,10 +18,16 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
         private val ACTION_LOG = "kr.ac.snu.hcil.omnitrack.services.action.LOG"
 
         fun startLogging(context: Context, tracker: OTTracker) {
+
+            context.startService(makeIntent(context, tracker))
+        }
+
+        fun makeIntent(context: Context, tracker: OTTracker): Intent
+        {
             val intent = Intent(context, OTBackgroundLoggingService::class.java)
             intent.action = ACTION_LOG
             intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
-            context.startService(intent)
+            return intent
         }
     }
 

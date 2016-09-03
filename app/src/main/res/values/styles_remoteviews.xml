@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="shortcut_GroupStyle">
+        <item name="android:paddingTop">6dp</item>
+        <item name="android:paddingBottom">6dp</item>
+        <item name="android:paddingLeft">4dp</item>
+        <item name="android:paddingRight">4dp</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_weight">1</item>
+    </style>
+
+    <style name="shortcut_NameStyle">
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:minHeight">70dp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_marginLeft">6dp</item>
+        <item name="android:layout_marginRight">6dp</item>
+        <item name="android:layout_gravity">center_horizontal</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">6dp</item>
+
+        <item name="android:textColor">@color/textColorMid</item>
+    </style>
+
+    <style name="shortcut_ButtonStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/button_height_small</item>
+        <item name="android:src">@drawable/add_to_list_dark</item>
+        <item name="android:background">@drawable/button_background_formlike</item>
+    </style>
+
+</resources>

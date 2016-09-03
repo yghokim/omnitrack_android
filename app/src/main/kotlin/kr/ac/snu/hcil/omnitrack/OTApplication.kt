@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack
 
 import android.app.Application
 import android.graphics.Color
+import kr.ac.snu.hcil.omnitrack.core.OTShortcutManager
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.*
 import kr.ac.snu.hcil.omnitrack.core.database.CacheHelper
@@ -31,6 +32,11 @@ class OTApplication : Application() {
         const val INTENT_EXTRA_ITEMBUILDER = "itemBuilderId"
 
         const val BROADCAST_ACTION_ALARM = "kr.ac.snu.hcil.omnitrack.action.ALARM"
+
+        const val BROADCAST_ACTION_SHORTCUT_PUSH_NOW = "kr.ac.snu.hcil.omnitrack.action.SHORTCUT_PUSH_NOW"
+        const val BROADCAST_ACTION_SHORTCUT_OPEN_TRACKER = "kr.ac.snu.hcil.omnitrack.action.SHORTCUT_OPEN_TRACKER"
+        const val BROADCAST_ACTION_SHORTCUT_INCLUDE_TRACKER = "kr.ac.snu.hcil.omnitrack.action.SHORTCUT_INCLUDE_TRACKER"
+        const val BROADCAST_ACTION_SHORTCUT_EXCLUDE_TRACKER = "kr.ac.snu.hcil.omnitrack.action.SHORTCUT_EXCLUDE_TRACKER"
 
 
         const val PREFERENCE_KEY_FOREGROUND_ITEM_BUILDER_STORAGE = "item_builder_storage_foreground"
@@ -133,6 +139,11 @@ class OTApplication : Application() {
 
                 })
             }
+        }
+
+        for (tracker in currentUser.getTrackersOnShortcut())
+        {
+            OTShortcutManager+= tracker
         }
 
 

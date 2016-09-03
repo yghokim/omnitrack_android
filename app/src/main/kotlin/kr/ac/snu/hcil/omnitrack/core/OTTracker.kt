@@ -47,6 +47,14 @@ class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color
         prop, old, new->
         if(old!=new)
         {
+            if(new==true)
+            {
+                OTShortcutManager += this
+            }
+            else{
+                OTShortcutManager -= this
+            }
+
             isDirtySinceLastSync = true
         }
     }
