@@ -5,6 +5,7 @@ import android.content.Context
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.*
+import kr.ac.snu.hcil.omnitrack.utils.auth.AuthConstants
 import java.util.*
 
 /**
@@ -339,12 +340,12 @@ class OTTimeTrigger : OTTrigger {
 
                     if (!isRepeated) {
                         if (pivot == TRIGGER_TIME_NEVER_TRIGGERED) {
+
                             if (TimeHelper.compareTimePortions(cacheCalendar, cacheCalendar2) >= -MILLISECOND_TOLERANCE) {
                                 //next day
                                 cacheCalendar2.add(Calendar.DAY_OF_YEAR, 1)
 
                             }
-
                             cacheCalendar2.timeInMillis
                         } else {
                             0L

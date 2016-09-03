@@ -99,16 +99,18 @@ object TimeHelper {
 
 
     fun compareTimePortions(c1: Calendar, c2: Calendar): Int {
-        return compareTimePortions(c1.timeInMillis, c2.timeInMillis)
-    }
+        val h1 = c1.getHourOfDay()
+        val h2 = c2.getHourOfDay()
+        val m1 = c1.getMinute()
+        val m2 = c2.getMinute()
+        val s1 = c1.getMinute()
+        val s2 = c2.getMinute()
+        val ms1 = c1.get(Calendar.MILLISECOND)
+        val ms2 = c2.get(Calendar.MILLISECOND)
 
-    fun compareTimePortions(d1: Date, d2: Date): Int {
-        return compareTimePortions(d1.time, d2.time)
-    }
+        val t1 = h1*3600*1000 + m1 * 60 * 1000 + s1 * 1000 + ms1
+        val t2 =  h2*3600*1000 + m2 * 60 * 1000 + s2 * 1000 + ms2
 
-    fun compareTimePortions(d1: Long, d2: Long): Int {
-        val t1 = (d1 % daysInMilli).toInt()
-        val t2 = (d2 % daysInMilli).toInt()
         return t1 - t2
     }
 
