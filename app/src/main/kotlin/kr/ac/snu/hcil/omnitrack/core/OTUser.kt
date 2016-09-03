@@ -79,6 +79,10 @@ class OTUser(objectId: String?, dbId: Long?, name: String, email: String, attrib
         }
     }
 
+    fun getTrackersOnShortcut(): List<OTTracker>{
+        return trackers.filter { it.isOnShortcut == true }
+    }
+
     fun newTrackerWithDefaultName(context: Context, add: Boolean): OTTracker {
         return newTracker(OTApplication.app.currentUser.generateNewTrackerName(context), add)
     }
