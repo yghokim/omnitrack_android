@@ -6,6 +6,7 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.support.v4.app.TaskStackBuilder
 import android.support.v7.app.NotificationCompat
 import android.view.View
 import android.widget.RemoteViews
@@ -13,6 +14,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
+import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemEditingActivity
 
 class OTShortcutReceiver : BroadcastReceiver() {
@@ -66,9 +68,26 @@ class OTShortcutReceiver : BroadcastReceiver() {
         }
     }
 
-    fun buildNewNotificationShortcutViews(context: Context): RemoteViews
+    fun buildNewNotificationShortcutViews(context: Context, bigStyle: Boolean): RemoteViews
     {
-        val rv = RemoteViews(context.packageName, R.layout.remoteview_shortcut_notification)
+        //todo handle small style layout
+        val rv = RemoteViews(context.packageName, if(bigStyle) R.layout.remoteview_shortcut_notification_big else R.layout.remoteview_shortcut_notification_big)
+
+        if(bigStyle)
+        {
+            //header exist.
+
+            val stackBuilder = TaskStackBuilder.create(context)
+            // Adds the back stack for the Intent (but not the Intent itself)
+            stackBuilder.addParentStack(HomeActivity::class.java)
+            // Adds the Intent that starts the Activity to the top of the stack
+            stackBuilder.addNextIntent(Intent(context, HomeActivity::class.java))
+
+            val morePendingIntent = stackBuilder.getPendingIntent(0,
+                    PendingIntent.FLAG_UPDATE_CURRENT)
+
+            rv.setOnClickPendingIntent(R.id.ui_button_more, morePendingIntent)
+        }
 
         val trackers = OTApplication.app.currentUser.getTrackersOnShortcut()
 
@@ -102,12 +121,14 @@ class OTShortcutReceiver : BroadcastReceiver() {
     }
 
     fun refreshNotificationShortcutViews(context: Context) {
-        val rv = buildNewNotificationShortcutViews(context)
+        val bigView = buildNewNotificationShortcutViews(context, true)
+        val normalView = buildNewNotificationShortcutViews(context, false)
 
         val noti = NotificationCompat.Builder(context)
             .setSmallIcon(R.drawable.icon_simple_white)
             .setContentTitle(context.resources.getString(R.string.app_name))
-            .setCustomBigContentView(rv)
+            .setCustomBigContentView(bigView)
+            .setCustomContentView(normalView)
             .setVisibility(Notification.VISIBILITY_PUBLIC)
             .setAutoCancel(false)
             .setOngoing(true)
