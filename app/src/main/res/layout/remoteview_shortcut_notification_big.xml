@@ -1,25 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <RelativeLayout android:layout_width="match_parent"
-        android:layout_height="30dp"
-        android:paddingLeft="3dp"
+        android:layout_height="35dp"
+        android:background="@color/colorPrimarySemiLight"
         >
         <ImageView
+            android:id="@+id/icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/icon_simple"
             android:layout_centerVertical="true"
-            android:id="@+id/icon"
+            android:alpha="0.6"
+            android:paddingBottom="8dp"
+            android:paddingLeft="3dp"
+            android:paddingRight="3dp"
+            android:paddingTop="8dp"
+            android:src="@drawable/icon_simple_white"
             />
         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:text="@string/app_name"
-            android:layout_toRightOf="@+id/icon"
             android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/icon"
+            android:text="@string/app_name"
+            android:textColor="#fafafa"
             android:textStyle="bold"
             />
 
@@ -27,21 +33,21 @@
             android:id="@+id/ui_button_more"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:paddingRight="6dp"
-            android:paddingLeft="6dp"
-            android:src="@drawable/more"
-            android:background="@drawable/transparent_button_background"
+            android:layout_alignParentEnd="true"
             android:layout_alignTop="@+id/icon"
-            android:layout_alignParentEnd="true" />
+            android:background="@drawable/transparent_button_background"
+            android:paddingLeft="6dp"
+            android:paddingRight="6dp"
+            android:src="@drawable/more" />
     </RelativeLayout>
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:background="@drawable/expanded_view_inner_shadow_top"
-        android:orientation="horizontal" android:layout_width="match_parent"
+        android:id="@+id/container"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:showDividers="middle"
         android:divider="@drawable/left_separator_light"
         android:dividerPadding="8dp"
-        android:id="@+id/container"
+        android:orientation="horizontal"
+        android:showDividers="middle"
         />
 </LinearLayout>

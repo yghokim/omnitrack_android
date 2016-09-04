@@ -70,8 +70,7 @@ class OTShortcutReceiver : BroadcastReceiver() {
 
     fun buildNewNotificationShortcutViews(context: Context, bigStyle: Boolean): RemoteViews
     {
-        //todo handle small style layout
-        val rv = RemoteViews(context.packageName, if(bigStyle) R.layout.remoteview_shortcut_notification_big else R.layout.remoteview_shortcut_notification_big)
+        val rv = RemoteViews(context.packageName, if (bigStyle) R.layout.remoteview_shortcut_notification_big else R.layout.remoteview_shortcut_notification_normal)
 
         if(bigStyle)
         {
@@ -91,9 +90,11 @@ class OTShortcutReceiver : BroadcastReceiver() {
 
         val trackers = OTApplication.app.currentUser.getTrackersOnShortcut()
 
+        rv.removeAllViews(R.id.container)
+
         for(i in 0..MAX_NUM_SHORTCUTS-1)
         {
-            val element = RemoteViews(context.packageName, R.layout.remoteview_shortcut_notification_element)
+            val element = RemoteViews(context.packageName, if (bigStyle) R.layout.remoteview_shortcut_notification_element else R.layout.remoteview_shortcut_notification_element_normal)
 
             if(trackers.size-1 < i)
             {
@@ -107,8 +108,8 @@ class OTShortcutReceiver : BroadcastReceiver() {
                 element.setTextViewText(R.id.ui_name, trackers[i].name)
 
 
-                val instantLoggingIntent = PendingIntent.getService(context, i, OTBackgroundLoggingService.makeIntent(context, trackers[i]), PendingIntent.FLAG_CANCEL_CURRENT)
-                val openItemActivityIntent = PendingIntent.getActivity(context, i, ItemEditingActivity.makeIntent(trackers[i].objectId, context), PendingIntent.FLAG_CANCEL_CURRENT)
+                val instantLoggingIntent = PendingIntent.getService(context, i, OTBackgroundLoggingService.makeIntent(context, trackers[i]), PendingIntent.FLAG_UPDATE_CURRENT)
+                val openItemActivityIntent = PendingIntent.getActivity(context, i, ItemEditingActivity.makeIntent(trackers[i].objectId, context), PendingIntent.FLAG_UPDATE_CURRENT)
 
                 element.setOnClickPendingIntent(R.id.ui_button_instant, instantLoggingIntent)
                 element.setOnClickPendingIntent(R.id.group, openItemActivityIntent)

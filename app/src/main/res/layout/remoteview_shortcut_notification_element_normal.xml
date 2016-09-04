@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/group"
+    style="@style/shortcut_GroupStyle"
+    android:layout_height="match_parent"
+    android:minHeight="64dp">
+
+    <TextView
+        android:id="@+id/ui_name"
+        style="@style/shortcut_NameStyle"
+        android:layout_marginBottom="3dp"
+        android:layout_marginTop="2dp"
+        android:layout_weight="1"
+        android:fontFamily="sans-serif-condensed"
+        android:minHeight="0dp"
+        android:text="Manual Sleep"
+        android:textSize="13dp"
+        android:textStyle="normal" />
+
+    <ImageButton
+        android:id="@+id/ui_button_instant"
+        style="@style/shortcut_ButtonStyle"
+        android:layout_height="28dp" />
+</LinearLayout>
