@@ -41,7 +41,6 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
 
             adapter.notifyItemChanged(adapter.itemCount - 1)
             val newTrigger = makeNewTriggerInstance(type)
-            newTrigger.isDirtySinceLastSync = true
             OTApplication.app.triggerManager.putNewTrigger(newTrigger)
 
             adapter.notifyItemInserted(adapter.itemCount - 1)

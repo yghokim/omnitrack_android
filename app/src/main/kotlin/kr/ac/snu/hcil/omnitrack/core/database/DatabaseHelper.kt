@@ -193,7 +193,9 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
 
         val lastTriggeredTime = cursor.getLong(cursor.getColumnIndex(TriggerScheme.LAST_TRIGGERED_TIME))
 
-        return OTTrigger.makeInstance(objectId, id, type, name, Gson().fromJson(trackerObjectIds, Array<String>::class.java), isOn, action, lastTriggeredTime, serializedProperties)
+        val trigger =  OTTrigger.makeInstance(objectId, id, type, name, Gson().fromJson(trackerObjectIds, Array<String>::class.java), isOn, action, lastTriggeredTime, serializedProperties)
+        trigger.isDirtySinceLastSync = false
+        return trigger
     }
 
     fun extractTrackerEntity(cursor: Cursor): OTTracker {
@@ -203,7 +205,10 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         val color = cursor.getInt(cursor.getColumnIndex(TrackerScheme.COLOR))
         val isOnShortcut = cursor.getInt(cursor.getColumnIndex(TrackerScheme.IS_ON_SHORTCUT))
 
-        return OTTracker(objectId, id, name, color, isOnShortcut.toBoolean(), findAttributesOfTracker(id))
+        val tracker = OTTracker(objectId, id, name, color, isOnShortcut.toBoolean(), findAttributesOfTracker(id))
+        tracker.isDirtySinceLastSync = false
+
+        return tracker
     }
 
     fun extractAttributeEntity(cursor: Cursor): OTAttribute<out Any> {
@@ -214,7 +219,10 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         val settingData = cursor.getString(cursor.getColumnIndex(AttributeScheme.PROPERTY_DATA))
         val connectionData = cursor.getString(cursor.getColumnIndex(AttributeScheme.CONNECTION_DATA))
 
-        return OTAttribute.createAttribute(objectId, id, name, type, settingData, connectionData)
+        val attribute = OTAttribute.createAttribute(objectId, id, name, type, settingData, connectionData)
+        attribute.isDirtySinceLastSync = false
+
+        return attribute
     }
 
     private fun queryById(id: Long, table: TableScheme): Cursor {

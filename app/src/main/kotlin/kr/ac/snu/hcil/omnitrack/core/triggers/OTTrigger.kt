@@ -111,7 +111,7 @@ abstract class OTTrigger(objectId: String?, dbId: Long?, name: String,
             }
         }
 
-        isDirtySinceLastSync = false
+        isDirtySinceLastSync = true
     }
 
     fun getSerializedProperties(): String{

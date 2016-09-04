@@ -99,7 +99,7 @@ class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color
             }
         }
 
-        isDirtySinceLastSync = false
+        isDirtySinceLastSync = true
     }
 
     private fun onAttributeAdded(new: OTAttribute<out Any>, index: Int) {
