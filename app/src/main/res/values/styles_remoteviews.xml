@@ -26,11 +26,15 @@
         <item name="android:textColor">@color/textColorMid</item>
     </style>
 
-    <style name="shortcut_ButtonStyle">
+    <style name="shortcut_ButtonContainerStyle">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">@dimen/button_height_small</item>
-        <item name="android:src">@drawable/add_to_list_dark</item>
-        <item name="android:background">@drawable/button_background_formlike</item>
+    </style>
+    <style name="shortcut_ButtonStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:src">@drawable/add_to_list</item>
+        <item name="android:background">@drawable/transparent_button_background</item>
     </style>
 
 </resources>

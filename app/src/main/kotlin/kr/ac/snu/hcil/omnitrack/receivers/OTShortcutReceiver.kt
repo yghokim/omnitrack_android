@@ -6,7 +6,9 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.support.v4.app.TaskStackBuilder
+import android.support.v4.graphics.ColorUtils
 import android.support.v7.app.NotificationCompat
 import android.view.View
 import android.widget.RemoteViews
@@ -108,6 +110,8 @@ class OTShortcutReceiver : BroadcastReceiver() {
             else{
                 element.setViewVisibility(R.id.ui_button_instant, View.VISIBLE)
                 element.setViewVisibility(R.id.ui_name, View.VISIBLE)
+
+                element.setInt(R.id.ui_button_container, "setBackgroundColor", ColorUtils.setAlphaComponent(trackers[i].color, 200))
 
                 element.setTextViewText(R.id.ui_name, trackers[i].name)
 

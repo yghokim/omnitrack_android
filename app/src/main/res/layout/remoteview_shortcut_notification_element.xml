@@ -8,7 +8,11 @@
             android:layout_marginBottom="6dp"
             />
 
-        <ImageButton
-            android:id="@+id/ui_button_instant"
-            style="@style/shortcut_ButtonStyle"/>
+        <FrameLayout
+            android:id="@+id/ui_button_container"
+            style="@style/shortcut_ButtonContainerStyle">
+            <ImageButton
+                android:id="@+id/ui_button_instant"
+                style="@style/shortcut_ButtonStyle"/>
+        </FrameLayout>
     </LinearLayout>

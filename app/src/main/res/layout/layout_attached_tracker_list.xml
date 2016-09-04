@@ -9,7 +9,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
-        android:src="@drawable/add_to_list_dark"
+        android:src="@drawable/add_to_list"
         android:tint="@color/textColorMid" />
 
     <FrameLayout

@@ -9,7 +9,6 @@
         android:id="@+id/ui_name"
         style="@style/shortcut_NameStyle"
         android:layout_marginBottom="3dp"
-        android:layout_marginTop="2dp"
         android:layout_weight="1"
         android:fontFamily="sans-serif-condensed"
         android:minHeight="0dp"
@@ -17,8 +16,12 @@
         android:textSize="13dp"
         android:textStyle="normal" />
 
-    <ImageButton
-        android:id="@+id/ui_button_instant"
-        style="@style/shortcut_ButtonStyle"
-        android:layout_height="28dp" />
+    <FrameLayout
+        android:id="@+id/ui_button_container"
+        android:layout_height="28dp"
+        style="@style/shortcut_ButtonContainerStyle">
+        <ImageButton
+            android:id="@+id/ui_button_instant"
+            style="@style/shortcut_ButtonStyle"/>
+    </FrameLayout>
 </LinearLayout>
