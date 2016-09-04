@@ -58,6 +58,12 @@
         <item quantity="other">%d secs</item>
     </plurals>
 
+    <string name="msg_today">Today</string>
+    <string name="msg_yesterday">Yesterday</string>
+    <string name="msg_tracker_list_date_format">MMMM dd</string>
+    <string name="msg_tracker_list_time_format">hh:mm a</string>
+
+
     <string name="msg_everyday">Everyday</string>
     <string name="msg_once">Once</string>
 

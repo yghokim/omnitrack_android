@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="tracker_list_element_collapsed_height">120dp</dimen>
+    <dimen name="tracker_list_element_expanded_height">170dp</dimen>
+
+    <dimen name="tracker_list_bottom_space">100dp</dimen>
+
+    <dimen name="tracker_list_information_bottom_padding">16dp</dimen>
+    <dimen name="tracker_list_information_spacing">20dp</dimen>
+
+    <dimen name="tracker_list_color_bar_width">4dp</dimen>
+
+    <dimen name="tracker_list_element_information_text_contentSize">14dp</dimen>
+    <dimen name="tracker_list_element_information_text_headerSize">11sp</dimen>
+
+    <dimen name="trigger_list_element_divider_height">1dp</dimen>
+
+    <style name="trackerListInformationTextViewStyle.HeaderAppearance">
+        <item name="android:textSize">@dimen/tracker_list_element_information_text_headerSize</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/textColorLight</item>
+    </style>
+
+    <style name="trackerListInformationTextViewStyle">
+        <item name="android:textSize">@dimen/tracker_list_element_information_text_contentSize</item>
+        <item name="android:textColor">@color/textColorLight</item>
+    </style>
+
+</resources>

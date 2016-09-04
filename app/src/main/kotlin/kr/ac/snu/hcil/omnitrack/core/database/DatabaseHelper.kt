@@ -2,10 +2,13 @@ package kr.ac.snu.hcil.omnitrack.core.database
 
 import android.content.ContentValues
 import android.content.Context
+import android.content.Intent
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.os.AsyncTask
 import com.google.gson.Gson
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.NamedObject
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
@@ -21,6 +24,12 @@ import java.util.*
  */
 class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db", null, 1) {
 
+    companion object{
+        const val SAVE_RESULT_NEW = 1
+        const val SAVE_RESULT_EDIT = 2
+        const val SAVE_RESULT_FAIL = 0
+
+    }
 
     abstract class TableWithNameScheme : TableScheme() {
         val NAME = "name"
@@ -238,7 +247,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         }
     }
 
-    private fun saveObject(objRef: IDatabaseStorable, values: ContentValues, scheme: TableScheme): Boolean {
+    private fun saveObject(objRef: IDatabaseStorable, values: ContentValues, scheme: TableScheme): Int {
         val now = System.currentTimeMillis()
         values.put(scheme.UPDATED_AT, now)
 
@@ -248,6 +257,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         if (transactionMode) db.beginTransaction()
 
         try {
+            val result: Int
             if (objRef.dbId != null) //update
             {
                 val numAffected = db.update(scheme.tableName, values, "${scheme._ID}=?", arrayOf(objRef.dbId.toString()))
@@ -256,6 +266,8 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
                 } else { // something wrong
                     throw Exception("Something is wrong saving user in Db")
                 }
+
+                result = SAVE_RESULT_EDIT
             } else { //new
                 if (!values.containsKey(scheme.LOGGED_AT)) values.put(scheme.LOGGED_AT, now)
                 val newRowId = db.insert(scheme.tableName, null, values)
@@ -265,14 +277,16 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
                 } else {
                     throw Exception("Object insertion failed - ${scheme.tableName}")
                 }
+
+                result = SAVE_RESULT_NEW
             }
 
             if (transactionMode)
                 db.setTransactionSuccessful()
-            return true
+            return result
         } catch(e: Exception) {
             e.printStackTrace()
-            return false
+            return SAVE_RESULT_FAIL
         } finally {
             if (transactionMode)
                 db.endTransaction()
@@ -382,7 +396,22 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
 
         println("item id: ${item.dbId}")
 
-        saveObject(item, values, ItemScheme)
+        val result = saveObject(item, values, ItemScheme)
+
+        if(result != SAVE_RESULT_FAIL) {
+            val intent = Intent(when (result) {
+                SAVE_RESULT_NEW -> OTApplication.BROADCAST_ACTION_ITEM_ADDED
+                SAVE_RESULT_EDIT -> OTApplication.BROADCAST_ACTION_ITEM_EDITED
+                else -> throw IllegalArgumentException("")
+            })
+
+            intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
+
+            OTApplication.app.sendBroadcast(intent)
+        }
+        else{
+            println("Item insert failed - $item")
+        }
     }
 
     fun getItems(tracker: OTTracker, listOut: ArrayList<OTItem>): Int {
@@ -406,6 +435,15 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         } else return null
     }
 
+    fun removeItem(item: OTItem){
+        deleteObjects(DatabaseHelper.ItemScheme, item.dbId!!)
+        val intent = Intent(OTApplication.BROADCAST_ACTION_ITEM_REMOVED)
+
+        intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, item.trackerObjectId)
+
+        OTApplication.app.sendBroadcast(intent)
+    }
+
 
     fun extractItemEntity(cursor: Cursor, tracker: OTTracker): OTItem {
         val id = cursor.getLong(cursor.getColumnIndex(ItemScheme._ID))
@@ -418,5 +456,61 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
 
         return OTItem(id, tracker.objectId, serializedValues, timestamp)
     }
+
+    fun getLastLoggingTimeAsync(tracker: OTTracker, resultHandler: (Long?)->Unit) : LastItemTimeRetrievalTask
+    {
+        val task = LastItemTimeRetrievalTask(resultHandler)
+        task.execute(tracker)
+        return task
+    }
+
+    fun getLoggingCountOfDayAsync(tracker: OTTracker, pivot: Long, resultHandler: (Int) -> Unit): LoggingCountOfDayRetrievalTask
+    {
+        val task = LoggingCountOfDayRetrievalTask(pivot, resultHandler)
+        task.execute(tracker)
+        return task
+    }
+
+
+    inner class LoggingCountOfDayRetrievalTask(val pivot: Long, val resultHandler: (Int)->Unit): AsyncTask<OTTracker, Void?, Int>(){
+        override fun doInBackground(vararg trackers: OTTracker): Int {
+            val cal = Calendar.getInstance()
+            cal.set(Calendar.HOUR_OF_DAY, 0)
+            cal.set(Calendar.MINUTE, 0)
+            cal.set(Calendar.SECOND, 0)
+            cal.set(Calendar.MILLISECOND, 0)
+
+            val first = cal.timeInMillis
+
+            cal.add(Calendar.DAY_OF_YEAR, 1)
+            val second = cal.timeInMillis -20
+
+            val cursor = readableDatabase.query(ItemScheme.tableName, arrayOf(ItemScheme.LOGGED_AT), "${ItemScheme.TRACKER_ID}=? AND ${ItemScheme.LOGGED_AT} BETWEEN ? AND ?", arrayOf(trackers[0].dbId.toString(), first.toString(), second.toString()), null, null, null)
+            return cursor.count
+        }
+
+        override fun onPostExecute(result: Int) {
+            super.onPostExecute(result)
+            resultHandler.invoke(result)
+        }
+
+    }
+
+    inner class LastItemTimeRetrievalTask(val resultHandler: (Long?)->Unit): AsyncTask<OTTracker, Void?, Long?>(){
+        override fun doInBackground(vararg trackers: OTTracker): Long? {
+            val cursor = readableDatabase.query(ItemScheme.tableName, arrayOf(ItemScheme.LOGGED_AT), "${ItemScheme.TRACKER_ID}=?", arrayOf(trackers[0].dbId.toString()), null, null, "${ItemScheme.LOGGED_AT} DESC", "1")
+            if (cursor.moveToFirst()) {
+                return cursor.getLong(cursor.getColumnIndex(ItemScheme.LOGGED_AT))
+            }
+            else return null
+        }
+
+        override fun onPostExecute(result: Long?) {
+            super.onPostExecute(result)
+            resultHandler.invoke(result)
+        }
+
+    }
+
 
 }

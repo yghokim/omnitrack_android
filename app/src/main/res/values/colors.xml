@@ -16,6 +16,8 @@
     <color name="textColorDark">#252525</color>
     <color name="textColorMid">#757575</color>
 
+
+    <color name="textColorMidLight">#9c9c9c</color>
     <color name="textColorLight">#aaaaaa</color>
 
     <color name="colorPointed">#16afa3</color>

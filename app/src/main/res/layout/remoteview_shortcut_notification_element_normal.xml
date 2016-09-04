@@ -3,6 +3,7 @@
     android:id="@+id/group"
     style="@style/shortcut_GroupStyle"
     android:layout_height="match_parent"
+    android:paddingTop="3dp"
     android:minHeight="64dp">
 
     <TextView
@@ -14,7 +15,9 @@
         android:minHeight="0dp"
         android:text="Manual Sleep"
         android:textSize="13dp"
-        android:textStyle="normal" />
+        android:textStyle="normal"
+        android:layout_marginTop="0dp"
+        />
 
     <FrameLayout
         android:id="@+id/ui_button_container"

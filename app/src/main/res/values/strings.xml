@@ -62,6 +62,10 @@
 
     <string name="msg_name">Name</string>
 
+    <string name="msg_never_logged">Never Logged</string>
+
+    <string name="msg_todays_log">Today\'s</string>
+
     <string name="msg_show_on_shortcut">Show on Shortcut</string>
 
     <string name="msg_attribute">Field</string>

@@ -173,7 +173,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                     }
                     R.id.action_remove -> {
                         DialogHelper.makeYesNoDialogBuilder(this@ItemBrowserActivity, "OmniTrack", resources.getString(R.string.msg_item_remove_confirm), {
-                            OTApplication.app.dbHelper.deleteObjects(DatabaseHelper.ItemScheme, items[adapterPosition].dbId!!)
+                            OTApplication.app.dbHelper.removeItem(items[adapterPosition])
                             items.removeAt(adapterPosition)
                             onItemRemoved(adapterPosition)
                         }).show()

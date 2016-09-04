@@ -1,12 +1,20 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.home
 
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
+import android.graphics.Typeface
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.Fragment
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.SpannableStringBuilder
+import android.text.style.*
 import android.transition.AutoTransition
 import android.transition.Fade
 import android.transition.TransitionManager
@@ -21,13 +29,15 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
+import kr.ac.snu.hcil.omnitrack.core.database.DatabaseHelper
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.DrawableListBottomSpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemBrowserActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemEditingActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.tracker.TrackerDetailActivity
-import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
-import kr.ac.snu.hcil.omnitrack.utils.startActivityOnDelay
+import kr.ac.snu.hcil.omnitrack.utils.*
+import java.text.SimpleDateFormat
+import java.util.*
 
 /**
  * Created by Young-Ho Kim on 2016-07-18.
@@ -43,6 +53,27 @@ class TrackerListFragment : Fragment() {
     lateinit private var trackerListLayoutManager: LinearLayoutManager
 
     lateinit private var popupMessages : Array<String>
+
+    private lateinit var lastLoggedTimeFormat : SimpleDateFormat
+
+    private lateinit var dateSizeSpan : AbsoluteSizeSpan
+    private lateinit var dateStyleSpan: StyleSpan
+    private lateinit var dateColorSpan: ForegroundColorSpan
+
+    private lateinit var timeStyleSpan: StyleSpan
+
+    private val itemEventReceiver: BroadcastReceiver by lazy{
+        ItemEventReceiver()
+    }
+
+    private val itemEventIntentFilter: IntentFilter by lazy{
+        val filter = IntentFilter()
+        filter.addAction(OTApplication.BROADCAST_ACTION_ITEM_ADDED)
+        filter.addAction(OTApplication.BROADCAST_ACTION_ITEM_EDITED)
+        filter.addAction(OTApplication.BROADCAST_ACTION_ITEM_REMOVED)
+
+        filter
+    }
 
     companion object{
         const val CHANGE_TRACKER_SETTINGS = 0
@@ -68,6 +99,11 @@ class TrackerListFragment : Fragment() {
 
         user = OTApplication.app.currentUser
 
+        lastLoggedTimeFormat =  SimpleDateFormat(context.resources.getString(R.string.msg_tracker_list_time_format))
+        dateStyleSpan = StyleSpan(Typeface.NORMAL)
+        timeStyleSpan = StyleSpan(Typeface.BOLD)
+        dateSizeSpan = AbsoluteSizeSpan(context.resources.getDimensionPixelSize(R.dimen.tracker_list_element_information_text_headerSize))
+        dateColorSpan = ForegroundColorSpan(context.resources.getColor(R.color.textColorLight, null))
         //attach events
         // user.trackerAdded += onTrackerAddedHandler
         //  user.trackerRemoved += onTrackerRemovedHandler
@@ -76,6 +112,7 @@ class TrackerListFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         trackerListAdapter.notifyDataSetChanged()
+        context.registerReceiver(itemEventReceiver, itemEventIntentFilter)
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
@@ -101,7 +138,7 @@ class TrackerListFragment : Fragment() {
 
         popupMessages = arrayOf(getString(R.string.msg_change_tracker_settings), getString(R.string.msg_remove_tracker))
         //listView.itemAnimator = SlideInRightAnimator()
-        listView.addItemDecoration(HorizontalImageDividerItemDecoration(R.drawable.horizontal_separator_pattern, context, 1.5f))
+        listView.addItemDecoration(HorizontalImageDividerItemDecoration(R.drawable.horizontal_separator_pattern, context, 1.0f))
         listView.addItemDecoration(DrawableListBottomSpaceItemDecoration(R.drawable.expanded_view_inner_shadow_top, resources.getDimensionPixelSize(R.dimen.tracker_list_bottom_space)))
 
         return rootView
@@ -111,6 +148,8 @@ class TrackerListFragment : Fragment() {
         super.onPause()
 
         trackerListAdapter.currentlyExpandedIndex = -1
+
+        context.unregisterReceiver(itemEventReceiver)
     }
 
     /*
@@ -180,22 +219,31 @@ class TrackerListFragment : Fragment() {
 
         inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view), View.OnClickListener {
 
-            lateinit var name: TextView
-            lateinit var color: View
-            lateinit var expandButton: ImageButton
+            val name: TextView
+            val color: View
+            val expandButton: ImageButton
 
-            lateinit var expandedView: View
+            val lastLoggingTimeView: TextView
+            val todayLoggingCountView: TextView
 
-            lateinit var editButton: View
-            lateinit var listButton: View
-            lateinit var removeButton: View
+            val expandedView: View
 
-            private var collapsed = true
+            val editButton: View
+            val listButton: View
+            val removeButton: View
+
+            var collapsed = true
+
+            private var lastLoggingTimeRetrievalTask: DatabaseHelper.LastItemTimeRetrievalTask? = null
+            private var todayLoggingCountTask: DatabaseHelper.LoggingCountOfDayRetrievalTask? = null
 
             init{
                 name = view.findViewById(R.id.name) as TextView
                 color = view.findViewById(R.id.color_bar) as View
                 expandButton = view.findViewById(R.id.ui_expand_button) as ImageButton
+
+                lastLoggingTimeView = view.findViewById(R.id.ui_last_logging_time) as TextView
+                todayLoggingCountView = view.findViewById(R.id.ui_today_logging_count) as TextView
 
                 expandedView = view.findViewById(R.id.ui_expanded_view)
 
@@ -254,6 +302,51 @@ class TrackerListFragment : Fragment() {
                 name.text = tracker.name
                 color.setBackgroundColor(tracker.color)
 
+                lastLoggingTimeRetrievalTask?.cancel(true)
+                todayLoggingCountTask?.cancel(true)
+
+                lastLoggingTimeRetrievalTask = OTApplication.app.dbHelper.getLastLoggingTimeAsync(tracker){
+
+                    timestamp->
+                    if(timestamp!=null) {
+                        InterfaceHelper.setTextAppearance(lastLoggingTimeView, R.style.trackerListInformationTextViewStyle)
+                        val dateText = TimeHelper.getDateText(timestamp, context).toUpperCase()
+                        val timeText = lastLoggedTimeFormat.format(Date(timestamp)).toUpperCase()
+                        val builder = SpannableString(dateText + "\n" + timeText)
+
+                        builder.setSpan(dateSizeSpan, 0, dateText.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                        builder.setSpan(dateColorSpan, 0, dateText.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+                        builder.setSpan(timeStyleSpan, dateText.length+1, dateText.length+1+timeText.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+                        todayLoggingCountView.visibility = View.VISIBLE
+
+                        lastLoggingTimeView.text = builder
+                    }
+                    else{
+                        lastLoggingTimeView.text = context.resources.getString(R.string.msg_never_logged).toUpperCase()
+                        InterfaceHelper.setTextAppearance(lastLoggingTimeView, R.style.trackerListInformationTextViewStyle_HeaderAppearance)
+                        todayLoggingCountView.visibility = View.INVISIBLE
+                    }
+                        lastLoggingTimeRetrievalTask = null
+                }
+
+
+                todayLoggingCountTask = OTApplication.app.dbHelper.getLoggingCountOfDayAsync(tracker, System.currentTimeMillis()) {
+
+                    count ->
+                    val header = context.resources.getString(R.string.msg_todays_log).toUpperCase()
+                    val builder = SpannableString(header + "\n" + count)
+
+                    builder.setSpan(dateSizeSpan, 0, header.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    builder.setSpan(dateColorSpan, 0, header.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+                    builder.setSpan(timeStyleSpan, header.length + 1, header.length + 1 + count.toString().length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+                    todayLoggingCountView.text = builder
+                }
+
+
                 if (currentlyExpandedIndex == adapterPosition) {
                     expand()
                 } else {
@@ -279,5 +372,13 @@ class TrackerListFragment : Fragment() {
                 collapsed = false
             }
         }
+    }
+
+    inner class ItemEventReceiver: BroadcastReceiver(){
+        override fun onReceive(context: Context, intent: Intent) {
+            val trackerPosition = user.trackers.indexOf(user[intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)]!!)
+            trackerListAdapter.notifyItemChanged(trackerPosition)
+        }
+
     }
 }

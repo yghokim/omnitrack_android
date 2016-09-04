@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.utils
 
 import android.content.Context
+import android.text.format.DateUtils
 import kr.ac.snu.hcil.omnitrack.R
 import java.text.SimpleDateFormat
 import java.util.*
@@ -40,6 +41,27 @@ object TimeHelper {
 
     fun cutMillisecond(timestamp: Long): Long {
         return timestamp / 1000 * 1000
+    }
+
+    fun getDateText(timestamp: Long, context: Context): String{
+        val cal = Calendar.getInstance()
+
+        cal.timeInMillis = timestamp
+        if(DateUtils.isToday(timestamp))
+        {
+            return context.resources.getString(R.string.msg_today)
+        }
+        else{
+            val yesterdayCal = Calendar.getInstance()
+            yesterdayCal.add(Calendar.DAY_OF_YEAR, -1)
+            if(yesterdayCal.getYear() == cal.getYear() && yesterdayCal.get(Calendar.DAY_OF_YEAR) == cal.get(Calendar.DAY_OF_YEAR))
+            {
+                return context.resources.getString(R.string.msg_yesterday)
+            }
+            else{
+                return SimpleDateFormat(context.resources.getString(R.string.msg_tracker_list_date_format)).format(cal.time)
+            }
+        }
     }
 
     fun durationToText(duration: Long, useShortUnits: Boolean, context: Context): String {
