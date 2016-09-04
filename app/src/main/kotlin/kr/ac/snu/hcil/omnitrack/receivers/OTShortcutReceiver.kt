@@ -65,6 +65,10 @@ class OTShortcutReceiver : BroadcastReceiver() {
             {
 
             }
+
+            OTApplication.BROADCAST_ACTION_SHORTCUT_TRACKER_INFO_CHANGED -> {
+                refreshNotificationShortcutViews(context)
+            }
         }
     }
 

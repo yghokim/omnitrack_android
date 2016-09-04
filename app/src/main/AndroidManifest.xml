@@ -53,6 +53,8 @@
                 <action android:name="kr.ac.snu.hcil.omnitrack.action.SHORTCUT_OPEN_TRACKER" />
                 <action android:name="kr.ac.snu.hcil.omnitrack.action.SHORTCUT_INCLUDE_TRACKER" />
                 <action android:name="kr.ac.snu.hcil.omnitrack.action.SHORTCUT_EXCLUDE_TRACKER" />
+                <action android:name="kr.ac.snu.hcil.omnitrack.action.SHORTCUT_TRACKER_INFO_CHANGED" />
+
             </intent-filter>
         </receiver>
 

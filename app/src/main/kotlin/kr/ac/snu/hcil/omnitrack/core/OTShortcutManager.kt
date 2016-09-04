@@ -8,6 +8,13 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
  */
 object OTShortcutManager {
 
+    fun notifyAppearanceChanged(tracker: OTTracker) {
+        val intent = Intent(OTApplication.BROADCAST_ACTION_SHORTCUT_TRACKER_INFO_CHANGED)
+        intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
+
+        OTApplication.app.sendBroadcast(intent)
+    }
+
     operator fun plusAssign(tracker: OTTracker)
     {
         val intent = Intent(OTApplication.BROADCAST_ACTION_SHORTCUT_INCLUDE_TRACKER)

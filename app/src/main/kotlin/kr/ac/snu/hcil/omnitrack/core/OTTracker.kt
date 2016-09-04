@@ -39,6 +39,8 @@ class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color
     {
         prop, old, new ->
         if (old != new) {
+            colorChanged.invoke(this, new)
+            OTShortcutManager.notifyAppearanceChanged(this)
             isDirtySinceLastSync = true
         }
     }
@@ -64,6 +66,8 @@ class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color
 
     val attributeAdded = Event<ReadOnlyPair<OTAttribute<out Any>, Int>>()
     val attributeRemoved = Event<ReadOnlyPair<OTAttribute<out Any>, Int>>()
+
+    val colorChanged = Event<Int>()
 
     constructor(): this(null, null, "New Tracker")
 
@@ -100,6 +104,11 @@ class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color
         }
 
         isDirtySinceLastSync = true
+    }
+
+    override fun onNameChanged(newName: String) {
+        super.onNameChanged(newName)
+        OTShortcutManager.notifyAppearanceChanged(this)
     }
 
     private fun onAttributeAdded(new: OTAttribute<out Any>, index: Int) {
