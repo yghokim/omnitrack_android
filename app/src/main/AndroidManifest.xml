@@ -13,6 +13,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:name=".OTApplication"
@@ -42,19 +43,31 @@
         <receiver android:name=".receivers.OTSystemReceiver">
             <intent-filter>
                 <action android:name="kr.ac.snu.hcil.omnitrack.action.ALARM" />
+                <action android:name="kr.ac.snu.hcil.omnitrack.action.SHORTCUT_REFRESH" />
             </intent-filter>
         </receiver>
 
         <receiver
-            android:name=".receivers.OTShortcutReceiver"
+            android:name=".receivers.PackageReceiver"
+            android:enabled="true"
             android:exported="false">
             <intent-filter>
-                <action android:name="kr.ac.snu.hcil.omnitrack.action.SHORTCUT_PUSH_NOW" />
-                <action android:name="kr.ac.snu.hcil.omnitrack.action.SHORTCUT_OPEN_TRACKER" />
-                <action android:name="kr.ac.snu.hcil.omnitrack.action.SHORTCUT_INCLUDE_TRACKER" />
-                <action android:name="kr.ac.snu.hcil.omnitrack.action.SHORTCUT_EXCLUDE_TRACKER" />
-                <action android:name="kr.ac.snu.hcil.omnitrack.action.SHORTCUT_TRACKER_INFO_CHANGED" />
+                <action android:name="android.intent.action.PACKAGE_ADDED" />
+                <action android:name="android.intent.action.PACKAGE_REMOVED" />
+                <action android:name="android.intent.action.PACKAGE_REPLACED" />
+                <data android:scheme="package" />
+            </intent-filter>
+        </receiver>
 
+        <receiver
+            android:name=".receivers.RebootReceiver"
+            android:enabled="true"
+            android:exported="false"
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+
+                <category android:name="ANDROID.INTENT.CATEGORY.HOME" />
             </intent-filter>
         </receiver>
 

@@ -4,6 +4,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.core.OTShortcutManager
+import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTriggerAlarmManager
 
 /**
@@ -23,13 +25,12 @@ class OTSystemReceiver : BroadcastReceiver() {
 
                 OTTimeTriggerAlarmManager.notifyAlarmFired(alarmId, triggerTime, System.currentTimeMillis())
 
-                /*
-                val trigger = OTApplication.app.triggerManager.getTriggerWithId(triggerId)
-                if (trigger != null) {
-                    println("alarm of ${trigger.name}")
-                    trigger?.fire(intent.getLongExtra(OTTimeTrigger.INTENT_EXTRA_TRIGGER_TIME, System.currentTimeMillis()))
-                }*/
             }
+
+            OTApplication.BROADCAST_ACTION_SHORTCUT_REFRESH->{
+                OTShortcutManager.refreshNotificationShortcutViews(context)
+            }
+
         }
     }
 
