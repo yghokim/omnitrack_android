@@ -9,7 +9,7 @@ import kotlin.properties.Delegates
 /**
  * Created by younghokim on 16. 7. 12..
  */
-abstract class OTProperty<T>(initialValue: T, val key: Int, val title: String) : ISerializableValueContainer {
+abstract class OTProperty<T>(initialValue: T, val key: Int, val title: String?) : ISerializableValueContainer {
 
     data class PropertyChangedEventArgs<T>(val key: Int, val old: T, val new: T)
 
@@ -31,7 +31,8 @@ abstract class OTProperty<T>(initialValue: T, val key: Int, val title: String) :
 
     fun buildView(context: Context): APropertyView<T> {
         val view = onBuildView(context)
-        view.title = title
+        if (title != null)
+            view.title = title
         view.value = value
         return view
     }

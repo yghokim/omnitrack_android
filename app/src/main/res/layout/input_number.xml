@@ -34,17 +34,17 @@
         <ImageButton
             android:id="@+id/ui_button_minus"
             style="@style/whiteMinusButtonStyle"
-            android:layout_width="@dimen/button_height_normal"
-            android:layout_height="@dimen/button_height_normal"
+            android:layout_width="@dimen/button_height_small"
+            android:layout_height="@dimen/button_height_small"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="8dp"
+            android:layout_marginLeft="4dp"
             android:layout_toStartOf="@+id/ui_button_plus" />
 
         <ImageButton
             android:id="@+id/ui_button_plus"
             style="@style/whitePlusButtonStyle"
-            android:layout_width="@dimen/button_height_normal"
-            android:layout_height="@dimen/button_height_normal"
+            android:layout_width="@dimen/button_height_small"
+            android:layout_height="@dimen/button_height_small"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:layout_marginLeft="5dp" />

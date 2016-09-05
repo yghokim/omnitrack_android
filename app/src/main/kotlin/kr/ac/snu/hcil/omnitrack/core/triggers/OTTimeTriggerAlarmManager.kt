@@ -4,7 +4,6 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.widget.Toast
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.receivers.OTSystemReceiver
 import kr.ac.snu.hcil.omnitrack.utils.FillingIntegerIdReservationTable
@@ -178,7 +177,7 @@ object OTTimeTriggerAlarmManager {
 
         //validation
         if (idTable.getKeyFromId(alarmId) == intentTriggerTime) {
-            Toast.makeText(OTApplication.app, "Alarm fired: ${reservationTable[intentTriggerTime]?.size ?: 0} triggers are reserved for this alarm.", Toast.LENGTH_SHORT).show()
+            //Toast.makeText(OTApplication.app, "Alarm fired: ${reservationTable[intentTriggerTime]?.size ?: 0} triggers are reserved for this alarm.", Toast.LENGTH_SHORT).show()
 
             println("${reservationTable[intentTriggerTime]?.size ?: 0} triggers are reserved for this alarm.")
 

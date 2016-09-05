@@ -1,6 +1,11 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes
 
 import android.content.Context
+import android.graphics.Typeface
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.StyleSpan
+import android.text.style.TextAppearanceSpan
 import android.util.AttributeSet
 import android.view.KeyEvent
 import android.view.View
@@ -9,22 +14,16 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.utils.NumberStyle
 import kr.ac.snu.hcil.omnitrack.utils.isNumericPrimitive
 import kr.ac.snu.hcil.omnitrack.utils.toBigDecimal
 import java.math.BigDecimal
-import java.math.RoundingMode
-import java.text.DecimalFormat
 import kotlin.properties.Delegates
 
 /**
  * Created by Young-Ho Kim on 2016-07-22.
  */
 class NumberInputView(context: Context, attrs: AttributeSet? = null) : AAttributeInputView<BigDecimal>(R.layout.input_number, context, attrs) {
-    companion object {
-        const val UNIT_POSITOIN_NONE = 0
-        const val UNIT_POSITOIN_FRONT = 1
-        const val UNIT_POSITOIN_END = 2
-    }
 
     override val typeId: Int = VIEW_TYPE_NUMBER
     override var value: BigDecimal = BigDecimal("0")
@@ -42,35 +41,14 @@ class NumberInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
     private lateinit var decreaseButton: View
     private lateinit var valueField: EditText
     private lateinit var valueStatic: TextView
-    var numDigitsUnderPoint: Int = 3
-        set(value) {
-            if (field != value) {
-                field = value
-                updateFormat()
-            }
-        }
 
-    var commasPerDigit: Int = 3
-        set(value) {
-            if (field != value) {
-                field = value
-                updateFormat()
-            }
-        }
+    private val formattedInformation = NumberStyle.FormattedInformation(null, "", NumberStyle.UnitPosition.None)
 
-    var unitText: String = ""
+    var numberStyle: NumberStyle = NumberStyle()
         set(value) {
             if (field != value) {
                 field = value
-                updateFormat()
-            }
-        }
-
-    var unitPosition: Int = UNIT_POSITOIN_NONE
-        set(value) {
-            if (field != value) {
-                field = value
-                updateFormat()
+                applyValueToView()
             }
         }
 
@@ -94,9 +72,6 @@ class NumberInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
         }
     }
 
-    private var hasFractionalPart: Boolean = false
-
-    private val format = DecimalFormat("#,###.###")
 
     private val onButtonClickedHandler = {
         view: View ->
@@ -144,12 +119,11 @@ class NumberInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
         increaseButton.setOnClickListener(onButtonClickedHandler)
         decreaseButton.setOnClickListener(onButtonClickedHandler)
 
-        updateFormat()
-
         applyValueToView()
     }
 
     fun applyValueToView() {
+/*
         valueStatic.text = format.format(value)
         var bigDecimalString = value.toPlainString()
         val decimalPointIndex = bigDecimalString.indexOfFirst { it == '.' }
@@ -161,24 +135,30 @@ class NumberInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
             bigDecimalString.substring(0, bigDecimalString.length)
         }
 
-        valueField.setText(bigDecimalString)
+        valueField.setText(bigDecimalString)*/
+        val formattedText = numberStyle.formatNumber(value, formattedInformation)
+
+        val spanned = SpannableString(formattedText)
+        if (numberStyle.unitPosition != NumberStyle.UnitPosition.None) {
+            spanned.setSpan(TextAppearanceSpan(context, R.style.numberInputViewUnitStyle), formattedInformation.unitPartStart, formattedInformation.unitPartEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+
+        spanned.setSpan(StyleSpan(Typeface.ITALIC), formattedInformation.numberPartStart, formattedInformation.numberPartEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+
+        valueStatic.text = spanned
     }
 
     fun applyFieldValue() {
         try {
-            value = BigDecimal(valueField.text.toString())
+            value = BigDecimal(if (valueField.text.isNotBlank()) {
+                valueField.text.toString()
+            } else {
+                "0"
+            })
         } catch(e: Exception) {
             e.printStackTrace()
         }
-    }
-
-    private fun updateFormat() {
-/*
-        format.groupingSize = commasPerDigit
-        format.maximumFractionDigits = numDigitsUnderPoint
-        format.isDecimalSeparatorAlwaysShown = if(commasPerDigit > 0){true}else{false}
-*/
-        format.roundingMode = RoundingMode.FLOOR
     }
 
     override fun focus() {

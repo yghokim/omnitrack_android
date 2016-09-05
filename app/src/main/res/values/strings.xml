@@ -87,6 +87,18 @@
 
     <string name="msg_item_list_empty_message">No items collected yet.</string>
 
+    <string name="msg_number_style_unit_position">Unit Position</string>
+    <string name="msg_number_style_unit_position_front">Front</string>
+    <string name="msg_number_style_unit_position_rear">Rear</string>
+    <string name="msg_number_style_unit_position_none">None</string>
+    <string name="msg_number_style_unit">Unit Text</string>
+    <string name="msg_number_style_unit_pluralize">Pluralize Unit</string>
+    <string name="msg_number_style_fraction_part">Show Fractional Part</string>
+    <string name="msg_number_style_fraction_part_count">Digits of Fraction</string>
+
+    <string name="msg_number_style_commas">Show Commas</string>
+
+
     <string name="hint_long_text">Write text here</string>
     <string name="hint_short_text">Type in short text here</string>
 

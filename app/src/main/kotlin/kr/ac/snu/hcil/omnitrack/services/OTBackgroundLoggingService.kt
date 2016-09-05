@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.services
 import android.app.IntentService
 import android.content.Context
 import android.content.Intent
+import android.widget.Toast
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilder
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
@@ -49,6 +50,8 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
 
             builder.autoCompleteAsync {
                 OTApplication.app.dbHelper.save(builder.makeItem(), tracker)
+
+                Toast.makeText(OTApplication.app, "${tracker.name} item was logged", Toast.LENGTH_SHORT).show()
             }
         }
     }

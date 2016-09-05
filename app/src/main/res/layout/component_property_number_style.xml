@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/linearLayoutWithHorizontalDivider.Light.Nomargin"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.SelectionPropertyView
+        android:id="@+id/ui_unit_position"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/msg_number_style_unit_position" />
+
+    <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ShortTextPropertyView
+        android:id="@+id/ui_unit_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/msg_number_style_unit" />
+
+    <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.BooleanPropertyView
+        android:id="@+id/ui_pluralize"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/msg_number_style_unit_pluralize" />
+
+    <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.BooleanPropertyView
+        android:id="@+id/ui_show_commas"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/msg_number_style_commas" />
+
+    <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.BooleanPropertyView
+        android:id="@+id/ui_show_fraction"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/msg_number_style_fraction_part" />
+
+
+    <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.NumericUpDownPropertyView
+        android:id="@+id/ui_fractional_count"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:layout_marginTop="12dp"
+        android:text="@string/msg_number_style_fraction_part_count"
+
+        android:visibility="gone" />
+
+</LinearLayout>

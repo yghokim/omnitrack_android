@@ -1,8 +1,10 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes
 
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTSelectionProperty
+import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTNumberStyleProperty
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.NumberInputView
+import kr.ac.snu.hcil.omnitrack.utils.NumberStyle
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import java.math.BigDecimal
 
@@ -22,17 +24,16 @@ class OTNumberAttribute(objectId: String?, dbId: Long?, columnName: String, sett
     override val typeSmallIconResourceId: Int = R.drawable.icon_small_number
 
     override val propertyKeys: Array<Int>
-        get() = arrayOf(DECIMAL_POINTS)
+        get() = arrayOf(NUMBERSTYLE)
 
-    companion object{
-        const val UNIT = 0
-        const val DECIMAL_POINTS = 1
+    companion object {
+        const val NUMBERSTYLE = 0
     }
 
     override fun createProperties() {
-        assignProperty(OTSelectionProperty(DECIMAL_POINTS, "Digits under Decimal Points", arrayOf("None", "1", "2", "3")))
+        assignProperty(OTNumberStyleProperty(NUMBERSTYLE))
     }
-
+/*
     var numDigitsUnderDecimalPoint: Int
         get() = getPropertyValue<Int>(DECIMAL_POINTS)
         set(value) = setPropertyValue(DECIMAL_POINTS, value)
@@ -41,13 +42,14 @@ class OTNumberAttribute(objectId: String?, dbId: Long?, columnName: String, sett
         get() = getPropertyValue<String>(UNIT)
         set(value) = setPropertyValue(UNIT, value)
 
+*/
 
-
+    var numberStyle: NumberStyle
+        get() = getPropertyValue<NumberStyle>(NUMBERSTYLE)
+        set(value) = setPropertyValue(NUMBERSTYLE, value)
 
     override fun formatAttributeValue(value: Any): String {
-        if (value is BigDecimal) {
-            return value.toPlainString()
-        } else return value.toString()
+        return numberStyle.formatNumber(value)
     }
 
     override fun getAutoCompleteValueAsync(resultHandler: (BigDecimal) -> Unit): Boolean {
@@ -56,12 +58,9 @@ class OTNumberAttribute(objectId: String?, dbId: Long?, columnName: String, sett
     }
 
     override fun refreshInputViewUI(inputView: AAttributeInputView<out Any>) {
-        /*if (inputView is NumberInputView) {
-            this.getAutoCompleteValueAsync {
-                result ->
-                inputView.value = result
-            }
-        }*/
+        if (inputView is NumberInputView) {
+            inputView.numberStyle = numberStyle
+        }
     }
 
 }

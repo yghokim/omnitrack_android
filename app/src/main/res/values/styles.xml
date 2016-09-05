@@ -131,7 +131,7 @@
 
     <style name="whitePlusButtonStyle">
         <item name="android:background">@drawable/round_button_background</item>
-        <item name="android:padding">17dp</item>
+        <item name="android:padding">14dp</item>
         <item name="android:scaleType">fitCenter</item>
         <item name="android:src">@drawable/plus_dark</item>
     </style>
@@ -148,7 +148,6 @@
 
     <style name="numberPropertyDigitViewStyle">
         <item name="android:textSize">35sp</item>
-        <item name="android:textStyle">italic</item>
         <item name="android:textColor">@color/colorSecondary</item>
         <item name="android:fontFamily">sans-serif-light</item>
     </style>
@@ -335,11 +334,22 @@
         <item name="android:showDividers">middle</item>
     </style>
 
+    <style name="linearLayoutWithHorizontalDivider.Light.Nomargin" parent="linearLayoutWithHorizontalDivider">
+        <item name="android:divider">@drawable/bottom_separator_thin</item>
+        <item name="android:dividerPadding">0dp</item>
+    </style>
+
     <style name="popupTitle">
         <item name="android:fontFamily">sans-serif-light</item>
         <item name="android:text">Select Type</item>
         <item name="android:textColor">@color/colorPointed</item>
         <item name="android:textSize">22.5sp</item>
+    </style>
+
+    <style name="numberInputViewUnitStyle">
+        <item name="android:textSize">@dimen/number_unit_size</item>
+        <item name="android:textColor">@color/textColorMid</item>
+        <item name="android:textStyle">normal</item>
     </style>
 
 </resources>
