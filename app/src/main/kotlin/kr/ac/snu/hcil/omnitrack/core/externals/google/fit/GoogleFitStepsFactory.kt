@@ -52,7 +52,7 @@ object GoogleFitStepsFactory : GoogleFitService.GoogleFitMeasureFactory() {
         return Measure(serialized)
     }
 
-    class Measure : OTMeasure {
+    class Measure : OTRangeQueriedMeasure {
         override val dataTypeName = TypeStringSerializationHelper.TYPENAME_INT
 
         override val factory: OTMeasureFactory = GoogleFitStepsFactory
@@ -64,9 +64,8 @@ object GoogleFitStepsFactory : GoogleFitService.GoogleFitMeasureFactory() {
             throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
         }
 
-        override fun requestValueAsync(builder: OTItemBuilder, query: OTTimeRangeQuery?, handler: (Any?) -> Unit) {
-            val range = query?.getRange(builder)
-            Task(range!!.first, range.second) {
+        override fun requestValueAsync(start: Long, end: Long, handler: (Any?) -> Unit) {
+            Task(start, end) {
                 steps ->
                 println("result step: $steps")
                 handler.invoke(steps)

@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.triggers
 
 import android.content.Context
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.calculation.AConditioner
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
@@ -32,12 +33,16 @@ class OTEventTrigger(objectId: String?, dbId: Long?, name: String, trackerObject
             }
         }
         set(value) {
-            if (value == null) {
-                measureFactoryCode = ""
-                serializedMeasure = ""
-            } else {
-                measureFactoryCode = value.factoryCode
-                serializedMeasure = value.getSerializedString()
+            if(measure != value) {
+                if (value == null) {
+                    measureFactoryCode = ""
+                    serializedMeasure = ""
+                } else {
+                    measureFactoryCode = value.factoryCode
+                    serializedMeasure = value.getSerializedString()
+                }
+
+                onMeasureChanged()
             }
         }
 
@@ -50,12 +55,16 @@ class OTEventTrigger(objectId: String?, dbId: Long?, name: String, trackerObject
             }
         }
         set(value) {
-            if (value == null) {
-                conditionerType = -1
-                serializedConditioner = ""
-            } else {
-                conditionerType = value.typeCode
-                serializedConditioner = value.getSerializedString()
+            if(conditioner != value) {
+                if (value == null) {
+                    conditionerType = -1
+                    serializedConditioner = ""
+                } else {
+                    conditionerType = value.typeCode
+                    serializedConditioner = value.getSerializedString()
+                }
+
+                onConditionerChanged()
             }
         }
 
@@ -78,11 +87,32 @@ class OTEventTrigger(objectId: String?, dbId: Long?, name: String, trackerObject
 
 
     override fun handleActivationOnSystem(context: Context) {
+        if (isOn) {
+            OTEventTriggerManager.onEventTriggerOn(this)
+        }
     }
 
     override fun handleOff() {
+        OTEventTriggerManager.onEventTriggerOff(this)
     }
 
     override fun handleOn() {
+        if(conditioner== null || measure == null)
+        {
+            isOn = false
+        }
+        else {
+            OTEventTriggerManager.onEventTriggerOn(this)
+        }
+    }
+
+    private fun onMeasureChanged(){
+        OTEventTriggerManager.onEventTriggerOff(this)
+        OTEventTriggerManager.onEventTriggerOn(this)
+    }
+
+    private fun onConditionerChanged(){
+        OTEventTriggerManager.onEventTriggerOff(this)
+        OTEventTriggerManager.onEventTriggerOn(this)
     }
 }

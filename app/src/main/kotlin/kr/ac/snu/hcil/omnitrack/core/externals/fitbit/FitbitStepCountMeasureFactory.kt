@@ -40,7 +40,7 @@ object FitbitStepCountMeasureFactory : OTMeasureFactory() {
     override val nameResourceId: Int = R.string.measure_fitbit_steps_name
 
 
-    class FitbitStepMeasure : OTMeasure {
+    class FitbitStepMeasure : OTRangeQueriedMeasure {
 
         override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_INT
 
@@ -67,10 +67,9 @@ object FitbitStepCountMeasureFactory : OTMeasureFactory() {
             throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
         }
 
-        override fun requestValueAsync(builder: OTItemBuilder, query: OTTimeRangeQuery?, handler: (Any?) -> Unit) {
-            val range = query!!.getRange(builder)
+        override fun requestValueAsync(start: Long, end: Long, handler: (Any?) -> Unit) {
             FitbitService.request(
-                    FitbitService.makeRequestUrlWithCommandAndDate(FitbitService.REQUEST_COMMAND_SUMMARY, Date(range.first)),
+                    FitbitService.makeRequestUrlWithCommandAndDate(FitbitService.REQUEST_COMMAND_SUMMARY, Date(start)),
                     converter)
             {
                 result ->

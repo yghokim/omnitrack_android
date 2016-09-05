@@ -34,7 +34,7 @@ object MisfitSleepMeasureFactory : OTMeasureFactory() {
     override val nameResourceId: Int = R.string.measure_misfit_sleeps_name
     override val descResourceId: Int = R.string.measure_misfit_sleeps_desc
 
-    class MisfitSleepMeasure : OTMeasure {
+    class MisfitSleepMeasure : OTRangeQueriedMeasure {
 
         constructor() : super()
         constructor(serialized: String) : super(serialized)
@@ -47,12 +47,11 @@ object MisfitSleepMeasureFactory : OTMeasureFactory() {
             throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
         }
 
-        override fun requestValueAsync(builder: OTItemBuilder, query: OTTimeRangeQuery?, handler: (Any?) -> Unit) {
+        override fun requestValueAsync(start: Long, end: Long, handler: (Any?) -> Unit) {
             println("Grab Misfit sleep data")
-            val range = query!!.getRange(builder)
             val token = MisfitService.getStoredAccessToken()
             if (token != null) {
-                MisfitApi.getLatestSleepOnDayAsync(token, Date(range.first), Date(range.second - 20))
+                MisfitApi.getLatestSleepOnDayAsync(token, Date(start), Date(end - 20))
                 {
                     result ->
                     println(result)

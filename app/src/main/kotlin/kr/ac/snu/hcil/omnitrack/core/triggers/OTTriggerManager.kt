@@ -63,6 +63,12 @@ class OTTriggerManager(val user: OTUser) {
         return triggers.find { it.objectId == objId }
     }
 
+    fun getFilteredTriggers(filter: (OTTrigger)->Boolean): List<OTTrigger>{
+        return triggers.filter{
+            filter(it)==true
+        }
+    }
+
     fun getAttachedTriggers(tracker: OTTracker): Array<OTTrigger> {
         if (trackerPivotedTriggerListCache.containsKey(tracker.objectId)) {
             //println("triggers cache hit")

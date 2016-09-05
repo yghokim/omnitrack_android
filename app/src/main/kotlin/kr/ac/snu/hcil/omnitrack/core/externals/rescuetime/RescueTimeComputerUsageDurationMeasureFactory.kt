@@ -38,7 +38,7 @@ object RescueTimeComputerUsageDurationMeasureFactory : OTMeasureFactory() {
     override val descResourceId: Int = R.string.measure_rescuetime_computer_usage_desc
 
 
-    class ComputerUsageDurationMeasure : OTMeasure {
+    class ComputerUsageDurationMeasure : OTRangeQueriedMeasure {
         override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_DOUBLE
         override val factory: OTMeasureFactory = RescueTimeComputerUsageDurationMeasureFactory
 
@@ -46,13 +46,12 @@ object RescueTimeComputerUsageDurationMeasureFactory : OTMeasureFactory() {
             throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
         }
 
-        override fun requestValueAsync(builder: OTItemBuilder, query: OTTimeRangeQuery?, handler: (Any?) -> Unit) {
+        override fun requestValueAsync(start:Long, end: Long, handler: (Any?) -> Unit) {
 
-            val range = query!!.getRange(builder)
             val apiKey = RescueTimeService.getStoredApiKey()
 
             if (apiKey != null) {
-                RescueTimeApi.queryUsageDuration(RescueTimeApi.Mode.ApiKey, Date(range.first), Date(range.second - 20))
+                RescueTimeApi.queryUsageDuration(RescueTimeApi.Mode.ApiKey, Date(start), Date(end-1))
                 {
                     result ->
                     println(result)

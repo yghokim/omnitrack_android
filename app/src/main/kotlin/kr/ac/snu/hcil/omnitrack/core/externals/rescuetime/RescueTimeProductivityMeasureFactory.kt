@@ -35,7 +35,7 @@ object RescueTimeProductivityMeasureFactory : OTMeasureFactory() {
     override val nameResourceId: Int = R.string.measure_rescuetime_productivity_name
     override val descResourceId: Int = R.string.measure_rescuetime_productivity_desc
 
-    class ProductivityMeasure : OTMeasure {
+    class ProductivityMeasure : OTRangeQueriedMeasure {
         override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_DOUBLE
         override val factory: OTMeasureFactory = RescueTimeProductivityMeasureFactory
 
@@ -46,13 +46,12 @@ object RescueTimeProductivityMeasureFactory : OTMeasureFactory() {
             throw NotImplementedError("")
         }
 
-        override fun requestValueAsync(builder: OTItemBuilder, query: OTTimeRangeQuery?, handler: (Any?) -> Unit) {
+        override fun requestValueAsync(start:Long, end: Long, handler: (Any?) -> Unit) {
 
-            val range = query!!.getRange(builder)
             val apiKey = RescueTimeService.getStoredApiKey()
 
             if (apiKey != null) {
-                RescueTimeApi.queryProductivityScore(RescueTimeApi.Mode.ApiKey, Date(range.first), Date(range.second - 20))
+                RescueTimeApi.queryProductivityScore(RescueTimeApi.Mode.ApiKey, Date(start), Date(end-1))
                 {
                     result ->
 

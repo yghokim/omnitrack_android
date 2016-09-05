@@ -199,7 +199,7 @@ object OTTimeTriggerAlarmManager {
 
     private fun makeIntent(context: Context, triggerTime: Long, alarmId: Int): PendingIntent {
         val intent = Intent(context, OTSystemReceiver::class.java)
-        intent.action = OTApplication.BROADCAST_ACTION_ALARM
+        intent.action = OTApplication.BROADCAST_ACTION_TIME_TRIGGER_ALARM
         intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_USER, OTApplication.app.currentUser.objectId)
         intent.putExtra(INTENT_EXTRA_ALARM_ID, alarmId)
         intent.putExtra(INTENT_EXTRA_TRIGGER_TIME, triggerTime)

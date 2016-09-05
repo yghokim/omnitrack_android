@@ -38,7 +38,7 @@ object MisfitStepMeasureFactory: OTMeasureFactory() {
     override val descResourceId: Int = R.string.measure_misfit_steps_desc
 
 
-    class MisfitStepMeasure : OTMeasure{
+    class MisfitStepMeasure : OTRangeQueriedMeasure{
 
         override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_INT
 
@@ -51,11 +51,10 @@ object MisfitStepMeasureFactory: OTMeasureFactory() {
             throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
         }
 
-        override fun requestValueAsync(builder: OTItemBuilder, query: OTTimeRangeQuery?, handler: (Any?) -> Unit) {
-            val range = query!!.getRange(builder)
+        override fun requestValueAsync(start: Long, end: Long, handler: (Any?) -> Unit) {
             val token = MisfitService.getStoredAccessToken()
             if (token != null) {
-                MisfitApi.getStepsOnDayAsync(token, Date(range.first), Date(range.second - 20))
+                MisfitApi.getStepsOnDayAsync(token, Date(start), Date(end-1))
                 {
                     result ->
                     println(result)

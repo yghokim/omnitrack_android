@@ -7,6 +7,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.calculation.AConditioner
 import kr.ac.snu.hcil.omnitrack.utils.INameDescriptionResourceProvider
+import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 import kr.ac.snu.hcil.omnitrack.utils.serialization.ATypedQueueSerializable
 
 /**
@@ -64,5 +65,23 @@ abstract class OTMeasureFactory() : INameDescriptionResourceProvider {
 
         abstract fun awaitRequestValue(query: OTTimeRangeQuery?): Any
         abstract fun requestValueAsync(builder: OTItemBuilder, query: OTTimeRangeQuery?, handler: (Any?) -> Unit)
+        abstract fun requestLatestValueAsync(handler: (Any?) -> Unit)
+    }
+
+    abstract class OTRangeQueriedMeasure: OTMeasure{
+        constructor() : super()
+        constructor(serialized: String) : super(serialized)
+
+        abstract fun requestValueAsync(start: Long, end: Long, handler: (Any?) -> Unit)
+        override final fun requestValueAsync(builder: OTItemBuilder, query: OTTimeRangeQuery?, handler: (Any?) -> Unit) {
+
+            val range = query!!.getRange(builder)
+            requestValueAsync(range.first, range.second, handler)
+        }
+
+        override final fun requestLatestValueAsync(handler: (Any?) -> Unit) {
+            val range = TimeHelper.getTodayRange()
+            requestValueAsync(range.first, range.second, handler)
+        }
     }
 }

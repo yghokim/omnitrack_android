@@ -38,8 +38,7 @@ object FitbitRecentSleepTimeMeasureFactory : OTMeasureFactory() {
     override val descResourceId: Int = R.string.measure_fitbit_sleep_time_desc
     override val nameResourceId: Int = R.string.measure_fitbit_sleep_time_name
 
-    class FitbitRecentSleepTimeMeasure : OTMeasure {
-
+    class FitbitRecentSleepTimeMeasure : OTRangeQueriedMeasure {
 
         override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_TIMESPAN
         override val factory: OTMeasureFactory = FitbitRecentSleepTimeMeasureFactory
@@ -74,9 +73,8 @@ object FitbitRecentSleepTimeMeasureFactory : OTMeasureFactory() {
             throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
         }
 
-        override fun requestValueAsync(builder: OTItemBuilder, query: OTTimeRangeQuery?, handler: (Any?) -> Unit) {
-            val range = query!!.getRange(builder)
-            val uri = HttpUrl.parse(FitbitService.makeRequestUrlWithCommandAndDate(FitbitService.REQUEST_COMMAND_SLEEP, Date(range.first)))
+        override fun requestValueAsync(start: Long, end: Long, handler: (Any?) -> Unit) {
+            val uri = HttpUrl.parse(FitbitService.makeRequestUrlWithCommandAndDate(FitbitService.REQUEST_COMMAND_SLEEP, Date(start)))
                     .newBuilder()
                     .addQueryParameter("isMainSleep", "true")
                     .build()
@@ -88,6 +86,7 @@ object FitbitRecentSleepTimeMeasureFactory : OTMeasureFactory() {
                 handler.invoke(result)
             }
         }
+
 
         override fun onDeserialize(typedQueue: SerializableTypedQueue) {
         }

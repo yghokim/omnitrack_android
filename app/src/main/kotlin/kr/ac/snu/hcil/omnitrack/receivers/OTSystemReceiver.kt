@@ -6,6 +6,7 @@ import android.content.Intent
 import android.widget.Toast
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTShortcutManager
+import kr.ac.snu.hcil.omnitrack.core.triggers.OTEventTriggerManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTriggerAlarmManager
 
 /**
@@ -17,7 +18,7 @@ class OTSystemReceiver : BroadcastReceiver() {
 
         println("OmniTrack system receiver received Intent: - ${intent.action}")
         when (intent.action) {
-            OTApplication.BROADCAST_ACTION_ALARM -> {
+            OTApplication.BROADCAST_ACTION_TIME_TRIGGER_ALARM -> {
                 //triggerId: String, UserId: String, alarmId: Int
                 //val userId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_USER)
                 val alarmId = intent.getIntExtra(OTTimeTriggerAlarmManager.INTENT_EXTRA_ALARM_ID, -1)
@@ -37,6 +38,9 @@ class OTSystemReceiver : BroadcastReceiver() {
                     Toast.makeText(OTApplication.app, "${tracker.name} item was logged", Toast.LENGTH_SHORT).show()
             }
 
+            OTApplication.BROADCAST_ACTION_EVENT_TRIGGER_CHECK_ALARM->{
+                OTEventTriggerManager.checkMeasures(context)
+            }
         }
     }
 

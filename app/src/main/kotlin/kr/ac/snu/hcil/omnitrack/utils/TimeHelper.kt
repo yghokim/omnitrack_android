@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.utils
 import android.content.Context
 import android.text.format.DateUtils
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.OTTimeRangeQuery
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -27,6 +28,23 @@ object TimeHelper {
 
     fun addDays(timestamp: Long, days: Int): Long {
         return timestamp + days * daysInMilli
+    }
+
+    fun getTodayRange(): Pair<Long, Long>{
+        val cal = Calendar.getInstance()
+        cal.set(Calendar.MILLISECOND, 0)
+        cal.set(Calendar.SECOND, 0)
+        cal.set(Calendar.MINUTE, 0)
+
+        cal.set(Calendar.HOUR_OF_DAY, 0)
+
+        val start = cal.timeInMillis
+
+        cal.add(Calendar.DAY_OF_YEAR, 1)
+
+        val end = cal.timeInMillis
+
+        return Pair(start, end)
     }
 
     fun cutTimePartFromEpoch(timestamp: Long): Long {
