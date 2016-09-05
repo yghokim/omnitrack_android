@@ -24,7 +24,7 @@
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
         android:layout_gravity="center_vertical"
-        android:layout_marginLeft="8dp"
+        android:layout_marginLeft="12dp"
         android:layout_weight="1"
         android:background="@drawable/text_field_singleline"
         android:ems="10"

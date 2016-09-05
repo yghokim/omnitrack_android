@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditionerviews
 
 import android.content.Context
+import android.support.v7.widget.AppCompatImageView
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -50,7 +51,7 @@ class SingleNumericConditionerSettingView : LinearLayout {
 
     }
 
-    inner class ComparisonMethodAdapter : ArrayAdapter<SingleNumericComparison.ComparisonMethod>(context, R.layout.simple_list_element_single_big_text,
+    inner class ComparisonMethodAdapter : ArrayAdapter<SingleNumericComparison.ComparisonMethod>(context, R.layout.simple_list_element_single_big_icon,
             SingleNumericComparison.ComparisonMethod.values()) {
 
 
@@ -65,7 +66,7 @@ class SingleNumericConditionerSettingView : LinearLayout {
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
 
             val view = convertView ?:
-                    LayoutInflater.from(parent.context).inflate(R.layout.simple_list_element_single_big_text, parent, false)
+                    LayoutInflater.from(parent.context).inflate(R.layout.simple_list_element_single_big_icon, parent, false)
 
             if (view.tag !is MethodViewHolder) {
                 view.tag = MethodViewHolder(view)
@@ -78,14 +79,14 @@ class SingleNumericConditionerSettingView : LinearLayout {
 
         inner class MethodViewHolder(val view: View) {
 
-            private val textView: TextView
+            private val iconView: AppCompatImageView
 
             init {
-                textView = view.findViewById(R.id.textView) as TextView
+                iconView = view.findViewById(R.id.textView) as AppCompatImageView
             }
 
             fun bind(method: SingleNumericComparison.ComparisonMethod) {
-                textView.text = method.symbol
+                iconView.setImageResource(method.symbolImageResourceId)
             }
         }
     }

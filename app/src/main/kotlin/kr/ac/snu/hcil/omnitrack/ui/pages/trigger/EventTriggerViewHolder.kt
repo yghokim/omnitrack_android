@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import kr.ac.snu.hcil.omnitrack.core.calculation.SingleNumericComparison
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTEventTrigger
 
 /**
@@ -22,7 +23,12 @@ class EventTriggerViewHolder : ATriggerViewHolder<OTEventTrigger> {
     }
 
     override fun getHeaderView(current: View?, trigger: OTEventTrigger): View {
-        return TextView(itemView.context)
+
+        val view = if (current is EventTriggerDisplayView) current else EventTriggerDisplayView(itemView.context)
+        view.setConditioner(trigger.conditioner as? SingleNumericComparison)
+        view.setMeasureFactory(trigger.measure?.factory)
+
+        return view
     }
 
     override fun initExpandedViewContent(): View {
@@ -38,8 +44,6 @@ class EventTriggerViewHolder : ATriggerViewHolder<OTEventTrigger> {
 
     override fun updateTriggerWithViewSettings(expandedView: View, trigger: OTEventTrigger) {
         if (expandedView is EventTriggerConfigurationPanel) {
-            println(expandedView.conditioner)
-            println(expandedView.selectedMeasureFactory?.typeCode)
             trigger.conditioner = expandedView.conditioner
             trigger.measure = expandedView.selectedMeasureFactory?.makeMeasure()
         }

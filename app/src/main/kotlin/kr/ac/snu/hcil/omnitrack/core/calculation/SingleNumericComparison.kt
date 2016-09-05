@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.calculation
 
+import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.convertNumericToDouble
 import kr.ac.snu.hcil.omnitrack.utils.isNumericPrimitive
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableTypedQueue
@@ -11,11 +12,11 @@ class SingleNumericComparison : AConditioner {
 
     override val typeCode: Int = AConditioner.TYPECODE_SINGLE_NUMERIC_COMPARISON
 
-    enum class ComparisonMethod(val symbol: String) {
-        BiggerThan("≧"), BiggerOrEqual(">"), Equal("="), SmallerOfEqual("≦"), SmallerThan("<")
+    enum class ComparisonMethod(val symbol: String, val symbolImageResourceId: Int) {
+        BiggerThan(">", R.drawable.symbol_bigger), BiggerOrEqual("≧", R.drawable.symbol_bigger_or_equal), Equal("=", R.drawable.symbol_equal), SmallerOfEqual("≦", R.drawable.symbol_smaller_or_equal), SmallerThan("<", R.drawable.symbol_smaller)
     }
 
-    var comparedTo: Double = 100.0
+    var comparedTo: Double = 10.0
 
     var method: ComparisonMethod = ComparisonMethod.BiggerThan
 
@@ -45,6 +46,10 @@ class SingleNumericComparison : AConditioner {
     override fun onSerialize(typedQueue: SerializableTypedQueue) {
         typedQueue.putInt(method.ordinal)
         typedQueue.putDouble(comparedTo)
+    }
+
+    override fun toString(): String {
+        return "Single Numeric Comparison: ${method} ${comparedTo}"
     }
 
 }

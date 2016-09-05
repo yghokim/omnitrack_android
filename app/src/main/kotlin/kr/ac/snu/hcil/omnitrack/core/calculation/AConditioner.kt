@@ -20,7 +20,11 @@ abstract class AConditioner : ATypedQueueSerializable {
 
         fun makeInstance(typeCode: Int, serialized: String): AConditioner? {
             return when (typeCode) {
-                TYPECODE_SINGLE_NUMERIC_COMPARISON -> SingleNumericComparison(serialized)
+                TYPECODE_SINGLE_NUMERIC_COMPARISON -> {
+                    val result = SingleNumericComparison()
+                    result.fromSerializedString(serialized)
+                    result
+                }
                 else -> null
             }
         }
