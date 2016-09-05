@@ -26,15 +26,23 @@ class EventTriggerViewHolder : ATriggerViewHolder<OTEventTrigger> {
     }
 
     override fun initExpandedViewContent(): View {
-        return TextView(itemView.context)
+        return EventTriggerConfigurationPanel(itemView.context)
     }
 
     override fun updateExpandedViewContent(expandedView: View, trigger: OTEventTrigger) {
-
+        if (expandedView is EventTriggerConfigurationPanel) {
+            expandedView.conditioner = trigger.conditioner
+            expandedView.selectedMeasureFactory = trigger.measure?.factory
+        }
     }
 
     override fun updateTriggerWithViewSettings(expandedView: View, trigger: OTEventTrigger) {
-
+        if (expandedView is EventTriggerConfigurationPanel) {
+            println(expandedView.conditioner)
+            println(expandedView.selectedMeasureFactory?.typeCode)
+            trigger.conditioner = expandedView.conditioner
+            trigger.measure = expandedView.selectedMeasureFactory?.makeMeasure()
+        }
     }
 
     override fun validateExpandedViewInputs(expandedView: View, errorMessagesOut: MutableList<String>): Boolean {

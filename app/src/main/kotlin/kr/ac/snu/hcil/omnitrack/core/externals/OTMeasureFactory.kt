@@ -33,6 +33,8 @@ abstract class OTMeasureFactory() : INameDescriptionResourceProvider {
     abstract fun isAttachableTo(attribute: OTAttribute<out Any>): Boolean
 
     abstract val isRangedQueryAvailable: Boolean
+    abstract val isDemandingUserInput: Boolean
+
 
     abstract fun makeMeasure(): OTMeasure
     abstract fun makeMeasure(serialized: String): OTMeasure

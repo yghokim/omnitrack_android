@@ -29,4 +29,8 @@
 
     <string name="msg_trigger_attached_trackers">Assigned Trackers</string>
 
+    <string name="msg_trigger_event_measure_selection">Select Measure</string>
+    <string name="msg_trigger_event_comparison_method">Comparison Settings</string>
+
+
 </resources>

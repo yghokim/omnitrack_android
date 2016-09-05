@@ -46,13 +46,13 @@ class OTEventTrigger(objectId: String?, dbId: Long?, name: String, trackerObject
             val s = serializedConditioner
             if (s.isNullOrBlank()) return null
             else {
-                return AConditioner.makeInstance(conditionerType)
+                return AConditioner.makeInstance(conditionerType, s)
             }
         }
         set(value) {
             if (value == null) {
                 conditionerType = -1
-                serializedMeasure = ""
+                serializedConditioner = ""
             } else {
                 conditionerType = value.typeCode
                 serializedConditioner = value.getSerializedString()

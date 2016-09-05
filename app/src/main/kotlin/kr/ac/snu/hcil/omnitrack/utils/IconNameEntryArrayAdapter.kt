@@ -27,8 +27,7 @@ class IconNameEntryArrayAdapter : ArrayAdapter<IconNameEntryArrayAdapter.Entry> 
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
 
-        val view = convertView ?:
-                LayoutInflater.from(parent.context).inflate(R.layout.simple_list_element_icon_name, parent, false)
+        val view = convertView ?: LayoutInflater.from(parent.context).inflate(R.layout.simple_list_element_icon_name, parent, false)
 
         if (view.tag !is ViewHolder) {
             view.tag = ViewHolder(view)

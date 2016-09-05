@@ -32,6 +32,7 @@ class MicrosoftBandHeartRateFactory : OTMeasureFactory() {
     }
 
     override val isRangedQueryAvailable: Boolean = false
+    override val isDemandingUserInput: Boolean = false
 
     override val nameResourceId: Int = R.string.measure_microsoft_band_heart_rate_name
     override val descResourceId: Int = R.string.measure_microsoft_band_heart_rate_desc

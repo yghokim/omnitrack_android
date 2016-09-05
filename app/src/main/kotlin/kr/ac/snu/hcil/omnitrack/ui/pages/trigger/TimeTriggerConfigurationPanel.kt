@@ -74,6 +74,7 @@ class TimeTriggerConfigurationPanel : LinearLayout, IEventListener<Int>, Compoun
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
     init {
+        //TODO change to merge
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         addView(inflater.inflate(R.layout.component_time_trigger_config_panel, this, false))
         orientation = LinearLayout.VERTICAL

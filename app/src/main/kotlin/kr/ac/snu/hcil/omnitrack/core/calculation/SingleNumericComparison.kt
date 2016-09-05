@@ -11,8 +11,8 @@ class SingleNumericComparison : AConditioner {
 
     override val typeCode: Int = AConditioner.TYPECODE_SINGLE_NUMERIC_COMPARISON
 
-    enum class ComparisonMethod {
-        BiggerThan, SmallerThan, BiggerOrEqual, SmallerOfEqual, Equal
+    enum class ComparisonMethod(val symbol: String) {
+        BiggerThan("≧"), BiggerOrEqual(">"), Equal("="), SmallerOfEqual("≦"), SmallerThan("<")
     }
 
     var comparedTo: Double = 100.0
@@ -37,6 +37,7 @@ class SingleNumericComparison : AConditioner {
 
 
     override fun onDeserialize(typedQueue: SerializableTypedQueue) {
+        println("deserialize comparison")
         method = ComparisonMethod.values()[typedQueue.getInt()]
         comparedTo = typedQueue.getDouble()
     }

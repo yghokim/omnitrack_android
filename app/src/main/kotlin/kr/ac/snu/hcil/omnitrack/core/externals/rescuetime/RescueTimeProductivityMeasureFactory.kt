@@ -22,6 +22,8 @@ object RescueTimeProductivityMeasureFactory : OTMeasureFactory() {
 
     override val isRangedQueryAvailable: Boolean = true
 
+    override val isDemandingUserInput: Boolean = false
+
     override fun makeMeasure(): OTMeasure {
         return ProductivityMeasure()
     }

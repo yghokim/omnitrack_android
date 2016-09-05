@@ -29,6 +29,7 @@ object GoogleFitStepsFactory : GoogleFitService.GoogleFitMeasureFactory() {
     override val service: OTExternalService = GoogleFitService
 
     override val isRangedQueryAvailable: Boolean = true
+    override val isDemandingUserInput: Boolean = false
 
     override val nameResourceId: Int = R.string.measure_googlefit_steps_name
 
