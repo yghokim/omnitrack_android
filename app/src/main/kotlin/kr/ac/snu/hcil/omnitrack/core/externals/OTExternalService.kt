@@ -7,7 +7,6 @@ import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.support.v4.app.Fragment
 import kr.ac.snu.hcil.omnitrack.OTApplication
-import kr.ac.snu.hcil.omnitrack.core.externals.device.AndroidDeviceService
 import kr.ac.snu.hcil.omnitrack.core.externals.fitbit.FitbitService
 import kr.ac.snu.hcil.omnitrack.core.externals.google.fit.GoogleFitService
 import kr.ac.snu.hcil.omnitrack.core.externals.microsoft.band.MicrosoftBandService
@@ -43,6 +42,20 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
                     ,MicrosoftBandService
                     ,MiBandService
             )
+        }
+
+        fun getFilteredMeasureFactories(filter: (OTMeasureFactory) -> Boolean): List<OTMeasureFactory> {
+
+            val list = ArrayList<OTMeasureFactory>()
+            for (service in OTExternalService.availableServices) {
+                for (factory in service.measureFactories) {
+                    if (filter(factory)) {
+                        list.add(factory)
+                    }
+                }
+            }
+
+            return list
         }
 
         fun getMeasureFactoryByCode(typeCode: String): OTMeasureFactory? {

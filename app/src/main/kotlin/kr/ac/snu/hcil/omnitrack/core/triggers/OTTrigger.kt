@@ -35,6 +35,7 @@ abstract class OTTrigger(objectId: String?, dbId: Long?, name: String,
         fun makeInstance(objectId: String?, dbId: Long?, typeId: Int, name: String, trackerObjectIds: Array<String>, isOn: Boolean, action: Int, lastTriggeredTime: Long, serializedProperties: String?): OTTrigger {
             return when (typeId) {
                 TYPE_TIME -> OTTimeTrigger(objectId, dbId, name, trackerObjectIds, isOn, action, lastTriggeredTime, serializedProperties)
+                TYPE_SERVICE_EVENT -> OTEventTrigger(objectId, dbId, name, trackerObjectIds, isOn, action, lastTriggeredTime, serializedProperties)
                 else -> throw Exception("wrong trigger type : $typeId")
             }
         }

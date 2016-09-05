@@ -14,6 +14,9 @@ import java.util.*
  * Created by Young-Ho Kim on 2016-09-02.
  */
 object RescueTimeComputerUsageDurationMeasureFactory : OTMeasureFactory() {
+
+    override val supportedConditionerTypes: IntArray = CONDITIONERS_FOR_SINGLE_NUMERIC_VALUE
+
     override val service: OTExternalService = RescueTimeService
 
     override fun isAttachableTo(attribute: OTAttribute<out Any>): Boolean {

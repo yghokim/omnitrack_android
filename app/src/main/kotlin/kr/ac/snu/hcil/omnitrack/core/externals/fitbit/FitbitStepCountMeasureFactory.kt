@@ -16,6 +16,9 @@ import java.util.*
  * Created by younghokim on 16. 9. 3..
  */
 object FitbitStepCountMeasureFactory : OTMeasureFactory() {
+
+    override val supportedConditionerTypes: IntArray = CONDITIONERS_FOR_SINGLE_NUMERIC_VALUE
+
     override fun isAttachableTo(attribute: OTAttribute<out Any>): Boolean {
         return attribute.typeId == OTAttribute.TYPE_NUMBER
     }

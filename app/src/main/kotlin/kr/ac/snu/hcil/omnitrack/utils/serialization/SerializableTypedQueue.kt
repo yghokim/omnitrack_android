@@ -34,6 +34,10 @@ class SerializableTypedQueue() : IStringSerializable {
         putValue(TypeStringSerializationHelper.TYPENAME_INT, value)
     }
 
+    fun putDouble(value: Double) {
+        putValue(TypeStringSerializationHelper.TYPENAME_DOUBLE, value)
+    }
+
     fun putString(value: String) {
         putValue(TypeStringSerializationHelper.TYPENAME_STRING, value)
     }
@@ -53,6 +57,12 @@ class SerializableTypedQueue() : IStringSerializable {
     fun getInt(): Int {
         return getValue(TypeStringSerializationHelper.TYPENAME_INT) as Int
     }
+
+    fun getDouble(): Double {
+        return getValue(TypeStringSerializationHelper.TYPENAME_DOUBLE) as Double
+    }
+
+
 
     fun getString(): String {
         return getValue(TypeStringSerializationHelper.TYPENAME_STRING) as String

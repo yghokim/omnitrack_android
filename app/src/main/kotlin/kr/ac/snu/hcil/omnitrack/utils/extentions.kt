@@ -90,6 +90,19 @@ fun isNumericPrimitive(value: Any): Boolean {
     return value is Int || value is Float || value is Double || value is Long
 }
 
+fun convertNumericToDouble(value: Any): Double {
+    if (value is Int) {
+        return value.toDouble()
+    } else if (value is Long) {
+        return value.toDouble()
+    } else if (value is Float) {
+        return value.toDouble()
+    } else if (value is Double) {
+        return value.toDouble()
+    } else return value.toString().toDouble()
+}
+
+
 fun toBigDecimal(value: Any): BigDecimal {
     if (value is Int) {
         return BigDecimal(value)

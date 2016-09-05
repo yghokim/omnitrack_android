@@ -12,6 +12,9 @@ import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
  * Created by younghokim on 16. 7. 28..
  */
 class MicrosoftBandHeartRateFactory : OTMeasureFactory() {
+
+    override val supportedConditionerTypes: IntArray = CONDITIONERS_FOR_SINGLE_NUMERIC_VALUE
+
     override val service: OTExternalService = MicrosoftBandService
 
     override fun makeMeasure(serialized: String): OTMeasure {

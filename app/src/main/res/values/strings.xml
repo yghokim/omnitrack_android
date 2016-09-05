@@ -139,10 +139,6 @@
     <string name="type_multiple_choices_name">Multiple Choices</string>
     <string name="type_multiple_choices_desc">choose multiple values from list</string>
 
-    <string name="trigger_periodic_name">Time Trigger</string>
-    <string name="trigger_periodic_desc">Fires by specific periods.</string>
-
-
     <string name="title_activity_projects">My Projects</string>
     <string name="title_activity_project_settings">Project Settings</string>
     <string name="title_activity_attribute_detail">Attribute Detail</string>
@@ -150,27 +146,6 @@
     <string name="title_activity_maps">Map</string>
     <string name="title_activity_new_connection">New Connection</string>
 
-    <string name="msg_select_trigger_type">Choose Trigger Type</string>
-
-    <string name="trigger_name_time">Time Trigger</string>
-    <string name="trigger_name_event">Event Trigger</string>
-    <string name="trigger_desc_time">Fires by time-related conditions</string>
-    <string name="trigger_desc_event">Fires when specific event occurs</string>
-
-    <string name="msg_trigger_time_config_type">Period Type</string>
-
-    <string name="msg_trigger_time_config_interval">Interval</string>
-    <string name="msg_trigger_time_config_alarm_time">Trigger time</string>
-
-    <string name="msg_trigger_time_config_repeat_range">Repeat Range</string>
-
-
-    <string name="msg_trigger_time_config_type_name_alram">Triggered at specific time</string>
-    <string name="msg_trigger_time_config_type_name_interval">Repeatedly triggered with interval</string>
-
-    <string name="msg_trigger_time_is_repeated">Repeat</string>
-
-    <string name="msg_trigger_error_interval_not_0">Interval must not be zero.</string>
 
     <string name="msg_connection_wizard_title_source_selection">Choose a data source</string>
     <string name="msg_connection_wizard_title_time_query">Config time query</string>
@@ -192,8 +167,6 @@
     <string name="msg_noti_tap_for_tracking_format">Tap to log new %1$s record.</string>
 
     <string name="msg_no_trackers_are_assigned">No trackers are assigned.</string>
-
-    <string name="msg_trigger_attached_trackers">Assigned Trackers</string>
 
     <string name="msg_pick_tracker">Pick a tracker</string>
 

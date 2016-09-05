@@ -23,6 +23,9 @@ import java.util.concurrent.TimeUnit
  */
 
 object GoogleFitStepsFactory : GoogleFitService.GoogleFitMeasureFactory() {
+
+    override val supportedConditionerTypes: IntArray = CONDITIONERS_FOR_SINGLE_NUMERIC_VALUE
+
     override val service: OTExternalService = GoogleFitService
 
     override val isRangedQueryAvailable: Boolean = true

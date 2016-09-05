@@ -5,6 +5,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilder
 import kr.ac.snu.hcil.omnitrack.core.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
+import kr.ac.snu.hcil.omnitrack.core.calculation.AConditioner
 import kr.ac.snu.hcil.omnitrack.utils.INameDescriptionResourceProvider
 import kr.ac.snu.hcil.omnitrack.utils.serialization.ATypedQueueSerializable
 
@@ -13,11 +14,19 @@ import kr.ac.snu.hcil.omnitrack.utils.serialization.ATypedQueueSerializable
  */
 abstract class OTMeasureFactory() : INameDescriptionResourceProvider {
 
+    companion object {
+        val CONDITIONERS_FOR_SINGLE_NUMERIC_VALUE = intArrayOf(AConditioner.TYPECODE_SINGLE_NUMERIC_COMPARISON)
+        val CONDITIONERS_FOR_TIMEPOINT_VALUE = intArrayOf()
+
+    }
+
     val typeCode: String by lazy {
         this.javaClass.name
     }
 
     abstract val service: OTExternalService
+
+    open val supportedConditionerTypes: IntArray = intArrayOf()
 
     open val requiredPermissions: Array<String> = arrayOf()
 

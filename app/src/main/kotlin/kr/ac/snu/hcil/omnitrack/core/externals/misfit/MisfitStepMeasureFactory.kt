@@ -14,6 +14,9 @@ import java.util.*
  * Created by Young-Ho on 9/2/2016.
  */
 object MisfitStepMeasureFactory: OTMeasureFactory() {
+
+    override val supportedConditionerTypes: IntArray = CONDITIONERS_FOR_SINGLE_NUMERIC_VALUE
+
     override val service: OTExternalService = MisfitService
 
     override fun isAttachableTo(attribute: OTAttribute<out Any>): Boolean {

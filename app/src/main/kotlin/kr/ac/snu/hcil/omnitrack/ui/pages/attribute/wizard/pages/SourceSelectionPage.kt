@@ -16,7 +16,6 @@ import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.AWizardPage
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.wizard.ConnectionWizardView
-import java.util.*
 
 /**
  * Created by Young-Ho Kim on 2016-08-30.
@@ -28,18 +27,17 @@ class SourceSelectionPage(val attribute: OTAttribute<out Any>) : AWizardPage() {
     override val canGoBack: Boolean = false
 
     override val canGoNext: Boolean = true
-    private val sources = ArrayList<SourceInformation>()
+    private val sources: List<SourceInformation>
 
     var selectedInformation: SourceInformation? = null
         private set
 
     init {
-        for (service in OTExternalService.availableServices) {
-            for (factory in service.measureFactories) {
-                if (factory.isAttachableTo(attribute)) {
-                    sources.add(MeasureFactoryInformation(factory))
-                }
-            }
+
+        sources = OTExternalService.getFilteredMeasureFactories {
+            it.isAttachableTo(attribute)
+        }.map {
+            MeasureFactoryInformation(it)
         }
     }
 
