@@ -53,6 +53,8 @@ dependencies {
     compile 'com.badoo.mobile:android-weak-handler:1.1'
     compile 'me.relex:circleindicator:1.2.1@aar'
     compile 'com.squareup.okhttp3:okhttp:3.4.1'
+    compile group: 'org.atteo', name: 'evo-inflector', version: '1.2.1'
+
 
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }
