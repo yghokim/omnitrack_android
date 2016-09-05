@@ -44,6 +44,10 @@
             <intent-filter>
                 <action android:name="kr.ac.snu.hcil.omnitrack.action.ALARM" />
                 <action android:name="kr.ac.snu.hcil.omnitrack.action.SHORTCUT_REFRESH" />
+                <action android:name="kr.ac.snu.hcil.omnitrack.action.ITEM_ADDED" />
+                <action android:name="kr.ac.snu.hcil.omnitrack.action.ITEM_EDITED" />
+                <action android:name="kr.ac.snu.hcil.omnitrack.action.ITEM_REMOVED" />
+
             </intent-filter>
         </receiver>
 

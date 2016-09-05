@@ -3,9 +3,9 @@ package kr.ac.snu.hcil.omnitrack.receivers
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.widget.Toast
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTShortcutManager
-import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTriggerAlarmManager
 
 /**
@@ -29,6 +29,12 @@ class OTSystemReceiver : BroadcastReceiver() {
 
             OTApplication.BROADCAST_ACTION_SHORTCUT_REFRESH->{
                 OTShortcutManager.refreshNotificationShortcutViews(context)
+            }
+
+            OTApplication.BROADCAST_ACTION_ITEM_ADDED -> {
+                val tracker = OTApplication.app.currentUser[intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)]
+                if (tracker != null)
+                    Toast.makeText(OTApplication.app, "${tracker.name} item was logged", Toast.LENGTH_SHORT).show()
             }
 
         }
