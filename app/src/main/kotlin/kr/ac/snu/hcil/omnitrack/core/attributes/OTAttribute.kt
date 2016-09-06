@@ -42,6 +42,8 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
         const val TYPE_LONG_TEXT = 4
         const val TYPE_LOCATION = 5
         const val TYPE_CHOICE = 6
+        const val TYPE_RATING = 7
+        const val TYPE_IMAGE = 8
 
 
         fun createAttribute(objectId: String?, dbId: Long?, columnName: String, typeId: Int, propertyData: String?, connectionData: String?): OTAttribute<out Any> {
@@ -53,6 +55,7 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
                 TYPE_LONG_TEXT -> OTLongTextAttribute(objectId, dbId, columnName, propertyData, connectionData)
                 TYPE_LOCATION -> OTLocationAttribute(objectId, dbId, columnName, propertyData, connectionData)
                 TYPE_CHOICE -> OTChoiceAttribute(objectId, dbId, columnName, propertyData, connectionData)
+                TYPE_RATING -> OTRatingAttribute(objectId, dbId, columnName, propertyData, connectionData)
                 else -> OTNumberAttribute(objectId, dbId, columnName, propertyData, connectionData)
             }
             return attr
