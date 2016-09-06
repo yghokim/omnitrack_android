@@ -15,7 +15,7 @@ class OTShortTextAttribute(objectId: String?, dbId: Long?, columnName: String, s
     override fun createProperties() {
     }
 
-    override val propertyKeys: Array<Int> = Array<Int>(0) { index -> 0 }
+    override val propertyKeys: IntArray = intArrayOf()
 
     override fun formatAttributeValue(value: Any): String {
         return value.toString()

@@ -56,6 +56,7 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
                 TYPE_LOCATION -> OTLocationAttribute(objectId, dbId, columnName, propertyData, connectionData)
                 TYPE_CHOICE -> OTChoiceAttribute(objectId, dbId, columnName, propertyData, connectionData)
                 TYPE_RATING -> OTRatingAttribute(objectId, dbId, columnName, propertyData, connectionData)
+                TYPE_IMAGE -> OTImageAttribute(objectId, dbId, columnName, propertyData, connectionData)
                 else -> OTNumberAttribute(objectId, dbId, columnName, propertyData, connectionData)
             }
             return attr
@@ -69,7 +70,7 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
     val removedFromTracker = Event<OTTracker>()
     val addedToTracker = Event<OTTracker>()
 
-    abstract val propertyKeys: Array<Int>
+    abstract val propertyKeys: IntArray
 
     abstract val typeNameResourceId: Int
 

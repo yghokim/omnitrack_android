@@ -24,6 +24,7 @@ abstract class AAttributeInputView<DataType>(layoutId: Int, context: Context, at
         const val VIEW_TYPE_CHOICE = 7
         const val VIEW_TYPE_RATING_STARS = 8
         const val VIEW_TYPE_RATING_LIKERT = 9
+        const val VIEW_TYPE_IMAGE = 10
 
 
 
@@ -37,6 +38,7 @@ abstract class AAttributeInputView<DataType>(layoutId: Int, context: Context, at
                 VIEW_TYPE_TIME_RANGE_PICKER -> TimeRangePickerInputView(context)
                 VIEW_TYPE_CHOICE -> ChoiceInputView(context)
                 VIEW_TYPE_RATING_STARS -> StarRatingInputView(context)
+                VIEW_TYPE_IMAGE -> ImageInputView(context)
                 else -> throw IllegalArgumentException("attribute view data type ${type} is not supported yet.")
             }
         }

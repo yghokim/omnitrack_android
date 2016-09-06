@@ -32,7 +32,7 @@ class OTChoiceAttribute(objectId: String?, dbId: Long?, columnName: String, prop
         }
     }
 
-    override val propertyKeys: Array<Int> = arrayOf(PROPERTY_MULTISELECTION, PROPERTY_ENTRIES)
+    override val propertyKeys: IntArray = intArrayOf(PROPERTY_MULTISELECTION, PROPERTY_ENTRIES)
 
     override val typeNameResourceId: Int = R.string.type_choice_name
 

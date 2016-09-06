@@ -18,7 +18,7 @@ class OTTimeSpanAttribute(objectId: String?, dbId: Long?, columnName: String, se
         const val PROPERTY_TYPE = 1
     }
 
-    override val propertyKeys: Array<Int> = arrayOf(PROPERTY_GRANULARITY, PROPERTY_TYPE)
+    override val propertyKeys: IntArray = intArrayOf(PROPERTY_GRANULARITY, PROPERTY_TYPE)
 
     override val typeNameResourceId: Int = R.string.type_timespan_name
     override val typeSmallIconResourceId: Int = R.drawable.icon_small_timer

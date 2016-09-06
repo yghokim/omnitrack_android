@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.utils.serialization
 
+import android.net.Uri
 import com.google.android.gms.maps.model.LatLng
 import com.google.gson.Gson
 import kr.ac.snu.hcil.omnitrack.core.datatypes.Route
@@ -37,6 +38,7 @@ object TypeStringSerializationHelper {
     const val TYPENAME_LATITUDE_LONGITUDE = "Crd"
     const val TYPENAME_ROUTE = "R"
     const val TYPENAME_TIMESPAN = "TS"
+    const val TYPENAME_URI = "U"
 
 
 
@@ -54,7 +56,8 @@ object TypeStringSerializationHelper {
             IntArray::class.java.name to TYPENAME_INT_ARRAY,
             LongArray::class.java.name to TYPENAME_LONG_ARRAY,
             LatLng::class.java.name to TYPENAME_LATITUDE_LONGITUDE,
-            Route::class.java.name to TYPENAME_ROUTE
+            Route::class.java.name to TYPENAME_ROUTE,
+            Uri::class.java.name to TYPENAME_URI
     )
 
     private val parcelCache = ParcelWithType("", "")
@@ -115,6 +118,7 @@ object TypeStringSerializationHelper {
             }
             TYPENAME_LATITUDE_LONGITUDE -> deserializeLatLng(parcel.v)
             TYPENAME_ROUTE -> Route(parcel.v)
+            TYPENAME_URI -> Uri.parse(parcel.v)
             else -> return parcel.v
         }
     }

@@ -23,8 +23,7 @@ class OTNumberAttribute(objectId: String?, dbId: Long?, columnName: String, sett
 
     override val typeSmallIconResourceId: Int = R.drawable.icon_small_number
 
-    override val propertyKeys: Array<Int>
-        get() = arrayOf(NUMBERSTYLE)
+    override val propertyKeys: IntArray = intArrayOf(NUMBERSTYLE)
 
     companion object {
         const val NUMBERSTYLE = 0

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="170dp">
+
+    <ImageView
+        android:id="@+id/ui_image_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <android.support.v7.widget.AppCompatImageButton
+        android:id="@+id/ui_button_cancel"
+        android:layout_width="@dimen/button_height_small"
+        android:layout_height="@dimen/button_height_small"
+        android:layout_gravity="top|right"
+        android:background="@drawable/transparent_button_background"
+        android:src="@drawable/ex_dark"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/ui_button_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="horizontal">
+
+        <android.support.v7.widget.AppCompatImageButton
+            android:id="@+id/ui_button_camera"
+            style="@style/whitePlusButtonStyle"
+            android:layout_width="@dimen/button_height_tall"
+            android:layout_height="@dimen/button_height_tall"
+
+            android:padding="16dp"
+            android:src="@drawable/camera"
+            android:tint="@color/buttonIconColorDark" />
+
+        <android.support.v7.widget.AppCompatImageButton
+            android:id="@+id/ui_button_gallery"
+            style="@style/whitePlusButtonStyle"
+            android:layout_width="@dimen/button_height_tall"
+            android:layout_height="@dimen/button_height_tall"
+            android:layout_marginLeft="20dp"
+
+            android:padding="16dp"
+            android:src="@drawable/gallery"
+            android:tint="@color/buttonIconColorDark" />
+    </LinearLayout>
+</FrameLayout>

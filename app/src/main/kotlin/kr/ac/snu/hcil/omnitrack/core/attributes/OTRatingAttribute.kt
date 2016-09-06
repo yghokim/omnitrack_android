@@ -43,7 +43,7 @@ class OTRatingAttribute(objectId: String?, dbId: Long?, columnName: String, sett
         }
     }
 
-    override val propertyKeys: Array<Int> = arrayOf(PROPERTY_DISPLAY_TYPE, PROPERTY_LEVELS, PROPERTY_ALLOW_INTERMEDIATE)
+    override val propertyKeys: IntArray = intArrayOf(PROPERTY_DISPLAY_TYPE, PROPERTY_LEVELS, PROPERTY_ALLOW_INTERMEDIATE)
 
 
     override fun createProperties() {
