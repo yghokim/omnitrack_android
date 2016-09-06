@@ -14,6 +14,10 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:name=".OTApplication"
@@ -39,6 +43,17 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version"
             tools:replace="android:value" />
+
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="kr.ac.snu.hcil.omnitrack.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"/>
+        </provider>
 
         <receiver android:name=".receivers.OTSystemReceiver">
             <intent-filter>

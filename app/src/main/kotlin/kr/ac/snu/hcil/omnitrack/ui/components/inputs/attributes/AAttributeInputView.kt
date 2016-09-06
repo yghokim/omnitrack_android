@@ -44,16 +44,16 @@ abstract class AAttributeInputView<DataType>(layoutId: Int, context: Context, at
         }
 
         fun makeActivityForResultRequestCode(position: Int, requestType: Int): Int {
-            //key is stored in upper 16 bit, type in under 16 bit
-            return (position shl 16) or requestType
+            //key is stored in upper 8 bit, type in under 8 bit
+            return (position shl 8) or requestType
         }
 
         fun getPositionFromRequestCode(requestCode: Int): Int {
-            return (requestCode shr 16) and 0xFFFF
+            return (requestCode shr 8) and 0xFF
         }
 
         fun getRequestTypeFromRequestCode(requestCode: Int): Int {
-            return requestCode and 0xFFFF
+            return requestCode and 0xFF
         }
     }
 
@@ -102,7 +102,7 @@ abstract class AAttributeInputView<DataType>(layoutId: Int, context: Context, at
     /***
      * apply value from external activity result
      */
-    open fun setValueFromActivityResult(intent: Intent, requestType: Int): Boolean {
+    open fun setValueFromActivityResult(data: Intent, requestType: Int): Boolean {
         return false
     }
 }

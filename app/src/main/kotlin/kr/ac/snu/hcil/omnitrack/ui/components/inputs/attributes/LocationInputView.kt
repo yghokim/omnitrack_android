@@ -32,7 +32,7 @@ import kr.ac.snu.hcil.omnitrack.utils.getActivity
 class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttributeInputView<LatLng>(R.layout.component_location_picker, context, attrs), OnMapReadyCallback, View.OnClickListener, LatLngToAddressTask.OnFinishListener, GoogleMap.OnCameraIdleListener {
 
     companion object {
-        const val REQUEST_TYPE_GOOGLE_PLACE_PICKER = 256
+        const val REQUEST_TYPE_GOOGLE_PLACE_PICKER = 2
     }
 
     override val typeId: Int = VIEW_TYPE_LOCATION
@@ -185,9 +185,9 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
         }
     }
 
-    override fun setValueFromActivityResult(intent: Intent, requestType: Int): Boolean {
+    override fun setValueFromActivityResult(data: Intent, requestType: Int): Boolean {
         if (requestType == REQUEST_TYPE_GOOGLE_PLACE_PICKER) {
-            val place = PlacePicker.getPlace(this.context, intent)
+            val place = PlacePicker.getPlace(this.context, data)
             value = place.latLng
             return true
         } else return false

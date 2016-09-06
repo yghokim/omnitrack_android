@@ -52,8 +52,15 @@ class HomeActivity : UserSyncedActivity() {
 
 
         //TODO do permission checks some other place
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) !== PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION), 10)
+
+        val permissions = arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.CAMERA).filter{
+            checkSelfPermission(it) != PackageManager.PERMISSION_GRANTED
+        }.toTypedArray()
+
+        if(permissions.size > 0)
+        {
+            requestPermissions(permissions,
+                    10)
         }
     }
 

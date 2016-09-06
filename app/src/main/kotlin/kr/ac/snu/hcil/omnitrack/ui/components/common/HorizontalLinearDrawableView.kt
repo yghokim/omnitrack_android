@@ -88,14 +88,10 @@ open class HorizontalLinearDrawableView : View {
 
         if (widthMode == MeasureSpec.EXACTLY) {
 
-            println("Exactly")
-
             measuredWidth = widthSize;
             measuredHeight = widthSize / (adapter?.numDrawables ?: 1)
             useIntrinsicWidth = false
         } else if (widthMode == MeasureSpec.AT_MOST) {
-
-            println("At Most")
 
             measuredWidth = Math.min(intrinsicWidth + paddingStart + paddingEnd, widthSize).toInt()
             measuredHeight = measuredWidth / (adapter?.numDrawables ?: 1)

@@ -49,7 +49,9 @@ class OTItemBuilder : ADataRow, IStringSerializable {
         syncFromTrackerScheme()
 
         for (attribute in tracker.attributes) {
-            setValueOf(attribute, item.getValueOf(attribute)!!)
+            if(item.hasValueOf(attribute)) {
+                setValueOf(attribute, item.getValueOf(attribute)!!)
+            }
         }
     }
 

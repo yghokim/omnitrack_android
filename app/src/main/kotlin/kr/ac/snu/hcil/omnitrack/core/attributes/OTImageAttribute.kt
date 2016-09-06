@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.attributes
 import android.net.Uri
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.ImageInputView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 
 /**
@@ -17,6 +18,7 @@ class OTImageAttribute(objectId: String?, dbId: Long?, columnName: String, setti
     }
 
     override fun formatAttributeValue(value: Any): String {
+        println("formatted image uri : ${value.javaClass}")
         return value.toString()
     }
 
@@ -25,9 +27,7 @@ class OTImageAttribute(objectId: String?, dbId: Long?, columnName: String, setti
         return true
     }
 
-    override fun getInputViewType(previewMode: Boolean): Int {
-        throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun getInputViewType(previewMode: Boolean): Int = AAttributeInputView.VIEW_TYPE_IMAGE
 
     override val propertyKeys: IntArray = intArrayOf()
 
@@ -39,6 +39,6 @@ class OTImageAttribute(objectId: String?, dbId: Long?, columnName: String, setti
 
     override val typeNameResourceId: Int = R.string.type_image_name
 
-    override val typeSmallIconResourceId: Int = R.string.type_image_desc
+    override val typeSmallIconResourceId: Int = R.drawable.icon_small_image
 
 }
