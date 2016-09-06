@@ -5,13 +5,14 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTBooleanProperty
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTSelectionProperty
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.StarRatingInputView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 
 /**
  * Created by younghokim on 16. 9. 6..
  */
 class OTRatingAttribute(objectId: String?, dbId: Long?, columnName: String, settingData: String?, connectionData: String?)
-: OTAttribute<Float>(objectId, dbId, columnName, OTAttribute.TYPE_NUMBER, settingData, connectionData) {
+: OTAttribute<Float>(objectId, dbId, columnName, OTAttribute.TYPE_RATING, settingData, connectionData) {
 
     enum class DisplayType(val nameResourceId: Int) {
         Star(R.string.property_rating_display_type_stars),
@@ -26,14 +27,18 @@ class OTRatingAttribute(objectId: String?, dbId: Long?, columnName: String, sett
         const val PROPERTY_DISPLAY_TYPE = 0
         const val PROPERTY_LEVELS = 1
         const val PROPERTY_ALLOW_INTERMEDIATE = 2
-
     }
 
     override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_FLOAT
 
     override val typeNameResourceId: Int = R.string.type_rating_name
 
-    override val typeSmallIconResourceId: Int = R.drawable.field_icon_rating
+    override val typeSmallIconResourceId: Int get() {
+        return when (displayType) {
+            DisplayType.Star -> R.drawable.icon_small_star
+            DisplayType.Likert -> R.drawable.icon_small_star //TODO add Likert icon
+        }
+    }
 
     override val propertyKeys: Array<Int> = arrayOf(PROPERTY_DISPLAY_TYPE, PROPERTY_LEVELS, PROPERTY_ALLOW_INTERMEDIATE)
 
@@ -74,12 +79,19 @@ class OTRatingAttribute(objectId: String?, dbId: Long?, columnName: String, sett
     }
 
     override fun getInputViewType(previewMode: Boolean): Int {
-        return AAttributeInputView.VIEW_TYPE_NUMBER
+        return when (displayType) {
+            DisplayType.Star -> AAttributeInputView.VIEW_TYPE_RATING_STARS
+            DisplayType.Likert -> AAttributeInputView.VIEW_TYPE_RATING_STARS
+        }
     }
 
 
     override fun refreshInputViewUI(inputView: AAttributeInputView<out Any>) {
-
+        if (inputView is StarRatingInputView) {
+            inputView.ratingView.allowIntermediate = allowIntermediate
+            inputView.ratingView.levels = level.maxScore
+            inputView.ratingView.score = level.maxScore / 2.0f
+        }
     }
 
 }

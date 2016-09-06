@@ -25,8 +25,15 @@ abstract class OTProperty<T>(initialValue: T, val key: Int, val title: String?) 
 
     abstract fun parseValue(serialized: String): T
 
-    override fun setValueFromSerializedString(serialized: String) {
-        value = parseValue(serialized)
+    override fun setValueFromSerializedString(serialized: String): Boolean {
+        try {
+            value = parseValue(serialized)
+            return true
+        } catch(e: Exception) {
+            println("Parsing property $title was failed.")
+            e.printStackTrace()
+            return false
+        }
     }
 
     fun buildView(context: Context): APropertyView<T> {
