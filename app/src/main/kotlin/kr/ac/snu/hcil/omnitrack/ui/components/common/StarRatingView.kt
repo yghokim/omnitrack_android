@@ -13,6 +13,13 @@ import kotlin.properties.Delegates
  */
 class StarRatingView : HorizontalLinearDrawableView {
 
+    var isLightMode: Boolean by Delegates.observable(false) {
+        prop, old, new ->
+        if (old != new) {
+            refresh()
+        }
+    }
+
     private var dragging = false
 
     var levels: Int by Delegates.observable(5) {
@@ -56,17 +63,19 @@ class StarRatingView : HorizontalLinearDrawableView {
 
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
 
-        if (event.action == MotionEvent.ACTION_DOWN) {
-            parent.requestDisallowInterceptTouchEvent(true)
-        } else if (event.action == MotionEvent.ACTION_CANCEL || event.action == MotionEvent.ACTION_UP) {
-            parent.requestDisallowInterceptTouchEvent(false)
+        if (!isLightMode) {
+            if (event.action == MotionEvent.ACTION_DOWN) {
+                parent.requestDisallowInterceptTouchEvent(true)
+            } else if (event.action == MotionEvent.ACTION_CANCEL || event.action == MotionEvent.ACTION_UP) {
+                parent.requestDisallowInterceptTouchEvent(false)
+            }
         }
         return super.dispatchTouchEvent(event)
     }
 
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        if (adapter != null) {
+        if (adapter != null && !isLightMode) {
 
             val adapter = adapter!!
 
@@ -120,28 +129,54 @@ class StarRatingView : HorizontalLinearDrawableView {
     inner class StarAdapter : ADrawableAdapter() {
         override val numDrawables: Int get() = levels
 
-        private val emptyDrawable: Drawable
-        private val halfDrawable: Drawable
-        private val fullDrawable: Drawable
+        private val emptyDrawable: Drawable by lazy {
+            resources.getDrawable(R.drawable.rating_star_empty, null)
+        }
+        private val halfDrawable: Drawable by lazy {
+            resources.getDrawable(R.drawable.rating_star_half, null)
+        }
+        private val fullDrawable: Drawable by lazy {
+            resources.getDrawable(R.drawable.rating_star_full, null)
+        }
+
+        private val emptyDrawableSmall: Drawable by lazy {
+            resources.getDrawable(R.drawable.symbol_star_empty, null)
+        }
+        private val halfDrawableSmall: Drawable by lazy {
+            resources.getDrawable(R.drawable.symbol_star_half, null)
+        }
+        private val fullDrawableSmall: Drawable by lazy {
+            resources.getDrawable(R.drawable.symbol_star_full, null)
+        }
 
         init {
-            emptyDrawable = resources.getDrawable(R.drawable.rating_star_empty, null)
-            halfDrawable = resources.getDrawable(R.drawable.rating_star_half, null)
-            fullDrawable = resources.getDrawable(R.drawable.rating_star_full, null)
         }
 
         override fun getDrawable(position: Int): Drawable {
             if (score.toInt() > position) {
-                return fullDrawable
+                return if (!isLightMode) {
+                    fullDrawable
+                } else fullDrawableSmall
             } else if (score.toInt() < position) {
-                return emptyDrawable
+                return if (!isLightMode) {
+                    emptyDrawable
+                } else emptyDrawableSmall
             } else {
                 val fraction = score - score.toInt()
-                return when (discreteFraction(fraction)) {
-                    0f -> emptyDrawable
-                    0.5f -> halfDrawable
-                    1f -> fullDrawable
-                    else -> emptyDrawable
+                if (!isLightMode) {
+                    return when (discreteFraction(fraction)) {
+                        0f -> emptyDrawable
+                        0.5f -> halfDrawable
+                        1f -> fullDrawable
+                        else -> emptyDrawable
+                    }
+                } else {
+                    return when (discreteFraction(fraction)) {
+                        0f -> emptyDrawableSmall
+                        0.5f -> halfDrawableSmall
+                        1f -> fullDrawableSmall
+                        else -> emptyDrawableSmall
+                    }
                 }
             }
         }

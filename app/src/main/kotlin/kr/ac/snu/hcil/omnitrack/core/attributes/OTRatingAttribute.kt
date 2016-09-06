@@ -1,9 +1,12 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes
 
+import android.content.Context
+import android.view.View
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTBooleanProperty
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTSelectionProperty
+import kr.ac.snu.hcil.omnitrack.ui.components.common.StarRatingView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.StarRatingInputView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
@@ -92,6 +95,32 @@ class OTRatingAttribute(objectId: String?, dbId: Long?, columnName: String, sett
             inputView.ratingView.levels = level.maxScore
             inputView.ratingView.score = level.maxScore / 2.0f
         }
+    }
+
+    override fun getViewForItemList(context: Context, recycledView: View?): View {
+
+        val target = if (recycledView is StarRatingView) {
+            recycledView
+        } else {
+            StarRatingView(context)
+        }
+
+        target.isLightMode = true
+        target.overridenIntrinsicWidth = context.resources.getDimensionPixelSize(R.dimen.star_rating_item_list_view_unit_size)
+        target.overridenIntrinsicHeight = target.overridenIntrinsicWidth
+
+        return target
+    }
+
+    override fun applyValueToViewForItemList(value: Any?, view: View): Boolean {
+        if (view is StarRatingView && value != null) {
+            if (value is Float) {
+                view.score = value
+                view.allowIntermediate = allowIntermediate
+                view.levels = level.maxScore
+                return true
+            } else return false
+        } else return super.applyValueToViewForItemList(value, view)
     }
 
 }

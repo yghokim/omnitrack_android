@@ -44,6 +44,7 @@
 
     <dimen name="selection_view_button_spacing">2dp</dimen>
 
+    <dimen name="star_rating_item_list_view_unit_size">25dp</dimen>
 
     <dimen name="button_height_tall">60dp</dimen>
     <dimen name="button_height_normal">50dp</dimen>

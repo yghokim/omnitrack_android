@@ -25,6 +25,20 @@ open class HorizontalLinearDrawableView : View {
             invalidate()
         }
 
+    var overridenIntrinsicWidth: Int? = null
+        set(value) {
+            field = value
+            calculateIntrinsicSize()
+            requestLayout()
+        }
+
+    var overridenIntrinsicHeight: Int? = null
+        set(value) {
+            field = value
+            calculateIntrinsicSize()
+            requestLayout()
+        }
+
     private var contentWidth: Int = 0
     private var contentHeight: Int = 0
 
@@ -51,8 +65,14 @@ open class HorizontalLinearDrawableView : View {
         intrinsicHeight = 0
         if (adapter != null) {
             for (i in 0..adapter!!.numDrawables - 1) {
-                intrinsicWidth += adapter?.getDrawable(i)?.intrinsicWidth ?: 0
-                intrinsicHeight = Math.max(intrinsicHeight, adapter?.getDrawable(i)?.intrinsicHeight ?: 0)
+                intrinsicWidth += if (overridenIntrinsicWidth != null) {
+                    overridenIntrinsicWidth!!
+                } else {
+                    adapter?.getDrawable(i)?.intrinsicWidth ?: 0
+                }
+                intrinsicHeight = if (overridenIntrinsicHeight != null) {
+                    overridenIntrinsicHeight!!
+                } else Math.max(intrinsicHeight, adapter?.getDrawable(i)?.intrinsicHeight ?: 0)
             }
         }
     }
@@ -67,10 +87,16 @@ open class HorizontalLinearDrawableView : View {
         var measuredHeight: Int = 0
 
         if (widthMode == MeasureSpec.EXACTLY) {
+
+            println("Exactly")
+
             measuredWidth = widthSize;
             measuredHeight = widthSize / (adapter?.numDrawables ?: 1)
             useIntrinsicWidth = false
         } else if (widthMode == MeasureSpec.AT_MOST) {
+
+            println("At Most")
+
             measuredWidth = Math.min(intrinsicWidth + paddingStart + paddingEnd, widthSize).toInt()
             measuredHeight = measuredWidth / (adapter?.numDrawables ?: 1)
             useIntrinsicWidth = true
@@ -85,8 +111,17 @@ open class HorizontalLinearDrawableView : View {
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
-        cellWidth = w / (adapter?.numDrawables ?: 1)
-        cellHeight = h
+        cellWidth = if (overridenIntrinsicWidth != null) {
+            overridenIntrinsicWidth!!
+        } else {
+            w / (adapter?.numDrawables ?: 1)
+        }
+        cellHeight =
+                if (overridenIntrinsicHeight != null) {
+                    overridenIntrinsicHeight!!
+                } else {
+                    h
+                }
     }
 
 
