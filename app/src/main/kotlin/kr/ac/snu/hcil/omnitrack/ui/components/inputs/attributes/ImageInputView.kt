@@ -72,21 +72,21 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
         {
             if(cameraCacheUri != null) {
 
-
                 val bitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, cameraCacheUri!!)
 
                 val numPixels = bitmap.width * bitmap.height
-                val scale = IMAGE_MAX_PIXELS / numPixels.toFloat()
+                val scale = Math.sqrt(IMAGE_MAX_PIXELS / numPixels.toDouble()).toFloat()
 
                 if (scale < 1) {
+                    println("scale down camera image : ${scale * 100}%")
+
                     val scaledBitmap = Bitmap.createScaledBitmap(bitmap, (bitmap.width * scale + 0.5f).toInt(), (bitmap.height * scale + 0.5f).toInt(), true)
+                    //val scaledBitmap = Bitmap.createBitmap(scaledWidth, scaledHeight, Bitmap.Config.ARGB_8888)
                     bitmap.recycle()
                     val outputStream = context.contentResolver.openOutputStream(cameraCacheUri!!)
                     scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 80, outputStream)
                     scaledBitmap.recycle()
                 }
-                //        MediaStore.Images.Media.getBitmap(context.getContentResolver(), cameraCacheUri).copy(Bitmap.Config.ARGB_8888, true)
-
 
                 this.picker.imageUri = cameraCacheUri!!
                 cameraCacheUri = null

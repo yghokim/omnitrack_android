@@ -45,7 +45,6 @@ class OTImageAttribute(objectId: String?, dbId: Long?, columnName: String, setti
             recycledView
         } else {
             val view = ImageView(context)
-            view.tag = "ImageAttribute"
             view
         }
 
@@ -58,6 +57,8 @@ class OTImageAttribute(objectId: String?, dbId: Long?, columnName: String, setti
             target.setPadding(padding, padding, padding, padding)
 
             target.minimumHeight = (100 * context.resources.displayMetrics.density).toInt()
+
+            target.tag = "ImageAttribute"
         }
 
         return target
