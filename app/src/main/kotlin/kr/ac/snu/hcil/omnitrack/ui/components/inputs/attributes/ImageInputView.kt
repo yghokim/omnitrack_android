@@ -18,6 +18,9 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
     companion object{
         const val REQUEST_CODE_CAMERA = 2
         const val REQUEST_CODE_GALLERY = 4
+
+        const val IMAGE_MAX_PIXELS = 720 * 1280
+
     }
 
     override val typeId: Int = VIEW_TYPE_IMAGE
@@ -68,6 +71,23 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
         if(requestType == REQUEST_CODE_CAMERA || requestType == REQUEST_CODE_GALLERY)
         {
             if(cameraCacheUri != null) {
+
+
+                val bitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, cameraCacheUri!!)
+
+                val numPixels = bitmap.width * bitmap.height
+                val scale = IMAGE_MAX_PIXELS / numPixels.toFloat()
+
+                if (scale < 1) {
+                    val scaledBitmap = Bitmap.createScaledBitmap(bitmap, (bitmap.width * scale + 0.5f).toInt(), (bitmap.height * scale + 0.5f).toInt(), true)
+                    bitmap.recycle()
+                    val outputStream = context.contentResolver.openOutputStream(cameraCacheUri!!)
+                    scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 80, outputStream)
+                    scaledBitmap.recycle()
+                }
+                //        MediaStore.Images.Media.getBitmap(context.getContentResolver(), cameraCacheUri).copy(Bitmap.Config.ARGB_8888, true)
+
+
                 this.picker.imageUri = cameraCacheUri!!
                 cameraCacheUri = null
             }

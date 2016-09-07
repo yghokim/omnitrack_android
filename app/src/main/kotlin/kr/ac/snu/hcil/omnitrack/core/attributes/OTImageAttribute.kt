@@ -1,9 +1,11 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes
 
+import android.content.Context
 import android.net.Uri
+import android.view.View
+import android.widget.ImageView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.ImageInputView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 
 /**
@@ -33,6 +35,28 @@ class OTImageAttribute(objectId: String?, dbId: Long?, columnName: String, setti
 
     override fun refreshInputViewUI(inputView: AAttributeInputView<out Any>) {
 
+    }
+
+    override fun getViewForItemListContainerType(): Int = VIEW_FOR_ITEM_LIST_CONTAINER_TYPE_MULTILINE
+
+    override fun getViewForItemList(context: Context, recycledView: View?): View {
+
+        val target = if (recycledView is ImageView) {
+            recycledView
+        } else {
+            ImageView(context)
+        }
+
+        return target
+    }
+
+    override fun applyValueToViewForItemList(value: Any?, view: View): Boolean {
+        if (view is ImageView && value != null) {
+            if (value is Uri) {
+                view.setImageURI(value)
+                return true
+            } else return false
+        } else return super.applyValueToViewForItemList(value, view)
     }
 
     override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_URI
