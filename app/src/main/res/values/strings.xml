@@ -86,6 +86,8 @@
 
     <string name="msg_triggers">Triggers</string>
 
+    <string name="msg_charts">Charts</string>
+
     <string name="msg_activate">Activate</string>
 
     <string name="msg_pick_date">Pick a date</string>

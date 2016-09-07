@@ -13,8 +13,9 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.Spannable
 import android.text.SpannableString
-import android.text.SpannableStringBuilder
-import android.text.style.*
+import android.text.style.AbsoluteSizeSpan
+import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
 import android.transition.AutoTransition
 import android.transition.Fade
 import android.transition.TransitionManager
@@ -35,7 +36,10 @@ import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDivider
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemBrowserActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemEditingActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.tracker.TrackerDetailActivity
-import kr.ac.snu.hcil.omnitrack.utils.*
+import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
+import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
+import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
+import kr.ac.snu.hcil.omnitrack.utils.startActivityOnDelay
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -231,6 +235,7 @@ class TrackerListFragment : Fragment() {
             val editButton: View
             val listButton: View
             val removeButton: View
+            val chartViewButton: View
 
             var collapsed = true
 
@@ -250,12 +255,16 @@ class TrackerListFragment : Fragment() {
                 editButton = view.findViewById(R.id.ui_button_edit)
                 listButton = view.findViewById(R.id.ui_button_list)
                 removeButton = view.findViewById(R.id.ui_button_remove)
+                chartViewButton = view.findViewById(R.id.ui_button_charts)
 
                 view.setOnClickListener(this)
                 editButton.setOnClickListener(this)
                 listButton.setOnClickListener(this)
                 removeButton.setOnClickListener(this)
+                chartViewButton.setOnClickListener(this)
+
                 expandButton.setOnClickListener(this)
+
 
                 collapse()
             }
@@ -272,6 +281,10 @@ class TrackerListFragment : Fragment() {
                 } else if (view === removeButton) {
                     val tracker = user.trackers[adapterPosition]
                     DialogHelper.makeYesNoDialogBuilder(context, tracker.name, getString(R.string.msg_confirm_remove_tracker), { -> user.trackers.remove(tracker); notifyItemRemoved(adapterPosition); listView.invalidateItemDecorations(); }).show()
+                } else if (view === chartViewButton) {
+
+
+
                 } else if (view === expandButton) {
                     var toClose = -1
                     if (collapsed) {

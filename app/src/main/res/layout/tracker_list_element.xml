@@ -26,40 +26,40 @@
             <TextView
                 android:id="@+id/name"
                 style="@style/ListElementTitle"
-                android:textSize="20sp"
-                android:textColor="#575757"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Project" />
+                android:text="Project"
+                android:textColor="#575757"
+                android:textSize="20sp" />
 
             <LinearLayout
-                android:orientation="horizontal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
-                android:paddingBottom="@dimen/tracker_list_information_bottom_padding"
                 android:layout_alignParentLeft="true"
-                android:gravity="bottom">
+                android:gravity="bottom"
+                android:orientation="horizontal"
+                android:paddingBottom="@dimen/tracker_list_information_bottom_padding">
 
 
                 <TextView
                     android:id="@+id/ui_last_logging_time"
+                    style="@style/trackerListInformationTextViewStyle"
                     android:layout_width="100dp"
                     android:layout_height="match_parent"
-                    style="@style/trackerListInformationTextViewStyle"
                     android:layout_gravity="bottom"
-                    android:text="YESTERDAY\n06:30 PM"
-                    android:gravity="bottom" />
+                    android:gravity="bottom"
+                    android:text="YESTERDAY\n06:30 PM" />
 
                 <TextView
                     android:id="@+id/ui_today_logging_count"
+                    style="@style/trackerListInformationTextViewStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    style="@style/trackerListInformationTextViewStyle"
-                    android:text="@string/msg_todays_log"
                     android:layout_gravity="bottom"
-                    android:gravity="bottom" />
+                    android:gravity="bottom"
+                    android:text="@string/msg_todays_log" />
             </LinearLayout>
 
             <ImageButton
@@ -87,26 +87,31 @@
             android:textAlignment="viewEnd"
             android:visibility="gone">
 
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
-
             <Button
                 android:id="@+id/ui_button_edit"
                 style="@style/expandedPanelButton"
+                android:layout_weight="1"
                 android:drawableStart="@drawable/pen"
                 android:text="@string/msg_edit" />
 
             <Button
                 android:id="@+id/ui_button_list"
                 style="@style/expandedPanelButton"
+                android:layout_weight="1"
                 android:drawableStart="@drawable/list"
                 android:text="@string/msg_data_list" />
 
             <Button
+                android:id="@+id/ui_button_charts"
+                style="@style/expandedPanelButton"
+                android:layout_weight="1"
+                android:drawableStart="@drawable/chart"
+                android:text="@string/msg_charts" />
+
+            <Button
                 android:id="@+id/ui_button_remove"
                 style="@style/expandedPanelButton"
+                android:layout_weight="1"
                 android:drawableStart="@drawable/ex"
                 android:text="@string/msg_remove" />
         </LinearLayout>

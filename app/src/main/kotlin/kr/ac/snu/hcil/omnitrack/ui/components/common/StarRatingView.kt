@@ -77,31 +77,14 @@ class StarRatingView : HorizontalLinearDrawableView {
     override fun onTouchEvent(event: MotionEvent): Boolean {
         if (adapter != null && !isLightMode) {
 
-            val adapter = adapter!!
-
             if (event.action == MotionEvent.ACTION_DOWN) {
                 dragging = true
+                handleTouchEvent(event)
 
                 return true
             } else if (event.action == MotionEvent.ACTION_MOVE) {
 
-                if (event.x < paddingLeft) {
-                    score = 0f
-                } else if (event.x > paddingLeft + currentCellWidth * adapter.numDrawables) {
-                    score = levels.toFloat()
-                } else {
-                    for (i in 0..adapter.numDrawables - 1) {
-                        val left = paddingLeft + i * currentCellWidth
-                        val right = left + currentCellWidth
-
-                        if (left <= event.x && right >= event.x) {
-                            val fraction = (event.x - left).toFloat() / currentCellWidth
-                            score = i + discreteFraction(fraction)
-                            break
-                        }
-                    }
-                }
-
+                handleTouchEvent(event)
                 return true
             } else if (event.action == MotionEvent.ACTION_UP) {
                 dragging = false
@@ -110,6 +93,26 @@ class StarRatingView : HorizontalLinearDrawableView {
         }
 
         return super.onTouchEvent(event)
+    }
+
+    private fun handleTouchEvent(event: MotionEvent) {
+        val adapter = adapter!!
+        if (event.x < paddingLeft) {
+            score = 0f
+        } else if (event.x > paddingLeft + currentCellWidth * adapter.numDrawables) {
+            score = levels.toFloat()
+        } else {
+            for (i in 0..adapter.numDrawables - 1) {
+                val left = paddingLeft + i * currentCellWidth
+                val right = left + currentCellWidth
+
+                if (left <= event.x && right >= event.x) {
+                    val fraction = (event.x - left).toFloat() / currentCellWidth
+                    score = i + discreteFraction(fraction)
+                    break
+                }
+            }
+        }
     }
 
     private fun discreteFraction(fraction: Float): Float {
