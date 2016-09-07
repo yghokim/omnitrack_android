@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Environment
-import android.provider.ContactsContract
 import android.provider.MediaStore
 import android.support.v4.content.FileProvider
 import android.support.v7.app.AppCompatActivity
@@ -15,7 +14,6 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.ImageInputView
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 import java.io.File
@@ -82,9 +80,11 @@ class ImagePicker : FrameLayout, View.OnClickListener {
                 if (value == Uri.EMPTY) {
                     removeButton.visibility = View.INVISIBLE
                     buttonGroup.visibility = View.VISIBLE
+                    imageView.visibility = View.GONE
                 } else {
                     removeButton.visibility = View.VISIBLE
                     buttonGroup.visibility = View.INVISIBLE
+                    imageView.visibility = View.VISIBLE
                 }
                 uriChanged.invoke(this, value)
             }

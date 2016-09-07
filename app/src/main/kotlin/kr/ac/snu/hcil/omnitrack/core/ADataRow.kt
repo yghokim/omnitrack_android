@@ -30,6 +30,10 @@ abstract class ADataRow() {
         valueTable[attribute.objectId] = value
     }
 
+    fun removeValueOf(attribute: OTAttribute<out Any>) {
+        valueTable.remove(attribute.objectId)
+    }
+
     fun hasValueOf(attribute: OTAttribute<out Any>): Boolean {
         return valueTable.containsKey(attribute.objectId)
     }

@@ -44,7 +44,20 @@ class OTImageAttribute(objectId: String?, dbId: Long?, columnName: String, setti
         val target = if (recycledView is ImageView) {
             recycledView
         } else {
-            ImageView(context)
+            val view = ImageView(context)
+            view.tag = "ImageAttribute"
+            view
+        }
+
+        if (target.tag != "ImageAttribute") {
+            target.adjustViewBounds = true
+            target.scaleType = ImageView.ScaleType.FIT_CENTER
+            target.setBackgroundColor(context.resources.getColor(R.color.editTextFormBackground, null))
+
+            val padding = (8 * context.resources.displayMetrics.density).toInt()
+            target.setPadding(padding, padding, padding, padding)
+
+            target.minimumHeight = (100 * context.resources.displayMetrics.density).toInt()
         }
 
         return target
@@ -53,6 +66,7 @@ class OTImageAttribute(objectId: String?, dbId: Long?, columnName: String, setti
     override fun applyValueToViewForItemList(value: Any?, view: View): Boolean {
         if (view is ImageView && value != null) {
             if (value is Uri) {
+                println("URI is ${value.toString()}")
                 view.setImageURI(value)
                 return true
             } else return false

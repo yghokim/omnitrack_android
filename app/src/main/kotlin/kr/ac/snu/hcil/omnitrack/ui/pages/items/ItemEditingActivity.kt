@@ -78,6 +78,8 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
 
     private var mode: Mode = Mode.New
 
+    private var activityResultAppliedAttributePosition = -1
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         rightActionBarButton?.visibility = View.VISIBLE
@@ -94,8 +96,6 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
 
     override fun onStart() {
         super.onStart()
-
-        attributeValueExtractors.clear()
 
         val trackerId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
         if (trackerId != null) {
@@ -159,6 +159,8 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
                 skipViewValueCaching = false
             }
         }
+
+        this.activityResultAppliedAttributePosition = -1
     }
 
     override fun onSaveInstanceState(outState: Bundle?, outPersistentState: PersistableBundle?) {
@@ -207,12 +209,16 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
     }
 
     private fun syncViewStateToBuilderAsync(finished: (() -> Unit)?) {
+        println("grab inputView's values to ItemBuilder.")
         var waitingAttributes = ArrayList<OTAttribute<out Any>>()
         for (attribute in tracker!!.attributes.unObservedList) {
             val valueExtractor = attributeValueExtractors[attribute.objectId]
             if (valueExtractor != null) {
-                builder.setValueOf(attribute, valueExtractor())
+                val value = valueExtractor()
+                println("assigning value to builder.${attribute.name} : ${value}")
+                builder.setValueOf(attribute, value)
             } else {
+                println("value extract is null.")
                 waitingAttributes.add(attribute)
             }
         }
@@ -267,7 +273,11 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
         val serialized = preferences.getString(makeTrackerPreferenceKey(tracker), null)
         if (serialized != null) {
             println("stored ItemBuilder was restored.")
-            builder = OTItemBuilder(serialized)
+            val storedBuilder = OTItemBuilder(serialized)
+            if (activityResultAppliedAttributePosition != -1) {
+                storedBuilder.removeValueOf(tracker.attributes[activityResultAppliedAttributePosition])
+            }
+            builder = storedBuilder
             return true
         } else {
             println("new ItemBuilder created.")
@@ -288,8 +298,10 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode == Activity.RESULT_OK && data != null) {
-            val inputView = attributeListAdapter.inputViews.find { it.position == AAttributeInputView.getPositionFromRequestCode(requestCode) }
+            val attributePosition = AAttributeInputView.getPositionFromRequestCode(requestCode)
+            val inputView = attributeListAdapter.inputViews.find { it.position == attributePosition }
             inputView?.setValueFromActivityResult(data, AAttributeInputView.getRequestTypeFromRequestCode(requestCode))
+            activityResultAppliedAttributePosition = attributePosition
         }
     }
 
