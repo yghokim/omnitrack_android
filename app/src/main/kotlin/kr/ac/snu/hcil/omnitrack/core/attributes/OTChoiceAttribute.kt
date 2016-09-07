@@ -186,7 +186,7 @@ class OTChoiceAttribute(objectId: String?, dbId: Long?, columnName: String, prop
         return target
     }
 
-    override fun generateRecommendedChartModels(): Array<ChartModel> {
+    override fun getRecommendedChartModels(): Array<ChartModel<*>> {
         return arrayOf(ChoiceCategoricalBarChartModel(this))
     }
 

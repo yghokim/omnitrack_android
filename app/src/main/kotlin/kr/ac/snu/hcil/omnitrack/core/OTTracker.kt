@@ -8,7 +8,6 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AttributeSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
-import kr.ac.snu.hcil.omnitrack.core.visualization.IChartDataSource
 import kr.ac.snu.hcil.omnitrack.utils.DefaultNameGenerator
 import kr.ac.snu.hcil.omnitrack.utils.ObservableList
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
@@ -20,7 +19,7 @@ import kotlin.properties.Delegates
  * Created by Young-Ho on 7/11/2016.
  */
 class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color.WHITE, isOnShortcut: Boolean = false, _attributes: Collection<OTAttribute<out Any>>? = null)
-: NamedObject(objectId, dbId, name), IChartDataSource {
+: NamedObject(objectId, dbId, name) {
 
     val attributes = ObservableList<OTAttribute<out Any>>()
 
@@ -151,8 +150,16 @@ class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color
         return DefaultNameGenerator.generateName("${typeName} ${context.resources.getString(R.string.msg_attribute)}", attributes.unObservedList.map { it.name })
     }
 
-    override fun generateRecommendedChartModels(): Array<ChartModel> {
-        return arrayOf()
+    fun getRecommendedChartModels(): Array<ChartModel<*>> {
+
+        val list = ArrayList<ChartModel<*>>()
+
+        for(attribute in attributes)
+        {
+            list.addAll(attribute.getRecommendedChartModels())
+        }
+
+        return list.toTypedArray()
     }
 
 }

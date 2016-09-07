@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.utils
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
+import android.content.res.Resources
 import android.location.Address
 import android.location.Geocoder
 import android.os.Handler
@@ -12,6 +13,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.google.android.gms.maps.model.LatLng
+import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.R
 import java.math.BigDecimal
 import java.util.*
 

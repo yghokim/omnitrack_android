@@ -83,9 +83,10 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
         items.clear()
         if (intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER) != null) {
             tracker = OTApplication.app.currentUser.trackers.filter { it.objectId == intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER) }.first()
-            supportedItemComparators = tracker?.getSupportedComparators()
 
-            println(supportedItemComparators)
+            setTitle(String.format(resources.getString(R.string.title_activity_item_browser, tracker?.name)))
+
+            supportedItemComparators = tracker?.getSupportedComparators()
 
             if (supportedItemComparators != null) {
                 val adapter = ArrayAdapter<ItemComparator>(this, R.layout.simple_list_element_text_light, R.id.textView, supportedItemComparators)

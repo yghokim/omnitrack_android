@@ -14,8 +14,12 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
     <uses-feature android:name="android.hardware.camera" />
-    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.autofocus"
+        android:required="false" />
+
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
@@ -25,7 +29,7 @@
         android:icon="@drawable/icon"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
+        android:theme="@style/AppTheme.NoActionBar"
         tools:replace="android:allowBackup">
 
         <!--
@@ -44,7 +48,6 @@
             android:value="@integer/google_play_services_version"
             tools:replace="android:value" />
 
-
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="kr.ac.snu.hcil.omnitrack.fileprovider"
@@ -52,7 +55,7 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths"/>
+                android:resource="@xml/file_paths" />
         </provider>
 
         <receiver android:name=".receivers.OTSystemReceiver">
@@ -63,10 +66,8 @@
                 <action android:name="kr.ac.snu.hcil.omnitrack.action.ITEM_ADDED" />
                 <action android:name="kr.ac.snu.hcil.omnitrack.action.ITEM_EDITED" />
                 <action android:name="kr.ac.snu.hcil.omnitrack.action.ITEM_REMOVED" />
-
             </intent-filter>
         </receiver>
-
         <receiver
             android:name=".receivers.PackageReceiver"
             android:enabled="true"
@@ -75,10 +76,10 @@
                 <action android:name="android.intent.action.PACKAGE_ADDED" />
                 <action android:name="android.intent.action.PACKAGE_REMOVED" />
                 <action android:name="android.intent.action.PACKAGE_REPLACED" />
+
                 <data android:scheme="package" />
             </intent-filter>
         </receiver>
-
         <receiver
             android:name=".receivers.RebootReceiver"
             android:enabled="true"
@@ -109,35 +110,30 @@
             android:label="@string/app_name" />
         <activity
             android:name=".ui.pages.home.HomeActivity"
-            android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:label="@string/app_name" />
         <activity
             android:name=".ui.pages.tracker.TrackerDetailActivity"
             android:label="@string/title_activity_tracker_new"
-            android:parentActivityName=".ui.pages.home.HomeActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:parentActivityName=".ui.pages.home.HomeActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.pages.home.HomeActivity" />
         </activity>
         <activity
             android:name=".ui.pages.attribute.AttributeDetailActivity"
-            android:label="@string/title_activity_attribute_detail"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:label="@string/title_activity_attribute_detail" />
         <activity
             android:name=".ui.pages.items.ItemEditingActivity"
-            android:label="@string/title_activity_new_item"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:label="@string/title_activity_new_item" />
         <activity
-            android:name=".ui.pages.items.ItemBrowserActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:name=".ui.pages.items.ItemBrowserActivity" />
         <activity
-            android:name=".ui.pages.connectionwizard.ConnectionWizardActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".ui.components.common.activity.WebServiceLoginActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:name=".ui.pages.connectionwizard.ConnectionWizardActivity" />
 
+        <activity
+            android:name=".ui.components.common.activity.WebServiceLoginActivity"/>
+
+        <activity android:name=".ui.pages.visualization.ChartViewActivity" />
     </application>
 
 </manifest>

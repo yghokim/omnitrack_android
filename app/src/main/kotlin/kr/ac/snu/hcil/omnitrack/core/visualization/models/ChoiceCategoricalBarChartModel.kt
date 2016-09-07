@@ -1,22 +1,28 @@
 package kr.ac.snu.hcil.omnitrack.core.visualization.models
 
+import android.util.SparseArray
+import android.util.SparseIntArray
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTChoiceAttribute
 import kr.ac.snu.hcil.omnitrack.core.visualization.AttributeChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartType
 import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.ICategoricalBarChart
+import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
+import kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers.CategoricalBarChartDrawer
 import java.util.*
 
 /**
  * Created by younghokim on 16. 9. 7..
  */
-class ChoiceCategoricalBarChartModel : AttributeChartModel, ICategoricalBarChart {
-
+class ChoiceCategoricalBarChartModel(override val attribute: OTChoiceAttribute) : AttributeChartModel<ICategoricalBarChart.Point>(ChartType.BARCHART_CATEGORICAL, attribute), ICategoricalBarChart {
     private var loaded = false
     private val data = ArrayList<ICategoricalBarChart.Point>()
 
     private val itemsCache = ArrayList<OTItem>()
+    private val counterDictCache = SparseIntArray() // entry id : count
+    private val categoriesCache = HashSet<Int>()
 
     override val isLoaded: Boolean get() = !loaded
 
@@ -27,17 +33,69 @@ class ChoiceCategoricalBarChartModel : AttributeChartModel, ICategoricalBarChart
     }
 
     override fun reload() {
+
+        println("reload chart data : ${attribute.name}")
+
         val tracker = attribute.owner
         if (tracker != null) {
             itemsCache.clear()
             OTApplication.app.dbHelper.getItems(tracker, itemsCache)
+
+            counterDictCache.clear()
+            categoriesCache.clear()
+
+            var noResponseCount = 0
+
+            for(item in itemsCache)
+            {
+                val value = item.getValueOf(attribute) as? IntArray
+                if(value!= null && value.size > 0)
+                {
+                    for(id in value) {
+                        if(categoriesCache.contains(id) == false)
+                        {
+                            categoriesCache.add(id)
+                            counterDictCache.put(id, 1)
+                        }
+                        else{
+                            counterDictCache.put(id, counterDictCache[id]+ 1)
+                        }
+                    }
+                }
+                else{
+                    noResponseCount ++
+                }
+            }
+            itemsCache.clear()
+
+            for(categoryId in categoriesCache)
+            {
+                val entry = attribute.entries.findWithId(categoryId)
+                if(entry != null) {
+                    data.add(ICategoricalBarChart.Point(entry.text, counterDictCache[categoryId].toDouble(), categoryId))
+                }
+            }
+            
+            categoriesCache.clear()
+            counterDictCache.clear()
+
+            println(data)
         }
     }
+
+
+    override fun getDataPoints(): List<ICategoricalBarChart.Point> {
+        return data
+    }
+
 
     override fun getDataPointAt(position: Int): ICategoricalBarChart.Point {
         return data[position]
     }
 
-    constructor(attribute: OTAttribute<out Any>) : super(ChartType.BARCHART_CATEGORICAL, attribute)
+
+    override fun getChartDrawer(): AChartDrawer {
+        return CategoricalBarChartDrawer()
+    }
 
 }

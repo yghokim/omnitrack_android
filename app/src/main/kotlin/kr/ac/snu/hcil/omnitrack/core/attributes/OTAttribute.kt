@@ -12,7 +12,6 @@ import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTProperty
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
-import kr.ac.snu.hcil.omnitrack.core.visualization.IChartDataSource
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
@@ -26,7 +25,7 @@ import kotlin.properties.Delegates
 /**
  * Created by Young-Ho on 7/11/2016.
  */
-abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName: String, val typeId: Int, propertyData: String?, connectionData: String?) : NamedObject(objectId, dbId, columnName), IChartDataSource {
+abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName: String, val typeId: Int, propertyData: String?, connectionData: String?) : NamedObject(objectId, dbId, columnName) {
 
     override fun makeNewObjectId(): String {
         return owner?.owner?.makeNewObjectId() ?: UUID.randomUUID().toString()
@@ -233,7 +232,7 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
         } else return false
     }
 
-    override fun generateRecommendedChartModels(): Array<ChartModel> {
+    open fun getRecommendedChartModels(): Array<ChartModel<*>> {
         return arrayOf()
     }
 }
