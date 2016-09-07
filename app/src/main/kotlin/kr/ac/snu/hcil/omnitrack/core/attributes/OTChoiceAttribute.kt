@@ -6,6 +6,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTBooleanProperty
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTChoiceEntryListProperty
+import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.common.choice.WordListView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.ChoiceInputView
@@ -38,11 +39,18 @@ class OTChoiceAttribute(objectId: String?, dbId: Long?, columnName: String, prop
 
     override val typeSmallIconResourceId: Int
         get() {
-            if (allowedMultiselection) {
+            if (allowedMultiSelection) {
                 return R.drawable.icon_small_multiple_choice
             } else {
                 return R.drawable.icon_small_single_choice
             }
+        }
+
+    override val valueNumericCharacteristics: NumericCharacteristics
+        get() {
+            return if (allowedMultiSelection)
+                NumericCharacteristics(false, false)
+            else NumericCharacteristics(true, false)
         }
 
     override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_INT_ARRAY
@@ -53,7 +61,7 @@ class OTChoiceAttribute(objectId: String?, dbId: Long?, columnName: String, prop
         assignProperty(OTChoiceEntryListProperty(PROPERTY_ENTRIES, "Entries"))
     }
 
-    var allowedMultiselection: Boolean
+    var allowedMultiSelection: Boolean
         get() = getPropertyValue(PROPERTY_MULTISELECTION)
         set(value) = setPropertyValue(PROPERTY_MULTISELECTION, value)
 
@@ -66,16 +74,48 @@ class OTChoiceAttribute(objectId: String?, dbId: Long?, columnName: String, prop
         if (value is IntArray && value.size > 0) {
             val builder = StringBuilder()
             for (e in value.withIndex()) {
+                /*
                 if (e.value < entries.size) {
                     builder.append(entries[e.value])
                     if (e.index < value.size - 1) {
                         builder.append(", ")
                     }
+                }*/
+                val entry = entries.findWithId(e.value)
+                if (entry != null) {
+                    builder.append(entry.text)
+                    builder.append(", ")
                 }
             }
 
-            return builder.toString()
+            return builder.substring(0, -2)
         } else return "No selection"
+    }
+
+    override fun compareValues(a: Any, b: Any): Int {
+        if (a is IntArray && b is IntArray) {
+            if (a.size > 0 && b.size > 0) {
+                val idA = a.first()
+                val idB = b.first()
+
+                val valueA = entries.findWithId(idA)
+                val valueB = entries.findWithId(idB)
+                if (valueA != null && valueB != null) {
+                    println("${valueA} compare ${valueB} :  ${valueA.text.compareTo(valueB.text)}")
+                    return valueA.text.compareTo(valueB.text)
+                } else if (valueA == null) {
+                    return -1
+                } else if (valueB == null) {
+                    return 1
+                } else return 0
+
+            } else if (a.size == 0) {
+                return -1
+            } else if (b.size == 0) {
+                return 1
+            } else return 0
+        }
+        return super.compareValues(a, b)
     }
 
     override fun getAutoCompleteValueAsync(resultHandler: (IntArray) -> Unit): Boolean {
@@ -90,7 +130,7 @@ class OTChoiceAttribute(objectId: String?, dbId: Long?, columnName: String, prop
     override fun refreshInputViewUI(inputView: AAttributeInputView<out Any>) {
         if (inputView is ChoiceInputView) {
             inputView.entries = entries.toArray()
-            inputView.multiSelectionMode = allowedMultiselection
+            inputView.multiSelectionMode = allowedMultiSelection
         }
     }
 

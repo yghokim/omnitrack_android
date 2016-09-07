@@ -6,6 +6,7 @@ import android.location.LocationManager
 import android.view.View
 import com.google.android.gms.maps.model.LatLng
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.common.MapImageView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.utils.LocationRetrievalTask
@@ -29,6 +30,8 @@ class OTLocationAttribute(objectId: String?, dbId: Long?, columnName: String, se
             return bestLocation
         }
     }
+
+    override val valueNumericCharacteristics: NumericCharacteristics = NumericCharacteristics(false, true)
 
     override val propertyKeys: IntArray = intArrayOf()
 

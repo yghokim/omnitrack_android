@@ -24,7 +24,53 @@
         android:id="@+id/ui_item_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/appbar" />
+        android:layout_below="@+id/ui_top_control_bar" />
+
+
+    <LinearLayout
+        android:id="@+id/ui_top_control_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/appbar"
+        android:background="@color/colorPrimaryLight"
+        android:orientation="horizontal"
+        android:paddingBottom="8dp"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="8dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="6dp"
+            android:text="@string/msg_sort"
+            android:textColor="#c0ffffff"
+            android:textSize="14dp"
+            android:textStyle="bold" />
+
+        <Spinner
+            android:id="@+id/ui_spinner_sort_method"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/button_height_small"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/spinner_background_light" />
+
+        <ToggleButton
+            android:id="@+id/ui_toggle_sort_order"
+            style="@style/Base.Widget.AppCompat.Button.Borderless"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/button_height_small"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="8dp"
+            android:background="@drawable/button_background_rounded_semitransparent"
+            android:drawablePadding="3dp"
+            android:drawableRight="@drawable/descending"
+            android:text="New ToggleButton"
+            android:textColor="#FFF"
+            android:textOff="@string/msg_sort_descending"
+            android:textOn="@string/msg_sort_ascending" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/ui_empty_list_message"

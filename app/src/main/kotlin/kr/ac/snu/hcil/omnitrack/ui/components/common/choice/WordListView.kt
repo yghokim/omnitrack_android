@@ -69,7 +69,14 @@ open class WordListView : FlowLayout {
         }
 
         for (i in 0..words.size - 1) {
-            (getChildAt(i) as TextView).text = words[i]
+            val view = (getChildAt(i) as TextView)
+            view.text = words[i]
+
+            if (useColors) {
+                val shape = (view.background as LayerDrawable).findDrawableByLayerId(R.id.layer_color_shape) as GradientDrawable
+                shape.setColor(getColorPalette(context)[colorIndexList[i]])
+            }
+
         }
     }
 
@@ -79,13 +86,6 @@ open class WordListView : FlowLayout {
         InterfaceHelper.setTextAppearance(view, textAppearanceId)
 
         view.setBackgroundResource(R.drawable.word_list_element_frame)
-
-        if (useColors) {
-
-            val shape = (view.background as LayerDrawable).findDrawableByLayerId(R.id.layer_color_shape) as GradientDrawable
-            shape.setColor(getColorPalette(context)[colorIndexList[position]])
-
-        }
 
         val lp = LayoutParams(LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         lp.leftMargin = 20

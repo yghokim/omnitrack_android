@@ -6,6 +6,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTBooleanProperty
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTSelectionProperty
+import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.common.StarRatingView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.StarRatingInputView
@@ -31,6 +32,8 @@ class OTRatingAttribute(objectId: String?, dbId: Long?, columnName: String, sett
         const val PROPERTY_LEVELS = 1
         const val PROPERTY_ALLOW_INTERMEDIATE = 2
     }
+
+    override val valueNumericCharacteristics: NumericCharacteristics = NumericCharacteristics(true, true)
 
     override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_FLOAT
 
@@ -74,6 +77,12 @@ class OTRatingAttribute(objectId: String?, dbId: Long?, columnName: String, sett
 
     override fun formatAttributeValue(value: Any): String {
         return value.toString() + " / ${level.maxScore}"
+    }
+
+    override fun compareValues(a: Any, b: Any): Int {
+        if (a is Float && b is Float) {
+            return a.compareTo(b)
+        } else return super.compareValues(a, b)
     }
 
     override fun getAutoCompleteValueAsync(resultHandler: (Float) -> Unit): Boolean {

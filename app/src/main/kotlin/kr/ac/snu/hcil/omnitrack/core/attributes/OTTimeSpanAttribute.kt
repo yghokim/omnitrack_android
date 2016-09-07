@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.attributes
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTSelectionProperty
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
+import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.common.time.TimeRangePicker
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.TimeRangePickerInputView
@@ -32,6 +33,7 @@ class OTTimeSpanAttribute(objectId: String?, dbId: Long?, columnName: String, se
         setPropertyValue(PROPERTY_GRANULARITY, 0)
     }
 
+    override val valueNumericCharacteristics: NumericCharacteristics = NumericCharacteristics(true, false)
 
     override fun formatAttributeValue(value: Any): String {
         return ""

@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes
 
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 
@@ -11,6 +12,8 @@ class OTShortTextAttribute(objectId: String?, dbId: Long?, columnName: String, s
     override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_STRING
     override val typeNameResourceId: Int = R.string.type_shorttext_name
     override val typeSmallIconResourceId: Int = R.drawable.icon_small_shorttext
+
+    override val valueNumericCharacteristics: NumericCharacteristics = NumericCharacteristics(false, false)
 
     override fun createProperties() {
     }

@@ -11,6 +11,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTProperty
+import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
@@ -70,6 +71,8 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
     val removedFromTracker = Event<OTTracker>()
     val addedToTracker = Event<OTTracker>()
 
+    abstract val valueNumericCharacteristics: NumericCharacteristics
+
     abstract val propertyKeys: IntArray
 
     abstract val typeNameResourceId: Int
@@ -108,6 +111,10 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
     }
 
     protected abstract fun createProperties()
+
+    open fun compareValues(a: Any, b: Any): Int {
+        return 0
+    }
 
     fun getSerializedProperties(): String {
         val s = ArrayList<String>()

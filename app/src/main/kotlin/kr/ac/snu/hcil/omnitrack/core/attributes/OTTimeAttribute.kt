@@ -4,6 +4,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTProperty
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTSelectionProperty
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
+import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.common.time.DateTimePicker
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.TimePointInputView
@@ -15,6 +16,7 @@ import java.util.*
  * Created by Young-Ho Kim on 2016-07-20.
  */
 class OTTimeAttribute : OTAttribute<TimePoint> {
+
     override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_TIMEPOINT
 
 
@@ -39,6 +41,9 @@ class OTTimeAttribute : OTAttribute<TimePoint> {
                 Pair(GRANULARITY_SECOND, SimpleDateFormat("yyyy/MM/d h:mm:ss a"))
         )
     }
+
+
+    override val valueNumericCharacteristics: NumericCharacteristics = NumericCharacteristics(true, true)
 
     private val calendar = GregorianCalendar()
 
@@ -97,5 +102,9 @@ class OTTimeAttribute : OTAttribute<TimePoint> {
         }
     }
 
-
+    override fun compareValues(a: Any, b: Any): Int {
+        if (a is TimePoint && b is TimePoint) {
+            return a.compareTo(b)
+        } else return 0
+    }
 }

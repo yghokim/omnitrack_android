@@ -20,6 +20,10 @@
     <string name="msg_change_tracker_settings">Change attribute settings</string>
     <string name="msg_remove_tracker">Remove attribute</string>
 
+    <string name="msg_sort">Sort by</string>
+
+    <string name="msg_sort_method_timestamp">Logged Time</string>
+
     <string name="msg_yes">Yes</string>
     <string name="msg_no">No</string>
     <string name="msg_confirm_remove_tracker">Remove this attribute?</string>
@@ -44,6 +48,9 @@
     <string name="msg_edit">Edit</string>
     <string name="msg_data_list">Data List</string>
     <string name="msg_remove">Remove</string>
+
+    <string name="msg_sort_descending">Descending</string>
+    <string name="msg_sort_ascending">Ascending</string>
 
 
     <string name="msg_basic_information">Basic Information</string>

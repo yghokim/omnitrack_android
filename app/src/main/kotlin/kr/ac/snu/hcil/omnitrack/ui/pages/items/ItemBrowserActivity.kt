@@ -4,23 +4,26 @@ import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.*
-import android.widget.PopupMenu
-import android.widget.TextView
+import android.widget.*
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
-import kr.ac.snu.hcil.omnitrack.core.database.DatabaseHelper
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeAttribute
+import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AttributeSorter
+import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
+import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.DrawableListBottomSpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
+import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.getDayOfMonth
 import java.util.*
 
-class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_browser) {
+class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_browser), AdapterView.OnItemSelectedListener, View.OnClickListener {
 
     private var tracker: OTTracker? = null
 
@@ -32,8 +35,17 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
     private lateinit var emptyListMessageView: TextView
 
+    private lateinit var sortSpinner: Spinner
+
+    private lateinit var sortOrderButton: ToggleButton
+
+    private var supportedItemComparators: List<ItemComparator>? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        sortSpinner = findViewById(R.id.ui_spinner_sort_method) as Spinner
+        sortSpinner.onItemSelectedListener = this
 
         rightActionBarButton?.visibility = View.VISIBLE
         rightActionBarButton?.setImageResource(R.drawable.ic_add_box)
@@ -51,6 +63,18 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
         itemListViewAdapter = ItemListViewAdapter()
 
         itemListView.adapter = itemListViewAdapter
+
+        sortOrderButton = findViewById(R.id.ui_toggle_sort_order) as ToggleButton
+        sortOrderButton.setOnCheckedChangeListener { compoundButton, b ->
+            if (b) {
+                sortOrderButton.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ascending, 0)
+            } else {
+                sortOrderButton.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.descending, 0)
+            }
+        }
+        InterfaceHelper.removeButtonTextDecoration(sortOrderButton)
+
+        sortOrderButton.setOnClickListener(this)
     }
 
     override fun onStart() {
@@ -59,11 +83,48 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
         items.clear()
         if (intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER) != null) {
             tracker = OTApplication.app.currentUser.trackers.filter { it.objectId == intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER) }.first()
+            supportedItemComparators = tracker?.getSupportedComparators()
+
+            println(supportedItemComparators)
+
+            if (supportedItemComparators != null) {
+                val adapter = ArrayAdapter<ItemComparator>(this, R.layout.simple_list_element_text_light, R.id.textView, supportedItemComparators)
+                adapter.setDropDownViewResource(R.layout.simple_list_element_text_dropdown)
+
+                sortSpinner.adapter = adapter
+            }
 
             OTApplication.app.dbHelper.getItems(tracker!!, items)
 
             onItemListChanged()
         }
+
+
+    }
+
+    override fun onClick(view: View) {
+        reSort()
+    }
+
+    override fun onNothingSelected(p0: AdapterView<*>?) {
+    }
+
+    override fun onItemSelected(p0: AdapterView<*>?, p1: View?, position: Int, id: Long) {
+        reSort()
+    }
+
+    private fun reSort() {
+        val comparator = supportedItemComparators?.get(sortSpinner.selectedItemPosition)
+        if (comparator != null) {
+            println("sort items by ${comparator}")
+            comparator.isDecreasing = !sortOrderButton.isChecked
+            items.sortWith(comparator)
+            onItemListChanged()
+        }
+    }
+
+    private fun getCurrentSort(): ItemComparator? {
+        return supportedItemComparators?.get(sortSpinner.selectedItemPosition)
     }
 
     private fun onItemListChanged() {
@@ -186,7 +247,16 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
             fun bindItem(item: OTItem) {
                 val cal = Calendar.getInstance()
-                cal.timeInMillis = item.timestamp
+                val currentSorter = getCurrentSort()
+
+                cal.timeInMillis =
+                        if (currentSorter is AttributeSorter && currentSorter.attribute is OTTimeAttribute) {
+                            if (item.hasValueOf(currentSorter.attribute)) {
+                                (item.getValueOf(currentSorter.attribute) as TimePoint).timestamp
+                            } else item.timestamp
+                        } else item.timestamp
+
+
                 monthView.text = String.format(Locale.US, "%tb", cal);
                 dayView.text = cal.getDayOfMonth().toString()
 
@@ -238,6 +308,12 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
                     open fun bindAttribute(attribute: OTAttribute<out Any>) {
                         attributeNameView.text = attribute.name
+                        val sort = getCurrentSort()
+                        attributeNameView.setTextColor(
+                                if (sort is AttributeSorter && sort.attribute === attribute) {
+                                    resources.getColor(R.color.colorAccent, null)
+                                } else resources.getColor(R.color.textColorLight, null)
+                        )
 
                         val newValueView = attribute.getViewForItemList(this@ItemBrowserActivity, valueView)
                         if (newValueView !== valueView) {
@@ -252,7 +328,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                             valueView = newValueView
                         }
 
-                        if (getParentItem().hasValueOf(attribute) ?: false) {
+                        if (getParentItem().hasValueOf(attribute)) {
                             attribute.applyValueToViewForItemList(getParentItem().getValueOf(attribute), valueView)
                         }
                     }

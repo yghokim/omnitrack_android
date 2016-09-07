@@ -5,6 +5,8 @@ import android.content.Context
 import android.graphics.Color
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
+import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AttributeSorter
+import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
 import kr.ac.snu.hcil.omnitrack.utils.DefaultNameGenerator
 import kr.ac.snu.hcil.omnitrack.utils.ObservableList
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
@@ -126,6 +128,19 @@ class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color
             _removedAttributeIds.add(attribute.dbId as Long)
 
         attributeRemoved.invoke(this, ReadOnlyPair(attribute, index))
+    }
+
+    fun getSupportedComparators(): List<ItemComparator> {
+        val list = ArrayList<ItemComparator>()
+        list.add(ItemComparator.TIMESTAMP_SORTER)
+
+        for (attribute in attributes) {
+            if (attribute.valueNumericCharacteristics.sortable) {
+                list.add(AttributeSorter(attribute))
+            }
+        }
+
+        return list
     }
 
     fun generateNewAttributeName(typeName: String, context: Context): String {

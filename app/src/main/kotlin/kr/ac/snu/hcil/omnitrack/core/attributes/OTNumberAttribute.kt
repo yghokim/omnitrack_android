@@ -2,10 +2,12 @@ package kr.ac.snu.hcil.omnitrack.core.attributes
 
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTNumberStyleProperty
+import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.NumberInputView
 import kr.ac.snu.hcil.omnitrack.utils.NumberStyle
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
+import kr.ac.snu.hcil.omnitrack.utils.toBigDecimal
 import java.math.BigDecimal
 
 /**
@@ -19,6 +21,8 @@ class OTNumberAttribute(objectId: String?, dbId: Long?, columnName: String, sett
         return AAttributeInputView.VIEW_TYPE_NUMBER
     }
 
+    override val valueNumericCharacteristics: NumericCharacteristics = NumericCharacteristics(true, true)
+
     override val typeNameResourceId: Int = R.string.type_number_name
 
     override val typeSmallIconResourceId: Int = R.drawable.icon_small_number
@@ -31,6 +35,17 @@ class OTNumberAttribute(objectId: String?, dbId: Long?, columnName: String, sett
 
     override fun createProperties() {
         assignProperty(OTNumberStyleProperty(NUMBERSTYLE))
+    }
+
+    override fun compareValues(a: Any, b: Any): Int {
+        try {
+            val bdA = toBigDecimal(a)
+            val bdB = toBigDecimal(b)
+            return bdA.compareTo(bdB)
+        } catch(e: Exception) {
+            e.printStackTrace()
+            return super.compareValues(a, b)
+        }
     }
 /*
     var numDigitsUnderDecimalPoint: Int

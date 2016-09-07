@@ -95,6 +95,10 @@ class UniqueStringEntryList : IStringSerializable {
         return list[index]
     }
 
+    fun findWithId(id: Int): Entry? {
+        return list.find { it.id == id }
+    }
+
     val size: Int get() = list.size
 
     fun appendNewEntry() {

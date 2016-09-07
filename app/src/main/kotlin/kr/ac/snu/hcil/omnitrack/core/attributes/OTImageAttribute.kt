@@ -5,6 +5,7 @@ import android.net.Uri
 import android.view.View
 import android.widget.ImageView
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 
@@ -14,6 +15,7 @@ import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelpe
 class OTImageAttribute(objectId: String?, dbId: Long?, columnName: String, settingData: String?, connectionData: String?)
 : OTAttribute<Uri>(objectId, dbId, columnName, TYPE_IMAGE, settingData, connectionData) {
 
+    override val valueNumericCharacteristics: NumericCharacteristics = NumericCharacteristics(false, false)
 
     override fun createProperties() {
 

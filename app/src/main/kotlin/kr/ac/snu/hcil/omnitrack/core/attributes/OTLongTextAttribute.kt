@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.attributes
 import android.content.Context
 import android.view.View
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.common.text.LinedTextView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
@@ -24,6 +25,7 @@ class OTLongTextAttribute(objectId: String?, dbId: Long?, columnName: String, se
 
     override val typeSmallIconResourceId: Int = R.drawable.icon_small_longtext
 
+    override val valueNumericCharacteristics: NumericCharacteristics = NumericCharacteristics(false, false)
 
     override fun createProperties() {
     }

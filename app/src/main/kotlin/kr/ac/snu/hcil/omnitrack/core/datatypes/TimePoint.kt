@@ -6,7 +6,10 @@ import java.util.*
 /**
  * Created by younghokim on 16. 7. 21..
  */
-class TimePoint : IStringSerializable {
+class TimePoint : IStringSerializable, Comparable<TimePoint> {
+    override fun compareTo(other: TimePoint): Int {
+        return timestamp.compareTo(other.timestamp)
+    }
 
     var timestamp: Long = 0
     var timeZone: TimeZone = TimeZone.getDefault()

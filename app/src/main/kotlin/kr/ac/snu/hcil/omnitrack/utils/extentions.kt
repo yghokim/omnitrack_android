@@ -112,6 +112,8 @@ fun toBigDecimal(value: Any): BigDecimal {
         return BigDecimal(value)
     } else if (value is Float) {
         return BigDecimal(value.toDouble())
+    } else if (value is BigDecimal) {
+        return value
     } else throw Exception("value is not number primitive.")
 }
 
