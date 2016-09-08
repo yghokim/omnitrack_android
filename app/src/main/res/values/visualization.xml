@@ -4,12 +4,20 @@
     <color name="vis_color_axis">#575757</color>
     <dimen name="vis_axis_thickness">1dp</dimen>
 
+    <dimen name="vis_axis_grid_thickness">0.5dp</dimen>
+
     <dimen name="vis_axis_label_spacing">8dp</dimen>
 
     <dimen name="vis_axis_label_categorical_size">15dp</dimen>
+    <dimen name="vis_axis_label_numeric_size">12dp</dimen>
+
 
     <dimen name="vis_axis_height">40dp</dimen>
 
-    <dimen name="vis_axis_width">60dp</dimen>
+    <dimen name="vis_axis_width">35dp</dimen>
+
+    <dimen name="vis_bar_max_width">30dp</dimen>
+    <dimen name="vis_bar_spacing">6dp</dimen>
+
 
 </resources>

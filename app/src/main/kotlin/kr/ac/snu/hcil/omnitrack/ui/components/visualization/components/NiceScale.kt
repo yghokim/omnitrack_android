@@ -41,6 +41,7 @@ class NiceScale
         this.tickSpacing = niceNum(range / (maxTicks - 1), true)
         this.niceMin = Math.floor(minPoint / tickSpacing) * tickSpacing
         this.niceMax = Math.ceil(maxPoint / tickSpacing) * tickSpacing
+        println("${niceMin} ~ ${niceMax}, interval: ${tickSpacing}")
     }
 
     /**
@@ -83,7 +84,6 @@ class NiceScale
             else
                 niceFraction = 10.0
         }
-
         return niceFraction * Math.pow(10.0, exponent)
     }
 

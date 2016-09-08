@@ -4,7 +4,7 @@ package kr.ac.snu.hcil.omnitrack.ui.components.visualization.components
  * Created by Young-Ho on 9/8/2016.
  */
 interface IAxisScale {
-    fun setRealCoordRange(from: Float, to: Float)
+    fun setRealCoordRange(from: Float, to: Float): IAxisScale
     val numTicks : Int
     fun getTickCoordAt(index: Int): Float
     fun getTickLabelAt(index: Int): String

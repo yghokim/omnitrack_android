@@ -1,13 +1,16 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.visualization
 
 import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.RectF
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
-import kr.ac.snu.hcil.omnitrack.ui.components.visualization.ChartView
+import java.util.*
 
 /**
  * Created by Young-Ho on 9/7/2016.
  */
 abstract class AChartDrawer: IDrawer {
+
 
     private var chartView: ChartView? = null
 
@@ -28,6 +31,16 @@ abstract class AChartDrawer: IDrawer {
                 refresh(true)
             }
         }
+
+    private val fillPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val strokePaint = Paint(Paint.ANTI_ALIAS_FLAG)
+
+    protected val children = ArrayList<IDrawer>()
+
+    init {
+        fillPaint.style = Paint.Style.FILL
+        strokePaint.style = Paint.Style.STROKE
+    }
 
     fun setView(view: ChartView){
         chartView = view
@@ -56,4 +69,18 @@ abstract class AChartDrawer: IDrawer {
 
     protected abstract fun onRefresh()
 
+
+    //drawing apis
+
+
+    protected fun fillRect(rect: RectF, color: Int, canvas: Canvas) {
+        fillPaint.color = color
+        canvas.drawRect(rect, fillPaint)
+    }
+
+    override fun onDraw(canvas: Canvas) {
+        for (element in children) {
+            element.onDraw(canvas)
+        }
+    }
 }

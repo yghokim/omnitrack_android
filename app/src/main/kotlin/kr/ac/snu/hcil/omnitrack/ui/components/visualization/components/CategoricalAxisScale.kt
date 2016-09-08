@@ -13,18 +13,22 @@ class CategoricalAxisScale: IAxisScale {
 
     private var tickInterval: Float = 0f
 
-    override fun setRealCoordRange(from: Float, to: Float) {
+    override fun setRealCoordRange(from: Float, to: Float): CategoricalAxisScale {
         this.rangeFrom = from
         this.rangeTo = to
 
         tickInterval = if(numTicks>0)
             ((to - from)/numTicks)
             else 0f
+
+        return this
     }
 
-    fun setCategories(vararg categories: String){
+    fun setCategories(vararg categories: String): CategoricalAxisScale {
         categoryList.clear()
         categoryList.addAll(categories)
+
+        return this
     }
 
     override val numTicks: Int get()= categoryList.size

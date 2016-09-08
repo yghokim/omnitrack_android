@@ -10,32 +10,56 @@ class NumericScale: IAxisScale {
 
     private val niceScale = NiceScale()
 
-    private var domainMin: Float = 0f
-    private var domainMax: Float = 0f
+    private var domainExtendedMin: Float = 0f
+    private var domainExtendedMax: Float = 0f
+
+    private var domainDataMin: Float = 0f
+    private var domainDataMax: Float = 0f
+
     private var tickSpacingInDomain: Float = 0f
 
     private var _numTicks: Int = 0
 
     var tickFormat : ((Float)->String)? = null
 
-    override fun setRealCoordRange(from: Float, to: Float) {
+    override fun setRealCoordRange(from: Float, to: Float): NumericScale {
         this.rangeFrom = from
         this.rangeTo = to
+
+        return this
     }
 
-    fun setDomain(from: Float, to: Float)
+    fun setDomain(from: Float, to: Float): NumericScale
     {
-        niceScale.setMinMaxPoints(from.toDouble(), to.toDouble())
-        domainMin = niceScale.niceMin.toFloat()
-        domainMax = niceScale.niceMax.toFloat()
-        tickSpacingInDomain = niceScale.tickSpacing.toFloat()
-        _numTicks = ((domainMax - domainMin)/tickSpacingInDomain + 1f).toInt()
+        domainDataMax = to
+        domainDataMin = from
+        domainExtendedMax = to
+        domainExtendedMin = from
+
+        _numTicks = 5
+        tickSpacingInDomain = (domainDataMax - domainDataMin) / _numTicks
+
+        return this
     }
+
+    fun nice(): NumericScale {
+
+        niceScale.setMinMaxPoints(domainDataMin.toDouble(), domainDataMax.toDouble())
+        domainExtendedMin = niceScale.niceMin.toFloat()
+        domainExtendedMax = niceScale.niceMax.toFloat()
+        tickSpacingInDomain = niceScale.tickSpacing.toFloat()
+        _numTicks = ((domainExtendedMax - domainExtendedMin) / tickSpacingInDomain).toInt() + 1
+
+        println("nice min: $domainExtendedMin, max: $domainExtendedMax, numTicks: $_numTicks")
+
+        return this
+    }
+
 
     override val numTicks: Int get() = _numTicks
 
     fun getTickDomainAt(index: Int): Float{
-        return domainMin + index * tickSpacingInDomain
+        return domainExtendedMin + index * tickSpacingInDomain
     }
 
     override fun getTickCoordAt(index: Int): Float {
@@ -43,15 +67,20 @@ class NumericScale: IAxisScale {
     }
 
     fun convertDomainToRangeScale(domainValue: Float): Float{
-        return rangeFrom + (rangeTo - rangeFrom) * (domainValue - domainMin)/(domainMax - domainMin)
+
+        val converted = rangeFrom + (rangeTo - rangeFrom) * (domainValue - domainExtendedMin) / (domainExtendedMax - domainExtendedMin)
+
+        println("from ${domainValue} to $converted, rangeFrom:${rangeFrom}, rangeTo: $rangeTo, domainMin: $domainExtendedMax, domainMax: $domainExtendedMax")
+
+        return converted
     }
 
     override fun getTickLabelAt(index: Int): String {
-        return tickFormat?.invoke(getTickDomainAt(index)) ?: getTickLabelAt(index).toString()
+        return tickFormat?.invoke(getTickDomainAt(index)) ?: getTickDomainAt(index).toString()
     }
 
     override fun getTickInterval(): Float {
-        return tickSpacingInDomain * (rangeTo - rangeFrom)/(domainMax - domainMin)
+        return tickSpacingInDomain * (rangeTo - rangeFrom) / (domainExtendedMax - domainExtendedMin)
     }
 
 }
