@@ -7,6 +7,7 @@ import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.ILineChartOnTime
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.Axis
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.NumericScale
+import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.TimeLinearScale
 import java.util.*
 
 /**
@@ -20,7 +21,7 @@ class MultiLineChartDrawer() : AChartDrawer() {
     val verticalAxis = Axis(Axis.Pivot.LEFT)
 
     private val verticalAxisScale = NumericScale()
-    private val horizontalAxisScale = NumericScale()
+    private val horizontalAxisScale = TimeLinearScale()
 
     private val data = ArrayList<ILineChartOnTime.LineData>()
 
@@ -72,7 +73,7 @@ class MultiLineChartDrawer() : AChartDrawer() {
             verticalAxisScale.setDomain(minValue, maxValue, true).nice(true)
 
             val timeScope = (model as ILineChartOnTime).getTimeScope()
-            horizontalAxisScale.setDomain(timeScope.from.toFloat(), timeScope.to.toFloat(), false)
+            horizontalAxisScale.setDomain(timeScope.from, timeScope.to)
         }
     }
 

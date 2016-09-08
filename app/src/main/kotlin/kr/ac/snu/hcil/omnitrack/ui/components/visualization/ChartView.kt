@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
+import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.ITimelineChart
@@ -46,7 +47,7 @@ class ChartView : LinearLayout, IEventListener<ChartModel<*>?>, View.OnClickList
                 if (scopeSelectionView.selectedIndex != 0) {
                     scopeSelectionView.selectedIndex = 0
                 } else {
-                    scopeSelectionView.onSelectedIndexChanged.invoke(scopeSelectionView, 0)
+                    onTimeQueryChanged()
                 }
             } else {
                 timeNavigator.visibility = View.GONE
@@ -61,6 +62,7 @@ class ChartView : LinearLayout, IEventListener<ChartModel<*>?>, View.OnClickList
 
     private val chartView: ChartCanvasView
     private val timeNavigator: View
+    private val currentScopeView: TextView
     private val leftNavigationButton: View
     private val rightNavigationButton: View
 
@@ -83,6 +85,8 @@ class ChartView : LinearLayout, IEventListener<ChartModel<*>?>, View.OnClickList
         leftNavigationButton = findViewById(R.id.ui_navigate_left)
         rightNavigationButton = findViewById(R.id.ui_navigate_right)
 
+        currentScopeView = findViewById(R.id.ui_current_time) as TextView
+
         scopeSelectionView = findViewById(R.id.ui_scope_selection) as SelectionView
         scopeSelectionView.setValues(ITimelineChart.Granularity.values().map { resources.getString(it.nameId) }.toTypedArray())
         scopeSelectionView.onSelectedIndexChanged += {
@@ -90,15 +94,20 @@ class ChartView : LinearLayout, IEventListener<ChartModel<*>?>, View.OnClickList
             onGranularityChanged(ITimelineChart.Granularity.values()[index])
         }
 
-        onGranularityChanged(ITimelineChart.Granularity.values()[0])
+        onTimeQueryChanged()
     }
 
     private fun onGranularityChanged(granularity: ITimelineChart.Granularity) {
-        println("change granularity ${granularity}")
-        (model as? ITimelineChart)?.setTimeScope(currentPoint, granularity)
+        onTimeQueryChanged()
+    }
+
+    private fun onTimeQueryChanged() {
+        (model as? ITimelineChart)?.setTimeScope(currentPoint, currentScope)
         model?.reload()
         chartView.chartDrawer?.refresh()
         chartView.invalidate()
+
+        currentScopeView.text = currentScope.getFormattedCurrentScope(currentPoint, context)
     }
 
     override fun onEvent(sender: Any, args: ChartModel<*>?) {
@@ -108,9 +117,13 @@ class ChartView : LinearLayout, IEventListener<ChartModel<*>?>, View.OnClickList
 
     override fun onClick(view: View) {
         if (view === leftNavigationButton) {
+            currentPoint -= currentScope.getIntervalMillis(false, currentPoint)
+            onTimeQueryChanged()
 
         } else if (view === rightNavigationButton) {
 
+            currentPoint += currentScope.getIntervalMillis(true, currentPoint)
+            onTimeQueryChanged()
         }
     }
 }

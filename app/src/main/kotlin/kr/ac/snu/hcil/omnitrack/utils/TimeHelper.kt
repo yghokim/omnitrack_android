@@ -2,8 +2,8 @@ package kr.ac.snu.hcil.omnitrack.utils
 
 import android.content.Context
 import android.text.format.DateUtils
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.OTTimeRangeQuery
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -24,6 +24,9 @@ object TimeHelper {
 
     val DAY_OF_WEEK_FULL_FORMAT: SimpleDateFormat by lazy { SimpleDateFormat("EEEE") }
     val DAY_OF_WEEK_SHORT_FORMAT: SimpleDateFormat by lazy { SimpleDateFormat("EEE") }
+
+    val FORMAT_DAY = SimpleDateFormat(OTApplication.app.resources.getString(R.string.msg_date_format_scope_day))
+    val FORMAT_MONTH = SimpleDateFormat(OTApplication.app.resources.getString(R.string.msg_date_format_scope_month))
 
 
     fun addDays(timestamp: Long, days: Int): Long {
