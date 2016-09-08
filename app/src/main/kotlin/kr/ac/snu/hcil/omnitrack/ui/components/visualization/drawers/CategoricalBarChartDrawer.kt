@@ -99,7 +99,7 @@ class CategoricalBarChartDrawer(): AChartDrawer() {
 
             println("data min: $minValue, max: $maxValue")
 
-            verticalAxisScale.setDomain(Math.min(0.0, minValue.toDouble()).toFloat(), maxValue).nice(integerValues)
+            verticalAxisScale.setDomain(minValue, maxValue, true).nice(integerValues)
 
             //refresh data
             barElements.setData(barData).appendEnterSelection {

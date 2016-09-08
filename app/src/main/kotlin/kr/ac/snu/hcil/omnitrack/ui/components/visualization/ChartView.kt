@@ -42,6 +42,12 @@ class ChartView : LinearLayout, IEventListener<ChartModel<*>?>, View.OnClickList
                 if (new.isScopeControlSupported) {
                     scopeSelectionView.visibility = View.VISIBLE
                 } else scopeSelectionView.visibility = View.GONE
+
+                if (scopeSelectionView.selectedIndex != 0) {
+                    scopeSelectionView.selectedIndex = 0
+                } else {
+                    scopeSelectionView.onSelectedIndexChanged.invoke(scopeSelectionView, 0)
+                }
             } else {
                 timeNavigator.visibility = View.GONE
                 scopeSelectionView.visibility = View.GONE
@@ -84,13 +90,14 @@ class ChartView : LinearLayout, IEventListener<ChartModel<*>?>, View.OnClickList
             onGranularityChanged(ITimelineChart.Granularity.values()[index])
         }
 
-
+        onGranularityChanged(ITimelineChart.Granularity.values()[0])
     }
 
     private fun onGranularityChanged(granularity: ITimelineChart.Granularity) {
         println("change granularity ${granularity}")
         (model as? ITimelineChart)?.setTimeScope(currentPoint, granularity)
         model?.reload()
+        chartView.chartDrawer?.refresh()
         chartView.invalidate()
     }
 

@@ -29,10 +29,13 @@ class NumericScale: IAxisScale {
         return this
     }
 
-    fun setDomain(from: Float, to: Float): NumericScale
+    fun setDomain(from: Float, to: Float, isZeroBased: Boolean): NumericScale
     {
         domainDataMax = to
-        domainDataMin = from
+        domainDataMin = if (isZeroBased) {
+            Math.min(0f, from)
+        } else from
+
         domainExtendedMax = to
         domainExtendedMin = from
 
@@ -46,6 +49,7 @@ class NumericScale: IAxisScale {
 
         niceScale.calculate(domainDataMin, domainDataMax, isInteger)
         domainExtendedMin = niceScale.niceMin.toFloat()
+
         domainExtendedMax = niceScale.niceMax.toFloat()
         tickSpacingInDomain = niceScale.niceTickSpacing.toFloat()
         _numTicks = ((domainExtendedMax - domainExtendedMin) / tickSpacingInDomain).toInt() + 1

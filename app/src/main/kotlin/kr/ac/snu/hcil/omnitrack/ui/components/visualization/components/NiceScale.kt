@@ -18,7 +18,7 @@ class NiceScale
     var maxPoint: Double = 0.0
 
     private var maxTicks = 5.0
-    var tickSpacing: Double = 0.toDouble()
+    var niceTickSpacing: Double = 0.toDouble()
     private set
 
     private var range: Double = 0.toDouble()
@@ -38,10 +38,10 @@ class NiceScale
     fun calculate() {
 
         this.range = niceNum(maxPoint - minPoint, false)
-        this.tickSpacing = niceNum(range / (maxTicks - 1), true)
-        this.niceMin = Math.floor(minPoint / tickSpacing) * tickSpacing
-        this.niceMax = Math.ceil(maxPoint / tickSpacing) * tickSpacing
-        println("${niceMin} ~ ${niceMax}, interval: ${tickSpacing}")
+        this.niceTickSpacing = niceNum(range / (maxTicks - 1), true)
+        this.niceMin = Math.floor(minPoint / niceTickSpacing) * niceTickSpacing
+        this.niceMax = Math.ceil(maxPoint / niceTickSpacing) * niceTickSpacing
+        println("${niceMin} ~ ${niceMax}, interval: ${niceTickSpacing}")
     }
 
     /**

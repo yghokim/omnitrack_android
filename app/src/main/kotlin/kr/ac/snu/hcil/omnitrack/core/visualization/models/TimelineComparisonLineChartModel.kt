@@ -72,6 +72,10 @@ class TimelineComparisonLineChartModel(override val attributes: List<OTNumberAtt
     override fun getChartDrawer(): AChartDrawer {
         val drawer = MultiLineChartDrawer()
 
+
+
+        drawer.verticalAxis.labelPaint.isFakeBoldText = true
+        drawer.verticalAxis.labelPaint.textSize = OTApplication.app.resources.getDimension(R.dimen.vis_axis_label_numeric_size)
         return drawer
     }
 

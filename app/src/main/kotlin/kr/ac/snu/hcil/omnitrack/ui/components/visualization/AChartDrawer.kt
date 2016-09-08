@@ -26,6 +26,7 @@ abstract class AChartDrawer: IDrawer {
             {
                 field = value
                 onModelChanged()
+                refresh()
 
                 modelChanged.invoke(this, value)
             }

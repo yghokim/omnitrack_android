@@ -12,12 +12,12 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 2016-09-08.
  */
-class MultiLineChartDrawer : AChartDrawer() {
+class MultiLineChartDrawer() : AChartDrawer() {
 
     override val aspectRatio: Float = 1.7f
 
-    private val horizontalAxis = Axis(Axis.Pivot.BOTTOM)
-    private val verticalAxis = Axis(Axis.Pivot.LEFT)
+    val horizontalAxis = Axis(Axis.Pivot.BOTTOM)
+    val verticalAxis = Axis(Axis.Pivot.LEFT)
 
     private val verticalAxisScale = NumericScale()
     private val horizontalAxisScale = NumericScale()
@@ -29,6 +29,12 @@ class MultiLineChartDrawer : AChartDrawer() {
         paddingBottom = OTApplication.app.resources.getDimension(R.dimen.vis_axis_height).toFloat()
         paddingLeft = OTApplication.app.resources.getDimension(R.dimen.vis_axis_width).toFloat()
         paddingTop = OTApplication.app.resources.getDimension(R.dimen.vis_axis_label_numeric_size).toFloat()
+
+
+        verticalAxis.drawBar = false
+        verticalAxis.drawGridLines = true
+        horizontalAxis.drawBar = false
+        horizontalAxis.drawGridLines = true
 
         horizontalAxis.scale = horizontalAxisScale
         verticalAxis.scale = verticalAxisScale
@@ -44,6 +50,9 @@ class MultiLineChartDrawer : AChartDrawer() {
 
     override fun onModelChanged() {
 
+    }
+
+    override fun onRefresh() {
         if (model is ILineChartOnTime && model != null) {
             println("Model changed")
 
@@ -60,14 +69,11 @@ class MultiLineChartDrawer : AChartDrawer() {
 
             println("data ranges from $minValue ~ $maxValue")
 
-            verticalAxisScale.setDomain(minValue, maxValue)
+            verticalAxisScale.setDomain(minValue, maxValue, true).nice(true)
 
             val timeScope = (model as ILineChartOnTime).getTimeScope()
-            horizontalAxisScale.setDomain(timeScope.from.toFloat(), timeScope.to.toFloat())
+            horizontalAxisScale.setDomain(timeScope.from.toFloat(), timeScope.to.toFloat(), false)
         }
-    }
-
-    override fun onRefresh() {
     }
 
     override fun onDraw(canvas: Canvas) {
