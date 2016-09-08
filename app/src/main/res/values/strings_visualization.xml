@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="msg_vis_categorical_distribution_title_format">%1$s Distribution</string>
+
+</resources>

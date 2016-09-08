@@ -17,7 +17,7 @@ class NiceScale
     var minPoint: Double =0.0
     var maxPoint: Double = 0.0
 
-    private var maxTicks = 10.0
+    private var maxTicks = 5.0
     var tickSpacing: Double = 0.toDouble()
     private set
 

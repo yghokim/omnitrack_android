@@ -8,7 +8,7 @@ class NumericScale: IAxisScale {
     private var rangeFrom: Float = 0f
     private var rangeTo: Float = 0f
 
-    private val niceScale = NiceScale()
+    private val niceScale = NiceNumberHelper()
 
     private var domainExtendedMin: Float = 0f
     private var domainExtendedMax: Float = 0f
@@ -42,12 +42,12 @@ class NumericScale: IAxisScale {
         return this
     }
 
-    fun nice(): NumericScale {
+    fun nice(isInteger: Boolean): NumericScale {
 
-        niceScale.setMinMaxPoints(domainDataMin.toDouble(), domainDataMax.toDouble())
+        niceScale.calculate(domainDataMin, domainDataMax, isInteger)
         domainExtendedMin = niceScale.niceMin.toFloat()
         domainExtendedMax = niceScale.niceMax.toFloat()
-        tickSpacingInDomain = niceScale.tickSpacing.toFloat()
+        tickSpacingInDomain = niceScale.niceTickSpacing.toFloat()
         _numTicks = ((domainExtendedMax - domainExtendedMin) / tickSpacingInDomain).toInt() + 1
 
         println("nice min: $domainExtendedMin, max: $domainExtendedMax, numTicks: $_numTicks")

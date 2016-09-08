@@ -14,6 +14,22 @@ import java.util.*
  */
 class CategoricalBarChartDrawer(): AChartDrawer() {
 
+    //configuration
+    var integerValues: Boolean = false
+        set(value) {
+            if (field != value) {
+                field = value
+                if (value == true) {
+                    verticalAxisScale.tickFormat = {
+                        floatValue ->
+                        floatValue.toInt().toString()
+                    }
+                } else {
+                    verticalAxisScale.tickFormat = null
+                }
+            }
+        }
+
     private var vAxisWidth: Float
     private val hAxisHeight: Float
     private val topPadding: Float
@@ -37,7 +53,6 @@ class CategoricalBarChartDrawer(): AChartDrawer() {
         hAxisHeight = OTApplication.app.resources.getDimension(R.dimen.vis_axis_height).toFloat()
         vAxisWidth = OTApplication.app.resources.getDimension(R.dimen.vis_axis_width).toFloat()
         topPadding = OTApplication.app.resources.getDimension(R.dimen.vis_axis_label_numeric_size).toFloat()
-
 
         canvasRect = RectF()
         horizontalAxis.scale = horizontalAxisScale
@@ -67,7 +82,7 @@ class CategoricalBarChartDrawer(): AChartDrawer() {
                         OTApplication.app.resources.getDimension(R.dimen.vis_bar_max_width)
                 )
 
-                bar.bound.set(dataX - barWidth / 2, dataY, dataX + barWidth / 2, canvasRect.bottom)
+                bar.bound.set(dataX - barWidth / 2, dataY, dataX + barWidth / 2, canvasRect.bottom - OTApplication.app.resources.getDimension(R.dimen.vis_bar_axis_spacing))
 
             }
         }
@@ -90,7 +105,7 @@ class CategoricalBarChartDrawer(): AChartDrawer() {
 
             println("data min: $minValue, max: $maxValue")
 
-            verticalAxisScale.setDomain(minValue, maxValue).nice()
+            verticalAxisScale.setDomain(Math.min(0.0, minValue.toDouble()).toFloat(), maxValue).nice(integerValues)
 
             //refresh data
             barElements.setData(barData).appendEnterSelection {
@@ -98,11 +113,6 @@ class CategoricalBarChartDrawer(): AChartDrawer() {
                 println("updating enter selection for datum ${datum}")
                 val newBar = VerticalBar<ICategoricalBarChart.Point>()
                 newBar.color = OTApplication.app.resources.getColor(R.color.colorPointed, null)
-                val dataX = horizontalAxisScale.getTickCoordAt(datum.index)
-                val dataY = verticalAxisScale.convertDomainToRangeScale(datum.value.value.toFloat())
-                println("$dataX, $dataY")
-                newBar.bound.set(dataX - 10, dataY, dataX + 10, canvasRect.bottom)
-
                 newBar
             }
         }

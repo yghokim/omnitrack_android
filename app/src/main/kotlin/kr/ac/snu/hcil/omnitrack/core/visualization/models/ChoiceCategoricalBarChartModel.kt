@@ -1,10 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.core.visualization.models
 
-import android.util.SparseArray
 import android.util.SparseIntArray
 import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItem
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTChoiceAttribute
 import kr.ac.snu.hcil.omnitrack.core.visualization.AttributeChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartType
@@ -27,6 +26,9 @@ class ChoiceCategoricalBarChartModel(override val attribute: OTChoiceAttribute) 
     override val isLoaded: Boolean get() = !loaded
 
     override val numDataPoints: Int get() = data.size
+
+    override val name: String
+        get() = String.format(OTApplication.app.resources.getString(R.string.msg_vis_categorical_distribution_title_format), super.name)
 
     override fun recycle() {
         data.clear()
@@ -78,8 +80,6 @@ class ChoiceCategoricalBarChartModel(override val attribute: OTChoiceAttribute) 
             
             categoriesCache.clear()
             counterDictCache.clear()
-
-            println(data)
         }
     }
 
@@ -95,7 +95,10 @@ class ChoiceCategoricalBarChartModel(override val attribute: OTChoiceAttribute) 
 
 
     override fun getChartDrawer(): AChartDrawer {
-        return CategoricalBarChartDrawer()
+        val drawer = CategoricalBarChartDrawer()
+        drawer.integerValues = true
+
+        return drawer
     }
 
 }
