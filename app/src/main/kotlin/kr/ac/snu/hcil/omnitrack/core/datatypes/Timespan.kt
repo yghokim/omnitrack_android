@@ -13,6 +13,8 @@ class TimeSpan : IStringSerializable {
     var duration: Int = 0
     var timeZone: TimeZone = TimeZone.getDefault()
 
+    val to: Long get() = from + duration.toLong()
+
     constructor(from: Long = System.currentTimeMillis(), duration: Int = 0, timeZone: TimeZone = TimeZone.getDefault()) {
         this.from = from
         this.duration = duration

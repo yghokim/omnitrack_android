@@ -3,4 +3,5 @@
 
     <string name="msg_vis_categorical_distribution_title_format">%1$s Distribution</string>
 
+    <string name="msg_vis_numeric_line_timeline_title">Numeric Fields on Timeline</string>
 </resources>

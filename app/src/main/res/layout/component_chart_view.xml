@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/ui_time_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:paddingLeft="60dp"
+        android:paddingRight="60dp"
+        android:visibility="gone">
+
+        <android.support.v7.widget.AppCompatImageButton
+            android:id="@+id/ui_navigate_left"
+            android:layout_width="@dimen/button_height_small"
+            android:layout_height="@dimen/button_height_small"
+            android:background="@drawable/transparent_button_background"
+            android:src="@drawable/left_dark" />
+
+        <TextView
+            android:id="@+id/ui_current_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:text="Aug 16, 2016"
+            android:textAlignment="center"
+            android:textColor="@color/textColorMid"
+            android:textSize="16dp" />
+
+        <android.support.v7.widget.AppCompatImageButton
+            android:id="@+id/ui_navigate_right"
+            android:layout_width="@dimen/button_height_small"
+            android:layout_height="@dimen/button_height_small"
+            android:background="@drawable/transparent_button_background"
+            android:src="@drawable/right_dark" />
+    </LinearLayout>
+
+
+    <kr.ac.snu.hcil.omnitrack.ui.components.visualization.ChartCanvasView
+        android:id="@+id/ui_chart"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <kr.ac.snu.hcil.omnitrack.ui.components.common.choice.SelectionView
+        android:id="@+id/ui_scope_selection"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:visibility="gone" />
+
+</merge>

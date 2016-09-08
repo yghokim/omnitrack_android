@@ -5,9 +5,11 @@ import android.content.Context
 import android.graphics.Color
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AttributeSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
+import kr.ac.snu.hcil.omnitrack.core.visualization.models.TimelineComparisonLineChartModel
 import kr.ac.snu.hcil.omnitrack.utils.DefaultNameGenerator
 import kr.ac.snu.hcil.omnitrack.utils.ObservableList
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
@@ -153,6 +155,18 @@ class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color
     fun getRecommendedChartModels(): Array<ChartModel<*>> {
 
         val list = ArrayList<ChartModel<*>>()
+
+
+        //generate tracker-level charts
+
+        //TODO add heatmap timeline
+
+        //add line timeline if numeric variables exist
+        val numberAttrs = attributes.filter { it is OTNumberAttribute }.map { it as OTNumberAttribute }
+        if (numberAttrs.size > 0) {
+            list.add(TimelineComparisonLineChartModel(numberAttrs, this))
+        }
+
 
         for(attribute in attributes)
         {

@@ -14,6 +14,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
+import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.utils.toBoolean
 import kr.ac.snu.hcil.omnitrack.utils.toInt
@@ -416,6 +417,20 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
 
     fun getItems(tracker: OTTracker, listOut: ArrayList<OTItem>): Int {
         val cursor = readableDatabase.query(ItemScheme.tableName, ItemScheme.columnNames, "${ItemScheme.TRACKER_ID}=?", arrayOf(tracker.dbId.toString()), null, null, "${ItemScheme.LOGGED_AT} DESC")
+
+        var count = 0
+        if (cursor.moveToFirst()) {
+            do {
+                listOut.add(extractItemEntity(cursor, tracker))
+                count++
+            } while (cursor.moveToNext())
+        }
+
+        return count
+    }
+
+    fun getItems(tracker: OTTracker, timeRange: TimeSpan, listOut: ArrayList<OTItem>): Int {
+        val cursor = readableDatabase.query(ItemScheme.tableName, ItemScheme.columnNames, "${ItemScheme.TRACKER_ID}=?  AND ${ItemScheme.LOGGED_AT} BETWEEN ? AND ?", arrayOf(tracker.dbId.toString(), timeRange.from.toString(), timeRange.to.toString()), null, null, "${ItemScheme.LOGGED_AT} DESC")
 
         var count = 0
         if (cursor.moveToFirst()) {

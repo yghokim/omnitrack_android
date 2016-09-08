@@ -65,6 +65,8 @@ class Axis(var pivot: Pivot): IDrawer {
 
     override fun onDraw(canvas: Canvas) {
 
+        println("draw axis: ${attachedTo}")
+
         when (pivot) {
             Pivot.BOTTOM -> labelPaint.textAlign = Paint.Align.CENTER
             Pivot.LEFT -> labelPaint.textAlign = Paint.Align.RIGHT

@@ -4,15 +4,13 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.RectF
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
+import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import java.util.*
 
 /**
  * Created by Young-Ho on 9/7/2016.
  */
 abstract class AChartDrawer: IDrawer {
-
-
-    private var chartView: ChartView? = null
 
     abstract val aspectRatio: Float
 
@@ -28,22 +26,30 @@ abstract class AChartDrawer: IDrawer {
             {
                 field = value
                 onModelChanged()
-                refresh(true)
+
+                modelChanged.invoke(this, value)
             }
         }
+
+    val modelChanged = Event<ChartModel<*>?>()
 
     private val fillPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val strokePaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
     protected val children = ArrayList<IDrawer>()
 
+    protected val plotAreaRect: RectF = RectF()
+
+    protected var paddingLeft = 0f
+    protected var paddingTop = 0f
+    protected var paddingRight = 0f
+    protected var paddingBottom = 0f
+
+
+
     init {
         fillPaint.style = Paint.Style.FILL
         strokePaint.style = Paint.Style.STROKE
-    }
-
-    fun setView(view: ChartView){
-        chartView = view
     }
 
     fun setCanvasSize(width: Int, height: Int)
@@ -51,8 +57,11 @@ abstract class AChartDrawer: IDrawer {
         if(this.canvasWidth!= width || this.canvasHeight != height) {
             this.canvasWidth = width
             this.canvasHeight = height
+            this.plotAreaRect.set(
+                    paddingLeft, paddingTop, width - paddingRight, height - paddingBottom
+            )
             onResized()
-            refresh(false)
+            refresh()
         }
     }
 
@@ -61,10 +70,8 @@ abstract class AChartDrawer: IDrawer {
     protected abstract fun onModelChanged()
 
 
-   fun refresh(redrawView: Boolean = true){
+    fun refresh() {
        onRefresh()
-       if(redrawView)
-        chartView?.invalidate()
    }
 
     protected abstract fun onRefresh()

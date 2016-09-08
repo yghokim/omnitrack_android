@@ -1,68 +1,96 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.visualization
 
 import android.content.Context
-import android.graphics.Canvas
 import android.util.AttributeSet
 import android.view.View
+import android.widget.LinearLayout
+import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
+import kr.ac.snu.hcil.omnitrack.core.visualization.ITimelineChart
+import kr.ac.snu.hcil.omnitrack.ui.components.common.choice.SelectionView
+import kr.ac.snu.hcil.omnitrack.utils.events.IEventListener
+import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 import kotlin.properties.Delegates
 
 /**
  * Created by Young-Ho on 9/7/2016.
  */
-class ChartView: View {
+class ChartView : LinearLayout, IEventListener<ChartModel<*>?>, View.OnClickListener {
 
-
-    var chartDrawer: AChartDrawer? by Delegates.observable(null as AChartDrawer?){
-        prop, old, new->
-            if(old!=new)
+    /*
+    var chartDrawer: AChartDrawer?
+        get() = chartView.chartDrawer
+        set(value)
+        {
+            if(chartDrawer !== value)
             {
-                var needResize = true
-                if(old!=null && new != null)
+                if(chartDrawer!=null)
                 {
-                    if(old.aspectRatio == new.aspectRatio)
-                    {
-                        needResize = false
-                    }
+                    chartDrawer?.modelChanged?.minusAssign(this)
                 }
-                chartDrawer?.setView(this)
-                if(needResize)
-                    requestLayout()
+                value?.modelChanged?.plusAssign(this)
             }
+            chartView.chartDrawer = value
+        }
+        */
+    var model: ChartModel<*>? by Delegates.observable(null as ChartModel<*>?)
+    {
+        prop, old, new ->
+        if (new != null) {
+            if (new is ITimelineChart) {
+                timeNavigator.visibility = View.VISIBLE
+                if (new.isScopeControlSupported) {
+                    scopeSelectionView.visibility = View.VISIBLE
+                } else scopeSelectionView.visibility = View.GONE
+            } else {
+                timeNavigator.visibility = View.GONE
+                scopeSelectionView.visibility = View.GONE
+            }
+
+            chartView.chartDrawer = new.getChartDrawer()
+            chartView.chartDrawer?.model = new
+            chartView.invalidate()
+        }
     }
 
-    private var contentWidth: Int = 0
-    private var contentHeight: Int = 0
+    private val chartView: ChartCanvasView
+    private val timeNavigator: View
+    private val leftNavigationButton: View
+    private val rightNavigationButton: View
+
+    private val scopeSelectionView: SelectionView
 
 
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
 
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val widthMode = MeasureSpec.getMode(widthMeasureSpec)
-        val widthSize = MeasureSpec.getSize(widthMeasureSpec)
-        val heightMode = MeasureSpec.getMode(heightMeasureSpec)
-        val heightSize = MeasureSpec.getSize(heightMeasureSpec)
+    init {
+        orientation = VERTICAL
+        inflateContent(R.layout.component_chart_view, true)
 
-        var measuredWidth: Int = 0
-        var measuredHeight: Int = 0
+        chartView = findViewById(R.id.ui_chart) as ChartCanvasView
+        timeNavigator = findViewById(R.id.ui_time_navigation)
+        leftNavigationButton = findViewById(R.id.ui_navigate_left)
+        rightNavigationButton = findViewById(R.id.ui_navigate_right)
 
-        measuredWidth = widthSize;
-        measuredHeight = (widthSize / (chartDrawer?.aspectRatio ?: 1f) + 0.5f).toInt()
+        scopeSelectionView = findViewById(R.id.ui_scope_selection) as SelectionView
+        scopeSelectionView.setValues(ITimelineChart.Granularity.values().map { resources.getString(it.nameId) }.toTypedArray())
+        scopeSelectionView.onSelectedIndexChanged += {
+            sender, index ->
 
-        setMeasuredDimension(measuredWidth, measuredHeight)
+        }
+    }
+
+    override fun onEvent(sender: Any, args: ChartModel<*>?) {
+        chartView.invalidate()
     }
 
 
-    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
-        super.onSizeChanged(w, h, oldw, oldh)
-        chartDrawer?.setCanvasSize(w - paddingLeft - paddingRight, h - paddingTop - paddingBottom)
+    override fun onClick(view: View) {
+        if (view === leftNavigationButton) {
+
+        } else if (view === rightNavigationButton) {
+
+        }
     }
-
-
-    override fun onDraw(canvas: Canvas) {
-        println("chartview onDraw")
-        canvas.translate(paddingLeft.toFloat(), paddingRight.toFloat())
-        chartDrawer?.onDraw(canvas)
-    }
-
 }

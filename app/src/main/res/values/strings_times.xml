@@ -83,4 +83,10 @@
     <string name="friday_oneletter">F</string>
     <string name="saturday_oneletter">S</string>
 
+    <string name="granularity_day">Day</string>
+    <string name="granularity_week">Week</string>
+    <string name="granularity_month">Month</string>
+    <string name="granularity_year">Year</string>
+
+
 </resources>

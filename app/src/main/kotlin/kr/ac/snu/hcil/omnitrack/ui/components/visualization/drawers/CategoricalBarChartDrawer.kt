@@ -1,7 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers
 
 import android.graphics.Canvas
-import android.graphics.RectF
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.ICategoricalBarChart
@@ -30,12 +29,6 @@ class CategoricalBarChartDrawer(): AChartDrawer() {
             }
         }
 
-    private var vAxisWidth: Float
-    private val hAxisHeight: Float
-    private val topPadding: Float
-
-    private val canvasRect: RectF
-
     override val aspectRatio: Float = 1.7f
 
     private val horizontalAxisScale = CategoricalAxisScale()
@@ -50,11 +43,13 @@ class CategoricalBarChartDrawer(): AChartDrawer() {
     private val barElements = DataEncodedDrawingList<ICategoricalBarChart.Point>()
 
     init{
-        hAxisHeight = OTApplication.app.resources.getDimension(R.dimen.vis_axis_height).toFloat()
-        vAxisWidth = OTApplication.app.resources.getDimension(R.dimen.vis_axis_width).toFloat()
-        topPadding = OTApplication.app.resources.getDimension(R.dimen.vis_axis_label_numeric_size).toFloat()
+        paddingBottom = OTApplication.app.resources.getDimension(R.dimen.vis_axis_height).toFloat()
+        paddingLeft = OTApplication.app.resources.getDimension(R.dimen.vis_axis_width).toFloat()
+        paddingTop = OTApplication.app.resources.getDimension(R.dimen.vis_axis_label_numeric_size).toFloat()
 
-        canvasRect = RectF()
+        verticalAxis.drawBar = false
+        verticalAxis.drawGridLines = true
+
         horizontalAxis.scale = horizontalAxisScale
         verticalAxis.scale = verticalAxisScale
         verticalAxis.drawBar = false
@@ -68,9 +63,8 @@ class CategoricalBarChartDrawer(): AChartDrawer() {
     }
 
     override fun onResized() {
-        canvasRect.set(vAxisWidth, topPadding, canvasWidth.toFloat(), canvasHeight.toFloat() - hAxisHeight)
-        horizontalAxis.attachedTo = canvasRect
-        verticalAxis.attachedTo = canvasRect
+        horizontalAxis.attachedTo = plotAreaRect
+        verticalAxis.attachedTo = plotAreaRect
 
         barElements.onResizedCanvas { datum, bar ->
             if (bar is VerticalBar<ICategoricalBarChart.Point>) {
@@ -82,7 +76,7 @@ class CategoricalBarChartDrawer(): AChartDrawer() {
                         OTApplication.app.resources.getDimension(R.dimen.vis_bar_max_width)
                 )
 
-                bar.bound.set(dataX - barWidth / 2, dataY, dataX + barWidth / 2, canvasRect.bottom - OTApplication.app.resources.getDimension(R.dimen.vis_bar_axis_spacing))
+                bar.bound.set(dataX - barWidth / 2, dataY, dataX + barWidth / 2, plotAreaRect.bottom - OTApplication.app.resources.getDimension(R.dimen.vis_bar_axis_spacing))
 
             }
         }
@@ -123,9 +117,8 @@ class CategoricalBarChartDrawer(): AChartDrawer() {
     }
 
     override fun onDraw(canvas: Canvas) {
-        println("draw categorical chart")
 
-        fillRect(canvasRect, OTApplication.app.resources.getColor(R.color.editTextFormBackground, null), canvas)
+        fillRect(plotAreaRect, OTApplication.app.resources.getColor(R.color.editTextFormBackground, null), canvas)
 
         super.onDraw(canvas)
     }

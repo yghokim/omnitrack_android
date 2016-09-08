@@ -1,13 +1,11 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.visualization
 
-import android.support.v7.widget.AppCompatImageView
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
-import kr.ac.snu.hcil.omnitrack.core.visualization.AttributeChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.ChartView
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
@@ -61,8 +59,7 @@ class TrackerChartListAdapter(_tracker: OTTracker?): RecyclerView.Adapter<Tracke
         {
             nameView.text = model.name
             model.reload()
-            chartView.chartDrawer = model.getChartDrawer()
-            chartView.chartDrawer?.model = model
+            chartView.model = model
         }
     }
 }
