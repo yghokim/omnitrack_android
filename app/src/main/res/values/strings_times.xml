@@ -64,9 +64,11 @@
     <string name="msg_tracker_list_time_format">hh:mm a</string>
 
 
-    <string name="msg_date_format_scope_day">MMM ddd, yyyy</string>
-    <string name="msg_date_format_scope_month">MMM yyyy</string>
+    <string name="msg_date_format_scope_day_for_week">MMM dd</string>
+    <string name="msg_date_format_scope_day">MMM dd, yyyy</string>
+    <string name="msg_date_format_scope_month">MMMM</string>
 
+    <string name="msg_noon">Noon</string>
 
     <string name="msg_everyday">Everyday</string>
     <string name="msg_once">Once</string>

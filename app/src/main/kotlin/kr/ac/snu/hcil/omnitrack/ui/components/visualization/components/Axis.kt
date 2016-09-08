@@ -65,8 +65,6 @@ class Axis(var pivot: Pivot): IDrawer {
 
     override fun onDraw(canvas: Canvas) {
 
-        println("draw axis: ${attachedTo}")
-
         when (pivot) {
             Pivot.BOTTOM -> labelPaint.textAlign = Paint.Align.CENTER
             Pivot.LEFT -> labelPaint.textAlign = Paint.Align.RIGHT
@@ -86,7 +84,6 @@ class Axis(var pivot: Pivot): IDrawer {
 
             val tickLabel = scale?.getTickLabelAt(i)
             if (!tickLabel.isNullOrBlank()) {
-                println("draw tick: $tickLabel")
                 when (pivot) {
                     Pivot.BOTTOM ->
                         canvas.drawText(tickLabel, tickCoord, attachedTo.bottom + labelSpacing + labelPaint.textSize, labelPaint)

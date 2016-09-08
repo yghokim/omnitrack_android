@@ -68,21 +68,30 @@ class CategoricalBarChartDrawer(): AChartDrawer() {
 
         barElements.onResizedCanvas { datum, bar ->
             if (bar is VerticalBar<ICategoricalBarChart.Point>) {
-                val dataX = horizontalAxisScale.getTickCoordAt(datum.index)
-                val dataY = verticalAxisScale.convertDomainToRangeScale(datum.value.value.toFloat())
-                println("$dataX, $dataY")
-                val barWidth = Math.min(
-                        horizontalAxisScale.getTickInterval() - OTApplication.app.resources.getDimension(R.dimen.vis_bar_spacing),
-                        OTApplication.app.resources.getDimension(R.dimen.vis_bar_max_width)
-                )
-
-                bar.bound.set(dataX - barWidth / 2, dataY, dataX + barWidth / 2, plotAreaRect.bottom - OTApplication.app.resources.getDimension(R.dimen.vis_bar_axis_spacing))
-
+                mapBarElementToSpace(datum, bar)
             }
         }
     }
 
+    private fun mapBarElementToSpace(datum:IndexedValue<ICategoricalBarChart.Point>, bar : VerticalBar<ICategoricalBarChart.Point>)
+    {
+        val dataX = horizontalAxisScale.getTickCoordAt(datum.index)
+        val dataY = verticalAxisScale.convertDomainToRangeScale(datum.value.value.toFloat())
+        println("$dataX, $dataY")
+        val barWidth = Math.min(
+                horizontalAxisScale.getTickInterval() - OTApplication.app.resources.getDimension(R.dimen.vis_bar_spacing),
+                OTApplication.app.resources.getDimension(R.dimen.vis_bar_max_width)
+        )
+
+        bar.bound.set(dataX - barWidth / 2, dataY, dataX + barWidth / 2, plotAreaRect.bottom - OTApplication.app.resources.getDimension(R.dimen.vis_bar_axis_spacing))
+
+    }
+
     override fun onModelChanged() {
+    }
+
+    override fun onRefresh() {
+
         if(model is ICategoricalBarChart && model != null) {
             println("Model changed")
             barData.clear()
@@ -97,8 +106,6 @@ class CategoricalBarChartDrawer(): AChartDrawer() {
             val minValue = barData.minWith(ICategoricalBarChart.Point.VALUE_COMPARATOR)?.value?.toFloat() ?: 0f
             val maxValue = barData.maxWith(ICategoricalBarChart.Point.VALUE_COMPARATOR)?.value?.toFloat() ?: 0f
 
-            println("data min: $minValue, max: $maxValue")
-
             verticalAxisScale.setDomain(minValue, maxValue, true).nice(integerValues)
 
             //refresh data
@@ -107,13 +114,21 @@ class CategoricalBarChartDrawer(): AChartDrawer() {
                 println("updating enter selection for datum ${datum}")
                 val newBar = VerticalBar<ICategoricalBarChart.Point>()
                 newBar.color = OTApplication.app.resources.getColor(R.color.colorPointed, null)
+
+                mapBarElementToSpace(datum, newBar)
+
                 newBar
             }
+
+            //remove exit
+            barElements.removeElements(barElements.getExitElements())
+
+            //update
+            barElements.updateElement { datum, drawer ->
+                val bar = drawer as VerticalBar<ICategoricalBarChart.Point>
+                mapBarElementToSpace(datum, bar)
+            }
         }
-    }
-
-    override fun onRefresh() {
-
     }
 
     override fun onDraw(canvas: Canvas) {

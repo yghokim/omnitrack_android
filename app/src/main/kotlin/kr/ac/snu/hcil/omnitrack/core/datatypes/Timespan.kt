@@ -1,6 +1,8 @@
 package kr.ac.snu.hcil.omnitrack.core.datatypes
 
 
+import android.text.format.DateUtils
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.utils.serialization.IStringSerializable
 import java.util.*
 
@@ -36,6 +38,10 @@ class TimeSpan : IStringSerializable {
         this.timeZone = timeZone
     }
 
+
+    override fun toString(): String {
+        return "TimeSpan : ${DateUtils.formatDateTime(OTApplication.app, from, DateUtils.FORMAT_ABBREV_ALL)} ~ ${DateUtils.formatDateTime(OTApplication.app, to, DateUtils.FORMAT_ABBREV_ALL)}"
+    }
 
     constructor(serialized: String) {
         fromSerializedString(serialized)

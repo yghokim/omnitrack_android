@@ -6,7 +6,6 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTChoiceAttribute
 import kr.ac.snu.hcil.omnitrack.core.visualization.AttributeChartModel
-import kr.ac.snu.hcil.omnitrack.core.visualization.ChartType
 import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.ICategoricalBarChart
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers.CategoricalBarChartDrawer
@@ -15,7 +14,7 @@ import java.util.*
 /**
  * Created by younghokim on 16. 9. 7..
  */
-class ChoiceCategoricalBarChartModel(override val attribute: OTChoiceAttribute) : AttributeChartModel<ICategoricalBarChart.Point>(ChartType.BARCHART_CATEGORICAL, attribute), ICategoricalBarChart {
+class ChoiceCategoricalBarChartModel(override val attribute: OTChoiceAttribute) : AttributeChartModel<ICategoricalBarChart.Point>(attribute), ICategoricalBarChart {
     private var loaded = false
     private val data = ArrayList<ICategoricalBarChart.Point>()
 
@@ -34,14 +33,15 @@ class ChoiceCategoricalBarChartModel(override val attribute: OTChoiceAttribute) 
         data.clear()
     }
 
-    override fun reload() {
+    override fun onReload() {
 
-        println("reload chart data : ${attribute.name}")
+        println("reload chart data : ${attribute.name} during $queryRange")
+        data.clear()
 
         val tracker = attribute.owner
         if (tracker != null) {
             itemsCache.clear()
-            OTApplication.app.dbHelper.getItems(tracker, itemsCache)
+            OTApplication.app.dbHelper.getItems(tracker, queryRange, itemsCache)
 
             counterDictCache.clear()
             categoriesCache.clear()
@@ -77,6 +77,8 @@ class ChoiceCategoricalBarChartModel(override val attribute: OTChoiceAttribute) 
                     data.add(ICategoricalBarChart.Point(entry.text, counterDictCache[categoryId].toDouble(), categoryId))
                 }
             }
+
+            println(data)
             
             categoriesCache.clear()
             counterDictCache.clear()

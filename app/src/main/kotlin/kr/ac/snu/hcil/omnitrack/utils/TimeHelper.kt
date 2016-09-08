@@ -25,9 +25,10 @@ object TimeHelper {
     val DAY_OF_WEEK_FULL_FORMAT: SimpleDateFormat by lazy { SimpleDateFormat("EEEE") }
     val DAY_OF_WEEK_SHORT_FORMAT: SimpleDateFormat by lazy { SimpleDateFormat("EEE") }
 
+
     val FORMAT_DAY = SimpleDateFormat(OTApplication.app.resources.getString(R.string.msg_date_format_scope_day))
     val FORMAT_MONTH = SimpleDateFormat(OTApplication.app.resources.getString(R.string.msg_date_format_scope_month))
-
+    val FORMAT_DAY_WITHOUT_YEAR  = SimpleDateFormat(OTApplication.app.resources.getString(R.string.msg_date_format_scope_day_for_week))
 
     fun addDays(timestamp: Long, days: Int): Long {
         return timestamp + days * daysInMilli
@@ -138,6 +139,13 @@ object TimeHelper {
         }
 
         return builder.trim().toString()
+    }
+
+    fun getYear(time: Long): Int
+    {
+        val cal = Calendar.getInstance()
+        cal.timeInMillis = time
+        return cal.getYear()
     }
 
 

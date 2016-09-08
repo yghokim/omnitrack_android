@@ -92,6 +92,7 @@ class DataEncodedDrawingList<T>() : ADataEncodedDrawer<T>() {
     fun updateElement(updater: (newItem: IndexedValue<T>, element: ADataEncodedDrawer<T>) -> Unit) {
         for (element in _updateElements) {
             updater.invoke(element.first, element.second)
+            element.second.datum = element.first.value
         }
     }
 
@@ -110,7 +111,7 @@ class DataEncodedDrawingList<T>() : ADataEncodedDrawer<T>() {
     }
 
     fun removeElements(toRemove: Collection<ADataEncodedDrawer<T>>) {
-        elements.removeAll(toRemove)
+        println("batch removal : ${elements.removeAll(toRemove)}")
     }
 
     fun onResizedCanvas(sizeUpdater: (IndexedValue<T>, ADataEncodedDrawer<T>) -> Unit) {

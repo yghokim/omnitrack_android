@@ -6,9 +6,8 @@ import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
-import kr.ac.snu.hcil.omnitrack.core.visualization.ChartType
 import kr.ac.snu.hcil.omnitrack.core.visualization.CompoundAttributeChartModel
-import kr.ac.snu.hcil.omnitrack.core.visualization.ITimelineChart
+import kr.ac.snu.hcil.omnitrack.core.visualization.Granularity
 import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.ILineChartOnTime
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers.MultiLineChartDrawer
@@ -19,9 +18,7 @@ import java.util.*
  * Created by Young-Ho Kim on 2016-09-08.
  */
 class TimelineComparisonLineChartModel(override val attributes: List<OTNumberAttribute>, parent: OTTracker)
-: CompoundAttributeChartModel<ILineChartOnTime.LineData>(ChartType.TIMESPAN_TIMELINE, attributes, parent), ILineChartOnTime {
-
-    override val isScopeControlSupported: Boolean = true
+: CompoundAttributeChartModel<ILineChartOnTime.LineData>(attributes, parent), ILineChartOnTime {
 
     override val name: String = OTApplication.app.resources.getString(R.string.msg_vis_numeric_line_timeline_title)
 
@@ -34,13 +31,12 @@ class TimelineComparisonLineChartModel(override val attributes: List<OTNumberAtt
 
     private val data = ArrayList<ILineChartOnTime.LineData>()
 
-    private val queryRange = TimeSpan()
 
     private val itemsCache = ArrayList<OTItem>()
 
     private val pointsCache = ArrayList<Pair<Long, BigDecimal>>()
 
-    override fun reload() {
+    override fun onReload() {
         data.clear()
 
         OTApplication.app.dbHelper.getItems(parent, queryRange, itemsCache)
@@ -86,14 +82,4 @@ class TimelineComparisonLineChartModel(override val attributes: List<OTNumberAtt
     override fun getDataPoints(): List<ILineChartOnTime.LineData> {
         return data
     }
-
-    override fun setTimeScope(time: Long, scope: ITimelineChart.Granularity) {
-        scope.convertToRange(time, queryRange)
-    }
-
-    override fun getTimeScope(): TimeSpan {
-        return queryRange
-    }
-
-
 }

@@ -7,6 +7,7 @@ import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
+import kr.ac.snu.hcil.omnitrack.core.visualization.Granularity
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.ChartView
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 
@@ -29,6 +30,16 @@ class TrackerChartListAdapter(_tracker: OTTracker?): RecyclerView.Adapter<Tracke
         }
 
     var models: Array<ChartModel<*>>? = null
+
+    fun setScopedQueryRange(pivot: Long, scope: Granularity)
+    {
+        if(models != null) {
+            for (model in models!!) {
+                model.setTimeScope(pivot, scope)
+                model.reload()
+            }
+        }
+    }
 
     override fun getItemCount(): Int {
         return models?.size ?: 0

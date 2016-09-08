@@ -1,14 +1,13 @@
 package kr.ac.snu.hcil.omnitrack.core.visualization.interfaces
 
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
-import kr.ac.snu.hcil.omnitrack.core.visualization.ITimelineChart
 import java.math.BigDecimal
 import java.util.*
 
 /**
  * Created by Young-Ho Kim on 2016-09-08.
  */
-interface ILineChartOnTime : IChartInterface<ILineChartOnTime.LineData>, ITimelineChart {
+interface ILineChartOnTime : IChartInterface<ILineChartOnTime.LineData> {
     data class LineData(val points: Array<Pair<Long, BigDecimal>>, val attribute: OTAttribute<out Any>) {
         fun maxValue(): BigDecimal {
             return points.maxWith(ValueComparator)?.second ?: BigDecimal.valueOf(0)

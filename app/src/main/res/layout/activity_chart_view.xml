@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/frontalBackground"
     android:descendantFocusability="beforeDescendants"
-
+    android:orientation="vertical"
     android:fitsSystemWindows="true"
     android:focusableInTouchMode="true"
 
@@ -22,10 +22,96 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/ui_list"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/appbar" />
 
-</RelativeLayout>
+    <FrameLayout android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bottom_separator_thin"
+        android:paddingBottom="12dp"
+        android:paddingTop="12dp"
+        >
+
+        <kr.ac.snu.hcil.omnitrack.ui.components.common.choice.SelectionView
+            android:id="@+id/ui_scope_selection"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"/>
+    </FrameLayout>
+
+
+    <LinearLayout
+        android:id="@+id/ui_time_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:paddingLeft="60dp"
+        android:paddingRight="60dp"
+
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+
+        android:background="@drawable/bottom_separator_light">
+
+        <android.support.v7.widget.AppCompatImageButton
+            android:id="@+id/ui_navigate_left"
+            android:layout_width="@dimen/button_height_normal"
+            android:layout_height="@dimen/button_height_normal"
+            android:background="@drawable/transparent_button_background"
+            android:src="@drawable/left_dark" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical"
+            android:gravity="center"
+            android:orientation="vertical"
+            >
+
+            <TextView
+                android:id="@+id/ui_current_year"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2016"
+                android:textAlignment="center"
+                android:textColor="@color/colorPointed.Light"
+                android:textSize="12dp"/>
+            <TextView
+                android:id="@+id/ui_current_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Aug 16, 2016"
+                android:textAlignment="center"
+                android:textColor="@color/colorPointed.Light"
+                android:textStyle="bold"
+                android:textSize="16dp" />
+
+
+        </LinearLayout>
+
+        <android.support.v7.widget.AppCompatImageButton
+            android:id="@+id/ui_navigate_right"
+            android:layout_width="@dimen/button_height_normal"
+            android:layout_height="@dimen/button_height_normal"
+            android:background="@drawable/transparent_button_background"
+            android:src="@drawable/right_dark" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/ui_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/expanded_view_inner_shadow_top"/>
+    </FrameLayout>
+
+
+
+
+</LinearLayout>

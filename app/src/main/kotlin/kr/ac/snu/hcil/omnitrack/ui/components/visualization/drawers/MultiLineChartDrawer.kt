@@ -34,7 +34,7 @@ class MultiLineChartDrawer() : AChartDrawer() {
 
         verticalAxis.drawBar = false
         verticalAxis.drawGridLines = true
-        horizontalAxis.drawBar = false
+        horizontalAxis.drawBar = true
         horizontalAxis.drawGridLines = true
 
         horizontalAxis.scale = horizontalAxisScale
@@ -72,8 +72,10 @@ class MultiLineChartDrawer() : AChartDrawer() {
 
             verticalAxisScale.setDomain(minValue, maxValue, true).nice(true)
 
-            val timeScope = (model as ILineChartOnTime).getTimeScope()
-            horizontalAxisScale.setDomain(timeScope.from, timeScope.to)
+            val timeScope = model!!.getTimeScope()
+            val granularity = model!!.getCurrentScopeGranularity()
+
+            horizontalAxisScale.setDomain(timeScope.from, timeScope.to).setTicksBasedOnGranularity(granularity)
         }
     }
 
