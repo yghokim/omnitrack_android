@@ -10,18 +10,32 @@ import java.util.*
 class TimeSpan : IStringSerializable {
 
     var from: Long = 0
-    var duration: Int = 0
+    var duration: Long = 0
     var timeZone: TimeZone = TimeZone.getDefault()
 
     val to: Long get() = from + duration.toLong()
 
-    constructor(from: Long = System.currentTimeMillis(), duration: Int = 0, timeZone: TimeZone = TimeZone.getDefault()) {
+    companion object {
+        fun fromDuration(from: Long = System.currentTimeMillis(), duration: Long = 0L, timeZone: TimeZone = TimeZone.getDefault()): TimeSpan {
+            return TimeSpan(from, duration, timeZone)
+        }
+
+        fun fromPoints(from: Long = System.currentTimeMillis(), to: Long = from, timeZone: TimeZone = TimeZone.getDefault()): TimeSpan {
+            return TimeSpan(from, to - from, timeZone)
+        }
+    }
+
+
+    constructor() {
+        from = System.currentTimeMillis()
+    }
+
+    private constructor(from: Long = System.currentTimeMillis(), duration: Long = 0L, timeZone: TimeZone = TimeZone.getDefault()) {
         this.from = from
         this.duration = duration
         this.timeZone = timeZone
     }
 
-    constructor(from: Long, to: Long, timeZone: TimeZone = TimeZone.getDefault()) : this(from, (to - from).toInt())
 
     constructor(serialized: String) {
         fromSerializedString(serialized)
@@ -36,7 +50,7 @@ class TimeSpan : IStringSerializable {
             val parts = serialized.split("@")
             from = parts[0].toLong()
             timeZone = TimeZone.getTimeZone(parts[1])
-            duration = parts[2].toInt()
+            duration = parts[2].toLong()
 
             return true
         } catch(e: Exception) {

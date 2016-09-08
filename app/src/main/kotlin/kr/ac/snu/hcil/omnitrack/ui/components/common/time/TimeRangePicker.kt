@@ -75,7 +75,7 @@ class TimeRangePicker : FrameLayout, View.OnClickListener {
     private lateinit var format: SimpleDateFormat
 
     fun getTimeSpan(): TimeSpan {
-        return TimeSpan(from, to)
+        return TimeSpan.fromPoints(from, to)
     }
 
     fun setTimeSpan(value: TimeSpan) {

@@ -15,12 +15,14 @@ interface ITimelineChart {
                 val cal = GregorianCalendar.getInstance()
                 cal.timeInMillis = time
                 cal.set(Calendar.HOUR_OF_DAY, 0)
+                cal.set(Calendar.HOUR, 0)
+                cal.set(Calendar.AM_PM, 0)
                 cal.set(Calendar.MINUTE, 0)
                 cal.set(Calendar.SECOND, 0)
                 cal.set(Calendar.MILLISECOND, 0)
 
                 out.from = cal.timeInMillis
-                out.duration = DateUtils.DAY_IN_MILLIS.toInt()
+                out.duration = DateUtils.DAY_IN_MILLIS
             }
 
         },
@@ -33,7 +35,7 @@ interface ITimelineChart {
                 cal.set(Calendar.DAY_OF_WEEK, 1)
 
                 out.from = cal.timeInMillis
-                out.duration = DateUtils.WEEK_IN_MILLIS.toInt()
+                out.duration = DateUtils.WEEK_IN_MILLIS
             }
         },
         MONTH(R.string.granularity_month) {
@@ -41,13 +43,16 @@ interface ITimelineChart {
                 val cal = GregorianCalendar.getInstance()
                 cal.timeInMillis = time
                 cal.set(Calendar.DAY_OF_MONTH, 1)
+                cal.set(Calendar.HOUR, 0)
+                cal.set(Calendar.AM_PM, 0)
                 cal.set(Calendar.HOUR_OF_DAY, 0)
                 cal.set(Calendar.MINUTE, 0)
                 cal.set(Calendar.SECOND, 0)
                 cal.set(Calendar.MILLISECOND, 0)
 
                 out.from = cal.timeInMillis
-                out.duration = (cal.getMaximum(Calendar.DAY_OF_MONTH) * DateUtils.DAY_IN_MILLIS).toInt()
+
+                out.duration = (cal.getMaximum(Calendar.DAY_OF_MONTH) * DateUtils.DAY_IN_MILLIS)
             }
         },
         YEAR(R.string.granularity_year) {
@@ -56,12 +61,14 @@ interface ITimelineChart {
                 cal.timeInMillis = time
                 cal.set(Calendar.DAY_OF_YEAR, 1)
                 cal.set(Calendar.HOUR_OF_DAY, 0)
+                cal.set(Calendar.HOUR, 0)
+                cal.set(Calendar.AM_PM, 0)
                 cal.set(Calendar.MINUTE, 0)
                 cal.set(Calendar.SECOND, 0)
                 cal.set(Calendar.MILLISECOND, 0)
 
                 out.from = cal.timeInMillis
-                out.duration = DateUtils.YEAR_IN_MILLIS.toInt()
+                out.duration = DateUtils.YEAR_IN_MILLIS
             }
         };
 

@@ -1,7 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.fitbit
 
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.OTItemBuilder
 import kr.ac.snu.hcil.omnitrack.core.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
@@ -53,12 +52,12 @@ object FitbitRecentSleepTimeMeasureFactory : OTMeasureFactory() {
                     if (sleeps.length() > 0) {
                         val lastObj = sleeps.getJSONObject(0)
                         val dateOfSleepString = lastObj.getString("dateOfSleep") // yyyy-mm-dd
-                        val duration = lastObj.getInt("duration") //millis
+                        val duration = lastObj.getLong("duration") //millis
                         val minuteData = lastObj.getJSONArray("minuteData")
                         val startTimeString = minuteData.getJSONObject(0).getString("dateTime") // hh:mm:ss
 
                         val startTime = AuthConstants.DATE_TIME_FORMAT_WITHOUT_TIMEZONE.parse(dateOfSleepString + 'T' + startTimeString)
-                        return TimeSpan(startTime.time, duration)
+                        return TimeSpan.fromDuration(startTime.time, duration)
                     } else return null
                 } else return null
 

@@ -73,7 +73,7 @@ object MisfitApi {
                     val duration = last.getInt("duration")
 
                     val startTime = AuthConstants.DATE_TIME_FORMAT.parse(startTimeString)
-                    handler.invoke(TimeSpan(startTime.time, startTime.time + duration * 1000))
+                    handler.invoke(TimeSpan.fromPoints(startTime.time, startTime.time + duration * 1000))
 
                 } else handler.invoke(null)
             } else handler.invoke(null)

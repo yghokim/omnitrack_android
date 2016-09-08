@@ -60,6 +60,10 @@ class ChartView : LinearLayout, IEventListener<ChartModel<*>?>, View.OnClickList
 
     private val scopeSelectionView: SelectionView
 
+    private val currentScope: ITimelineChart.Granularity
+        get() = ITimelineChart.Granularity.values()[scopeSelectionView.selectedIndex]
+
+    private var currentPoint: Long = System.currentTimeMillis()
 
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
@@ -77,8 +81,17 @@ class ChartView : LinearLayout, IEventListener<ChartModel<*>?>, View.OnClickList
         scopeSelectionView.setValues(ITimelineChart.Granularity.values().map { resources.getString(it.nameId) }.toTypedArray())
         scopeSelectionView.onSelectedIndexChanged += {
             sender, index ->
-
+            onGranularityChanged(ITimelineChart.Granularity.values()[index])
         }
+
+
+    }
+
+    private fun onGranularityChanged(granularity: ITimelineChart.Granularity) {
+        println("change granularity ${granularity}")
+        (model as? ITimelineChart)?.setTimeScope(currentPoint, granularity)
+        model?.reload()
+        chartView.invalidate()
     }
 
     override fun onEvent(sender: Any, args: ChartModel<*>?) {
