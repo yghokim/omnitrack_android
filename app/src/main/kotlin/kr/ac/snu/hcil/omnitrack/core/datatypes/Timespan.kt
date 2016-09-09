@@ -3,7 +3,10 @@ package kr.ac.snu.hcil.omnitrack.core.datatypes
 
 import android.text.format.DateUtils
 import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 import kr.ac.snu.hcil.omnitrack.utils.serialization.IStringSerializable
+import java.text.SimpleDateFormat
 import java.util.*
 
 /**
@@ -15,7 +18,7 @@ class TimeSpan : IStringSerializable {
     var duration: Long = 0
     var timeZone: TimeZone = TimeZone.getDefault()
 
-    val to: Long get() = from + duration.toLong()
+    val to: Long get() = from + duration
 
     companion object {
         fun fromDuration(from: Long = System.currentTimeMillis(), duration: Long = 0L, timeZone: TimeZone = TimeZone.getDefault()): TimeSpan {
@@ -40,7 +43,8 @@ class TimeSpan : IStringSerializable {
 
 
     override fun toString(): String {
-        return "TimeSpan : ${DateUtils.formatDateTime(OTApplication.app, from, DateUtils.FORMAT_ABBREV_ALL)} ~ ${DateUtils.formatDateTime(OTApplication.app, to, DateUtils.FORMAT_ABBREV_ALL)}"
+        val format = SimpleDateFormat(OTApplication.app.resources.getString(R.string.msg_tracker_list_time_format))
+        return "${TimeHelper.getDateText(from, OTApplication.app)} ${format.format(Date(from))} \n~ ${TimeHelper.getDateText(to, OTApplication.app)} ${format.format(Date(to))}"
     }
 
     constructor(serialized: String) {
@@ -55,11 +59,11 @@ class TimeSpan : IStringSerializable {
         try {
             val parts = serialized.split("@")
             from = parts[0].toLong()
-            timeZone = TimeZone.getTimeZone(parts[1])
-            duration = parts[2].toLong()
-
+            duration = parts[1].toLong()
+            timeZone = TimeZone.getTimeZone(parts[2])
             return true
         } catch(e: Exception) {
+            e.printStackTrace()
             return false
         }
     }

@@ -79,6 +79,7 @@ class TimeRangePicker : FrameLayout, View.OnClickListener {
     }
 
     fun setTimeSpan(value: TimeSpan) {
+        println("${value}, ${value.from}) ~ ${value.to}")
         from = value.from
         to = value.from + value.duration
         invalidateViewSettings()

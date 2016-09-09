@@ -179,4 +179,23 @@ object TimeHelper {
             Length.SHORTEST -> DAY_OF_WEEK_SHORT_FORMAT.format(date)
         }
     }
+
+    fun loopForDays(from: Long, to: Long, loopHandler:(time:Long, start:Long, end:Long, dayOfYear:Int)->Unit)
+    {
+        val rangeCal = Calendar.getInstance()
+        val cal = Calendar.getInstance()
+        cal.timeInMillis = from
+
+        while(cal.timeInMillis <= to)
+        {
+            rangeCal.timeInMillis = cal.timeInMillis
+            rangeCal.setHourOfDay(0, true)
+
+            loopHandler(cal.timeInMillis, rangeCal.timeInMillis, rangeCal.timeInMillis + DateUtils.DAY_IN_MILLIS,  cal.get(Calendar.DAY_OF_YEAR))
+
+            cal.add(Calendar.DAY_OF_YEAR, 1)
+        }
+    }
+
+
 }

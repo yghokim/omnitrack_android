@@ -89,6 +89,8 @@ class QuantizedTimeScale : IAxisScale<Long> {
 
     private val domainBinPoints = ArrayList<Long>()
 
+    val binPointsOnDomain: List<Long> get() = domainBinPoints
+
     //Calendar flag
     private var calendarLevel: Int = Calendar.DAY_OF_YEAR
 

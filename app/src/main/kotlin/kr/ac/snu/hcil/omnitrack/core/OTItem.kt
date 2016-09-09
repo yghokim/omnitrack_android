@@ -42,6 +42,27 @@ class OTItem : ADataRow, IDatabaseStorable {
         }
     }
 
+    /**
+     * used to log directly in code behind
+     */
+    constructor( tracker: OTTracker, timestamp: Long,  vararg values : Any?): this(tracker.objectId)
+    {
+        this.timestamp = timestamp
+
+        if(tracker.attributes.size != values.size)
+        {
+            throw IllegalArgumentException("attribute count and value count is different.")
+        }
+
+        for(valueEntry in values.withIndex())
+        {
+            if(valueEntry.value!=null)
+            {
+                setValueOf(tracker.attributes[valueEntry.index], valueEntry.value!!)
+            }
+        }
+    }
+
     fun getSerializedValueTable(scheme: OTTracker): String {
         return Gson().toJson(tableToSerializedEntryArray(scheme))
     }

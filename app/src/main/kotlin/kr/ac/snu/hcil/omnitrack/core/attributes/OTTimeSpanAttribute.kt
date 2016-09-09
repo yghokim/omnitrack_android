@@ -36,7 +36,7 @@ class OTTimeSpanAttribute(objectId: String?, dbId: Long?, columnName: String, se
     override val valueNumericCharacteristics: NumericCharacteristics = NumericCharacteristics(true, false)
 
     override fun formatAttributeValue(value: Any): String {
-        return ""
+        return (value as TimeSpan).toString()
     }
 
     override fun getAutoCompleteValueAsync(resultHandler: (TimeSpan) -> Unit): Boolean {

@@ -2,15 +2,21 @@ package kr.ac.snu.hcil.omnitrack
 
 import android.app.Application
 import android.graphics.Color
+import android.text.format.DateUtils
+import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTShortcutManager
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.*
 import kr.ac.snu.hcil.omnitrack.core.database.CacheHelper
 import kr.ac.snu.hcil.omnitrack.core.database.DatabaseHelper
+import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTriggerAlarmManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerManager
+import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 import kr.ac.snu.hcil.omnitrack.utils.UniqueStringEntryList
+import java.math.BigDecimal
+import java.util.*
 
 /**
  * Created by Young-Ho Kim on 2016-07-11.
@@ -93,6 +99,9 @@ class OTApplication : Application() {
         if (user == null) {
             val defaultUser = OTUser("Young-Ho Kim", "yhkim@hcil.snu.ac.kr")
             _currentUser = defaultUser
+
+
+            //====================================================================================================================================================
             val coffeeTracker = defaultUser.newTracker("Coffee", true)
             coffeeTracker.attributes.add(OTAttribute.Companion.createAttribute(defaultUser, "Name", OTAttribute.TYPE_SHORT_TEXT))
             coffeeTracker.attributes.add(OTAttribute.Companion.createAttribute(defaultUser, "Drank At", OTAttribute.TYPE_TIME))
@@ -100,20 +109,18 @@ class OTApplication : Application() {
             val waterTracker = defaultUser.newTracker("Water", true)
             waterTracker.attributes.add(OTAttribute.Companion.createAttribute(defaultUser, "Drank At", OTAttribute.TYPE_TIME))
 
+
+            //====================================================================================================================================================
             val sleepTracker = defaultUser.newTracker("Manual Sleep", true)
-
-            val stepAttribute = OTAttribute.Companion.createAttribute(defaultUser, "Steps of the day", OTAttribute.TYPE_NUMBER)
-
-            sleepTracker.attributes.add(stepAttribute)
-
-            sleepTracker.attributes.add(OTAttribute.Companion.createAttribute(defaultUser, "When to Bed", OTAttribute.TYPE_TIME))
 
             val sleepTimeAttribute = OTAttribute.Companion.createAttribute(defaultUser, "Slept for", OTAttribute.TYPE_TIMESPAN)
             sleepTimeAttribute.setPropertyValue(OTTimeSpanAttribute.PROPERTY_GRANULARITY, OTTimeAttribute.GRANULARITY_MINUTE)
 
             sleepTracker.attributes.add(sleepTimeAttribute)
+            sleepTracker.attributes.add(OTAttribute.Companion.createAttribute(defaultUser, "Quality", OTAttribute.TYPE_RATING))
             sleepTracker.attributes.add(OTAttribute.Companion.createAttribute(defaultUser, "Memo", OTAttribute.TYPE_LONG_TEXT))
 
+            //====================================================================================================================================================
             val diaryTracker = defaultUser.newTracker("Diary", true)
             val dateAttribute = OTAttribute.createAttribute(defaultUser, "Date", OTAttribute.TYPE_TIME)
             dateAttribute.setPropertyValue(OTTimeAttribute.GRANULARITY, OTTimeAttribute.GRANULARITY_DAY)
@@ -128,8 +135,58 @@ class OTApplication : Application() {
             diaryTracker.attributes.add(OTAttribute.Companion.createAttribute(defaultUser, "Content", OTAttribute.TYPE_LONG_TEXT))
 
 
+            //====================================================================================================================================================
+            val stepComparisonTracker = defaultUser.newTracker("Step Devices", true)
+            val fitbitAttribute = OTAttribute.createAttribute(defaultUser, "Fitbit", OTAttribute.TYPE_NUMBER) as OTNumberAttribute
+            fitbitAttribute.numberStyle.fractionPart = 0
+            val misfitAttribute = OTAttribute.createAttribute(defaultUser, "MisFit", OTAttribute.TYPE_NUMBER) as OTNumberAttribute
+            misfitAttribute.numberStyle.fractionPart = 0
 
-            _currentUser = defaultUser
+            stepComparisonTracker.attributes.add(fitbitAttribute)
+            stepComparisonTracker.attributes.add(misfitAttribute)
+
+            dbHelper.save(_currentUser)
+
+            java.lang.Runnable{
+
+                //batch input
+                val end = System.currentTimeMillis()
+                val start = end - 200 * DateUtils.DAY_IN_MILLIS
+
+                val stepItems = ArrayList<OTItem>()
+
+
+                val sleepItems = ArrayList<OTItem>()
+
+                TimeHelper.loopForDays(start, end)
+                {
+                    time, from, to, dayOfYear->
+                        stepItems.add(
+                             OTItem(
+                                     stepComparisonTracker,
+                                     time,
+                                     BigDecimal( Math.sin(dayOfYear/31.0) * 3000 + 5000 ),
+                                     BigDecimal( Math.cos(dayOfYear/31.0) * 3000 + 4000 )
+                                     )
+                        )
+
+                        sleepItems.add(
+                            OTItem(
+                                    sleepTracker,
+                                    time,
+                                    TimeSpan.fromDuration(from + (Math.sin(dayOfYear/31.0)*2*DateUtils.HOUR_IN_MILLIS).toLong(), 5 * DateUtils.HOUR_IN_MILLIS + (Math.random() * DateUtils.HOUR_IN_MILLIS*1.5).toLong()),
+                                    (Math.random() * 5).toFloat(),
+                                    ""
+                            )
+                        )
+                }
+                dbHelper.save(stepItems, stepComparisonTracker)
+                dbHelper.save(sleepItems, sleepTracker)
+
+
+
+            }.run()
+
         } else {
             _currentUser = user
         }
