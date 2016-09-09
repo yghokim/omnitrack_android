@@ -8,6 +8,7 @@ import android.support.v4.graphics.ColorUtils
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.IDrawer
+import kotlin.properties.Delegates
 
 /**
  * Created by Young-Ho on 9/8/2016.
@@ -16,6 +17,29 @@ class Axis(var pivot: Pivot): IDrawer {
 
     enum class Pivot{
         LEFT, BOTTOM
+    }
+
+    enum class TickLabelStyle{
+
+        Small {
+            override fun applyStyle(axis: Axis) {
+
+                axis.labelPaint.textSize = OTApplication.app.resources.getDimension(R.dimen.vis_axis_label_numeric_size)
+                axis.labelPaint.isFakeBoldText = true
+                axis.labelSpacing = 2 * OTApplication.app.resources.displayMetrics.density
+            }
+
+        },
+        Normal {
+            override fun applyStyle(axis: Axis) {
+                axis.labelPaint.textSize = OTApplication.app.resources.getDimension(R.dimen.vis_axis_label_categorical_size)
+                axis.labelPaint.isFakeBoldText = false
+                axis.labelSpacing = OTApplication.app.resources.getDimension(R.dimen.vis_axis_label_spacing)
+            }
+        };
+
+
+        abstract fun applyStyle(axis: Axis)
     }
 
     var drawPin: Boolean = false
@@ -28,6 +52,8 @@ class Axis(var pivot: Pivot): IDrawer {
     var labelPaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
     var labelSpacing: Float = 0f
+
+    var gridOnBorder: Boolean = false
 
     var attachedTo: RectF = RectF()
         set(value)
@@ -45,6 +71,11 @@ class Axis(var pivot: Pivot): IDrawer {
     var scale: IAxisScale<*>? = null
 
     private val tickLabelSizeMeasureRect = Rect()
+
+    var style: TickLabelStyle by Delegates.observable(TickLabelStyle.Normal){
+        prop, old, new->
+            new.applyStyle(this)
+    }
 
     init{
         linePaint.color = OTApplication.app.resources.getColor(R.color.vis_color_axis, null)
@@ -95,11 +126,20 @@ class Axis(var pivot: Pivot): IDrawer {
             }
 
             if (drawGridLines) {
+
+                val gridCoord = if (gridOnBorder && i < scale?.numTicks?:0 -1) {
+                    tickCoord + (scale?.getTickInterval() ?: 0f)/2
+                } else {
+                    tickCoord
+                }
+
                 when (pivot) {
-                    Pivot.BOTTOM ->
-                        canvas.drawLine(tickCoord, attachedTo.top, tickCoord, attachedTo.bottom, gridLinePaint)
+                    Pivot.BOTTOM -> {
+
+                        canvas.drawLine(gridCoord, attachedTo.top, gridCoord, attachedTo.bottom, gridLinePaint)
+                    }
                     Pivot.LEFT ->
-                        canvas.drawLine(attachedTo.left, tickCoord, attachedTo.right, tickCoord, gridLinePaint)
+                        canvas.drawLine(attachedTo.left, gridCoord, attachedTo.right, gridCoord, gridLinePaint)
                 }
             }
         }

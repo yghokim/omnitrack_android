@@ -154,9 +154,8 @@ class OTApplication : Application() {
                 val start = end - 200 * DateUtils.DAY_IN_MILLIS
 
                 val stepItems = ArrayList<OTItem>()
-
-
                 val sleepItems = ArrayList<OTItem>()
+                val coffeeItems = ArrayList<OTItem>()
 
                 TimeHelper.loopForDays(start, end)
                 {
@@ -179,9 +178,24 @@ class OTApplication : Application() {
                                     ""
                             )
                         )
+
+                        val numCoffeeADay = ((Math.random() * 4) + .5f).toInt()
+                        for(i in 0..numCoffeeADay-1)
+                        {
+                            val coffeeTime  = from + ((to - from) * Math.random()).toLong()
+                            coffeeItems.add(
+                                    OTItem(
+                                            coffeeTracker,
+                                            coffeeTime,
+                                            "Americano",
+                                            coffeeTime
+                                    )
+                            )
+                        }
                 }
                 dbHelper.save(stepItems, stepComparisonTracker)
                 dbHelper.save(sleepItems, sleepTracker)
+                dbHelper.save(coffeeItems, coffeeTracker)
 
 
 

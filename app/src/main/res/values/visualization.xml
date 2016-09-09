@@ -14,7 +14,7 @@
 
     <dimen name="vis_axis_height">40dp</dimen>
 
-    <dimen name="vis_axis_width">35dp</dimen>
+    <dimen name="vis_axis_width">32dp</dimen>
 
     <dimen name="vis_bar_max_width">30dp</dimen>
     <dimen name="vis_bar_spacing">6dp</dimen>

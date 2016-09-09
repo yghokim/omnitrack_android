@@ -15,41 +15,26 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 2016-09-08.
  */
-class MultiLineChartDrawer() : AChartDrawer() {
+class MultiLineChartDrawer() : ATimelineChartDrawer() {
 
     override val aspectRatio: Float = 1.7f
-
-    val horizontalAxis = Axis(Axis.Pivot.BOTTOM)
     val verticalAxis = Axis(Axis.Pivot.LEFT)
 
     private val verticalAxisScale = NumericScale()
-    private val horizontalAxisScale = QuantizedTimeScale().inset(true)
 
     private val data = ArrayList<ILineChartOnTime.LineData>()
 
     init {
 
-        paddingBottom = OTApplication.app.resources.getDimension(R.dimen.vis_axis_height).toFloat()
-        paddingLeft = OTApplication.app.resources.getDimension(R.dimen.vis_axis_width).toFloat()
-        paddingTop = OTApplication.app.resources.getDimension(R.dimen.vis_axis_label_numeric_size).toFloat()
-
-
         verticalAxis.drawBar = false
         verticalAxis.drawGridLines = true
-        horizontalAxis.drawBar = true
-        horizontalAxis.drawGridLines = true
-        horizontalAxis.labelPaint.isFakeBoldText = true
-
-
-        horizontalAxis.scale = horizontalAxisScale
         verticalAxis.scale = verticalAxisScale
 
-        children.add(horizontalAxis)
         children.add(verticalAxis)
     }
 
     override fun onResized() {
-        horizontalAxis.attachedTo = plotAreaRect
+        super.onResized()
         verticalAxis.attachedTo = plotAreaRect
     }
 
@@ -58,6 +43,7 @@ class MultiLineChartDrawer() : AChartDrawer() {
     }
 
     override fun onRefresh() {
+        super.onRefresh()
         if (model is ILineChartOnTime && model != null) {
             println("Model changed")
 
@@ -75,24 +61,6 @@ class MultiLineChartDrawer() : AChartDrawer() {
             println("data ranges from $minValue ~ $maxValue")
 
             verticalAxisScale.setDomain(minValue, maxValue, true).nice(true)
-
-            val timeScope = model!!.getTimeScope()
-            val granularity = model!!.getCurrentScopeGranularity()
-
-            horizontalAxisScale.setDomain(timeScope.from, timeScope.to).quantize(granularity)
-
-            if(granularity != Granularity.WEEK)
-            {
-
-                horizontalAxis.labelPaint.textSize = verticalAxis.labelPaint.textSize
-                horizontalAxis.labelPaint.isFakeBoldText = true
-                horizontalAxis.labelSpacing = 2 * OTApplication.app.resources.displayMetrics.density
-            }
-            else{
-                horizontalAxis.labelPaint.textSize = OTApplication.app.resources.getDimension(R.dimen.vis_axis_label_categorical_size)
-                horizontalAxis.labelPaint.isFakeBoldText = false
-                horizontalAxis.labelSpacing = OTApplication.app.resources.getDimension(R.dimen.vis_axis_label_spacing)
-            }
         }
     }
 

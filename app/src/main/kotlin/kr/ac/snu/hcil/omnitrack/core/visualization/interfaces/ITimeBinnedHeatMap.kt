@@ -8,5 +8,5 @@ interface ITimeBinnedHeatMap{
     /**
      * float is normalized
      */
-    data class Cell(val time: Long, val distribution: FloatArray )
+    data class CounterVector(val time: Long, val distribution: FloatArray )
 }

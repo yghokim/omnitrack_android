@@ -6,7 +6,7 @@ import java.util.*
 /**
  * Created by younghokim on 16. 9. 8..
  */
-class DataEncodedDrawingList<T>() : ADataEncodedDrawer<T>() {
+class DataEncodedDrawingList<T, SelfDataType>() : ADataEncodedDrawer<SelfDataType>() {
 
     private var elements = ArrayList<ADataEncodedDrawer<T>>()
     private var _updateElements = ArrayList<Pair<IndexedValue<T>, ADataEncodedDrawer<T>>>()
@@ -22,13 +22,13 @@ class DataEncodedDrawingList<T>() : ADataEncodedDrawer<T>() {
         }
     }
 
-    fun setIdentifier(identifierFunc: ((a: T, b: T) -> Boolean)?): DataEncodedDrawingList<T> {
+    fun setIdentifier(identifierFunc: ((a: T, b: T) -> Boolean)?): DataEncodedDrawingList<T, SelfDataType> {
         identifier = identifierFunc
 
         return this
     }
 
-    fun setData(data: List<T>): DataEncodedDrawingList<T> {
+    fun setData(data: List<T>): DataEncodedDrawingList<T, SelfDataType> {
 
         val original = elements.map { it.datum }.filter { it == null }
 
@@ -74,10 +74,11 @@ class DataEncodedDrawingList<T>() : ADataEncodedDrawer<T>() {
             }
         }
 
+        /*
         println("enter: ${_enterData}")
         println("update: ${_updateElements}")
         println("exit: ${_exitElements}")
-
+*/
         return this
     }
 
@@ -96,7 +97,7 @@ class DataEncodedDrawingList<T>() : ADataEncodedDrawer<T>() {
         }
     }
 
-    fun appendEnterSelection(generator: (IndexedValue<T>) -> ADataEncodedDrawer<T>): DataEncodedDrawingList<T> {
+    fun appendEnterSelection(generator: (IndexedValue<T>) -> ADataEncodedDrawer<T>): DataEncodedDrawingList<T, SelfDataType> {
         for (enter in _enterData) {
             val newObj = generator(enter)
             newObj.datum = enter.value

@@ -16,6 +16,8 @@ class CategoricalAxisScale: IAxisScale<Int> {
 
     private var tickInterval: Float = 0f
 
+    private var inversed : Boolean = false
+
     override fun setRealCoordRange(from: Float, to: Float): CategoricalAxisScale {
         this.rangeFrom = from
         this.rangeTo = to
@@ -24,6 +26,11 @@ class CategoricalAxisScale: IAxisScale<Int> {
             ((to - from)/numTicks)
             else 0f
 
+        return this
+    }
+
+    fun inverse(): CategoricalAxisScale{
+        inversed = true
         return this
     }
 
@@ -37,7 +44,8 @@ class CategoricalAxisScale: IAxisScale<Int> {
     override val numTicks: Int get()= categoryList.size
 
     override fun getTickCoordAt(index: Int): Float {
-        return rangeFrom + tickInterval * index + tickInterval/2
+        val m = if(inversed){ numTicks -1 - index } else index
+        return rangeFrom + tickInterval * m + tickInterval/2
     }
 
     override fun getTickInterval(): Float {
@@ -46,9 +54,8 @@ class CategoricalAxisScale: IAxisScale<Int> {
 
 
     override fun getTickLabelAt(index: Int): String {
-        return categoryList[index]
+        return tickFormat?.format(index, index) ?: categoryList[ index ]
     }
-
 
     override fun get(domain: Int): Float {
         return getTickCoordAt(domain)

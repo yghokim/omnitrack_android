@@ -8,7 +8,7 @@ import android.graphics.RectF
 /**
  * Created by younghokim on 16. 9. 8..
  */
-class VerticalBar<T> : ADataEncodedDrawer<T> {
+class OTRect<T> : ADataEncodedDrawer<T> {
 
     var bound: RectF = RectF()
     var color: Int = Color.RED

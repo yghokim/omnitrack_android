@@ -75,7 +75,7 @@ class NumericScale: IAxisScale<Float> {
     }
 
     override fun getTickLabelAt(index: Int): String {
-        return tickFormat?.format(getTickDomainAt(index), index) ?: getTickDomainAt(index).toString()
+        return tickFormat?.format(getTickDomainAt(index), index) ?: if(tickSpacingInDomain >= 1){ getTickDomainAt(index).toInt().toString() }else getTickDomainAt(index).toString()
     }
 
     override fun getTickInterval(): Float {
@@ -85,8 +85,6 @@ class NumericScale: IAxisScale<Float> {
 
     override fun get(domain: Float): Float {
         val converted = rangeFrom + (rangeTo - rangeFrom) * (domain - domainExtendedMin) / (domainExtendedMax - domainExtendedMin)
-
-        println("from ${domain} to $converted, rangeFrom:${rangeFrom}, rangeTo: $rangeTo, domainMin: $domainExtendedMin, domainMax: $domainExtendedMax")
 
         return converted
     }

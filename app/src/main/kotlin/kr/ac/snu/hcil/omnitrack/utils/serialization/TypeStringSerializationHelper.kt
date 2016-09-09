@@ -9,6 +9,7 @@ import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.utils.isNumericPrimitive
 import kr.ac.snu.hcil.omnitrack.utils.toBigDecimal
 import java.math.BigDecimal
+import java.util.*
 
 /**
  * Created by Young-Ho Kim on 2016-07-27.
@@ -76,7 +77,15 @@ object TypeStringSerializationHelper {
                     } else throw IllegalArgumentException("input value $value is not convertible to BigDecimal.")
                 }
             }
-            TYPENAME_TIMEPOINT -> (value as TimePoint).getSerializedString()
+            TYPENAME_TIMEPOINT -> {
+                if(value is TimePoint) {
+                    value.getSerializedString()
+                }
+                else if(value is Long){
+                    TimePoint(value, TimeZone.getDefault().id).getSerializedString()
+                }
+                else throw TypeCastException("this value is not a Long or Timepoint.")
+            }
             TYPENAME_TIMESPAN -> (value as TimeSpan).getSerializedString()
             TYPENAME_INT_ARRAY -> (value as IntArray).joinToString(",")
             TYPENAME_LONG_ARRAY -> (value as IntArray).joinToString(",")

@@ -9,6 +9,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AttributeSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
+import kr.ac.snu.hcil.omnitrack.core.visualization.models.LoggingHeatMapModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.models.TimelineComparisonLineChartModel
 import kr.ac.snu.hcil.omnitrack.utils.DefaultNameGenerator
 import kr.ac.snu.hcil.omnitrack.utils.ObservableList
@@ -159,7 +160,9 @@ class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color
 
         //generate tracker-level charts
 
-        //TODO add heatmap timeline
+        list.add(
+                LoggingHeatMapModel(this)
+        )
 
         //add line timeline if numeric variables exist
         val numberAttrs = attributes.filter { it is OTNumberAttribute }.map { it as OTNumberAttribute }

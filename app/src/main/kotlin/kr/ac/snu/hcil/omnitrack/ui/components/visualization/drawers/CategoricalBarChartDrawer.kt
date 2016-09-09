@@ -41,7 +41,7 @@ class CategoricalBarChartDrawer(): AChartDrawer() {
 
     private val barData = ArrayList<ICategoricalBarChart.Point>()
 
-    private val barElements = DataEncodedDrawingList<ICategoricalBarChart.Point>()
+    private val barElements = DataEncodedDrawingList<ICategoricalBarChart.Point, Void?>()
 
     init{
         paddingBottom = OTApplication.app.resources.getDimension(R.dimen.vis_axis_height).toFloat()
@@ -68,17 +68,16 @@ class CategoricalBarChartDrawer(): AChartDrawer() {
         verticalAxis.attachedTo = plotAreaRect
 
         barElements.onResizedCanvas { datum, bar ->
-            if (bar is VerticalBar<ICategoricalBarChart.Point>) {
+            if (bar is OTRect<ICategoricalBarChart.Point>) {
                 mapBarElementToSpace(datum, bar)
             }
         }
     }
 
-    private fun mapBarElementToSpace(datum:IndexedValue<ICategoricalBarChart.Point>, bar : VerticalBar<ICategoricalBarChart.Point>)
+    private fun mapBarElementToSpace(datum:IndexedValue<ICategoricalBarChart.Point>, bar : OTRect<ICategoricalBarChart.Point>)
     {
         val dataX = horizontalAxisScale.getTickCoordAt(datum.index)
         val dataY = verticalAxisScale[datum.value.value.toFloat()]
-        println("$dataX, $dataY")
         val barWidth = Math.min(
                 horizontalAxisScale.getTickInterval() - OTApplication.app.resources.getDimension(R.dimen.vis_bar_spacing),
                 OTApplication.app.resources.getDimension(R.dimen.vis_bar_max_width)
@@ -113,7 +112,7 @@ class CategoricalBarChartDrawer(): AChartDrawer() {
             barElements.setData(barData).appendEnterSelection {
                 datum ->
                 println("updating enter selection for datum ${datum}")
-                val newBar = VerticalBar<ICategoricalBarChart.Point>()
+                val newBar = OTRect<ICategoricalBarChart.Point>()
                 newBar.color = OTApplication.app.resources.getColor(R.color.colorPointed, null)
 
                 mapBarElementToSpace(datum, newBar)
@@ -126,7 +125,7 @@ class CategoricalBarChartDrawer(): AChartDrawer() {
 
             //update
             barElements.updateElement { datum, drawer ->
-                val bar = drawer as VerticalBar<ICategoricalBarChart.Point>
+                val bar = drawer as OTRect<ICategoricalBarChart.Point>
                 mapBarElementToSpace(datum, bar)
             }
         }
