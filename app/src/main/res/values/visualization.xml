@@ -16,11 +16,16 @@
 
     <dimen name="vis_axis_width">32dp</dimen>
 
+    <dimen name="vis_axis_width_extended">40dp</dimen>
+
+    <dimen name="vis_duration_bar_max_width">14dp</dimen>
+
+
     <dimen name="vis_bar_max_width">30dp</dimen>
     <dimen name="vis_bar_spacing">6dp</dimen>
 
     <dimen name="vis_bar_axis_spacing">1dp</dimen>
 
-    <dimen name="vis_right_margin">0dp</dimen>
+    <dimen name="vis_right_margin">3dp</dimen>
 
 </resources>

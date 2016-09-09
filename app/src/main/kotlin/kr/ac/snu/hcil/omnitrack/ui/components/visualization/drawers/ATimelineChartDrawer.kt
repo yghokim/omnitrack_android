@@ -20,6 +20,7 @@ abstract class ATimelineChartDrawer : AChartDrawer(){
         paddingBottom = OTApplication.app.resources.getDimension(R.dimen.vis_axis_height).toFloat()
         paddingLeft = OTApplication.app.resources.getDimension(R.dimen.vis_axis_width).toFloat()
         paddingTop = OTApplication.app.resources.getDimension(R.dimen.vis_axis_label_numeric_size).toFloat()
+        paddingRight = OTApplication.app.resources.getDimension(R.dimen.vis_right_margin).toFloat()
 
         horizontalAxis.drawBar = true
         horizontalAxis.drawGridLines = true

@@ -23,13 +23,34 @@ class NumericScale: IAxisScale<Float> {
 
     private var _numTicks: Int = 0
 
+    private var inversed : Boolean = false
+
 
     override var tickFormat: IAxisScale.ITickFormat<Float>? = null
 
     override fun setRealCoordRange(from: Float, to: Float): NumericScale {
-        this.rangeFrom = from
-        this.rangeTo = to
 
+        if(inversed) {
+            this.rangeFrom = to
+            this.rangeTo = from
+        }
+        else{
+            this.rangeFrom = from
+            this.rangeTo = to
+
+        }
+        return this
+    }
+
+    fun setTicksForEvery(domainSpacing: Float): NumericScale{
+
+        tickSpacingInDomain = domainSpacing
+        _numTicks = ((domainExtendedMax - domainExtendedMin)/tickSpacingInDomain).toInt()+1
+        return this
+    }
+
+    fun inverse(): NumericScale{
+        inversed = true
         return this
     }
 
@@ -79,6 +100,7 @@ class NumericScale: IAxisScale<Float> {
     }
 
     override fun getTickInterval(): Float {
+
         return tickSpacingInDomain * (rangeTo - rangeFrom) / (domainExtendedMax - domainExtendedMin)
     }
 

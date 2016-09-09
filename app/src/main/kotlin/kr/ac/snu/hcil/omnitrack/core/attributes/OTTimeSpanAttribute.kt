@@ -3,6 +3,8 @@ package kr.ac.snu.hcil.omnitrack.core.attributes
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTSelectionProperty
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
+import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
+import kr.ac.snu.hcil.omnitrack.core.visualization.models.DurationTimelineModel
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.common.time.TimeRangePicker
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
@@ -60,6 +62,10 @@ class OTTimeSpanAttribute(objectId: String?, dbId: Long?, columnName: String, se
 
             inputView.setGranularity(granularity)
         }
+    }
+
+    override fun getRecommendedChartModels(): Array<ChartModel<*>> {
+        return arrayOf(DurationTimelineModel(this))
     }
 
 

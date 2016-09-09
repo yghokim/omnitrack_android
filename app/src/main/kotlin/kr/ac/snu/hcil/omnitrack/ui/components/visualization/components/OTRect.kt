@@ -26,7 +26,8 @@ class OTRect<T> : ADataEncodedDrawer<T> {
 
     override fun onDraw(canvas: Canvas) {
         paint.color = color
-        canvas.drawRect(bound, paint)
+        if(Color.alpha(color) > 5)
+            canvas.drawRect(bound, paint)
     }
 
 }

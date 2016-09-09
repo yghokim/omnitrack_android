@@ -72,6 +72,10 @@
     <string name="msg_date_format_scope_month_short">MMM</string>
 
     <string name="msg_noon">Noon</string>
+    <string name="msg_midnight">Midnight</string>
+    <string name="msg_last_noon">Last Noon</string>
+
+
 
     <string name="msg_everyday">Everyday</string>
     <string name="msg_once">Once</string>

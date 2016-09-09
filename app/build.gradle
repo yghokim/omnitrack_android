@@ -54,7 +54,8 @@ dependencies {
     compile 'me.relex:circleindicator:1.2.1@aar'
     compile 'com.squareup.okhttp3:okhttp:3.4.1'
     compile group: 'org.atteo', name: 'evo-inflector', version: '1.2.1'
-
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-math3
+    compile group: 'org.apache.commons', name: 'commons-math3', version: '3.0'
 
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }

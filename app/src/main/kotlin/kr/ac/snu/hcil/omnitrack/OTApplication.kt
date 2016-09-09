@@ -173,7 +173,7 @@ class OTApplication : Application() {
                             OTItem(
                                     sleepTracker,
                                     time,
-                                    TimeSpan.fromDuration(from + (Math.sin(dayOfYear/31.0)*2*DateUtils.HOUR_IN_MILLIS).toLong(), 5 * DateUtils.HOUR_IN_MILLIS + (Math.random() * DateUtils.HOUR_IN_MILLIS*1.5).toLong()),
+                                    TimeSpan.fromDuration(from + ( Math.random() * 3*DateUtils.HOUR_IN_MILLIS - 1.5*DateUtils.HOUR_IN_MILLIS).toLong(), 5*DateUtils.HOUR_IN_MILLIS + (Math.random() * DateUtils.HOUR_IN_MILLIS*2.5).toLong()),
                                     (Math.random() * 5).toFloat(),
                                     ""
                             )

@@ -456,8 +456,8 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         return count
     }
 
-    fun getItems(tracker: OTTracker, timeRange: TimeSpan, listOut: ArrayList<OTItem>): Int {
-        val cursor = readableDatabase.query(ItemScheme.tableName, ItemScheme.columnNames, "${ItemScheme.TRACKER_ID}=?  AND ${ItemScheme.LOGGED_AT} BETWEEN ? AND ?", arrayOf(tracker.dbId.toString(), timeRange.from.toString(), timeRange.to.toString()), null, null, "${ItemScheme.LOGGED_AT} DESC")
+    fun getItems(tracker: OTTracker, timeRange: TimeSpan, listOut: ArrayList<OTItem>, timestampAsc: Boolean = false): Int {
+        val cursor = readableDatabase.query(ItemScheme.tableName, ItemScheme.columnNames, "${ItemScheme.TRACKER_ID}=?  AND ${ItemScheme.LOGGED_AT} BETWEEN ? AND ?", arrayOf(tracker.dbId.toString(), timeRange.from.toString(), timeRange.to.toString()), null, null, "${ItemScheme.LOGGED_AT} ${if(timestampAsc){"ASC"} else "DESC"}")
 
         var count = 0
         if (cursor.moveToFirst()) {
