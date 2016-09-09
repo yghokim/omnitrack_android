@@ -1,11 +1,14 @@
-package kr.ac.snu.hcil.omnitrack.ui.components.visualization.components
+package kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales
 
+import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.IAxisScale
 import java.util.*
 
 /**
  * Created by Young-Ho on 9/8/2016.
  */
-class CategoricalAxisScale: IAxisScale {
+class CategoricalAxisScale: IAxisScale<Int> {
+    override var tickFormat: IAxisScale.ITickFormat<Int>? = null
+
     private var rangeFrom: Float = 0f
     private var rangeTo: Float = 0f
 
@@ -44,6 +47,11 @@ class CategoricalAxisScale: IAxisScale {
 
     override fun getTickLabelAt(index: Int): String {
         return categoryList[index]
+    }
+
+
+    override fun get(domain: Int): Float {
+        return getTickCoordAt(domain)
     }
 
 }

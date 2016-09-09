@@ -1,10 +1,11 @@
-package kr.ac.snu.hcil.omnitrack.ui.components.visualization.components
+package kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales
 
 import android.text.format.DateUtils
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.visualization.Granularity
+import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.IAxisScale
 import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 import kr.ac.snu.hcil.omnitrack.utils.getHourOfDay
 import java.util.*
@@ -12,8 +13,7 @@ import java.util.*
 /**
  * Created by younghokim on 16. 9. 8..
  */
-class TimeLinearScale : IAxisScale {
-
+class TimeLinearScale : IAxisScale<Long> {
 
     private var rangeFrom: Float = 0f
     private var rangeTo: Float = 0f
@@ -27,7 +27,7 @@ class TimeLinearScale : IAxisScale {
 
     private var domainInterval: Long = 0L
 
-    var tickFormat : ((Long)->String)? = null
+    override var tickFormat : IAxisScale.ITickFormat<Long>? = null
 
     val tsCache = TimeSpan()
 
@@ -45,50 +45,45 @@ class TimeLinearScale : IAxisScale {
         return this
     }
 
-    fun setTicksBasedOnGranularity(granularity: Granularity): TimeLinearScale{
+    fun setTicksBasedOnGranularity(granularity: Granularity): TimeLinearScale {
 
         when(granularity)
         {
-            Granularity.DAY->//time
+            Granularity.DAY ->//time
             {
                 //3 hours
                 _numIntervals = 8
                 domainInterval = 3 * DateUtils.HOUR_IN_MILLIS
-                tickFormat = {
-                    time->
-                    calendarCache.timeInMillis = time
-                    val hourOfDay = calendarCache.getHourOfDay()
+                tickFormat = object: IAxisScale.ITickFormat<Long> {
+                    override fun format(time: Long, index: Int): String {
+                        calendarCache.timeInMillis = time
+                        val hourOfDay = calendarCache.getHourOfDay()
 
-                    if(hourOfDay == 12)
-                    {
-                        OTApplication.app.resources.getString(R.string.msg_noon)
+                        return if (hourOfDay == 12) {
+                            OTApplication.app.resources.getString(R.string.msg_noon)
+                        } else if (hourOfDay == 0 || hourOfDay == 23) {
+                            TimeHelper.FORMAT_DAY.format(Date(time))
+                        } else {
+                            "haha"
+                        }
                     }
-                    else if(hourOfDay == 0 || hourOfDay == 23)
-                    {
-                        TimeHelper.FORMAT_DAY.format(Date(time))
-                    }
-                    else
-                    {
-                        "haha"
-                    }
-
                 }
             }
 
-            Granularity.WEEK->
+            Granularity.WEEK ->
             {
                 // day of week
                 _numIntervals = 7
                 domainInterval = DateUtils.DAY_IN_MILLIS
             }
 
-            Granularity.MONTH->
+            Granularity.MONTH ->
             {
                 //5 days
 
             }
 
-            Granularity.YEAR->
+            Granularity.YEAR ->
             {
                 //month
                 _numIntervals = 12
@@ -107,7 +102,7 @@ class TimeLinearScale : IAxisScale {
     }
 
     override fun getTickCoordAt(index: Int): Float {
-        return convertDomainToRangeScale(domainExtendedMin + domainInterval * index)
+        return this[domainExtendedMin + domainInterval * index]
     }
 
     override fun getTickInterval(): Float {
@@ -116,12 +111,13 @@ class TimeLinearScale : IAxisScale {
 
     override fun getTickLabelAt(index: Int): String {
         val tickValue = domainExtendedMin + domainInterval * index
-        return tickFormat?.invoke(tickValue) ?: tickValue.toString()
+        return tickFormat?.format(tickValue, index) ?: tickValue.toString()
     }
 
-    fun convertDomainToRangeScale(domainValue: Long): Float {
-        return rangeFrom + (rangeTo - rangeFrom) * ((domainValue - domainExtendedMin).toDouble() / (domainExtendedMax - domainExtendedMin)).toFloat()
+    override fun get(domain: Long): Float {
+        return rangeFrom + (rangeTo - rangeFrom) * ((domain - domainExtendedMin).toDouble() / (domainExtendedMax - domainExtendedMin)).toFloat()
     }
+
 
     override val numTicks: Int get() = _numIntervals + 1
 

@@ -63,6 +63,30 @@ enum class Granularity(val nameId: Int) {
 
     },
 
+    WEEK_2(R.string.granularity_week_2) {
+        override fun convertToRange(time: Long, out: TimeSpan) {
+            DAY.convertToRange(time, out)
+
+            val cal = GregorianCalendar.getInstance()
+            cal.timeInMillis = out.from
+            cal.set(Calendar.DAY_OF_WEEK, 1)
+
+            out.from = cal.timeInMillis
+            out.duration = DateUtils.WEEK_IN_MILLIS * 2
+        }
+
+        override fun getIntervalMillis(directionToNext: Boolean, pivot: Long): Long {
+            return 2 * DateUtils.WEEK_IN_MILLIS
+        }
+
+        override fun getFormattedCurrentScope(time: Long, context: Context): String {
+            val ts = TimeSpan()
+            convertToRange(time, ts)
+            return "${TimeHelper.FORMAT_DAY_WITHOUT_YEAR.format(ts.from)} ~ ${TimeHelper.FORMAT_DAY_WITHOUT_YEAR.format(ts.to - 1)} "
+        }
+
+    },
+
     MONTH(R.string.granularity_month) {
         override fun convertToRange(time: Long, out: TimeSpan) {
             val cal = GregorianCalendar.getInstance()
@@ -77,7 +101,8 @@ enum class Granularity(val nameId: Int) {
 
             out.from = cal.timeInMillis
 
-            out.duration = (cal.getMaximum(Calendar.DAY_OF_MONTH) * DateUtils.DAY_IN_MILLIS)
+            cal.add(Calendar.MONTH, 1)
+            out.duration = cal.timeInMillis - out.from
         }
 
         override fun getIntervalMillis(directionToNext: Boolean, pivot: Long): Long {
@@ -102,7 +127,7 @@ enum class Granularity(val nameId: Int) {
             */
 
 
-            return cal.timeInMillis - pivot
+            return if(directionToNext){ cal.timeInMillis - pivot } else { pivot - cal.timeInMillis }
         }
 
         override fun getFormattedCurrentScope(time: Long, context: Context): String {

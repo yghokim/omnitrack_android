@@ -6,9 +6,9 @@
 
     <dimen name="vis_axis_grid_thickness">0.5dp</dimen>
 
-    <dimen name="vis_axis_label_spacing">8dp</dimen>
+    <dimen name="vis_axis_label_spacing">4dp</dimen>
 
-    <dimen name="vis_axis_label_categorical_size">15dp</dimen>
+    <dimen name="vis_axis_label_categorical_size">13.5dp</dimen>
     <dimen name="vis_axis_label_numeric_size">10dp</dimen>
 
 
@@ -20,5 +20,7 @@
     <dimen name="vis_bar_spacing">6dp</dimen>
 
     <dimen name="vis_bar_axis_spacing">1dp</dimen>
+
+    <dimen name="vis_right_margin">0dp</dimen>
 
 </resources>

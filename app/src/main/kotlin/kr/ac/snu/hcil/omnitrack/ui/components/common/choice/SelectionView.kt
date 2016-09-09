@@ -41,6 +41,9 @@ class SelectionView(context: Context, attrs: AttributeSet?, defStyle: Int) : Rec
         }
     }
 
+    val selectedItem: String
+        get()= values[selectedIndex]
+
     val onSelectedIndexChanged = Event<Int>()
 
     fun setValues(newValues: Array<String>) {

@@ -6,6 +6,8 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.ICategoricalBarChart
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.*
+import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.CategoricalAxisScale
+import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.NumericScale
 import java.util.*
 
 /**
@@ -19,9 +21,8 @@ class CategoricalBarChartDrawer(): AChartDrawer() {
             if (field != value) {
                 field = value
                 if (value == true) {
-                    verticalAxisScale.tickFormat = {
-                        floatValue ->
-                        floatValue.toInt().toString()
+                    verticalAxisScale.tickFormat = object: IAxisScale.ITickFormat<Float>{
+                        override fun format(value: Float, index: Int): String { return value.toInt().toString() }
                     }
                 } else {
                     verticalAxisScale.tickFormat = null
@@ -76,7 +77,7 @@ class CategoricalBarChartDrawer(): AChartDrawer() {
     private fun mapBarElementToSpace(datum:IndexedValue<ICategoricalBarChart.Point>, bar : VerticalBar<ICategoricalBarChart.Point>)
     {
         val dataX = horizontalAxisScale.getTickCoordAt(datum.index)
-        val dataY = verticalAxisScale.convertDomainToRangeScale(datum.value.value.toFloat())
+        val dataY = verticalAxisScale[datum.value.value.toFloat()]
         println("$dataX, $dataY")
         val barWidth = Math.min(
                 horizontalAxisScale.getTickInterval() - OTApplication.app.resources.getDimension(R.dimen.vis_bar_spacing),

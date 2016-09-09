@@ -3,9 +3,9 @@ package kr.ac.snu.hcil.omnitrack.ui.components.visualization.components
 /**
  * Created by Young-Ho on 9/8/2016.
  */
-class NiceScale
+class NiceNumber
 /**
- * Instantiates a new instance of the NiceScale class.
+ * Instantiates a new instance of the NiceNumber class.
     http://stackoverflow.com/questions/8506881/nice-label-algorithm-for-charts-with-minimum-ticks
     Author: Incongruous
  * @param min the minimum data point on the axis

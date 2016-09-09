@@ -46,13 +46,15 @@ class ChartViewActivity : MultiButtonActionBarActivity(R.layout.activity_chart_v
     private lateinit var scopeSelectionView: SelectionView
 
     private val currentScope: Granularity
-        get() = Granularity.values()[scopeSelectionView.selectedIndex]
+        get() = supportedGranularity[scopeSelectionView.selectedIndex]
 
     private var currentPoint: Long = System.currentTimeMillis()
 
     private lateinit var listView: RecyclerView
 
     private var adapter: TrackerChartListAdapter = TrackerChartListAdapter(null)
+
+    private var supportedGranularity = arrayOf(Granularity.WEEK, Granularity.WEEK_2, Granularity.MONTH, Granularity.YEAR)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,7 +72,7 @@ class ChartViewActivity : MultiButtonActionBarActivity(R.layout.activity_chart_v
 
 
         scopeSelectionView = findViewById(R.id.ui_scope_selection) as SelectionView
-        scopeSelectionView.setValues(Granularity.values().map { resources.getString(it.nameId) }.toTypedArray())
+        scopeSelectionView.setValues(supportedGranularity.map { resources.getString(it.nameId) }.toTypedArray())
         scopeSelectionView.onSelectedIndexChanged += {
             sender, index ->onTimeQueryChanged()
         }

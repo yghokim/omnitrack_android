@@ -42,7 +42,7 @@ class Axis(var pivot: Pivot): IDrawer {
             }
         }
 
-    var scale: IAxisScale? = null
+    var scale: IAxisScale<*>? = null
 
     private val tickLabelSizeMeasureRect = Rect()
 

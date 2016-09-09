@@ -3,11 +3,13 @@ package kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers
 import android.graphics.Canvas
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.visualization.Granularity
 import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.ILineChartOnTime
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.Axis
-import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.NumericScale
-import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.TimeLinearScale
+import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.NumericScale
+import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.QuantizedTimeScale
+import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.TimeLinearScale
 import java.util.*
 
 /**
@@ -21,7 +23,7 @@ class MultiLineChartDrawer() : AChartDrawer() {
     val verticalAxis = Axis(Axis.Pivot.LEFT)
 
     private val verticalAxisScale = NumericScale()
-    private val horizontalAxisScale = TimeLinearScale()
+    private val horizontalAxisScale = QuantizedTimeScale().inset(true)
 
     private val data = ArrayList<ILineChartOnTime.LineData>()
 
@@ -36,6 +38,8 @@ class MultiLineChartDrawer() : AChartDrawer() {
         verticalAxis.drawGridLines = true
         horizontalAxis.drawBar = true
         horizontalAxis.drawGridLines = true
+        horizontalAxis.labelPaint.isFakeBoldText = true
+
 
         horizontalAxis.scale = horizontalAxisScale
         verticalAxis.scale = verticalAxisScale
@@ -75,7 +79,20 @@ class MultiLineChartDrawer() : AChartDrawer() {
             val timeScope = model!!.getTimeScope()
             val granularity = model!!.getCurrentScopeGranularity()
 
-            horizontalAxisScale.setDomain(timeScope.from, timeScope.to).setTicksBasedOnGranularity(granularity)
+            horizontalAxisScale.setDomain(timeScope.from, timeScope.to).quantize(granularity)
+
+            if(granularity != Granularity.WEEK)
+            {
+
+                horizontalAxis.labelPaint.textSize = verticalAxis.labelPaint.textSize
+                horizontalAxis.labelPaint.isFakeBoldText = true
+                horizontalAxis.labelSpacing = 2 * OTApplication.app.resources.displayMetrics.density
+            }
+            else{
+                horizontalAxis.labelPaint.textSize = OTApplication.app.resources.getDimension(R.dimen.vis_axis_label_categorical_size)
+                horizontalAxis.labelPaint.isFakeBoldText = false
+                horizontalAxis.labelSpacing = OTApplication.app.resources.getDimension(R.dimen.vis_axis_label_spacing)
+            }
         }
     }
 

@@ -9,6 +9,8 @@
     <string name="dateformat_ymd">MMM d, EEEE, yyyy</string>
     <string name="dateformat_full">h:m:s a, MM d, yyyy</string>
 
+    <string name="dateformat_day_of_week_short">E</string>
+
     <string name="time_duration_no_difference">Same time</string>
 
     <string name="time_duration_hour">h</string>
@@ -67,6 +69,7 @@
     <string name="msg_date_format_scope_day_for_week">MMM dd</string>
     <string name="msg_date_format_scope_day">MMM dd, yyyy</string>
     <string name="msg_date_format_scope_month">MMMM</string>
+    <string name="msg_date_format_scope_month_short">MMM</string>
 
     <string name="msg_noon">Noon</string>
 
@@ -91,6 +94,8 @@
 
     <string name="granularity_day">Day</string>
     <string name="granularity_week">Week</string>
+
+    <string name="granularity_week_2">2 Weeks</string>
     <string name="granularity_month">Month</string>
     <string name="granularity_year">Year</string>
 
