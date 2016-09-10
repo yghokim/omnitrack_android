@@ -1,25 +1,21 @@
 package kr.ac.snu.hcil.omnitrack.core.visualization.models
 
 import android.graphics.Canvas
-import android.graphics.Color
 import android.support.v4.graphics.ColorUtils
 import android.text.format.DateUtils
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
-import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
-import kr.ac.snu.hcil.omnitrack.core.visualization.Granularity
 import kr.ac.snu.hcil.omnitrack.core.visualization.TrackerChartModel
-import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.ICategoricalBarChart
 import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.ITimeBinnedHeatMap
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
-import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.*
+import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.Axis
+import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.IAxisScale
+import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.element.DataEncodedDrawingList
+import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.element.RectElement
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.CategoricalAxisScale
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.QuantizedTimeScale
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers.ATimelineChartDrawer
-import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
-import kr.ac.snu.hcil.omnitrack.utils.getHour
 import kr.ac.snu.hcil.omnitrack.utils.getHourOfDay
 import kr.ac.snu.hcil.omnitrack.utils.setHourOfDay
 import java.util.*
@@ -186,7 +182,7 @@ class LoggingHeatMapModel(tracker: OTTracker): TrackerChartModel<ITimeBinnedHeat
             cellColumns.onResizedCanvas { datum, column ->
                 val columnGroup = column as DataEncodedDrawingList<Float, ITimeBinnedHeatMap.CounterVector>
                 columnGroup.onResizedCanvas { count, cell ->
-                    if(cell is OTRect<Float>)
+                    if (cell is RectElement<Float>)
                     {
                         mapCellRectToSpace(cell, datum.value.time, count.index)
                     }
@@ -199,7 +195,7 @@ class LoggingHeatMapModel(tracker: OTTracker): TrackerChartModel<ITimeBinnedHeat
 
         }
 
-        private fun mapCellRectToSpace(cell: OTRect<Float>,x: Long,  y: Int){
+        private fun mapCellRectToSpace(cell: RectElement<Float>, x: Long, y: Int) {
             val centerX = xScale[x]
             val centerY = yScale[y]
             val width  = xScale.getTickInterval()- 4
@@ -225,7 +221,7 @@ class LoggingHeatMapModel(tracker: OTTracker): TrackerChartModel<ITimeBinnedHeat
 
                     cellGroup.appendEnterSelection {
                         count->
-                        val newCell = OTRect<Float>()
+                        val newCell = RectElement<Float>()
                         newCell.color = ColorUtils.setAlphaComponent(OTApplication.app.resources.getColor(R.color.colorPointed, null), (255*count.value + 0.5f).toInt())
                         mapCellRectToSpace(newCell, datum.value.time, count.index)
                         newCell
@@ -238,14 +234,14 @@ class LoggingHeatMapModel(tracker: OTTracker): TrackerChartModel<ITimeBinnedHeat
                     rectList.setData(datum.value.distribution.toList())
                     rectList.appendEnterSelection {
                         count->
-                        val newCell = OTRect<Float>()
+                        val newCell = RectElement<Float>()
                         newCell.color = ColorUtils.setAlphaComponent(OTApplication.app.resources.getColor(R.color.colorPointed, null), (255*count.value + 0.5f).toInt())
                         mapCellRectToSpace(newCell, datum.value.time, count.index)
                         newCell
                     }
 
                     rectList.updateElement { count, cell ->
-                        mapCellRectToSpace(cell as OTRect<Float>, datum.value.time, count.index)
+                        mapCellRectToSpace(cell as RectElement<Float>, datum.value.time, count.index)
                         cell.color = ColorUtils.setAlphaComponent(OTApplication.app.resources.getColor(R.color.colorPointed, null), (255*count.value + 0.5f).toInt())
                     }
 

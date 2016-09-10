@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.components.visualization.components
+package kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.element
 
 import android.graphics.Canvas
 import android.graphics.Color
@@ -8,7 +8,7 @@ import android.graphics.RectF
 /**
  * Created by younghokim on 16. 9. 8..
  */
-class OTRect<T> : ADataEncodedDrawer<T> {
+class RectElement<T> : ADataEncodedDrawer<T> {
 
     var bound: RectF = RectF()
     var color: Int = Color.RED

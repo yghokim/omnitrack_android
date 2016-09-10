@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.components.visualization.components
+package kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.element
 
 import android.graphics.Canvas
 import java.util.*
@@ -112,7 +112,7 @@ class DataEncodedDrawingList<T, SelfDataType>() : ADataEncodedDrawer<SelfDataTyp
     }
 
     fun removeElements(toRemove: Collection<ADataEncodedDrawer<T>>) {
-        println("batch removal : ${elements.removeAll(toRemove)}")
+        elements.removeAll(toRemove)
     }
 
     fun onResizedCanvas(sizeUpdater: (IndexedValue<T>, ADataEncodedDrawer<T>) -> Unit) {

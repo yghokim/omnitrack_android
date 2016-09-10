@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core
 
 import com.google.gson.Gson
 import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.database.IDatabaseStorable
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializedStringKeyEntry
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
@@ -10,6 +11,23 @@ import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelpe
  * Created by younghokim on 16. 7. 22..
  */
 class OTItem : ADataRow, IDatabaseStorable {
+
+    companion object {
+        inline fun <reified T> extractNotNullValues(items: Collection<OTItem>, attribute: OTAttribute<out Any>, out: MutableList<T>): Int {
+            var count = 0
+
+            for (item in items) {
+                if (item.hasValueOf(attribute)) {
+                    val value = item.getValueOf(attribute)
+                    if (value is T) {
+                        out.add(value)
+                        count++
+                    }
+                }
+            }
+            return count
+        }
+    }
 
     val trackerObjectId: String
 

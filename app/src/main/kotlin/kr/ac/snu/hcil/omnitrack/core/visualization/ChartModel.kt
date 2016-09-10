@@ -1,15 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.core.visualization
 
-import android.content.Context
-import android.text.format.DateUtils
-import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.IChartInterface
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
-import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
-import kr.ac.snu.hcil.omnitrack.utils.getYear
-import java.util.*
 
 /**
  * Created by younghokim on 16. 9. 7..
@@ -23,7 +17,7 @@ abstract class ChartModel<T>(): IChartInterface<T> {
 
     val onReloaded = Event<Boolean>()
 
-    protected val queryRange = TimeSpan()
+    private val queryRange = TimeSpan()
     protected var currentGranularity: Granularity = Granularity.WEEK
         private set
 

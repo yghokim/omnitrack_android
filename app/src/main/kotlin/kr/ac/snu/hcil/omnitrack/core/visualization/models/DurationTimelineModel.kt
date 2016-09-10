@@ -1,20 +1,21 @@
 package kr.ac.snu.hcil.omnitrack.core.visualization.models
 
-import android.graphics.*
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.RectF
 import android.text.format.DateUtils
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItem
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeSpanAttribute
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.visualization.AttributeChartModel
-import kr.ac.snu.hcil.omnitrack.core.visualization.Granularity
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
-import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.ADataEncodedDrawer
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.Axis
-import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.DataEncodedDrawingList
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.IAxisScale
+import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.element.ADataEncodedDrawer
+import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.element.DataEncodedDrawingList
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.NumericScale
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.QuantizedTimeScale
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers.ATimelineChartDrawer
@@ -121,7 +122,7 @@ class DurationTimelineModel(override val attribute: OTTimeSpanAttribute) : Attri
     override val numDataPoints: Int
         get() = data.size
 
-    inner class DurationBar: ADataEncodedDrawer<AggregatedDuration>{
+    inner class DurationBar : ADataEncodedDrawer<AggregatedDuration> {
 
         var drawRange: Boolean = false
         var frontalBound: RectF = RectF()

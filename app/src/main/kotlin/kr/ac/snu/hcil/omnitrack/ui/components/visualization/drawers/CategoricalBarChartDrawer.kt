@@ -5,7 +5,10 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.ICategoricalBarChart
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
-import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.*
+import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.Axis
+import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.IAxisScale
+import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.element.DataEncodedDrawingList
+import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.element.RectElement
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.CategoricalAxisScale
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.NumericScale
 import java.util.*
@@ -68,13 +71,13 @@ class CategoricalBarChartDrawer(): AChartDrawer() {
         verticalAxis.attachedTo = plotAreaRect
 
         barElements.onResizedCanvas { datum, bar ->
-            if (bar is OTRect<ICategoricalBarChart.Point>) {
+            if (bar is RectElement<ICategoricalBarChart.Point>) {
                 mapBarElementToSpace(datum, bar)
             }
         }
     }
 
-    private fun mapBarElementToSpace(datum:IndexedValue<ICategoricalBarChart.Point>, bar : OTRect<ICategoricalBarChart.Point>)
+    private fun mapBarElementToSpace(datum: IndexedValue<ICategoricalBarChart.Point>, bar: RectElement<ICategoricalBarChart.Point>)
     {
         val dataX = horizontalAxisScale.getTickCoordAt(datum.index)
         val dataY = verticalAxisScale[datum.value.value.toFloat()]
@@ -112,7 +115,7 @@ class CategoricalBarChartDrawer(): AChartDrawer() {
             barElements.setData(barData).appendEnterSelection {
                 datum ->
                 println("updating enter selection for datum ${datum}")
-                val newBar = OTRect<ICategoricalBarChart.Point>()
+                val newBar = RectElement<ICategoricalBarChart.Point>()
                 newBar.color = OTApplication.app.resources.getColor(R.color.colorPointed, null)
 
                 mapBarElementToSpace(datum, newBar)
@@ -125,7 +128,7 @@ class CategoricalBarChartDrawer(): AChartDrawer() {
 
             //update
             barElements.updateElement { datum, drawer ->
-                val bar = drawer as OTRect<ICategoricalBarChart.Point>
+                val bar = drawer as RectElement<ICategoricalBarChart.Point>
                 mapBarElementToSpace(datum, bar)
             }
         }

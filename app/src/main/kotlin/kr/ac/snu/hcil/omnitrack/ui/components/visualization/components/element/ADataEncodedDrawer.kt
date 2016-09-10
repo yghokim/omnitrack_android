@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.components.visualization.components
+package kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.element
 
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.IDrawer
 

@@ -7,10 +7,11 @@ import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.visualization.CompoundAttributeChartModel
-import kr.ac.snu.hcil.omnitrack.core.visualization.Granularity
 import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.ILineChartOnTime
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
+import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.QuantizedTimeScale
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers.MultiLineChartDrawer
+import org.apache.commons.math3.stat.StatUtils
 import java.math.BigDecimal
 import java.util.*
 
@@ -18,7 +19,7 @@ import java.util.*
  * Created by Young-Ho Kim on 2016-09-08.
  */
 class TimelineComparisonLineChartModel(override val attributes: List<OTNumberAttribute>, parent: OTTracker)
-: CompoundAttributeChartModel<ILineChartOnTime.LineData>(attributes, parent), ILineChartOnTime {
+: CompoundAttributeChartModel<ILineChartOnTime.TimeSeriesTrendData>(attributes, parent), ILineChartOnTime {
 
     override val name: String = OTApplication.app.resources.getString(R.string.msg_vis_numeric_line_timeline_title)
 
@@ -29,34 +30,55 @@ class TimelineComparisonLineChartModel(override val attributes: List<OTNumberAtt
 
     private var _isLoaded = false
 
-    private val data = ArrayList<ILineChartOnTime.LineData>()
+    private val data = ArrayList<ILineChartOnTime.TimeSeriesTrendData>()
 
 
     private val itemsCache = ArrayList<OTItem>()
 
     private val pointsCache = ArrayList<Pair<Long, BigDecimal>>()
 
+    private val values = ArrayList<BigDecimal>()
+
+
     override fun onReload() {
         data.clear()
 
-        OTApplication.app.dbHelper.getItems(parent, queryRange, itemsCache)
+
+        val xScale = QuantizedTimeScale()
+        xScale.setDomain(getTimeScope().from, getTimeScope().to)
+        xScale.quantize(currentGranularity)
 
         for (attribute in attributes) {
-            for (item in itemsCache) {
-                if (item.hasValueOf(attribute)) {
-                    pointsCache.add(Pair(item.timestamp, item.getCastedValueOf<BigDecimal>(attribute)!!))
+
+            pointsCache.clear()
+
+            for (xIndex in 0..xScale.numTicks - 1) {
+                itemsCache.clear()
+                val from = xScale.binPointsOnDomain[xIndex]
+                val to = if (xIndex < xScale.numTicks - 1) xScale.binPointsOnDomain[xIndex + 1]
+                else getTimeScope().to
+
+                OTApplication.app.dbHelper.getItems(parent, TimeSpan.fromPoints(from, to), itemsCache, true)
+
+                values.clear()
+
+                val numPoints = OTItem.extractNotNullValues(itemsCache, attribute, values)
+                if (numPoints > 0) {
+                    pointsCache.add(
+                            Pair(from, BigDecimal(StatUtils.mean(values.map { it.toDouble() }.toDoubleArray())))
+                    )
                 }
             }
 
             data.add(
-                    ILineChartOnTime.LineData(pointsCache.toTypedArray(), attribute)
+                    ILineChartOnTime.TimeSeriesTrendData(pointsCache.toTypedArray(), attribute)
             )
-
-            pointsCache.clear()
         }
 
         println(data)
 
+        values.clear()
+        pointsCache.clear()
         itemsCache.clear()
         _isLoaded = true
     }
@@ -75,11 +97,11 @@ class TimelineComparisonLineChartModel(override val attributes: List<OTNumberAtt
         return drawer
     }
 
-    override fun getDataPointAt(position: Int): ILineChartOnTime.LineData {
+    override fun getDataPointAt(position: Int): ILineChartOnTime.TimeSeriesTrendData {
         return data[position]
     }
 
-    override fun getDataPoints(): List<ILineChartOnTime.LineData> {
+    override fun getDataPoints(): List<ILineChartOnTime.TimeSeriesTrendData> {
         return data
     }
 }

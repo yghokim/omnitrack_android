@@ -7,8 +7,8 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 2016-09-08.
  */
-interface ILineChartOnTime : IChartInterface<ILineChartOnTime.LineData> {
-    data class LineData(val points: Array<Pair<Long, BigDecimal>>, val attribute: OTAttribute<out Any>) {
+interface ILineChartOnTime : IChartInterface<ILineChartOnTime.TimeSeriesTrendData> {
+    data class TimeSeriesTrendData(val points: Array<Pair<Long, BigDecimal>>, val attribute: OTAttribute<out Any>) {
         fun maxValue(): BigDecimal {
             return points.maxWith(ValueComparator)?.second ?: BigDecimal.valueOf(0)
         }
@@ -28,12 +28,12 @@ interface ILineChartOnTime : IChartInterface<ILineChartOnTime.LineData> {
                 a.compareTo(b)
             }
 
-            fun maxValue(vararg lines: LineData): BigDecimal {
+            fun maxValue(vararg lines: TimeSeriesTrendData): BigDecimal {
                 return lines.map { it.maxValue() }.maxWith(BigDecimalComparetor) ?: BigDecimal.valueOf(0)
             }
 
 
-            fun minValue(vararg lines: LineData): BigDecimal {
+            fun minValue(vararg lines: TimeSeriesTrendData): BigDecimal {
                 return lines.map { it.minValue() }.minWith(BigDecimalComparetor) ?: BigDecimal.valueOf(0)
             }
 
