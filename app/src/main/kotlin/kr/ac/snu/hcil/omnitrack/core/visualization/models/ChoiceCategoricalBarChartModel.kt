@@ -35,13 +35,12 @@ class ChoiceCategoricalBarChartModel(override val attribute: OTChoiceAttribute) 
 
     override fun onReload() {
 
-        println("reload chart data : ${attribute.name} during $queryRange")
         data.clear()
 
         val tracker = attribute.owner
         if (tracker != null) {
             itemsCache.clear()
-            OTApplication.app.dbHelper.getItems(tracker, queryRange, itemsCache)
+            OTApplication.app.dbHelper.getItems(tracker, getTimeScope(), itemsCache)
 
             counterDictCache.clear()
             categoriesCache.clear()

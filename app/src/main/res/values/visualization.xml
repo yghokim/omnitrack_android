@@ -14,11 +14,26 @@
 
     <dimen name="vis_axis_height">40dp</dimen>
 
+
+    <dimen name="vis_axis_height_with_legend">60dp</dimen>
+
     <dimen name="vis_axis_width">32dp</dimen>
 
     <dimen name="vis_axis_width_extended">40dp</dimen>
 
     <dimen name="vis_duration_bar_max_width">14dp</dimen>
+
+    <dimen name="vis_line_chart_thickness">2dp</dimen>
+    <dimen name="vis_line_chart_marker_radius">4dp</dimen>
+    <dimen name="vis_line_chart_marker_stroke">2dp</dimen>
+
+    <dimen name="vis_legend_rect_width">16dp</dimen>
+    <dimen name="vis_legend_label_size">13sp</dimen>
+    <dimen name="vis_legend_label_spacing">4dp</dimen>
+    <dimen name="vis_legend_entry_spacing">12dp</dimen>
+
+    <dimen name="visi_legend_margin">15dp</dimen>
+
 
 
     <dimen name="vis_bar_max_width">30dp</dimen>

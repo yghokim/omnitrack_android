@@ -1,10 +1,13 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers
 
 import android.graphics.Canvas
+import android.graphics.Paint
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.visualization.CompoundAttributeChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.ILineChartOnTime
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.Axis
+import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.Legend
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.element.DataEncodedDrawingList
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.element.PolyLineElement
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.NumericScale
@@ -23,8 +26,18 @@ class MultiLineChartDrawer() : ATimelineChartDrawer() {
     private val data = ArrayList<ILineChartOnTime.TimeSeriesTrendData>()
 
     private val lineElements = DataEncodedDrawingList<ILineChartOnTime.TimeSeriesTrendData, Void?>()
+    private val markerElements = DataEncodedDrawingList<ILineChartOnTime.TimeSeriesTrendData, Void?>()
+
+    private val legend = Legend()
+
+    private val linePaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val markerPaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
     init {
+
+        paddingBottom = OTApplication.app.resources.getDimension(R.dimen.vis_axis_height_with_legend)
+
+        linePaint.style = Paint.Style.STROKE
 
         verticalAxis.drawBar = false
         verticalAxis.drawGridLines = true
@@ -32,16 +45,25 @@ class MultiLineChartDrawer() : ATimelineChartDrawer() {
 
         children.add(verticalAxis)
         children.add(lineElements)
+        children.add(markerElements)
+        children.add(legend)
     }
 
     override fun onResized() {
         super.onResized()
         verticalAxis.attachedTo = plotAreaRect
+        legend.attachedTo = plotAreaRect
 
         lineElements.onResizedCanvas { datum, element ->
             if (element is PolyLineElement)
-                refreshPolyLine(datum.value, element)
+                refreshPolyLine(datum, element)
         }
+
+        markerElements.onResizedCanvas { datum, element ->
+            if (element is PolyLineElement)
+                refreshPolyLine(datum, element)
+        }
+
     }
 
     override fun onModelChanged() {
@@ -52,6 +74,17 @@ class MultiLineChartDrawer() : ATimelineChartDrawer() {
         super.onRefresh()
         if (model is ILineChartOnTime && model != null) {
             println("Model changed")
+
+            if(model is CompoundAttributeChartModel)
+            {
+                legend.entries.clear()
+                for(attr in (model as CompoundAttributeChartModel).attributes.withIndex()) {
+                    legend.entries.add(
+                            Pair(attr.value.name, OTApplication.app.colorPalette[attr.index % OTApplication.app.colorPalette.size])
+                    )
+                }
+                legend.refresh()
+            }
 
             data.clear()
             data.addAll(model!!.getDataPoints().map {
@@ -71,33 +104,63 @@ class MultiLineChartDrawer() : ATimelineChartDrawer() {
             lineElements.setData(data)
                     .appendEnterSelection {
                         datum ->
-                        val lines = PolyLineElement<ILineChartOnTime.TimeSeriesTrendData>()
+                        val lines = PolyLineElement<ILineChartOnTime.TimeSeriesTrendData>(linePaint, markerPaint)
 
-                        refreshPolyLine(datum.value, lines)
+                        lines.thickness = OTApplication.app.resources.getDimension(R.dimen.vis_line_chart_thickness)
+
+                        refreshPolyLine(datum, lines)
 
                         lines
                     }
                     .updateElement { datum, element ->
                         if (element is PolyLineElement) {
-                            refreshPolyLine(datum.value, element)
+                            refreshPolyLine(datum, element)
                         }
                     }
 
             lineElements.removeElements(lineElements.getExitElements())
+
+            markerElements.setData(data)
+                    .appendEnterSelection {
+                        datum ->
+                        val lines = PolyLineElement<ILineChartOnTime.TimeSeriesTrendData>(linePaint, markerPaint)
+                        lines.drawLine = false
+                        lines.drawMarker = true
+
+                        lines.markerRadius = OTApplication.app.resources.getDimension(R.dimen.vis_line_chart_marker_radius)
+                        lines.markerThickness = OTApplication.app.resources.getDimension(R.dimen.vis_line_chart_marker_stroke)
+                        lines.thickness = OTApplication.app.resources.getDimension(R.dimen.vis_line_chart_thickness)
+
+                        refreshPolyLine(datum, lines)
+
+                        lines
+                    }
+                    .updateElement { datum, element ->
+                        if (element is PolyLineElement) {
+                            refreshPolyLine(datum, element)
+                        }
+                    }
+
+            markerElements.removeElements(markerElements.getExitElements())
         }
     }
 
-    fun refreshPolyLine(datum: ILineChartOnTime.TimeSeriesTrendData, element: PolyLineElement<ILineChartOnTime.TimeSeriesTrendData>) {
-        element.fitNumPoints(datum.points.count())
-        for (point in datum.points.withIndex()) {
-            element.addPoint(xScale[point.value.first], verticalAxisScale[point.value.second.toFloat()])
+    fun refreshPolyLine(datum: IndexedValue<ILineChartOnTime.TimeSeriesTrendData>, element: PolyLineElement<ILineChartOnTime.TimeSeriesTrendData>) {
+
+        println("coord of line")
+        element.color = OTApplication.app.colorPalette[datum.index%OTApplication.app.colorPalette.size]
+        element.fitNumPoints(datum.value.points.count())
+        for (point in datum.value.points.withIndex()) {
+            element.set(point.index, xScale[point.value.first], verticalAxisScale[point.value.second.toFloat()])
         }
+        element.refreshPath()
     }
 
     override fun onDraw(canvas: Canvas) {
         fillRect(plotAreaRect, OTApplication.app.resources.getColor(R.color.editTextFormBackground, null), canvas)
 
         super.onDraw(canvas)
+        legend.onDraw(canvas)
     }
 
 }

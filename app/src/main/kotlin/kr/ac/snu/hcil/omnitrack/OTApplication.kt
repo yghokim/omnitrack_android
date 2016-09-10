@@ -164,8 +164,8 @@ class OTApplication : Application() {
                              OTItem(
                                      stepComparisonTracker,
                                      time,
-                                     BigDecimal( Math.sin(dayOfYear/31.0) * 3000 + 5000 ),
-                                     BigDecimal( Math.cos(dayOfYear/31.0) * 3000 + 4000 )
+                                     BigDecimal( Math.random() * 5000 + 5000 ),
+                                     BigDecimal( Math.random() * 3000 + 4000 )
                                      )
                         )
 

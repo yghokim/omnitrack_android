@@ -107,12 +107,12 @@ class ChartViewActivity : MultiButtonActionBarActivity(R.layout.activity_chart_v
         }
 
         currentPoint = System.currentTimeMillis()
+
+        onTimeQueryChanged()
     }
 
     override fun onResume() {
         super.onResume()
-
-        onTimeQueryChanged()
     }
 
 
