@@ -141,7 +141,7 @@ class OTTriggerManager(val user: OTUser) {
                 Toast.makeText(OTApplication.app, "Logged!", Toast.LENGTH_SHORT).show()
 
                 for (tracker in trigger.trackers)
-                    OTBackgroundLoggingService.startLogging(OTApplication.app, tracker)
+                    OTBackgroundLoggingService.startLogging(OTApplication.app, tracker, OTBackgroundLoggingService.LoggingSource.Trigger)
             }
             OTTrigger.ACTION_NOTIFICATION -> {
                 println("trigger fired - send notification")

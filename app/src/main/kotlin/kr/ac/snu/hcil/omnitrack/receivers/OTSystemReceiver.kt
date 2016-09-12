@@ -38,6 +38,14 @@ class OTSystemReceiver : BroadcastReceiver() {
                     Toast.makeText(OTApplication.app, "${tracker.name} item was logged", Toast.LENGTH_SHORT).show()
             }
 
+            OTApplication.BROADCAST_ACTION_BACKGROUND_LOGGING_STARTED -> {
+
+            }
+
+            OTApplication.BROADCAST_ACTION_BACKGROUND_LOGGING_SUCCEEDED -> {
+
+            }
+
             OTApplication.BROADCAST_ACTION_EVENT_TRIGGER_CHECK_ALARM->{
                 OTEventTriggerManager.checkMeasures(context)
             }

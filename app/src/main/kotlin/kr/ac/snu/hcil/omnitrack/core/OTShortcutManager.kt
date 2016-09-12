@@ -67,7 +67,7 @@ object OTShortcutManager {
                 element.setTextViewText(R.id.ui_name, trackers[i].name)
 
 
-                val instantLoggingIntent = PendingIntent.getService(context, i, OTBackgroundLoggingService.makeIntent(context, trackers[i]), PendingIntent.FLAG_UPDATE_CURRENT)
+                val instantLoggingIntent = PendingIntent.getService(context, i, OTBackgroundLoggingService.makeIntent(context, trackers[i], OTBackgroundLoggingService.LoggingSource.Shortcut), PendingIntent.FLAG_UPDATE_CURRENT)
                 val openItemActivityIntent = PendingIntent.getActivity(context, i, ItemEditingActivity.makeIntent(trackers[i].objectId, context), PendingIntent.FLAG_UPDATE_CURRENT)
 
                 element.setOnClickPendingIntent(R.id.ui_button_instant, instantLoggingIntent)

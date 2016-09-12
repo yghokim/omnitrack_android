@@ -63,6 +63,9 @@
                 <action android:name="kr.ac.snu.hcil.omnitrack.action.ALARM" />
                 <action android:name="kr.ac.snu.hcil.omnitrack.action.EVENT_TRIGGER_ALARM" />
                 <action android:name="kr.ac.snu.hcil.omnitrack.action.SHORTCUT_REFRESH" />
+                <action android:name="kr.ac.snu.hcil.omnitrack.action.BACKGROUND_LOGGING_STARTED" />
+                <action android:name="kr.ac.snu.hcil.omnitrack.action.BACKGROUND_LOGGING_SUCCEEDED" />
+                <action android:name="kr.ac.snu.hcil.omnitrack.action.BACKGROUND_LOGGING_FAILED" />
                 <action android:name="kr.ac.snu.hcil.omnitrack.action.ITEM_ADDED" />
                 <action android:name="kr.ac.snu.hcil.omnitrack.action.ITEM_EDITED" />
                 <action android:name="kr.ac.snu.hcil.omnitrack.action.ITEM_REMOVED" />
