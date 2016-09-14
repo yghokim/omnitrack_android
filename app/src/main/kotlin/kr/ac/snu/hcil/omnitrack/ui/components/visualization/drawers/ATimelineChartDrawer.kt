@@ -42,7 +42,7 @@ abstract class ATimelineChartDrawer : AChartDrawer(){
 
             xScale.setDomain(timeScope.from, timeScope.to).quantize(granularity)
 
-            if(granularity != Granularity.WEEK)
+            if (granularity != Granularity.WEEK && granularity != Granularity.WEEK_REL)
             {
                 horizontalAxis.style = Axis.TickLabelStyle.Small
             }

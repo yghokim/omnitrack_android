@@ -1,25 +1,20 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.visualization
 
-import android.animation.LayoutTransition
 import android.content.Context
 import android.content.Intent
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
-import android.view.ViewGroup
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
-import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.Granularity
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.choice.SelectionView
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
-import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemEditingActivity
 import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 
 class ChartViewActivity : MultiButtonActionBarActivity(R.layout.activity_chart_view), View.OnClickListener {
@@ -54,7 +49,7 @@ class ChartViewActivity : MultiButtonActionBarActivity(R.layout.activity_chart_v
 
     private var adapter: TrackerChartListAdapter = TrackerChartListAdapter(null)
 
-    private var supportedGranularity = arrayOf(Granularity.WEEK, Granularity.WEEK_2, Granularity.MONTH, Granularity.YEAR)
+    private var supportedGranularity = arrayOf(Granularity.WEEK_REL, Granularity.WEEK_2_REL, Granularity.WEEK_4_REL)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,7 +69,9 @@ class ChartViewActivity : MultiButtonActionBarActivity(R.layout.activity_chart_v
         scopeSelectionView = findViewById(R.id.ui_scope_selection) as SelectionView
         scopeSelectionView.setValues(supportedGranularity.map { resources.getString(it.nameId) }.toTypedArray())
         scopeSelectionView.onSelectedIndexChanged += {
-            sender, index ->onTimeQueryChanged()
+            sender, index ->
+            currentPoint = System.currentTimeMillis()
+            onTimeQueryChanged()
         }
         listView = findViewById(R.id.ui_list) as RecyclerView
         listView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)

@@ -100,6 +100,7 @@
     <string name="granularity_week">Week</string>
 
     <string name="granularity_week_2">2 Weeks</string>
+    <string name="granularity_week_4">4 Weeks</string>
     <string name="granularity_month">Month</string>
     <string name="granularity_year">Year</string>
 

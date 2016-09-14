@@ -2,10 +2,12 @@ package kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales
 
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.visualization.Granularity
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.IAxisScale
-import kr.ac.snu.hcil.omnitrack.utils.*
+import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
+import kr.ac.snu.hcil.omnitrack.utils.getDayOfMonth
+import kr.ac.snu.hcil.omnitrack.utils.getDayOfWeek
+import kr.ac.snu.hcil.omnitrack.utils.getHourOfDay
 import java.util.*
 
 /**
@@ -75,6 +77,21 @@ class QuantizedTimeScale : IAxisScale<Long> {
             override fun format(value: Long, index: Int): String {
                 return TimeHelper.FORMAT_MONTH_SHORT.format(Date(value))
 
+            }
+        }
+
+
+        val TICKFORMAT_DATE = object : IAxisScale.ITickFormat<Long> {
+            override fun format(value: Long, index: Int): String {
+                calendarCache.timeInMillis = value
+                val dayOfMonth = calendarCache.getDayOfMonth()
+                val maxDays = calendarCache.getMaximum(Calendar.DAY_OF_MONTH)
+
+                if (dayOfMonth == 1) {
+                    return TimeHelper.FORMAT_MONTH_SHORT.format(value)
+                } else if (dayOfMonth % 2 == 0 && dayOfMonth >= 4 && maxDays - dayOfMonth > 0) {
+                    return dayOfMonth.toString()
+                } else return ""
             }
         }
 
@@ -185,6 +202,22 @@ class QuantizedTimeScale : IAxisScale<Long> {
             Granularity.YEAR ->{
                 quantize(Calendar.MONTH, 1)
                 tickFormat = TICKFORMAT_YEAR
+            }
+
+
+            Granularity.WEEK_REL -> {
+                quantize(Calendar.DAY_OF_YEAR, 1)
+                tickFormat = TICKFORMAT_WEEK
+            }
+
+            Granularity.WEEK_2_REL -> {
+                quantize(Calendar.DAY_OF_YEAR, 1)
+                tickFormat = TICKFORMAT_WEEK_2
+            }
+
+            Granularity.WEEK_4_REL -> {
+                quantize(Calendar.DAY_OF_YEAR, 1)
+                tickFormat = TICKFORMAT_DATE
             }
         }
     }

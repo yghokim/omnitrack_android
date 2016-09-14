@@ -163,8 +163,66 @@ enum class Granularity(val nameId: Int) {
         }
 
 
-    };
+    },
 
+
+    WEEK_REL(R.string.granularity_week) {
+        override fun convertToRange(time: Long, out: TimeSpan) {
+            DAY.convertToRange(time, out)
+
+            out.from = out.to - DateUtils.WEEK_IN_MILLIS
+            out.duration = DateUtils.WEEK_IN_MILLIS
+        }
+
+        override fun getIntervalMillis(directionToNext: Boolean, pivot: Long): Long {
+            return DateUtils.WEEK_IN_MILLIS
+        }
+
+        override fun getFormattedCurrentScope(time: Long, context: Context): String {
+            val ts = TimeSpan()
+            convertToRange(time, ts)
+            return "${TimeHelper.FORMAT_DAY_WITHOUT_YEAR.format(ts.from)} ~ ${TimeHelper.FORMAT_DAY_WITHOUT_YEAR.format(ts.to - 1)} "
+        }
+
+    },
+
+    WEEK_2_REL(R.string.granularity_week_2) {
+        override fun convertToRange(time: Long, out: TimeSpan) {
+            DAY.convertToRange(time, out)
+            out.from = out.to - DateUtils.WEEK_IN_MILLIS * 2
+            out.duration = DateUtils.WEEK_IN_MILLIS * 2
+        }
+
+        override fun getIntervalMillis(directionToNext: Boolean, pivot: Long): Long {
+            return 2 * DateUtils.WEEK_IN_MILLIS
+        }
+
+        override fun getFormattedCurrentScope(time: Long, context: Context): String {
+            val ts = TimeSpan()
+            convertToRange(time, ts)
+            return "${TimeHelper.FORMAT_DAY_WITHOUT_YEAR.format(ts.from)} ~ ${TimeHelper.FORMAT_DAY_WITHOUT_YEAR.format(ts.to - 1)} "
+        }
+
+    },
+
+    WEEK_4_REL(R.string.granularity_week_4) {
+        override fun convertToRange(time: Long, out: TimeSpan) {
+            DAY.convertToRange(time, out)
+            out.from = out.to - DateUtils.WEEK_IN_MILLIS * 4
+            out.duration = DateUtils.WEEK_IN_MILLIS * 4
+        }
+
+        override fun getIntervalMillis(directionToNext: Boolean, pivot: Long): Long {
+            return 4 * DateUtils.WEEK_IN_MILLIS
+        }
+
+        override fun getFormattedCurrentScope(time: Long, context: Context): String {
+            val ts = TimeSpan()
+            convertToRange(time, ts)
+            return "${TimeHelper.FORMAT_DAY_WITHOUT_YEAR.format(ts.from)} ~ ${TimeHelper.FORMAT_DAY_WITHOUT_YEAR.format(ts.to - 1)} "
+        }
+
+    };
 
     abstract fun convertToRange(time: Long, out: TimeSpan)
     abstract fun getIntervalMillis(directionToNext: Boolean, pivot: Long): Long
