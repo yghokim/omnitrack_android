@@ -105,6 +105,39 @@ class OAuth2Client(val config: OAuth2Config, val activityRequestCode: Int) {
         }.execute(code)
     }
 
+    private fun refreshToken(credential: Credential): Credential?{
+        val uri = HttpUrl.parse(config.tokenRequestUrl)
+
+        println("trying to refresh token with refresh token ${credential.refreshToken}")
+
+        val requestBody = FormBody.Builder()
+                .add(AuthConstants.PARAM_REFRESH_TOKEN, credential.refreshToken)
+                .add(AuthConstants.PARAM_GRANT_TYPE, "refresh_token")
+                .build()
+
+        val request = makeRequestBuilderWithAuthHeader(uri)
+                .post(requestBody)
+                .build()
+
+
+        try {
+            val response = OkHttpClient().newCall(request).execute()
+            val json = JSONObject(response.body().string())
+            println(json)
+            if(json.has(AuthConstants.PARAM_ACCESS_TOKEN)) {
+                println("token refreshing was successful")
+                return Credential(json.getString(AuthConstants.PARAM_ACCESS_TOKEN),
+                        json.getString(AuthConstants.PARAM_REFRESH_TOKEN),
+                        json.getInt(AuthConstants.PARAM_EXPIRES_IN))
+            }
+            else return null
+        }catch(e: Exception)
+        {
+            e.printStackTrace()
+            return null
+        }
+    }
+
 
     private fun makeRequestBuilderWithAuthHeader(url: HttpUrl): Request.Builder {
         return makeRequestBuilderWithAuthHeader(url.toString())
@@ -139,17 +172,23 @@ class OAuth2Client(val config: OAuth2Config, val activityRequestCode: Int) {
                 if (response.code() == 401) {
 
                     //token expired
+                    println(response.body().string())
                     println("token expired. try refreshing..")
-                    val newCredential = TokenRefreshTask(null).execute(credentials[0]).get()
+
+                    val newCredential = refreshToken(credentials[0])
 
                     if (newCredential != null) {
                         println("token was refreshed successfully. Made new credential.")
-                        credentialRefreshedListener?.onCredentialRefreshed(newCredential)
-                        response = requestAwait(newCredential)
-                    } else return null
+                        credentialRefreshedListener?.onCredentialRefreshed(newCredential!!)
+                        response = requestAwait(newCredential!!)
+                    } else{
+                        println("new credential is null. token refresh failed.")
+                        return null
+                    }
                 }
 
                 val resultString = response.body().string()
+                println(response.headers().names())
                 return converter.process(resultString)
             } catch(e: Exception) {
                 e.printStackTrace()
@@ -201,31 +240,7 @@ class OAuth2Client(val config: OAuth2Config, val activityRequestCode: Int) {
         }
 
         override fun doInBackground(vararg credential: Credential): Credential? {
-            val uri = HttpUrl.parse(config.tokenRequestUrl)
-
-            val requestBody = FormBody.Builder()
-                    .add(AuthConstants.PARAM_REFRESH_TOKEN, credential[0].refreshToken)
-                    .add(AuthConstants.PARAM_GRANT_TYPE, "refresh_token")
-                    .build()
-
-            val request = makeRequestBuilderWithAuthHeader(uri)
-                    .post(requestBody)
-                    .build()
-
-
-            try {
-                val response = OkHttpClient().newCall(request).execute()
-                val json = JSONObject(response.body().string())
-                if(json.has(AuthConstants.PARAM_ACCESS_TOKEN)) {
-                    return Credential(json.getString(AuthConstants.PARAM_ACCESS_TOKEN),
-                            json.getString(AuthConstants.PARAM_REFRESH_TOKEN),
-                            json.getInt(AuthConstants.PARAM_EXPIRES_IN))
-                }
-                else return null
-            }catch(e: Exception)
-            {
-                return null
-            }
+            return refreshToken(credential[0])
         }
 
     }
@@ -244,6 +259,7 @@ class OAuth2Client(val config: OAuth2Config, val activityRequestCode: Int) {
                     .add(AuthConstants.PARAM_CLIENT_ID, config.clientId)
                     .add(AuthConstants.PARAM_GRANT_TYPE, "authorization_code")
                     .add(AuthConstants.PARAM_REDIRECT_URI, AuthConstants.VALUE_REDIRECT_URI)
+                   // .add(AuthConstants.PARAM_EXPIRES_IN, "2592000" ) //TODO use long period when you sure that there is no error in the token process.
                     .build()
 
             val request = makeRequestBuilderWithAuthHeader(uri)

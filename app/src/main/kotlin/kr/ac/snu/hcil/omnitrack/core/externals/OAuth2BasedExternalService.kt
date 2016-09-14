@@ -62,6 +62,7 @@ abstract class OAuth2BasedExternalService(identifier: String, minimumSDK: Int) :
     }
 
     override fun onCredentialRefreshed(newCredential: OAuth2Client.Credential) {
+        println("store refreshed credential")
         credential = newCredential
     }
 
