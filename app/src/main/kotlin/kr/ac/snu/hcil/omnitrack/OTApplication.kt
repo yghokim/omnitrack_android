@@ -2,15 +2,17 @@ package kr.ac.snu.hcil.omnitrack
 
 import android.app.Application
 import android.graphics.Color
+import android.os.AsyncTask
 import android.text.format.DateUtils
-import kr.ac.snu.hcil.omnitrack.core.OTItem
-import kr.ac.snu.hcil.omnitrack.core.OTShortcutManager
-import kr.ac.snu.hcil.omnitrack.core.OTUser
+import kr.ac.snu.hcil.omnitrack.core.*
 import kr.ac.snu.hcil.omnitrack.core.attributes.*
 import kr.ac.snu.hcil.omnitrack.core.database.CacheHelper
 import kr.ac.snu.hcil.omnitrack.core.database.DatabaseHelper
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
+import kr.ac.snu.hcil.omnitrack.core.externals.fitbit.FitbitRecentSleepTimeMeasureFactory
+import kr.ac.snu.hcil.omnitrack.core.externals.fitbit.FitbitStepCountMeasureFactory
+import kr.ac.snu.hcil.omnitrack.core.externals.misfit.MisfitStepMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTriggerAlarmManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerManager
 import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
@@ -98,111 +100,13 @@ class OTApplication : Application() {
 
         dbHelper = DatabaseHelper(this)
 
+        var initialRun = false
         val user = dbHelper.findUserById(1)
         if (user == null) {
             val defaultUser = OTUser("Young-Ho Kim", "yhkim@hcil.snu.ac.kr")
             _currentUser = defaultUser
 
-
-            //====================================================================================================================================================
-            val coffeeTracker = defaultUser.newTracker("Coffee", true)
-            coffeeTracker.attributes.add(OTAttribute.Companion.createAttribute(defaultUser, "Name", OTAttribute.TYPE_SHORT_TEXT))
-            coffeeTracker.attributes.add(OTAttribute.Companion.createAttribute(defaultUser, "Drank At", OTAttribute.TYPE_TIME))
-
-            val waterTracker = defaultUser.newTracker("Water", true)
-            waterTracker.attributes.add(OTAttribute.Companion.createAttribute(defaultUser, "Drank At", OTAttribute.TYPE_TIME))
-
-
-            //====================================================================================================================================================
-            val sleepTracker = defaultUser.newTracker("Manual Sleep", true)
-
-            val sleepTimeAttribute = OTAttribute.Companion.createAttribute(defaultUser, "Slept for", OTAttribute.TYPE_TIMESPAN)
-            sleepTimeAttribute.setPropertyValue(OTTimeSpanAttribute.PROPERTY_GRANULARITY, OTTimeAttribute.GRANULARITY_MINUTE)
-
-            sleepTracker.attributes.add(sleepTimeAttribute)
-            sleepTracker.attributes.add(OTAttribute.Companion.createAttribute(defaultUser, "Quality", OTAttribute.TYPE_RATING))
-            sleepTracker.attributes.add(OTAttribute.Companion.createAttribute(defaultUser, "Memo", OTAttribute.TYPE_LONG_TEXT))
-
-            //====================================================================================================================================================
-            val diaryTracker = defaultUser.newTracker("Diary", true)
-            val dateAttribute = OTAttribute.createAttribute(defaultUser, "Date", OTAttribute.TYPE_TIME)
-            dateAttribute.setPropertyValue(OTTimeAttribute.GRANULARITY, OTTimeAttribute.GRANULARITY_DAY)
-            diaryTracker.attributes.add(dateAttribute)
-
-            val moodAttribute = OTAttribute.createAttribute(defaultUser, "Mood", OTAttribute.TYPE_CHOICE)
-            moodAttribute.setPropertyValue(OTChoiceAttribute.PROPERTY_ENTRIES, UniqueStringEntryList("Wonderful", "Sad", "Good", "Insomnia", "Depressed", "Angry", "Fatigued", "Happy"))
-            moodAttribute.setPropertyValue(OTChoiceAttribute.PROPERTY_MULTISELECTION, true)
-            diaryTracker.attributes.add(moodAttribute)
-
-            diaryTracker.attributes.add(OTAttribute.Companion.createAttribute(defaultUser, "Title", OTAttribute.TYPE_SHORT_TEXT))
-            diaryTracker.attributes.add(OTAttribute.Companion.createAttribute(defaultUser, "Content", OTAttribute.TYPE_LONG_TEXT))
-
-
-            //====================================================================================================================================================
-            val stepComparisonTracker = defaultUser.newTracker("Step Devices", true)
-            val fitbitAttribute = OTAttribute.createAttribute(defaultUser, "Fitbit", OTAttribute.TYPE_NUMBER) as OTNumberAttribute
-            fitbitAttribute.numberStyle.fractionPart = 0
-            val misfitAttribute = OTAttribute.createAttribute(defaultUser, "MisFit", OTAttribute.TYPE_NUMBER) as OTNumberAttribute
-            misfitAttribute.numberStyle.fractionPart = 0
-
-            stepComparisonTracker.attributes.add(fitbitAttribute)
-            stepComparisonTracker.attributes.add(misfitAttribute)
-
-            dbHelper.save(_currentUser)
-
-            java.lang.Runnable{
-
-                //batch input
-                val end = System.currentTimeMillis()
-                val start = end - 200 * DateUtils.DAY_IN_MILLIS
-
-                val stepItems = ArrayList<OTItem>()
-                val sleepItems = ArrayList<OTItem>()
-                val coffeeItems = ArrayList<OTItem>()
-
-                TimeHelper.loopForDays(start, end)
-                {
-                    time, from, to, dayOfYear->
-                        stepItems.add(
-                             OTItem(
-                                     stepComparisonTracker,
-                                     time,
-                                     BigDecimal( Math.random() * 5000 + 5000 ),
-                                     BigDecimal( Math.random() * 3000 + 4000 )
-                                     )
-                        )
-
-                        sleepItems.add(
-                            OTItem(
-                                    sleepTracker,
-                                    time,
-                                    TimeSpan.fromDuration(from + ( Math.random() * 3*DateUtils.HOUR_IN_MILLIS - 1.5*DateUtils.HOUR_IN_MILLIS).toLong(), 5*DateUtils.HOUR_IN_MILLIS + (Math.random() * DateUtils.HOUR_IN_MILLIS*2.5).toLong()),
-                                    (Math.random() * 5).toFloat(),
-                                    ""
-                            )
-                        )
-
-                        val numCoffeeADay = ((Math.random() * 4) + .5f).toInt()
-                        for(i in 0..numCoffeeADay-1)
-                        {
-                            val coffeeTime  = from + ((to - from) * Math.random()).toLong()
-                            coffeeItems.add(
-                                    OTItem(
-                                            coffeeTracker,
-                                            coffeeTime,
-                                            "Americano",
-                                            coffeeTime
-                                    )
-                            )
-                        }
-                }
-                dbHelper.save(stepItems, stepComparisonTracker)
-                dbHelper.save(sleepItems, sleepTracker)
-                dbHelper.save(coffeeItems, coffeeTracker)
-
-
-
-            }.run()
+            initialRun = true
 
         } else {
             _currentUser = user
@@ -257,7 +161,11 @@ class OTApplication : Application() {
 
         )
 
-
+        if (initialRun) {
+            AsyncTask.execute {
+                createExampleTrackers()
+            }
+        }
     }
 
     fun syncUserToDb() {
@@ -276,5 +184,125 @@ class OTApplication : Application() {
         syncUserToDb()
 
         dbHelper.close()
+    }
+
+    private fun createExampleTrackers() {
+        //====================================================================================================================================================
+        val coffeeTracker = currentUser.newTracker("Coffee", true)
+        coffeeTracker.attributes.add(OTAttribute.Companion.createAttribute(currentUser, "Name", OTAttribute.TYPE_SHORT_TEXT))
+        coffeeTracker.attributes.add(OTAttribute.Companion.createAttribute(currentUser, "Drank At", OTAttribute.TYPE_TIME))
+
+        val waterTracker = currentUser.newTracker("Water", true)
+        waterTracker.attributes.add(OTAttribute.Companion.createAttribute(currentUser, "Drank At", OTAttribute.TYPE_TIME))
+
+
+        //====================================================================================================================================================
+        val sleepTracker = currentUser.newTracker("Sleep", true)
+
+        val sleepTimeAttribute = OTAttribute.Companion.createAttribute(currentUser, "Sleep Duration", OTAttribute.TYPE_TIMESPAN)
+        sleepTimeAttribute.setPropertyValue(OTTimeSpanAttribute.PROPERTY_GRANULARITY, OTTimeAttribute.GRANULARITY_MINUTE)
+
+        val sleepTimeConnection = OTConnection()
+        sleepTimeConnection.source = FitbitRecentSleepTimeMeasureFactory.makeMeasure()
+        sleepTimeConnection.rangedQuery = OTTimeRangeQuery(OTTimeRangeQuery.TYPE_PIVOT_TIMESTAMP, OTTimeRangeQuery.BIN_SIZE_DAY, 0)
+        sleepTimeAttribute.valueConnection = sleepTimeConnection
+
+        sleepTracker.attributes.add(sleepTimeAttribute)
+        sleepTracker.attributes.add(OTAttribute.Companion.createAttribute(currentUser, "Quality", OTAttribute.TYPE_RATING))
+        sleepTracker.attributes.add(OTAttribute.Companion.createAttribute(currentUser, "Memo", OTAttribute.TYPE_LONG_TEXT))
+
+        //====================================================================================================================================================
+        val beerTracker = currentUser.newTracker("Beer", true)
+        val dateAttribute = OTAttribute.createAttribute(currentUser, "Date", OTAttribute.TYPE_TIME)
+        dateAttribute.setPropertyValue(OTTimeAttribute.GRANULARITY, OTTimeAttribute.GRANULARITY_DAY)
+        beerTracker.attributes.add(dateAttribute)
+
+        beerTracker.attributes.add(OTAttribute.Companion.createAttribute(currentUser, "Name", OTAttribute.TYPE_SHORT_TEXT))
+
+        val typeAttribute = OTAttribute.createAttribute(currentUser, "Type", OTAttribute.TYPE_CHOICE)
+        typeAttribute.setPropertyValue(OTChoiceAttribute.PROPERTY_ENTRIES, UniqueStringEntryList("Lager", "Dark Lager", "Pale Ale", "IPA", "Stout", "German Bock"))
+        typeAttribute.setPropertyValue(OTChoiceAttribute.PROPERTY_MULTISELECTION, false)
+        beerTracker.attributes.add(typeAttribute)
+
+        beerTracker.attributes.add(OTAttribute.Companion.createAttribute(currentUser, "Flavor", OTAttribute.TYPE_RATING))
+        beerTracker.attributes.add(OTAttribute.Companion.createAttribute(currentUser, "Review", OTAttribute.TYPE_LONG_TEXT))
+
+        beerTracker.attributes.add(OTAttribute.Companion.createAttribute(currentUser, "Photo", OTAttribute.TYPE_IMAGE))
+
+
+        //====================================================================================================================================================
+        val stepComparisonTracker = currentUser.newTracker("Step Devices", true)
+        val fitbitAttribute = OTAttribute.createAttribute(currentUser, "Fitbit", OTAttribute.TYPE_NUMBER) as OTNumberAttribute
+        fitbitAttribute.numberStyle.fractionPart = 0
+        val fitbitStepConnection = OTConnection()
+        fitbitStepConnection.source = FitbitStepCountMeasureFactory.makeMeasure()
+        fitbitStepConnection.rangedQuery = OTTimeRangeQuery(OTTimeRangeQuery.TYPE_PIVOT_TIMESTAMP, OTTimeRangeQuery.BIN_SIZE_DAY, -1)
+        fitbitAttribute.valueConnection = fitbitStepConnection
+
+        val misfitAttribute = OTAttribute.createAttribute(currentUser, "MisFit", OTAttribute.TYPE_NUMBER) as OTNumberAttribute
+        misfitAttribute.numberStyle.fractionPart = 0
+        val misfitStepConnection = OTConnection()
+
+        misfitStepConnection.source = MisfitStepMeasureFactory.makeMeasure()
+        misfitStepConnection.rangedQuery = OTTimeRangeQuery(OTTimeRangeQuery.TYPE_PIVOT_TIMESTAMP, OTTimeRangeQuery.BIN_SIZE_DAY, -1)
+        misfitAttribute.valueConnection = misfitStepConnection
+
+
+        stepComparisonTracker.attributes.add(fitbitAttribute)
+        stepComparisonTracker.attributes.add(misfitAttribute)
+
+        dbHelper.save(_currentUser)
+
+        java.lang.Runnable {
+
+            //batch input
+            val end = System.currentTimeMillis()
+            val start = end - 200 * DateUtils.DAY_IN_MILLIS
+
+            val stepItems = ArrayList<OTItem>()
+            val sleepItems = ArrayList<OTItem>()
+            val coffeeItems = ArrayList<OTItem>()
+
+            TimeHelper.loopForDays(start, end)
+            {
+                time, from, to, dayOfYear ->
+                stepItems.add(
+                        OTItem(
+                                stepComparisonTracker,
+                                time,
+                                BigDecimal(Math.random() * 5000 + 5000),
+                                BigDecimal(Math.random() * 3000 + 4000)
+                        )
+                )
+
+                sleepItems.add(
+                        OTItem(
+                                sleepTracker,
+                                time,
+                                TimeSpan.fromDuration(from + (Math.random() * 3 * DateUtils.HOUR_IN_MILLIS - 1.5 * DateUtils.HOUR_IN_MILLIS).toLong(), 5 * DateUtils.HOUR_IN_MILLIS + (Math.random() * DateUtils.HOUR_IN_MILLIS * 2.5).toLong()),
+                                (Math.random() * 5).toFloat(),
+                                ""
+                        )
+                )
+
+                val numCoffeeADay = ((Math.random() * 4) + .5f).toInt()
+                for (i in 0..numCoffeeADay - 1) {
+                    val coffeeTime = from + ((to - from) * Math.random()).toLong()
+                    coffeeItems.add(
+                            OTItem(
+                                    coffeeTracker,
+                                    coffeeTime,
+                                    "Americano",
+                                    coffeeTime
+                            )
+                    )
+                }
+            }
+            dbHelper.save(stepItems, stepComparisonTracker)
+            dbHelper.save(sleepItems, sleepTracker)
+            dbHelper.save(coffeeItems, coffeeTracker)
+
+
+        }.run()
     }
 }

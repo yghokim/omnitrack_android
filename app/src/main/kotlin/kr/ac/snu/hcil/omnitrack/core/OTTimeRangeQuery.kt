@@ -12,7 +12,7 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 2016-08-11.
  */
-class OTTimeRangeQuery : ATypedQueueSerializable() {
+class OTTimeRangeQuery : ATypedQueueSerializable {
 
     companion object {
         const val TYPE_PIVOT_TIMESTAMP = 0
@@ -45,6 +45,16 @@ class OTTimeRangeQuery : ATypedQueueSerializable() {
     var binOffset: Int = 0
 
     var linkedAttribute: OTAttribute<out Any>? = null
+
+    constructor() {
+
+    }
+
+    constructor(mode: Int, binSize: Int, binOffset: Int) {
+        this.mode = mode
+        this.binOffset = binOffset
+        this.binSize = binSize
+    }
 
     override fun onSerialize(typedQueue: SerializableTypedQueue) {
         typedQueue.putInt(mode)
