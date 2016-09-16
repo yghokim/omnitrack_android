@@ -94,6 +94,8 @@
 
     <string name="msg_set_new_connection">Connect to External Source</string>
 
+    <string name="msg_notification_content_format_new_item">"New item was logged to %1$s"</string>
+
     <string name="msg_item_list_empty_message">No items collected yet.</string>
 
     <string name="msg_number_style_unit_position">Unit Position</string>

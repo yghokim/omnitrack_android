@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.widget.Toast
 import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.core.OTNotificationManager
 import kr.ac.snu.hcil.omnitrack.core.OTShortcutManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTEventTriggerManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTriggerAlarmManager
@@ -43,7 +44,11 @@ class OTSystemReceiver : BroadcastReceiver() {
             }
 
             OTApplication.BROADCAST_ACTION_BACKGROUND_LOGGING_SUCCEEDED -> {
-
+                println("background logging successful")
+                val tracker = OTApplication.app.currentUser[intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)]
+                if (tracker != null) {
+                    OTNotificationManager.pushBackgroundLoggingNotification(context, tracker, System.currentTimeMillis())
+                }
             }
 
             OTApplication.BROADCAST_ACTION_EVENT_TRIGGER_CHECK_ALARM->{

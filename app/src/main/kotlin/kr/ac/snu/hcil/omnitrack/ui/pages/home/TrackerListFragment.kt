@@ -276,9 +276,7 @@ class TrackerListFragment : Fragment() {
                 } else if (view === editButton) {
                     startActivityOnDelay(TrackerDetailActivity.makeIntent(user.trackers[adapterPosition].objectId, this@TrackerListFragment.context))
                 } else if (view === listButton) {
-                    val intent = Intent(context, ItemBrowserActivity::class.java)
-                    intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, user.trackers[adapterPosition].objectId)
-                    startActivityOnDelay(intent)
+                    startActivityOnDelay(ItemBrowserActivity.makeIntent(user.trackers[adapterPosition], this@TrackerListFragment.context))
                 } else if (view === removeButton) {
                     val tracker = user.trackers[adapterPosition]
                     DialogHelper.makeYesNoDialogBuilder(context, tracker.name, getString(R.string.msg_confirm_remove_tracker), { -> user.trackers.remove(tracker); notifyItemRemoved(adapterPosition); listView.invalidateItemDecorations(); }).show()

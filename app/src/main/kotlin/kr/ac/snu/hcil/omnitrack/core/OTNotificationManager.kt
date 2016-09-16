@@ -7,6 +7,7 @@ import android.content.Context
 import android.support.v4.app.TaskStackBuilder
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemBrowserActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemEditingActivity
 import kr.ac.snu.hcil.omnitrack.utils.FillingIntegerIdReservationTable
 import java.util.*
@@ -17,11 +18,20 @@ import java.util.concurrent.atomic.AtomicInteger
  */
 object OTNotificationManager {
 
-    private val increment = AtomicInteger(100)
+    private val increment = AtomicInteger(500)
 
     private val reminderTrackerPendingCounts = Hashtable<String, Int>()
 
-    private val reminderTrackerIdTable = FillingIntegerIdReservationTable<String>()
+    private val reminderTrackerNotificationIdTable = FillingIntegerIdReservationTable<String>()
+    private val backgroundLoggingTrackerNotificationIdTable = FillingIntegerIdReservationTable<String>()
+
+    private fun getNewReminderNotificationId(tracker: OTTracker): Int {
+        return reminderTrackerNotificationIdTable[tracker.objectId]
+    }
+
+    private fun getNewBackgroundLoggingNotificationId(tracker: OTTracker): Int {
+        return 500 + backgroundLoggingTrackerNotificationIdTable[tracker.objectId]
+    }
 
     enum class Type(val priority: Int, val collapse: Boolean) {
         TRACKING_REMINDER(Notification.PRIORITY_MAX, false),
@@ -38,8 +48,8 @@ object OTNotificationManager {
         }
     }
 
-    private fun getNotiService(): NotificationManager {
-        return OTApplication.app.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    private val notificationService: NotificationManager by lazy {
+        OTApplication.app.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     }
 
     fun pushReminderNotification(context: Context, tracker: OTTracker, reminderTime: Long) {
@@ -54,6 +64,7 @@ object OTNotificationManager {
         val builder = makeBaseBuilder(context, Type.TRACKING_REMINDER, reminderTime)
                 .setContentIntent(resultPendingIntent)
                 .setContentText(String.format(context.resources.getString(R.string.msg_noti_tap_for_tracking_format), tracker.name))
+                .setDefaults(Notification.DEFAULT_ALL)
 
         if (reminderTrackerPendingCounts.containsKey(tracker.objectId)) {
             println("merge reminder - ${tracker.name}")
@@ -72,11 +83,27 @@ object OTNotificationManager {
         }
 
 
-        getNotiService().notify(reminderTrackerIdTable[tracker.objectId], builder.build())
+        notificationService.notify(getNewReminderNotificationId(tracker), builder.build())
     }
 
     fun pushBackgroundLoggingNotification(context: Context, tracker: OTTracker, loggedTime: Long) {
+        val stackBuilder = TaskStackBuilder.create(context)
+        // Adds the back stack for the Intent (but not the Intent itself)
+        stackBuilder.addParentStack(ItemBrowserActivity::class.java)
+        // Adds the Intent that starts the Activity to the top of the stack
+        stackBuilder.addNextIntent(ItemBrowserActivity.makeIntent(tracker, context))
 
+        val resultPendingIntent = stackBuilder.getPendingIntent(0,
+                PendingIntent.FLAG_UPDATE_CURRENT)
+
+        val builder = makeBaseBuilder(context, Type.TRACKING_REMINDER, loggedTime)
+                .setContentIntent(resultPendingIntent)
+                .setContentText(
+                        String.format(OTApplication.app.resources.getString(R.string.msg_notification_content_format_new_item),
+                                tracker.name
+                        ))
+
+        notificationService.notify(getNewBackgroundLoggingNotificationId(tracker), builder.build())
     }
 
     fun notifyReminderChecked(trackerId: String, reminderTime: Long) {
@@ -86,8 +113,8 @@ object OTNotificationManager {
         //  {
         //remove reminder
         reminderTrackerPendingCounts.remove(trackerId)
-        getNotiService().cancel(reminderTrackerIdTable[trackerId])
-        reminderTrackerIdTable.removeKey(trackerId)
+        notificationService.cancel(reminderTrackerNotificationIdTable[trackerId])
+        reminderTrackerNotificationIdTable.removeKey(trackerId)
         //  }
         //  else{
         //      reminderTrackerPendingCounts[trackerId] = reminderTrackerPendingCounts[trackerId]!! - 1

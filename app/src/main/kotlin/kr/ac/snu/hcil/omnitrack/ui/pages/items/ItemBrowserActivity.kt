@@ -1,5 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.items
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -24,6 +26,14 @@ import kr.ac.snu.hcil.omnitrack.utils.getDayOfMonth
 import java.util.*
 
 class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_browser), AdapterView.OnItemSelectedListener, View.OnClickListener {
+
+    companion object {
+        fun makeIntent(tracker: OTTracker, context: Context): Intent {
+            val intent = Intent(context, ItemBrowserActivity::class.java)
+            intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
+            return intent
+        }
+    }
 
     private var tracker: OTTracker? = null
 
