@@ -8,7 +8,6 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
-import me.relex.circleindicator.CircleIndicator
 
 /**
  * Created by Young-Ho Kim on 2016-08-30.
@@ -21,7 +20,6 @@ abstract class WizardView : FrameLayout, AWizardViewPagerAdapter.IWizardPageList
         fun onCanceled(wizard: WizardView)
     }
 
-    private val indicator: CircleIndicator
     private val titleView: TextView
     private val viewPager: ViewPager
 
@@ -46,13 +44,10 @@ abstract class WizardView : FrameLayout, AWizardViewPagerAdapter.IWizardPageList
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         inflater.inflate(R.layout.layout_wizard_view_parent, this, true)
 
-        indicator = findViewById(R.id.ui_wizard_indicator) as CircleIndicator
-
         titleView = findViewById(R.id.ui_wizard_title) as TextView
 
         viewPager = findViewById(R.id.ui_wizard_pager) as ViewPager
         viewPager.addOnPageChangeListener(this)
-        indicator.setViewPager(viewPager)
 
         cancelButton = findViewById(R.id.ui_button_cancel)
         okButton = findViewById(R.id.ui_button_ok)
@@ -64,7 +59,6 @@ abstract class WizardView : FrameLayout, AWizardViewPagerAdapter.IWizardPageList
 
     fun setAdapter(value: AWizardViewPagerAdapter) {
         this.adapter = value
-        this.adapter.registerDataSetObserver(indicator.dataSetObserver)
         viewPager.adapter = value
 
         value.setListener(this)

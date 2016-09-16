@@ -21,6 +21,10 @@ android {
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
+
+    lintOptions {
+        checkReleaseBuilds false
+    }
 }
 
 dependencies {
@@ -41,7 +45,6 @@ dependencies {
     }
     compile 'jp.wasabeef:recyclerview-animators:2.2.3'
     compile 'com.google.code.gson:gson:2.7'
-    compile 'de.codecrafters.tableview:tableview:2.2.0'
     compile 'com.github.markushi:android-ui:1.2'
     compile 'com.kovachcode:timePickerWithSeconds:1.0.0'
     compile 'com.github.TechFreak:WizardPager:1.0.3'
@@ -51,7 +54,6 @@ dependencies {
     compile 'io.nlopez.smartlocation:library:3.2.5'
     compile 'com.github.ybq:Android-SpinKit:1.0.5'
     compile 'com.badoo.mobile:android-weak-handler:1.1'
-    compile 'me.relex:circleindicator:1.2.1@aar'
     compile 'com.squareup.okhttp3:okhttp:3.4.1'
     compile group: 'org.atteo', name: 'evo-inflector', version: '1.2.1'
     // https://mvnrepository.com/artifact/org.apache.commons/commons-math3
