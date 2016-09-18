@@ -275,11 +275,12 @@ class OTApplication : Application() {
                         )
                 )
 
+                val wakeUp = from + 8 * DateUtils.HOUR_IN_MILLIS + (Math.random() * DateUtils.HOUR_IN_MILLIS * 1.5).toLong()
                 sleepItems.add(
                         OTItem(
                                 sleepTracker,
-                                time,
-                                TimeSpan.fromDuration(from + (Math.random() * 3 * DateUtils.HOUR_IN_MILLIS - 1.5 * DateUtils.HOUR_IN_MILLIS).toLong(), 5 * DateUtils.HOUR_IN_MILLIS + (Math.random() * DateUtils.HOUR_IN_MILLIS * 2.5).toLong()),
+                                wakeUp + (Math.random() * DateUtils.HOUR_IN_MILLIS).toLong(),
+                                TimeSpan.fromPoints(from + (Math.random() * 3 * DateUtils.HOUR_IN_MILLIS - 1.5 * DateUtils.HOUR_IN_MILLIS).toLong(), wakeUp),
                                 (Math.random() * 5).toFloat(),
                                 ""
                         )
