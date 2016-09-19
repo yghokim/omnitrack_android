@@ -80,6 +80,7 @@ class CategoricalBarChartDrawer(): AChartDrawer() {
     private fun mapBarElementToSpace(datum: IndexedValue<ICategoricalBarChart.Point>, bar: RectElement<ICategoricalBarChart.Point>)
     {
         val dataX = horizontalAxisScale.getTickCoordAt(datum.index)
+        println("bar X : $dataX")
         val dataY = verticalAxisScale[datum.value.value.toFloat()]
         val barWidth = Math.min(
                 horizontalAxisScale.getTickInterval() - OTApplication.app.resources.getDimension(R.dimen.vis_bar_spacing),
@@ -101,6 +102,9 @@ class CategoricalBarChartDrawer(): AChartDrawer() {
             barData.addAll( model!!.getDataPoints().map {
                 (it as ICategoricalBarChart.Point)
             })
+
+            println("categorical bar data")
+            println(barData)
 
             horizontalAxisScale.setCategories(*barData.map{
                 it.label

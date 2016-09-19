@@ -28,7 +28,7 @@ class OTItem : ADataRow, IDatabaseStorable {
             return count
         }
 
-        fun createItemsWithColumnArrays(tracker: OTTracker, timestamps: LongArray, vararg columnValuesArray: Array<Any?>, outItems: MutableList<OTItem>) {
+        fun createItemsWithColumnArrays(tracker: OTTracker, timestamps: LongArray, outItems: MutableList<OTItem>, vararg columnValuesArray: Array<Any?>) {
 
             if (columnValuesArray.size > 0) {
                 val numItems = columnValuesArray[0].size
@@ -49,7 +49,7 @@ class OTItem : ADataRow, IDatabaseStorable {
                             OTItem(
                                     tracker,
                                     timestamps[i],
-                                    values
+                                    *values
                             )
                     )
                 }
@@ -97,7 +97,7 @@ class OTItem : ADataRow, IDatabaseStorable {
 
         if(tracker.attributes.size != values.size)
         {
-            throw IllegalArgumentException("attribute count and value count is different.")
+            throw IllegalArgumentException("attribute count and value count is different. - attribute count is ${tracker.attributes.size}, input value count is ${values.size}")
         }
 
         for(valueEntry in values.withIndex())

@@ -38,6 +38,10 @@ class CategoricalAxisScale: IAxisScale<Int> {
         categoryList.clear()
         categoryList.addAll(categories)
 
+        tickInterval = if (numTicks > 0)
+            ((rangeTo - rangeFrom) / numTicks)
+        else 0f
+
         return this
     }
 

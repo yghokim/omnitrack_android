@@ -3,7 +3,9 @@ package kr.ac.snu.hcil.omnitrack.core.attributes
 import android.content.Context
 import android.net.Uri
 import android.view.View
+import android.webkit.URLUtil
 import android.widget.ImageView
+import com.koushikdutta.ion.Ion
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
@@ -69,8 +71,12 @@ class OTImageAttribute(objectId: String?, dbId: Long?, columnName: String, setti
     override fun applyValueToViewForItemList(value: Any?, view: View): Boolean {
         if (view is ImageView && value != null) {
             if (value is Uri) {
-                println("URI is ${value.toString()}")
-                view.setImageURI(value)
+                if (URLUtil.isNetworkUrl(value.toString())) {
+                    Ion.with(view)
+                            .load(value.toString())
+                } else {
+                    view.setImageURI(value)
+                }
                 return true
             } else return false
         } else return super.applyValueToViewForItemList(value, view)
