@@ -26,7 +26,7 @@
 
     <string name="msg_yes">Yes</string>
     <string name="msg_no">No</string>
-    <string name="msg_confirm_remove_tracker">Remove this attribute?</string>
+    <string name="msg_confirm_remove_tracker">Remove this tracker?</string>
     <string name="msg_confirm_apply_settings">Apply settings?</string>
 
     <string name="msg_confirm_remove_connection">Disconnect with the external source?</string>
@@ -56,7 +56,7 @@
     <string name="msg_basic_information">Basic Information</string>
     <string name="msg_attributes">Fields</string>
 
-    <string name="msg_attribute_removed_message">Attribute was removed</string>
+    <string name="msg_attribute_removed_message">The field was removed</string>
     <string name="msg_add_new_attribute">Add new field</string>
 
     <string name="msg_item_remove_confirm">Deleting item cannot be undone. Do you want to remove this item?</string>
@@ -124,7 +124,7 @@
 
     <string name="title_activity_projects">My Projects</string>
     <string name="title_activity_project_settings">Project Settings</string>
-    <string name="title_activity_attribute_detail">Attribute Detail</string>
+    <string name="title_activity_attribute_detail">Field Details</string>
     <string name="title_activity_new_item">New [%1$s] Item</string>
     <string name="title_activity_maps">Map</string>
     <string name="title_activity_new_connection">New Connection</string>

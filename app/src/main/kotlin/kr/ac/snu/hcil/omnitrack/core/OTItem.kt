@@ -27,6 +27,34 @@ class OTItem : ADataRow, IDatabaseStorable {
             }
             return count
         }
+
+        fun createItemsWithColumnArrays(tracker: OTTracker, timestamps: LongArray, vararg columnValuesArray: Array<Any?>, outItems: MutableList<OTItem>) {
+
+            if (columnValuesArray.size > 0) {
+                val numItems = columnValuesArray[0].size
+
+                for (columnValues in columnValuesArray) {
+                    if (numItems != columnValues.size) {
+                        throw IllegalArgumentException("The size of column values are different.")
+                    }
+                }
+
+                for (i in 0..numItems - 1) {
+                    val values = Array(columnValuesArray.size) {
+                        index ->
+                        columnValuesArray[index][i]
+                    }
+
+                    outItems.add(
+                            OTItem(
+                                    tracker,
+                                    timestamps[i],
+                                    values
+                            )
+                    )
+                }
+            }
+        }
     }
 
     val trackerObjectId: String
