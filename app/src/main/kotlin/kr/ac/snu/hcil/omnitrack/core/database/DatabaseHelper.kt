@@ -376,7 +376,11 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
             user.isDirtySinceLastSync = false
         }
         writableDatabase.beginTransaction()
-        deleteObjects(TrackerScheme, *user.fetchRemovedTrackerIds())
+
+        val removedTrackerIds = user.fetchRemovedTrackerIds()
+        writableDatabase.delete(AttributeScheme.tableName, "${AttributeScheme.TRACKER_ID} = ?", removedTrackerIds.map { it.toString() }.toTypedArray())
+
+        deleteObjects(TrackerScheme, *removedTrackerIds)
 
         for (child in user.trackers.iterator().withIndex()) {
             save(child.value, child.index)

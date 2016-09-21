@@ -5,12 +5,14 @@
     <string name="trigger_periodic_name">Time Trigger</string>
     <string name="trigger_periodic_desc">Fires by specific periods.</string>
 
-    <string name="msg_select_trigger_type">Choose Trigger Type</string>
+    <string name="msg_text_trigger">Trigger</string>
+    <string name="msg_text_reminder">Reminder</string>
+    <string name="msg_select_trigger_type_format">Select %1$s} Type</string>
 
-    <string name="trigger_name_time">Time Trigger</string>
-    <string name="trigger_name_event">Event Trigger</string>
+    <string name="trigger_name_time">Time-based</string>
+    <string name="trigger_name_event">Data-driven</string>
     <string name="trigger_desc_time">Fires by time-related conditions</string>
-    <string name="trigger_desc_event">Fires when specific event occurs</string>
+    <string name="trigger_desc_event">Fires when the data passes the threshold</string>
 
     <string name="msg_trigger_time_config_type">Period Type</string>
 
@@ -20,8 +22,8 @@
     <string name="msg_trigger_time_config_repeat_range">Repeat Range</string>
 
 
-    <string name="msg_trigger_time_config_type_name_alram">Triggered at specific time</string>
-    <string name="msg_trigger_time_config_type_name_interval">Repeatedly triggered with interval</string>
+    <string name="msg_trigger_time_config_type_name_alram">At specific time</string>
+    <string name="msg_trigger_time_config_type_name_interval">Repeated with interval</string>
 
     <string name="msg_trigger_time_is_repeated">Repeat</string>
 

@@ -16,6 +16,6 @@
         android:layout_marginTop="8dp"
         android:background="@drawable/text_field_singleline"
         android:inputType="textShortMessage"
-
-        android:maxLines="1" />
+        android:maxLines="1"
+        android:selectAllOnFocus="true" />
 </LinearLayout>

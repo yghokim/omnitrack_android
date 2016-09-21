@@ -11,8 +11,10 @@ import android.support.v7.app.AppCompatActivity
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.URLUtil
 import android.widget.FrameLayout
 import android.widget.ImageView
+import com.koushikdutta.ion.Ion
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
@@ -76,7 +78,14 @@ class ImagePicker : FrameLayout, View.OnClickListener {
             if (field != value) {
                 field = value
 
-                imageView.setImageURI(value)
+                if (URLUtil.isNetworkUrl(value.toString())) {
+                    println("uri is network. download the image and put it to the imageview.")
+                    Ion.with(imageView)
+                            .load(value.toString())
+                } else {
+                    imageView.setImageURI(value)
+                }
+
                 if (value == Uri.EMPTY) {
                     removeButton.visibility = View.INVISIBLE
                     buttonGroup.visibility = View.VISIBLE

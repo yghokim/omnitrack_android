@@ -24,7 +24,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
 
     abstract fun makeNewTriggerInstance(type: Int): OTTrigger
     abstract fun getTriggers(): Array<OTTrigger>
-
+    abstract val triggerActionTypeName: Int
 
     private lateinit var adapter: Adapter
 
@@ -35,16 +35,13 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
     private var expandedTriggerPosition: Int = -1
 
     private val triggerTypeDialog: AlertDialog by lazy {
-        NewTriggerTypeSelectionDialogHelper.builder(parent.context) {
+        NewTriggerTypeSelectionDialogHelper.builder(parent.context, triggerActionTypeName) {
             type ->
             println("trigger type selected - $type")
 
-            adapter.notifyItemChanged(adapter.itemCount - 1)
             val newTrigger = makeNewTriggerInstance(type)
-            OTApplication.app.triggerManager.putNewTrigger(newTrigger)
+            appendNewTrigger(newTrigger)
 
-            adapter.notifyItemInserted(adapter.itemCount - 1)
-            listView.smoothScrollToPosition(adapter.itemCount - 1)
             triggerTypeDialog.dismiss()
         }.create()
     }
@@ -70,10 +67,23 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
         newTriggerButton = rootView.findViewById(R.id.ui_button_new_trigger) as FloatingActionButton
 
         newTriggerButton.setOnClickListener {
-            triggerTypeDialog.show()
+            onNewTriggerButtonClicked()
         }
 
         return rootView
+    }
+
+    protected fun appendNewTrigger(trigger: OTTrigger) {
+        adapter.notifyItemChanged(adapter.itemCount - 1)
+        OTApplication.app.triggerManager.putNewTrigger(trigger)
+
+        adapter.notifyItemInserted(adapter.itemCount - 1)
+        listView.smoothScrollToPosition(adapter.itemCount - 1)
+
+    }
+
+    protected open fun onNewTriggerButtonClicked() {
+        triggerTypeDialog.show()
     }
 
 

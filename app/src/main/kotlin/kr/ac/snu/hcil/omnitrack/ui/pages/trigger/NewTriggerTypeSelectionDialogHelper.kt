@@ -24,7 +24,7 @@ object NewTriggerTypeSelectionDialogHelper {
             TriggerTypeEntry(OTTrigger.TYPE_SERVICE_EVENT, R.drawable.event_dark, R.string.trigger_name_event, R.string.trigger_desc_event)
     )
 
-    fun builder(context: Context, listener: (Int) -> Unit): AlertDialog.Builder {
+    fun builder(context: Context, triggerActionTypeName: Int, listener: (Int) -> Unit): AlertDialog.Builder {
 
         val view = LayoutInflater.from(context).inflate(R.layout.simple_layout_with_recycler_view, null)
         val listView = view.findViewById(R.id.ui_list) as RecyclerView
@@ -33,7 +33,11 @@ object NewTriggerTypeSelectionDialogHelper {
         listView.adapter = Adapter(listener)
 
         return AlertDialog.Builder(context)
-                .setTitle(context.resources.getString(R.string.msg_select_trigger_type))
+                .setTitle(
+                        String.format(
+                                context.resources.getString(R.string.msg_select_trigger_type_format),
+                                context.resources.getString(triggerActionTypeName)
+                        ))
                 .setView(view)
     }
 

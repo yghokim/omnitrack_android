@@ -189,6 +189,9 @@ class OAuth2Client(val config: OAuth2Config, val activityRequestCode: Int) {
 
                 val resultString = response.body().string()
                 println(response.headers().names())
+
+                Thread.sleep(4000)
+
                 return converter.process(resultString)
             } catch(e: Exception) {
                 e.printStackTrace()

@@ -37,7 +37,7 @@
 
     <string name="msg_tab_trackers">Trackers</string>
     <string name="msg_tab_services">Services</string>
-    <string name="msg_tab_background_loggers">Auto Triggers</string>
+    <string name="msg_tab_background_loggers">Triggers</string>
 
     <string name="msg_tab_attribute_basic">Properties</string>
     <string name="msg_tab_attribute_connection">Connections</string>
