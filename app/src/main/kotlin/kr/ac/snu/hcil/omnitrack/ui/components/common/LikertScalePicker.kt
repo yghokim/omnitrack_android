@@ -2,6 +2,9 @@ package kr.ac.snu.hcil.omnitrack.ui.components.common
 
 import android.content.Context
 import android.graphics.*
+import android.text.Layout
+import android.text.StaticLayout
+import android.text.TextPaint
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
@@ -75,7 +78,6 @@ class LikertScalePicker : View {
     private var contentWidth: Int = 0
     private var contentHeight: Int = 0
 
-    private var intrinsicWidth: Int = 0
     private var intrinsicHeight: Int = 0
 
     private var _pointDistance: Float = 0f
@@ -98,9 +100,9 @@ class LikertScalePicker : View {
     private val labelTextSize: Float
     private val labelSpacing: Float
 
-    private val labelTextPaint: Paint
-    private val numberTextPaint: Paint
-    private val valueTextPaint: Paint
+    private val labelTextPaint: TextPaint
+    private val numberTextPaint: TextPaint
+    private val valueTextPaint: TextPaint
     private val valueBoxPaint: Paint
     private val pointPaint: Paint
     private val linePaint: Paint
@@ -121,13 +123,13 @@ class LikertScalePicker : View {
         labelTextSize = resources.getDimension(R.dimen.likert_scale_label_textSize)
         labelSpacing = resources.getDimension(R.dimen.likert_scale_label_spacing)
 
-        labelTextPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        valueTextPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+        labelTextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
+        valueTextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
         valueBoxPaint = Paint(Paint.ANTI_ALIAS_FLAG)
         pointPaint = Paint(Paint.ANTI_ALIAS_FLAG)
         linePaint = Paint(Paint.ANTI_ALIAS_FLAG)
         valueIndicatorPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        numberTextPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+        numberTextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
 
         linePaint.style = Paint.Style.STROKE
         linePaint.strokeWidth = resources.getDimension(R.dimen.likert_scale_line_stroke_width)
@@ -154,23 +156,33 @@ class LikertScalePicker : View {
         valueBoxPaint.style = Paint.Style.FILL
         valueBoxPaint.color = resources.getColor(R.color.colorSecondary, null)
 
-        calcIntrinsicSize()
+        labelTextPaint.style = Paint.Style.FILL
+        labelTextPaint.textSize = labelTextSize
+        labelTextPaint.isFakeBoldText = true
+        labelTextPaint.color = resources.getColor(R.color.textColorMid, null)
     }
 
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
     constructor(context: Context?) : super(context)
 
 
-    private fun calcIntrinsicSize() {
-        intrinsicHeight = (2 * valueBoxVerticalPadding + valueTextSize + valueBoxSpacing + numberSpacing + numberTextSize + labelSpacing +
-                Math.max(Math.max(textHeight(leftLabel, labelTextPaint), textHeight(rightLabel, labelTextPaint)), textHeight(middleLabel, labelTextPaint)) + 0.5f).toInt()
-
-        intrinsicWidth = contentWidth
+    private fun makeMultilineStaticLayout(text: String, paint: TextPaint, maxWidth: Int, align: Layout.Alignment): StaticLayout {
+        return StaticLayout(text, paint, maxWidth.toInt(), align, 1f, 1f, false)
     }
 
     private fun textHeight(text: String, paint: Paint): Int {
         paint.getTextBounds(text, 0, text.length, boundRect)
         return boundRect.height()
+    }
+
+    private fun textHeight(text: String, paint: TextPaint, maxWidth: Int): Int {
+        if (text.isNullOrBlank()) {
+            return 0
+        } else {
+            val dl = makeMultilineStaticLayout(text, paint, maxWidth, Layout.Alignment.ALIGN_CENTER)
+            println("text: text length: ${text.length}, lineCount: ${dl.lineCount}, height: ${dl.height}")
+            return dl.height
+        }
     }
 
     private fun textWidth(text: String, paint: Paint): Int {
@@ -194,8 +206,39 @@ class LikertScalePicker : View {
             canvas.drawText(numberText, numberX, _lineY + numberTextSize + numberSpacing, numberTextPaint)
         }
 
-        val valuePosition = convertValueToCoordinate(value)
+
+        //draw labels
+
+        labelTextPaint.textAlign = Paint.Align.LEFT
+        val leftLabelLayout = makeMultilineStaticLayout(leftLabel, labelTextPaint, contentWidth / 5, Layout.Alignment.ALIGN_NORMAL)
+        canvas.save()
+
+        canvas.translate(paddingLeft.toFloat(), _labelY)
+        leftLabelLayout.draw(canvas)
+        canvas.restore()
+
+
+        labelTextPaint.textAlign = Paint.Align.LEFT
+        val middleLabelLayout = makeMultilineStaticLayout(middleLabel, labelTextPaint, contentWidth / 5, Layout.Alignment.ALIGN_CENTER)
+        canvas.save()
+
+        canvas.translate(((_lineLeft + _lineRight) / 2 - (middleLabelLayout.width shr 1)).toFloat(), _labelY)
+        middleLabelLayout.draw(canvas)
+        canvas.restore()
+
+
+        labelTextPaint.textAlign = Paint.Align.RIGHT
+        val rightLabelLayout = makeMultilineStaticLayout(rightLabel, labelTextPaint, contentWidth / 5, Layout.Alignment.ALIGN_NORMAL)
+        canvas.save()
+
+        canvas.translate((paddingLeft + contentWidth).toFloat() - 2 * resources.displayMetrics.density, _labelY)
+        rightLabelLayout.draw(canvas)
+        canvas.restore()
+
+
         //draw value
+        val valuePosition = convertValueToCoordinate(value)
+
         canvas.drawCircle(valuePosition, _lineY, valueIndicatorRadius, valueIndicatorPaint)
 
         val valueText = value.toString()
@@ -271,16 +314,20 @@ class LikertScalePicker : View {
         val heightMode = MeasureSpec.getMode(heightMeasureSpec)
         val heightSize = MeasureSpec.getSize(heightMeasureSpec)
 
-        var measuredWidth: Int
-        var measuredHeight: Int
+        val measuredWidth: Int
+        val measuredHeight: Int
 
         if (widthMode == MeasureSpec.EXACTLY) {
             measuredWidth = widthSize;
         } else if (widthMode == MeasureSpec.AT_MOST) {
-            measuredWidth = Math.min(intrinsicWidth + paddingLeft + paddingRight, widthSize).toInt()
+            measuredWidth = widthSize
         } else {
-            measuredWidth = intrinsicWidth.toInt() + paddingLeft + paddingRight
+            measuredWidth = 400 + paddingLeft + paddingRight
         }
+
+        contentWidth = measuredWidth - paddingStart - paddingEnd
+        intrinsicHeight = (2 * valueBoxVerticalPadding + valueTextSize + valueBoxSpacing + numberSpacing + numberTextSize + labelSpacing +
+                Math.max(Math.max(textHeight(leftLabel, labelTextPaint, contentWidth / 5), textHeight(rightLabel, labelTextPaint, contentWidth / 5)), textHeight(middleLabel, labelTextPaint, contentWidth / 5)) + 0.5f).toInt()
 
         if (heightMode == MeasureSpec.EXACTLY) {
             measuredHeight = heightSize;
@@ -298,7 +345,7 @@ class LikertScalePicker : View {
         _valueY = valueBoxVerticalPadding + valueTextSize
         _lineY = _valueY + valueBoxVerticalPadding + valueBoxSpacing
         _numberY = _lineY + numberSpacing
-        _labelY = _numberY + labelSpacing
+        _labelY = _numberY + labelSpacing + numberTextSize
 
         _lineLeft = paddingLeft + Math.max(pointRadius, valueIndicatorRadius)
         _lineRight = paddingLeft + contentWidth - Math.max(pointRadius, valueIndicatorRadius)
