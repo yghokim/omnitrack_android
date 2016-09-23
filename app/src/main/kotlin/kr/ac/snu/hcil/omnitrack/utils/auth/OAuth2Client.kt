@@ -179,8 +179,8 @@ class OAuth2Client(val config: OAuth2Config, val activityRequestCode: Int) {
 
                     if (newCredential != null) {
                         println("token was refreshed successfully. Made new credential.")
-                        credentialRefreshedListener?.onCredentialRefreshed(newCredential!!)
-                        response = requestAwait(newCredential!!)
+                        credentialRefreshedListener?.onCredentialRefreshed(newCredential)
+                        response = requestAwait(newCredential)
                     } else{
                         println("new credential is null. token refresh failed.")
                         return null

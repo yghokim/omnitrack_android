@@ -5,11 +5,9 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.support.design.widget.TabLayout
-import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
-import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewPager
 import android.support.v7.widget.Toolbar
 import kr.ac.snu.hcil.omnitrack.R
@@ -96,7 +94,7 @@ class HomeActivity : UserSyncedActivity() {
                 0 -> return TrackerListFragment()
                 1 -> return LoggingTriggerListFragment()
                 2 -> return ServiceListFragment()
-                else -> return throw Exception("wrong tab index")
+                else -> throw Exception("wrong tab index")
             }
         }
 

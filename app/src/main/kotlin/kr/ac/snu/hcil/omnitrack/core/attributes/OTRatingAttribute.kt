@@ -2,14 +2,14 @@ package kr.ac.snu.hcil.omnitrack.core.attributes
 
 import android.content.Context
 import android.view.View
-import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTBooleanProperty
-import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTSelectionProperty
+import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTRatingOptionsProperty
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.common.StarRatingView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.LikertScaleInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.StarRatingInputView
+import kr.ac.snu.hcil.omnitrack.utils.RatingOptions
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 
 /**
@@ -18,19 +18,14 @@ import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelpe
 class OTRatingAttribute(objectId: String?, dbId: Long?, columnName: String, settingData: String?, connectionData: String?)
 : OTAttribute<Float>(objectId, dbId, columnName, OTAttribute.TYPE_RATING, settingData, connectionData) {
 
-    enum class DisplayType(val nameResourceId: Int) {
-        Star(R.string.property_rating_display_type_stars),
-        Likert(R.string.property_rating_display_type_likert)
-    }
 
-    enum class Level(val maxScore: Int) {
-        Level5(5), Level7(7), Level10(10)
-    }
 
     companion object {
+        /*
         const val PROPERTY_DISPLAY_TYPE = 0
         const val PROPERTY_LEVELS = 1
-        const val PROPERTY_ALLOW_INTERMEDIATE = 2
+        const val PROPERTY_ALLOW_INTERMEDIATE = 2*/
+        const val PROPERTY_OPTIONS = 0
     }
 
     override val valueNumericCharacteristics: NumericCharacteristics = NumericCharacteristics(true, true)
@@ -41,15 +36,18 @@ class OTRatingAttribute(objectId: String?, dbId: Long?, columnName: String, sett
 
     override val typeSmallIconResourceId: Int get() {
         return when (displayType) {
-            DisplayType.Star -> R.drawable.icon_small_star
-            DisplayType.Likert -> R.drawable.icon_small_star //TODO add Likert icon
+            RatingOptions.DisplayType.Star -> R.drawable.icon_small_star
+            RatingOptions.DisplayType.Likert -> R.drawable.icon_small_star //TODO add Likert icon
         }
     }
 
-    override val propertyKeys: IntArray = intArrayOf(PROPERTY_DISPLAY_TYPE, PROPERTY_LEVELS, PROPERTY_ALLOW_INTERMEDIATE)
+    override val propertyKeys: IntArray = intArrayOf(PROPERTY_OPTIONS)
 
 
     override fun createProperties() {
+        assignProperty(OTRatingOptionsProperty(PROPERTY_OPTIONS))
+
+        /*
         assignProperty(OTSelectionProperty(PROPERTY_DISPLAY_TYPE,
                 OTApplication.app.resources.getString(R.string.property_rating_display_type),
                 DisplayType.values().map { OTApplication.app.resources.getString(it.nameResourceId) }.toTypedArray()
@@ -63,20 +61,34 @@ class OTRatingAttribute(objectId: String?, dbId: Long?, columnName: String, sett
                 true,
                 PROPERTY_ALLOW_INTERMEDIATE,
                 OTApplication.app.resources.getString(R.string.property_rating_allow_intermediate)))
-
+*/
     }
 
-    var level: Level get() = Level.values()[getPropertyValue<Int>(PROPERTY_LEVELS)]
-        set(value) = setPropertyValue(PROPERTY_LEVELS, value.ordinal)
+    var ratingOptions: RatingOptions get() = getPropertyValue<RatingOptions>(PROPERTY_OPTIONS)
+        set(value) {
+            setPropertyValue(PROPERTY_OPTIONS, value)
+        }
 
-    var displayType: DisplayType get() = DisplayType.values()[getPropertyValue<Int>(PROPERTY_DISPLAY_TYPE)]
-        set(value) = setPropertyValue(PROPERTY_DISPLAY_TYPE, value.ordinal)
+    var level: RatingOptions.StarLevel get() = ratingOptions.starLevels
+        set(value) {
+            ratingOptions.starLevels = value
+        }
 
-    var allowIntermediate: Boolean get() = getPropertyValue(PROPERTY_ALLOW_INTERMEDIATE)
-        set(value) = setPropertyValue(PROPERTY_ALLOW_INTERMEDIATE, value)
+    var displayType: RatingOptions.DisplayType get() = ratingOptions.type
+        set(value) {
+            ratingOptions.type = value
+        }
+
+    var allowIntermediate: Boolean get() = ratingOptions.allowIntermediate
+        set(value) {
+            ratingOptions.allowIntermediate = value
+        }
 
     override fun formatAttributeValue(value: Any): String {
-        return value.toString() + " / ${level.maxScore}"
+        return when (displayType) {
+            RatingOptions.DisplayType.Star -> value.toString() + " / ${level.maxScore}"
+            RatingOptions.DisplayType.Likert -> value.toString()
+        }
     }
 
     override fun compareValues(a: Any, b: Any): Int {
@@ -92,8 +104,8 @@ class OTRatingAttribute(objectId: String?, dbId: Long?, columnName: String, sett
 
     override fun getInputViewType(previewMode: Boolean): Int {
         return when (displayType) {
-            DisplayType.Star -> AAttributeInputView.VIEW_TYPE_RATING_STARS
-            DisplayType.Likert -> AAttributeInputView.VIEW_TYPE_RATING_STARS
+            RatingOptions.DisplayType.Star -> AAttributeInputView.VIEW_TYPE_RATING_STARS
+            RatingOptions.DisplayType.Likert -> AAttributeInputView.VIEW_TYPE_RATING_LIKERT
         }
     }
 
@@ -103,22 +115,37 @@ class OTRatingAttribute(objectId: String?, dbId: Long?, columnName: String, sett
             inputView.ratingView.allowIntermediate = allowIntermediate
             inputView.ratingView.levels = level.maxScore
             inputView.ratingView.score = level.maxScore / 2.0f
+        } else if (inputView is LikertScaleInputView) {
+            inputView.scalePicker.allowIntermediate = allowIntermediate
+            val options = ratingOptions
+            inputView.scalePicker.leftMost = options.leftMost
+            inputView.scalePicker.rightMost = options.rightMost
+            inputView.scalePicker.leftLabel = options.leftLabel
+            inputView.scalePicker.rightLabel = options.rightLabel
+            inputView.scalePicker.middleLabel = options.middleLabel
+            inputView.scalePicker.value = ((options.rightMost + options.leftMost) shr 1).toFloat()
         }
     }
 
     override fun getViewForItemList(context: Context, recycledView: View?): View {
+        when (displayType) {
+            RatingOptions.DisplayType.Star -> {
+                val target = if (recycledView is StarRatingView) {
+                    recycledView
+                } else {
+                    StarRatingView(context)
+                }
 
-        val target = if (recycledView is StarRatingView) {
-            recycledView
-        } else {
-            StarRatingView(context)
+                target.isLightMode = true
+                target.overridenIntrinsicWidth = context.resources.getDimensionPixelSize(R.dimen.star_rating_item_list_view_unit_size)
+                target.overridenIntrinsicHeight = target.overridenIntrinsicWidth
+                return target
+            }
+
+            RatingOptions.DisplayType.Likert -> {
+                return super.getViewForItemList(context, recycledView)
+            }
         }
-
-        target.isLightMode = true
-        target.overridenIntrinsicWidth = context.resources.getDimensionPixelSize(R.dimen.star_rating_item_list_view_unit_size)
-        target.overridenIntrinsicHeight = target.overridenIntrinsicWidth
-
-        return target
     }
 
     override fun applyValueToViewForItemList(value: Any?, view: View): Boolean {

@@ -190,17 +190,17 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
             refreshConnection(true)
             */
 
-            val view = ConnectionWizardView(this)
+            val wizardView = ConnectionWizardView(this)
 
             val wizardDialog = AlertDialog.Builder(this)
-                    .setView(view)
+                    .setView(wizardView)
                     .create()
 
-            view.init(attribute!!)
+            wizardView.init(attribute!!)
 
-            view.setWizardListener(object : WizardView.IWizardListener {
+            wizardView.setWizardListener(object : WizardView.IWizardListener {
                 override fun onComplete(wizard: WizardView) {
-                    attribute?.valueConnection = view.connection
+                    attribute?.valueConnection = wizardView.connection
                     refreshConnection(true)
                     println("new connection refreshed.")
                     wizardDialog.dismiss()

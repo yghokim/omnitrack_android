@@ -109,6 +109,21 @@
 
     <string name="msg_number_style_commas">Show Commas</string>
 
+    <string name="msg_rating_options_display_type">Input Type</string>
+    <string name="msg_rating_options_star_levels">Number of Stars</string>
+    <string name="msg_rating_options_leftmost_value">Leftmost value</string>
+    <string name="msg_rating_options_rightmost_value">Rightmost value</string>
+
+    <string name="msg_rating_options_group_labels">Labels</string>
+
+    <string name="msg_rating_options_leftmost_label">Leftmost label</string>
+    <string name="msg_rating_options_middle_label">Middle label</string>
+    <string name="msg_rating_options_rightmost_label">Rightmost label</string>
+
+    <string name="msg_rating_options_leftmost_label_example">strongly disagree</string>
+    <string name="msg_rating_options_rightmost_label_example">strongly agree</string>
+
+    <string name="msg_rating_options_allow_intermediate">Allow intermediate</string>
 
     <string name="hint_long_text">Write text here</string>
     <string name="hint_short_text">Type in short text here</string>
@@ -130,8 +145,6 @@
     <string name="title_activity_new_connection">New Connection</string>
     <string name="title_activity_chart_view">%1$s Summary</string>
     <string name="title_activity_item_browser">%1$s Logs</string>
-
-
 
 
     <string name="msg_connection_wizard_title_source_selection">Choose a data source</string>

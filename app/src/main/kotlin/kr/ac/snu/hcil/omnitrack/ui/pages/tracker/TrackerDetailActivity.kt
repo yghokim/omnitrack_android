@@ -222,7 +222,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
                         0 -> TrackerDetailStructureTabFragment()
                         1 -> TrackerDetailReminderTabFragment()
                         else -> TrackerDetailReminderTabFragment()
-                    }) as Fragment
+                    })
 
             fragment.arguments = bundle
 

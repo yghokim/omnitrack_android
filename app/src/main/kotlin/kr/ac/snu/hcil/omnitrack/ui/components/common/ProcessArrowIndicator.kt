@@ -71,7 +71,7 @@ class ProcessArrowIndicator : View {
         val heightMode = MeasureSpec.getMode(heightMeasureSpec)
         val heightSize = MeasureSpec.getSize(heightMeasureSpec)
 
-        var measuredWidth: Int = 0
+        var measuredWidth: Int
 
         if (widthMode == MeasureSpec.EXACTLY) {
             measuredWidth = widthSize;

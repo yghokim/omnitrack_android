@@ -77,7 +77,6 @@ class NumberStylePropertyView(context: Context, attrs: AttributeSet?) : APropert
         fractionalDigitCountView.picker.minValue = 1
         fractionalDigitCountView.picker.maxValue = 5
 
-
         showFractionView.valueChanged += onBooleanValueChangedHandler
         pluralizeCheckView.valueChanged += onBooleanValueChangedHandler
         showCommasCheckView.valueChanged += onBooleanValueChangedHandler

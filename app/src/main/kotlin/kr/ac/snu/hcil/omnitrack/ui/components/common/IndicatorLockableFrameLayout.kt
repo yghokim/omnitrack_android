@@ -33,12 +33,6 @@ class IndicatorLockableFrameLayout : LockableFrameLayout {
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
         if (changed) {
-            val contentWidth = right - left - paddingLeft - paddingRight
-            val contentHeight = bottom - top - paddingTop - paddingBottom
-
-            val indicatorAspectRatio = indicator.intrinsicWidth / indicator.intrinsicHeight
-
-
         }
     }
 
