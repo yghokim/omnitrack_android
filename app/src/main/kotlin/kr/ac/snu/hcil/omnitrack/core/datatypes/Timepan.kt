@@ -1,7 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.datatypes
 
 
-import android.text.format.DateUtils
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
