@@ -262,12 +262,20 @@ class LikertScalePicker : View {
         )
     }
 
+    fun getSnappedValue(original: Float): Float {
+        return if (allowIntermediate) {
+            (original * 10 + .5f).toInt() / 10f
+        } else {
+            Math.round(original).toFloat()
+        }
+    }
+
     fun convertValueToCoordinate(value: Float): Float {
-        return (_lineRight - _lineLeft) * ((value - leftMost) / (rightMost - leftMost)) + _lineLeft
+        return (_lineRight - _lineLeft) * ((getSnappedValue(value) - leftMost) / (rightMost - leftMost)) + _lineLeft
     }
 
     fun convertCoordinateToValue(x: Float): Float {
-        return (rightMost - leftMost) * ((x - _lineLeft) / (_lineRight - _lineLeft)) + leftMost
+        return getSnappedValue((rightMost - leftMost) * ((x - _lineLeft) / (_lineRight - _lineLeft)) + leftMost)
     }
 
 
@@ -304,7 +312,7 @@ class LikertScalePicker : View {
         } else if (event.x > _lineRight) {
             value = rightMost.toFloat()
         } else {
-            value = (convertCoordinateToValue(event.x) * 10 + .5f).toInt() / 10f
+            value = getSnappedValue(convertCoordinateToValue(event.x))
         }
     }
 
