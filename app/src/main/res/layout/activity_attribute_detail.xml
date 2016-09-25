@@ -38,10 +38,18 @@
                 android:id="@+id/nameProperty"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:text="@string/msg_column_name" />
 
+            <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.BooleanPropertyView
+                android:id="@+id/requiredProperty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp"
                 android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin" />
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:text="@string/msg_required" />
 
             <LinearLayout
                 android:id="@+id/ui_list"

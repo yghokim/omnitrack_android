@@ -29,7 +29,7 @@
 
 
         <TextView
-            android:id="@+id/title"
+            android:id="@+id/ui_column_name"
             style="@style/PropertyHeaderStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -37,6 +37,18 @@
             android:layout_marginLeft="?attr/actionBarSize"
             android:text="Text"
             android:textSize="17dp" />
+
+        <android.support.v7.widget.AppCompatImageView
+            android:id="@+id/ui_required_marker"
+            android:layout_width="11dp"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="4dp"
+            android:layout_toRightOf="@+id/title"
+            android:paddingBottom="5dp"
+            android:scaleType="fitStart"
+            android:src="@drawable/icon_asterisk"
+            android:tint="@color/colorAccent" />
 
         <TextView
             android:id="@+id/ui_attribute_type"

@@ -54,6 +54,16 @@
                 android:layout_toRightOf="@+id/ui_attribute_type"
                 android:text="Column Name" />
 
+            <android.support.v7.widget.AppCompatImageView
+                android:id="@+id/ui_required_marker"
+                android:layout_width="12dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="2.5dp"
+                android:layout_marginTop="5dp"
+                android:layout_toRightOf="@+id/ui_column_name"
+                android:src="@drawable/icon_asterisk"
+                android:tint="@color/colorAccent" />
+
 
             <ImageButton
                 android:id="@+id/ui_button_edit"

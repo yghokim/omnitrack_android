@@ -12,7 +12,7 @@ import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelpe
 /**
  * Created by younghokim on 16. 7. 24..
  */
-class OTLongTextAttribute(objectId: String?, dbId: Long?, columnName: String, settingData: String?, connectionData: String?) : OTAttribute<CharSequence>(objectId, dbId, columnName, Companion.TYPE_LONG_TEXT, settingData, connectionData) {
+class OTLongTextAttribute(objectId: String?, dbId: Long?, columnName: String, isRequired: Boolean, settingData: String?, connectionData: String?) : OTAttribute<CharSequence>(objectId, dbId, columnName, isRequired, Companion.TYPE_LONG_TEXT, settingData, connectionData) {
     override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_STRING
 
     override fun getInputViewType(previewMode: Boolean): Int {

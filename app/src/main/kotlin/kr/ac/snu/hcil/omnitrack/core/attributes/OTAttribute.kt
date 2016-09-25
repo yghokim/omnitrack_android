@@ -25,7 +25,7 @@ import kotlin.properties.Delegates
 /**
  * Created by Young-Ho on 7/11/2016.
  */
-abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName: String, val typeId: Int, propertyData: String?, connectionData: String?) : NamedObject(objectId, dbId, columnName) {
+abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName: String, isRequired: Boolean, val typeId: Int, propertyData: String?, connectionData: String?) : NamedObject(objectId, dbId, columnName) {
 
     override fun makeNewObjectId(): String {
         return owner?.owner?.makeNewObjectId() ?: UUID.randomUUID().toString()
@@ -48,26 +48,34 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
         const val TYPE_IMAGE = 8
 
 
-        fun createAttribute(objectId: String?, dbId: Long?, columnName: String, typeId: Int, propertyData: String?, connectionData: String?): OTAttribute<out Any> {
+        fun createAttribute(objectId: String?, dbId: Long?, columnName: String, isRequired: Boolean, typeId: Int, propertyData: String?, connectionData: String?): OTAttribute<out Any> {
             val attr = when (typeId) {
-                TYPE_NUMBER -> OTNumberAttribute(objectId, dbId, columnName, propertyData, connectionData)
-                TYPE_TIME -> OTTimeAttribute(objectId, dbId, columnName, propertyData, connectionData)
-                TYPE_TIMESPAN -> OTTimeSpanAttribute(objectId, dbId, columnName, propertyData, connectionData)
-                TYPE_SHORT_TEXT -> OTShortTextAttribute(objectId, dbId, columnName, propertyData, connectionData)
-                TYPE_LONG_TEXT -> OTLongTextAttribute(objectId, dbId, columnName, propertyData, connectionData)
-                TYPE_LOCATION -> OTLocationAttribute(objectId, dbId, columnName, propertyData, connectionData)
-                TYPE_CHOICE -> OTChoiceAttribute(objectId, dbId, columnName, propertyData, connectionData)
-                TYPE_RATING -> OTRatingAttribute(objectId, dbId, columnName, propertyData, connectionData)
-                TYPE_IMAGE -> OTImageAttribute(objectId, dbId, columnName, propertyData, connectionData)
-                else -> OTNumberAttribute(objectId, dbId, columnName, propertyData, connectionData)
+                TYPE_NUMBER -> OTNumberAttribute(objectId, dbId, columnName, isRequired, propertyData, connectionData)
+                TYPE_TIME -> OTTimeAttribute(objectId, dbId, columnName, isRequired, propertyData, connectionData)
+                TYPE_TIMESPAN -> OTTimeSpanAttribute(objectId, dbId, columnName, isRequired, propertyData, connectionData)
+                TYPE_SHORT_TEXT -> OTShortTextAttribute(objectId, dbId, columnName, isRequired, propertyData, connectionData)
+                TYPE_LONG_TEXT -> OTLongTextAttribute(objectId, dbId, columnName, isRequired, propertyData, connectionData)
+                TYPE_LOCATION -> OTLocationAttribute(objectId, dbId, columnName, isRequired, propertyData, connectionData)
+                TYPE_CHOICE -> OTChoiceAttribute(objectId, dbId, columnName, isRequired, propertyData, connectionData)
+                TYPE_RATING -> OTRatingAttribute(objectId, dbId, columnName, isRequired, propertyData, connectionData)
+                TYPE_IMAGE -> OTImageAttribute(objectId, dbId, columnName, isRequired, propertyData, connectionData)
+                else -> OTNumberAttribute(objectId, dbId, columnName, isRequired, propertyData, connectionData)
             }
             return attr
         }
 
         fun createAttribute(user: OTUser, columnName: String, typeId: Int): OTAttribute<out Any> {
-            return createAttribute(user.getNewAttributeObjectId().toString(), null, columnName, typeId, null, null)
+            return createAttribute(user.getNewAttributeObjectId().toString(), null, columnName, false, typeId, null, null)
         }
     }
+
+    var isRequired: Boolean = isRequired
+        set(value) {
+            if (field != value) {
+                field = value
+                isDirtySinceLastSync = true
+            }
+        }
 
     val removedFromTracker = Event<OTTracker>()
     val addedToTracker = Event<OTTracker>()
@@ -90,7 +98,7 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
         }
     }
 
-    constructor(columnName: String, typeId: Int) : this(null, null, columnName, typeId, null, null)
+    constructor(columnName: String, typeId: Int) : this(null, null, columnName, false, typeId, null, null)
 
     init {
         createProperties()

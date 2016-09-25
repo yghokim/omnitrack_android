@@ -261,6 +261,8 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
             private val editButton: ImageButton
             private val removeButton: ImageButton
 
+            private val requiredMarker: View
+
             private val draggableZone: View
 
             private val connectionIndicatorStub: ViewStub
@@ -293,6 +295,8 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
                 draggableZone = view.findViewById(R.id.ui_drag_handle)
                 connectionIndicatorStub = view.findViewById(R.id.ui_connection_indicator_stub) as ViewStub
 
+                requiredMarker = view.findViewById(R.id.ui_required_marker)
+
                 editButton.setOnClickListener(this)
                 removeButton.setOnClickListener(this)
                 draggableZone.setOnTouchListener(this)
@@ -321,6 +325,11 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
             fun bindAttribute(attribute: OTAttribute<out Any>) {
                 typeIconView.setImageResource(attribute.typeSmallIconResourceId)
                 columnNameView.text = attribute.name
+                requiredMarker.visibility = if (attribute.isRequired) {
+                    View.VISIBLE
+                } else {
+                    View.INVISIBLE
+                }
 
                 previewContainer.alpha = 0.5f
                 preview = attribute.getInputView(context, true, preview)

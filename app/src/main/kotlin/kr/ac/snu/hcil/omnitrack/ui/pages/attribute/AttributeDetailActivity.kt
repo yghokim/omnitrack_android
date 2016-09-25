@@ -15,6 +15,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.WizardView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.BooleanPropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ShortTextPropertyView
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.wizard.ConnectionWizardView
 import kr.ac.snu.hcil.omnitrack.utils.*
@@ -29,6 +30,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
     private lateinit var propertyViewContainer: LinearLayout
 
     private lateinit var columnNameView: ShortTextPropertyView
+    private lateinit var requiredView: BooleanPropertyView
 
     private lateinit var connectionFrame: FrameLayout
     private lateinit var newConnectionButton: Button
@@ -47,14 +49,18 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
         propertyViewContainer = findViewById(R.id.ui_list) as LinearLayout
 
         columnNameView = findViewById(R.id.nameProperty) as ShortTextPropertyView
-        columnNameView.title = resources.getString(R.string.msg_column_name)
-
         columnNameView.addNewValidator(String.format(resources.getString(R.string.msg_format_cannot_be_blank), resources.getString(R.string.msg_column_name)), ShortTextPropertyView.NOT_EMPTY_VALIDATOR)
 
         columnNameView.valueChanged += {
             sender, value ->
             if (columnNameView.validate())
                 attribute?.name = value
+        }
+
+        requiredView = findViewById(R.id.requiredProperty) as BooleanPropertyView
+        requiredView.valueChanged += {
+            sender, value ->
+            attribute?.isRequired = value
         }
 
         connectionFrame = findViewById(R.id.ui_attribute_connection_frame) as FrameLayout

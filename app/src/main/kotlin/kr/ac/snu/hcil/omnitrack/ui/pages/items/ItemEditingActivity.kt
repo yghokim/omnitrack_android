@@ -341,6 +341,7 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
         inner class ViewHolder(val inputView: AAttributeInputView<out Any>, val frame: View) : RecyclerView.ViewHolder(frame) {
 
             private val columnNameView: TextView
+            private val requiredMarker: View
             private val attributeTypeView: TextView
 
             private val container: LockableFrameLayout
@@ -356,7 +357,8 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
 
 
             init {
-                columnNameView = frame.findViewById(R.id.title) as TextView
+                columnNameView = frame.findViewById(R.id.ui_column_name) as TextView
+                requiredMarker = frame.findViewById(R.id.ui_required_marker)
                 attributeTypeView = frame.findViewById(R.id.ui_attribute_type) as TextView
                 container = frame.findViewById(R.id.ui_input_view_container) as LockableFrameLayout
                 container.addView(inputView, 0)
@@ -382,6 +384,11 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
 
                 attributeId = attribute.objectId
                 columnNameView.text = attribute.name
+                requiredMarker.visibility = if (attribute.isRequired) {
+                    View.VISIBLE
+                } else {
+                    View.INVISIBLE
+                }
                 attributeTypeView.text = resources.getString(attribute.typeNameResourceId)
 
                 val connectionSource = attribute.valueConnection?.source

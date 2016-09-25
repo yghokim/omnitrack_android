@@ -69,6 +69,8 @@
 
     <string name="msg_name">Name</string>
 
+    <string name="msg_required">Required</string>
+
     <string name="msg_never_logged">Never Logged</string>
 
     <string name="msg_todays_log">Today\'s</string>

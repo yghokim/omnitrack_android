@@ -19,7 +19,7 @@ import java.util.*
 /**
  * Created by younghokim on 16. 8. 12..
  */
-class OTChoiceAttribute(objectId: String?, dbId: Long?, columnName: String, propertyData: String?, connectionData: String?) : OTAttribute<IntArray>(objectId, dbId, columnName, TYPE_CHOICE, propertyData, connectionData) {
+class OTChoiceAttribute(objectId: String?, dbId: Long?, columnName: String, isRequired: Boolean, propertyData: String?, connectionData: String?) : OTAttribute<IntArray>(objectId, dbId, columnName, isRequired, TYPE_CHOICE, propertyData, connectionData) {
 
     companion object {
         const val PROPERTY_MULTISELECTION = 0

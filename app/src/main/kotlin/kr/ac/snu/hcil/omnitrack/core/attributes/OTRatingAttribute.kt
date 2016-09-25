@@ -15,8 +15,8 @@ import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelpe
 /**
  * Created by younghokim on 16. 9. 6..
  */
-class OTRatingAttribute(objectId: String?, dbId: Long?, columnName: String, settingData: String?, connectionData: String?)
-: OTAttribute<Float>(objectId, dbId, columnName, OTAttribute.TYPE_RATING, settingData, connectionData) {
+class OTRatingAttribute(objectId: String?, dbId: Long?, columnName: String, isRequired: Boolean, settingData: String?, connectionData: String?)
+: OTAttribute<Float>(objectId, dbId, columnName, isRequired, OTAttribute.TYPE_RATING, settingData, connectionData) {
 
 
 
