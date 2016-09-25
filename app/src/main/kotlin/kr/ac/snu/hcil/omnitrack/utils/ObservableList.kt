@@ -41,6 +41,14 @@ class ObservableList<T>(){
         return list[index]
     }
 
+    fun <R> map(transform: (T) -> R): List<R> {
+        return list.map(transform)
+    }
+
+    fun <R> mapNonNull(transform: (T) -> R?): List<R> {
+        return list.map(transform).filter { it != null }.map { it!! }
+    }
+
     fun moveItem(fromPosition: Int, toPosition: Int) {
         if (unObservedList.move(fromPosition, toPosition)) {
             if (fromPosition < toPosition) {

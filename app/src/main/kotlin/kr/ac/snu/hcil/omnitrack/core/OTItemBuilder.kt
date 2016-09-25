@@ -1,21 +1,33 @@
 package kr.ac.snu.hcil.omnitrack.core
 
+import android.os.Parcel
+import android.os.Parcelable
 import com.google.gson.Gson
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.utils.serialization.IStringSerializable
-import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializedStringKeyEntry
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import java.util.*
 
 /**
  * Created by younghokim on 16. 7. 25..
  */
-class OTItemBuilder : ADataRow, IStringSerializable {
+class OTItemBuilder : Parcelable, IStringSerializable {
+
     companion object {
         const val MODE_EDIT = 2
         const val MODE_FOREGROUND = 1
         const val MODE_BACKGROUND = 0
+
+        @JvmField final val CREATOR: Parcelable.Creator<OTItemBuilder> = object : Parcelable.Creator<OTItemBuilder> {
+            override fun createFromParcel(source: Parcel): OTItemBuilder {
+                return OTItemBuilder(source)
+            }
+
+            override fun newArray(size: Int): Array<OTItemBuilder?> {
+                return arrayOfNulls(size)
+            }
+        }
     }
 
     enum class EAttributeValueState {
@@ -26,9 +38,13 @@ class OTItemBuilder : ADataRow, IStringSerializable {
         fun onAttributeStateChanged(attribute: OTAttribute<*>, position: Int, state: EAttributeValueState);
     }
 
+    data class ValueInfo(var value: Any, var timestamp: Long)
+
+    internal data class SerializationPackage(val trackerObjectId: String, val mode: Int, val connectedItemDbId: Long, val serializedEntries: Array<String>)
+
     private val attributeStateList = ArrayList<EAttributeValueState>()
 
-    internal data class Parcel(val trackerObjectId: String, val mode: Int, val connectedItemDbId: Long, val valueTable: Array<String>)
+    protected val valueTable = Hashtable<String, ValueInfo>()
 
     private lateinit var tracker: OTTracker
 
@@ -36,6 +52,7 @@ class OTItemBuilder : ADataRow, IStringSerializable {
 
     private val mode: Int
 
+    val isEmpty: Boolean get() = valueTable.isEmpty
 
     /**
      * Used when editing item.
@@ -67,25 +84,131 @@ class OTItemBuilder : ADataRow, IStringSerializable {
         syncFromTrackerScheme()
     }
 
+
     /**
      * used when deserializing
      */
+    constructor(parcel: Parcel) {
+
+        val gson = Gson()
+
+        reloadTracker(parcel.readString())
+
+        this.mode = parcel.readInt()
+        this.connectedItemDbId = parcel.readLong()
+
+        for (serializedEntry in parcel.createStringArray()) {
+            val entry = gson.fromJson(serializedEntry, Array<String>::class.java)
+
+            valueTable[entry[0]] = ValueInfo(
+                    TypeStringSerializationHelper.deserialize(entry[1]),
+                    entry[2].toLong()
+            )
+
+        }
+
+        syncFromTrackerScheme()
+    }
+
+    override fun writeToParcel(parcel: Parcel, content: Int) {
+        parcel.writeString(tracker.objectId)
+        parcel.writeInt(mode)
+        parcel.writeLong(connectedItemDbId)
+
+        val gson = Gson()
+        parcel.writeStringArray(
+                valueTable.map {
+                    gson.toJson(arrayOf(it.key,
+                            TypeStringSerializationHelper.serialize(it.value), it.value.timestamp.toString()))
+                }.toTypedArray()
+        )
+    }
+
+
     constructor(serialized: String) {
 
-        val parser = Gson()
-        val parcel = parser.fromJson(serialized, Parcel::class.java)
+        val gson = Gson()
 
-        this.mode = parcel.mode
-        this.connectedItemDbId = parcel.connectedItemDbId
+        val pack = gson.fromJson(serialized, SerializationPackage::class.java)
 
-        reloadTracker(parcel.trackerObjectId)
+        reloadTracker(pack.trackerObjectId)
 
-        val s = parcel.valueTable.map { parser.fromJson(it, SerializedStringKeyEntry::class.java) }
+        this.mode = pack.mode
+        this.connectedItemDbId = pack.connectedItemDbId
 
-        for (entry in s) {
-            valueTable[entry.key] = TypeStringSerializationHelper.deserialize(entry.value)
+        for (serializedEntry in pack.serializedEntries) {
+            val entry = gson.fromJson(serializedEntry, Array<String>::class.java)
+
+            valueTable[entry[0]] = ValueInfo(
+                    TypeStringSerializationHelper.deserialize(entry[1]),
+                    entry[2].toLong()
+            )
+
         }
+
         syncFromTrackerScheme()
+    }
+
+    override fun getSerializedString(): String {
+
+        val gson = Gson()
+
+        val pack = SerializationPackage(tracker.objectId, mode, connectedItemDbId,
+                tracker.attributes.mapNonNull {
+                    val valueInfo = valueTable[it.objectId]
+                    if (valueInfo != null) {
+                        gson.toJson(arrayOf(it.objectId,
+                                TypeStringSerializationHelper.serialize(it.typeNameForSerialization, valueInfo.value), valueInfo.timestamp.toString()))
+                    } else null
+                }.toTypedArray()
+        )
+
+        return gson.toJson(pack)
+    }
+
+    override fun fromSerializedString(serialized: String): Boolean {
+        throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    fun getValueInformationOf(attribute: OTAttribute<out Any>): ValueInfo? {
+        return valueTable[attribute.objectId]
+    }
+
+    @SuppressWarnings("UNCHECKED CAST")
+    fun <T> getCastedValueOf(attribute: OTAttribute<T>): T? {
+        return valueTable[attribute.objectId]?.value as? T
+    }
+
+    fun setValueOf(attribute: OTAttribute<out Any>, value: Any, timestamp: Long = System.currentTimeMillis()) {
+        synchronized(valueTable) {
+            val info = valueTable[attribute.objectId]
+            if (info != null) {
+                info.value = value
+                info.timestamp = timestamp
+            } else {
+                valueTable[attribute.objectId] = ValueInfo(value, timestamp)
+            }
+        }
+    }
+
+    fun removeValueOf(attribute: OTAttribute<out Any>) {
+        valueTable.remove(attribute.objectId)
+    }
+
+    fun hasValueOf(attribute: OTAttribute<out Any>): Boolean {
+        return valueTable.containsKey(attribute.objectId)
+    }
+
+    fun getNumStoredAttributes(): Int {
+        return valueTable.keys.size
+    }
+
+    fun clear() {
+        valueTable.clear()
     }
 
     fun getAttributeValueState(position: Int): EAttributeValueState {
@@ -200,23 +323,6 @@ class OTItemBuilder : ADataRow, IStringSerializable {
         }
     }
 
-    override fun extractFormattedStringArray(scheme: OTTracker): Array<String?> {
-        throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun extractValueArray(scheme: OTTracker): Array<Any?> {
-        throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun fromSerializedString(serialized: String): Boolean {
-        throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun getSerializedString(): String {
-        val parser = Gson()
-        return parser.toJson(Parcel(tracker.objectId, mode, connectedItemDbId, tableToSerializedEntryArray(tracker)))
-    }
-
     fun makeItem(): OTItem {
         val item = OTItem(tracker.objectId)
         if (connectedItemDbId != -1L) {
@@ -226,7 +332,7 @@ class OTItemBuilder : ADataRow, IStringSerializable {
 
         for (attribute in tracker.attributes) {
             if (hasValueOf(attribute)) {
-                item.setValueOf(attribute, getValueOf(attribute)!!)
+                item.setValueOf(attribute, getValueInformationOf(attribute)!!.value)
             }
         }
 

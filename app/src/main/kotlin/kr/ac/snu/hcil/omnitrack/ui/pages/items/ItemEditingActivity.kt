@@ -197,7 +197,6 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
 
             OTApplication.app.dbHelper.save(item, tracker!!)
             builder.clear()
-            println(builder.getSerializedString())
             clearBuilderCache()
             skipViewValueCaching = true
             finish()
@@ -271,15 +270,17 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
     private fun tryRestoreItemBuilderCache(tracker: OTTracker): Boolean {
         val preferences = getSharedPreferences(OTApplication.PREFERENCE_KEY_FOREGROUND_ITEM_BUILDER_STORAGE, Context.MODE_PRIVATE)
         val serialized = preferences.getString(makeTrackerPreferenceKey(tracker), null)
-        if (serialized != null) {
-            println("stored ItemBuilder was restored.")
+        try {
             val storedBuilder = OTItemBuilder(serialized)
             if (activityResultAppliedAttributePosition != -1) {
                 storedBuilder.removeValueOf(tracker.attributes[activityResultAppliedAttributePosition])
             }
             builder = storedBuilder
             return true
-        } else {
+        } catch(e: Exception) {
+            e.printStackTrace()
+            println("deserialization failed. make new itemBuilder.")
+
             println("new ItemBuilder created.")
             builder = OTItemBuilder(tracker, OTItemBuilder.MODE_FOREGROUND)
             return false
@@ -409,7 +410,7 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
                 if (builder.hasValueOf(attribute)) {
 
                     inputView.valueChanged.suspend = true
-                    inputView.setAnyValue(builder.getValueOf(attribute)!!)
+                    inputView.setAnyValue(builder.getValueInformationOf(attribute)!!.value)
                     inputView.valueChanged.suspend = false
                 }
 
