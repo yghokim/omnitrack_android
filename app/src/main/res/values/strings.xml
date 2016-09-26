@@ -130,6 +130,9 @@
     <string name="hint_long_text">Write text here</string>
     <string name="hint_short_text">Type in short text here</string>
 
+    <string name="msg_discard">Discard</string>
+    <string name="msg_builder_restored">Incomplete form contents were restored.</string>
+
     <string name="sentence_new_tracker_added">Tracker \'%1$s\' was added</string>
 
     <string name="title_activity_tracker_new">New Tracker</string>

@@ -7,7 +7,7 @@
     <string name="time_pm">PM</string>
 
     <string name="dateformat_ymd">MMM d, EEEE, yyyy</string>
-    <string name="dateformat_full">h:m:s a, MM d, yyyy</string>
+    <string name="dateformat_full">hh:mm:ss a, MMM d, yyyy</string>
 
     <string name="dateformat_day_of_week_short">E</string>
 

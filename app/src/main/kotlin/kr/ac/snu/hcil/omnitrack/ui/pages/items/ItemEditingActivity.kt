@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.PersistableBundle
+import android.support.design.widget.Snackbar
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.format.DateUtils
@@ -81,6 +82,8 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
 
     private var activityResultAppliedAttributePosition = -1
 
+    private lateinit var builderRestoredSnackbar: Snackbar
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         rightActionBarButton?.visibility = View.VISIBLE
@@ -93,6 +96,16 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
         attributeListView.addItemDecoration(HorizontalImageDividerItemDecoration(R.drawable.horizontal_separator_pattern, this))
 
         attributeListView.adapter = attributeListAdapter
+
+        builderRestoredSnackbar = Snackbar.make(findViewById(R.id.ui_root), resources.getText(R.string.msg_builder_restored), Snackbar.LENGTH_INDEFINITE)
+        builderRestoredSnackbar.setAction(resources.getText(R.string.msg_discard)) {
+            view ->
+            builder = OTItemBuilder(tracker!!, OTItemBuilder.MODE_FOREGROUND)
+            builder.autoCompleteAsync(this) {
+                //attributeListAdapter.notifyDataSetChanged()
+            }
+            builderRestoredSnackbar.dismiss()
+        }
     }
 
     override fun onStart() {
@@ -127,7 +140,8 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
                 if (mode == Mode.New) {
                     if (tryRestoreItemBuilderCache(tracker!!)) {
 
-                        Toast.makeText(this, "Past inputs were restored.", Toast.LENGTH_SHORT).show()
+                        //Toast.makeText(this, "Past inputs were restored.", Toast.LENGTH_SHORT).show()
+                        builderRestoredSnackbar.show()
                     } else {
                         //new builder was created
                         //TODO make it as a AcyncTask and update each attribute immediately
