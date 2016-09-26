@@ -256,7 +256,8 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
     private fun storeItemBuilderCache() {
         if (tracker != null) {
 
-            syncViewStateToBuilderAsync {
+
+//            syncViewStateToBuilderAsync {
                 if (!builder.isEmpty) {
 
                     val preferences = getSharedPreferences(OTApplication.PREFERENCE_KEY_FOREGROUND_ITEM_BUILDER_STORAGE, Context.MODE_PRIVATE)
@@ -264,7 +265,7 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
                     editor.putString(makeTrackerPreferenceKey(tracker!!), builder.getSerializedString())
                     editor.apply()
                 }
-            }
+            //          }
 
         }
     }
@@ -297,6 +298,10 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
 
     private fun onAttributeValueChangedHandler(attributeId: String, newVal: Any) {
         println("Attribute $attributeId was changed to $newVal")
+        val attribute = tracker?.attributes?.unObservedList?.find { it.objectId == attributeId }
+        if (attribute != null) {
+            builder.setValueOf(attribute, newVal)
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -382,8 +387,18 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
             }
 
             private fun onInputViewValueChanged(sender: AInputView<out Any>, newVal: Any) {
+                setTimestampIndicatorText(System.currentTimeMillis())
                 if (attributeId != null) {
                     onAttributeValueChangedHandler(attributeId!!, newVal)
+                }
+            }
+
+            private fun setTimestampIndicatorText(timestamp: Long) {
+                val now = System.currentTimeMillis()
+                timestampIndicator.text = if (now - timestamp < DateUtils.SECOND_IN_MILLIS) {
+                    resources.getString(R.string.time_just_now)
+                } else {
+                    DateUtils.getRelativeTimeSpanString(timestamp, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_ABBREV_ALL)
                 }
             }
 
@@ -421,7 +436,7 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
                     inputView.setAnyValue(valueInfo.value)
                     inputView.valueChanged.suspend = false
 
-                    timestampIndicator.text = DateUtils.getRelativeTimeSpanString(valueInfo.timestamp, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS)
+                    setTimestampIndicatorText(valueInfo.timestamp)
                 }
 
                 attributeValueExtractors[attributeId] = {

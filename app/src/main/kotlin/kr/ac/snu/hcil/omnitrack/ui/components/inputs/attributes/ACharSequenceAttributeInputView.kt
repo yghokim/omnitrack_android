@@ -1,6 +1,8 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes
 
 import android.content.Context
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.AttributeSet
 import android.widget.EditText
 import android.widget.TextView
@@ -15,18 +17,32 @@ abstract class ACharSequenceAttributeInputView(layoutId: Int, context: Context, 
         set(value) {
             if (value != valueView.text.toString()) {
                 valueView.setText(value, TextView.BufferType.EDITABLE)
-                onValueChanged(value)
             }
-
         }
 
-    private lateinit var valueView: EditText
+    private val valueView: EditText
 
     init {
         valueView = findViewById(R.id.value) as EditText
+        valueView.addTextChangedListener(Watcher())
     }
 
     override fun focus() {
         valueView.requestFocus()
+    }
+
+    inner class Watcher : TextWatcher {
+        override fun afterTextChanged(editable: Editable) {
+            onValueChanged(editable.toString())
+        }
+
+        override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+        }
+
+        override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+        }
+
     }
 }
