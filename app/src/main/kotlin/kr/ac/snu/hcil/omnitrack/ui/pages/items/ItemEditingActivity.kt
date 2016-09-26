@@ -132,7 +132,7 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
                         //new builder was created
                         //TODO make it as a AcyncTask and update each attribute immediately
                         builder.autoCompleteAsync(this) {
-                            attributeListAdapter.notifyDataSetChanged()
+                            //attributeListAdapter.notifyDataSetChanged()
                         }
                     }
                 }

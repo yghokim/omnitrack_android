@@ -70,9 +70,9 @@
             android:layout_centerVertical="true"
             android:layout_marginStart="15dp"
             android:fontFamily="sans-serif-light"
-            android:text="3 mins ago"
+            android:text=""
             android:textColor="@color/textColorMid"
-            android:textSize="13sp"
+            android:textSize="14sp"
             android:textStyle="italic" />
 
     </RelativeLayout>
