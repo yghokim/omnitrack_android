@@ -7,7 +7,7 @@ import android.widget.Toast
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTNotificationManager
 import kr.ac.snu.hcil.omnitrack.core.OTShortcutManager
-import kr.ac.snu.hcil.omnitrack.core.triggers.OTEventTriggerManager
+import kr.ac.snu.hcil.omnitrack.core.triggers.OTDataTriggerManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTriggerAlarmManager
 
 /**
@@ -52,7 +52,7 @@ class OTSystemReceiver : BroadcastReceiver() {
             }
 
             OTApplication.BROADCAST_ACTION_EVENT_TRIGGER_CHECK_ALARM->{
-                OTEventTriggerManager.checkMeasures(context)
+                OTDataTriggerManager.checkMeasures(context)
             }
         }
     }

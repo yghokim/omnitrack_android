@@ -28,14 +28,14 @@ abstract class OTTrigger(objectId: String?, dbId: Long?, name: String,
 
         const val TYPE_TIME = 0
         const val TYPE_NEW_ENTRY = 1
-        const val TYPE_SERVICE_EVENT = 2
+        const val TYPE_DATA_THRESHOLD = 2
 
         const val TRIGGER_TIME_NEVER_TRIGGERED = -1L
 
         fun makeInstance(objectId: String?, dbId: Long?, typeId: Int, name: String, trackerObjectIds: Array<String>, isOn: Boolean, action: Int, lastTriggeredTime: Long, serializedProperties: String?): OTTrigger {
             return when (typeId) {
                 TYPE_TIME -> OTTimeTrigger(objectId, dbId, name, trackerObjectIds, isOn, action, lastTriggeredTime, serializedProperties)
-                TYPE_SERVICE_EVENT -> OTEventTrigger(objectId, dbId, name, trackerObjectIds, isOn, action, lastTriggeredTime, serializedProperties)
+                TYPE_DATA_THRESHOLD -> OTDataTrigger(objectId, dbId, name, trackerObjectIds, isOn, action, lastTriggeredTime, serializedProperties)
                 else -> throw Exception("wrong trigger type : $typeId")
             }
         }

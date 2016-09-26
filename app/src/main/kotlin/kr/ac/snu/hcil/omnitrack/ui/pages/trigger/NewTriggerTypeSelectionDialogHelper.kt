@@ -21,7 +21,7 @@ object NewTriggerTypeSelectionDialogHelper {
 
     val triggerTypes = arrayOf(
             TriggerTypeEntry(OTTrigger.TYPE_TIME, R.drawable.alarm_dark, R.string.trigger_name_time, R.string.trigger_desc_time),
-            TriggerTypeEntry(OTTrigger.TYPE_SERVICE_EVENT, R.drawable.event_dark, R.string.trigger_name_event, R.string.trigger_desc_event)
+            TriggerTypeEntry(OTTrigger.TYPE_DATA_THRESHOLD, R.drawable.event_dark, R.string.trigger_name_event, R.string.trigger_desc_event)
     )
 
     fun builder(context: Context, triggerActionTypeName: Int, listener: (Int) -> Unit): AlertDialog.Builder {

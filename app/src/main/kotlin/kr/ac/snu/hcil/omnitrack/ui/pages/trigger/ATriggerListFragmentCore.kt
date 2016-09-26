@@ -120,7 +120,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
             return when (viewType) {
                 OTTrigger.TYPE_TIME ->
                     TimeTriggerViewHolder(parentView, this, parent.context)
-                OTTrigger.TYPE_SERVICE_EVENT ->
+                OTTrigger.TYPE_DATA_THRESHOLD ->
                     EventTriggerViewHolder(parentView, this, parent.context)
                 else ->
                     TimeTriggerViewHolder(parentView, this, parent.context)

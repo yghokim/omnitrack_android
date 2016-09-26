@@ -12,12 +12,9 @@ import android.view.animation.DecelerateInterpolator
 import android.widget.Button
 import kr.ac.snu.hcil.omnitrack.R
 
-/**
- * TODO: document your custom view class.
- */
 class ColorSelectionButton : Button, ValueAnimator.AnimatorUpdateListener {
 
-    var color:Int = Color.RED // TODO: use a default from R.color...
+    var color: Int = Color.RED
         set(value){
             if(field != value) {
                 field = value

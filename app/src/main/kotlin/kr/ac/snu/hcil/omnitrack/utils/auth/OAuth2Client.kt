@@ -262,7 +262,7 @@ class OAuth2Client(val config: OAuth2Config, val activityRequestCode: Int) {
                     .add(AuthConstants.PARAM_CLIENT_ID, config.clientId)
                     .add(AuthConstants.PARAM_GRANT_TYPE, "authorization_code")
                     .add(AuthConstants.PARAM_REDIRECT_URI, AuthConstants.VALUE_REDIRECT_URI)
-                   // .add(AuthConstants.PARAM_EXPIRES_IN, "2592000" ) //TODO use long period when you sure that there is no error in the token process.
+                    // .add(AuthConstants.PARAM_EXPIRES_IN, "2592000" ) //use long period when you sure that there is no error in the token process.
                     .build()
 
             val request = makeRequestBuilderWithAuthHeader(uri)
@@ -288,26 +288,4 @@ class OAuth2Client(val config: OAuth2Config, val activityRequestCode: Int) {
         }
 
     }
-
-
-/*
-    class OAuth2LoginActivity: WebServiceLoginActivity(){
-        override fun finishIfPossible(redirectedUrl: String) {
-            val parsedUrl = HttpUrl.parse(redirectedUrl)
-            val accessToken = parsedUrl.queryParameter(AuthConstants.PARAM_ACCESS_TOKEN)
-            val expiresIn = parsedUrl.queryParameter(AuthConstants.PARAM_EXPIRES_IN)
-
-            if (!accessToken.isNullOrBlank()) {
-                val result = Intent()
-                result.putExtra(AuthConstants.PARAM_ACCESS_TOKEN, accessToken)
-                result.putExtra(AuthConstants.PARAM_EXPIRES_IN, expiresIn)
-                setResult(Activity.RESULT_OK, result)
-                finish()
-            }
-
-            //TODO error handling
-        }
-
-    }
-*/
 }

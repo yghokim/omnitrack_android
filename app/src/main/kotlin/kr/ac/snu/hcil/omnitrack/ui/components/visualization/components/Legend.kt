@@ -19,8 +19,8 @@ class Legend: IDrawer {
 
     private var left: Float = 0f
 
-    val labelPaint = Paint()
-    val rectPaint = Paint()
+    val labelPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    val rectPaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
     val rectSize: Float = OTApplication.app.resources.getDimension(R.dimen.vis_legend_rect_width)
     val rectMargin: Float = OTApplication.app.resources.getDimension(R.dimen.vis_legend_label_spacing)

@@ -13,7 +13,7 @@ import java.util.*
 /**
  * Created by younghokim on 16. 9. 5..
  */
-object OTEventTriggerManager {
+object OTDataTriggerManager {
 
     const val CHECK_PERIOD = 10000L // 1 minute
     const val ALARM_ID: Int = 9000000
@@ -30,7 +30,9 @@ object OTEventTriggerManager {
 
     private val alarmManager by lazy { OTApplication.app.getSystemService(Context.ALARM_SERVICE) as AlarmManager }
 
-    private fun prefKey(trigger: OTEventTrigger): String{ return PREFERENCE_TRIGGER_ID_PREFIX + trigger.objectId}
+    private fun prefKey(trigger: OTDataTrigger): String {
+        return PREFERENCE_TRIGGER_ID_PREFIX + trigger.objectId
+    }
 
     private fun makeIntent(context: Context): PendingIntent {
         val intent = Intent(context, OTSystemReceiver::class.java)
@@ -39,7 +41,7 @@ object OTEventTriggerManager {
         return PendingIntent.getBroadcast(context, ALARM_ID, intent, PendingIntent.FLAG_CANCEL_CURRENT)
     }
 
-    fun onEventTriggerOn(trigger: OTEventTrigger) {
+    fun onEventTriggerOn(trigger: OTDataTrigger) {
 
         println("event trigger is registered on system.")
 
@@ -53,7 +55,7 @@ object OTEventTriggerManager {
         //alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), CHECK_PERIOD, makeIntent(OTApplication.app))
     }
 
-    fun onEventTriggerOff(trigger: OTEventTrigger)
+    fun onEventTriggerOff(trigger: OTDataTrigger)
     {
 
         println("event trigger is unregistered on system.")
@@ -75,7 +77,7 @@ object OTEventTriggerManager {
     fun checkMeasures(context: Context){
         println("checking measures for event triggers...")
 
-        val triggersToCheck = OTApplication.app.triggerManager.getFilteredTriggers { it is OTEventTrigger && it.isOn == true }.map{it as OTEventTrigger}.toTypedArray()
+        val triggersToCheck = OTApplication.app.triggerManager.getFilteredTriggers { it is OTDataTrigger && it.isOn == true }.map { it as OTDataTrigger }.toTypedArray()
 
         batch?.cancel(true)
 
@@ -85,8 +87,8 @@ object OTEventTriggerManager {
         batch?.execute(*triggersToCheck)
     }
 
-    private class MeasureBatchCheckTask(val finishedHandler: (BooleanArray)->Unit): AsyncTask<OTEventTrigger, OTEventTrigger, BooleanArray>(){
-        override fun onProgressUpdate(vararg values: OTEventTrigger) {
+    private class MeasureBatchCheckTask(val finishedHandler: (BooleanArray) -> Unit) : AsyncTask<OTDataTrigger, OTDataTrigger, BooleanArray>() {
+        override fun onProgressUpdate(vararg values: OTDataTrigger) {
             super.onProgressUpdate(*values)
             println("Fire Event trigger - ${values[0].measure?.factoryCode}, ${values[0].conditioner}")
             values[0].fire(System.currentTimeMillis())
@@ -98,7 +100,7 @@ object OTEventTriggerManager {
             finishedHandler.invoke(result)
         }
 
-        override fun doInBackground(vararg triggers: OTEventTrigger): BooleanArray {
+        override fun doInBackground(vararg triggers: OTDataTrigger): BooleanArray {
             val measureResults = BooleanArray(triggers.size)
             var left = triggers.size
             for(trigger in triggers.withIndex())
