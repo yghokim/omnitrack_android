@@ -44,7 +44,7 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginLeft="4dp"
-            android:layout_toRightOf="@+id/title"
+            android:layout_toRightOf="@+id/ui_column_name"
             android:paddingBottom="5dp"
             android:scaleType="fitStart"
             android:src="@drawable/icon_asterisk"
@@ -61,6 +61,18 @@
             android:text="Attribute Type"
             android:textAllCaps="true"
             android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/ui_timestamp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="15dp"
+            android:text="3 mins ago"
+            android:textColor="@color/textColorLight"
+            android:textSize="11sp"
+            android:textStyle="bold" />
 
     </RelativeLayout>
 

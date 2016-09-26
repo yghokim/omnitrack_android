@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.os.PersistableBundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -129,6 +130,7 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
                         Toast.makeText(this, "Past inputs were restored.", Toast.LENGTH_SHORT).show()
                     } else {
                         //new builder was created
+                        //TODO make it as a AcyncTask and update each attribute immediately
                         builder.autoCompleteAsync(this) {
                             attributeListAdapter.notifyDataSetChanged()
                         }
@@ -351,6 +353,8 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
             private var connectionIndicator: View? = null
             private var connectionIndicatorSourceNameView: TextView? = null
 
+            private var timestampIndicator: TextView
+
 
             private val loadingIndicatorInContainer: View
 
@@ -361,6 +365,9 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
                 columnNameView = frame.findViewById(R.id.ui_column_name) as TextView
                 requiredMarker = frame.findViewById(R.id.ui_required_marker)
                 attributeTypeView = frame.findViewById(R.id.ui_attribute_type) as TextView
+
+                timestampIndicator = frame.findViewById(R.id.ui_timestamp) as TextView
+
                 container = frame.findViewById(R.id.ui_input_view_container) as LockableFrameLayout
                 container.addView(inputView, 0)
 
@@ -408,10 +415,13 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
 
 
                 if (builder.hasValueOf(attribute)) {
+                    val valueInfo = builder.getValueInformationOf(attribute)!!
 
                     inputView.valueChanged.suspend = true
-                    inputView.setAnyValue(builder.getValueInformationOf(attribute)!!.value)
+                    inputView.setAnyValue(valueInfo.value)
                     inputView.valueChanged.suspend = false
+
+                    timestampIndicator.text = DateUtils.getRelativeTimeSpanString(valueInfo.timestamp, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS)
                 }
 
                 attributeValueExtractors[attributeId] = {

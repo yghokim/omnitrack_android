@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core
 //import kr.ac.snu.hcil.omnitrack.core.database.TrackerEntity
 import android.content.Context
 import android.graphics.Color
+import android.os.AsyncTask
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
@@ -177,6 +178,32 @@ class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color
         }
 
         return list.toTypedArray()
+    }
+
+    inner class AutoCompleteAttributeValuesAsyncTask(
+            val onValueRetrievedHandler: (attr: OTAttribute<out Any>, value: Any?) -> Unit,
+            val finishedHandler: (success: Boolean) -> Unit) : AsyncTask<OTTracker, Pair<OTAttribute<out Any>, Any>, Boolean>() {
+
+        override fun onPreExecute() {
+            super.onPreExecute()
+        }
+
+        override fun doInBackground(vararg p0: OTTracker?): Boolean {
+            throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+
+        override fun onProgressUpdate(vararg values: Pair<OTAttribute<out Any>, Any>) {
+            super.onProgressUpdate(*values)
+
+            for (pack in values) {
+                onValueRetrievedHandler.invoke(pack.first, pack.second)
+            }
+        }
+
+        override fun onPostExecute(result: Boolean?) {
+            super.onPostExecute(result)
+        }
+
     }
 
 }
