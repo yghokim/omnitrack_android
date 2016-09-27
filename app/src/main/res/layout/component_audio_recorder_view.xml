@@ -20,6 +20,7 @@
             android:orientation="vertical">
 
             <View
+                android:id="@+id/ui_play_bar"
                 android:layout_width="match_parent"
                 android:layout_height="47dp"
                 android:background="#efefef" />
@@ -63,6 +64,7 @@
     </FrameLayout>
 
     <kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioRecordingButton
+        android:id="@+id/ui_main_button"
         android:layout_width="@dimen/button_height_tall"
         android:layout_height="@dimen/button_height_tall"
         android:background="@null"

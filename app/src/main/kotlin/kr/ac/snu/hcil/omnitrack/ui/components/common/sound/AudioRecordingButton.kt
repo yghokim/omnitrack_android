@@ -1,5 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.common.sound
 
+import android.animation.ArgbEvaluator
+import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
@@ -15,15 +17,34 @@ import kotlin.properties.Delegates
 /**
  * Created by younghokim on 2016. 9. 27..
  */
-class AudioRecordingButton : Button {
+class AudioRecordingButton : Button, ValueAnimator.AnimatorUpdateListener {
 
-    enum class State {
-        RECORD, RECORDING, REMOVE
-    }
-
-    var state: State by Delegates.observable(State.RECORD) {
+    var state: AudioRecorderView.State by Delegates.observable(AudioRecorderView.State.RECORD) {
         prop, old, new ->
         if (old != new) {
+
+            when (new) {
+                AudioRecorderView.State.RECORD -> {
+                    radiusAnimator.cancel()
+                    colorAnimator.cancel()
+                    currentCircleRadius = buttonMaxRadius - circleInset
+                    currentCircleColor = circleNormalColor
+                }
+
+                AudioRecorderView.State.RECORDING -> {
+                    radiusAnimator.start()
+                    colorAnimator.start()
+                }
+
+                AudioRecorderView.State.REMOVE -> {
+                    colorAnimator.reverse()
+                    radiusAnimator.cancel()
+
+                    currentCircleRadius = buttonMaxRadius
+                    currentCircleColor = circleNormalColor
+                }
+            }
+
             invalidate()
         }
     }
@@ -34,6 +55,7 @@ class AudioRecordingButton : Button {
 
     private val circleNormalColor: Int
     private val circlePressedColor: Int
+    private val circleStopColor: Int
 
     private var buttonMaxRadius: Float = 0f
     private var buttonCenterX: Float = 0f
@@ -41,7 +63,14 @@ class AudioRecordingButton : Button {
 
     private val circleInset: Float
 
-    private val drawableRatio: Float = 0.7f
+    private val drawableRatio: Float = 0.6f
+
+    private val colorAnimator: ValueAnimator
+    private val radiusAnimator: ValueAnimator
+
+    private var currentCircleColor: Int
+    private var currentCircleRadius: Float
+
 
     private val stopDrawable: Drawable by lazy {
         val drawable = resources.getDrawable(R.drawable.stop_dark, null)
@@ -53,7 +82,7 @@ class AudioRecordingButton : Button {
     private val removeDrawable: Drawable by lazy {
         val drawable = resources.getDrawable(R.drawable.trashcan, null)
         drawable.setColorFilter(Color.parseColor("#ffffff"), PorterDuff.Mode.SRC_ATOP)
-        drawable.alpha = 150
+        drawable.alpha = 200
         drawable
     }
 
@@ -69,11 +98,25 @@ class AudioRecordingButton : Button {
         buttonCirclePaint = Paint(Paint.ANTI_ALIAS_FLAG)
         buttonCirclePaint.style = Paint.Style.FILL
         circleNormalColor = resources.getColor(R.color.colorRed, null)
-        circlePressedColor = ColorUtils.blendARGB(circleNormalColor, Color.BLACK, 0.8f)
+        circlePressedColor = ColorUtils.blendARGB(circleNormalColor, Color.BLACK, 0.2f)
+        circleStopColor = resources.getColor(R.color.colorPointed, null)
 
         circleInset = resources.getDimension(R.dimen.audio_recorder_circle_inset)
+
+
+        colorAnimator = ValueAnimator.ofInt(circleNormalColor, circleStopColor).setDuration(600)
+        colorAnimator.setEvaluator(ArgbEvaluator())
+        colorAnimator.addUpdateListener(this)
+
+        radiusAnimator = ValueAnimator.ofFloat(0f, 1f, 0f).setDuration(1000)
+        radiusAnimator.repeatCount = ValueAnimator.INFINITE
+        radiusAnimator.addUpdateListener(this)
+
         background = null
         setPadding(0, 0, 0, 0)
+
+        currentCircleColor = circleNormalColor
+        currentCircleRadius = buttonMaxRadius - circleInset
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -84,18 +127,13 @@ class AudioRecordingButton : Button {
 
 
         //draw circle
-        if (isPressed) {
-            buttonCirclePaint.color = circlePressedColor
-        } else {
-            buttonCirclePaint.color = circleNormalColor
-        }
+        buttonCirclePaint.color = currentCircleColor
 
-        canvas.drawCircle(buttonCenterX, buttonCenterY, buttonMaxRadius - circleInset, buttonCirclePaint)
+        canvas.drawCircle(buttonCenterX, buttonCenterY, currentCircleRadius, buttonCirclePaint)
 
-
-        if (state != State.RECORD) {
+        if (state != AudioRecorderView.State.RECORD) {
             val drawableRadius = buttonMaxRadius * drawableRatio
-            val drawable = if (state == State.RECORDING) {
+            val drawable = if (state == AudioRecorderView.State.RECORDING) {
                 stopDrawable
             } else {
                 removeDrawable
@@ -113,6 +151,7 @@ class AudioRecordingButton : Button {
 
     }
 
+
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
         if (changed) {
@@ -121,7 +160,25 @@ class AudioRecordingButton : Button {
             buttonCenterX = paddingLeft + width * .5f
             buttonCenterY = paddingTop + height * .5f
             buttonMaxRadius = Math.min(width, height) * .5f
+
+            if (state == AudioRecorderView.State.RECORD) {
+                currentCircleRadius = buttonMaxRadius - circleInset
+            } else if (state == AudioRecorderView.State.REMOVE) {
+                currentCircleRadius = buttonMaxRadius
+            }
         }
+    }
+
+
+    override fun onAnimationUpdate(animator: ValueAnimator) {
+
+        if (animator === colorAnimator) {
+            currentCircleColor = colorAnimator.animatedValue as Int
+        } else if (animator === radiusAnimator) {
+            currentCircleRadius = (buttonMaxRadius - circleInset) + circleInset * radiusAnimator.animatedValue as Float
+        }
+
+        invalidate()
     }
 
 }
