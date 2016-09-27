@@ -84,5 +84,6 @@
     <dimen name="likert_scale_label_textSize">12sp</dimen>
     <dimen name="likert_scale_label_spacing">5dp</dimen>
 
+    <dimen name="audio_recorder_circle_inset">6dp</dimen>
 
 </resources>

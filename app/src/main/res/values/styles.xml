@@ -353,4 +353,21 @@
         <item name="android:textStyle">normal</item>
     </style>
 
+    <style name="audioPlayerTimeText">
+        <item name="android:textSize">12sp</item>
+        <item name="android:text">0:00</item>
+        <item name="android:textColor">@color/textColorMid</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+
+    <style name="audioPlayerControlButton">
+        <item name="android:layout_width">@dimen/button_height_small</item>
+        <item name="android:layout_height">@dimen/button_height_small</item>
+        <item name="android:background">@drawable/round_button_background</item>
+        <item name="android:tint">@color/textColorLight</item>
+        <item name="android:layout_marginLeft">4dp</item>
+        <item name="android:layout_marginRight">4dp</item>
+
+    </style>
+
 </resources>

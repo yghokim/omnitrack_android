@@ -46,6 +46,7 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
         const val TYPE_CHOICE = 6
         const val TYPE_RATING = 7
         const val TYPE_IMAGE = 8
+        const val TYPE_AUDIO = 9
 
 
         fun createAttribute(objectId: String?, dbId: Long?, columnName: String, isRequired: Boolean, typeId: Int, propertyData: String?, connectionData: String?): OTAttribute<out Any> {
@@ -59,6 +60,7 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
                 TYPE_CHOICE -> OTChoiceAttribute(objectId, dbId, columnName, isRequired, propertyData, connectionData)
                 TYPE_RATING -> OTRatingAttribute(objectId, dbId, columnName, isRequired, propertyData, connectionData)
                 TYPE_IMAGE -> OTImageAttribute(objectId, dbId, columnName, isRequired, propertyData, connectionData)
+                TYPE_AUDIO -> OTAudioRecordAttribute(objectId, dbId, columnName, isRequired, propertyData, connectionData)
                 else -> OTNumberAttribute(objectId, dbId, columnName, isRequired, propertyData, connectionData)
             }
             return attr
