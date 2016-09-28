@@ -417,6 +417,7 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
             }
 
             fun bind(attribute: OTAttribute<out Any>) {
+                inputView.boundAttributeId = attribute.objectId
                 attribute.refreshInputViewUI(inputView)
 
                 attributeId = attribute.objectId

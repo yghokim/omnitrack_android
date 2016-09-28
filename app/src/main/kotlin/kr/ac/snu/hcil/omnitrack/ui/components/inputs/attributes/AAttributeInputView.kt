@@ -63,6 +63,15 @@ abstract class AAttributeInputView<DataType>(layoutId: Int, context: Context, at
     abstract val typeId: Int
         get
 
+    var boundAttributeId: String? by Delegates.observable(null as String?) {
+        prop, old, new ->
+        if (old != new) {
+            if (new != null) {
+                onAttributeBound(new)
+            }
+        }
+    }
+
     init {
     }
 
@@ -100,6 +109,10 @@ abstract class AAttributeInputView<DataType>(layoutId: Int, context: Context, at
     }
 
     override fun onLowMemory() {
+    }
+
+    protected open fun onAttributeBound(attributeId: String) {
+
     }
 
     /***

@@ -1,14 +1,18 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.common.sound
 
 import android.content.Context
+import android.media.MediaPlayer
 import android.net.Uri
+import android.os.Looper
 import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
+import com.badoo.mobile.util.WeakHandler
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.AudioRecordingModule
 import kr.ac.snu.hcil.omnitrack.utils.Ticker
+import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 import java.util.*
 import kotlin.properties.Delegates
@@ -66,6 +70,7 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
                 field = value
                 if (value != Uri.EMPTY) {
                     state = State.REMOVE
+                    mountNewFile(value)
                 } else {
                     state = State.RECORD
                 }
@@ -92,12 +97,23 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
     var recordingId: String by Delegates.observable(UUID.randomUUID().toString()) {
         prop, old, new ->
         if (old != new) {
-            if (Companion.currentRecorderId == old) {
+            println("recording Id changed")
+            if (Companion.currentRecorderId == new) {
                 //cancel last recording
-                Companion.cancelCurrentModule()
+                //Companion.cancelCurrentModule()
+                Companion.currentRecordingModule!!.listener = this
+                playBar.amplitudeTimelineProvider = Companion.currentRecordingModule
+                state = State.RECORDING
+            } else if (Companion.currentRecorderId == old) {
+                if (state == State.RECORDING) {
+                    state = State.RECORD
+                }
             }
         }
     }
+
+    val recordingComplete = Event<Long>()
+    val fileRemoved = Event<Long>()
 
     private val mainButton: AudioRecordingButton
     private val playBar: AudioRecorderProgressBar
@@ -159,6 +175,7 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
         Companion.currentRecordingModule?.startAsync()
 
         playBar.currentProgressRatio = 0f
+        playBar.amplitudeTimelineProvider = Companion.currentRecordingModule
         secondTicker.start()
 
         state = State.RECORDING
@@ -168,9 +185,25 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
         Companion.currentRecordingModule?.stop(false)
     }
 
+    private fun mountNewFile(fileUri: Uri) {
+        val player = MediaPlayer()
+        player.setDataSource(fileUri.toString())
+        Thread {
+            player.prepare()
+            println("sound player prepared.")
+            WeakHandler(Looper.getMainLooper()).post {
+                audioLengthSeconds = player.duration / 1000
+            }
+
+        }.start()
+    }
+
     private fun clearMountedFile() {
-        this.audioFileUri = Uri.EMPTY
-        state = State.RECORD
+        if (this.audioFileUri != Uri.EMPTY) {
+            this.audioFileUri = Uri.EMPTY
+            state = State.RECORD
+            fileRemoved.invoke(this, 0)
+        }
     }
 
     private fun onSetState(state: State) {
@@ -180,6 +213,8 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
             State.RECORD -> {
                 currentAudioSeconds = 0
                 audioLengthSeconds = 60
+                playBar.clear()
+                secondTicker.stop()
             }
 
             State.RECORDING -> {
@@ -188,7 +223,6 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
 
             State.REMOVE -> {
                 currentAudioSeconds = 0
-                audioLengthSeconds = 60
             }
         }
     }
@@ -200,20 +234,21 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
 
 
     override fun onRecordingProgress(module: AudioRecordingModule, volume: Int) {
-        if (module === currentRecordingModule) {
+        if (module === currentRecordingModule && currentRecorderId == recordingId) {
             playBar.currentProgressRatio = (System.currentTimeMillis() - currentRecordingModule!!.recordingStartedAt).toFloat() / (audioLengthSeconds * 1000)
-            playBar.putVolumeBar(volume = volume)
         }
     }
 
     override fun onRecordingFinished(module: AudioRecordingModule, resultPath: String?) {
-        if (module === currentRecordingModule) {
+        if (module === currentRecordingModule && currentRecorderId == recordingId) {
             playBar.clear()
             secondTicker.stop()
+            val soundLength = System.currentTimeMillis() - currentRecordingModule!!.recordingStartedAt
             Companion.clearModule()
 
             if (resultPath != null) {
                 this.audioFileUri = Uri.parse(resultPath)
+                recordingComplete.invoke(this, soundLength)
             } else {
                 state = State.RECORD
             }

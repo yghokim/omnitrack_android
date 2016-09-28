@@ -9,12 +9,17 @@ import android.util.AttributeSet
 import android.view.View
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.NumericScale
-import java.util.*
 
 /**
  * Created by younghokim on 2016. 9. 28..
  */
 class AudioRecorderProgressBar : View {
+
+    interface AmplitudeTimelineProvider {
+        val amplitudeTimeline: List<Pair<Float, Int>>
+    }
+
+    var amplitudeTimelineProvider: AmplitudeTimelineProvider? = null
 
     private val scale: NumericScale
 
@@ -37,8 +42,6 @@ class AudioRecorderProgressBar : View {
                 invalidate()
             }
         }
-
-    private val volumePoints = ArrayList<Pair<Float, Int>>()
 
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
@@ -77,10 +80,12 @@ class AudioRecorderProgressBar : View {
 
         var x: Float
         var volumeLength: Float
-        for (volumePoint in volumePoints) {
-            x = scale[volumePoint.first]
-            volumeLength = renderAreaRect.height() / 2 * Math.min(0.9f, (volumePoint.second.toFloat() / 8000))
-            canvas.drawLine(x, renderAreaRect.centerY() - volumeLength, x, renderAreaRect.centerY() + volumeLength, volumeLinePaint)
+        if (amplitudeTimelineProvider != null) {
+            for (volumePoint in amplitudeTimelineProvider!!.amplitudeTimeline) {
+                x = scale[volumePoint.first]
+                volumeLength = renderAreaRect.height() / 2 * Math.min(0.9f, (volumePoint.second.toFloat() / 8000))
+                canvas.drawLine(x, renderAreaRect.centerY() - volumeLength, x, renderAreaRect.centerY() + volumeLength, volumeLinePaint)
+            }
         }
         canvas.drawLine(renderAreaRect.left, renderAreaRect.centerY(), renderAreaRect.right, renderAreaRect.centerY(), centerLinePaint)
     }
@@ -99,11 +104,7 @@ class AudioRecorderProgressBar : View {
     }
 
     fun clear() {
+        amplitudeTimelineProvider = null
         currentProgressRatio = 0f
-        volumePoints.clear()
-    }
-
-    fun putVolumeBar(ratio: Float = currentProgressRatio, volume: Int) {
-        volumePoints.add(Pair(ratio, volume))
     }
 }

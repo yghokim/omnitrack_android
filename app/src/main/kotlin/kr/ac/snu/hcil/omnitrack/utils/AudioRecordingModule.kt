@@ -2,13 +2,18 @@ package kr.ac.snu.hcil.omnitrack.utils
 
 import android.media.MediaRecorder
 import android.text.format.DateUtils
+import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioRecorderProgressBar
 import java.io.File
 import java.io.IOException
+import java.util.*
 
 /**
  * Created by younghokim on 2016. 9. 27..
  */
-class AudioRecordingModule(val listener: RecordingListener, val filePath: String, val samplingRate: Int = 11025, val maxLengthMillis: Int = DateUtils.MINUTE_IN_MILLIS.toInt(), val progressTerm: Int = 100) : MediaRecorder.OnInfoListener {
+class AudioRecordingModule(var listener: RecordingListener,
+                           val filePath: String, val samplingRate: Int = 11025,
+                           val maxLengthMillis: Int = DateUtils.MINUTE_IN_MILLIS.toInt(),
+                           val progressTerm: Int = 100) : MediaRecorder.OnInfoListener, AudioRecorderProgressBar.AmplitudeTimelineProvider {
 
 
     interface RecordingListener {
@@ -21,6 +26,10 @@ class AudioRecordingModule(val listener: RecordingListener, val filePath: String
     private var _isRecording: Boolean = false
 
     val isRecording: Boolean get() = _isRecording
+
+    private val amplitudes = ArrayList<Pair<Float, Int>>()
+
+    override val amplitudeTimeline: List<Pair<Float, Int>> get() = amplitudes
 
     var recordingStartedAt: Long = 0
         private set
@@ -43,7 +52,11 @@ class AudioRecordingModule(val listener: RecordingListener, val filePath: String
 
         ticker.tick += {
             sender, time ->
+            val progress = (time - recordingStartedAt).toFloat() / maxLengthMillis
+            println(progress)
+            amplitudes.add(Pair(progress, recorder.maxAmplitude))
             listener.onRecordingProgress(this, recorder.maxAmplitude)
+
         }
     }
 
@@ -59,6 +72,8 @@ class AudioRecordingModule(val listener: RecordingListener, val filePath: String
         }
 
         _isRecording = true
+
+        amplitudes.clear()
 
         recordingStartedAt = System.currentTimeMillis()
         recorder.start()
