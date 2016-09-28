@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.utils.AudioRecordingModule
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 import kotlin.properties.Delegates
 
@@ -21,6 +22,24 @@ class AudioRecorderView : FrameLayout, View.OnClickListener {
             val sec = seconds % 60
 
             return "$min:${String.format("%02d", sec)}"
+        }
+
+        private var currentRecorderId: String? = null
+        private var currentRecordingModule: AudioRecordingModule? = null
+
+        private val isRecordingSourceFree: Boolean get() = currentRecordingModule == null
+
+        private fun assignNewRecordingModule(id: String, module: AudioRecordingModule) {
+            this.currentRecorderId = id
+            this.currentRecordingModule = module
+        }
+
+        private fun stopCurrentModule() {
+            if (!isRecordingSourceFree) {
+                currentRecordingModule?.stopAsync()
+                currentRecorderId = null
+                currentRecordingModule = null
+            }
         }
     }
 
@@ -66,7 +85,7 @@ class AudioRecorderView : FrameLayout, View.OnClickListener {
 
 
     private val mainButton: AudioRecordingButton
-    private val playBar: View
+    private val playBar: AudioRecorderProgressBar
     private val elapsedTimeView: TextView
     private val remainingTimeView: TextView
 
@@ -79,7 +98,7 @@ class AudioRecorderView : FrameLayout, View.OnClickListener {
         mainButton = findViewById(R.id.ui_main_button) as AudioRecordingButton
         mainButton.setOnClickListener(this)
 
-        playBar = findViewById(R.id.ui_play_bar)
+        playBar = findViewById(R.id.ui_play_bar) as AudioRecorderProgressBar
         elapsedTimeView = findViewById(R.id.ui_time_elapsed) as TextView
         remainingTimeView = findViewById(R.id.ui_time_remain) as TextView
 

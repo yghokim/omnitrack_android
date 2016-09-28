@@ -19,7 +19,7 @@
             android:layout_gravity="top"
             android:orientation="vertical">
 
-            <View
+            <kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioRecorderProgressBar
                 android:id="@+id/ui_play_bar"
                 android:layout_width="match_parent"
                 android:layout_height="47dp"
