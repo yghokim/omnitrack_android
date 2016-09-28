@@ -1,125 +1,91 @@
 package kr.ac.snu.hcil.omnitrack.utils
 
-import android.media.AudioFormat
-import android.media.AudioRecord
 import android.media.MediaRecorder
-import android.os.Looper
 import android.text.format.DateUtils
-import com.badoo.mobile.util.WeakHandler
-import java.io.BufferedOutputStream
-import java.io.DataOutputStream
-import java.io.FileOutputStream
+import java.io.File
+import java.io.IOException
 
 /**
  * Created by younghokim on 2016. 9. 27..
  */
-class AudioRecordingModule(val listener: RecordingListener, val filePath: String, val samplingRate: Int = 11025, val maxLengthMillis: Long = DateUtils.MINUTE_IN_MILLIS) {
+class AudioRecordingModule(val listener: RecordingListener, val filePath: String, val samplingRate: Int = 11025, val maxLengthMillis: Int = DateUtils.MINUTE_IN_MILLIS.toInt(), val progressTerm: Int = 100) : MediaRecorder.OnInfoListener {
+
 
     interface RecordingListener {
         fun onRecordingProgress(module: AudioRecordingModule, volume: Int)
-        fun onRecordingFinished(module: AudioRecordingModule, success: Boolean)
-        fun onRecordingCanceled(module: AudioRecordingModule)
+        fun onRecordingFinished(module: AudioRecordingModule, resultPath: String?)
     }
 
-    private val audioRecord: AudioRecord
-
-    private val bufferSize: Int
+    private val recorder: MediaRecorder
 
     private var _isRecording: Boolean = false
 
     val isRecording: Boolean get() = _isRecording
 
-    private var _stopReserved: Boolean = false
+    var recordingStartedAt: Long = 0
+        private set
 
-    private var _recordingStartedAt: Long = 0
+    private val ticker: Ticker
 
     init {
 
-        bufferSize = AudioRecord.getMinBufferSize(samplingRate, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT)
+        recorder = MediaRecorder()
+        recorder.setAudioSource(MediaRecorder.AudioSource.MIC)
+        recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
+        recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
+        recorder.setOutputFile(filePath)
+        recorder.setAudioSamplingRate(samplingRate)
+        recorder.setMaxDuration(maxLengthMillis)
 
-        audioRecord = AudioRecord(MediaRecorder.AudioSource.DEFAULT,
-                samplingRate, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, bufferSize)
+        recorder.setOnInfoListener(this)
 
+        ticker = Ticker(progressTerm)
+
+        ticker.tick += {
+            sender, time ->
+            listener.onRecordingProgress(this, recorder.maxAmplitude)
+        }
     }
 
     fun startAsync() {
 
-
-        val outputStream = DataOutputStream(BufferedOutputStream(FileOutputStream(filePath, false)))
-
-        if (audioRecord.state != AudioRecord.STATE_INITIALIZED) {
+        try {
+            recorder.prepare()
+        } catch(e: IOException) {
+            e.printStackTrace()
             println("audioRecorder cannot be initialized.")
-            listener.onRecordingFinished(this, false)
+            listener.onRecordingFinished(this, null)
             return;
         }
 
-        _stopReserved = false
         _isRecording = true
 
-        Thread(RecordRunnable(outputStream)).start()
+        recordingStartedAt = System.currentTimeMillis()
+        recorder.start()
+        println("Start recording")
+        ticker.start()
 
     }
 
-    fun stopAsync() {
-        _stopReserved = true
+    fun stop(cancel: Boolean) {
+        ticker.stop()
+        recorder.stop()
+        recorder.release()
+        _isRecording = false
+        if (cancel) {
+            File(filePath).delete()
+            listener.onRecordingFinished(this, null)
+            println("canceled the audio recording.")
+        } else {
+            listener.onRecordingFinished(this, filePath)
+            println("successfully finished the audio recording.")
+        }
     }
 
-    internal inner class RecordRunnable(val outputStream: DataOutputStream) : Runnable {
-
-        private val mainHandler: WeakHandler
-
-        val progressRunner = ProgressPublishRunnable()
-
-        init {
-            mainHandler = WeakHandler(Looper.getMainLooper())
+    override fun onInfo(p0: MediaRecorder?, what: Int, extra: Int) {
+        if (what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED) {
+            //max duration reached.
+            stop(false)
         }
-
-        override fun run() {
-            android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_AUDIO);
-
-            val audioBuffer = ShortArray(bufferSize / 2)
-            audioRecord.startRecording()
-
-            println("Start recording")
-            _recordingStartedAt = System.currentTimeMillis()
-
-            var shortsRead: Long = 0
-            while (!_stopReserved) {
-                val numberOfShort = audioRecord.read(audioBuffer, 0, audioBuffer.size)
-                shortsRead += numberOfShort.toLong()
-
-                var volume = 0
-                //store the audioBuffer
-                for (i in 0..numberOfShort - 1) {
-                    outputStream.writeShort(audioBuffer[i].toInt())
-                    volume = Math.max(volume, audioBuffer[i].toInt())
-                }
-
-                if (System.currentTimeMillis() - _recordingStartedAt >= maxLengthMillis) {
-                    _stopReserved = true
-                }
-
-                this.progressRunner.volume = volume
-                mainHandler.post(this.progressRunner)
-            }
-
-            audioRecord.stop()
-            audioRecord.release()
-            _stopReserved = false
-            _isRecording = false
-            outputStream.close()
-
-            mainHandler.post { listener.onRecordingFinished(this@AudioRecordingModule, true) }
-        }
-
-        internal inner class ProgressPublishRunnable : Runnable {
-            var volume: Int = 0
-
-            override fun run() {
-                listener.onRecordingProgress(this@AudioRecordingModule, volume)
-            }
-
-        }
-
     }
 }

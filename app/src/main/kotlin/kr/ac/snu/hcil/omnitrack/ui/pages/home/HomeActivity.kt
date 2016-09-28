@@ -51,7 +51,7 @@ class HomeActivity : UserSyncedActivity() {
 
         //TODO do permission checks some other place
 
-        val permissions = arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.CAMERA).filter{
+        val permissions = arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO).filter {
             checkSelfPermission(it) != PackageManager.PERMISSION_GRANTED
         }.toTypedArray()
 
