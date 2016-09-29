@@ -85,5 +85,8 @@
     <dimen name="likert_scale_label_spacing">5dp</dimen>
 
     <dimen name="audio_recorder_circle_inset">6dp</dimen>
+    <dimen name="audio_recorder_progressbar_height_recorder">47dp</dimen>
+    <dimen name="audio_recorder_progressbar_height_player">12dp</dimen>
+
 
 </resources>

@@ -22,7 +22,7 @@
             <kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioRecorderProgressBar
                 android:id="@+id/ui_play_bar"
                 android:layout_width="match_parent"
-                android:layout_height="47dp"
+                android:layout_height="@dimen/audio_recorder_progressbar_height_recorder"
                 android:background="#efefef" />
 
             <FrameLayout
@@ -53,12 +53,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center|bottom"
-            android:orientation="horizontal"
-            android:visibility="gone">
+            android:layout_marginBottom="5dp"
+            android:orientation="horizontal">
 
             <android.support.v7.widget.AppCompatImageButton
+                android:id="@+id/ui_player_button"
                 style="@style/audioPlayerControlButton"
-                android:src="@drawable/play_dark" />
+                android:src="@drawable/play_dark"
+                android:visibility="gone" />
         </LinearLayout>
 
     </FrameLayout>

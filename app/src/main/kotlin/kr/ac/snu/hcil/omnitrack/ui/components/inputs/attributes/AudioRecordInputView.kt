@@ -40,6 +40,6 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
     }
 
     override fun onAttributeBound(attributeId: String) {
-        valueView.recordingId = attributeId
+        valueView.mediaSessionId = attributeId
     }
 }

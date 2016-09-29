@@ -36,7 +36,7 @@ class AudioRecordingButton : Button, ValueAnimator.AnimatorUpdateListener {
                     colorAnimator.start()
                 }
 
-                AudioRecorderView.State.REMOVE -> {
+                AudioRecorderView.State.FILE_MOUNTED -> {
                     colorAnimator.reverse()
                     radiusAnimator.cancel()
 
@@ -163,7 +163,7 @@ class AudioRecordingButton : Button, ValueAnimator.AnimatorUpdateListener {
 
             if (state == AudioRecorderView.State.RECORD) {
                 currentCircleRadius = buttonMaxRadius - circleInset
-            } else if (state == AudioRecorderView.State.REMOVE) {
+            } else if (state == AudioRecorderView.State.FILE_MOUNTED) {
                 currentCircleRadius = buttonMaxRadius
             }
         }
