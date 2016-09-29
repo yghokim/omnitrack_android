@@ -20,6 +20,7 @@ class OAuth2Client(val config: OAuth2Config, val activityRequestCode: Int) {
         var clientId: String = ""
         var clientSecret: String = ""
         var scope: String = ""
+        var redirectUri: String = AuthConstants.VALUE_REDIRECT_URI
     }
 
     interface OAuth2ResultListener{
@@ -78,7 +79,7 @@ class OAuth2Client(val config: OAuth2Config, val activityRequestCode: Int) {
         val uri = HttpUrl.parse(config.authorizationUrl).newBuilder()
                 .addQueryParameter(AuthConstants.PARAM_CLIENT_ID, config.clientId)
                 .addQueryParameter(AuthConstants.PARAM_RESPONSE_TYPE, AuthConstants.VALUE_RESPONSE_TYPE_CODE)
-                .addQueryParameter(AuthConstants.PARAM_REDIRECT_URI, AuthConstants.VALUE_REDIRECT_URI)
+                .addQueryParameter(AuthConstants.PARAM_REDIRECT_URI, config.redirectUri)
                 .addQueryParameter(AuthConstants.PARAM_SCOPE, config.scope)
                 .build()
 
@@ -259,7 +260,7 @@ class OAuth2Client(val config: OAuth2Config, val activityRequestCode: Int) {
                     .add(AuthConstants.PARAM_CODE, p0[0])
                     .add(AuthConstants.PARAM_CLIENT_ID, config.clientId)
                     .add(AuthConstants.PARAM_GRANT_TYPE, "authorization_code")
-                    .add(AuthConstants.PARAM_REDIRECT_URI, AuthConstants.VALUE_REDIRECT_URI)
+                    .add(AuthConstants.PARAM_REDIRECT_URI, config.redirectUri)
                     // .add(AuthConstants.PARAM_EXPIRES_IN, "2592000" ) //use long period when you sure that there is no error in the token process.
                     .build()
 
@@ -273,9 +274,14 @@ class OAuth2Client(val config: OAuth2Config, val activityRequestCode: Int) {
                 println(json)
                 if(json.has(AuthConstants.PARAM_ACCESS_TOKEN)) {
                     println("successfully exchanged code to credential.")
-                    return Credential(json.getString(AuthConstants.PARAM_ACCESS_TOKEN),
-                            json.getString(AuthConstants.PARAM_REFRESH_TOKEN),
-                            json.getInt(AuthConstants.PARAM_EXPIRES_IN))
+                    val accessToken = json.getString(AuthConstants.PARAM_ACCESS_TOKEN)
+                    val refreshToken = if (json.has(AuthConstants.PARAM_REFRESH_TOKEN)) {
+                        json.getString(AuthConstants.PARAM_REFRESH_TOKEN)
+                    } else ""
+                    val expiresIn = if (json.has(AuthConstants.PARAM_EXPIRES_IN)) {
+                        json.getInt(AuthConstants.PARAM_EXPIRES_IN)
+                    } else Int.MAX_VALUE
+                    return Credential(accessToken, refreshToken, expiresIn)
                 }
                 else return null
             }catch(e: Exception)

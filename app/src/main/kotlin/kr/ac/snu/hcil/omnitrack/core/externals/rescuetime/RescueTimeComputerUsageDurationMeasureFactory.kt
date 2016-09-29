@@ -1,13 +1,13 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.rescuetime
 
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.OTItemBuilder
 import kr.ac.snu.hcil.omnitrack.core.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableTypedQueue
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
+import org.json.JSONObject
 import java.util.*
 
 /**
@@ -37,6 +37,14 @@ object RescueTimeComputerUsageDurationMeasureFactory : OTMeasureFactory() {
     override val nameResourceId: Int = R.string.measure_rescuetime_computer_usage_name
     override val descResourceId: Int = R.string.measure_rescuetime_computer_usage_desc
 
+    val usageDurationCalculator = object : RescueTimeService.ISummaryCalculator<Double> {
+        override fun calculate(list: List<JSONObject>, startDate: Date, endDate: Date): Double? {
+            return if (list.size > 0)
+                list.map { it.getDouble(RescueTimeService.SUMMARY_VARIABLE_TOTAL_HOURS) }.sum()
+            else null
+        }
+
+    }
 
     class ComputerUsageDurationMeasure : OTRangeQueriedMeasure {
         override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_DOUBLE
@@ -48,6 +56,11 @@ object RescueTimeComputerUsageDurationMeasureFactory : OTMeasureFactory() {
 
         override fun requestValueAsync(start:Long, end: Long, handler: (Any?) -> Unit) {
 
+            RescueTimeService.requestSummary(Date(start), Date(end - 1), usageDurationCalculator) {
+                result ->
+                handler.invoke(result)
+            }
+/*
             val apiKey = RescueTimeService.getStoredApiKey()
 
             if (apiKey != null) {
@@ -59,7 +72,7 @@ object RescueTimeComputerUsageDurationMeasureFactory : OTMeasureFactory() {
                 }
             } else {
                 handler.invoke(null)
-            }
+            }*/
         }
 
         override fun onSerialize(typedQueue: SerializableTypedQueue) {
