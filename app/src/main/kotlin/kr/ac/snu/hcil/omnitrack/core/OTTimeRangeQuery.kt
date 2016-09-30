@@ -47,6 +47,10 @@ class OTTimeRangeQuery : ATypedQueueSerializable {
         fun makeQueryInstance(): OTTimeRangeQuery {
             return OTTimeRangeQuery(type, binSize, binOffset, anchorToNow)
         }
+
+        fun equals(query: OTTimeRangeQuery): Boolean {
+            return query.mode == type && query.binSize == binSize && query.binOffset == binOffset && query.anchorToNow == anchorToNow
+        }
     }
 
     var mode: Int = TYPE_PIVOT_TIMESTAMP

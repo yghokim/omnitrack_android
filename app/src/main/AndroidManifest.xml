@@ -133,8 +133,6 @@
             android:label="@string/title_activity_new_item" />
         <activity
             android:name=".ui.pages.items.ItemBrowserActivity" />
-        <activity
-            android:name=".ui.pages.connectionwizard.ConnectionWizardActivity" />
 
         <activity
             android:name=".ui.components.common.activity.WebServiceLoginActivity"/>
