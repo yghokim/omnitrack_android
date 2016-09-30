@@ -13,7 +13,7 @@ class OTShortTextAttribute(objectId: String?, dbId: Long?, columnName: String, i
     override val typeNameResourceId: Int = R.string.type_shorttext_name
     override val typeSmallIconResourceId: Int = R.drawable.icon_small_shorttext
 
-    override val valueNumericCharacteristics: NumericCharacteristics = NumericCharacteristics(false, false)
+    override val valueNumericCharacteristics: NumericCharacteristics = NumericCharacteristics(true, false)
 
     override fun createProperties() {
     }
@@ -35,5 +35,9 @@ class OTShortTextAttribute(objectId: String?, dbId: Long?, columnName: String, i
 
     override fun getInputViewType(previewMode: Boolean): Int {
         return AAttributeInputView.VIEW_TYPE_SHORT_TEXT
+    }
+
+    override fun compareValues(a: Any, b: Any): Int {
+        return a.toString().trim().compareTo(b.toString().trim(), true)
     }
 }
