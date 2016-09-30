@@ -175,6 +175,28 @@
 
     <string name="msg_pick_tracker">Pick a tracker</string>
 
+    <string name="msg_present_date">Present date</string>
+    <string name="msg_present_date_desc">Query from midnight to present</string>
+
+    <string name="msg_previous_date">Previous date</string>
+    <string name="msg_previous_date_desc">Query for previous date</string>
+
+    <string name="msg_recent_hour">Recent one hour</string>
+    <string name="msg_recent_hour_desc">Query from an hour ago to present</string>
+
+    <string name="msg_recent_24_hours">Recent 24 hours</string>
+    <string name="msg_recent_24_hours_desc">Query from 24 hours ago to present</string>
+
+    <string name="msg_recent_7_days">Recent 7 days</string>
+    <string name="msg_recent_7_days_desc">Query from 7 days ago to present</string>
+
+    <string name="msg_present_week">Present week</string>
+    <string name="msg_present_week_desc">Query from last sunday midnight to present</string>
+
+    <string name="msg_previous_week">Previous week</string>
+    <string name="msg_previous_week_desc">Query for previous week</string>
+
+
     <string name="msg_rescuetime_api_key_input_title">Input RescueTime API key</string>
     <string name="msg_rescuetime_api_key_input_hint">Paste RescueTime api key here.</string>
 
