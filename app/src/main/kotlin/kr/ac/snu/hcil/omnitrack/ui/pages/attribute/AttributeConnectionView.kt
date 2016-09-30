@@ -9,6 +9,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTConnection
+import kr.ac.snu.hcil.omnitrack.core.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 
@@ -73,12 +74,18 @@ class AttributeConnectionView : LinearLayout, View.OnClickListener {
             if (query != null) {
                 val builder = StringBuilder()
 
-                if (!query.isBinAndOffsetAvailable) {
-                    builder.append(query.getModeName(context))
+                val matchedPreset = OTTimeRangeQuery.Preset.values().find { it.equals(query) }
+
+                if (matchedPreset != null) {
+                    builder.append(context.resources.getString(matchedPreset.nameResId))
                 } else {
-                    builder.append("<b>${context.resources.getString(R.string.msg_connection_wizard_time_query_pivot_time)}</b> : ${query.getModeName(context)}<br>")
-                    builder.append("<b>${context.resources.getString(R.string.msg_connection_wizard_time_query_scope)}</b> : ${query.getScopeName(context)}<br>")
-                    builder.append("<b>${context.resources.getString(R.string.msg_connection_wizard_time_query_offset)}</b> : ${query.binOffset}")
+                    if (!query.isBinAndOffsetAvailable) {
+                        builder.append(query.getModeName(context))
+                    } else {
+                        builder.append("<b>${context.resources.getString(R.string.msg_connection_wizard_time_query_pivot_time)}</b> : ${query.getModeName(context)}<br>")
+                        builder.append("<b>${context.resources.getString(R.string.msg_connection_wizard_time_query_scope)}</b> : ${query.getScopeName(context)}<br>")
+                        builder.append("<b>${context.resources.getString(R.string.msg_connection_wizard_time_query_offset)}</b> : ${query.binOffset}")
+                    }
                 }
 
                 queryView.text = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
