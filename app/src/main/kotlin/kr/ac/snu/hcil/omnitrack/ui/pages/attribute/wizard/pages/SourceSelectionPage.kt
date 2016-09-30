@@ -55,7 +55,7 @@ class SourceSelectionPage(val attribute: OTAttribute<out Any>) : AWizardPage() {
 
     private fun onSourceSelected(information: SourceInformation) {
         selectedInformation = information
-        requestGoNextPage(ConnectionWizardView.PAGE_INDEX_TIME_QUERY)
+        requestGoNextPage(ConnectionWizardView.PAGE_INDEX_CONFIGURATION)
     }
 
     inner class PageView : RecyclerView {

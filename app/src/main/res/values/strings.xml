@@ -165,6 +165,9 @@
     <string name="msg_connection_wizard_time_query_scope_day">Day</string>
     <string name="msg_connection_wizard_time_query_scope_week">Week</string>
 
+
+    <string name="msg_connection_wizard_time_query_preset">Query range</string>
+
     <string name="msg_connection_wizard_time_query_pivot_present">Present time</string>
 
     <string name="msg_connection_wizard_time_query_pivot_field_format">\'%1$s\' Field</string>

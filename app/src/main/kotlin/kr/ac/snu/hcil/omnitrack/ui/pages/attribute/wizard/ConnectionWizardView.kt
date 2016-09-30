@@ -7,6 +7,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.AWizardPage
 import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.AWizardViewPagerAdapter
 import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.WizardView
+import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.wizard.pages.SourceConfigurationPage
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.wizard.pages.SourceSelectionPage
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.wizard.pages.TimeQueryPage
 
@@ -18,7 +19,9 @@ class ConnectionWizardView : WizardView {
     companion object {
         const val PAGE_INDEX_SOURCE_SELECTION = 0
         const val PAGE_INDEX_TIME_QUERY = 1
-        const val PAGE_INDEX_POST_PROCESSING = 2
+        const val PAGE_INDEX_CONFIGURATION = 2
+
+        //const val PAGE_INDEX_POST_PROCESSING = 2
     }
 
     private lateinit var pendingConnection: OTConnection
@@ -71,16 +74,21 @@ class ConnectionWizardView : WizardView {
                     pendingConnection.rangedQuery = tq
                 }
             }
+            PAGE_INDEX_CONFIGURATION -> {
+                println("apply configuration")
+                (page as SourceConfigurationPage).applyConfiguration(pendingConnection)
+            }
         }
     }
 
 
     class Adapter(attribute: OTAttribute<out Any>) : AWizardViewPagerAdapter() {
-        val pages = Array<AWizardPage>(2) {
+        val pages = Array<AWizardPage>(3) {
             index ->
             when (index) {
                 PAGE_INDEX_SOURCE_SELECTION -> SourceSelectionPage(attribute)
                 PAGE_INDEX_TIME_QUERY -> TimeQueryPage(attribute)
+                PAGE_INDEX_CONFIGURATION -> SourceConfigurationPage(attribute)
                 else -> throw Exception("wrong index")
             }
         }

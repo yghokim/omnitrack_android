@@ -27,7 +27,7 @@ class OTTimeRangeQuery : ATypedQueueSerializable {
         const val BIN_SIZE_WEEK = 2
     }
 
-    enum class Preset(val nameResId: Int, val descResid: Int, val type: Int, val binSize: Int, val binOffset: Int, val anchorToNow: Boolean) {
+    enum class Preset(val nameResId: Int, val descResId: Int, val type: Int, val binSize: Int, val binOffset: Int, val anchorToNow: Boolean) {
         /*
 
     <string name="msg_present_date">Present date</string>
