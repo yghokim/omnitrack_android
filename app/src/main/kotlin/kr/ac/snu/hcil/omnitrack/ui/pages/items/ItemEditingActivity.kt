@@ -137,7 +137,8 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
                 OTNotificationManager.notifyReminderChecked(trackerId, intent.getLongExtra(INTENT_EXTRA_REMINDER_TIME, 0))
                 //}
 
-                if (mode == Mode.New) {
+                //when the activity is NOT started by startActivityWithResult()
+                if (mode == Mode.New && activityResultAppliedAttributePosition == -1) {
                     if (tryRestoreItemBuilderCache(tracker!!)) {
 
                         //Toast.makeText(this, "Past inputs were restored.", Toast.LENGTH_SHORT).show()
@@ -289,11 +290,11 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
         val serialized = preferences.getString(makeTrackerPreferenceKey(tracker), null)
         try {
             val storedBuilder = OTItemBuilder(serialized)
+            /*
             if (activityResultAppliedAttributePosition != -1) {
                 storedBuilder.setValueOf(tracker.attributes[activityResultAppliedAttributePosition],
                         builder.getValueInformationOf(tracker.attributes[activityResultAppliedAttributePosition])!!.value)
-                activityResultAppliedAttributePosition = -1
-            }
+            }*/
             builder = storedBuilder
             return true
         } catch(e: Exception) {
@@ -322,6 +323,7 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        println("activityResult")
         if (resultCode == Activity.RESULT_OK && data != null) {
             val attributePosition = AAttributeInputView.getPositionFromRequestCode(requestCode)
             val inputView = attributeListAdapter.inputViews.find { it.position == attributePosition }
