@@ -59,7 +59,7 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
             this.currentRecordingModule = module
         }
 
-        private fun cancelCurrentModule() {
+        private fun cancelCurrentRecording() {
             if (!isRecordingSourceFree) {
                 currentRecordingModule?.cancel()
                 clearModule()
@@ -118,7 +118,7 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
         if (old != new) {
             if (Companion.currentRecorderId == new) {
                 //cancel last recording
-                //Companion.cancelCurrentModule()
+                //Companion.cancelCurrentRecording()
                 Companion.currentRecordingModule!!.listener = this
                 playBar.amplitudeTimelineProvider = Companion.currentRecordingModule
                 state = State.RECORDING
@@ -146,6 +146,14 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
                 }
             }
         }
+    }
+
+    val isRecording: Boolean get() {
+        return Companion.currentRecorderId == mediaSessionId
+    }
+
+    val isPlaying: Boolean get() {
+        return Companion.currentPlayingId == mediaSessionId
     }
 
     val recordingComplete = Event<Long>()
@@ -274,7 +282,7 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
     private fun startRecording() {
 
         if (!Companion.isRecordingSourceFree) {
-            Companion.cancelCurrentModule()
+            Companion.cancelCurrentRecording()
         }
 
         if (Companion.isSoundPlaying) {
@@ -410,6 +418,18 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
             } else {
                 state = State.RECORD
             }
+        }
+    }
+
+    fun dispose() {
+        if (isRecording) {
+            println("cancel recording.")
+            cancelCurrentRecording()
+        }
+
+        if (isPlaying) {
+            println("cancel recording")
+            cancelCurrentPlayer()
         }
     }
 

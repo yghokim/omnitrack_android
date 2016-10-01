@@ -167,6 +167,10 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
 
     override fun onPause() {
         super.onPause()
+        for (inputView in attributeListAdapter.inputViews) {
+            inputView.onPause()
+        }
+
         if (mode == Mode.New) {
             if (!skipViewValueCaching) {
                 storeItemBuilderCache()

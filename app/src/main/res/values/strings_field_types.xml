@@ -42,7 +42,7 @@
     <string name="property_rating_levels">Max Score</string>
 
 
-    <string name="type_audio_record_name">Audio Record</string>
+    <string name="type_audio_record_name">Audio Note</string>
     <string name="type_audio_record_desc">record the audio with a microphone</string>
 
     <string name="property_rating_allow_intermediate">Allow half point</string>

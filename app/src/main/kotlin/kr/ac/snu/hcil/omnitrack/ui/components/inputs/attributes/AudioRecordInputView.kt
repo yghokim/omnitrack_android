@@ -42,4 +42,10 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
     override fun onAttributeBound(attributeId: String) {
         valueView.mediaSessionId = attributeId
     }
+
+    override fun onPause() {
+        super.onPause()
+        println("dispose audio recorder view")
+        valueView.dispose()
+    }
 }
