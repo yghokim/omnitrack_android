@@ -10,6 +10,7 @@ import android.support.v4.graphics.ColorUtils
 import android.support.v7.app.NotificationCompat
 import android.view.View
 import android.widget.RemoteViews
+import android.widget.Toast
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
@@ -24,6 +25,10 @@ object OTShortcutManager {
     const val NOTIFICATION_ID = 200000
 
     const val MAX_NUM_SHORTCUTS = 5
+
+    val toastForAdded by lazy { Toast.makeText(OTApplication.app, R.string.msg_shortcut_added, Toast.LENGTH_SHORT) }
+    val toastForRemoved by lazy { Toast.makeText(OTApplication.app, R.string.msg_shortcut_removed, Toast.LENGTH_SHORT) }
+
 
     private fun buildNewNotificationShortcutViews(context: Context, bigStyle: Boolean): RemoteViews
     {
@@ -117,6 +122,7 @@ object OTShortcutManager {
 
         OTApplication.app.sendBroadcast(intent)*/
         refreshNotificationShortcutViews()
+        toastForAdded.show()
     }
 
     operator fun minusAssign(tracker: OTTracker)
@@ -126,5 +132,6 @@ object OTShortcutManager {
 
         OTApplication.app.sendBroadcast(intent)*/
         refreshNotificationShortcutViews()
+        toastForRemoved.show()
     }
 }

@@ -189,6 +189,7 @@ class OTApplication : Application() {
     private fun createExampleTrackers() {
         //====================================================================================================================================================
         val coffeeTracker = currentUser.newTracker("Coffee", true)
+        coffeeTracker.isOnShortcut = true
         coffeeTracker.attributes.add(OTAttribute.Companion.createAttribute(currentUser, "Name", OTAttribute.TYPE_SHORT_TEXT))
         coffeeTracker.attributes.add(OTAttribute.Companion.createAttribute(currentUser, "Drank At", OTAttribute.TYPE_TIME))
 
@@ -198,6 +199,7 @@ class OTApplication : Application() {
 
         //====================================================================================================================================================
         val sleepTracker = currentUser.newTracker("Sleep", true)
+        sleepTracker.isOnShortcut = true
 
         val sleepTimeAttribute = OTAttribute.Companion.createAttribute(currentUser, "Sleep Duration", OTAttribute.TYPE_TIMESPAN)
         sleepTimeAttribute.setPropertyValue(OTTimeSpanAttribute.PROPERTY_GRANULARITY, OTTimeAttribute.GRANULARITY_MINUTE)
