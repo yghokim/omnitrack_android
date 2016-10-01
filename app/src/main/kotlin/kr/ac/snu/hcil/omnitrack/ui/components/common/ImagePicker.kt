@@ -35,9 +35,7 @@ class ImagePicker : FrameLayout, View.OnClickListener {
             //ensure there is a camera activity
             if (takePictureIntent.resolveActivity(activity.getPackageManager()) != null) {
 
-                val photoFile = createCacheImageFile(activity)
-                val uri = FileProvider.getUriForFile(activity, "kr.ac.snu.hcil.omnitrack.fileprovider", photoFile)
-
+                val uri = createCacheImageFileUri(activity)
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
 
                 activity.startActivityForResult(takePictureIntent, requestCode)
@@ -47,7 +45,25 @@ class ImagePicker : FrameLayout, View.OnClickListener {
             else return null
         }
 
-        private fun createCacheImageFile(context: Context): File {
+        fun dispatchImagePickIntent(activity: AppCompatActivity, requestCode: Int) {
+            val getIntent = Intent(Intent.ACTION_GET_CONTENT)
+            getIntent.type = "image/*"
+
+            val pickIntent = Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+            pickIntent.type = "image/*"
+
+            val chooserIntent = Intent.createChooser(getIntent, "Select Image")
+            chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf(pickIntent))
+
+            activity.startActivityForResult(chooserIntent, requestCode)
+        }
+
+
+        fun createCacheImageFileUri(context: Context): Uri {
+            return FileProvider.getUriForFile(context, "kr.ac.snu.hcil.omnitrack.fileprovider", createCacheImageFile(context))
+        }
+
+        fun createCacheImageFile(context: Context): File {
             // Create an image file name
             val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
             val imageFileName = "JPEG_" + timeStamp + "_"

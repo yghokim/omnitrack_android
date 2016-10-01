@@ -163,7 +163,9 @@ class OTItemBuilder : Parcelable, IStringSerializable {
                 }.toTypedArray()
         )
 
-        return gson.toJson(pack)
+        val json = gson.toJson(pack)
+        println(json)
+        return json
     }
 
     override fun fromSerializedString(serialized: String): Boolean {

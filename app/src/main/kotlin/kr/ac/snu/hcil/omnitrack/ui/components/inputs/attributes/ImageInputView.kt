@@ -63,37 +63,55 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
     }
 
     override fun onRequestGalleryImage(view: ImagePicker) {
-
+        val activity = this.getActivity()
+        if (activity != null) {
+            ImagePicker.dispatchImagePickIntent(activity, makeActivityForResultRequestCode(position, REQUEST_CODE_GALLERY))
+        }
     }
 
     override fun setValueFromActivityResult(data: Intent, requestType: Int): Boolean {
 
-        if(requestType == REQUEST_CODE_CAMERA || requestType == REQUEST_CODE_GALLERY)
+        fun resizeImage(source: Uri, dest: Uri) {
+            val bitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, source)
+
+            val numPixels = bitmap.width * bitmap.height
+            val scale = Math.sqrt(IMAGE_MAX_PIXELS / numPixels.toDouble()).toFloat()
+
+            if (scale < 1) {
+                println("scale down camera image : ${scale * 100}%")
+
+                val scaledBitmap = Bitmap.createScaledBitmap(bitmap, (bitmap.width * scale + 0.5f).toInt(), (bitmap.height * scale + 0.5f).toInt(), true)
+                //val scaledBitmap = Bitmap.createBitmap(scaledWidth, scaledHeight, Bitmap.Config.ARGB_8888)
+                bitmap.recycle()
+                val outputStream = context.contentResolver.openOutputStream(dest)
+                scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 80, outputStream)
+                scaledBitmap.recycle()
+            }
+        }
+
+        if (requestType == REQUEST_CODE_CAMERA)
         {
             if(cameraCacheUri != null) {
 
-                val bitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, cameraCacheUri!!)
-
-                val numPixels = bitmap.width * bitmap.height
-                val scale = Math.sqrt(IMAGE_MAX_PIXELS / numPixels.toDouble()).toFloat()
-
-                if (scale < 1) {
-                    println("scale down camera image : ${scale * 100}%")
-
-                    val scaledBitmap = Bitmap.createScaledBitmap(bitmap, (bitmap.width * scale + 0.5f).toInt(), (bitmap.height * scale + 0.5f).toInt(), true)
-                    //val scaledBitmap = Bitmap.createBitmap(scaledWidth, scaledHeight, Bitmap.Config.ARGB_8888)
-                    bitmap.recycle()
-                    val outputStream = context.contentResolver.openOutputStream(cameraCacheUri!!)
-                    scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 80, outputStream)
-                    scaledBitmap.recycle()
-                }
+                resizeImage(cameraCacheUri!!, cameraCacheUri!!)
 
                 this.picker.imageUri = cameraCacheUri!!
                 cameraCacheUri = null
             }
             return true
+        } else if (requestType == REQUEST_CODE_GALLERY) {
+            if (data.data != null) {
+                val uri = Uri.fromFile(ImagePicker.createCacheImageFile(context))
+                resizeImage(data.data, uri)
+
+                this.picker.imageUri = uri
+            }
+
+            return true
         }
         else return false
+
+
     }
 
 }

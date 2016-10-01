@@ -290,7 +290,9 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
         try {
             val storedBuilder = OTItemBuilder(serialized)
             if (activityResultAppliedAttributePosition != -1) {
-                storedBuilder.removeValueOf(tracker.attributes[activityResultAppliedAttributePosition])
+                storedBuilder.setValueOf(tracker.attributes[activityResultAppliedAttributePosition],
+                        builder.getValueInformationOf(tracker.attributes[activityResultAppliedAttributePosition])!!.value)
+                activityResultAppliedAttributePosition = -1
             }
             builder = storedBuilder
             return true
@@ -314,6 +316,7 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
         println("Attribute $attributeId was changed to $newVal")
         val attribute = tracker?.attributes?.unObservedList?.find { it.objectId == attributeId }
         if (attribute != null) {
+            println("set item builder ${attribute.typeId}, ${attributeId}")
             builder.setValueOf(attribute, newVal)
         }
     }
