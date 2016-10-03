@@ -72,6 +72,7 @@
                 <action android:name="kr.ac.snu.hcil.omnitrack.action.ITEM_ADDED" />
                 <action android:name="kr.ac.snu.hcil.omnitrack.action.ITEM_EDITED" />
                 <action android:name="kr.ac.snu.hcil.omnitrack.action.ITEM_REMOVED" />
+                <action android:name="kr.ac.snu.hcil.omnitrack.action.COMMAND_REMOVE_ITEM" />
             </intent-filter>
         </receiver>
         <receiver

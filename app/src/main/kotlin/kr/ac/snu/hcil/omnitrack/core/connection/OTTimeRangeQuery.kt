@@ -1,9 +1,10 @@
-package kr.ac.snu.hcil.omnitrack.core
+package kr.ac.snu.hcil.omnitrack.core.connection
 
 import android.content.Context
 import android.text.format.DateUtils
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.OTItemBuilder
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeSpanAttribute
 import kr.ac.snu.hcil.omnitrack.utils.serialization.ATypedQueueSerializable
@@ -161,11 +162,11 @@ class OTTimeRangeQuery : ATypedQueueSerializable {
     }
 
     fun getModeName(context: Context): CharSequence {
-        if (mode == OTTimeRangeQuery.TYPE_PIVOT_TIMESTAMP) {
+        if (mode == TYPE_PIVOT_TIMESTAMP) {
             return context.resources.getString(R.string.msg_connection_wizard_time_query_pivot_present)
-        } else if (mode == OTTimeRangeQuery.TYPE_PIVOT_TIMEPOINT || mode == OTTimeRangeQuery.TYPE_LINK_TIMESPAN) {
+        } else if (mode == TYPE_PIVOT_TIMEPOINT || mode == TYPE_LINK_TIMESPAN) {
             val fieldNameFormat = context.resources.getString(R.string.msg_connection_wizard_time_query_pivot_field_format)
-            return String.Companion.format(fieldNameFormat, linkedAttribute?.name ?: "")
+            return String.format(fieldNameFormat, linkedAttribute?.name ?: "")
         } else return "None"
     }
 

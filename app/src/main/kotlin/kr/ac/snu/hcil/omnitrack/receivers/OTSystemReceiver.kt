@@ -5,8 +5,9 @@ import android.content.Context
 import android.content.Intent
 import android.widget.Toast
 import kr.ac.snu.hcil.omnitrack.OTApplication
-import kr.ac.snu.hcil.omnitrack.core.OTNotificationManager
-import kr.ac.snu.hcil.omnitrack.core.OTShortcutManager
+import kr.ac.snu.hcil.omnitrack.core.database.DatabaseHelper
+import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
+import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTDataTriggerManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTriggerAlarmManager
 
@@ -39,6 +40,18 @@ class OTSystemReceiver : BroadcastReceiver() {
                     Toast.makeText(OTApplication.app, "${tracker.name} item was logged", Toast.LENGTH_SHORT).show()
             }
 
+            OTApplication.BROADCAST_ACTION_COMMAND_REMOVE_ITEM -> {
+                val tracker = OTApplication.app.currentUser[intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)]
+                if (tracker != null) {
+                    val itemDbId = intent.getLongExtra(OTApplication.INTENT_EXTRA_DB_ID_ITEM, -1)
+                    if (itemDbId != -1L) {
+                        OTApplication.app.dbHelper.deleteObjects(DatabaseHelper.ItemScheme, itemDbId)
+                    }
+
+                    OTNotificationManager.cancelBackgroundLoggingSuccessNotification(context, tracker)
+                }
+            }
+
             OTApplication.BROADCAST_ACTION_BACKGROUND_LOGGING_STARTED -> {
 
             }
@@ -47,7 +60,10 @@ class OTSystemReceiver : BroadcastReceiver() {
                 println("background logging successful")
                 val tracker = OTApplication.app.currentUser[intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)]
                 if (tracker != null) {
-                    OTNotificationManager.pushBackgroundLoggingNotification(context, tracker, System.currentTimeMillis())
+                    val itemDbId = intent.getLongExtra(OTApplication.INTENT_EXTRA_DB_ID_ITEM, -1)
+                    if (itemDbId != -1L) {
+                        OTNotificationManager.pushBackgroundLoggingSuccessNotification(context, tracker, itemDbId, System.currentTimeMillis())
+                    }
                 }
             }
 

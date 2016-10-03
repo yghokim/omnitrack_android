@@ -202,6 +202,7 @@
     <string name="msg_shortcut_added">Tracker was added to the shortcut panel.</string>
     <string name="msg_shortcut_removed">Tracker was removed from the shortcut panel.</string>
 
+    <string name="msg_notification_action_discard_item">Cancel it</string>
 
     <string name="msg_rescuetime_api_key_input_title">Input RescueTime API key</string>
     <string name="msg_rescuetime_api_key_input_hint">Paste RescueTime api key here.</string>

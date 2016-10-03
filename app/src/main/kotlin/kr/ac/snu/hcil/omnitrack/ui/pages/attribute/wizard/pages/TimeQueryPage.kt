@@ -3,8 +3,8 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.attribute.wizard.pages
 import android.content.Context
 import android.view.View
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
+import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.AWizardPage
 
 /**

@@ -1,7 +1,5 @@
-package kr.ac.snu.hcil.omnitrack.core
+package kr.ac.snu.hcil.omnitrack.core.database
 
-import kr.ac.snu.hcil.omnitrack.core.database.IDatabaseStorable
-import kr.ac.snu.hcil.omnitrack.core.database.IDatabaseSyncedObject
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import java.util.*
 import kotlin.properties.Delegates

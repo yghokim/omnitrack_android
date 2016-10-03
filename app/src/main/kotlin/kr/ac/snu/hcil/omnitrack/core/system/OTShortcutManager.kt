@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.core
+package kr.ac.snu.hcil.omnitrack.core.system
 
 import android.app.Notification
 import android.app.NotificationManager
@@ -13,6 +13,7 @@ import android.widget.RemoteViews
 import android.widget.Toast
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemEditingActivity
@@ -54,7 +55,7 @@ object OTShortcutManager {
 
         rv.removeAllViews(R.id.container)
 
-        for(i in 0..MAX_NUM_SHORTCUTS-1)
+        for (i in 0..MAX_NUM_SHORTCUTS - 1)
         {
             val element = RemoteViews(context.packageName, if (bigStyle) R.layout.remoteview_shortcut_notification_element else R.layout.remoteview_shortcut_notification_element_normal)
 

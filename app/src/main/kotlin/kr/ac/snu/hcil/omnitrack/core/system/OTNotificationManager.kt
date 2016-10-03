@@ -1,12 +1,16 @@
-package kr.ac.snu.hcil.omnitrack.core
+package kr.ac.snu.hcil.omnitrack.core.system
 
 import android.app.Notification
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
+import android.os.Build
+import android.support.v4.app.NotificationCompat
 import android.support.v4.app.TaskStackBuilder
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemBrowserActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemEditingActivity
 import kr.ac.snu.hcil.omnitrack.utils.FillingIntegerIdReservationTable
@@ -25,6 +29,11 @@ object OTNotificationManager {
     private val reminderTrackerNotificationIdTable = FillingIntegerIdReservationTable<String>()
     private val backgroundLoggingTrackerNotificationIdTable = FillingIntegerIdReservationTable<String>()
 
+    /*
+    private val icon_ex: Icon by lazy{
+        Icon.createWithBitmap(BitmapFactory.decodeResource(OTApplication.app.resources, R.drawable.ex_dark))
+    }*/
+
     private fun getNewReminderNotificationId(tracker: OTTracker): Int {
         return reminderTrackerNotificationIdTable[tracker.objectId]
     }
@@ -41,7 +50,7 @@ object OTNotificationManager {
 
         fun getNewId(): Int {
             return if (collapse) {
-                Type.values().indexOf(this)
+                values().indexOf(this)
             } else {
                 increment.incrementAndGet()
             }
@@ -86,7 +95,12 @@ object OTNotificationManager {
         notificationService.notify(getNewReminderNotificationId(tracker), builder.build())
     }
 
-    fun pushBackgroundLoggingNotification(context: Context, tracker: OTTracker, loggedTime: Long) {
+    fun cancelBackgroundLoggingSuccessNotification(context: Context, tracker: OTTracker) {
+
+        notificationService.cancel(getNewBackgroundLoggingNotificationId(tracker))
+    }
+
+    fun pushBackgroundLoggingSuccessNotification(context: Context, tracker: OTTracker, itemDbId: Long, loggedTime: Long) {
         val stackBuilder = TaskStackBuilder.create(context)
         // Adds the back stack for the Intent (but not the Intent itself)
         stackBuilder.addParentStack(ItemBrowserActivity::class.java)
@@ -96,12 +110,21 @@ object OTNotificationManager {
         val resultPendingIntent = stackBuilder.getPendingIntent(0,
                 PendingIntent.FLAG_UPDATE_CURRENT)
 
+        val itemRemoveIntent = Intent(OTApplication.BROADCAST_ACTION_COMMAND_REMOVE_ITEM)
+        itemRemoveIntent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
+        itemRemoveIntent.putExtra(OTApplication.INTENT_EXTRA_DB_ID_ITEM, itemDbId)
+
+        val discardAction = NotificationCompat.Action.Builder(R.drawable.ex_dark,
+                context.resources.getString(R.string.msg_notification_action_discard_item),
+                PendingIntent.getBroadcast(context, 0, itemRemoveIntent, PendingIntent.FLAG_UPDATE_CURRENT)).build()
+
         val builder = makeBaseBuilder(context, Type.TRACKING_REMINDER, loggedTime)
                 .setContentIntent(resultPendingIntent)
                 .setContentText(
                         String.format(OTApplication.app.resources.getString(R.string.msg_notification_content_format_new_item),
                                 tracker.name
                         ))
+                .addAction(discardAction)
 
         notificationService.notify(getNewBackgroundLoggingNotificationId(tracker), builder.build())
     }
@@ -123,14 +146,14 @@ object OTNotificationManager {
         // }
     }
 
-    fun makeBaseBuilder(context: Context, type: Type, time: Long): Notification.Builder {
+    fun makeBaseBuilder(context: Context, type: Type, time: Long): NotificationCompat.Builder {
 
-        val builder = Notification.Builder(context).setPriority(type.priority)
+        val builder = NotificationCompat.Builder(context).setPriority(type.priority)
                 .setWhen(time)
                 .setShowWhen(true)
                 .setSmallIcon(R.drawable.icon_simple)
 
-        if (android.os.Build.VERSION.SDK_INT >= 21) {
+        if (Build.VERSION.SDK_INT >= 21) {
             builder
                     .setColor(context.resources.getColor(R.color.colorPrimary, null))
         }

@@ -20,6 +20,7 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
 
     companion object {
         private val ACTION_LOG = "kr.ac.snu.hcil.omnitrack.services.action.LOG"
+
         private const val INTENT_EXTRA_LOGGING_SOURCE = "loggingSource"
 
         fun startLogging(context: Context, tracker: OTTracker, source: LoggingSource) {
@@ -56,8 +57,11 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
             sendBroadcast(OTApplication.BROADCAST_ACTION_BACKGROUND_LOGGING_STARTED, tracker)
 
             builder.autoCompleteAsync {
-                OTApplication.app.dbHelper.save(builder.makeItem(), tracker)
-                sendBroadcast(OTApplication.BROADCAST_ACTION_BACKGROUND_LOGGING_SUCCEEDED, tracker)
+                val item = builder.makeItem()
+                OTApplication.app.dbHelper.save(item, tracker)
+                if (item.dbId != null) {
+                    sendBroadcast(OTApplication.BROADCAST_ACTION_BACKGROUND_LOGGING_SUCCEEDED, tracker, item.dbId!!)
+                }
             }
         }
     }
@@ -67,4 +71,13 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
         intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
         sendBroadcast(intent)
     }
+
+    private fun sendBroadcast(action: String, tracker: OTTracker, itemDbId: Long) {
+        val intent = Intent(action)
+        intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
+        intent.putExtra(OTApplication.INTENT_EXTRA_DB_ID_ITEM, itemDbId)
+        sendBroadcast(intent)
+    }
+
+
 }

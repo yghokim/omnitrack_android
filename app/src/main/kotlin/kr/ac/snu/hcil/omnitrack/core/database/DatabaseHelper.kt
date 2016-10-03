@@ -10,7 +10,6 @@ import android.database.sqlite.SQLiteOpenHelper
 import android.os.AsyncTask
 import com.google.gson.Gson
 import kr.ac.snu.hcil.omnitrack.OTApplication
-import kr.ac.snu.hcil.omnitrack.core.NamedObject
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
@@ -416,6 +415,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
                 })
 
                 intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
+                intent.putExtra(OTApplication.INTENT_EXTRA_DB_ID_ITEM, item.dbId)
 
                 OTApplication.app.sendBroadcast(intent)
             }
