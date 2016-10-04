@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="msg_external_service_element_supported_measures">Supported Measures</string>
+
 
     <!-- microsoft band -->
     <string name="service_microsoft_band_name">Microsoft Band</string>

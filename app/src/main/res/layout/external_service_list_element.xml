@@ -38,7 +38,7 @@
             android:layout_toStartOf="@+id/ui_activation_switch_group"
             android:text="Microsoft Band"
             android:textColor="@color/textColorDark"
-            android:textSize="20dp" />
+            android:textSize="22sp" />
 
         <TextView
             android:id="@+id/description"
@@ -50,7 +50,8 @@
             android:layout_marginTop="5dp"
             android:text="ms band description"
             android:textColor="@color/textColorLight"
-            android:textSize="14dp" />
+            android:textSize="16dp"
+            android:textStyle="italic" />
 
         <FrameLayout
             android:id="@+id/ui_activation_switch_group"
@@ -85,18 +86,25 @@
 
     </RelativeLayout>
 
+    <View style="@style/HorizontalSeparator.NoVerticalMargin" />
 
-    <View
-        style="@style/HorizontalSeparator"
-        android:layout_marginBottom="0dp" />
-    <Button
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:layout_marginTop="12dp"
+        android:paddingStart="@dimen/activity_horizontal_margin"
+        android:text="@string/msg_external_service_element_supported_measures"
+        android:textColor="#ff9f22"
+        android:textSize="16dp"
+        android:textStyle="bold" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/ui_supported_measure_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/transparent_button_background"
-        android:drawableStart="@drawable/down_dark"
-        android:paddingStart="4dp"
-        android:text="Show available measures"
-        android:textAlignment="viewStart"
-        android:textColor="@color/buttonIconColorDark" />
+        android:layout_marginBottom="12dp"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin" />
 
 </LinearLayout>

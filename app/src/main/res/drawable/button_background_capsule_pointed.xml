@@ -1,0 +1,12 @@
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/capsule_frame_color_pointed" android:state_pressed="false" />
+
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <corners android:radius="50dp" />
+            <solid android:color="@color/colorPointed.Light" />
+            <padding android:bottom="4dp" android:left="9dp" android:right="9dp" android:top="4dp" />
+
+        </shape>
+    </item>
+</selector>
