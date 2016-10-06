@@ -13,6 +13,7 @@ import android.view.*
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import jp.wasabeef.recyclerview.animators.SlideInRightAnimator
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
@@ -32,6 +33,11 @@ import kr.ac.snu.hcil.omnitrack.utils.startActivityOnDelay
  * Created by younghokim on 16. 7. 29..
  */
 class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() {
+
+    companion object {
+        val toastForAdded by lazy { Toast.makeText(OTApplication.app, R.string.msg_shortcut_added, Toast.LENGTH_SHORT) }
+        val toastForRemoved by lazy { Toast.makeText(OTApplication.app, R.string.msg_shortcut_removed, Toast.LENGTH_SHORT) }
+    }
 
     lateinit private var rootScrollView: NestedScrollView
 
@@ -54,7 +60,6 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
     private lateinit var removalSnackbar: Snackbar
 
     private var scrollToBottomReserved = false
-
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val rootView = inflater!!.inflate(R.layout.fragment_tracker_detail_structure, container, false)
@@ -79,7 +84,14 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
         isOnShortcutPropertyView = rootView.findViewById(R.id.isOnShortcutProperty) as BooleanPropertyView
         isOnShortcutPropertyView.valueChanged += {
             sender, isOnShortcut->
+            if (tracker.isOnShortcut != isOnShortcut) {
                 tracker.isOnShortcut = isOnShortcut
+                if (tracker.isOnShortcut) {
+                    toastForAdded.show()
+                } else {
+                    toastForRemoved.show()
+                }
+            }
         }
 
         attributeListView = rootView.findViewById(R.id.ui_attribute_list) as RecyclerView

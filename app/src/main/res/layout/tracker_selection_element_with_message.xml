@@ -4,9 +4,9 @@
     android:layout_height="wrap_content"
     android:background="@drawable/transparent_button_background"
     android:orientation="vertical"
-    android:paddingBottom="6dp"
-
-    android:paddingTop="6dp">
+    android:paddingBottom="16dp"
+    android:paddingStart="12dp"
+    android:paddingTop="16dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -17,6 +17,7 @@
             android:id="@+id/colored_circle"
             android:layout_width="20dp"
             android:layout_height="20dp"
+            android:layout_gravity="center_vertical"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:padding="4dp"
@@ -29,7 +30,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:text="Tracker"
-            android:textSize="17sp" />
+            android:textColor="@color/textColorMid"
+            android:textSize="18sp" />
     </LinearLayout>
 
 
