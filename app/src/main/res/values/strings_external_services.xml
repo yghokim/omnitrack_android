@@ -61,7 +61,10 @@
     <string name="measure_fitbit_sleep_time_desc">Get sleep time range</string>
 
     <string name="measure_fitbit_steps_name">Step Count</string>
-    <string name="measure_fitbit_steps_desc">Get step count during specific range</string>
+    <string name="measure_fitbit_steps_desc">Get step count during a specific range</string>
+
+    <string name="measure_fitbit_heart_rate_name">Average Heart Rate</string>
+    <string name="measure_fitbit_heart_rate_desc">Get the average heart rate during a specific range</string>
 
 
 </resources>
