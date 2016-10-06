@@ -155,6 +155,15 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
 
     override fun onStart() {
         super.onStart()
+        if (activity.intent.hasExtra(TrackerDetailActivity.INTENT_KEY_FOCUS_ATTRIBUTE_ID)) {
+            val attrId = activity.intent.getStringExtra(TrackerDetailActivity.INTENT_KEY_FOCUS_ATTRIBUTE_ID)
+            for (attr in tracker.attributes.unObservedList.withIndex()) {
+                if (attr.value.objectId == attrId) {
+                    scrollToBottomReserved = true
+                    break
+                }
+            }
+        }
 
     }
 
@@ -188,7 +197,9 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
     }
 
     fun scrollToBottom() {
-        rootScrollView.scrollTo(0, contentContainer.measuredHeight)
+        newAttributePanel.measure(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        println(newAttributePanel.measuredHeight)
+        rootScrollView.scrollTo(0, contentContainer.measuredHeight - newAttributePanel.measuredHeight)
     }
 
 

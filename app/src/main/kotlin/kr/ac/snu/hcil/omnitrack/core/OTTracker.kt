@@ -10,6 +10,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AttributeSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
 import kr.ac.snu.hcil.omnitrack.core.database.NamedObject
+import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutManager
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.models.LoggingHeatMapModel
@@ -180,6 +181,14 @@ class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color
         }
 
         return list.toTypedArray()
+    }
+
+    fun isMeasureFactoryConnected(measureFactory: OTMeasureFactory): Boolean {
+        for (attr in attributes) {
+            if (attr.isMeasureFactoryConnected(measureFactory)) return true
+        }
+
+        return false
     }
 
     inner class AutoCompleteAttributeValuesAsyncTask(

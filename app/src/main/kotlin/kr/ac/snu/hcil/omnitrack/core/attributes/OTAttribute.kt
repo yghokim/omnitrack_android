@@ -11,6 +11,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTProperty
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.database.NamedObject
+import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
@@ -244,5 +245,9 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
 
     open fun getRecommendedChartModels(): Array<ChartModel<*>> {
         return arrayOf()
+    }
+
+    fun isMeasureFactoryConnected(measureFactory: OTMeasureFactory): Boolean {
+        return valueConnection?.source?.factory?.typeCode == measureFactory.typeCode
     }
 }

@@ -16,6 +16,7 @@ import android.widget.Switch
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
+import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
 
 /**
  * Created by Young-Ho on 7/29/2016.
@@ -52,7 +53,6 @@ class ServiceListFragment : Fragment() {
         return rootView
     }
 
-
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         println("permission result: $requestCode ${pendedActivations.size()}")
@@ -78,7 +78,6 @@ class ServiceListFragment : Fragment() {
 
     private inner class Adapter : RecyclerView.Adapter<Adapter.ViewHolder>() {
 
-
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             holder.bind(getService(position))
         }
@@ -96,7 +95,6 @@ class ServiceListFragment : Fragment() {
             return OTExternalService.availableServices[position]
         }
 
-
         inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
             val thumbView: ImageView
@@ -109,6 +107,10 @@ class ServiceListFragment : Fragment() {
             val activationSwitchGroup: ViewGroup
             val activationIndicator: TextView
 
+            val measureFactoryListView: RecyclerView
+
+            val measureFactoryAdapter = MeasureFactoryAdapter()
+
             var holderState: OTExternalService.ServiceState = OTExternalService.ServiceState.DEACTIVATED
                 set(value) {
                     if (field != value) {
@@ -117,7 +119,6 @@ class ServiceListFragment : Fragment() {
                     }
                 }
 
-
             init {
                 thumbView = view.findViewById(R.id.thumb) as ImageView
                 nameView = view.findViewById(R.id.name) as TextView
@@ -125,10 +126,14 @@ class ServiceListFragment : Fragment() {
 
                 progressBar = view.findViewById(R.id.ui_progress_bar) as ProgressBar
 
+                measureFactoryListView = view.findViewById(R.id.ui_supported_measure_list) as RecyclerView
+                measureFactoryListView.adapter = measureFactoryAdapter
+                measureFactoryListView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+                measureFactoryListView.addItemDecoration(HorizontalDividerItemDecoration(resources.getColor(R.color.separator_Light, null), (0.6f * resources.displayMetrics.density + .5f).toInt()))
+
                 activationSwitchGroup = view.findViewById(R.id.ui_activation_switch_group) as ViewGroup
 
                 activationIndicator = view.findViewById(R.id.ui_activation_indicator_text) as TextView
-
 
                 activationButton = view.findViewById(R.id.ui_button_activate) as Switch
 
@@ -163,7 +168,6 @@ class ServiceListFragment : Fragment() {
                         }
                     }
                 }
-
             }
 
             private fun applyState(state: OTExternalService.ServiceState) {
@@ -195,9 +199,10 @@ class ServiceListFragment : Fragment() {
                 descriptionView.text = context.resources.getString(service.descResourceId)
                 thumbView.setImageResource(service.thumbResourceId)
 
+                measureFactoryAdapter.service = service
+
                 holderState = service.state
             }
-
         }
     }
 }

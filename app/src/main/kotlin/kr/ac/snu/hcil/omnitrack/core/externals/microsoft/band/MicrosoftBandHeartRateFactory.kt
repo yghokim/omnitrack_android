@@ -13,6 +13,13 @@ import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
  */
 class MicrosoftBandHeartRateFactory : OTMeasureFactory() {
 
+    override fun getExampleAttributeConfigurator(): IExampleAttributeConfigurator {
+        return CONFIGURATOR_FOR_HEART_RATE_ATTRIBUTE
+    }
+
+
+    override val exampleAttributeType: Int = OTAttribute.TYPE_NUMBER
+
     override val supportedConditionerTypes: IntArray = CONDITIONERS_FOR_SINGLE_NUMERIC_VALUE
 
     override val service: OTExternalService = MicrosoftBandService

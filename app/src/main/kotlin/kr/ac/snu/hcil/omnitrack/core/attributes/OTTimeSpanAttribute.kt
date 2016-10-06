@@ -37,6 +37,7 @@ class OTTimeSpanAttribute(objectId: String?, dbId: Long?, columnName: String, is
 
     override val valueNumericCharacteristics: NumericCharacteristics = NumericCharacteristics(true, false)
 
+
     override fun formatAttributeValue(value: Any): String {
         return (value as TimeSpan).toString()
     }

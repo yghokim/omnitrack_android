@@ -13,7 +13,14 @@ import java.util.*
  * Created by Young-Ho Kim on 2016-09-01.
  */
 object MisfitSleepMeasureFactory : OTMeasureFactory() {
+
+    override fun getExampleAttributeConfigurator(): IExampleAttributeConfigurator {
+        return CONFIGURATOR_FOR_TIMESPAN_ATTRIBUTE
+    }
+
     override val service: OTExternalService = MisfitService
+
+    override val exampleAttributeType: Int = OTAttribute.TYPE_TIMESPAN
 
     override fun isAttachableTo(attribute: OTAttribute<out Any>): Boolean {
         return attribute.typeId == OTAttribute.TYPE_TIMESPAN

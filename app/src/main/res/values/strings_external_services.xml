@@ -2,6 +2,7 @@
 <resources>
 
     <string name="msg_external_service_element_supported_measures">Supported Measures</string>
+    <string name="msg_sentence_field_already_connected_to_measure">Already contains %1$s connected</string>
 
 
     <!-- microsoft band -->

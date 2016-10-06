@@ -18,7 +18,8 @@ object DialogHelper {
                         dialog, which ->
                         if (onYes != null) onYes()
                 }
-                    .setOnCancelListener {
+                    .setNegativeButton(R.string.msg_no) {
+                        dialog, which ->
                         if (onNo != null) onNo()
                     }
 

@@ -18,12 +18,19 @@ import java.util.*
  * Created by younghokim on 16. 9. 3..
  */
 object FitbitRecentSleepTimeMeasureFactory : OTMeasureFactory() {
+    override fun getExampleAttributeConfigurator(): IExampleAttributeConfigurator {
+        return CONFIGURATOR_FOR_TIMESPAN_ATTRIBUTE
+    }
+
     override fun isAttachableTo(attribute: OTAttribute<out Any>): Boolean {
         return attribute.typeId == OTAttribute.TYPE_TIMESPAN
     }
 
     override val isRangedQueryAvailable: Boolean = true
     override val isDemandingUserInput: Boolean = false
+
+
+    override val exampleAttributeType: Int = OTAttribute.TYPE_TIMESPAN
 
     override fun makeMeasure(): OTMeasure {
         return FitbitRecentSleepTimeMeasure()

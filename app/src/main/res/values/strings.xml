@@ -20,6 +20,12 @@
     <string name="msg_change_tracker_settings">Change attribute settings</string>
     <string name="msg_remove_tracker">Remove attribute</string>
 
+    <plurals name="field">
+        <item quantity="zero">0 fields</item>
+        <item quantity="one">a field</item>
+        <item quantity="other">%d fields</item>
+    </plurals>
+
     <string name="msg_sort">Sort by</string>
 
     <string name="msg_sort_method_timestamp">Logged Time</string>

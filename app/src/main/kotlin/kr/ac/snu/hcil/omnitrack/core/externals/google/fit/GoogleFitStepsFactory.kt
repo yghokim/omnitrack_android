@@ -23,9 +23,16 @@ import java.util.concurrent.TimeUnit
 
 object GoogleFitStepsFactory : GoogleFitService.GoogleFitMeasureFactory() {
 
+    override fun getExampleAttributeConfigurator(): IExampleAttributeConfigurator {
+        return CONFIGURATOR_STEP_ATTRIBUTE
+    }
+
     override val supportedConditionerTypes: IntArray = CONDITIONERS_FOR_SINGLE_NUMERIC_VALUE
 
     override val service: OTExternalService = GoogleFitService
+
+
+    override val exampleAttributeType: Int = OTAttribute.TYPE_NUMBER
 
     override val isRangedQueryAvailable: Boolean = true
     override val isDemandingUserInput: Boolean = false

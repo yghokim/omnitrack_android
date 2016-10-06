@@ -16,6 +16,7 @@ import at.markushi.ui.RevealColorView
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 
@@ -24,9 +25,17 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
     companion object {
         const val IS_EDIT_MODE = "isEditMode"
 
+        const val INTENT_KEY_FOCUS_ATTRIBUTE_ID = "focusAttributeId"
+
         fun makeIntent(trackerId: String, context: Context): Intent {
             val intent = Intent(context, TrackerDetailActivity::class.java)
             intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
+            return intent
+        }
+
+        fun makeIntent(trackerId: String, focusAttribute: OTAttribute<out Any>, context: Context): Intent {
+            val intent = makeIntent(trackerId, context)
+            intent.putExtra(INTENT_KEY_FOCUS_ATTRIBUTE_ID, focusAttribute.objectId)
             return intent
         }
     }
@@ -49,7 +58,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
     /**
      * The [ViewPager] that will host the section contents.
      */
-    private var mViewPager: ViewPager? = null
+    private lateinit var mViewPager: ViewPager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,8 +66,8 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
         mSectionsPagerAdapter = SectionsPagerAdapter(supportFragmentManager)
 
         // Set up the ViewPager with the sections adapter.
-        mViewPager = findViewById(R.id.container) as ViewPager?
-        mViewPager!!.adapter = mSectionsPagerAdapter
+        mViewPager = findViewById(R.id.container) as ViewPager
+        mViewPager.adapter = mSectionsPagerAdapter
 
         val tabLayout = findViewById(R.id.tabs) as TabLayout?
         tabLayout!!.setupWithViewPager(mViewPager)
@@ -122,6 +131,13 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
 
     override fun onStart(){
         super.onStart()
+
+        if (intent.hasExtra(INTENT_KEY_FOCUS_ATTRIBUTE_ID)) {
+            val attributeId = intent.getStringExtra(INTENT_KEY_FOCUS_ATTRIBUTE_ID)
+
+            mViewPager.setCurrentItem(0, true)
+
+        }
     }
 
     override fun onToolbarLeftButtonClicked() {

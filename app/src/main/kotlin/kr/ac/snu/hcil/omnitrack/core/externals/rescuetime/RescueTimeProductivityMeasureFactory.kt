@@ -2,9 +2,11 @@ package kr.ac.snu.hcil.omnitrack.core.externals.rescuetime
 
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
+import kr.ac.snu.hcil.omnitrack.utils.NumberStyle
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableTypedQueue
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import org.json.JSONObject
@@ -14,6 +16,25 @@ import java.util.*
  * Created by Young-Ho Kim on 2016-09-02.
  */
 object RescueTimeProductivityMeasureFactory : OTMeasureFactory() {
+
+
+    val configurator = object : IExampleAttributeConfigurator {
+        override fun configureExampleAttribute(attr: OTAttribute<out Any>): Boolean {
+            if (attr is OTNumberAttribute) {
+                val ns = NumberStyle()
+                ns.fractionPart = 0
+                ns.commaUnit = 0
+                return true
+            } else return false
+        }
+    }
+
+    override fun getExampleAttributeConfigurator(): IExampleAttributeConfigurator {
+        return configurator
+    }
+
+    override val exampleAttributeType: Int = OTAttribute.TYPE_NUMBER
+
     override val service: OTExternalService = RescueTimeService
 
     override fun isAttachableTo(attribute: OTAttribute<out Any>): Boolean {

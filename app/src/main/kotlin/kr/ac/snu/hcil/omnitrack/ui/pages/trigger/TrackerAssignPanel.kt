@@ -7,7 +7,7 @@ import android.view.View
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
-import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.TrackerPickerDialogHelper
+import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.TrackerPickerDialogBuilder
 import kr.ac.snu.hcil.omnitrack.utils.getActivity
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 import org.apmem.tools.layouts.FlowLayout
@@ -66,7 +66,7 @@ class TrackerAssignPanel : FlowLayout, View.OnClickListener {
     override fun onClick(view: View) {
         val fm = this.getActivity()?.supportFragmentManager
         if (fm != null) {
-            val dialog = TrackerPickerDialogHelper.createDialog(getActivity()!!, trackerIds.toTypedArray()) {
+            val dialog = TrackerPickerDialogBuilder().createDialog(getActivity()!!, trackerIds.toTypedArray()) {
                 tracker ->
                 if (tracker != null) {
                     trackerIds += tracker.objectId

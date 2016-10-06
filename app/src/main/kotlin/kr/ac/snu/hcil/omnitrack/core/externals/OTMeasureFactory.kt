@@ -4,9 +4,13 @@ import android.text.Html
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilder
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeSpanAttribute
 import kr.ac.snu.hcil.omnitrack.core.calculation.AConditioner
+import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.utils.INameDescriptionResourceProvider
+import kr.ac.snu.hcil.omnitrack.utils.NumberStyle
 import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 import kr.ac.snu.hcil.omnitrack.utils.serialization.ATypedQueueSerializable
 
@@ -19,6 +23,54 @@ abstract class OTMeasureFactory() : INameDescriptionResourceProvider {
         val CONDITIONERS_FOR_SINGLE_NUMERIC_VALUE = intArrayOf(AConditioner.TYPECODE_SINGLE_NUMERIC_COMPARISON)
         val CONDITIONERS_FOR_TIMEPOINT_VALUE = intArrayOf()
 
+        val CONFIGURATOR_STEP_ATTRIBUTE = object : IExampleAttributeConfigurator {
+            override fun configureExampleAttribute(attr: OTAttribute<out Any>): Boolean {
+                if (attr is OTNumberAttribute) {
+                    val ns = NumberStyle()
+                    ns.commaUnit = 3
+                    ns.fractionPart = 0
+                    ns.unit = "Step"
+                    ns.pluralizeUnit = true
+                    ns.unitPosition = NumberStyle.UnitPosition.Rear
+
+                    attr.numberStyle = ns
+
+                    return true
+                } else return false
+            }
+        }
+
+        val CONFIGURATOR_FOR_HEART_RATE_ATTRIBUTE = object : IExampleAttributeConfigurator {
+            override fun configureExampleAttribute(attr: OTAttribute<out Any>): Boolean {
+                if (attr is OTNumberAttribute) {
+                    val ns = NumberStyle()
+                    ns.commaUnit = 3
+                    ns.fractionPart = 0
+                    ns.unit = "BPS"
+                    ns.pluralizeUnit = false
+                    ns.unitPosition = NumberStyle.UnitPosition.Rear
+                    attr.numberStyle = ns
+                    return true
+                } else return false
+            }
+        }
+
+        val CONFIGURATOR_FOR_TIMESPAN_ATTRIBUTE = object : IExampleAttributeConfigurator {
+            override fun configureExampleAttribute(attr: OTAttribute<out Any>): Boolean {
+                if (attr is OTTimeSpanAttribute) {
+                    attr.setPropertyValue(OTTimeSpanAttribute.PROPERTY_GRANULARITY, 1)
+                    attr.setPropertyValue(OTTimeSpanAttribute.PROPERTY_TYPE, 0)
+
+                    return true
+                } else return false
+            }
+        }
+
+
+    }
+
+    interface IExampleAttributeConfigurator {
+        fun configureExampleAttribute(attr: OTAttribute<out Any>): Boolean
     }
 
     val typeCode: String by lazy {
@@ -47,6 +99,27 @@ abstract class OTMeasureFactory() : INameDescriptionResourceProvider {
         } else {
             Html.fromHtml(html)
         }
+    }
+
+    protected abstract val exampleAttributeType: Int
+    protected abstract fun getExampleAttributeConfigurator(): IExampleAttributeConfigurator
+
+
+    open fun makeNewExampleAttribute(): OTAttribute<out Any> {
+        val attr = OTAttribute.Companion.createAttribute(OTApplication.app.currentUser,
+                "${OTApplication.app.getString(service.nameResourceId)} ${OTApplication.app.resources.getString(nameResourceId)}",
+                exampleAttributeType)
+
+        getExampleAttributeConfigurator().configureExampleAttribute(attr)
+
+        val connection = OTConnection()
+        connection.source = makeMeasure()
+        if (isRangedQueryAvailable) {
+            connection.rangedQuery = OTTimeRangeQuery.Preset.PresentDate.makeQueryInstance()
+        }
+        attr.valueConnection = connection
+
+        return attr
     }
 
     abstract class OTMeasure : ATypedQueueSerializable {
