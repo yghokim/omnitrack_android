@@ -111,6 +111,20 @@ class OTUser(objectId: String?, dbId: Long?, name: String, email: String, attrib
         return tracker
     }
 
+    fun getPermissionsRequiredForFields(): Set<String> {
+        val set = HashSet<String>()
+        for (tracker in trackers) {
+            for (attr in tracker.attributes) {
+                val permissions = attr.requiredPermissions()
+                if (permissions != null) {
+                    set.addAll(permissions)
+                }
+            }
+        }
+
+        return set
+    }
+
     private fun onTrackerAdded(new: OTTracker, index: Int) {
         new.owner = this
         _removedTrackerIds.remove(new.dbId)

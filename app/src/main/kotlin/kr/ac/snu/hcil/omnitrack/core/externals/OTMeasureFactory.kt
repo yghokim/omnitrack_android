@@ -46,7 +46,7 @@ abstract class OTMeasureFactory() : INameDescriptionResourceProvider {
                     val ns = NumberStyle()
                     ns.commaUnit = 3
                     ns.fractionPart = 0
-                    ns.unit = "BPS"
+                    ns.unit = "bps"
                     ns.pluralizeUnit = false
                     ns.unitPosition = NumberStyle.UnitPosition.Rear
                     attr.numberStyle = ns

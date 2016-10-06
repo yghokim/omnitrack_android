@@ -1,6 +1,5 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.home
 
-import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -10,6 +9,7 @@ import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
 import android.support.v4.view.ViewPager
 import android.support.v7.widget.Toolbar
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.ui.activities.UserSyncedActivity
@@ -49,9 +49,7 @@ class HomeActivity : UserSyncedActivity() {
         tabLayout!!.setupWithViewPager(mViewPager)
 
 
-        //TODO do permission checks some other place
-
-        val permissions = arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO).filter {
+        val permissions = OTApplication.app.currentUser.getPermissionsRequiredForFields().filter {
             checkSelfPermission(it) != PackageManager.PERMISSION_GRANTED
         }.toTypedArray()
 

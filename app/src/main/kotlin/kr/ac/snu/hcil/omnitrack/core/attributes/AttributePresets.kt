@@ -7,9 +7,9 @@ import kr.ac.snu.hcil.omnitrack.core.OTUser
  */
 
 
-open class AttributePresetInfo(val iconId: Int, val name: String, val description: String?, val creater: ((user: OTUser, columnName: String) -> OTAttribute<out Any>))
+open class AttributePresetInfo(val typeId: Int, val iconId: Int, val name: String, val description: String?, val creater: ((user: OTUser, columnName: String) -> OTAttribute<out Any>))
 
-class SimpleAttributePresetInfo(val typeId: Int, iconId: Int, name: String, description: String?) : AttributePresetInfo(iconId, name, description,
+class SimpleAttributePresetInfo(typeId: Int, iconId: Int, name: String, description: String?) : AttributePresetInfo(typeId, iconId, name, description,
         {
             user, columnName ->
             OTAttribute.createAttribute(user, columnName, typeId)

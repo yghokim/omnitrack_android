@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.tracker
 
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v4.widget.NestedScrollView
@@ -60,6 +61,8 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
     private lateinit var removalSnackbar: Snackbar
 
     private var scrollToBottomReserved = false
+
+    private var permissionWaitingTypeInfo: AttributePresetInfo? = null
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val rootView = inflater!!.inflate(R.layout.fragment_tracker_detail_structure, container, false)
@@ -376,6 +379,26 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
 
     }
 
+    protected fun addNewAttribute(typeInfo: AttributePresetInfo) {
+        val newAttribute = typeInfo.creater(OTApplication.app.currentUser, tracker.generateNewAttributeName(typeInfo.name, context))
+        tracker.attributes.add(newAttribute)
+
+        attributeListAdapter.notifyItemInserted(tracker.attributes.size - 1)
+        scrollToBottomReserved = true
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (grantResults.filter { it != PackageManager.PERMISSION_GRANTED }.size == 0) {
+            //granted
+            if (permissionWaitingTypeInfo != null) {
+                addNewAttribute(permissionWaitingTypeInfo!!)
+                permissionWaitingTypeInfo = null
+            }
+        }
+    }
+
 
     inner class GridAdapter() : RecyclerView.Adapter<GridAdapter.ViewHolder>() {
 
@@ -396,7 +419,6 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
             return position.toLong();
         }
 
-
         inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             lateinit var name: TextView
             lateinit var typeIcon: ImageView
@@ -407,11 +429,14 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
 
                 view.setOnClickListener {
                     val typeInfo = OTApplication.app.supportedAttributePresets[adapterPosition]
-                    val newAttribute = typeInfo.creater(OTApplication.app.currentUser, tracker.generateNewAttributeName(typeInfo.name, context))
-                    tracker.attributes.add(newAttribute)
 
-                    attributeListAdapter.notifyItemInserted(tracker.attributes.size - 1)
-                    scrollToBottomReserved = true
+                    val requiredPermissions = OTAttribute.getPermissionsForAttribute(typeInfo.typeId)
+                    if (requiredPermissions != null) {
+                        permissionWaitingTypeInfo = typeInfo
+                        requestPermissions(requiredPermissions, 10)
+                    } else {
+                        addNewAttribute(typeInfo)
+                    }
                 }
             }
 

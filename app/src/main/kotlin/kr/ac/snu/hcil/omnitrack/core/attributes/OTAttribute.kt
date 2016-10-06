@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes
 
+import android.Manifest
 import android.content.Context
 import android.util.SparseArray
 import android.view.View
@@ -49,6 +50,18 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
         const val TYPE_IMAGE = 8
         const val TYPE_AUDIO = 9
 
+        private val permissionDict = SparseArray<Array<String>>()
+
+        init {
+            permissionDict.put(TYPE_LOCATION, arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION))
+            permissionDict.put(TYPE_IMAGE, arrayOf(Manifest.permission.CAMERA))
+            permissionDict.put(TYPE_AUDIO, arrayOf(Manifest.permission.RECORD_AUDIO))
+        }
+
+        fun getPermissionsForAttribute(typeId: Int): Array<String>? {
+            return permissionDict[typeId]
+        }
+
 
         fun createAttribute(objectId: String?, dbId: Long?, columnName: String, isRequired: Boolean, typeId: Int, propertyData: String?, connectionData: String?): OTAttribute<out Any> {
             val attr = when (typeId) {
@@ -70,6 +83,10 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
         fun createAttribute(user: OTUser, columnName: String, typeId: Int): OTAttribute<out Any> {
             return createAttribute(user.getNewAttributeObjectId().toString(), null, columnName, false, typeId, null, null)
         }
+    }
+
+    fun requiredPermissions(): Array<String>? {
+        return getPermissionsForAttribute(typeId)
     }
 
     var isRequired: Boolean = isRequired
