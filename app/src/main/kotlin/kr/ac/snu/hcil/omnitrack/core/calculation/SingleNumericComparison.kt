@@ -13,7 +13,11 @@ class SingleNumericComparison : AConditioner {
     override val typeCode: Int = AConditioner.TYPECODE_SINGLE_NUMERIC_COMPARISON
 
     enum class ComparisonMethod(val symbol: String, val symbolImageResourceId: Int) {
+        /*
         BiggerThan(">", R.drawable.symbol_bigger), BiggerOrEqual("≧", R.drawable.symbol_bigger_or_equal), Equal("=", R.drawable.symbol_equal), SmallerOfEqual("≦", R.drawable.symbol_smaller_or_equal), SmallerThan("<", R.drawable.symbol_smaller)
+    */
+        BiggerThan(">", R.drawable.icon_threshold_up),
+        SmallerThan("<", R.drawable.icon_threshold_down)
     }
 
     var comparedTo: Double = 10.0
@@ -27,10 +31,10 @@ class SingleNumericComparison : AConditioner {
     override fun validate(value: Any): Boolean {
         if (isNumericPrimitive(value)) {
             return when (method) {
-                ComparisonMethod.Equal -> convertNumericToDouble(value) == comparedTo
-                ComparisonMethod.BiggerOrEqual -> convertNumericToDouble(value) >= comparedTo
+            //ComparisonMethod.Equal -> convertNumericToDouble(value) == comparedTo
+            //ComparisonMethod.BiggerOrEqual -> convertNumericToDouble(value) >= comparedTo
                 ComparisonMethod.BiggerThan -> convertNumericToDouble(value) > comparedTo
-                ComparisonMethod.SmallerOfEqual -> convertNumericToDouble(value) <= comparedTo
+            //ComparisonMethod.SmallerOfEqual -> convertNumericToDouble(value) <= comparedTo
                 ComparisonMethod.SmallerThan -> convertNumericToDouble(value) < comparedTo
             }
         } else return false
