@@ -17,7 +17,7 @@ import java.util.*
 import kotlin.properties.Delegates
 
 /**
- * Created by younghokim on 2016. 9. 27..
+ * Created by Young-Ho Kim on 2016. 9. 27
  */
 class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModule.RecordingListener, AudioPlayerModule.PlayerListener, ValueAnimator.AnimatorUpdateListener {
     companion object {
@@ -198,6 +198,8 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
         secondTicker.tick += {
             sender, time ->
             when (state) {
+                State.RECORD -> {
+                }
                 State.RECORDING -> {
                     if (currentRecorderId == mediaSessionId) {
                         currentAudioSeconds = ((time - Companion.currentRecordingModule!!.startedAt) / 1000).toInt()

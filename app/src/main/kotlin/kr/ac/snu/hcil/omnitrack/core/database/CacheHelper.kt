@@ -15,7 +15,7 @@ import java.io.FileOutputStream
 import java.util.*
 
 /**
- * Created by younghokim on 16. 8. 20..
+ * Created by Young-Ho Kim on 16. 8. 20
  */
 
 class CacheHelper(context: Context) : SQLiteOpenHelper(context, "cache.db", null, 1) {
@@ -81,11 +81,11 @@ class CacheHelper(context: Context) : SQLiteOpenHelper(context, "cache.db", null
         try {
             if (cursor.count == 0) {
                 //insert
-                val id = db.insertOrThrow(BitmapCacheScheme.tableName, null, values)
+                db.insertOrThrow(BitmapCacheScheme.tableName, null, values)
 
             } else {
                 //update
-                val numAffected = db.update(BitmapCacheScheme.tableName, values, "${BitmapCacheScheme.KEY}=?", arrayOf(key))
+                db.update(BitmapCacheScheme.tableName, values, "${BitmapCacheScheme.KEY}=?", arrayOf(key))
             }
         } catch(e: SQLException) {
             e.printStackTrace()

@@ -12,7 +12,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 
 /**
- * Created by Young-Ho Kim on 2016-07-19.
+ * Created by Young-Ho Kim on 2016-07-19
  */
 class ColorPaletteView(context: Context, attrs: AttributeSet?, defStyle: Int) : RecyclerView(context, attrs, defStyle) {
     private var selectedIndex : Int = 0
@@ -63,7 +63,7 @@ class ColorPaletteView(context: Context, attrs: AttributeSet?, defStyle: Int) : 
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            var view = ColorSelectionButton(context)
+            val view = ColorSelectionButton(context)
             buttonSize = ((parent.measuredWidth - parent.paddingLeft - parent.paddingRight) / itemCount - 4 * resources.displayMetrics.density).toInt()
             view.layoutParams = LayoutParams(buttonSize, buttonSize)
             return ViewHolder(view)
@@ -89,7 +89,6 @@ class ColorPaletteView(context: Context, attrs: AttributeSet?, defStyle: Int) : 
                 view.setOnClickListener {
                     if(adapterPosition != selectedIndex)
                     {
-                        val toDeselect = selectedIndex
                         selectedIndex = adapterPosition
                         colorChanged.invoke(parent, selectedIndex)
                     }

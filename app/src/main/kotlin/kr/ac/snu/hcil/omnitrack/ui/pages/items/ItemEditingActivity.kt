@@ -26,11 +26,10 @@ import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.AInputView
 import java.util.*
 
 /**
- * Created by younghokim on 16. 7. 24..
+ * Created by Young-Ho Kim on 16. 7. 24
  */
 class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_item), OTItemBuilder.AttributeStateChangedListener {
 
@@ -230,7 +229,7 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
 
     private fun syncViewStateToBuilderAsync(finished: (() -> Unit)?) {
         println("grab inputView's values to ItemBuilder.")
-        var waitingAttributes = ArrayList<OTAttribute<out Any>>()
+        val waitingAttributes = ArrayList<OTAttribute<out Any>>()
         for (attribute in tracker!!.attributes.unObservedList) {
             val valueExtractor = attributeValueExtractors[attribute.objectId]
             if (valueExtractor != null) {
@@ -266,7 +265,7 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
     private fun clearBuilderCache() {
         if (tracker != null) {
             val preferences = getSharedPreferences(OTApplication.PREFERENCE_KEY_FOREGROUND_ITEM_BUILDER_STORAGE, Context.MODE_PRIVATE)
-            val editor = preferences.edit();
+            val editor = preferences.edit()
             editor.remove(makeTrackerPreferenceKey(tracker!!))
             editor.apply()
         }
@@ -350,7 +349,7 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
 
         override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
 
-            val frame = LayoutInflater.from(this@ItemEditingActivity).inflate(R.layout.attribute_input_frame, parent, false);
+            val frame = LayoutInflater.from(this@ItemEditingActivity).inflate(R.layout.attribute_input_frame, parent, false)
 
             val inputView = AAttributeInputView.makeInstance(viewType, this@ItemEditingActivity)
             inputViews.add(inputView)
@@ -369,7 +368,7 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
             return tracker?.attributes?.size ?: 0
         }
 
-        inner class ViewHolder(val inputView: AAttributeInputView<out Any>, val frame: View) : RecyclerView.ViewHolder(frame) {
+        inner class ViewHolder(val inputView: AAttributeInputView<out Any>, frame: View) : RecyclerView.ViewHolder(frame) {
 
             private val columnNameView: TextView
             private val requiredMarker: View
@@ -405,11 +404,11 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
 
                 inputView.valueChanged += {
                     sender, args ->
-                    onInputViewValueChanged(sender as AInputView<out Any>, args)
+                    onInputViewValueChanged(args)
                 }
             }
 
-            private fun onInputViewValueChanged(sender: AInputView<out Any>, newVal: Any) {
+            private fun onInputViewValueChanged(newVal: Any) {
                 setTimestampIndicatorText(System.currentTimeMillis())
                 if (attributeId != null) {
                     onAttributeValueChangedHandler(attributeId!!, newVal)

@@ -102,7 +102,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
             if (entry.first != null) {
                 if (entry.second is APropertyView<*>) {
                     if (entry.second.validate()) {
-                        attribute?.setPropertyValue(entry.first!!, entry.second.value!!)
+                        attribute?.setPropertyValue(entry.first, entry.second.value!!)
                     }
                 }
             }

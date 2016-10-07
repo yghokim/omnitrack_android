@@ -133,8 +133,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
         super.onStart()
 
         if (intent.hasExtra(INTENT_KEY_FOCUS_ATTRIBUTE_ID)) {
-            val attributeId = intent.getStringExtra(INTENT_KEY_FOCUS_ATTRIBUTE_ID)
-
+            //val attributeId = intent.getStringExtra(INTENT_KEY_FOCUS_ATTRIBUTE_ID)
             mViewPager.setCurrentItem(0, true)
 
         }

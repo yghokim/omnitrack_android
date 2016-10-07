@@ -10,7 +10,7 @@ import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelpe
 import java.util.*
 
 /**
- * Created by younghokim on 16. 7. 25..
+ * Created by Young-Ho Kim on 16. 7. 25
  */
 class OTItemBuilder : Parcelable, IStringSerializable {
 
@@ -19,7 +19,7 @@ class OTItemBuilder : Parcelable, IStringSerializable {
         const val MODE_FOREGROUND = 1
         const val MODE_BACKGROUND = 0
 
-        @JvmField final val CREATOR: Parcelable.Creator<OTItemBuilder> = object : Parcelable.Creator<OTItemBuilder> {
+        @JvmField val CREATOR: Parcelable.Creator<OTItemBuilder> = object : Parcelable.Creator<OTItemBuilder> {
             override fun createFromParcel(source: Parcel): OTItemBuilder {
                 return OTItemBuilder(source)
             }
@@ -35,7 +35,7 @@ class OTItemBuilder : Parcelable, IStringSerializable {
     }
 
     interface AttributeStateChangedListener {
-        fun onAttributeStateChanged(attribute: OTAttribute<*>, position: Int, state: EAttributeValueState);
+        fun onAttributeStateChanged(attribute: OTAttribute<*>, position: Int, state: EAttributeValueState)
     }
 
     data class ValueInfo(var value: Any, var timestamp: Long)
@@ -180,7 +180,7 @@ class OTItemBuilder : Parcelable, IStringSerializable {
         return valueTable[attribute.objectId]
     }
 
-    @SuppressWarnings("UNCHECKED CAST")
+    @Suppress("UNCHECKED_CAST")
     fun <T> getCastedValueOf(attribute: OTAttribute<T>): T? {
         return valueTable[attribute.objectId]?.value as? T
     }

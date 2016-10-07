@@ -23,7 +23,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 /**
- * Created by Young-Ho Kim on 2016-08-24.
+ * Created by Young-Ho Kim on 2016-08-24
  */
 class TimeTriggerConfigurationPanel : LinearLayout, IEventListener<Int>, CompoundButton.OnCheckedChangeListener, DatePickerDialog.OnDateSetListener, View.OnClickListener {
 
@@ -132,7 +132,7 @@ class TimeTriggerConfigurationPanel : LinearLayout, IEventListener<Int>, Compoun
     }
 
     private fun applyIsRepeated(isRepeated: Boolean, animate: Boolean) {
-        TransitionManager.beginDelayedTransition(this)
+        if (animate) TransitionManager.beginDelayedTransition(this)
         if (isRepeated)
             repetitionConfigGroup.visibility = View.VISIBLE
         else

@@ -7,7 +7,7 @@ import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelpe
 import java.util.*
 
 /**
- * Created by younghokim on 16. 7. 22..
+ * Created by Young-Ho Kim on 16. 7. 22
  */
 abstract class ADataRow() {
 
@@ -21,7 +21,7 @@ abstract class ADataRow() {
         return valueTable[attribute.objectId]
     }
 
-    @SuppressWarnings("UNCHECKED CAST")
+    @Suppress("UNCHECKED_CAST")
     fun <T> getCastedValueOf(attribute: OTAttribute<T>): T? {
         return valueTable[attribute.objectId] as? T
     }

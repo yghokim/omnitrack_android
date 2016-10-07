@@ -21,7 +21,7 @@ import kr.ac.snu.hcil.omnitrack.utils.setHourOfDay
 import java.util.*
 
 /**
- * Created by Young-Ho on 9/9/2016.
+ * Created by Young-Ho Kim on 9/9/2016
  */
 
 
@@ -67,7 +67,7 @@ class LoggingHeatMapModel(tracker: OTTracker): TrackerChartModel<ITimeBinnedHeat
                 else getTimeScope().to
 
             var currentTime = from
-            var binIndex = 0
+            var binIndex: Int
             while(currentTime< to)
             {
                 binIndex = 0
@@ -175,16 +175,19 @@ class LoggingHeatMapModel(tracker: OTTracker): TrackerChartModel<ITimeBinnedHeat
             children.add(cellColumns)
         }
 
+
         override fun onResized() {
             super.onResized()
             verticalAxis.attachedTo = plotAreaRect
 
             cellColumns.onResizedCanvas { datum, column ->
-                val columnGroup = column as DataEncodedDrawingList<Float, ITimeBinnedHeatMap.CounterVector>
-                columnGroup.onResizedCanvas { count, cell ->
-                    if (cell is RectElement<Float>)
-                    {
-                        mapCellRectToSpace(cell, datum.value.time, count.index)
+                if (column is DataEncodedDrawingList<*, *>) {
+                    @Suppress("UNCHECKED_CAST")
+                    val columnGroup = column as DataEncodedDrawingList<Float, ITimeBinnedHeatMap.CounterVector>
+                    columnGroup.onResizedCanvas { count, cell ->
+                        if (cell is RectElement<Float>) {
+                            mapCellRectToSpace(cell, datum.value.time, count.index)
+                        }
                     }
                 }
             }
@@ -230,6 +233,7 @@ class LoggingHeatMapModel(tracker: OTTracker): TrackerChartModel<ITimeBinnedHeat
                 }
 
                 cellColumns.updateElement { datum, column ->
+                    @Suppress("UNCHECKED_CAST")
                     val rectList = column as DataEncodedDrawingList<Float, ITimeBinnedHeatMap.CounterVector>
                     rectList.setData(datum.value.distribution.toList())
                     rectList.appendEnterSelection {

@@ -9,7 +9,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.database.CacheHelper
 
 /**
- * Created by younghokim on 16. 8. 18..
+ * Created by Young-Ho Kim on 16. 8. 18
  */
 class MapImageView : ImageView, CacheHelper.ICachedBitmapListener /*FutureCallback<ImageView>*/ {
 
@@ -136,7 +136,7 @@ class MapImageView : ImageView, CacheHelper.ICachedBitmapListener /*FutureCallba
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val originalWidth = MeasureSpec.getSize(widthMeasureSpec)
-        val widthMode = MeasureSpec.getMode(widthMeasureSpec)
+        //val widthMode = MeasureSpec.getMode(widthMeasureSpec)
 
         val originalHeight = MeasureSpec.getSize(heightMeasureSpec)
         val heightMode = MeasureSpec.getMode(heightMeasureSpec)

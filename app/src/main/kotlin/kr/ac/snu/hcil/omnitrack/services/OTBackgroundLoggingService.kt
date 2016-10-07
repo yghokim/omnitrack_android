@@ -8,7 +8,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTItemBuilder
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 
 
-/*TODO
+/*
 *
 * this will need to be refactored to be a normal service to handle the long retrieval operation of external measure factory values.
  */

@@ -10,7 +10,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kotlin.properties.Delegates
 
 /**
- * Created by younghokim on 16. 8. 16..
+ * Created by Young-Ho Kim on 16. 8. 16
  */
 class LinedTextBase(val textView: View) {
 
@@ -82,7 +82,7 @@ class LinedTextBase(val textView: View) {
 
 
     fun onDraw(canvas: Canvas) {
-        var baseline = getLineBounds(0, lineBounds) + lineOffset - lineHeight; // start from upline
+        val baseline = getLineBounds(0, lineBounds) + lineOffset - lineHeight // start from upline
 
         val start = if (drawOuterLines) {
             0
@@ -97,11 +97,11 @@ class LinedTextBase(val textView: View) {
 
         for (i in start..end) {
             val y = (baseline + i * lineHeight).toFloat()
-            canvas.drawLine(lineBounds.left.toFloat(), y, lineBounds.right.toFloat(), y, linePaint);
+            canvas.drawLine(lineBounds.left.toFloat(), y, lineBounds.right.toFloat(), y, linePaint)
         }
     }
 
-    fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+    fun onLayout(changed: Boolean) {
         if (changed) {
             numLines = textView.height / lineHeight
         }

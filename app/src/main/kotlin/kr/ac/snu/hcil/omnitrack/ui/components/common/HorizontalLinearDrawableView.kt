@@ -8,7 +8,7 @@ import android.util.AttributeSet
 import android.view.View
 
 /**
- * Created by Young-Ho Kim on 2016-09-06.
+ * Created by Young-Ho Kim on 2016-09-06
  */
 open class HorizontalLinearDrawableView : View {
 
@@ -80,15 +80,15 @@ open class HorizontalLinearDrawableView : View {
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val widthMode = MeasureSpec.getMode(widthMeasureSpec)
         val widthSize = MeasureSpec.getSize(widthMeasureSpec)
-        val heightMode = MeasureSpec.getMode(heightMeasureSpec)
-        val heightSize = MeasureSpec.getSize(heightMeasureSpec)
+        //val heightMode = MeasureSpec.getMode(heightMeasureSpec)
+        //val heightSize = MeasureSpec.getSize(heightMeasureSpec)
 
-        var measuredWidth: Int = 0
-        var measuredHeight: Int = 0
+        val measuredWidth: Int
+        val measuredHeight: Int
 
         if (widthMode == MeasureSpec.EXACTLY) {
 
-            measuredWidth = widthSize;
+            measuredWidth = widthSize
             measuredHeight = widthSize / (adapter?.numDrawables ?: 1)
             useIntrinsicWidth = false
         } else if (widthMode == MeasureSpec.AT_MOST) {

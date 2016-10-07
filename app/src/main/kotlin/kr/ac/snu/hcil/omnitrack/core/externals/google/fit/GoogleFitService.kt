@@ -14,7 +14,7 @@ import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import java.util.*
 
 /**
- * Created by younghokim on 16. 8. 8..
+ * Created by Young-Ho Kim on 16. 8. 8
  */
 object GoogleFitService : OTExternalService("GoogleFitService", 19) {
 
@@ -116,7 +116,7 @@ object GoogleFitService : OTExternalService("GoogleFitService", 19) {
         client = null
     }
 
-    override fun handleActivityActivationResultOk(data: Intent?) {
+    override fun handleActivityActivationResultOk(resultData: Intent?) {
         prepareServiceAsync(currentActivationHandler)
     }
 

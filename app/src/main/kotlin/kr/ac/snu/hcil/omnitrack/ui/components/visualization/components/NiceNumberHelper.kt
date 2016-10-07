@@ -40,20 +40,20 @@ open class NiceNumberHelper {
 
 
     private fun calcPivotedDimension(from: Float, to: Float, binSize: Float, pivotLeft: Boolean): Float {
-        var currentBorder = 0f
+        var currentBorder: Float
         var numBins = 0
 
         if (pivotLeft) {
             currentBorder = from
             while (currentBorder <= to) {
-                currentBorder += binSize;
-                numBins++;
+                currentBorder += binSize
+                numBins++
             }
         } else {
             currentBorder = to
             while (currentBorder >= from) {
-                currentBorder -= binSize;
-                numBins++;
+                currentBorder -= binSize
+                numBins++
             }
         }
 

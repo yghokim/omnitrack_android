@@ -1,15 +1,12 @@
 package kr.ac.snu.hcil.omnitrack.core.triggers
 
-import android.app.AlarmManager
 import android.content.Context
-import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.*
-import kr.ac.snu.hcil.omnitrack.utils.auth.AuthConstants
 import java.util.*
 
 /**
- * Created by younghokim on 16. 7. 27..
+ * Created by Young-Ho Kim on 16. 7. 27
  */
 class OTTimeTrigger : OTTrigger {
 
@@ -519,7 +516,7 @@ class OTTimeTrigger : OTTrigger {
 
     private fun onConfigChanged() {
 
-        val alarmManager = OTApplication.app.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        //val alarmManager = OTApplication.app.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
         OTTimeTriggerAlarmManager.cancelTrigger(this)
         if (!reserveNextAlarmToSystem(lastTriggeredTime)) {
@@ -528,7 +525,7 @@ class OTTimeTrigger : OTTrigger {
     }
 
     private fun onRangeChanged() {
-        val alarmManager = OTApplication.app.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        //val alarmManager = OTApplication.app.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
         OTTimeTriggerAlarmManager.cancelTrigger(this)
         if (!reserveNextAlarmToSystem(lastTriggeredTime)) {

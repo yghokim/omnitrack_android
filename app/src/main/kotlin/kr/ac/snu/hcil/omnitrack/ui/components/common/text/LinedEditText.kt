@@ -9,7 +9,7 @@ import android.util.AttributeSet
 import android.widget.EditText
 
 /**
- * Created by younghokim on 16. 7. 24..
+ * Created by Young-Ho Kim on 16. 7. 24
  */
 class LinedEditText : EditText {
 
@@ -51,12 +51,12 @@ class LinedEditText : EditText {
 
         base.onDraw(canvas)
 
-        super.onDraw(canvas);
+        super.onDraw(canvas)
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
-        base.onLayout(changed, left, top, right, bottom)
+        base.onLayout(changed)
     }
 
     override fun setLineSpacing(add: Float, mult: Float) {
@@ -70,6 +70,7 @@ class LinedEditText : EditText {
         base.refresh()
     }
 
+    @Suppress("DEPRECATION")
     override fun setTextAppearance(context: Context?, resId: Int) {
         super.setTextAppearance(context, resId)
         base.refresh()

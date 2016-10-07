@@ -18,7 +18,7 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemEditingActivity
 
 /**
- * Created by Young-Ho on 9/4/2016.
+ * Created by Young-Ho Kim on 9/4/2016
  */
 object OTShortcutManager {
 
@@ -102,7 +102,7 @@ object OTShortcutManager {
     }
 
 
-    fun notifyAppearanceChanged(tracker: OTTracker) {
+    fun notifyAppearanceChanged(@Suppress("UNUSED_PARAMETER") tracker: OTTracker) {
         /*
         val intent = Intent(OTApplication.BROADCAST_ACTION_SHORTCUT_TRACKER_INFO_CHANGED)
         intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
@@ -111,7 +111,7 @@ object OTShortcutManager {
         refreshNotificationShortcutViews()
     }
 
-    operator fun plusAssign(tracker: OTTracker)
+    operator fun plusAssign(@Suppress("UNUSED_PARAMETER") tracker: OTTracker)
     {/*
         val intent = Intent(OTApplication.BROADCAST_ACTION_SHORTCUT_INCLUDE_TRACKER)
         intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
@@ -120,7 +120,7 @@ object OTShortcutManager {
         refreshNotificationShortcutViews()
     }
 
-    operator fun minusAssign(tracker: OTTracker)
+    operator fun minusAssign(@Suppress("UNUSED_PARAMETER") tracker: OTTracker)
     {
     /*    val intent = Intent(OTApplication.BROADCAST_ACTION_SHORTCUT_EXCLUDE_TRACKER)
         intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)

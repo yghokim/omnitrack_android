@@ -7,7 +7,7 @@ import android.view.View
 import kotlin.properties.Delegates
 
 /**
- * Created by Young-Ho Kim on 2016-09-08.
+ * Created by Young-Ho Kim on 2016-09-08
  */
 class ChartCanvasView : View {
 
@@ -34,15 +34,15 @@ class ChartCanvasView : View {
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val widthMode = MeasureSpec.getMode(widthMeasureSpec)
+        //val widthMode = MeasureSpec.getMode(widthMeasureSpec)
         val widthSize = MeasureSpec.getSize(widthMeasureSpec)
-        val heightMode = MeasureSpec.getMode(heightMeasureSpec)
-        val heightSize = MeasureSpec.getSize(heightMeasureSpec)
+        //val heightMode = MeasureSpec.getMode(heightMeasureSpec)
+        //val heightSize = MeasureSpec.getSize(heightMeasureSpec)
 
-        var measuredWidth: Int = 0
-        var measuredHeight: Int = 0
+        val measuredWidth: Int
+        val measuredHeight: Int
 
-        measuredWidth = widthSize;
+        measuredWidth = widthSize
         measuredHeight = (widthSize / (chartDrawer?.aspectRatio ?: 1f) + 0.5f).toInt()
 
         setMeasuredDimension(measuredWidth, measuredHeight)

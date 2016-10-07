@@ -4,7 +4,7 @@ import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
 /**
- * Created by younghokim on 16. 8. 24..
+ * Created by Young-Ho Kim on 16. 8. 24
  */
 class ObservableMapDelegate<OWNER, TYPE : Any>(private val initialValue: TYPE, private val map: MutableMap<String, Any?>, private val changedListener: (value: TYPE) -> Unit) : ReadWriteProperty<OWNER, TYPE> {
 
@@ -13,6 +13,7 @@ class ObservableMapDelegate<OWNER, TYPE : Any>(private val initialValue: TYPE, p
             map[property.name] = initialValue
         }
 
+        @Suppress("UNCHECKED_CAST")
         return map[property.name] as TYPE
     }
 

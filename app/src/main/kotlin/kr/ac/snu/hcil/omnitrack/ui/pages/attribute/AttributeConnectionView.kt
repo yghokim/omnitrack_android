@@ -14,7 +14,7 @@ import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 
 /**
- * Created by younghokim on 16. 8. 11..
+ * Created by Young-Ho Kim on 16. 8. 11
  */
 class AttributeConnectionView : LinearLayout, View.OnClickListener {
 
@@ -28,12 +28,12 @@ class AttributeConnectionView : LinearLayout, View.OnClickListener {
             }
         }
 
-    private lateinit var sourceView: TextView
-    private lateinit var queryViewGroup: View
-    private lateinit var queryView: TextView
+    private val sourceView: TextView
+    private val queryViewGroup: View
+    private val queryView: TextView
 
 
-    private lateinit var removeButton: Button
+    private val removeButton: Button
 
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
@@ -91,6 +91,7 @@ class AttributeConnectionView : LinearLayout, View.OnClickListener {
                 queryView.text = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                     Html.fromHtml(builder.toString(), Html.FROM_HTML_MODE_LEGACY)
                 } else {
+                    @Suppress("DEPRECATION")
                     Html.fromHtml(builder.toString())
                 }
 

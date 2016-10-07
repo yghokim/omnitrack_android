@@ -7,7 +7,7 @@ import android.util.AttributeSet
 import android.widget.TextView
 
 /**
- * Created by younghokim on 16. 8. 16..
+ * Created by Young-Ho Kim on 16. 8. 16
  */
 class LinedTextView : TextView {
 
@@ -37,12 +37,12 @@ class LinedTextView : TextView {
 
         base.onDraw(canvas)
 
-        super.onDraw(canvas);
+        super.onDraw(canvas)
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
-        base.onLayout(changed, left, top, right, bottom)
+        base.onLayout(changed)
     }
 
     @TargetApi(23)
@@ -51,6 +51,7 @@ class LinedTextView : TextView {
         base.refresh()
     }
 
+    @Suppress("DEPRECATION")
     override fun setTextAppearance(context: Context?, resId: Int) {
         super.setTextAppearance(context, resId)
         base.refresh()

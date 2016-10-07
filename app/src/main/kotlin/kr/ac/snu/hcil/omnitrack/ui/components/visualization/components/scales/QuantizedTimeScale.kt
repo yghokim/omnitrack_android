@@ -11,7 +11,7 @@ import kr.ac.snu.hcil.omnitrack.utils.getHourOfDay
 import java.util.*
 
 /**
- * Created by Young-Ho on 9/9/2016.
+ * Created by Young-Ho Kim on 9/9/2016
  */
 
 class QuantizedTimeScale : IAxisScale<Long> {
@@ -24,14 +24,14 @@ class QuantizedTimeScale : IAxisScale<Long> {
         }
 
         val TICKFORMAT_DAY =  object: IAxisScale.ITickFormat<Long> {
-            override fun format(time: Long, index: Int): String {
-                calendarCache.timeInMillis = time
+            override fun format(value: Long, index: Int): String {
+                calendarCache.timeInMillis = value
                 val hourOfDay = calendarCache.getHourOfDay()
 
                 return if (hourOfDay == 12) {
                     OTApplication.app.resources.getString(R.string.msg_noon)
                 } else if (hourOfDay == 0 || hourOfDay == 23) {
-                    TimeHelper.FORMAT_DAY.format(Date(time))
+                    TimeHelper.FORMAT_DAY.format(Date(value))
                 } else {
                     "haha"
                 }

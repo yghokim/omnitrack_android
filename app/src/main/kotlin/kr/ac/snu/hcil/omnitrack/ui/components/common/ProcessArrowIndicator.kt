@@ -9,7 +9,7 @@ import android.util.AttributeSet
 import android.view.View
 
 /**
- * Created by Young-Ho on 8/7/2016.
+ * Created by Young-Ho Kim on 8/7/2016
  */
 class ProcessArrowIndicator : View {
 
@@ -68,13 +68,13 @@ class ProcessArrowIndicator : View {
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val widthMode = MeasureSpec.getMode(widthMeasureSpec)
         val widthSize = MeasureSpec.getSize(widthMeasureSpec)
-        val heightMode = MeasureSpec.getMode(heightMeasureSpec)
+        //val heightMode = MeasureSpec.getMode(heightMeasureSpec)
         val heightSize = MeasureSpec.getSize(heightMeasureSpec)
 
-        var measuredWidth: Int
+        val measuredWidth: Int
 
         if (widthMode == MeasureSpec.EXACTLY) {
-            measuredWidth = widthSize;
+            measuredWidth = widthSize
         } else if (widthMode == MeasureSpec.AT_MOST) {
             measuredWidth = Math.min(intrinsicWidth + paddingStart + paddingEnd, widthSize.toFloat()).toInt()
         } else {

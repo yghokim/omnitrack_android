@@ -15,7 +15,7 @@ import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 import kr.ac.snu.hcil.omnitrack.utils.serialization.ATypedQueueSerializable
 
 /**
- * Created by younghokim on 16. 7. 28..
+ * Created by Young-Ho Kim on 16. 7. 28
  */
 abstract class OTMeasureFactory() : INameDescriptionResourceProvider {
 
@@ -97,6 +97,7 @@ abstract class OTMeasureFactory() : INameDescriptionResourceProvider {
         return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY)
         } else {
+            @Suppress("DEPRECATION")
             Html.fromHtml(html)
         }
     }

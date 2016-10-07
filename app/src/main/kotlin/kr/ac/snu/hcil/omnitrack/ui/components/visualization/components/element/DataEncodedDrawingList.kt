@@ -4,7 +4,7 @@ import android.graphics.Canvas
 import java.util.*
 
 /**
- * Created by younghokim on 16. 9. 8..
+ * Created by Young-Ho Kim  on 16. 9. 8
  */
 class DataEncodedDrawingList<T, SelfDataType>() : ADataEncodedDrawer<SelfDataType>() {
 
@@ -30,7 +30,7 @@ class DataEncodedDrawingList<T, SelfDataType>() : ADataEncodedDrawer<SelfDataTyp
 
     fun setData(data: List<T>): DataEncodedDrawingList<T, SelfDataType> {
 
-        val original = elements.map { it.datum }.filter { it == null }
+        //val original = elements.map { it.datum }.filter { it == null }
 
         _updateElements.clear()
         _enterData.clear()

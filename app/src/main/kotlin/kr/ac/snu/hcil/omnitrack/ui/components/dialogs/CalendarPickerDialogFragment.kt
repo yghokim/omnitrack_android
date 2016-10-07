@@ -10,7 +10,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import java.util.*
 
 /**
- * Created by Young-Ho on 8/7/2016.
+ * Created by Young-Ho Kim on 8/7/2016
  */
 class CalendarPickerDialogFragment : DialogFragment() {
 
@@ -69,9 +69,9 @@ class CalendarPickerDialogFragment : DialogFragment() {
                 .setTitle(resources.getString(R.string.msg_pick_date))
                 .setView(calendarView)
                 .setPositiveButton(R.string.msg_ok) { a, b ->
-                    val cal = GregorianCalendar(TimeZone.getDefault())
-                    cal.set(year, month, day)
-                    listener?.invoke(cal.timeInMillis, year, month, day)
+                    val calendar = GregorianCalendar(TimeZone.getDefault())
+                    calendar.set(year, month, day)
+                    listener?.invoke(calendar.timeInMillis, year, month, day)
                 }
                 .setNegativeButton(R.string.msg_cancel, null)
                 .create()

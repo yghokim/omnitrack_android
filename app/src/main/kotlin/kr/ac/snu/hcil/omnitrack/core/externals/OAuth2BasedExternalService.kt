@@ -6,7 +6,7 @@ import android.support.v4.app.FragmentActivity
 import kr.ac.snu.hcil.omnitrack.utils.auth.OAuth2Client
 
 /**
- * Created by younghokim on 16. 9. 3..
+ * Created by Young-Ho Kim on 16. 9. 3
  */
 abstract class OAuth2BasedExternalService(identifier: String, minimumSDK: Int) : OTExternalService(identifier, minimumSDK), OAuth2Client.OAuth2ResultListener, OAuth2Client.OAuth2CredentialRefreshedListener {
 
@@ -18,7 +18,7 @@ abstract class OAuth2BasedExternalService(identifier: String, minimumSDK: Int) :
         get() = OAuth2Client.Credential.restore(preferences, identifier)
         set(value) {
             if (value != null)
-                value?.store(preferences, identifier)
+                value.store(preferences, identifier)
             else {
                 credential?.remove(preferences, identifier)
             }

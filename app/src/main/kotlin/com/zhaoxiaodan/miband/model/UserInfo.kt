@@ -48,7 +48,7 @@ class UserInfo {
     }
 
     fun getBytes(mBTAddress: String): ByteArray {
-        val aliasBytes: ByteArray
+        var aliasBytes: ByteArray
         try {
             aliasBytes = this.alias.toByteArray(charset("UTF-8"))
         } catch (e: UnsupportedEncodingException) {

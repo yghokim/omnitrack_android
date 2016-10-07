@@ -4,7 +4,7 @@ import android.content.Context
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
-import android.util.SparseArray
+import android.util.SparseIntArray
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,7 +17,7 @@ import java.util.*
 import kotlin.properties.Delegates
 
 /**
- * Created by Young-Ho on 8/14/2016.
+ * Created by Young-Ho Kim on 8/14/2016
  */
 class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttributeInputView<IntArray>(R.layout.input_choice, context, attrs) {
 
@@ -26,7 +26,7 @@ class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
 
     private val selectedIds = ArrayList<Int>()
 
-    private val idPivotedEntryIndexTable = SparseArray<Int>()
+    private val idPivotedEntryIndexTable = SparseIntArray()
 
     init {
         listView = findViewById(R.id.ui_list) as RecyclerView

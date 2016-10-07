@@ -21,7 +21,7 @@ import kr.ac.snu.hcil.omnitrack.utils.toInt
 import java.util.*
 
 /**
- * Created by Young-Ho Kim on 2016-07-11.
+ * Created by Young-Ho Kim on 2016-07-11
  */
 class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db", null, 1) {
 
@@ -138,9 +138,9 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
             result.close()
             return null
         } else {
-            val objectId = result.getString(result.getColumnIndex(UserScheme.OBJECT_ID));
-            val name = result.getString(result.getColumnIndex(UserScheme.NAME));
-            val email = result.getString(result.getColumnIndex(UserScheme.EMAIL));
+            val objectId = result.getString(result.getColumnIndex(UserScheme.OBJECT_ID))
+            val name = result.getString(result.getColumnIndex(UserScheme.NAME))
+            val email = result.getString(result.getColumnIndex(UserScheme.EMAIL))
             val seed = result.getLong(result.getColumnIndex(UserScheme.ATTR_ID_SEED))
             val entity = OTUser(objectId, id, name, email, seed, findTrackersOfUser(id))
             result.close()
@@ -244,9 +244,9 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
     }
 
     fun deleteObjects(scheme: TableScheme, vararg ids: Long) {
-        val ids = ids.map { "${scheme._ID}=${it.toString()}" }.toTypedArray()
-        if (ids.size > 0) {
-            writableDatabase.delete(scheme.tableName, ids.joinToString(" OR "), null)
+        val idStringArray = ids.map { "${scheme._ID}=${it.toString()}" }.toTypedArray()
+        if (idStringArray.size > 0) {
+            writableDatabase.delete(scheme.tableName, idStringArray.joinToString(" OR "), null)
         }
     }
 
@@ -553,9 +553,12 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         override fun doInBackground(vararg trackers: OTTracker): Long? {
             val cursor = readableDatabase.query(ItemScheme.tableName, arrayOf(ItemScheme.LOGGED_AT), "${ItemScheme.TRACKER_ID}=?", arrayOf(trackers[0].dbId.toString()), null, null, "${ItemScheme.LOGGED_AT} DESC", "1")
             if (cursor.moveToFirst()) {
+                cursor.close()
                 return cursor.getLong(cursor.getColumnIndex(ItemScheme.LOGGED_AT))
+            } else {
+                cursor.close()
+                return null
             }
-            else return null
         }
 
         override fun onPostExecute(result: Long?) {

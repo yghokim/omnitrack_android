@@ -18,7 +18,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.decorations.DrawableListBottomSpac
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
 
 /**
- * Created by Young-Ho on 9/2/2016.
+ * Created by Young-Ho Kim on 9/2/2016
  */
 abstract class ATriggerListFragmentCore(val parent: Fragment) {
 
@@ -46,7 +46,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
         }.create()
     }
 
-    fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, @Suppress("UNUSED_PARAMETER") savedInstanceState: Bundle?): View {
         val rootView = inflater!!.inflate(R.layout.fragment_tracker_detail_triggers, container, false)
 
         listView = rootView.findViewById(R.id.ui_trigger_list) as RecyclerView
@@ -84,11 +84,6 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
 
     protected open fun onNewTriggerButtonClicked() {
         triggerTypeDialog.show()
-    }
-
-
-    fun openTriggerDetailActivity(triggerIndex: Int) {
-
     }
 
     inner class Adapter : RecyclerView.Adapter<ATriggerViewHolder<out OTTrigger>>(), ATriggerViewHolder.ITriggerControlListener {

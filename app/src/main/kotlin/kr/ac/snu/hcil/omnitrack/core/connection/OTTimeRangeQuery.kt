@@ -12,7 +12,7 @@ import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableTypedQueue
 import java.util.*
 
 /**
- * Created by Young-Ho Kim on 2016-08-11.
+ * Created by Young-Ho Kim on 2016-08-11
  */
 class OTTimeRangeQuery : ATypedQueueSerializable {
 
@@ -84,6 +84,7 @@ class OTTimeRangeQuery : ATypedQueueSerializable {
         this.mode = mode
         this.binOffset = binOffset
         this.binSize = binSize
+        this.anchorToNow = anchorToNow
     }
 
     override fun onSerialize(typedQueue: SerializableTypedQueue) {
@@ -116,7 +117,7 @@ class OTTimeRangeQuery : ATypedQueueSerializable {
     }
 
 
-    fun getRange(builder: OTItemBuilder): Pair<Long, Long> {
+    fun getRange(@Suppress("UNUSED_PARAMETER") builder: OTItemBuilder): Pair<Long, Long> {
         val start: Long
         val end: Long
         if (mode == TYPE_PIVOT_TIMESTAMP) {

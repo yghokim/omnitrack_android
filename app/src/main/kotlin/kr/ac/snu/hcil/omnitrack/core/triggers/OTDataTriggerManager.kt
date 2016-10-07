@@ -11,7 +11,7 @@ import kr.ac.snu.hcil.omnitrack.receivers.OTSystemReceiver
 import java.util.*
 
 /**
- * Created by younghokim on 16. 9. 5..
+ * Created by Young-Ho Kim on 16. 9. 5
  */
 object OTDataTriggerManager {
 
@@ -74,7 +74,7 @@ object OTDataTriggerManager {
         }
     }
 
-    fun checkMeasures(context: Context){
+    fun checkMeasures(@Suppress("UNUSED_PARAMETER") context: Context) {
         println("checking measures for event triggers...")
 
         val triggersToCheck = OTApplication.app.triggerManager.getFilteredTriggers { it is OTDataTrigger && it.isOn == true }.map { it as OTDataTrigger }.toTypedArray()

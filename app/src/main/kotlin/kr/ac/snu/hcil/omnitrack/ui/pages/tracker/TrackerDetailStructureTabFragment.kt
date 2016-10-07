@@ -31,7 +31,7 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeDetailActivity
 import kr.ac.snu.hcil.omnitrack.utils.startActivityOnDelay
 
 /**
- * Created by younghokim on 16. 7. 29..
+ * Created by Young-Ho Kim on 16. 7. 29
  */
 class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() {
 
@@ -118,7 +118,7 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
 
         attributeListView.layoutManager = layoutManager
         attributeListView.itemAnimator = SlideInRightAnimator()
-        attributeListView.addItemDecoration(SpaceItemDecoration(LinearLayoutManager.VERTICAL, resources.getDimensionPixelOffset(R.dimen.attribute_list_element_vertical_space)));
+        attributeListView.addItemDecoration(SpaceItemDecoration(LinearLayoutManager.VERTICAL, resources.getDimensionPixelOffset(R.dimen.attribute_list_element_vertical_space)))
 
         attributeListAdapter = AttributeListAdapter()
 
@@ -207,7 +207,7 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
 
     fun openAttributeDetailActivity(position: Int) {
         val intent = Intent(activity, AttributeDetailActivity::class.java)
-        intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ATTRIBUTE, tracker!!.attributes[position].objectId)
+        intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ATTRIBUTE, tracker.attributes[position].objectId)
         startActivityOnDelay(intent)
     }
 
@@ -403,7 +403,7 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
     inner class GridAdapter() : RecyclerView.Adapter<GridAdapter.ViewHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            var view = LayoutInflater.from(parent.context).inflate(R.layout.attribute_type_grid_element, parent, false)
+            val view = LayoutInflater.from(parent.context).inflate(R.layout.attribute_type_grid_element, parent, false)
             return ViewHolder(view)
         }
 
@@ -416,12 +416,12 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
         }
 
         override fun getItemId(position: Int): Long {
-            return position.toLong();
+            return position.toLong()
         }
 
         inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-            lateinit var name: TextView
-            lateinit var typeIcon: ImageView
+            val name: TextView
+            val typeIcon: ImageView
 
             init {
                 name = view.findViewById(R.id.name) as TextView

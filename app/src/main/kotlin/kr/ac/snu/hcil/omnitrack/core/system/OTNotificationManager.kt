@@ -18,7 +18,7 @@ import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
- * Created by younghokim on 16. 9. 1..
+ * Created by Young-Ho Kim on 16. 9. 1
  */
 object OTNotificationManager {
 
@@ -95,7 +95,7 @@ object OTNotificationManager {
         notificationService.notify(getNewReminderNotificationId(tracker), builder.build())
     }
 
-    fun cancelBackgroundLoggingSuccessNotification(context: Context, tracker: OTTracker) {
+    fun cancelBackgroundLoggingSuccessNotification(tracker: OTTracker) {
 
         notificationService.cancel(getNewBackgroundLoggingNotificationId(tracker))
     }
@@ -130,6 +130,7 @@ object OTNotificationManager {
     }
 
     fun notifyReminderChecked(trackerId: String, reminderTime: Long) {
+        println("reminder checked - ${reminderTime}")
         //if(reminderTrackerPendingCounts[trackerId] != null)
         //{
         //  if(reminderTrackerPendingCounts[trackerId]!! == 1)

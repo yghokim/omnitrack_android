@@ -10,7 +10,7 @@ import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
 
 /**
- * Created by Young-Ho Kim on 2016-09-02.
+ * Created by Young-Ho Kim on 2016-09-02
  */
 object TextInputDialogHelper {
 
@@ -32,8 +32,7 @@ object TextInputDialogHelper {
                     (keyCode == KeyEvent.KEYCODE_ENTER)) {
                 onOk.invoke(textInput.text)
                 true
-            }
-            false
+            } else false
         }
 
         return AlertDialog.Builder(context)

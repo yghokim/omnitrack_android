@@ -12,7 +12,7 @@ import kr.ac.snu.hcil.omnitrack.core.triggers.OTDataTriggerManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTriggerAlarmManager
 
 /**
- * Created by younghokim on 16. 7. 28..
+ * Created by Young-Ho Kim on 16. 7. 28
  */
 class OTSystemReceiver : BroadcastReceiver() {
 
@@ -48,7 +48,7 @@ class OTSystemReceiver : BroadcastReceiver() {
                         OTApplication.app.dbHelper.deleteObjects(DatabaseHelper.ItemScheme, itemDbId)
                     }
 
-                    OTNotificationManager.cancelBackgroundLoggingSuccessNotification(context, tracker)
+                    OTNotificationManager.cancelBackgroundLoggingSuccessNotification(tracker)
                 }
             }
 

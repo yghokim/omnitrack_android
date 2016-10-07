@@ -8,7 +8,7 @@ import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializedStringKeyEntry
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 
 /**
- * Created by younghokim on 16. 7. 22..
+ * Created by Young-Ho Kim on 16. 7. 22
  */
 class OTItem : ADataRow, IDatabaseStorable {
 
@@ -102,9 +102,10 @@ class OTItem : ADataRow, IDatabaseStorable {
 
         for(valueEntry in values.withIndex())
         {
-            if(valueEntry.value!=null)
+            val value = valueEntry.value
+            if (value != null)
             {
-                setValueOf(tracker.attributes[valueEntry.index], valueEntry.value!!)
+                setValueOf(tracker.attributes[valueEntry.index], value)
             }
         }
     }

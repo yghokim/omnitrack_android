@@ -22,7 +22,7 @@ import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 import java.util.*
 
 /**
- * Created by younghokim on 16. 8. 24..
+ * Created by Young-Ho Kim on 16. 8. 24
  */
 abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener: ITriggerControlListener, context: Context) :
         RecyclerView.ViewHolder(LayoutInflater.from(context).inflate(R.layout.trigger_list_element, parent, false))
@@ -171,6 +171,7 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
         }
     }
 
+    @Suppress("UNCHECKED_CAST")
     fun bind(trigger: OTTrigger) {
         if (!isFirstBinding) {
             this.trigger.switchTurned -= onTriggerSwitchTurned
