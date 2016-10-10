@@ -66,10 +66,20 @@ abstract class OAuth2BasedExternalService(identifier: String, minimumSDK: Int) :
         credential = newCredential
     }
 
-    fun <T> request(requestUrl: String, converter: OAuth2Client.OAuth2RequestConverter<T>, resultHandler: ((T?) -> Unit)) {
+
+    fun <T> request(requestUrls: String, converter: OAuth2Client.OAuth2RequestConverter<T>, resultHandler: ((T?) -> Unit)) {
         val credential = credential
         if (credential != null) {
-            authClient.request(credential, requestUrl, converter, this, resultHandler)
+            authClient.request(credential, requestUrls, converter, this, resultHandler)
+        } else {
+            resultHandler.invoke(null)
+        }
+    }
+
+    fun <T> request(requestUrls: Array<String>, converter: OAuth2Client.OAuth2RequestConverter<T>, resultHandler: ((T?) -> Unit)) {
+        val credential = credential
+        if (credential != null) {
+            authClient.request(credential, requestUrls, converter, this, resultHandler)
         } else {
             resultHandler.invoke(null)
         }

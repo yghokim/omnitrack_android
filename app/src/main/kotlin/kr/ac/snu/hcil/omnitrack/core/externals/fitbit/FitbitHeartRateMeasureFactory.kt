@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.fitbit
 
+import android.text.format.DateUtils
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
@@ -9,6 +10,7 @@ import kr.ac.snu.hcil.omnitrack.utils.auth.AuthConstants
 import kr.ac.snu.hcil.omnitrack.utils.auth.OAuth2Client
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableTypedQueue
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
+import kr.ac.snu.hcil.omnitrack.utils.setHourOfDay
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
@@ -19,12 +21,8 @@ import java.util.*
 object FitbitHeartRateMeasureFactory : OTMeasureFactory() {
 
 
-    const val REQUEST_URL_HEART_RATE_INTRADAY_COMMAND_FORMAT = "https://api.fitbit.com/1/user/-/activities/heart/date/%s/%s/1min/time/%s/%s.json"
+    const val REQUEST_URL_HEART_RATE_INTRADAY_COMMAND_FORMAT = "https://api.fitbit.com/1/user/-/activities/heart/date/%s/1d/1min/time/%s/%s.json"
     val REQUEST_TIME_FORMAT = SimpleDateFormat("HH:mm")
-
-    fun makeRequestUrl(start: Date, end: Date): String {
-        return String.format(REQUEST_URL_HEART_RATE_INTRADAY_COMMAND_FORMAT, AuthConstants.DATE_FORMAT.format(start), AuthConstants.DATE_FORMAT.format(end), REQUEST_TIME_FORMAT.format(start), REQUEST_TIME_FORMAT.format(end))
-    }
 
     override val service: OTExternalService = FitbitService
 
@@ -60,6 +58,7 @@ object FitbitHeartRateMeasureFactory : OTMeasureFactory() {
                     else {
                         var sum = 0
                         var totalCount = 0
+
                         for (requestResultString in requestResultStrings) {
                             println(requestResultString)
                             val json = JSONObject(requestResultString)
@@ -85,9 +84,9 @@ object FitbitHeartRateMeasureFactory : OTMeasureFactory() {
         }
 
         override fun requestValueAsync(start: Long, end: Long, handler: (Any?) -> Unit) {
-            val url = makeRequestUrl(Date(start), Date(end - 60000))
-            println(url)
-            FitbitService.request(url, converter) {
+            val urls = makeRequestUrls(start, end)
+            println(urls)
+            FitbitService.request(urls, converter) {
                 result ->
                 handler.invoke(result)
             }
@@ -105,6 +104,59 @@ object FitbitHeartRateMeasureFactory : OTMeasureFactory() {
 
         override fun onDeserialize(typedQueue: SerializableTypedQueue) {
         }
+
+
+        fun makeRequestUrls(start: Long, end: Long): Array<String> {
+
+            val urls = ArrayList<String>()
+
+            val points: Array<Long?>
+
+            val startCal = Calendar.getInstance()
+            startCal.timeInMillis = start
+
+            val dateDiff = (end / DateUtils.DAY_IN_MILLIS).toInt() - (start / DateUtils.DAY_IN_MILLIS).toInt()
+
+            if (dateDiff <= 0) {
+                points = arrayOf(start, end)
+            } else {
+                points = arrayOfNulls<Long>(if (end % DateUtils.DAY_IN_MILLIS == 0L) {
+                    (2 + dateDiff - 1)
+                } else {
+                    2 + dateDiff
+                })
+
+                points[0] = start
+
+                startCal.setHourOfDay(0, true)
+                for (i in 1..dateDiff) {
+                    points[i] = startCal.timeInMillis + i * DateUtils.DAY_IN_MILLIS
+                }
+
+                if (end % DateUtils.DAY_IN_MILLIS != 0L) {
+                    points[points.size - 1] = end
+                }
+            }
+
+            var startDate: Date
+            var endDate: Date
+            for (i in 0..(points.size - 2)) {
+                startDate = Date(points[i]!!)
+                endDate = if (i + 1 < points.size - 1) {
+                    Date(points[i + 1]!! - DateUtils.MINUTE_IN_MILLIS)
+                } else {
+                    Date(points[i + 1]!!)
+                }
+
+                urls.add(
+                        String.format(REQUEST_URL_HEART_RATE_INTRADAY_COMMAND_FORMAT, AuthConstants.DATE_FORMAT.format(startDate), REQUEST_TIME_FORMAT.format(startDate), REQUEST_TIME_FORMAT.format(endDate))
+                )
+            }
+
+
+            return urls.toTypedArray()
+        }
+
 
 
         constructor() : super()
