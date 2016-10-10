@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.activity.WebServiceLoginActivity
 import okhttp3.*
 import org.json.JSONObject
+import java.util.*
 
 /**
  * Created by Young-Ho Kim on 2016-09-01.
@@ -35,7 +36,7 @@ class OAuth2Client(val config: OAuth2Config, val activityRequestCode: Int) {
     }
 
     interface OAuth2RequestConverter<T> {
-        fun process(requestResultString: String): T
+        fun process(requestResultStrings: Array<String>): T
     }
 
     data class Credential(val accessToken: String, val refreshToken: String, val expiresIn: Int){
@@ -157,48 +158,60 @@ class OAuth2Client(val config: OAuth2Config, val activityRequestCode: Int) {
     }
 
     fun <T> request(credential: Credential, requestUrl: String, converter: OAuth2RequestConverter<T>, credentialRefreshedListener: OAuth2CredentialRefreshedListener?, handler: ((T?) -> Unit)?) {
-        RequestTask<T>(requestUrl, converter, credentialRefreshedListener, handler).execute(credential)
+        RequestTask<T>(credential, converter, credentialRefreshedListener, handler).execute(requestUrl)
     }
 
+    fun <T> request(credential: Credential, requestUrls: Array<String>, converter: OAuth2RequestConverter<T>, credentialRefreshedListener: OAuth2CredentialRefreshedListener?, handler: ((T?) -> Unit)?) {
+        RequestTask<T>(credential, converter, credentialRefreshedListener, handler).execute(*requestUrls)
+    }
 
-    inner class RequestTask<T>(val requestUrl: String, val converter: OAuth2RequestConverter<T>, val credentialRefreshedListener: OAuth2CredentialRefreshedListener?, val handler: ((T?) -> Unit)?) : AsyncTask<Credential, Void?, T?>() {
+    inner class RequestTask<T>(val credential: Credential, val converter: OAuth2RequestConverter<T>, val credentialRefreshedListener: OAuth2CredentialRefreshedListener?, val handler: ((T?) -> Unit)?) : AsyncTask<String, Void?, T?>() {
         override fun onPostExecute(result: T?) {
             super.onPostExecute(result)
             handler?.invoke(result)
         }
 
-        override fun doInBackground(vararg credentials: Credential): T? {
+        override fun doInBackground(vararg urls: String): T? {
             try {
-                var response = requestAwait(credentials[0])
-                if (response.code() == 401) {
-
-                    //token expired
-                    println(response.body().string())
-                    println("token expired. try refreshing..")
-
-                    val newCredential = refreshToken(credentials[0])
-
-                    if (newCredential != null) {
-                        println("token was refreshed successfully. Made new credential.")
-                        credentialRefreshedListener?.onCredentialRefreshed(newCredential)
-                        response = requestAwait(newCredential)
-                    } else{
-                        println("new credential is null. token refresh failed.")
-                        return null
-                    }
-                }
-
-                val resultString = response.body().string()
-                println(response.headers().names())
-
-                return converter.process(resultString)
+                val result = requestAwait(urls)
+                return converter.process(result)
             } catch(e: Exception) {
                 e.printStackTrace()
                 return null
             }
         }
 
-        private fun requestAwait(credential: Credential): Response {
+        private fun requestAwait(urls: Array<out String>): Array<String> {
+            val result = ArrayList<String>()
+            for (url in urls) {
+                println("fetching ${url}")
+                var response = requestAwait(credential, url)
+
+                println("fetching finished")
+                if (response.code() == 401) {
+
+                    //token expired
+                    println(response.body().string())
+                    println("token expired. try refreshing..")
+
+                    val newCredential = refreshToken(credential)
+
+                    if (newCredential != null) {
+                        println("token was refreshed successfully. Made new credential.")
+                        credentialRefreshedListener?.onCredentialRefreshed(newCredential)
+                        response = requestAwait(newCredential, url)
+                    } else {
+                        println("new credential is null. token refresh failed.")
+                        continue
+                    }
+                }
+                result.add(response.body().string())
+            }
+
+            return result.toTypedArray()
+        }
+
+        private fun requestAwait(credential: Credential, requestUrl: String): Response {
             val request = makeRequestBuilderWithTokenHeader(requestUrl, credential)
                     .get()
                     .build()

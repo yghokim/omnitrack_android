@@ -553,8 +553,9 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         override fun doInBackground(vararg trackers: OTTracker): Long? {
             val cursor = readableDatabase.query(ItemScheme.tableName, arrayOf(ItemScheme.LOGGED_AT), "${ItemScheme.TRACKER_ID}=?", arrayOf(trackers[0].dbId.toString()), null, null, "${ItemScheme.LOGGED_AT} DESC", "1")
             if (cursor.moveToFirst()) {
+                val value = cursor.getLong(cursor.getColumnIndex(ItemScheme.LOGGED_AT))
                 cursor.close()
-                return cursor.getLong(cursor.getColumnIndex(ItemScheme.LOGGED_AT))
+                return value
             } else {
                 cursor.close()
                 return null

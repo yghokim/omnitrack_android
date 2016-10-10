@@ -52,9 +52,8 @@ object FitbitStepCountMeasureFactory : OTMeasureFactory() {
         override val factory: OTMeasureFactory = FitbitStepCountMeasureFactory
 
         val converter = object : OAuth2Client.OAuth2RequestConverter<Int?> {
-            override fun process(requestResultString: String): Int? {
-                println(requestResultString)
-                val json = JSONObject(requestResultString)
+            override fun process(requestResultStrings: Array<String>): Int? {
+                val json = JSONObject(requestResultStrings.first())
                 if (json.has("summary")) {
                     val steps = json.getJSONObject("summary").getInt("steps")
                     return steps

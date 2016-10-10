@@ -80,9 +80,9 @@ object RescueTimeService : OAuth2BasedExternalService("RescueTimeService", 0) {
     }
 
     internal class Converter<T>(val startDate: Date, val endDate: Date, val calculator: ISummaryCalculator<T>) : OAuth2Client.OAuth2RequestConverter<T?> {
-        override fun process(requestResultString: String): T? {
+        override fun process(requestResultStrings: Array<String>): T? {
             try {
-                val array = JSONArray(requestResultString)
+                val array = JSONArray(requestResultStrings.first())
 
                 val list = ArrayList<JSONObject>()
 

@@ -50,8 +50,8 @@ object FitbitRecentSleepTimeMeasureFactory : OTMeasureFactory() {
         override val factory: OTMeasureFactory = FitbitRecentSleepTimeMeasureFactory
 
         val converter = object : OAuth2Client.OAuth2RequestConverter<TimeSpan?> {
-            override fun process(requestResultString: String): TimeSpan? {
-                val json = JSONObject(requestResultString)
+            override fun process(requestResultStrings: Array<String>): TimeSpan? {
+                val json = JSONObject(requestResultStrings.first())
 
                 if (json.has("sleep")) {
                     val sleeps = json.getJSONArray("sleep")

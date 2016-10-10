@@ -54,23 +54,33 @@ object FitbitHeartRateMeasureFactory : OTMeasureFactory() {
     class FitbitHeartRateMeasure : OTRangeQueriedMeasure {
         companion object {
             val converter = object : OAuth2Client.OAuth2RequestConverter<Int?> {
-                override fun process(requestResultString: String): Int? {
-                    println(requestResultString)
-                    val json = JSONObject(requestResultString)
-                    val intradayDataSet = json.getJSONObject("activities-heart-intraday").getJSONArray("dataset")
-                    val count = intradayDataSet.length()
+                override fun process(requestResultStrings: Array<String>): Int? {
 
-                    if (count == 0) {
-                        return null
-                    } else {
+                    if (requestResultStrings.size == 0) return null
+                    else {
                         var sum = 0
-                        for (i in 0..count - 1) {
-                            sum += intradayDataSet.getJSONObject(i).getInt("value")
+                        var totalCount = 0
+                        for (requestResultString in requestResultStrings) {
+                            println(requestResultString)
+                            val json = JSONObject(requestResultString)
+                            val intradayDataSet = json.getJSONObject("activities-heart-intraday").getJSONArray("dataset")
+                            val count = intradayDataSet.length()
+                            totalCount += count
+
+                            if (count == 0) {
+                                continue
+                            } else {
+                                for (i in 0..count - 1) {
+                                    sum += intradayDataSet.getJSONObject(i).getInt("value")
+                                }
+                            }
                         }
-                        return Math.round(sum.toFloat() / count)
+
+                        if (totalCount > 0)
+                            return Math.round(sum.toFloat() / totalCount)
+                        else return null
                     }
                 }
-
             }
         }
 
