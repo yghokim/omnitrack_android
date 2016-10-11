@@ -1,8 +1,8 @@
 package kr.ac.snu.hcil.omnitrack
 
-import android.app.Application
 import android.graphics.Color
 import android.os.AsyncTask
+import android.support.multidex.MultiDexApplication
 import android.text.format.DateUtils
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
@@ -29,7 +29,7 @@ import java.util.*
  * Created by Young-Ho Kim on 2016-07-11.
  */
 
-class OTApplication : Application() {
+class OTApplication : MultiDexApplication() {
 
     companion object {
         lateinit var app: OTApplication
