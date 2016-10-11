@@ -43,7 +43,9 @@
                 <android.support.design.widget.TabLayout
                     android:id="@+id/tabs"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    app:tabIndicatorHeight="3dp"
+                    app:tabTextAppearance="@style/TabTextStyle" />
             </LinearLayout>
         </RelativeLayout>
     </android.support.design.widget.AppBarLayout>

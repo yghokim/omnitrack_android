@@ -24,9 +24,14 @@
         <item name="android:windowNoTitle">false</item>
     </style>
 
+    <style name="TabTextStyle" parent="TextAppearance.Design.Tab">
+        <item name="android:textSize">15sp</item>
+
+    </style>
+
     <style name="PropertyHeaderStyle">
         <item name="android:textColor">#434c69</item>
-        <item name="android:textSize">14dp</item>
+        <item name="android:textSize">14sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
@@ -48,12 +53,12 @@
 
     <style name="ListElementTitle">
         <item name="android:textStyle">bold</item>
-        <item name="android:textSize">18dp</item>
+        <item name="android:textSize">18sp</item>
         <item name="android:textColor">@color/titleTextColor</item>
     </style>
 
     <style name="AttributeDetailFieldName">
-        <item name="android:textSize">18dp</item>
+        <item name="android:textSize">18sp</item>
         <item name="android:textStyle">italic</item>
         <item name="android:fontFamily">sans-serif-normal</item>
         <item name="android:textColor">@color/titleTextColor</item>
@@ -62,7 +67,7 @@
 
     <style name="SubTitle">
         <item name="android:textStyle">bold</item>
-        <item name="android:textSize">14dp</item>
+        <item name="android:textSize">14sp</item>
         <item name="android:textAllCaps">true</item>
         <item name="android:textColor">#a0a0a0</item>
 
@@ -76,7 +81,7 @@
 
     <style name="BadgeText">
         <item name="android:textStyle">bold</item>
-        <item name="android:textSize">11dp</item>
+        <item name="android:textSize">11sp</item>
         <item name="android:textColor">#ffffff</item>
         <item name="android:background">@drawable/capsule_frame</item>
 
@@ -101,7 +106,7 @@
         <item name="android:imeOptions">actionDone</item>
         <item name="android:hint">@string/hint_short_text</item>
         <item name="android:textColorHint">#66000000</item>
-        <item name="android:textSize">17dp</item>
+        <item name="android:textSize">17sp</item>
         <item name="android:textColor">@color/inputTextColor</item>
         <item name="android:typeface">serif</item>
         <item name="android:lineSpacingExtra">0dp</item>
@@ -120,7 +125,7 @@
         <item name="android:hint">@string/hint_long_text</item>
         <item name="android:textColorHint">#33000000</item>
         <item name="android:textColor">@color/inputTextColor</item>
-        <item name="android:textSize">18dp</item>
+        <item name="android:textSize">18sp</item>
         <item name="android:typeface">serif</item>
         <item name="android:lineSpacingExtra">12dp</item>
         <item name="android:minLines">3</item>
@@ -202,20 +207,20 @@
     </style>
 
     <style name="itemListAttributeName">
-        <item name="android:textSize">15dp</item>
+        <item name="android:textSize">15sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@color/textColorLight</item>
     </style>
 
     <style name="viewForItemListTextAppearance">
         <item name="android:textColor">@color/textColorMid</item>
-        <item name="android:textSize">16dp</item>
+        <item name="android:textSize">16sp</item>
         <item name="android:textStyle">normal</item>
     </style>
 
     <style name="longTextForItemListTextAppearance">
         <item name="android:textColor">@color/textColorMid</item>
-        <item name="android:textSize">17dp</item>
+        <item name="android:textSize">17sp</item>
         <item name="android:textStyle">normal</item>
         <item name="android:lineSpacingMultiplier">1.2</item>
         <item name="android:lineSpacingExtra">5dp</item>
@@ -230,7 +235,7 @@
     <style name="listEmptyMessage">
         <item name="android:textColor">#ababab</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:textSize">16dp</item>
+        <item name="android:textSize">16sp</item>
     </style>
 
     <style name="durationPickerDigitViewStyle">
@@ -319,7 +324,7 @@
 
 
     <style name="hourPickerAmPmStyle" parent="durationPickerUnitViewStyle">
-        <item name="android:textSize">16dp</item>
+        <item name="android:textSize">16sp</item>
         <item name="android:textColor">@color/textColorMid</item>
     </style>
 
