@@ -16,6 +16,7 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
 
     <uses-feature android:name="android.hardware.camera" />
@@ -63,7 +64,6 @@
 
         <receiver android:name=".receivers.OTSystemReceiver">
             <intent-filter>
-                <action android:name="kr.ac.snu.hcil.omnitrack.action.ALARM" />
                 <action android:name="kr.ac.snu.hcil.omnitrack.action.EVENT_TRIGGER_ALARM" />
                 <action android:name="kr.ac.snu.hcil.omnitrack.action.SHORTCUT_REFRESH" />
                 <action android:name="kr.ac.snu.hcil.omnitrack.action.BACKGROUND_LOGGING_STARTED" />
@@ -98,6 +98,19 @@
                 <category android:name="ANDROID.INTENT.CATEGORY.HOME" />
             </intent-filter>
         </receiver>
+
+        <receiver
+            android:name=".receivers.TimeTriggerAlarmReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="kr.ac.snu.hcil.omnitrack.action.ALARM" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name=".receivers.TimeTriggerAlarmReceiver$TimeTriggerWakefulHandlingService"
+            android:exported="false" />
 
         <service
             android:name=".services.OTBackgroundLoggingService"

@@ -9,7 +9,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.DatabaseHelper
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTDataTriggerManager
-import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTriggerAlarmManager
 
 /**
  * Created by Young-Ho Kim on 16. 7. 28
@@ -20,15 +19,6 @@ class OTSystemReceiver : BroadcastReceiver() {
 
         println("OmniTrack system receiver received Intent: - ${intent.action}")
         when (intent.action) {
-            OTApplication.BROADCAST_ACTION_TIME_TRIGGER_ALARM -> {
-                //triggerId: String, UserId: String, alarmId: Int
-                //val userId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_USER)
-                val alarmId = intent.getIntExtra(OTTimeTriggerAlarmManager.INTENT_EXTRA_ALARM_ID, -1)
-                val triggerTime = intent.getLongExtra(OTTimeTriggerAlarmManager.INTENT_EXTRA_TRIGGER_TIME, System.currentTimeMillis())
-
-                OTTimeTriggerAlarmManager.notifyAlarmFired(alarmId, triggerTime, System.currentTimeMillis())
-
-            }
 
             OTApplication.BROADCAST_ACTION_SHORTCUT_REFRESH->{
                 OTShortcutManager.refreshNotificationShortcutViews(context)
@@ -36,8 +26,9 @@ class OTSystemReceiver : BroadcastReceiver() {
 
             OTApplication.BROADCAST_ACTION_ITEM_ADDED -> {
                 val tracker = OTApplication.app.currentUser[intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)]
-                if (tracker != null)
+                if (tracker != null) {
                     Toast.makeText(OTApplication.app, "${tracker.name} item was logged", Toast.LENGTH_SHORT).show()
+                }
             }
 
             OTApplication.BROADCAST_ACTION_COMMAND_REMOVE_ITEM -> {

@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 import android.app.ActionBar
 import android.content.Context
 import android.graphics.Color
+import android.os.Looper
 import android.support.v7.widget.AppCompatImageButton
 import android.support.v7.widget.AppCompatImageView
 import android.support.v7.widget.RecyclerView
@@ -14,6 +15,7 @@ import android.view.ViewStub
 import android.widget.FrameLayout
 import android.widget.Switch
 import android.widget.TextView
+import com.badoo.mobile.util.WeakHandler
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
@@ -78,12 +80,16 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
 
     private val onTriggerSwitchTurned: ((sender: Any, isOn: Boolean) -> Unit) = {
         sender, isOn ->
-        applyTriggerStateToView()
+        WeakHandler(Looper.getMainLooper()).post {
+            applyTriggerStateToView()
+        }
     }
 
     private val onTriggerFired: ((Any, Long) -> Unit) = {
         sender, triggeredTime ->
-        applyTriggerStateToView()
+        WeakHandler(Looper.getMainLooper()).post {
+            applyTriggerStateToView()
+        }
     }
 
 
@@ -296,12 +302,15 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
                         trigger.addTracker(trackerId)
                     }
 
-                    for (tracker in trigger.trackers) {
+                    var i = 0
+                    while (i < trigger.trackers.size) {
+                        val tracker = trigger.trackers[i]
                         if (!trackerAssignPanel!!.trackerIds.contains(tracker.objectId)) {
                             trigger.removeTracker(tracker)
+                        } else {
+                            i++
                         }
                     }
-
                 }
 
                 listener.onTriggerCollapse(adapterPosition)

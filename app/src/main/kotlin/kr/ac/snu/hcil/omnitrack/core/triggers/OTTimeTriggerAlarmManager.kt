@@ -5,7 +5,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import kr.ac.snu.hcil.omnitrack.OTApplication
-import kr.ac.snu.hcil.omnitrack.receivers.OTSystemReceiver
+import kr.ac.snu.hcil.omnitrack.receivers.TimeTriggerAlarmReceiver
 import kr.ac.snu.hcil.omnitrack.utils.FillingIntegerIdReservationTable
 import kr.ac.snu.hcil.omnitrack.utils.TimeKeyValueSetTable
 import java.util.*
@@ -172,7 +172,7 @@ object OTTimeTriggerAlarmManager {
     }
 
 
-    fun notifyAlarmFired(alarmId: Int, intentTriggerTime: Long, reallyFiredAt: Long) {
+    fun notifyAlarmFiredAndGetTriggers(alarmId: Int, intentTriggerTime: Long, reallyFiredAt: Long): List<OTTrigger>? {
         println("alarm fired - id: $alarmId, delayed: ${reallyFiredAt - intentTriggerTime}")
 
         //validation
@@ -186,19 +186,22 @@ object OTTimeTriggerAlarmManager {
             idTable.removeKey(intentTriggerTime)
 
             if (reservedTriggers != null) {
+                val triggers = ArrayList<OTTrigger>()
                 for (triggerId in reservedTriggers) {
                     triggerTable.remove(triggerId)
                     val trigger = OTApplication.app.triggerManager.getTriggerWithId(triggerId)
-                    trigger?.fire(intentTriggerTime)
+                    if (trigger != null)
+                        triggers.add(trigger)
                 }
-            }
-        }
 
+                return triggers
+            } else return null
+        } else return null
     }
 
 
     private fun makeIntent(context: Context, triggerTime: Long, alarmId: Int): PendingIntent {
-        val intent = Intent(context, OTSystemReceiver::class.java)
+        val intent = Intent(context, TimeTriggerAlarmReceiver::class.java)
         intent.action = OTApplication.BROADCAST_ACTION_TIME_TRIGGER_ALARM
         intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_USER, OTApplication.app.currentUser.objectId)
         intent.putExtra(INTENT_EXTRA_ALARM_ID, alarmId)

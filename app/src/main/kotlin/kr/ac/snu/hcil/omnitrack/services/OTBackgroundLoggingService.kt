@@ -23,9 +23,38 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
 
         private const val INTENT_EXTRA_LOGGING_SOURCE = "loggingSource"
 
-        fun startLogging(context: Context, tracker: OTTracker, source: LoggingSource) {
+        fun startLoggingInService(context: Context, tracker: OTTracker, source: LoggingSource) {
 
             context.startService(makeIntent(context, tracker, source))
+        }
+
+        fun startLoggingAsync(context: Context, tracker: OTTracker, source: LoggingSource, finished: ((success: Boolean) -> Unit)? = null) {
+            val builder = OTItemBuilder(tracker, OTItemBuilder.MODE_BACKGROUND)
+
+            sendBroadcast(context, OTApplication.BROADCAST_ACTION_BACKGROUND_LOGGING_STARTED, tracker)
+            builder.autoCompleteAsync {
+                val item = builder.makeItem()
+                OTApplication.app.dbHelper.save(item, tracker)
+                if (item.dbId != null) {
+                    sendBroadcast(context, OTApplication.BROADCAST_ACTION_BACKGROUND_LOGGING_SUCCEEDED, tracker, item.dbId!!)
+                    finished?.invoke(true)
+                } else {
+                    finished?.invoke(false)
+                }
+            }
+        }
+
+        private fun sendBroadcast(context: Context, action: String, tracker: OTTracker) {
+            val intent = Intent(action)
+            intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
+            context.sendBroadcast(intent)
+        }
+
+        private fun sendBroadcast(context: Context, action: String, tracker: OTTracker, itemDbId: Long) {
+            val intent = Intent(action)
+            intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
+            intent.putExtra(OTApplication.INTENT_EXTRA_DB_ID_ITEM, itemDbId)
+            context.sendBroadcast(intent)
         }
 
         fun makeIntent(context: Context, tracker: OTTracker, source: LoggingSource): Intent
@@ -43,41 +72,21 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
         if (intent != null) {
             val action = intent.action
             if (ACTION_LOG == action) {
+                println("try background logging..")
                 val trackerId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
-                handleLogging(trackerId)
+                handleLogging(trackerId, intent)
             }
         }
     }
 
-    private fun handleLogging(trackerId: String) {
+    private fun handleLogging(trackerId: String, intent: Intent) {
         val tracker = OTApplication.app.currentUser[trackerId]
         if (tracker != null) {
-            val builder = OTItemBuilder(tracker, OTItemBuilder.MODE_BACKGROUND)
-
-            sendBroadcast(OTApplication.BROADCAST_ACTION_BACKGROUND_LOGGING_STARTED, tracker)
-
-            builder.autoCompleteAsync {
-                val item = builder.makeItem()
-                OTApplication.app.dbHelper.save(item, tracker)
-                if (item.dbId != null) {
-                    sendBroadcast(OTApplication.BROADCAST_ACTION_BACKGROUND_LOGGING_SUCCEEDED, tracker, item.dbId!!)
-                }
-            }
+            startLoggingAsync(this, tracker, LoggingSource.valueOf(intent.getStringExtra(INTENT_EXTRA_LOGGING_SOURCE)), null)
         }
     }
 
-    private fun sendBroadcast(action: String, tracker: OTTracker) {
-        val intent = Intent(action)
-        intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
-        sendBroadcast(intent)
-    }
 
-    private fun sendBroadcast(action: String, tracker: OTTracker, itemDbId: Long) {
-        val intent = Intent(action)
-        intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
-        intent.putExtra(OTApplication.INTENT_EXTRA_DB_ID_ITEM, itemDbId)
-        sendBroadcast(intent)
-    }
 
 
 }

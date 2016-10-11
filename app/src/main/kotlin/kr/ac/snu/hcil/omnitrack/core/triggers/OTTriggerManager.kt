@@ -1,11 +1,8 @@
 package kr.ac.snu.hcil.omnitrack.core.triggers
 
-import android.widget.Toast
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
-import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
-import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
 import java.util.*
 
 /**
@@ -134,22 +131,6 @@ class OTTriggerManager(val user: OTUser) {
     }
 
     private fun onTriggerFired(trigger: OTTrigger, triggerTime: Long) {
-        when (trigger.action) {
-            OTTrigger.ACTION_BACKGROUND_LOGGING -> {
-                println("trigger fired - loggin in background")
-
-                Toast.makeText(OTApplication.app, "Logged!", Toast.LENGTH_SHORT).show()
-
-                for (tracker in trigger.trackers)
-                    OTBackgroundLoggingService.startLogging(OTApplication.app, tracker, OTBackgroundLoggingService.LoggingSource.Trigger)
-            }
-            OTTrigger.ACTION_NOTIFICATION -> {
-                println("trigger fired - send notification")
-                for (tracker in trigger.trackers)
-                    OTNotificationManager.pushReminderNotification(OTApplication.app, tracker, triggerTime)
-            }
-        }
-
 
     }
 

@@ -5,6 +5,8 @@ import com.google.gson.Gson
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.database.NamedObject
+import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
+import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializedStringKeyEntry
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
@@ -148,8 +150,31 @@ abstract class OTTrigger(objectId: String?, dbId: Long?, name: String,
         }
     }
 
-    fun fire(triggerTime: Long) {
+    fun fire(triggerTime: Long, finished: ((success: Boolean) -> Unit)? = null) {
         handleFire(triggerTime)
+
+        when (action) {
+            OTTrigger.ACTION_BACKGROUND_LOGGING -> {
+                println("trigger fired - loggin in background")
+
+                //Toast.makeText(OTApplication.app, "Logged!", Toast.LENGTH_SHORT).show()
+
+                var left = trackers.size
+                for (tracker in trackers)
+                    OTBackgroundLoggingService.startLoggingAsync(OTApplication.app, tracker, OTBackgroundLoggingService.LoggingSource.Trigger) {
+                        left--
+                        if (left == 0) {
+                            finished?.invoke(true)
+                        }
+                    }
+            }
+            OTTrigger.ACTION_NOTIFICATION -> {
+                println("trigger fired - send notification")
+                for (tracker in trackers)
+                    OTNotificationManager.pushReminderNotification(OTApplication.app, tracker, triggerTime)
+                finished?.invoke(true)
+            }
+        }
 
         fired.invoke(this, triggerTime)
         this.lastTriggeredTime = triggerTime
