@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.ui.components.common
 
 import android.content.Context
 import android.graphics.*
+import android.support.v4.content.ContextCompat
 import android.text.Layout
 import android.text.StaticLayout
 import android.text.TextPaint
@@ -133,20 +134,20 @@ class LikertScalePicker : View {
 
         linePaint.style = Paint.Style.STROKE
         linePaint.strokeWidth = resources.getDimension(R.dimen.likert_scale_line_stroke_width)
-        linePaint.color = resources.getColor(R.color.textColorLight, null)
+        linePaint.color = ContextCompat.getColor(context, R.color.textColorLight)
         linePaint.alpha = 200
 
         pointPaint.style = Paint.Style.FILL
-        pointPaint.color = resources.getColor(R.color.textColorLight, null)
+        pointPaint.color = ContextCompat.getColor(context, R.color.textColorLight)
 
         numberTextPaint.style = Paint.Style.FILL
-        numberTextPaint.color = resources.getColor(R.color.textColorMidLight, null)
+        numberTextPaint.color = ContextCompat.getColor(context, R.color.textColorMidLight)
         numberTextPaint.textAlign = Paint.Align.CENTER
         numberTextPaint.textSize = numberTextSize
         numberTextPaint.isFakeBoldText = true
 
         valueIndicatorPaint.style = Paint.Style.FILL
-        valueIndicatorPaint.color = resources.getColor(R.color.colorSecondary, null)
+        valueIndicatorPaint.color = ContextCompat.getColor(context, R.color.colorSecondary)
 
         valueTextPaint.style = Paint.Style.FILL
         valueTextPaint.textSize = valueTextSize
@@ -154,12 +155,12 @@ class LikertScalePicker : View {
         valueTextPaint.textAlign = Paint.Align.CENTER
 
         valueBoxPaint.style = Paint.Style.FILL
-        valueBoxPaint.color = resources.getColor(R.color.colorSecondary, null)
+        valueBoxPaint.color = ContextCompat.getColor(context, R.color.colorSecondary)
 
         labelTextPaint.style = Paint.Style.FILL
         labelTextPaint.textSize = labelTextSize
         labelTextPaint.isFakeBoldText = true
-        labelTextPaint.color = resources.getColor(R.color.textColorMid, null)
+        labelTextPaint.color = ContextCompat.getColor(context, R.color.textColorMid)
     }
 
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)

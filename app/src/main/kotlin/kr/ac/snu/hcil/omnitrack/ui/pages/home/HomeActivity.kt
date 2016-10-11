@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.home
 
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
@@ -49,14 +50,15 @@ class HomeActivity : UserSyncedActivity() {
         tabLayout!!.setupWithViewPager(mViewPager)
 
 
-        val permissions = OTApplication.app.currentUser.getPermissionsRequiredForFields().filter {
-            checkSelfPermission(it) != PackageManager.PERMISSION_GRANTED
-        }.toTypedArray()
+        if (Build.VERSION.SDK_INT >= 23) {
+            val permissions = OTApplication.app.currentUser.getPermissionsRequiredForFields().filter {
+                checkSelfPermission(it) != PackageManager.PERMISSION_GRANTED
+            }.toTypedArray()
 
-        if(permissions.size > 0)
-        {
-            requestPermissions(permissions,
-                    10)
+            if (permissions.size > 0) {
+                requestPermissions(permissions,
+                        10)
+            }
         }
     }
 

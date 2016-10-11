@@ -5,6 +5,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
+import android.support.v4.content.ContextCompat
 import android.util.AttributeSet
 import android.view.View
 import kr.ac.snu.hcil.omnitrack.R
@@ -60,7 +61,7 @@ class AudioRecorderProgressBar : View {
 
         progressedAreaPaint = Paint()
         progressedAreaPaint.style = Paint.Style.FILL
-        progressedAreaPaint.color = resources.getColor(R.color.colorPointed, null)
+        progressedAreaPaint.color = ContextCompat.getColor(context, R.color.colorPointed)
         progressedAreaPaint.alpha = 150
 
         volumeLinePaint = Paint(Paint.ANTI_ALIAS_FLAG)

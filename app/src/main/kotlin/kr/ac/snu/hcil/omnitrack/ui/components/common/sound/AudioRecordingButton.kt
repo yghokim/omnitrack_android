@@ -8,6 +8,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.PorterDuff
 import android.graphics.drawable.Drawable
+import android.support.v4.content.ContextCompat
 import android.support.v4.graphics.ColorUtils
 import android.util.AttributeSet
 import android.widget.Button
@@ -73,14 +74,14 @@ class AudioRecordingButton : Button, ValueAnimator.AnimatorUpdateListener {
 
 
     private val stopDrawable: Drawable by lazy {
-        val drawable = resources.getDrawable(R.drawable.stop_dark, null)
+        val drawable = ContextCompat.getDrawable(context, R.drawable.stop_dark)
         drawable.setColorFilter(Color.parseColor("#ffffff"), PorterDuff.Mode.SRC_ATOP)
         drawable.alpha = 150
         drawable
     }
 
     private val removeDrawable: Drawable by lazy {
-        val drawable = resources.getDrawable(R.drawable.trashcan, null)
+        val drawable = ContextCompat.getDrawable(context, R.drawable.trashcan)
         drawable.setColorFilter(Color.parseColor("#ffffff"), PorterDuff.Mode.SRC_ATOP)
         drawable.alpha = 200
         drawable
@@ -92,14 +93,14 @@ class AudioRecordingButton : Button, ValueAnimator.AnimatorUpdateListener {
     init {
         frameCirclePaint = Paint(Paint.ANTI_ALIAS_FLAG)
         frameCirclePaint.style = Paint.Style.STROKE
-        frameCirclePaint.color = resources.getColor(R.color.dividerColor, null)
+        frameCirclePaint.color = ContextCompat.getColor(context, R.color.dividerColor)
         frameCirclePaint.strokeWidth = 1 * resources.displayMetrics.density
 
         buttonCirclePaint = Paint(Paint.ANTI_ALIAS_FLAG)
         buttonCirclePaint.style = Paint.Style.FILL
-        circleNormalColor = resources.getColor(R.color.colorRed, null)
+        circleNormalColor = ContextCompat.getColor(context, R.color.colorRed)
         circlePressedColor = ColorUtils.blendARGB(circleNormalColor, Color.BLACK, 0.2f)
-        circleStopColor = resources.getColor(R.color.colorPointed, null)
+        circleStopColor = ContextCompat.getColor(context, R.color.colorPointed)
 
         circleInset = resources.getDimension(R.dimen.audio_recorder_circle_inset)
 

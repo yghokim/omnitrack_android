@@ -9,6 +9,7 @@ import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
+import android.support.v4.content.ContextCompat
 import android.support.v4.graphics.ColorUtils
 import android.support.v4.view.ViewPager
 import android.view.View
@@ -158,7 +159,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
     }
 
     fun calculateBlendedColor(color: Int): Int {
-        return ColorUtils.blendARGB(resources.getColor(R.color.colorPrimary, null), color, 0.6f)
+        return ColorUtils.blendARGB(ContextCompat.getColor(this@TrackerDetailActivity, R.color.colorPrimary), color, 0.6f)
 
     }
 

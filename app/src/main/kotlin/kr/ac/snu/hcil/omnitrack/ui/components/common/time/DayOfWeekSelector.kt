@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.support.v4.content.ContextCompat
 import android.util.AttributeSet
 import android.view.Gravity
 import android.view.View
@@ -158,7 +159,7 @@ class DayOfWeekSelector : LinearLayout, View.OnClickListener {
 
         init {
             circlePaint.style = Paint.Style.FILL
-            circlePaint.color = resources.getColor(R.color.textColorMid, null)
+            circlePaint.color = ContextCompat.getColor(context, R.color.textColorMid)
 
             animator = ValueAnimator.ofFloat(0f, 1f)
             animator.duration = 300

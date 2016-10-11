@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.Rect
 import android.graphics.Typeface
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
@@ -61,8 +62,8 @@ class SelectionView(context: Context, attrs: AttributeSet?, defStyle: Int) : Rec
 
         buttonTextSize = resources.getDimensionPixelSize(R.dimen.selection_view_button_text_size).toFloat()
 
-        selectedTextColor = resources.getColor(R.color.selection_view_button_selected_text_color, null)
-        unSelectedTextColor = resources.getColor(R.color.selection_view_button_unselected_text_color, null)
+        selectedTextColor = ContextCompat.getColor(context, R.color.selection_view_button_selected_text_color)
+        unSelectedTextColor = ContextCompat.getColor(context, R.color.selection_view_button_unselected_text_color)
 
 
         layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)

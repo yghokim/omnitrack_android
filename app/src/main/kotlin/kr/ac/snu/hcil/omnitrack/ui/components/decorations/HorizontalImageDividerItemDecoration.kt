@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import kr.ac.snu.hcil.omnitrack.R
@@ -18,7 +19,7 @@ class HorizontalImageDividerItemDecoration(resId: Int = R.drawable.horizontal_se
     private var dividerHeight: Int = 0
 
     init {
-        divider = context.resources.getDrawable(resId, null)
+        divider = ContextCompat.getDrawable(context, resId)
         dividerHeight = (divider.intrinsicHeight * heightMultiplier).toInt()
     }
 

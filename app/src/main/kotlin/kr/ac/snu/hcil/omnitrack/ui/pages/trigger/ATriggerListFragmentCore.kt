@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.Fragment
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -100,13 +101,13 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
                 holder.setIsExpanded(false, false)
                 if (expandedTriggerPosition != -1) {
                     holder.itemView.alpha = 0.2f
-                    holder.itemView.setBackgroundColor(parent.resources.getColor(R.color.outerBackground, null))
+                    holder.itemView.setBackgroundColor(ContextCompat.getColor(parent.context, R.color.outerBackground))
                 }
             }
 
             if (expandedTriggerPosition == position || expandedTriggerPosition == -1) {
                 holder.itemView.alpha = 1.0f
-                holder.itemView.setBackgroundColor(parent.resources.getColor(R.color.frontalBackground, null))
+                holder.itemView.setBackgroundColor(ContextCompat.getColor(parent.context, R.color.frontalBackground))
             }
         }
 

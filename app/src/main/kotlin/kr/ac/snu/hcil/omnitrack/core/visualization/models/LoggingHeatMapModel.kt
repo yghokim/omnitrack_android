@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.visualization.models
 
 import android.graphics.Canvas
+import android.support.v4.content.ContextCompat
 import android.support.v4.graphics.ColorUtils
 import android.text.format.DateUtils
 import kr.ac.snu.hcil.omnitrack.OTApplication
@@ -135,8 +136,8 @@ class LoggingHeatMapModel(tracker: OTTracker): TrackerChartModel<ITimeBinnedHeat
 
         init{
 
-            horizontalAxis.gridLinePaint.color = OTApplication.app.resources.getColor(R.color.frontalBackground, null)
-            verticalAxis.gridLinePaint.color = OTApplication.app.resources.getColor(R.color.frontalBackground, null)
+            horizontalAxis.gridLinePaint.color = ContextCompat.getColor(OTApplication.app, R.color.frontalBackground)
+            verticalAxis.gridLinePaint.color = ContextCompat.getColor(OTApplication.app, R.color.frontalBackground)
 
             verticalAxis.style = Axis.TickLabelStyle.Small
 
@@ -225,7 +226,7 @@ class LoggingHeatMapModel(tracker: OTTracker): TrackerChartModel<ITimeBinnedHeat
                     cellGroup.appendEnterSelection {
                         count->
                         val newCell = RectElement<Float>()
-                        newCell.color = ColorUtils.setAlphaComponent(OTApplication.app.resources.getColor(R.color.colorPointed, null), (255*count.value + 0.5f).toInt())
+                        newCell.color = ColorUtils.setAlphaComponent(ContextCompat.getColor(OTApplication.app, R.color.colorPointed), (255 * count.value + 0.5f).toInt())
                         mapCellRectToSpace(newCell, datum.value.time, count.index)
                         newCell
                     }
@@ -239,14 +240,14 @@ class LoggingHeatMapModel(tracker: OTTracker): TrackerChartModel<ITimeBinnedHeat
                     rectList.appendEnterSelection {
                         count->
                         val newCell = RectElement<Float>()
-                        newCell.color = ColorUtils.setAlphaComponent(OTApplication.app.resources.getColor(R.color.colorPointed, null), (255*count.value + 0.5f).toInt())
+                        newCell.color = ColorUtils.setAlphaComponent(ContextCompat.getColor(OTApplication.app, R.color.colorPointed), (255 * count.value + 0.5f).toInt())
                         mapCellRectToSpace(newCell, datum.value.time, count.index)
                         newCell
                     }
 
                     rectList.updateElement { count, cell ->
                         mapCellRectToSpace(cell as RectElement<Float>, datum.value.time, count.index)
-                        cell.color = ColorUtils.setAlphaComponent(OTApplication.app.resources.getColor(R.color.colorPointed, null), (255*count.value + 0.5f).toInt())
+                        cell.color = ColorUtils.setAlphaComponent(ContextCompat.getColor(OTApplication.app, R.color.colorPointed), (255 * count.value + 0.5f).toInt())
                     }
 
                     rectList.removeElements(rectList.getExitElements())
@@ -258,7 +259,7 @@ class LoggingHeatMapModel(tracker: OTTracker): TrackerChartModel<ITimeBinnedHeat
         }
 
         override fun onDraw(canvas: Canvas) {
-            fillRect(plotAreaRect, OTApplication.app.resources.getColor(R.color.editTextFormBackground, null), canvas)
+            fillRect(plotAreaRect, ContextCompat.getColor(OTApplication.app, R.color.editTextFormBackground), canvas)
 
             super.onDraw(canvas)
         }

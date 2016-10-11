@@ -50,7 +50,7 @@
                     android:layout_height="match_parent"
                     android:layout_gravity="bottom"
                     android:gravity="bottom"
-                    android:text="YESTERDAY\n06:30 PM" />
+                    android:text="" />
 
                 <TextView
                     android:id="@+id/ui_today_logging_count"
@@ -59,7 +59,7 @@
                     android:layout_height="match_parent"
                     android:layout_gravity="bottom"
                     android:gravity="bottom"
-                    android:text="@string/msg_todays_log" />
+                    android:text="" />
             </LinearLayout>
 
             <ImageButton

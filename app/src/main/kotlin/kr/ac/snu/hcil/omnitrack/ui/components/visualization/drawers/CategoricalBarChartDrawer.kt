@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers
 
 import android.graphics.Canvas
+import android.support.v4.content.ContextCompat
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.ICategoricalBarChart
@@ -120,7 +121,7 @@ class CategoricalBarChartDrawer(): AChartDrawer() {
                 datum ->
                 println("updating enter selection for datum ${datum}")
                 val newBar = RectElement<ICategoricalBarChart.Point>()
-                newBar.color = OTApplication.app.resources.getColor(R.color.colorPointed, null)
+                newBar.color = ContextCompat.getColor(OTApplication.app, R.color.colorPointed)
 
                 mapBarElementToSpace(datum, newBar)
 
@@ -140,7 +141,7 @@ class CategoricalBarChartDrawer(): AChartDrawer() {
 
     override fun onDraw(canvas: Canvas) {
 
-        fillRect(plotAreaRect, OTApplication.app.resources.getColor(R.color.editTextFormBackground, null), canvas)
+        fillRect(plotAreaRect, ContextCompat.getColor(OTApplication.app, R.color.editTextFormBackground), canvas)
 
         super.onDraw(canvas)
     }

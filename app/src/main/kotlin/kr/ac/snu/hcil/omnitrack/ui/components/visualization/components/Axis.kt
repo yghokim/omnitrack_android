@@ -4,6 +4,7 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.RectF
+import android.support.v4.content.ContextCompat
 import android.support.v4.graphics.ColorUtils
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
@@ -78,7 +79,7 @@ class Axis(var pivot: Pivot): IDrawer {
     }
 
     init{
-        linePaint.color = OTApplication.app.resources.getColor(R.color.vis_color_axis, null)
+        linePaint.color = ContextCompat.getColor(OTApplication.app, R.color.vis_color_axis)
         linePaint.style = Paint.Style.STROKE
         linePaint.strokeWidth = OTApplication.app.resources.getDimension(R.dimen.vis_axis_thickness)
 
@@ -87,7 +88,7 @@ class Axis(var pivot: Pivot): IDrawer {
         gridLinePaint.strokeWidth = OTApplication.app.resources.getDimension(R.dimen.vis_axis_grid_thickness)
 
         labelPaint.style = Paint.Style.FILL
-        labelPaint.color = OTApplication.app.resources.getColor(R.color.textColorMid, null)
+        labelPaint.color = ContextCompat.getColor(OTApplication.app, R.color.textColorMid)
         labelPaint.textAlign = Paint.Align.CENTER
         labelPaint.textSize = OTApplication.app.resources.getDimension(R.dimen.vis_axis_label_categorical_size)
 

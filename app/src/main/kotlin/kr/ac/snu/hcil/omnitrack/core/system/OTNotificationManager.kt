@@ -8,6 +8,7 @@ import android.content.Intent
 import android.os.Build
 import android.support.v4.app.NotificationCompat
 import android.support.v4.app.TaskStackBuilder
+import android.support.v4.content.ContextCompat
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
@@ -155,8 +156,7 @@ object OTNotificationManager {
                 .setSmallIcon(R.drawable.icon_simple)
 
         if (Build.VERSION.SDK_INT >= 21) {
-            builder
-                    .setColor(context.resources.getColor(R.color.colorPrimary, null))
+            builder.setColor(ContextCompat.getColor(context, R.color.colorPrimary))
         }
 
 

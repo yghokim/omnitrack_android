@@ -3,8 +3,10 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.home
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.SwitchCompat
 import android.transition.TransitionManager
 import android.util.SparseArray
 import android.view.LayoutInflater
@@ -12,7 +14,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.ProgressBar
-import android.widget.Switch
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
@@ -101,7 +102,7 @@ class ServiceListFragment : Fragment() {
             val nameView: TextView
             val descriptionView: TextView
 
-            val activationButton: Switch
+            val activationButton: SwitchCompat
             val progressBar: ProgressBar
 
             val activationSwitchGroup: ViewGroup
@@ -129,13 +130,13 @@ class ServiceListFragment : Fragment() {
                 measureFactoryListView = view.findViewById(R.id.ui_supported_measure_list) as RecyclerView
                 measureFactoryListView.adapter = measureFactoryAdapter
                 measureFactoryListView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-                measureFactoryListView.addItemDecoration(HorizontalDividerItemDecoration(resources.getColor(R.color.separator_Light, null), (0.6f * resources.displayMetrics.density + .5f).toInt()))
+                measureFactoryListView.addItemDecoration(HorizontalDividerItemDecoration(ContextCompat.getColor(context, R.color.separator_Light), (0.6f * resources.displayMetrics.density + .5f).toInt()))
 
                 activationSwitchGroup = view.findViewById(R.id.ui_activation_switch_group) as ViewGroup
 
                 activationIndicator = view.findViewById(R.id.ui_activation_indicator_text) as TextView
 
-                activationButton = view.findViewById(R.id.ui_button_activate) as Switch
+                activationButton = view.findViewById(R.id.ui_button_activate) as SwitchCompat
 
                 activationButton.setOnClickListener {
                     val service = getService(adapterPosition)

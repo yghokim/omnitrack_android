@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.attribute.wizard.pages
 
 import android.content.Context
 import android.os.Handler
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
@@ -65,7 +66,7 @@ class SourceSelectionPage(val attribute: OTAttribute<out Any>) : AWizardPage() {
 
         init {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-            addItemDecoration(HorizontalDividerItemDecoration(resources.getColor(R.color.separator_Light, null),
+            addItemDecoration(HorizontalDividerItemDecoration(ContextCompat.getColor(context, R.color.separator_Light),
                     (1.5f * resources.displayMetrics.density).toInt(),
                     resources.getDimensionPixelSize(R.dimen.activity_horizontal_margin),
                     resources.getDimensionPixelSize(R.dimen.activity_horizontal_margin)))

@@ -4,6 +4,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
+import android.support.v4.content.ContextCompat
 import android.text.format.DateUtils
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
@@ -213,11 +214,11 @@ class DurationTimelineModel(override val attribute: OTTimeSpanAttribute) : Attri
         init{
 
             paint.style = Paint.Style.FILL
-            paint.color = OTApplication.app.resources.getColor(R.color.colorPointed_Light, null)
+            paint.color = ContextCompat.getColor(OTApplication.app, R.color.colorPointed_Light)
 
             pointPaint.strokeWidth = 2f * OTApplication.app.resources.displayMetrics.density
             pointPaint.style = Paint.Style.STROKE
-            pointPaint.color = OTApplication.app.resources.getColor(R.color.colorPointed, null)
+            pointPaint.color = ContextCompat.getColor(OTApplication.app, R.color.colorPointed)
 
             paddingLeft = OTApplication.app.resources.getDimension(R.dimen.vis_axis_width_extended).toFloat()
 

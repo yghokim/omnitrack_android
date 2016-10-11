@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
 import kr.ac.snu.hcil.omnitrack.R
@@ -17,7 +18,7 @@ class DragItemTouchHelperCallback(private val adapter: ItemDragHelperAdapter, co
 
     init {
         if (showDragShadow)
-            shadow = context.resources.getDrawable(R.drawable.shadow, null)
+            shadow = ContextCompat.getDrawable(context, R.drawable.shadow)
     }
 
     interface ItemDragHelperAdapter {

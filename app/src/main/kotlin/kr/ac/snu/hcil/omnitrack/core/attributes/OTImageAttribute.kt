@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.attributes
 
 import android.content.Context
 import android.net.Uri
+import android.support.v4.content.ContextCompat
 import android.view.View
 import android.webkit.URLUtil
 import android.widget.ImageView
@@ -55,7 +56,7 @@ class OTImageAttribute(objectId: String?, dbId: Long?, columnName: String, isReq
         if (target.tag != "ImageAttribute") {
             target.adjustViewBounds = true
             target.scaleType = ImageView.ScaleType.FIT_CENTER
-            target.setBackgroundColor(context.resources.getColor(R.color.editTextFormBackground, null))
+            target.setBackgroundColor(ContextCompat.getColor(context, R.color.editTextFormBackground))
 
             val padding = (8 * context.resources.displayMetrics.density).toInt()
             target.setPadding(padding, padding, padding, padding)

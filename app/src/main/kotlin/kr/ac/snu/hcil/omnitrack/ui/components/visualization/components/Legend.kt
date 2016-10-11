@@ -4,6 +4,7 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.RectF
+import android.support.v4.content.ContextCompat
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.IDrawer
@@ -48,7 +49,7 @@ class Legend: IDrawer {
     init{
         labelPaint.textSize = OTApplication.app.resources.getDimension(R.dimen.vis_legend_label_size)
         labelPaint.isFakeBoldText = true
-        labelPaint.color = OTApplication.app.resources.getColor(R.color.textColorMid, null)
+        labelPaint.color = ContextCompat.getColor(OTApplication.app, R.color.textColorMid)
     }
 
     fun refresh(){

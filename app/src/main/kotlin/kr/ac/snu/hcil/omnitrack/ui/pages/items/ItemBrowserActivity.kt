@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.items
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.*
@@ -224,7 +225,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                 valueListView = view.findViewById(R.id.ui_list) as RecyclerView
                 valueListView.layoutManager = LinearLayoutManager(this@ItemBrowserActivity, LinearLayoutManager.VERTICAL, false)
 
-                valueListView.addItemDecoration(HorizontalDividerItemDecoration(resources.getColor(R.color.separator_Light, null), (1 * resources.displayMetrics.density).toInt()))
+                valueListView.addItemDecoration(HorizontalDividerItemDecoration(ContextCompat.getColor(this@ItemBrowserActivity, R.color.separator_Light), (1 * resources.displayMetrics.density).toInt()))
 
                 valueListAdapter = TableRowAdapter()
                 valueListView.adapter = valueListAdapter
@@ -322,8 +323,8 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                         val sort = getCurrentSort()
                         attributeNameView.setTextColor(
                                 if (sort is AttributeSorter && sort.attribute === attribute) {
-                                    resources.getColor(R.color.colorAccent, null)
-                                } else resources.getColor(R.color.textColorLight, null)
+                                    ContextCompat.getColor(this@ItemBrowserActivity, R.color.colorAccent)
+                                } else ContextCompat.getColor(this@ItemBrowserActivity, R.color.textColorLight)
                         )
 
                         val newValueView = attribute.getViewForItemList(this@ItemBrowserActivity, valueView)
@@ -349,7 +350,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                     init {
                         if (valueView is TextView) {
                             (valueView as TextView).text = "No value"
-                            (valueView as TextView).setTextColor(resources.getColor(R.color.colorRed_Light, null))
+                            (valueView as TextView).setTextColor(ContextCompat.getColor(this@ItemBrowserActivity, R.color.colorRed_Light))
                         }
                     }
 

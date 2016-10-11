@@ -8,6 +8,7 @@ import android.graphics.Typeface
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.Fragment
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -108,7 +109,7 @@ class TrackerListFragment : Fragment() {
         dateStyleSpan = StyleSpan(Typeface.NORMAL)
         timeStyleSpan = StyleSpan(Typeface.BOLD)
         dateSizeSpan = AbsoluteSizeSpan(context.resources.getDimensionPixelSize(R.dimen.tracker_list_element_information_text_headerSize))
-        dateColorSpan = ForegroundColorSpan(context.resources.getColor(R.color.textColorLight, null))
+        dateColorSpan = ForegroundColorSpan(ContextCompat.getColor(context, R.color.textColorLight))
         //attach events
         // user.trackerAdded += onTrackerAddedHandler
         //  user.trackerRemoved += onTrackerRemovedHandler

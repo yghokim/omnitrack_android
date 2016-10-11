@@ -1,9 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties
 
 import android.content.Context
+import android.support.v7.widget.SwitchCompat
 import android.util.AttributeSet
 import android.view.View
-import android.widget.Switch
 import kr.ac.snu.hcil.omnitrack.R
 
 /**
@@ -12,7 +12,7 @@ import kr.ac.snu.hcil.omnitrack.R
 class BooleanPropertyView(context: Context, attrs: AttributeSet?) : APropertyView<Boolean>(R.layout.component_property_boolean, context, attrs), View.OnClickListener {
 
 
-    private val switch: Switch
+    private val switch: SwitchCompat
 
     private val proxyButton: View
 
@@ -23,7 +23,7 @@ class BooleanPropertyView(context: Context, attrs: AttributeSet?) : APropertyVie
         }
 
     init {
-        switch = findViewById(R.id.value) as Switch
+        switch = findViewById(R.id.value) as SwitchCompat
         proxyButton = findViewById(R.id.ui_button_proxy)
 
         proxyButton.setOnClickListener(this)

@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 
 import android.content.Context
+import android.support.v4.content.ContextCompat
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.format.DateUtils
@@ -86,7 +87,7 @@ class TimeTriggerDisplayView : LinearLayout {
         val amPmTextIndex = sb.indexOf(amPmText)
         sb.setSpan(AbsoluteSizeSpan(resources.getDimensionPixelSize(R.dimen.number_unit_size)), amPmTextIndex, amPmTextIndex + amPmText.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         sb.setSpan(TypefaceSpan("sans-serif-normal"), amPmTextIndex, amPmTextIndex + amPmText.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-        sb.setSpan(ForegroundColorSpan(resources.getColor(R.color.textColorMid, null)), amPmTextIndex, amPmTextIndex + amPmText.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        sb.setSpan(ForegroundColorSpan(ContextCompat.getColor(context, R.color.textColorMid)), amPmTextIndex, amPmTextIndex + amPmText.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
 
 
         mainView.text = sb
@@ -105,7 +106,7 @@ class TimeTriggerDisplayView : LinearLayout {
             text.setSpan(AbsoluteSizeSpan(resources.getDimensionPixelSize(R.dimen.number_unit_size_small)), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
 
             text.setSpan(TypefaceSpan("sans-serif-normal"), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-            text.setSpan(ForegroundColorSpan(resources.getColor(R.color.textColorMid, null)), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            text.setSpan(ForegroundColorSpan(ContextCompat.getColor(context, R.color.textColorMid)), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
 
         mainView.text = text

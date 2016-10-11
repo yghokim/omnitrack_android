@@ -4,16 +4,17 @@ import android.app.ActionBar
 import android.content.Context
 import android.graphics.Color
 import android.os.Looper
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.AppCompatImageButton
 import android.support.v7.widget.AppCompatImageView
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.SwitchCompat
 import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewStub
 import android.widget.FrameLayout
-import android.widget.Switch
 import android.widget.TextView
 import com.badoo.mobile.util.WeakHandler
 import kr.ac.snu.hcil.omnitrack.R
@@ -45,7 +46,7 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
     var isExpanded: Boolean = true
         private set
 
-    private val triggerSwitch: Switch
+    private val triggerSwitch: SwitchCompat
 
     private val removeButton: AppCompatImageButton
     private val expandToggleButton: AppCompatImageButton
@@ -99,7 +100,7 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
 
         itemView.setOnClickListener(this)
 
-        triggerSwitch = itemView.findViewById(R.id.ui_trigger_switch) as Switch
+        triggerSwitch = itemView.findViewById(R.id.ui_trigger_switch) as SwitchCompat
         triggerSwitch.setOnClickListener(this)
 
         removeButton = itemView.findViewById(R.id.ui_button_remove) as AppCompatImageButton
@@ -156,7 +157,7 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
                 expandedView.visibility = View.VISIBLE
 
                 bottomBar.locked = false
-                bottomBar.setBackgroundColor(itemView.resources.getColor(R.color.colorSecondary, null))
+                bottomBar.setBackgroundColor(ContextCompat.getColor(itemView.context, R.color.colorSecondary))
                 removeButton.setColorFilter(Color.WHITE)
                 applyButtonGroup.visibility = View.VISIBLE
                 expandToggleButton.visibility = View.INVISIBLE
@@ -169,8 +170,8 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
                 collapsedView.visibility = View.VISIBLE
 
                 bottomBar.locked = true
-                bottomBar.setBackgroundColor(itemView.resources.getColor(R.color.editTextFormBackground, null))
-                removeButton.setColorFilter(itemView.resources.getColor(R.color.buttonIconColorDark, null))
+                bottomBar.setBackgroundColor(ContextCompat.getColor(itemView.context, R.color.editTextFormBackground))
+                removeButton.setColorFilter(ContextCompat.getColor(itemView.context, R.color.buttonIconColorDark))
                 applyButtonGroup.visibility = View.INVISIBLE
                 expandToggleButton.visibility = View.VISIBLE
             }

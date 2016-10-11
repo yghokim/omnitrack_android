@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.ui.components.common
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.support.v4.content.ContextCompat
 import android.util.AttributeSet
 import android.view.MotionEvent
 import kr.ac.snu.hcil.omnitrack.R
@@ -133,23 +134,23 @@ class StarRatingView : HorizontalLinearDrawableView {
         override val numDrawables: Int get() = levels
 
         private val emptyDrawable: Drawable by lazy {
-            resources.getDrawable(R.drawable.rating_star_empty, null)
+            ContextCompat.getDrawable(context, R.drawable.rating_star_empty)
         }
         private val halfDrawable: Drawable by lazy {
-            resources.getDrawable(R.drawable.rating_star_half, null)
+            ContextCompat.getDrawable(context, R.drawable.rating_star_half)
         }
         private val fullDrawable: Drawable by lazy {
-            resources.getDrawable(R.drawable.rating_star_full, null)
+            ContextCompat.getDrawable(context, R.drawable.rating_star_full)
         }
 
         private val emptyDrawableSmall: Drawable by lazy {
-            resources.getDrawable(R.drawable.symbol_star_empty, null)
+            ContextCompat.getDrawable(context, R.drawable.symbol_star_empty)
         }
         private val halfDrawableSmall: Drawable by lazy {
-            resources.getDrawable(R.drawable.symbol_star_half, null)
+            ContextCompat.getDrawable(context, R.drawable.symbol_star_half)
         }
         private val fullDrawableSmall: Drawable by lazy {
-            resources.getDrawable(R.drawable.symbol_star_full, null)
+            ContextCompat.getDrawable(context, R.drawable.symbol_star_full)
         }
 
         init {

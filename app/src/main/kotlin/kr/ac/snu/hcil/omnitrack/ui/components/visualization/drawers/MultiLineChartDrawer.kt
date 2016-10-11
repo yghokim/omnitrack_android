@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers
 
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.support.v4.content.ContextCompat
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.visualization.CompoundAttributeChartModel
@@ -157,7 +158,7 @@ class MultiLineChartDrawer() : ATimelineChartDrawer() {
     }
 
     override fun onDraw(canvas: Canvas) {
-        fillRect(plotAreaRect, OTApplication.app.resources.getColor(R.color.editTextFormBackground, null), canvas)
+        fillRect(plotAreaRect, ContextCompat.getColor(OTApplication.app, R.color.editTextFormBackground), canvas)
 
         super.onDraw(canvas)
         legend.onDraw(canvas)

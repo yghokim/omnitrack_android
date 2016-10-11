@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui.components.common.text
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
+import android.support.v4.content.ContextCompat
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
@@ -46,7 +47,7 @@ class LinedTextBase(val textView: View) {
     init {
         linePaint.style = Paint.Style.STROKE
         linePaint.strokeWidth = 2.0f
-        linePaint.color = textView.resources.getColor(R.color.editTextLine, null)
+        linePaint.color = ContextCompat.getColor(textView.context, R.color.editTextLine)
 
         lineOffset = 5 * textView.resources.displayMetrics.density
         refresh()
