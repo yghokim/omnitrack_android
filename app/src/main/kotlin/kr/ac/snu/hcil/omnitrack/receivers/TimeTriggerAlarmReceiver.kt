@@ -40,12 +40,16 @@ class TimeTriggerAlarmReceiver : WakefulBroadcastReceiver() {
                         trigger.fire(triggerTime) {
                             println("${trigger.action} fire finished.")
                             left--
-                            if (left == 0) {
-                                println("every trigger was done. finish the wakeup")
-                                WakefulBroadcastReceiver.completeWakefulIntent(intent)
-                            }
                         }
                     }
+
+                    while (left > 0) {
+                        1
+                    }
+
+                    println("every trigger was done. finish the wakeup")
+                    WakefulBroadcastReceiver.completeWakefulIntent(intent)
+
                 }
             } else {
                 WakefulBroadcastReceiver.completeWakefulIntent(intent)
