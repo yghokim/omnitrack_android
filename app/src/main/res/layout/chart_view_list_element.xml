@@ -2,12 +2,12 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@color/frontalBackground"
+    android:orientation="vertical"
+    android:paddingBottom="12dp"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
-    android:orientation="vertical"
-    android:background="@color/frontalBackground"
     android:paddingTop="12dp"
-    android:paddingBottom="12dp"
 
     >
 
@@ -22,15 +22,15 @@
             style="@style/PropertyHeaderStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Text"
             android:layout_gravity="center_vertical"
-            android:textSize="17sp" />
+            android:text="Text"
+            android:textSize="16sp" />
 
     </LinearLayout>
 
     <kr.ac.snu.hcil.omnitrack.ui.components.visualization.ChartView
+        android:id="@+id/ui_chart_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/ui_chart_view"/>
+        android:layout_height="wrap_content" />
 
 </LinearLayout>

@@ -12,7 +12,7 @@
         android:layout_marginRight="6dp"
         android:text="New Text"
         android:textColor="@color/textColorMid"
-        android:textSize="40dp"
+        android:textSize="40sp"
 
         />
 </FrameLayout>

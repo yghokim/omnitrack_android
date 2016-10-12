@@ -22,6 +22,6 @@
         android:layout_toEndOf="@+id/ui_checked"
         android:text="Choice Entry 1"
         android:textColor="@color/textColorMid"
-        android:textSize="16dp"
+        android:textSize="16sp"
         android:textStyle="bold" />
 </RelativeLayout>

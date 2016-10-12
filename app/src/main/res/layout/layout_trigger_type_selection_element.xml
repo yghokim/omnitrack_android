@@ -27,7 +27,7 @@
         android:fontFamily="sans-serif-light"
         android:text="@string/trigger_name_event"
         android:textColor="@color/textColorDark"
-        android:textSize="18dp"
+        android:textSize="18sp"
         android:textStyle="italic" />
 
 
@@ -38,5 +38,5 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="6dp"
         android:text="@string/trigger_desc_event"
-        android:textSize="14dp" />
+        android:textSize="14sp" />
 </LinearLayout>

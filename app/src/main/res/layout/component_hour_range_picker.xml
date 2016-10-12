@@ -19,7 +19,7 @@
         android:text="~"
         android:textAlignment="center"
         android:textColor="@color/textColorMid"
-        android:textSize="24dp" />
+        android:textSize="24sp" />
 
     <kr.ac.snu.hcil.omnitrack.ui.components.common.time.HourPicker
         android:id="@+id/ui_picker_to"

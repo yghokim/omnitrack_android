@@ -148,7 +148,11 @@ object OTTimeTriggerAlarmManager {
             val alarmId = idTable[result.first]
             println("new alarm is needed for timestamp ${result.first}. alarmId is $alarmId")
 
-            alarmManager.setExact(AlarmManager.RTC_WAKEUP, result.first, makeIntent(OTApplication.app, result.first, alarmId))
+            if (android.os.Build.VERSION.SDK_INT >= 23) {
+                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, result.first, makeIntent(OTApplication.app, result.first, alarmId))
+            } else {
+                alarmManager.setExact(AlarmManager.RTC_WAKEUP, result.first, makeIntent(OTApplication.app, result.first, alarmId))
+            }
         } else {
             println("System alarm is already registered at ${result.first}.")
         }

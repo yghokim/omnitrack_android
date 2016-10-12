@@ -3,26 +3,26 @@
     android:id="@+id/group"
     style="@style/shortcut_GroupStyle"
     android:layout_height="match_parent"
-    android:paddingTop="3dp"
-    android:minHeight="64dp">
+    android:minHeight="64dp"
+    android:paddingTop="3dp">
 
     <TextView
         android:id="@+id/ui_name"
         style="@style/shortcut_NameStyle"
         android:layout_marginBottom="3dp"
+        android:layout_marginTop="0dp"
         android:layout_weight="1"
         android:fontFamily="sans-serif-condensed"
         android:minHeight="0dp"
         android:text="Manual Sleep"
-        android:textSize="13dp"
+        android:textSize="13sp"
         android:textStyle="normal"
-        android:layout_marginTop="0dp"
         />
 
     <FrameLayout
         android:id="@+id/ui_button_container"
-        android:layout_height="28dp"
-        style="@style/shortcut_ButtonContainerStyle">
+        style="@style/shortcut_ButtonContainerStyle"
+        android:layout_height="28dp">
         <ImageButton
             android:id="@+id/ui_button_instant"
             style="@style/shortcut_ButtonStyle"/>

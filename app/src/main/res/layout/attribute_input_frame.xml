@@ -36,7 +36,7 @@
             android:layout_centerVertical="true"
             android:layout_marginLeft="?attr/actionBarSize"
             android:text="Text"
-            android:textSize="17dp" />
+            android:textSize="16sp" />
 
         <android.support.v7.widget.AppCompatImageView
             android:id="@+id/ui_required_marker"

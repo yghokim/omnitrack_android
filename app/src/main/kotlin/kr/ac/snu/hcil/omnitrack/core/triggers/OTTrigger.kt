@@ -19,7 +19,7 @@ import kotlin.properties.Delegates
 abstract class OTTrigger(objectId: String?, dbId: Long?, name: String,
                          trackerObjectIds: Array<String>,
                          isOn: Boolean,
-                         action: Int,
+                         val action: Int,
                          lastTriggeredTime: Long,
                          serializedProperties: String? = null) : NamedObject(objectId, dbId, name) {
 
@@ -65,9 +65,6 @@ abstract class OTTrigger(objectId: String?, dbId: Long?, name: String,
 
     abstract val configIconId: Int
     abstract val configTitleId: Int
-
-
-    val action: Int = action
 
     var lastTriggeredTime: Long by Delegates.observable(lastTriggeredTime) {
         prop, old, new ->
@@ -119,13 +116,12 @@ abstract class OTTrigger(objectId: String?, dbId: Long?, name: String,
 
     fun getSerializedProperties(): String{
         val list = ArrayList<SerializedStringKeyEntry>()
-        for(entry in properties)
-        {
-            if(entry.value!=null)
+
+        for ((key, value) in properties)
+            if (value != null)
             {
-                list.add(SerializedStringKeyEntry(entry.key, TypeStringSerializationHelper.serialize(entry.value!!)))
+                list.add(SerializedStringKeyEntry(key, TypeStringSerializationHelper.serialize(value)))
             }
-        }
 
         return Gson().toJson(list.toTypedArray())
     }
@@ -160,13 +156,14 @@ abstract class OTTrigger(objectId: String?, dbId: Long?, name: String,
                 //Toast.makeText(OTApplication.app, "Logged!", Toast.LENGTH_SHORT).show()
 
                 var left = trackers.size
-                for (tracker in trackers)
+                for (tracker in trackers) {
                     OTBackgroundLoggingService.startLoggingAsync(OTApplication.app, tracker, OTBackgroundLoggingService.LoggingSource.Trigger) {
                         left--
                         if (left == 0) {
                             finished?.invoke(true)
                         }
                     }
+                }
             }
             OTTrigger.ACTION_NOTIFICATION -> {
                 println("trigger fired - send notification")
@@ -193,7 +190,7 @@ abstract class OTTrigger(objectId: String?, dbId: Long?, name: String,
     }
 
 
-    abstract fun handleOn();
-    abstract fun handleOff();
+    abstract fun handleOn()
+    abstract fun handleOff()
 
 }

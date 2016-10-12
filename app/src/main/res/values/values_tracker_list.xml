@@ -11,7 +11,7 @@
 
     <dimen name="tracker_list_color_bar_width">4dp</dimen>
 
-    <dimen name="tracker_list_element_information_text_contentSize">14dp</dimen>
+    <dimen name="tracker_list_element_information_text_contentSize">14sp</dimen>
     <dimen name="tracker_list_element_information_text_headerSize">11sp</dimen>
 
     <dimen name="trigger_list_element_divider_height">1dp</dimen>

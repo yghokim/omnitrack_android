@@ -30,5 +30,5 @@
         android:ems="10"
         android:inputType="numberDecimal|numberSigned"
         android:text="10000"
-        android:textSize="25dp" />
+        android:textSize="25sp" />
 </merge>

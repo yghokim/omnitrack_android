@@ -17,6 +17,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:text="Convert Result"
-        android:textSize="13dp"
+        android:textSize="13sp"
         android:textStyle="bold" />
 </merge>

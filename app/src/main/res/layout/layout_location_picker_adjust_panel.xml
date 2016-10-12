@@ -14,7 +14,7 @@
         android:text="Adjust location to center"
         android:textAlignment="center"
         android:textColor="#fff"
-        android:textSize="13dp"
+        android:textSize="13sp"
 
         android:textStyle="bold" />
 

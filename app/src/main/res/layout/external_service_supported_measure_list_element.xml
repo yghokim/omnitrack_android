@@ -25,7 +25,7 @@
             android:layout_marginBottom="3dp"
             android:text="Step Count"
             android:textColor="@color/textColorMid"
-            android:textSize="16dp"
+            android:textSize="16sp"
             android:textStyle="bold" />
 
         <TextView
@@ -34,7 +34,7 @@
             android:layout_height="wrap_content"
             android:text="Get step count during specific range"
             android:textColor="@color/textColorLight"
-            android:textSize="13dp" />
+            android:textSize="13sp" />
     </LinearLayout>
 
     <android.support.v7.widget.AppCompatButton
@@ -47,7 +47,6 @@
         android:background="@drawable/button_background_capsule_pointed"
         android:drawableLeft="@drawable/link"
         android:drawablePadding="5dp"
-        android:elevation="0dp"
         android:includeFontPadding="false"
         android:paddingEnd="12dp"
         android:text="connect"

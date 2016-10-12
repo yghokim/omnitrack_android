@@ -13,5 +13,5 @@
         android:layout_marginTop="6dp"
         android:text="New Text"
         android:textColor="@color/colorSecondary"
-        android:textSize="18dp" />
+        android:textSize="18sp" />
 </FrameLayout>
