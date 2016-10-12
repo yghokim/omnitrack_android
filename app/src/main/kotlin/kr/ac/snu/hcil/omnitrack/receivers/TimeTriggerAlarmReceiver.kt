@@ -44,7 +44,7 @@ class TimeTriggerAlarmReceiver : WakefulBroadcastReceiver() {
                     }
 
                     while (left > 0) {
-                        1
+
                     }
 
                     println("every trigger was done. finish the wakeup")
