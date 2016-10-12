@@ -12,6 +12,7 @@ import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.database.CacheHelper
 import kr.ac.snu.hcil.omnitrack.core.database.DatabaseHelper
+import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.fitbit.FitbitRecentSleepTimeMeasureFactory
@@ -33,6 +34,9 @@ class OTApplication : MultiDexApplication() {
 
     companion object {
         lateinit var app: OTApplication
+            private set
+
+        lateinit var logger: LoggingDbHelper
             private set
 
         const val INTENT_EXTRA_OBJECT_ID_TRACKER = "trackerObjectId"
@@ -105,7 +109,10 @@ class OTApplication : MultiDexApplication() {
 
         app = this
 
+        logger = LoggingDbHelper(this)
+
         dbHelper = DatabaseHelper(this)
+
 
         var initialRun = false
         val user = dbHelper.findUserById(1)
