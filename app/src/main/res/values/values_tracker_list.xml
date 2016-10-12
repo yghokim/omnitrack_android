@@ -6,6 +6,10 @@
 
     <dimen name="tracker_list_bottom_space">100dp</dimen>
 
+    <fraction name="tracker_list_separator_height_ratio">100%</fraction>
+
+    <dimen name="tracker_list_expand_button_width">45dp</dimen>
+
     <dimen name="tracker_list_information_bottom_padding">16dp</dimen>
     <dimen name="tracker_list_information_spacing">20dp</dimen>
 

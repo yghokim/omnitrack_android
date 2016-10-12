@@ -128,7 +128,7 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
         attributeListItemTouchHelper.attachToRecyclerView(attributeListView)
 
         newAttributeGrid = rootView.findViewById(R.id.ui_new_attribute_grid) as RecyclerView
-        newAttributeGrid.layoutManager = GridLayoutManager(context, 5)
+        newAttributeGrid.layoutManager = GridLayoutManager(context, resources.getInteger(R.integer.new_attribute_panel_horizontal_count))
         newAttributeGrid.adapter = GridAdapter()
 
 

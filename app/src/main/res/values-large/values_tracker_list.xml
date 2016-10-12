@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="tracker_list_element_collapsed_height">100dp</dimen>
+    <dimen name="tracker_list_element_expanded_height">140dp</dimen>
+
+    <dimen name="tracker_list_bottom_space">100dp</dimen>
+
+    <fraction name="tracker_list_separator_height_ratio">70%</fraction>
+
+    <dimen name="tracker_list_expand_button_width">40dp</dimen>
+
+    <dimen name="tracker_list_information_bottom_padding">12dp</dimen>
+    <dimen name="tracker_list_information_spacing">10dp</dimen>
+
+    <dimen name="tracker_list_color_bar_width">3.5dp</dimen>
+
+</resources>

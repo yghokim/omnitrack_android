@@ -3,7 +3,6 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_horizontal_margin.Negative">-16dp</dimen>
 
-
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
 
@@ -13,19 +12,6 @@
     <dimen name="property_bottom_padding">16dp</dimen>
 
     <dimen name="list_element_vertical_space">7dp</dimen>
-    <dimen name="attribute_list_element_vertical_space">15dp</dimen>
-
-    <dimen name="attribute_list_element_drag_area_width">35dp</dimen>
-
-    <dimen name="attribute_list_element_min_height">120dp</dimen>
-    <dimen name="attribute_list_element_header_height">45dp</dimen>
-    <dimen name="attribute_list_element_header_type_icon_width">20dp</dimen>
-    <dimen name="attribute_list_horizontal_padding">11dp</dimen>
-    <dimen name="attribute_list_element_spacing">2dp</dimen>
-
-    <dimen name="attribute_list_element_horizontal_padding">10dp</dimen>
-
-    <dimen name="attribute_input_header_margin_bottom">20dp</dimen>
 
     <dimen name="color_selection_button_size">36dp</dimen>
 

@@ -64,7 +64,7 @@
 
             <ImageButton
                 android:id="@+id/ui_expand_button"
-                android:layout_width="45dp"
+                android:layout_width="@dimen/tracker_list_expand_button_width"
                 android:layout_height="match_parent"
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentEnd="true"

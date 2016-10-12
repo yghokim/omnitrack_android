@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <integer name="new_attribute_panel_horizontal_count">6</integer>
+    <dimen name="new_attribute_panel_icon_size">50dp</dimen>
+
+    <dimen name="attribute_list_element_vertical_space">10dp</dimen>
+    <dimen name="attribute_list_element_drag_area_width">35dp</dimen>
+
+    <dimen name="attribute_list_element_min_height">120dp</dimen>
+    <dimen name="attribute_list_element_header_height">37dp</dimen>
+    <dimen name="attribute_list_element_header_type_icon_width">17dp</dimen>
+    <dimen name="attribute_list_element_header_type_icon_padding">8dp</dimen>
+
+    <dimen name="attribute_list_element_edit_padding">11dp</dimen>
+    <dimen name="attribute_list_element_remove_padding">12dp</dimen>
+
+    <dimen name="attribute_list_horizontal_padding">11dp</dimen>
+    <dimen name="attribute_list_element_spacing">2dp</dimen>
+
+    <dimen name="attribute_list_element_horizontal_padding">10dp</dimen>
+
+    <dimen name="attribute_input_header_margin_bottom">20dp</dimen>
+
+</resources>
