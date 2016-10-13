@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui.activities
 import android.app.Activity
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.AppCompatImageButton
 import android.support.v7.widget.Toolbar
 import android.view.View
 import android.widget.ImageButton
@@ -30,7 +31,7 @@ abstract class MultiButtonActionBarActivity(val layoutId: Int) : AppCompatActivi
         val toolbar = findViewById(R.id.toolbar) as Toolbar?
         setSupportActionBar(toolbar)
 
-        leftActionBarButton = findViewById(R.id.ui_appbar_button_left) as ImageButton
+        leftActionBarButton = findViewById(R.id.ui_appbar_button_left) as AppCompatImageButton
         leftActionBarButton?.setOnClickListener {
 
             super.setResult(leftButtonResultCode)
@@ -38,7 +39,7 @@ abstract class MultiButtonActionBarActivity(val layoutId: Int) : AppCompatActivi
         }
 
 
-        rightActionBarButton = findViewById(R.id.ui_appbar_button_right) as ImageButton
+        rightActionBarButton = findViewById(R.id.ui_appbar_button_right) as AppCompatImageButton
 
         rightActionBarButton?.setOnClickListener {
 

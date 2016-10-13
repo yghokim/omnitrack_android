@@ -1,7 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.core.triggers
 
 import android.content.Context
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
 import kr.ac.snu.hcil.omnitrack.utils.*
 import java.util.*
 
@@ -11,6 +13,9 @@ import java.util.*
 class OTTimeTrigger : OTTrigger {
 
     companion object {
+
+        const val TAG = "TimeTrigger"
+
         const val CONFIG_TYPE_ALARM = 0
         const val CONFIG_TYPE_INTERVAL = 1
 
@@ -552,6 +557,8 @@ class OTTimeTrigger : OTTrigger {
 
             cacheCalendar.timeInMillis = nextAlarmTime
             println("next alarm will be fired at $cacheCalendar")
+
+            OTApplication.logger.writeSystemLog("Next alarm is reserved at ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(nextAlarmTime))}", TAG)
 
             OTTimeTriggerAlarmManager.reserveAlarm(this, nextAlarmTime)
             return true

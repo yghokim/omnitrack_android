@@ -4,13 +4,18 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import java.text.SimpleDateFormat
 
 /**
  * Created by Young-Ho on 10/12/2016.
  */
 class LoggingDbHelper(context: Context) : SQLiteOpenHelper(context, "logging.db", null, 1) {
 
-    data class OTLog(val log: String, val tag: String, val timestamp: Long)
+    companion object {
+        val TIMESTAMP_FORMAT = SimpleDateFormat("YY/MM/dd hh:mm:ss")
+    }
+
+    data class OTLog(val id: Long, val log: String, val tag: String, val timestamp: Long)
 
     object SystemLogScheme : TableScheme() {
 
@@ -30,7 +35,7 @@ class LoggingDbHelper(context: Context) : SQLiteOpenHelper(context, "logging.db"
 
         for (scheme in tables) {
             db.execSQL(scheme.creationQueryString)
-            db.execSQL(scheme.indexCreationQueryString)
+            //db.execSQL(scheme.indexCreationQueryString)
         }
     }
 
@@ -58,7 +63,7 @@ class LoggingDbHelper(context: Context) : SQLiteOpenHelper(context, "logging.db"
 
         if (query.moveToFirst()) {
             do {
-                val new = OTLog(query.getString(query.getColumnIndex(SystemLogScheme.LOG)), query.getString(query.getColumnIndex(SystemLogScheme.TAG)), query.getLong(query.getColumnIndex(SystemLogScheme.LOGGED_AT)))
+                val new = OTLog(query.getLong(query.getColumnIndex(SystemLogScheme._ID)), query.getString(query.getColumnIndex(SystemLogScheme.LOG)), query.getString(query.getColumnIndex(SystemLogScheme.TAG)), query.getLong(query.getColumnIndex(SystemLogScheme.LOGGED_AT)))
                 out.add(new)
             } while (query.moveToNext())
         }

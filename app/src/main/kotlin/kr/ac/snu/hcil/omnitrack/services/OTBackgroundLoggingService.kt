@@ -19,6 +19,8 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
     }
 
     companion object {
+        const val TAG = "BGLoggingService"
+
         private val ACTION_LOG = "kr.ac.snu.hcil.omnitrack.services.action.LOG"
 
         private const val INTENT_EXTRA_LOGGING_SOURCE = "loggingSource"
@@ -31,14 +33,20 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
         fun startLoggingAsync(context: Context, tracker: OTTracker, source: LoggingSource, finished: ((success: Boolean) -> Unit)? = null) {
             val builder = OTItemBuilder(tracker, OTItemBuilder.MODE_BACKGROUND)
 
+
+            OTApplication.logger.writeSystemLog("start background logging of ${tracker.name}", TAG)
             sendBroadcast(context, OTApplication.BROADCAST_ACTION_BACKGROUND_LOGGING_STARTED, tracker)
             builder.autoCompleteAsync {
                 val item = builder.makeItem()
                 OTApplication.app.dbHelper.save(item, tracker)
                 if (item.dbId != null) {
                     sendBroadcast(context, OTApplication.BROADCAST_ACTION_BACKGROUND_LOGGING_SUCCEEDED, tracker, item.dbId!!)
+
+                    OTApplication.logger.writeSystemLog("${tracker.name} background logging was successful", TAG)
                     finished?.invoke(true)
                 } else {
+
+                    OTApplication.logger.writeSystemLog("${tracker.name} background logging failed", TAG)
                     finished?.invoke(false)
                 }
             }

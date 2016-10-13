@@ -18,14 +18,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <ImageButton
+                <android.support.v7.widget.AppCompatImageButton
                     android:id="@+id/ui_appbar_button_left"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_alignParentStart="true"
+                    android:layout_marginRight="-8dp"
                     android:background="@drawable/transparent_button_background"
                     android:minWidth="?attr/actionBarSize"
-                    android:src="@drawable/cancel" />
+                    android:src="@drawable/cancel"
+                    android:tint="#FFF" />
 
                 <TextView
                     android:id="@+id/ui_appbar_title"
@@ -33,19 +35,20 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:layout_marginLeft="8dp"
+                    android:layout_marginLeft="@dimen/activity_horizontal_margin"
                     android:layout_toRightOf="@+id/ui_appbar_button_left"
                     android:text="Title"
                     android:textColor="#ffffff" />
 
-                <ImageButton
+                <android.support.v7.widget.AppCompatImageButton
                     android:id="@+id/ui_appbar_button_right"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_alignParentEnd="true"
                     android:background="@drawable/transparent_button_background"
                     android:minWidth="?attr/actionBarSize"
-                    android:src="@drawable/done" />
+                    android:src="@drawable/done"
+                    android:tint="#FFF" />
             </RelativeLayout>
         </android.support.v7.widget.Toolbar>
 </merge>

@@ -18,7 +18,6 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
-
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature
         android:name="android.hardware.camera.autofocus"
@@ -98,7 +97,6 @@
                 <category android:name="ANDROID.INTENT.CATEGORY.HOME" />
             </intent-filter>
         </receiver>
-
         <receiver
             android:name=".receivers.TimeTriggerAlarmReceiver"
             android:enabled="true"
@@ -111,7 +109,6 @@
         <service
             android:name=".receivers.TimeTriggerAlarmReceiver$TimeTriggerWakefulHandlingService"
             android:exported="false" />
-
         <service
             android:name=".services.OTBackgroundLoggingService"
             android:exported="false" />
@@ -145,13 +142,12 @@
         <activity
             android:name=".ui.pages.items.ItemEditingActivity"
             android:label="@string/title_activity_new_item" />
-        <activity
-            android:name=".ui.pages.items.ItemBrowserActivity" />
-
-        <activity
-            android:name=".ui.components.common.activity.WebServiceLoginActivity"/>
-
+        <activity android:name=".ui.pages.items.ItemBrowserActivity" />
+        <activity android:name=".ui.components.common.activity.WebServiceLoginActivity" />
         <activity android:name=".ui.pages.visualization.ChartViewActivity" />
+        <activity
+            android:name=".ui.pages.diagnostics.SystemLogActivity"
+            android:label="System Logs" />
     </application>
 
 </manifest>
