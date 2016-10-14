@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
 import kr.ac.snu.hcil.omnitrack.receivers.TimeTriggerAlarmReceiver
 import kr.ac.snu.hcil.omnitrack.utils.FillingIntegerIdReservationTable
 import kr.ac.snu.hcil.omnitrack.utils.TimeKeyValueSetTable
@@ -161,7 +162,10 @@ class OTTimeTriggerAlarmManager {
             } else {
                 alarmManager.setExact(AlarmManager.RTC_WAKEUP, result.first, makeIntent(OTApplication.app, result.first, alarmId))
             }
+
+            OTApplication.logger.writeSystemLog("Set new system alarm at ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(result.first))}", "TimeTriggerAlarmManager")
         } else {
+            OTApplication.logger.writeSystemLog("System alarm is already registered at ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(result.first))}", "TimeTriggerAlarmManager")
             println("System alarm is already registered at ${result.first}.")
         }
     }
@@ -191,8 +195,9 @@ class OTTimeTriggerAlarmManager {
         if (idTable.getKeyFromId(alarmId) == intentTriggerTime) {
             //Toast.makeText(OTApplication.app, "Alarm fired: ${reservationTable[intentTriggerTime]?.size ?: 0} triggers are reserved for this alarm.", Toast.LENGTH_SHORT).show()
 
-            println("${reservationTable[intentTriggerTime]?.size ?: 0} triggers are reserved for this alarm.")
 
+            println("${reservationTable[intentTriggerTime]?.size ?: 0} triggers are reserved for this alarm.")
+            OTApplication.logger.writeSystemLog("${reservationTable.size} timestamps are stored", "TimeTriggerAlarmManager")
             val reservedTriggers = reservationTable[intentTriggerTime]
             reservationTable.clearTimestamp(timestamp = intentTriggerTime)
             idTable.removeKey(intentTriggerTime)
@@ -205,7 +210,6 @@ class OTTimeTriggerAlarmManager {
                     if (trigger != null)
                         triggers.add(trigger)
                 }
-
                 return triggers
             } else return null
         } else return null

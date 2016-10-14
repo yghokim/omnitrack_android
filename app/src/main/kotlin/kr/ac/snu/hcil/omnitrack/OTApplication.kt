@@ -129,6 +129,7 @@ class OTApplication : MultiDexApplication() {
             _currentUser = user
         }
 
+        timeTriggerAlarmManager = OTTimeTriggerAlarmManager()
 
         triggerManager = OTTriggerManager(_currentUser, if (_currentUser.dbId != null) {
             dbHelper.findTriggersOfUser(_currentUser.dbId!!)
@@ -136,7 +137,6 @@ class OTApplication : MultiDexApplication() {
             null
         })
 
-        timeTriggerAlarmManager = OTTimeTriggerAlarmManager()
 
 
         for (service in OTExternalService.availableServices) {

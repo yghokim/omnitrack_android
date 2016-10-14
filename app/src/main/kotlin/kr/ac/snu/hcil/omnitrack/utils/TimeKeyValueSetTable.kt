@@ -17,6 +17,9 @@ class TimeKeyValueSetTable<T>(var thresholdMillis: Int, data: SortedMap<Long, Mu
     val timeKeys: Set<Long>
         get() = map.keys
 
+    val size: Int
+        get() = map.size
+
     init {
         if (data != null)
             map = TreeMap<Long, MutableSet<T>>(data)

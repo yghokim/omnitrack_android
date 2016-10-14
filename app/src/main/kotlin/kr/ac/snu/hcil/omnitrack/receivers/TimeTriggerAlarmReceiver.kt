@@ -62,12 +62,12 @@ class TimeTriggerAlarmReceiver : WakefulBroadcastReceiver() {
                     OTApplication.logger.writeSystemLog("Every trigger firing was done. Release the wake lock.", TAG)
 
                     println("every trigger was done. finish the wakeup")
+                    OTApplication.app.timeTriggerAlarmManager.storeTableToPreferences()
                     WakefulBroadcastReceiver.completeWakefulIntent(intent)
-
                 }
             } else {
+                OTApplication.app.timeTriggerAlarmManager.storeTableToPreferences()
                 WakefulBroadcastReceiver.completeWakefulIntent(intent)
-
                 OTApplication.logger.writeSystemLog("No trigger is assigned to this alarm. Release the wake lock.", TAG)
             }
         }

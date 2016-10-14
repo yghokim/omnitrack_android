@@ -12,7 +12,7 @@ import java.text.SimpleDateFormat
 class LoggingDbHelper(context: Context) : SQLiteOpenHelper(context, "logging.db", null, 1) {
 
     companion object {
-        val TIMESTAMP_FORMAT = SimpleDateFormat("YY/MM/dd hh:mm:ss")
+        val TIMESTAMP_FORMAT = SimpleDateFormat("yy/MM/dd hh:mm:ss")
     }
 
     data class OTLog(val id: Long, val log: String, val tag: String, val timestamp: Long)

@@ -65,6 +65,11 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home) {
         startActivity(intent)
     }
 
+    override fun onPause() {
+        super.onPause()
+        (application as OTApplication).syncUserToDb()
+    }
+
     /**
      * A [FragmentPagerAdapter] that returns a fragment corresponding to
      * one of the sections/tabs/pages.

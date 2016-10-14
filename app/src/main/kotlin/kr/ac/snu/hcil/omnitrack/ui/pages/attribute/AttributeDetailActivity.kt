@@ -107,6 +107,8 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
                 }
             }
         }
+
+        (application as OTApplication).syncUserToDb()
     }
 
     fun refresh() {
