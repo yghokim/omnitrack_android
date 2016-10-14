@@ -523,7 +523,7 @@ class OTTimeTrigger : OTTrigger {
 
         //val alarmManager = OTApplication.app.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-        OTTimeTriggerAlarmManager.cancelTrigger(this)
+        OTApplication.app.timeTriggerAlarmManager.cancelTrigger(this)
         if (!reserveNextAlarmToSystem(lastTriggeredTime)) {
             isOn = false
         }
@@ -532,7 +532,7 @@ class OTTimeTrigger : OTTrigger {
     private fun onRangeChanged() {
         //val alarmManager = OTApplication.app.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-        OTTimeTriggerAlarmManager.cancelTrigger(this)
+        OTApplication.app.timeTriggerAlarmManager.cancelTrigger(this)
         if (!reserveNextAlarmToSystem(lastTriggeredTime)) {
             isOn = false
         }
@@ -560,7 +560,7 @@ class OTTimeTrigger : OTTrigger {
 
             OTApplication.logger.writeSystemLog("Next alarm is reserved at ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(nextAlarmTime))}", TAG)
 
-            OTTimeTriggerAlarmManager.reserveAlarm(this, nextAlarmTime)
+            OTApplication.app.timeTriggerAlarmManager.reserveAlarm(this, nextAlarmTime)
             return true
         } else {
             println("Finish trigger. Do not repeat.")
@@ -581,6 +581,6 @@ class OTTimeTrigger : OTTrigger {
     }
 
     override fun handleOff() {
-        OTTimeTriggerAlarmManager.cancelTrigger(this)
+        OTApplication.app.timeTriggerAlarmManager.cancelTrigger(this)
     }
 }

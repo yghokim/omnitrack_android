@@ -120,7 +120,7 @@ class OTTriggerManager(val user: OTUser) {
 
         //TODO handler dependencies associated with the trigger
         if (trigger is OTTimeTrigger) {
-            OTTimeTriggerAlarmManager.cancelTrigger(trigger)
+            OTApplication.app.timeTriggerAlarmManager.cancelTrigger(trigger)
         }
 
         for (tracker in trigger.trackers) {

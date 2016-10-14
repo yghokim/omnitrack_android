@@ -14,25 +14,49 @@ import java.util.concurrent.ConcurrentHashMap
 /**
  * Created by younghokim on 16. 8. 29..
  */
-object OTTimeTriggerAlarmManager {
-    const val PREFERENCE_NAME = "TimeTriggerReservationTable"
+class OTTimeTriggerAlarmManager {
+    companion object {
+        const val PREFERENCE_NAME = "TimeTriggerReservationTable"
 
-    const val RESERVATION_TABLE_STORED = "reservationTableStored"
-    const val RESERVATION_TABLE_MEMBER_THRESHOLD = "thresholdMillis"
-    const val RESERVATION_TABLE_MEMBER_KEYS = "timestampList"
+        const val RESERVATION_TABLE_STORED = "reservationTableStored"
+        const val RESERVATION_TABLE_MEMBER_THRESHOLD = "thresholdMillis"
+        const val RESERVATION_TABLE_MEMBER_KEYS = "timestampList"
 
-    const val TRIGGER_TABLE_STORED = "triggerTableStored"
-    const val TRIGGER_TABLE_KEYS = "triggerTableKeys"
+        const val TRIGGER_TABLE_STORED = "triggerTableStored"
+        const val TRIGGER_TABLE_KEYS = "triggerTableKeys"
 
-    const val ID_TABLE_STORED = "idTableStored"
-    const val ID_TABLE_IDS = "idTableIds"
+        const val ID_TABLE_STORED = "idTableStored"
+        const val ID_TABLE_IDS = "idTableIds"
 
-    const val INTENT_EXTRA_TRIGGER_TIME = "triggerTime"
-    const val INTENT_EXTRA_ALARM_ID = "alarmId"
+        const val INTENT_EXTRA_TRIGGER_TIME = "triggerTime"
+        const val INTENT_EXTRA_ALARM_ID = "alarmId"
+
+        private fun makeIntent(context: Context, triggerTime: Long, alarmId: Int): PendingIntent {
+            val intent = Intent(context, TimeTriggerAlarmReceiver::class.java)
+            intent.action = OTApplication.BROADCAST_ACTION_TIME_TRIGGER_ALARM
+            intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_USER, OTApplication.app.currentUser.objectId)
+            intent.putExtra(INTENT_EXTRA_ALARM_ID, alarmId)
+            intent.putExtra(INTENT_EXTRA_TRIGGER_TIME, triggerTime)
+            return PendingIntent.getBroadcast(context, alarmId, intent, PendingIntent.FLAG_CANCEL_CURRENT)
+        }
+    }
+
+    private val reservationTable: TimeKeyValueSetTable<String>
+
+    private val triggerTable: ConcurrentHashMap<String, Long>
+
+    private val idTable: FillingIntegerIdReservationTable<Long>
 
 
-    private val reservationTable: TimeKeyValueSetTable<String> by lazy {
-        if (preferences.getBoolean(RESERVATION_TABLE_STORED, false)) {
+    private val preferences by lazy {
+        OTApplication.app.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
+    }
+
+    private val alarmManager by lazy { OTApplication.app.getSystemService(Context.ALARM_SERVICE) as AlarmManager }
+
+
+    init {
+        reservationTable = if (preferences.getBoolean(RESERVATION_TABLE_STORED, false)) {
             val threshold = preferences.getInt(RESERVATION_TABLE_MEMBER_THRESHOLD, 500)
             val map = java.util.TreeMap<Long, MutableSet<String>>()
             val keys = preferences.getStringSet(RESERVATION_TABLE_MEMBER_KEYS, null)
@@ -46,10 +70,8 @@ object OTTimeTriggerAlarmManager {
 
             TimeKeyValueSetTable<String>(500)
         }
-    }
 
-    private val triggerTable: ConcurrentHashMap<String, Long> by lazy {
-        if (preferences.getBoolean(TRIGGER_TABLE_STORED, false)) {
+        triggerTable = if (preferences.getBoolean(TRIGGER_TABLE_STORED, false)) {
             val keys = preferences.getStringSet(TRIGGER_TABLE_KEYS, null)
 
             val map = ConcurrentHashMap<String, Long>(keys.size)
@@ -74,10 +96,8 @@ object OTTimeTriggerAlarmManager {
 
             map
         }
-    }
 
-    private val idTable: FillingIntegerIdReservationTable<Long> by lazy {
-        if (preferences.getBoolean(ID_TABLE_STORED, false)) {
+        idTable = if (preferences.getBoolean(ID_TABLE_STORED, false)) {
             val ids = preferences.getStringSet(ID_TABLE_IDS, null).map { it.toInt() }
             val list = ArrayList<Pair<Int, Long>>()
             for (id in ids) {
@@ -88,18 +108,6 @@ object OTTimeTriggerAlarmManager {
         } else {
             FillingIntegerIdReservationTable<Long>()
         }
-    }
-
-
-    private val preferences by lazy {
-        OTApplication.app.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
-    }
-
-    private val alarmManager by lazy { OTApplication.app.getSystemService(Context.ALARM_SERVICE) as AlarmManager }
-
-
-    init {
-
     }
 
     fun storeTableToPreferences(): Unit {
@@ -201,16 +209,6 @@ object OTTimeTriggerAlarmManager {
                 return triggers
             } else return null
         } else return null
-    }
-
-
-    private fun makeIntent(context: Context, triggerTime: Long, alarmId: Int): PendingIntent {
-        val intent = Intent(context, TimeTriggerAlarmReceiver::class.java)
-        intent.action = OTApplication.BROADCAST_ACTION_TIME_TRIGGER_ALARM
-        intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_USER, OTApplication.app.currentUser.objectId)
-        intent.putExtra(INTENT_EXTRA_ALARM_ID, alarmId)
-        intent.putExtra(INTENT_EXTRA_TRIGGER_TIME, triggerTime)
-        return PendingIntent.getBroadcast(context, alarmId, intent, PendingIntent.FLAG_CANCEL_CURRENT)
     }
 
 }

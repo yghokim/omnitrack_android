@@ -100,6 +100,9 @@ class OTApplication : MultiDexApplication() {
     lateinit var triggerManager: OTTriggerManager
         private set
 
+    lateinit var timeTriggerAlarmManager: OTTimeTriggerAlarmManager
+        private set
+
 
     lateinit var supportedAttributePresets: Array<AttributePresetInfo>
         private set
@@ -132,6 +135,8 @@ class OTApplication : MultiDexApplication() {
         } else {
             null
         })
+
+        timeTriggerAlarmManager = OTTimeTriggerAlarmManager()
 
 
         for (service in OTExternalService.availableServices) {
@@ -189,11 +194,13 @@ class OTApplication : MultiDexApplication() {
         }
         dbHelper.deleteObjects(DatabaseHelper.TriggerScheme, *triggerManager.fetchRemovedTriggerIds())
 
-        OTTimeTriggerAlarmManager.storeTableToPreferences()
+        timeTriggerAlarmManager.storeTableToPreferences()
     }
 
     override fun onTerminate() {
         super.onTerminate()
+
+        logger.writeSystemLog("App terminates.", "Application")
 
         syncUserToDb()
 
