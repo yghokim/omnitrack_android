@@ -38,7 +38,7 @@ class OTTimeTriggerAlarmManager {
             intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_USER, OTApplication.app.currentUser.objectId)
             intent.putExtra(INTENT_EXTRA_ALARM_ID, alarmId)
             intent.putExtra(INTENT_EXTRA_TRIGGER_TIME, triggerTime)
-            return PendingIntent.getBroadcast(context, alarmId, intent, PendingIntent.FLAG_CANCEL_CURRENT)
+            return PendingIntent.getBroadcast(context, alarmId, intent, 0)
         }
     }
 
@@ -179,18 +179,22 @@ class OTTimeTriggerAlarmManager {
                 alarmManager.cancel(makeIntent(OTApplication.app, reservedTime, alarmId))
                 idTable.removeKey(reservedTime)
                 println("all triggers at $reservedTime was canceled. System alarm is canceled - ${alarmId}.")
+                OTApplication.logger.writeSystemLog("all triggers at ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(reservedTime))} was canceled. System alarm is canceled - ${alarmId}.", "TimeTriggerAlarmManager")
             } else {
                 println("only this trigger was excluded at $reservedTime. There are still ${reservationTable[reservedTime]?.size ?: 0} triggers reserved at that time. System alarm persists.")
+                OTApplication.logger.writeSystemLog("only this trigger was excluded at $reservedTime. There are still ${reservationTable[reservedTime]?.size ?: 0} triggers reserved at that time. System alarm persists.", "TimeTriggerAlarmManager")
             }
 
             triggerTable.remove(trigger.objectId)
+        } else {
+            OTApplication.logger.writeSystemLog("no reserved alarm of the trigger. trigger canceling is in vain", "TimeTriggerAlarmManager")
         }
     }
-
 
     fun notifyAlarmFiredAndGetTriggers(alarmId: Int, intentTriggerTime: Long, reallyFiredAt: Long): List<OTTrigger>? {
         println("alarm fired - id: $alarmId, delayed: ${reallyFiredAt - intentTriggerTime}")
 
+        OTApplication.logger.writeSystemLog("# of timestamps : ${reservationTable.size}, # of triggers: ${idTable.size}", "TimeTriggerAlarmManager")
         //validation
         if (idTable.getKeyFromId(alarmId) == intentTriggerTime) {
             //Toast.makeText(OTApplication.app, "Alarm fired: ${reservationTable[intentTriggerTime]?.size ?: 0} triggers are reserved for this alarm.", Toast.LENGTH_SHORT).show()

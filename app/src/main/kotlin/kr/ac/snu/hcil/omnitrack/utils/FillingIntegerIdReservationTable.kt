@@ -13,6 +13,9 @@ class FillingIntegerIdReservationTable<T> {
     val ids: IntArray
         get() = keyPivotedTable.values.toIntArray()
 
+    val size: Int
+        get() = keyPivotedTable.size
+
     constructor() {
 
     }
