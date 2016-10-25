@@ -8,6 +8,7 @@ import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.ui.components.common.activity.WebServiceLoginActivity
 import kr.ac.snu.hcil.omnitrack.utils.auth.AuthConstants
+import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
 import okhttp3.FormBody
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
@@ -104,7 +105,7 @@ object MisfitApi {
 
     private class APIRequestTask(val parameters: Map<String, String>, val activity: String, val handler: ((JSONObject?) -> Unit)? = null) : AsyncTask<String, Void?, String?>() {
 
-        override fun doInBackground(vararg p0: String): String {
+        override fun doInBackground(vararg p0: String): String? {
             val token = p0[0]
             val uriBuilder = makeUriBuilderRoot().addPathSegments(SUBURL_ACTIVITY).addPathSegment(activity)
 
@@ -121,10 +122,12 @@ object MisfitApi {
                     .get()
                     .build()
 
-            val response = OkHttpClient().newCall(request).execute()
-            val responseBody = response.body().string()
-            println(responseBody)
-            return responseBody
+            if (NetworkHelper.isConnectedToInternet()) {
+                val response = OkHttpClient().newCall(request).execute()
+                val responseBody = response.body().string()
+                println(responseBody)
+                return responseBody
+            } else return null
         }
 
         override fun onPostExecute(result: String?) {

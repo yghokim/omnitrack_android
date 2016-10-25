@@ -520,7 +520,7 @@ class OTTimeTrigger : OTTrigger {
     }
 
     private fun onConfigChanged() {
-
+        OTApplication.logger.writeSystemLog("Time trigger config changed. cancel trigger", TAG)
         //val alarmManager = OTApplication.app.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
         OTApplication.app.timeTriggerAlarmManager.cancelTrigger(this)
@@ -531,6 +531,8 @@ class OTTimeTrigger : OTTrigger {
 
     private fun onRangeChanged() {
         //val alarmManager = OTApplication.app.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+        OTApplication.logger.writeSystemLog("Time trigger range changed. cancel trigger", TAG)
 
         OTApplication.app.timeTriggerAlarmManager.cancelTrigger(this)
         if (!reserveNextAlarmToSystem(lastTriggeredTime)) {
@@ -581,6 +583,8 @@ class OTTimeTrigger : OTTrigger {
     }
 
     override fun handleOff() {
+
+        OTApplication.logger.writeSystemLog("Time trigger turned off. cancel trigger", TAG)
         OTApplication.app.timeTriggerAlarmManager.cancelTrigger(this)
     }
 }

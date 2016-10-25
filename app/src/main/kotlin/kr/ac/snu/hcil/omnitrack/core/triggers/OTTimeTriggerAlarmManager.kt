@@ -17,6 +17,9 @@ import java.util.concurrent.ConcurrentHashMap
  */
 class OTTimeTriggerAlarmManager {
     companion object {
+
+        const val TAG = "TimeTriggerAlarmManager"
+
         const val PREFERENCE_NAME = "TimeTriggerReservationTable"
 
         const val RESERVATION_TABLE_STORED = "reservationTableStored"
@@ -38,7 +41,7 @@ class OTTimeTriggerAlarmManager {
             intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_USER, OTApplication.app.currentUser.objectId)
             intent.putExtra(INTENT_EXTRA_ALARM_ID, alarmId)
             intent.putExtra(INTENT_EXTRA_TRIGGER_TIME, triggerTime)
-            return PendingIntent.getBroadcast(context, alarmId, intent, 0)
+            return PendingIntent.getBroadcast(context, alarmId, intent, PendingIntent.FLAG_CANCEL_CURRENT)
         }
     }
 
@@ -148,9 +151,22 @@ class OTTimeTriggerAlarmManager {
     //==========================================================
 
     fun reserveAlarm(trigger: OTTrigger, alarmTime: Long) {
+
+        //check if the trigger already exists in triggerTable
+
+
+        if (triggerTable[trigger.objectId] != null) {
+            OTApplication.logger.writeSystemLog("Trigger already exists. cancel it first. Skipped trigger time - ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(triggerTable[trigger.objectId]!!))}", TAG)
+
+            cancelTrigger(trigger)
+        }
+
         val result = reservationTable.appendAndCheckIsNewKey(alarmTime, trigger.objectId, null)
 
         triggerTable[trigger.objectId] = result.first
+
+        OTApplication.logger.writeSystemLog("Reserving alarm for trigger ${trigger.objectId}", TAG)
+
 
         if (result.second == true) {
             //new alarm
@@ -163,14 +179,16 @@ class OTTimeTriggerAlarmManager {
                 alarmManager.setExact(AlarmManager.RTC_WAKEUP, result.first, makeIntent(OTApplication.app, result.first, alarmId))
             }
 
-            OTApplication.logger.writeSystemLog("Set new system alarm at ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(result.first))}", "TimeTriggerAlarmManager")
+            OTApplication.logger.writeSystemLog("Set new system alarm at ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(result.first))}", TAG)
         } else {
-            OTApplication.logger.writeSystemLog("System alarm is already registered at ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(result.first))}", "TimeTriggerAlarmManager")
+            OTApplication.logger.writeSystemLog("System alarm is already registered at ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(result.first))}", TAG)
             println("System alarm is already registered at ${result.first}.")
         }
     }
 
     fun cancelTrigger(trigger: OTTrigger) {
+        OTApplication.logger.writeSystemLog("Canceling the alarm for trigger ${trigger.objectId}", "TimeTriggerAlarmManager")
+
         println(triggerTable)
         val reservedTime = triggerTable[trigger.objectId]
         if (reservedTime != null) {
@@ -179,29 +197,33 @@ class OTTimeTriggerAlarmManager {
                 alarmManager.cancel(makeIntent(OTApplication.app, reservedTime, alarmId))
                 idTable.removeKey(reservedTime)
                 println("all triggers at $reservedTime was canceled. System alarm is canceled - ${alarmId}.")
-                OTApplication.logger.writeSystemLog("all triggers at ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(reservedTime))} was canceled. System alarm is canceled - ${alarmId}.", "TimeTriggerAlarmManager")
+                OTApplication.logger.writeSystemLog("all triggers at ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(reservedTime))} was canceled. System alarm is canceled - ${alarmId}.", TAG)
             } else {
                 println("only this trigger was excluded at $reservedTime. There are still ${reservationTable[reservedTime]?.size ?: 0} triggers reserved at that time. System alarm persists.")
-                OTApplication.logger.writeSystemLog("only this trigger was excluded at $reservedTime. There are still ${reservationTable[reservedTime]?.size ?: 0} triggers reserved at that time. System alarm persists.", "TimeTriggerAlarmManager")
+                OTApplication.logger.writeSystemLog("only this trigger was excluded at $reservedTime. There are still ${reservationTable[reservedTime]?.size ?: 0} triggers reserved at that time. System alarm persists.", TAG)
             }
 
             triggerTable.remove(trigger.objectId)
         } else {
-            OTApplication.logger.writeSystemLog("no reserved alarm of the trigger. trigger canceling is in vain", "TimeTriggerAlarmManager")
+            OTApplication.logger.writeSystemLog("no reserved alarm of the trigger. trigger canceling is in vain", TAG)
         }
     }
 
     fun notifyAlarmFiredAndGetTriggers(alarmId: Int, intentTriggerTime: Long, reallyFiredAt: Long): List<OTTrigger>? {
         println("alarm fired - id: $alarmId, delayed: ${reallyFiredAt - intentTriggerTime}")
 
-        OTApplication.logger.writeSystemLog("# of timestamps : ${reservationTable.size}, # of triggers: ${idTable.size}", "TimeTriggerAlarmManager")
+        OTApplication.logger.writeSystemLog("alarm fired - id: $alarmId, delayed: ${reallyFiredAt - intentTriggerTime}", TAG)
+
+        OTApplication.logger.writeSystemLog("# of timestamps : ${reservationTable.size}, # of triggers: ${triggerTable.size}", TAG)
         //validation
+
+        OTApplication.logger.writeSystemLog("idTableSearchResult: ${idTable.getKeyFromId(alarmId)}, intentTriggerTime: ${intentTriggerTime}", TAG)
+
         if (idTable.getKeyFromId(alarmId) == intentTriggerTime) {
             //Toast.makeText(OTApplication.app, "Alarm fired: ${reservationTable[intentTriggerTime]?.size ?: 0} triggers are reserved for this alarm.", Toast.LENGTH_SHORT).show()
 
-
             println("${reservationTable[intentTriggerTime]?.size ?: 0} triggers are reserved for this alarm.")
-            OTApplication.logger.writeSystemLog("${reservationTable.size} timestamps are stored", "TimeTriggerAlarmManager")
+            OTApplication.logger.writeSystemLog("${reservationTable.size} timestamps are stored", TAG)
             val reservedTriggers = reservationTable[intentTriggerTime]
             reservationTable.clearTimestamp(timestamp = intentTriggerTime)
             idTable.removeKey(intentTriggerTime)

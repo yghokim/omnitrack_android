@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.os.AsyncTask
 import android.support.v4.app.FragmentActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.activity.WebServiceLoginActivity
+import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
 import okhttp3.*
 import org.json.JSONObject
 import java.util.*
@@ -172,13 +173,15 @@ class OAuth2Client(val config: OAuth2Config, val activityRequestCode: Int) {
         }
 
         override fun doInBackground(vararg urls: String): T? {
-            try {
-                val result = requestAwait(urls)
-                return converter.process(result)
-            } catch(e: Exception) {
-                e.printStackTrace()
-                return null
-            }
+            if (NetworkHelper.isConnectedToInternet()) {
+                try {
+                    val result = requestAwait(urls)
+                    return converter.process(result)
+                } catch(e: Exception) {
+                    e.printStackTrace()
+                    return null
+                }
+            } else return null
         }
 
         private fun requestAwait(urls: Array<out String>): Array<String> {
@@ -234,13 +237,15 @@ class OAuth2Client(val config: OAuth2Config, val activityRequestCode: Int) {
                     .post(requestBody)
                     .build()
 
-            try {
-                val response = OkHttpClient().newCall(request).execute()
-                return response.code() == 200
-            } catch(e: Exception) {
-                e.printStackTrace()
-                return false
-            }
+            if (NetworkHelper.isConnectedToInternet()) {
+                try {
+                    val response = OkHttpClient().newCall(request).execute()
+                    return response.code() == 200
+                } catch(e: Exception) {
+                    e.printStackTrace()
+                    return false
+                }
+            } else return false
 
         }
 
@@ -281,26 +286,26 @@ class OAuth2Client(val config: OAuth2Config, val activityRequestCode: Int) {
                     .post(requestBody)
                     .build()
 
-            try {
-                val response = OkHttpClient().newCall(request).execute()
-                val json = JSONObject(response.body().string())
-                println(json)
-                if(json.has(AuthConstants.PARAM_ACCESS_TOKEN)) {
-                    println("successfully exchanged code to credential.")
-                    val accessToken = json.getString(AuthConstants.PARAM_ACCESS_TOKEN)
-                    val refreshToken = if (json.has(AuthConstants.PARAM_REFRESH_TOKEN)) {
-                        json.getString(AuthConstants.PARAM_REFRESH_TOKEN)
-                    } else ""
-                    val expiresIn = if (json.has(AuthConstants.PARAM_EXPIRES_IN)) {
-                        json.getInt(AuthConstants.PARAM_EXPIRES_IN)
-                    } else Int.MAX_VALUE
-                    return Credential(accessToken, refreshToken, expiresIn)
+            if (NetworkHelper.isConnectedToInternet()) {
+                try {
+                    val response = OkHttpClient().newCall(request).execute()
+                    val json = JSONObject(response.body().string())
+                    println(json)
+                    if (json.has(AuthConstants.PARAM_ACCESS_TOKEN)) {
+                        println("successfully exchanged code to credential.")
+                        val accessToken = json.getString(AuthConstants.PARAM_ACCESS_TOKEN)
+                        val refreshToken = if (json.has(AuthConstants.PARAM_REFRESH_TOKEN)) {
+                            json.getString(AuthConstants.PARAM_REFRESH_TOKEN)
+                        } else ""
+                        val expiresIn = if (json.has(AuthConstants.PARAM_EXPIRES_IN)) {
+                            json.getInt(AuthConstants.PARAM_EXPIRES_IN)
+                        } else Int.MAX_VALUE
+                        return Credential(accessToken, refreshToken, expiresIn)
+                    } else return null
+                } catch(e: Exception) {
+                    return null
                 }
-                else return null
-            }catch(e: Exception)
-            {
-                return null
-            }
+            } else return null
 
         }
 
