@@ -113,6 +113,7 @@ class OTApplication : MultiDexApplication() {
         app = this
 
         logger = LoggingDbHelper(this)
+        logger.writeSystemLog("Application creates.", "OTApplication")
 
         dbHelper = DatabaseHelper(this)
 
