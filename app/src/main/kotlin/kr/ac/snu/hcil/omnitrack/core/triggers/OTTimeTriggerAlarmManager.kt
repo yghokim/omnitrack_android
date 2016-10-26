@@ -217,9 +217,11 @@ class OTTimeTriggerAlarmManager {
         OTApplication.logger.writeSystemLog("# of timestamps : ${reservationTable.size}, # of triggers: ${triggerTable.size}", TAG)
         //validation
 
-        OTApplication.logger.writeSystemLog("idTableSearchResult: ${idTable.getKeyFromId(alarmId)}, intentTriggerTime: ${intentTriggerTime}", TAG)
+        val reservedTimeOfAlarm = idTable.getKeyFromId(alarmId)
 
-        if (idTable.getKeyFromId(alarmId) == intentTriggerTime) {
+        OTApplication.logger.writeSystemLog("idTableSearchResult: $reservedTimeOfAlarm, intentTriggerTime: ${intentTriggerTime}", TAG)
+
+        if (reservedTimeOfAlarm == intentTriggerTime) {
             //Toast.makeText(OTApplication.app, "Alarm fired: ${reservationTable[intentTriggerTime]?.size ?: 0} triggers are reserved for this alarm.", Toast.LENGTH_SHORT).show()
 
             println("${reservationTable[intentTriggerTime]?.size ?: 0} triggers are reserved for this alarm.")
@@ -232,6 +234,19 @@ class OTTimeTriggerAlarmManager {
                 val triggers = ArrayList<OTTrigger>()
                 for (triggerId in reservedTriggers) {
                     triggerTable.remove(triggerId)
+                    val trigger = OTApplication.app.triggerManager.getTriggerWithId(triggerId)
+                    if (trigger != null)
+                        triggers.add(trigger)
+                }
+                return triggers
+            } else return null
+        } else if (reservedTimeOfAlarm != null) {
+            OTApplication.logger.writeSystemLog("alarm is reserved but at different time. run trigger and keep the reservation.", TAG)
+
+            val reservedTriggers = reservationTable[reservedTimeOfAlarm]
+            if (reservedTriggers != null) {
+                val triggers = ArrayList<OTTrigger>()
+                for (triggerId in reservedTriggers) {
                     val trigger = OTApplication.app.triggerManager.getTriggerWithId(triggerId)
                     if (trigger != null)
                         triggers.add(trigger)
