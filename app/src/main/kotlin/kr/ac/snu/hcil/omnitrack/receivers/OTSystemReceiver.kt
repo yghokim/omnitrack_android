@@ -6,8 +6,8 @@ import android.content.Intent
 import android.widget.Toast
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.database.DatabaseHelper
+import kr.ac.snu.hcil.omnitrack.core.system.OTAmbientShortcutManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
-import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTDataTriggerManager
 
 /**
@@ -21,7 +21,7 @@ class OTSystemReceiver : BroadcastReceiver() {
         when (intent.action) {
 
             OTApplication.BROADCAST_ACTION_SHORTCUT_REFRESH->{
-                OTShortcutManager.refreshNotificationShortcutViews(context)
+                OTAmbientShortcutManager.refreshNotificationShortcutViews(context)
             }
 
             OTApplication.BROADCAST_ACTION_ITEM_ADDED -> {

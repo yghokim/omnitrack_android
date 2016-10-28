@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.misfit
 
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
@@ -59,10 +60,13 @@ object MisfitStepMeasureFactory: OTMeasureFactory() {
         override fun requestValueAsync(start: Long, end: Long, handler: (Any?) -> Unit) {
             val token = MisfitService.getStoredAccessToken()
             if (token != null) {
+                OTApplication.logger.writeSystemLog("Start getting Misfit Step Log", "MisfitStepFactory")
                 MisfitApi.getStepsOnDayAsync(token, Date(start), Date(end-1))
                 {
                     result ->
                     println(result)
+
+                    OTApplication.logger.writeSystemLog("Finished getting Misfit Step Log", "MisfitStepFactory")
                     handler.invoke(result)
                 }
             } else {

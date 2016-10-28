@@ -38,7 +38,6 @@ class TimeTriggerAlarmReceiver : WakefulBroadcastReceiver() {
 
             val triggers = OTApplication.app.timeTriggerAlarmManager.notifyAlarmFiredAndGetTriggers(alarmId, triggerTime, System.currentTimeMillis())
 
-
             if (triggers != null) {
 
                 OTApplication.logger.writeSystemLog("${triggers.size} triggers will be fired.", TAG)
@@ -67,8 +66,8 @@ class TimeTriggerAlarmReceiver : WakefulBroadcastReceiver() {
                 }
             } else {
                 OTApplication.app.timeTriggerAlarmManager.storeTableToPreferences()
-                WakefulBroadcastReceiver.completeWakefulIntent(intent)
                 OTApplication.logger.writeSystemLog("No trigger is assigned to this alarm. Release the wake lock.", TAG)
+                WakefulBroadcastReceiver.completeWakefulIntent(intent)
             }
         }
 

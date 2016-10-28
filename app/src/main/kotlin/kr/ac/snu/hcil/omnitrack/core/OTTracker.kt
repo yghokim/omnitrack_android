@@ -11,7 +11,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AttributeSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
 import kr.ac.snu.hcil.omnitrack.core.database.NamedObject
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
-import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutManager
+import kr.ac.snu.hcil.omnitrack.core.system.OTAmbientShortcutManager
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.models.LoggingHeatMapModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.models.TimelineComparisonLineChartModel
@@ -52,7 +52,7 @@ class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color
         prop, old, new ->
         if (old != new) {
             colorChanged.invoke(this, new)
-            OTShortcutManager.notifyAppearanceChanged(this)
+            OTAmbientShortcutManager.notifyAppearanceChanged(this)
             isDirtySinceLastSync = true
         }
     }
@@ -63,10 +63,10 @@ class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color
         {
             if(new==true)
             {
-                OTShortcutManager += this
+                OTAmbientShortcutManager += this
             }
             else{
-                OTShortcutManager -= this
+                OTAmbientShortcutManager -= this
             }
 
             isDirtySinceLastSync = true
@@ -120,7 +120,7 @@ class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color
 
     override fun onNameChanged(newName: String) {
         super.onNameChanged(newName)
-        OTShortcutManager.notifyAppearanceChanged(this)
+        OTAmbientShortcutManager.notifyAppearanceChanged(this)
     }
 
     private fun onAttributeAdded(new: OTAttribute<out Any>, index: Int) {

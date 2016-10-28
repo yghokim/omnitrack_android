@@ -84,6 +84,12 @@ class OTUser(objectId: String?, dbId: Long?, name: String, email: String, attrib
         return trackers.filter { it.isOnShortcut == true }
     }
 
+    /*
+    fun getRecentTrackers(): List<OTTracker>{
+        val list = trackers.unObservedList.toMutableList()
+        list.map { OTApplication.app.dbHelper.getLastLoggingTimeAsync(it,) }
+    }*/
+
     fun newTrackerWithDefaultName(context: Context, add: Boolean): OTTracker {
         return newTracker(OTApplication.app.currentUser.generateNewTrackerName(context), add)
     }

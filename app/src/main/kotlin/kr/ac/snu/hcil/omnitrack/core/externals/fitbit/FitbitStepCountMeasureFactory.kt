@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.fitbit
 
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
@@ -72,11 +73,14 @@ object FitbitStepCountMeasureFactory : OTMeasureFactory() {
         }
 
         override fun requestValueAsync(start: Long, end: Long, handler: (Any?) -> Unit) {
+
+            OTApplication.logger.writeSystemLog("Start getting Fitbit Step Log", "FitbitStepFactory")
             FitbitService.request(
                     FitbitService.makeRequestUrlWithCommandAndDate(FitbitService.REQUEST_COMMAND_SUMMARY, Date(start)),
                     converter)
             {
                 result ->
+                OTApplication.logger.writeSystemLog("Finished getting Fitbit Step Log", "FitbitStepFactory")
                 handler.invoke(result)
             }
         }

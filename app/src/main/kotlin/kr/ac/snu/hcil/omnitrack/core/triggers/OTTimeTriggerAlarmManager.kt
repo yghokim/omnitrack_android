@@ -60,7 +60,7 @@ class OTTimeTriggerAlarmManager {
 
 
     init {
-        reservationTable = if (preferences.getBoolean(RESERVATION_TABLE_STORED, false)) {
+        reservationTable = /*if (preferences.getBoolean(RESERVATION_TABLE_STORED, false)) {
             val threshold = preferences.getInt(RESERVATION_TABLE_MEMBER_THRESHOLD, 500)
             val map = java.util.TreeMap<Long, MutableSet<String>>()
             val keys = preferences.getStringSet(RESERVATION_TABLE_MEMBER_KEYS, null)
@@ -71,11 +71,11 @@ class OTTimeTriggerAlarmManager {
 
             TimeKeyValueSetTable<String>(threshold, map)
         } else {
-
+*/
             TimeKeyValueSetTable<String>(500)
-        }
+        //       }
 
-        triggerTable = if (preferences.getBoolean(TRIGGER_TABLE_STORED, false)) {
+        triggerTable = /*if (preferences.getBoolean(TRIGGER_TABLE_STORED, false)) {
             val keys = preferences.getStringSet(TRIGGER_TABLE_KEYS, null)
 
             val map = ConcurrentHashMap<String, Long>(keys.size)
@@ -85,6 +85,7 @@ class OTTimeTriggerAlarmManager {
 
             map
         } else {
+        */
             ConcurrentHashMap<String, Long>()
             val map = ConcurrentHashMap<String, Long>()
 
@@ -99,9 +100,9 @@ class OTTimeTriggerAlarmManager {
             }
 
             map
-        }
+        //}
 
-        idTable = if (preferences.getBoolean(ID_TABLE_STORED, false)) {
+        idTable = /*if (preferences.getBoolean(ID_TABLE_STORED, false)) {
             val ids = preferences.getStringSet(ID_TABLE_IDS, null).map { it.toInt() }
             val list = ArrayList<Pair<Int, Long>>()
             for (id in ids) {
@@ -109,12 +110,13 @@ class OTTimeTriggerAlarmManager {
             }
 
             FillingIntegerIdReservationTable(list)
-        } else {
+        } else {*/
             FillingIntegerIdReservationTable<Long>()
-        }
+        //}
     }
 
     fun storeTableToPreferences(): Unit {
+        /*
         val editor = preferences.edit()
 
         //reservation table
@@ -146,6 +148,7 @@ class OTTimeTriggerAlarmManager {
         }
 
         editor.apply()
+        */
     }
 
     //==========================================================
@@ -156,9 +159,28 @@ class OTTimeTriggerAlarmManager {
 
 
         if (triggerTable[trigger.objectId] != null) {
-            OTApplication.logger.writeSystemLog("Trigger already exists. cancel it first. Skipped trigger time - ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(triggerTable[trigger.objectId]!!))}", TAG)
+            OTApplication.logger.writeSystemLog("Trigger already exists. reserved trigger time - ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(triggerTable[trigger.objectId]!!))}", TAG)
+            val reservedTriggerTime = triggerTable[trigger.objectId]!!
 
-            cancelTrigger(trigger)
+            if (reservedTriggerTime >= alarmTime) {
+                OTApplication.logger.writeSystemLog("check the system alarm exists.", TAG)
+
+                val reservedAlarmId = idTable[reservedTriggerTime]
+
+                val intent = Intent(OTApplication.app, TimeTriggerAlarmReceiver::class.java)
+                intent.action = OTApplication.BROADCAST_ACTION_TIME_TRIGGER_ALARM
+
+                val isIntentExists = PendingIntent.getBroadcast(OTApplication.app, reservedAlarmId, intent, PendingIntent.FLAG_NO_CREATE) != null
+
+                if (isIntentExists) {
+                    OTApplication.logger.writeSystemLog("alarm is already registered. skip this reservation.", TAG)
+                    return
+                } else {
+                    cancelTrigger(trigger)
+                }
+            } else {
+                cancelTrigger(trigger)
+            }
         }
 
         val result = reservationTable.appendAndCheckIsNewKey(alarmTime, trigger.objectId, null)
@@ -194,7 +216,11 @@ class OTTimeTriggerAlarmManager {
         if (reservedTime != null) {
             if (reservationTable.removeValueAndCheckIsTimestampEmpty(reservedTime, trigger.objectId)) {
                 val alarmId = idTable[reservedTime]
-                alarmManager.cancel(makeIntent(OTApplication.app, reservedTime, alarmId))
+
+                val pendingIntent = makeIntent(OTApplication.app, reservedTime, alarmId)
+                alarmManager.cancel(pendingIntent)
+                pendingIntent.cancel()
+
                 idTable.removeKey(reservedTime)
                 println("all triggers at $reservedTime was canceled. System alarm is canceled - ${alarmId}.")
                 OTApplication.logger.writeSystemLog("all triggers at ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(reservedTime))} was canceled. System alarm is canceled - ${alarmId}.", TAG)

@@ -20,7 +20,7 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemEditingActivity
 /**
  * Created by Young-Ho Kim on 9/4/2016
  */
-object OTShortcutManager {
+object OTAmbientShortcutManager {
 
     const val NOTIFICATION_ID = 200000
 
