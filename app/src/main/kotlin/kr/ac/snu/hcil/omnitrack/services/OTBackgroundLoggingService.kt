@@ -3,9 +3,11 @@ package kr.ac.snu.hcil.omnitrack.services
 import android.app.IntentService
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilder
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
+import kr.ac.snu.hcil.omnitrack.utils.isInDozeMode
 
 
 /*
@@ -23,7 +25,33 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
 
         private val ACTION_LOG = "kr.ac.snu.hcil.omnitrack.services.action.LOG"
 
+
         private const val INTENT_EXTRA_LOGGING_SOURCE = "loggingSource"
+
+        private val flagPreferences: SharedPreferences by lazy {
+            OTApplication.app.getSharedPreferences("pref_background_logging_service", Context.MODE_PRIVATE)
+        }
+
+        private fun getLoggingFlag(tracker: OTTracker): Long? {
+            return if (flagPreferences.contains(tracker.objectId)) {
+                flagPreferences.getLong(tracker.objectId, Long.MIN_VALUE)
+            } else null
+        }
+
+        /**
+         * return: String: tracker id, Long: Timestamp
+         */
+        fun getFlags(): List<Pair<String, Long>> {
+            return flagPreferences.all.entries.map { Pair(it.key, it.value as Long) }
+        }
+
+        private fun setLoggingFlag(tracker: OTTracker, timestamp: Long) {
+            flagPreferences.edit().putLong(tracker.objectId, timestamp).apply()
+        }
+
+        private fun removeLoggingFlag(tracker: OTTracker) {
+            flagPreferences.edit().remove(tracker.objectId).apply()
+        }
 
         fun startLoggingInService(context: Context, tracker: OTTracker, source: LoggingSource) {
 
@@ -33,8 +61,12 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
         fun startLoggingAsync(context: Context, tracker: OTTracker, source: LoggingSource, finished: ((success: Boolean) -> Unit)? = null) {
             val builder = OTItemBuilder(tracker, OTItemBuilder.MODE_BACKGROUND)
 
-
             OTApplication.logger.writeSystemLog("start background logging of ${tracker.name}", TAG)
+            if (android.os.Build.VERSION.SDK_INT >= 23) {
+                OTApplication.logger.writeSystemLog("idleMode: ${isInDozeMode()}", TAG)
+            }
+
+            setLoggingFlag(tracker, System.currentTimeMillis())
             sendBroadcast(context, OTApplication.BROADCAST_ACTION_BACKGROUND_LOGGING_STARTED, tracker)
             builder.autoCompleteAsync {
                 val item = builder.makeItem()
@@ -43,10 +75,12 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
                     sendBroadcast(context, OTApplication.BROADCAST_ACTION_BACKGROUND_LOGGING_SUCCEEDED, tracker, item.dbId!!)
 
                     OTApplication.logger.writeSystemLog("${tracker.name} background logging was successful", TAG)
+                    removeLoggingFlag(tracker)
                     finished?.invoke(true)
                 } else {
 
                     OTApplication.logger.writeSystemLog("${tracker.name} background logging failed", TAG)
+                    removeLoggingFlag(tracker)
                     finished?.invoke(false)
                 }
             }

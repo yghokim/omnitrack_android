@@ -1,12 +1,13 @@
 package kr.ac.snu.hcil.omnitrack.utils
 
+import android.annotation.TargetApi
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
-import android.content.res.Resources
 import android.location.Address
 import android.location.Geocoder
 import android.os.Handler
+import android.os.PowerManager
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.view.LayoutInflater
@@ -14,13 +15,18 @@ import android.view.View
 import android.view.ViewGroup
 import com.google.android.gms.maps.model.LatLng
 import kr.ac.snu.hcil.omnitrack.OTApplication
-import kr.ac.snu.hcil.omnitrack.R
 import java.math.BigDecimal
 import java.util.*
 
 /**
  * Created by younghokim on 16. 7. 28..
  */
+
+@TargetApi(23)
+fun isInDozeMode(): Boolean {
+    val powerManager = OTApplication.app.getSystemService(PowerManager::class.java)
+    return powerManager.isDeviceIdleMode
+}
 
 fun Boolean.toInt(): Int{
     return if(this==true) 1 else 0

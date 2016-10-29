@@ -22,6 +22,7 @@ import kr.ac.snu.hcil.omnitrack.core.externals.misfit.MisfitStepMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.system.OTAmbientShortcutManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTriggerAlarmManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerManager
+import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
 import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 import kr.ac.snu.hcil.omnitrack.utils.UniqueStringEntryList
 import java.util.*
@@ -139,7 +140,6 @@ class OTApplication : MultiDexApplication() {
         })
 
 
-
         for (service in OTExternalService.availableServices) {
             if (service.state == OTExternalService.ServiceState.ACTIVATED) {
                 service.prepareServiceAsync({
@@ -151,6 +151,14 @@ class OTApplication : MultiDexApplication() {
 
         for (tracker in currentUser.getTrackersOnShortcut()) {
             OTAmbientShortcutManager += tracker
+        }
+
+        //handle failed background logging
+        for (pair in OTBackgroundLoggingService.getFlags()) {
+            val tracker = currentUser[pair.first]
+            if (tracker != null) {
+                logger.writeSystemLog("${tracker.name} background logging was failed. started at ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(pair.second))}", "OmniTrack")
+            }
         }
 
 
@@ -194,8 +202,6 @@ class OTApplication : MultiDexApplication() {
             dbHelper.save(triggerEntry.value, _currentUser, triggerEntry.index)
         }
         dbHelper.deleteObjects(DatabaseHelper.TriggerScheme, *triggerManager.fetchRemovedTriggerIds())
-
-        timeTriggerAlarmManager.storeTableToPreferences()
     }
 
     override fun onTerminate() {
@@ -283,6 +289,8 @@ class OTApplication : MultiDexApplication() {
         stepComparisonTracker.attributes.add(googleFitAttribute)
 
         dbHelper.save(_currentUser)
+
+        return // skip example data
 
         java.lang.Runnable {
 
