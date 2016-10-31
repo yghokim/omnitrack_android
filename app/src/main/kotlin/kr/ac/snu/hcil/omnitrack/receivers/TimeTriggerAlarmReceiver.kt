@@ -1,9 +1,12 @@
 package kr.ac.snu.hcil.omnitrack.receivers
 
 import android.app.IntentService
+import android.content.BroadcastReceiver
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.support.v4.content.WakefulBroadcastReceiver
+import android.os.PowerManager
+import android.util.SparseArray
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTriggerAlarmManager
@@ -12,9 +15,56 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 2016-10-11.
  */
-class TimeTriggerAlarmReceiver : WakefulBroadcastReceiver() {
+class TimeTriggerAlarmReceiver : BroadcastReceiver() {
     companion object {
         const val TAG = "TimeTriggerAlarmReceiver"
+        private val EXTRA_WAKE_LOCK_ID = "kr.ac.snu.hcil.omnitrack.wakelockid"
+
+        private val mActiveWakeLocks = SparseArray<PowerManager.WakeLock>()
+        private var mNextId = 1
+
+        fun startWakefulService(context: Context, intent: Intent): ComponentName? {
+            synchronized(mActiveWakeLocks) {
+                val id = mNextId
+                mNextId++
+                if (mNextId <= 0) {
+                    mNextId = 1
+                }
+
+                intent.putExtra(EXTRA_WAKE_LOCK_ID, id)
+                val comp = context.startService(intent) ?: return null
+
+                val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+                val wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
+                        "wake:" + comp.flattenToShortString())
+                wl.setReferenceCounted(false)
+                wl.acquire() // remove timeout
+                mActiveWakeLocks.put(id, wl)
+                return comp
+            }
+        }
+
+        fun completeWakefulIntent(intent: Intent): Boolean {
+            val id = intent.getIntExtra(EXTRA_WAKE_LOCK_ID, 0)
+            if (id == 0) {
+                return false
+            }
+            synchronized(mActiveWakeLocks) {
+                val wl = mActiveWakeLocks.get(id)
+                if (wl != null) {
+                    wl.release()
+                    mActiveWakeLocks.remove(id)
+                    return true
+                }
+                // We return true whether or not we actually found the wake lock
+                // the return code is defined to indicate whether the Intent contained
+                // an identifier for a wake lock that it was supposed to match.
+                // We just log a warning here if there is no wake lock found, which could
+                // happen for example if this function is called twice on the same
+                // intent or the process is killed and restarted before processing the intent.
+                return true
+            }
+        }
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -44,7 +94,7 @@ class TimeTriggerAlarmReceiver : WakefulBroadcastReceiver() {
 
                 var left = triggers.size
                 if (left == 0) {
-                    WakefulBroadcastReceiver.completeWakefulIntent(intent)
+                    completeWakefulIntent(intent)
                 } else {
                     for (trigger in triggers.withIndex()) {
                         trigger.value.fire(triggerTime) {
@@ -62,12 +112,12 @@ class TimeTriggerAlarmReceiver : WakefulBroadcastReceiver() {
 
                     println("every trigger was done. finish the wakeup")
                     OTApplication.app.timeTriggerAlarmManager.storeTableToPreferences()
-                    WakefulBroadcastReceiver.completeWakefulIntent(intent)
+                    completeWakefulIntent(intent)
                 }
             } else {
                 OTApplication.app.timeTriggerAlarmManager.storeTableToPreferences()
                 OTApplication.logger.writeSystemLog("No trigger is assigned to this alarm. Release the wake lock.", TAG)
-                WakefulBroadcastReceiver.completeWakefulIntent(intent)
+                completeWakefulIntent(intent)
             }
         }
 
