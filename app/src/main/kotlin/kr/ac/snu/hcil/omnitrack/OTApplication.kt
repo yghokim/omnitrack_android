@@ -312,6 +312,7 @@ class OTApplication : MultiDexApplication() {
                         OTItem(
                                 sleepTracker,
                                 wakeUp + (Math.random() * DateUtils.HOUR_IN_MILLIS).toLong(),
+                                OTItem.LoggingSource.Unspecified,
                                 TimeSpan.fromPoints(from + (Math.random() * 3 * DateUtils.HOUR_IN_MILLIS - 1.5 * DateUtils.HOUR_IN_MILLIS).toLong(), wakeUp),
                                 (Math.random() * 5).toFloat(),
                                 ""
@@ -325,6 +326,7 @@ class OTApplication : MultiDexApplication() {
                             OTItem(
                                     coffeeTracker,
                                     coffeeTime,
+                                    OTItem.LoggingSource.Unspecified,
                                     "Americano",
                                     coffeeTime
                             )
@@ -362,7 +364,7 @@ class OTApplication : MultiDexApplication() {
         }
 
         val stepItems = ArrayList<OTItem>()
-        OTItem.createItemsWithColumnArrays(stepTracker, timestamps, stepItems, fitbitSteps, misfitSteps, googleSteps)
+        OTItem.createItemsWithColumnArrays(stepTracker, timestamps, OTItem.LoggingSource.Unspecified, stepItems, fitbitSteps, misfitSteps, googleSteps)
 
         dbHelper.save(stepItems, stepTracker)
     }
@@ -386,6 +388,7 @@ class OTApplication : MultiDexApplication() {
                     OTItem(
                             beerTracker,
                             it[1] as Long,
+                            OTItem.LoggingSource.Unspecified,
                             *it
                     )
                 }, beerTracker)

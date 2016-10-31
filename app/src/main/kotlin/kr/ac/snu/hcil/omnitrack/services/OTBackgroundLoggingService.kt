@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilder
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.utils.isInDozeMode
@@ -15,10 +16,6 @@ import kr.ac.snu.hcil.omnitrack.utils.isInDozeMode
 * this will need to be refactored to be a normal service to handle the long retrieval operation of external measure factory values.
  */
 class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
-
-    enum class LoggingSource {
-        Trigger, Shortcut
-    }
 
     companion object {
         const val TAG = "BGLoggingService"
@@ -53,12 +50,12 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
             flagPreferences.edit().remove(tracker.objectId).apply()
         }
 
-        fun startLoggingInService(context: Context, tracker: OTTracker, source: LoggingSource) {
+        fun startLoggingInService(context: Context, tracker: OTTracker, source: OTItem.LoggingSource) {
 
             context.startService(makeIntent(context, tracker, source))
         }
 
-        fun startLoggingAsync(context: Context, tracker: OTTracker, source: LoggingSource, finished: ((success: Boolean) -> Unit)? = null) {
+        fun startLoggingAsync(context: Context, tracker: OTTracker, source: OTItem.LoggingSource, finished: ((success: Boolean) -> Unit)? = null) {
             val builder = OTItemBuilder(tracker, OTItemBuilder.MODE_BACKGROUND)
 
             OTApplication.logger.writeSystemLog("start background logging of ${tracker.name}", TAG)
@@ -69,7 +66,7 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
             setLoggingFlag(tracker, System.currentTimeMillis())
             sendBroadcast(context, OTApplication.BROADCAST_ACTION_BACKGROUND_LOGGING_STARTED, tracker)
             builder.autoCompleteAsync {
-                val item = builder.makeItem()
+                val item = builder.makeItem(source)
                 OTApplication.app.dbHelper.save(item, tracker)
                 if (item.dbId != null) {
                     sendBroadcast(context, OTApplication.BROADCAST_ACTION_BACKGROUND_LOGGING_SUCCEEDED, tracker, item.dbId!!)
@@ -99,7 +96,7 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
             context.sendBroadcast(intent)
         }
 
-        fun makeIntent(context: Context, tracker: OTTracker, source: LoggingSource): Intent
+        fun makeIntent(context: Context, tracker: OTTracker, source: OTItem.LoggingSource): Intent
         {
             val intent = Intent(context, OTBackgroundLoggingService::class.java)
             intent.action = ACTION_LOG
@@ -124,7 +121,7 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
     private fun handleLogging(trackerId: String, intent: Intent) {
         val tracker = OTApplication.app.currentUser[trackerId]
         if (tracker != null) {
-            startLoggingAsync(this, tracker, LoggingSource.valueOf(intent.getStringExtra(INTENT_EXTRA_LOGGING_SOURCE)), null)
+            startLoggingAsync(this, tracker, OTItem.LoggingSource.valueOf(intent.getStringExtra(INTENT_EXTRA_LOGGING_SOURCE)), null)
         }
     }
 

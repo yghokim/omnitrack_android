@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.triggers
 import android.content.Context
 import com.google.gson.Gson
 import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.database.NamedObject
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
@@ -157,7 +158,7 @@ abstract class OTTrigger(objectId: String?, dbId: Long?, name: String,
 
                 var left = trackers.size
                 for (tracker in trackers) {
-                    OTBackgroundLoggingService.startLoggingAsync(OTApplication.app, tracker, OTBackgroundLoggingService.LoggingSource.Trigger) {
+                    OTBackgroundLoggingService.startLoggingAsync(OTApplication.app, tracker, OTItem.LoggingSource.Trigger) {
                         left--
                         if (left == 0) {
                             finished?.invoke(true)

@@ -12,6 +12,10 @@ import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelpe
  */
 class OTItem : ADataRow, IDatabaseStorable {
 
+    enum class LoggingSource {
+        Unspecified, Trigger, Shortcut, Manual
+    }
+
     companion object {
         inline fun <reified T> extractNotNullValues(items: Collection<OTItem>, attribute: OTAttribute<out Any>, out: MutableList<T>): Int {
             var count = 0
@@ -28,7 +32,7 @@ class OTItem : ADataRow, IDatabaseStorable {
             return count
         }
 
-        fun createItemsWithColumnArrays(tracker: OTTracker, timestamps: LongArray, outItems: MutableList<OTItem>, vararg columnValuesArray: Array<Any?>) {
+        fun createItemsWithColumnArrays(tracker: OTTracker, timestamps: LongArray, source: LoggingSource, outItems: MutableList<OTItem>, vararg columnValuesArray: Array<Any?>) {
 
             if (columnValuesArray.size > 0) {
                 val numItems = columnValuesArray[0].size
@@ -49,6 +53,7 @@ class OTItem : ADataRow, IDatabaseStorable {
                             OTItem(
                                     tracker,
                                     timestamps[i],
+                                    source,
                                     *values
                             )
                     )
@@ -71,15 +76,20 @@ class OTItem : ADataRow, IDatabaseStorable {
     var timestamp: Long = -1
         private set
 
-    constructor(trackerObjectId: String) : super() {
+    var source: LoggingSource
+        private set
+
+    constructor(trackerObjectId: String, source: LoggingSource) : super() {
         dbId = null
         this.trackerObjectId = trackerObjectId
+        this.source = source
     }
 
-    constructor(dbId: Long, trackerObjectId: String, serializedValues: String, timestamp: Long) {
+    constructor(dbId: Long, trackerObjectId: String, serializedValues: String, timestamp: Long, source: LoggingSource) {
         this.dbId = dbId
         this.trackerObjectId = trackerObjectId
         this.timestamp = timestamp
+        this.source = source
 
         val parser = Gson()
         val s = parser.fromJson(serializedValues, Array<String>::class.java).map { parser.fromJson(it, SerializedStringKeyEntry::class.java) }
@@ -91,9 +101,10 @@ class OTItem : ADataRow, IDatabaseStorable {
     /**
      * used to log directly in code behind
      */
-    constructor( tracker: OTTracker, timestamp: Long,  vararg values : Any?): this(tracker.objectId)
+    constructor(tracker: OTTracker, timestamp: Long, source: LoggingSource, vararg values: Any?) : this(tracker.objectId, source)
     {
         this.timestamp = timestamp
+        this.source = source
 
         if(tracker.attributes.size != values.size)
         {

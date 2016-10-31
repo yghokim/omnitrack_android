@@ -106,12 +106,14 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         val TRACKER_ID = "tracker_id"
         val VALUES_JSON = "values_json"
 
+        val SOURCE_TYPE = "source_type"
+
         val KEY_TIME_TIMESTAMP = "key_time_timestamp"
         val KEY_TIME_GRANULARITY = "key_time_granularity"
         val KEY_TIME_TIMEZONE = "key_time_timezone"
 
-        override val intrinsicColumnNames: Array<String> = arrayOf(TRACKER_ID, VALUES_JSON, KEY_TIME_TIMESTAMP, KEY_TIME_GRANULARITY, KEY_TIME_TIMEZONE)
-        override val creationColumnContentString: String = "${makeForeignKeyStatementString(TRACKER_ID, TrackerScheme.tableName)}, $VALUES_JSON TEXT, $KEY_TIME_TIMESTAMP INTEGER, $KEY_TIME_GRANULARITY TEXT, $KEY_TIME_TIMEZONE TEXT"
+        override val intrinsicColumnNames: Array<String> = arrayOf(TRACKER_ID, SOURCE_TYPE, VALUES_JSON, KEY_TIME_TIMESTAMP, KEY_TIME_GRANULARITY, KEY_TIME_TIMEZONE)
+        override val creationColumnContentString: String = "${makeForeignKeyStatementString(TRACKER_ID, TrackerScheme.tableName)}, $SOURCE_TYPE INTEGER, $VALUES_JSON TEXT, $KEY_TIME_TIMESTAMP INTEGER, $KEY_TIME_GRANULARITY TEXT, $KEY_TIME_TIMEZONE TEXT"
 
         override val indexCreationQueryString: String =
                 makeIndexQueryString(false, "tracker_and_timestamp", TRACKER_ID, KEY_TIME_TIMESTAMP)
@@ -397,6 +399,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         val values = ContentValues()
 
         values.put(ItemScheme.TRACKER_ID, tracker.dbId)
+        values.put(ItemScheme.SOURCE_TYPE, item.source.ordinal)
         values.put(ItemScheme.VALUES_JSON, item.getSerializedValueTable(tracker))
         if (item.timestamp != -1L) {
             values.put(ItemScheme.LOGGED_AT, item.timestamp)
@@ -501,9 +504,12 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         //val KEY_TIME_TIMESTAMP = "key_time_timestamp"
         //val KEY_TIME_GRANULARITY = "key_time_granularity"
         //val KEY_TIME_TIMEZONE = "key_time_timezone"
+
+
+        val source = OTItem.LoggingSource.values()[cursor.getInt(cursor.getColumnIndex(ItemScheme.SOURCE_TYPE))]
         val timestamp = cursor.getLong(cursor.getColumnIndex(ItemScheme.LOGGED_AT))
 
-        return OTItem(id, tracker.objectId, serializedValues, timestamp)
+        return OTItem(id, tracker.objectId, serializedValues, timestamp, source)
     }
 
     fun getLastLoggingTimeAsync(tracker: OTTracker, resultHandler: (Long?)->Unit) : LastItemTimeRetrievalTask

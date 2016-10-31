@@ -12,6 +12,7 @@ import android.view.View
 import android.widget.RemoteViews
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
@@ -68,7 +69,7 @@ object OTAmbientShortcutManager {
                 element.setTextViewText(R.id.ui_name, trackers[i].name)
 
 
-                val instantLoggingIntent = PendingIntent.getService(context, i, OTBackgroundLoggingService.makeIntent(context, trackers[i], OTBackgroundLoggingService.LoggingSource.Shortcut), PendingIntent.FLAG_UPDATE_CURRENT)
+                val instantLoggingIntent = PendingIntent.getService(context, i, OTBackgroundLoggingService.makeIntent(context, trackers[i], OTItem.LoggingSource.Shortcut), PendingIntent.FLAG_UPDATE_CURRENT)
                 val openItemActivityIntent = PendingIntent.getActivity(context, i, ItemEditingActivity.makeIntent(trackers[i].objectId, context), PendingIntent.FLAG_UPDATE_CURRENT)
 
                 element.setOnClickPendingIntent(R.id.ui_button_instant, instantLoggingIntent)

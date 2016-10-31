@@ -325,8 +325,8 @@ class OTItemBuilder : Parcelable, IStringSerializable {
         }
     }
 
-    fun makeItem(): OTItem {
-        val item = OTItem(tracker.objectId)
+    fun makeItem(source: OTItem.LoggingSource): OTItem {
+        val item = OTItem(tracker.objectId, source)
         if (connectedItemDbId != -1L) {
             println("assigned db id : $connectedItemDbId")
             item.dbId = connectedItemDbId

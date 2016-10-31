@@ -212,7 +212,7 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
     override fun onToolbarRightButtonClicked() {
         //push item to db
         syncViewStateToBuilderAsync {
-            val item = builder.makeItem()
+            val item = builder.makeItem(OTItem.LoggingSource.Manual)
             println("Will push $item")
 
             OTApplication.app.dbHelper.save(item, tracker!!)
