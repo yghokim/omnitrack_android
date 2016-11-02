@@ -382,7 +382,8 @@ class OTTimeTrigger : OTTrigger {
                     val startBoundHourOfDay = IntervalConfig.getStartHour(configVariables)
                     val endBoundHourOfDay = IntervalConfig.getEndHour(configVariables)
 
-                    val isRangeBounded = startBoundHourOfDay == endBoundHourOfDay
+
+                    val isRangeBounded = startBoundHourOfDay != endBoundHourOfDay
 
                     val realPivot = if (pivot == TRIGGER_TIME_NEVER_TRIGGERED) {
                         now

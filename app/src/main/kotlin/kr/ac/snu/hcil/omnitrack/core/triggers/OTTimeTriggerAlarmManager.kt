@@ -211,7 +211,6 @@ class OTTimeTriggerAlarmManager {
     fun cancelTrigger(trigger: OTTrigger) {
         OTApplication.logger.writeSystemLog("Canceling the alarm for trigger ${trigger.objectId}", "TimeTriggerAlarmManager")
 
-        println(triggerTable)
         val reservedTime = triggerTable[trigger.objectId]
         if (reservedTime != null) {
             if (reservationTable.removeValueAndCheckIsTimestampEmpty(reservedTime, trigger.objectId)) {
