@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.triggers
 
 import android.content.Context
+import android.text.format.DateUtils
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
@@ -213,6 +214,7 @@ class OTTimeTrigger : OTTrigger {
             16 bits: seconds
             5 bits : time of day(0~24) - start
             5 bits : time of day(0~24) - end
+            1 bit : flag to use the hours range
          */
 
         const val DURATION_SHIFT = 16
@@ -380,99 +382,124 @@ class OTTimeTrigger : OTTrigger {
                     val startBoundHourOfDay = IntervalConfig.getStartHour(configVariables)
                     val endBoundHourOfDay = IntervalConfig.getEndHour(configVariables)
 
+                    val isRangeBounded = startBoundHourOfDay == endBoundHourOfDay
+
                     val realPivot = if (pivot == TRIGGER_TIME_NEVER_TRIGGERED) {
                         now
                     } else pivot
 
-
-                    //extract hour range of today
-                    cacheCalendar.timeInMillis = now
-
-                    cacheCalendar.setHourOfDay(startBoundHourOfDay, cutUnder = true)
-                    val lowerBoundToday = cacheCalendar.timeInMillis
-
-                    cacheCalendar.setHourOfDay(endBoundHourOfDay, cutUnder = true)
-                    if (startBoundHourOfDay >= endBoundHourOfDay) {
-                        cacheCalendar.add(Calendar.DAY_OF_YEAR, 1)
-                    }
-                    val upperBoundToday = cacheCalendar.timeInMillis
-
-                    val upperBoundLastDay = TimeHelper.addDays(upperBoundToday, -1)
-
-
                     val intrinsicNextTime =
-                            if (now < upperBoundLastDay) {
+                            if (!isRangeBounded) {
                                 if (isRepeated) {
                                     cacheCalendar.timeInMillis = now
-                                    cacheCalendar.add(Calendar.DAY_OF_YEAR, -1)
                                     if (Range.isDayOfWeekUsed(rangeVariables, cacheCalendar.getDayOfWeek())) {
                                         //yesterday is used
-                                        val intrinsic = getIntrinsicNextIntervalTime(realPivot, now, intervalMillis)
-                                        if (intrinsic < upperBoundLastDay) {
-                                            intrinsic
-                                        } else {
-                                            getClosestLowerBoundOfInterval(now, startBoundHourOfDay)
-                                        }
+                                        getIntrinsicNextIntervalTime(realPivot, now, intervalMillis)
                                     } else {
                                         getClosestLowerBoundOfInterval(now, startBoundHourOfDay)
                                     }
                                 } else {
+                                    cacheCalendar.timeInMillis = now
+                                    cacheCalendar.setHourOfDay(0, true)
 
                                     val intrinsic = getIntrinsicNextIntervalTime(realPivot, now, intervalMillis)
-                                    if (intrinsic < upperBoundLastDay) {
+                                    if (intrinsic < cacheCalendar.timeInMillis + DateUtils.DAY_IN_MILLIS) {
                                         intrinsic
                                     } else {
                                         if (pivot == TRIGGER_TIME_NEVER_TRIGGERED) {
-                                            lowerBoundToday
-                                        } else 0L
-                                    }
-                                }
-                            } else if (upperBoundLastDay <= now && now < lowerBoundToday) {
-                                if (isRepeated) {
-                                    getClosestLowerBoundOfInterval(now, startBoundHourOfDay)
-                                } else {
-                                    if (pivot == TRIGGER_TIME_NEVER_TRIGGERED) {
-                                        lowerBoundToday
-                                    } else {
-                                        0L
-                                    }
-                                }
-                            } else if (lowerBoundToday <= now && now < upperBoundToday) {
-                                //now is later than upperBound
-                                if (isRepeated) {
-                                    cacheCalendar.timeInMillis = now
-                                    if (Range.isDayOfWeekUsed(rangeVariables, cacheCalendar.getDayOfWeek())) {
-                                        //yesterday is used
-                                        val intrinsic = getIntrinsicNextIntervalTime(realPivot, now, intervalMillis)
-                                        if (intrinsic < upperBoundToday) {
-                                            intrinsic
-                                        } else {
-                                            getClosestLowerBoundOfInterval(now, startBoundHourOfDay)
-                                        }
-                                    } else {
-                                        getClosestLowerBoundOfInterval(now, startBoundHourOfDay)
-                                    }
-                                } else {
-                                    val intrinsic = getIntrinsicNextIntervalTime(realPivot, now, intervalMillis)
-                                    if (intrinsic < upperBoundToday) {
-                                        intrinsic
-                                    } else {
-                                        if (pivot == TRIGGER_TIME_NEVER_TRIGGERED) {
-                                            TimeHelper.addDays(lowerBoundToday, 1)
+                                            cacheCalendar.timeInMillis + DateUtils.DAY_IN_MILLIS
                                         } else 0L
                                     }
                                 }
                             } else {
-                                if (isRepeated) {
-                                    getClosestLowerBoundOfInterval(now, startBoundHourOfDay)
-                                } else {
-                                    if (pivot == TRIGGER_TIME_NEVER_TRIGGERED) {
-                                        TimeHelper.addDays(lowerBoundToday, 1)
+                                //extract hour range of today
+                                cacheCalendar.timeInMillis = now
+
+                                cacheCalendar.setHourOfDay(startBoundHourOfDay, cutUnder = true)
+                                val lowerBoundToday = cacheCalendar.timeInMillis
+
+                                cacheCalendar.setHourOfDay(endBoundHourOfDay, cutUnder = true)
+                                if (startBoundHourOfDay >= endBoundHourOfDay) {
+                                    cacheCalendar.add(Calendar.DAY_OF_YEAR, 1)
+                                }
+                                val upperBoundToday = cacheCalendar.timeInMillis
+
+                                val upperBoundLastDay = TimeHelper.addDays(upperBoundToday, -1)
+
+                                if (now < upperBoundLastDay) {
+                                    if (isRepeated) {
+                                        cacheCalendar.timeInMillis = now
+                                        cacheCalendar.add(Calendar.DAY_OF_YEAR, -1)
+                                        if (Range.isDayOfWeekUsed(rangeVariables, cacheCalendar.getDayOfWeek())) {
+                                            //yesterday is used
+                                            val intrinsic = getIntrinsicNextIntervalTime(realPivot, now, intervalMillis)
+                                            if (intrinsic < upperBoundLastDay) {
+                                                intrinsic
+                                            } else {
+                                                getClosestLowerBoundOfInterval(now, startBoundHourOfDay)
+                                            }
+                                        } else {
+                                            getClosestLowerBoundOfInterval(now, startBoundHourOfDay)
+                                        }
                                     } else {
-                                        0L
+
+                                        val intrinsic = getIntrinsicNextIntervalTime(realPivot, now, intervalMillis)
+                                        if (intrinsic < upperBoundLastDay) {
+                                            intrinsic
+                                        } else {
+                                            if (pivot == TRIGGER_TIME_NEVER_TRIGGERED) {
+                                                lowerBoundToday
+                                            } else 0L
+                                        }
+                                    }
+                                } else if (upperBoundLastDay <= now && now < lowerBoundToday) {
+                                    if (isRepeated) {
+                                        getClosestLowerBoundOfInterval(now, startBoundHourOfDay)
+                                    } else {
+                                        if (pivot == TRIGGER_TIME_NEVER_TRIGGERED) {
+                                            lowerBoundToday
+                                        } else {
+                                            0L
+                                        }
+                                    }
+                                } else if (lowerBoundToday <= now && now < upperBoundToday) {
+                                    //now is later than upperBound
+                                    if (isRepeated) {
+                                        cacheCalendar.timeInMillis = now
+                                        if (Range.isDayOfWeekUsed(rangeVariables, cacheCalendar.getDayOfWeek())) {
+                                            //yesterday is used
+                                            val intrinsic = getIntrinsicNextIntervalTime(realPivot, now, intervalMillis)
+                                            if (intrinsic < upperBoundToday) {
+                                                intrinsic
+                                            } else {
+                                                getClosestLowerBoundOfInterval(now, startBoundHourOfDay)
+                                            }
+                                        } else {
+                                            getClosestLowerBoundOfInterval(now, startBoundHourOfDay)
+                                        }
+                                    } else {
+                                        val intrinsic = getIntrinsicNextIntervalTime(realPivot, now, intervalMillis)
+                                        if (intrinsic < upperBoundToday) {
+                                            intrinsic
+                                        } else {
+                                            if (pivot == TRIGGER_TIME_NEVER_TRIGGERED) {
+                                                TimeHelper.addDays(lowerBoundToday, 1)
+                                            } else 0L
+                                        }
+                                    }
+                                } else {
+                                    if (isRepeated) {
+                                        getClosestLowerBoundOfInterval(now, startBoundHourOfDay)
+                                    } else {
+                                        if (pivot == TRIGGER_TIME_NEVER_TRIGGERED) {
+                                            TimeHelper.addDays(lowerBoundToday, 1)
+                                        } else {
+                                            0L
+                                        }
                                     }
                                 }
                             }
+
                     intrinsicNextTime
                 }
                 else -> 0L
@@ -493,7 +520,6 @@ class OTTimeTrigger : OTTrigger {
 
         return pivot + (skipIntervalCount + 1) * interval
     }
-
 
 
     private fun getClosestLowerBoundOfInterval(from: Long, lowerBoundHourOfDay: Int): Long {
