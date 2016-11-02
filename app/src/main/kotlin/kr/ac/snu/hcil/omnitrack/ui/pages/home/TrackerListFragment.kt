@@ -10,6 +10,7 @@ import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
+import android.support.v7.widget.AppCompatImageButton
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.Spannable
@@ -239,6 +240,8 @@ class TrackerListFragment : Fragment() {
             val removeButton: View
             val chartViewButton: View
 
+            val errorIndicator: AppCompatImageButton
+
             var collapsed = true
 
             private var lastLoggingTimeRetrievalTask: DatabaseHelper.LastItemTimeRetrievalTask? = null
@@ -259,6 +262,8 @@ class TrackerListFragment : Fragment() {
                 removeButton = view.findViewById(R.id.ui_button_remove)
                 chartViewButton = view.findViewById(R.id.ui_button_charts)
 
+                errorIndicator = view.findViewById(R.id.ui_invalid_icon) as AppCompatImageButton
+
                 view.setOnClickListener(this)
                 editButton.setOnClickListener(this)
                 listButton.setOnClickListener(this)
@@ -266,7 +271,6 @@ class TrackerListFragment : Fragment() {
                 chartViewButton.setOnClickListener(this)
 
                 expandButton.setOnClickListener(this)
-
 
                 collapse()
             }
@@ -315,6 +319,12 @@ class TrackerListFragment : Fragment() {
 
                 name.text = tracker.name
                 color.setBackgroundColor(tracker.color)
+
+                errorIndicator.visibility = if (tracker.isValid(null)) {
+                    View.INVISIBLE
+                } else {
+                    View.VISIBLE
+                }
 
                 lastLoggingTimeRetrievalTask?.cancel(true)
                 todayLoggingCountTask?.cancel(true)

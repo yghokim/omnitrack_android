@@ -3,7 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core
 //import kr.ac.snu.hcil.omnitrack.core.database.TrackerEntity
 import android.content.Context
 import android.graphics.Color
-import android.os.AsyncTask
+import android.text.SpannedString
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
@@ -191,30 +191,17 @@ class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color
         return false
     }
 
-    inner class AutoCompleteAttributeValuesAsyncTask(
-            val onValueRetrievedHandler: (attr: OTAttribute<out Any>, value: Any?) -> Unit,
-            val finishedHandler: (success: Boolean) -> Unit) : AsyncTask<OTTracker, Pair<OTAttribute<out Any>, Any>, Boolean>() {
+    fun isValid(invalidMessages: MutableList<SpannedString>?): Boolean {
 
-        override fun onPreExecute() {
-            super.onPreExecute()
-        }
+        var invalid = false
 
-        override fun doInBackground(vararg p0: OTTracker?): Boolean {
-            throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
-        }
-
-        override fun onProgressUpdate(vararg values: Pair<OTAttribute<out Any>, Any>) {
-            super.onProgressUpdate(*values)
-
-            for (pack in values) {
-                onValueRetrievedHandler.invoke(pack.first, pack.second)
+        for (attr in attributes) {
+            if (!attr.isConnectionValid(invalidMessages)) {
+                invalid = true
             }
         }
 
-        override fun onPostExecute(result: Boolean?) {
-            super.onPostExecute(result)
-        }
-
+        return !invalid
     }
 
 }

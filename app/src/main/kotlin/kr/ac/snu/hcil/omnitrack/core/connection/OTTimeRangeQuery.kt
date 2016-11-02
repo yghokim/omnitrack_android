@@ -41,9 +41,9 @@ class OTTimeRangeQuery : ATypedQueueSerializable {
          */
         PresentDate(R.string.msg_present_date, R.string.msg_present_date_desc, TYPE_PIVOT_TIMESTAMP, BIN_SIZE_DAY, 0, false),
         PreviousDate(R.string.msg_previous_date, R.string.msg_previous_date_desc, TYPE_PIVOT_TIMESTAMP, BIN_SIZE_DAY, -1, false),
+        Recent1Hour(R.string.msg_recent_hour, R.string.msg_recent_hour_desc, TYPE_PIVOT_TIMESTAMP, BIN_SIZE_HOUR, 0, true),
         Recent24Hours(R.string.msg_recent_24_hours, R.string.msg_recent_24_hours_desc, TYPE_PIVOT_TIMESTAMP, BIN_SIZE_DAY, 0, true),
-        Recent7Days(R.string.msg_recent_7_days, R.string.msg_recent_7_days_desc, TYPE_PIVOT_TIMESTAMP, BIN_SIZE_WEEK, 0, true),
-        Recent1Hour(R.string.msg_recent_hour, R.string.msg_recent_hour_desc, TYPE_PIVOT_TIMESTAMP, BIN_SIZE_HOUR, 0, true);
+        Recent7Days(R.string.msg_recent_7_days, R.string.msg_recent_7_days_desc, TYPE_PIVOT_TIMESTAMP, BIN_SIZE_WEEK, 0, true);
 
         fun makeQueryInstance(): OTTimeRangeQuery {
             return OTTimeRangeQuery(type, binSize, binOffset, anchorToNow)

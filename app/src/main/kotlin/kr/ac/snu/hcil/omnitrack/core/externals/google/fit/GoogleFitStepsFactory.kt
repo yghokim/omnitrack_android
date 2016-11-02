@@ -71,11 +71,15 @@ object GoogleFitStepsFactory : GoogleFitService.GoogleFitMeasureFactory() {
         }
 
         override fun requestValueAsync(start: Long, end: Long, handler: (Any?) -> Unit) {
-            Task(start, end) {
-                steps ->
-                println("result step: $steps")
-                handler.invoke(steps)
-            }.execute()
+            if (factory.service.state == OTExternalService.ServiceState.ACTIVATED) {
+                Task(start, end) {
+                    steps ->
+                    println("result step: $steps")
+                    handler.invoke(steps)
+                }.execute()
+            } else {
+                handler.invoke(null)
+            }
         }
 
         override fun onSerialize(typedQueue: SerializableTypedQueue) {

@@ -2,16 +2,19 @@ package kr.ac.snu.hcil.omnitrack.core.attributes
 
 import android.Manifest
 import android.content.Context
+import android.text.SpannedString
 import android.util.SparseArray
 import android.view.View
 import android.widget.TextView
 import com.google.gson.Gson
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTProperty
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.database.NamedObject
+import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
@@ -266,5 +269,20 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
 
     fun isMeasureFactoryConnected(measureFactory: OTMeasureFactory): Boolean {
         return valueConnection?.source?.factory?.typeCode == measureFactory.typeCode
+    }
+
+    fun isConnectionValid(invalidMessages: MutableList<SpannedString>?): Boolean {
+        val connection = valueConnection
+        if (connection != null) {
+            val service = connection.source!!.factory.service
+            if (service.state == OTExternalService.ServiceState.ACTIVATED) {
+                return true
+            } else {
+                invalidMessages?.add(SpannedString.valueOf(String.format(
+                        OTApplication.app.resources.getString(R.string.msg_service_is_not_activated_format),
+                        OTApplication.app.resources.getString(service.nameResourceId))))
+                return false
+            }
+        } else return true
     }
 }

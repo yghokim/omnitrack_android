@@ -157,12 +157,20 @@ abstract class OTTrigger(objectId: String?, dbId: Long?, name: String,
                 //Toast.makeText(OTApplication.app, "Logged!", Toast.LENGTH_SHORT).show()
 
                 var left = trackers.size
+                fun onTrackerHandled() {
+                    left--
+                    if (left == 0) {
+                        finished?.invoke(true)
+                    }
+                }
+
                 for (tracker in trackers) {
-                    OTBackgroundLoggingService.startLoggingAsync(OTApplication.app, tracker, OTItem.LoggingSource.Trigger) {
-                        left--
-                        if (left == 0) {
-                            finished?.invoke(true)
+                    if (tracker.isValid(null)) {
+                        OTBackgroundLoggingService.startLoggingAsync(OTApplication.app, tracker, OTItem.LoggingSource.Trigger) {
+                            onTrackerHandled()
                         }
+                    } else {
+                        onTrackerHandled()
                     }
                 }
             }

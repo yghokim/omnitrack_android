@@ -71,7 +71,7 @@ object OTNotificationManager {
         val resultPendingIntent = stackBuilder.getPendingIntent(0,
                 PendingIntent.FLAG_UPDATE_CURRENT)
 
-        val builder = makeBaseBuilder(context, Type.TRACKING_REMINDER, reminderTime)
+        val builder = makeBaseBuilder(context, Type.TRACKING_REMINDER.priority, reminderTime)
                 .setContentIntent(resultPendingIntent)
                 .setContentText(String.format(context.resources.getString(R.string.msg_noti_tap_for_tracking_format), tracker.name))
                 .setDefaults(Notification.DEFAULT_ALL)
@@ -119,7 +119,7 @@ object OTNotificationManager {
                 context.resources.getString(R.string.msg_notification_action_discard_item),
                 PendingIntent.getBroadcast(context, 0, itemRemoveIntent, PendingIntent.FLAG_UPDATE_CURRENT)).build()
 
-        val builder = makeBaseBuilder(context, Type.TRACKING_REMINDER, loggedTime)
+        val builder = makeBaseBuilder(context, Type.BACKGROUND_LOGGING_NOTIFICATION.priority, loggedTime)
                 .setContentIntent(resultPendingIntent)
                 .setContentText(
                         String.format(OTApplication.app.resources.getString(R.string.msg_notification_content_format_new_item),
@@ -148,9 +148,13 @@ object OTNotificationManager {
         // }
     }
 
-    fun makeBaseBuilder(context: Context, type: Type, time: Long): NotificationCompat.Builder {
+    fun pushWarningMessageNotification(context: Context, message: String) {
 
-        val builder = NotificationCompat.Builder(context).setPriority(type.priority)
+    }
+
+    fun makeBaseBuilder(context: Context, priority: Int, time: Long): NotificationCompat.Builder {
+
+        val builder = NotificationCompat.Builder(context).setPriority(priority)
                 .setWhen(time)
                 .setShowWhen(true)
                 .setSmallIcon(R.drawable.icon_simple)
