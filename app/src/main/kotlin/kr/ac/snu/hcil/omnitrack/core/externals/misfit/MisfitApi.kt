@@ -123,10 +123,15 @@ object MisfitApi {
                     .build()
 
             if (NetworkHelper.isConnectedToInternet()) {
-                val response = OkHttpClient().newCall(request).execute()
-                val responseBody = response.body().string()
-                println(responseBody)
-                return responseBody
+                try {
+                    val response = OkHttpClient().newCall(request).execute()
+                    val responseBody = response.body().string()
+                    println(responseBody)
+                    return responseBody
+                } catch(e: Exception) {
+                    OTApplication.logger.writeSystemLog("Misfit API Exception: ${e.message}", "MisfitAPI")
+                    return null
+                }
             } else return null
         }
 
@@ -160,11 +165,16 @@ object MisfitApi {
                     .post(requestBody)
                     .build()
 
-            val response = OkHttpClient().newCall(request).execute()
-            val result = JSONObject(response.body().string())
-            if (result.has(AuthConstants.PARAM_ACCESS_TOKEN)) {
-                return result.getString(AuthConstants.PARAM_ACCESS_TOKEN)
-            } else return null
+            try {
+                val response = OkHttpClient().newCall(request).execute()
+                val result = JSONObject(response.body().string())
+                if (result.has(AuthConstants.PARAM_ACCESS_TOKEN)) {
+                    return result.getString(AuthConstants.PARAM_ACCESS_TOKEN)
+                } else return null
+            } catch(e: Exception) {
+                OTApplication.logger.writeSystemLog("Misfit Token Exchange Exception: ${e.message}", "MisfitAPI")
+                return null
+            }
         }
 
     }
