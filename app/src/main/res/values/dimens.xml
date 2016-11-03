@@ -74,5 +74,6 @@
     <dimen name="audio_recorder_progressbar_height_recorder">47dp</dimen>
     <dimen name="audio_recorder_progressbar_height_player">12dp</dimen>
 
+    <dimen name="tooltip_max_width">250dp</dimen>
 
 </resources>

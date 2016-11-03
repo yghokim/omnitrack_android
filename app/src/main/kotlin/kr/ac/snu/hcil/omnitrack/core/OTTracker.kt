@@ -3,7 +3,6 @@ package kr.ac.snu.hcil.omnitrack.core
 //import kr.ac.snu.hcil.omnitrack.core.database.TrackerEntity
 import android.content.Context
 import android.graphics.Color
-import android.text.SpannedString
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
@@ -191,7 +190,7 @@ class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color
         return false
     }
 
-    fun isValid(invalidMessages: MutableList<SpannedString>?): Boolean {
+    fun isValid(invalidMessages: MutableList<CharSequence>?): Boolean {
 
         var invalid = false
 

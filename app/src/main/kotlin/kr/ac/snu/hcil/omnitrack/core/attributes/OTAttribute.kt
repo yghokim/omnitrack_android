@@ -2,7 +2,6 @@ package kr.ac.snu.hcil.omnitrack.core.attributes
 
 import android.Manifest
 import android.content.Context
-import android.text.SpannedString
 import android.util.SparseArray
 import android.view.View
 import android.widget.TextView
@@ -271,15 +270,15 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
         return valueConnection?.source?.factory?.typeCode == measureFactory.typeCode
     }
 
-    fun isConnectionValid(invalidMessages: MutableList<SpannedString>?): Boolean {
+    fun isConnectionValid(invalidMessages: MutableList<CharSequence>?): Boolean {
         val connection = valueConnection
         if (connection != null) {
             val service = connection.source!!.factory.service
             if (service.state == OTExternalService.ServiceState.ACTIVATED) {
                 return true
             } else {
-                invalidMessages?.add(SpannedString.valueOf(String.format(
-                        OTApplication.app.resources.getString(R.string.msg_service_is_not_activated_format),
+                invalidMessages?.add(TextHelper.fromHtml(String.format(
+                        "<font color=\"blue\">${OTApplication.app.resources.getString(R.string.msg_service_is_not_activated_format)}</font>",
                         OTApplication.app.resources.getString(service.nameResourceId))))
                 return false
             }

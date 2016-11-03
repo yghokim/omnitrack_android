@@ -1,7 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.attribute
 
 import android.content.Context
-import android.text.Html
 import android.util.AttributeSet
 import android.view.View
 import android.widget.Button
@@ -10,6 +9,7 @@ import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
+import kr.ac.snu.hcil.omnitrack.utils.TextHelper
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 
@@ -88,12 +88,7 @@ class AttributeConnectionView : LinearLayout, View.OnClickListener {
                     }
                 }
 
-                queryView.text = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                    Html.fromHtml(builder.toString(), Html.FROM_HTML_MODE_LEGACY)
-                } else {
-                    @Suppress("DEPRECATION")
-                    Html.fromHtml(builder.toString())
-                }
+                queryView.text = TextHelper.fromHtml(builder.toString())
 
             }
         } else {

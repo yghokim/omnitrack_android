@@ -28,11 +28,13 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
+import it.sephiroth.android.library.tooltip.Tooltip
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.database.DatabaseHelper
+import kr.ac.snu.hcil.omnitrack.ui.components.common.TooltipHelper
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.DrawableListBottomSpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemBrowserActivity
@@ -242,6 +244,8 @@ class TrackerListFragment : Fragment() {
 
             val errorIndicator: AppCompatImageButton
 
+            private val validationErrorMessages = ArrayList<CharSequence>()
+
             var collapsed = true
 
             private var lastLoggingTimeRetrievalTask: DatabaseHelper.LastItemTimeRetrievalTask? = null
@@ -271,6 +275,8 @@ class TrackerListFragment : Fragment() {
                 chartViewButton.setOnClickListener(this)
 
                 expandButton.setOnClickListener(this)
+
+                errorIndicator.setOnClickListener(this)
 
                 collapse()
             }
@@ -311,6 +317,13 @@ class TrackerListFragment : Fragment() {
 
                     TransitionManager.beginDelayedTransition(listView, transition)
                     notifyDataSetChanged()
+                } else if (view === errorIndicator) {
+                    val tooltipView = Tooltip.make(context, TooltipHelper.makeTooltipBuilder(adapterPosition, errorIndicator).build())
+
+                    tooltipView.setText(
+                            validationErrorMessages.joinToString("\n")
+                    )
+                    tooltipView.show()
                 }
             }
 
@@ -320,7 +333,8 @@ class TrackerListFragment : Fragment() {
                 name.text = tracker.name
                 color.setBackgroundColor(tracker.color)
 
-                errorIndicator.visibility = if (tracker.isValid(null)) {
+                validationErrorMessages.clear()
+                errorIndicator.visibility = if (tracker.isValid(validationErrorMessages)) {
                     View.INVISIBLE
                 } else {
                     View.VISIBLE
