@@ -318,12 +318,14 @@ class TrackerListFragment : Fragment() {
                     TransitionManager.beginDelayedTransition(listView, transition)
                     notifyDataSetChanged()
                 } else if (view === errorIndicator) {
-                    val tooltipView = Tooltip.make(context, TooltipHelper.makeTooltipBuilder(adapterPosition, errorIndicator).build())
+                    if (validationErrorMessages.size > 0) {
+                        val tooltipView = Tooltip.make(context, TooltipHelper.makeTooltipBuilder(adapterPosition, errorIndicator).build())
 
-                    tooltipView.setText(
-                            validationErrorMessages.joinToString("\n")
-                    )
-                    tooltipView.show()
+                        tooltipView.setText(
+                                validationErrorMessages.joinToString("\n")
+                        )
+                        tooltipView.show()
+                    }
                 }
             }
 
