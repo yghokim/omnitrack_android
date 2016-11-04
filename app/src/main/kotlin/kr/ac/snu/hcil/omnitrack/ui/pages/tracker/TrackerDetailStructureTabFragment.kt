@@ -10,7 +10,10 @@ import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
-import android.view.*
+import android.view.LayoutInflater
+import android.view.MotionEvent
+import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
@@ -27,6 +30,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputV
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.BooleanPropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ColorPalettePropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ShortTextPropertyView
+import kr.ac.snu.hcil.omnitrack.ui.pages.ConnectionIndicatorStubProxy
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeDetailActivity
 import kr.ac.snu.hcil.omnitrack.utils.startActivityOnDelay
 
@@ -291,7 +295,7 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
 
             private val draggableZone: View
 
-            private val connectionIndicatorStub: ViewStub
+            private val connectionIndicatorStubProxy: ConnectionIndicatorStubProxy
 
             private var connectionIndicator: View? = null
             private var connectionSourceNameView: TextView? = null
@@ -319,7 +323,8 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
                 editButton = view.findViewById(R.id.ui_button_edit) as ImageButton
                 removeButton = view.findViewById(R.id.ui_button_remove) as ImageButton
                 draggableZone = view.findViewById(R.id.ui_drag_handle)
-                connectionIndicatorStub = view.findViewById(R.id.ui_connection_indicator_stub) as ViewStub
+
+                connectionIndicatorStubProxy = ConnectionIndicatorStubProxy(view, R.id.ui_connection_indicator_stub)
 
                 requiredMarker = view.findViewById(R.id.ui_required_marker)
 
@@ -360,20 +365,7 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
                 previewContainer.alpha = 0.5f
                 preview = attribute.getInputView(context, true, preview)
 
-                val connectionSource = attribute.valueConnection?.source
-                if (connectionSource != null) {
-                    if (connectionIndicator == null) {
-                        val inflatedIndicator = connectionIndicatorStub.inflate()
-                        connectionSourceNameView = inflatedIndicator.findViewById(R.id.ui_connection_source_name) as TextView
-                        this.connectionIndicator = inflatedIndicator
-                    } else {
-                        connectionIndicator?.visibility = View.VISIBLE
-                    }
-
-                    connectionSourceNameView?.text = connectionSource.factory.getFormattedName()
-                } else {
-                    connectionIndicator?.visibility = View.GONE
-                }
+                connectionIndicatorStubProxy.onBind(attribute)
             }
         }
 

@@ -12,7 +12,6 @@ import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewStub
 import android.widget.TextView
 import android.widget.Toast
 import kr.ac.snu.hcil.omnitrack.OTApplication
@@ -26,6 +25,7 @@ import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
+import kr.ac.snu.hcil.omnitrack.ui.pages.ConnectionIndicatorStubProxy
 import java.util.*
 
 /**
@@ -376,12 +376,10 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
 
             private val container: LockableFrameLayout
 
-            private val connectionIndicatorStub: ViewStub
-            private var connectionIndicator: View? = null
-            private var connectionIndicatorSourceNameView: TextView? = null
 
             private var timestampIndicator: TextView
 
+            private val connectionIndicatorStubProxy: ConnectionIndicatorStubProxy
 
             private val loadingIndicatorInContainer: View
 
@@ -400,12 +398,12 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
 
                 loadingIndicatorInContainer = frame.findViewById(R.id.ui_container_indicator)
 
-                connectionIndicatorStub = frame.findViewById(R.id.ui_connection_indicator_stub) as ViewStub
-
                 inputView.valueChanged += {
                     sender, args ->
                     onInputViewValueChanged(args)
                 }
+
+                connectionIndicatorStubProxy = ConnectionIndicatorStubProxy(frame, R.id.ui_connection_indicator_stub)
             }
 
             private fun onInputViewValueChanged(newVal: Any) {
@@ -436,19 +434,7 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
                 }
                 attributeTypeView.text = resources.getString(attribute.typeNameResourceId)
 
-                val connectionSource = attribute.valueConnection?.source
-                if (connectionSource != null) {
-                    if (connectionIndicator == null) {
-                        connectionIndicator = connectionIndicatorStub.inflate()
-                        connectionIndicatorSourceNameView = connectionIndicator?.findViewById(R.id.ui_connection_source_name) as TextView
-                    } else {
-                        connectionIndicator?.visibility = View.VISIBLE
-                    }
-
-                    connectionIndicatorSourceNameView?.text = connectionSource.factory.getFormattedName()
-                } else {
-                    connectionIndicator?.visibility = View.GONE
-                }
+                connectionIndicatorStubProxy.onBind(attribute)
 
 
                 if (builder.hasValueOf(attribute)) {

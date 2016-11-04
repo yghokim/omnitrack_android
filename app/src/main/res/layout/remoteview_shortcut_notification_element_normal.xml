@@ -14,7 +14,7 @@
         android:layout_weight="1"
         android:fontFamily="sans-serif-condensed"
         android:minHeight="0dp"
-        android:text="Manual Sleep"
+        android:text=""
         android:textSize="13sp"
         android:textStyle="normal"
         />
