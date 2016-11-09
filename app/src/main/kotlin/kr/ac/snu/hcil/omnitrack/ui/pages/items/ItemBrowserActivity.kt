@@ -194,6 +194,9 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
             val moreButton: View
 
+            val sourceView: TextView
+            val loggingTimeView: TextView
+
             val valueListAdapter: TableRowAdapter
 
             val itemMenu: PopupMenu
@@ -217,6 +220,9 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                 moreButton = view.findViewById(R.id.ui_button_more)
                 moreButton.setOnClickListener(this)
 
+                sourceView = view.findViewById(R.id.ui_logging_source) as TextView
+                loggingTimeView = view.findViewById(R.id.ui_logging_time) as TextView
+
                 itemMenu = PopupMenu(this@ItemBrowserActivity, moreButton, Gravity.TOP or Gravity.LEFT)
                 itemMenu.inflate(R.menu.menu_item_list_element)
                 itemMenu.setOnMenuItemClickListener(this)
@@ -238,7 +244,6 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
             }
 
             override fun onMenuItemClick(p0: MenuItem): Boolean {
-                println(p0.itemId)
                 when (p0.itemId) {
                     R.id.action_edit -> {
                         startActivity(ItemEditingActivity.makeIntent(items[adapterPosition], tracker!!, this@ItemBrowserActivity))
@@ -271,6 +276,9 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
                 monthView.text = String.format(Locale.US, "%tb", cal);
                 dayView.text = cal.getDayOfMonth().toString()
+
+                sourceView.text = item.source.sourceText
+                loggingTimeView.text = OTTimeAttribute.formats[OTTimeAttribute.GRANULARITY_SECOND]!!.format(Date(item.timestamp))
 
                 valueListAdapter.notifyDataSetChanged()
             }
@@ -313,9 +321,26 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                     val attributeNameView: TextView
                     var valueView: View
 
+
                     init {
                         attributeNameView = view.findViewById(R.id.ui_attribute_name) as TextView
+
                         valueView = view.findViewById(R.id.ui_value_view_replace)
+                    }
+
+                    open fun bindRawValue(name: String, value: String) {
+                        attributeNameView.text = name
+                        val newValueView: TextView = if (valueView is TextView) {
+                            valueView as TextView
+                        } else {
+                            TextView(this@ItemBrowserActivity)
+                        }
+
+                        InterfaceHelper.setTextAppearance(newValueView, R.style.viewForItemListTextAppearance)
+
+                        changeNewValueView(newValueView)
+
+                        newValueView.text = value
                     }
 
                     open fun bindAttribute(attribute: OTAttribute<out Any>) {
@@ -328,6 +353,14 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                         )
 
                         val newValueView = attribute.getViewForItemList(this@ItemBrowserActivity, valueView)
+                        changeNewValueView(newValueView)
+
+                        if (getParentItem().hasValueOf(attribute)) {
+                            attribute.applyValueToViewForItemList(getParentItem().getValueOf(attribute), valueView)
+                        }
+                    }
+
+                    private fun changeNewValueView(newValueView: View) {
                         if (newValueView !== valueView) {
                             val lp = valueView.layoutParams
 
@@ -338,10 +371,6 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                             newValueView.layoutParams = lp
                             container.addView(newValueView, index)
                             valueView = newValueView
-                        }
-
-                        if (getParentItem().hasValueOf(attribute)) {
-                            attribute.applyValueToViewForItemList(getParentItem().getValueOf(attribute), valueView)
                         }
                     }
                 }

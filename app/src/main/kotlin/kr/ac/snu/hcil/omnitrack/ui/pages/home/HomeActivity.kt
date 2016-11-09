@@ -9,6 +9,8 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
 import android.support.v4.view.ViewPager
+import android.support.v4.widget.DrawerLayout
+import android.view.Gravity
 import android.view.View
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
@@ -25,12 +27,15 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home) {
      */
     private var mViewPager: ViewPager? = null
 
+    private lateinit var drawerLayout: DrawerLayout
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         rightActionBarButton?.visibility = View.VISIBLE
         rightActionBarButton?.setImageResource(R.drawable.settings_dark)
-        leftActionBarButton?.visibility = View.GONE
+        leftActionBarButton?.visibility = View.VISIBLE
+        leftActionBarButton?.setImageResource(R.drawable.menu_dark)
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
@@ -43,7 +48,16 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home) {
         val tabLayout = findViewById(R.id.tabs) as TabLayout?
         tabLayout!!.setupWithViewPager(mViewPager)
 
-
+        //Setup sliding menu
+        drawerLayout = findViewById(R.id.ui_drawer_layout) as DrawerLayout
+        /*
+        slidingMenu = SlidingMenu(this, SlidingMenu.SLIDING_WINDOW)
+        slidingMenu.mode = SlidingMenu.LEFT
+        slidingMenu.setFadeDegree(0.3f)
+        slidingMenu.setFadeEnabled(true)
+        slidingMenu.setBehindOffsetRes(R.dimen.home_sliding_menu_right_region)
+*/
+        //Ask permission if needed
         if (Build.VERSION.SDK_INT >= 23) {
             val permissions = OTApplication.app.currentUser.getPermissionsRequiredForFields().filter {
                 checkSelfPermission(it) != PackageManager.PERMISSION_GRANTED
@@ -57,7 +71,12 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home) {
     }
 
     override fun onToolbarLeftButtonClicked() {
-
+        //       slidingMenu.toggle(true)
+        if (drawerLayout.isDrawerOpen(Gravity.LEFT)) {
+            drawerLayout.closeDrawer(Gravity.LEFT)
+        } else {
+            drawerLayout.openDrawer(Gravity.LEFT)
+        }
     }
 
     override fun onToolbarRightButtonClicked() {

@@ -11,7 +11,7 @@
             <solid android:color="@color/transparent" />
             <stroke
                 android:width="0.6dp"
-                android:color="@color/textColorMidLight" />
+                android:color="@color/separator.Light" />
         </shape>
     </item>
 

@@ -6,6 +6,8 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
 
+    <dimen name="home_sliding_menu_right_region">120dp</dimen>
+
     <dimen name="property_left_padding">5dp</dimen>
     <dimen name="property_right_padding">5dp</dimen>
     <dimen name="property_top_padding">12dp</dimen>

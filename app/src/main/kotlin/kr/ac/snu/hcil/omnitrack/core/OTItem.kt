@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core
 
 import com.google.gson.Gson
 import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.database.IDatabaseStorable
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializedStringKeyEntry
@@ -12,8 +13,15 @@ import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelpe
  */
 class OTItem : ADataRow, IDatabaseStorable {
 
-    enum class LoggingSource {
-        Unspecified, Trigger, Shortcut, Manual
+    enum class LoggingSource(val nameResId: Int) {
+        Unspecified(R.string.msg_tracking_source_unspecified),
+        Trigger(R.string.msg_tracking_source_trigger),
+        Shortcut(R.string.msg_tracking_source_shortcut),
+        Manual(R.string.msg_tracking_source_manual);
+
+        val sourceText: String by lazy {
+            OTApplication.app.resources.getString(nameResId)
+        }
     }
 
     companion object {
