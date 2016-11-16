@@ -165,7 +165,9 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
     override fun onToolbarRightButtonClicked() {
         if (tracker != null) {
-            startActivity(ItemEditingActivity.makeIntent(tracker!!.objectId, this))
+            val intent = ItemEditingActivity.makeIntent(tracker!!.objectId, this)
+            intent.putExtra(OTApplication.INTENT_EXTRA_FROM, this@ItemBrowserActivity.javaClass.simpleName)
+            startActivity(intent)
         }
     }
 
@@ -246,7 +248,9 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
             override fun onMenuItemClick(p0: MenuItem): Boolean {
                 when (p0.itemId) {
                     R.id.action_edit -> {
-                        startActivity(ItemEditingActivity.makeIntent(items[adapterPosition], tracker!!, this@ItemBrowserActivity))
+                        val intent = ItemEditingActivity.makeIntent(items[adapterPosition], tracker!!, this@ItemBrowserActivity)
+                        intent.putExtra(OTApplication.INTENT_EXTRA_FROM, this@ItemBrowserActivity.javaClass.simpleName)
+                        startActivity(intent)
                         return true
                     }
                     R.id.action_remove -> {

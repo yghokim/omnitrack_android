@@ -14,11 +14,13 @@ import android.support.v4.graphics.ColorUtils
 import android.support.v4.view.ViewPager
 import android.view.View
 import at.markushi.ui.RevealColorView
+import com.google.gson.JsonObject
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
+import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 
 class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tracker_detail) {
@@ -60,6 +62,17 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
      * The [ViewPager] that will host the section contents.
      */
     private lateinit var mViewPager: ViewPager
+
+    init {
+        isSessionLoggingEnabled = false
+    }
+
+    override fun onSessionLogContent(contentObject: JsonObject) {
+        super.onSessionLogContent(contentObject)
+        contentObject.addProperty("tracker_id", tracker.objectId)
+        contentObject.addProperty("tracker_name", tracker.name)
+        contentObject.addProperty("isEditMode", isEditMode)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -193,7 +206,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
     }
 
 
-    abstract class ChildFragment : Fragment() {
+    abstract class ChildFragment : OTFragment() {
         protected var isEditMode = false
             private set
         protected lateinit var tracker: OTTracker

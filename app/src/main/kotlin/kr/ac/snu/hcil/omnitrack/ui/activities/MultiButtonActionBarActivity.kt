@@ -2,18 +2,18 @@ package kr.ac.snu.hcil.omnitrack.ui.activities
 
 import android.app.Activity
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.AppCompatImageButton
 import android.support.v7.widget.Toolbar
 import android.view.View
 import android.widget.ImageButton
 import android.widget.TextView
+import com.google.gson.JsonObject
 import kr.ac.snu.hcil.omnitrack.R
 
 /**
  * Created by Young-Ho Kim on 2016-07-18.
  */
-abstract class MultiButtonActionBarActivity(val layoutId: Int) : AppCompatActivity()  {
+abstract class MultiButtonActionBarActivity(val layoutId: Int) : OTActivity() {
 
     enum class Mode {
         OKCancel, Back, BackAndMenu, None
@@ -22,6 +22,12 @@ abstract class MultiButtonActionBarActivity(val layoutId: Int) : AppCompatActivi
     protected var leftActionBarButton: ImageButton?=null
     protected var rightActionBarButton: ImageButton?=null
     protected var titleView: TextView? = null
+
+    private var isCanceled = false
+
+    override fun onSessionLogContent(contentObject: JsonObject) {
+        super.onSessionLogContent(contentObject)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

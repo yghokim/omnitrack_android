@@ -14,6 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import com.google.gson.JsonObject
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItem
@@ -82,6 +83,18 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
     private var activityResultAppliedAttributePosition = -1
 
     private lateinit var builderRestoredSnackbar: Snackbar
+
+    private var itemSaved: Boolean = false
+
+    override fun onSessionLogContent(contentObject: JsonObject) {
+        super.onSessionLogContent(contentObject)
+        contentObject.addProperty("mode", mode.name)
+        contentObject.addProperty("tracker_id", tracker?.objectId)
+        contentObject.addProperty("tracker_name", tracker?.name)
+        if (isFinishing) {
+            contentObject.addProperty("item_saved", itemSaved)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -206,6 +219,7 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
 
     override fun onToolbarLeftButtonClicked() {
         //back button
+        itemSaved = false
         finish()
     }
 
@@ -219,6 +233,7 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
             builder.clear()
             clearBuilderCache()
             skipViewValueCaching = true
+            itemSaved = true
             finish()
         }
     }

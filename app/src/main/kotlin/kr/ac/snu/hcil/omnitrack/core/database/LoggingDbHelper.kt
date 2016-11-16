@@ -29,13 +29,30 @@ class LoggingDbHelper(context: Context) : SQLiteOpenHelper(context, "logging.db"
         override val tableName: String = "system_logs"
     }
 
+    object SessionLogScheme : TableScheme() {
+        val ACTIVITY = "activity"
+        val ELAPSED_TIME = "elapsed_time"
+        val FROM = "opened_from"
+        val CONTENT = "content"
+
+        override val creationColumnContentString: String = "$ACTIVITY TEXT, $ELAPSED_TIME INTEGER, $FROM TEXT, $CONTENT TEXT"
+
+        override val intrinsicColumnNames: Array<String> = arrayOf(ACTIVITY, ELAPSED_TIME, FROM, CONTENT)
+
+        override val tableName: String = "session_logs"
+
+        override val indexCreationQueryString: String = makeIndexQueryString(false, "timestamp_index", LOGGED_AT)
+    }
+
 
     override fun onCreate(db: SQLiteDatabase) {
-        val tables = arrayOf(SystemLogScheme)
+        val tables = arrayOf(SystemLogScheme, SessionLogScheme)
 
         for (scheme in tables) {
             db.execSQL(scheme.creationQueryString)
-            //db.execSQL(scheme.indexCreationQueryString)
+            if (!scheme.indexCreationQueryString.isNullOrBlank()) {
+                db.execSQL(scheme.indexCreationQueryString)
+            }
         }
     }
 
@@ -70,4 +87,22 @@ class LoggingDbHelper(context: Context) : SQLiteOpenHelper(context, "logging.db"
 
         query.close()
     }
+
+    fun writeSessionLog(activity: Any, elapsed: Long, finishedAt: Long, from: String?, content: String?) {
+        val values = ContentValues()
+        values.put(SessionLogScheme.UPDATED_AT, finishedAt)
+        values.put(SessionLogScheme.LOGGED_AT, finishedAt)
+        values.put(SessionLogScheme.ACTIVITY, activity.javaClass.simpleName)
+        values.put(SessionLogScheme.ELAPSED_TIME, elapsed)
+
+        if (content != null)
+            values.put(SessionLogScheme.CONTENT, content)
+
+        if (from != null)
+            values.put(SessionLogScheme.FROM, from)
+
+        val newRowId = writableDatabase.insert(SessionLogScheme.tableName, null, values)
+    }
+
+
 }
