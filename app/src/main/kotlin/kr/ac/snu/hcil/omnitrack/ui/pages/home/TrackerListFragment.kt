@@ -7,7 +7,6 @@ import android.content.IntentFilter
 import android.graphics.Typeface
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
-import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.AppCompatImageButton
@@ -34,6 +33,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.database.DatabaseHelper
+import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.common.TooltipHelper
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.DrawableListBottomSpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
@@ -51,7 +51,7 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 2016-07-18.
  */
-class TrackerListFragment : Fragment() {
+class TrackerListFragment : OTFragment() {
 
     private lateinit var user : OTUser
 

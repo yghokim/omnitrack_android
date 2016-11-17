@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.LinearLayout
+import com.google.gson.JsonObject
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
@@ -39,6 +40,12 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
     private var propertyViewHorizontalMargin: Int = 0
 
     private val propertyViewList = ArrayList<ReadOnlyPair<Int?, View>>()
+
+    override fun onSessionLogContent(contentObject: JsonObject) {
+        super.onSessionLogContent(contentObject)
+        contentObject.addProperty("attribute_id", attribute?.objectId)
+        contentObject.addProperty("attribute_name", attribute?.name)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

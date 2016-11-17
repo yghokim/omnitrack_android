@@ -19,11 +19,11 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
-import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
+import kr.ac.snu.hcil.omnitrack.ui.activities.OTTrackerAttachedActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 
-class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tracker_detail) {
+class TrackerDetailActivity : OTTrackerAttachedActivity(R.layout.activity_tracker_detail) {
 
     companion object {
         const val IS_EDIT_MODE = "isEditMode"
@@ -43,15 +43,6 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
         }
     }
 
-    /*
-        interface IChild{
-            fun init(tracker: OTTracker, editMode: Boolean)
-            fun onClose()
-        }
-
-        private val childFragments = Hashtable<Int, IChild>()
-    */
-    private lateinit var tracker: OTTracker
     private var isEditMode = true
 
     private var mSectionsPagerAdapter: SectionsPagerAdapter? = null
@@ -63,14 +54,8 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
      */
     private lateinit var mViewPager: ViewPager
 
-    init {
-        isSessionLoggingEnabled = false
-    }
-
     override fun onSessionLogContent(contentObject: JsonObject) {
         super.onSessionLogContent(contentObject)
-        contentObject.addProperty("tracker_id", tracker.objectId)
-        contentObject.addProperty("tracker_name", tracker.name)
         contentObject.addProperty("isEditMode", isEditMode)
     }
 
@@ -100,23 +85,12 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
             this.intent.putExtra(IS_EDIT_MODE, savedInstanceState.getBoolean(IS_EDIT_MODE, true))
         }
 
-        if (intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER) != null) {
-            //edit
-            //instant update
-            val tracker = OTApplication.app.currentUser[intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)]
+        isEditMode = intent.getBooleanExtra(IS_EDIT_MODE, true)
+    }
 
-            if (tracker != null) {
-                this.tracker = tracker
-
-                transitionToColor(this.tracker.color, false)
-                isEditMode = intent.getBooleanExtra(IS_EDIT_MODE, true)
-            } else {
-                tossToHome()
-            }
-
-        } else {
-            tossToHome()
-        }
+    override fun onTrackerLoaded(tracker: OTTracker) {
+        super.onTrackerLoaded(tracker)
+        transitionToColor(tracker.color, false)
     }
 
     private fun tossToHome() {
@@ -128,7 +102,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putString(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
+        outState.putString(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker?.objectId)
         outState.putBoolean(IS_EDIT_MODE, true)
     }
 
@@ -243,7 +217,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
         override fun getItem(position: Int): Fragment {
 
             val bundle = Bundle()
-            bundle.putString(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
+            bundle.putString(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker?.objectId)
             bundle.putBoolean(IS_EDIT_MODE, isEditMode)
 
             val fragment =

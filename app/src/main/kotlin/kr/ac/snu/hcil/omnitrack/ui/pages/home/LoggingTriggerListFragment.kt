@@ -1,19 +1,19 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.home
 
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
+import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.ATriggerListFragmentCore
 
 /**
  * Created by Young-Ho on 9/1/2016.
  */
-class LoggingTriggerListFragment : Fragment() {
+class LoggingTriggerListFragment : OTFragment() {
     val core: ATriggerListFragmentCore
 
     init {

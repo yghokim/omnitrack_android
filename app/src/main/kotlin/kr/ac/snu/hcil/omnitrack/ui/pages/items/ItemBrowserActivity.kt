@@ -17,7 +17,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AttributeSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
-import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
+import kr.ac.snu.hcil.omnitrack.ui.activities.OTTrackerAttachedActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.DrawableListBottomSpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
@@ -26,7 +26,7 @@ import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.getDayOfMonth
 import java.util.*
 
-class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_browser), AdapterView.OnItemSelectedListener, View.OnClickListener {
+class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_browser), AdapterView.OnItemSelectedListener, View.OnClickListener {
 
     companion object {
         fun makeIntent(tracker: OTTracker, context: Context): Intent {
@@ -35,8 +35,6 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
             return intent
         }
     }
-
-    private var tracker: OTTracker? = null
 
     private val items = ArrayList<OTItem>()
 
@@ -88,30 +86,23 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
         sortOrderButton.setOnClickListener(this)
     }
 
-    override fun onStart() {
-        super.onStart()
-
+    override fun onTrackerLoaded(tracker: OTTracker) {
+        super.onTrackerLoaded(tracker)
         items.clear()
-        if (intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER) != null) {
-            tracker = OTApplication.app.currentUser.trackers.filter { it.objectId == intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER) }.first()
+        title = String.format(resources.getString(R.string.title_activity_item_browser, tracker.name))
 
-            setTitle(String.format(resources.getString(R.string.title_activity_item_browser, tracker?.name)))
+        supportedItemComparators = tracker.getSupportedComparators()
 
-            supportedItemComparators = tracker?.getSupportedComparators()
+        if (supportedItemComparators != null) {
+            val adapter = ArrayAdapter<ItemComparator>(this, R.layout.simple_list_element_text_light, R.id.textView, supportedItemComparators)
+            adapter.setDropDownViewResource(R.layout.simple_list_element_text_dropdown)
 
-            if (supportedItemComparators != null) {
-                val adapter = ArrayAdapter<ItemComparator>(this, R.layout.simple_list_element_text_light, R.id.textView, supportedItemComparators)
-                adapter.setDropDownViewResource(R.layout.simple_list_element_text_dropdown)
-
-                sortSpinner.adapter = adapter
-            }
-
-            OTApplication.app.dbHelper.getItems(tracker!!, items)
-
-            onItemListChanged()
+            sortSpinner.adapter = adapter
         }
 
+        OTApplication.app.dbHelper.getItems(tracker, items)
 
+        onItemListChanged()
     }
 
     override fun onClick(view: View) {

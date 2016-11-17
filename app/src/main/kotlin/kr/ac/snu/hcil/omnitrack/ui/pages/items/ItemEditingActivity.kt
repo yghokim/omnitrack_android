@@ -22,7 +22,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTItemBuilder
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
-import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
+import kr.ac.snu.hcil.omnitrack.ui.activities.OTTrackerAttachedActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
@@ -32,7 +32,7 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 16. 7. 24
  */
-class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_item), OTItemBuilder.AttributeStateChangedListener {
+class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item), OTItemBuilder.AttributeStateChangedListener {
 
     companion object {
 
@@ -67,8 +67,6 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
 
     private val attributeListAdapter = AttributeListAdapter()
 
-    private var tracker: OTTracker? = null
-
     private lateinit var builder: OTItemBuilder
 
     private lateinit var attributeListView: RecyclerView
@@ -89,8 +87,6 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
     override fun onSessionLogContent(contentObject: JsonObject) {
         super.onSessionLogContent(contentObject)
         contentObject.addProperty("mode", mode.name)
-        contentObject.addProperty("tracker_id", tracker?.objectId)
-        contentObject.addProperty("tracker_name", tracker?.name)
         if (isFinishing) {
             contentObject.addProperty("item_saved", itemSaved)
         }
@@ -120,52 +116,43 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
         }
     }
 
-    override fun onStart() {
-        super.onStart()
+    override fun onTrackerLoaded(tracker: OTTracker) {
+        super.onTrackerLoaded(tracker)
+        title = String.format(resources.getString(R.string.title_activity_new_item), tracker?.name)
 
-        val trackerId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
-        if (trackerId != null) {
-            tracker = OTApplication.app.currentUser.trackers.unObservedList.find { it.objectId == trackerId }
+        if (intent.hasExtra(OTApplication.INTENT_EXTRA_DB_ID_ITEM)) {
+            //contains item. Edit mode
+            val item = OTApplication.app.dbHelper.getItem(intent.getLongExtra(OTApplication.INTENT_EXTRA_DB_ID_ITEM, -1), tracker!!)
+            if (item != null) {
+                mode = Mode.Edit
+                println("started activity with edit mode")
+                builder = OTItemBuilder(item, tracker)
+            } else mode = Mode.New
+        } else {
+            mode = Mode.New
+        }
 
-            if (tracker != null) {
-                title = String.format(resources.getString(R.string.title_activity_new_item), tracker?.name)
+        //if(intent.hasExtra(INTENT_EXTRA_REMINDER_TIME))
+        //{
+        //TODO need more rich design for Notifications. Currently, dismiss all notifications for the tracker when opening the activity.
+        //this is from the reminder.
+        OTNotificationManager.notifyReminderChecked(tracker.objectId, intent.getLongExtra(INTENT_EXTRA_REMINDER_TIME, 0))
+        //}
 
-                if (intent.hasExtra(OTApplication.INTENT_EXTRA_DB_ID_ITEM)) {
-                    //contains item. Edit mode
-                    val item = OTApplication.app.dbHelper.getItem(intent.getLongExtra(OTApplication.INTENT_EXTRA_DB_ID_ITEM, -1), tracker!!)
-                    if (item != null) {
-                        mode = Mode.Edit
-                        println("started activity with edit mode")
-                        builder = OTItemBuilder(item, tracker!!)
-                    } else mode = Mode.New
-                } else {
-                    mode = Mode.New
-                }
+        //when the activity is NOT started by startActivityWithResult()
+        if (mode == Mode.New && activityResultAppliedAttributePosition == -1) {
+            if (tryRestoreItemBuilderCache(tracker)) {
 
-                //if(intent.hasExtra(INTENT_EXTRA_REMINDER_TIME))
-                //{
-                //TODO need more rich design for Notifications. Currently, dismiss all notifications for the tracker when opening the activity.
-                //this is from the reminder.
-                OTNotificationManager.notifyReminderChecked(trackerId, intent.getLongExtra(INTENT_EXTRA_REMINDER_TIME, 0))
-                //}
-
-                //when the activity is NOT started by startActivityWithResult()
-                if (mode == Mode.New && activityResultAppliedAttributePosition == -1) {
-                    if (tryRestoreItemBuilderCache(tracker!!)) {
-
-                        //Toast.makeText(this, "Past inputs were restored.", Toast.LENGTH_SHORT).show()
-                        builderRestoredSnackbar.show()
-                    } else {
-                        //new builder was created
-                        //TODO make it as a AcyncTask and update each attribute immediately
-                        builder.autoCompleteAsync(this) {
-                            //attributeListAdapter.notifyDataSetChanged()
-                        }
-                    }
+                //Toast.makeText(this, "Past inputs were restored.", Toast.LENGTH_SHORT).show()
+                builderRestoredSnackbar.show()
+            } else {
+                //new builder was created
+                //TODO make it as a AcyncTask and update each attribute immediately
+                builder.autoCompleteAsync(this) {
+                    //attributeListAdapter.notifyDataSetChanged()
                 }
             }
         }
-
     }
 
     override fun onResume() {
@@ -291,13 +278,13 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
 
 
 //            syncViewStateToBuilderAsync {
-                if (!builder.isEmpty) {
+            if (!builder.isEmpty) {
 
-                    val preferences = getSharedPreferences(OTApplication.PREFERENCE_KEY_FOREGROUND_ITEM_BUILDER_STORAGE, Context.MODE_PRIVATE)
-                    val editor = preferences.edit()
-                    editor.putString(makeTrackerPreferenceKey(tracker!!), builder.getSerializedString())
-                    editor.apply()
-                }
+                val preferences = getSharedPreferences(OTApplication.PREFERENCE_KEY_FOREGROUND_ITEM_BUILDER_STORAGE, Context.MODE_PRIVATE)
+                val editor = preferences.edit()
+                editor.putString(makeTrackerPreferenceKey(tracker!!), builder.getSerializedString())
+                editor.apply()
+            }
             //          }
 
         }

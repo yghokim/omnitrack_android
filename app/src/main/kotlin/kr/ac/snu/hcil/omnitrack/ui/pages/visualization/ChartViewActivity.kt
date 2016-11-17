@@ -12,12 +12,12 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.visualization.Granularity
-import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
+import kr.ac.snu.hcil.omnitrack.ui.activities.OTTrackerAttachedActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.choice.SelectionView
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 
-class ChartViewActivity : MultiButtonActionBarActivity(R.layout.activity_chart_view), View.OnClickListener {
+class ChartViewActivity : OTTrackerAttachedActivity(R.layout.activity_chart_view), View.OnClickListener {
 
     companion object{
             fun makeIntent(trackerId: String, context: Context): Intent {
@@ -26,9 +26,6 @@ class ChartViewActivity : MultiButtonActionBarActivity(R.layout.activity_chart_v
                 return intent
             }
     }
-
-    private lateinit var tracker: OTTracker
-    private var isTrackerLoaded = false
 
     private lateinit var timeNavigator: View
     private lateinit var currentScopeView: TextView
@@ -89,29 +86,17 @@ class ChartViewActivity : MultiButtonActionBarActivity(R.layout.activity_chart_v
 
     }
 
-    override fun onStart() {
-        super.onStart()
+    override fun onTrackerLoaded(tracker: OTTracker) {
+        super.onTrackerLoaded(tracker)
 
-        val trackerId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
-        val tracker = OTApplication.app.currentUser[trackerId]
-        if(tracker!=null)
-        {
-            this.tracker = tracker
-            isTrackerLoaded = true
-            adapter.tracker = this.tracker
+        adapter.tracker = tracker
 
-            setTitle(String.format(resources.getString(R.string.title_activity_chart_view, tracker.name)))
-        }
+        title = String.format(resources.getString(R.string.title_activity_chart_view, tracker.name))
 
         currentPoint = System.currentTimeMillis()
 
         onTimeQueryChanged()
     }
-
-    override fun onResume() {
-        super.onResume()
-    }
-
 
     private fun onTimeQueryChanged() {
         /*

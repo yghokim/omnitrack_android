@@ -2,7 +2,6 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.home
 
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -17,26 +16,19 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
+import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
 
 /**
  * Created by Young-Ho on 7/29/2016.
  */
-class ServiceListFragment : Fragment() {
+class ServiceListFragment : OTFragment() {
 
     private lateinit var listView: RecyclerView
 
     private lateinit var adapter: Adapter
 
     private val pendedActivations = SparseArray<Adapter.ViewHolder>()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
-    override fun onResume() {
-        super.onResume()
-    }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
