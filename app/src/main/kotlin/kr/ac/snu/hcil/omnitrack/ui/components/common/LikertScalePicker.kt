@@ -36,7 +36,7 @@ class LikertScalePicker : View {
     }
 
 
-    var leftLabel: String by Delegates.observable(OTApplication.app.resources.getString(R.string.msg_rating_options_leftmost_label_example)) {
+    var leftLabel: String by Delegates.observable(OTApplication.app.resources.getString(R.string.property_rating_options_leftmost_label_example)) {
         prop, old, new ->
         if (old != new) {
             requestLayout()
@@ -50,7 +50,7 @@ class LikertScalePicker : View {
         }
     }
 
-    var rightLabel: String by Delegates.observable(OTApplication.app.resources.getString(R.string.msg_rating_options_rightmost_label_example)) {
+    var rightLabel: String by Delegates.observable(OTApplication.app.resources.getString(R.string.property_rating_options_rightmost_label_example)) {
         prop, old, new ->
         if (old != new) {
             requestLayout()

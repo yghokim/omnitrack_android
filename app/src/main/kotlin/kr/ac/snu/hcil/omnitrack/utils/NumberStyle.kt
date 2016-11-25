@@ -40,9 +40,9 @@ class NumberStyle {
     }
 
     enum class UnitPosition(val nameResId: Int) {
-        Front(R.string.msg_number_style_unit_position_front),
-        Rear(R.string.msg_number_style_unit_position_rear),
-        None(R.string.msg_number_style_unit_position_none)
+        Front(R.string.property_number_style_unit_position_front),
+        Rear(R.string.property_number_style_unit_position_rear),
+        None(R.string.property_number_style_unit_position_none)
     }
 
     var unitPosition: UnitPosition

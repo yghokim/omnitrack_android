@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="type_timespan_name">시간 범위</string>
+    <string name="type_timespan_desc">시작과 끝이 있는 시간 범위을 나타냅니다</string>
+
+
+    <string name="type_timepoint_name">특정 시각</string>
+    <string name="type_timepoint_desc">A specific time point</string>
+
+    <string name="type_longtext_name">긴 텍스트</string>
+    <string name="type_longtext_desc">A multiline text</string>
+
+    <string name="type_location_name">지도상 위치</string>
+    <string name="type_location_desc">A location on map</string>
+
+    <string name="type_shorttext_name">짧은 텍스트</string>
+    <string name="type_shorttext_desc">A single-lined text</string>
+
+    <string name="type_number_name">숫자</string>
+    <string name="type_number_desc">An integer or real number with unit</string>
+
+    <string name="type_image_name">이미지</string>
+    <string name="type_image_desc">A 2-dimensional image</string>
+
+    <string name="type_choice_name">선택지</string>
+    <string name="type_choice_desc">choose single or multiple values from list</string>
+
+    <string name="type_single_choice_name">단일 선택지</string>
+    <string name="type_single_choice_desc">choose a single value from list</string>
+
+    <string name="type_multiple_choices_name">복수 선택지</string>
+    <string name="type_multiple_choices_desc">choose multiple values from list</string>
+
+    <string name="type_rating_name">점수/척도</string>
+    <string name="type_rating_desc">rating through likert scale or stars</string>
+
+    <string name="type_audio_record_name">음성 녹음</string>
+    <string name="type_audio_record_desc">record the audio with a microphone</string>
+
+
+    <string name="property_number_style_unit_position">단위 위치</string>
+    <string name="property_number_style_unit_position_front">숫자 앞</string>
+    <string name="property_number_style_unit_position_rear">숫자 뒤</string>
+    <string name="property_number_style_unit_position_none">표시하지 않음</string>
+    <string name="property_number_style_unit">단위</string>
+    <string name="property_number_style_unit_pluralize">단위 복수화(영어 전용)</string>
+    <string name="property_number_style_fraction_part">소숫점 영역 표시</string>
+    <string name="property_number_style_fraction_part_count">소숫점 아래 표시 자리</string>
+
+    <string name="property_number_style_commas">콤마 표시</string>
+
+    <string name="property_rating_options_display_type">입력 방식</string>
+    <string name="property_rating_display_type_likert">Likert 척도</string>
+    <string name="property_rating_display_type_stars">별점</string>
+    <string name="property_rating_options_star_levels">별 갯수</string>
+    <string name="property_rating_options_leftmost_value">최저점</string>
+    <string name="property_rating_options_rightmost_value">최고점</string>
+
+    <string name="property_rating_options_group_labels">레이블</string>
+
+    <string name="property_rating_options_leftmost_label">최저점 레이블</string>
+    <string name="property_rating_options_middle_label">중간 레이블</string>
+    <string name="property_rating_options_rightmost_label">최고점 레이블</string>
+
+    <string name="property_rating_options_leftmost_label_example">전혀 그렇지 않다</string>
+    <string name="property_rating_options_rightmost_label_example">매우 그렇다</string>
+
+    <string name="property_rating_options_allow_intermediate">중간점수 허용</string>
+
+    <string name="hint_long_text">이곳에 입력하세요.</string>
+    <string name="hint_short_text">이곳에 입력하세요.</string>
+
+</resources>

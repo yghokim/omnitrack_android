@@ -14,8 +14,6 @@
         completions."
     </string>
 
-    <string name="msg_select_attribute_type">Select attribute type</string>
-
     <string name="msg_change_tracker_name">Change attribute name</string>
     <string name="msg_change_tracker_settings">Change attribute settings</string>
     <string name="msg_remove_tracker">Remove attribute</string>
@@ -33,7 +31,6 @@
     <string name="msg_yes">Yes</string>
     <string name="msg_no">No</string>
     <string name="msg_confirm_remove_tracker">Remove this tracker?</string>
-    <string name="msg_confirm_apply_settings">Apply settings?</string>
 
     <string name="msg_confirm_remove_connection">Disconnect with the external source?</string>
 
@@ -44,9 +41,6 @@
     <string name="msg_tab_trackers">Trackers</string>
     <string name="msg_tab_services">Services</string>
     <string name="msg_tab_background_loggers">Triggers</string>
-
-    <string name="msg_tab_attribute_basic">Properties</string>
-    <string name="msg_tab_attribute_connection">Connections</string>
 
     <string name="msg_tab_tracker_detail_structure">Structure</string>
     <string name="msg_tab_tracker_detail_reminders">Reminders</string>
@@ -105,36 +99,6 @@
     <string name="msg_notification_content_format_new_item">"New item was logged to %1$s"</string>
 
     <string name="msg_item_list_empty_message">No items collected yet.</string>
-
-    <string name="msg_number_style_unit_position">Unit Position</string>
-    <string name="msg_number_style_unit_position_front">Front</string>
-    <string name="msg_number_style_unit_position_rear">Rear</string>
-    <string name="msg_number_style_unit_position_none">None</string>
-    <string name="msg_number_style_unit">Unit Text</string>
-    <string name="msg_number_style_unit_pluralize">Pluralize Unit</string>
-    <string name="msg_number_style_fraction_part">Show Fractional Part</string>
-    <string name="msg_number_style_fraction_part_count">Digits of Fraction</string>
-
-    <string name="msg_number_style_commas">Show Commas</string>
-
-    <string name="msg_rating_options_display_type">Input Type</string>
-    <string name="msg_rating_options_star_levels">Number of Stars</string>
-    <string name="msg_rating_options_leftmost_value">Leftmost value</string>
-    <string name="msg_rating_options_rightmost_value">Rightmost value</string>
-
-    <string name="msg_rating_options_group_labels">Labels</string>
-
-    <string name="msg_rating_options_leftmost_label">Leftmost label</string>
-    <string name="msg_rating_options_middle_label">Middle label</string>
-    <string name="msg_rating_options_rightmost_label">Rightmost label</string>
-
-    <string name="msg_rating_options_leftmost_label_example">strongly disagree</string>
-    <string name="msg_rating_options_rightmost_label_example">strongly agree</string>
-
-    <string name="msg_rating_options_allow_intermediate">Allow intermediate</string>
-
-    <string name="hint_long_text">Write text here</string>
-    <string name="hint_short_text">Type in short text here</string>
 
     <string name="msg_discard">Discard</string>
     <string name="msg_builder_restored">Incomplete form contents were restored.</string>
