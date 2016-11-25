@@ -118,11 +118,11 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
 
     override fun onTrackerLoaded(tracker: OTTracker) {
         super.onTrackerLoaded(tracker)
-        title = String.format(resources.getString(R.string.title_activity_new_item), tracker?.name)
+        title = String.format(resources.getString(R.string.title_activity_new_item), tracker.name)
 
         if (intent.hasExtra(OTApplication.INTENT_EXTRA_DB_ID_ITEM)) {
             //contains item. Edit mode
-            val item = OTApplication.app.dbHelper.getItem(intent.getLongExtra(OTApplication.INTENT_EXTRA_DB_ID_ITEM, -1), tracker!!)
+            val item = OTApplication.app.dbHelper.getItem(intent.getLongExtra(OTApplication.INTENT_EXTRA_DB_ID_ITEM, -1), tracker)
             if (item != null) {
                 mode = Mode.Edit
                 println("started activity with edit mode")

@@ -10,7 +10,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.choice.SelectionView
  */
 class SelectionPropertyView(context: Context, attrs: AttributeSet?) : APropertyView<Int>(R.layout.component_property_selection, context, attrs) {
 
-    private lateinit var selectionView: SelectionView
+    private var selectionView: SelectionView
 
     override var value: Int
         get() = selectionView.selectedIndex

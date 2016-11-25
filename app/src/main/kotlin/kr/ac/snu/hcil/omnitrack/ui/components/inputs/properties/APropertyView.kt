@@ -10,7 +10,7 @@ import kr.ac.snu.hcil.omnitrack.R
  */
 abstract class APropertyView<T>(layoutId: Int, context: Context, attrs: AttributeSet?) : AInputView<T>(layoutId, context, attrs) {
 
-    protected lateinit var titleView: TextView
+    protected var titleView: TextView
 
     var useIntrinsicPadding: Boolean = false
 

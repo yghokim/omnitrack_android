@@ -334,7 +334,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
 
             values.put(AttributeScheme.POSITION, position)
             values.put(AttributeScheme.TYPE, attribute.typeId)
-            values.put(AttributeScheme.TRACKER_ID, attribute.owner?.dbId ?: null)
+            values.put(AttributeScheme.TRACKER_ID, attribute.owner?.dbId)
             values.put(AttributeScheme.IS_REQUIRED, attribute.isRequired.toInt())
             values.put(AttributeScheme.PROPERTY_DATA, attribute.getSerializedProperties())
 
@@ -351,7 +351,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
             val values = baseContentValuesOfNamed(tracker, TrackerScheme)
             values.put(TrackerScheme.POSITION, position)
             values.put(TrackerScheme.COLOR, tracker.color)
-            values.put(TrackerScheme.USER_ID, tracker.owner?.dbId ?: null)
+            values.put(TrackerScheme.USER_ID, tracker.owner?.dbId)
             values.put(TrackerScheme.IS_ON_SHORTCUT, tracker.isOnShortcut.toInt())
 
             saveObject(tracker, values, TrackerScheme)

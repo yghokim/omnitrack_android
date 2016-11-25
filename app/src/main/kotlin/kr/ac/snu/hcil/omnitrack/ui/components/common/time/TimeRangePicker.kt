@@ -29,9 +29,9 @@ class TimeRangePicker : FrameLayout, View.OnClickListener {
 
     private var suspendInvalidate: Boolean = false
 
-    private lateinit var fromButton: Button
-    private lateinit var toButton: Button
-    private lateinit var durationIndicator: TextView
+    private var fromButton: Button
+    private var toButton: Button
+    private var durationIndicator: TextView
 
     private var from: Long = TimeHelper.cutMillisecond(System.currentTimeMillis())
         set(value) {

@@ -13,8 +13,8 @@ import kr.ac.snu.hcil.omnitrack.R
  */
 class AttributeConnectionViewSubHeader : LinearLayout {
 
-    private lateinit var iconView: ImageView
-    private lateinit var labelView: TextView
+    private var iconView: ImageView
+    private var labelView: TextView
 
 
     constructor(context: Context) : super(context)

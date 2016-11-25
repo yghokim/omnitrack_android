@@ -4,12 +4,8 @@ import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.AttributeSet
-import android.view.LayoutInflater
-import android.widget.FrameLayout
-import android.widget.LinearLayout
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
 
 /**
  * Created by Young-Ho Kim on 2016-07-13.
@@ -29,7 +25,7 @@ class ShortTextPropertyView(context: Context, attrs: AttributeSet?) : APropertyV
             }
         }
 
-    lateinit private var valueView : TextView
+    private var valueView: TextView
 
     init{
         valueView = findViewById(R.id.value) as TextView
