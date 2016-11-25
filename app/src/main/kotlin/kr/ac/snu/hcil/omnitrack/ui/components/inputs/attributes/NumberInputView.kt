@@ -37,8 +37,8 @@ class NumberInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
 
     private var moveUnit: BigDecimal = BigDecimal(1)
 
-    private lateinit var increaseButton: View
-    private lateinit var decreaseButton: View
+    private var increaseButton: View
+    private var decreaseButton: View
     private lateinit var valueField: EditText
     private lateinit var valueStatic: TextView
 

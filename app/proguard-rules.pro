@@ -15,3 +15,11 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+-keepattributes Signature
+
+-dontwarn okio.**
+
+-dontwarn org.apache.commons.math3.**
+
+-dontwarn io.nlopez.smartlocation.rx.**

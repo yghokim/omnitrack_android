@@ -98,8 +98,6 @@ class OTTimeTriggerAlarmManager {
                     }
                 }
             }
-
-            map
         //}
 
         idTable = /*if (preferences.getBoolean(ID_TABLE_STORED, false)) {

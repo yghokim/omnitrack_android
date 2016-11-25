@@ -26,7 +26,7 @@ class SelectionView(context: Context, attrs: AttributeSet?, defStyle: Int) : Rec
     constructor(context: Context) : this(context, null)
 
     private val values = ArrayList<String>()
-    private lateinit var buttonPadding: Rect
+    private var buttonPadding: Rect
     private var buttonTextSize: Float = 10.0f
     private var selectedTextColor: Int = Color.WHITE
     private var unSelectedTextColor: Int = Color.BLACK
@@ -104,7 +104,7 @@ class SelectionView(context: Context, attrs: AttributeSet?, defStyle: Int) : Rec
 
 
         inner class ViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
-            lateinit var button: TextView
+            var button: TextView
 
             init {
                 button = view as TextView

@@ -52,15 +52,15 @@ class DateTimePicker(context: Context, attrs: AttributeSet? = null) : FrameLayou
     private lateinit var middlePicker: NumericUpDown
     private lateinit var rightPicker: NumericUpDown
 
-    private lateinit var dateButton: Button
+    private var dateButton: Button
 
     //private lateinit var timeZoneSpinner: Spinner
 
     private var calendar = Calendar.getInstance()
 
-    private lateinit var dateFormat: DateFormat
+    private var dateFormat: DateFormat
 
-    private lateinit var hourNames: Array<String>
+    private var hourNames: Array<String>
 
     var mode: Int by Delegates.observable(-1)
     {

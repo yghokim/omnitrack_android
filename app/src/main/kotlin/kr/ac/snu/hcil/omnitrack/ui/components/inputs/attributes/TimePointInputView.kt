@@ -12,7 +12,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.time.DateTimePicker
 class TimePointInputView(context: Context, attrs: AttributeSet? = null) : AAttributeInputView<TimePoint>(R.layout.input_time_picker, context, attrs) {
     override val typeId: Int = VIEW_TYPE_TIME_POINT
 
-    private lateinit var valueView: DateTimePicker
+    private var valueView: DateTimePicker
 
     override var value: TimePoint
         get() = valueView.time
