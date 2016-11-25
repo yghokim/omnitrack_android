@@ -35,17 +35,40 @@
     <string name="type_rating_name">Rating</string>
     <string name="type_rating_desc">rating through likert scale or stars</string>
 
-    <string name="property_rating_display_type_likert">Likert Scale</string>
-    <string name="property_rating_display_type_stars">Start</string>
-
-    <string name="property_rating_display_type">Display type</string>
-    <string name="property_rating_levels">Max Score</string>
-
-
     <string name="type_audio_record_name">Audio Note</string>
     <string name="type_audio_record_desc">record the audio with a microphone</string>
 
-    <string name="property_rating_allow_intermediate">Allow half point</string>
+    <string name="property_number_style_unit_position">Unit Position</string>
+    <string name="property_number_style_unit_position_front">Front</string>
+    <string name="property_number_style_unit_position_rear">Rear</string>
+    <string name="property_number_style_unit_position_none">None</string>
+    <string name="property_number_style_unit">Unit Text</string>
+    <string name="property_number_style_unit_pluralize">Pluralize Unit</string>
+    <string name="property_number_style_fraction_part">Show Fractional Part</string>
+    <string name="property_number_style_fraction_part_count">Digits of Fraction</string>
+
+    <string name="property_number_style_commas">Show Commas</string>
+
+    <string name="property_rating_options_display_type">Input Type</string>
+    <string name="property_rating_display_type_likert">Likert Scale</string>
+    <string name="property_rating_display_type_stars">Start</string>
+    <string name="property_rating_options_star_levels">Number of Stars</string>
+    <string name="property_rating_options_leftmost_value">Leftmost value</string>
+    <string name="property_rating_options_rightmost_value">Rightmost value</string>
+
+    <string name="property_rating_options_group_labels">Labels</string>
+
+    <string name="property_rating_options_leftmost_label">Leftmost label</string>
+    <string name="property_rating_options_middle_label">Middle label</string>
+    <string name="property_rating_options_rightmost_label">Rightmost label</string>
+
+    <string name="property_rating_options_leftmost_label_example">strongly disagree</string>
+    <string name="property_rating_options_rightmost_label_example">strongly agree</string>
+
+    <string name="property_rating_options_allow_intermediate">Allow intermediate</string>
+
+    <string name="hint_long_text">Write text here</string>
+    <string name="hint_short_text">Type in short text here</string>
 
 
 </resources>
