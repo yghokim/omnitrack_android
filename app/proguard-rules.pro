@@ -18,6 +18,12 @@
 
 -keepattributes Signature
 
+-keepclassmembers class * extends java.lang.Enum {
+    <fields>;
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
+
 -dontwarn okio.**
 
 -dontwarn org.apache.commons.math3.**
