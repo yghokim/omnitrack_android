@@ -1,12 +1,162 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="dateformat_ymd">yyyy년 M월 d일, E요일</string>
 
-    <string name="dateformat_full">a h:m:s, yyyy년 M월 d일</string>
+    <plurals name="field">
+        <item quantity="zero">0개의 필드</item>
+        <item quantity="one">한 개의 필드</item>
+        <item quantity="other">%d개의 필드</item>
+    </plurals>
+
+    <string name="msg_sort">정렬</string>
+
+    <string name="msg_sort_method_timestamp">기록 시각</string>
+
+    <string name="msg_yes">예</string>
+    <string name="msg_no">아니오</string>
+    <string name="msg_confirm_remove_tracker">이 트래커를 삭제하시겠습니까?</string>
+
+    <string name="msg_confirm_remove_connection">이 값으로부터 연결을 끊겠습니까?</string>
 
 
-    <string name="format_hour_am">오전 %1$s시</string>
-    <string name="format_hour_pm">오후 %1$s시</string>
+    <string name="msg_ok">확인</string>
+    <string name="msg_apply">적용</string>
+    <string name="msg_cancel">취소</string>
 
+    <string name="msg_tab_trackers">트래커</string>
+    <string name="msg_tab_services">외부 서비스</string>
+    <string name="msg_tab_background_loggers">트리거</string>
+
+    <string name="msg_tab_tracker_detail_structure">트래커 속성</string>
+    <string name="msg_tab_tracker_detail_reminders">리마인더</string>
+
+    <string name="msg_edit">수정</string>
+    <string name="msg_data_list">아이템 리스트</string>
+    <string name="msg_remove">삭제</string>
+
+    <string name="msg_sort_descending">내림차순</string>
+    <string name="msg_sort_ascending">오름차순</string>
+
+
+    <string name="msg_basic_information">기본 정보</string>
+    <string name="msg_attributes">필드</string>
+
+    <string name="msg_attribute_removed_message">필드가 삭제되었습니다.</string>
+    <string name="msg_add_new_attribute">새로운 필드 추가</string>
+
+    <string name="msg_item_remove_confirm">아이템을 삭제하면 되돌릴 수 없습니다. 정말 삭제하시겠습니까?</string>
+
+    <string name="msg_new_item_confirm_restore_previous_input">이전에 입력한 내용이 임시로 저장되어 있습니다. 다시 불러오시겠습니까?</string>
+
+    <string name="msg_undo">되돌리기</string>
+
+    <string name="msg_color">컬러</string>
+
+    <string name="msg_name">이름</string>
+
+    <string name="msg_required">필수 항목</string>
+
+    <string name="msg_never_logged">기록 없음</string>
+
+    <string name="msg_todays_log">오늘의 기록</string>
+
+    <string name="msg_show_on_shortcut">바로가기 패널에 추가</string>
+
+    <string name="msg_attribute">필드</string>
+    <string name="msg_new_tracker_prefix">내 트래커</string>
+
+    <string name="msg_value_autocompletion">값 자동완성</string>
+
+    <string name="msg_column_name">필드 이름</string>
+
+    <string name='msg_format_cannot_be_blank'>%1$s 항목은 비어있을 수 없습니다.</string>
+
+    <string name="msg_charts">시각화</string>
+
+    <string name="msg_pick_date">날짜를 선택하세요</string>
+
+    <string name="msg_set_new_connection">레퍼런스 값 연결</string>
+
+    <string name="msg_notification_content_format_new_item">"%1$s 트래커에 새로운 아이템이 기록되었습니다."</string>
+
+    <string name="msg_item_list_empty_message">기록된 아이템이 없습니다.</string>
+
+    <string name="msg_discard">초기화</string>
+    <string name="msg_builder_restored">기록되지 않은 이전 입력값을 불러왔습니다.</string>
+
+    <string name="sentence_new_tracker_added">새로운 트래커 \'%1$s\'가 추가되었습니다.</string>
+
+    <string name="action_settings">설정</string>
+
+    <string name="msg_connection_wizard_title_source_selection">연결할 데이터를 선택하세요</string>
+    <string name="msg_connection_wizard_title_time_query">쿼리 시간을 설정하세요</string>
+
+    <string name="msg_connection_wizard_time_query_pivot_time">기준 시간</string>
+
+    <string name="msg_connection_wizard_time_query_scope">포함 범위 크기</string>
+
+    <string name="msg_connection_wizard_time_query_offset">오프셋</string>
+
+    <string name="msg_connection_wizard_time_query_scope_hour">시</string>
+    <string name="msg_connection_wizard_time_query_scope_day">하루</string>
+    <string name="msg_connection_wizard_time_query_scope_week">일주일</string>
+
+
+    <string name="msg_connection_wizard_time_query_preset">데이터 로드 범위</string>
+
+    <string name="msg_connection_wizard_time_query_pivot_present">현재 시각</string>
+
+    <string name="msg_connection_wizard_time_query_pivot_field_format">\'%1$s\' 필드</string>
+
+    <string name="msg_connection_panel_time_query">쿼리 시간</string>
+    <string name="msg_connection_panel_connected_with">연결된 모듈</string>
+
+    <string name="msg_noti_tap_for_tracking_format">%1$s 아이템을 기록하려면 탭하세요.</string>
+
+    <string name="msg_no_trackers_are_assigned">트래커가 등록되지 않았습니다.</string>
+
+    <string name="msg_pick_tracker">트래커를 선택하세요</string>
+
+    <string name="msg_present_date">현재 날짜</string>
+    <string name="msg_present_date_desc">자정부터 현재까지의 데이터를 불러옵니다</string>
+
+    <string name="msg_previous_date">전날 하루</string>
+    <string name="msg_previous_date_desc">전날 하루동안의 데이터를 불러옵니다</string>
+
+    <string name="msg_recent_hour">최근 한 시간</string>
+    <string name="msg_recent_hour_desc">한 시간 전부터 현재까지의 데이터를 불러옵니다</string>
+
+    <string name="msg_recent_24_hours">최근 24시간</string>
+    <string name="msg_recent_24_hours_desc">24시간 전부터 현재까지의 데이터를 불러옵니다</string>
+
+    <string name="msg_recent_7_days">최근 7일</string>
+    <string name="msg_recent_7_days_desc">최근 7일간의 데이터를 불러옵니다</string>
+
+    <string name="msg_present_week">이번 주</string>
+    <string name="msg_present_week_desc">지난 일요일부터 현재까지의 데이터를 불러옵니다</string>
+
+    <string name="msg_previous_week">지난 한 주</string>
+    <string name="msg_previous_week_desc">지난 한 주간의 데이터를 불러옵니다</string>
+
+    <string name="msg_shortcut_added">트래커가 바로가기 패널에 등록되었습니다.</string>
+    <string name="msg_shortcut_removed">트래커가 바로가기 패널에서 제거되었습니다.</string>
+
+    <string name="msg_notification_action_discard_item">기록 취소하기</string>
+
+    <string name="msg_rescuetime_api_key_input_title">Input RescueTime API key</string>
+    <string name="msg_rescuetime_api_key_input_hint">Paste RescueTime api key here.</string>
+
+    <string name="msg_service_is_not_activated_format">%1$s 서비스가 활성화되지 않았습니다.</string>
+
+    <string name="msg_tracking_source_unspecified">Source Unspecified</string>
+    <string name="msg_tracking_source_trigger">Logged by Trigger</string>
+    <string name="msg_tracking_source_shortcut">Logged via Shortcut</string>
+    <string name="msg_tracking_source_manual">Logged Manually</string>
+
+
+    <string-array name="choice_preview_entries">
+        <item>선택 항목 1</item>
+        <item>선택 항목 2</item>
+        <item>선택 항목 3</item>
+    </string-array>
 
 </resources>

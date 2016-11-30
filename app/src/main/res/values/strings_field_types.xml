@@ -67,6 +67,13 @@
 
     <string name="property_rating_options_allow_intermediate">Allow intermediate</string>
 
+    <string name="property_location_msg_adjust_pin">Adjust location to center</string>
+
+    <string name="property_time_granularity">Time Granularity</string>
+    <string name="property_time_granularity_day">Day</string>
+    <string name="property_time_granularity_minute">Minute</string>
+    <string name="property_time_granularity_second">Second</string>
+
     <string name="hint_long_text">Write text here</string>
     <string name="hint_short_text">Type in short text here</string>
 

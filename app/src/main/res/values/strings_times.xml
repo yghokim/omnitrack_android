@@ -19,8 +19,6 @@
 
     <string name="time_just_now">Just now</string>
 
-    <string name="time_never">Never</string>
-
     <plurals name="time_duration_day">
         <item quantity="zero">0 days</item>
         <item quantity="one">one day</item>

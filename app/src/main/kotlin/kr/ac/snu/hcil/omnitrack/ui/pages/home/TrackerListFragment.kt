@@ -8,7 +8,6 @@ import android.graphics.Typeface
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.v4.content.ContextCompat
-import android.support.v7.app.AlertDialog
 import android.support.v7.widget.AppCompatImageButton
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -60,8 +59,6 @@ class TrackerListFragment : OTFragment() {
     lateinit private var trackerListAdapter : TrackerListAdapter
 
     lateinit private var trackerListLayoutManager: LinearLayoutManager
-
-    lateinit private var popupMessages : Array<String>
 
     private lateinit var lastLoggedTimeFormat : SimpleDateFormat
 
@@ -145,8 +142,6 @@ class TrackerListFragment : OTFragment() {
 
         listView.adapter = trackerListAdapter
 
-        popupMessages = arrayOf(getString(R.string.msg_change_tracker_settings), getString(R.string.msg_remove_tracker))
-        //listView.itemAnimator = SlideInRightAnimator()
         listView.addItemDecoration(HorizontalImageDividerItemDecoration(R.drawable.horizontal_separator_pattern, context, resources.getFraction(R.fraction.tracker_list_separator_height_ratio, 1, 1)))
         listView.addItemDecoration(DrawableListBottomSpaceItemDecoration(R.drawable.expanded_view_inner_shadow_top, resources.getDimensionPixelSize(R.dimen.tracker_list_bottom_space)))
 
@@ -183,6 +178,7 @@ class TrackerListFragment : OTFragment() {
 
     private fun handleTrackerLongClick(tracker: OTTracker)
     {
+        /*
         val builder = AlertDialog.Builder(context)
         builder.setTitle(tracker.name)
         builder.setItems(popupMessages){
@@ -197,7 +193,7 @@ class TrackerListFragment : OTFragment() {
                 REMOVE_TRACKER -> DialogHelper.makeYesNoDialogBuilder(context, tracker.name, getString(R.string.msg_confirm_remove_tracker), {->user.trackers.remove(tracker)}).show()
             }
         }
-        builder.show()
+        builder.show()*/
     }
 
 

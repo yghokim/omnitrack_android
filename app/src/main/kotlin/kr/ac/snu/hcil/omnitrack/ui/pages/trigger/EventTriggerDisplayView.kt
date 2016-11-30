@@ -3,14 +3,15 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 import android.content.Context
 import android.support.v7.widget.AppCompatImageView
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.calculation.SingleNumericComparison
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
+import kr.ac.snu.hcil.omnitrack.utils.setPaddingTop
 import java.text.DecimalFormat
 
 /**
@@ -40,9 +41,7 @@ class EventTriggerDisplayView: LinearLayout {
 
     fun setMeasureFactory(factory: OTMeasureFactory?)
     {
-        measureNameView.text =if(factory != null) {
-             factory.getFormattedName()
-        }else "Select Measure"
+        measureNameView.text = factory?.getFormattedName()
     }
 
     fun setConditioner(conditioner: SingleNumericComparison?)
@@ -50,13 +49,24 @@ class EventTriggerDisplayView: LinearLayout {
         if(conditioner==null)
         {
             symbolView.visibility = GONE
-            comparedNumberView.text = "Set Conditioner"
+            measureNameView.visibility = GONE
+
+
+            comparedNumberView.setText(R.string.msg_trigger_event_msg_tap_to_configure)
+
+            comparedNumberView.setPaddingTop((10f * resources.displayMetrics.density + .5f).toInt())
+            comparedNumberView.setTextSize(TypedValue.COMPLEX_UNIT_PX, 20f * resources.displayMetrics.density)
         }
         else{
             symbolView.visibility = View.VISIBLE
+            measureNameView.visibility = VISIBLE
 
             symbolView.setImageResource(conditioner.method.symbolImageResourceId)
+
+            comparedNumberView.setPaddingTop(0)
             comparedNumberView.text = numberFormat.format(conditioner.comparedTo)
+            comparedNumberView.setTextSize(TypedValue.COMPLEX_UNIT_PX, resources.getDimension(R.dimen.number_digit_size))
+
         }
 
     }

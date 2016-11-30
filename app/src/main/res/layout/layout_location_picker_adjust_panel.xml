@@ -11,7 +11,7 @@
         android:layout_marginTop="@dimen/mapview_frame_thickness"
         android:background="@color/editModeOverlay"
         android:paddingBottom="4dp"
-        android:text="Adjust location to center"
+        android:text="@string/property_location_msg_adjust_pin"
         android:textAlignment="center"
         android:textColor="#fff"
         android:textSize="13sp"
@@ -29,7 +29,7 @@
         android:layout_marginEnd="7dp"
         android:drawableStart="@drawable/done_dark"
         android:padding="10dp"
-        android:text="Apply"
+        android:text="@string/msg_apply"
         android:textColor="@color/textColorMid" />
 
     <android.support.v7.widget.AppCompatButton
@@ -41,7 +41,7 @@
         android:layout_toStartOf="@+id/ui_button_apply"
         android:drawableStart="@drawable/ex_dark"
         android:padding="10dp"
-        android:text="Cancel"
+        android:text="@string/msg_cancel"
         android:textColor="@color/textColorMid" />
 
     <ImageView
