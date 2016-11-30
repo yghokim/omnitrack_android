@@ -15,13 +15,14 @@
     <string name="msg_trigger_time_config_interval">시간 간격</string>
     <string name="msg_trigger_time_config_alarm_time">발동 시각</string>
 
-    <string name="msg_trigger_time_config_repeat_range">발동 시간대</string>
-
-
     <string name="msg_trigger_time_config_type_name_alram">특정한 시각에 발동</string>
     <string name="msg_trigger_time_config_type_name_interval">정해진 시간 간격으로 발동</string>
 
     <string name="msg_trigger_time_is_repeated">반복</string>
+
+    <string name="msg_trigger_time_use_time_range">발동 시간대 지정</string>
+
+    <string name="msg_trigger_time_finish_on_end_date">종료일 지정</string>
 
     <string name="msg_trigger_error_interval_not_0">시간 간격은 0이 될 수 없습니다.</string>
 

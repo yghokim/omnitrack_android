@@ -59,8 +59,8 @@ class OTChoiceAttribute(objectId: String?, dbId: Long?, columnName: String, isRe
 
 
     override fun createProperties() {
-        assignProperty(OTBooleanProperty(false, PROPERTY_MULTISELECTION, "Allow Multiple Selections"))
-        assignProperty(OTChoiceEntryListProperty(PROPERTY_ENTRIES, "Entries"))
+        assignProperty(OTBooleanProperty(false, PROPERTY_MULTISELECTION, OTApplication.getString(R.string.property_choice_allow_multiple_selections)))
+        assignProperty(OTChoiceEntryListProperty(PROPERTY_ENTRIES, OTApplication.getString(R.string.property_choice_entries)))
     }
 
     var allowedMultiSelection: Boolean

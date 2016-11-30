@@ -59,7 +59,7 @@
         android:drawableLeft="@drawable/search_dark"
         android:paddingEnd="12dp"
         android:paddingStart="8dp"
-        android:text="Search..."
+        android:text="@string/btn_search"
         android:textColor="@color/buttonIconColorDark"
 
         android:textSize="13sp" />
@@ -118,7 +118,7 @@
                 android:layout_alignParentEnd="true"
                 android:drawableStart="@drawable/edit_location"
                 android:padding="10dp"
-                android:text="Adjust"
+                android:text="@string/adjust"
                 android:textColor="@color/textColorMid" />
         </RelativeLayout>
 

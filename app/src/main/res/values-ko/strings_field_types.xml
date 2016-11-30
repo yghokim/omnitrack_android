@@ -78,4 +78,9 @@
     <string name="hint_long_text">이곳에 입력하세요.</string>
     <string name="hint_short_text">이곳에 입력하세요.</string>
 
+    <string name="property_choice_allow_multiple_selections">복수선택 허용</string>
+    <string name="property_choice_entries">선택지 리스트</string>
+    <string name="property_choice_add_new_entry">항목 추가</string>
+    <string name="property_choice_type_in_entry_text">항목 입력</string>
+
 </resources>
