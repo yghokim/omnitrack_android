@@ -24,9 +24,13 @@
         <item name="android:windowNoTitle">false</item>
     </style>
 
-    <style name="TabTextStyle" parent="TextAppearance.Design.Tab">
-        <item name="android:textSize">15sp</item>
+    <style name="TabLayoutStyle">
+        <item name="android:background">#20350325</item>
+    </style>
 
+    <style name="TabTextStyle" parent="TextAppearance.Design.Tab">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">normal</item>
     </style>
 
     <style name="PropertyHeaderStyle">

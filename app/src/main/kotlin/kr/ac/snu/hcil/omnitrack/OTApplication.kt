@@ -75,6 +75,10 @@ class OTApplication : MultiDexApplication() {
         const val PREFERENCE_KEY_FOREGROUND_ITEM_BUILDER_STORAGE = "item_builder_storage_foreground"
 
         const val PREFERENCE_KEY_BACKGROUND_ITEM_BUILDER_STORAGE = "item_builder_storage_background"
+
+        fun getString(resId: Int): String {
+            return app.resources.getString(resId)
+        }
     }
 
     private lateinit var _currentUser: OTUser

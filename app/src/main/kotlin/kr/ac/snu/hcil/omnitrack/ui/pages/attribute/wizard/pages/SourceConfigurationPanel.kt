@@ -7,10 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.FrameLayout
-import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
+import kr.ac.snu.hcil.omnitrack.ui.components.common.viewholders.SimpleNameDescriptionViewHolder
+import kr.ac.snu.hcil.omnitrack.ui.components.common.viewholders.SimpleTextViewHolder
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ComboBoxPropertyView
 import kr.ac.snu.hcil.omnitrack.utils.events.IEventListener
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
@@ -51,7 +52,17 @@ class SourceConfigurationPanel : FrameLayout, IEventListener<Int> {
 
         override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
 
-            val view = getView(position, convertView, parent)
+            val view = convertView ?: LayoutInflater.from(parent.context).inflate(R.layout.simple_list_element_name_desc_dropdown, parent, false)
+
+            if (view.tag !is SimpleNameDescriptionViewHolder) {
+                view.tag = SimpleNameDescriptionViewHolder(view)
+            }
+
+            val holder = view.tag as SimpleNameDescriptionViewHolder
+
+            holder.descriptionView.setText(getItem(position).descResId)
+            holder.nameView.setText(getItem(position).nameResId)
+
             view.setBackgroundResource(R.drawable.bottom_separator_thin)
 
             return view
@@ -59,32 +70,19 @@ class SourceConfigurationPanel : FrameLayout, IEventListener<Int> {
 
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
 
-            val view = convertView ?: LayoutInflater.from(parent.context).inflate(R.layout.simple_list_element_name_desc_dropdown, parent, false)
+            val view = convertView ?: LayoutInflater.from(parent.context).inflate(R.layout.simple_list_element_text_dropdown, parent, false)
 
-            if (view.tag !is ViewHolder) {
-                view.tag = ViewHolder(view)
+            if (view.tag !is SimpleTextViewHolder) {
+                view.tag = SimpleTextViewHolder(view)
             }
 
-            val holder = view.tag as ViewHolder
+            val holder = view.tag as SimpleTextViewHolder
 
-            holder.descriptionView.setText(getItem(position).descResId)
-            holder.nameView.setText(getItem(position).nameResId)
+            holder.textView.setText(getItem(position).nameResId)
 
             view.background = null
 
             return view
-        }
-
-        inner class ViewHolder(val view: View) {
-
-            val nameView: TextView
-            val descriptionView: TextView
-
-            init {
-                descriptionView = view.findViewById(R.id.description) as TextView
-                nameView = view.findViewById(R.id.name) as TextView
-            }
-
         }
     }
 

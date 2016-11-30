@@ -165,6 +165,9 @@
     <string name="msg_tracking_source_shortcut">Logged via Shortcut</string>
     <string name="msg_tracking_source_manual">Logged Manually</string>
 
+    <string name="btn_search">Search&#8230;</string>
+    <string name="adjust">Adjust</string>
+
 
     <string-array name="choice_preview_entries">
         <item>Choice entry 1</item>

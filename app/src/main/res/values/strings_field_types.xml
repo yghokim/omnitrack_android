@@ -77,5 +77,10 @@
     <string name="hint_long_text">Write text here</string>
     <string name="hint_short_text">Type in short text here</string>
 
+    <string name="property_choice_allow_multiple_selections">Allow Multiple Selections</string>
+    <string name="property_choice_entries">Entries</string>
+    <string name="property_choice_add_new_entry">Add New Entry</string>
+    <string name="property_choice_type_in_entry_text">Type in entry text</string>
+
 
 </resources>

@@ -22,7 +22,7 @@
         android:layout_toEndOf="@+id/ui_drag_handle"
         android:layout_toStartOf="@+id/ui_button_remove"
         android:background="@drawable/text_field_singleline"
-        android:hint="Type in entry text"
+        android:hint="@string/property_choice_type_in_entry_text"
         android:textColor="@color/inputTextColor"
         android:textColorHint="@color/textColorLight" />
 

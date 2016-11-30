@@ -15,13 +15,12 @@
     <string name="msg_trigger_time_config_interval">Interval</string>
     <string name="msg_trigger_time_config_alarm_time">Trigger time</string>
 
-    <string name="msg_trigger_time_config_repeat_range">Repeat Range</string>
-
-
     <string name="msg_trigger_time_config_type_name_alram">At specific time</string>
     <string name="msg_trigger_time_config_type_name_interval">Repeated with interval</string>
 
     <string name="msg_trigger_time_is_repeated">Repeat</string>
+
+    <string name="msg_trigger_time_use_time_range">Use Time Range</string>
 
     <string name="msg_trigger_error_interval_not_0">Interval must not be zero.</string>
 
@@ -35,5 +34,6 @@
     <string name="msg_trigger_event_comparison_method_lower">When gets lower than</string>
 
     <string name='msg_trigger_event_msg_tap_to_configure'>Tap to configure</string>
+    <string name="msg_trigger_time_finish_on_end_date">Finish on End Date</string>
 
 </resources>
