@@ -34,7 +34,6 @@
                     android:id="@+id/ui_type_icon"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    android:layout_centerVertical="true"
                     android:layout_gravity="center_vertical"
                     android:src="@drawable/alarm_dark"
                     android:tint="#FFF" />
@@ -45,7 +44,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_marginLeft="6dp"
-                    android:text="Reserved Time"
+                    android:text=""
                     android:textColor="#fff"
                     android:textSize="12sp"
                     android:textStyle="bold" />
@@ -55,8 +54,6 @@
                 android:id="@+id/ui_header_view_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/ui_wappen_type"
-                android:layout_toStartOf="@+id/ui_trigger_switch"
                 android:paddingBottom="8dp"
                 android:paddingTop="8dp">
 
@@ -97,7 +94,7 @@
         <FrameLayout
             android:id="@+id/ui_control_panel"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"></FrameLayout>
+            android:layout_height="wrap_content" />
 
         <ViewStub
             android:id="@+id/ui_tracker_assign_panel_stub"
@@ -141,7 +138,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/button_height_normal"
                 android:background="@drawable/transparent_button_background"
-                android:text="Cancel" />
+                android:text="@string/msg_cancel" />
 
             <Button
                 android:id="@+id/ui_button_apply"
@@ -149,7 +146,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/button_height_normal"
                 android:background="@drawable/transparent_button_background"
-                android:text="Apply" />
+                android:text="@string/msg_apply" />
         </LinearLayout>
 
         <android.support.v7.widget.AppCompatImageButton

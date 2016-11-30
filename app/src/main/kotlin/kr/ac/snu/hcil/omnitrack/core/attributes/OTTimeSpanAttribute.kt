@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes
 
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTSelectionProperty
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
@@ -21,16 +22,19 @@ class OTTimeSpanAttribute(objectId: String?, dbId: Long?, columnName: String, is
         const val PROPERTY_TYPE = 1
     }
 
-    override val propertyKeys: IntArray = intArrayOf(PROPERTY_GRANULARITY, PROPERTY_TYPE)
+    override val propertyKeys: IntArray = intArrayOf(PROPERTY_GRANULARITY/*, PROPERTY_TYPE*/)
 
     override val typeNameResourceId: Int = R.string.type_timespan_name
     override val typeSmallIconResourceId: Int = R.drawable.icon_small_timer
     override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_TIMESPAN
 
     override fun createProperties() {
-        //TODO I18n
-        assignProperty(OTSelectionProperty(PROPERTY_GRANULARITY, "Granularity", arrayOf("Date", "Time")))
-        assignProperty(OTSelectionProperty(PROPERTY_TYPE, "Interface Type", arrayOf("Range Picker", "Stopwatch")))
+        assignProperty(OTSelectionProperty(PROPERTY_GRANULARITY,
+                OTApplication.app.resources.getString(R.string.property_time_granularity),
+                arrayOf(OTApplication.app.resources.getString(R.string.property_time_granularity_day),
+                        OTApplication.app.resources.getString(R.string.property_time_granularity_minute)
+                )))
+        //assignProperty(OTSelectionProperty(PROPERTY_TYPE, "Interface Type", arrayOf("Range Picker", "Stopwatch")))
 
         setPropertyValue(PROPERTY_GRANULARITY, 0)
     }

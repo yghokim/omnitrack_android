@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes
 
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTProperty
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTSelectionProperty
@@ -15,7 +16,7 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 2016-07-20.
  */
-class OTTimeAttribute : OTAttribute<TimePoint> {
+class OTTimeAttribute(objectId: String?, dbId: Long?, columnName: String, isRequired: Boolean, settingData: String?, connectionData: String?) : OTAttribute<TimePoint>(objectId, dbId, columnName, isRequired, OTAttribute.TYPE_TIME, settingData, connectionData) {
 
     override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_TIMEPOINT
 
@@ -47,8 +48,6 @@ class OTTimeAttribute : OTAttribute<TimePoint> {
 
     private val calendar = GregorianCalendar()
 
-    constructor(objectId: String?, dbId: Long?, columnName: String, isRequired: Boolean, settingData: String?, connectionData: String?) : super(objectId, dbId, columnName, isRequired, OTAttribute.TYPE_TIME, settingData, connectionData)
-
     var granularity: Int
         get() = getPropertyValue<Int>(GRANULARITY)
         set(value) = setPropertyValue(GRANULARITY, value)
@@ -60,7 +59,14 @@ class OTTimeAttribute : OTAttribute<TimePoint> {
     override val propertyKeys: IntArray = intArrayOf(GRANULARITY)
 
     override fun createProperties() {
-        assignProperty(OTSelectionProperty(GRANULARITY, "TimePoint Granularity", arrayOf("Day", "Minute", "Second"))) //TODO: I18N
+        assignProperty(OTSelectionProperty(GRANULARITY,
+                OTApplication.app.resources.getString(R.string.property_time_granularity),
+                arrayOf(OTApplication.app.resources.getString(R.string.property_time_granularity_day),
+                        OTApplication.app.resources.getString(R.string.property_time_granularity_minute),
+                        OTApplication.app.resources.getString(R.string.property_time_granularity_second)
+
+                )))
+
         setPropertyValue(GRANULARITY, GRANULARITY_MINUTE)
     }
 

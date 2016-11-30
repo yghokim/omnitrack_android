@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="msg_external_service_element_supported_measures">지원되는 측정 모듈</string>
+    <string name="msg_sentence_field_already_connected_to_measure">이미 %1$s 측정 모듈이 연결되어 있습니다.</string>
+
+
+    <!-- microsoft band -->
+    <string name="service_microsoft_band_name">Microsoft Band</string>
+    <string name="service_microsoft_band_desc">Microsoft Band and Band2</string>
+    <string name="measure_microsoft_band_heart_rate_name">심박</string>
+    <string name="measure_microsoft_band_heart_rate_desc">Receives user\'s heart rate bpm</string>
+
+
+    <!-- mi band -->
+    <string name="service_mi_band_name">Mi Band</string>
+    <string name="service_mi_band_desc">Mi Band and Band2</string>
+    <string name="measure_mi_band_heart_rate_name">Heart Rate</string>
+    <string name="measure_mi_band_heart_rate_desc">Receives user\'s heart rate bpm</string>
+
+
+    <!-- google fit -->
+    <string name="service_googlefit_name">Google 피트니스</string>
+    <string name="service_googlefit_desc">구글 헬스케어 데이터를 불러옵니다</string>
+    <string name="measure_googlefit_steps_name">걸음 수</string>
+    <string name="measure_googlefit_steps_desc">특정 기간 동안의 걸음 수를 불러옵니다</string>
+
+
+    <!-- misfit -->
+    <string name="service_misfit_name">Misfit</string>
+    <string name="service_misfit_desc">Misfit 서버로부터 데이터를 불러옵니다</string>
+
+    <string name="measure_misfit_sleeps_name">수면 시간</string>
+    <string name="measure_misfit_sleeps_desc">수면한 시간 범위를 불러옵니다</string>
+
+    <string name="measure_misfit_steps_name">걸음 수</string>
+    <string name="measure_misfit_steps_desc">특정 기간 동안의 걸음 수를 불러옵니다</string>
+
+
+    <!-- device -->
+    <string name="service_device_name">Android Device</string>
+    <string name="service_device_desc">Android device events and measures</string>
+
+
+    <!-- rescuetime -->
+    <string name="service_rescuetime_name">RescueTime</string>
+    <string name="service_rescuetime_desc">RescueTime 소프트웨어로 측정한 컴퓨터 사용시간 및 생산성 정보를 불러옵니다</string>
+
+    <string name="measure_rescuetime_computer_usage_name">컴퓨터 사용시간</string>
+    <string name="measure_rescuetime_computer_usage_desc">특정 기간 동안 컴퓨터를 사용한 총 시간을 불러옵니다</string>
+
+    <string name="measure_rescuetime_productivity_name">생산성 스코어</string>
+    <string name="measure_rescuetime_productivity_desc">특정 기간 동안의 컴퓨터 생산성 스코어를 불러옵니다</string>
+
+
+    <!-- fitbit -->
+    <string name="service_fitbit_name">Fitbit</string>
+    <string name="service_fitbit_desc">Fitbit 헬스케어 데이터를 불러옵니다</string>
+
+    <string name="measure_fitbit_sleep_time_name">수면 시간</string>
+    <string name="measure_fitbit_sleep_time_desc">수면한 시간 범위를 불러옵니다</string>
+
+    <string name="measure_fitbit_steps_name">걸음 수</string>
+    <string name="measure_fitbit_steps_desc">특정 기간 동안의 걸음 수를 불러옵니다</string>
+
+    <string name="measure_fitbit_heart_rate_name">심박 수</string>
+    <string name="measure_fitbit_heart_rate_desc">특정 기간 동안의 평균 심박 수를 불러옵니다</string>
+
+
+</resources>

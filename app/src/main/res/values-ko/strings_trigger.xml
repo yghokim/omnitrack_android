@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="msg_text_trigger">트리거</string>
+    <string name="msg_text_reminder">리마인더</string>
+    <string name="msg_select_trigger_type_format">%1$s 타입을 선택하세요</string>
+
+    <string name="trigger_name_time">시간 기반</string>
+    <string name="trigger_name_event">데이터 기반</string>
+    <string name="trigger_desc_time">정해진 시각에, 혹은 특정 시간 간격으로 발동됩니다</string>
+    <string name="trigger_desc_event">연결된 값이 특정 임계치에 도달할 때 발동됩니다</string>
+
+    <string name="msg_trigger_time_config_type">설정 방식</string>
+
+    <string name="msg_trigger_time_config_interval">시간 간격</string>
+    <string name="msg_trigger_time_config_alarm_time">발동 시각</string>
+
+    <string name="msg_trigger_time_config_repeat_range">발동 시간대</string>
+
+
+    <string name="msg_trigger_time_config_type_name_alram">특정한 시각에 발동</string>
+    <string name="msg_trigger_time_config_type_name_interval">정해진 시간 간격으로 발동</string>
+
+    <string name="msg_trigger_time_is_repeated">반복</string>
+
+    <string name="msg_trigger_error_interval_not_0">시간 간격은 0이 될 수 없습니다.</string>
+
+    <string name="msg_trigger_attached_trackers">등록된 트래커</string>
+
+    <string name="msg_trigger_assign_tracker">트래커 등록</string>
+
+    <string name="msg_trigger_event_measure_selection">측정 모듈</string>
+    <string name="msg_trigger_event_comparison_method">트리거 발동 임계값</string>
+    <string name="msg_trigger_event_comparison_method_higher">임계치를 넘는 순간</string>
+    <string name="msg_trigger_event_comparison_method_lower">임계치보다 낮아지는 순간</string>
+
+    <string name='msg_trigger_event_msg_tap_to_configure'>탭해서 설정</string>
+
+</resources>

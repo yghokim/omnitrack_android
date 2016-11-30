@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-
-    <string name="trigger_periodic_name">Time Trigger</string>
-    <string name="trigger_periodic_desc">Fires by specific periods.</string>
-
     <string name="msg_text_trigger">Trigger</string>
     <string name="msg_text_reminder">Reminder</string>
-    <string name="msg_select_trigger_type_format">Select %1$s} Type</string>
+    <string name="msg_select_trigger_type_format">Select %1$s Type</string>
 
     <string name="trigger_name_time">Time-based</string>
     <string name="trigger_name_event">Data-driven</string>
@@ -31,10 +27,13 @@
 
     <string name="msg_trigger_attached_trackers">Assigned Trackers</string>
 
+    <string name="msg_trigger_assign_tracker">Assign Tracker</string>
+
     <string name="msg_trigger_event_measure_selection">Select Measure</string>
     <string name="msg_trigger_event_comparison_method">Triggered Threshold</string>
     <string name="msg_trigger_event_comparison_method_higher">When gets higher than</string>
     <string name="msg_trigger_event_comparison_method_lower">When gets lower than</string>
 
+    <string name='msg_trigger_event_msg_tap_to_configure'>Tap to configure</string>
 
 </resources>

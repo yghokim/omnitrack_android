@@ -16,5 +16,5 @@
         android:paddingStart="5dp"
 
         android:paddingTop="5dp"
-        android:text="Assign Tracker" />
+        android:text="@string/msg_trigger_assign_tracker" />
 </merge>
