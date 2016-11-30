@@ -93,7 +93,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 app:icon="@drawable/link_dark"
-                app:label="Connected with" />
+                app:label="@string/msg_connection_panel_connected_with" />
 
             <TextView
                 android:id="@+id/ui_source"
@@ -121,7 +121,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 app:icon="@drawable/timelapse_dark"
-                app:label="Time Query" />
+                app:label="@string/msg_connection_panel_time_query" />
 
 
             <TextView

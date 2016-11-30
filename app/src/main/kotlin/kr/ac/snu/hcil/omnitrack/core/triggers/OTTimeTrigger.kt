@@ -260,8 +260,8 @@ class OTTimeTrigger : OTTrigger {
 
     override val typeId: Int = TYPE_TIME
 
-    override val typeNameResourceId: Int = R.string.trigger_periodic_name
-    override val descriptionResourceId: Int = R.string.trigger_periodic_desc
+    override val typeNameResourceId: Int = R.string.trigger_name_time
+    override val descriptionResourceId: Int = R.string.trigger_desc_time
 
     var configType: Int by ObservableMapDelegate(CONFIG_TYPE_ALARM, properties) {
         isDirtySinceLastSync = true

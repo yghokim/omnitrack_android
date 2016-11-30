@@ -37,8 +37,9 @@
             android:layout_marginTop="@dimen/service_list_element_vertical_padding"
             android:layout_toStartOf="@+id/ui_activation_switch_group"
             android:text="Microsoft Band"
-            android:textColor="@color/textColorDark"
-            android:textSize="22sp" />
+            android:textColor="@color/textColorMidDark"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/description"
@@ -49,9 +50,8 @@
             android:layout_below="@+id/name"
             android:layout_marginTop="5dp"
             android:text="ms band description"
-            android:textColor="@color/textColorLight"
-            android:textSize="16sp"
-            android:textStyle="italic" />
+            android:textColor="@color/textColorMidLight"
+            android:textSize="14sp" />
 
         <FrameLayout
             android:id="@+id/ui_activation_switch_group"

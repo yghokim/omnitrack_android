@@ -17,7 +17,7 @@
 
     <dimen name="color_selection_button_size">36dp</dimen>
 
-    <dimen name="appbar_padding_top">8dp</dimen>
+    <dimen name="appbar_padding_top">0dp</dimen>
     <dimen name="text_margin">16dp</dimen>
 
     <dimen name="selection_view_button_padding_left">17dp</dimen>
