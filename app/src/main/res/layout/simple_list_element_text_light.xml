@@ -13,6 +13,5 @@
         android:layout_height="wrap_content"
         android:text="New Text"
         android:textColor="#faffffff"
-        android:textSize="16sp"
         android:textStyle="bold" />
 </FrameLayout>

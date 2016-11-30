@@ -38,7 +38,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:layout_marginLeft="8dp"
-            android:text="Use Time Range" />
+            android:text="@string/msg_trigger_time_use_time_range" />
 
         <kr.ac.snu.hcil.omnitrack.ui.components.common.time.HourRangePicker
             android:id="@+id/ui_trigger_interval_timespan_picker"
@@ -121,7 +121,7 @@
                     android:layout_marginBottom="8dp"
                     android:layout_marginLeft="8dp"
                     android:gravity="center_vertical"
-                    android:text="Finish on End Date" />
+                    android:text="@string/msg_trigger_time_finish_on_end_date" />
 
                 <Button
                     android:id="@+id/ui_button_end_date"

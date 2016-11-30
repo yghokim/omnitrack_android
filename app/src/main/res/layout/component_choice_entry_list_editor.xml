@@ -17,7 +17,7 @@
         android:includeFontPadding="false"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="12dp"
-        android:text="New Entry"
+        android:text="@string/property_choice_add_new_entry"
         android:textAlignment="viewStart"
         android:textColor="@color/buttonIconColorDark" />
 
