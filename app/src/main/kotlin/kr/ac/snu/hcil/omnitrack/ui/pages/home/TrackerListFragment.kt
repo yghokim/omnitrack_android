@@ -204,6 +204,7 @@ class TrackerListFragment : OTFragment() {
     inner class TrackerListAdapter(val user: OTUser) : RecyclerView.Adapter<TrackerListAdapter.ViewHolder>() {
 
         var currentlyExpandedIndex = -1
+        private var lastExpandedViewHolder: ViewHolder? = null
 
         init {
         }
@@ -307,20 +308,32 @@ class TrackerListFragment : OTFragment() {
                             toClose = currentlyExpandedIndex
                             println("toClose: $toClose")
 
-                            if (trackerListLayoutManager.findFirstVisibleItemPosition() > toClose || trackerListLayoutManager.findLastVisibleItemPosition() < toClose) {
+                            /*
+                            if (trackerListLayoutManager.findFirstCompletelyVisibleItemPosition() > toClose || trackerListLayoutManager.findLastCompletelyVisibleItemPosition() < toClose) {
                                 currentlyExpandedIndex = adapterPosition
                                 notifyItemChanged(toClose)
                             } else {
-                                val viewHolderToClose = listView.getChildViewHolder(listView.getChildAt(toClose)) as ViewHolder
-                                viewHolderToClose.collapse(true)
-                            }
+                                val cv = listView.getChildAt(toClose)
+                                if (cv != null) {
+                                    val viewHolderToClose = listView.getChildViewHolder(listView.getChildAt(toClose)) as ViewHolder
+                                    viewHolderToClose.collapse(true)
+                                }
+                                else{
+                                    currentlyExpandedIndex = adapterPosition
+                                    notifyItemChanged(toClose)
+                                }
+                            }*/
                         }
 
+                        lastExpandedViewHolder?.collapse(true)
+
                         currentlyExpandedIndex = adapterPosition
+                        lastExpandedViewHolder = this
                         expand(true)
 
                     } else {
                         currentlyExpandedIndex = -1
+                        lastExpandedViewHolder = null
                         collapse(true)
                     }
 
@@ -406,7 +419,7 @@ class TrackerListFragment : OTFragment() {
                 println("collapse")
                 if (animate) {
                     val animator = ValueAnimator.ofFloat(1f, 0f).apply {
-                        duration = 200
+                        duration = 250
                         interpolator = DecelerateInterpolator()
                         addListener(object : Animator.AnimatorListener {
                             override fun onAnimationRepeat(p0: Animator?) {
@@ -450,7 +463,7 @@ class TrackerListFragment : OTFragment() {
             fun expand(animate: Boolean) {
                 if (animate) {
                     val animator = ValueAnimator.ofFloat(0f, 1f).apply {
-                        duration = 300
+                        duration = 250
                         interpolator = DecelerateInterpolator()
                         addListener(object : Animator.AnimatorListener {
                             override fun onAnimationRepeat(p0: Animator?) {
