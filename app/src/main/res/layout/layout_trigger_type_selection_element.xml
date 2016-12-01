@@ -25,10 +25,11 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="6dp"
         android:fontFamily="sans-serif-light"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"
         android:text="@string/trigger_name_event"
         android:textColor="@color/textColorDark"
-        android:textSize="18sp"
-        android:textStyle="italic" />
+        android:textSize="18sp" />
 
 
     <TextView
@@ -36,6 +37,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="4dp"
         android:layout_marginTop="6dp"
         android:text="@string/trigger_desc_event"
         android:textSize="14sp" />
