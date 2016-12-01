@@ -249,6 +249,8 @@ class TrackerListFragment : OTFragment() {
 
             var collapsed = true
 
+            val expandedViewHeight: Int
+
             private var lastLoggingTimeRetrievalTask: DatabaseHelper.LastItemTimeRetrievalTask? = null
             private var todayLoggingCountTask: DatabaseHelper.LoggingCountOfDayRetrievalTask? = null
 
@@ -261,6 +263,9 @@ class TrackerListFragment : OTFragment() {
                 todayLoggingCountView = view.findViewById(R.id.ui_today_logging_count) as TextView
 
                 expandedView = view.findViewById(R.id.ui_expanded_view)
+
+                expandedView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
+                expandedViewHeight = expandedView.measuredHeight
 
                 editButton = view.findViewById(R.id.ui_button_edit)
                 listButton = view.findViewById(R.id.ui_button_list)
@@ -299,31 +304,7 @@ class TrackerListFragment : OTFragment() {
 
                 } else if (view === expandButton) {
                     var toClose = -1
-                    println(collapsed)
-                    println(currentlyExpandedIndex)
                     if (collapsed) {
-
-                        if (currentlyExpandedIndex != -1) {
-
-                            toClose = currentlyExpandedIndex
-                            println("toClose: $toClose")
-
-                            /*
-                            if (trackerListLayoutManager.findFirstCompletelyVisibleItemPosition() > toClose || trackerListLayoutManager.findLastCompletelyVisibleItemPosition() < toClose) {
-                                currentlyExpandedIndex = adapterPosition
-                                notifyItemChanged(toClose)
-                            } else {
-                                val cv = listView.getChildAt(toClose)
-                                if (cv != null) {
-                                    val viewHolderToClose = listView.getChildViewHolder(listView.getChildAt(toClose)) as ViewHolder
-                                    viewHolderToClose.collapse(true)
-                                }
-                                else{
-                                    currentlyExpandedIndex = adapterPosition
-                                    notifyItemChanged(toClose)
-                                }
-                            }*/
-                        }
 
                         lastExpandedViewHolder?.collapse(true)
 
@@ -336,10 +317,6 @@ class TrackerListFragment : OTFragment() {
                         lastExpandedViewHolder = null
                         collapse(true)
                     }
-
-                    //TransitionManager.beginDelayedTransition(listView, transition)
-                    //notifyDataSetChanged()
-
 
                 } else if (view === errorIndicator) {
                     if (validationErrorMessages.size > 0) {
@@ -416,7 +393,6 @@ class TrackerListFragment : OTFragment() {
             }
 
             fun collapse(animate: Boolean) {
-                println("collapse")
                 if (animate) {
                     val animator = ValueAnimator.ofFloat(1f, 0f).apply {
                         duration = 250
@@ -426,9 +402,8 @@ class TrackerListFragment : OTFragment() {
                             }
 
                             override fun onAnimationEnd(p0: Animator?) {
+                                expandButton.isEnabled = true
                                 collapse(false)
-
-                                println("animation end")
                             }
 
                             override fun onAnimationCancel(p0: Animator?) {
@@ -436,6 +411,8 @@ class TrackerListFragment : OTFragment() {
                             }
 
                             override fun onAnimationStart(p0: Animator?) {
+                                expandButton.isEnabled = false
+                                expandButton.setImageResource(R.drawable.down_dark)
                             }
 
                         })
@@ -445,6 +422,9 @@ class TrackerListFragment : OTFragment() {
                             val lp = itemView.layoutParams.apply { height = (collapsedHeight + (expandedHeight - collapsedHeight) * progress).toInt() }
                             itemView.layoutParams = lp
                             itemView.requestLayout()
+
+                            expandedView.layoutParams.height = (0.5f + (expandedViewHeight) * progress).toInt()
+                            expandedView.requestLayout()
                         }
                     }
 
@@ -470,6 +450,7 @@ class TrackerListFragment : OTFragment() {
                             }
 
                             override fun onAnimationEnd(p0: Animator?) {
+                                expandButton.isEnabled = true
                                 expand(false)
                             }
 
@@ -478,7 +459,11 @@ class TrackerListFragment : OTFragment() {
                             }
 
                             override fun onAnimationStart(p0: Animator?) {
+                                expandButton.isEnabled = false
+                                expandButton.setImageResource(R.drawable.up_dark)
                                 expandedView.visibility = View.VISIBLE
+                                expandedView.layoutParams.height = 0
+                                expandedView.requestLayout()
                             }
 
                         })
@@ -488,6 +473,9 @@ class TrackerListFragment : OTFragment() {
                             val lp = itemView.layoutParams.apply { height = (collapsedHeight + (expandedHeight - collapsedHeight) * progress).toInt() }
                             itemView.layoutParams = lp
                             itemView.requestLayout()
+
+                            expandedView.layoutParams.height = (0.5f + (expandedViewHeight) * progress).toInt()
+                            expandedView.requestLayout()
                         }
                     }
 
