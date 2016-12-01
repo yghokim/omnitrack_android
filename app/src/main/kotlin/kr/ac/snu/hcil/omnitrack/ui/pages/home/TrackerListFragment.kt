@@ -1,5 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.home
 
+import android.animation.Animator
+import android.animation.ValueAnimator
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -18,11 +20,11 @@ import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.transition.AutoTransition
 import android.transition.Fade
-import android.transition.TransitionManager
 import android.transition.TransitionSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.DecelerateInterpolator
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
@@ -52,27 +54,31 @@ import java.util.*
  */
 class TrackerListFragment : OTFragment() {
 
-    private lateinit var user : OTUser
+    private lateinit var user: OTUser
 
-    lateinit private var listView : RecyclerView
+    lateinit private var listView: RecyclerView
 
-    lateinit private var trackerListAdapter : TrackerListAdapter
+    lateinit private var trackerListAdapter: TrackerListAdapter
 
     lateinit private var trackerListLayoutManager: LinearLayoutManager
 
-    private lateinit var lastLoggedTimeFormat : SimpleDateFormat
+    private lateinit var lastLoggedTimeFormat: SimpleDateFormat
 
-    private lateinit var dateSizeSpan : AbsoluteSizeSpan
+    private lateinit var dateSizeSpan: AbsoluteSizeSpan
     private lateinit var dateStyleSpan: StyleSpan
     private lateinit var dateColorSpan: ForegroundColorSpan
 
     private lateinit var timeStyleSpan: StyleSpan
 
-    private val itemEventReceiver: BroadcastReceiver by lazy{
+    private val collapsedHeight = OTApplication.app.resources.getDimensionPixelSize(R.dimen.tracker_list_element_collapsed_height)
+    private val expandedHeight = OTApplication.app.resources.getDimensionPixelSize(R.dimen.tracker_list_element_expanded_height)
+
+
+    private val itemEventReceiver: BroadcastReceiver by lazy {
         ItemEventReceiver()
     }
 
-    private val itemEventIntentFilter: IntentFilter by lazy{
+    private val itemEventIntentFilter: IntentFilter by lazy {
         val filter = IntentFilter()
         filter.addAction(OTApplication.BROADCAST_ACTION_ITEM_ADDED)
         filter.addAction(OTApplication.BROADCAST_ACTION_ITEM_EDITED)
@@ -81,7 +87,7 @@ class TrackerListFragment : OTFragment() {
         filter
     }
 
-    companion object{
+    companion object {
         const val CHANGE_TRACKER_SETTINGS = 0
         const val REMOVE_TRACKER = 1
 
@@ -105,7 +111,7 @@ class TrackerListFragment : OTFragment() {
 
         user = OTApplication.app.currentUser
 
-        lastLoggedTimeFormat =  SimpleDateFormat(context.resources.getString(R.string.msg_tracker_list_time_format))
+        lastLoggedTimeFormat = SimpleDateFormat(context.resources.getString(R.string.msg_tracker_list_time_format))
         dateStyleSpan = StyleSpan(Typeface.NORMAL)
         timeStyleSpan = StyleSpan(Typeface.BOLD)
         dateSizeSpan = AbsoluteSizeSpan(context.resources.getDimensionPixelSize(R.dimen.tracker_list_element_information_text_headerSize))
@@ -171,13 +177,11 @@ class TrackerListFragment : OTFragment() {
         trackerListAdapter.notifyItemRemoved(args.second)
     }*/
 
-    private fun handleTrackerClick(tracker: OTTracker)
-    {
+    private fun handleTrackerClick(tracker: OTTracker) {
         startActivityOnDelay(ItemEditingActivity.makeIntent(tracker.objectId, context))
     }
 
-    private fun handleTrackerLongClick(tracker: OTTracker)
-    {
+    private fun handleTrackerLongClick(tracker: OTTracker) {
         /*
         val builder = AlertDialog.Builder(context)
         builder.setTitle(tracker.name)
@@ -197,7 +201,7 @@ class TrackerListFragment : OTFragment() {
     }
 
 
-    inner class TrackerListAdapter(val user: OTUser) : RecyclerView.Adapter<TrackerListAdapter.ViewHolder>(){
+    inner class TrackerListAdapter(val user: OTUser) : RecyclerView.Adapter<TrackerListAdapter.ViewHolder>() {
 
         var currentlyExpandedIndex = -1
 
@@ -247,7 +251,7 @@ class TrackerListFragment : OTFragment() {
             private var lastLoggingTimeRetrievalTask: DatabaseHelper.LastItemTimeRetrievalTask? = null
             private var todayLoggingCountTask: DatabaseHelper.LoggingCountOfDayRetrievalTask? = null
 
-            init{
+            init {
                 name = view.findViewById(R.id.name) as TextView
                 color = view.findViewById(R.id.color_bar) as View
                 expandButton = view.findViewById(R.id.ui_expand_button) as ImageButton
@@ -274,7 +278,7 @@ class TrackerListFragment : OTFragment() {
 
                 errorIndicator.setOnClickListener(this)
 
-                collapse()
+                collapse(false)
             }
 
             override fun onClick(view: View) {
@@ -294,25 +298,36 @@ class TrackerListFragment : OTFragment() {
 
                 } else if (view === expandButton) {
                     var toClose = -1
+                    println(collapsed)
+                    println(currentlyExpandedIndex)
                     if (collapsed) {
+
                         if (currentlyExpandedIndex != -1) {
+
                             toClose = currentlyExpandedIndex
-                            currentlyExpandedIndex = adapterPosition
-                            //notifyItemChanged(close)
-                        } else {
-                            currentlyExpandedIndex = adapterPosition
+                            println("toClose: $toClose")
+
+                            if (trackerListLayoutManager.findFirstVisibleItemPosition() > toClose || trackerListLayoutManager.findLastVisibleItemPosition() < toClose) {
+                                currentlyExpandedIndex = adapterPosition
+                                notifyItemChanged(toClose)
+                            } else {
+                                val viewHolderToClose = listView.getChildViewHolder(listView.getChildAt(toClose)) as ViewHolder
+                                viewHolderToClose.collapse(true)
+                            }
                         }
+
+                        currentlyExpandedIndex = adapterPosition
+                        expand(true)
+
                     } else {
                         currentlyExpandedIndex = -1
+                        collapse(true)
                     }
 
-                    if (toClose >= 0 && (trackerListLayoutManager.findFirstVisibleItemPosition() > toClose || trackerListLayoutManager.findLastVisibleItemPosition() < toClose)) {
-                        //item to close is outside the screen
-                        println("$toClose is out of the screen.")
-                    }
+                    //TransitionManager.beginDelayedTransition(listView, transition)
+                    //notifyDataSetChanged()
 
-                    TransitionManager.beginDelayedTransition(listView, transition)
-                    notifyDataSetChanged()
+
                 } else if (view === errorIndicator) {
                     if (validationErrorMessages.size > 0) {
                         val tooltipView = Tooltip.make(context, TooltipHelper.makeTooltipBuilder(adapterPosition, errorIndicator).build())
@@ -326,7 +341,7 @@ class TrackerListFragment : OTFragment() {
             }
 
 
-            fun bindTracker(tracker: OTTracker){
+            fun bindTracker(tracker: OTTracker) {
 
                 name.text = tracker.name
                 color.setBackgroundColor(tracker.color)
@@ -341,30 +356,29 @@ class TrackerListFragment : OTFragment() {
                 lastLoggingTimeRetrievalTask?.cancel(true)
                 todayLoggingCountTask?.cancel(true)
 
-                lastLoggingTimeRetrievalTask = OTApplication.app.dbHelper.getLastLoggingTimeAsync(tracker){
+                lastLoggingTimeRetrievalTask = OTApplication.app.dbHelper.getLastLoggingTimeAsync(tracker) {
 
-                    timestamp->
-                    if(timestamp!=null) {
+                    timestamp ->
+                    if (timestamp != null) {
                         InterfaceHelper.setTextAppearance(lastLoggingTimeView, R.style.trackerListInformationTextViewStyle)
                         val dateText = TimeHelper.getDateText(timestamp, context).toUpperCase()
                         val timeText = lastLoggedTimeFormat.format(Date(timestamp)).toUpperCase()
-                        val builder = SpannableString(dateText + "\n" + timeText)
+                        val builder = SpannableString(dateText + "\n" + timeText).apply {
+                            setSpan(dateSizeSpan, 0, dateText.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                            setSpan(dateColorSpan, 0, dateText.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                            setSpan(timeStyleSpan, dateText.length + 1, dateText.length + 1 + timeText.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                        }
 
-                        builder.setSpan(dateSizeSpan, 0, dateText.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                        builder.setSpan(dateColorSpan, 0, dateText.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-
-                        builder.setSpan(timeStyleSpan, dateText.length+1, dateText.length+1+timeText.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
 
                         todayLoggingCountView.visibility = View.VISIBLE
 
                         lastLoggingTimeView.text = builder
-                    }
-                    else{
+                    } else {
                         lastLoggingTimeView.text = context.resources.getString(R.string.msg_never_logged).toUpperCase()
                         InterfaceHelper.setTextAppearance(lastLoggingTimeView, R.style.trackerListInformationTextViewStyle_HeaderAppearance)
                         todayLoggingCountView.visibility = View.INVISIBLE
                     }
-                        lastLoggingTimeRetrievalTask = null
+                    lastLoggingTimeRetrievalTask = null
                 }
 
 
@@ -372,45 +386,112 @@ class TrackerListFragment : OTFragment() {
 
                     count ->
                     val header = context.resources.getString(R.string.msg_todays_log).toUpperCase()
-                    val builder = SpannableString(header + "\n" + count)
-
-                    builder.setSpan(dateSizeSpan, 0, header.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                    builder.setSpan(dateColorSpan, 0, header.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-
-                    builder.setSpan(timeStyleSpan, header.length + 1, header.length + 1 + count.toString().length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    val builder = SpannableString(header + "\n" + count).apply {
+                        setSpan(dateSizeSpan, 0, header.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                        setSpan(dateColorSpan, 0, header.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                        setSpan(timeStyleSpan, header.length + 1, header.length + 1 + count.toString().length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    }
 
                     todayLoggingCountView.text = builder
                 }
 
-
                 if (currentlyExpandedIndex == adapterPosition) {
-                    expand()
+                    expand(false)
                 } else {
-                    collapse()
+                    collapse(false)
                 }
             }
 
-            fun collapse() {
-                expandedView.visibility = View.GONE
-                expandButton.setImageResource(R.drawable.down_dark)
-                val lp = itemView.layoutParams
-                lp.height = resources.getDimensionPixelSize(R.dimen.tracker_list_element_collapsed_height)
-                itemView.layoutParams = lp
-                collapsed = true
+            fun collapse(animate: Boolean) {
+                println("collapse")
+                if (animate) {
+                    val animator = ValueAnimator.ofFloat(1f, 0f).apply {
+                        duration = 200
+                        interpolator = DecelerateInterpolator()
+                        addListener(object : Animator.AnimatorListener {
+                            override fun onAnimationRepeat(p0: Animator?) {
+                            }
+
+                            override fun onAnimationEnd(p0: Animator?) {
+                                collapse(false)
+
+                                println("animation end")
+                            }
+
+                            override fun onAnimationCancel(p0: Animator?) {
+                                collapse(false)
+                            }
+
+                            override fun onAnimationStart(p0: Animator?) {
+                            }
+
+                        })
+                        addUpdateListener {
+                            val progress = (animatedValue as Float)
+                            expandedView.alpha = progress
+                            val lp = itemView.layoutParams.apply { height = (collapsedHeight + (expandedHeight - collapsedHeight) * progress).toInt() }
+                            itemView.layoutParams = lp
+                            itemView.requestLayout()
+                        }
+                    }
+
+                    animator.start()
+                    collapsed = true
+
+                } else {
+                    expandedView.visibility = View.GONE
+                    expandButton.setImageResource(R.drawable.down_dark)
+                    val lp = itemView.layoutParams.apply { height = collapsedHeight }
+                    itemView.layoutParams = lp
+                    collapsed = true
+                }
             }
 
-            fun expand() {
-                expandedView.visibility = View.VISIBLE
-                expandButton.setImageResource(R.drawable.up_dark)
-                val lp = itemView.layoutParams
-                lp.height = resources.getDimensionPixelSize(R.dimen.tracker_list_element_expanded_height)
-                itemView.layoutParams = lp
-                collapsed = false
+            fun expand(animate: Boolean) {
+                if (animate) {
+                    val animator = ValueAnimator.ofFloat(0f, 1f).apply {
+                        duration = 300
+                        interpolator = DecelerateInterpolator()
+                        addListener(object : Animator.AnimatorListener {
+                            override fun onAnimationRepeat(p0: Animator?) {
+                            }
+
+                            override fun onAnimationEnd(p0: Animator?) {
+                                expand(false)
+                            }
+
+                            override fun onAnimationCancel(p0: Animator?) {
+                                expand(false)
+                            }
+
+                            override fun onAnimationStart(p0: Animator?) {
+                                expandedView.visibility = View.VISIBLE
+                            }
+
+                        })
+                        addUpdateListener {
+                            val progress = (animatedValue as Float)
+                            expandedView.alpha = progress
+                            val lp = itemView.layoutParams.apply { height = (collapsedHeight + (expandedHeight - collapsedHeight) * progress).toInt() }
+                            itemView.layoutParams = lp
+                            itemView.requestLayout()
+                        }
+                    }
+
+                    animator.start()
+                    collapsed = false
+                } else {
+                    expandedView.visibility = View.VISIBLE
+                    expandButton.setImageResource(R.drawable.up_dark)
+                    val lp = itemView.layoutParams.apply { height = expandedHeight }
+                    itemView.layoutParams = lp
+                    collapsed = false
+                }
             }
         }
     }
 
-    inner class ItemEventReceiver: BroadcastReceiver(){
+    inner class ItemEventReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val trackerPosition = user.trackers.indexOf(user[intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)]!!)
             trackerListAdapter.notifyItemChanged(trackerPosition)
