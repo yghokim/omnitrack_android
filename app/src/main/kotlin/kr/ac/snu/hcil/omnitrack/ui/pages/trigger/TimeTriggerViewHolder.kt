@@ -8,10 +8,9 @@ import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTrigger
 
 /**
  * Created by younghokim on 16. 8. 24..
+ *
  */
-class TimeTriggerViewHolder : ATriggerViewHolder<OTTimeTrigger> {
-
-    constructor(parent: ViewGroup, listener: ITriggerControlListener, context: Context) : super(parent, listener, context)
+class TimeTriggerViewHolder(parent: ViewGroup, listener: ITriggerControlListener, context: Context) : ATriggerViewHolder<OTTimeTrigger>(parent, listener, context) {
 
     override fun getConfigSummary(trigger: OTTimeTrigger): CharSequence {
         if (trigger.isConfigSpecified) {
