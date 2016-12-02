@@ -186,10 +186,15 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
                                     }
 
                                     override fun onAnimationEnd(p0: Animator?) {
-                                        collapsedView.visibility = View.GONE
-                                        collapsedView.alpha = 1f
-                                        toggleViewContainer.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
-                                        toggleViewContainer.requestLayout()
+                                        collapsedView.run {
+                                            visibility = View.GONE
+                                            alpha = 1f
+                                        }
+
+                                        toggleViewContainer.run {
+                                            layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
+                                            requestLayout()
+                                        }
                                     }
 
                                     override fun onAnimationRepeat(p0: Animator?) {
@@ -206,31 +211,45 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
                                     val ratio = animatedValue as Float
                                     collapsedView.alpha = 1 - ratio
                                     expandedView.alpha = ratio
-                                    toggleViewContainer.layoutParams.height = (0.5f + collapsedHeight + (expandedHeight - collapsedHeight) * ratio).toInt()
-                                    toggleViewContainer.requestLayout()
+                                    toggleViewContainer.run {
+                                        layoutParams.height = (0.5f + collapsedHeight + (expandedHeight - collapsedHeight) * ratio).toInt()
+                                        requestLayout()
+                                    }
                                 }
 
                             }
                     animator.start()
                 } else {
-                    toggleViewContainer.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
-                    toggleViewContainer.requestLayout()
+                    toggleViewContainer.run {
+                        layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
+                        requestLayout()
+                    }
                     collapsedView.visibility = View.GONE
                     expandedView.visibility = View.VISIBLE
+
                 }
 
 
             } else {
 
-                removeButton.visibility = View.INVISIBLE
-                configSummaryView.visibility = View.VISIBLE
-                expandToggleButton.setImageResource(R.drawable.down_dark)
+                removeButton.run {
+                    visibility = View.INVISIBLE
+                    setColorFilter(ContextCompat.getColor(itemView.context, R.color.buttonIconColorDark))
+                }
 
-                bottomBar.locked = true
-                bottomBar.setBackgroundColor(ContextCompat.getColor(itemView.context, R.color.editTextFormBackground))
-                removeButton.setColorFilter(ContextCompat.getColor(itemView.context, R.color.buttonIconColorDark))
+                configSummaryView.visibility = View.VISIBLE
+
+                expandToggleButton.run {
+                    setImageResource(R.drawable.down_dark)
+                    visibility = View.VISIBLE
+                }
+
+                bottomBar.run {
+                    locked = true
+                    setBackgroundColor(ContextCompat.getColor(itemView.context, R.color.editTextFormBackground))
+                }
+
                 applyButtonGroup.visibility = View.INVISIBLE
-                expandToggleButton.visibility = View.VISIBLE
 
 
                 if (animate) {
@@ -247,10 +266,14 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
                                     }
 
                                     override fun onAnimationEnd(p0: Animator?) {
-                                        expandedView.visibility = View.GONE
-                                        expandedView.alpha = 1f
-                                        toggleViewContainer.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
-                                        toggleViewContainer.requestLayout()
+                                        expandedView.run {
+                                            visibility = View.GONE
+                                            alpha = 1f
+                                        }
+                                        toggleViewContainer.run {
+                                            layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
+                                            requestLayout()
+                                        }
                                     }
 
                                     override fun onAnimationRepeat(p0: Animator?) {
@@ -267,8 +290,10 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
                                     val ratio = animatedValue as Float
                                     collapsedView.alpha = 1 - ratio
                                     expandedView.alpha = ratio
-                                    toggleViewContainer.layoutParams.height = (0.5f + collapsedHeight + (expandedHeight - collapsedHeight) * ratio).toInt()
-                                    toggleViewContainer.requestLayout()
+                                    toggleViewContainer.run {
+                                        layoutParams.height = (0.5f + collapsedHeight + (expandedHeight - collapsedHeight) * ratio).toInt()
+                                        requestLayout()
+                                    }
                                 }
 
                             }
@@ -295,8 +320,10 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
     @Suppress("UNCHECKED_CAST")
     fun bind(trigger: OTTrigger) {
         if (!isFirstBinding) {
-            this.trigger.switchTurned -= onTriggerSwitchTurned
-            this.trigger.fired -= onTriggerFired
+            this.trigger.run {
+                switchTurned -= onTriggerSwitchTurned
+                fired -= onTriggerFired
+            }
         } else {
             isFirstBinding = false
         }
@@ -304,9 +331,10 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
         this.trigger = trigger as T
 
 
-        this.trigger.switchTurned += onTriggerSwitchTurned
-        this.trigger.fired += onTriggerFired
-
+        this.trigger.run {
+            switchTurned += onTriggerSwitchTurned
+            fired += onTriggerFired
+        }
 
         //attached tracker list
         if (this.trigger.action == OTTrigger.ACTION_BACKGROUND_LOGGING) {
