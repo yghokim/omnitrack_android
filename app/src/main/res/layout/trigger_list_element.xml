@@ -2,7 +2,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/frontalBackground"
     android:clickable="true"
     android:orientation="vertical">
 
@@ -93,7 +92,7 @@
             android:id="@+id/ui_expanded_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/expanded_view_inner_shadow"
+            android:background="#FFF"
             android:orientation="vertical">
 
             <FrameLayout
