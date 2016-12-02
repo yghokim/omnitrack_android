@@ -1,5 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 
+import android.animation.Animator
+import android.animation.ValueAnimator
 import android.app.ActionBar
 import android.content.Context
 import android.graphics.Color
@@ -9,11 +11,11 @@ import android.support.v7.widget.AppCompatImageButton
 import android.support.v7.widget.AppCompatImageView
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SwitchCompat
-import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewStub
+import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
 import android.widget.TextView
 import com.badoo.mobile.util.WeakHandler
@@ -34,8 +36,8 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
     interface ITriggerControlListener {
         fun onTriggerRemove(position: Int)
         fun onTriggerEdited(position: Int)
-        fun onTriggerExpandRequested(position: Int)
-        fun onTriggerCollapse(position: Int)
+        fun onTriggerExpandRequested(position: Int, viewHolder: ATriggerViewHolder<out OTTrigger>)
+        fun onTriggerCollapse(position: Int, viewHolder: ATriggerViewHolder<out OTTrigger>)
     }
 
     private var isFirstBinding = true
@@ -54,6 +56,8 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
     private val typeIconView: AppCompatImageView
     private val typeDescriptionView: TextView
     private val typeWappen: View
+
+    private val toggleViewContainer: ViewGroup
 
     private val configSummaryView: TextView
     private val expandedView: ViewGroup
@@ -77,6 +81,9 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
 
     private val bottomBar: LockableFrameLayout
 
+    private var collapsedHeight: Int = 0
+    private var expandedHeight: Int = 0
+
     private val errorMessages: ArrayList<String>
 
     private val onTriggerSwitchTurned: ((sender: Any, isOn: Boolean) -> Unit) = {
@@ -97,6 +104,8 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
     init {
 
         errorMessages = ArrayList<String>()
+
+        toggleViewContainer = itemView.findViewById(R.id.ui_toggle_view_container) as ViewGroup
 
         itemView.setOnClickListener(this)
 
@@ -139,22 +148,22 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
 
     fun setIsExpanded(isExpanded: Boolean, animate: Boolean) {
         if (this.isExpanded != isExpanded) {
+            if (!isFirstBinding)
+                applyTriggerStateToView()
+
             this.isExpanded = isExpanded
-            if (animate) {
-                TransitionManager.beginDelayedTransition(itemView as ViewGroup)
-            }
 
             if (isExpanded) {
+
                 removeButton.visibility = View.VISIBLE
                 configSummaryView.visibility = View.INVISIBLE
                 expandToggleButton.setImageResource(R.drawable.up_dark)
-                collapsedView.visibility = View.GONE
                 if (controlPanelContainer.childCount == 0) {
                     val lp = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT)
                     controlPanelContainer.addView(initExpandedViewContent(), lp)
                 }
                 updateExpandedViewContent(controlPanelContainer.getChildAt(0), trigger)
-                expandedView.visibility = View.VISIBLE
+
 
                 bottomBar.locked = false
                 bottomBar.setBackgroundColor(ContextCompat.getColor(itemView.context, R.color.colorSecondary))
@@ -162,20 +171,116 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
                 applyButtonGroup.visibility = View.VISIBLE
                 expandToggleButton.visibility = View.INVISIBLE
 
+                if (animate) {
+                    measureCollapsedAndExpandedHeight()
+
+                    val animator = ValueAnimator.ofFloat(0f, 1f)
+                            .apply {
+                                duration = 250
+                                interpolator = DecelerateInterpolator()
+
+                                addListener(object : Animator.AnimatorListener {
+                                    override fun onAnimationCancel(p0: Animator?) {
+
+                                    }
+
+                                    override fun onAnimationEnd(p0: Animator?) {
+                                        collapsedView.visibility = View.GONE
+                                        toggleViewContainer.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
+                                        toggleViewContainer.requestLayout()
+                                    }
+
+                                    override fun onAnimationRepeat(p0: Animator?) {
+                                    }
+
+                                    override fun onAnimationStart(p0: Animator?) {
+                                        expandedView.visibility = View.VISIBLE
+                                    }
+
+                                })
+
+                                addUpdateListener {
+                                    val ratio = animatedValue as Float
+                                    collapsedView.alpha = 1 - ratio
+                                    expandedView.alpha = ratio
+                                    toggleViewContainer.layoutParams.height = (0.5f + collapsedHeight + (expandedHeight - collapsedHeight) * ratio).toInt()
+                                    toggleViewContainer.requestLayout()
+                                }
+
+                            }
+                    animator.start()
+                } else {
+                    collapsedView.visibility = View.GONE
+                    expandedView.visibility = View.VISIBLE
+                }
+
+
             } else {
+
                 removeButton.visibility = View.INVISIBLE
                 configSummaryView.visibility = View.VISIBLE
                 expandToggleButton.setImageResource(R.drawable.down_dark)
-                expandedView.visibility = View.GONE
-                collapsedView.visibility = View.VISIBLE
 
                 bottomBar.locked = true
                 bottomBar.setBackgroundColor(ContextCompat.getColor(itemView.context, R.color.editTextFormBackground))
                 removeButton.setColorFilter(ContextCompat.getColor(itemView.context, R.color.buttonIconColorDark))
                 applyButtonGroup.visibility = View.INVISIBLE
                 expandToggleButton.visibility = View.VISIBLE
+
+
+                if (animate) {
+                    measureCollapsedAndExpandedHeight()
+
+                    val animator = ValueAnimator.ofFloat(1f, 0f)
+                            .apply {
+                                duration = 250
+                                interpolator = DecelerateInterpolator()
+
+                                addListener(object : Animator.AnimatorListener {
+                                    override fun onAnimationCancel(p0: Animator?) {
+
+                                    }
+
+                                    override fun onAnimationEnd(p0: Animator?) {
+                                        expandedView.visibility = View.GONE
+                                    }
+
+                                    override fun onAnimationRepeat(p0: Animator?) {
+                                    }
+
+                                    override fun onAnimationStart(p0: Animator?) {
+                                        collapsedView.visibility = View.VISIBLE
+                                    }
+
+                                })
+
+                                addUpdateListener {
+                                    val ratio = animatedValue as Float
+                                    collapsedView.alpha = 1 - ratio
+                                    expandedView.alpha = ratio
+                                    toggleViewContainer.layoutParams.height = (0.5f + collapsedHeight + (expandedHeight - collapsedHeight) * ratio).toInt()
+                                    toggleViewContainer.requestLayout()
+                                }
+
+                            }
+                    animator.start()
+
+                } else {
+                    expandedView.visibility = View.GONE
+                    collapsedView.visibility = View.VISIBLE
+                }
             }
         }
+    }
+
+    private fun measureCollapsedAndExpandedHeight() {
+        collapsedView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
+        collapsedHeight = collapsedView.measuredHeight
+
+        expandedView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
+        expandedHeight = expandedView.measuredHeight
+
+        println("measured trigger view sizes: $collapsedHeight, $expandedHeight")
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -287,12 +392,12 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
         if (view === removeButton) {
             listener.onTriggerRemove(adapterPosition)
         } else if (view === expandToggleButton) {
-            listener.onTriggerCollapse(adapterPosition)
+            listener.onTriggerCollapse(adapterPosition, this)
         } else if (view === triggerSwitch) {
             trigger.isOn = triggerSwitch.isChecked
         } else if (view === bottomBar || view === itemView) {
             if (!isExpanded) {
-                listener.onTriggerExpandRequested(adapterPosition)
+                listener.onTriggerExpandRequested(adapterPosition, this)
             }
         } else if (view === applyButton) {
             if (validateExpandedViewInputs(controlPanelContainer.getChildAt(0), errorMessages)) {
@@ -314,13 +419,13 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
                     }
                 }
 
-                listener.onTriggerCollapse(adapterPosition)
+                listener.onTriggerCollapse(adapterPosition, this)
             } else {
                 //validation failed
                 DialogHelper.makeSimpleAlertBuilder(itemView.context, errorMessages.joinToString("\n")).show()
             }
         } else if (view === cancelButton) {
-            listener.onTriggerCollapse(adapterPosition)
+            listener.onTriggerCollapse(adapterPosition, this)
         }
     }
 
@@ -333,7 +438,6 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
             colorBar = view.findViewById(R.id.color_bar)
         }
     }
-
 
 
 }

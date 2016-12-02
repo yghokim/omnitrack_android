@@ -34,6 +34,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
     private lateinit var newTriggerButton: FloatingActionButton
 
     private var expandedTriggerPosition: Int = -1
+    private var expandedViewHolder: ATriggerViewHolder<out OTTrigger>? = null
 
     private val triggerTypeDialog: AlertDialog by lazy {
         NewTriggerTypeSelectionDialogHelper.builder(parent.context, triggerActionTypeName) {
@@ -138,6 +139,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
             if (expandedTriggerPosition == position) {
                 val lastExpandedIndex = expandedTriggerPosition
                 expandedTriggerPosition = -1
+                expandedViewHolder = null
                 for (triggerEntry in getTriggers().withIndex()) {
                     if (triggerEntry.index != lastExpandedIndex) {
                         this.notifyItemChanged(triggerEntry.index)
@@ -150,20 +152,30 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
             newTriggerButton.visibility = View.VISIBLE
         }
 
-        override fun onTriggerExpandRequested(position: Int) {
+        override fun onTriggerExpandRequested(position: Int, viewHolder: ATriggerViewHolder<out OTTrigger>) {
             if (expandedTriggerPosition == -1) {
                 expandedTriggerPosition = position
+
                 newTriggerButton.visibility = View.INVISIBLE
-                adapter.notifyDataSetChanged()
+
+
+                expandedViewHolder?.setIsExpanded(false, true)
+                viewHolder.setIsExpanded(true, true)
+
+                // adapter.notifyDataSetChanged()
             } else {
-                onTriggerCollapse(expandedTriggerPosition)
+                if (expandedViewHolder != null)
+                    onTriggerCollapse(expandedTriggerPosition, expandedViewHolder!!)
             }
         }
 
-        override fun onTriggerCollapse(position: Int) {
+        override fun onTriggerCollapse(position: Int, viewHolder: ATriggerViewHolder<out OTTrigger>) {
             expandedTriggerPosition = -1
+            expandedViewHolder?.setIsExpanded(false, true)
             newTriggerButton.visibility = View.VISIBLE
-            adapter.notifyDataSetChanged()
+
+            viewHolder.setIsExpanded(false, true)
+            //adapter.notifyDataSetChanged()
         }
     }
 
