@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@color/frontalBackground"
     android:clickable="true"
     android:orientation="vertical">
 
@@ -81,8 +82,6 @@
                 android:layout_alignParentTop="true"
                 android:paddingLeft="@dimen/activity_horizontal_margin"
                 android:paddingRight="@dimen/activity_horizontal_margin"
-                android:textOff="Inactive"
-                android:textOn="Active"
                 android:textStyle="bold" />
 
         </RelativeLayout>
@@ -171,7 +170,7 @@
             android:layout_gravity="center_vertical|start"
             android:layout_marginLeft="@dimen/activity_horizontal_margin"
             android:fontFamily="sans-serif-light"
-            android:text="Summary Content"
+            android:text=""
             android:textColor="@color/textColorMid"
             android:textSize="14sp" />
     </kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout>

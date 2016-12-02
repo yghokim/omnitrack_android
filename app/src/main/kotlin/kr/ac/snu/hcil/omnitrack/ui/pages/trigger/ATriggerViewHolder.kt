@@ -163,6 +163,11 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
                     val lp = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT)
                     controlPanelContainer.addView(initExpandedViewContent(), lp)
                 }
+
+
+                if (trackerAssignPanel != null) {
+                    trackerAssignPanel?.init(trigger.trackers)
+                }
                 updateExpandedViewContent(controlPanelContainer.getChildAt(0), trigger)
 
 
