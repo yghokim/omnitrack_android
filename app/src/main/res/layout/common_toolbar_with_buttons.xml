@@ -24,7 +24,7 @@
                     android:layout_height="match_parent"
                     android:layout_alignParentStart="true"
                     android:layout_marginRight="-8dp"
-                    android:background="@drawable/transparent_button_background"
+                    android:background="?selectableItemBackgroundBorderless"
                     android:minWidth="?attr/actionBarSize"
                     android:src="@drawable/cancel"
                     android:tint="#FFF" />
@@ -45,7 +45,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_alignParentEnd="true"
-                    android:background="@drawable/transparent_button_background"
+                    android:background="?selectableItemBackgroundBorderless"
                     android:minWidth="?attr/actionBarSize"
                     android:src="@drawable/done"
                     android:tint="#FFF" />

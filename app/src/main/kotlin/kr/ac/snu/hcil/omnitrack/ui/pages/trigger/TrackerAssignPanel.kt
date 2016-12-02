@@ -59,7 +59,6 @@ class TrackerAssignPanel : FlowLayout, View.OnClickListener {
             val vh = (getChildAt(tracker.index).tag as RemovableAttachedTrackerViewHolder)
             vh.textView.text = tracker.value.name
             vh.colorBar.setBackgroundColor(tracker.value.color)
-            vh.position = tracker.index
         }
     }
 
@@ -79,8 +78,6 @@ class TrackerAssignPanel : FlowLayout, View.OnClickListener {
 
     private inner class RemovableAttachedTrackerViewHolder(view: View) : ATriggerViewHolder.AttachedTrackerViewHolder(view), View.OnClickListener {
 
-        var position: Int = -1
-
         val removeButton: View
 
         init {
@@ -88,10 +85,13 @@ class TrackerAssignPanel : FlowLayout, View.OnClickListener {
             removeButton.setOnClickListener(this)
         }
 
-        override fun onClick(view: View) {
-            if (view === removeButton) {
-                trackerIds.removeAt(position)
-                this@TrackerAssignPanel.removeViewAt(position)
+        override fun onClick(clickedView: View) {
+            if (clickedView === removeButton) {
+                val position = this@TrackerAssignPanel.indexOfChild(this.view)
+                if (position != -1) {
+                    trackerIds.removeAt(position)
+                    this@TrackerAssignPanel.removeViewAt(position)
+                }
             }
         }
 
