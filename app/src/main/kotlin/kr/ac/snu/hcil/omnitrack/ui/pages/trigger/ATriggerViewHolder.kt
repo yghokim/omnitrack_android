@@ -15,6 +15,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewStub
+import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
 import android.widget.TextView
@@ -176,7 +177,7 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
 
                     val animator = ValueAnimator.ofFloat(0f, 1f)
                             .apply {
-                                duration = 250
+                                duration = 200
                                 interpolator = DecelerateInterpolator()
 
                                 addListener(object : Animator.AnimatorListener {
@@ -186,6 +187,7 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
 
                                     override fun onAnimationEnd(p0: Animator?) {
                                         collapsedView.visibility = View.GONE
+                                        collapsedView.alpha = 1f
                                         toggleViewContainer.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
                                         toggleViewContainer.requestLayout()
                                     }
@@ -195,6 +197,7 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
 
                                     override fun onAnimationStart(p0: Animator?) {
                                         expandedView.visibility = View.VISIBLE
+                                        collapsedView.visibility = View.VISIBLE
                                     }
 
                                 })
@@ -210,6 +213,8 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
                             }
                     animator.start()
                 } else {
+                    toggleViewContainer.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
+                    toggleViewContainer.requestLayout()
                     collapsedView.visibility = View.GONE
                     expandedView.visibility = View.VISIBLE
                 }
@@ -233,8 +238,8 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
 
                     val animator = ValueAnimator.ofFloat(1f, 0f)
                             .apply {
-                                duration = 250
-                                interpolator = DecelerateInterpolator()
+                                duration = 200
+                                interpolator = AccelerateInterpolator()
 
                                 addListener(object : Animator.AnimatorListener {
                                     override fun onAnimationCancel(p0: Animator?) {
@@ -243,6 +248,9 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
 
                                     override fun onAnimationEnd(p0: Animator?) {
                                         expandedView.visibility = View.GONE
+                                        expandedView.alpha = 1f
+                                        toggleViewContainer.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
+                                        toggleViewContainer.requestLayout()
                                     }
 
                                     override fun onAnimationRepeat(p0: Animator?) {
@@ -250,6 +258,7 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
 
                                     override fun onAnimationStart(p0: Animator?) {
                                         collapsedView.visibility = View.VISIBLE
+                                        expandedView.visibility = View.VISIBLE
                                     }
 
                                 })

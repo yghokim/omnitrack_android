@@ -3,7 +3,6 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.Fragment
-import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -100,15 +99,17 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
                 holder.setIsExpanded(true, false)
             } else {
                 holder.setIsExpanded(false, false)
+                /*
                 if (expandedTriggerPosition != -1) {
                     holder.itemView.alpha = 0.2f
                     holder.itemView.setBackgroundColor(ContextCompat.getColor(parent.context, R.color.outerBackground))
-                }
+                }*/
             }
 
             if (expandedTriggerPosition == position || expandedTriggerPosition == -1) {
+                /*
                 holder.itemView.alpha = 1.0f
-                holder.itemView.setBackgroundColor(ContextCompat.getColor(parent.context, R.color.frontalBackground))
+                holder.itemView.setBackgroundColor(ContextCompat.getColor(parent.context, R.color.frontalBackground))*/
             }
         }
 
@@ -153,26 +154,24 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
         }
 
         override fun onTriggerExpandRequested(position: Int, viewHolder: ATriggerViewHolder<out OTTrigger>) {
-            if (expandedTriggerPosition == -1) {
-                expandedTriggerPosition = position
 
-                newTriggerButton.visibility = View.INVISIBLE
+            if (expandedViewHolder !== viewHolder)
+                expandedViewHolder?.setIsExpanded(false, false)
 
+            newTriggerButton.visibility = View.INVISIBLE
 
-                expandedViewHolder?.setIsExpanded(false, true)
-                viewHolder.setIsExpanded(true, true)
+            expandedTriggerPosition = position
+            expandedViewHolder = viewHolder
 
-                // adapter.notifyDataSetChanged()
-            } else {
-                if (expandedViewHolder != null)
-                    onTriggerCollapse(expandedTriggerPosition, expandedViewHolder!!)
-            }
+            viewHolder.setIsExpanded(true, true)
         }
 
         override fun onTriggerCollapse(position: Int, viewHolder: ATriggerViewHolder<out OTTrigger>) {
             expandedTriggerPosition = -1
-            expandedViewHolder?.setIsExpanded(false, true)
             newTriggerButton.visibility = View.VISIBLE
+
+            if (expandedViewHolder !== viewHolder)
+                expandedViewHolder?.setIsExpanded(false, false)
 
             viewHolder.setIsExpanded(false, true)
             //adapter.notifyDataSetChanged()
