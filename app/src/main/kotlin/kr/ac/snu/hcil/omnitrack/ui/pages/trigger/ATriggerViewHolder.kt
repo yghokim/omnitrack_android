@@ -19,6 +19,7 @@ import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
 import android.widget.TextView
+import butterknife.bindView
 import com.badoo.mobile.util.WeakHandler
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
@@ -49,38 +50,38 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
     var isExpanded: Boolean = true
         private set
 
-    private val triggerSwitch: SwitchCompat
+    private val triggerSwitch: SwitchCompat by bindView(R.id.ui_trigger_switch)
 
-    private val removeButton: AppCompatImageButton
-    private val expandToggleButton: AppCompatImageButton
+    private val removeButton: AppCompatImageButton by bindView(R.id.ui_button_remove)
+    private val expandToggleButton: AppCompatImageButton by bindView(R.id.ui_button_expand_toggle)
 
-    private val typeIconView: AppCompatImageView
-    private val typeDescriptionView: TextView
-    private val typeWappen: View
+    private val typeIconView: AppCompatImageView by bindView(R.id.ui_type_icon)
+    private val typeDescriptionView: TextView by bindView(R.id.ui_type_description)
+    private val typeWappen: View by bindView(R.id.ui_wappen_type)
 
-    private val toggleViewContainer: ViewGroup
+    private val toggleViewContainer: ViewGroup by bindView(R.id.ui_toggle_view_container)
 
-    private val configSummaryView: TextView
-    private val expandedView: ViewGroup
-    private val controlPanelContainer: ViewGroup
-    private val collapsedView: ViewGroup
-    private val headerViewContainer: ViewGroup
+    private val configSummaryView: TextView by bindView(R.id.ui_config_summary)
+    private val expandedView: ViewGroup by bindView(R.id.ui_expanded_view)
+    private val controlPanelContainer: ViewGroup by bindView(R.id.ui_control_panel)
+    private val collapsedView: ViewGroup by bindView(R.id.ui_collapsed_view)
+    private val headerViewContainer: ViewGroup by bindView(R.id.ui_header_view_container)
 
-    private val applyButtonGroup: ViewGroup
-    private val applyButton: View
-    private val cancelButton: View
+    private val applyButtonGroup: ViewGroup by bindView(R.id.ui_apply_button_group)
+    private val applyButton: View by bindView(R.id.ui_button_apply)
+    private val cancelButton: View by bindView(R.id.ui_button_cancel)
 
     private var attachedTrackerListView: View? = null
     private var attachedTrackerList: ViewGroup? = null
     private var attachedTrackerNoTrackerFallbackView: View? = null
 
-    private val attachedTrackerListStub: ViewStub
+    private val attachedTrackerListStub: ViewStub by bindView(R.id.ui_attached_tracker_list_stub)
 
-    private val trackerAssignPanelStub: ViewStub
+    private val trackerAssignPanelStub: ViewStub by bindView(R.id.ui_tracker_assign_panel_stub)
     private var trackerAssignPanelContainer: View? = null
     private var trackerAssignPanel: TrackerAssignPanel? = null
 
-    private val bottomBar: LockableFrameLayout
+    private val bottomBar: LockableFrameLayout by bindView(R.id.ui_bottom_bar)
 
     private var collapsedHeight: Int = 0
     private var expandedHeight: Int = 0
@@ -106,45 +107,25 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
 
         errorMessages = ArrayList<String>()
 
-        toggleViewContainer = itemView.findViewById(R.id.ui_toggle_view_container) as ViewGroup
-
-        itemView.setOnClickListener(this)
-
-        triggerSwitch = itemView.findViewById(R.id.ui_trigger_switch) as SwitchCompat
-        triggerSwitch.setOnClickListener(this)
-
-        removeButton = itemView.findViewById(R.id.ui_button_remove) as AppCompatImageButton
-        removeButton.setOnClickListener(this)
-
-        expandToggleButton = itemView.findViewById(R.id.ui_button_expand_toggle) as AppCompatImageButton
-        expandToggleButton.setOnClickListener(this)
-
-        bottomBar = itemView.findViewById(R.id.ui_bottom_bar) as LockableFrameLayout
-        bottomBar.setOnClickListener(this)
-
-        typeIconView = itemView.findViewById(R.id.ui_type_icon) as AppCompatImageView
-        typeDescriptionView = itemView.findViewById(R.id.ui_type_description) as TextView
-        typeWappen = itemView.findViewById(R.id.ui_wappen_type)
-
-        configSummaryView = itemView.findViewById(R.id.ui_config_summary) as TextView
-        expandedView = itemView.findViewById(R.id.ui_expanded_view) as ViewGroup
-        controlPanelContainer = itemView.findViewById(R.id.ui_control_panel) as ViewGroup
-        collapsedView = itemView.findViewById(R.id.ui_collapsed_view) as ViewGroup
-
-        headerViewContainer = itemView.findViewById(R.id.ui_header_view_container) as ViewGroup
-
-        applyButtonGroup = itemView.findViewById(R.id.ui_apply_button_group) as ViewGroup
-        applyButton = itemView.findViewById(R.id.ui_button_apply)
-        applyButton.setOnClickListener(this)
-
-        cancelButton = itemView.findViewById(R.id.ui_button_cancel)
-        cancelButton.setOnClickListener(this)
-
-        attachedTrackerListStub = itemView.findViewById(R.id.ui_attached_tracker_list_stub) as ViewStub
-
-        trackerAssignPanelStub = itemView.findViewById(R.id.ui_tracker_assign_panel_stub) as ViewStub
+        attachOnClickListener()
 
         setIsExpanded(false, false)
+    }
+
+    private fun attachOnClickListener() {
+        itemView.setOnClickListener(this)
+
+        triggerSwitch.setOnClickListener(this)
+
+        removeButton.setOnClickListener(this)
+
+        expandToggleButton.setOnClickListener(this)
+
+        bottomBar.setOnClickListener(this)
+
+        applyButton.setOnClickListener(this)
+
+        cancelButton.setOnClickListener(this)
     }
 
     fun setIsExpanded(isExpanded: Boolean, animate: Boolean) {

@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import butterknife.bindView
 import kr.ac.snu.hcil.omnitrack.R
 
 /**
@@ -13,8 +14,8 @@ import kr.ac.snu.hcil.omnitrack.R
  */
 class AttributeConnectionViewSubHeader : LinearLayout {
 
-    private var iconView: ImageView
-    private var labelView: TextView
+    private val iconView: ImageView by bindView(R.id.ui_icon)
+    private val labelView: TextView by bindView(R.id.ui_label)
 
 
     constructor(context: Context) : super(context)
@@ -32,9 +33,6 @@ class AttributeConnectionViewSubHeader : LinearLayout {
 
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         inflater.inflate(R.layout.component_attribute_connection_subheader, this, true)
-
-        iconView = findViewById(R.id.ui_icon) as ImageView
-        labelView = findViewById(R.id.ui_label) as TextView
     }
 
     private fun init(context: Context, attrs: AttributeSet) {
