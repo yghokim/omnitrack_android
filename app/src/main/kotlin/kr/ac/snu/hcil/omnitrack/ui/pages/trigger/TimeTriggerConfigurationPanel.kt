@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import butterknife.bindView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTrigger
 import kr.ac.snu.hcil.omnitrack.ui.components.common.time.DateTimePicker
@@ -30,23 +31,22 @@ class TimeTriggerConfigurationPanel : LinearLayout, IEventListener<Int>, Compoun
 
     private val dateFormat: DateFormat
 
-    private val configTypePropertyView: ComboBoxPropertyView
-    private val intervalConfigGroup: ViewGroup
-    private val alarmConfigGroup: ViewGroup
+    private val configTypePropertyView: ComboBoxPropertyView by bindView(R.id.ui_time_trigger_type)
+    private val intervalConfigGroup: ViewGroup by bindView(R.id.ui_interval_group)
+    private val alarmConfigGroup: ViewGroup by bindView(R.id.ui_alarm_group)
+    private val durationPicker: DurationPicker by bindView(R.id.ui_duration_picker)
+    private val timePicker: DateTimePicker by bindView(R.id.ui_time_picker)
+    private val dayOfWeekPicker: DayOfWeekSelector by bindView(R.id.ui_day_of_week_selector)
 
-    private val durationPicker: DurationPicker
-    private val timePicker: DateTimePicker
-    private val dayOfWeekPicker: DayOfWeekSelector
+    private val timeSpanCheckBox: CheckBox by bindView(R.id.ui_checkbox_interval_use_timespan)
+    private val timeSpanPicker: HourRangePicker by bindView(R.id.ui_trigger_interval_timespan_picker)
 
-    private val timeSpanCheckBox: CheckBox
-    private val timeSpanPicker: HourRangePicker
+    private val isRepeatedView: BooleanPropertyView by bindView(R.id.ui_is_repeated)
 
-    private val isRepeatedView: BooleanPropertyView
+    private val isEndSpecifiedCheckBox: CheckBox by bindView(R.id.ui_checkbox_range_specify_end)
+    private val endDateButton: Button by bindView(R.id.ui_button_end_date)
 
-    private val isEndSpecifiedCheckBox: CheckBox
-    private val endDateButton: Button
-
-    private val repetitionConfigGroup: ViewGroup
+    private val repetitionConfigGroup: ViewGroup by bindView(R.id.ui_repetition_config_group)
 
     private val repeatEndDate: Calendar
 
@@ -82,8 +82,6 @@ class TimeTriggerConfigurationPanel : LinearLayout, IEventListener<Int>, Compoun
         dateFormat = SimpleDateFormat(resources.getString(R.string.dateformat_ymd))
         repeatEndDate = GregorianCalendar(2016, 1, 1)
 
-        configTypePropertyView = findViewById(R.id.ui_time_trigger_type) as ComboBoxPropertyView
-
         configTypePropertyView.adapter = IconNameEntryArrayAdapter(context,
                 arrayOf(
                         IconNameEntryArrayAdapter.Entry(OTTimeTrigger.configIconId(OTTimeTrigger.CONFIG_TYPE_ALARM),
@@ -94,36 +92,20 @@ class TimeTriggerConfigurationPanel : LinearLayout, IEventListener<Int>, Compoun
 
         configTypePropertyView.valueChanged += this
 
-        intervalConfigGroup = findViewById(R.id.ui_interval_group) as ViewGroup
-        alarmConfigGroup = findViewById(R.id.ui_alarm_group) as ViewGroup
-
-
-        durationPicker = findViewById(R.id.ui_duration_picker) as DurationPicker
-        timePicker = findViewById(R.id.ui_time_picker) as DateTimePicker
         timePicker.mode = DateTimePicker.MINUTE
         timePicker.isDayUsed = false
 
-        dayOfWeekPicker = findViewById(R.id.ui_day_of_week_selector) as DayOfWeekSelector
         dayOfWeekPicker.allowNoneSelection = false
 
-        timeSpanCheckBox = findViewById(R.id.ui_checkbox_interval_use_timespan) as CheckBox
         timeSpanCheckBox.setOnCheckedChangeListener(this)
-
-        timeSpanPicker = findViewById(R.id.ui_trigger_interval_timespan_picker) as HourRangePicker
-
-        repetitionConfigGroup = findViewById(R.id.ui_repetition_config_group) as ViewGroup
-
-        isRepeatedView = findViewById(R.id.ui_is_repeated) as BooleanPropertyView
 
         isRepeatedView.valueChanged += {
             sender, value ->
             applyIsRepeated(value, true)
         }
 
-        endDateButton = findViewById(R.id.ui_button_end_date) as Button
         InterfaceHelper.removeButtonTextDecoration(endDateButton)
         endDateButton.setOnClickListener(this)
-        isEndSpecifiedCheckBox = findViewById(R.id.ui_checkbox_range_specify_end) as CheckBox
         isEndSpecifiedCheckBox.setOnCheckedChangeListener(this)
 
         applyConfigMode(OTTimeTrigger.CONFIG_TYPE_ALARM, false)

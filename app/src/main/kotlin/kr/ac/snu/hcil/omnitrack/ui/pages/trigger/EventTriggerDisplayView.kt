@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
+import butterknife.bindView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.calculation.SingleNumericComparison
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
@@ -19,9 +20,9 @@ import java.text.DecimalFormat
  */
 class EventTriggerDisplayView: LinearLayout {
 
-    private val measureNameView: TextView
-    private val symbolView: AppCompatImageView
-    private val comparedNumberView: TextView
+    private val measureNameView: TextView by bindView(R.id.ui_measure_name)
+    private val symbolView: AppCompatImageView by bindView(R.id.ui_comparison_symbol)
+    private val comparedNumberView: TextView by bindView(R.id.ui_compared_number)
 
     val numberFormat = DecimalFormat("#,###.###")
 
@@ -33,10 +34,6 @@ class EventTriggerDisplayView: LinearLayout {
 
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         inflater.inflate(R.layout.trigger_display_event, this, true)
-
-        measureNameView = findViewById(R.id.ui_measure_name) as TextView
-        symbolView = findViewById(R.id.ui_comparison_symbol) as AppCompatImageView
-        comparedNumberView = findViewById(R.id.ui_compared_number) as TextView
     }
 
     fun setMeasureFactory(factory: OTMeasureFactory?)

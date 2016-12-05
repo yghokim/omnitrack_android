@@ -13,6 +13,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import butterknife.bindView
 import com.google.gson.JsonObject
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
@@ -68,7 +69,7 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
 
     private lateinit var builder: OTItemBuilder
 
-    private lateinit var attributeListView: RecyclerView
+    private val attributeListView: RecyclerView by bindView(R.id.ui_attribute_list)
     private val layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
 
     private val attributeValueExtractors = Hashtable<String, () -> Any>()
@@ -98,7 +99,6 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
         leftActionBarButton?.setImageResource(R.drawable.back_rhombus)
         rightActionBarButton?.setImageResource(R.drawable.done)
 
-        attributeListView = findViewById(R.id.ui_attribute_list) as RecyclerView
         attributeListView.layoutManager = layoutManager
         attributeListView.addItemDecoration(HorizontalImageDividerItemDecoration(R.drawable.horizontal_separator_pattern, this))
 
@@ -371,33 +371,24 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
 
         inner class ViewHolder(val inputView: AAttributeInputView<out Any>, frame: View) : RecyclerView.ViewHolder(frame) {
 
-            private val columnNameView: TextView
-            private val requiredMarker: View
-            private val attributeTypeView: TextView
+            private val columnNameView: TextView by bindView(R.id.ui_column_name)
+            private val requiredMarker: View by bindView(R.id.ui_required_marker)
+            private val attributeTypeView: TextView by bindView(R.id.ui_attribute_type)
 
-            private val container: LockableFrameLayout
+            private val container: LockableFrameLayout by bindView(R.id.ui_input_view_container)
 
-
-            private var timestampIndicator: TextView
+            private val timestampIndicator: TextView by bindView(R.id.ui_timestamp)
 
             private val connectionIndicatorStubProxy: ConnectionIndicatorStubProxy
 
-            private val loadingIndicatorInContainer: View
+            private val loadingIndicatorInContainer: View by bindView(R.id.ui_container_indicator)
 
             private var attributeId: String? = null
 
 
             init {
-                columnNameView = frame.findViewById(R.id.ui_column_name) as TextView
-                requiredMarker = frame.findViewById(R.id.ui_required_marker)
-                attributeTypeView = frame.findViewById(R.id.ui_attribute_type) as TextView
 
-                timestampIndicator = frame.findViewById(R.id.ui_timestamp) as TextView
-
-                container = frame.findViewById(R.id.ui_input_view_container) as LockableFrameLayout
                 container.addView(inputView, 0)
-
-                loadingIndicatorInContainer = frame.findViewById(R.id.ui_container_indicator)
 
                 inputView.valueChanged += {
                     sender, args ->

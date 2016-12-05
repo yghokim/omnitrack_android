@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.LinearLayout
+import butterknife.bindView
 import com.google.gson.JsonObject
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
@@ -28,14 +29,15 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
     var attribute: OTAttribute<out Any>? = null
 
 
-    private lateinit var propertyViewContainer: LinearLayout
+    private val propertyViewContainer: LinearLayout by bindView(R.id.ui_list)
 
-    private lateinit var columnNameView: ShortTextPropertyView
-    private lateinit var requiredView: BooleanPropertyView
+    private val columnNameView: ShortTextPropertyView by bindView(R.id.nameProperty)
 
-    private lateinit var connectionFrame: FrameLayout
-    private lateinit var newConnectionButton: Button
-    private lateinit var connectionView: AttributeConnectionView
+    private val requiredView: BooleanPropertyView by bindView(R.id.requiredProperty)
+
+    private val connectionFrame: FrameLayout by bindView(R.id.ui_attribute_connection_frame)
+    private val newConnectionButton: Button by bindView(R.id.ui_button_new_connection)
+    private val connectionView: AttributeConnectionView by  bindView(R.id.ui_attribute_connection)
 
     private var propertyViewHorizontalMargin: Int = 0
 
@@ -53,9 +55,6 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
         propertyViewHorizontalMargin = resources.getDimensionPixelSize(R.dimen.activity_horizontal_margin)
 
-        propertyViewContainer = findViewById(R.id.ui_list) as LinearLayout
-
-        columnNameView = findViewById(R.id.nameProperty) as ShortTextPropertyView
         columnNameView.addNewValidator(String.format(resources.getString(R.string.msg_format_cannot_be_blank), resources.getString(R.string.msg_column_name)), ShortTextPropertyView.NOT_EMPTY_VALIDATOR)
 
         columnNameView.valueChanged += {
@@ -64,14 +63,11 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
                 attribute?.name = value
         }
 
-        requiredView = findViewById(R.id.requiredProperty) as BooleanPropertyView
         requiredView.valueChanged += {
             sender, value ->
             attribute?.isRequired = value
         }
 
-        connectionFrame = findViewById(R.id.ui_attribute_connection_frame) as FrameLayout
-        connectionView = findViewById(R.id.ui_attribute_connection) as AttributeConnectionView
         connectionView.onRemoveButtonClicked += {
             sender, arg ->
             DialogHelper.makeYesNoDialogBuilder(this, "OmniTrack", resources.getString(R.string.msg_confirm_remove_connection), {
@@ -79,8 +75,6 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
                 refreshConnection(true)
             }).show()
         }
-
-        newConnectionButton = findViewById(R.id.ui_button_new_connection) as Button
 
         InterfaceHelper.removeButtonTextDecoration(newConnectionButton)
 
