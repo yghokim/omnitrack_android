@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import butterknife.bindView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
@@ -28,12 +29,10 @@ class AttributeConnectionView : LinearLayout, View.OnClickListener {
             }
         }
 
-    private val sourceView: TextView
-    private val queryViewGroup: View
-    private val queryView: TextView
-
-
-    private val removeButton: Button
+    private val sourceView: TextView by bindView(R.id.ui_source)
+    private val queryViewGroup: View by bindView(R.id.ui_group_time_query)
+    private val queryView: TextView by bindView(R.id.ui_query)
+    private val removeButton: Button by bindView(R.id.ui_button_remove)
 
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
@@ -44,14 +43,7 @@ class AttributeConnectionView : LinearLayout, View.OnClickListener {
 
         inflateContent(R.layout.component_attribute_connection, true)
 
-        sourceView = findViewById(R.id.ui_source) as TextView
-        queryView = findViewById(R.id.ui_query) as TextView
-
-        queryViewGroup = findViewById(R.id.ui_group_time_query)
-
-        removeButton = findViewById(R.id.ui_button_remove) as Button
         removeButton.setOnClickListener(this)
-
     }
 
 

@@ -12,6 +12,7 @@ import android.support.v4.view.ViewPager
 import android.support.v4.widget.DrawerLayout
 import android.view.Gravity
 import android.view.View
+import butterknife.bindView
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
@@ -25,7 +26,7 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home) {
     /**
      * The [ViewPager] that will host the section contents.
      */
-    private var mViewPager: ViewPager? = null
+    private val mViewPager: ViewPager by bindView(R.id.container)
 
     private lateinit var drawerLayout: DrawerLayout
 
@@ -42,8 +43,7 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home) {
         mSectionsPagerAdapter = SectionsPagerAdapter(supportFragmentManager)
 
         // Set up the ViewPager with the sections adapter.
-        mViewPager = findViewById(R.id.container) as ViewPager?
-        mViewPager!!.adapter = mSectionsPagerAdapter
+        mViewPager.adapter = mSectionsPagerAdapter
 
         val tabLayout = findViewById(R.id.tabs) as TabLayout?
         tabLayout!!.setupWithViewPager(mViewPager)
@@ -63,7 +63,7 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home) {
                 checkSelfPermission(it) != PackageManager.PERMISSION_GRANTED
             }.toTypedArray()
 
-            if (permissions.size > 0) {
+            if (permissions.isNotEmpty()) {
                 requestPermissions(permissions,
                         10)
             }

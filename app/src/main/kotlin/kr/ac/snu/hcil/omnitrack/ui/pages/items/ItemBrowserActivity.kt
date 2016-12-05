@@ -8,6 +8,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.*
 import android.widget.*
+import butterknife.bindView
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItem
@@ -38,22 +39,21 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
 
     private val items = ArrayList<OTItem>()
 
-    private lateinit var itemListView: RecyclerView
+    private val itemListView: RecyclerView by bindView(R.id.ui_item_list)
 
     private lateinit var itemListViewAdapter: ItemListViewAdapter
 
-    private lateinit var emptyListMessageView: TextView
+    private val emptyListMessageView: TextView by bindView(R.id.ui_empty_list_message)
 
-    private lateinit var sortSpinner: Spinner
+    private val sortSpinner: Spinner by bindView(R.id.ui_spinner_sort_method)
 
-    private lateinit var sortOrderButton: ToggleButton
+    private val sortOrderButton: ToggleButton by bindView(R.id.ui_toggle_sort_order)
 
     private var supportedItemComparators: List<ItemComparator>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        sortSpinner = findViewById(R.id.ui_spinner_sort_method) as Spinner
         sortSpinner.onItemSelectedListener = this
 
         rightActionBarButton?.visibility = View.VISIBLE
@@ -61,19 +61,14 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
         leftActionBarButton?.visibility = View.VISIBLE
         leftActionBarButton?.setImageResource(R.drawable.back_rhombus)
 
-        itemListView = findViewById(R.id.ui_item_list) as RecyclerView
-
         itemListView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         itemListView.addItemDecoration(HorizontalImageDividerItemDecoration(context = this))
         itemListView.addItemDecoration(DrawableListBottomSpaceItemDecoration(R.drawable.expanded_view_inner_shadow_top, 0))
-
-        emptyListMessageView = findViewById(R.id.ui_empty_list_message) as TextView
 
         itemListViewAdapter = ItemListViewAdapter()
 
         itemListView.adapter = itemListViewAdapter
 
-        sortOrderButton = findViewById(R.id.ui_toggle_sort_order) as ToggleButton
         sortOrderButton.setOnCheckedChangeListener { compoundButton, b ->
             if (b) {
                 sortOrderButton.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ascending, 0)
@@ -178,17 +173,17 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
 
         inner class ItemElementViewHolder(view: View) : RecyclerView.ViewHolder(view), View.OnClickListener, PopupMenu.OnMenuItemClickListener {
 
-            val colorBar: View
+            val colorBar: View by bindView(R.id.color_bar)
 
-            val monthView: TextView
-            val dayView: TextView
+            val monthView: TextView by bindView(R.id.ui_text_month)
+            val dayView: TextView by bindView(R.id.ui_text_day)
 
-            val valueListView: RecyclerView
+            val valueListView: RecyclerView by bindView(R.id.ui_list)
 
-            val moreButton: View
+            val moreButton: View by bindView(R.id.ui_button_more)
 
-            val sourceView: TextView
-            val loggingTimeView: TextView
+            val sourceView: TextView by bindView(R.id.ui_logging_source)
+            val loggingTimeView: TextView by bindView(R.id.ui_logging_time)
 
             val valueListAdapter: TableRowAdapter
 
@@ -202,26 +197,16 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                 leftBar.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
                 view.minimumHeight = leftBar.measuredHeight
 
-                colorBar = view.findViewById(R.id.color_bar)
                 /*
                 if(tracker!=null)
                     colorBar.setBackgroundColor(tracker!!.color)
 */
-                monthView = view.findViewById(R.id.ui_text_month) as TextView
-                dayView = view.findViewById(R.id.ui_text_day) as TextView
-
-                moreButton = view.findViewById(R.id.ui_button_more)
                 moreButton.setOnClickListener(this)
-
-                sourceView = view.findViewById(R.id.ui_logging_source) as TextView
-                loggingTimeView = view.findViewById(R.id.ui_logging_time) as TextView
 
                 itemMenu = PopupMenu(this@ItemBrowserActivity, moreButton, Gravity.TOP or Gravity.LEFT)
                 itemMenu.inflate(R.menu.menu_item_list_element)
                 itemMenu.setOnMenuItemClickListener(this)
 
-
-                valueListView = view.findViewById(R.id.ui_list) as RecyclerView
                 valueListView.layoutManager = LinearLayoutManager(this@ItemBrowserActivity, LinearLayoutManager.VERTICAL, false)
 
                 valueListView.addItemDecoration(HorizontalDividerItemDecoration(ContextCompat.getColor(this@ItemBrowserActivity, R.color.separator_Light), (1 * resources.displayMetrics.density).toInt()))
@@ -313,13 +298,11 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
 
                 inner open class TableRowViewHolder(val view: ViewGroup) : RecyclerView.ViewHolder(view) {
 
-                    val attributeNameView: TextView
+                    val attributeNameView: TextView by bindView(R.id.ui_attribute_name)
                     var valueView: View
 
 
                     init {
-                        attributeNameView = view.findViewById(R.id.ui_attribute_name) as TextView
-
                         valueView = view.findViewById(R.id.ui_value_view_replace)
                     }
 

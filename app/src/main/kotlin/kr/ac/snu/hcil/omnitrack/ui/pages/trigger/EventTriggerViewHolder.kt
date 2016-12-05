@@ -23,7 +23,7 @@ class EventTriggerViewHolder : ATriggerViewHolder<OTDataTrigger> {
 
     override fun getHeaderView(current: View?, trigger: OTDataTrigger): View {
 
-        val view = if (current is EventTriggerDisplayView) current else EventTriggerDisplayView(itemView.context)
+        val view = current as? EventTriggerDisplayView ?: EventTriggerDisplayView(itemView.context)
         view.setConditioner(trigger.conditioner as? SingleNumericComparison)
         view.setMeasureFactory(trigger.measure?.factory)
 

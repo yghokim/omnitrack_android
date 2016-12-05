@@ -13,6 +13,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
+import butterknife.bindView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.Ticker
 import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
@@ -40,19 +41,17 @@ class TimeTriggerDisplayView : LinearLayout {
         private var shownInstances = HashSet<TimeTriggerDisplayView>()
     }
 
+    private val mainView: TextView by bindView(R.id.value)
+    private val nextTriggerView: TextView by bindView(R.id.ui_next_trigger)
+
     init {
         orientation = VERTICAL
 
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         inflater.inflate(R.layout.trigger_display_time, this, true)
 
-        mainView = findViewById(R.id.value) as TextView
-        nextTriggerView = findViewById(R.id.ui_next_trigger) as TextView
         nextTriggerView.visibility = GONE
     }
-
-    private val mainView: TextView
-    private val nextTriggerView: TextView
 
     var nextTriggerTime: Long by Delegates.observable(0L) {
         prop, old, new ->

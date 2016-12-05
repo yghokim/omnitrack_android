@@ -14,6 +14,7 @@ import android.support.v4.graphics.ColorUtils
 import android.support.v4.view.ViewPager
 import android.view.View
 import at.markushi.ui.RevealColorView
+import butterknife.bindView
 import com.google.gson.JsonObject
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
@@ -47,12 +48,12 @@ class TrackerDetailActivity : OTTrackerAttachedActivity(R.layout.activity_tracke
 
     private var mSectionsPagerAdapter: SectionsPagerAdapter? = null
 
-    private lateinit var appBarRevealView: RevealColorView
+    private val appBarRevealView: RevealColorView by bindView(R.id.ui_appbar_reveal)
 
     /**
      * The [ViewPager] that will host the section contents.
      */
-    private lateinit var mViewPager: ViewPager
+    private val mViewPager: ViewPager by bindView(R.id.container)
 
     override fun onSessionLogContent(contentObject: JsonObject) {
         super.onSessionLogContent(contentObject)
@@ -65,14 +66,10 @@ class TrackerDetailActivity : OTTrackerAttachedActivity(R.layout.activity_tracke
         mSectionsPagerAdapter = SectionsPagerAdapter(supportFragmentManager)
 
         // Set up the ViewPager with the sections adapter.
-        mViewPager = findViewById(R.id.container) as ViewPager
         mViewPager.adapter = mSectionsPagerAdapter
 
         val tabLayout = findViewById(R.id.tabs) as TabLayout?
         tabLayout!!.setupWithViewPager(mViewPager)
-
-        appBarRevealView = findViewById(R.id.ui_appbar_reveal) as RevealColorView
-
 
         setActionBarButtonMode(Mode.Back)
         title = resources.getString(R.string.title_activity_tracker_edit)
