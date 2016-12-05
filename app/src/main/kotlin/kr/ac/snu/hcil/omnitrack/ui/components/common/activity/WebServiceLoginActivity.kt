@@ -18,10 +18,12 @@ open class WebServiceLoginActivity : AppCompatActivity(), View.OnClickListener {
     companion object {
 
         const val EXTRA_RESQUEST_URL = "requestUrl"
+        const val EXTRA_SERVICE_NAME = "serviceName"
 
-        fun makeIntent(url: String, context: Context, activityClass: Class<out WebServiceLoginActivity> = WebServiceLoginActivity::class.java): Intent {
+        fun makeIntent(url: String, serviceName: String, context: Context, activityClass: Class<out WebServiceLoginActivity> = WebServiceLoginActivity::class.java): Intent {
             val intent = Intent(context, activityClass)
             intent.putExtra(EXTRA_RESQUEST_URL, url)
+            intent.putExtra(EXTRA_SERVICE_NAME, serviceName)
             return intent
         }
     }
@@ -57,9 +59,13 @@ open class WebServiceLoginActivity : AppCompatActivity(), View.OnClickListener {
 
         if (intent.hasExtra(EXTRA_RESQUEST_URL)) {
             val url = intent.getStringExtra(EXTRA_RESQUEST_URL)
+            val serviceName = intent.getStringExtra(EXTRA_SERVICE_NAME)
+            titleView.text = String.format(resources.getString(R.string.msg_format_login_to), serviceName)
+
             webView.loadUrl(url)
         }
     }
+
 
     open fun onPageFinished(url: String) {
         println("webView finished - $url")
