@@ -15,7 +15,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical|left"
             android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:text="Login to " />
+            android:text="" />
 
         <android.support.v7.widget.AppCompatImageButton
             android:id="@+id/ui_button_cancel"

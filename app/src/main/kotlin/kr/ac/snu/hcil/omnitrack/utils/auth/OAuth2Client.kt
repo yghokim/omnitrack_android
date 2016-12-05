@@ -76,7 +76,7 @@ class OAuth2Client(val config: OAuth2Config, val activityRequestCode: Int) {
 
     private var resultHandler: OAuth2ResultListener? = null
 
-    fun authorize(activity: FragmentActivity, resultHandler: OAuth2ResultListener) {
+    fun authorize(activity: FragmentActivity, resultHandler: OAuth2ResultListener, serviceName: String? = null) {
         this.resultHandler = resultHandler
         val uri = HttpUrl.parse(config.authorizationUrl).newBuilder()
                 .addQueryParameter(AuthConstants.PARAM_CLIENT_ID, config.clientId)
@@ -86,7 +86,7 @@ class OAuth2Client(val config: OAuth2Config, val activityRequestCode: Int) {
                 .build()
 
         println(uri.toString())
-        activity.startActivityForResult(WebServiceLoginActivity.makeIntent(uri.toString(), activity), activityRequestCode)
+        activity.startActivityForResult(WebServiceLoginActivity.makeIntent(uri.toString(), serviceName ?: "Service", activity), activityRequestCode)
     }
 
     fun signOut(credential: Credential, resultHandler: (Boolean) -> Unit) {
