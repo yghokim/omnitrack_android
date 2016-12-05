@@ -110,6 +110,8 @@
     <string name="msg_connection_panel_time_query">쿼리 시간</string>
     <string name="msg_connection_panel_connected_with">연결된 모듈</string>
 
+    <string name="msg_format_login_to">%1$s에 로그인</string>
+
     <string name="msg_noti_tap_for_tracking_format">%1$s 아이템을 기록하려면 탭하세요.</string>
 
     <string name="msg_no_trackers_are_assigned">트래커가 등록되지 않았습니다.</string>

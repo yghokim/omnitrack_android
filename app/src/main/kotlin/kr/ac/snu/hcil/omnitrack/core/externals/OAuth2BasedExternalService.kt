@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.externals
 import android.content.Context
 import android.content.Intent
 import android.support.v4.app.FragmentActivity
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.utils.auth.OAuth2Client
 
 /**
@@ -27,7 +28,7 @@ abstract class OAuth2BasedExternalService(identifier: String, minimumSDK: Int) :
     abstract fun makeNewAuth2Client(requestCode: Int): OAuth2Client
 
     override fun onActivateAsync(context: Context, connectedHandler: ((Boolean) -> Unit)?) {
-        authClient.authorize(context as FragmentActivity, this)
+        authClient.authorize(context as FragmentActivity, this, OTApplication.getString(nameResourceId))
     }
 
     override fun onDeactivate() {

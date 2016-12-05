@@ -50,7 +50,7 @@ object MisfitApi {
                 .build()
 
         println(uri.toString())
-        activity.startActivityForResult(WebServiceLoginActivity.makeIntent(uri.toString(), activity), OTExternalService.requestCodeDict[MisfitService])
+        activity.startActivityForResult(WebServiceLoginActivity.makeIntent(uri.toString(), OTApplication.getString(R.string.service_misfit_name), activity), OTExternalService.requestCodeDict[MisfitService])
     }
 
     fun exchangeToToken(code: String, handler: (String?) -> Unit) {
