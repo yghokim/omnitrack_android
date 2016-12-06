@@ -19,6 +19,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AttributeSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTTrackerAttachedActivity
+import kr.ac.snu.hcil.omnitrack.ui.components.common.FallbackRecyclerView
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.DrawableListBottomSpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
@@ -39,7 +40,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
 
     private val items = ArrayList<OTItem>()
 
-    private val itemListView: RecyclerView by bindView(R.id.ui_item_list)
+    private val itemListView: FallbackRecyclerView by bindView(R.id.ui_item_list)
 
     private lateinit var itemListViewAdapter: ItemListViewAdapter
 
@@ -61,6 +62,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
         leftActionBarButton?.visibility = View.VISIBLE
         leftActionBarButton?.setImageResource(R.drawable.back_rhombus)
 
+        itemListView.emptyView = emptyListMessageView
         itemListView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         itemListView.addItemDecoration(HorizontalImageDividerItemDecoration(context = this))
         itemListView.addItemDecoration(DrawableListBottomSpaceItemDecoration(R.drawable.expanded_view_inner_shadow_top, 0))
@@ -141,8 +143,6 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
     }
 
     private fun onListChanged() {
-        emptyListMessageView.visibility = if (items.size != 0) View.GONE else View.VISIBLE
-
     }
 
     override fun onToolbarLeftButtonClicked() {

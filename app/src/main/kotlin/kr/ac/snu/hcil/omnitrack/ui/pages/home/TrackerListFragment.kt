@@ -35,6 +35,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.database.DatabaseHelper
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
+import kr.ac.snu.hcil.omnitrack.ui.components.common.FallbackRecyclerView
 import kr.ac.snu.hcil.omnitrack.ui.components.common.TooltipHelper
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.DrawableListBottomSpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
@@ -56,7 +57,9 @@ class TrackerListFragment : OTFragment() {
 
     private lateinit var user: OTUser
 
-    lateinit private var listView: RecyclerView
+    lateinit private var listView: FallbackRecyclerView
+
+    lateinit private var emptyMessageView: TextView
 
     lateinit private var trackerListAdapter: TrackerListAdapter
 
@@ -141,7 +144,9 @@ class TrackerListFragment : OTFragment() {
 
         }
 
-        listView = rootView.findViewById(R.id.ui_tracker_list_view) as RecyclerView
+        listView = rootView.findViewById(R.id.ui_tracker_list_view) as FallbackRecyclerView
+        emptyMessageView = rootView.findViewById(R.id.ui_empty_list_message) as TextView
+        listView.emptyView = emptyMessageView
         trackerListLayoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         listView.layoutManager = trackerListLayoutManager
         trackerListAdapter = TrackerListAdapter(user)

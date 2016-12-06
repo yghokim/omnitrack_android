@@ -19,6 +19,7 @@ class TrackerDetailReminderTabFragment : TrackerDetailActivity.ChildFragment() {
     init {
         core = object : ATriggerListFragmentCore(this) {
             override val triggerActionTypeName: Int = R.string.msg_text_reminder
+            override val emptyMessageId: Int = R.string.msg_reminder_empty
 
             override fun getTriggers(): Array<OTTrigger> {
                 return OTApplication.app.triggerManager.getAttachedTriggers(tracker, OTTrigger.ACTION_NOTIFICATION)
@@ -40,6 +41,11 @@ class TrackerDetailReminderTabFragment : TrackerDetailActivity.ChildFragment() {
         val rootView = core.onCreateView(inflater, container, savedInstanceState)
 
         return rootView
+    }
+
+    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        core.onViewCreated(view, savedInstanceState)
     }
 
 }
