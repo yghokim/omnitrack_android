@@ -17,7 +17,7 @@ class LoggingTriggerListFragment : OTFragment() {
     val core: ATriggerListFragmentCore
 
     init {
-        core = object : ATriggerListFragmentCore(this) {
+        core = object : ATriggerListFragmentCore(this@LoggingTriggerListFragment) {
             override val triggerActionTypeName: Int = R.string.msg_text_trigger
             override val emptyMessageId: Int = R.string.msg_trigger_empty
 
@@ -40,5 +40,10 @@ class LoggingTriggerListFragment : OTFragment() {
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         core.onViewCreated(view, savedInstanceState)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        core.onSaveInstanceState(outState)
     }
 }
