@@ -19,6 +19,7 @@ class LoggingTriggerListFragment : OTFragment() {
     init {
         core = object : ATriggerListFragmentCore(this) {
             override val triggerActionTypeName: Int = R.string.msg_text_trigger
+            override val emptyMessageId: Int = R.string.msg_trigger_empty
 
             override fun getTriggers(): Array<OTTrigger> {
                 return OTApplication.app.triggerManager.getTriggersOfAction(OTTrigger.ACTION_BACKGROUND_LOGGING)
@@ -34,5 +35,10 @@ class LoggingTriggerListFragment : OTFragment() {
         val rootView = core.onCreateView(inflater, container, savedInstanceState)
 
         return rootView
+    }
+
+    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        core.onViewCreated(view, savedInstanceState)
     }
 }

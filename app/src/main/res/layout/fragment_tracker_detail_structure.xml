@@ -37,31 +37,31 @@
                     android:id="@+id/nameProperty"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/msg_name"
                     android:paddingLeft="@dimen/activity_horizontal_margin"
-                    android:paddingRight="@dimen/activity_horizontal_margin" />
+                    android:paddingRight="@dimen/activity_horizontal_margin"
+                    android:text="@string/msg_name" />
 
                 <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ColorPalettePropertyView
                     android:id="@+id/colorProperty"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/msg_color"
                     android:paddingLeft="@dimen/activity_horizontal_margin"
-                    android:paddingRight="@dimen/activity_horizontal_margin" />
+                    android:paddingRight="@dimen/activity_horizontal_margin"
+                    android:text="@string/msg_color" />
 
                 <View style="@style/HorizontalSeparator.NoVerticalMargin"
-                    android:background="@color/separator.Light"
                     android:layout_marginLeft="@dimen/activity_horizontal_margin"
                     android:layout_marginRight="@dimen/activity_horizontal_margin"
+                    android:background="@color/separator.Light"
                     />
 
                 <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.BooleanPropertyView
                     android:id="@+id/isOnShortcutProperty"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/msg_show_on_shortcut"
                     android:paddingLeft="@dimen/activity_horizontal_margin"
                     android:paddingRight="@dimen/activity_horizontal_margin"
+                    android:text="@string/msg_show_on_shortcut"
                     />
 
             </LinearLayout>
@@ -83,12 +83,19 @@
                     android:paddingRight="@dimen/activity_horizontal_margin"
                     android:text="@string/msg_attributes" />
 
-                <android.support.v7.widget.RecyclerView
+                <kr.ac.snu.hcil.omnitrack.ui.components.common.FallbackRecyclerView
                     android:id="@+id/ui_attribute_list"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/expanded_view_inner_shadow_bottom"
                     android:paddingBottom="@dimen/activity_vertical_margin" />
+
+                <TextView
+                    android:id="@+id/ui_empty_list_message"
+                    style="@style/listEmptyMessage"
+                    android:layout_marginBottom="18dp"
+                    android:text="@string/msg_field_empty"
+                    android:textSize="14sp" />
 
             </LinearLayout>
 

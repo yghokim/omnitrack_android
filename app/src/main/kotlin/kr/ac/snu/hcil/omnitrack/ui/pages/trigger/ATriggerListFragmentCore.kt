@@ -10,10 +10,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
+import android.widget.TextView
 import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
+import kr.ac.snu.hcil.omnitrack.ui.components.common.FallbackRecyclerView
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.DrawableListBottomSpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
 
@@ -26,9 +28,11 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
     abstract fun getTriggers(): Array<OTTrigger>
     abstract val triggerActionTypeName: Int
 
+    protected abstract val emptyMessageId: Int
+
     private lateinit var adapter: Adapter
 
-    private lateinit var listView: RecyclerView
+    private lateinit var listView: FallbackRecyclerView
 
     private lateinit var newTriggerButton: FloatingActionButton
 
@@ -50,14 +54,16 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
     fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, @Suppress("UNUSED_PARAMETER") savedInstanceState: Bundle?): View {
         val rootView = inflater!!.inflate(R.layout.fragment_tracker_detail_triggers, container, false)
 
-        listView = rootView.findViewById(R.id.ui_trigger_list) as RecyclerView
+        listView = rootView.findViewById(R.id.ui_trigger_list) as FallbackRecyclerView
+        listView.emptyView = (rootView.findViewById(R.id.ui_empty_list_message) as TextView).apply {
+            setText(emptyMessageId)
+        }
 
         val layoutManager = LinearLayoutManager(parent.context, LinearLayoutManager.VERTICAL, false)
         //layoutManager.reverseLayout = true
 
         listView.layoutManager = layoutManager
-        adapter = Adapter()
-        listView.adapter = adapter
+
         //listView.addItemDecoration(HorizontalDividerItemDecoration(resources.getColor(R.color.dividerColor, null), resources.getDimensionPixelSize(R.dimen.trigger_list_element_divider_height)))
 
         listView.addItemDecoration(HorizontalImageDividerItemDecoration(context = parent.context))
@@ -72,6 +78,11 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
         }
 
         return rootView
+    }
+
+    fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+        adapter = Adapter()
+        listView.adapter = adapter
     }
 
     protected fun appendNewTrigger(trigger: OTTrigger) {
