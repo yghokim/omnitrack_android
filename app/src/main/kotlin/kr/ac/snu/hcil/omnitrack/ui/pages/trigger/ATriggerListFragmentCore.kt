@@ -24,6 +24,10 @@ import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDivider
  */
 abstract class ATriggerListFragmentCore(val parent: Fragment) {
 
+    companion object {
+        private const val STATE_EXPANDED_POSITION = "expandedTriggerPosition"
+    }
+
     abstract fun makeNewTriggerInstance(type: Int): OTTrigger
     abstract fun getTriggers(): Array<OTTrigger>
     abstract val triggerActionTypeName: Int
@@ -82,7 +86,13 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
 
     fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         adapter = Adapter()
+        expandedTriggerPosition = savedInstanceState?.getInt(STATE_EXPANDED_POSITION, -1) ?: -1
         listView.adapter = adapter
+
+    }
+
+    fun onSaveInstanceState(outState: Bundle) {
+        outState.putInt(STATE_EXPANDED_POSITION, expandedTriggerPosition)
     }
 
     protected fun appendNewTrigger(trigger: OTTrigger) {
@@ -108,6 +118,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
             holder.bind(getTriggers()[position])
             if (expandedTriggerPosition == position) {
                 holder.setIsExpanded(true, false)
+                expandedViewHolder = holder
             } else {
                 holder.setIsExpanded(false, false)
                 /*

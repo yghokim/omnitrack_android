@@ -94,6 +94,8 @@ class TrackerListFragment : OTFragment() {
         const val CHANGE_TRACKER_SETTINGS = 0
         const val REMOVE_TRACKER = 1
 
+        const val STATE_EXPANDED_TRACKER_INDEX = "expandedTrackerIndex"
+
         //val transition = AutoTransition()
         val transition = TransitionSet()
 
@@ -107,6 +109,11 @@ class TrackerListFragment : OTFragment() {
             transition.ordering = AutoTransition.ORDERING_TOGETHER
             transition.duration = 300
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt(STATE_EXPANDED_TRACKER_INDEX, trackerListAdapter.currentlyExpandedIndex)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -151,6 +158,8 @@ class TrackerListFragment : OTFragment() {
         listView.layoutManager = trackerListLayoutManager
         trackerListAdapter = TrackerListAdapter(user)
 
+        trackerListAdapter.currentlyExpandedIndex = savedInstanceState?.getInt(STATE_EXPANDED_TRACKER_INDEX, -1) ?: -1
+
         listView.adapter = trackerListAdapter
 
         listView.addItemDecoration(HorizontalImageDividerItemDecoration(R.drawable.horizontal_separator_pattern, context, resources.getFraction(R.fraction.tracker_list_separator_height_ratio, 1, 1)))
@@ -161,8 +170,6 @@ class TrackerListFragment : OTFragment() {
 
     override fun onPause() {
         super.onPause()
-
-        trackerListAdapter.currentlyExpandedIndex = -1
 
         context.unregisterReceiver(itemEventReceiver)
     }
@@ -391,6 +398,7 @@ class TrackerListFragment : OTFragment() {
                 }
 
                 if (currentlyExpandedIndex == adapterPosition) {
+                    lastExpandedViewHolder = this
                     expand(false)
                 } else {
                     collapse(false)
