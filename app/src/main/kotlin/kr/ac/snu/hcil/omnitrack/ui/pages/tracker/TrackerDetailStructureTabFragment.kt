@@ -10,6 +10,7 @@ import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
+import android.text.InputType
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -18,6 +19,8 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import butterknife.bindView
+import com.afollestad.materialdialogs.MaterialDialog
 import jp.wasabeef.recyclerview.animators.SlideInRightAnimator
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
@@ -288,21 +291,25 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
 
         inner class ViewHolder(val view: View) : RecyclerView.ViewHolder(view), View.OnClickListener, View.OnTouchListener {
 
-            private val previewContainer: LockableFrameLayout
-            private val columnNameView: TextView
-            private val typeIconView: AppCompatImageView
+            private val previewContainer: LockableFrameLayout by bindView(R.id.ui_preview_container)
+            private val columnNameView: TextView by bindView(R.id.ui_column_name)
+            private val typeIconView: AppCompatImageView by bindView(R.id.ui_attribute_type)
 
-            private val editButton: ImageButton
-            private val removeButton: ImageButton
+            private val editButton: ImageButton by bindView(R.id.ui_button_edit)
+            private val removeButton: ImageButton by bindView(R.id.ui_button_remove)
 
-            private val requiredMarker: View
+            private val requiredMarker: View by bindView(R.id.ui_required_marker)
 
-            private val draggableZone: View
+            private val draggableZone: View by bindView(R.id.ui_drag_handle)
+
+            private val columnNameButton: View by bindView(R.id.ui_column_name_button)
 
             private val connectionIndicatorStubProxy: ConnectionIndicatorStubProxy
 
             private var connectionIndicator: View? = null
             private var connectionSourceNameView: TextView? = null
+
+            private val columnNameChangeDialog: MaterialDialog.Builder
 
             var preview: AAttributeInputView<out Any>? = null
                 get
@@ -319,22 +326,21 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
 
             init {
 
-                previewContainer = view.findViewById(R.id.ui_preview_container) as LockableFrameLayout
                 previewContainer.locked = true
 
-                columnNameView = view.findViewById(R.id.ui_column_name) as TextView
-                typeIconView = view.findViewById(R.id.ui_attribute_type) as AppCompatImageView
-                editButton = view.findViewById(R.id.ui_button_edit) as ImageButton
-                removeButton = view.findViewById(R.id.ui_button_remove) as ImageButton
-                draggableZone = view.findViewById(R.id.ui_drag_handle)
-
                 connectionIndicatorStubProxy = ConnectionIndicatorStubProxy(view, R.id.ui_connection_indicator_stub)
-
-                requiredMarker = view.findViewById(R.id.ui_required_marker)
 
                 editButton.setOnClickListener(this)
                 removeButton.setOnClickListener(this)
                 draggableZone.setOnTouchListener(this)
+                columnNameButton.setOnClickListener(this)
+
+                columnNameChangeDialog = MaterialDialog.Builder(this.view.context)
+                        .title(R.string.msg_change_field_name)
+                        .inputType(InputType.TYPE_CLASS_TEXT)
+                        .inputRangeRes(1, 20, R.color.colorRed)
+                        .cancelable(true)
+                        .negativeText(R.string.msg_cancel)
             }
 
             override fun onClick(view: View) {
@@ -346,6 +352,15 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
                     tracker.attributes.remove(tracker.attributes[adapterPosition])
                     notifyItemRemoved(adapterPosition)
                     showRemovalSnackbar()
+                } else if (view === columnNameButton) {
+                    columnNameChangeDialog
+                            .input(null, tracker.attributes[adapterPosition].name, false) {
+                                dialog, input ->
+                                if (tracker.attributes[adapterPosition].name.compareTo(input.toString()) != 0) {
+                                    tracker.attributes[adapterPosition].name = input.toString()
+                                    attributeListAdapter.notifyItemChanged(adapterPosition)
+                                }
+                            }.show()
                 }
             }
 
@@ -386,7 +401,7 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
-        if (grantResults.filter { it != PackageManager.PERMISSION_GRANTED }.size == 0) {
+        if (grantResults.filter { it != PackageManager.PERMISSION_GRANTED }.isEmpty()) {
             //granted
             if (permissionWaitingTypeInfo != null) {
                 addNewAttribute(permissionWaitingTypeInfo!!)
@@ -394,7 +409,6 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
             }
         }
     }
-
 
     inner class GridAdapter() : RecyclerView.Adapter<GridAdapter.ViewHolder>() {
 

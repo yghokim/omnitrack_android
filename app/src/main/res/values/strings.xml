@@ -35,6 +35,7 @@
     <string name="msg_reminder_empty">No reminders yet.\nAdd a reminder to notice you not to forget tracking.</string>
     <string name="msg_field_empty">Currently this tracker contains no fields.\nIt will log timestamp only.</string>
 
+    <string name="msg_change_field_name">Change field name</string>
 
     <string name="msg_ok">Okay</string>
     <string name="msg_apply">Apply</string>
