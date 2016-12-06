@@ -24,6 +24,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.AttributePresetInfo
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.ui.DragItemTouchHelperCallback
+import kr.ac.snu.hcil.omnitrack.ui.components.common.FallbackRecyclerView
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.SpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
@@ -46,7 +47,7 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
 
     lateinit private var rootScrollView: NestedScrollView
 
-    lateinit private var attributeListView: RecyclerView
+    lateinit private var attributeListView: FallbackRecyclerView
     lateinit private var attributeListAdapter: AttributeListAdapter
 
     lateinit private var attributeListItemTouchHelper: ItemTouchHelper
@@ -101,7 +102,8 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
             }
         }
 
-        attributeListView = rootView.findViewById(R.id.ui_attribute_list) as RecyclerView
+        attributeListView = rootView.findViewById(R.id.ui_attribute_list) as FallbackRecyclerView
+        attributeListView.emptyView = rootView.findViewById(R.id.ui_empty_list_message)
         val layoutManager = object : LinearLayoutManager(context, VERTICAL, false) {
             override fun canScrollVertically(): Boolean {
                 return false
@@ -124,12 +126,6 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
         attributeListView.itemAnimator = SlideInRightAnimator()
         attributeListView.addItemDecoration(SpaceItemDecoration(LinearLayoutManager.VERTICAL, resources.getDimensionPixelOffset(R.dimen.attribute_list_element_vertical_space)))
 
-        attributeListAdapter = AttributeListAdapter()
-
-        attributeListView.adapter = attributeListAdapter
-
-        attributeListItemTouchHelper = ItemTouchHelper(DragItemTouchHelperCallback(attributeListAdapter, context, true, false))
-        attributeListItemTouchHelper.attachToRecyclerView(attributeListView)
 
         newAttributeGrid = rootView.findViewById(R.id.ui_new_attribute_grid) as RecyclerView
         newAttributeGrid.layoutManager = GridLayoutManager(context, resources.getInteger(R.integer.new_attribute_panel_horizontal_count))
@@ -153,6 +149,14 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        attributeListAdapter = AttributeListAdapter()
+
+        attributeListView.adapter = attributeListAdapter
+
+        attributeListItemTouchHelper = ItemTouchHelper(DragItemTouchHelperCallback(attributeListAdapter, context, true, false))
+        attributeListItemTouchHelper.attachToRecyclerView(attributeListView)
+
         refresh()
     }
 

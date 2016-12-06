@@ -3,11 +3,15 @@
     android:layout_height="match_parent"
     android:background="@color/outerBackground">
 
-    <android.support.v7.widget.RecyclerView
+    <kr.ac.snu.hcil.omnitrack.ui.components.common.FallbackRecyclerView
             android:id="@+id/ui_tracker_list_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            ></android.support.v7.widget.RecyclerView>
+        android:layout_height="match_parent" />
+
+    <TextView
+        android:id="@+id/ui_empty_list_message"
+        style="@style/listEmptyMessage"
+        android:text="@string/msg_tracker_empty" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
