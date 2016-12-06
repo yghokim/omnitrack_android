@@ -17,7 +17,7 @@ class TrackerDetailReminderTabFragment : TrackerDetailActivity.ChildFragment() {
     val core: ATriggerListFragmentCore
 
     init {
-        core = object : ATriggerListFragmentCore(this) {
+        core = object : ATriggerListFragmentCore(this@TrackerDetailReminderTabFragment) {
             override val triggerActionTypeName: Int = R.string.msg_text_reminder
             override val emptyMessageId: Int = R.string.msg_reminder_empty
 
@@ -35,6 +35,11 @@ class TrackerDetailReminderTabFragment : TrackerDetailActivity.ChildFragment() {
                 super.appendNewTrigger(newTrigger)
             }
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        core.onSaveInstanceState(outState)
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
