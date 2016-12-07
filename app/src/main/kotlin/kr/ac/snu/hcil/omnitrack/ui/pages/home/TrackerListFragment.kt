@@ -28,12 +28,15 @@ import android.view.animation.DecelerateInterpolator
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
+import com.afollestad.materialdialogs.MaterialDialog
 import it.sephiroth.android.library.tooltip.Tooltip
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.database.DatabaseHelper
+import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.common.FallbackRecyclerView
 import kr.ac.snu.hcil.omnitrack.ui.components.common.TooltipHelper
@@ -72,6 +75,18 @@ class TrackerListFragment : OTFragment() {
     private lateinit var dateColorSpan: ForegroundColorSpan
 
     private lateinit var timeStyleSpan: StyleSpan
+
+    private val emptyTrackerDialog: MaterialDialog.Builder by lazy {
+        MaterialDialog.Builder(context)
+                .cancelable(true)
+                .positiveColorRes(R.color.colorPointed)
+                .negativeColorRes(R.color.colorRed_Light)
+                .title("OmniTrack")
+                .content(R.string.msg_confirm_empty_tracker_log)
+                .positiveText(R.string.msg_confirm_log)
+                .negativeText(R.string.msg_cancel)
+                .neutralText(R.string.msg_go_to_add_field)
+    }
 
     private val collapsedHeight = OTApplication.app.resources.getDimensionPixelSize(R.dimen.tracker_list_element_collapsed_height)
     private val expandedHeight = OTApplication.app.resources.getDimensionPixelSize(R.dimen.tracker_list_element_expanded_height)
@@ -190,7 +205,18 @@ class TrackerListFragment : OTFragment() {
     }*/
 
     private fun handleTrackerClick(tracker: OTTracker) {
-        startActivityOnDelay(ItemEditingActivity.makeIntent(tracker.objectId, context))
+        if (tracker.attributes.size == 0) {
+            emptyTrackerDialog
+                    .onPositive { materialDialog, dialogAction ->
+                        OTBackgroundLoggingService.startLoggingAsync(context, tracker, OTItem.LoggingSource.Manual, notify = false)
+                    }
+                    .onNeutral { materialDialog, dialogAction ->
+                        startActivity(TrackerDetailActivity.makeIntent(tracker.objectId, context))
+                    }
+                    .show()
+        } else {
+            startActivityOnDelay(ItemEditingActivity.makeIntent(tracker.objectId, context))
+        }
     }
 
     private fun handleTrackerLongClick(tracker: OTTracker) {
