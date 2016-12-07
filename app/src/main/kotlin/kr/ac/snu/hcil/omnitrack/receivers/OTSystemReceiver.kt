@@ -9,6 +9,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.DatabaseHelper
 import kr.ac.snu.hcil.omnitrack.core.system.OTAmbientShortcutManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTDataTriggerManager
+import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
 
 /**
  * Created by Young-Ho Kim on 16. 7. 28
@@ -52,7 +53,8 @@ class OTSystemReceiver : BroadcastReceiver() {
                 val tracker = OTApplication.app.currentUser[intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)]
                 if (tracker != null) {
                     val itemDbId = intent.getLongExtra(OTApplication.INTENT_EXTRA_DB_ID_ITEM, -1)
-                    if (itemDbId != -1L) {
+                    val notify = intent.getBooleanExtra(OTBackgroundLoggingService.INTENT_EXTRA_NOTIFY, true)
+                    if (itemDbId != -1L && notify) {
                         OTNotificationManager.pushBackgroundLoggingSuccessNotification(context, tracker, itemDbId, System.currentTimeMillis())
                     }
                 }

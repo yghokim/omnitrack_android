@@ -7,6 +7,7 @@ import android.util.AttributeSet
 import android.widget.EditText
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.utils.EnterHideKeyboardEditorActionListener
 
 /**
  * Created by Young-Ho Kim on 2016-08-01.
@@ -25,6 +26,8 @@ abstract class ACharSequenceAttributeInputView(layoutId: Int, context: Context, 
     init {
         valueView = findViewById(R.id.value) as EditText
         valueView.addTextChangedListener(Watcher())
+
+        EnterHideKeyboardEditorActionListener(valueView)
     }
 
     override fun focus() {

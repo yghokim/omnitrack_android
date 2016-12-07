@@ -6,6 +6,7 @@ import android.text.TextWatcher
 import android.util.AttributeSet
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.utils.EnterHideKeyboardEditorActionListener
 
 /**
  * Created by Young-Ho Kim on 2016-07-13.
@@ -42,6 +43,8 @@ class ShortTextPropertyView(context: Context, attrs: AttributeSet?) : APropertyV
                 onValueChanged(s.toString())
             }
         })
+
+        EnterHideKeyboardEditorActionListener(valueView)
     }
 
     override fun focus() {
