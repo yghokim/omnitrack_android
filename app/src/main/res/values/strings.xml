@@ -56,7 +56,7 @@
     <string name="msg_tab_tracker_detail_reminders">Reminders</string>
 
     <string name="msg_edit">Edit</string>
-    <string name="msg_data_list">Data List</string>
+    <string name="msg_data_list">Item List</string>
     <string name="msg_remove">Remove</string>
 
     <string name="msg_sort_descending">Descending</string>

@@ -2,7 +2,6 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:bottom="-1dp"
-        android:gravity="top"
         android:left="-1dp"
         android:right="-1dp"
 
