@@ -4,6 +4,7 @@
     <string name="msg_external_service_element_supported_measures">Supported Measures</string>
     <string name="msg_sentence_field_already_connected_to_measure">Already contains %1$s connected</string>
 
+    <string name="msg_external_service_activation_requires_internet">Activation requires the internet connection.</string>
 
     <!-- microsoft band -->
     <string name="service_microsoft_band_name">Microsoft Band</string>

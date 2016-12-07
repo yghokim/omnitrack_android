@@ -14,10 +14,13 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import com.afollestad.materialdialogs.MaterialDialog
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
+import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
+import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
 
 /**
  * Created by Young-Ho on 7/29/2016.
@@ -29,6 +32,10 @@ class ServiceListFragment : OTFragment() {
     private lateinit var adapter: Adapter
 
     private val pendedActivations = SparseArray<Adapter.ViewHolder>()
+
+    private val internetRequiredAlertBuilder: MaterialDialog.Builder by lazy {
+        DialogHelper.makeSimpleAlertBuilder(context, context.getString(R.string.msg_external_service_activation_requires_internet))
+    }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -143,18 +150,22 @@ class ServiceListFragment : OTFragment() {
 
                         }
                         OTExternalService.ServiceState.DEACTIVATED -> {
-                            holderState = OTExternalService.ServiceState.ACTIVATING
-
-                            if (!service.permissionGranted) {
-                                pendedActivations.setValueAt(adapterPosition, this@ViewHolder)
-                                service.grantPermissions(this@ServiceListFragment, adapterPosition)
+                            if (service.isInternetRequiredForActivation && !NetworkHelper.isConnectedToInternet()) {
+                                internetRequiredAlertBuilder.show()
                             } else {
-                                service.activateAsync(context) {
-                                    success ->
-                                    if (success) {
-                                        holderState = OTExternalService.ServiceState.ACTIVATED
-                                    } else {
-                                        holderState = OTExternalService.ServiceState.DEACTIVATED
+                                holderState = OTExternalService.ServiceState.ACTIVATING
+
+                                if (!service.permissionGranted) {
+                                    pendedActivations.setValueAt(adapterPosition, this@ViewHolder)
+                                    service.grantPermissions(this@ServiceListFragment, adapterPosition)
+                                } else {
+                                    service.activateAsync(context) {
+                                        success ->
+                                        if (success) {
+                                            holderState = OTExternalService.ServiceState.ACTIVATED
+                                        } else {
+                                            holderState = OTExternalService.ServiceState.DEACTIVATED
+                                        }
                                     }
                                 }
                             }

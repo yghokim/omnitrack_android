@@ -9,10 +9,8 @@ import android.support.v4.app.Fragment
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.externals.fitbit.FitbitService
 import kr.ac.snu.hcil.omnitrack.core.externals.google.fit.GoogleFitService
-import kr.ac.snu.hcil.omnitrack.core.externals.microsoft.band.MicrosoftBandService
 import kr.ac.snu.hcil.omnitrack.core.externals.misfit.MisfitService
 import kr.ac.snu.hcil.omnitrack.core.externals.rescuetime.RescueTimeService
-import kr.ac.snu.hcil.omnitrack.core.externals.shaomi.miband.MiBandService
 import kr.ac.snu.hcil.omnitrack.utils.FillingIntegerIdReservationTable
 import kr.ac.snu.hcil.omnitrack.utils.INameDescriptionResourceProvider
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
@@ -39,8 +37,8 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
                     ,FitbitService
                     ,MisfitService
                     ,RescueTimeService
-                    ,MicrosoftBandService
-                    ,MiBandService
+                    //,MicrosoftBandService
+                    //,MiBandService
             )
         }
 
@@ -95,6 +93,8 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
     enum class ServiceState {
         DEACTIVATED, ACTIVATING, ACTIVATED
     }
+
+    open val isInternetRequiredForActivation = true
 
     open val permissionGranted: Boolean
         get() {
@@ -190,7 +190,5 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
         } else handleActivityActivationResultOk(resultData)
     }
 
-
     abstract fun handleActivityActivationResultOk(resultData: Intent?)
-
 }
