@@ -24,7 +24,9 @@ import com.badoo.mobile.util.WeakHandler
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
+import kr.ac.snu.hcil.omnitrack.ui.components.common.ValidatedSwitch
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
+import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 import java.util.*
 
@@ -33,7 +35,7 @@ import java.util.*
  */
 abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener: ITriggerControlListener, context: Context) :
         RecyclerView.ViewHolder(LayoutInflater.from(context).inflate(R.layout.trigger_list_element, parent, false))
-        , View.OnClickListener {
+        , View.OnClickListener, ValidatedSwitch.IValidationListener {
 
     interface ITriggerControlListener {
         fun onTriggerRemove(position: Int)
@@ -50,7 +52,7 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
     var isExpanded: Boolean = true
         private set
 
-    private val triggerSwitch: SwitchCompat by bindView(R.id.ui_trigger_switch)
+    private val triggerSwitch: ValidatedSwitch by bindView(R.id.ui_trigger_switch)
 
     private val removeButton: AppCompatImageButton by bindView(R.id.ui_button_remove)
     private val expandToggleButton: AppCompatImageButton by bindView(R.id.ui_button_expand_toggle)
@@ -65,7 +67,7 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
     private val expandedView: ViewGroup by bindView(R.id.ui_expanded_view)
     private val controlPanelContainer: ViewGroup by bindView(R.id.ui_control_panel)
     private val collapsedView: ViewGroup by bindView(R.id.ui_collapsed_view)
-    private val headerViewContainer: ViewGroup by bindView(R.id.ui_header_view_container)
+    protected val headerViewContainer: ViewGroup by bindView(R.id.ui_header_view_container)
 
     private val applyButtonGroup: ViewGroup by bindView(R.id.ui_apply_button_group)
     private val applyButton: View by bindView(R.id.ui_button_apply)
@@ -74,6 +76,8 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
     private var attachedTrackerListView: View? = null
     private var attachedTrackerList: ViewGroup? = null
     private var attachedTrackerNoTrackerFallbackView: View? = null
+
+    private var currentAlertAnimation: ValueAnimator? = null
 
     private val attachedTrackerListStub: ViewStub by bindView(R.id.ui_attached_tracker_list_stub)
 
@@ -102,20 +106,32 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
         }
     }
 
+    private val triggerOnValidator: () -> Boolean = {
+        validateTriggerSwitchOn()
+    }
+
+    protected open fun validateTriggerSwitchOn(): Boolean {
+        return if (trackerAssignPanelContainer != null) {
+            trigger.trackers.isNotEmpty()
+        } else true
+    }
 
     init {
 
         errorMessages = ArrayList<String>()
 
-        attachOnClickListener()
+        triggerSwitch.switchOnValidator = triggerOnValidator
+
+        attachListener()
 
         setIsExpanded(false, false)
     }
 
-    private fun attachOnClickListener() {
+    private fun attachListener() {
         itemView.setOnClickListener(this)
 
         triggerSwitch.setOnClickListener(this)
+        triggerSwitch.addValidationListener(this)
 
         removeButton.setOnClickListener(this)
 
@@ -130,6 +146,10 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
 
     fun setIsExpanded(isExpanded: Boolean, animate: Boolean) {
         if (this.isExpanded != isExpanded) {
+
+            currentAlertAnimation?.cancel()
+            currentAlertAnimation = null
+
             if (!isFirstBinding)
                 applyTriggerStateToView()
 
@@ -316,6 +336,8 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
 
         this.trigger = trigger as T
 
+        currentAlertAnimation?.cancel()
+        currentAlertAnimation = null
 
         this.trigger.run {
             switchTurned += onTriggerSwitchTurned
@@ -409,6 +431,31 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
     protected abstract fun getConfigSummary(trigger: T): CharSequence
 
     protected abstract fun validateExpandedViewInputs(expandedView: View, errorMessagesOut: MutableList<String>): Boolean
+
+    override fun onValidationFailed(switch: SwitchCompat, on: Boolean) {
+        if (switch === triggerSwitch && on == true) {
+            onSwitchOnValidationFailed()
+        }
+    }
+
+    protected open fun getViewsForSwitchValidationFailedAlert(): Array<View>? {
+        return if (attachedTrackerNoTrackerFallbackView != null) {
+            arrayOf(attachedTrackerNoTrackerFallbackView!!)
+        } else null
+    }
+
+    protected fun onSwitchOnValidationFailed() {
+        val alertViews = getViewsForSwitchValidationFailedAlert()
+        if (alertViews != null) {
+            currentAlertAnimation?.cancel()
+
+            currentAlertAnimation = InterfaceHelper.alertBackground(alertViews)
+            currentAlertAnimation?.start()
+        }
+    }
+
+    override fun onValidationSucceeded(switch: SwitchCompat, on: Boolean) {
+    }
 
     override fun onClick(view: View?) {
 

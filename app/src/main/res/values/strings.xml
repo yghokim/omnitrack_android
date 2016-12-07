@@ -26,6 +26,13 @@
 
     <string name="msg_yes">Yes</string>
     <string name="msg_no">No</string>
+
+    <string name="msg_confirm_log">Log Item</string>
+
+    <string name="msg_go_to_add_field">Go to edit tracker</string>
+
+    <string name="msg_confirm_empty_tracker_log">This tracker has no fields. Do you want to log present time only?</string>
+
     <string name="msg_confirm_remove_tracker">Remove this tracker?</string>
 
     <string name="msg_confirm_remove_connection">Disconnect with the external source?</string>
