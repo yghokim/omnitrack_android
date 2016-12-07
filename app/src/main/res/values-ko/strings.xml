@@ -13,10 +13,16 @@
 
     <string name="msg_yes">예</string>
     <string name="msg_no">아니오</string>
+
+    <string name="msg_confirm_log">아이템 기록</string>
+
+    <string name="msg_confirm_empty_tracker_log">이 트래커에는 필드가 없습니다. 현재 시각만을 기록하시겠습니까?</string>
+
     <string name="msg_confirm_remove_tracker">이 트래커를 삭제하시겠습니까?</string>
 
     <string name="msg_confirm_remove_connection">이 값으로부터 연결을 끊겠습니까?</string>
 
+    <string name="msg_go_to_add_field">트래커 수정하기</string>
 
     <string name="msg_ok">확인</string>
     <string name="msg_apply">적용</string>
