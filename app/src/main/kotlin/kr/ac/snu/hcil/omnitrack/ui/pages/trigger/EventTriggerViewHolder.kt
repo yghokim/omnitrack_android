@@ -9,9 +9,12 @@ import kr.ac.snu.hcil.omnitrack.core.triggers.OTDataTrigger
 /**
  * Created by younghokim on 16. 9. 5..
  */
-class EventTriggerViewHolder : ATriggerViewHolder<OTDataTrigger> {
+class EventTriggerViewHolder(parent: ViewGroup, listener: ITriggerControlListener, context: Context) : ATriggerViewHolder<OTDataTrigger>(parent, listener, context) {
 
-    constructor(parent: ViewGroup, listener: ITriggerControlListener, context: Context) : super(parent, listener, context)
+    override fun validateTriggerSwitchOn(): Boolean {
+        println("validation: ${trigger.measure} , ${trigger.conditioner}")
+        return super.validateTriggerSwitchOn() && trigger.measure != null && trigger.conditioner != null
+    }
 
     override fun getConfigSummary(trigger: OTDataTrigger): CharSequence {
         if (trigger.measure == null || trigger.conditioner == null) {
@@ -52,4 +55,18 @@ class EventTriggerViewHolder : ATriggerViewHolder<OTDataTrigger> {
         return true
     }
 
+    override fun getViewsForSwitchValidationFailedAlert(): Array<View>? {
+        val superValue = super.getViewsForSwitchValidationFailedAlert()
+
+        val childValue = if (trigger.measure == null || trigger.conditioner == null) {
+            arrayOf(headerViewContainer as View)
+        } else null
+
+        return if (superValue != null && childValue != null) superValue + childValue
+        else if (superValue != null && childValue == null) {
+            superValue
+        } else if (childValue != null && superValue == null) {
+            childValue
+        } else null
+    }
 }
