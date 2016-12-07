@@ -4,6 +4,7 @@
     <string name="msg_external_service_element_supported_measures">지원되는 측정 모듈</string>
     <string name="msg_sentence_field_already_connected_to_measure">이미 %1$s 측정 모듈이 연결되어 있습니다.</string>
 
+    <string name="msg_external_service_activation_requires_internet">서비스 활성화를 위해서는 인터넷 연결이 필요합니다.</string>
 
     <!-- microsoft band -->
     <string name="service_microsoft_band_name">Microsoft Band</string>
