@@ -14,9 +14,9 @@
     <item
         android:bottom="0dp"
         android:gravity="bottom"
-        android:left="-1dp"
-        android:right="-1dp"
-        android:top="-1dp">
+        android:left="-2dp"
+        android:right="-2dp"
+        android:top="-2dp">
         <shape android:shape="rectangle">
             <solid android:color="@color/transparent" />
             <stroke
