@@ -36,7 +36,7 @@
     <string name="msg_tab_tracker_detail_reminders">리마인더</string>
 
     <string name="msg_edit">수정</string>
-    <string name="msg_data_list">아이템 리스트</string>
+    <string name="msg_data_list">리스트</string>
     <string name="msg_remove">삭제</string>
 
     <string name="msg_sort_descending">내림차순</string>
