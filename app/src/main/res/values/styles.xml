@@ -117,7 +117,8 @@
         <item name="android:lines">1</item>
         <item name="android:paddingTop">12dp</item>
         <item name="android:paddingBottom">12dp</item>
-
+        <item name="android:paddingLeft">6dp</item>
+        <item name="android:paddingRight">6dp</item>
     </style>
 
     <style name="LongTextInputStyle">
@@ -135,6 +136,8 @@
         <item name="android:minLines">3</item>
         <item name="android:paddingTop">12dp</item>
         <item name="android:paddingBottom">12dp</item>
+        <item name="android:paddingLeft">6dp</item>
+        <item name="android:paddingRight">6dp</item>
 
     </style>
 
