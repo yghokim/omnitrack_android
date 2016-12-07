@@ -15,6 +15,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="8dp"
         android:background="@drawable/text_field_singleline"
+        android:imeOptions="actionDone"
         android:inputType="textShortMessage"
         android:maxLines="1"
         android:selectAllOnFocus="true" />
