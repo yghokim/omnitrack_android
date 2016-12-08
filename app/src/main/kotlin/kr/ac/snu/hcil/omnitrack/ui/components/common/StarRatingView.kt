@@ -1,9 +1,11 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.common
 
 import android.content.Context
+import android.graphics.PointF
 import android.graphics.drawable.Drawable
 import android.support.v4.content.ContextCompat
 import android.util.AttributeSet
+import android.view.GestureDetector
 import android.view.MotionEvent
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
@@ -12,7 +14,15 @@ import kotlin.properties.Delegates
 /**
  * Created by Young-Ho Kim on 2016-09-06.
  */
-class StarRatingView : HorizontalLinearDrawableView {
+class StarRatingView : HorizontalLinearDrawableView, GestureDetector.OnGestureListener {
+
+    private val moveAmount: PointF = PointF()
+
+    private val touchSlop = 30
+
+    private var touchDownX = 0f
+
+    private val gestureDetector: GestureDetector
 
     var isLightMode: Boolean by Delegates.observable(false) {
         prop, old, new ->
@@ -55,13 +65,16 @@ class StarRatingView : HorizontalLinearDrawableView {
 
     init {
         adapter = starAdapter
+
+        gestureDetector = GestureDetector(context, this)
+
     }
 
     private fun refresh() {
         invalidate()
     }
 
-
+/*
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
 
         if (!isLightMode) {
@@ -72,23 +85,35 @@ class StarRatingView : HorizontalLinearDrawableView {
             }
         }
         return super.dispatchTouchEvent(event)
-    }
+    }*/
 
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
+        gestureDetector.onTouchEvent(event)
         if (adapter != null && !isLightMode) {
 
             if (event.action == MotionEvent.ACTION_DOWN) {
-                dragging = true
-                handleTouchEvent(event)
-
+                touchDownX = event.x
                 return true
             } else if (event.action == MotionEvent.ACTION_MOVE) {
 
-                handleTouchEvent(event)
+                if (dragging) {
+                    handleTouchEvent(event)
+                } else {
+                    val x = event.x
+                    if (Math.abs(x - touchDownX) > touchSlop) {
+                        dragging = true
+                        if (!isLightMode) {
+                            parent.requestDisallowInterceptTouchEvent(true)
+                        }
+                    }
+                }
+
                 return true
-            } else if (event.action == MotionEvent.ACTION_UP) {
+            } else if (event.action == MotionEvent.ACTION_UP || event.action == MotionEvent.ACTION_CANCEL) {
                 dragging = false
+                moveAmount.x = 0f
+                moveAmount.y = 0f
                 return true
             }
         }
@@ -114,6 +139,30 @@ class StarRatingView : HorizontalLinearDrawableView {
                 }
             }
         }
+    }
+
+
+    override fun onSingleTapUp(p0: MotionEvent): Boolean {
+        handleTouchEvent(p0)
+        return true
+    }
+
+    override fun onDown(p0: MotionEvent?): Boolean {
+        return true
+    }
+
+    override fun onFling(p0: MotionEvent?, p1: MotionEvent?, p2: Float, p3: Float): Boolean {
+        return true
+    }
+
+    override fun onScroll(e1: MotionEvent?, e2: MotionEvent?, distanceX: Float, distanceY: Float): Boolean {
+        return true
+    }
+
+    override fun onShowPress(p0: MotionEvent?) {
+    }
+
+    override fun onLongPress(p0: MotionEvent?) {
     }
 
     private fun discreteFraction(fraction: Float): Float {
