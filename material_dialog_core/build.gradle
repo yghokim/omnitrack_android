@@ -34,4 +34,3 @@ dependencies {
     compile "me.zhanghai.android.materialprogressbar:library:1.3.0"
 }
 
-apply from: 'https://raw.githubusercontent.com/afollestad/aidanfollestad.com/master/android-lib-release.gradle'
