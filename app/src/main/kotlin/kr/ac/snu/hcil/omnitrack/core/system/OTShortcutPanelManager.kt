@@ -21,11 +21,15 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemEditingActivity
 /**
  * Created by Young-Ho Kim on 9/4/2016
  */
-object OTAmbientShortcutManager {
+object OTShortcutPanelManager {
 
     const val NOTIFICATION_ID = 200000
 
     const val MAX_NUM_SHORTCUTS = 5
+
+    private val notificationManager: NotificationManager by lazy {
+        (OTApplication.app.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
+    }
 
     private fun buildNewNotificationShortcutViews(context: Context, bigStyle: Boolean): RemoteViews
     {
@@ -83,23 +87,30 @@ object OTAmbientShortcutManager {
     }
 
     fun refreshNotificationShortcutViews(context: Context = OTApplication.app) {
-        val bigView = buildNewNotificationShortcutViews(context, true)
-        val normalView = buildNewNotificationShortcutViews(context, false)
 
-        val noti = NotificationCompat.Builder(context)
-                .setSmallIcon(R.drawable.icon_simple_white)
-                .setContentTitle(context.resources.getString(R.string.app_name))
-                .setCustomBigContentView(bigView)
-                .setCustomContentView(normalView)
-                .setVisibility(Notification.VISIBILITY_PUBLIC)
-                .setAutoCancel(false)
-                .setOngoing(true)
-                .setStyle(android.support.v4.app.NotificationCompat.BigTextStyle())
-                .setPriority(Notification.PRIORITY_MAX)
-                .build()
+        val trackers = OTApplication.app.currentUser.getTrackersOnShortcut()
+        if (trackers.isNotEmpty()) {
+            val bigView = buildNewNotificationShortcutViews(context, true)
+            val normalView = buildNewNotificationShortcutViews(context, false)
 
-        (context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
-                .notify(NOTIFICATION_ID, noti)
+            val noti = NotificationCompat.Builder(context)
+                    .setSmallIcon(R.drawable.icon_simple_white)
+                    .setContentTitle(context.resources.getString(R.string.app_name))
+                    .setCustomBigContentView(bigView)
+                    .setCustomContentView(normalView)
+                    .setVisibility(Notification.VISIBILITY_PUBLIC)
+                    .setAutoCancel(false)
+                    .setOngoing(true)
+                    .setStyle(android.support.v4.app.NotificationCompat.BigTextStyle())
+                    .setPriority(Notification.PRIORITY_MAX)
+                    .build()
+
+            notificationManager
+                    .notify(NOTIFICATION_ID, noti)
+        } else {
+            //dismiss notification
+            notificationManager.cancel(NOTIFICATION_ID)
+        }
     }
 
 

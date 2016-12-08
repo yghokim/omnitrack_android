@@ -19,7 +19,7 @@ import kr.ac.snu.hcil.omnitrack.core.externals.fitbit.FitbitRecentSleepTimeMeasu
 import kr.ac.snu.hcil.omnitrack.core.externals.fitbit.FitbitStepCountMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.externals.google.fit.GoogleFitStepsFactory
 import kr.ac.snu.hcil.omnitrack.core.externals.misfit.MisfitStepMeasureFactory
-import kr.ac.snu.hcil.omnitrack.core.system.OTAmbientShortcutManager
+import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTriggerAlarmManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerManager
 import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
@@ -155,7 +155,7 @@ class OTApplication : MultiDexApplication() {
         }
 
         for (tracker in currentUser.getTrackersOnShortcut()) {
-            OTAmbientShortcutManager += tracker
+            OTShortcutPanelManager += tracker
         }
 
         //handle failed background logging
