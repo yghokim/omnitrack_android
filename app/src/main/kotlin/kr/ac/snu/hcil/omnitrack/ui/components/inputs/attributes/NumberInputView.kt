@@ -61,6 +61,8 @@ class NumberInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
                 valueStatic.visibility = GONE
                 valueField.visibility = VISIBLE
                 valueField.requestFocus()
+                val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.showSoftInput(valueField, InputMethodManager.SHOW_IMPLICIT)
             } else {
 
                 val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager

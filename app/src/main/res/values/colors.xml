@@ -11,6 +11,8 @@
 
     <color name="colorAccent">#ff8940</color>
 
+    <color name="colorAccent.Background.Light">#f7f3ec</color>
+
     <color name="buttonIconColorDark">#757575</color>
 
     <color name="cardHeader">#efefef</color>
