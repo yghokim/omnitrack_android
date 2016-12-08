@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.tracker
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.support.design.widget.CoordinatorLayout
 import android.support.design.widget.Snackbar
 import android.support.v4.widget.NestedScrollView
 import android.support.v7.widget.AppCompatImageView
@@ -135,7 +136,8 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
         newAttributeGrid.adapter = GridAdapter()
 
 
-        removalSnackbar = Snackbar.make(rootView, resources.getText(R.string.msg_attribute_removed_message), Snackbar.LENGTH_LONG)
+        val snackBarContainer: CoordinatorLayout = rootView.findViewById(R.id.ui_snackbar_container) as CoordinatorLayout
+        removalSnackbar = Snackbar.make(snackBarContainer, resources.getText(R.string.msg_attribute_removed_message), Snackbar.LENGTH_LONG)
         removalSnackbar.setAction(resources.getText(R.string.msg_undo)) {
             view ->
             attributeListAdapter.undoRemove()
