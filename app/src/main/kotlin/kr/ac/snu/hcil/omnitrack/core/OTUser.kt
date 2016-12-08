@@ -5,6 +5,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.database.NamedObject
+import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.utils.DefaultNameGenerator
 import kr.ac.snu.hcil.omnitrack.utils.ObservableList
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
@@ -148,6 +149,13 @@ class OTUser(objectId: String?, dbId: Long?, name: String, email: String, attrib
 
         if (tracker.isOnShortcut) {
             tracker.isOnShortcut = false
+        }
+
+        //TODO currently, reminders are assigned to tracker so should be removed.
+        val reminders = OTApplication.app.triggerManager.getAttachedTriggers(tracker, OTTrigger.ACTION_NOTIFICATION)
+        for (reminder in reminders) {
+            reminder.isOn = false
+            OTApplication.app.triggerManager.removeTrigger(reminder)
         }
     }
 
