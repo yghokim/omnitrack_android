@@ -268,7 +268,7 @@ class OTTimeTrigger : OTTrigger {
         onConfigChanged()
     }
 
-    var rangeVariables: Int by ObservableMapDelegate(0, properties) {
+    var rangeVariables: Int by ObservableMapDelegate(Range.makeConfig(Range.DAYS_OF_WEEK_FLAGS_MASK), properties) {
         isDirtySinceLastSync = true
         onRangeChanged()
     }
@@ -279,7 +279,7 @@ class OTTimeTrigger : OTTrigger {
     }
     var configVariables: Int by configVariablesDelegate
 
-    private val isRepeatedDelegate = ObservableMapDelegate<OTTimeTrigger, Int>(0, properties) {
+    private val isRepeatedDelegate = ObservableMapDelegate<OTTimeTrigger, Int>(1, properties) {
         isDirtySinceLastSync = true
         onRangeChanged()
     }
