@@ -145,6 +145,10 @@ class OTUser(objectId: String?, dbId: Long?, name: String, email: String, attrib
             _removedTrackerIds.add(tracker.dbId as Long)
 
         trackerRemoved.invoke(this, ReadOnlyPair(tracker, index))
+
+        if (tracker.isOnShortcut) {
+            tracker.isOnShortcut = false
+        }
     }
 
     fun findAttributeByObjectId(id: String): OTAttribute<out Any>? {
