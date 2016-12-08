@@ -8,6 +8,12 @@
     <string name="type_timepoint_name">Time Point</string>
     <string name="type_timepoint_desc">A specific time point</string>
 
+    <string name="type_timepoint_time_name">Time</string>
+    <string name="type_timepoint_time_desc">A specific time point</string>
+
+    <string name="type_timepoint_date_name">Date</string>
+    <string name="type_timepoint_date_desc">A specific date</string>
+
     <string name="type_longtext_name">Long Text</string>
     <string name="type_longtext_desc">A multiline text</string>
 
