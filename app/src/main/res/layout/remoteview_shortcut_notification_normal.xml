@@ -5,6 +5,6 @@
     android:layout_height="match_parent"
     android:divider="@drawable/left_separator_light"
     android:dividerPadding="8dp"
-    android:minHeight="64dp"
+    android:minHeight="96dp"
     android:orientation="horizontal"
     android:showDividers="middle" />
