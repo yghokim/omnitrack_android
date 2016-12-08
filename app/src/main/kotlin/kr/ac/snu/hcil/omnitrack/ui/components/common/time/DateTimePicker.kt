@@ -217,9 +217,10 @@ class DateTimePicker(context: Context, attrs: AttributeSet? = null) : FrameLayou
     }
 
 
-    fun setToCurrent() {
+    fun setToPresent() {
         calendar = Calendar.getInstance()
         refresh()
+        timeChanged.invoke(this, time)
     }
 
     fun setTime(hour: Int, minute: Int, amPm: Int) {
