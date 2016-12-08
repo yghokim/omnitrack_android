@@ -26,7 +26,7 @@
     <string name="type_number_name">숫자</string>
     <string name="type_number_desc">An integer or real number with unit</string>
 
-    <string name="type_image_name">이미지</string>
+    <string name="type_image_name">사진</string>
     <string name="type_image_desc">A 2-dimensional image</string>
 
     <string name="type_choice_name">선택지</string>
