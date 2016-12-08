@@ -8,6 +8,12 @@
     <string name="type_timepoint_name">특정 시각</string>
     <string name="type_timepoint_desc">A specific time point</string>
 
+    <string name="type_timepoint_time_name">시각</string>
+    <string name="type_timepoint_time_desc">특정 시각</string>
+
+    <string name="type_timepoint_date_name">날짜</string>
+    <string name="type_timepoint_date_desc">특정 날짜</string>
+
     <string name="type_longtext_name">긴 텍스트</string>
     <string name="type_longtext_desc">A multiline text</string>
 
