@@ -101,6 +101,8 @@ class OTTimeAttribute(objectId: String?, dbId: Long?, columnName: String, isRequ
                 GRANULARITY_SECOND -> inputView.setPickerMode(DateTimePicker.SECOND)
             }
 
+            inputView.value = TimePoint()
+
             /*
             getAutoCompleteValueAsync { result ->
                 inputView.value = result
