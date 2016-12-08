@@ -104,7 +104,7 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
 
         attributeListView.adapter = attributeListAdapter
 
-        builderRestoredSnackbar = Snackbar.make(findViewById(R.id.ui_root), resources.getText(R.string.msg_builder_restored), Snackbar.LENGTH_INDEFINITE)
+        builderRestoredSnackbar = Snackbar.make(findViewById(R.id.ui_snackbar_container), resources.getText(R.string.msg_builder_restored), Snackbar.LENGTH_INDEFINITE)
         builderRestoredSnackbar.setAction(resources.getText(R.string.msg_discard)) {
             view ->
             builder = OTItemBuilder(tracker!!, OTItemBuilder.MODE_FOREGROUND)
