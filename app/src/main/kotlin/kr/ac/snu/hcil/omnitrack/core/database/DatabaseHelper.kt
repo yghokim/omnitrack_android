@@ -179,12 +179,12 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         } else return null
     }
 
-    fun findTriggersOfUser(userId: Long): List<OTTrigger>? {
-        val query: Cursor = readableDatabase.query(TriggerScheme.tableName, TriggerScheme.columnNames, "${TriggerScheme.USER_ID}=?", arrayOf(userId.toString()), null, null, "${TriggerScheme.POSITION} ASC")
+    fun findTriggersOfUser(user: OTUser): List<OTTrigger>? {
+        val query: Cursor = readableDatabase.query(TriggerScheme.tableName, TriggerScheme.columnNames, "${TriggerScheme.USER_ID}=?", arrayOf(user.dbId.toString()), null, null, "${TriggerScheme.POSITION} ASC")
         if (query.moveToFirst()) {
             val result = ArrayList<OTTrigger>()
             do {
-                result.add(extractTriggerEntity(query))
+                result.add(extractTriggerEntity(query, user))
             } while (query.moveToNext())
 
             query.close()
@@ -193,7 +193,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
 
     }
 
-    fun extractTriggerEntity(cursor: Cursor): OTTrigger {
+    fun extractTriggerEntity(cursor: Cursor, user: OTUser): OTTrigger {
         val id = cursor.getLong(cursor.getColumnIndex(TriggerScheme._ID))
         val name = cursor.getString(cursor.getColumnIndex(TriggerScheme.NAME))
         val objectId = cursor.getString(cursor.getColumnIndex(TriggerScheme.OBJECT_ID))
@@ -206,7 +206,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
 
         val lastTriggeredTime = cursor.getLong(cursor.getColumnIndex(TriggerScheme.LAST_TRIGGERED_TIME))
 
-        val trigger =  OTTrigger.makeInstance(objectId, id, type, name, Gson().fromJson(trackerObjectIds, Array<String>::class.java), isOn, action, lastTriggeredTime, serializedProperties)
+        val trigger = OTTrigger.makeInstance(objectId, id, type, user, name, Gson().fromJson(trackerObjectIds, Array<String>::class.java), isOn, action, lastTriggeredTime, serializedProperties)
         trigger.isDirtySinceLastSync = false
         return trigger
     }
@@ -389,6 +389,12 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         for (child in user.trackers.iterator().withIndex()) {
             save(child.value, child.index)
         }
+
+        for (triggerEntry in user.triggerManager.withIndex()) {
+            save(triggerEntry.value, user, triggerEntry.index)
+        }
+        deleteObjects(DatabaseHelper.TriggerScheme, *user.triggerManager.fetchRemovedTriggerIds())
+
         writableDatabase.setTransactionSuccessful()
         writableDatabase.endTransaction()
     }

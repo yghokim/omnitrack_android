@@ -6,6 +6,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.database.NamedObject
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
+import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerManager
 import kr.ac.snu.hcil.omnitrack.utils.DefaultNameGenerator
 import kr.ac.snu.hcil.omnitrack.utils.ObservableList
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
@@ -27,7 +28,6 @@ class OTUser(objectId: String?, dbId: Long?, name: String, email: String, attrib
             }
         }
 
-
     val email: String by Delegates.observable(email) {
         prop, old, new ->
         if (old != new) {
@@ -36,6 +36,9 @@ class OTUser(objectId: String?, dbId: Long?, name: String, email: String, attrib
     }
 
     val trackers = ObservableList<OTTracker>()
+
+
+    val triggerManager: OTTriggerManager
 
     private val _removedTrackerIds = ArrayList<Long>()
     fun fetchRemovedTrackerIds(): LongArray {
@@ -65,6 +68,8 @@ class OTUser(objectId: String?, dbId: Long?, name: String, email: String, attrib
             }
         }
 
+        triggerManager = OTTriggerManager(this, OTApplication.app.dbHelper.findTriggersOfUser(this))
+
         trackers.elementAdded += { sender, args ->
             onTrackerAdded(args.first, args.second)
         }
@@ -92,7 +97,7 @@ class OTUser(objectId: String?, dbId: Long?, name: String, email: String, attrib
     }*/
 
     fun newTrackerWithDefaultName(context: Context, add: Boolean): OTTracker {
-        return newTracker(OTApplication.app.currentUser.generateNewTrackerName(context), add)
+        return newTracker(this.generateNewTrackerName(context), add)
     }
 
     fun newTracker(name: String, add: Boolean): OTTracker {
@@ -105,7 +110,7 @@ class OTUser(objectId: String?, dbId: Long?, name: String, email: String, attrib
             } == null
         }
 
-        tracker.color = if (unOccupied.size > 0) {
+        tracker.color = if (unOccupied.isNotEmpty()) {
             unOccupied.first()
         } else {
             OTApplication.app.colorPalette.first()
@@ -152,10 +157,10 @@ class OTUser(objectId: String?, dbId: Long?, name: String, email: String, attrib
         }
 
         //TODO currently, reminders are assigned to tracker so should be removed.
-        val reminders = OTApplication.app.triggerManager.getAttachedTriggers(tracker, OTTrigger.ACTION_NOTIFICATION)
+        val reminders = triggerManager.getAttachedTriggers(tracker, OTTrigger.ACTION_NOTIFICATION)
         for (reminder in reminders) {
             reminder.isOn = false
-            OTApplication.app.triggerManager.removeTrigger(reminder)
+            triggerManager.removeTrigger(reminder)
         }
     }
 
@@ -179,6 +184,6 @@ class OTUser(objectId: String?, dbId: Long?, name: String, email: String, attrib
     }
 
     fun generateNewTrackerName(context: Context): String {
-        return DefaultNameGenerator.generateName("${context.resources.getString(R.string.msg_new_tracker_prefix)}", trackers.unObservedList.map { it.name })
+        return DefaultNameGenerator.generateName(context.resources.getString(R.string.msg_new_tracker_prefix), trackers.unObservedList.map { it.name })
     }
 }

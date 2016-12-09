@@ -50,6 +50,7 @@ import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 import kr.ac.snu.hcil.omnitrack.utils.startActivityOnDelay
+import rx.subscriptions.CompositeSubscription
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -59,14 +60,17 @@ import java.util.*
 class TrackerListFragment : OTFragment() {
 
     private lateinit var user: OTUser
+    private var userLoaded: Boolean = false
 
     lateinit private var listView: FallbackRecyclerView
 
     lateinit private var emptyMessageView: TextView
 
-    lateinit private var trackerListAdapter: TrackerListAdapter
+    private lateinit var trackerListAdapter: TrackerListAdapter
 
     lateinit private var trackerListLayoutManager: LinearLayoutManager
+
+    private lateinit var addTrackerFloatingButton: FloatingActionButton
 
     private lateinit var lastLoggedTimeFormat: SimpleDateFormat
 
@@ -105,6 +109,10 @@ class TrackerListFragment : OTFragment() {
         filter
     }
 
+    private val onCreateSubscriptions: CompositeSubscription = CompositeSubscription()
+    private val resumeSubscriptions: CompositeSubscription = CompositeSubscription()
+
+
     companion object {
         const val CHANGE_TRACKER_SETTINGS = 0
         const val REMOVE_TRACKER = 1
@@ -128,13 +136,11 @@ class TrackerListFragment : OTFragment() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putInt(STATE_EXPANDED_TRACKER_INDEX, trackerListAdapter.currentlyExpandedIndex)
+        outState.putInt(STATE_EXPANDED_TRACKER_INDEX, trackerListAdapter?.currentlyExpandedIndex ?: -1)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        user = OTApplication.app.currentUser
 
         lastLoggedTimeFormat = SimpleDateFormat(context.resources.getString(R.string.msg_tracker_list_time_format))
         dateStyleSpan = StyleSpan(Typeface.NORMAL)
@@ -144,25 +150,36 @@ class TrackerListFragment : OTFragment() {
         //attach events
         // user.trackerAdded += onTrackerAddedHandler
         //  user.trackerRemoved += onTrackerRemovedHandler
+
+        onCreateSubscriptions.add(
+                OTApplication.app.currentUserObservable.subscribe {
+                    user ->
+                    this.user = user
+                    userLoaded = true
+                    trackerListAdapter.notifyDataSetChanged()
+                })
     }
 
     override fun onResume() {
         super.onResume()
-        trackerListAdapter.notifyDataSetChanged()
+
         context.registerReceiver(itemEventReceiver, itemEventIntentFilter)
+        trackerListAdapter.notifyDataSetChanged()
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val rootView = inflater!!.inflate(R.layout.fragment_home_trackers, container, false)
 
-        val fab = rootView.findViewById(R.id.fab) as FloatingActionButton?
-        fab!!.setOnClickListener { view ->
-            val newTracker = OTApplication.app.currentUser.newTrackerWithDefaultName(context, true)
+        addTrackerFloatingButton = rootView.findViewById(R.id.fab) as FloatingActionButton
+        addTrackerFloatingButton.setOnClickListener { view ->
+            if (userLoaded) {
+                val newTracker = user.newTrackerWithDefaultName(context, true)
 
-            startActivityOnDelay(TrackerDetailActivity.makeIntent(newTracker.objectId, context))
-            Toast.makeText(context,
-                    String.format(resources.getString(R.string.sentence_new_tracker_added), newTracker.name), Toast.LENGTH_LONG).show()
+                startActivityOnDelay(TrackerDetailActivity.makeIntent(newTracker.objectId, context))
+                Toast.makeText(context,
+                        String.format(resources.getString(R.string.sentence_new_tracker_added), newTracker.name), Toast.LENGTH_LONG).show()
+            }
 
         }
 
@@ -171,21 +188,29 @@ class TrackerListFragment : OTFragment() {
         listView.emptyView = emptyMessageView
         trackerListLayoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         listView.layoutManager = trackerListLayoutManager
-        trackerListAdapter = TrackerListAdapter(user)
-
-        trackerListAdapter.currentlyExpandedIndex = savedInstanceState?.getInt(STATE_EXPANDED_TRACKER_INDEX, -1) ?: -1
-
-        listView.adapter = trackerListAdapter
 
         listView.addItemDecoration(HorizontalImageDividerItemDecoration(R.drawable.horizontal_separator_pattern, context, resources.getFraction(R.fraction.tracker_list_separator_height_ratio, 1, 1)))
         listView.addItemDecoration(DrawableListBottomSpaceItemDecoration(R.drawable.expanded_view_inner_shadow_top, resources.getDimensionPixelSize(R.dimen.tracker_list_bottom_space)))
 
+        trackerListAdapter = TrackerListAdapter()
+        trackerListAdapter.currentlyExpandedIndex = savedInstanceState?.getInt(STATE_EXPANDED_TRACKER_INDEX, -1) ?: -1
+        listView.adapter = trackerListAdapter
+
         return rootView
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        onCreateSubscriptions.unsubscribe()
     }
 
     override fun onPause() {
         super.onPause()
-
+        resumeSubscriptions.unsubscribe()
         context.unregisterReceiver(itemEventReceiver)
     }
 
@@ -239,7 +264,7 @@ class TrackerListFragment : OTFragment() {
     }
 
 
-    inner class TrackerListAdapter(val user: OTUser) : RecyclerView.Adapter<TrackerListAdapter.ViewHolder>() {
+    inner class TrackerListAdapter() : RecyclerView.Adapter<TrackerListAdapter.ViewHolder>() {
 
         var currentlyExpandedIndex = -1
         private var lastExpandedViewHolder: ViewHolder? = null
@@ -257,7 +282,7 @@ class TrackerListFragment : OTFragment() {
         }
 
         override fun getItemCount(): Int {
-            return user.trackers.size
+            return if (userLoaded) user.trackers.size else 0
         }
 
         override fun getItemId(position: Int): Long {
@@ -533,8 +558,11 @@ class TrackerListFragment : OTFragment() {
 
     inner class ItemEventReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            val trackerPosition = user.trackers.indexOf(user[intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)]!!)
-            trackerListAdapter.notifyItemChanged(trackerPosition)
+            if (userLoaded) {
+                val trackerPosition = user.trackers.indexOf(user[intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)]!!)
+                println("tracker changed = $trackerPosition")
+                trackerListAdapter.notifyItemChanged(trackerPosition)
+            }
         }
 
     }

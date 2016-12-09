@@ -77,7 +77,7 @@ object OTDataTriggerManager {
     fun checkMeasures(@Suppress("UNUSED_PARAMETER") context: Context) {
         println("checking measures for event triggers...")
 
-        val triggersToCheck = OTApplication.app.triggerManager.getFilteredTriggers { it is OTDataTrigger && it.isOn == true }.map { it as OTDataTrigger }.toTypedArray()
+        val triggersToCheck = OTApplication.app.currentUser.triggerManager.getFilteredTriggers { it is OTDataTrigger && it.isOn == true }.map { it as OTDataTrigger }.toTypedArray()
 
         batch?.cancel(true)
 

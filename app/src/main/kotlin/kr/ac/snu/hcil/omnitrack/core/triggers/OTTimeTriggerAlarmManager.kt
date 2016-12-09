@@ -5,17 +5,19 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
 import kr.ac.snu.hcil.omnitrack.receivers.TimeTriggerAlarmReceiver
 import kr.ac.snu.hcil.omnitrack.utils.FillingIntegerIdReservationTable
 import kr.ac.snu.hcil.omnitrack.utils.TimeKeyValueSetTable
+import rx.Observable
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Created by younghokim on 16. 8. 29..
  */
-class OTTimeTriggerAlarmManager {
+class OTTimeTriggerAlarmManager() {
     companion object {
 
         const val TAG = "TimeTriggerAlarmManager"
@@ -35,10 +37,10 @@ class OTTimeTriggerAlarmManager {
         const val INTENT_EXTRA_TRIGGER_TIME = "triggerTime"
         const val INTENT_EXTRA_ALARM_ID = "alarmId"
 
-        private fun makeIntent(context: Context, triggerTime: Long, alarmId: Int): PendingIntent {
+        private fun makeIntent(context: Context, user: OTUser, triggerTime: Long, alarmId: Int): PendingIntent {
             val intent = Intent(context, TimeTriggerAlarmReceiver::class.java)
             intent.action = OTApplication.BROADCAST_ACTION_TIME_TRIGGER_ALARM
-            intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_USER, OTApplication.app.currentUser.objectId)
+            intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_USER, user.objectId)
             intent.putExtra(INTENT_EXTRA_ALARM_ID, alarmId)
             intent.putExtra(INTENT_EXTRA_TRIGGER_TIME, triggerTime)
             return PendingIntent.getBroadcast(context, alarmId, intent, PendingIntent.FLAG_CANCEL_CURRENT)
@@ -194,9 +196,9 @@ class OTTimeTriggerAlarmManager {
             println("new alarm is needed for timestamp ${result.first}. alarmId is $alarmId")
 
             if (android.os.Build.VERSION.SDK_INT >= 23) {
-                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, result.first, makeIntent(OTApplication.app, result.first, alarmId))
+                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, result.first, makeIntent(OTApplication.app, trigger.user, result.first, alarmId))
             } else {
-                alarmManager.setExact(AlarmManager.RTC_WAKEUP, result.first, makeIntent(OTApplication.app, result.first, alarmId))
+                alarmManager.setExact(AlarmManager.RTC_WAKEUP, result.first, makeIntent(OTApplication.app, trigger.user, result.first, alarmId))
             }
 
             OTApplication.logger.writeSystemLog("Set new system alarm at ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(result.first))}", TAG)
@@ -214,7 +216,7 @@ class OTTimeTriggerAlarmManager {
             if (reservationTable.removeValueAndCheckIsTimestampEmpty(reservedTime, trigger.objectId)) {
                 val alarmId = idTable[reservedTime]
 
-                val pendingIntent = makeIntent(OTApplication.app, reservedTime, alarmId)
+                val pendingIntent = makeIntent(OTApplication.app, trigger.user, reservedTime, alarmId)
                 alarmManager.cancel(pendingIntent)
                 pendingIntent.cancel()
 
@@ -232,23 +234,24 @@ class OTTimeTriggerAlarmManager {
         }
     }
 
-    fun notifyAlarmFiredAndGetTriggers(alarmId: Int, intentTriggerTime: Long, reallyFiredAt: Long): List<OTTrigger>? {
+    fun notifyAlarmFiredAndGetTriggersSync(user: OTUser, alarmId: Int, intentTriggerTime: Long, reallyFiredAt: Long): List<OTTrigger>? {
+
         println("alarm fired - id: $alarmId, delayed: ${reallyFiredAt - intentTriggerTime}")
 
-        OTApplication.logger.writeSystemLog("alarm fired - id: $alarmId, delayed: ${reallyFiredAt - intentTriggerTime}", TAG)
+        OTApplication.logger.writeSystemLog("alarm fired - id: $alarmId, delayed: ${reallyFiredAt - intentTriggerTime}", OTTimeTriggerAlarmManager.TAG)
 
-        OTApplication.logger.writeSystemLog("# of timestamps : ${reservationTable.size}, # of triggers: ${triggerTable.size}", TAG)
+        OTApplication.logger.writeSystemLog("# of timestamps : ${reservationTable.size}, # of triggers: ${triggerTable.size}", OTTimeTriggerAlarmManager.TAG)
         //validation
 
         val reservedTimeOfAlarm = idTable.getKeyFromId(alarmId)
 
-        OTApplication.logger.writeSystemLog("idTableSearchResult: $reservedTimeOfAlarm, intentTriggerTime: ${intentTriggerTime}", TAG)
+        OTApplication.logger.writeSystemLog("idTableSearchResult: $reservedTimeOfAlarm, intentTriggerTime: ${intentTriggerTime}", OTTimeTriggerAlarmManager.TAG)
 
         if (reservedTimeOfAlarm == intentTriggerTime) {
             //Toast.makeText(OTApplication.app, "Alarm fired: ${reservationTable[intentTriggerTime]?.size ?: 0} triggers are reserved for this alarm.", Toast.LENGTH_SHORT).show()
 
             println("${reservationTable[intentTriggerTime]?.size ?: 0} triggers are reserved for this alarm.")
-            OTApplication.logger.writeSystemLog("${reservationTable.size} timestamps are stored", TAG)
+            OTApplication.logger.writeSystemLog("${reservationTable.size} timestamps are stored", OTTimeTriggerAlarmManager.TAG)
             val reservedTriggers = reservationTable[intentTriggerTime]
             reservationTable.clearTimestamp(timestamp = intentTriggerTime)
             idTable.removeKey(intentTriggerTime)
@@ -257,26 +260,33 @@ class OTTimeTriggerAlarmManager {
                 val triggers = ArrayList<OTTrigger>()
                 for (triggerId in reservedTriggers) {
                     triggerTable.remove(triggerId)
-                    val trigger = OTApplication.app.triggerManager.getTriggerWithId(triggerId)
+                    val trigger = OTApplication.app.currentUser.triggerManager.getTriggerWithId(triggerId)
                     if (trigger != null)
                         triggers.add(trigger)
                 }
                 return triggers
             } else return null
         } else if (reservedTimeOfAlarm != null) {
-            OTApplication.logger.writeSystemLog("alarm is reserved but at different time. run trigger and keep the reservation.", TAG)
+            OTApplication.logger.writeSystemLog("alarm is reserved but at different time. run trigger and keep the reservation.", OTTimeTriggerAlarmManager.TAG)
 
             val reservedTriggers = reservationTable[reservedTimeOfAlarm]
             if (reservedTriggers != null) {
                 val triggers = ArrayList<OTTrigger>()
                 for (triggerId in reservedTriggers) {
-                    val trigger = OTApplication.app.triggerManager.getTriggerWithId(triggerId)
+                    val trigger = OTApplication.app.currentUser.triggerManager.getTriggerWithId(triggerId)
                     if (trigger != null)
                         triggers.add(trigger)
                 }
                 return triggers
             } else return null
         } else return null
+    }
+
+    fun notifyAlarmFiredAndGetTriggers(alarmId: Int, intentTriggerTime: Long, reallyFiredAt: Long): Observable<List<OTTrigger>?> {
+        return OTApplication.app.currentUserObservable.map {
+            user ->
+            notifyAlarmFiredAndGetTriggersSync(user, alarmId, intentTriggerTime, reallyFiredAt)
+        }
     }
 
 }
