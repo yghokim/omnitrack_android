@@ -25,8 +25,7 @@ import com.afollestad.materialdialogs.MaterialDialog
 import jp.wasabeef.recyclerview.animators.SlideInRightAnimator
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.attributes.AttributePresetInfo
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
+import kr.ac.snu.hcil.omnitrack.core.attributes.*
 import kr.ac.snu.hcil.omnitrack.ui.DragItemTouchHelperCallback
 import kr.ac.snu.hcil.omnitrack.ui.components.common.FallbackRecyclerView
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
@@ -38,6 +37,10 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ShortTextPropert
 import kr.ac.snu.hcil.omnitrack.ui.pages.ConnectionIndicatorStubProxy
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeDetailActivity
 import kr.ac.snu.hcil.omnitrack.utils.startActivityOnDelay
+import rx.Observable
+import rx.android.schedulers.AndroidSchedulers
+import rx.schedulers.Schedulers
+import rx.subscriptions.CompositeSubscription
 
 /**
  * Created by Young-Ho Kim on 16. 7. 29
@@ -73,6 +76,10 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
 
     private var permissionWaitingTypeInfo: AttributePresetInfo? = null
 
+    private lateinit var gridAdapter: GridAdapter
+
+    private val subscriptions = CompositeSubscription()
+
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val rootView = inflater!!.inflate(R.layout.fragment_tracker_detail_structure, container, false)
 
@@ -95,7 +102,7 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
 
         isOnShortcutPropertyView = rootView.findViewById(R.id.isOnShortcutProperty) as BooleanPropertyView
         isOnShortcutPropertyView.valueChanged += {
-            sender, isOnShortcut->
+            sender, isOnShortcut ->
             if (tracker.isOnShortcut != isOnShortcut) {
                 tracker.isOnShortcut = isOnShortcut
                 if (tracker.isOnShortcut) {
@@ -133,7 +140,8 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
 
         newAttributeGrid = rootView.findViewById(R.id.ui_new_attribute_grid) as RecyclerView
         newAttributeGrid.layoutManager = GridLayoutManager(context, resources.getInteger(R.integer.new_attribute_panel_horizontal_count))
-        newAttributeGrid.adapter = GridAdapter()
+        gridAdapter = GridAdapter()
+        newAttributeGrid.adapter = gridAdapter
 
 
         val snackBarContainer: CoordinatorLayout = rootView.findViewById(R.id.ui_snackbar_container) as CoordinatorLayout
@@ -162,7 +170,23 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
         attributeListItemTouchHelper = ItemTouchHelper(DragItemTouchHelperCallback(attributeListAdapter, context, true, false))
         attributeListItemTouchHelper.attachToRecyclerView(attributeListView)
 
+        subscriptions.add(
+                Observable.defer { Observable.just(makeAttributePresets()) }
+                        .subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe {
+                            presets ->
+                            gridAdapter.presets = presets
+                            gridAdapter.notifyDataSetChanged()
+                        }
+        )
+
         refresh()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        subscriptions.clear()
     }
 
     fun refresh() {
@@ -412,7 +436,55 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
         }
     }
 
+    private fun makeAttributePresets(): Array<AttributePresetInfo> {
+        return arrayOf(
+                SimpleAttributePresetInfo(OTAttribute.TYPE_SHORT_TEXT, R.drawable.field_icon_shorttext, this.getString(R.string.type_shorttext_name), this.getString(R.string.type_shorttext_desc)),
+                SimpleAttributePresetInfo(OTAttribute.TYPE_LONG_TEXT, R.drawable.field_icon_longtext, this.getString(R.string.type_longtext_name), this.getString(R.string.type_longtext_desc)),
+                SimpleAttributePresetInfo(OTAttribute.TYPE_NUMBER, R.drawable.field_icon_number, this.getString(R.string.type_number_name), this.getString(R.string.type_number_desc)),
+                SimpleAttributePresetInfo(OTAttribute.TYPE_RATING, R.drawable.field_icon_rating, this.getString(R.string.type_rating_name), this.getString(R.string.type_rating_desc)),
+                //                SimpleAttributePresetInfo(OTAttribute.TYPE_TIME, R.drawable.field_icon_time, this.getString(R.string.type_timepoint_name), this.getString(R.string.type_timepoint_desc)),
+
+                AttributePresetInfo(OTAttribute.TYPE_TIME, R.drawable.field_icon_time_hour, this.getString(R.string.type_timepoint_time_name), this.getString(R.string.type_timepoint_time_desc),
+                        { user, columnName ->
+                            val attr = OTAttribute.createAttribute(user, columnName, OTAttribute.TYPE_TIME) as OTTimeAttribute
+                            attr.granularity = OTTimeAttribute.GRANULARITY_MINUTE
+                            attr
+                        }),
+
+                AttributePresetInfo(OTAttribute.TYPE_TIME, R.drawable.field_icon_time_date, this.getString(R.string.type_timepoint_date_name), this.getString(R.string.type_timepoint_date_desc),
+                        { user, columnName ->
+                            val attr = OTAttribute.createAttribute(user, columnName, OTAttribute.TYPE_TIME) as OTTimeAttribute
+                            attr.granularity = OTTimeAttribute.GRANULARITY_DAY
+                            attr
+                        }),
+
+
+                SimpleAttributePresetInfo(OTAttribute.TYPE_TIMESPAN, R.drawable.field_icon_timer, this.getString(R.string.type_timespan_name), this.getString(R.string.type_timespan_desc)),
+                SimpleAttributePresetInfo(OTAttribute.TYPE_LOCATION, R.drawable.field_icon_location, this.getString(R.string.type_location_name), this.getString(R.string.type_location_desc)),
+                SimpleAttributePresetInfo(OTAttribute.TYPE_IMAGE, R.drawable.field_icon_image, this.getString(R.string.type_image_name), this.getString(R.string.type_image_desc)),
+                SimpleAttributePresetInfo(OTAttribute.TYPE_AUDIO, R.drawable.field_icon_audio, this.getString(R.string.type_audio_record_name), this.getString(R.string.type_audio_record_desc)),
+
+                AttributePresetInfo(OTAttribute.TYPE_CHOICE, R.drawable.field_icon_singlechoice, this.getString(R.string.type_single_choice_name), this.getString(R.string.type_single_choice_desc),
+                        { user, columnName ->
+                            val attr = OTAttribute.createAttribute(user, columnName, OTAttribute.TYPE_CHOICE) as OTChoiceAttribute
+                            attr.allowedMultiSelection = false
+                            attr
+                        }),
+
+                AttributePresetInfo(OTAttribute.TYPE_CHOICE, R.drawable.field_icon_multiplechoice, this.getString(R.string.type_multiple_choices_name), this.getString(R.string.type_multiple_choices_desc),
+                        { user, columnName ->
+                            val attr = OTAttribute.createAttribute(user, columnName, OTAttribute.TYPE_CHOICE) as OTChoiceAttribute
+                            attr.allowedMultiSelection = true
+                            attr
+                        })
+
+        )
+    }
+
+
     inner class GridAdapter() : RecyclerView.Adapter<GridAdapter.ViewHolder>() {
+
+        var presets: Array<AttributePresetInfo>? = null
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val view = LayoutInflater.from(parent.context).inflate(R.layout.attribute_type_grid_element, parent, false)
@@ -420,11 +492,13 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.bind(OTApplication.app.supportedAttributePresets[position])
+            if (presets != null) {
+                holder.bind(presets!![position])
+            }
         }
 
         override fun getItemCount(): Int {
-            return OTApplication.app.supportedAttributePresets.size
+            return presets?.size ?: 0
         }
 
         override fun getItemId(position: Int): Long {
@@ -440,14 +514,15 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
                 typeIcon = view.findViewById(R.id.type_icon) as ImageView
 
                 view.setOnClickListener {
-                    val typeInfo = OTApplication.app.supportedAttributePresets[adapterPosition]
-
-                    val requiredPermissions = OTAttribute.getPermissionsForAttribute(typeInfo.typeId)
-                    if (requiredPermissions != null) {
-                        permissionWaitingTypeInfo = typeInfo
-                        requestPermissions(requiredPermissions, 10)
-                    } else {
-                        addNewAttribute(typeInfo)
+                    val typeInfo = presets?.get(adapterPosition)
+                    if (typeInfo != null) {
+                        val requiredPermissions = OTAttribute.getPermissionsForAttribute(typeInfo.typeId)
+                        if (requiredPermissions != null) {
+                            permissionWaitingTypeInfo = typeInfo
+                            requestPermissions(requiredPermissions, 10)
+                        } else {
+                            addNewAttribute(typeInfo)
+                        }
                     }
                 }
             }

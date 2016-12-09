@@ -59,14 +59,18 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home) {
 */
         //Ask permission if needed
         if (Build.VERSION.SDK_INT >= 23) {
-            val permissions = OTApplication.app.currentUser.getPermissionsRequiredForFields().filter {
-                checkSelfPermission(it) != PackageManager.PERMISSION_GRANTED
-            }.toTypedArray()
+            OTApplication.app.currentUserObservable.subscribe {
+                user ->
+                val permissions = user.getPermissionsRequiredForFields().filter {
+                    checkSelfPermission(it) != PackageManager.PERMISSION_GRANTED
+                }.toTypedArray()
 
-            if (permissions.isNotEmpty()) {
-                requestPermissions(permissions,
-                        10)
+                if (permissions.isNotEmpty()) {
+                    requestPermissions(permissions,
+                            10)
+                }
             }
+
         }
     }
 

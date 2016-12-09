@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.ATriggerListFragmentCore
@@ -22,11 +21,11 @@ class TrackerDetailReminderTabFragment : TrackerDetailActivity.ChildFragment() {
             override val emptyMessageId: Int = R.string.msg_reminder_empty
 
             override fun getTriggers(): Array<OTTrigger> {
-                return OTApplication.app.triggerManager.getAttachedTriggers(tracker, OTTrigger.ACTION_NOTIFICATION)
+                return user?.triggerManager?.getAttachedTriggers(tracker, OTTrigger.ACTION_NOTIFICATION) ?: emptyArray()
             }
 
             override fun makeNewTriggerInstance(type: Int): OTTrigger {
-                return OTTrigger.makeInstance(type, "My Trigger", OTTrigger.ACTION_NOTIFICATION, tracker)
+                return OTTrigger.makeInstance(type, "My Trigger", OTTrigger.ACTION_NOTIFICATION, user!!, tracker)
             }
 
             //TODO remove this to unlock data-driven trigger

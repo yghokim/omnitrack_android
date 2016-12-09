@@ -14,10 +14,12 @@ import android.widget.TextView
 import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.ui.components.common.FallbackRecyclerView
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.DrawableListBottomSpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
+import rx.subscriptions.CompositeSubscription
 
 /**
  * Created by Young-Ho Kim on 9/2/2016
@@ -27,6 +29,8 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
     companion object {
         private const val STATE_EXPANDED_POSITION = "expandedTriggerPosition"
     }
+
+    protected var user: OTUser? = null
 
     abstract fun makeNewTriggerInstance(type: Int): OTTrigger
     abstract fun getTriggers(): Array<OTTrigger>
@@ -42,6 +46,8 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
 
     private var expandedTriggerPosition: Int = -1
     private var expandedViewHolder: ATriggerViewHolder<out OTTrigger>? = null
+
+    private val subscriptions = CompositeSubscription()
 
     private val triggerTypeDialog: AlertDialog by lazy {
         NewTriggerTypeSelectionDialogHelper.builder(parent.context, triggerActionTypeName) {
@@ -75,6 +81,10 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
 
         listView.itemAnimator = SlideInLeftAnimator(DecelerateInterpolator(2.0f))
 
+        adapter = Adapter()
+        expandedTriggerPosition = savedInstanceState?.getInt(STATE_EXPANDED_POSITION, -1) ?: -1
+        listView.adapter = adapter
+
         newTriggerButton = rootView.findViewById(R.id.ui_button_new_trigger) as FloatingActionButton
 
         newTriggerButton.setOnClickListener {
@@ -85,10 +95,18 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
     }
 
     fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
-        adapter = Adapter()
-        expandedTriggerPosition = savedInstanceState?.getInt(STATE_EXPANDED_POSITION, -1) ?: -1
-        listView.adapter = adapter
 
+        subscriptions.add(
+                OTApplication.app.currentUserObservable.subscribe {
+                    user ->
+                    this.user = user
+                    adapter.notifyDataSetChanged()
+                }
+        )
+    }
+
+    fun onDestroyView() {
+        subscriptions.unsubscribe()
     }
 
     fun onSaveInstanceState(outState: Bundle) {
@@ -97,7 +115,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
 
     protected fun appendNewTrigger(trigger: OTTrigger) {
         adapter.notifyItemChanged(adapter.itemCount - 1)
-        OTApplication.app.triggerManager.putNewTrigger(trigger)
+        user?.triggerManager?.putNewTrigger(trigger)
 
         adapter.notifyItemInserted(adapter.itemCount - 1)
         listView.smoothScrollToPosition(adapter.itemCount - 1)
@@ -108,7 +126,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
         triggerTypeDialog.show()
     }
 
-    inner class Adapter : RecyclerView.Adapter<ATriggerViewHolder<out OTTrigger>>(), ATriggerViewHolder.ITriggerControlListener {
+    inner class Adapter() : RecyclerView.Adapter<ATriggerViewHolder<out OTTrigger>>(), ATriggerViewHolder.ITriggerControlListener {
 
         override fun getItemViewType(position: Int): Int {
             return getTriggers()[position].typeId
@@ -149,7 +167,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
         }
 
         override fun getItemCount(): Int {
-            return getTriggers().size
+            return if (user != null) getTriggers().size else 0
         }
 
 
@@ -170,7 +188,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
                 }
             }
 
-            OTApplication.app.triggerManager.removeTrigger(getTriggers()[position])
+            user?.triggerManager?.removeTrigger(getTriggers()[position])
             this.notifyItemRemoved(position)
             newTriggerButton.visibility = View.VISIBLE
         }

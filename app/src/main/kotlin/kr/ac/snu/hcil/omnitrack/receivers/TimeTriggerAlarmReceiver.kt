@@ -86,7 +86,7 @@ class TimeTriggerAlarmReceiver : BroadcastReceiver() {
 
             OTApplication.logger.writeSystemLog("Wakeful Service handleIntent, trigger time: ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(triggerTime))}", TAG)
 
-            val triggers = OTApplication.app.timeTriggerAlarmManager.notifyAlarmFiredAndGetTriggers(alarmId, triggerTime, System.currentTimeMillis())
+            val triggers = OTApplication.app.timeTriggerAlarmManager.notifyAlarmFiredAndGetTriggersSync(OTApplication.app.currentUser, alarmId, triggerTime, System.currentTimeMillis())
 
             if (triggers != null) {
 
@@ -120,6 +120,5 @@ class TimeTriggerAlarmReceiver : BroadcastReceiver() {
                 completeWakefulIntent(intent)
             }
         }
-
     }
 }

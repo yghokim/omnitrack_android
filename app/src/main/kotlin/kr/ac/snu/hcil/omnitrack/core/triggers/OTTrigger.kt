@@ -5,6 +5,7 @@ import com.google.gson.Gson
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
+import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.database.NamedObject
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
 import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
@@ -17,7 +18,7 @@ import kotlin.properties.Delegates
 /**
  * Created by younghokim on 16. 7. 27..
  */
-abstract class OTTrigger(objectId: String?, dbId: Long?, name: String,
+abstract class OTTrigger(objectId: String?, dbId: Long?, val user: OTUser, name: String,
                          trackerObjectIds: Array<String>,
                          isOn: Boolean,
                          val action: Int,
@@ -35,16 +36,16 @@ abstract class OTTrigger(objectId: String?, dbId: Long?, name: String,
 
         const val TRIGGER_TIME_NEVER_TRIGGERED = -1L
 
-        fun makeInstance(objectId: String?, dbId: Long?, typeId: Int, name: String, trackerObjectIds: Array<String>, isOn: Boolean, action: Int, lastTriggeredTime: Long, serializedProperties: String?): OTTrigger {
+        fun makeInstance(objectId: String?, dbId: Long?, typeId: Int, user: OTUser, name: String, trackerObjectIds: Array<String>, isOn: Boolean, action: Int, lastTriggeredTime: Long, serializedProperties: String?): OTTrigger {
             return when (typeId) {
-                TYPE_TIME -> OTTimeTrigger(objectId, dbId, name, trackerObjectIds, isOn, action, lastTriggeredTime, serializedProperties)
-                TYPE_DATA_THRESHOLD -> OTDataTrigger(objectId, dbId, name, trackerObjectIds, isOn, action, lastTriggeredTime, serializedProperties)
+                TYPE_TIME -> OTTimeTrigger(objectId, dbId, user, name, trackerObjectIds, isOn, action, lastTriggeredTime, serializedProperties)
+                TYPE_DATA_THRESHOLD -> OTDataTrigger(objectId, dbId, user, name, trackerObjectIds, isOn, action, lastTriggeredTime, serializedProperties)
                 else -> throw Exception("wrong trigger type : $typeId")
             }
         }
 
-        fun makeInstance(typeId: Int, name: String, action: Int, vararg trackers: OTTracker): OTTrigger {
-            return makeInstance(null, null, typeId, name, trackers.map { it.objectId }.toTypedArray(), false, action, TRIGGER_TIME_NEVER_TRIGGERED, null)
+        fun makeInstance(typeId: Int, name: String, action: Int, user: OTUser, vararg trackers: OTTracker): OTTrigger {
+            return makeInstance(null, null, typeId, user, name, trackers.map { it.objectId }.toTypedArray(), false, action, TRIGGER_TIME_NEVER_TRIGGERED, null)
         }
     }
 
@@ -96,7 +97,7 @@ abstract class OTTrigger(objectId: String?, dbId: Long?, name: String,
 
     init {
         for (trackerId in trackerObjectIds) {
-            val tracker = OTApplication.app.currentUser[trackerId]
+            val tracker = user[trackerId]
             if (tracker != null) {
                 _trackerList.add(tracker)
             }
@@ -135,7 +136,7 @@ abstract class OTTrigger(objectId: String?, dbId: Long?, name: String,
     }
 
     fun addTracker(trackerId: String) {
-        val tracker = OTApplication.app.currentUser[trackerId]
+        val tracker = user[trackerId]
         if (tracker != null) {
             addTracker(tracker)
         }

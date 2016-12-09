@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.triggers
 
 import android.content.Context
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.calculation.AConditioner
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
@@ -10,7 +11,7 @@ import kr.ac.snu.hcil.omnitrack.utils.ObservableMapDelegate
 /**
  * Created by younghokim on 16. 9. 5..
  */
-class OTDataTrigger(objectId: String?, dbId: Long?, name: String, trackerObjectIds: Array<String>, isOn: Boolean, action: Int, lastTriggeredTime: Long, serializedProperties: String? = null) : OTTrigger(objectId, dbId, name, trackerObjectIds, isOn, action, lastTriggeredTime, serializedProperties) {
+class OTDataTrigger(objectId: String?, dbId: Long?, user: OTUser, name: String, trackerObjectIds: Array<String>, isOn: Boolean, action: Int, lastTriggeredTime: Long, serializedProperties: String? = null) : OTTrigger(objectId, dbId, user, name, trackerObjectIds, isOn, action, lastTriggeredTime, serializedProperties) {
     override val configIconId: Int = R.drawable.event_dark
     override val configTitleId: Int = R.string.trigger_desc_event
 

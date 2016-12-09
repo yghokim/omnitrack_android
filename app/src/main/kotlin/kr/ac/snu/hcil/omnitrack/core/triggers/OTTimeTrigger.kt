@@ -4,6 +4,7 @@ import android.content.Context
 import android.text.format.DateUtils
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
 import kr.ac.snu.hcil.omnitrack.utils.*
 import java.util.*
@@ -11,7 +12,7 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 16. 7. 27
  */
-class OTTimeTrigger : OTTrigger {
+class OTTimeTrigger(objectId: String?, dbId: Long?, user: OTUser, name: String, trackerObjectIds: Array<String>, isOn: Boolean, action: Int, lastTriggeredTime: Long, serializedProperties: String? = null) : OTTrigger(objectId, dbId, user, name, trackerObjectIds, isOn, action, lastTriggeredTime, serializedProperties) {
 
     companion object {
 
@@ -300,10 +301,6 @@ class OTTimeTrigger : OTTrigger {
     private var cacheCalendar = Calendar.getInstance()
     private var cacheCalendar2 = Calendar.getInstance()
 
-
-    constructor(objectId: String?, dbId: Long?, name: String, trackerObjectIds: Array<String>, isOn: Boolean, action: Int, lastTriggeredTime: Long, serializedProperties: String? = null) : super(objectId, dbId, name, trackerObjectIds, isOn, action, lastTriggeredTime, serializedProperties) {
-
-    }
 
     val isRangeSpecified: Boolean get() = OTTimeTrigger.Range.isSpecified(rangeVariables)
     val isConfigSpecified: Boolean get() {
