@@ -39,7 +39,6 @@ class OTTriggerManager(val user: OTUser) {
         }
     }
 
-
     private val _removedTriggerIds = ArrayList<Long>()
     fun fetchRemovedTriggerIds(): LongArray {
         val result = _removedTriggerIds.toLongArray()
