@@ -52,10 +52,10 @@ class ObservableList<T>(){
     fun moveItem(fromPosition: Int, toPosition: Int) {
         if (unObservedList.move(fromPosition, toPosition)) {
             if (fromPosition < toPosition) {
-                elementReordered.invoke(this, IntRange(fromPosition, toPosition - 1))
+                elementReordered.invoke(this, IntRange(fromPosition, toPosition))
 
             } else {
-                elementReordered.invoke(this, IntRange(toPosition + 1, fromPosition))
+                elementReordered.invoke(this, IntRange(toPosition, fromPosition))
             }
         }
     }
