@@ -25,7 +25,7 @@
     </style>
 
     <style name="TabLayoutStyle">
-        <item name="android:background">#20350325</item>
+        <item name="android:background">@color/appBarOverlayElementColor</item>
     </style>
 
     <style name="TabTextStyle" parent="TextAppearance.Design.Tab">

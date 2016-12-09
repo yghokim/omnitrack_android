@@ -1,12 +1,18 @@
 package kr.ac.snu.hcil.omnitrack.ui.activities
 
 import android.app.Activity
+import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
+import android.support.design.widget.AppBarLayout
+import android.support.v4.content.ContextCompat
+import android.support.v4.graphics.ColorUtils
 import android.support.v7.widget.AppCompatImageButton
 import android.support.v7.widget.Toolbar
 import android.view.View
 import android.widget.ImageButton
 import android.widget.TextView
+import butterknife.bindView
 import com.google.gson.JsonObject
 import kr.ac.snu.hcil.omnitrack.R
 
@@ -18,6 +24,8 @@ abstract class MultiButtonActionBarActivity(val layoutId: Int) : OTActivity() {
     enum class Mode {
         OKCancel, Back, BackAndMenu, None
     }
+
+    protected val header: AppBarLayout by bindView(R.id.appbar)
 
     protected var leftActionBarButton: ImageButton?=null
     protected var rightActionBarButton: ImageButton?=null
@@ -34,7 +42,7 @@ abstract class MultiButtonActionBarActivity(val layoutId: Int) : OTActivity() {
 
         setContentView(layoutId)
 
-        val toolbar = findViewById(R.id.toolbar) as Toolbar?
+        val toolbar = findViewById(R.id.toolbar) as Toolbar
         setSupportActionBar(toolbar)
 
         leftActionBarButton = findViewById(R.id.ui_appbar_button_left) as AppCompatImageButton
@@ -65,6 +73,27 @@ abstract class MultiButtonActionBarActivity(val layoutId: Int) : OTActivity() {
 
     protected open val leftButtonResultCode = Activity.RESULT_CANCELED
     protected open val rightButtonResultCode = Activity.RESULT_OK
+
+    protected fun setHeaderColor(color: Int, blend: Boolean = true) {
+        val c = if (blend) getDimmedHeaderColor(color) else color
+        onChangedHeaderColor(c, color)
+    }
+
+    protected open fun onChangedHeaderColor(actualColor: Int, originalColor: Int) {
+        if (Build.VERSION.SDK_INT >= 21) {
+            window.statusBarColor = actualColor
+        }
+
+        header.setBackgroundColor(actualColor)
+    }
+
+    fun getDimmedHeaderColor(color: Int): Int {
+        return ColorUtils.blendARGB(ContextCompat.getColor(this, R.color.colorPrimary), color, 0.6f)
+    }
+
+    fun getDimmedHeaderColorDark(color: Int): Int {
+        return ColorUtils.blendARGB(Color.BLACK, getDimmedHeaderColor(color), 0.9f)
+    }
 
 
     abstract protected fun onToolbarLeftButtonClicked()

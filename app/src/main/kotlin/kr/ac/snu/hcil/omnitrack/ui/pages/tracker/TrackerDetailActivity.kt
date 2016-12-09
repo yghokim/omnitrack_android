@@ -9,8 +9,6 @@ import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
-import android.support.v4.content.ContextCompat
-import android.support.v4.graphics.ColorUtils
 import android.support.v4.view.ViewPager
 import android.view.View
 import at.markushi.ui.RevealColorView
@@ -142,13 +140,8 @@ class TrackerDetailActivity : OTTrackerAttachedActivity(R.layout.activity_tracke
             }*/
     }
 
-    fun calculateBlendedColor(color: Int): Int {
-        return ColorUtils.blendARGB(ContextCompat.getColor(this@TrackerDetailActivity, R.color.colorPrimary), color, 0.6f)
-
-    }
-
     fun transitionToColor(color: Int, animate: Boolean = true) {
-        val blendedColor = calculateBlendedColor(color)
+        val blendedColor = getDimmedHeaderColor(color)
 
         if (Build.VERSION.SDK_INT >= 21) {
             window.statusBarColor = blendedColor
