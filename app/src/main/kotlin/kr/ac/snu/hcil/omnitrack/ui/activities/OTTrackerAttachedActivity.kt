@@ -1,7 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.ui.activities
 
+import android.support.v4.content.ContextCompat
 import com.google.gson.JsonObject
 import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 
 /**
@@ -28,13 +30,15 @@ abstract class OTTrackerAttachedActivity(layoutId: Int) : MultiButtonActionBarAc
         if (trackerObjectId != null) {
             _tracker = OTApplication.app.currentUser[trackerObjectId!!]
             if (_tracker != null) {
+                setHeaderColor(tracker!!.color, true)
                 onTrackerLoaded(tracker!!)
+            } else {
+                setHeaderColor(ContextCompat.getColor(this, R.color.colorPrimary), false)
             }
         }
     }
 
     protected open fun onTrackerLoaded(tracker: OTTracker) {
-
     }
 
     override fun onSessionLogContent(contentObject: JsonObject) {
