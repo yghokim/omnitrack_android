@@ -121,7 +121,7 @@ class TimeRangePicker : FrameLayout, View.OnClickListener {
             Granularity.DATE ->
                 context.resources.getString(R.string.dateformat_ymd)
             Granularity.TIME ->
-                context.resources.getString(R.string.dateformat_full)
+                context.resources.getString(R.string.dateformat_minute)
         }
 
         format = SimpleDateFormat(formatString)

@@ -458,8 +458,13 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
                             attr
                         }),
 
-
-                SimpleAttributePresetInfo(OTAttribute.TYPE_TIMESPAN, R.drawable.field_icon_timer, this.getString(R.string.type_timespan_name), this.getString(R.string.type_timespan_desc)),
+                AttributePresetInfo(OTAttribute.TYPE_TIMESPAN, R.drawable.field_icon_timer, this.getString(R.string.type_timespan_name), this.getString(R.string.type_timespan_desc),
+                        { user, columnName ->
+                            (OTAttribute.createAttribute(user, columnName, OTAttribute.TYPE_TIMESPAN) as OTTimeSpanAttribute).apply {
+                                setPropertyValue(OTTimeSpanAttribute.PROPERTY_GRANULARITY, OTTimeSpanAttribute.GRANULARITY_MINUTE)
+                            }
+                        }),
+                SimpleAttributePresetInfo(OTAttribute.TYPE_TIMESPAN, R.drawable.field_icon_time_range_date, this.getString(R.string.type_timespan_date_name), this.getString(R.string.type_timespan_date_desc)),
                 SimpleAttributePresetInfo(OTAttribute.TYPE_LOCATION, R.drawable.field_icon_location, this.getString(R.string.type_location_name), this.getString(R.string.type_location_desc)),
                 SimpleAttributePresetInfo(OTAttribute.TYPE_IMAGE, R.drawable.field_icon_image, this.getString(R.string.type_image_name), this.getString(R.string.type_image_desc)),
                 SimpleAttributePresetInfo(OTAttribute.TYPE_AUDIO, R.drawable.field_icon_audio, this.getString(R.string.type_audio_record_name), this.getString(R.string.type_audio_record_desc)),

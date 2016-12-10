@@ -127,6 +127,7 @@ class OTApplication : MultiDexApplication() {
                 Observable.just(currentUser)
             }.subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .cache()
         }
 
     val colorPalette: IntArray by lazy {

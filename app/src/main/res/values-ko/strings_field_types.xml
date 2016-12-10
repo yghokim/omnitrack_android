@@ -4,6 +4,9 @@
     <string name="type_timespan_name">시간 범위</string>
     <string name="type_timespan_desc">시작과 끝이 있는 시간 범위을 나타냅니다</string>
 
+    <string name="type_timespan_date_name">날짜 범위</string>
+    <string name="type_timespan_date_desc">시작과 끝이 날짜 범위를 나타냅니다</string>
+
 
     <string name="type_timepoint_name">특정 시각</string>
     <string name="type_timepoint_desc">A specific time point</string>
