@@ -20,6 +20,9 @@ class OTTimeSpanAttribute(objectId: String?, dbId: Long?, columnName: String, is
     companion object {
         const val PROPERTY_GRANULARITY = 0
         const val PROPERTY_TYPE = 1
+
+        const val GRANULARITY_DAY = 0
+        const val GRANULARITY_MINUTE = 1
     }
 
     override val propertyKeys: IntArray = intArrayOf(PROPERTY_GRANULARITY/*, PROPERTY_TYPE*/)
@@ -36,7 +39,7 @@ class OTTimeSpanAttribute(objectId: String?, dbId: Long?, columnName: String, is
                 )))
         //assignProperty(OTSelectionProperty(PROPERTY_TYPE, "Interface Type", arrayOf("Range Picker", "Stopwatch")))
 
-        setPropertyValue(PROPERTY_GRANULARITY, 0)
+        setPropertyValue(PROPERTY_GRANULARITY, GRANULARITY_DAY)
     }
 
     override val valueNumericCharacteristics: NumericCharacteristics = NumericCharacteristics(true, false)
