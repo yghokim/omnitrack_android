@@ -44,7 +44,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/button_height_small"
                 android:layout_gravity="center_vertical"
-                android:background="@drawable/spinner_background_light" />
+                android:background="@drawable/spinner_background_light"
+                android:popupBackground="@color/frontalBackground" />
 
             <ToggleButton
                 android:id="@+id/ui_toggle_sort_order"
