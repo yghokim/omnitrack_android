@@ -5,13 +5,11 @@ import android.os.AsyncTask
 import android.view.View
 import com.google.android.gms.maps.model.LatLng
 import kr.ac.snu.hcil.omnitrack.OTApplication
-import net.daum.mf.map.api.MapPoint
-import net.daum.mf.map.api.MapReverseGeoCoder
 
 /**
  * Created by Young-Ho on 8/15/2016.
  */
-class LatLngToAddressTask(private val listener: OnFinishListener, private val view: View) : AsyncTask<LatLng, Void, String?>(), MapReverseGeoCoder.ReverseGeoCodingResultListener {
+class LatLngToAddressTask(private val listener: OnFinishListener, private val view: View) : AsyncTask<LatLng, Void, String?>() {
 
     interface OnFinishListener {
         fun onAddressReceived(address: String?);
@@ -27,24 +25,6 @@ class LatLngToAddressTask(private val listener: OnFinishListener, private val vi
             googleAddress = args.first().getAddress(OTApplication.app)
         }
 
-        if (googleAddress.countryCode == "KR") {
-            val daumGeocoder = MapReverseGeoCoder("	83165b09ca2e119324c4f438c3ae0e5e", MapPoint.mapPointWithGeoCoord(args.first().latitude, args.first().longitude), this, view.getActivity())
-            val address = daumGeocoder.findAddressForMapPointSync("83165b09ca2e119324c4f438c3ae0e5e", MapPoint.mapPointWithGeoCoord(args.first().latitude, args.first().longitude), MapReverseGeoCoder.AddressType.FullAddress)
-
-            return address
-        } else {
-            return googleAddress.getAddressLine(0)
-        }
-
+        return googleAddress.getAddressLine(googleAddress.maxAddressLineIndex)
     }
-
-
-    override fun onReverseGeoCoderFailedToFindAddress(p0: MapReverseGeoCoder?) {
-        println("Fail")
-    }
-
-    override fun onReverseGeoCoderFoundAddress(p0: MapReverseGeoCoder?, p1: String?) {
-        println("Success")
-    }
-
 }
