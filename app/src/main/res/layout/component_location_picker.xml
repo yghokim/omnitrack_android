@@ -55,14 +55,15 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
         android:height="@dimen/button_height_small"
-
         android:drawableLeft="@drawable/search_dark"
+
         android:paddingEnd="12dp"
         android:paddingStart="8dp"
         android:text="@string/btn_search"
         android:textColor="@color/buttonIconColorDark"
+        android:textSize="13sp"
 
-        android:textSize="13sp" />
+        android:visibility="gone" />
 
     <FrameLayout
         android:layout_width="match_parent"
