@@ -27,60 +27,20 @@
                 android:layout_height="match_parent">
 
 
-                <LinearLayout
+                <FrameLayout
                     android:id="@+id/ui_time_tab_content"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="horizontal"
                     android:paddingBottom="15dp"
-                    android:paddingEnd="@dimen/activity_horizontal_margin"
-                    android:paddingStart="@dimen/activity_horizontal_margin"
-                    android:paddingTop="15dp"
-
                     >
 
-                    <NumberPicker
-                        android:id="@+id/ui_hour_picker"
-                        android:layout_width="wrap_content"
+                    <TimePicker
+                        android:id="@+id/ui_time_picker_view"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:descendantFocusability="blocksDescendants" />
+                        android:timePickerMode="clock" />
 
-                    <ImageView
-                        android:layout_width="18dp"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:src="@drawable/time_digit_separator" />
-
-                    <NumberPicker
-                        android:id="@+id/ui_minute_picker"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:descendantFocusability="blocksDescendants" />
-
-                    <ImageView
-                        android:layout_width="18dp"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:src="@drawable/time_digit_separator" />
-
-                    <NumberPicker
-                        android:id="@+id/ui_second_picker"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:descendantFocusability="blocksDescendants" />
-
-                    <NumberPicker
-                        android:id="@+id/ui_ampm_picker"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
-                        android:layout_weight="1"
-                        android:descendantFocusability="blocksDescendants" />
-
-                </LinearLayout>
+                </FrameLayout>
 
 
                 <FrameLayout
@@ -100,4 +60,16 @@
         </LinearLayout>
     </TabHost>
 
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/ui_mode_button"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:drawableRight="@drawable/right_dark"
+        android:text="Select Time"
+        android:textColor="@color/colorPointed"
+        android:textSize="16dp" />
+
+    <View style="@style/HorizontalSeparator.NoVerticalMargin" />
 </LinearLayout>

@@ -23,6 +23,7 @@
         android:layout_toStartOf="@+id/ui_button_remove"
         android:background="@drawable/text_field_singleline"
         android:hint="@string/property_choice_type_in_entry_text"
+        android:selectAllOnFocus="true"
         android:textColor="@color/inputTextColor"
         android:textColorHint="@color/textColorLight" />
 
