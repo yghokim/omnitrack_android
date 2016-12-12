@@ -174,6 +174,8 @@ class TimeRangePicker : FrameLayout, View.OnClickListener {
                     }
                 } else {
                     //datetime picking
+
+
                     DateTimePickerDialogFragment.getInstance(timestamp).showDialog(activity.supportFragmentManager) {
                         timestamp ->
                         if (button === fromButton) {

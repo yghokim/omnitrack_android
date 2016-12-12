@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TimePicker
 import com.google.android.gms.maps.model.LatLng
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import java.math.BigDecimal
@@ -201,3 +202,38 @@ fun LatLng.getAddress(context: Context): Address? {
         return null
     }
 }
+
+fun TimePicker.getHourOfDayCompat(): Int {
+    if (android.os.Build.VERSION.SDK_INT >= 23) {
+        return this.hour
+    } else {
+        return this.currentHour
+    }
+}
+
+fun TimePicker.getMinuteCompat(): Int {
+    if (android.os.Build.VERSION.SDK_INT >= 23) {
+        return this.minute
+    } else {
+        return this.currentMinute
+    }
+}
+
+fun TimePicker.setHourOfDayCompat(hourOfDay: Int) {
+    if (android.os.Build.VERSION.SDK_INT >= 23) {
+        this.hour = hourOfDay
+    } else {
+        this.currentHour = hourOfDay
+    }
+}
+
+fun TimePicker.setMinuteCompat(minute: Int) {
+    if (android.os.Build.VERSION.SDK_INT >= 23) {
+        this.minute = minute
+    } else {
+        this.currentMinute = minute
+    }
+}
+
+
+
