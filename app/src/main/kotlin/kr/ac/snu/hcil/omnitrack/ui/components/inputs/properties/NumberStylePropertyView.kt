@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties
 import android.animation.LayoutTransition
 import android.content.Context
 import android.util.AttributeSet
+import com.google.gson.Gson
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.NumberStyle
 
@@ -93,6 +94,13 @@ class NumberStylePropertyView(context: Context, attrs: AttributeSet?) : APropert
         pluralizeCheckView.value = style.pluralizeUnit
         showCommasCheckView.value = style.commaUnit != 0
         showFractionView.value = style.fractionPart != 0
+
+        if (showFractionView.value) {
+            fractionalDigitCountView.visibility = VISIBLE
+        } else {
+            fractionalDigitCountView.visibility = GONE
+        }
+
         fractionalDigitCountView.value = style.fractionPart
 
         suspendEvent = false
@@ -134,5 +142,18 @@ class NumberStylePropertyView(context: Context, attrs: AttributeSet?) : APropert
 
     }
 
+
+    override fun getSerializedValue(): String? {
+        return Gson().toJson(value)
+    }
+
+    override fun setSerializedValue(serialized: String): Boolean {
+        try {
+            value = Gson().fromJson(serialized, NumberStyle::class.java)
+            return true
+        } catch(e: Exception) {
+            return false
+        }
+    }
 
 }

@@ -11,7 +11,6 @@ import kr.ac.snu.hcil.omnitrack.R
  */
 class BooleanPropertyView(context: Context, attrs: AttributeSet?) : APropertyView<Boolean>(R.layout.component_property_boolean, context, attrs), View.OnClickListener {
 
-
     private val switch: SwitchCompat
 
     private val proxyButton: View
@@ -36,6 +35,19 @@ class BooleanPropertyView(context: Context, attrs: AttributeSet?) : APropertyVie
         if(validate(!value)) {
             switch.performClick()
             onValueChanged(switch.isChecked)
+        }
+    }
+
+    override fun getSerializedValue(): String? {
+        return value.toString()
+    }
+
+    override fun setSerializedValue(serialized: String): Boolean {
+        try {
+            value = serialized.toBoolean()
+            return true
+        } catch(e: Exception) {
+            return false
         }
     }
 

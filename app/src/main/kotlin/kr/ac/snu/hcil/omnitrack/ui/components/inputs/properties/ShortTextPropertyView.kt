@@ -63,4 +63,16 @@ class ShortTextPropertyView(context: Context, attrs: AttributeSet?) : APropertyV
         }
     }
 
+    override fun getSerializedValue(): String? {
+        return value
+    }
+
+    override fun setSerializedValue(serialized: String): Boolean {
+        try {
+            value = serialized
+            return true
+        } catch(e: Exception) {
+            return false
+        }
+    }
 }

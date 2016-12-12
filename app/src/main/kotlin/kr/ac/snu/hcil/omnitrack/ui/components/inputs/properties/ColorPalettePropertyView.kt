@@ -31,4 +31,16 @@ class ColorPalettePropertyView(context: Context, attrs: AttributeSet?) : AProper
     }
 
 
+    override fun getSerializedValue(): String? {
+        return value.toString()
+    }
+
+    override fun setSerializedValue(serialized: String): Boolean {
+        try {
+            value = serialized.toInt()
+            return true
+        } catch(e: Exception) {
+            return false
+        }
+    }
 }
