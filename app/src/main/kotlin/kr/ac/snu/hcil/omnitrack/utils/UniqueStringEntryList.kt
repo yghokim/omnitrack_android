@@ -37,6 +37,16 @@ class UniqueStringEntryList : IStringSerializable {
         list.addAll(parcel.entries)
     }
 
+    constructor(entries: Collection<Entry>) {
+        this.increment = entries.size - 1
+        list = ArrayList<Entry>(entries)
+    }
+
+    constructor(entries: Array<Entry>) {
+        this.increment = entries.size - 1
+        list = ArrayList<Entry>().apply { addAll(entries) }
+    }
+
     constructor(vararg entryNames: String) {
         list = ArrayList<Entry>(entryNames.size)
         entryNames.map { Entry(getNewId, it) }.toCollection(list)
