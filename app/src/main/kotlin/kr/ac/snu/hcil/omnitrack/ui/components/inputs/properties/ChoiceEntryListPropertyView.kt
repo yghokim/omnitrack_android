@@ -30,4 +30,18 @@ class ChoiceEntryListPropertyView(context: Context, attrs: AttributeSet?) : APro
     }
 
 
+    override fun getSerializedValue(): String? {
+        return value.getSerializedString()
+    }
+
+    override fun setSerializedValue(serialized: String): Boolean {
+        try {
+            value = UniqueStringEntryList(serialized)
+            return true
+        } catch(e: Exception) {
+            return false
+        }
+    }
+
+
 }

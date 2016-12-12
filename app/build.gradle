@@ -3,12 +3,13 @@ apply plugin: 'kotlin-android'
 
 android {
     signingConfigs {
+        /*
         sign_test {
             keyAlias 'HCIL4ever'
             keyPassword 'HCIL4ever'
             storeFile file('D:/cloud/Dropbox/#school/#research/OmniTrack2/omnitrack_android_keystore.jks')
             storePassword 'HCIL4ever'
-        }
+        }*/
     }
     compileSdkVersion 25
     buildToolsVersion '25.0.1'
@@ -25,7 +26,7 @@ android {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.sign_test
+            //signingConfig signingConfigs.sign_test
         }
         debug {
         }

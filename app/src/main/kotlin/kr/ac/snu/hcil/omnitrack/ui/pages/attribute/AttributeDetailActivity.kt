@@ -14,6 +14,7 @@ import com.google.gson.JsonObject
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
+import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.WizardView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
@@ -25,6 +26,11 @@ import java.util.*
 
 class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_attribute_detail), View.OnClickListener {
 
+    companion object {
+        const val STATE_COLUMN_NAME = "columnName"
+        const val STATE_CONNECTION = "connection"
+        const val STATE_PROPERTIES = "properties"
+    }
 
     var attribute: OTAttribute<out Any>? = null
 
@@ -51,27 +57,28 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setActionBarButtonMode(Mode.Back)
+        setActionBarButtonMode(Mode.OKCancel)
 
         propertyViewHorizontalMargin = resources.getDimensionPixelSize(R.dimen.activity_horizontal_margin)
 
         columnNameView.addNewValidator(String.format(resources.getString(R.string.msg_format_cannot_be_blank), resources.getString(R.string.msg_column_name)), ShortTextPropertyView.NOT_EMPTY_VALIDATOR)
 
+        /*
         columnNameView.valueChanged += {
             sender, value ->
             if (columnNameView.validate())
                 attribute?.name = value
-        }
-
+        }*/
+/*
         requiredView.valueChanged += {
             sender, value ->
             attribute?.isRequired = value
-        }
+        }*/
 
         connectionView.onRemoveButtonClicked += {
             sender, arg ->
             DialogHelper.makeYesNoDialogBuilder(this, "OmniTrack", resources.getString(R.string.msg_confirm_remove_connection), {
-                attribute?.valueConnection = null
+                connectionView.connection = null
                 refreshConnection(true)
             }).show()
         }
@@ -79,35 +86,96 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
         InterfaceHelper.removeButtonTextDecoration(newConnectionButton)
 
         newConnectionButton.setOnClickListener(this)
+    }
 
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        println("restore state")
+
+        savedInstanceState.getString(STATE_COLUMN_NAME)?.let {
+            columnNameView.value = it
+        }
+
+        connectionView.connection = null
+        savedInstanceState.getString(STATE_CONNECTION)?.let {
+            try {
+                connectionView.connection = OTConnection(it)
+            } catch(e: Exception) {
+                connectionView.connection = null
+            }
+        }
+
+
+        refreshConnection(false)
+
+        savedInstanceState.getStringArray(STATE_PROPERTIES)?.let {
+            for (entry in it.withIndex()) {
+                (propertyViewList[entry.index].second as? APropertyView<out Any>)?.setSerializedValue(entry.value)
+            }
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        outState.putString(STATE_COLUMN_NAME, columnNameView.value)
+        outState.putString(STATE_CONNECTION, connectionView.connection?.getSerializedString())
+
+        outState.putStringArray(STATE_PROPERTIES, propertyViewList.map { (it.second as APropertyView<out Any>).getSerializedValue() }.toTypedArray())
     }
 
     override fun onStart() {
         super.onStart()
+
         if (intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ATTRIBUTE) != null) {
             attribute = OTApplication.app.currentUser.findAttributeByObjectId(intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ATTRIBUTE))
             refresh()
+            applyAttributeToPropertyView(attribute!!)
         }
     }
 
     override fun onToolbarLeftButtonClicked() {
-        finish()
+        DialogHelper.makeYesNoDialogBuilder(this, "OmniTrack", resources.getString(R.string.msg_confirm_apply_change),
+                {
+                    saveChanges()
+                    finish()
+                },
+                {
+                    finish()
+                }
+        ).cancelListener { finish() }
+                .show()
     }
 
     override fun onToolbarRightButtonClicked() {
+        saveChanges()
+        finish()
     }
 
-    override fun onPause() {
-        super.onPause()
-        for (entry in propertyViewList) {
-            if (entry.first != null) {
-                if (entry.second is APropertyView<*>) {
-                    if (entry.second.validate()) {
-                        attribute?.setPropertyValue(entry.first, entry.second.value!!)
+    private fun isChanged(): Boolean {
+        return true
+    }
+
+    private fun saveChanges() {
+        if (isChanged()) {
+            if (columnNameView.validate())
+                attribute?.name = columnNameView.value
+
+            attribute?.valueConnection = connectionView.connection
+
+            for (entry in propertyViewList) {
+                if (entry.first != null) {
+                    if (entry.second is APropertyView<*>) {
+                        if (entry.second.validate()) {
+                            attribute?.setPropertyValue(entry.first, entry.second.value!!)
+                        }
                     }
                 }
             }
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
 
         (application as OTApplication).syncUserToDb()
     }
@@ -138,7 +206,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
                         propView.setPaddingRight(propertyViewHorizontalMargin)
                     }
 
-                    propView.value = attr.getPropertyValue(entry.first)
+                    //propView.value = attr.getPropertyValue(entry.first)
                     propView.valueChanged += {
                         sender, value ->
                         if (sender is APropertyView<*>) {
@@ -149,14 +217,14 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
                     }
                 }
 
+                entry.second.id = View.generateViewId()
                 propertyViewContainer.addView(entry.second, layoutParams)
             }
             //end: refresh properties==================================================================================
-            refreshConnection(false)
 
             //refresh connections======================================================================================
-
-
+            connectionView.connection = attr.valueConnection
+            refreshConnection(false)
         }
 
         if (attr == null || attr.propertyKeys.size == 0) {
@@ -171,15 +239,23 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
         }
     }
 
+    private fun applyAttributeToPropertyView(attribute: OTAttribute<out Any>) {
+        for (propertyViewEntry in propertyViewList) {
+            @Suppress("UNCHECKED_CAST")
+            val propView: APropertyView<Any> = propertyViewEntry.second as APropertyView<Any>
+
+            propView.value = attribute.getPropertyValue(propertyViewEntry.first!!)
+        }
+    }
+
     private fun refreshConnection(animated: Boolean) {
         if (animated) {
             TransitionManager.beginDelayedTransition(connectionFrame)
         }
 
-        if (attribute?.valueConnection != null) {
+        if (connectionView.connection != null) {
             newConnectionButton.visibility = View.GONE
             connectionView.visibility = View.VISIBLE
-            connectionView.connection = attribute?.valueConnection
         } else {
             connectionView.visibility = View.GONE
             newConnectionButton.visibility = View.VISIBLE
@@ -209,7 +285,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
             wizardView.setWizardListener(object : WizardView.IWizardListener {
                 override fun onComplete(wizard: WizardView) {
-                    attribute?.valueConnection = wizardView.connection
+                    connectionView.connection = wizardView.connection
                     refreshConnection(true)
                     println("new connection refreshed.")
                     wizardDialog.dismiss()
