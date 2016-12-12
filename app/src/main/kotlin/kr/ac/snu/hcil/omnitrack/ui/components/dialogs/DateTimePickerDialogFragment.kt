@@ -5,10 +5,9 @@ import android.app.Dialog
 import android.os.Bundle
 import android.support.v4.app.DialogFragment
 import android.support.v4.app.FragmentManager
-import android.widget.CalendarView
-import android.widget.NumberPicker
-import android.widget.TabHost
-import android.widget.TextView
+import android.support.v7.widget.AppCompatButton
+import android.view.Gravity
+import android.widget.*
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.*
 import java.util.*
@@ -24,13 +23,13 @@ class DateTimePickerDialogFragment : DialogFragment() {
             labelView.text = "${year}-${zeroBasedMonth + 1}-${day}"
         }
 
-        private fun setTimeLabel(tabHost: TabHost, hour: Int, minute: Int, second: Int, ampm: Int) {
+        private fun setTimeLabel(tabHost: TabHost, hour: Int, minute: Int) {
             val labelView = tabHost.tabWidget.getChildAt(1).findViewById(android.R.id.title) as TextView
-            labelView.text = "${if (ampm == 0) {
+            labelView.text = "${if (hour < 12) {
                 "AM"
             } else {
                 "PM"
-            }} ${String.format("%02d", hour)}:${String.format("%02d", minute)}:${String.format("%02d", second)}"
+            }} ${String.format("%02d", hour)}:${String.format("%02d", minute)}"
         }
 
         fun getInstance(timestamp: Long): DateTimePickerDialogFragment {
@@ -41,7 +40,12 @@ class DateTimePickerDialogFragment : DialogFragment() {
             fragment.arguments = bundle
             return fragment
         }
+
+        const val TAB_DATE = "DateTab"
+        const val TAB_TIME = "TimeTab"
     }
+
+    private lateinit var tabHost: TabHost
 
     private var listener: ((timestamp: Long) -> Unit)? = null
 
@@ -49,33 +53,63 @@ class DateTimePickerDialogFragment : DialogFragment() {
     private var zeroBasedMonth: Int = 0
     private var day: Int = 0
 
-    private lateinit var hourPicker: NumberPicker
-    private lateinit var minutePicker: NumberPicker
-    private lateinit var secondPicker: NumberPicker
-    private lateinit var ampmPicker: NumberPicker
+    private fun applyModeToButton(tabTag: String, modeButton: AppCompatButton) {
+        when (tabTag) {
+            TAB_DATE -> {
+                modeButton.setText(R.string.msg_pick_time)
+                (modeButton.layoutParams as LinearLayout.LayoutParams).gravity = Gravity.END
+                modeButton.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.right_dark, 0)
+            }
+            TAB_TIME -> {
+                modeButton.setText(R.string.msg_pick_date)
+                (modeButton.layoutParams as LinearLayout.LayoutParams).gravity = Gravity.START
+                modeButton.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.left_dark, 0, 0, 0)
+            }
+        }
+    }
 
     fun showDialog(fragmentManager: FragmentManager, listener: (timestamp: Long) -> Unit) {
         this.listener = listener
         show(fragmentManager, "dialog")
     }
 
+    private var currentTab: String
+        get() {
+            return tabHost.currentTabTag
+        }
+        set(value) {
+            tabHost.setCurrentTabByTag(value)
+        }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
         val inflater = activity.layoutInflater
         val view = inflater.inflate(R.layout.dialog_datetime_picker, null)
 
-        val tabHost = view.findViewById(R.id.tabHost) as TabHost
+        tabHost = view.findViewById(R.id.tabHost) as TabHost
         tabHost.setup()
 
+        val modeButton = (view.findViewById(R.id.ui_mode_button) as AppCompatButton).apply {
+            InterfaceHelper.removeButtonTextDecoration(this)
+            applyModeToButton(TAB_DATE, this)
+            setOnClickListener {
+                currentTab = if (currentTab == TAB_DATE) {
+                    TAB_TIME
+                } else TAB_DATE
+            }
+        }
+
         tabHost.addTab(
-                tabHost.newTabSpec("DateTab").setContent(R.id.ui_calendar_tab_content).setIndicator("Date")
+                tabHost.newTabSpec(TAB_DATE).setContent(R.id.ui_calendar_tab_content).setIndicator("Date")
         )
 
         tabHost.addTab(
-                tabHost.newTabSpec("TimeTab").setContent(R.id.ui_time_tab_content).setIndicator("Time")
+                tabHost.newTabSpec(TAB_TIME).setContent(R.id.ui_time_tab_content).setIndicator("Time")
         )
 
+        tabHost.setOnTabChangedListener { tabName ->
+            applyModeToButton(tabName, modeButton)
+        }
 
         val calendar = GregorianCalendar(TimeZone.getDefault())
         calendar.timeInMillis = arguments?.getLong("timestamp", System.currentTimeMillis()) ?: System.currentTimeMillis()
@@ -85,10 +119,9 @@ class DateTimePickerDialogFragment : DialogFragment() {
         zeroBasedMonth = calendar.getZeroBasedMonth()
         day = calendar.getDayOfMonth()
 
-
         //apply labels
         setDateLabel(tabHost, year, zeroBasedMonth, day)
-        setTimeLabel(tabHost, calendar.getHour(), calendar.getMinute(), calendar.getSecond(), calendar.getAmPm())
+        setTimeLabel(tabHost, calendar.getHour(), calendar.getMinute())
 
         val calendarView = view.findViewById(R.id.ui_calendar_view) as CalendarView
 
@@ -101,59 +134,22 @@ class DateTimePickerDialogFragment : DialogFragment() {
             day = d
         }
 
-        hourPicker = view.findViewById(R.id.ui_hour_picker) as NumberPicker
-        minutePicker = view.findViewById(R.id.ui_minute_picker) as NumberPicker
-        secondPicker = view.findViewById(R.id.ui_second_picker) as NumberPicker
-        ampmPicker = view.findViewById(R.id.ui_ampm_picker) as NumberPicker
+        val timePickerView = view.findViewById(R.id.ui_time_picker_view) as TimePicker
+        timePickerView.setHourOfDayCompat(calendar.getHourOfDay())
+        timePickerView.setMinuteCompat(calendar.getMinute())
 
-        val onPickerValueChanged = NumberPicker.OnValueChangeListener { numberPicker, old, new ->
-            setTimeLabel(tabHost, hourPicker.value, minutePicker.value, secondPicker.value, ampmPicker.value)
+        timePickerView.setOnTimeChangedListener { picker, hourOfDay, minute ->
+
+            setTimeLabel(tabHost, hourOfDay, minute)
         }
-
-        hourPicker.setOnValueChangedListener(onPickerValueChanged)
-        minutePicker.setOnValueChangedListener(onPickerValueChanged)
-        secondPicker.setOnValueChangedListener(onPickerValueChanged)
-        ampmPicker.setOnValueChangedListener(onPickerValueChanged)
-
-        hourPicker.minValue = 1
-        hourPicker.maxValue = 12
-        val hour = calendar.get(Calendar.HOUR)
-        hourPicker.value = if (hour == 0) {
-            12
-        } else {
-            hour
-        }
-
-        minutePicker.minValue = 0
-        minutePicker.maxValue = 59
-        minutePicker.displayedValues = Array<String>(60) {
-            i ->
-            String.format("%02d", i);
-        }
-        minutePicker.value = calendar.get(Calendar.MINUTE)
-
-        secondPicker.minValue = 0
-        secondPicker.maxValue = 59
-        secondPicker.displayedValues = Array<String>(60) {
-            i ->
-            String.format("%02d", i);
-        }
-
-        secondPicker.value = calendar.get(Calendar.SECOND)
-
-        ampmPicker.minValue = 0
-        ampmPicker.maxValue = 1
-        ampmPicker.displayedValues = arrayOf("AM", "PM")
-        ampmPicker.value = calendar.get(Calendar.AM_PM)
-
 
         return AlertDialog.Builder(activity)
-                .setTitle(resources.getString(R.string.msg_pick_date))
+                .setTitle(resources.getString(R.string.msg_pick_date_and_time))
                 .setView(view)
                 .setPositiveButton(R.string.msg_ok) { a, b ->
                     val cal = GregorianCalendar(TimeZone.getDefault())
                     cal.set(Calendar.MILLISECOND, 0)
-                    cal.set(year, zeroBasedMonth, day, (hourPicker.value % 12) + 12 * ampmPicker.value, minutePicker.value, secondPicker.value)
+                    cal.set(year, zeroBasedMonth, day, timePickerView.getHourOfDayCompat(), timePickerView.getMinuteCompat())
                     listener?.invoke(cal.timeInMillis)
                 }
                 .setNegativeButton(R.string.msg_cancel, null)

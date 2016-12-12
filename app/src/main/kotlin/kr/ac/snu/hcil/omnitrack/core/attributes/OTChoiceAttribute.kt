@@ -57,12 +57,6 @@ class OTChoiceAttribute(objectId: String?, dbId: Long?, columnName: String, isRe
 
     override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_INT_ARRAY
 
-
-    override fun createProperties() {
-        assignProperty(OTBooleanProperty(false, PROPERTY_MULTISELECTION, OTApplication.getString(R.string.property_choice_allow_multiple_selections)))
-        assignProperty(OTChoiceEntryListProperty(PROPERTY_ENTRIES, OTApplication.getString(R.string.property_choice_entries)))
-    }
-
     var allowedMultiSelection: Boolean
         get() = getPropertyValue(PROPERTY_MULTISELECTION)
         set(value) = setPropertyValue(PROPERTY_MULTISELECTION, value)
@@ -70,6 +64,15 @@ class OTChoiceAttribute(objectId: String?, dbId: Long?, columnName: String, isRe
     var entries: UniqueStringEntryList
         get() = getPropertyValue(PROPERTY_ENTRIES)
         set(value) = setPropertyValue(PROPERTY_ENTRIES, value)
+
+    init {
+        entries = UniqueStringEntryList(PREVIEW_ENTRIES)
+    }
+
+    override fun createProperties() {
+        assignProperty(OTBooleanProperty(false, PROPERTY_MULTISELECTION, OTApplication.getString(R.string.property_choice_allow_multiple_selections)))
+        assignProperty(OTChoiceEntryListProperty(PROPERTY_ENTRIES, OTApplication.getString(R.string.property_choice_entries)))
+    }
 
     override fun formatAttributeValue(value: Any): String {
         val entries = this.entries
@@ -176,10 +179,7 @@ class OTChoiceAttribute(objectId: String?, dbId: Long?, columnName: String, isRe
 
     override fun getViewForItemList(context: Context, recycledView: View?): View {
 
-        val target: WordListView = if (recycledView is WordListView) {
-            recycledView
-        } else WordListView(context)
-
+        val target: WordListView = recycledView as? WordListView ?: WordListView(context)
 
         target.useColors = true
 

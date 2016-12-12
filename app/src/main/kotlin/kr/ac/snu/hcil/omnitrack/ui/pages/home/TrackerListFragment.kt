@@ -366,7 +366,6 @@ class TrackerListFragment : OTFragment() {
 
 
                 } else if (view === expandButton) {
-                    var toClose = -1
                     if (collapsed) {
 
                         lastExpandedViewHolder?.collapse(true)
