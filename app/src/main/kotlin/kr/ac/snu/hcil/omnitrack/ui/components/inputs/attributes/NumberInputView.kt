@@ -149,6 +149,8 @@ class NumberInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
 
 
         valueStatic.text = spanned
+        valueField.setText(value.toPlainString(), TextView.BufferType.NORMAL)
+        valueField.setSelection(valueField.text.length)
     }
 
     fun applyFieldValue() {
