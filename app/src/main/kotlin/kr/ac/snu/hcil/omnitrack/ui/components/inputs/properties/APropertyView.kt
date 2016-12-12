@@ -20,6 +20,9 @@ abstract class APropertyView<T>(layoutId: Int, context: Context, attrs: Attribut
             titleView.text = value
         }
 
+    abstract fun getSerializedValue(): String?
+    abstract fun setSerializedValue(serialized: String): Boolean
+
     constructor(layoutId: Int, context: Context) : this(layoutId, context, null)
 
     init {

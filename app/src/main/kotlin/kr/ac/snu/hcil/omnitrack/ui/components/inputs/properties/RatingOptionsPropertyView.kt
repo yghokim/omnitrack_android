@@ -5,6 +5,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
+import com.google.gson.Gson
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.RatingOptions
 
@@ -91,6 +92,19 @@ class RatingOptionsPropertyView(context: Context, attrs: AttributeSet?) : APrope
                     starLevelSelectionView.visibility = View.VISIBLE
                 }
             }
+        }
+    }
+
+    override fun getSerializedValue(): String? {
+        return Gson().toJson(value)
+    }
+
+    override fun setSerializedValue(serialized: String): Boolean {
+        try {
+            value = Gson().fromJson(serialized, RatingOptions::class.java)
+            return true
+        } catch(e: Exception) {
+            return false
         }
     }
 }
