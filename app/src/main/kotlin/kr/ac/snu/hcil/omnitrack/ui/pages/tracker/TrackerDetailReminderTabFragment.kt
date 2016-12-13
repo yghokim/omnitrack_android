@@ -47,6 +47,11 @@ class TrackerDetailReminderTabFragment : TrackerDetailActivity.ChildFragment() {
         return rootView
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        core.onDestroyView()
+    }
+
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         core.onViewCreated(view, savedInstanceState)
