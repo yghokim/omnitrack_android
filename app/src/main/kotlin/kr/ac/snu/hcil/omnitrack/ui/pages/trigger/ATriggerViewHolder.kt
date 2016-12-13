@@ -323,6 +323,15 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
         println("measured trigger view sizes: $collapsedHeight, $expandedHeight")
     }
 
+    fun unSubscribeAll() {
+        if (!isFirstBinding) {
+            this.trigger.run {
+                switchTurned -= onTriggerSwitchTurned
+                fired -= onTriggerFired
+            }
+        }
+    }
+
     @Suppress("UNCHECKED_CAST")
     fun bind(trigger: OTTrigger) {
         if (!isFirstBinding) {

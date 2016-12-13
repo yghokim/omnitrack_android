@@ -20,6 +20,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.FallbackRecyclerView
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.DrawableListBottomSpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
 import rx.subscriptions.CompositeSubscription
+import java.util.*
 
 /**
  * Created by Young-Ho Kim on 9/2/2016
@@ -107,6 +108,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
 
     fun onDestroyView() {
         subscriptions.unsubscribe()
+        adapter.unSubscribeAll()
     }
 
     fun onSaveInstanceState(outState: Bundle) {
@@ -127,6 +129,14 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
     }
 
     inner class Adapter() : RecyclerView.Adapter<ATriggerViewHolder<out OTTrigger>>(), ATriggerViewHolder.ITriggerControlListener {
+
+        private val viewHolders = ArrayList<ATriggerViewHolder<out OTTrigger>>()
+
+        fun unSubscribeAll() {
+            for (viewHolder in viewHolders) {
+                viewHolder.unSubscribeAll()
+            }
+        }
 
         override fun getItemViewType(position: Int): Int {
             return getTriggers()[position].typeId
@@ -163,6 +173,8 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
                 else ->
                     TimeTriggerViewHolder(parentView, this, parent.context)
 
+            }.apply {
+                viewHolders.add(this)
             }
         }
 
