@@ -1,7 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.triggers
 
 import android.content.Context
-import com.google.gson.Gson
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
@@ -12,6 +11,7 @@ import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializedStringKeyEntry
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
+import kr.ac.snu.hcil.omnitrack.utils.serialization.stringKeyEntryParser
 import java.util.*
 import kotlin.properties.Delegates
 
@@ -105,11 +105,8 @@ abstract class OTTrigger(objectId: String?, dbId: Long?, val user: OTUser, name:
 
         if(serializedProperties!=null)
         {
-            val gson = Gson()
-            val parcel = gson.fromJson(serializedProperties, Array<SerializedStringKeyEntry>::class.java)
-            for(entry in parcel)
-            {
-                properties[entry.key] = TypeStringSerializationHelper.deserialize(entry.value)
+            stringKeyEntryParser.fromJson(serializedProperties, Array<SerializedStringKeyEntry>::class.java).forEach {
+                properties[it.key] = TypeStringSerializationHelper.deserialize(it.value)
             }
         }
 
@@ -125,7 +122,7 @@ abstract class OTTrigger(objectId: String?, dbId: Long?, val user: OTUser, name:
                 list.add(SerializedStringKeyEntry(key, TypeStringSerializationHelper.serialize(value)))
             }
 
-        return Gson().toJson(list.toTypedArray())
+        return stringKeyEntryParser.toJson(list.toTypedArray())
     }
 
     fun addTracker(tracker: OTTracker) {

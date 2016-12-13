@@ -1,6 +1,5 @@
 package kr.ac.snu.hcil.omnitrack.core
 
-import com.google.gson.Gson
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializedStringKeyEntry
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
@@ -50,13 +49,12 @@ abstract class ADataRow() {
 
     abstract fun extractValueArray(scheme: OTTracker): Array<Any?>
 
-    protected fun tableToSerializedEntryArray(scheme: OTTracker): Array<String> {
-        val s = ArrayList<String>()
-        val parser = Gson()
+    protected fun tableToSerializedEntryArray(scheme: OTTracker): Array<SerializedStringKeyEntry> {
+        val s = ArrayList<SerializedStringKeyEntry>()
 
         for (attribute in scheme.attributes) {
             if (valueTable[attribute.objectId] != null) {
-                s.add(parser.toJson(SerializedStringKeyEntry(attribute.objectId, TypeStringSerializationHelper.serialize(attribute.typeNameForSerialization, valueTable[attribute.objectId]!!))))
+                s.add(SerializedStringKeyEntry(attribute.objectId, TypeStringSerializationHelper.serialize(attribute.typeNameForSerialization, valueTable[attribute.objectId]!!)))
             }
         }
 
