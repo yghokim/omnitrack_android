@@ -176,7 +176,7 @@
     <string name="btn_search">검색&#8230;</string>
     <string name="adjust">조정</string>
 
-    <string name="msg_empty_vaule">값 없음</string>
+    <string name="msg_empty_value">값 없음</string>
 
 
     <string-array name="choice_preview_entries">
