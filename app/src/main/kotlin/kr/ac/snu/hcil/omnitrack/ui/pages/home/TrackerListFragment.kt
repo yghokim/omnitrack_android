@@ -28,6 +28,7 @@ import android.view.animation.DecelerateInterpolator
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
+import butterknife.bindView
 import com.afollestad.materialdialogs.MaterialDialog
 import it.sephiroth.android.library.tooltip.Tooltip
 import kr.ac.snu.hcil.omnitrack.OTApplication
@@ -292,21 +293,21 @@ class TrackerListFragment : OTFragment() {
 
         inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view), View.OnClickListener {
 
-            val name: TextView
-            val color: View
-            val expandButton: ImageButton
+            val name: TextView by bindView(R.id.name)
+            val color: View by bindView(R.id.color_bar)
+            val expandButton: ImageButton by bindView(R.id.ui_expand_button)
 
-            val lastLoggingTimeView: TextView
-            val todayLoggingCountView: TextView
+            val lastLoggingTimeView: TextView by bindView(R.id.ui_last_logging_time)
+            val todayLoggingCountView: TextView by bindView(R.id.ui_today_logging_count)
 
-            val expandedView: View
+            val expandedView: View by bindView(R.id.ui_expanded_view)
 
-            val editButton: View
-            val listButton: View
-            val removeButton: View
-            val chartViewButton: View
+            val editButton: View by bindView(R.id.ui_button_edit)
+            val listButton: View by bindView(R.id.ui_button_list)
+            val removeButton: View by bindView(R.id.ui_button_remove)
+            val chartViewButton: View by bindView(R.id.ui_button_charts)
 
-            val errorIndicator: AppCompatImageButton
+            val errorIndicator: AppCompatImageButton by bindView(R.id.ui_invalid_icon)
 
             private val validationErrorMessages = ArrayList<CharSequence>()
 
@@ -318,24 +319,9 @@ class TrackerListFragment : OTFragment() {
             private var todayLoggingCountTask: DatabaseHelper.LoggingCountOfDayRetrievalTask? = null
 
             init {
-                name = view.findViewById(R.id.name) as TextView
-                color = view.findViewById(R.id.color_bar) as View
-                expandButton = view.findViewById(R.id.ui_expand_button) as ImageButton
-
-                lastLoggingTimeView = view.findViewById(R.id.ui_last_logging_time) as TextView
-                todayLoggingCountView = view.findViewById(R.id.ui_today_logging_count) as TextView
-
-                expandedView = view.findViewById(R.id.ui_expanded_view)
 
                 expandedView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
                 expandedViewHeight = expandedView.measuredHeight
-
-                editButton = view.findViewById(R.id.ui_button_edit)
-                listButton = view.findViewById(R.id.ui_button_list)
-                removeButton = view.findViewById(R.id.ui_button_remove)
-                chartViewButton = view.findViewById(R.id.ui_button_charts)
-
-                errorIndicator = view.findViewById(R.id.ui_invalid_icon) as AppCompatImageButton
 
                 view.setOnClickListener(this)
                 editButton.setOnClickListener(this)
@@ -348,6 +334,77 @@ class TrackerListFragment : OTFragment() {
                 errorIndicator.setOnClickListener(this)
 
                 collapse(false)
+            }
+
+            private val collapseAnimator = ValueAnimator.ofFloat(1f, 0f).apply {
+                duration = 250
+                interpolator = DecelerateInterpolator()
+                addListener(object : Animator.AnimatorListener {
+                    override fun onAnimationRepeat(p0: Animator?) {
+                    }
+
+                    override fun onAnimationEnd(p0: Animator?) {
+                        expandButton.isEnabled = true
+                        collapse(false)
+                    }
+
+                    override fun onAnimationCancel(p0: Animator?) {
+                        collapse(false)
+                    }
+
+                    override fun onAnimationStart(p0: Animator?) {
+                        expandButton.isEnabled = false
+                        expandButton.setImageResource(R.drawable.down_dark)
+                    }
+
+                })
+                addUpdateListener {
+                    val progress = (animatedValue as Float)
+                    expandedView.alpha = progress
+                    val lp = itemView.layoutParams.apply { height = (collapsedHeight + (expandedHeight - collapsedHeight) * progress).toInt() }
+                    itemView.layoutParams = lp
+                    itemView.requestLayout()
+
+                    expandedView.layoutParams.height = (0.5f + (expandedViewHeight) * progress).toInt()
+                    expandedView.requestLayout()
+                }
+            }
+
+            private val expandAnimator = ValueAnimator.ofFloat(0f, 1f).apply {
+                duration = 250
+                interpolator = DecelerateInterpolator()
+                addListener(object : Animator.AnimatorListener {
+                    override fun onAnimationRepeat(p0: Animator?) {
+                    }
+
+                    override fun onAnimationEnd(p0: Animator?) {
+                        expandButton.isEnabled = true
+                        expand(false)
+                    }
+
+                    override fun onAnimationCancel(p0: Animator?) {
+                        expand(false)
+                    }
+
+                    override fun onAnimationStart(p0: Animator?) {
+                        expandButton.isEnabled = false
+                        expandButton.setImageResource(R.drawable.up_dark)
+                        expandedView.visibility = View.VISIBLE
+                        expandedView.layoutParams.height = 0
+                        expandedView.requestLayout()
+                    }
+
+                })
+                addUpdateListener {
+                    val progress = (animatedValue as Float)
+                    expandedView.alpha = progress
+                    val lp = itemView.layoutParams.apply { height = (collapsedHeight + (expandedHeight - collapsedHeight) * progress).toInt() }
+                    itemView.layoutParams = lp
+                    itemView.requestLayout()
+
+                    expandedView.layoutParams.height = (0.5f + (expandedViewHeight) * progress).toInt()
+                    expandedView.requestLayout()
+                }
             }
 
             override fun onClick(view: View) {
@@ -457,41 +514,7 @@ class TrackerListFragment : OTFragment() {
 
             fun collapse(animate: Boolean) {
                 if (animate) {
-                    val animator = ValueAnimator.ofFloat(1f, 0f).apply {
-                        duration = 250
-                        interpolator = DecelerateInterpolator()
-                        addListener(object : Animator.AnimatorListener {
-                            override fun onAnimationRepeat(p0: Animator?) {
-                            }
-
-                            override fun onAnimationEnd(p0: Animator?) {
-                                expandButton.isEnabled = true
-                                collapse(false)
-                            }
-
-                            override fun onAnimationCancel(p0: Animator?) {
-                                collapse(false)
-                            }
-
-                            override fun onAnimationStart(p0: Animator?) {
-                                expandButton.isEnabled = false
-                                expandButton.setImageResource(R.drawable.down_dark)
-                            }
-
-                        })
-                        addUpdateListener {
-                            val progress = (animatedValue as Float)
-                            expandedView.alpha = progress
-                            val lp = itemView.layoutParams.apply { height = (collapsedHeight + (expandedHeight - collapsedHeight) * progress).toInt() }
-                            itemView.layoutParams = lp
-                            itemView.requestLayout()
-
-                            expandedView.layoutParams.height = (0.5f + (expandedViewHeight) * progress).toInt()
-                            expandedView.requestLayout()
-                        }
-                    }
-
-                    animator.start()
+                    collapseAnimator.start()
                     collapsed = true
 
                 } else {
@@ -505,44 +528,7 @@ class TrackerListFragment : OTFragment() {
 
             fun expand(animate: Boolean) {
                 if (animate) {
-                    val animator = ValueAnimator.ofFloat(0f, 1f).apply {
-                        duration = 250
-                        interpolator = DecelerateInterpolator()
-                        addListener(object : Animator.AnimatorListener {
-                            override fun onAnimationRepeat(p0: Animator?) {
-                            }
-
-                            override fun onAnimationEnd(p0: Animator?) {
-                                expandButton.isEnabled = true
-                                expand(false)
-                            }
-
-                            override fun onAnimationCancel(p0: Animator?) {
-                                expand(false)
-                            }
-
-                            override fun onAnimationStart(p0: Animator?) {
-                                expandButton.isEnabled = false
-                                expandButton.setImageResource(R.drawable.up_dark)
-                                expandedView.visibility = View.VISIBLE
-                                expandedView.layoutParams.height = 0
-                                expandedView.requestLayout()
-                            }
-
-                        })
-                        addUpdateListener {
-                            val progress = (animatedValue as Float)
-                            expandedView.alpha = progress
-                            val lp = itemView.layoutParams.apply { height = (collapsedHeight + (expandedHeight - collapsedHeight) * progress).toInt() }
-                            itemView.layoutParams = lp
-                            itemView.requestLayout()
-
-                            expandedView.layoutParams.height = (0.5f + (expandedViewHeight) * progress).toInt()
-                            expandedView.requestLayout()
-                        }
-                    }
-
-                    animator.start()
+                    expandAnimator.start()
                     collapsed = false
                 } else {
                     expandedView.visibility = View.VISIBLE

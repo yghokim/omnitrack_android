@@ -356,7 +356,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                 inner class NoValueTableRowViewHolder(view: ViewGroup) : TableRowViewHolder(view) {
                     init {
                         if (valueView is TextView) {
-                            (valueView as TextView).text = "No value"
+                            (valueView as TextView).text = getString(R.string.msg_empty_value)
                             (valueView as TextView).setTextColor(ContextCompat.getColor(this@ItemBrowserActivity, R.color.colorRed_Light))
                         }
                     }
