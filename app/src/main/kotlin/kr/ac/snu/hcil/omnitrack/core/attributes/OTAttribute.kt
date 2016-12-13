@@ -5,7 +5,6 @@ import android.content.Context
 import android.util.SparseArray
 import android.view.View
 import android.widget.TextView
-import com.google.gson.Gson
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
@@ -23,6 +22,7 @@ import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 import kr.ac.snu.hcil.omnitrack.utils.TextHelper
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializedIntegerKeyEntry
+import kr.ac.snu.hcil.omnitrack.utils.serialization.integerKeyEntryParser
 import java.util.*
 import kotlin.properties.Delegates
 
@@ -126,11 +126,8 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
         createProperties()
         if (propertyData != null) {
 
-            val parser = Gson()
-            val s = parser.fromJson(propertyData, Array<String>::class.java).map { parser.fromJson(it, SerializedIntegerKeyEntry::class.java) }
-
-            for (entry in s) {
-                setPropertyValueFromSerializedString(entry.key, entry.value)
+            integerKeyEntryParser.fromJson(propertyData, Array<SerializedIntegerKeyEntry>::class.java).forEach {
+                setPropertyValueFromSerializedString(it.key, it.value)
             }
         }
 
@@ -148,13 +145,11 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
     }
 
     fun getSerializedProperties(): String {
-        val s = ArrayList<String>()
-        val parser = Gson()
-        for (key in propertyKeys) {
-            s.add(parser.toJson(SerializedIntegerKeyEntry(key, getProperty<Any>(key).getSerializedValue())))
-        }
-
-        return parser.toJson(s.toTypedArray())
+        return integerKeyEntryParser.toJson(
+                propertyKeys.map {
+                    SerializedIntegerKeyEntry(it, getProperty<Any>(it).getSerializedValue())
+                }.toTypedArray()
+        )
     }
 
     abstract val typeNameForSerialization: String
@@ -240,9 +235,7 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
 
     open fun getViewForItemList(context: Context, recycledView: View?): View {
 
-        val target: TextView = if (recycledView is TextView) {
-            recycledView
-        } else TextView(context)
+        val target: TextView = recycledView as? TextView ?: TextView(context)
 
         InterfaceHelper.setTextAppearance(target, R.style.viewForItemListTextAppearance)
 
@@ -256,7 +249,7 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
             if (value != null) {
                 view.text = TextHelper.stringWithFallback(formatAttributeValue(value), "-")
             } else {
-                view.text = "No value"
+                view.text = view.context.getString(R.string.msg_empty_vaule)
             }
             return true
         } else return false
