@@ -7,6 +7,7 @@ import android.os.Looper
 import android.os.SystemClock
 import android.support.multidex.MultiDexApplication
 import android.text.format.DateUtils
+import com.squareup.leakcanary.LeakCanary
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
@@ -145,6 +146,13 @@ class OTApplication : MultiDexApplication() {
 
     override fun onCreate() {
         super.onCreate()
+
+        if (LeakCanary.isInAnalyzerProcess(this)) {
+            // This process is dedicated to LeakCanary for heap analysis.
+            // You should not init your app in this process.
+            return;
+        }
+        LeakCanary.install(this);
 
         val startedAt = SystemClock.elapsedRealtime()
 

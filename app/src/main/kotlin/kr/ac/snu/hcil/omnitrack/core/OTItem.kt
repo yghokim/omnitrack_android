@@ -1,12 +1,12 @@
 package kr.ac.snu.hcil.omnitrack.core
 
-import com.google.gson.Gson
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.database.IDatabaseStorable
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializedStringKeyEntry
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
+import kr.ac.snu.hcil.omnitrack.utils.serialization.stringKeyEntryParser
 
 /**
  * Created by Young-Ho Kim on 16. 7. 22
@@ -99,9 +99,9 @@ class OTItem : ADataRow, IDatabaseStorable {
         this.timestamp = timestamp
         this.source = source
 
-        val parser = Gson()
-        val s = parser.fromJson(serializedValues, Array<String>::class.java).map { parser.fromJson(it, SerializedStringKeyEntry::class.java) }
+        val s = stringKeyEntryParser.fromJson(serializedValues, Array<SerializedStringKeyEntry>::class.java)
         for (entry in s) {
+            println(entry.value)
             valueTable[entry.key] = TypeStringSerializationHelper.deserialize(entry.value)
         }
     }
@@ -130,7 +130,7 @@ class OTItem : ADataRow, IDatabaseStorable {
     }
 
     fun getSerializedValueTable(scheme: OTTracker): String {
-        return Gson().toJson(tableToSerializedEntryArray(scheme))
+        return stringKeyEntryParser.toJson(tableToSerializedEntryArray(scheme))
     }
 
     override fun extractFormattedStringArray(scheme: OTTracker): Array<String?> {
