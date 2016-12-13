@@ -190,7 +190,7 @@
     <string name="btn_search">Search&#8230;</string>
     <string name="adjust">Adjust</string>
 
-    <string name="msg_empty_vaule">Empty value</string>
+    <string name="msg_empty_value">Empty value</string>
 
 
     <string-array name="choice_preview_entries">

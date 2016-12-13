@@ -249,7 +249,7 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
             if (value != null) {
                 view.text = TextHelper.stringWithFallback(formatAttributeValue(value), "-")
             } else {
-                view.text = view.context.getString(R.string.msg_empty_vaule)
+                view.text = view.context.getString(R.string.msg_empty_value)
             }
             return true
         } else return false
