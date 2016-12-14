@@ -2,7 +2,6 @@ package kr.ac.snu.hcil.omnitrack.utils.serialization
 
 import android.net.Uri
 import com.google.android.gms.maps.model.LatLng
-import com.google.gson.Gson
 import kr.ac.snu.hcil.omnitrack.core.datatypes.Route
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
@@ -61,13 +60,12 @@ object TypeStringSerializationHelper {
             Uri::class.java.name to TYPENAME_URI
     )
 
-    private val parcelCache = ParcelWithType("", "")
-    private val gson = Gson()
-
-
     fun serialize(typeName: String, value: Any): String {
-        parcelCache.t = typeName
-        parcelCache.v = when (parcelCache.t) {
+        val stringBuilder = StringBuilder()
+        stringBuilder.append(typeName.length)
+        stringBuilder.append(typeName)
+
+        val stringValue = when (typeName) {
             TYPENAME_BIGDECIMAL -> {
                 if (value is BigDecimal) {
                     value.toPlainString()
@@ -78,13 +76,9 @@ object TypeStringSerializationHelper {
                 }
             }
             TYPENAME_TIMEPOINT -> {
-                if(value is TimePoint) {
-                    value.getSerializedString()
-                }
-                else if(value is Long){
+                (value as? TimePoint)?.getSerializedString() ?: if (value is Long) {
                     TimePoint(value, TimeZone.getDefault().id).getSerializedString()
-                }
-                else throw TypeCastException("this value is not a Long or Timepoint.")
+                } else throw TypeCastException("this value is not a Long or Timepoint.")
             }
             TYPENAME_TIMESPAN -> (value as TimeSpan).getSerializedString()
             TYPENAME_INT_ARRAY -> (value as IntArray).joinToString(",")
@@ -94,7 +88,9 @@ object TypeStringSerializationHelper {
             else -> value.toString()
         }
 
-        return gson.toJson(parcelCache)
+        stringBuilder.append(stringValue)
+
+        return stringBuilder.toString()
     }
 
     fun serialize(value: Any): String {
@@ -105,30 +101,33 @@ object TypeStringSerializationHelper {
     }
 
     fun deserialize(serialized: String): Any {
-        val parcel = gson.fromJson(serialized, ParcelWithType::class.java)
-        return when (parcel.t) {
-            TYPENAME_INT -> parcel.v.toInt()
-            TYPENAME_FLOAT -> parcel.v.toFloat()
-            TYPENAME_DOUBLE -> parcel.v.toDouble()
-            TYPENAME_LONG -> parcel.v.toLong()
-            TYPENAME_STRING -> parcel.v
-            TYPENAME_BIGDECIMAL -> BigDecimal(parcel.v)
-            TYPENAME_TIMEPOINT -> TimePoint(parcel.v)
-            TYPENAME_TIMESPAN -> TimeSpan(parcel.v)
-            TYPENAME_INT_ARRAY -> if (parcel.v.isNullOrEmpty()) {
+        val typeLength = Character.getNumericValue(serialized[0])
+        val typeName = serialized.subSequence(1, typeLength + 1)
+        val value = serialized.subSequence(1 + typeLength, serialized.length).toString()
+        println(value)
+        return when (typeName) {
+            TYPENAME_INT -> value.toInt()
+            TYPENAME_FLOAT -> value.toFloat()
+            TYPENAME_DOUBLE -> value.toDouble()
+            TYPENAME_LONG -> value.toLong()
+            TYPENAME_STRING -> value
+            TYPENAME_BIGDECIMAL -> BigDecimal(value)
+            TYPENAME_TIMEPOINT -> TimePoint(value)
+            TYPENAME_TIMESPAN -> TimeSpan(value)
+            TYPENAME_INT_ARRAY -> if (value.isNullOrEmpty()) {
                 intArrayOf()
             } else {
-                parcel.v.split(",").map { it.toInt() }.toIntArray()
+                value.split(",").map(String::toInt).toIntArray()
             }
-            TYPENAME_LONG_ARRAY -> if (parcel.v.isNullOrEmpty()) {
+            TYPENAME_LONG_ARRAY -> if (value.isNullOrEmpty()) {
                 longArrayOf()
             } else {
-                parcel.v.split(",").map { it.toLong() }.toLongArray()
+                value.split(",").map(String::toLong).toLongArray()
             }
-            TYPENAME_LATITUDE_LONGITUDE -> deserializeLatLng(parcel.v)
-            TYPENAME_ROUTE -> Route(parcel.v)
-            TYPENAME_URI -> Uri.parse(parcel.v)
-            else -> return parcel.v
+            TYPENAME_LATITUDE_LONGITUDE -> deserializeLatLng(value)
+            TYPENAME_ROUTE -> Route(value)
+            TYPENAME_URI -> Uri.parse(value)
+            else -> return value
         }
     }
 

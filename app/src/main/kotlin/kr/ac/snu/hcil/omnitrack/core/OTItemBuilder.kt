@@ -191,8 +191,6 @@ class OTItemBuilder : Parcelable, IStringSerializable {
      */
     constructor(parcel: Parcel) {
 
-        val gson = Gson()
-
         reloadTracker(parcel.readString())
 
         this.mode = parcel.readInt()
