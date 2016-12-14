@@ -169,6 +169,7 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
             inputView.onPause()
         }
 
+
         if (mode == Mode.New) {
             if (!skipViewValueCaching) {
                 storeItemBuilderCache()
@@ -293,7 +294,7 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
         val preferences = getSharedPreferences(OTApplication.PREFERENCE_KEY_FOREGROUND_ITEM_BUILDER_STORAGE, Context.MODE_PRIVATE)
         val serialized = preferences.getString(makeTrackerPreferenceKey(tracker), null)
         try {
-            val storedBuilder = OTItemBuilder(serialized)
+            val storedBuilder = OTItemBuilder.parser.fromJson(serialized, OTItemBuilder::class.java)
             /*
             if (activityResultAppliedAttributePosition != -1) {
                 storedBuilder.setValueOf(tracker.attributes[activityResultAppliedAttributePosition],
