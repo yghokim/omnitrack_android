@@ -1,7 +1,6 @@
 package kr.ac.snu.hcil.omnitrack
 
 import android.graphics.Color
-import android.os.AsyncTask
 import android.os.HandlerThread
 import android.os.Looper
 import android.os.SystemClock
@@ -193,6 +192,7 @@ class OTApplication : MultiDexApplication() {
         userLoadingLooper = thread.looper
 
         currentUserObservable
+                .subscribeOn(Schedulers.newThread())
                 .subscribe {
                     user ->
                     for (tracker in user.getTrackersOnShortcut()) {
@@ -208,9 +208,7 @@ class OTApplication : MultiDexApplication() {
                     }
 
                     if (initialRun) {
-                        AsyncTask.execute {
                             createExampleTrackers(user)
-                        }
                     }
                 }
 

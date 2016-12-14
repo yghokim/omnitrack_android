@@ -1,5 +1,10 @@
 package kr.ac.snu.hcil.omnitrack.utils
 
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.TypeAdapter
+import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonWriter
 import kr.ac.snu.hcil.omnitrack.R
 import org.atteo.evo.inflector.English
 import java.math.BigDecimal
@@ -10,6 +15,49 @@ import java.text.DecimalFormat
  * Created by younghokim on 16. 9. 5..
  */
 class NumberStyle {
+
+    companion object {
+        val parser: Gson by lazy {
+            GsonBuilder().registerTypeAdapter(NumberStyle::class.java, NumberStyleTypeAdapter()).create()
+        }
+    }
+
+    internal class NumberStyleTypeAdapter : TypeAdapter<NumberStyle>() {
+        override fun read(input: JsonReader): NumberStyle {
+
+
+            return NumberStyle().apply {
+
+                input.beginObject()
+                input.nextName()
+                this.unitPositionId = input.nextInt()
+
+                input.nextName()
+                this.unit = input.nextString()
+
+                input.nextName()
+                this.pluralizeUnit = input.nextBoolean()
+
+                input.nextName()
+                this.fractionPart = input.nextInt()
+
+                input.nextName()
+                this.commaUnit = input.nextInt()
+
+                input.endObject()
+            }
+        }
+
+        override fun write(out: JsonWriter, value: NumberStyle) {
+            out.beginObject()
+            out.name("up").value(value.unitPositionId)
+            out.name("un").value(value.unit)
+            out.name("p").value(value.pluralizeUnit)
+            out.name("f").value(value.fractionPart)
+            out.name("c").value(value.commaUnit)
+            out.endObject()
+        }
+    }
 
     class FormattedInformation(var unitPart: String?, var numberPart: String, var unitPosition: UnitPosition) {
         val unitPartStart: Int get() {

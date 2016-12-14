@@ -144,15 +144,20 @@ class NumberStylePropertyView(context: Context, attrs: AttributeSet?) : APropert
 
 
     override fun getSerializedValue(): String? {
-        return Gson().toJson(value)
+        return NumberStyle.parser.toJson(value)
     }
 
     override fun setSerializedValue(serialized: String): Boolean {
         try {
-            value = Gson().fromJson(serialized, NumberStyle::class.java)
+            value = NumberStyle.parser.fromJson(serialized, NumberStyle::class.java)
             return true
         } catch(e: Exception) {
-            return false
+            try {
+                value = Gson().fromJson(serialized, NumberStyle::class.java)
+                return true
+            } catch(e: Exception) {
+                return false
+            }
         }
     }
 

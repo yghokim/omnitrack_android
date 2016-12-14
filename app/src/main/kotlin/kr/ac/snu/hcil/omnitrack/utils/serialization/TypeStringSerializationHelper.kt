@@ -104,7 +104,6 @@ object TypeStringSerializationHelper {
         val typeLength = Character.getNumericValue(serialized[0])
         val typeName = serialized.subSequence(1, typeLength + 1)
         val value = serialized.subSequence(1 + typeLength, serialized.length).toString()
-        println(value)
         return when (typeName) {
             TYPENAME_INT -> value.toInt()
             TYPENAME_FLOAT -> value.toFloat()
