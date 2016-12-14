@@ -96,15 +96,20 @@ class RatingOptionsPropertyView(context: Context, attrs: AttributeSet?) : APrope
     }
 
     override fun getSerializedValue(): String? {
-        return Gson().toJson(value)
+        return RatingOptions.parser.toJson(value)
     }
 
     override fun setSerializedValue(serialized: String): Boolean {
         try {
-            value = Gson().fromJson(serialized, RatingOptions::class.java)
+            value = RatingOptions.parser.fromJson(serialized, RatingOptions::class.java)
             return true
         } catch(e: Exception) {
-            return false
+            try {
+                value = Gson().fromJson(serialized, RatingOptions::class.java)
+                return true
+            } catch(e: Exception) {
+                return false
+            }
         }
     }
 }

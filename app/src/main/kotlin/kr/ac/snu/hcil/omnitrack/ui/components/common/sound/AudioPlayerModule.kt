@@ -59,9 +59,14 @@ class AudioPlayerModule(var listener: PlayerListener?, val filePath: String, pro
     }
 
     override fun onStop(cancel: Boolean) {
-        player.stop()
-        player.reset()
-        player.release()
+        try {
+            player.stop()
+            player.reset()
+        } catch(e: Exception) {
+            e.printStackTrace()
+        } finally {
+            player.release()
+        }
         isPlaying = false
         if (cancel != true) {
             listener?.onAudioPlayerFinished(this, filePath)
