@@ -3,6 +3,10 @@ package kr.ac.snu.hcil.omnitrack.core
 import android.os.Parcel
 import android.os.Parcelable
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.TypeAdapter
+import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonWriter
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.utils.serialization.IStringSerializable
@@ -13,6 +17,97 @@ import java.util.*
  * Created by Young-Ho Kim on 16. 7. 25
  */
 class OTItemBuilder : Parcelable, IStringSerializable {
+
+    internal data class ValueParcel(val key: String, val serializedValue: String, val timeStamp: Long)
+
+    internal class ValueParcelTypeAdapter : TypeAdapter<ValueParcel>() {
+
+        override fun read(input: JsonReader): ValueParcel {
+            input.beginObject()
+            input.nextName()
+            val k = input.nextString()
+            input.nextName()
+            val s = input.nextString()
+            input.nextName()
+            val t = input.nextLong()
+            input.endObject()
+
+            return ValueParcel(k, s, t)
+        }
+
+        override fun write(out: JsonWriter, value: ValueParcel) {
+            out.beginObject()
+            out.name("k").value(value.key)
+            out.name("s").value(value.serializedValue)
+            out.name("t").value(value.timeStamp)
+            out.endObject()
+        }
+    }
+
+    class OTItemBuilderTypeAdapter : TypeAdapter<OTItemBuilder>() {
+
+        override fun read(input: JsonReader): OTItemBuilder {
+            input.beginObject()
+            input.nextName()
+            val trackerObjId = input.nextString()
+            input.nextName()
+            val itemId = input.nextLong()
+            input.nextName()
+            val mode = input.nextInt()
+
+            val builder = OTItemBuilder(trackerObjId, mode, itemId)
+
+            input.nextName()
+            input.beginArray()
+
+            while (input.hasNext()) {
+                input.beginObject()
+
+                input.nextName()
+                val key = input.nextString()
+
+                input.nextName()
+                val value = input.nextString()
+
+                input.nextName()
+                val timeStamp = input.nextLong()
+
+                builder.valueTable[key] = ValueInfo(TypeStringSerializationHelper.deserialize(value), timeStamp)
+                input.endObject()
+            }
+
+            input.endArray()
+
+            input.endObject()
+
+            return builder
+        }
+
+        override fun write(out: JsonWriter, builder: OTItemBuilder) {
+            out.beginObject()
+            out.name("tr").value(builder.tracker.objectId)
+            out.name("it").value(builder.connectedItemDbId)
+            out.name("md").value(builder.mode)
+            out.name("v").beginArray()
+
+            builder.tracker.attributes.unObservedList.forEach {
+                val valueInfo = builder.valueTable[it.objectId]
+                if (valueInfo != null) {
+                    out.beginObject()
+                    out.name("k").value(it.objectId)
+                    out.name("v").value(TypeStringSerializationHelper.serialize(it.typeNameForSerialization, valueInfo.value))
+                    out.name("t").value(valueInfo.timestamp)
+                    out.endObject()
+                }
+            }
+            out.endArray()
+
+            out.endObject()
+
+        }
+
+    }
+
 
     companion object {
         const val MODE_EDIT = 2
@@ -28,6 +123,14 @@ class OTItemBuilder : Parcelable, IStringSerializable {
                 return arrayOfNulls(size)
             }
         }
+
+        val parcelParser: Gson by lazy {
+            GsonBuilder().registerTypeAdapter(ValueParcel::class.java, ValueParcelTypeAdapter()).create()
+        }
+
+        val parser: Gson by lazy {
+            GsonBuilder().registerTypeAdapter(OTItemBuilder::class.java, OTItemBuilderTypeAdapter()).create()
+        }
     }
 
     enum class EAttributeValueState {
@@ -39,8 +142,6 @@ class OTItemBuilder : Parcelable, IStringSerializable {
     }
 
     data class ValueInfo(var value: Any, var timestamp: Long)
-
-    internal data class SerializationPackage(val trackerObjectId: String, val mode: Int, val connectedItemDbId: Long, val serializedEntries: Array<String>)
 
     private val attributeStateList = ArrayList<EAttributeValueState>()
 
@@ -97,12 +198,12 @@ class OTItemBuilder : Parcelable, IStringSerializable {
         this.mode = parcel.readInt()
         this.connectedItemDbId = parcel.readLong()
 
-        for (serializedEntry in parcel.createStringArray()) {
-            val entry = gson.fromJson(serializedEntry, Array<String>::class.java)
+        val parcelArray = parcelParser.fromJson(parcel.readString(), Array<ValueParcel>::class.java)
 
-            valueTable[entry[0]] = ValueInfo(
-                    TypeStringSerializationHelper.deserialize(entry[1]),
-                    entry[2].toLong()
+        for (entry in parcelArray) {
+            valueTable[entry.key] = ValueInfo(
+                    TypeStringSerializationHelper.deserialize(entry.serializedValue),
+                    entry.timeStamp
             )
 
         }
@@ -115,57 +216,49 @@ class OTItemBuilder : Parcelable, IStringSerializable {
         parcel.writeInt(mode)
         parcel.writeLong(connectedItemDbId)
 
-        val gson = Gson()
-        parcel.writeStringArray(
-                valueTable.map {
-                    gson.toJson(arrayOf(it.key,
-                            TypeStringSerializationHelper.serialize(it.value), it.value.timestamp.toString()))
+
+        parcel.writeString(
+                parcelParser.toJson(valueTable.map {
+                    ValueParcel(it.key,
+                            TypeStringSerializationHelper.serialize(it.value), it.value.timestamp)
                 }.toTypedArray()
-        )
+                ))
     }
 
-
+    constructor(trackerObjectId: String, mode: Int, connectedItemDbId: Long) {
+        reloadTracker(trackerObjectId)
+        this.mode = mode
+        this.connectedItemDbId = connectedItemDbId
+        syncFromTrackerScheme()
+    }
+/*
     constructor(serialized: String) {
 
         val gson = Gson()
 
         val pack = gson.fromJson(serialized, SerializationPackage::class.java)
 
+
         reloadTracker(pack.trackerObjectId)
 
         this.mode = pack.mode
         this.connectedItemDbId = pack.connectedItemDbId
 
-        for (serializedEntry in pack.serializedEntries) {
-            val entry = gson.fromJson(serializedEntry, Array<String>::class.java)
+        val parcelArray = parcelParser.fromJson(pack.valueParcelArray, Array<ValueParcel>::class.java)
 
-            valueTable[entry[0]] = ValueInfo(
-                    TypeStringSerializationHelper.deserialize(entry[1]),
-                    entry[2].toLong()
+        for (entry in parcelArray) {
+            valueTable[entry.key] = ValueInfo(
+                    TypeStringSerializationHelper.deserialize(entry.serializedValue),
+                    entry.timeStamp
             )
 
         }
 
         syncFromTrackerScheme()
-    }
+    }*/
 
     override fun getSerializedString(): String {
-
-        val gson = Gson()
-
-        val pack = SerializationPackage(tracker.objectId, mode, connectedItemDbId,
-                tracker.attributes.mapNonNull {
-                    val valueInfo = valueTable[it.objectId]
-                    if (valueInfo != null) {
-                        gson.toJson(arrayOf(it.objectId,
-                                TypeStringSerializationHelper.serialize(it.typeNameForSerialization, valueInfo.value), valueInfo.timestamp.toString()))
-                    } else null
-                }.toTypedArray()
-        )
-
-        val json = gson.toJson(pack)
-        println(json)
-        return json
+        return parser.toJson(this)
     }
 
     override fun fromSerializedString(serialized: String): Boolean {
@@ -230,17 +323,45 @@ class OTItemBuilder : Parcelable, IStringSerializable {
         for (attributeEntry in tracker.attributes.unObservedList.withIndex()) {
             val attribute = attributeEntry.value
 
-                if (attribute.valueConnection == null) {
-                    attributeStateList[attributeEntry.index] = EAttributeValueState.Processing
-                    val isSynchronous = attribute.getAutoCompleteValueAsync {
-                        result ->
-                        synchronized(remain)
-                        {
-                            remain--
-                            setValueOf(attribute, result)
+            if (attribute.valueConnection == null) {
+                attributeStateList[attributeEntry.index] = EAttributeValueState.Processing
+                val isSynchronous = attribute.getAutoCompleteValueAsync {
+                    result ->
+                    synchronized(remain)
+                    {
+                        remain--
+                        setValueOf(attribute, result)
 
+                        attributeStateList[attributeEntry.index] = EAttributeValueState.Idle
+                        onAttributeStateChangedListener?.onAttributeStateChanged(attribute, attributeEntry.index, EAttributeValueState.Idle)
+
+                        if (remain == 0) {
+                            //finish
+                            finished?.invoke()
+                            println("finished autocompleting builder")
+                        }
+                    }
+                }
+
+                if (!isSynchronous) {
+                    onAttributeStateChangedListener?.onAttributeStateChanged(attribute, attributeEntry.index, EAttributeValueState.Processing)
+                }
+
+            } else {
+                println("request value connection")
+
+                attributeStateList[attributeEntry.index] = EAttributeValueState.GettingExternalValue
+                onAttributeStateChangedListener?.onAttributeStateChanged(attribute, attributeEntry.index, EAttributeValueState.GettingExternalValue)
+
+                attribute.valueConnection?.requestValueAsync(this) {
+                    value: Any? ->
+                    if (value != null) {
+                        synchronized(remain) {
+                            remain--
+                            setValueOf(attribute, value)
                             attributeStateList[attributeEntry.index] = EAttributeValueState.Idle
                             onAttributeStateChangedListener?.onAttributeStateChanged(attribute, attributeEntry.index, EAttributeValueState.Idle)
+
 
                             if (remain == 0) {
                                 //finish
@@ -248,27 +369,14 @@ class OTItemBuilder : Parcelable, IStringSerializable {
                                 println("finished autocompleting builder")
                             }
                         }
-                    }
-
-                    if (!isSynchronous) {
-                        onAttributeStateChangedListener?.onAttributeStateChanged(attribute, attributeEntry.index, EAttributeValueState.Processing)
-                    }
-
-                } else {
-                    println("request value connection")
-
-                    attributeStateList[attributeEntry.index] = EAttributeValueState.GettingExternalValue
-                    onAttributeStateChangedListener?.onAttributeStateChanged(attribute, attributeEntry.index, EAttributeValueState.GettingExternalValue)
-
-                    attribute.valueConnection?.requestValueAsync(this) {
-                        value: Any? ->
-                        if (value != null) {
+                    } else {
+                        attribute.getAutoCompleteValueAsync {
+                            result ->
                             synchronized(remain) {
                                 remain--
-                                setValueOf(attribute, value)
+                                setValueOf(attribute, result)
                                 attributeStateList[attributeEntry.index] = EAttributeValueState.Idle
                                 onAttributeStateChangedListener?.onAttributeStateChanged(attribute, attributeEntry.index, EAttributeValueState.Idle)
-
 
                                 if (remain == 0) {
                                     //finish
@@ -276,26 +384,11 @@ class OTItemBuilder : Parcelable, IStringSerializable {
                                     println("finished autocompleting builder")
                                 }
                             }
-                        } else {
-                            attribute.getAutoCompleteValueAsync {
-                                result ->
-                                synchronized(remain) {
-                                    remain--
-                                    setValueOf(attribute, result)
-                                    attributeStateList[attributeEntry.index] = EAttributeValueState.Idle
-                                    onAttributeStateChangedListener?.onAttributeStateChanged(attribute, attributeEntry.index, EAttributeValueState.Idle)
-
-                                    if (remain == 0) {
-                                        //finish
-                                        finished?.invoke()
-                                        println("finished autocompleting builder")
-                                    }
-                                }
-                            }
                         }
                     }
                 }
             }
+        }
     }
 
     private fun setTracker(tracker: OTTracker) {

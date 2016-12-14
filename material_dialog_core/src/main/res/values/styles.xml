@@ -51,6 +51,7 @@
         <item name="android:minWidth">@dimen/md_button_min_width</item>
         <item name="android:paddingLeft">@dimen/md_button_textpadding_horizontal</item>
         <item name="android:paddingRight">@dimen/md_button_textpadding_horizontal</item>
+        <item name="android:textStyle">bold</item>
     </style>
 
     <style name="MD_WindowAnimation">
