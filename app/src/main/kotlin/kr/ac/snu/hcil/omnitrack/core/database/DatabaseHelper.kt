@@ -8,7 +8,6 @@ import android.database.DatabaseUtils
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.os.AsyncTask
-import com.google.gson.Gson
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
@@ -206,7 +205,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
 
         val lastTriggeredTime = cursor.getLong(cursor.getColumnIndex(TriggerScheme.LAST_TRIGGERED_TIME))
 
-        val trigger = OTTrigger.makeInstance(objectId, id, type, user, name, Gson().fromJson(trackerObjectIds, Array<String>::class.java), isOn, action, lastTriggeredTime, serializedProperties)
+        val trigger = OTTrigger.makeInstance(objectId, id, type, user, name, trackerObjectIds.split(";").toTypedArray(), isOn, action, lastTriggeredTime, serializedProperties)
         trigger.isDirtySinceLastSync = false
         return trigger
     }
@@ -314,7 +313,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
             println("saving trigger with user id ${owner.dbId}")
             values.put(TriggerScheme.TYPE, trigger.typeId)
             values.put(TriggerScheme.PROPERTIES, trigger.getSerializedProperties())
-            values.put(TriggerScheme.TRACKER_OBJECT_IDS, Gson().toJson(trigger.trackers.map { it.objectId }.toTypedArray()))
+            values.put(TriggerScheme.TRACKER_OBJECT_IDS, trigger.trackers.map { it.objectId }.joinToString(";"))
             values.put(TriggerScheme.POSITION, position)
             values.put(TriggerScheme.ACTION, trigger.action)
             values.put(TriggerScheme.IS_ON, trigger.isOn.toInt())
