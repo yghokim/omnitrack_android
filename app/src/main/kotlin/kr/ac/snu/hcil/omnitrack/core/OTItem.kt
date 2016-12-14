@@ -101,7 +101,6 @@ class OTItem : ADataRow, IDatabaseStorable {
 
         val s = stringKeyEntryParser.fromJson(serializedValues, Array<SerializedStringKeyEntry>::class.java)
         for (entry in s) {
-            println(entry.value)
             valueTable[entry.key] = TypeStringSerializationHelper.deserialize(entry.value)
         }
     }
