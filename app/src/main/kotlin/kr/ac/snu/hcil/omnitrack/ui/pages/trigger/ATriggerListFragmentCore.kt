@@ -107,7 +107,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
     }
 
     fun onDestroyView() {
-        subscriptions.unsubscribe()
+        subscriptions.clear()
         adapter.unSubscribeAll()
     }
 
@@ -136,6 +136,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
             for (viewHolder in viewHolders) {
                 viewHolder.unSubscribeAll()
             }
+            viewHolders.clear()
         }
 
         override fun getItemViewType(position: Int): Int {

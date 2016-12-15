@@ -7,7 +7,6 @@ import android.database.Cursor
 import android.database.DatabaseUtils
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import android.os.AsyncTask
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
@@ -17,6 +16,8 @@ import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.utils.toBoolean
 import kr.ac.snu.hcil.omnitrack.utils.toInt
+import rx.Observable
+import rx.schedulers.Schedulers
 import java.util.*
 
 /**
@@ -517,28 +518,14 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         return OTItem(id, tracker.objectId, serializedValues, timestamp, source)
     }
 
-    fun getLastLoggingTimeAsync(tracker: OTTracker, resultHandler: (Long?)->Unit) : LastItemTimeRetrievalTask
-    {
-        val task = LastItemTimeRetrievalTask(resultHandler)
-        task.execute(tracker)
-        return task
-    }
-
-    fun getLoggingCountOfDayAsync(tracker: OTTracker, pivot: Long, resultHandler: (Int) -> Unit): LoggingCountOfDayRetrievalTask
-    {
-        val task = LoggingCountOfDayRetrievalTask(pivot, resultHandler)
-        task.execute(tracker)
-        return task
-    }
-
     fun getLogCountDuring(tracker: OTTracker, from: Long, to: Long): Int
     {
         val numRows = DatabaseUtils.queryNumEntries(readableDatabase, ItemScheme.tableName, "${ItemScheme.TRACKER_ID}=? AND ${ItemScheme.LOGGED_AT} BETWEEN ? AND ?", arrayOf(tracker.dbId.toString(), from.toString(), to.toString()))
         return numRows.toInt()
     }
 
-    inner class LoggingCountOfDayRetrievalTask(val pivot: Long, val resultHandler: (Int)->Unit): AsyncTask<OTTracker, Void?, Int>(){
-        override fun doInBackground(vararg trackers: OTTracker): Int {
+    fun getLogCountOfDay(tracker: OTTracker): Observable<Int> {
+        return Observable.defer {
             val cal = Calendar.getInstance()
             cal.set(Calendar.HOUR_OF_DAY, 0)
             cal.set(Calendar.MINUTE, 0)
@@ -550,35 +537,22 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
             cal.add(Calendar.DAY_OF_YEAR, 1)
             val second = cal.timeInMillis -20
 
-            return getLogCountDuring(trackers[0], first, second)
-        }
-
-        override fun onPostExecute(result: Int) {
-            super.onPostExecute(result)
-            resultHandler.invoke(result)
-        }
-
+            Observable.just(getLogCountDuring(tracker, first, second))
+        }.subscribeOn(Schedulers.computation())
     }
 
-    inner class LastItemTimeRetrievalTask(val resultHandler: (Long?)->Unit): AsyncTask<OTTracker, Void?, Long?>(){
-        override fun doInBackground(vararg trackers: OTTracker): Long? {
-            val cursor = readableDatabase.query(ItemScheme.tableName, arrayOf(ItemScheme.LOGGED_AT), "${ItemScheme.TRACKER_ID}=?", arrayOf(trackers[0].dbId.toString()), null, null, "${ItemScheme.LOGGED_AT} DESC", "1")
+    fun getLastLoggingTime(tracker: OTTracker): Observable<Long?> {
+        return Observable.defer {
+            val cursor = readableDatabase.query(ItemScheme.tableName, arrayOf(ItemScheme.LOGGED_AT), "${ItemScheme.TRACKER_ID}=?", arrayOf(tracker.dbId.toString()), null, null, "${ItemScheme.LOGGED_AT} DESC", "1")
             if (cursor.moveToFirst()) {
                 val value = cursor.getLong(cursor.getColumnIndex(ItemScheme.LOGGED_AT))
                 cursor.close()
-                return value
+                Observable.just(value)
             } else {
                 cursor.close()
-                return null
+                Observable.just<Long?>(null)
             }
-        }
-
-        override fun onPostExecute(result: Long?) {
-            super.onPostExecute(result)
-            resultHandler.invoke(result)
-        }
-
+        }.subscribeOn(Schedulers.computation())
     }
-
 
 }

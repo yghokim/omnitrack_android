@@ -125,7 +125,7 @@ class OTApplication : MultiDexApplication() {
         get() {
             return Observable.defer {
                 Observable.just(currentUser)
-            }.subscribeOn(Schedulers.io())
+            }.subscribeOn(Schedulers.computation())
                     .observeOn(AndroidSchedulers.mainThread())
                     .cache()
         }
