@@ -11,6 +11,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.time.TimeRangePicker
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.TimeRangePickerInputView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
+import rx.Observable
 
 /**
  * Created by younghokim on 16. 8. 6..
@@ -49,10 +50,10 @@ class OTTimeSpanAttribute(objectId: String?, dbId: Long?, columnName: String, is
         return (value as TimeSpan).toString()
     }
 
-    override fun getAutoCompleteValueAsync(resultHandler: (TimeSpan) -> Unit): Boolean {
-        resultHandler.invoke(TimeSpan())
-        return true
+    override fun getAutoCompleteValue(): Observable<TimeSpan> {
+        return Observable.just(TimeSpan())
     }
+
 
     override fun getInputViewType(previewMode: Boolean): Int {
         return AAttributeInputView.VIEW_TYPE_TIME_RANGE_PICKER

@@ -8,6 +8,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.NumberInputView
 import kr.ac.snu.hcil.omnitrack.utils.NumberStyle
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import kr.ac.snu.hcil.omnitrack.utils.toBigDecimal
+import rx.Observable
 import java.math.BigDecimal
 
 /**
@@ -15,6 +16,7 @@ import java.math.BigDecimal
  */
 
 class OTNumberAttribute(objectId: String?, dbId: Long?, columnName: String, isRequired: Boolean, settingData: String?, connectionData: String?) : OTAttribute<BigDecimal>(objectId, dbId, columnName, isRequired, OTAttribute.TYPE_NUMBER, settingData, connectionData) {
+
     override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_BIGDECIMAL
 
     override fun getInputViewType(previewMode: Boolean): Int {
@@ -66,10 +68,10 @@ class OTNumberAttribute(objectId: String?, dbId: Long?, columnName: String, isRe
         return numberStyle.formatNumber(value)
     }
 
-    override fun getAutoCompleteValueAsync(resultHandler: (BigDecimal) -> Unit): Boolean {
-        resultHandler(BigDecimal(0))
-        return true
+    override fun getAutoCompleteValue(): Observable<BigDecimal> {
+        return Observable.just(BigDecimal(0))
     }
+
 
     override fun refreshInputViewUI(inputView: AAttributeInputView<out Any>) {
         if (inputView is NumberInputView) {
