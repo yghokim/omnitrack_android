@@ -24,7 +24,6 @@ fun deserializeLatLng(serialized: String): LatLng {
 }
 
 object TypeStringSerializationHelper {
-    data class ParcelWithType(var t: String, var v: String)
 
     const val TYPENAME_INT = "I"
     const val TYPENAME_LONG = "L"
