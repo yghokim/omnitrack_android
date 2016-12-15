@@ -14,6 +14,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputV
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.ChoiceInputView
 import kr.ac.snu.hcil.omnitrack.utils.UniqueStringEntryList
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
+import rx.Observable
 import java.util.*
 
 /**
@@ -123,9 +124,8 @@ class OTChoiceAttribute(objectId: String?, dbId: Long?, columnName: String, isRe
         return super.compareValues(a, b)
     }
 
-    override fun getAutoCompleteValueAsync(resultHandler: (IntArray) -> Unit): Boolean {
-        resultHandler.invoke(IntArray(0))
-        return true
+    override fun getAutoCompleteValue(): Observable<IntArray> {
+        return Observable.just(IntArray(0))
     }
 
     override fun getInputViewType(previewMode: Boolean): Int {

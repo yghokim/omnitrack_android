@@ -11,14 +11,13 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.LikertScaleInput
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.StarRatingInputView
 import kr.ac.snu.hcil.omnitrack.utils.RatingOptions
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
+import rx.Observable
 
 /**
  * Created by younghokim on 16. 9. 6..
  */
 class OTRatingAttribute(objectId: String?, dbId: Long?, columnName: String, isRequired: Boolean, settingData: String?, connectionData: String?)
 : OTAttribute<Float>(objectId, dbId, columnName, isRequired, OTAttribute.TYPE_RATING, settingData, connectionData) {
-
-
 
     companion object {
         /*
@@ -97,9 +96,8 @@ class OTRatingAttribute(objectId: String?, dbId: Long?, columnName: String, isRe
         } else return super.compareValues(a, b)
     }
 
-    override fun getAutoCompleteValueAsync(resultHandler: (Float) -> Unit): Boolean {
-        resultHandler.invoke(0f)
-        return true
+    override fun getAutoCompleteValue(): Observable<Float> {
+        return Observable.just(0f)
     }
 
     override fun getInputViewType(previewMode: Boolean): Int {

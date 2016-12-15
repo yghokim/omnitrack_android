@@ -10,6 +10,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.time.DateTimePicker
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.TimePointInputView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
+import rx.Observable
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -87,9 +88,9 @@ class OTTimeAttribute(objectId: String?, dbId: Long?, columnName: String, isRequ
         } else return ""
     }
 
-    override fun getAutoCompleteValueAsync(resultHandler: (TimePoint) -> Unit): Boolean {
-        resultHandler(TimePoint())
-        return true
+
+    override fun getAutoCompleteValue(): Observable<TimePoint> {
+        return Observable.just(TimePoint())
     }
 
     override fun refreshInputViewUI(inputView: AAttributeInputView<out Any>) {

@@ -27,6 +27,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.pages.ConnectionIndicatorStubProxy
+import rx.Observable
 import java.util.*
 
 /**
@@ -108,7 +109,7 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
         builderRestoredSnackbar.setAction(resources.getText(R.string.msg_discard)) {
             view ->
             builder = OTItemBuilder(tracker!!, OTItemBuilder.MODE_FOREGROUND)
-            builder.autoCompleteAsync(this) {
+            builder.autoComplete(this) {
                 //attributeListAdapter.notifyDataSetChanged()
             }
             builderRestoredSnackbar.dismiss()
@@ -147,7 +148,7 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
             } else {
                 //new builder was created
                 //TODO make it as a AcyncTask and update each attribute immediately
-                builder.autoCompleteAsync(this) {
+                builder.autoComplete(this) {
                     //attributeListAdapter.notifyDataSetChanged()
                 }
             }
@@ -244,24 +245,19 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
             }
         }
 
-        var remain = waitingAttributes.size
-        if (remain == 0) {
-            finished?.invoke()
-            return
-        }
-
-        for (attribute in waitingAttributes) {
-            attribute.getAutoCompleteValueAsync {
-                result ->
-                remain--
-                builder.setValueOf(attribute, result)
-
-                if (remain == 0) {
-                    //finish
-                    finished?.invoke()
-                }
+        Observable.merge(waitingAttributes.map {
+            it.getAutoCompleteValue().map {
+                value ->
+                Pair<OTAttribute<out Any>, Any>(it, value)
             }
-        }
+        }).subscribe({
+            result ->
+            builder.setValueOf(result.first, result.second)
+        },
+                {},
+                {
+                    finished?.invoke()
+                })
     }
 
     private fun clearBuilderCache() {

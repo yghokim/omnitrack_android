@@ -66,7 +66,8 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
 
             setLoggingFlag(tracker, System.currentTimeMillis())
             sendBroadcast(context, OTApplication.BROADCAST_ACTION_BACKGROUND_LOGGING_STARTED, tracker)
-            builder.autoCompleteAsync {
+
+            builder.autoComplete {
                 val item = builder.makeItem(source)
                 OTApplication.app.dbHelper.save(item, tracker)
                 if (item.dbId != null) {
