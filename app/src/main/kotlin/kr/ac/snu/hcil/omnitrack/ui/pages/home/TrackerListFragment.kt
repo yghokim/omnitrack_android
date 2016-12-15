@@ -36,7 +36,6 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
-import kr.ac.snu.hcil.omnitrack.core.database.DatabaseHelper
 import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.common.FallbackRecyclerView
@@ -51,6 +50,7 @@ import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 import kr.ac.snu.hcil.omnitrack.utils.startActivityOnDelay
+import rx.android.schedulers.AndroidSchedulers
 import rx.subscriptions.CompositeSubscription
 import java.text.SimpleDateFormat
 import java.util.*
@@ -206,12 +206,17 @@ class TrackerListFragment : OTFragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        onCreateSubscriptions.unsubscribe()
+        onCreateSubscriptions.clear()
     }
 
     override fun onPause() {
         super.onPause()
-        resumeSubscriptions.unsubscribe()
+        resumeSubscriptions.clear()
+        for (viewHolder in trackerListAdapter.viewHolders) {
+            viewHolder.subscriptions.clear()
+        }
+        trackerListAdapter.viewHolders.clear()
+
         context.unregisterReceiver(itemEventReceiver)
     }
 
@@ -267,6 +272,8 @@ class TrackerListFragment : OTFragment() {
 
     inner class TrackerListAdapter() : RecyclerView.Adapter<TrackerListAdapter.ViewHolder>() {
 
+        val viewHolders = ArrayList<ViewHolder>()
+
         var currentlyExpandedIndex = -1
         private var lastExpandedViewHolder: ViewHolder? = null
 
@@ -275,7 +282,9 @@ class TrackerListFragment : OTFragment() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val view = LayoutInflater.from(parent.context).inflate(R.layout.tracker_list_element, parent, false)
-            return ViewHolder(view)
+            return ViewHolder(view).apply {
+                viewHolders.add(this)
+            }
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -315,8 +324,7 @@ class TrackerListFragment : OTFragment() {
 
             val expandedViewHeight: Int
 
-            private var lastLoggingTimeRetrievalTask: DatabaseHelper.LastItemTimeRetrievalTask? = null
-            private var todayLoggingCountTask: DatabaseHelper.LoggingCountOfDayRetrievalTask? = null
+            var subscriptions = CompositeSubscription()
 
             init {
 
@@ -462,47 +470,47 @@ class TrackerListFragment : OTFragment() {
                     View.VISIBLE
                 }
 
-                lastLoggingTimeRetrievalTask?.cancel(true)
-                todayLoggingCountTask?.cancel(true)
+                subscriptions.clear()
 
-                lastLoggingTimeRetrievalTask = OTApplication.app.dbHelper.getLastLoggingTimeAsync(tracker) {
+                subscriptions.add(
+                        OTApplication.app.dbHelper.getLastLoggingTime(tracker).observeOn(AndroidSchedulers.mainThread()).subscribe {
+                            timestamp ->
+                            if (timestamp != null) {
+                                InterfaceHelper.setTextAppearance(lastLoggingTimeView, R.style.trackerListInformationTextViewStyle)
+                                val dateText = TimeHelper.getDateText(timestamp, context).toUpperCase()
+                                val timeText = lastLoggedTimeFormat.format(Date(timestamp)).toUpperCase()
+                                val builder = SpannableString(dateText + "\n" + timeText).apply {
+                                    setSpan(dateSizeSpan, 0, dateText.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                                    setSpan(dateColorSpan, 0, dateText.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                                    setSpan(timeStyleSpan, dateText.length + 1, dateText.length + 1 + timeText.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                                }
 
-                    timestamp ->
-                    if (timestamp != null) {
-                        InterfaceHelper.setTextAppearance(lastLoggingTimeView, R.style.trackerListInformationTextViewStyle)
-                        val dateText = TimeHelper.getDateText(timestamp, context).toUpperCase()
-                        val timeText = lastLoggedTimeFormat.format(Date(timestamp)).toUpperCase()
-                        val builder = SpannableString(dateText + "\n" + timeText).apply {
-                            setSpan(dateSizeSpan, 0, dateText.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                            setSpan(dateColorSpan, 0, dateText.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                            setSpan(timeStyleSpan, dateText.length + 1, dateText.length + 1 + timeText.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+                                todayLoggingCountView.visibility = View.VISIBLE
+
+                                lastLoggingTimeView.text = builder
+                            } else {
+                                lastLoggingTimeView.text = context.resources.getString(R.string.msg_never_logged).toUpperCase()
+                                InterfaceHelper.setTextAppearance(lastLoggingTimeView, R.style.trackerListInformationTextViewStyle_HeaderAppearance)
+                                todayLoggingCountView.visibility = View.INVISIBLE
+                            }
+                    }
+                )
+
+
+                subscriptions.add(
+                        OTApplication.app.dbHelper.getLogCountOfDay(tracker).observeOn(AndroidSchedulers.mainThread()).subscribe {
+                            count ->
+                            val header = context.resources.getString(R.string.msg_todays_log).toUpperCase()
+                            val builder = SpannableString(header + "\n" + count).apply {
+                                setSpan(dateSizeSpan, 0, header.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                                setSpan(dateColorSpan, 0, header.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                                setSpan(timeStyleSpan, header.length + 1, header.length + 1 + count.toString().length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                            }
+
+                            todayLoggingCountView.text = builder
                         }
-
-
-                        todayLoggingCountView.visibility = View.VISIBLE
-
-                        lastLoggingTimeView.text = builder
-                    } else {
-                        lastLoggingTimeView.text = context.resources.getString(R.string.msg_never_logged).toUpperCase()
-                        InterfaceHelper.setTextAppearance(lastLoggingTimeView, R.style.trackerListInformationTextViewStyle_HeaderAppearance)
-                        todayLoggingCountView.visibility = View.INVISIBLE
-                    }
-                    lastLoggingTimeRetrievalTask = null
-                }
-
-
-                todayLoggingCountTask = OTApplication.app.dbHelper.getLoggingCountOfDayAsync(tracker, System.currentTimeMillis()) {
-
-                    count ->
-                    val header = context.resources.getString(R.string.msg_todays_log).toUpperCase()
-                    val builder = SpannableString(header + "\n" + count).apply {
-                        setSpan(dateSizeSpan, 0, header.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                        setSpan(dateColorSpan, 0, header.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                        setSpan(timeStyleSpan, header.length + 1, header.length + 1 + count.toString().length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                    }
-
-                    todayLoggingCountView.text = builder
-                }
+                )
 
                 if (currentlyExpandedIndex == adapterPosition) {
                     lastExpandedViewHolder = this
