@@ -5,6 +5,7 @@ import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.serialization.ATypedQueueSerializable
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableTypedQueue
+import rx.Observable
 
 /**
  * Created by Young-Ho Kim on 2016-08-11.
@@ -43,6 +44,23 @@ class OTConnection : ATypedQueueSerializable {
     constructor() : super()
     constructor(serialized: String) : super(serialized)
 
+
+    fun getRequestedValue(builder: OTItemBuilder): Observable<Any?> {
+        if (source != null) {
+            return Observable.create {
+                subscriber ->
+                source!!.requestValueAsync(builder, rangedQuery) {
+                    value ->
+                    if (!subscriber.isUnsubscribed) {
+                        subscriber.onNext(value)
+                        subscriber.onCompleted()
+                    }
+                }
+            }
+        } else {
+            return Observable.just<Any?>(null)
+        }
+    }
 
     fun requestValueAsync(builder: OTItemBuilder, handler: (Any?) -> Unit) {
         if (source != null) {

@@ -8,6 +8,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.text.LinedTextView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
+import rx.Observable
 
 /**
  * Created by younghokim on 16. 7. 24..
@@ -34,9 +35,8 @@ class OTLongTextAttribute(objectId: String?, dbId: Long?, columnName: String, is
         return value.toString()
     }
 
-    override fun getAutoCompleteValueAsync(resultHandler: (CharSequence) -> Unit): Boolean {
-        resultHandler("")
-        return true
+    override fun getAutoCompleteValue(): Observable<CharSequence> {
+        return Observable.just("")
     }
 
     override fun refreshInputViewUI(inputView: AAttributeInputView<out Any>) {
@@ -45,9 +45,7 @@ class OTLongTextAttribute(objectId: String?, dbId: Long?, columnName: String, is
 
     override fun getViewForItemList(context: Context, recycledView: View?): View {
 
-        val target = if (recycledView is LinedTextView) {
-            recycledView
-        } else LinedTextView(context)
+        val target = recycledView as? LinedTextView ?: LinedTextView(context)
 
         InterfaceHelper.setTextAppearance(target, R.style.longTextForItemListTextAppearance)
 

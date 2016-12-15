@@ -5,12 +5,15 @@ import android.location.Location
 import android.location.LocationManager
 import android.view.View
 import com.google.android.gms.maps.model.LatLng
+import io.nlopez.smartlocation.SmartLocation
+import io.nlopez.smartlocation.rx.ObservableFactory
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.common.MapImageView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
-import kr.ac.snu.hcil.omnitrack.utils.LocationRetrievalTask
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
+import rx.Observable
 
 /**
  * Created by Young-Ho on 8/2/2016.
@@ -49,12 +52,17 @@ class OTLocationAttribute(objectId: String?, dbId: Long?, columnName: String, is
         return value.toString()
     }
 
-    override fun getAutoCompleteValueAsync(resultHandler: (LatLng) -> Unit): Boolean {
-
-        LocationRetrievalTask(resultHandler).execute()
-
-        return false
+    override fun getAutoCompleteValue(): Observable<LatLng> {
+        return ObservableFactory.from(SmartLocation.with(OTApplication.app).location())
+                .map {
+                    location ->
+                    LatLng(location.latitude, location.longitude)
+                }
+                .onErrorReturn {
+                    LatLng(0.0, 0.0)
+                }
     }
+
 
 
     override fun getInputViewType(previewMode: Boolean): Int {
@@ -76,15 +84,7 @@ class OTLocationAttribute(objectId: String?, dbId: Long?, columnName: String, is
 
     override fun getViewForItemList(context: Context, recycledView: View?): View {
 
-        val target = if (recycledView is MapImageView) {
-            recycledView
-        } else {
-            MapImageView(context)
-        }
-
-
-
-        return target
+        return recycledView as? MapImageView ?: MapImageView(context)
     }
 
     override fun applyValueToViewForItemList(value: Any?, view: View): Boolean {

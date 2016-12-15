@@ -11,6 +11,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.utils.serialization.IStringSerializable
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
+import rx.Observable
 import java.util.*
 
 /**
@@ -167,7 +168,7 @@ class OTItemBuilder : Parcelable, IStringSerializable {
         syncFromTrackerScheme()
 
         for (attribute in tracker.attributes) {
-            if(item.hasValueOf(attribute)) {
+            if (item.hasValueOf(attribute)) {
                 setValueOf(attribute, item.getValueOf(attribute)!!)
             }
         }
@@ -308,85 +309,42 @@ class OTItemBuilder : Parcelable, IStringSerializable {
         return attributeStateList[position]
     }
 
+    fun autoComplete(onAttributeStateChangedListener: AttributeStateChangedListener? = null, finished: (() -> Unit)? = null) {
+        Observable.merge(tracker.attributes.unObservedList.mapIndexed { i, attr ->
+            if (attr.valueConnection != null) {
+                attributeStateList[i] = EAttributeValueState.GettingExternalValue
+                onAttributeStateChangedListener?.onAttributeStateChanged(attr, i, EAttributeValueState.GettingExternalValue)
+                attr.valueConnection!!.getRequestedValue(this).map {
+                    data ->
+                    Pair(i, data as Any)
+                }
+            } else {
+                attributeStateList[i] = EAttributeValueState.Processing
+                onAttributeStateChangedListener?.onAttributeStateChanged(attr, i, EAttributeValueState.Processing)
+                attr.getAutoCompleteValue().map {
+                    data ->
+                    Pair(i, data as Any)
+                }
+            }
+        })
+                .subscribe(
+                        {
+                            result ->
+                            val index = result.first
+                            val value = result.second
+                            val attribute = tracker.attributes[index]
+                            attributeStateList[index] = EAttributeValueState.Idle
+                            onAttributeStateChangedListener?.onAttributeStateChanged(attribute, index, EAttributeValueState.Idle)
+                            setValueOf(attribute, value)
+                        },
+                        {
 
-    fun autoCompleteAsync(onAttributeStateChangedListener: AttributeStateChangedListener? = null,
-                          finished: (() -> Unit)? = null) {
-
-        var remain = tracker.attributes.size
-        if (remain == 0) {
-            finished?.invoke()
-            return
-        }
-
-        for (attributeEntry in tracker.attributes.unObservedList.withIndex()) {
-            val attribute = attributeEntry.value
-
-            if (attribute.valueConnection == null) {
-                attributeStateList[attributeEntry.index] = EAttributeValueState.Processing
-                val isSynchronous = attribute.getAutoCompleteValueAsync {
-                    result ->
-                    synchronized(remain)
-                    {
-                        remain--
-                        setValueOf(attribute, result)
-
-                        attributeStateList[attributeEntry.index] = EAttributeValueState.Idle
-                        onAttributeStateChangedListener?.onAttributeStateChanged(attribute, attributeEntry.index, EAttributeValueState.Idle)
-
-                        if (remain == 0) {
-                            //finish
+                        },
+                        {
                             finished?.invoke()
                             println("finished autocompleting builder")
                         }
-                    }
-                }
-
-                if (!isSynchronous) {
-                    onAttributeStateChangedListener?.onAttributeStateChanged(attribute, attributeEntry.index, EAttributeValueState.Processing)
-                }
-
-            } else {
-                println("request value connection")
-
-                attributeStateList[attributeEntry.index] = EAttributeValueState.GettingExternalValue
-                onAttributeStateChangedListener?.onAttributeStateChanged(attribute, attributeEntry.index, EAttributeValueState.GettingExternalValue)
-
-                attribute.valueConnection?.requestValueAsync(this) {
-                    value: Any? ->
-                    if (value != null) {
-                        synchronized(remain) {
-                            remain--
-                            setValueOf(attribute, value)
-                            attributeStateList[attributeEntry.index] = EAttributeValueState.Idle
-                            onAttributeStateChangedListener?.onAttributeStateChanged(attribute, attributeEntry.index, EAttributeValueState.Idle)
-
-
-                            if (remain == 0) {
-                                //finish
-                                finished?.invoke()
-                                println("finished autocompleting builder")
-                            }
-                        }
-                    } else {
-                        attribute.getAutoCompleteValueAsync {
-                            result ->
-                            synchronized(remain) {
-                                remain--
-                                setValueOf(attribute, result)
-                                attributeStateList[attributeEntry.index] = EAttributeValueState.Idle
-                                onAttributeStateChangedListener?.onAttributeStateChanged(attribute, attributeEntry.index, EAttributeValueState.Idle)
-
-                                if (remain == 0) {
-                                    //finish
-                                    finished?.invoke()
-                                    println("finished autocompleting builder")
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+                )
     }
 
     private fun setTracker(tracker: OTTracker) {

@@ -23,6 +23,7 @@ import kr.ac.snu.hcil.omnitrack.utils.TextHelper
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializedIntegerKeyEntry
 import kr.ac.snu.hcil.omnitrack.utils.serialization.integerKeyEntryParser
+import rx.Observable
 import java.util.*
 import kotlin.properties.Delegates
 
@@ -201,7 +202,16 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
      * Autocompleted values based on attribute-specific settings.
      * [return] whether the method finished synchronously.
      */
-    abstract fun getAutoCompleteValueAsync(resultHandler: (result: DataType) -> Unit): Boolean
+    abstract fun getAutoCompleteValue(): Observable<DataType>
+
+    fun makeAutoCompleteValueWithId(id: Int): Observable<Pair<Int, Any>> {
+        return getAutoCompleteValue().map {
+            data ->
+            Pair(id, data as Any)
+        }
+    }
+
+
 
     abstract fun getInputViewType(previewMode: Boolean = false): Int
 

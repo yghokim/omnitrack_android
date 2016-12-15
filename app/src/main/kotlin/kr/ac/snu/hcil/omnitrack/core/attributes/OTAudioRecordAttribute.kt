@@ -5,6 +5,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
+import rx.Observable
 
 /**
  * Created by younghokim on 2016. 9. 26..
@@ -32,9 +33,8 @@ class OTAudioRecordAttribute(objectId: String?, dbId: Long?, columnName: String,
         return "audio"
     }
 
-    override fun getAutoCompleteValueAsync(resultHandler: (Uri) -> Unit): Boolean {
-        resultHandler.invoke(Uri.EMPTY)
-        return true
+    override fun getAutoCompleteValue(): Observable<Uri> {
+        return Observable.just(Uri.EMPTY)
     }
 
     override fun getInputViewType(previewMode: Boolean): Int {
