@@ -4,8 +4,8 @@ ext {
     PUBLISH_GROUP_ID = 'com.afollestad.material-dialogs'
     PUBLISH_ARTIFACT_ID = 'core'
     PUBLISH_VERSION = '0.9.1.0'
-    SUPPORT_LIBRARY_VERSION = '25.0.0'
-    BUILD_TOOLS = "24.0.3"
+    SUPPORT_LIBRARY_VERSION = '25.1.0'
+    BUILD_TOOLS = "25.0.2"
     TARGET_SDK = 25
 }
 
