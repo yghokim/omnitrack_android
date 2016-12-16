@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.transition.TransitionManager
+import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
@@ -109,7 +110,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
         savedInstanceState.getStringArray(STATE_PROPERTIES)?.let {
             for (entry in it.withIndex()) {
-                (propertyViewList[entry.index].second as? APropertyView<out Any>)?.setSerializedValue(entry.value)
+                (propertyViewList[entry.index].second as? APropertyView<*>)?.setSerializedValue(entry.value)
             }
         }
     }
@@ -120,7 +121,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
         outState.putString(STATE_COLUMN_NAME, columnNameView.value)
         outState.putString(STATE_CONNECTION, connectionView.connection?.getSerializedString())
 
-        outState.putStringArray(STATE_PROPERTIES, propertyViewList.map { (it.second as APropertyView<out Any>).getSerializedValue() }.toTypedArray())
+        outState.putStringArray(STATE_PROPERTIES, propertyViewList.map { (it.second as APropertyView<*>).getSerializedValue() }.toTypedArray())
     }
 
     override fun onStart() {
@@ -134,15 +135,33 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
     }
 
     override fun onToolbarLeftButtonClicked() {
+        askChangeAndFinish()
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+
+            askChangeAndFinish(true)
+            return true
+        } else return super.onKeyDown(keyCode, event)
+    }
+
+    private fun askChangeAndFinish(backInsteadOfFinish: Boolean = false) {
         DialogHelper.makeYesNoDialogBuilder(this, "OmniTrack", resources.getString(R.string.msg_confirm_apply_change),
                 {
                     saveChanges()
-                    finish()
+                    if (backInsteadOfFinish)
+                        super.onBackPressed()
+                    else
+                        finish()
                 },
                 {
-                    finish()
+                    if (backInsteadOfFinish)
+                        super.onBackPressed()
+                    else
+                        finish()
                 }
-        ).cancelListener { finish() }
+        ).cancelable(false)
                 .show()
     }
 
@@ -227,7 +246,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
             refreshConnection(false)
         }
 
-        if (attr == null || attr.propertyKeys.size == 0) {
+        if (attr == null || attr.propertyKeys.isEmpty()) {
             //no property
             propertyViewContainer.setBackgroundResource(R.drawable.bottom_separator_light)
         } else if (attr.propertyKeys.size == 1) {
