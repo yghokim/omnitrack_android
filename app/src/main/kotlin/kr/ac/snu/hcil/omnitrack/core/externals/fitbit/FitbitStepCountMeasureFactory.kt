@@ -55,6 +55,7 @@ object FitbitStepCountMeasureFactory : OTMeasureFactory() {
         val converter = object : OAuth2Client.OAuth2RequestConverter<Int?> {
             override fun process(requestResultStrings: Array<String>): Int? {
                 val json = JSONObject(requestResultStrings.first())
+                println("convert $json")
                 if (json.has("summary")) {
                     val steps = json.getJSONObject("summary").getInt("steps")
                     return steps
@@ -81,6 +82,7 @@ object FitbitStepCountMeasureFactory : OTMeasureFactory() {
             {
                 result ->
                 OTApplication.logger.writeSystemLog("Finished getting Fitbit Step Log", "FitbitStepFactory")
+                println("Fitbit step result: $result")
                 handler.invoke(result)
             }
         }

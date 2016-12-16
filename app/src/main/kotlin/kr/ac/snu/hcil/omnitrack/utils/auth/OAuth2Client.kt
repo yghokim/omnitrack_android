@@ -210,7 +210,6 @@ class OAuth2Client(val config: OAuth2Config, val activityRequestCode: Int) {
                 }
                 result.add(response.body().string())
             }
-
             return result.toTypedArray()
         }
 

@@ -9,6 +9,7 @@ import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
+import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.utils.serialization.IStringSerializable
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Observable
@@ -310,13 +311,28 @@ class OTItemBuilder : Parcelable, IStringSerializable {
     }
 
     fun autoComplete(onAttributeStateChangedListener: AttributeStateChangedListener? = null, finished: (() -> Unit)? = null) {
+
         Observable.merge(tracker.attributes.unObservedList.mapIndexed { i, attr ->
             if (attr.valueConnection != null) {
-                attributeStateList[i] = EAttributeValueState.GettingExternalValue
-                onAttributeStateChangedListener?.onAttributeStateChanged(attr, i, EAttributeValueState.GettingExternalValue)
-                attr.valueConnection!!.getRequestedValue(this).map {
-                    data ->
-                    Pair(i, data as Any)
+                Observable.create<Pair<Int, Any>> {
+                    subscriber ->
+                    attributeStateList[i] = EAttributeValueState.GettingExternalValue
+                    onAttributeStateChangedListener?.onAttributeStateChanged(attr, i, EAttributeValueState.GettingExternalValue)
+                    attr.valueConnection!!.getRequestedValue(this).subscribe {
+                        data ->
+                        if (!subscriber.isUnsubscribed) {
+                            if (data === OTConnection.NULL) {
+                                attr.getAutoCompleteValue().subscribe {
+                                    data ->
+                                    subscriber.onNext(Pair(i, data as Any))
+                                    subscriber.onCompleted()
+                                }
+                            } else {
+                                subscriber.onNext(Pair(i, data as Any))
+                                subscriber.onCompleted()
+                            }
+                        }
+                    }
                 }
             } else {
                 attributeStateList[i] = EAttributeValueState.Processing
@@ -333,6 +349,7 @@ class OTItemBuilder : Parcelable, IStringSerializable {
                             val index = result.first
                             val value = result.second
                             val attribute = tracker.attributes[index]
+                            println("${attribute.name} - $value")
                             attributeStateList[index] = EAttributeValueState.Idle
                             onAttributeStateChangedListener?.onAttributeStateChanged(attribute, index, EAttributeValueState.Idle)
                             setValueOf(attribute, value)

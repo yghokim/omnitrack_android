@@ -13,7 +13,7 @@ import rx.Observable
 class OTConnection : ATypedQueueSerializable {
 
     companion object {
-
+        val NULL = Any()
     }
 
     var source: OTMeasureFactory.OTMeasure? = null
@@ -51,8 +51,14 @@ class OTConnection : ATypedQueueSerializable {
                 subscriber ->
                 source!!.requestValueAsync(builder, rangedQuery) {
                     value ->
+                    println("connection value retrieval result")
+                    println(value)
                     if (!subscriber.isUnsubscribed) {
-                        subscriber.onNext(value)
+                        if (value != null) {
+                            subscriber.onNext(value)
+                        } else {
+                            subscriber.onNext(NULL)
+                        }
                         subscriber.onCompleted()
                     }
                 }

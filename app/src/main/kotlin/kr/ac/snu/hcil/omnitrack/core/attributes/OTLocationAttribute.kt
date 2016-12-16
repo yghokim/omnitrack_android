@@ -6,7 +6,6 @@ import android.location.LocationManager
 import android.view.View
 import com.google.android.gms.maps.model.LatLng
 import io.nlopez.smartlocation.SmartLocation
-import io.nlopez.smartlocation.rx.ObservableFactory
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
@@ -53,6 +52,22 @@ class OTLocationAttribute(objectId: String?, dbId: Long?, columnName: String, is
     }
 
     override fun getAutoCompleteValue(): Observable<LatLng> {
+
+        return Observable.create {
+            subscriber ->
+            val sm = SmartLocation.with(OTApplication.app).location().oneFix()
+            sm.start {
+                location ->
+
+                sm.stop()
+                if (!subscriber.isUnsubscribed) {
+                    subscriber.onNext(LatLng(location?.latitude ?: 0.0, location?.longitude ?: 0.0))
+                    subscriber.onCompleted()
+                }
+            }
+        }
+
+        /*
         return ObservableFactory.from(SmartLocation.with(OTApplication.app).location())
                 .map {
                     location ->
@@ -60,7 +75,7 @@ class OTLocationAttribute(objectId: String?, dbId: Long?, columnName: String, is
                 }
                 .onErrorReturn {
                     LatLng(0.0, 0.0)
-                }
+                }.single()*/
     }
 
 
