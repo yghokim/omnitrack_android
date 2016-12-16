@@ -28,7 +28,7 @@ class OTAudioRecordAttribute(objectId: String?, dbId: Long?, columnName: String,
 
     }
 
-    override fun formatAttributeValue(value: Any): String {
+    override fun formatAttributeValue(value: Any): CharSequence {
         //TODO read file and get the information
         return "audio"
     }

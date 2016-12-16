@@ -22,7 +22,7 @@ class OTShortTextAttribute(objectId: String?, dbId: Long?, columnName: String, i
 
     override val propertyKeys: IntArray = intArrayOf()
 
-    override fun formatAttributeValue(value: Any): String {
+    override fun formatAttributeValue(value: Any): CharSequence {
         return value.toString()
     }
 

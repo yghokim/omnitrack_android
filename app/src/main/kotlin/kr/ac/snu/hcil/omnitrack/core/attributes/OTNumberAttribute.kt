@@ -64,7 +64,7 @@ class OTNumberAttribute(objectId: String?, dbId: Long?, columnName: String, isRe
         get() = getPropertyValue<NumberStyle>(NUMBERSTYLE)
         set(value) = setPropertyValue(NUMBERSTYLE, value)
 
-    override fun formatAttributeValue(value: Any): String {
+    override fun formatAttributeValue(value: Any): CharSequence {
         return numberStyle.formatNumber(value)
     }
 

@@ -1,5 +1,12 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes
 
+import android.graphics.Typeface
+import android.support.v4.content.ContextCompat
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.AbsoluteSizeSpan
+import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTProperty
@@ -38,10 +45,14 @@ class OTTimeAttribute(objectId: String?, dbId: Long?, columnName: String, isRequ
 
 
         val formats = mapOf<Int, SimpleDateFormat>(
-                Pair(GRANULARITY_DAY, SimpleDateFormat("yyyy/MM/d")),
-                Pair(GRANULARITY_MINUTE, SimpleDateFormat("yyyy/MM/d h:mm a")),
-                Pair(GRANULARITY_SECOND, SimpleDateFormat("yyyy/MM/d h:mm:ss a"))
+                Pair(GRANULARITY_DAY, SimpleDateFormat(OTApplication.app.getString(R.string.property_time_format_granularity_day))),
+                Pair(GRANULARITY_MINUTE, SimpleDateFormat(OTApplication.app.getString(R.string.property_time_format_granularity_minute))),
+                Pair(GRANULARITY_SECOND, SimpleDateFormat(OTApplication.app.getString(R.string.property_time_format_granularity_second)))
         )
+
+        private val timezoneSizeSpan = AbsoluteSizeSpan(OTApplication.app.resources.getDimensionPixelSize(R.dimen.tracker_list_element_information_text_headerSize))
+        private val timezoneStyleSpan = StyleSpan(Typeface.BOLD)
+        private val timezoneColorSpan = ForegroundColorSpan(ContextCompat.getColor(OTApplication.app, R.color.textColorLight))
     }
 
 
@@ -71,7 +82,7 @@ class OTTimeAttribute(objectId: String?, dbId: Long?, columnName: String, isRequ
         setPropertyValue(GRANULARITY, GRANULARITY_MINUTE)
     }
 
-    override fun formatAttributeValue(value: Any): String {
+    override fun formatAttributeValue(value: Any): CharSequence {
         if (value is TimePoint) {
             calendar.timeInMillis = value.timestamp
             calendar.timeZone = value.timeZone
@@ -84,7 +95,16 @@ class OTTimeAttribute(objectId: String?, dbId: Long?, columnName: String, isRequ
                 calendar.set(Calendar.HOUR_OF_DAY, 0)
             }
 
-            return formats[granularity]!!.format(calendar.time)
+            val timeString = formats[granularity]!!.format(calendar.time)
+            val timeZoneName = value.timeZone.displayName
+            val start = timeString.length + 1
+            val end = timeString.length + 1 + timeZoneName.length
+
+            return SpannableString("$timeString\n$timeZoneName").apply {
+                setSpan(timezoneSizeSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                setSpan(timezoneStyleSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                setSpan(timezoneColorSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
         } else return ""
     }
 

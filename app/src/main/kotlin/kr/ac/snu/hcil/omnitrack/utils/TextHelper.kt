@@ -9,7 +9,7 @@ import android.text.Spanned
 object TextHelper {
 
 
-    fun stringWithFallback(value: String?, nullFallback: String, blankFallback: String): String {
+    fun stringWithFallback(value: CharSequence?, nullFallback: CharSequence, blankFallback: CharSequence): CharSequence {
         return if (value != null) {
             if (value.isEmpty()) {
                 blankFallback
@@ -19,7 +19,7 @@ object TextHelper {
         }
     }
 
-    fun stringWithFallback(value: String?, nullOrBlankFallback: String): String {
+    fun stringWithFallback(value: CharSequence?, nullOrBlankFallback: CharSequence): CharSequence {
         return stringWithFallback(value, nullOrBlankFallback, nullOrBlankFallback)
     }
 
