@@ -12,6 +12,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputV
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.TimeRangePickerInputView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Observable
+import java.util.*
 
 /**
  * Created by younghokim on 16. 8. 6..
@@ -45,9 +46,32 @@ class OTTimeSpanAttribute(objectId: String?, dbId: Long?, columnName: String, is
 
     override val valueNumericCharacteristics: NumericCharacteristics = NumericCharacteristics(true, false)
 
+    val granularity: Int get() = getPropertyValue(PROPERTY_GRANULARITY)
 
-    override fun formatAttributeValue(value: Any): String {
-        return (value as TimeSpan).toString()
+    override fun formatAttributeValue(value: Any): CharSequence {
+
+        return (value as? TimeSpan)?.let {
+            val format = when (granularity) {
+                GRANULARITY_DAY -> OTTimeAttribute.formats[OTTimeAttribute.GRANULARITY_DAY]!!
+                GRANULARITY_MINUTE -> OTTimeAttribute.formats[OTTimeAttribute.GRANULARITY_MINUTE]!!
+                else -> OTTimeAttribute.formats[OTTimeAttribute.GRANULARITY_MINUTE]!!
+            }
+
+            val from = format.format(Date(it.from))
+            val to = format.format(Date(it.to))
+
+            val overlapUntil = 0
+            /*
+            while( from[overlapUntil] == to[overlapUntil] )
+            {
+                overlapUntil++
+                if(overlapUntil>=from.length || overlapUntil >= to.length){break;}
+            }*/
+
+            val builder = StringBuilder(from)
+            builder.append(" ~ ").append(to.subSequence(overlapUntil, to.length)).toString()
+
+        } ?: ""
     }
 
     override fun getAutoCompleteValue(): Observable<TimeSpan> {

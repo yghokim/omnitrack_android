@@ -136,7 +136,7 @@ class OTItem : ADataRow, IDatabaseStorable {
         return scheme.attributes.unObservedList.map {
             val value = getCastedValueOf(it)
             if (value != null) {
-                it.formatAttributeValue(value)
+                it.formatAttributeValue(value).toString()
             } else {
                 null
             }

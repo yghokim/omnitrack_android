@@ -258,7 +258,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                 dayView.text = cal.getDayOfMonth().toString()
 
                 sourceView.text = item.source.sourceText
-                loggingTimeView.text = OTTimeAttribute.formats[OTTimeAttribute.GRANULARITY_SECOND]!!.format(Date(item.timestamp))
+                loggingTimeView.text = OTTimeAttribute.formats[OTTimeAttribute.GRANULARITY_MINUTE]!!.format(Date(item.timestamp))
 
                 valueListAdapter.notifyDataSetChanged()
             }

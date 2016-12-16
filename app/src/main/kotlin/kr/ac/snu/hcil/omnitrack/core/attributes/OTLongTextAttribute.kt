@@ -31,7 +31,7 @@ class OTLongTextAttribute(objectId: String?, dbId: Long?, columnName: String, is
     override fun createProperties() {
     }
 
-    override fun formatAttributeValue(value: Any): String {
+    override fun formatAttributeValue(value: Any): CharSequence {
         return value.toString()
     }
 

@@ -83,7 +83,7 @@ class OTRatingAttribute(objectId: String?, dbId: Long?, columnName: String, isRe
             ratingOptions.allowIntermediate = value
         }
 
-    override fun formatAttributeValue(value: Any): String {
+    override fun formatAttributeValue(value: Any): CharSequence {
         return when (displayType) {
             RatingOptions.DisplayType.Star -> value.toString() + " / ${level.maxScore}"
             RatingOptions.DisplayType.Likert -> value.toString()

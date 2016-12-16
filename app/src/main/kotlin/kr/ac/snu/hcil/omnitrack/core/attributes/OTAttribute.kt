@@ -196,7 +196,7 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
         getProperty<Any>(key).setValueFromSerializedString(serializedValue)
     }
 
-    abstract fun formatAttributeValue(value: Any): String
+    abstract fun formatAttributeValue(value: Any): CharSequence
 
     /***
      * Autocompleted values based on attribute-specific settings.

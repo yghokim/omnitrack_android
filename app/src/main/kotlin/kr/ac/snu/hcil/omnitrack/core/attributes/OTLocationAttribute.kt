@@ -47,7 +47,7 @@ class OTLocationAttribute(objectId: String?, dbId: Long?, columnName: String, is
 
     override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_LATITUDE_LONGITUDE
 
-    override fun formatAttributeValue(value: Any): String {
+    override fun formatAttributeValue(value: Any): CharSequence {
         return value.toString()
     }
 
