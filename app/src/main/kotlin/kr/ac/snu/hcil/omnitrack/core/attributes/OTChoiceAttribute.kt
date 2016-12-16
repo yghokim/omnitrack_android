@@ -75,7 +75,7 @@ class OTChoiceAttribute(objectId: String?, dbId: Long?, columnName: String, isRe
         assignProperty(OTChoiceEntryListProperty(PROPERTY_ENTRIES, OTApplication.getString(R.string.property_choice_entries)))
     }
 
-    override fun formatAttributeValue(value: Any): String {
+    override fun formatAttributeValue(value: Any): CharSequence {
         val entries = this.entries
         if (value is IntArray && value.size > 0) {
             val builder = StringBuilder()

@@ -4,6 +4,8 @@
     <string name="type_timespan_name">Time Range</string>
     <string name="type_timespan_desc">A timespan data designated by start and end</string>
 
+    <string name="type_timespan_date_name">Date Range</string>
+    <string name="type_timespan_date_desc">A timespan data designated by start and end</string>
 
     <string name="type_timepoint_name">Time Point</string>
     <string name="type_timepoint_desc">A specific time point</string>
@@ -87,6 +89,11 @@
     <string name="property_choice_entries">Entries</string>
     <string name="property_choice_add_new_entry">Add New Entry</string>
     <string name="property_choice_type_in_entry_text">Type in entry text</string>
+
+
+    <string name="property_time_format_granularity_day">MMM dd, yyyy</string>
+    <string name="property_time_format_granularity_minute">MMM dd, yyyy hh:mm a</string>
+    <string name="property_time_format_granularity_second">MMM dd, yyyy hh:mm:ss a</string>
 
 
 </resources>

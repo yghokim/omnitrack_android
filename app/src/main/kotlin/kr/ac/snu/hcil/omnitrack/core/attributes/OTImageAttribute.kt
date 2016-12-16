@@ -25,7 +25,7 @@ class OTImageAttribute(objectId: String?, dbId: Long?, columnName: String, isReq
 
     }
 
-    override fun formatAttributeValue(value: Any): String {
+    override fun formatAttributeValue(value: Any): CharSequence {
         println("formatted image uri : ${value.javaClass}")
         return value.toString()
     }
