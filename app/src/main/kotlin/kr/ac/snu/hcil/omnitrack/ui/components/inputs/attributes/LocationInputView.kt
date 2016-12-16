@@ -305,6 +305,7 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
     }
 
     override fun onDestroy() {
+        googleMap?.setOnCameraIdleListener(null)
         mapView.onDestroy()
     }
 }
