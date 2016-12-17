@@ -76,15 +76,20 @@ object OTShortcutPanelManager {
                 element.setViewVisibility(R.id.ui_button_instant, View.VISIBLE)
                 element.setViewVisibility(R.id.ui_name, View.VISIBLE)
 
-                //element.setInt(R.id.ui_button_container, "setBackgroundColor", ColorUtils.setAlphaComponent(trackers[i].color, 200))
+                //
 
                 element.setTextViewText(R.id.ui_name, trackers[i].name)
 
-                val buttonBitmap = Bitmap.createBitmap(buttonSize, buttonSize, Bitmap.Config.ARGB_8888)
-                val buttonCanvas = Canvas(buttonBitmap)
-                paint.color = ColorUtils.setAlphaComponent(trackers[i].color, 200)
-                buttonCanvas.drawCircle(buttonRadius, buttonRadius, buttonRadius, paint)
-                element.setImageViewBitmap(R.id.ui_background_image, buttonBitmap)
+                if (true) {
+                    val buttonBitmap = Bitmap.createBitmap(buttonSize, buttonSize, Bitmap.Config.ARGB_8888)
+                    val buttonCanvas = Canvas(buttonBitmap)
+                    paint.color = ColorUtils.setAlphaComponent(trackers[i].color, 200)
+                    buttonCanvas.drawCircle(buttonRadius, buttonRadius, buttonRadius, paint)
+                    element.setImageViewBitmap(R.id.ui_background_image, buttonBitmap)
+                } else {
+                    element.setInt(R.id.ui_button_container, "setBackgroundColor", ColorUtils.setAlphaComponent(trackers[i].color, 200))
+                    element.setViewVisibility(R.id.ui_background_image, View.INVISIBLE)
+                }
 
                 val instantLoggingIntent = PendingIntent.getService(context, i, OTBackgroundLoggingService.makeIntent(context, trackers[i], OTItem.LoggingSource.Shortcut), PendingIntent.FLAG_UPDATE_CURRENT)
                 val openItemActivityIntent = PendingIntent.getActivity(context, i, ItemEditingActivity.makeIntent(trackers[i].objectId, context), PendingIntent.FLAG_UPDATE_CURRENT)
@@ -103,13 +108,13 @@ object OTShortcutPanelManager {
 
         val trackers = OTApplication.app.currentUser.getTrackersOnShortcut()
         if (trackers.isNotEmpty()) {
-            //val bigView = buildNewNotificationShortcutViews(context, true)
+            val bigView = buildNewNotificationShortcutViews(context, true)
             val normalView = buildNewNotificationShortcutViews(context, false)
 
             val noti = NotificationCompat.Builder(context)
                     .setSmallIcon(R.drawable.icon_simple_white)
                     .setContentTitle(context.resources.getString(R.string.app_name))
-                    //.setCustomBigContentView(bigView)
+                    .setCustomBigContentView(bigView)
                     .setCustomContentView(normalView)
                     .setVisibility(Notification.VISIBILITY_PUBLIC)
                     .setAutoCancel(false)

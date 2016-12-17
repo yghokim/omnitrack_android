@@ -14,7 +14,7 @@
 
     <style name="shortcut_NameStyle">
         <item name="android:gravity">center_horizontal</item>
-        <item name="android:minHeight">70dp</item>
+        <item name="android:minHeight">45dp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:layout_marginLeft">6dp</item>
         <item name="android:layout_marginRight">6dp</item>
@@ -28,8 +28,8 @@
 
     <style name="shortcut_ButtonContainerStyle">
         <item name="android:layout_gravity">center_horizontal</item>
-        <item name="android:layout_width">@dimen/button_height_small</item>
-        <item name="android:layout_height">@dimen/button_height_small</item>
+        <item name="android:layout_width">@dimen/shortcut_panel_button_size</item>
+        <item name="android:layout_height">@dimen/shortcut_panel_button_size</item>
     </style>
     <style name="shortcut_ButtonStyle">
         <item name="android:layout_width">match_parent</item>

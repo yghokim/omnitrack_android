@@ -3,6 +3,7 @@
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/frontalBackground"
     android:divider="@drawable/vertical_separator_shadowed"
     android:minHeight="96dp"
     android:orientation="horizontal"
