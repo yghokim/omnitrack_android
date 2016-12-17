@@ -27,13 +27,15 @@
     </style>
 
     <style name="shortcut_ButtonContainerStyle">
-        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_gravity">center_horizontal</item>
+        <item name="android:layout_width">@dimen/button_height_small</item>
         <item name="android:layout_height">@dimen/button_height_small</item>
     </style>
     <style name="shortcut_ButtonStyle">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>
-        <item name="android:src">@drawable/add_to_list</item>
+        <item name="android:src">@drawable/instant_add</item>
+        <item name="android:tint">#FFF</item>
         <item name="android:background">@drawable/transparent_button_background</item>
     </style>
 

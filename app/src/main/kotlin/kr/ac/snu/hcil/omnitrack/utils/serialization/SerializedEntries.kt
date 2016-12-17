@@ -21,7 +21,6 @@ val integerKeyEntryParser: Gson by lazy { GsonBuilder().registerTypeAdapter(Seri
 
 class SerializedIntegerKeyEntryTypeAdapter : TypeAdapter<SerializedIntegerKeyEntry>() {
     override fun read(input: JsonReader): SerializedIntegerKeyEntry {
-
         input.beginObject()
 
         input.nextName()
