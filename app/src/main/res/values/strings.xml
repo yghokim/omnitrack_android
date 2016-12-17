@@ -78,6 +78,8 @@
 
     <string name="msg_new_item_confirm_restore_previous_input">Previously input forms are stored. Do you want to restore the data?</string>
 
+    <string name="msg_clear_form">Reset</string>
+
     <string name="msg_undo">Undo</string>
 
     <string name="msg_color">Color</string>
@@ -116,8 +118,7 @@
 
     <string name="msg_item_list_empty_message">No items collected yet.</string>
 
-    <string name="msg_discard">Discard</string>
-    <string name="msg_builder_restored">Incomplete form contents were restored.</string>
+    <string name="msg_builder_restored">Restored form contents that were not saved.</string>
 
     <string name="sentence_new_tracker_added">Tracker \'%1$s\' was added</string>
 
