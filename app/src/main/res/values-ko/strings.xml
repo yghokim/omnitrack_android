@@ -51,6 +51,8 @@
     <string name="msg_attribute_removed_message">필드가 삭제되었습니다.</string>
     <string name="msg_add_new_attribute">새로운 필드 추가</string>
 
+    <string name="msg_item_removed_message">아이템이 삭제되었습니다.</string>
+
     <string name="msg_item_remove_confirm">아이템을 삭제하면 되돌릴 수 없습니다. 정말 삭제하시겠습니까?</string>
 
     <string name="msg_new_item_confirm_restore_previous_input">이전에 입력한 내용이 임시로 저장되어 있습니다. 다시 불러오시겠습니까?</string>

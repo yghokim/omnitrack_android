@@ -3,9 +3,12 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.items
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.support.design.widget.CoordinatorLayout
+import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.*
 import android.widget.*
 import butterknife.bindView
@@ -18,6 +21,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AttributeSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
+import kr.ac.snu.hcil.omnitrack.ui.DragItemTouchHelperCallback
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTTrackerAttachedActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.FallbackRecyclerView
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.DrawableListBottomSpaceItemDecoration
@@ -50,6 +54,8 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
 
     private val sortOrderButton: ToggleButton by bindView(R.id.ui_toggle_sort_order)
 
+    private lateinit var removalSnackbar: Snackbar
+
     private var supportedItemComparators: List<ItemComparator>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,6 +77,21 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
 
         itemListView.adapter = itemListViewAdapter
 
+        itemListView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView?, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                if (removalSnackbar.isShown) {
+                    removalSnackbar.dismiss()
+                }
+            }
+
+        })
+
+
+        ItemTouchHelper(DragItemTouchHelperCallback(itemListViewAdapter, this, false, true))
+                .attachToRecyclerView(itemListView)
+
+
         sortOrderButton.setOnCheckedChangeListener { compoundButton, b ->
             if (b) {
                 sortOrderButton.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ascending, 0)
@@ -81,6 +102,14 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
         InterfaceHelper.removeButtonTextDecoration(sortOrderButton)
 
         sortOrderButton.setOnClickListener(this)
+
+        val snackBarContainer: CoordinatorLayout = findViewById(R.id.ui_snackbar_container) as CoordinatorLayout
+        removalSnackbar = Snackbar.make(snackBarContainer, resources.getText(R.string.msg_item_removed_message), Snackbar.LENGTH_INDEFINITE)
+        removalSnackbar.setAction(resources.getText(R.string.msg_undo)) {
+            view ->
+            itemListViewAdapter.undoRemoval()
+        }
+
     }
 
     override fun onTrackerLoaded(tracker: OTTracker) {
@@ -100,6 +129,11 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
         OTApplication.app.dbHelper.getItems(tracker, items)
 
         onItemListChanged()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        itemListViewAdapter.clearTrashcan()
     }
 
     override fun onClick(view: View) {
@@ -157,7 +191,49 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
         }
     }
 
-    inner class ItemListViewAdapter : RecyclerView.Adapter<ItemListViewAdapter.ItemElementViewHolder>() {
+    fun addItem(item: OTItem) {
+        tracker?.let {
+            OTApplication.app.dbHelper.save(item, it, false)
+        }
+        items.add(item)
+        reSort()
+    }
+
+    fun removeItem(position: Int): OTItem {
+        val removedItem = items[position]
+        OTApplication.app.dbHelper.removeItem(removedItem)
+        items.removeAt(position)
+        onItemRemoved(position)
+
+        return removedItem
+    }
+
+    inner class ItemListViewAdapter : RecyclerView.Adapter<ItemListViewAdapter.ItemElementViewHolder>(), DragItemTouchHelperCallback.ItemDragHelperAdapter {
+
+        private var lastRemovedItem: OTItem? = null
+        private var lastRemovedItemPosition: Int = -1
+
+        fun clearTrashcan() {
+            lastRemovedItem = null
+            lastRemovedItemPosition = -1
+        }
+
+        override fun onMoveItem(fromPosition: Int, toPosition: Int) {
+
+        }
+
+        override fun onRemoveItem(position: Int) {
+            lastRemovedItem = removeItem(position)
+            lastRemovedItemPosition = position
+            removalSnackbar.show()
+        }
+
+        fun undoRemoval() {
+            lastRemovedItem?.let {
+                addItem(it)
+            }
+        }
+
         override fun getItemCount(): Int {
             return items.size
         }
@@ -231,9 +307,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                     }
                     R.id.action_remove -> {
                         DialogHelper.makeYesNoDialogBuilder(this@ItemBrowserActivity, "OmniTrack", resources.getString(R.string.msg_item_remove_confirm), {
-                            OTApplication.app.dbHelper.removeItem(items[adapterPosition])
-                            items.removeAt(adapterPosition)
-                            onItemRemoved(adapterPosition)
+                            removeItem(adapterPosition)
                         }).show()
                         return true
                     }
@@ -270,7 +344,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                 }
 
                 override fun getItemViewType(position: Int): Int {
-                    if (getParentItem().hasValueOf(tracker!!.attributes[position]))
+                    if (this@ItemElementViewHolder.adapterPosition != -1 && getParentItem().hasValueOf(tracker!!.attributes[position]))
                         return tracker?.attributes?.get(position)?.getViewForItemListContainerType() ?: 0
                     else return 5
                 }
