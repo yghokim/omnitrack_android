@@ -69,7 +69,10 @@
     <string name="msg_attributes">Fields</string>
 
     <string name="msg_attribute_removed_message">The field was removed</string>
+
     <string name="msg_add_new_attribute">Add new field</string>
+
+    <string name="msg_item_removed_message">The item was removed</string>
 
     <string name="msg_item_remove_confirm">Deleting item cannot be undone. Do you want to remove this item?</string>
 

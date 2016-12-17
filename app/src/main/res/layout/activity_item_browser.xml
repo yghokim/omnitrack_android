@@ -69,6 +69,7 @@
         android:id="@+id/ui_item_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@+id/ui_snackbar_container"
         android:layout_below="@+id/appbar" />
 
     <TextView
@@ -82,4 +83,11 @@
         android:layout_marginTop="18dp"
         android:text="@string/msg_item_list_empty_message"
         android:visibility="gone" />
+
+
+    <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/ui_snackbar_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true" />
 </RelativeLayout>
