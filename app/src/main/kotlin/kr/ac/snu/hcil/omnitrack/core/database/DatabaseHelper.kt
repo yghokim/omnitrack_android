@@ -541,6 +541,13 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         }.subscribeOn(Schedulers.computation())
     }
 
+    fun getTotalItemCount(tracker: OTTracker): Observable<Int> {
+        return Observable.defer {
+            val numRows = DatabaseUtils.queryNumEntries(readableDatabase, ItemScheme.tableName, "${ItemScheme.TRACKER_ID}=?", arrayOf(tracker.dbId.toString()))
+            Observable.just(numRows.toInt())
+        }.subscribeOn(Schedulers.computation())
+    }
+
     fun getLastLoggingTime(tracker: OTTracker): Observable<Long?> {
         return Observable.defer {
             val cursor = readableDatabase.query(ItemScheme.tableName, arrayOf(ItemScheme.LOGGED_AT), "${ItemScheme.TRACKER_ID}=?", arrayOf(tracker.dbId.toString()), null, null, "${ItemScheme.LOGGED_AT} DESC", "1")

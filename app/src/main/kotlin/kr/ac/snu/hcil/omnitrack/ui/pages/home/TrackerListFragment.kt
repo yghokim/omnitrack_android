@@ -75,11 +75,11 @@ class TrackerListFragment : OTFragment() {
 
     private lateinit var lastLoggedTimeFormat: SimpleDateFormat
 
-    private lateinit var dateSizeSpan: AbsoluteSizeSpan
+    private lateinit var statHeaderSizeSpan: AbsoluteSizeSpan
     private lateinit var dateStyleSpan: StyleSpan
-    private lateinit var dateColorSpan: ForegroundColorSpan
+    private lateinit var statHeaderColorSpan: ForegroundColorSpan
 
-    private lateinit var timeStyleSpan: StyleSpan
+    private lateinit var statContentStyleSpan: StyleSpan
 
     private val emptyTrackerDialog: MaterialDialog.Builder by lazy {
         MaterialDialog.Builder(context)
@@ -145,9 +145,9 @@ class TrackerListFragment : OTFragment() {
 
         lastLoggedTimeFormat = SimpleDateFormat(context.resources.getString(R.string.msg_tracker_list_time_format))
         dateStyleSpan = StyleSpan(Typeface.NORMAL)
-        timeStyleSpan = StyleSpan(Typeface.BOLD)
-        dateSizeSpan = AbsoluteSizeSpan(context.resources.getDimensionPixelSize(R.dimen.tracker_list_element_information_text_headerSize))
-        dateColorSpan = ForegroundColorSpan(ContextCompat.getColor(context, R.color.textColorLight))
+        statContentStyleSpan = StyleSpan(Typeface.BOLD)
+        statHeaderSizeSpan = AbsoluteSizeSpan(context.resources.getDimensionPixelSize(R.dimen.tracker_list_element_information_text_headerSize))
+        statHeaderColorSpan = ForegroundColorSpan(ContextCompat.getColor(context, R.color.textColorLight))
         //attach events
         // user.trackerAdded += onTrackerAddedHandler
         //  user.trackerRemoved += onTrackerRemovedHandler
@@ -308,6 +308,8 @@ class TrackerListFragment : OTFragment() {
 
             val lastLoggingTimeView: TextView by bindView(R.id.ui_last_logging_time)
             val todayLoggingCountView: TextView by bindView(R.id.ui_today_logging_count)
+            val totalItemCountView: TextView by bindView(R.id.ui_total_item_count)
+
 
             val expandedView: View by bindView(R.id.ui_expanded_view)
 
@@ -479,20 +481,15 @@ class TrackerListFragment : OTFragment() {
                                 InterfaceHelper.setTextAppearance(lastLoggingTimeView, R.style.trackerListInformationTextViewStyle)
                                 val dateText = TimeHelper.getDateText(timestamp, context).toUpperCase()
                                 val timeText = lastLoggedTimeFormat.format(Date(timestamp)).toUpperCase()
-                                val builder = SpannableString(dateText + "\n" + timeText).apply {
-                                    setSpan(dateSizeSpan, 0, dateText.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                                    setSpan(dateColorSpan, 0, dateText.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                                    setSpan(timeStyleSpan, dateText.length + 1, dateText.length + 1 + timeText.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                                }
-
-
+                                putStatistics(lastLoggingTimeView, dateText, timeText)
                                 todayLoggingCountView.visibility = View.VISIBLE
+                                totalItemCountView.visibility = View.VISIBLE
 
-                                lastLoggingTimeView.text = builder
                             } else {
                                 lastLoggingTimeView.text = context.resources.getString(R.string.msg_never_logged).toUpperCase()
                                 InterfaceHelper.setTextAppearance(lastLoggingTimeView, R.style.trackerListInformationTextViewStyle_HeaderAppearance)
                                 todayLoggingCountView.visibility = View.INVISIBLE
+                                totalItemCountView.visibility = View.INVISIBLE
                             }
                     }
                 )
@@ -502,15 +499,19 @@ class TrackerListFragment : OTFragment() {
                         OTApplication.app.dbHelper.getLogCountOfDay(tracker).observeOn(AndroidSchedulers.mainThread()).subscribe {
                             count ->
                             val header = context.resources.getString(R.string.msg_todays_log).toUpperCase()
-                            val builder = SpannableString(header + "\n" + count).apply {
-                                setSpan(dateSizeSpan, 0, header.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                                setSpan(dateColorSpan, 0, header.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                                setSpan(timeStyleSpan, header.length + 1, header.length + 1 + count.toString().length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                            }
-
-                            todayLoggingCountView.text = builder
+                            putStatistics(todayLoggingCountView, header, count.toString())
                         }
                 )
+
+                subscriptions.add(
+                        OTApplication.app.dbHelper.getTotalItemCount(tracker).observeOn(AndroidSchedulers.mainThread()).subscribe {
+                            count ->
+                            val header = context.resources.getString(R.string.msg_tracker_list_stat_total).toUpperCase()
+                            putStatistics(totalItemCountView, header, count.toString())
+                        }
+                )
+
+
 
                 if (currentlyExpandedIndex == adapterPosition) {
                     lastExpandedViewHolder = this
@@ -518,6 +519,16 @@ class TrackerListFragment : OTFragment() {
                 } else {
                     collapse(false)
                 }
+            }
+
+            private fun putStatistics(view: TextView, header: CharSequence, content: CharSequence) {
+                val builder = SpannableString("$header\n$content").apply {
+                    setSpan(statHeaderSizeSpan, 0, header.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    setSpan(statHeaderColorSpan, 0, header.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    setSpan(statContentStyleSpan, header.length + 1, header.length + 1 + content.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                }
+
+                view.text = builder
             }
 
             fun collapse(animate: Boolean) {

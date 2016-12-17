@@ -192,6 +192,8 @@
 
     <string name="msg_empty_value">Empty value</string>
 
+    <string name="msg_tracker_list_stat_total">Total</string>
+
 
     <string-array name="choice_preview_entries">
         <item>Choice entry 1</item>
