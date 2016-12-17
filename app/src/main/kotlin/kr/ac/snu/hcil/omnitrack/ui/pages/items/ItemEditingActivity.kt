@@ -22,6 +22,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTItemBuilder
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
+import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTTrackerAttachedActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
@@ -95,10 +96,7 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        rightActionBarButton?.visibility = View.VISIBLE
-        leftActionBarButton?.visibility = View.VISIBLE
-        leftActionBarButton?.setImageResource(R.drawable.back_rhombus)
-        rightActionBarButton?.setImageResource(R.drawable.done)
+        setActionBarButtonMode(MultiButtonActionBarActivity.Mode.SaveCancel)
 
         attributeListView.layoutManager = layoutManager
         attributeListView.addItemDecoration(HorizontalImageDividerItemDecoration(R.drawable.horizontal_separator_pattern, this))

@@ -58,7 +58,8 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setActionBarButtonMode(Mode.OKCancel)
+        setActionBarButtonMode(Mode.SaveCancel)
+        rightActionBarTextButton?.setText(R.string.msg_apply)
 
         propertyViewHorizontalMargin = resources.getDimensionPixelSize(R.dimen.activity_horizontal_margin)
 

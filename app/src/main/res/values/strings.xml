@@ -27,6 +27,8 @@
     <string name="msg_yes">Yes</string>
     <string name="msg_no">No</string>
 
+    <string name="msg_save">Save</string>
+
     <string name="msg_confirm_apply_change">Do you want to apply changes?</string>
 
     <string name="msg_confirm_log">Log Item</string>
