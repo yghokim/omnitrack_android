@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.items
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.support.design.widget.BaseTransientBottomBar
 import android.support.design.widget.CoordinatorLayout
 import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
@@ -108,7 +109,13 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
         removalSnackbar.setAction(resources.getText(R.string.msg_undo)) {
             view ->
             itemListViewAdapter.undoRemoval()
-        }
+        }.addCallback(object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
+            override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                super.onDismissed(transientBottomBar, event)
+                itemListViewAdapter.clearTrashcan()
+            }
+
+        })
 
     }
 
@@ -131,9 +138,10 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
         onItemListChanged()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onPause() {
+        super.onPause()
         itemListViewAdapter.clearTrashcan()
+        removalSnackbar.dismiss()
     }
 
     override fun onClick(view: View) {
@@ -147,13 +155,14 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
         reSort()
     }
 
-    private fun reSort() {
+    private fun reSort(refresh: Boolean = true) {
         val comparator = supportedItemComparators?.get(sortSpinner.selectedItemPosition)
         if (comparator != null) {
             println("sort items by ${comparator}")
             comparator.isDecreasing = !sortOrderButton.isChecked
             items.sortWith(comparator)
-            onItemListChanged()
+            if (refresh)
+                onItemListChanged()
         }
     }
 
@@ -191,15 +200,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
         }
     }
 
-    fun addItem(item: OTItem) {
-        tracker?.let {
-            OTApplication.app.dbHelper.save(item, it, false)
-        }
-        items.add(item)
-        reSort()
-    }
-
-    fun removeItem(position: Int): OTItem {
+    fun deleteItemPermanently(position: Int): OTItem {
         val removedItem = items[position]
         OTApplication.app.dbHelper.removeItem(removedItem)
         items.removeAt(position)
@@ -210,12 +211,12 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
 
     inner class ItemListViewAdapter : RecyclerView.Adapter<ItemListViewAdapter.ItemElementViewHolder>(), DragItemTouchHelperCallback.ItemDragHelperAdapter {
 
-        private var lastRemovedItem: OTItem? = null
-        private var lastRemovedItemPosition: Int = -1
+        private val removedItems = ArrayList<OTItem>()
 
         fun clearTrashcan() {
-            lastRemovedItem = null
-            lastRemovedItemPosition = -1
+            for (item in removedItems) {
+                OTApplication.app.dbHelper.removeItem(item)
+            }
         }
 
         override fun onMoveItem(fromPosition: Int, toPosition: Int) {
@@ -223,14 +224,22 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
         }
 
         override fun onRemoveItem(position: Int) {
-            lastRemovedItem = removeItem(position)
-            lastRemovedItemPosition = position
+            removedItems += items.removeAt(position)
+            notifyItemRemoved(position)
             removalSnackbar.show()
         }
 
         fun undoRemoval() {
-            lastRemovedItem?.let {
-                addItem(it)
+            if (!removedItems.isEmpty()) {
+                val restored = removedItems.removeAt(removedItems.size - 1)
+                items.add(restored)
+                reSort(false)
+                val newPosition = items.indexOf(restored)
+                if (newPosition != -1) {
+                    itemListViewAdapter.notifyItemInserted(newPosition)
+                } else {
+                    itemListViewAdapter.notifyDataSetChanged()
+                }
             }
         }
 
@@ -294,6 +303,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
             override fun onClick(p0: View?) {
                 if (p0 === moreButton) {
                     itemMenu.show()
+                    removalSnackbar.dismiss()
                 }
             }
 
@@ -307,7 +317,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                     }
                     R.id.action_remove -> {
                         DialogHelper.makeYesNoDialogBuilder(this@ItemBrowserActivity, "OmniTrack", resources.getString(R.string.msg_item_remove_confirm), {
-                            removeItem(adapterPosition)
+                            deleteItemPermanently(adapterPosition)
                         }).show()
                         return true
                     }
