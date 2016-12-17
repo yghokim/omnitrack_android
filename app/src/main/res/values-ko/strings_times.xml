@@ -64,7 +64,7 @@
 
     <string name="msg_today">오늘</string>
     <string name="msg_yesterday">어제</string>
-    <string name="msg_tracker_list_date_format">MMMM ddd</string>
+    <string name="msg_tracker_list_date_format">M월 d일</string>
     <string name="msg_tracker_list_time_format">a hh:mm</string>
 
 
