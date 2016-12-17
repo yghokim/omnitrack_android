@@ -57,6 +57,8 @@
 
     <string name="msg_new_item_confirm_restore_previous_input">이전에 입력한 내용이 임시로 저장되어 있습니다. 다시 불러오시겠습니까?</string>
 
+    <string name="msg_clear_form">초기화</string>
+
     <string name="msg_undo">되돌리기</string>
 
     <string name="msg_color">컬러</string>
@@ -101,8 +103,7 @@
 
     <string name="msg_item_list_empty_message">기록된 아이템이 없습니다.</string>
 
-    <string name="msg_discard">초기화</string>
-    <string name="msg_builder_restored">기록되지 않은 이전 입력값을 불러왔습니다.</string>
+    <string name="msg_builder_restored">저장하지 않은 이전 입력값을 불러왔습니다.</string>
 
     <string name="sentence_new_tracker_added">새로운 트래커 \'%1$s\'가 추가되었습니다.</string>
 
