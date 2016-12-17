@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.support.design.widget.AppBarLayout
 import android.support.v4.content.ContextCompat
 import android.support.v4.graphics.ColorUtils
+import android.support.v7.widget.AppCompatButton
 import android.support.v7.widget.AppCompatImageButton
 import android.support.v7.widget.Toolbar
 import android.view.View
@@ -22,13 +23,15 @@ import kr.ac.snu.hcil.omnitrack.R
 abstract class MultiButtonActionBarActivity(val layoutId: Int) : OTActivity() {
 
     enum class Mode {
-        OKCancel, Back, BackAndMenu, None
+        OKCancel, Back, BackAndMenu, SaveCancel, None
     }
 
     protected val header: AppBarLayout by bindView(R.id.appbar)
 
     protected var leftActionBarButton: ImageButton?=null
     protected var rightActionBarButton: ImageButton?=null
+
+    protected var rightActionBarTextButton: AppCompatButton? = null
     protected var titleView: TextView? = null
 
     private var isCanceled = false
@@ -57,6 +60,12 @@ abstract class MultiButtonActionBarActivity(val layoutId: Int) : OTActivity() {
 
         rightActionBarButton?.setOnClickListener {
 
+            super.setResult(rightButtonResultCode)
+            onToolbarRightButtonClicked()
+        }
+
+        rightActionBarTextButton = findViewById(R.id.ui_appbar_text_button_right) as AppCompatButton
+        rightActionBarTextButton?.setOnClickListener {
             super.setResult(rightButtonResultCode)
             onToolbarRightButtonClicked()
         }
@@ -104,22 +113,35 @@ abstract class MultiButtonActionBarActivity(val layoutId: Int) : OTActivity() {
         when (mode) {
             Mode.Back -> {
                 rightActionBarButton?.visibility = View.GONE
+                rightActionBarTextButton?.visibility = View.GONE
                 leftActionBarButton?.visibility = View.VISIBLE
                 leftActionBarButton?.setImageResource(R.drawable.back_rhombus)
             }
             Mode.OKCancel -> {
                 rightActionBarButton?.visibility = View.VISIBLE
+                rightActionBarTextButton?.visibility = View.GONE
                 leftActionBarButton?.visibility = View.VISIBLE
                 rightActionBarButton?.setImageResource(R.drawable.done)
                 leftActionBarButton?.setImageResource(R.drawable.cancel)
             }
             Mode.None -> {
                 rightActionBarButton?.visibility = View.GONE
+                rightActionBarTextButton?.visibility = View.GONE
                 leftActionBarButton?.visibility = View.GONE
             }
             Mode.BackAndMenu -> {
 
             }
+            Mode.SaveCancel -> {
+
+                rightActionBarTextButton?.visibility = View.VISIBLE
+                rightActionBarButton?.visibility = View.GONE
+
+                leftActionBarButton?.visibility = View.VISIBLE
+                leftActionBarButton?.setImageResource(R.drawable.cancel)
+                rightActionBarTextButton?.setText(R.string.msg_save)
+            }
+
         }
     }
 }
