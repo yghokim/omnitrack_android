@@ -3,8 +3,7 @@
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:divider="@drawable/left_separator_light"
-    android:dividerPadding="8dp"
+    android:divider="@drawable/vertical_separator_shadowed"
     android:minHeight="96dp"
     android:orientation="horizontal"
     android:showDividers="middle" />

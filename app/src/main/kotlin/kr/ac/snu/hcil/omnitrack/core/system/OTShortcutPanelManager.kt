@@ -5,6 +5,9 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Paint
 import android.support.v4.app.TaskStackBuilder
 import android.support.v4.graphics.ColorUtils
 import android.support.v7.app.NotificationCompat
@@ -55,6 +58,11 @@ object OTShortcutPanelManager {
 
         rv.removeAllViews(R.id.container)
 
+        val buttonSize = OTApplication.app.resources.getDimensionPixelSize(R.dimen.button_height_small)
+        val buttonRadius = buttonSize * .5f
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+        paint.style = Paint.Style.FILL
+
         for (i in 0..MAX_NUM_SHORTCUTS - 1)
         {
             val element = RemoteViews(context.packageName, if (bigStyle) R.layout.remoteview_shortcut_notification_element else R.layout.remoteview_shortcut_notification_element_normal)
@@ -68,10 +76,15 @@ object OTShortcutPanelManager {
                 element.setViewVisibility(R.id.ui_button_instant, View.VISIBLE)
                 element.setViewVisibility(R.id.ui_name, View.VISIBLE)
 
-                element.setInt(R.id.ui_button_container, "setBackgroundColor", ColorUtils.setAlphaComponent(trackers[i].color, 200))
+                //element.setInt(R.id.ui_button_container, "setBackgroundColor", ColorUtils.setAlphaComponent(trackers[i].color, 200))
 
                 element.setTextViewText(R.id.ui_name, trackers[i].name)
 
+                val buttonBitmap = Bitmap.createBitmap(buttonSize, buttonSize, Bitmap.Config.ARGB_8888)
+                val buttonCanvas = Canvas(buttonBitmap)
+                paint.color = ColorUtils.setAlphaComponent(trackers[i].color, 200)
+                buttonCanvas.drawCircle(buttonRadius, buttonRadius, buttonRadius, paint)
+                element.setImageViewBitmap(R.id.ui_background_image, buttonBitmap)
 
                 val instantLoggingIntent = PendingIntent.getService(context, i, OTBackgroundLoggingService.makeIntent(context, trackers[i], OTItem.LoggingSource.Shortcut), PendingIntent.FLAG_UPDATE_CURRENT)
                 val openItemActivityIntent = PendingIntent.getActivity(context, i, ItemEditingActivity.makeIntent(trackers[i].objectId, context), PendingIntent.FLAG_UPDATE_CURRENT)
@@ -90,18 +103,17 @@ object OTShortcutPanelManager {
 
         val trackers = OTApplication.app.currentUser.getTrackersOnShortcut()
         if (trackers.isNotEmpty()) {
-            val bigView = buildNewNotificationShortcutViews(context, true)
+            //val bigView = buildNewNotificationShortcutViews(context, true)
             val normalView = buildNewNotificationShortcutViews(context, false)
 
             val noti = NotificationCompat.Builder(context)
                     .setSmallIcon(R.drawable.icon_simple_white)
                     .setContentTitle(context.resources.getString(R.string.app_name))
-                    .setCustomBigContentView(bigView)
+                    //.setCustomBigContentView(bigView)
                     .setCustomContentView(normalView)
                     .setVisibility(Notification.VISIBILITY_PUBLIC)
                     .setAutoCancel(false)
                     .setOngoing(true)
-                    .setStyle(android.support.v4.app.NotificationCompat.BigTextStyle())
                     .setPriority(Notification.PRIORITY_MAX)
                     .build()
 

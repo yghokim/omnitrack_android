@@ -4,13 +4,18 @@
         style="@style/shortcut_GroupStyle">
         <TextView android:id="@+id/ui_name"
             style="@style/shortcut_NameStyle"
-            android:text="Manual Sleep"
             android:layout_marginBottom="6dp"
+            android:text="Manual Sleep"
             />
 
         <FrameLayout
             android:id="@+id/ui_button_container"
             style="@style/shortcut_ButtonContainerStyle">
+
+            <ImageView
+                android:id="@+id/ui_background_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
             <ImageButton
                 android:id="@+id/ui_button_instant"
                 style="@style/shortcut_ButtonStyle"/>
