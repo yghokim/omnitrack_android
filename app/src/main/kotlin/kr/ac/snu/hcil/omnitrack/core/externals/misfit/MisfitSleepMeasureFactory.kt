@@ -74,5 +74,16 @@ object MisfitSleepMeasureFactory : OTMeasureFactory() {
         override fun onDeserialize(typedQueue: SerializableTypedQueue) {
         }
 
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            else if (other is MisfitSleepMeasure) {
+                return true
+            } else return false
+        }
+
+        override fun hashCode(): Int {
+            return factoryCode.hashCode()
+        }
+
     }
 }

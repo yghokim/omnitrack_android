@@ -87,6 +87,17 @@ class OTTimeRangeQuery : ATypedQueueSerializable {
         this.anchorToNow = anchorToNow
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        else if (other is OTTimeRangeQuery) {
+            return other.mode == this.mode &&
+                    other.anchorToNow == this.anchorToNow &&
+                    other.binOffset == this.binOffset &&
+                    other.binSize == this.binSize &&
+                    other.linkedAttribute == this.linkedAttribute
+        } else return false
+    }
+
     override fun onSerialize(typedQueue: SerializableTypedQueue) {
         typedQueue.putInt(mode)
         typedQueue.putBoolean(anchorToNow)

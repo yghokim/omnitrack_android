@@ -107,6 +107,17 @@ object RescueTimeComputerUsageDurationMeasureFactory : OTMeasureFactory() {
         constructor() : super()
         constructor(serialized: String) : super(serialized)
 
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            else if (other is ComputerUsageDurationMeasure) {
+                return true
+            } else return false
+        }
+
+        override fun hashCode(): Int {
+            return factoryCode.hashCode()
+        }
+
     }
 
 }

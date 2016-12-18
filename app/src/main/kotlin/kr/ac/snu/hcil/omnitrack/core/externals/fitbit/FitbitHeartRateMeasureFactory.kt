@@ -157,9 +157,19 @@ object FitbitHeartRateMeasureFactory : OTMeasureFactory() {
             return urls.toTypedArray()
         }
 
-
-
         constructor() : super()
         constructor(serialized: String) : super(serialized)
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            else if (other is FitbitHeartRateMeasure) {
+                return true
+            } else return false
+        }
+
+        override fun hashCode(): Int {
+            return factoryCode.hashCode()
+        }
+
     }
 }

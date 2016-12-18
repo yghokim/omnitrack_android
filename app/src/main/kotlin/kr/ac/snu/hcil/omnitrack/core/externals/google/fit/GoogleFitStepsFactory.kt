@@ -90,6 +90,17 @@ object GoogleFitStepsFactory : GoogleFitService.GoogleFitMeasureFactory() {
 
         }
 
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            else if (other is Measure) {
+                return true
+            } else return false
+        }
+
+        override fun hashCode(): Int {
+            return factoryCode.hashCode()
+        }
+
         class Task(val from: Long, val to: Long, val handler: ((Int) -> Unit)?) : AsyncTask<Void?, Void?, Int>() {
 
             override fun doInBackground(vararg p0: Void?): Int {
