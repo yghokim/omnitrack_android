@@ -87,4 +87,19 @@ class RatingOptions {
     var middleLabel: String = ""
     var rightLabel: String = OTApplication.app.resources.getString(R.string.property_rating_options_rightmost_label_example)
     var allowIntermediate: Boolean = true
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) {
+            return true
+        } else if (other is RatingOptions) {
+            return other.allowIntermediate == this.allowIntermediate &&
+                    other.type == this.type &&
+                    other.leftMost == this.leftMost &&
+                    other.leftLabel == this.leftLabel &&
+                    other.middleLabel == this.middleLabel &&
+                    other.rightMost == this.rightMost &&
+                    other.rightLabel == this.rightLabel &&
+                    other.starLevels == this.starLevels
+        } else return false
+    }
 }
