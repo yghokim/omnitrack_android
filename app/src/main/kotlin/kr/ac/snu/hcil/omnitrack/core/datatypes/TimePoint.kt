@@ -25,6 +25,13 @@ class TimePoint : IStringSerializable, Comparable<TimePoint> {
         fromSerializedString(serialized)
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        else if (other is TimePoint) {
+            return other.timestamp == this.timestamp && other.timeZone == this.timeZone
+        } else return false
+    }
+
     override fun getSerializedString(): String {
         return "${timestamp}@${timeZone.id}"
     }
