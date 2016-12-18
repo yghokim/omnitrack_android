@@ -40,6 +40,13 @@ class TimeSpan : IStringSerializable {
         this.timeZone = timeZone
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        else if (other is TimeSpan) {
+            return other.from == this.from && other.duration == this.duration && other.timeZone == this.timeZone
+        } else return false
+    }
+
 
     override fun toString(): String {
         val format = SimpleDateFormat(OTApplication.app.resources.getString(R.string.msg_tracker_list_time_format))

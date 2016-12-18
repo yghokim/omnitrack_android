@@ -136,14 +136,18 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
     }
 
     override fun onToolbarLeftButtonClicked() {
-        askChangeAndFinish()
+        if (isChanged()) askChangeAndFinish()
+        else finish()
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-
-            askChangeAndFinish(true)
-            return true
+            if (isChanged()) {
+                askChangeAndFinish(true)
+                return true
+            } else {
+                return super.onKeyDown(keyCode, event)
+            }
         } else return super.onKeyDown(keyCode, event)
     }
 
@@ -172,7 +176,26 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
     }
 
     private fun isChanged(): Boolean {
-        return true
+
+        if (columnNameView.value != attribute?.name) {
+            return true
+        }
+
+        if (attribute?.valueConnection != connectionView.connection) {
+            return true
+        }
+
+        for (entry in propertyViewList) {
+            entry.first?.let {
+                if (entry.second is APropertyView<*>) {
+                    if (attribute?.getPropertyValue<Any>(it) != entry.second.value!!) {
+                        return true
+                    }
+                }
+            }
+        }
+
+        return false
     }
 
     private fun saveChanges() {
