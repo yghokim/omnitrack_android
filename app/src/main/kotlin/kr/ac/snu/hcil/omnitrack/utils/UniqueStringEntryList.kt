@@ -52,10 +52,19 @@ class UniqueStringEntryList : IStringSerializable {
         entryNames.map { Entry(getNewId, it) }.toCollection(list)
     }
 
+    override fun equals(other: Any?): Boolean {
+
+
+        if (this === other) return true
+        else if (other is UniqueStringEntryList) {
+            return other.increment == this.increment && other.list.isSame(this.list)
+        } else return false
+    }
+
     fun set(from: UniqueStringEntryList) {
         this.increment = from.increment
         this.list.clear()
-        this.list.addAll(from.list)
+        this.list.addAll(from.list.map { it.copy() })
     }
 
     fun indexOf(id: Int): Int {

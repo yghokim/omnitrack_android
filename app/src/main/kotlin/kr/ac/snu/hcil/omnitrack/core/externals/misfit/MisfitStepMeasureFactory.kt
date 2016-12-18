@@ -80,5 +80,15 @@ object MisfitStepMeasureFactory: OTMeasureFactory() {
         override fun onDeserialize(typedQueue: SerializableTypedQueue) {
         }
 
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            else if (other is MisfitStepMeasure) {
+                return true
+            } else return false
+        }
+
+        override fun hashCode(): Int {
+            return factoryCode.hashCode()
+        }
     }
 }

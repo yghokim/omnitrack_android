@@ -76,6 +76,13 @@ class OTConnection : ATypedQueueSerializable {
         }
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        else if (other is OTConnection) {
+            return other.rangedQuery == this.rangedQuery && other.source == this.source
+        } else return false
+    }
+
     override fun onSerialize(typedQueue: SerializableTypedQueue) {
         typedQueue.putBoolean(source != null)
         if (source != null) {

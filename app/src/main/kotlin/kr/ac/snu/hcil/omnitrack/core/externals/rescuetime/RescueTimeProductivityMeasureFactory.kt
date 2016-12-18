@@ -106,6 +106,17 @@ object RescueTimeProductivityMeasureFactory : OTMeasureFactory() {
 
         }
 
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            else if (other is ProductivityMeasure) {
+                return true
+            } else return false
+        }
+
+        override fun hashCode(): Int {
+            return factoryCode.hashCode()
+        }
+
     }
 
 }

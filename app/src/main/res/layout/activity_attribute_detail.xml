@@ -63,48 +63,54 @@
 
             </LinearLayout>
 
-
-            <TextView
-                android:id="@+id/title"
-                style="@style/PropertyHeaderStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/property_top_padding"
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:text="@string/msg_value_autocompletion" />
-
-            <FrameLayout
-                android:id="@+id/ui_attribute_connection_frame"
+            <LinearLayout
+                android:id="@+id/ui_connection_group"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/attribute_list_element_horizontal_padding"
-                android:layout_marginStart="@dimen/attribute_list_element_horizontal_padding"
-                android:layout_marginTop="@dimen/activity_vertical_margin"
-                android:background="@drawable/attribute_card">
+                android:orientation="vertical">
 
-                <Button
-                    android:id="@+id/ui_button_new_connection"
-                    style="@style/Base.Widget.AppCompat.Button.Borderless"
+                <TextView
+                    android:id="@+id/ui_property_title_value_connection"
+                    style="@style/PropertyHeaderStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/property_top_padding"
+                    android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:paddingRight="@dimen/activity_horizontal_margin"
+                    android:text="@string/msg_value_autocompletion" />
+
+                <FrameLayout
+                    android:id="@+id/ui_attribute_connection_frame"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:drawablePadding="8dp"
-                    android:drawableStart="@drawable/link_dark"
-                    android:paddingBottom="14dp"
-                    android:paddingStart="12dp"
+                    android:layout_marginEnd="@dimen/attribute_list_element_horizontal_padding"
+                    android:layout_marginStart="@dimen/attribute_list_element_horizontal_padding"
+                    android:layout_marginTop="@dimen/activity_vertical_margin"
+                    android:background="@drawable/attribute_card">
 
-                    android:paddingTop="14dp"
-                    android:text="@string/msg_set_new_connection"
-                    android:textAlignment="viewStart"
-                    android:textColor="@color/buttonIconColorDark" />
+                    <Button
+                        android:id="@+id/ui_button_new_connection"
+                        style="@style/Base.Widget.AppCompat.Button.Borderless"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:drawablePadding="8dp"
+                        android:drawableStart="@drawable/link_dark"
+                        android:paddingBottom="14dp"
+                        android:paddingStart="12dp"
 
-                <kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeConnectionView
-                    android:id="@+id/ui_attribute_connection"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:visibility="gone" />
-            </FrameLayout>
+                        android:paddingTop="14dp"
+                        android:text="@string/msg_set_new_connection"
+                        android:textAlignment="viewStart"
+                        android:textColor="@color/buttonIconColorDark" />
 
+                    <kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeConnectionView
+                        android:id="@+id/ui_attribute_connection"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone" />
+                </FrameLayout>
+
+            </LinearLayout>
 
         </LinearLayout>
 
