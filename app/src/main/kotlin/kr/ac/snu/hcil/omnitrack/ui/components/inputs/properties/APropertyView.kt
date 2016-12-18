@@ -14,10 +14,20 @@ abstract class APropertyView<T>(layoutId: Int, context: Context, attrs: Attribut
 
     var useIntrinsicPadding: Boolean = false
 
+    var showEdited: Boolean = false
+        set(value) {
+            if (field != value) {
+                field = value
+                refreshTitle()
+            }
+        }
+
+    private var titleBody: CharSequence = ""
     var title: CharSequence
         get() = titleView.text
         set(value) {
-            titleView.text = value
+            titleBody = value
+            refreshTitle()
         }
 
     abstract fun getSerializedValue(): String?
@@ -40,5 +50,9 @@ abstract class APropertyView<T>(layoutId: Int, context: Context, attrs: Attribut
             a.recycle()
         }
 
+    }
+
+    private fun refreshTitle() {
+        titleView.text = if (showEdited) "$titleBody*" else titleBody
     }
 }

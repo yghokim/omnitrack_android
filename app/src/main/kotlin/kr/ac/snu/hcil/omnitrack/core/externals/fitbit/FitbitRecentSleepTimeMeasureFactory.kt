@@ -100,6 +100,15 @@ object FitbitRecentSleepTimeMeasureFactory : OTMeasureFactory() {
         override fun onSerialize(typedQueue: SerializableTypedQueue) {
         }
 
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            else if (other is FitbitRecentSleepTimeMeasure) {
+                return true
+            } else return false
+        }
 
+        override fun hashCode(): Int {
+            return factoryCode.hashCode()
+        }
     }
 }

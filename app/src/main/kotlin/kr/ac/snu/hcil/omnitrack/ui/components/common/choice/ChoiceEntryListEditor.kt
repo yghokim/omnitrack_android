@@ -17,11 +17,16 @@ import android.widget.LinearLayout
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.DragItemTouchHelperCallback
 import kr.ac.snu.hcil.omnitrack.utils.UniqueStringEntryList
+import java.util.*
 
 /**
  * Created by younghokim on 16. 8. 13..
  */
 class ChoiceEntryListEditor : LinearLayout, View.OnClickListener {
+
+    interface IListEditedListener {
+        fun onContentEdited(editor: ChoiceEntryListEditor)
+    }
 
     private val newEntryButton: Button
     private val entryListView: RecyclerView
@@ -32,6 +37,8 @@ class ChoiceEntryListEditor : LinearLayout, View.OnClickListener {
     private val entryListAdapter: Adapter
 
     private val touchHelper: ItemTouchHelper
+
+    private val listeners = ArrayList<IListEditedListener>()
 
 
     /*
@@ -83,16 +90,20 @@ class ChoiceEntryListEditor : LinearLayout, View.OnClickListener {
         entryList = UniqueStringEntryList()
     }
 
+    fun addListEditedListener(listener: IListEditedListener) {
+        this.listeners.add(listener)
+    }
+
     override fun onClick(p0: View?) {
         if (p0 === newEntryButton) {
             //add new entry
             entryList.appendNewEntry()
             entryListAdapter.notifyItemInserted(entryList.size - 1)
+            notifyListEdited()
         }
     }
 
     fun getNotBlankEntryList(): UniqueStringEntryList {
-
         val clone = entryList.clone()
         clone.filterSelf { !it.text.isNullOrBlank() }
         return clone
@@ -108,6 +119,12 @@ class ChoiceEntryListEditor : LinearLayout, View.OnClickListener {
 
             entryListAdapter.notifyDataSetChanged()
 
+        }
+    }
+
+    private fun notifyListEdited() {
+        for (listener in listeners) {
+            listener.onContentEdited(this)
         }
     }
 
@@ -130,6 +147,7 @@ class ChoiceEntryListEditor : LinearLayout, View.OnClickListener {
         override fun onMoveItem(fromPosition: Int, toPosition: Int) {
             entryList.move(fromPosition, toPosition)
             notifyItemMoved(fromPosition, toPosition)
+            notifyListEdited()
         }
 
         override fun onRemoveItem(position: Int) {
@@ -157,6 +175,7 @@ class ChoiceEntryListEditor : LinearLayout, View.OnClickListener {
                 if (p0 === removeEntryButton) {
                     entryList.removeAt(adapterPosition)
                     notifyItemRemoved(adapterPosition)
+                    notifyListEdited()
                 }
             }
 
@@ -175,6 +194,7 @@ class ChoiceEntryListEditor : LinearLayout, View.OnClickListener {
 
             override fun afterTextChanged(s: Editable) {
                 entryList[adapterPosition].text = s.toString()
+                notifyListEdited()
             }
 
             override fun onTouch(view: View, mv: MotionEvent): Boolean {

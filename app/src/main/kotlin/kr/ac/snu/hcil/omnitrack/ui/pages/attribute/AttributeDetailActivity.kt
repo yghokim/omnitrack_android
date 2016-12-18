@@ -10,12 +10,14 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.LinearLayout
+import android.widget.TextView
 import butterknife.bindView
 import com.google.gson.JsonObject
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
+import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.WizardView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
@@ -42,9 +44,14 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
     private val requiredView: BooleanPropertyView by bindView(R.id.requiredProperty)
 
+    private val connectionGroup: ViewGroup by bindView(R.id.ui_connection_group)
+
     private val connectionFrame: FrameLayout by bindView(R.id.ui_attribute_connection_frame)
+
     private val newConnectionButton: Button by bindView(R.id.ui_button_new_connection)
     private val connectionView: AttributeConnectionView by  bindView(R.id.ui_attribute_connection)
+
+    private val connectionViewTitle: TextView by bindView(R.id.ui_property_title_value_connection)
 
     private var propertyViewHorizontalMargin: Int = 0
 
@@ -65,14 +72,14 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
         columnNameView.addNewValidator(String.format(resources.getString(R.string.msg_format_cannot_be_blank), resources.getString(R.string.msg_column_name)), ShortTextPropertyView.NOT_EMPTY_VALIDATOR)
 
-        /*
+
         columnNameView.valueChanged += {
             sender, value ->
-            if (columnNameView.validate())
-                attribute?.name = value
-        }*/
-/*
-        requiredView.valueChanged += {
+            columnNameView.validate()
+            columnNameView.showEdited = attribute?.name != value
+        }
+
+        /*requiredView.valueChanged += {
             sender, value ->
             attribute?.isRequired = value
         }*/
@@ -114,6 +121,8 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
                 (propertyViewList[entry.index].second as? APropertyView<*>)?.setSerializedValue(entry.value)
             }
         }
+
+        checkIsChangedAndIndicate()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -173,6 +182,26 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
     override fun onToolbarRightButtonClicked() {
         saveChanges()
         finish()
+    }
+
+    private fun checkIsChangedAndIndicate() {
+        columnNameView.showEdited = columnNameView.value != attribute?.name
+
+
+
+        if (attribute?.valueConnection != connectionView.connection) {
+            connectionViewTitle.text = "${resources.getString(R.string.msg_value_autocompletion)}*"
+        } else {
+            connectionViewTitle.text = resources.getString(R.string.msg_value_autocompletion)
+        }
+
+        for (entry in propertyViewList) {
+            entry.first?.let {
+                if (entry.second is APropertyView<*>) {
+                    entry.second.showEdited = attribute?.getPropertyValue<Any>(it) != entry.second.value!!
+                }
+            }
+        }
     }
 
     private fun isChanged(): Boolean {
@@ -256,6 +285,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
                             if (sender.validate()) {
                                 //attr.setPropertyValue(entry.first, value)
                             }
+                            sender.showEdited = attribute?.getPropertyValue<Any>(entryWithIndex.index) != value
                         }
                     }
                 }
@@ -266,8 +296,17 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
             //end: refresh properties==================================================================================
 
             //refresh connections======================================================================================
-            connectionView.connection = attr.valueConnection
-            refreshConnection(false)
+
+            if (OTExternalService.getFilteredMeasureFactories {
+                it.isAttachableTo(attr)
+            }.isEmpty()) {
+                connectionGroup.visibility = View.GONE
+                connectionView.connection = null
+            } else {
+                connectionGroup.visibility = View.VISIBLE
+                connectionView.connection = attr.valueConnection
+                refreshConnection(false)
+            }
         }
 
         if (attr == null || attr.propertyKeys.isEmpty()) {
@@ -302,6 +341,12 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
         } else {
             connectionView.visibility = View.GONE
             newConnectionButton.visibility = View.VISIBLE
+        }
+
+        if (attribute?.valueConnection != connectionView.connection) {
+            connectionViewTitle.text = "${resources.getString(R.string.msg_value_autocompletion)}*"
+        } else {
+            connectionViewTitle.text = resources.getString(R.string.msg_value_autocompletion)
         }
     }
 

@@ -47,6 +47,17 @@ fun AppCompatActivity.startActivityOnDelay(intent: Intent, delay: Long = 50) {
 
 }
 
+fun List<*>.isSame(other: List<*>): Boolean {
+    if (this.size == other.size) {
+        for (i in 0..this.size - 1) {
+            if (this[i] != other[i]) {
+                return false
+            }
+        }
+        return true
+    } else return false
+}
+
 fun Fragment.startActivityOnDelay(intent: Intent, delay: Long = 50) {
     val handler = Handler()
     handler.postDelayed(object : Runnable {
