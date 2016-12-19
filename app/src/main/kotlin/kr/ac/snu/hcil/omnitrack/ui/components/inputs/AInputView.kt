@@ -72,7 +72,7 @@ abstract class AInputView<T>(layoutId: Int, context: Context, attrs: AttributeSe
         ;
     }
 
-    protected fun onValueChanged(newValue: T){
+    protected open fun onValueChanged(newValue: T) {
         validate()
         valueChanged.invoke(this, newValue)
     }

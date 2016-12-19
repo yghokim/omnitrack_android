@@ -22,6 +22,8 @@ abstract class APropertyView<T>(layoutId: Int, context: Context, attrs: Attribut
             }
         }
 
+    private var originalValue: T? = null
+
     private var titleBody: CharSequence = ""
     var title: CharSequence
         get() = titleView.text
@@ -54,5 +56,22 @@ abstract class APropertyView<T>(layoutId: Int, context: Context, attrs: Attribut
 
     private fun refreshTitle() {
         titleView.text = if (showEdited) "$titleBody*" else titleBody
+    }
+
+    open fun watchOriginalValue() {
+        originalValue = value
+        showEdited = false
+    }
+
+    open fun stopWatchOriginalValue() {
+        originalValue = null
+    }
+
+    override fun onValueChanged(newValue: T) {
+        super.onValueChanged(newValue)
+
+        originalValue?.let {
+            showEdited = originalValue != newValue
+        }
     }
 }
