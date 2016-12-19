@@ -174,7 +174,8 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
                     else
                         finish()
                 }
-        ).cancelable(false)
+        ).cancelable(true)
+                .neutralText(R.string.msg_cancel)
                 .show()
     }
 

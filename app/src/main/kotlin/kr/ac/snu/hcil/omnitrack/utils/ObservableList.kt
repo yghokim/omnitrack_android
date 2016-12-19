@@ -77,6 +77,10 @@ class ObservableList<T>(){
         }
     }
 
+    operator fun plusAssign(element: T) {
+        add(element)
+    }
+
     operator fun iterator(): MutableIterator<T> {
         return list.iterator()
     }
