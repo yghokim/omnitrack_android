@@ -25,6 +25,7 @@ import kr.ac.snu.hcil.omnitrack.core.externals.misfit.MisfitStepMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTriggerAlarmManager
 import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
+import kr.ac.snu.hcil.omnitrack.utils.NumberStyle
 import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 import kr.ac.snu.hcil.omnitrack.utils.UniqueStringEntryList
 import rx.Observable
@@ -58,14 +59,6 @@ class OTApplication : MultiDexApplication() {
         const val BROADCAST_ACTION_TIME_TRIGGER_ALARM = "kr.ac.snu.hcil.omnitrack.action.ALARM"
         const val BROADCAST_ACTION_EVENT_TRIGGER_CHECK_ALARM = "kr.ac.snu.hcil.omnitrack.action.EVENT_TRIGGER_ALARM"
 
-
-        /*
-        const val BROADCAST_ACTION_SHORTCUT_PUSH_NOW = "kr.ac.snu.hcil.omnitrack.action.SHORTCUT_PUSH_NOW"
-        const val BROADCAST_ACTION_SHORTCUT_OPEN_TRACKER = "kr.ac.snu.hcil.omnitrack.action.SHORTCUT_OPEN_TRACKER"
-        const val BROADCAST_ACTION_SHORTCUT_INCLUDE_TRACKER = "kr.ac.snu.hcil.omnitrack.action.SHORTCUT_INCLUDE_TRACKER"
-        const val BROADCAST_ACTION_SHORTCUT_EXCLUDE_TRACKER = "kr.ac.snu.hcil.omnitrack.action.SHORTCUT_EXCLUDE_TRACKER"
-        const val BROADCAST_ACTION_SHORTCUT_TRACKER_INFO_CHANGED = "kr.ac.snu.hcil.omnitrack.action.SHORTCUT_TRACKER_INFO_CHANGED"
-*/
         const val BROADCAST_ACTION_SHORTCUT_REFRESH = "kr.ac.snu.hcil.omnitrack.action.SHORTCUT_TRACKER_REFRESH"
 
         const val BROADCAST_ACTION_ITEM_ADDED = "kr.ac.snu.hcil.omnitrack.action.ITEM_ADDED"
@@ -208,7 +201,8 @@ class OTApplication : MultiDexApplication() {
                     }
 
                     if (initialRun) {
-                            createExampleTrackers(user)
+                        //createExampleTrackers(user)
+                        createUsabilityTestingTrackers(user)
                     }
                 }
 
@@ -228,6 +222,92 @@ class OTApplication : MultiDexApplication() {
         syncUserToDb()
 
         dbHelper.close()
+    }
+
+    private fun createUsabilityTestingTrackers(user: OTUser) {
+
+        val bookTracker = user.newTracker("독서록", true)
+        bookTracker.attributes += OTAttribute.createAttribute(user, "제목", OTAttribute.TYPE_SHORT_TEXT)
+        bookTracker.attributes += OTAttribute.createAttribute(user, "날짜", OTAttribute.TYPE_TIME).apply {
+            this.setPropertyValue(OTTimeAttribute.GRANULARITY, OTTimeAttribute.GRANULARITY_DAY)
+        }
+        bookTracker.attributes += OTAttribute.createAttribute(user, "감상평", OTAttribute.TYPE_LONG_TEXT)
+        bookTracker.attributes += OTAttribute.createAttribute(user, "별점", OTAttribute.TYPE_RATING)
+
+        //===================================================================================================================================
+        val stepComparisonTracker = user.newTracker("걸음 수 비교", true)
+
+        val stepNumberStyle = NumberStyle().apply {
+            this.unit = "걸음"
+            this.unitPosition = NumberStyle.UnitPosition.Rear
+            this.fractionPart = 0
+        }
+
+        val fitbitAttribute = OTAttribute.createAttribute(user, "Fitbit", OTAttribute.TYPE_NUMBER) as OTNumberAttribute
+        fitbitAttribute.numberStyle = stepNumberStyle
+
+        val googleFitAttribute = OTAttribute.createAttribute(user, "Google Fit", OTAttribute.TYPE_NUMBER) as OTNumberAttribute
+        googleFitAttribute.numberStyle = stepNumberStyle
+
+        stepComparisonTracker.attributes.add(fitbitAttribute)
+        stepComparisonTracker.attributes.add(googleFitAttribute)
+
+
+        //===================================================================================================================================
+        val diaryTracker = user.newTracker("일기", true)
+
+        diaryTracker.attributes += OTAttribute.createAttribute(user, "날짜", OTAttribute.TYPE_TIME).apply {
+            this.setPropertyValue(OTTimeAttribute.GRANULARITY, OTTimeAttribute.GRANULARITY_DAY)
+        }
+
+        diaryTracker.attributes += OTAttribute.createAttribute(user, "기분", OTAttribute.TYPE_RATING).apply {
+            this.setPropertyValue(OTRatingAttribute.PROPERTY_OPTIONS, kr.ac.snu.hcil.omnitrack.utils.RatingOptions().apply {
+                this.allowIntermediate = true
+                this.leftLabel = "매우 나쁨"
+                this.middleLabel = "보통"
+                this.rightLabel = "매우 좋음"
+                this.type = kr.ac.snu.hcil.omnitrack.utils.RatingOptions.DisplayType.Likert
+            })
+        }
+
+        diaryTracker.attributes += OTAttribute.createAttribute(user, "날씨", OTAttribute.TYPE_CHOICE).apply {
+            this.setPropertyValue(OTChoiceAttribute.PROPERTY_ENTRIES, UniqueStringEntryList("맑음", "흐림", "비", "눈"))
+            this.setPropertyValue(OTChoiceAttribute.PROPERTY_MULTISELECTION, false)
+        }
+        diaryTracker.attributes += OTAttribute.Companion.createAttribute(user, "제목", OTAttribute.TYPE_SHORT_TEXT)
+        diaryTracker.attributes += OTAttribute.createAttribute(user, "내용", OTAttribute.TYPE_LONG_TEXT)
+
+
+        //=====================================================================================================================================
+        val stressTracker = user.newTracker("스트레스", true)
+        stressTracker.attributes += OTAttribute.createAttribute(user, "시간", OTAttribute.TYPE_TIME).apply {
+            this.setPropertyValue(OTTimeAttribute.GRANULARITY, OTTimeAttribute.GRANULARITY_MINUTE)
+        }
+
+        stressTracker.attributes += OTAttribute.createAttribute(user, "기분", OTAttribute.TYPE_RATING).apply {
+            this.setPropertyValue(OTRatingAttribute.PROPERTY_OPTIONS, kr.ac.snu.hcil.omnitrack.utils.RatingOptions().apply {
+                this.allowIntermediate = true
+                this.leftLabel = "매우 나쁨"
+                this.middleLabel = "보통"
+                this.rightLabel = "매우 좋음"
+                this.type = kr.ac.snu.hcil.omnitrack.utils.RatingOptions.DisplayType.Likert
+            })
+        }
+
+        stressTracker.attributes += OTAttribute.createAttribute(user, "이유", OTAttribute.TYPE_LONG_TEXT)
+
+        //=====================================================================================================================================
+        val foodTracker = user.newTracker("맛집", true)
+        foodTracker.attributes += OTAttribute.createAttribute(user, "식당명", OTAttribute.TYPE_SHORT_TEXT)
+        foodTracker.attributes += OTAttribute.createAttribute(user, "먹은 날", OTAttribute.TYPE_TIME).apply {
+            this.setPropertyValue(OTTimeAttribute.GRANULARITY, OTTimeAttribute.GRANULARITY_DAY)
+        }
+        foodTracker.attributes += OTAttribute.createAttribute(user, "위치", OTAttribute.TYPE_LOCATION)
+        foodTracker.attributes += OTAttribute.createAttribute(user, "사진", OTAttribute.TYPE_IMAGE)
+        foodTracker.attributes += OTAttribute.createAttribute(user, "평점", OTAttribute.TYPE_RATING)
+
+
+        dbHelper.save(user)
     }
 
     private fun createExampleTrackers(user: OTUser) {
