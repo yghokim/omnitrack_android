@@ -6,8 +6,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.AsyncTask
+import com.google.android.gms.gcm.GcmNetworkManager
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.receivers.OTSystemReceiver
+import kr.ac.snu.hcil.omnitrack.services.DataTriggerCheckService
 import java.util.*
 
 /**
@@ -15,7 +17,7 @@ import java.util.*
  */
 object OTDataTriggerManager {
 
-    const val CHECK_PERIOD = 10000L // 1 minute
+    const val CHECK_PERIOD = 30L // 1 minute
     const val ALARM_ID: Int = 9000000
 
     const val PREFERENCE_LAST_CONDITION_TABLE = "EventTriggerLastCondition"
@@ -41,6 +43,10 @@ object OTDataTriggerManager {
         return PendingIntent.getBroadcast(context, ALARM_ID, intent, PendingIntent.FLAG_CANCEL_CURRENT)
     }
 
+    private val gcmManager: GcmNetworkManager by lazy {
+        GcmNetworkManager.getInstance(OTApplication.app)
+    }
+
     fun onEventTriggerOn(trigger: OTDataTrigger) {
 
         println("event trigger is registered on system.")
@@ -52,7 +58,8 @@ object OTDataTriggerManager {
             ids.add(trigger.objectId)
             preferences.edit().putBoolean(prefKey(trigger), false).putStringSet(PREFERENCE_ENROLLED_IDS, ids).apply()
         }
-        //alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), CHECK_PERIOD, makeIntent(OTApplication.app))
+        gcmManager.schedule(DataTriggerCheckService.makeTask(CHECK_PERIOD))
+        //alarmManager.setsetInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), CHECK_PERIOD, makeIntent(OTApplication.app))
     }
 
     fun onEventTriggerOff(trigger: OTDataTrigger)
@@ -69,7 +76,10 @@ object OTDataTriggerManager {
             if(ids.size == 0)
             {
                 println("No event trigger is on. Cancel alarm.")
-                alarmManager.cancel(makeIntent(OTApplication.app))
+                //alarmManager.cancel(makeIntent(OTApplication.app))
+
+
+                gcmManager.cancelAllTasks(DataTriggerCheckService::class.java)
             }
         }
     }
@@ -108,6 +118,7 @@ object OTDataTriggerManager {
                 val measure = trigger.value.measure
                 measure?.requestLatestValueAsync {
                     value->
+                    println("event trigger checked value : $value")
                     if(value!=null)
                     {
                         measureResults[trigger.index] = trigger.value.conditioner?.validate(value) ?: false
