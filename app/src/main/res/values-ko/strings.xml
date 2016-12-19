@@ -18,7 +18,7 @@
 
     <string name="msg_confirm_log">아이템 기록</string>
 
-    <string name="msg_confirm_apply_change">변경사항을 적용하시겠습니까?</string>
+    <string name="msg_confirm_apply_change">나가기 전에 변경사항을 적용하시겠습니까?</string>
 
     <string name="msg_confirm_empty_tracker_log">이 트래커에는 필드가 없습니다. 현재 시각만을 기록하시겠습니까?</string>
 
