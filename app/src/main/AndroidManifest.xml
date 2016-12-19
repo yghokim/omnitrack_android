@@ -112,6 +112,14 @@
         <service
             android:name=".services.OTBackgroundLoggingService"
             android:exported="false" />
+        <service
+            android:name=".services.DataTriggerCheckService"
+            android:exported="true"
+            android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE">
+            <intent-filter>
+                <action android:name="com.google.android.gms.gcm.ACTION_TASK_READY" />
+            </intent-filter>
+        </service>
 
         <activity
             android:name=".ui.activities.SplashScreenActivity"
@@ -148,6 +156,7 @@
         <activity
             android:name=".ui.pages.diagnostics.SystemLogActivity"
             android:label="System Logs" />
+
     </application>
 
 </manifest>
