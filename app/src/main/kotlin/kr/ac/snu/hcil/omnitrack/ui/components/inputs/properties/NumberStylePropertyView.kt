@@ -142,6 +142,27 @@ class NumberStylePropertyView(context: Context, attrs: AttributeSet?) : APropert
 
     }
 
+    override fun watchOriginalValue() {
+        //super.watchOriginalValue()
+
+        unitPositionSelectionView.watchOriginalValue()
+        unitTextView.watchOriginalValue()
+        pluralizeCheckView.watchOriginalValue()
+        showCommasCheckView.watchOriginalValue()
+        showFractionView.watchOriginalValue()
+        fractionalDigitCountView.watchOriginalValue()
+    }
+
+    override fun stopWatchOriginalValue() {
+        //super.stopWatchOriginalValue()
+
+        unitPositionSelectionView.stopWatchOriginalValue()
+        unitTextView.stopWatchOriginalValue()
+        pluralizeCheckView.stopWatchOriginalValue()
+        showCommasCheckView.stopWatchOriginalValue()
+        showFractionView.stopWatchOriginalValue()
+        fractionalDigitCountView.stopWatchOriginalValue()
+    }
 
     override fun getSerializedValue(): String? {
         return NumberStyle.parser.toJson(value)
