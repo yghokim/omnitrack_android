@@ -27,7 +27,7 @@ class ChoiceEntryListPropertyView(context: Context, attrs: AttributeSet?) : APro
     }
 
     override fun onContentEdited(editor: ChoiceEntryListEditor) {
-        valueChanged.invoke(this, editor.getNotBlankEntryList())
+        onValueChanged(editor.getNotBlankEntryList())
     }
 
     override fun focus() {

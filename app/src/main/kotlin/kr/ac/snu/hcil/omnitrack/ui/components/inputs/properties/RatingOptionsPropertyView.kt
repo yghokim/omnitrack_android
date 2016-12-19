@@ -64,19 +64,56 @@ class RatingOptionsPropertyView(context: Context, attrs: AttributeSet?) : APrope
 
         displayTypeSelectionView = findViewById(R.id.ui_display_type) as SelectionPropertyView
         displayTypeSelectionView.setEntries(RatingOptions.DisplayType.values().map { resources.getString(it.nameResourceId) }.toTypedArray())
+        displayTypeSelectionView.valueChanged += {
+            sender, v ->
+            onValueChanged(value)
+        }
 
         starLevelSelectionView = findViewById(R.id.ui_star_levels) as SelectionPropertyView
         starLevelSelectionView.setEntries(RatingOptions.StarLevel.values().map { it.maxScore.toString() }.toTypedArray())
+        starLevelSelectionView.valueChanged += {
+            sender, v ->
+            onValueChanged(value)
+        }
 
         likertOptionsGroup = findViewById(R.id.ui_group_options_likert) as ViewGroup
 
         allowIntermediatePropertyView = findViewById(R.id.ui_allow_intermediate) as BooleanPropertyView
+        allowIntermediatePropertyView.valueChanged += {
+            sender, v ->
+            onValueChanged(value)
+        }
 
         leftmostValuePicker = likertOptionsGroup.findViewById(R.id.ui_leftmost_value) as NumericUpDownPropertyView
         rightmostValuePicker = likertOptionsGroup.findViewById(R.id.ui_rightmost_value) as NumericUpDownPropertyView
         leftLabelPropertyView = likertOptionsGroup.findViewById(R.id.ui_left_label) as ShortTextPropertyView
         middleLabelPropertyView = likertOptionsGroup.findViewById(R.id.ui_middle_label) as ShortTextPropertyView
         rightLabelPropertyView = likertOptionsGroup.findViewById(R.id.ui_right_label) as ShortTextPropertyView
+
+        leftmostValuePicker.valueChanged += {
+            sender, v ->
+            onValueChanged(value)
+        }
+
+        rightmostValuePicker.valueChanged += {
+            sender, v ->
+            onValueChanged(value)
+        }
+
+        leftLabelPropertyView.valueChanged += {
+            sender, v ->
+            onValueChanged(value)
+        }
+
+        middleLabelPropertyView.valueChanged += {
+            sender, v ->
+            onValueChanged(value)
+        }
+
+        rightLabelPropertyView.valueChanged += {
+            sender, v ->
+            onValueChanged(value)
+        }
 
 
         displayTypeSelectionView.valueChanged += {
@@ -92,7 +129,37 @@ class RatingOptionsPropertyView(context: Context, attrs: AttributeSet?) : APrope
                     starLevelSelectionView.visibility = View.VISIBLE
                 }
             }
+            onValueChanged(value)
         }
+    }
+
+    override fun watchOriginalValue() {
+        //super.watchOriginalValue()
+        displayTypeSelectionView.watchOriginalValue()
+        starLevelSelectionView.watchOriginalValue()
+        leftmostValuePicker.watchOriginalValue()
+        rightmostValuePicker.watchOriginalValue()
+
+        leftLabelPropertyView.watchOriginalValue()
+        middleLabelPropertyView.watchOriginalValue()
+        rightLabelPropertyView.watchOriginalValue()
+
+        allowIntermediatePropertyView.watchOriginalValue()
+
+    }
+
+    override fun stopWatchOriginalValue() {
+        //super.stopWatchOriginalValue()
+        displayTypeSelectionView.stopWatchOriginalValue()
+        starLevelSelectionView.stopWatchOriginalValue()
+        leftmostValuePicker.stopWatchOriginalValue()
+        rightmostValuePicker.stopWatchOriginalValue()
+
+        leftLabelPropertyView.stopWatchOriginalValue()
+        middleLabelPropertyView.stopWatchOriginalValue()
+        rightLabelPropertyView.stopWatchOriginalValue()
+
+        allowIntermediatePropertyView.stopWatchOriginalValue()
     }
 
     override fun getSerializedValue(): String? {

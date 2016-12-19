@@ -76,7 +76,6 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
         columnNameView.valueChanged += {
             sender, value ->
             columnNameView.validate()
-            columnNameView.showEdited = attribute?.name != value
         }
 
         /*requiredView.valueChanged += {
@@ -258,6 +257,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
             //refresh properties===============================================================================================================
 
             columnNameView.value = attr.name
+            columnNameView.watchOriginalValue()
 
             propertyViewContainer.removeAllViewsInLayout()
 
@@ -285,7 +285,6 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
                             if (sender.validate()) {
                                 //attr.setPropertyValue(entry.first, value)
                             }
-                            sender.showEdited = attribute?.getPropertyValue<Any>(entryWithIndex.index) != value
                         }
                     }
                 }
@@ -327,6 +326,8 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
             val propView: APropertyView<Any> = propertyViewEntry.second as APropertyView<Any>
 
             propView.value = attribute.getPropertyValue(propertyViewEntry.first!!)
+
+            propView.watchOriginalValue()
         }
     }
 
