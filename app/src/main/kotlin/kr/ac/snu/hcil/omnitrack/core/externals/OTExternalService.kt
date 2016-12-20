@@ -186,6 +186,7 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
 
     fun onActivityActivationResult(resultCode: Int, resultData: Intent?) {
         if (resultCode != Activity.RESULT_OK) {
+            println("activation result failed")
             cancelActivationProcess()
         } else handleActivityActivationResultOk(resultData)
     }
