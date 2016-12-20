@@ -137,7 +137,7 @@ class ServiceListFragment : OTFragment() {
 
                 activationButton = view.findViewById(R.id.ui_button_activate) as SwitchCompat
 
-                activationButton.setOnClickListener {
+                activationSwitchGroup.setOnClickListener {
                     val service = getService(adapterPosition)
 
                     println("service state: ${service.state}")
