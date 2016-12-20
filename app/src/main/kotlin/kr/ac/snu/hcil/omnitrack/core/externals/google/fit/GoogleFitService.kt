@@ -96,19 +96,22 @@ object GoogleFitService : OTExternalService("GoogleFitService", 19) {
 
     override fun onActivateAsync(context: Context, connectedHandler: ((Boolean) -> Unit)?) {
         println("activate Google Fit...")
-        if (client == null) {
+        if (client?.isConnected == true) {
+            connectedHandler?.invoke(true)
+        } else {
             currentActivationHandler = connectedHandler
             client = buildClientBuilderBase(context)
                     .addConnectionCallbacks(activationConnectionCallbacks)
                     .addOnConnectionFailedListener {
                         result ->
+                        println("connectionFailed - ${result.errorCode}, ${result.errorMessage}")
                         if (result.hasResolution()) {
                             result.startResolutionForResult(context as Activity, requestCodeDict[this])
                         }
                     }
                     .build()
             client?.connect()
-        } else connectedHandler?.invoke(true)
+        }
     }
 
     override fun onDeactivate() {
@@ -121,15 +124,16 @@ object GoogleFitService : OTExternalService("GoogleFitService", 19) {
     }
 
     override fun prepareServiceAsync(preparedHandler: ((Boolean) -> Unit)?) {
-        if (client == null) {
+        if (client?.isConnected == true) {
+
+            preparedHandler?.invoke(true)
+        } else {
             currentPreparationHandler = preparedHandler
             client = buildClientBuilderBase()
                     .addConnectionCallbacks(preparationConnectionCallbacks)
                     .addOnConnectionFailedListener(preparationConnectionFailedListener)
                     .build()
             client?.connect()
-        } else {
-            preparedHandler?.invoke(true)
         }
     }
 
