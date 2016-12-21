@@ -1,6 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.home
 
-import android.support.v7.widget.AppCompatButton
+import android.support.v7.widget.AppCompatImageButton
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -52,12 +52,12 @@ class MeasureFactoryAdapter : RecyclerView.Adapter<MeasureFactoryAdapter.Measure
         val nameView: TextView
         val descriptionView: TextView
 
-        val connectButton: AppCompatButton
+        val connectButton: AppCompatImageButton
 
         init {
             nameView = view.findViewById(R.id.name) as TextView
             descriptionView = view.findViewById(R.id.description) as TextView
-            connectButton = view.findViewById(R.id.ui_connect_button) as AppCompatButton
+            connectButton = view.findViewById(R.id.ui_connect_button) as AppCompatImageButton
 
             connectButton.setOnClickListener(this)
         }

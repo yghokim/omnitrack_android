@@ -3,12 +3,17 @@ package kr.ac.snu.hcil.omnitrack.ui.components.common.activity
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
+import android.webkit.WebResourceError
+import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.TextView
+import butterknife.bindView
+import com.github.ybq.android.spinkit.SpinKitView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.auth.AuthConstants
 import okhttp3.HttpUrl
@@ -28,26 +33,33 @@ open class WebServiceLoginActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    private lateinit var webView: WebView
-    private lateinit var titleView: TextView
-    private lateinit var cancelButton: View
+    private val webView: WebView by bindView(R.id.webView)
+    private val titleView: TextView by bindView(R.id.title)
+    private val cancelButton: View by bindView(R.id.ui_button_cancel)
+    private val loadingIndicator: SpinKitView by bindView(R.id.ui_loading_indicator)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.auth_webview_screen)
 
-        webView = findViewById(R.id.webView) as WebView
-
-        titleView = findViewById(R.id.title) as TextView
-        cancelButton = findViewById(R.id.ui_button_cancel)
         cancelButton.setOnClickListener(this)
 
         webView.settings.javaScriptEnabled = true
         webView.setWebViewClient(
                 object : WebViewClient() {
+                    override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+                        super.onPageStarted(view, url, favicon)
+                    }
+
+                    override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
+                        super.onReceivedError(view, request, error)
+                        loadingIndicator.visibility = View.INVISIBLE
+                    }
+
                     override fun onPageFinished(view: WebView, url: String) {
                         super.onPageFinished(view, url)
                         onPageFinished(url)
+                        loadingIndicator.visibility = View.INVISIBLE
                     }
 
                 }
@@ -61,7 +73,7 @@ open class WebServiceLoginActivity : AppCompatActivity(), View.OnClickListener {
             val url = intent.getStringExtra(EXTRA_RESQUEST_URL)
             val serviceName = intent.getStringExtra(EXTRA_SERVICE_NAME)
             titleView.text = String.format(resources.getString(R.string.msg_format_login_to), serviceName)
-
+            loadingIndicator.visibility = View.VISIBLE
             webView.loadUrl(url)
         }
     }

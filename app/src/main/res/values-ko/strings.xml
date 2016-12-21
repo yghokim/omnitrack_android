@@ -185,6 +185,8 @@
 
     <string name="msg_tracker_list_stat_total">전체</string>
 
+    <string name="msg_attach">트래커에 추가</string>
+
 
     <string-array name="choice_preview_entries">
         <item>선택 항목 1</item>
