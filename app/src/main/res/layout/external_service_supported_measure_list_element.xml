@@ -46,5 +46,6 @@
         android:background="@drawable/button_background_capsule_pointed"
         android:paddingLeft="12dp"
         android:paddingRight="12dp"
-        android:src="@drawable/link" />
+        android:src="@drawable/icon_attach_link_attribute"
+        android:tint="#FFF" />
 </RelativeLayout>
