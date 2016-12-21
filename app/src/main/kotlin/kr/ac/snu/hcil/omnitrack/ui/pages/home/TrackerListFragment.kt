@@ -364,7 +364,7 @@ class TrackerListFragment : OTFragment() {
 
                     override fun onAnimationStart(p0: Animator?) {
                         expandButton.isEnabled = false
-                        expandButton.setImageResource(R.drawable.down_dark)
+                        expandButton.setImageResource(R.drawable.more_horiz_scarse)
                     }
 
                 })
@@ -538,7 +538,7 @@ class TrackerListFragment : OTFragment() {
 
                 } else {
                     expandedView.visibility = View.GONE
-                    expandButton.setImageResource(R.drawable.down_dark)
+                    expandButton.setImageResource(R.drawable.more_horiz_scarse)
                     val lp = itemView.layoutParams.apply { height = collapsedHeight }
                     itemView.layoutParams = lp
                     collapsed = true
