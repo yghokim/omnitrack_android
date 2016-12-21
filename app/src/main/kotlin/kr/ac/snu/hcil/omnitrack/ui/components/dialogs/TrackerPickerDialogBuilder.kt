@@ -33,12 +33,20 @@ class TrackerPickerDialogBuilder(val viewHolderFactory: ViewHolderFactory = defa
         fun createViewHolder(parent: ViewGroup, viewType: Int): TrackerViewHolder
     }
 
-    fun createDialog(context: Context, inactiveIds: Array<String>? = null, onPicked: ((OTTracker?) -> Unit)): Dialog {
+    fun createDialog(context: Context, title: Int, inactiveIds: Array<String>? = null, onPicked: (OTTracker?) -> Unit): Dialog {
+        return createDialog(context, context.resources.getString(title), inactiveIds, onPicked)
+    }
+
+    fun createDialog(context: Context, inactiveIds: Array<String>? = null, onPicked: (OTTracker?) -> Unit): Dialog {
+        return createDialog(context, context.resources.getString(R.string.msg_pick_tracker), inactiveIds, onPicked)
+    }
+
+    fun createDialog(context: Context, title: String, inactiveIds: Array<String>? = null, onPicked: (OTTracker?) -> Unit): Dialog {
 
         val view = View.inflate(context, R.layout.simple_layout_with_recycler_view, null)
 
         val dialog = AlertDialog.Builder(context)
-                .setTitle(context.resources.getString(R.string.msg_pick_tracker))
+                .setTitle(title)
                 .setView(view)
                 .create()
 

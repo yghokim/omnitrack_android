@@ -64,7 +64,7 @@ class MeasureFactoryAdapter : RecyclerView.Adapter<MeasureFactoryAdapter.Measure
 
         override fun onClick(view: View) {
             if (view === connectButton) {
-                val dialog = TrackerPickerDialogBuilder(this).createDialog(itemView.getActivity()!!, null) {
+                val dialog = TrackerPickerDialogBuilder(this).createDialog(itemView.getActivity()!!, R.string.msg_pick_track_to_attach_field_with_measure, null, {
                     tracker ->
                     if (tracker != null) {
                         DialogHelper.makeYesNoDialogBuilder(itemView.context, "OmniTrack", "Add a field to this tracker?", {
@@ -75,7 +75,7 @@ class MeasureFactoryAdapter : RecyclerView.Adapter<MeasureFactoryAdapter.Measure
                             itemView.context.startActivity(intent)
                         }, null).show()
                     }
-                }
+                })
                 dialog.show()
             }
         }
