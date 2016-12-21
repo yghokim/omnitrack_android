@@ -113,6 +113,7 @@
 
     <string name="msg_pick_date_and_time">Pick date and time</string>
 
+    <string name="msg_pick_track_to_attach_field_with_measure">Pick a tracker to append field connected with the measure</string>
 
     <string name="msg_set_new_connection">Connect to External Source</string>
 

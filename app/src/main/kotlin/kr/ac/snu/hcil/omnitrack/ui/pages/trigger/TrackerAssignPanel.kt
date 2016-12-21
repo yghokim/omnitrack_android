@@ -65,13 +65,13 @@ class TrackerAssignPanel : FlowLayout, View.OnClickListener {
     override fun onClick(view: View) {
         val fm = this.getActivity()?.supportFragmentManager
         if (fm != null) {
-            val dialog = TrackerPickerDialogBuilder().createDialog(getActivity()!!, trackerIds.toTypedArray()) {
+            val dialog = TrackerPickerDialogBuilder().createDialog(getActivity()!!, trackerIds.toTypedArray(), {
                 tracker ->
                 if (tracker != null) {
                     trackerIds += tracker.objectId
                     refresh()
                 }
-            }
+            })
             dialog.show()
         }
     }
