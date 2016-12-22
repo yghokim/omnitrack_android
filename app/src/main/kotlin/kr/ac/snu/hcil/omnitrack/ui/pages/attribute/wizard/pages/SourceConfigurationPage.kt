@@ -6,11 +6,12 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.AWizardPage
+import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.wizard.ConnectionWizardView
 
 /**
  * Created by Young-Ho Kim on 2016-08-30.
  */
-class SourceConfigurationPage(val attribute: OTAttribute<out Any>) : AWizardPage() {
+class SourceConfigurationPage(override val parent: ConnectionWizardView, val attribute: OTAttribute<out Any>) : AWizardPage(parent) {
 
     override val getTitleResourceId: Int = R.string.msg_connection_wizard_title_time_query
 
@@ -34,11 +35,12 @@ class SourceConfigurationPage(val attribute: OTAttribute<out Any>) : AWizardPage
     }
 
     override fun onEnter() {
+        view?.initialize(parent.connection)
     }
 
     override fun makeViewInstance(context: Context): View {
         view = SourceConfigurationPanel(context)
-
+        view?.initialize(parent.connection)
         return view!!
     }
 }

@@ -38,6 +38,16 @@ class SourceConfigurationPanel : FrameLayout, IEventListener<Int> {
         queryPresetSelectionView.valueChanged += this
     }
 
+    fun initialize(pendingConnection: OTConnection) {
+
+        val filtered = OTTimeRangeQuery.Preset.values().filter { it.granularity.ordinal >= pendingConnection.source?.factory?.minimumGranularity?.ordinal ?: 0 }
+        println(filtered)
+
+        queryPresetAdapter.clear()
+        queryPresetAdapter.addAll(filtered)
+        queryPresetAdapter.notifyDataSetChanged()
+    }
+
     fun applyConfiguration(connection: OTConnection) {
         connection.rangedQuery = queryPresetAdapter.getItem(queryPresetSelectionView.value).makeQueryInstance()
     }

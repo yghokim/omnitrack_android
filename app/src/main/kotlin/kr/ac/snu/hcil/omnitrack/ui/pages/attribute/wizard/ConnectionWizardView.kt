@@ -82,13 +82,13 @@ class ConnectionWizardView : WizardView {
     }
 
 
-    class Adapter(attribute: OTAttribute<out Any>) : AWizardViewPagerAdapter() {
+    inner class Adapter(attribute: OTAttribute<out Any>) : AWizardViewPagerAdapter() {
         val pages = Array<AWizardPage>(3) {
             index ->
             when (index) {
-                PAGE_INDEX_SOURCE_SELECTION -> SourceSelectionPage(attribute)
-                PAGE_INDEX_TIME_QUERY -> TimeQueryPage(attribute)
-                PAGE_INDEX_CONFIGURATION -> SourceConfigurationPage(attribute)
+                PAGE_INDEX_SOURCE_SELECTION -> SourceSelectionPage(this@ConnectionWizardView, attribute)
+                PAGE_INDEX_TIME_QUERY -> TimeQueryPage(this@ConnectionWizardView, attribute)
+                PAGE_INDEX_CONFIGURATION -> SourceConfigurationPage(this@ConnectionWizardView, attribute)
                 else -> throw Exception("wrong index")
             }
         }

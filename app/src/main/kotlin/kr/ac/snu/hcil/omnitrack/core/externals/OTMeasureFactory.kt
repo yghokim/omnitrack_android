@@ -88,6 +88,7 @@ abstract class OTMeasureFactory() : INameDescriptionResourceProvider {
 
     abstract val isRangedQueryAvailable: Boolean
     abstract val isDemandingUserInput: Boolean
+    abstract val minimumGranularity: OTTimeRangeQuery.Granularity
 
 
     abstract fun makeMeasure(): OTMeasure

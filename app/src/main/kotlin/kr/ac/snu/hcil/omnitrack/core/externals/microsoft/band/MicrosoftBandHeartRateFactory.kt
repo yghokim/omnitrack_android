@@ -5,6 +5,7 @@ import com.microsoft.band.sensors.BandHeartRateEventListener
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
+import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 
@@ -39,6 +40,7 @@ class MicrosoftBandHeartRateFactory : OTMeasureFactory() {
     }
 
     override val isRangedQueryAvailable: Boolean = false
+    override val minimumGranularity: OTTimeRangeQuery.Granularity = OTTimeRangeQuery.Granularity.Hour
     override val isDemandingUserInput: Boolean = false
 
     override val nameResourceId: Int = R.string.measure_microsoft_band_heart_rate_name

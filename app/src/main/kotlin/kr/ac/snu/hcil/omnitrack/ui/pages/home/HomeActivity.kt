@@ -57,6 +57,25 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home) {
         slidingMenu.setFadeEnabled(true)
         slidingMenu.setBehindOffsetRes(R.dimen.home_sliding_menu_right_region)
 */
+    }
+
+    override fun onToolbarLeftButtonClicked() {
+        //       slidingMenu.toggle(true)
+        if (drawerLayout.isDrawerOpen(Gravity.LEFT)) {
+            drawerLayout.closeDrawer(Gravity.LEFT)
+        } else {
+            drawerLayout.openDrawer(Gravity.LEFT)
+        }
+    }
+
+    override fun onToolbarRightButtonClicked() {
+        val intent = Intent(this, SystemLogActivity::class.java)
+        startActivity(intent)
+    }
+
+    override fun onStart() {
+        super.onStart()
+
         //Ask permission if needed
         if (Build.VERSION.SDK_INT >= 23) {
             OTApplication.app.currentUserObservable.subscribe {
@@ -72,20 +91,6 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home) {
             }
 
         }
-    }
-
-    override fun onToolbarLeftButtonClicked() {
-        //       slidingMenu.toggle(true)
-        if (drawerLayout.isDrawerOpen(Gravity.LEFT)) {
-            drawerLayout.closeDrawer(Gravity.LEFT)
-        } else {
-            drawerLayout.openDrawer(Gravity.LEFT)
-        }
-    }
-
-    override fun onToolbarRightButtonClicked() {
-        val intent = Intent(this, SystemLogActivity::class.java)
-        startActivity(intent)
     }
 
     override fun onPause() {
