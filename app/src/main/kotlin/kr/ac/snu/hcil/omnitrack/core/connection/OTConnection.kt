@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.connection
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilder
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
+import kr.ac.snu.hcil.omnitrack.utils.Result
 import kr.ac.snu.hcil.omnitrack.utils.serialization.ATypedQueueSerializable
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableTypedQueue
 import rx.Observable
@@ -45,34 +46,13 @@ class OTConnection : ATypedQueueSerializable {
     constructor(serialized: String) : super(serialized)
 
 
-    fun getRequestedValue(builder: OTItemBuilder): Observable<Any?> {
-        if (source != null) {
-            return Observable.create {
-                subscriber ->
-                source!!.requestValueAsync(builder, rangedQuery) {
-                    value ->
-                    println("connection value retrieval result")
-                    println(value)
-                    if (!subscriber.isUnsubscribed) {
-                        if (value != null) {
-                            subscriber.onNext(value)
-                        } else {
-                            subscriber.onNext(NULL)
-                        }
-                        subscriber.onCompleted()
-                    }
-                }
+    fun getRequestedValue(builder: OTItemBuilder): Observable<Result<out Any>> {
+        return Observable.defer {
+            if (source != null) {
+                return@defer source!!.getValueRequest(builder, rangedQuery)
+            } else {
+                return@defer Observable.error<Result<out Any>>(Exception("Connection source is not designated."))
             }
-        } else {
-            return Observable.just<Any?>(null)
-        }
-    }
-
-    fun requestValueAsync(builder: OTItemBuilder, handler: (Any?) -> Unit) {
-        if (source != null) {
-            source!!.requestValueAsync(builder, rangedQuery, handler)
-        } else {
-            handler.invoke(null)
         }
     }
 

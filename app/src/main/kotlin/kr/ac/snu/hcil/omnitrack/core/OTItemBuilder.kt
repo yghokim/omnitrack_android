@@ -9,10 +9,11 @@ import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
-import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.utils.serialization.IStringSerializable
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Observable
+import rx.android.schedulers.AndroidSchedulers
+import rx.schedulers.Schedulers
 import java.util.*
 
 /**
@@ -318,21 +319,36 @@ class OTItemBuilder : Parcelable, IStringSerializable {
                     subscriber ->
                     attributeStateList[i] = EAttributeValueState.GettingExternalValue
                     onAttributeStateChangedListener?.onAttributeStateChanged(attr, i, EAttributeValueState.GettingExternalValue)
-                    attr.valueConnection!!.getRequestedValue(this).subscribe {
+                    attr.valueConnection!!.getRequestedValue(this).subscribeOn(Schedulers.io()).subscribe({
                         data ->
+                        println("result data: ")
+                        println(data)
                         if (!subscriber.isUnsubscribed) {
-                            if (data === OTConnection.NULL) {
+                            if (data.datum == null) {
                                 attr.getAutoCompleteValue().subscribe {
-                                    data ->
-                                    subscriber.onNext(Pair(i, data as Any))
-                                    subscriber.onCompleted()
+                                    defaultValue ->
+                                    if (!subscriber.isUnsubscribed) {
+                                        subscriber.onNext(Pair(i, defaultValue as Any))
+                                        subscriber.onCompleted()
+                                    }
                                 }
                             } else {
-                                subscriber.onNext(Pair(i, data as Any))
+                                subscriber.onNext(Pair(i, data.datum))
                                 subscriber.onCompleted()
                             }
                         }
-                    }
+                    },
+                            {
+                                exception ->
+                                println(exception.message)
+                                attr.getAutoCompleteValue().subscribe {
+                                    defaultValue ->
+                                    if (!subscriber.isUnsubscribed) {
+                                        subscriber.onNext(Pair(i, defaultValue as Any))
+                                        subscriber.onCompleted()
+                                    }
+                                }
+                            })
                 }
             } else {
                 attributeStateList[i] = EAttributeValueState.Processing
@@ -343,7 +359,7 @@ class OTItemBuilder : Parcelable, IStringSerializable {
                 }
             }
         })
-                .subscribe(
+                .observeOn(AndroidSchedulers.mainThread()).subscribe(
                         {
                             result ->
                             val index = result.first

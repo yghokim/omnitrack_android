@@ -3,15 +3,16 @@ package kr.ac.snu.hcil.omnitrack.core.externals.fitbit
 import android.text.format.DateUtils
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
-import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
+import kr.ac.snu.hcil.omnitrack.utils.Result
 import kr.ac.snu.hcil.omnitrack.utils.auth.AuthConstants
 import kr.ac.snu.hcil.omnitrack.utils.auth.OAuth2Client
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableTypedQueue
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import kr.ac.snu.hcil.omnitrack.utils.setHourOfDay
 import org.json.JSONObject
+import rx.Observable
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -54,7 +55,7 @@ object FitbitHeartRateMeasureFactory : OTMeasureFactory() {
             val converter = object : OAuth2Client.OAuth2RequestConverter<Int?> {
                 override fun process(requestResultStrings: Array<String>): Int? {
 
-                    if (requestResultStrings.size == 0) return null
+                    if (requestResultStrings.isEmpty()) return null
                     else {
                         var sum = 0
                         var totalCount = 0
@@ -83,21 +84,14 @@ object FitbitHeartRateMeasureFactory : OTMeasureFactory() {
             }
         }
 
-        override fun requestValueAsync(start: Long, end: Long, handler: (Any?) -> Unit) {
+        override fun getValueRequest(start: Long, end: Long): Observable<Result<out Any>> {
             val urls = makeRequestUrls(start, end)
             println(urls)
-            FitbitService.request(urls, converter) {
-                result ->
-                handler.invoke(result)
-            }
+            return FitbitService.getRequest(converter, *urls) as Observable<Result<out Any>>
         }
 
         override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_INT
         override val factory: OTMeasureFactory = FitbitHeartRateMeasureFactory
-
-        override fun awaitRequestValue(query: OTTimeRangeQuery?): Any {
-            return 0
-        }
 
         override fun onSerialize(typedQueue: SerializableTypedQueue) {
         }
