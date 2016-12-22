@@ -28,7 +28,9 @@ class OTTimeRangeQuery : ATypedQueueSerializable {
         const val BIN_SIZE_WEEK = 2
     }
 
-    enum class Preset(val nameResId: Int, val descResId: Int, val type: Int, val binSize: Int, val binOffset: Int, val anchorToNow: Boolean) {
+    enum class Granularity {Millis, Second, Minute, Hour, Day, Week }
+
+    enum class Preset(val nameResId: Int, val descResId: Int, val type: Int, val binSize: Int, val binOffset: Int, val anchorToNow: Boolean, val granularity: Granularity) {
         /*
 
     <string name="msg_present_date">Present date</string>
@@ -39,11 +41,11 @@ class OTTimeRangeQuery : ATypedQueueSerializable {
     <string name="msg_present_week">Present week</string>
     <string name="msg_previous_week">Previous week</string>
          */
-        PresentDate(R.string.msg_present_date, R.string.msg_present_date_desc, TYPE_PIVOT_TIMESTAMP, BIN_SIZE_DAY, 0, false),
-        PreviousDate(R.string.msg_previous_date, R.string.msg_previous_date_desc, TYPE_PIVOT_TIMESTAMP, BIN_SIZE_DAY, -1, false),
-        Recent1Hour(R.string.msg_recent_hour, R.string.msg_recent_hour_desc, TYPE_PIVOT_TIMESTAMP, BIN_SIZE_HOUR, 0, true),
-        Recent24Hours(R.string.msg_recent_24_hours, R.string.msg_recent_24_hours_desc, TYPE_PIVOT_TIMESTAMP, BIN_SIZE_DAY, 0, true),
-        Recent7Days(R.string.msg_recent_7_days, R.string.msg_recent_7_days_desc, TYPE_PIVOT_TIMESTAMP, BIN_SIZE_WEEK, 0, true);
+        PresentDate(R.string.msg_present_date, R.string.msg_present_date_desc, TYPE_PIVOT_TIMESTAMP, BIN_SIZE_DAY, 0, false, Granularity.Day),
+        PreviousDate(R.string.msg_previous_date, R.string.msg_previous_date_desc, TYPE_PIVOT_TIMESTAMP, BIN_SIZE_DAY, -1, false, Granularity.Day),
+        Recent1Hour(R.string.msg_recent_hour, R.string.msg_recent_hour_desc, TYPE_PIVOT_TIMESTAMP, BIN_SIZE_HOUR, 0, true, Granularity.Hour),
+        Recent24Hours(R.string.msg_recent_24_hours, R.string.msg_recent_24_hours_desc, TYPE_PIVOT_TIMESTAMP, BIN_SIZE_DAY, 0, true, Granularity.Hour),
+        Recent7Days(R.string.msg_recent_7_days, R.string.msg_recent_7_days_desc, TYPE_PIVOT_TIMESTAMP, BIN_SIZE_WEEK, 0, true, Granularity.Hour);
 
         fun makeQueryInstance(): OTTimeRangeQuery {
             return OTTimeRangeQuery(type, binSize, binOffset, anchorToNow)

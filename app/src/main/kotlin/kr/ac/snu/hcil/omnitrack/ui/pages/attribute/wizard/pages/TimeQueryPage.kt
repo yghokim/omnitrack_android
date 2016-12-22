@@ -6,11 +6,12 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.AWizardPage
+import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.wizard.ConnectionWizardView
 
 /**
  * Created by Young-Ho Kim on 2016-08-30.
  */
-class TimeQueryPage(val attribute: OTAttribute<out Any>) : AWizardPage() {
+class TimeQueryPage(override val parent: ConnectionWizardView, val attribute: OTAttribute<out Any>) : AWizardPage(parent) {
 
     override val getTitleResourceId: Int = R.string.msg_connection_wizard_title_time_query
 
