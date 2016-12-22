@@ -32,7 +32,7 @@ class ComboBoxPropertyView(context: Context, attrs: AttributeSet?) : APropertyVi
         spinner.setOnItemSelectedListener(this)
     }
 
-    override fun onItemSelected(parent: AdapterView<*>?, view: View, position: Int, id: Long) {
+    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         onValueChanged(position)
     }
 

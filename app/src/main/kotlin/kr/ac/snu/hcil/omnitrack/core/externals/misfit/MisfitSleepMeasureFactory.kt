@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.externals.misfit
 
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
+import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.Result
@@ -28,6 +29,7 @@ object MisfitSleepMeasureFactory : OTMeasureFactory() {
     }
 
     override val isRangedQueryAvailable: Boolean = true
+    override val minimumGranularity: OTTimeRangeQuery.Granularity = OTTimeRangeQuery.Granularity.Day
     override val isDemandingUserInput: Boolean = false
 
     override fun makeMeasure(): OTMeasure {

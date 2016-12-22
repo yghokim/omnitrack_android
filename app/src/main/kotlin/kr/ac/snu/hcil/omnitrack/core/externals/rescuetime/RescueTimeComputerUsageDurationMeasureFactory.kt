@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.externals.rescuetime
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
+import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.NumberStyle
@@ -47,6 +48,7 @@ object RescueTimeComputerUsageDurationMeasureFactory : OTMeasureFactory() {
         return attribute.typeId == OTAttribute.TYPE_NUMBER
     }
 
+    override val minimumGranularity: OTTimeRangeQuery.Granularity = OTTimeRangeQuery.Granularity.Hour
     override val isRangedQueryAvailable: Boolean = true
     override val isDemandingUserInput: Boolean = false
 

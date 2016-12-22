@@ -9,6 +9,7 @@ import com.google.android.gms.fitness.request.DataReadRequest
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
+import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.Result
@@ -36,6 +37,7 @@ object GoogleFitStepsFactory : GoogleFitService.GoogleFitMeasureFactory() {
     override val exampleAttributeType: Int = OTAttribute.TYPE_NUMBER
 
     override val isRangedQueryAvailable: Boolean = true
+    override val minimumGranularity: OTTimeRangeQuery.Granularity = OTTimeRangeQuery.Granularity.Millis
     override val isDemandingUserInput: Boolean = false
 
     override val nameResourceId: Int = R.string.measure_googlefit_steps_name
