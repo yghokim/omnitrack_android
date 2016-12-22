@@ -2,16 +2,17 @@ package kr.ac.snu.hcil.omnitrack.core.externals.fitbit
 
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
-import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
+import kr.ac.snu.hcil.omnitrack.utils.Result
 import kr.ac.snu.hcil.omnitrack.utils.auth.AuthConstants
 import kr.ac.snu.hcil.omnitrack.utils.auth.OAuth2Client
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableTypedQueue
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import okhttp3.HttpUrl
 import org.json.JSONObject
+import rx.Observable
 import java.util.*
 
 /**
@@ -75,24 +76,15 @@ object FitbitRecentSleepTimeMeasureFactory : OTMeasureFactory() {
         constructor() : super()
         constructor(serialized: String) : super(serialized)
 
-        override fun awaitRequestValue(query: OTTimeRangeQuery?): Any {
-            throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
-        }
-
-        override fun requestValueAsync(start: Long, end: Long, handler: (Any?) -> Unit) {
+        override fun getValueRequest(start: Long, end: Long): Observable<Result<out Any>> {
             val uri = HttpUrl.parse(FitbitService.makeRequestUrlWithCommandAndDate(FitbitService.REQUEST_COMMAND_SLEEP, Date(start)))
                     .newBuilder()
                     .addQueryParameter("isMainSleep", "true")
                     .build()
-            FitbitService.request(
-                    uri.toString(),
-                    converter)
-            {
-                result ->
-                handler.invoke(result)
-            }
+            return FitbitService.getRequest(
+                    converter,
+                    uri.toString()) as Observable<Result<out Any>>
         }
-
 
         override fun onDeserialize(typedQueue: SerializableTypedQueue) {
         }

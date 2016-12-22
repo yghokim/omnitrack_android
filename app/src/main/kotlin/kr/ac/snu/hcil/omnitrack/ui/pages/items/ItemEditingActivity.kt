@@ -450,6 +450,8 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
                     inputView.alpha = 0.12f
                 }
 
+                println("current builder attribute state: ${builder.getAttributeValueState(adapterPosition)}")
+
                 when (builder.getAttributeValueState(adapterPosition)) {
                     OTItemBuilder.EAttributeValueState.Idle -> {
                         loadingIndicatorInContainer.visibility = View.GONE

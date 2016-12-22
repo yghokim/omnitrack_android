@@ -1,15 +1,15 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.fitbit
 
-import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
-import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
+import kr.ac.snu.hcil.omnitrack.utils.Result
 import kr.ac.snu.hcil.omnitrack.utils.auth.OAuth2Client
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableTypedQueue
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import org.json.JSONObject
+import rx.Observable
 import java.util.*
 
 /**
@@ -69,22 +69,11 @@ object FitbitStepCountMeasureFactory : OTMeasureFactory() {
         constructor(serialized: String) : super(serialized)
 
 
-        override fun awaitRequestValue(query: OTTimeRangeQuery?): Any {
-            throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
-        }
-
-        override fun requestValueAsync(start: Long, end: Long, handler: (Any?) -> Unit) {
-
-            OTApplication.logger.writeSystemLog("Start getting Fitbit Step Log", "FitbitStepFactory")
-            FitbitService.request(
-                    FitbitService.makeRequestUrlWithCommandAndDate(FitbitService.REQUEST_COMMAND_SUMMARY, Date(start)),
-                    converter)
-            {
-                result ->
-                OTApplication.logger.writeSystemLog("Finished getting Fitbit Step Log", "FitbitStepFactory")
-                println("Fitbit step result: $result")
-                handler.invoke(result)
-            }
+        override fun getValueRequest(start: Long, end: Long): Observable<Result<out Any>> {
+            return FitbitService.getRequest(
+                    converter,
+                    FitbitService.makeRequestUrlWithCommandAndDate(FitbitService.REQUEST_COMMAND_SUMMARY, Date(start)))
+                    as Observable<Result<out Any>>
         }
 
         override fun onDeserialize(typedQueue: SerializableTypedQueue) {
@@ -95,9 +84,7 @@ object FitbitStepCountMeasureFactory : OTMeasureFactory() {
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
-            else if (other is FitbitStepMeasure) {
-                return true
-            } else return false
+            else return other is FitbitStepMeasure
         }
 
         override fun hashCode(): Int {

@@ -1,13 +1,13 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.misfit
 
-import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
-import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
+import kr.ac.snu.hcil.omnitrack.utils.Result
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableTypedQueue
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
+import rx.Observable
 import java.util.*
 
 /**
@@ -53,24 +53,14 @@ object MisfitStepMeasureFactory: OTMeasureFactory() {
         constructor() : super()
         constructor(serialized: String) : super(serialized)
 
-        override fun awaitRequestValue(query: OTTimeRangeQuery?): Any {
-            throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
-        }
-
-        override fun requestValueAsync(start: Long, end: Long, handler: (Any?) -> Unit) {
-            val token = MisfitService.getStoredAccessToken()
-            if (token != null) {
-                OTApplication.logger.writeSystemLog("Start getting Misfit Step Log", "MisfitStepFactory")
-                MisfitApi.getStepsOnDayAsync(token, Date(start), Date(end-1))
-                {
-                    result ->
-                    println(result)
-
-                    OTApplication.logger.writeSystemLog("Finished getting Misfit Step Log", "MisfitStepFactory")
-                    handler.invoke(result)
+        override fun getValueRequest(start: Long, end: Long): Observable<Result<out Any>> {
+            return Observable.defer {
+                val token = MisfitService.getStoredAccessToken()
+                if (token != null) {
+                    return@defer MisfitApi.getStepsOnDayRequest(token, Date(start), Date(end - 1)) as Observable<Result<out Any>>
+                } else {
+                    return@defer Observable.error<Result<out Any>>(Exception("no token"))
                 }
-            } else {
-                handler.invoke(null)
             }
         }
 
@@ -82,9 +72,7 @@ object MisfitStepMeasureFactory: OTMeasureFactory() {
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
-            else if (other is MisfitStepMeasure) {
-                return true
-            } else return false
+            else return other is MisfitStepMeasure
         }
 
         override fun hashCode(): Int {

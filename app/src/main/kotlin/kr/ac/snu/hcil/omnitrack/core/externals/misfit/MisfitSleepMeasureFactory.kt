@@ -2,11 +2,12 @@ package kr.ac.snu.hcil.omnitrack.core.externals.misfit
 
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
-import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
+import kr.ac.snu.hcil.omnitrack.utils.Result
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableTypedQueue
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
+import rx.Observable
 import java.util.*
 
 /**
@@ -49,24 +50,15 @@ object MisfitSleepMeasureFactory : OTMeasureFactory() {
 
         override val factory: OTMeasureFactory = MisfitSleepMeasureFactory
 
-        override fun awaitRequestValue(query: OTTimeRangeQuery?): Any {
-            throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
-        }
-
-        override fun requestValueAsync(start: Long, end: Long, handler: (Any?) -> Unit) {
-            println("Grab Misfit sleep data")
-            val token = MisfitService.getStoredAccessToken()
-            if (token != null) {
-                MisfitApi.getLatestSleepOnDayAsync(token, Date(start), Date(end - 20))
-                {
-                    result ->
-                    println(result)
-                    handler.invoke(result)
-                }
-            } else {
-                handler.invoke(null)
+        override fun getValueRequest(start: Long, end: Long): Observable<Result<out Any>> {
+            return Observable.defer {
+                val token = MisfitService.getStoredAccessToken()
+                if (token != null) {
+                    return@defer MisfitApi.getLatestSleepOnDayRequest(token, Date(start), Date(end - 20)) as Observable<Result<out Any>>
+                } else return@defer Observable.error<Result<out Any>>(Exception("no token"))
             }
         }
+
 
         override fun onSerialize(typedQueue: SerializableTypedQueue) {
         }
@@ -76,9 +68,7 @@ object MisfitSleepMeasureFactory : OTMeasureFactory() {
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
-            else if (other is MisfitSleepMeasure) {
-                return true
-            } else return false
+            else return other is MisfitSleepMeasure
         }
 
         override fun hashCode(): Int {

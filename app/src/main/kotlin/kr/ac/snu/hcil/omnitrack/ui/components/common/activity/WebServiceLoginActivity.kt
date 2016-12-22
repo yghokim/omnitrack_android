@@ -56,11 +56,6 @@ open class WebServiceLoginActivity : AppCompatActivity(), View.OnClickListener {
                         loadingIndicator.visibility = View.INVISIBLE
                     }
 
-                    override fun onLoadResource(view: WebView?, url: String?) {
-                        super.onLoadResource(view, url)
-                        loadingIndicator.visibility = View.INVISIBLE
-                    }
-
                     override fun onPageFinished(view: WebView, url: String) {
                         super.onPageFinished(view, url)
                         onPageFinished(url)
