@@ -1,6 +1,5 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.google.fit
 
-import android.os.AsyncTask
 import com.google.android.gms.common.api.Api
 import com.google.android.gms.common.api.Scope
 import com.google.android.gms.fitness.Fitness
@@ -70,20 +69,41 @@ object GoogleFitStepsFactory : GoogleFitService.GoogleFitMeasureFactory() {
         override fun getValueRequest(start: Long, end: Long): Observable<Result<out Any>> {
             return Observable.create<Result<out Any>> {
                 subscriber ->
-
                 if (factory.service.state == OTExternalService.ServiceState.ACTIVATED) {
-                    Task(start, end) {
-                        steps ->
-                        println("result step: $steps")
-                        if (!subscriber.isUnsubscribed) {
-                            subscriber.onNext(Result(steps))
-                            subscriber.onCompleted()
+
+                    val request = DataReadRequest.Builder()
+                            .aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
+                            .bucketByTime(1, TimeUnit.DAYS)
+                            .setTimeRange(start, end, TimeUnit.MILLISECONDS)
+                            .build()
+
+                    GoogleFitService.getConnectedClient().subscribe({
+                        client ->
+                        Fitness.HistoryApi.readData(client!!, request).setResultCallback {
+                            result ->
+                            var steps = 0
+                            for (bucket in result.buckets) {
+                                for (dataset in bucket.dataSets) {
+                                    for (dataPoint in dataset.dataPoints) {
+                                        steps += dataPoint.getValue(Field.FIELD_STEPS).asInt()
+                                        println(dataPoint.getValue(Field.FIELD_STEPS))
+                                    }
+                                }
+                            }
+
+                            if (!subscriber.isUnsubscribed) {
+                                subscriber.onNext(Result(steps))
+                                subscriber.onCompleted()
+                            }
                         }
-                    }.execute()
+                    }, {
+                        exception ->
+                        subscriber.onError(exception)
+                    })
+
                 } else {
                     if (!subscriber.isUnsubscribed) {
-                        subscriber.onNext(Result(null))
-                        subscriber.onCompleted()
+                        subscriber.onError(Exception("Service is not activated."))
                     }
                 }
             }.subscribeOn(Schedulers.io())
@@ -105,50 +125,5 @@ object GoogleFitStepsFactory : GoogleFitService.GoogleFitMeasureFactory() {
         override fun hashCode(): Int {
             return factoryCode.hashCode()
         }
-
-        class Task(val from: Long, val to: Long, val handler: ((Int) -> Unit)?) : AsyncTask<Void?, Void?, Int>() {
-
-            override fun doInBackground(vararg p0: Void?): Int {
-                val request = DataReadRequest.Builder()
-                        .aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
-                        .bucketByTime(1, TimeUnit.DAYS)
-                        .setTimeRange(from, to, TimeUnit.MILLISECONDS)
-                        .build()
-
-                var finish = false
-
-                var steps = 0
-
-                GoogleFitService.getClientAsync {
-                    client ->
-                    Fitness.HistoryApi.readData(client!!, request).setResultCallback {
-                        result ->
-                        for (bucket in result.buckets) {
-                            for (dataset in bucket.dataSets) {
-                                for (dataPoint in dataset.dataPoints) {
-                                    steps += dataPoint.getValue(Field.FIELD_STEPS).asInt()
-                                    println(dataPoint.getValue(Field.FIELD_STEPS))
-                                }
-                            }
-                        }
-
-                        finish = true
-                    }
-                }
-
-                while (!finish) {
-                }
-                println("retreived steps")
-
-                return steps
-            }
-
-            override fun onPostExecute(result: Int) {
-                super.onPostExecute(result)
-                handler?.invoke(result)
-            }
-
-        }
-
     }
 }
