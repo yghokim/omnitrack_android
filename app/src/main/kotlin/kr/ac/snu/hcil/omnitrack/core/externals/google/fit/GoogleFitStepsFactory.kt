@@ -10,11 +10,13 @@ import com.google.android.gms.fitness.request.DataReadRequest
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
-import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
+import kr.ac.snu.hcil.omnitrack.utils.Result
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableTypedQueue
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
+import rx.Observable
+import rx.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 
 /**
@@ -45,9 +47,7 @@ object GoogleFitStepsFactory : GoogleFitService.GoogleFitMeasureFactory() {
     override val usedScope: Scope = Fitness.SCOPE_ACTIVITY_READ
 
     override fun isAttachableTo(attribute: OTAttribute<out Any>): Boolean {
-        if (attribute is OTNumberAttribute) {
-            return true
-        } else return false
+        return attribute is OTNumberAttribute
     }
 
     override fun makeMeasure(): OTMeasure {
@@ -59,6 +59,7 @@ object GoogleFitStepsFactory : GoogleFitService.GoogleFitMeasureFactory() {
     }
 
     class Measure : OTRangeQueriedMeasure {
+
         override val dataTypeName = TypeStringSerializationHelper.TYPENAME_INT
 
         override val factory: OTMeasureFactory = GoogleFitStepsFactory
@@ -66,20 +67,26 @@ object GoogleFitStepsFactory : GoogleFitService.GoogleFitMeasureFactory() {
         constructor() : super()
         constructor(serialized: String) : super(serialized)
 
-        override fun awaitRequestValue(query: OTTimeRangeQuery?): Any {
-            throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
-        }
+        override fun getValueRequest(start: Long, end: Long): Observable<Result<out Any>> {
+            return Observable.create<Result<out Any>> {
+                subscriber ->
 
-        override fun requestValueAsync(start: Long, end: Long, handler: (Any?) -> Unit) {
-            if (factory.service.state == OTExternalService.ServiceState.ACTIVATED) {
-                Task(start, end) {
-                    steps ->
-                    println("result step: $steps")
-                    handler.invoke(steps)
-                }.execute()
-            } else {
-                handler.invoke(null)
-            }
+                if (factory.service.state == OTExternalService.ServiceState.ACTIVATED) {
+                    Task(start, end) {
+                        steps ->
+                        println("result step: $steps")
+                        if (!subscriber.isUnsubscribed) {
+                            subscriber.onNext(Result(steps))
+                            subscriber.onCompleted()
+                        }
+                    }.execute()
+                } else {
+                    if (!subscriber.isUnsubscribed) {
+                        subscriber.onNext(Result(null))
+                        subscriber.onCompleted()
+                    }
+                }
+            }.subscribeOn(Schedulers.io())
         }
 
         override fun onSerialize(typedQueue: SerializableTypedQueue) {
@@ -92,9 +99,7 @@ object GoogleFitStepsFactory : GoogleFitService.GoogleFitMeasureFactory() {
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
-            else if (other is Measure) {
-                return true
-            } else return false
+            else return other is Measure
         }
 
         override fun hashCode(): Int {

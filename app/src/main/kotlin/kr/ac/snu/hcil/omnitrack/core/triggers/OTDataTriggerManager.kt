@@ -5,7 +5,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.os.AsyncTask
 import com.google.android.gms.gcm.GcmNetworkManager
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.receivers.OTSystemReceiver
@@ -24,7 +23,7 @@ object OTDataTriggerManager {
     const val PREFERENCE_ENROLLED_IDS = "EventTriggerEnrolledIds"
     const val PREFERENCE_TRIGGER_ID_PREFIX = "ET_"
 
-    private var batch: MeasureBatchCheckTask? = null
+    //private var batch: MeasureBatchCheckTask? = null
 
     private val preferences: SharedPreferences by lazy{
         OTApplication.app.getSharedPreferences(PREFERENCE_LAST_CONDITION_TABLE, Context.MODE_PRIVATE)
@@ -88,15 +87,15 @@ object OTDataTriggerManager {
         println("checking measures for event triggers...")
 
         val triggersToCheck = OTApplication.app.currentUser.triggerManager.getFilteredTriggers { it is OTDataTrigger && it.isOn == true }.map { it as OTDataTrigger }.toTypedArray()
-
+/*
         batch?.cancel(true)
 
         batch = MeasureBatchCheckTask {
             batch = null
         }
-        batch?.execute(*triggersToCheck)
+        batch?.execute(*triggersToCheck)*/
     }
-
+/*
     private class MeasureBatchCheckTask(val finishedHandler: (BooleanArray) -> Unit) : AsyncTask<OTDataTrigger, OTDataTrigger, BooleanArray>() {
         override fun onProgressUpdate(vararg values: OTDataTrigger) {
             super.onProgressUpdate(*values)
@@ -157,5 +156,5 @@ object OTDataTriggerManager {
             return measureResults
         }
 
-    }
+    }*/
 }

@@ -6,6 +6,8 @@ import android.support.v4.app.FragmentActivity
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.utils.auth.AuthConstants
+import rx.android.schedulers.AndroidSchedulers
+import rx.schedulers.Schedulers
 
 /**
  * Created by Young-Ho on 9/1/2016.
@@ -48,15 +50,17 @@ object MisfitService : OTExternalService("MisfitService", 0) {
 
         val code = resultData?.getStringExtra(AuthConstants.PARAM_CODE)
         if (code != null) {
-            MisfitApi.exchangeToToken(code) {
-                token ->
-                if (token != null) {
-                    println("my access token $token")
-                    preferences.edit().putString(PREFERENCE_ACCESS_TOKEN, token).apply()
-                    pendingConnectionListener?.invoke(true)
-                } else cancelActivationProcess()
-            }
-
+            MisfitApi.getTokenExchangeRequest(code).subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({
+                        token ->
+                        println("my access token $token")
+                        preferences.edit().putString(PREFERENCE_ACCESS_TOKEN, token).apply()
+                        pendingConnectionListener?.invoke(true)
+                    }, {
+                        exception ->
+                        cancelActivationProcess()
+                    })
         }
     }
 

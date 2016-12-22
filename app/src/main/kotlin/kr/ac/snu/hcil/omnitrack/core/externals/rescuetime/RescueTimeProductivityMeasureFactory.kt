@@ -3,13 +3,14 @@ package kr.ac.snu.hcil.omnitrack.core.externals.rescuetime
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
-import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.NumberStyle
+import kr.ac.snu.hcil.omnitrack.utils.Result
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableTypedQueue
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import org.json.JSONObject
+import rx.Observable
 import java.util.*
 
 /**
@@ -66,36 +67,15 @@ object RescueTimeProductivityMeasureFactory : OTMeasureFactory() {
     }
 
     class ProductivityMeasure : OTRangeQueriedMeasure {
+
         override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_DOUBLE
         override val factory: OTMeasureFactory = RescueTimeProductivityMeasureFactory
 
         constructor() : super()
         constructor(serialized: String) : super(serialized)
 
-        override fun awaitRequestValue(query: OTTimeRangeQuery?): Any {
-            throw NotImplementedError("")
-        }
-
-        override fun requestValueAsync(start:Long, end: Long, handler: (Any?) -> Unit) {
-
-            RescueTimeService.requestSummary(Date(start), Date(end - 1), productivityCalculator) {
-                result ->
-                handler.invoke(result)
-            }
-            /*
-            val apiKey = RescueTimeService.getStoredApiKey()
-
-            if (apiKey != null) {
-                RescueTimeApi.queryProductivityScore(RescueTimeApi.Mode.ApiKey, Date(start), Date(end-1))
-                {
-                    result ->
-
-                    handler.invoke(result)
-                }
-            } else {
-                handler.invoke(null)
-            }
-*/
+        override fun getValueRequest(start: Long, end: Long): Observable<Result<out Any>> {
+            return RescueTimeService.getSummaryRequest(Date(start), Date(end - 1), productivityCalculator) as Observable<Result<out Any>>
         }
 
         override fun onSerialize(typedQueue: SerializableTypedQueue) {

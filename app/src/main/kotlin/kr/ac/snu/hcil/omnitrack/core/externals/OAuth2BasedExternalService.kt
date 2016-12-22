@@ -4,7 +4,9 @@ import android.content.Context
 import android.content.Intent
 import android.support.v4.app.FragmentActivity
 import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.utils.Result
 import kr.ac.snu.hcil.omnitrack.utils.auth.OAuth2Client
+import rx.Observable
 
 /**
  * Created by Young-Ho Kim on 16. 9. 3
@@ -67,6 +69,7 @@ abstract class OAuth2BasedExternalService(identifier: String, minimumSDK: Int) :
         credential = newCredential
     }
 
+    /*
 
     fun <T> request(requestUrls: String, converter: OAuth2Client.OAuth2RequestConverter<T>, resultHandler: ((T?) -> Unit)) {
         val credential = credential
@@ -84,6 +87,13 @@ abstract class OAuth2BasedExternalService(identifier: String, minimumSDK: Int) :
         } else {
             resultHandler.invoke(null)
         }
+    }*/
+
+    fun <T> getRequest(converter: OAuth2Client.OAuth2RequestConverter<T>, vararg requestUrls: String): Observable<Result<T>> {
+        val credential = credential
+        return if (credential != null) {
+            authClient.getRequest(credential, converter, this, *requestUrls)
+        } else Observable.error(Exception("Auth Credential is not stored."))
     }
 
     override fun handleActivityActivationResultOk(resultData: Intent?) {
