@@ -11,6 +11,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
+import rx.Observable
 import java.util.*
 
 /**
@@ -52,7 +53,7 @@ object GoogleFitService : OTExternalService("GoogleFitService", 19) {
     //===================================================================================================
     private var currentActivationHandler: ((Boolean) -> Unit)? = null
 
-    private var currentPreparationHandler: ((Boolean) -> Unit)? = null
+    //private var currentPreparationHandler: ((Boolean) -> Unit)? = null
 
 
     private val activationConnectionCallbacks = object : GoogleApiClient.ConnectionCallbacks {
@@ -64,26 +65,6 @@ object GoogleFitService : OTExternalService("GoogleFitService", 19) {
             println("activation success.")
             currentActivationHandler?.invoke(true)
         }
-    }
-
-    private val preparationConnectionCallbacks = object : GoogleApiClient.ConnectionCallbacks {
-        override fun onConnectionSuspended(reason: Int) {
-            println("Google Fit preparation connection is pending.. - $reason")
-        }
-
-        override fun onConnected(reason: Bundle?) {
-
-            println("preparation success.")
-            currentPreparationHandler?.invoke(true)
-
-        }
-    }
-
-    private val preparationConnectionFailedListener = GoogleApiClient.OnConnectionFailedListener {
-        result ->
-        println("Google fit preparation connection failed - ${result.toString()}")
-        println(result.errorMessage)
-        currentPreparationHandler?.invoke(false)
     }
 
     //==================================================================================================
@@ -124,30 +105,43 @@ object GoogleFitService : OTExternalService("GoogleFitService", 19) {
     }
 
     override fun prepareServiceAsync(preparedHandler: ((Boolean) -> Unit)?) {
-        if (client?.isConnected == true) {
-
+        getConnectedClient().subscribe({
+            client ->
             preparedHandler?.invoke(true)
-        } else {
-            currentPreparationHandler = preparedHandler
-            client = buildClientBuilderBase()
-                    .addConnectionCallbacks(preparationConnectionCallbacks)
-                    .addOnConnectionFailedListener(preparationConnectionFailedListener)
-                    .build()
-            client?.connect()
-        }
+        }, {
+            preparedHandler?.invoke(false)
+        })
     }
 
-    fun getClientAsync(handler: (client: GoogleApiClient?) -> Unit) {
-        if (client != null) {
-            handler.invoke(client)
-        } else {
-            prepareServiceAsync {
-                success ->
-                if (success == true) {
-                    handler.invoke(client)
-                } else {
-                    handler.invoke(null)
+    fun getConnectedClient(): Observable<GoogleApiClient> {
+        return Observable.create {
+            subscriber ->
+            if (client?.isConnected == true) {
+                if (!subscriber.isUnsubscribed) {
+                    subscriber.onNext(client!!)
+                    subscriber.onCompleted()
                 }
+            } else {
+                client = buildClientBuilderBase()
+                        .addConnectionCallbacks(object : GoogleApiClient.ConnectionCallbacks {
+                            override fun onConnected(p0: Bundle?) {
+                                if (!subscriber.isUnsubscribed) {
+                                    subscriber.onNext(client!!)
+                                    subscriber.onCompleted()
+                                }
+                            }
+
+                            override fun onConnectionSuspended(p0: Int) {
+                            }
+
+                        })
+                        .addOnConnectionFailedListener {
+                            if (!subscriber.isUnsubscribed) {
+                                subscriber.onNext(client!!)
+                                subscriber.onCompleted()
+                            }
+                        }
+                        .build().apply { connect() }
             }
         }
     }
