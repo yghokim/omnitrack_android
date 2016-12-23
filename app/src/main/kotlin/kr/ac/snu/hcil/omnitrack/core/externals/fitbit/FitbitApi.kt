@@ -89,6 +89,7 @@ object FitbitApi {
                 val values = ArrayList<ValueType>()
 
                 for (requestResultString in requestResultStrings) {
+                    println(requestResultString)
                     val json = JSONObject(requestResultString)
                     val intradayDataSet = json.getJSONObject(dataSetKey).getJSONArray("dataset")
                     val count = intradayDataSet.length()
