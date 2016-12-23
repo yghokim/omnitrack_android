@@ -6,6 +6,7 @@ import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.Result
+import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 import kr.ac.snu.hcil.omnitrack.utils.auth.OAuth2Client
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableTypedQueue
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
@@ -54,7 +55,7 @@ object FitbitStepCountMeasureFactory : OTMeasureFactory() {
 
         override val factory: OTMeasureFactory = FitbitStepCountMeasureFactory
 
-        val converter = object : OAuth2Client.OAuth2RequestConverter<Int?> {
+        val dailyConverter = object : OAuth2Client.OAuth2RequestConverter<Int?> {
             override fun process(requestResultStrings: Array<String>): Int? {
                 val json = JSONObject(requestResultStrings.first())
                 println("convert $json")
@@ -67,15 +68,31 @@ object FitbitStepCountMeasureFactory : OTMeasureFactory() {
 
         }
 
+        val intraDayConverter = object : FitbitApi.AIntraDayConverter<Int, Int>("activities-log-steps-intraday") {
+            override fun extractValueFromDatum(datum: JSONObject): Int {
+                return datum.getInt("value")
+            }
+
+            override fun processValues(values: List<Int>): Int {
+                return values.sum()
+            }
+
+        }
+
         constructor() : super()
         constructor(serialized: String) : super(serialized)
 
 
         override fun getValueRequest(start: Long, end: Long): Observable<Result<out Any>> {
-            return FitbitService.getRequest(
-                    converter,
-                    FitbitService.makeRequestUrlWithCommandAndDate(FitbitService.REQUEST_COMMAND_SUMMARY, Date(start)))
+
+            return if (TimeHelper.isSameDay(start, end)) {
+                FitbitService.getRequest(
+                        dailyConverter,
+                        FitbitApi.makeDailyRequestUrl(FitbitApi.REQUEST_COMMAND_SUMMARY, Date(start)))
                     as Observable<Result<out Any>>
+            } else
+                FitbitService.getRequest(intraDayConverter, *FitbitApi.makeIntraDayRequestUrls(FitbitApi.REQUEST_INTRADAY_RESOURCE_PATH_STEPS, start, end))
+                        as Observable<Result<out Any>>
         }
 
         override fun onDeserialize(typedQueue: SerializableTypedQueue) {

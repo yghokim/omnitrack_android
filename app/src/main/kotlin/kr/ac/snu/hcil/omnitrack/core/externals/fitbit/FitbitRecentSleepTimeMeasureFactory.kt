@@ -79,7 +79,7 @@ object FitbitRecentSleepTimeMeasureFactory : OTMeasureFactory() {
         constructor(serialized: String) : super(serialized)
 
         override fun getValueRequest(start: Long, end: Long): Observable<Result<out Any>> {
-            val uri = HttpUrl.parse(FitbitService.makeRequestUrlWithCommandAndDate(FitbitService.REQUEST_COMMAND_SLEEP, Date(start)))
+            val uri = HttpUrl.parse(FitbitApi.makeDailyRequestUrl(FitbitApi.REQUEST_COMMAND_SLEEP, Date(start)))
                     .newBuilder()
                     .addQueryParameter("isMainSleep", "true")
                     .build()

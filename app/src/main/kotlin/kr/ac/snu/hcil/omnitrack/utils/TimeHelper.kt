@@ -53,6 +53,19 @@ object TimeHelper {
         return Pair(start, end)
     }
 
+    fun isSameDay(timeStampA: Long, timeStampB: Long, timeZone: TimeZone? = null): Boolean {
+        val cal = Calendar.getInstance()       // get calendar instance
+        timeZone?.let { cal.timeZone = timeZone }
+        cal.timeInMillis = timeStampA
+        val yearA = cal.getYear()
+        val dayOfYearA = cal.get(Calendar.DAY_OF_YEAR)
+        cal.timeInMillis = timeStampB
+        val yearB = cal.getYear()
+        val dayOfYearB = cal.get(Calendar.DAY_OF_YEAR)
+
+        return yearA == yearB && dayOfYearA == dayOfYearB
+    }
+
     fun cutTimePartFromEpoch(timestamp: Long): Long {
         val cal = Calendar.getInstance()       // get calendar instance
         cal.timeInMillis = timestamp                           // set cal to date
