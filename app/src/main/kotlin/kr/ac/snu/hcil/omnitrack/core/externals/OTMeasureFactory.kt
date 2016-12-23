@@ -139,11 +139,6 @@ abstract class OTMeasureFactory() : INameDescriptionResourceProvider {
         constructor(serialized: String) : super(serialized)
 
         abstract fun getValueRequest(builder: OTItemBuilder, query: OTTimeRangeQuery?): Observable<Result<out Any>>
-        /*
-        abstract fun requestValueAsync(builder: OTItemBuilder, query: OTTimeRangeQuery?, handler: (Any?) -> Unit)
-
-        abstract fun requestLatestValueAsync(handler: (Any?) -> Unit)
-        */
     }
 
     abstract class OTRangeQueriedMeasure: OTMeasure{
@@ -157,18 +152,5 @@ abstract class OTMeasureFactory() : INameDescriptionResourceProvider {
             val range = query!!.getRange(builder)
             return getValueRequest(range.first, range.second)
         }
-
-/*
-        abstract fun requestValueAsync(start: Long, end: Long, handler: (Any?) -> Unit)
-        override final fun requestValueAsync(builder: OTItemBuilder, query: OTTimeRangeQuery?, handler: (Any?) -> Unit) {
-
-            val range = query!!.getRange(builder)
-            requestValueAsync(range.first, range.second, handler)
-        }
-
-        override final fun requestLatestValueAsync(handler: (Any?) -> Unit) {
-            val range = TimeHelper.getTodayRange()
-            requestValueAsync(range.first, range.second, handler)
-        }*/
     }
 }
