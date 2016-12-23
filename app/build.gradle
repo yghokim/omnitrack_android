@@ -6,7 +6,7 @@ android {
         sign_test {
             keyAlias '***REMOVED***'
             keyPassword '***REMOVED***'
-            storeFile file('/Volumes/data/Dropbox/#school/#research/OmniTrack2/omnitrack_android_keystore.jks')
+            storeFile file('D:/cloud/Dropbox/#school/#research/OmniTrack2/omnitrack_android_keystore.jks')
             storePassword '***REMOVED***'
         }
     }

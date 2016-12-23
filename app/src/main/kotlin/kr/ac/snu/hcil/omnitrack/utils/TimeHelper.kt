@@ -62,7 +62,7 @@ object TimeHelper {
         cal.timeInMillis = timeStampB
         val yearB = cal.getYear()
         val dayOfYearB = cal.get(Calendar.DAY_OF_YEAR)
-
+        println("$yearA-$dayOfYearA, $yearB-$dayOfYearB")
         return yearA == yearB && dayOfYearA == dayOfYearB
     }
 
