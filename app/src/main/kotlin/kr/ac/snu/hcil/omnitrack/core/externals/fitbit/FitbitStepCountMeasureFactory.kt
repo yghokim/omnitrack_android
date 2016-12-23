@@ -68,7 +68,7 @@ object FitbitStepCountMeasureFactory : OTMeasureFactory() {
 
         }
 
-        val intraDayConverter = object : FitbitApi.AIntraDayConverter<Int, Int>("activities-log-steps-intraday") {
+        val intraDayConverter = object : FitbitApi.AIntraDayConverter<Int, Int>("activities-steps-intraday") {
             override fun extractValueFromDatum(datum: JSONObject): Int {
                 return datum.getInt("value")
             }
@@ -85,12 +85,13 @@ object FitbitStepCountMeasureFactory : OTMeasureFactory() {
 
         override fun getValueRequest(start: Long, end: Long): Observable<Result<out Any>> {
 
-            return if (TimeHelper.isSameDay(start, end)) {
+            return if (TimeHelper.isSameDay(start, end - 10)) {
                 FitbitService.getRequest(
                         dailyConverter,
                         FitbitApi.makeDailyRequestUrl(FitbitApi.REQUEST_COMMAND_SUMMARY, Date(start)))
                     as Observable<Result<out Any>>
             } else
+            //TODO: Can be optimized by querying summary data of middle days.
                 FitbitService.getRequest(intraDayConverter, *FitbitApi.makeIntraDayRequestUrls(FitbitApi.REQUEST_INTRADAY_RESOURCE_PATH_STEPS, start, end))
                         as Observable<Result<out Any>>
         }
