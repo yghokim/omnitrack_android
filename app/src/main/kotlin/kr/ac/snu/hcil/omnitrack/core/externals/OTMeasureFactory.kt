@@ -41,6 +41,23 @@ abstract class OTMeasureFactory() : INameDescriptionResourceProvider {
             }
         }
 
+        val CONFIGURATOR_DISTANCE_ATTRIBUTE = object : IExampleAttributeConfigurator {
+            override fun configureExampleAttribute(attr: OTAttribute<out Any>): Boolean {
+                if (attr is OTNumberAttribute) {
+                    val ns = NumberStyle()
+                    ns.commaUnit = 3
+                    ns.fractionPart = 2
+                    ns.unit = "km"
+                    ns.pluralizeUnit = false
+                    ns.unitPosition = NumberStyle.UnitPosition.Rear
+
+                    attr.numberStyle = ns
+
+                    return true
+                } else return false
+            }
+        }
+
         val CONFIGURATOR_FOR_HEART_RATE_ATTRIBUTE = object : IExampleAttributeConfigurator {
             override fun configureExampleAttribute(attr: OTAttribute<out Any>): Boolean {
                 if (attr is OTNumberAttribute) {

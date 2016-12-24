@@ -110,7 +110,7 @@ class TrackerListFragment : OTFragment() {
         filter
     }
 
-    private val onCreateSubscriptions: CompositeSubscription = CompositeSubscription()
+    private val createViewSubscriptions: CompositeSubscription = CompositeSubscription()
     private val resumeSubscriptions: CompositeSubscription = CompositeSubscription()
 
 
@@ -151,14 +151,6 @@ class TrackerListFragment : OTFragment() {
         //attach events
         // user.trackerAdded += onTrackerAddedHandler
         //  user.trackerRemoved += onTrackerRemovedHandler
-
-        onCreateSubscriptions.add(
-                OTApplication.app.currentUserObservable.subscribe {
-                    user ->
-                    this.user = user
-                    userLoaded = true
-                    trackerListAdapter.notifyDataSetChanged()
-                })
     }
 
     override fun onResume() {
@@ -197,16 +189,24 @@ class TrackerListFragment : OTFragment() {
         trackerListAdapter.currentlyExpandedIndex = savedInstanceState?.getInt(STATE_EXPANDED_TRACKER_INDEX, -1) ?: -1
         listView.adapter = trackerListAdapter
 
+        createViewSubscriptions.add(
+                OTApplication.app.currentUserObservable.subscribe {
+                    user ->
+                    this.user = user
+                    userLoaded = true
+                    trackerListAdapter.notifyDataSetChanged()
+                })
+
         return rootView
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        createViewSubscriptions.clear()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        onCreateSubscriptions.clear()
     }
 
     override fun onPause() {

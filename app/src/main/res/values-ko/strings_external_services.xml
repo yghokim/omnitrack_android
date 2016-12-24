@@ -61,6 +61,9 @@
     <string name="measure_fitbit_sleep_time_name">수면 시간</string>
     <string name="measure_fitbit_sleep_time_desc">수면한 시간 범위를 불러옵니다</string>
 
+    <string name="measure_fitbit_distance_name">총 이동거리</string>
+    <string name="measure_fitbit_distance_desc">특정 기간 동안 걸은 총 거리를 불러옵니다</string>
+
     <string name="measure_fitbit_steps_name">걸음 수</string>
     <string name="measure_fitbit_steps_desc">특정 기간 동안의 걸음 수를 불러옵니다</string>
 
