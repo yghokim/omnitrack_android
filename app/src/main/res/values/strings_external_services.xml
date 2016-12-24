@@ -61,6 +61,10 @@
     <string name="measure_fitbit_sleep_time_name">Sleep Time</string>
     <string name="measure_fitbit_sleep_time_desc">Get sleep time range</string>
 
+
+    <string name="measure_fitbit_distance_name">Total Distance</string>
+    <string name="measure_fitbit_distance_desc">Get total distance walked during a specific range</string>
+
     <string name="measure_fitbit_steps_name">Step Count</string>
     <string name="measure_fitbit_steps_desc">Get step count during a specific range</string>
 

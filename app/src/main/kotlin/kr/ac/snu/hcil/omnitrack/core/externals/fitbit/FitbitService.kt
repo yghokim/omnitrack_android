@@ -27,6 +27,7 @@ object FitbitService : OAuth2BasedExternalService("FitbitService", 0) {
 
     init {
         _measureFactories.add(FitbitStepCountMeasureFactory)
+        _measureFactories.add(FitbitDistanceMeasureFactory)
         _measureFactories.add(FitbitRecentSleepTimeMeasureFactory)
         _measureFactories.add(FitbitHeartRateMeasureFactory)
 
