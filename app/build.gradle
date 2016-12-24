@@ -4,10 +4,15 @@ apply plugin: 'kotlin-android'
 android {
     signingConfigs {
         sign_test {
-            keyAlias '***REMOVED***'
-            keyPassword '***REMOVED***'
-            storeFile file('D:/cloud/Dropbox/#school/#research/OmniTrack2/omnitrack_android_keystore.jks')
-            storePassword '***REMOVED***'
+            try {
+                keyAlias RELEASE_ALIAS
+                keyPassword RELEASE_KEY_PASSWORD
+                storeFile file(RELEASE_KEYSTORE_LOCATION)
+                storePassword RELEASE_STORE_PASSWORD
+            }
+            catch (ex) {
+                throw new InvalidUserDataException("You should define RELASE_KEYSTORE_LOCATION RELEASE_ALIAS, RELEASE_KEY_PASSWORD, RELASE_STORE_PASSWORD in gradle.properties.")
+            }
         }
     }
     compileSdkVersion 25
