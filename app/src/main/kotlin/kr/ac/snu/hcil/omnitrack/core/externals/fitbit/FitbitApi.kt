@@ -15,7 +15,7 @@ object FitbitApi {
 
     const val REQUEST_INTRADAY_RESOURCE_PATH_HEART_RATE = "activities/heart"
     const val REQUEST_INTRADAY_RESOURCE_PATH_STEPS = "activities/steps"
-    const val REQUEST_INTRADAY_RESOURCE_PATH_DISTANCES = "activities/distance"
+    const val REQUEST_INTRADAY_RESOURCE_PATH_DISTANCE = "activities/distance"
 
 
     const val REQUEST_COMMAND_SUMMARY = "activities"
