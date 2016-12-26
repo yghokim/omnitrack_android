@@ -95,9 +95,12 @@ class OTApplication : MultiDexApplication() {
 
     val currentUser: OTUser
         get() {
-            return if (_currentUser != null)
+            return if (_currentUser != null) {
+                println("return cached user instance")
                 _currentUser!!
+            }
             else {
+                println("load user from db")
                 val user = dbHelper.findUserById(1)
                 if (user == null) {
                     initialRun = true
@@ -113,15 +116,11 @@ class OTApplication : MultiDexApplication() {
 
     //val currentUserObservable = PublishSubject.create<OTUser>()
 
-
-    val currentUserObservable: Observable<OTUser>
-        get() {
-            return Observable.defer {
+    val currentUserObservable: Observable<OTUser> =
+            Observable.defer {
                 Observable.just(currentUser)
             }.subscribeOn(Schedulers.computation())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .cache()
-        }
+                    .observeOn(AndroidSchedulers.mainThread()).cache()
 
     val colorPalette: IntArray by lazy {
         this.resources.getStringArray(R.array.colorPaletteArray).map { Color.parseColor(it) }.toIntArray()
