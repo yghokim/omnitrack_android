@@ -33,6 +33,8 @@ android {
             signingConfig signingConfigs.sign_test
         }
         debug {
+            applicationIdSuffix '.debug'
+            versionNameSuffix '-Debug'
         }
     }
     sourceSets {
