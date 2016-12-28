@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ui_new_attribute_panel"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/colorSecondary"
+    android:orientation="vertical">
+
+    <TextView
+        style="@style/SubTitleInverse"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="0dp"
+        android:layout_marginTop="0dp"
+        android:background="#10ffffff"
+        android:orientation="horizontal"
+        android:paddingBottom="12dp"
+        android:paddingStart="@dimen/activity_horizontal_margin"
+        android:paddingTop="12dp"
+        android:text="@string/msg_add_new_attribute" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/ui_new_attribute_grid"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:numColumns="5" />
+</LinearLayout>
