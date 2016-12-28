@@ -19,7 +19,7 @@
 
     <LinearLayout
         android:id="@+id/ui_content_container"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_toEndOf="@+id/ui_drag_handle"
         android:orientation="vertical">
@@ -28,6 +28,7 @@
             android:id="@+id/ui_attribute_card_header"
             android:layout_width="match_parent"
             android:layout_height="@dimen/attribute_list_element_header_height"
+            android:background="@drawable/bottom_separator_light_light"
             android:orientation="horizontal"
             android:paddingEnd="0dp">
 
@@ -91,13 +92,6 @@
                 android:tint="@color/textColorLight" />
 
         </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#dadada">
-
-        </View>
 
         <kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
             android:id="@+id/ui_preview_container"

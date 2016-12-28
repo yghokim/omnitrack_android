@@ -1,13 +1,11 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.tracker
 
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
-import android.support.design.widget.CoordinatorLayout
+import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
 import android.support.v4.widget.NestedScrollView
 import android.support.v7.widget.AppCompatImageView
-import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
@@ -17,7 +15,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
-import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import butterknife.bindView
@@ -25,7 +22,8 @@ import com.afollestad.materialdialogs.MaterialDialog
 import jp.wasabeef.recyclerview.animators.SlideInRightAnimator
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.attributes.*
+import kr.ac.snu.hcil.omnitrack.core.attributes.AttributePresetInfo
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.ui.DragItemTouchHelperCallback
 import kr.ac.snu.hcil.omnitrack.ui.components.common.FallbackRecyclerView
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
@@ -37,10 +35,6 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ShortTextPropert
 import kr.ac.snu.hcil.omnitrack.ui.pages.ConnectionIndicatorStubProxy
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeDetailActivity
 import kr.ac.snu.hcil.omnitrack.utils.startActivityOnDelay
-import rx.Observable
-import rx.android.schedulers.AndroidSchedulers
-import rx.schedulers.Schedulers
-import rx.subscriptions.CompositeSubscription
 
 /**
  * Created by Young-Ho Kim on 16. 7. 29
@@ -66,19 +60,12 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
 
     private lateinit var contentContainer: ViewGroup
 
-    private lateinit var newAttributePanel: ViewGroup
-
-    private lateinit var newAttributeGrid: RecyclerView
-
     private lateinit var removalSnackbar: Snackbar
+
+    private lateinit var newAttributeButton: FloatingActionButton
 
     private var scrollToBottomReserved = false
 
-    private var permissionWaitingTypeInfo: AttributePresetInfo? = null
-
-    private lateinit var gridAdapter: GridAdapter
-
-    private val subscriptions = CompositeSubscription()
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val rootView = inflater!!.inflate(R.layout.fragment_tracker_detail_structure, container, false)
@@ -86,7 +73,6 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
         rootScrollView = rootView.findViewById(R.id.scroll_root) as NestedScrollView
 
         contentContainer = rootView.findViewById(R.id.ui_content_container) as ViewGroup
-        newAttributePanel = rootView.findViewById(R.id.ui_new_attribute_panel) as ViewGroup
 
         namePropertyView = rootView.findViewById(R.id.nameProperty) as ShortTextPropertyView
         namePropertyView.addNewValidator("Name cannot be empty.", ShortTextPropertyView.NOT_EMPTY_VALIDATOR)
@@ -137,18 +123,23 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
         attributeListView.itemAnimator = SlideInRightAnimator()
         attributeListView.addItemDecoration(SpaceItemDecoration(LinearLayoutManager.VERTICAL, resources.getDimensionPixelOffset(R.dimen.attribute_list_element_vertical_space)))
 
-
-        newAttributeGrid = rootView.findViewById(R.id.ui_new_attribute_grid) as RecyclerView
-        newAttributeGrid.layoutManager = GridLayoutManager(context, resources.getInteger(R.integer.new_attribute_panel_horizontal_count))
-        gridAdapter = GridAdapter()
-        newAttributeGrid.adapter = gridAdapter
-
-
-        val snackBarContainer: CoordinatorLayout = rootView.findViewById(R.id.ui_snackbar_container) as CoordinatorLayout
-        removalSnackbar = Snackbar.make(snackBarContainer, resources.getText(R.string.msg_attribute_removed_message), Snackbar.LENGTH_LONG)
+        //val snackBarContainer: CoordinatorLayout = rootView.findViewById(R.id.ui_snackbar_container) as CoordinatorLayout
+        removalSnackbar = Snackbar.make(rootView, resources.getText(R.string.msg_attribute_removed_message), Snackbar.LENGTH_LONG)
         removalSnackbar.setAction(resources.getText(R.string.msg_undo)) {
             view ->
             attributeListAdapter.undoRemove()
+        }
+
+        newAttributeButton = rootView.findViewById(R.id.ui_button_new_attribute) as FloatingActionButton
+
+        newAttributeButton.setOnClickListener {
+            val newAttributePanel = FieldPresetSelectionBottomSheetFragment()
+            newAttributePanel.callback = object : FieldPresetSelectionBottomSheetFragment.Callback {
+                override fun onAttributePermittedToAdd(typeInfo: AttributePresetInfo) {
+                    addNewAttribute(typeInfo)
+                }
+            }
+            newAttributePanel.show(this@TrackerDetailStructureTabFragment.fragmentManager, newAttributePanel.tag)
         }
 
         return rootView
@@ -170,23 +161,7 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
         attributeListItemTouchHelper = ItemTouchHelper(DragItemTouchHelperCallback(attributeListAdapter, context, true, false))
         attributeListItemTouchHelper.attachToRecyclerView(attributeListView)
 
-        subscriptions.add(
-                Observable.defer { Observable.just(makeAttributePresets()) }
-                        .subscribeOn(Schedulers.newThread())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe {
-                            presets ->
-                            gridAdapter.presets = presets
-                            gridAdapter.notifyDataSetChanged()
-                        }
-        )
-
         refresh()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        subscriptions.clear()
     }
 
     fun refresh() {
@@ -249,9 +224,7 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
     }
 
     fun scrollToBottom() {
-        newAttributePanel.measure(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-        println(newAttributePanel.measuredHeight)
-        rootScrollView.scrollTo(0, contentContainer.measuredHeight - newAttributePanel.measuredHeight)
+        rootScrollView.scrollTo(0, contentContainer.measuredHeight)
     }
 
 
@@ -367,10 +340,12 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
                         .inputRangeRes(1, 20, R.color.colorRed)
                         .cancelable(true)
                         .negativeText(R.string.msg_cancel)
+
+                previewContainer.setOnClickListener(this)
             }
 
             override fun onClick(view: View) {
-                if (view === editButton) {
+                if (view === editButton || view === previewContainer) {
                     openAttributeDetailActivity(adapterPosition)
                 } else if (view === removeButton) {
                     removed = tracker.attributes[adapterPosition]
@@ -422,120 +397,5 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
 
         attributeListAdapter.notifyItemInserted(tracker.attributes.size - 1)
         scrollToBottomReserved = true
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
-        if (grantResults.filter { it != PackageManager.PERMISSION_GRANTED }.isEmpty()) {
-            //granted
-            if (permissionWaitingTypeInfo != null) {
-                addNewAttribute(permissionWaitingTypeInfo!!)
-                permissionWaitingTypeInfo = null
-            }
-        }
-    }
-
-    private fun makeAttributePresets(): Array<AttributePresetInfo> {
-        return arrayOf(
-                SimpleAttributePresetInfo(OTAttribute.TYPE_SHORT_TEXT, R.drawable.field_icon_shorttext, this.getString(R.string.type_shorttext_name), this.getString(R.string.type_shorttext_desc)),
-                SimpleAttributePresetInfo(OTAttribute.TYPE_LONG_TEXT, R.drawable.field_icon_longtext, this.getString(R.string.type_longtext_name), this.getString(R.string.type_longtext_desc)),
-                SimpleAttributePresetInfo(OTAttribute.TYPE_NUMBER, R.drawable.field_icon_number, this.getString(R.string.type_number_name), this.getString(R.string.type_number_desc)),
-                SimpleAttributePresetInfo(OTAttribute.TYPE_RATING, R.drawable.field_icon_rating, this.getString(R.string.type_rating_name), this.getString(R.string.type_rating_desc)),
-                //                SimpleAttributePresetInfo(OTAttribute.TYPE_TIME, R.drawable.field_icon_time, this.getString(R.string.type_timepoint_name), this.getString(R.string.type_timepoint_desc)),
-
-                AttributePresetInfo(OTAttribute.TYPE_TIME, R.drawable.field_icon_time_hour, this.getString(R.string.type_timepoint_time_name), this.getString(R.string.type_timepoint_time_desc),
-                        { user, columnName ->
-                            val attr = OTAttribute.createAttribute(user, columnName, OTAttribute.TYPE_TIME) as OTTimeAttribute
-                            attr.granularity = OTTimeAttribute.GRANULARITY_MINUTE
-                            attr
-                        }),
-
-                AttributePresetInfo(OTAttribute.TYPE_TIME, R.drawable.field_icon_time_date, this.getString(R.string.type_timepoint_date_name), this.getString(R.string.type_timepoint_date_desc),
-                        { user, columnName ->
-                            val attr = OTAttribute.createAttribute(user, columnName, OTAttribute.TYPE_TIME) as OTTimeAttribute
-                            attr.granularity = OTTimeAttribute.GRANULARITY_DAY
-                            attr
-                        }),
-
-                AttributePresetInfo(OTAttribute.TYPE_TIMESPAN, R.drawable.field_icon_timer, this.getString(R.string.type_timespan_name), this.getString(R.string.type_timespan_desc),
-                        { user, columnName ->
-                            (OTAttribute.createAttribute(user, columnName, OTAttribute.TYPE_TIMESPAN) as OTTimeSpanAttribute).apply {
-                                setPropertyValue(OTTimeSpanAttribute.PROPERTY_GRANULARITY, OTTimeSpanAttribute.GRANULARITY_MINUTE)
-                            }
-                        }),
-                SimpleAttributePresetInfo(OTAttribute.TYPE_TIMESPAN, R.drawable.field_icon_time_range_date, this.getString(R.string.type_timespan_date_name), this.getString(R.string.type_timespan_date_desc)),
-                SimpleAttributePresetInfo(OTAttribute.TYPE_LOCATION, R.drawable.field_icon_location, this.getString(R.string.type_location_name), this.getString(R.string.type_location_desc)),
-                SimpleAttributePresetInfo(OTAttribute.TYPE_IMAGE, R.drawable.field_icon_image, this.getString(R.string.type_image_name), this.getString(R.string.type_image_desc)),
-                SimpleAttributePresetInfo(OTAttribute.TYPE_AUDIO, R.drawable.field_icon_audio, this.getString(R.string.type_audio_record_name), this.getString(R.string.type_audio_record_desc)),
-
-                AttributePresetInfo(OTAttribute.TYPE_CHOICE, R.drawable.field_icon_singlechoice, this.getString(R.string.type_single_choice_name), this.getString(R.string.type_single_choice_desc),
-                        { user, columnName ->
-                            val attr = OTAttribute.createAttribute(user, columnName, OTAttribute.TYPE_CHOICE) as OTChoiceAttribute
-                            attr.allowedMultiSelection = false
-                            attr
-                        }),
-
-                AttributePresetInfo(OTAttribute.TYPE_CHOICE, R.drawable.field_icon_multiplechoice, this.getString(R.string.type_multiple_choices_name), this.getString(R.string.type_multiple_choices_desc),
-                        { user, columnName ->
-                            val attr = OTAttribute.createAttribute(user, columnName, OTAttribute.TYPE_CHOICE) as OTChoiceAttribute
-                            attr.allowedMultiSelection = true
-                            attr
-                        })
-
-        )
-    }
-
-
-    inner class GridAdapter() : RecyclerView.Adapter<GridAdapter.ViewHolder>() {
-
-        var presets: Array<AttributePresetInfo>? = null
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            val view = LayoutInflater.from(parent.context).inflate(R.layout.attribute_type_grid_element, parent, false)
-            return ViewHolder(view)
-        }
-
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            if (presets != null) {
-                holder.bind(presets!![position])
-            }
-        }
-
-        override fun getItemCount(): Int {
-            return presets?.size ?: 0
-        }
-
-        override fun getItemId(position: Int): Long {
-            return position.toLong()
-        }
-
-        inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-            val name: TextView
-            val typeIcon: ImageView
-
-            init {
-                name = view.findViewById(R.id.name) as TextView
-                typeIcon = view.findViewById(R.id.type_icon) as ImageView
-
-                view.setOnClickListener {
-                    val typeInfo = presets?.get(adapterPosition)
-                    if (typeInfo != null) {
-                        val requiredPermissions = OTAttribute.getPermissionsForAttribute(typeInfo.typeId)
-                        if (requiredPermissions != null) {
-                            permissionWaitingTypeInfo = typeInfo
-                            requestPermissions(requiredPermissions, 10)
-                        } else {
-                            addNewAttribute(typeInfo)
-                        }
-                    }
-                }
-            }
-
-            fun bind(entry: AttributePresetInfo) {
-                name.text = entry.name
-                typeIcon.setImageResource(entry.iconId)
-            }
-        }
     }
 }
