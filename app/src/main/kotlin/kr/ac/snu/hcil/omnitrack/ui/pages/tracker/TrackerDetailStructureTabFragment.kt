@@ -340,10 +340,12 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
                         .inputRangeRes(1, 20, R.color.colorRed)
                         .cancelable(true)
                         .negativeText(R.string.msg_cancel)
+
+                previewContainer.setOnClickListener(this)
             }
 
             override fun onClick(view: View) {
-                if (view === editButton) {
+                if (view === editButton || view === previewContainer) {
                     openAttributeDetailActivity(adapterPosition)
                 } else if (view === removeButton) {
                     removed = tracker.attributes[adapterPosition]
