@@ -21,11 +21,17 @@ class TrackerDetailReminderTabFragment : TrackerDetailActivity.ChildFragment() {
             override val emptyMessageId: Int = R.string.msg_reminder_empty
 
             override fun getTriggers(): Array<OTTrigger> {
-                return user?.triggerManager?.getAttachedTriggers(tracker, OTTrigger.ACTION_NOTIFICATION) ?: emptyArray()
+                if (trackerObjectId != null) {
+                    val tracker = user?.get(trackerObjectId!!)
+                    return if (tracker != null) {
+                        user?.triggerManager?.getAttachedTriggers(tracker, OTTrigger.ACTION_NOTIFICATION) ?: emptyArray()
+                    } else emptyArray()
+                } else return emptyArray()
             }
 
             override fun makeNewTriggerInstance(type: Int): OTTrigger {
-                return OTTrigger.makeInstance(type, "My Trigger", OTTrigger.ACTION_NOTIFICATION, user!!, tracker)
+                val tracker = user?.get(trackerObjectId!!)
+                return OTTrigger.makeInstance(type, "My Trigger", OTTrigger.ACTION_NOTIFICATION, user!!, tracker!!)
             }
 
             //TODO remove this to unlock data-driven trigger
@@ -36,6 +42,11 @@ class TrackerDetailReminderTabFragment : TrackerDetailActivity.ChildFragment() {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        core.refresh()
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         core.onSaveInstanceState(outState)
@@ -43,7 +54,6 @@ class TrackerDetailReminderTabFragment : TrackerDetailActivity.ChildFragment() {
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val rootView = core.onCreateView(inflater, container, savedInstanceState)
-
         return rootView
     }
 

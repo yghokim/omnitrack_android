@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.tracker
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
@@ -22,6 +23,7 @@ import com.afollestad.materialdialogs.MaterialDialog
 import jp.wasabeef.recyclerview.animators.SlideInRightAnimator
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.AttributePresetInfo
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.ui.DragItemTouchHelperCallback
@@ -35,6 +37,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ShortTextPropert
 import kr.ac.snu.hcil.omnitrack.ui.pages.ConnectionIndicatorStubProxy
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeDetailActivity
 import kr.ac.snu.hcil.omnitrack.utils.startActivityOnDelay
+import rx.subscriptions.CompositeSubscription
 
 /**
  * Created by Young-Ho Kim on 16. 7. 29
@@ -66,6 +69,9 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
 
     private var scrollToBottomReserved = false
 
+    private val subscriptions = CompositeSubscription()
+
+    private var tracker: OTTracker? = null
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val rootView = inflater!!.inflate(R.layout.fragment_tracker_detail_structure, container, false)
@@ -89,9 +95,9 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
         isOnShortcutPropertyView = rootView.findViewById(R.id.isOnShortcutProperty) as BooleanPropertyView
         isOnShortcutPropertyView.valueChanged += {
             sender, isOnShortcut ->
-            if (tracker.isOnShortcut != isOnShortcut) {
-                tracker.isOnShortcut = isOnShortcut
-                if (tracker.isOnShortcut) {
+            if (tracker?.isOnShortcut != isOnShortcut) {
+                tracker?.isOnShortcut = isOnShortcut
+                if (tracker?.isOnShortcut == true) {
                     toastForAdded.show()
                 } else {
                     toastForRemoved.show()
@@ -160,8 +166,6 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
 
         attributeListItemTouchHelper = ItemTouchHelper(DragItemTouchHelperCallback(attributeListAdapter, context, true, false))
         attributeListItemTouchHelper.attachToRecyclerView(attributeListView)
-
-        refresh()
     }
 
     fun refresh() {
@@ -172,9 +176,9 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
             namePropertyView.focus()
         }
 
-        namePropertyView.value = tracker.name
-        colorPropertyView.value = tracker.color
-        isOnShortcutPropertyView.value = tracker.isOnShortcut
+        namePropertyView.value = tracker?.name ?: ""
+        colorPropertyView.value = tracker?.color ?: Color.BLACK
+        isOnShortcutPropertyView.value = tracker?.isOnShortcut ?: false
 
         attributeListAdapter.notifyDataSetChanged()
     }
@@ -182,16 +186,37 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
 
     override fun onStart() {
         super.onStart()
-        if (activity.intent.hasExtra(TrackerDetailActivity.INTENT_KEY_FOCUS_ATTRIBUTE_ID)) {
-            val attrId = activity.intent.getStringExtra(TrackerDetailActivity.INTENT_KEY_FOCUS_ATTRIBUTE_ID)
-            for (attr in tracker.attributes.unObservedList.withIndex()) {
-                if (attr.value.objectId == attrId) {
-                    scrollToBottomReserved = true
-                    break
-                }
-            }
-        }
 
+        subscriptions.add(
+                OTApplication.app.currentUserObservable.subscribe {
+                    user ->
+                    if (trackerObjectId != null) {
+                        tracker = user[trackerObjectId!!]
+                    }
+
+                    val tracker = tracker
+                    tracker?.let {
+
+                        if (activity.intent.hasExtra(TrackerDetailActivity.INTENT_KEY_FOCUS_ATTRIBUTE_ID)) {
+                            val focusedAttributeId = activity.intent.getStringExtra(TrackerDetailActivity.INTENT_KEY_FOCUS_ATTRIBUTE_ID)
+
+                            for (attr in tracker.attributes.unObservedList) {
+                                if (attr.objectId == focusedAttributeId) {
+                                    scrollToBottomReserved = true
+                                    break
+                                }
+                            }
+                        }
+                    }
+
+                    refresh()
+                }
+        )
+    }
+
+    override fun onStop() {
+        super.onStop()
+        subscriptions.clear()
     }
 
     override fun onResume() {
@@ -202,11 +227,11 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
     override fun onPause() {
         super.onPause()
         if (namePropertyView.validate()) {
-            tracker.name = namePropertyView.value
+            tracker?.name = namePropertyView.value
         }
 
         if (colorPropertyView.validate()) {
-            tracker.color = colorPropertyView.value
+            tracker?.color = colorPropertyView.value
         }
     }
 
@@ -219,7 +244,7 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
 
     fun openAttributeDetailActivity(position: Int) {
         val intent = Intent(activity, AttributeDetailActivity::class.java)
-        intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ATTRIBUTE, tracker.attributes[position].objectId)
+        intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ATTRIBUTE, tracker?.attributes?.get(position)?.objectId)
         startActivityOnDelay(intent)
     }
 
@@ -242,20 +267,20 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.bindAttribute(tracker.attributes[position])
+            holder.bindAttribute(tracker!!.attributes[position])
         }
 
         override fun getItemCount(): Int {
-            return tracker.attributes.size
+            return tracker?.attributes?.size ?: 0
         }
 
         override fun getItemId(position: Int): Long {
-            return tracker.attributes[position].objectId.toLong()
+            return tracker?.attributes?.get(position)?.objectId?.toLong() ?: -1
         }
 
         fun undoRemove() {
             if (removed != null) {
-                tracker.attributes.addAt(removed!!, removedPosition)
+                tracker?.attributes?.addAt(removed!!, removedPosition)
                 notifyItemInserted(removedPosition)
             }
         }
@@ -265,7 +290,7 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
         }
 
         override fun onMoveItem(fromPosition: Int, toPosition: Int) {
-            tracker.attributes.moveItem(fromPosition, toPosition)
+            tracker?.attributes?.moveItem(fromPosition, toPosition)
             notifyItemMoved(fromPosition, toPosition)
         }
 
@@ -348,20 +373,26 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
                 if (view === editButton || view === previewContainer) {
                     openAttributeDetailActivity(adapterPosition)
                 } else if (view === removeButton) {
-                    removed = tracker.attributes[adapterPosition]
-                    removedPosition = adapterPosition
-                    tracker.attributes.remove(tracker.attributes[adapterPosition])
-                    notifyItemRemoved(adapterPosition)
-                    showRemovalSnackbar()
+                    val tracker = tracker
+                    tracker?.let {
+                        removed = tracker.attributes[adapterPosition]
+                        removedPosition = adapterPosition
+                        tracker.attributes.remove(tracker.attributes[adapterPosition])
+                        notifyItemRemoved(adapterPosition)
+                        showRemovalSnackbar()
+                    }
                 } else if (view === columnNameButton) {
-                    columnNameChangeDialog
-                            .input(null, tracker.attributes[adapterPosition].name, false) {
-                                dialog, input ->
-                                if (tracker.attributes[adapterPosition].name.compareTo(input.toString()) != 0) {
-                                    tracker.attributes[adapterPosition].name = input.toString()
-                                    attributeListAdapter.notifyItemChanged(adapterPosition)
-                                }
-                            }.show()
+                    val tracker = tracker
+                    tracker?.let {
+                        columnNameChangeDialog
+                                .input(null, tracker?.attributes[adapterPosition].name, false) {
+                                    dialog, input ->
+                                    if (tracker.attributes[adapterPosition].name.compareTo(input.toString()) != 0) {
+                                        tracker.attributes[adapterPosition].name = input.toString()
+                                        attributeListAdapter.notifyItemChanged(adapterPosition)
+                                    }
+                                }.show()
+                    }
                 }
             }
 
@@ -392,10 +423,13 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
     }
 
     protected fun addNewAttribute(typeInfo: AttributePresetInfo) {
-        val newAttribute = typeInfo.creater(OTApplication.app.currentUser, tracker.generateNewAttributeName(typeInfo.name, context))
-        tracker.attributes.add(newAttribute)
+        val tracker = tracker
+        tracker?.let {
+            val newAttribute = typeInfo.creater(OTApplication.app.currentUser, tracker.generateNewAttributeName(typeInfo.name, context))
+            tracker.attributes.add(newAttribute)
 
-        attributeListAdapter.notifyItemInserted(tracker.attributes.size - 1)
-        scrollToBottomReserved = true
+            attributeListAdapter.notifyItemInserted(tracker.attributes.size - 1)
+            scrollToBottomReserved = true
+        }
     }
 }
