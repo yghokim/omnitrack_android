@@ -10,7 +10,6 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
 import android.support.v4.view.ViewPager
-import android.view.View
 import at.markushi.ui.RevealColorView
 import butterknife.bindView
 import com.google.gson.JsonObject
@@ -103,11 +102,6 @@ class TrackerDetailActivity : OTTrackerAttachedActivity(R.layout.activity_tracke
 
     override fun onPause(){
         super.onPause()
-        /*
-        for(child in childFragments)
-        {
-            child.value.onClose()
-        }*/
 
         OTApplication.app.syncUserToDb()
     }
@@ -173,36 +167,22 @@ class TrackerDetailActivity : OTTrackerAttachedActivity(R.layout.activity_tracke
     abstract class ChildFragment : OTFragment() {
         protected var isEditMode = false
             private set
-        protected lateinit var tracker: OTTracker
+
+        protected var trackerObjectId: String? = null
             private set
 
-        override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
-            super.onViewCreated(view, savedInstanceState)
-
+        override fun onStart() {
+            super.onStart()
             val args = arguments
-            val trackerObjectId = args.getString(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
+            trackerObjectId = args.getString(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
 
             isEditMode = args.getBoolean(IS_EDIT_MODE, true)
-            if (trackerObjectId != null) {
-                tracker = OTApplication.app.currentUser[trackerObjectId]!!
-            }
+
+            println(trackerObjectId)
         }
     }
 
     inner class SectionsPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
-
-        /*
-        override fun instantiateItem(container: ViewGroup?, position: Int): Any {
-            val fragment = super.instantiateItem(container, position) as IChild
-            childFragments[position] = fragment
-            fragment.init(tracker, isEditMode)
-            return fragment
-        }
-
-        override fun destroyItem(container: ViewGroup?, position: Int, `object`: Any?) {
-            childFragments.remove(position)
-            super.destroyItem(container, position, `object`)
-        }*/
 
         override fun getItem(position: Int): Fragment {
 

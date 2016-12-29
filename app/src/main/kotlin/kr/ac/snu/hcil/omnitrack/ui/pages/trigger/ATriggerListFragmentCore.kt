@@ -106,6 +106,10 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
         )
     }
 
+    fun refresh() {
+        adapter.notifyDataSetChanged()
+    }
+
     fun onDestroyView() {
         subscriptions.clear()
         adapter.unSubscribeAll()
