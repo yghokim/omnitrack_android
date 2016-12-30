@@ -29,6 +29,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDivider
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.pages.ConnectionIndicatorStubProxy
 import rx.Observable
+import rx.subscriptions.CompositeSubscription
 import java.util.*
 
 /**
@@ -86,6 +87,11 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
 
     private var itemSaved: Boolean = false
 
+    private val createSubscriptions = CompositeSubscription()
+    private val startSubscriptions = CompositeSubscription()
+
+
+
     override fun onSessionLogContent(contentObject: JsonObject) {
         super.onSessionLogContent(contentObject)
         contentObject.addProperty("mode", mode.name)
@@ -107,9 +113,11 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
         builderRestoredSnackbar.setAction(resources.getText(R.string.msg_clear_form)) {
             view ->
             builder = OTItemBuilder(tracker!!, OTItemBuilder.MODE_FOREGROUND)
-            builder.autoComplete(this) {
-                //attributeListAdapter.notifyDataSetChanged()
-            }
+
+            createSubscriptions.add(
+                    builder.autoComplete(this)
+            )
+
             builderRestoredSnackbar.dismiss()
         }
     }
@@ -145,10 +153,9 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
                 builderRestoredSnackbar.show()
             } else {
                 //new builder was created
-                //TODO make it as a AcyncTask and update each attribute immediately
-                builder.autoComplete(this) {
-                    //attributeListAdapter.notifyDataSetChanged()
-                }
+                startSubscriptions.add(
+                        builder.autoComplete(this)
+                )
             }
         }
     }
@@ -194,6 +201,15 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
         for (inputView in attributeListAdapter.inputViews) {
             inputView.onDestroy()
         }
+
+        println("createSubscriptions has subscriptoin: ${createSubscriptions.hasSubscriptions()}")
+        createSubscriptions.clear()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        println("startSubscriptions has subscriptoin: ${startSubscriptions.hasSubscriptions()}")
+        startSubscriptions.clear()
     }
 
     override fun onLowMemory() {
