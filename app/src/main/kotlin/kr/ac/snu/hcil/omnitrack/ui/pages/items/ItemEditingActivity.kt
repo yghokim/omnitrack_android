@@ -310,8 +310,14 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
                 storedBuilder.setValueOf(tracker.attributes[activityResultAppliedAttributePosition],
                         builder.getValueInformationOf(tracker.attributes[activityResultAppliedAttributePosition])!!.value)
             }*/
-            builder = storedBuilder
-            return true
+            if (storedBuilder == null) {
+                println("new ItemBuilder created.")
+                builder = OTItemBuilder(tracker, OTItemBuilder.MODE_FOREGROUND)
+                return false
+            } else {
+                builder = storedBuilder
+                return true
+            }
         } catch(e: Exception) {
             e.printStackTrace()
             println("deserialization failed. make new itemBuilder.")

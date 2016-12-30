@@ -26,7 +26,17 @@ class OTChoiceEntryListProperty(key: Int, title: String) : OTProperty<UniqueStri
     }
 
     override fun parseValue(serialized: String): UniqueStringEntryList {
-        return UniqueStringEntryList(serialized)
+        try {
+            return UniqueStringEntryList.parser.fromJson(serialized, UniqueStringEntryList::class.java)
+        } catch(e: Exception) {
+            println("UniqueStringEntryList parse error")
+            println(e)
+            try {
+                return UniqueStringEntryList(serialized)
+            } catch(e2: Exception) {
+                return UniqueStringEntryList(PREVIEW_ENTRIES)
+            }
+        }
     }
 
     override fun onBuildView(context: Context): APropertyView<UniqueStringEntryList> {

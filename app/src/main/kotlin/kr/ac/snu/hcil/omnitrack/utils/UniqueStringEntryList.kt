@@ -1,6 +1,10 @@
 package kr.ac.snu.hcil.omnitrack.utils
 
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.TypeAdapter
+import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonWriter
 import kr.ac.snu.hcil.omnitrack.utils.serialization.IStringSerializable
 import java.util.*
 
@@ -8,6 +12,62 @@ import java.util.*
  * Created by younghokim on 16. 8. 22..
  */
 class UniqueStringEntryList : IStringSerializable {
+
+    companion object {
+        val parser: Gson by lazy {
+            GsonBuilder().registerTypeAdapter(UniqueStringEntryList::class.java, UniqueStringEntryListTypeAdapter()).create()
+        }
+    }
+
+
+    internal class UniqueStringEntryListTypeAdapter : TypeAdapter<UniqueStringEntryList>() {
+        override fun read(input: JsonReader): UniqueStringEntryList {
+
+            val result = UniqueStringEntryList()
+
+            input.beginObject()
+
+            input.nextName()
+            result.increment = input.nextInt()
+
+            input.nextName()
+            input.beginArray()
+            while (input.hasNext()) {
+                input.beginObject()
+                input.nextName()
+                val id = input.nextInt()
+                input.nextName()
+                val value = input.nextString()
+                input.endObject()
+
+                result.list.add(Entry(id, value))
+            }
+            input.endArray()
+            input.endObject()
+
+
+
+            return result
+        }
+
+        override fun write(out: JsonWriter, value: UniqueStringEntryList) {
+            out.beginObject()
+            out.name("i").value(value.increment)
+            out.name("e").beginArray()
+
+            value.list.forEach {
+                out.beginObject()
+                out.name("i").value(it.id)
+                out.name("v").value(it.text)
+                out.endObject()
+            }
+
+            out.endArray()
+            out.endObject()
+        }
+
+    }
+
 
     private data class SerializationParcel(val increment: Int, val entries: Array<Entry>)
 
@@ -92,7 +152,8 @@ class UniqueStringEntryList : IStringSerializable {
     }
 
     override fun getSerializedString(): String {
-        return Gson().toJson(SerializationParcel(increment, list.toTypedArray()))
+        //return Gson().toJson(SerializationParcel(increment, list.toTypedArray()))
+        return parser.toJson(this)
     }
 
 
@@ -105,7 +166,8 @@ class UniqueStringEntryList : IStringSerializable {
     }
 
     fun clone(): UniqueStringEntryList {
-        return UniqueStringEntryList(increment, list)
+        val newList = list.map { Entry(it.id, it.text) }
+        return UniqueStringEntryList(increment, newList)
     }
 
     operator fun iterator(): MutableIterator<Entry> {
