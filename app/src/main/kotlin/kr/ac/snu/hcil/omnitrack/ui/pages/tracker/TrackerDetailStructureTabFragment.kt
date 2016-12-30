@@ -73,6 +73,18 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
 
     private var tracker: OTTracker? = null
 
+    private val newAttributePanel: FieldPresetSelectionBottomSheetFragment by lazy {
+
+        val newAttributePanel = FieldPresetSelectionBottomSheetFragment()
+        newAttributePanel.callback = object : FieldPresetSelectionBottomSheetFragment.Callback {
+            override fun onAttributePermittedToAdd(typeInfo: AttributePresetInfo) {
+                addNewAttribute(typeInfo)
+            }
+        }
+
+        newAttributePanel
+    }
+
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val rootView = inflater!!.inflate(R.layout.fragment_tracker_detail_structure, container, false)
 
@@ -139,12 +151,6 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
         newAttributeButton = rootView.findViewById(R.id.ui_button_new_attribute) as FloatingActionButton
 
         newAttributeButton.setOnClickListener {
-            val newAttributePanel = FieldPresetSelectionBottomSheetFragment()
-            newAttributePanel.callback = object : FieldPresetSelectionBottomSheetFragment.Callback {
-                override fun onAttributePermittedToAdd(typeInfo: AttributePresetInfo) {
-                    addNewAttribute(typeInfo)
-                }
-            }
             newAttributePanel.show(this@TrackerDetailStructureTabFragment.fragmentManager, newAttributePanel.tag)
         }
 
