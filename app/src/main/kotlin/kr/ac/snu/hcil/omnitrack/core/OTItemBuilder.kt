@@ -12,6 +12,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.utils.serialization.IStringSerializable
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Observable
+import rx.Subscription
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 import java.util.*
@@ -311,9 +312,9 @@ class OTItemBuilder : Parcelable, IStringSerializable {
         return attributeStateList[position]
     }
 
-    fun autoComplete(onAttributeStateChangedListener: AttributeStateChangedListener? = null, finished: (() -> Unit)? = null) {
+    fun autoComplete(onAttributeStateChangedListener: AttributeStateChangedListener? = null, finished: (() -> Unit)? = null): Subscription {
 
-        Observable.merge(tracker.attributes.unObservedList.mapIndexed { i, attr ->
+        return Observable.merge(tracker.attributes.unObservedList.mapIndexed { i, attr ->
             if (attr.valueConnection != null) {
                 Observable.create<Pair<Int, Any>> {
                     subscriber ->
