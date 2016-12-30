@@ -11,23 +11,30 @@ import kr.ac.snu.hcil.omnitrack.utils.UniqueStringEntryList
  */
 class ChoiceEntryListPropertyView(context: Context, attrs: AttributeSet?) : APropertyView<UniqueStringEntryList>(R.layout.component_property_choice_entry_list, context, attrs), ChoiceEntryListEditor.IListEditedListener {
 
-    private val valueView: ChoiceEntryListEditor
+    private val valueView: ChoiceEntryListEditor = findViewById(R.id.value) as ChoiceEntryListEditor
+
+    private var cache: UniqueStringEntryList? = null
 
     override var value: UniqueStringEntryList
-        get() = valueView.getNotBlankEntryList()
+        get() {
+            if (cache == null) {
+                cache = valueView.getNotBlankEntryList()
+            }
+            return cache!!
+        }
         set(value) {
             valueView.setEntryList(value)
         }
 
     init {
-        valueView = findViewById(R.id.value) as ChoiceEntryListEditor
         useIntrinsicPadding = true
 
         valueView.addListEditedListener(this)
     }
 
     override fun onContentEdited(editor: ChoiceEntryListEditor) {
-        onValueChanged(editor.getNotBlankEntryList())
+        cache = null
+        onValueChanged(value)
     }
 
     override fun focus() {
