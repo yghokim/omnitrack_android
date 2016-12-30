@@ -25,15 +25,6 @@ class OTChoiceAttribute(objectId: String?, dbId: Long?, columnName: String, isRe
     companion object {
         const val PROPERTY_MULTISELECTION = 0
         const val PROPERTY_ENTRIES = 1
-
-        val PREVIEW_ENTRIES: Array<UniqueStringEntryList.Entry>
-
-        init {
-            PREVIEW_ENTRIES = OTApplication.app.resources.getStringArray(R.array.choice_preview_entries).mapIndexed {
-                i, s ->
-                UniqueStringEntryList.Entry(i, s)
-            }.toTypedArray()
-        }
     }
 
     override val propertyKeys: IntArray = intArrayOf(PROPERTY_MULTISELECTION, PROPERTY_ENTRIES)
@@ -67,7 +58,7 @@ class OTChoiceAttribute(objectId: String?, dbId: Long?, columnName: String, isRe
         set(value) = setPropertyValue(PROPERTY_ENTRIES, value)
 
     init {
-        entries = UniqueStringEntryList(PREVIEW_ENTRIES)
+        //entries = UniqueStringEntryList(PREVIEW_ENTRIES)
     }
 
     override fun createProperties() {
@@ -143,7 +134,7 @@ class OTChoiceAttribute(objectId: String?, dbId: Long?, columnName: String, isRe
         val inputView = super.getInputView(context, previewMode, recycledView)
         if (inputView is ChoiceInputView) {
             if (inputView.entries.isEmpty()) {
-                inputView.entries = PREVIEW_ENTRIES
+                inputView.entries = OTChoiceEntryListProperty.PREVIEW_ENTRIES
             }
         }
 

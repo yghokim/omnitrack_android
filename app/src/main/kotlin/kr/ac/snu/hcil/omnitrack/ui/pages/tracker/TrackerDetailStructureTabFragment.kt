@@ -249,7 +249,7 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
     }
 
     fun scrollToBottom() {
-        rootScrollView.scrollTo(0, contentContainer.measuredHeight)
+        rootScrollView.smoothScrollTo(0, contentContainer.measuredHeight)
     }
 
 
