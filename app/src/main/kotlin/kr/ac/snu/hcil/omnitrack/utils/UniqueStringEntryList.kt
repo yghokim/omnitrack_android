@@ -83,6 +83,8 @@ class UniqueStringEntryList : IStringSerializable {
 
     override fun fromSerializedString(serialized: String): Boolean {
         val parcel = Gson().fromJson(serialized, SerializationParcel::class.java)
+        println("deserializing ustentrylist")
+        println(parcel.entries)
         increment = parcel.increment
         list.addAll(parcel.entries)
 
