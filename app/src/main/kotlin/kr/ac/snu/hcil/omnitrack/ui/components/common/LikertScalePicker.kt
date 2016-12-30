@@ -7,6 +7,7 @@ import android.text.Layout
 import android.text.StaticLayout
 import android.text.TextPaint
 import android.util.AttributeSet
+import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
 import kr.ac.snu.hcil.omnitrack.OTApplication
@@ -17,7 +18,7 @@ import kotlin.properties.Delegates
 /**
  * Created by Young-Ho Kim on 2016-09-23.
  */
-class LikertScalePicker : View {
+class LikertScalePicker : View, GestureDetector.OnGestureListener {
 
     var leftMost: Int by Delegates.observable(1) {
         prop, old, new ->
@@ -112,6 +113,14 @@ class LikertScalePicker : View {
     private val boundRect = Rect()
     private val boxRect = RectF()
 
+    private val touchSlop = 30
+
+    private var touchDownX = 0f
+
+    private var isDragging = false
+
+    private val gestureDetector: GestureDetector
+
     init {
         valueBoxHorizontalPadding = resources.getDimension(R.dimen.likert_scale_value_box_padding_horizontal)
         valueBoxVerticalPadding = resources.getDimension(R.dimen.likert_scale_value_box_padding_vertical)
@@ -161,6 +170,8 @@ class LikertScalePicker : View {
         labelTextPaint.textSize = labelTextSize
         labelTextPaint.isFakeBoldText = true
         labelTextPaint.color = ContextCompat.getColor(context, R.color.textColorMid)
+
+        gestureDetector = GestureDetector(context, this)
     }
 
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
@@ -279,28 +290,47 @@ class LikertScalePicker : View {
         return getSnappedValue((rightMost - leftMost) * ((x - _lineLeft) / (_lineRight - _lineLeft)) + leftMost)
     }
 
-
-    override fun dispatchTouchEvent(event: MotionEvent): Boolean {
-
-        if (event.action == MotionEvent.ACTION_DOWN) {
-            parent.requestDisallowInterceptTouchEvent(true)
-        } else if (event.action == MotionEvent.ACTION_CANCEL || event.action == MotionEvent.ACTION_UP) {
-            parent.requestDisallowInterceptTouchEvent(false)
-        }
-        return super.dispatchTouchEvent(event)
+    override fun onSingleTapUp(p0: MotionEvent): Boolean {
+        handleTouchEvent(p0)
+        return true
     }
 
+    override fun onDown(p0: MotionEvent?): Boolean {
+        return true
+    }
+
+    override fun onFling(p0: MotionEvent?, p1: MotionEvent?, p2: Float, p3: Float): Boolean {
+        return true
+    }
+
+    override fun onScroll(p0: MotionEvent?, p1: MotionEvent?, p2: Float, p3: Float): Boolean {
+        return true
+    }
+
+    override fun onShowPress(p0: MotionEvent?) {
+    }
+
+    override fun onLongPress(p0: MotionEvent?) {
+    }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
+        gestureDetector.onTouchEvent(event)
         if (event.action == MotionEvent.ACTION_DOWN) {
-            handleTouchEvent(event)
-
+            touchDownX = event.x
             return true
         } else if (event.action == MotionEvent.ACTION_MOVE) {
-
-            handleTouchEvent(event)
+            if (isDragging) {
+                handleTouchEvent(event)
+            } else {
+                val x = event.x
+                if (Math.abs(x - touchDownX) > touchSlop) {
+                    isDragging = true
+                    parent.requestDisallowInterceptTouchEvent(true)
+                }
+            }
             return true
         } else if (event.action == MotionEvent.ACTION_UP) {
+            isDragging = false
             return true
         }
 
