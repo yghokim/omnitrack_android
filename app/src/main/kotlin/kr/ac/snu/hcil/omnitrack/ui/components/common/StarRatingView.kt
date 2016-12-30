@@ -1,7 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.common
 
 import android.content.Context
-import android.graphics.PointF
 import android.graphics.drawable.Drawable
 import android.support.v4.content.ContextCompat
 import android.util.AttributeSet
@@ -15,8 +14,6 @@ import kotlin.properties.Delegates
  * Created by Young-Ho Kim on 2016-09-06.
  */
 class StarRatingView : HorizontalLinearDrawableView, GestureDetector.OnGestureListener {
-
-    private val moveAmount: PointF = PointF()
 
     private val touchSlop = 30
 
@@ -112,8 +109,6 @@ class StarRatingView : HorizontalLinearDrawableView, GestureDetector.OnGestureLi
                 return true
             } else if (event.action == MotionEvent.ACTION_UP || event.action == MotionEvent.ACTION_CANCEL) {
                 dragging = false
-                moveAmount.x = 0f
-                moveAmount.y = 0f
                 return true
             }
         }
