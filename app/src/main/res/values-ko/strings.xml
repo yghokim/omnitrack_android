@@ -188,6 +188,7 @@
     <string name="msg_tracker_list_stat_total">전체</string>
 
     <string name="msg_attach">트래커에 추가</string>
+    <string name="msg_service_activating">활성화중…</string>
 
 
     <string-array name="choice_preview_entries">

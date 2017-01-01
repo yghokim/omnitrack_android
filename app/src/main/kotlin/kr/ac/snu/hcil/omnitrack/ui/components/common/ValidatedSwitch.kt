@@ -1,18 +1,17 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.common
 
 import android.content.Context
-import android.support.v7.widget.SwitchCompat
 import android.util.AttributeSet
 import java.util.*
 
 /**
  * Created by Young-Ho Kim on 2016-08-12.
  */
-class ValidatedSwitch : SwitchCompat {
+class ValidatedSwitch : SwipelessSwitchCompat {
 
     interface IValidationListener {
-        fun onValidationFailed(switch: SwitchCompat, on: Boolean)
-        fun onValidationSucceeded(switch: SwitchCompat, on: Boolean)
+        fun onValidationFailed(switch: SwipelessSwitchCompat, on: Boolean)
+        fun onValidationSucceeded(switch: SwipelessSwitchCompat, on: Boolean)
     }
 
     constructor(context: Context?) : super(context)
@@ -21,6 +20,13 @@ class ValidatedSwitch : SwitchCompat {
 
     var switchOffValidator: (() -> Boolean)? = null
     var switchOnValidator: (() -> Boolean)? = null
+
+    init {
+        isClickable = false
+        setOnClickListener {
+            toggle()
+        }
+    }
 
     private val listeners = ArrayList<IValidationListener>()
 
