@@ -11,111 +11,103 @@
         android:id="@+id/ui_drag_handle"
         android:layout_width="@dimen/attribute_list_element_drag_area_width"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/ui_content_container"
-        android:layout_alignParentTop="true"
+        android:layout_centerVertical="true"
         android:padding="12dp"
         android:scaleType="fitCenter"
         android:src="@drawable/drag_handle" />
 
     <LinearLayout
-        android:id="@+id/ui_content_container"
+        android:id="@+id/ui_attribute_card_header"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/attribute_list_element_header_height"
         android:layout_toEndOf="@+id/ui_drag_handle"
-        android:orientation="vertical">
+        android:background="@drawable/bottom_separator_light_light"
+        android:orientation="horizontal"
+        android:paddingEnd="0dp">
+
+        <android.support.v7.widget.AppCompatImageView
+            android:id="@+id/ui_attribute_type"
+            android:layout_width="@dimen/attribute_list_element_header_type_icon_width"
+            android:layout_height="@dimen/attribute_list_element_header_height"
+            android:paddingBottom="@dimen/attribute_list_element_header_type_icon_padding"
+            android:paddingTop="@dimen/attribute_list_element_header_type_icon_padding"
+            android:src="@drawable/icon_small_location"
+            android:tint="@color/titleTextColor" />
 
         <LinearLayout
-            android:id="@+id/ui_attribute_card_header"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/attribute_list_element_header_height"
-            android:background="@drawable/bottom_separator_light_light"
-            android:orientation="horizontal"
-            android:paddingEnd="0dp">
+            android:id="@+id/ui_column_name_button"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/transparent_button_background"
+            android:orientation="horizontal">
 
-            <android.support.v7.widget.AppCompatImageView
-                android:id="@+id/ui_attribute_type"
-                android:layout_width="@dimen/attribute_list_element_header_type_icon_width"
-                android:layout_height="@dimen/attribute_list_element_header_height"
-                android:paddingBottom="@dimen/attribute_list_element_header_type_icon_padding"
-                android:paddingTop="@dimen/attribute_list_element_header_type_icon_padding"
-                android:src="@drawable/icon_small_location"
-                android:tint="@color/titleTextColor" />
-
-            <LinearLayout
-                android:id="@+id/ui_column_name_button"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@drawable/transparent_button_background"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/ui_column_name"
-                    style="@style/AttributeDetailFieldName"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginLeft="7dp"
-                    android:clickable="false"
-                    android:text="Column Name" />
-
-                <android.support.v7.widget.AppCompatImageView
-                    android:id="@+id/ui_required_marker"
-                    android:layout_width="12dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="2.5dp"
-                    android:layout_marginTop="5dp"
-                    android:clickable="false"
-                    android:src="@drawable/icon_asterisk"
-                    android:tint="@color/colorAccent" />
-            </LinearLayout>
-
-
-            <ImageButton
-                android:id="@+id/ui_button_edit"
-                android:layout_width="@dimen/attribute_list_element_header_height"
-                android:layout_height="match_parent"
-                android:background="@drawable/transparent_button_background"
-                android:padding="@dimen/attribute_list_element_edit_padding"
-                android:scaleType="fitCenter"
-                android:src="@drawable/edit_dark"
-                android:tint="@color/textColorLight" />
-
-            <ImageButton
-                android:id="@+id/ui_button_remove"
-                android:layout_width="@dimen/attribute_list_element_header_height"
-                android:layout_height="match_parent"
-                android:background="@drawable/transparent_button_background"
-                android:padding="@dimen/attribute_list_element_remove_padding"
-                android:scaleType="fitCenter"
-                android:src="@drawable/icon_ex_big"
-                android:tint="@color/textColorLight" />
-
-        </LinearLayout>
-
-        <kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
-            android:id="@+id/ui_preview_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-
-            android:minHeight="15dp"
-            android:paddingBottom="@dimen/activity_vertical_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin"
-            android:paddingTop="@dimen/activity_vertical_margin" />
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <ViewStub
-                android:id="@+id/ui_connection_indicator_stub"
+            <TextView
+                android:id="@+id/ui_column_name"
+                style="@style/AttributeDetailFieldName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="left"
-                android:layout_marginBottom="@dimen/activity_vertical_margin"
-                android:inflatedId="@+id/ui_connection_indicator"
-                android:layout="@layout/layout_connection_indicator_light" />
-        </FrameLayout>
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="7dp"
+                android:clickable="false"
+                android:text="Column Name" />
+
+            <android.support.v7.widget.AppCompatImageView
+                android:id="@+id/ui_required_marker"
+                android:layout_width="12dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="2.5dp"
+                android:layout_marginTop="5dp"
+                android:clickable="false"
+                android:src="@drawable/icon_asterisk"
+                android:tint="@color/colorAccent" />
+        </LinearLayout>
+
+
+        <ImageButton
+            android:id="@+id/ui_button_edit"
+            android:layout_width="@dimen/attribute_list_element_header_height"
+            android:layout_height="match_parent"
+            android:background="@drawable/transparent_button_background"
+            android:padding="@dimen/attribute_list_element_edit_padding"
+            android:scaleType="fitCenter"
+            android:src="@drawable/edit_dark"
+            android:tint="@color/textColorLight" />
+
+        <ImageButton
+            android:id="@+id/ui_button_remove"
+            android:layout_width="@dimen/attribute_list_element_header_height"
+            android:layout_height="match_parent"
+            android:background="@drawable/transparent_button_background"
+            android:padding="@dimen/attribute_list_element_remove_padding"
+            android:scaleType="fitCenter"
+            android:src="@drawable/icon_ex_big"
+            android:tint="@color/textColorLight" />
 
     </LinearLayout>
+
+    <kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
+        android:id="@+id/ui_preview_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:layout_below="@+id/ui_attribute_card_header"
+        android:layout_toEndOf="@+id/ui_drag_handle"
+
+        android:minHeight="15dp"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin" />
+
+    <ViewStub
+        android:id="@+id/ui_connection_indicator_stub"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ui_preview_container"
+        android:layout_gravity="left"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:layout_toEndOf="@+id/ui_drag_handle"
+        android:inflatedId="@+id/ui_connection_indicator"
+        android:layout="@layout/layout_connection_indicator_light" />
+
 </RelativeLayout>

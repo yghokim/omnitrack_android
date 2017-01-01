@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.SwitchCompat
 import android.transition.TransitionManager
 import android.util.SparseArray
 import android.view.LayoutInflater
@@ -18,6 +17,7 @@ import com.afollestad.materialdialogs.MaterialDialog
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
+import kr.ac.snu.hcil.omnitrack.ui.components.common.ManualSwitch
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
@@ -101,7 +101,7 @@ class ServiceListFragment : OTFragment() {
             val nameView: TextView
             val descriptionView: TextView
 
-            val activationButton: SwitchCompat
+            val activationButton: ManualSwitch
             val progressBar: ProgressBar
 
             val activationSwitchGroup: ViewGroup
@@ -135,7 +135,7 @@ class ServiceListFragment : OTFragment() {
 
                 activationIndicator = view.findViewById(R.id.ui_activation_indicator_text) as TextView
 
-                activationButton = view.findViewById(R.id.ui_button_activate) as SwitchCompat
+                activationButton = view.findViewById(R.id.ui_button_activate) as ManualSwitch
 
                 activationSwitchGroup.setOnClickListener {
                     val service = getService(adapterPosition)

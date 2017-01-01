@@ -10,7 +10,6 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.widget.AppCompatImageButton
 import android.support.v7.widget.AppCompatImageView
 import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.SwitchCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,6 +23,7 @@ import com.badoo.mobile.util.WeakHandler
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
+import kr.ac.snu.hcil.omnitrack.ui.components.common.SwipelessSwitchCompat
 import kr.ac.snu.hcil.omnitrack.ui.components.common.ValidatedSwitch
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
@@ -441,7 +441,7 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
 
     protected abstract fun validateExpandedViewInputs(expandedView: View, errorMessagesOut: MutableList<String>): Boolean
 
-    override fun onValidationFailed(switch: SwitchCompat, on: Boolean) {
+    override fun onValidationFailed(switch: SwipelessSwitchCompat, on: Boolean) {
         if (switch === triggerSwitch && on == true) {
             onSwitchOnValidationFailed()
         }
@@ -463,7 +463,7 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
         }
     }
 
-    override fun onValidationSucceeded(switch: SwitchCompat, on: Boolean) {
+    override fun onValidationSucceeded(switch: SwipelessSwitchCompat, on: Boolean) {
     }
 
     override fun onClick(view: View?) {

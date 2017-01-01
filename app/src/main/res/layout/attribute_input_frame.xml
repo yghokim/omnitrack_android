@@ -81,13 +81,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <RelativeLayout
+        <FrameLayout
             android:id="@+id/sidebar"
             android:layout_width="?attr/actionBarSize"
             android:layout_height="match_parent"
             android:layout_alignBottom="@+id/ui_content_container">
 
-        </RelativeLayout>
+        </FrameLayout>
 
         <LinearLayout
             android:id="@+id/ui_content_container"
