@@ -69,7 +69,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:paddingEnd="@dimen/service_list_element_horizontal_padding"
-                android:text="Activating..."
+                android:text="@string/msg_service_activating"
                 android:visibility="gone" />
 
             <kr.ac.snu.hcil.omnitrack.ui.components.common.ManualSwitch

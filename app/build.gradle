@@ -11,7 +11,7 @@ android {
                 storePassword RELEASE_STORE_PASSWORD
             }
             catch (ex) {
-                throw new InvalidUserDataException("You should define RELASE_KEYSTORE_LOCATION RELEASE_ALIAS, RELEASE_KEY_PASSWORD, RELASE_STORE_PASSWORD in gradle.properties.")
+                throw new InvalidUserDataException("You should define RELEASE_KEYSTORE_LOCATION RELEASE_ALIAS, RELEASE_KEY_PASSWORD, RELEASE_STORE_PASSWORD in gradle.properties.")
             }
         }
     }
