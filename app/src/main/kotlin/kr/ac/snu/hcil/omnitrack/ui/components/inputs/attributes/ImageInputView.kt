@@ -32,12 +32,11 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
             picker.imageUri = value
         }
 
-    private val picker: ImagePicker
+    private val picker: ImagePicker = findViewById(R.id.ui_image_picker) as ImagePicker
 
     private var cameraCacheUri: Uri? = null
 
     init {
-        picker = findViewById(R.id.ui_image_picker) as ImagePicker
         picker.callback = this
 
         picker.uriChanged += {

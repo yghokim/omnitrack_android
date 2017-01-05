@@ -1,6 +1,5 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.common
 
-import android.animation.LayoutTransition
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -9,6 +8,7 @@ import android.provider.MediaStore
 import android.support.v4.content.FileProvider
 import android.support.v7.app.AppCompatActivity
 import android.util.AttributeSet
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.URLUtil
@@ -17,7 +17,6 @@ import android.widget.ImageView
 import com.koushikdutta.ion.Ion
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
-import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -129,9 +128,9 @@ class ImagePicker : FrameLayout, View.OnClickListener {
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
 
     init {
-        val view = inflateContent(R.layout.component_image_picker, false) as ViewGroup
-        view.layoutTransition = LayoutTransition()
-        addView(view)
+        val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        inflater.inflate(R.layout.component_image_picker, this, true)
+        this.setBackgroundResource(R.drawable.hatching_repeated_wide_gray)
 
         cameraButton = findViewById(R.id.ui_button_camera)
         galleryButton = findViewById(R.id.ui_button_gallery)
