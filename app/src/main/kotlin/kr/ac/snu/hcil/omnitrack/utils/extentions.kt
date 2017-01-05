@@ -102,6 +102,10 @@ fun View.setPaddingBottom(padding: Int) {
     setPadding(paddingLeft, paddingTop, paddingRight, padding)
 }
 
+fun ViewGroup.inflateMergeLayout(layout: Int) {
+    LayoutInflater.from(context).inflate(layout, this, true)
+}
+
 fun ViewGroup.inflateContent(layout: Int, attach: Boolean): View {
     val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
     return inflater.inflate(layout, this, attach)
