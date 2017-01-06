@@ -64,6 +64,13 @@ dependencies {
     compile 'io.reactivex:rxandroid:1.2.1'
     compile 'io.reactivex:rxjava:1.1.6'
 
+    compile('com.amazonaws:aws-android-sdk-core:2.3.8')
+    compile('com.amazonaws:aws-android-sdk-cognito:2.3.8')
+    compile('com.amazonaws:aws-android-sdk-cognitoidentityprovider:2.3.8')
+    compile('com.amazonaws:aws-android-sdk-s3:2.3.8')
+    compile('com.amazonaws:aws-android-sdk-ddb:2.3.8')
+    compile('com.amazonaws:aws-android-sdk-ddb-mapper:2.3.8')
+
     compile('com.h6ah4i.android.widget.advrecyclerview:advrecyclerview:0.9.3@aar') {
         transitive = true
     }
