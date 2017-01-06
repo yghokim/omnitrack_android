@@ -13,6 +13,8 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
@@ -123,16 +125,13 @@
 
         <activity
             android:name=".ui.activities.SplashScreenActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".ui.activities.LoginActivity"
-            android:label="@string/app_name" />
         <activity
             android:name=".ui.pages.home.HomeActivity"
             android:label="@string/app_name" />
@@ -156,6 +155,28 @@
         <activity
             android:name=".ui.pages.diagnostics.SystemLogActivity"
             android:label="System Logs" />
+
+        <activity
+            android:name="com.amazonaws.activities.SignInActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_sign_in"></activity>
+
+        <activity
+            android:name="com.amazonaws.activities.ForgotPasswordActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_forgot_password"></activity>
+        <activity
+            android:name="com.amazonaws.activities.SignUpActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_sign_up"></activity>
+        <activity
+            android:name="com.amazonaws.activities.MFAActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_mfa"></activity>
+        <activity
+            android:name="com.amazonaws.activities.SignUpConfirmActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_sign_up_confirm"></activity>
 
     </application>
 

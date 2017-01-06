@@ -1,0 +1,236 @@
+<resources>
+
+    <!-- CUSTOMIZE THESE FOR YOUR APP -->
+
+    <!-- Suffix after '-' must be the app package name as specified in the build.gradle file. This
+         is used by the com.amazonaws.mobile.downloader.query.DownloadQueueProvider class. -->
+    <!--<string name="download_queue_provider_authority">com.amazonaws.mobile.downloader-com.amazon.mysampleapp</string>-->
+    <!-- This can be anything, but it should be unique to the app. -->
+    <!--<string name="content_file_provider_authority">com.mysampleapp.fileprovider</string>-->
+
+    <!-- REQUIRED FOR GENERAL APP FUNCTIONALITY - YOU MAY WANT TO KEEP THESE -->
+
+    <string name="main_nav_menu_item_home">Home</string>
+    <string name="title_activity_item_detail">Item Detail</string>
+    <string name="title_activity_item_list">Item List</string>
+    <string name="title_activity_main">@string/app_name</string>
+    <string name="title_activity_sign_in">Sign-in</string>
+    <string name="button_text_sign_in">SIGN IN</string>
+    <string name="button_text_sign_out">SIGN OUT</string>
+    <string name="sign_in_email">Email</string>
+    <string name="sign_in_username">Username/Phone Number (+15551234567)</string>
+    <string name="sign_in_password">Password</string>
+    <string name="sign_in_new_account">Create New Account</string>
+    <string name="sign_in_forgot_password">Forgot Your Password?</string>
+    <string name="sign_in_or">or sign in with</string>
+    <string name="main_nav_menu_default_user_text">\u0020\u0020\u0020\u0020\u0020\u0020\u0020\u0020\u0020\u0020\u0020\u0020\u0020\u0020\u0020\u0020\u0020\u0020</string>
+    <string name="content_helper_error_title">No Content Viewer</string>
+    <string name="content_helper_error_no_app">No Viewing App exists for content type \'%s\'.</string>
+    <string name="title_activity_sign_up">Sign Up</string>
+    <string name="title_activity_forgot_password">Forgot Password</string>
+    <string name="title_activity_mfa">MFA Code</string>
+    <string name="title_activity_sign_up_confirm">Confirm Account</string>
+    <string name="forgot_password_header">Forgot your password?</string>
+    <string name="forgot_password_body">Set your new password with the verification code that was sent to you.</string>
+    <string name="forgot_password_input_code_hint">Verification code</string>
+    <string name="forgot_password_button_hint">Set password</string>
+    <string name="mfa_header">MFA verification is required to authenticate.</string>
+    <string name="mfa_code_sent_message">Code sent.</string>
+    <string name="verify_button_text">Verify</string>
+    <string name="username_text">Username</string>
+    <string name="given_name_text">Given name</string>
+    <string name="email_address_text">Email address</string>
+    <string name="phone_number_text">Phone number (+15551234567)</string>
+    <string name="sign_up_header">Enter the following information to sign up.</string>
+    <string name="sign_up_confirm_code">Confirmation code</string>
+    <string name="sign_up_confirm_text">Confirm</string>
+    <string name="sign_up_confirm_code_sent">A confirmation code was sent.</string>
+    <string name="sign_up_confirm_enter_code">Please enter the code below to confirm your account.</string>
+    <string name="sign_up_confirm_title">Confirm your account</string>
+    <string name="password_change_success">Password change succeeded.</string>
+    <string name="password_change_failed">Password change failed.</string>
+    <string name="sign_up_success">Sign up succeeded.</string>
+    <string name="sign_up_failed">Sign up failed.</string>
+    <string name="login_success">Login succeeded.</string>
+    <string name="login_failed">Login failed.</string>
+    <string name="sign_up_confirm_success">Sign up confirmation succeeded.</string>
+    <string name="sign_up_confirm_failed">Sign up confirmation failed.</string>
+
+    <!-- USED BY DEMO FEATURES ONLY - YOU CAN DISCARD THESE WITH THE DEMO FOLDER -->
+
+    <string name="fragment_demo_instruction_overview_header">Overview</string>
+    <string name="fragment_demo_instruction_description_header">Sample App Features</string>
+    <string name="feature_sign_in_title">User Sign-in</string>
+    <string name="feature_sign_in_subtitle">Let your users sign in with public identity providers or your own identity system.</string>
+    <string name="feature_sign_in_overview">Whether your users sign in or not, the User sign-in feature configures Amazon Cognito to uniquely identify the user and provide your app the appropriate credentials to access your AWS resources.</string>
+    <string name="feature_sign_in_description">The Sample App demonstrates assignment of a unique identifier for the user, the Amazon Cognito User ID. If optional or mandatory User Sign-in has been enabled in your project, then the Sample App also includes a sign-in screen, with a button for each configured sign-in provider.</string>
+    <string name="feature_sign_in_powered_by">Powered by Amazon Cognito</string>
+    <string name="feature_sign_in_demo_button">Demo User Identity</string>
+    <string name="feature_user_data_storage_title">User Data Storage</string>
+    <string name="feature_user_data_storage_subtitle">Store files for your users in the cloud.\nStore and sync user data in key/value pairs.</string>
+    <string name="feature_user_data_storage_overview">Store user files such as photos in the cloud. Save user data in key/value pairs and sync across devices that are signed-in with the same user.</string>
+    <string name="feature_user_data_storage_description">The Sample App demonstrates User File Storage and User Profile Data. The User File Storage demonstration includes a remote file explorer, which allows you to upload and download files from your Amazon S3 bucket. You will have access to two folders, a public folder where files are accessible to all users and a private folder where files are only accessible by the current app user.\n\nThe User Profile Data demonstration stores an app color theme using Amazon Cognito Sync and synchronizes that data across all of the user\'s devices as key/value pairs.</string>
+    <string name="feature_user_data_storage_powered_by">Powered by Amazon Cognito and Amazon S3</string>
+    <string name="feature_user_data_storage_demo_button_user_file_storage">Demo User File Storage</string>
+    <string name="feature_user_data_storage_demo_button_user_settings">Demo User Profile Data</string>
+
+    <string name="main_fragment_title_user_identity">User Identity</string>
+    <string name="main_fragment_subtitle_user_identity">Keep track of users</string>
+    <string name="identity_demo_text_view_description">Displays the user identity.</string>
+    <string name="unknown_user">Guest User</string>
+    <string name="user_id">USER IDENTIFIER</string>
+    <string name="identity_demo_textview_username_description">User\'s name</string>
+    <string name="identity_demo_textview_userid_description">User\'s unique identifier</string>
+    <string name="identity_demo_unknown_identity_text">&lt;UNKNOWN IDENTITY&gt;</string>
+    <string name="identity_demo_dialog_dismiss_text">DISMISS</string>
+    <string name="identity_demo_error_dialog_title">Failed Identity Retrieval</string>
+    <string name="identity_demo_error_message_failed_get_identity">Could not retrieve the user identity:\u0020</string>
+    <string name="content_dialog_ok">OK</string>
+    <string name="content_cache_summary_text">Cache Summary</string>
+    <string name="content_cache_limit_text">Limit</string>
+    <string name="content_cache_use_text">In Use</string>
+    <string name="content_cache_available_text">Available</string>
+    <string name="content_cache_pinned_text">Pinned</string>
+    <string name="content_refresh_text">Refresh</string>
+    <string name="content_download_recent_text">Download Recent</string>
+    <string name="content_set_cache_size_text">Set Cache Size</string>
+    <string name="content_clear_cache_text">Clear Cache</string>
+    <string name="content_path_prefix_text">Path:\u0020</string>
+    <string name="content_folder_text">This is a folder.</string>
+    <string name="content_context_menu_open">Open</string>
+    <string name="content_context_menu_open_remote">Open Remote URL</string>
+    <string name="content_context_menu_download">Download</string>
+    <string name="content_context_menu_download_latest">Download Latest Version</string>
+    <string name="content_context_menu_pin">Pin</string>
+    <string name="content_context_menu_download_pin">Download &amp; Pin</string>
+    <string name="content_context_menu_unpin">Unpin</string>
+    <string name="content_context_menu_delete_local">Delete Local Copy</string>
+    <string name="content_progress_dialog_title_wait">Please wait &#8230;</string>
+    <string name="content_progress_dialog_message_load_local_content">Loading local content</string>
+    <string name="content_progress_dialog_message_load_content">Loading S3 objects list</string>
+    <string name="content_list_failure_text">Failure Listing Content</string>
+    <string name="content_transfer_failure_text">Transfer Failure</string>
+    <string name="content_removal_error_text">Content Removal Error</string>
+    <string name="content_permission_failure_title_text">Permission Failure</string>
+    <string name="content_permission_failure_text">Denial of Read External Storage Permission has disabled the ability to upload user files.</string>
+    <string name="main_fragment_title_user_files">User Files</string>
+    <string name="main_fragment_subtitle_user_files">Store and access files for your users.</string>
+    <string name="user_files_demo_button_public">PUBLIC</string>
+    <string name="user_files_demo_button_private">PRIVATE</string>
+    <string name="user_files_demo_dialog_signin_message">Private user file storage is only available to users who are signed-in.\n\nWould you like to sign in?</string>
+    <string name="user_files_browser_upload_text">Upload</string>
+    <string name="user_files_browser_new_folder_text">New Folder</string>
+    <string name="user_files_browser_context_menu_delete">Delete Remote File</string>
+    <string name="user_files_browser_dialog_create_folder_title">New folder</string>
+    <string name="user_files_browser_progress_dialog_message_create_folder">Creating folder \'%s\'</string>
+    <string name="user_files_browser_progress_dialog_message_delete_item">Deleting \'%s\'</string>
+    <string name="user_files_browser_progress_dialog_message_upload_file">Uploading file \'%s\'</string>
+    <string name="user_files_browser_progress_dialog_message_download_item">Downloading item \'%s\'</string>
+    <string name="user_files_browser_error_message_create_folder">Failed to create folder due to \'%s\'.</string>
+    <string name="user_files_browser_error_message_delete_item">Failed to delete item due to \'%s\'.</string>
+    <string name="user_files_browser_error_message_download_item">Failed to download item due to \'%s\'.</string>
+    <string name="user_files_browser_error_message_upload_file">Failed to upload file due to \'%s\'.</string>
+    <string name="main_fragment_title_user_settings">User Profile Data</string>
+    <string name="settings_fragment_dialog_title">Please wait &#8230;</string>
+    <string name="settings_fragment_dialog_message">Loading&#8230;</string>
+    <string name="settings_fragment_prompt">Please choose a theme:</string>
+    <string name="feature_nosql_database_title">NoSQL Database</string>
+    <string name="feature_nosql_database_subtitle">Store data in the cloud.</string>
+    <string name="feature_nosql_database_overview">Store data in the cloud.</string>
+    <string name="feature_nosql_database_description">The Sample App demonstrates how to access your configured Amazon DynamoDB NoSQL database tables. Select your table, insert sample data, and perform queries by choosing from a list of examples. Hold down an item in query results to update or delete the item. When you\'re done with the demo, you can remove the sample data from your table.</string>
+    <string name="feature_nosql_database_powered_by">Powered by Amazon DynamoDB</string>
+
+    <string name="main_fragment_title_nosql_database">NoSQL Database</string>
+    <string name="feature_nosql_database_demo_button">Demo NoSQL Database</string>
+
+    <string name="main_fragment_title_nosql_select_operation">NoSQL Demo: %s</string>
+    <string name="main_fragment_title_nosql_select_table">NoSQL Demo: Select Table</string>
+
+    <string name="nosql_select_table_item_partition_key_text">Partition Key</string>
+    <string name="nosql_select_table_item_sort_key_text">Sort Key</string>
+    <string name="nosql_select_table_index_count_text">Indexes</string>
+
+    <string name="nosql_dialog_title_failed_dynamodb_describe_table_text">Failed retrieving schema for table \'%s\'.</string>
+    <string name="nosql_dialog_title_failed_operation_text">Operation Failed</string>
+    <string name="nosql_dialog_title_failed_loading_more_results">Failed Loading More Results</string>
+    <string name="nosql_dialog_title_failed_update_item_text">Update Item Failed</string>
+    <string name="nosql_dialog_title_failed_delete_item_text">Delete Item Failed</string>
+
+    <string name="nosql_database_table_item_creation_date_text">Created %s</string>
+    <string name="nosql_insert_sample_data_button_text">INSERT SAMPLE DATA</string>
+    <string name="nosql_remove_sample_data_button_text">REMOVE SAMPLE DATA</string>
+
+    <string name="nosql_dialog_title_remove_confirmation">Confirm Removal of Sample Items</string>
+    <string name="nosql_dialog_message_remove_confirmation">This will remove all your sample items.  Are you sure?</string>
+
+    <string name="nosql_dialog_title_added_sample_data_text">Added Sample Data</string>
+    <string name="nosql_dialog_message_added_sample_data_text">20 Sample Items with random data were added to your table.</string>
+    <string name="nosql_dialog_title_removed_sample_data_text">Removed Sample Data</string>
+    <string name="nosql_dialog_message_removed_sample_data_text">All Sample Items have been removed from your table.</string>
+    <string name="nosql_dialog_ok_text">OK</string>
+
+    <!-- NoSQL Demo Operations Headers -->
+    <string name="nosql_operation_header_get">Get</string>
+    <string name="nosql_operation_header_primary_queries">Primary Index Queries</string>
+    <string name="nosql_operation_header_secondary_queries">Secondary Index Queries (%s)</string>
+    string>
+    <string name="nosql_operation_header_scan">Scan</string>string>
+    <!-- NoSQL Demo Get Operations -->
+    <string name="nosql_operation_get_by_partition_text">Get Item</string>
+    <string name="nosql_operation_example_get_by_partition_text">Find Item with %1$s = \'%2$s\'.</string>
+
+    <string name="nosql_operation_get_by_partition_and_sort_text">Get Item</string>
+    <string name="nosql_operation_example_get_by_partition_and_sort_text">Find Item with %1$s = \'%2$s\' and %3$s = \'%4$s\'.</string>
+
+    <!-- NoSQL Demo Query Operations -->
+    <string name="nosql_operation_title_query_by_partition_and_sort_condition_text">Query by Partition Key and Sort Condition</string>
+    <string name="nosql_operation_example_query_by_partition_and_sort_condition_text">Find all items with %1$s = \'%2$s\' and %3$s &lt; \'%4$s\'.</string>
+
+    <string name="nosql_operation_title_query_by_partition_text">Query by Partition Key</string>
+    <string name="nosql_operation_example_query_by_partition_text">Find all items with %1$s = \'%2$s\'.</string>
+
+    <string name="nosql_operation_title_query_by_partition_and_filter_text">Query by Partition Key and Filter</string>
+    <string name="nosql_operation_example_query_by_partition_and_filter_text">Find all items with %1$s = \'%2$s\' and %3$s &gt; \'%4$s\'.</string>
+
+    <string name="nosql_operation_title_query_by_partition_sort_condition_and_filter_text">Query by Partition Key, Sort Condition, and Filter</string>
+    <string name="nosql_operation_example_query_by_partition_sort_condition_and_filter_text">Find all items with %1$s = \'%2$s\', %3$s &lt; \'%4$s\', and %5$s &gt; \'%6$s\'.</string>
+
+    <string name="nosql_operation_title_index_query_by_partition_and_sort_condition_text">Query by Partition Key and Sort Condition</string>
+    <string name="nosql_operation_example_index_query_by_partition_and_sort_condition_text">Find all items with %1$s = \'%2$s\' and %3$s &gt; \'%4$s\'.</string>
+
+    <string name="nosql_operation_title_index_query_by_partition_text">Query by Partition Key</string>
+    <string name="nosql_operation_example_index_query_by_partition_text">Find all items with %1$s = \'%2$s\'.</string>
+
+    <string name="nosql_operation_title_index_query_by_partition_and_filter_text">Query by Partition Key and Filter</string>
+    <string name="nosql_operation_example_index_query_by_partition_and_filter_text">Find all items with %1$s = \'%2$s\' and %3$s &gt; \'%4$s\'.</string>
+
+    <string name="nosql_operation_title_index_query_by_partition_sort_condition_and_filter_text">Query by Partition Key, Sort Condition, and Filter</string>
+    <string name="nosql_operation_example_index_query_by_partition_sort_condition_and_filter_text">Find all items with %1$s = \'%2$s\', %3$s &lt; \'%4$s\', and %5$s &gt; \'%6$s\'.</string>
+
+    <string name="nosql_operation_title_scan_with_filter">Scan with Filter</string>
+    <string name="nosql_operation_example_scan_with_filter">Find all items with \'%1$s\' &gt; \'%2$s\'.</string>
+    <string name="nosql_operation_example_scan_with_filter_on_partition_and_sort">Find all items with \'%1$s\' beginning with \'%2$s\' and \'%3$s\' beginning with \'%4$s\'.</string>
+    <string name="nosql_operation_example_scan_with_filter_on_partition">Find all items with \'%1$s\' beginning with \'%2$s\'</string>
+
+    <string name="nosql_operation_title_scan_without_filter">Scan</string>
+    <string name="nosql_operation_example_scan_without_filter">Show all items in the table.</string>
+
+    <string name="nosql_dialog_title_pending_results_text">Please wait&#8230;</string>
+    <string name="nosql_dialog_message_pending_results_text">Waiting for the response to load the results.</string>
+
+    <string name="nosql_dialog_title_scan_warning_text">WARNING: Scan is Expensive</string>
+    <string name="nosql_dialog_message_scan_warning_text">This operation scans the entire table and should not generally be used in a production app.</string>
+
+    <string name="nosql_dialog_title_no_results_text">No Matching Items Found</string>
+    <string name="nosql_dialog_message_no_results_text">No items match your criteria. Insert more sample data and try again.</string>
+
+    <string name="nosql_context_menu_title_for_results_text">Update or Delete Item</string>
+    <string name="nosql_context_menu_entry_update_item_text">Update Item</string>
+    <string name="nosql_context_menu_entry_delete_item_text">Delete Item</string>
+    <string name="nosql_dialog_title_confirm_update_item_text">Confirm Update</string>
+    <string name="nosql_dialog_message_confirm_update_item_text">Are you sure you want to update the selected item?</string>
+    <string name="nosql_dialog_title_confirm_delete_item_text">Confirm Delete</string>
+    <string name="nosql_dialog_message_confirm_delete_item_text">Are you sure you want to delete the selected item?</string>
+
+
+</resources>
