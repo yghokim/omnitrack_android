@@ -13,13 +13,16 @@ import android.support.v4.widget.DrawerLayout
 import android.view.Gravity
 import android.view.View
 import butterknife.bindView
+import com.amazonaws.activities.SignInActivity
+import com.amazonaws.mobile.AWSMobileClient
+import com.amazonaws.mobile.user.IdentityManager
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.diagnostics.SystemLogActivity
 
-class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home) {
+class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), IdentityManager.SignInStateChangeListener {
 
     private var mSectionsPagerAdapter: SectionsPagerAdapter? = null
 
@@ -50,6 +53,11 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home) {
 
         //Setup sliding menu
         drawerLayout = findViewById(R.id.ui_drawer_layout) as DrawerLayout
+
+        val signOutButton = drawerLayout.findViewById(R.id.ui_button_sign_out)
+        signOutButton.setOnClickListener {
+            AWSMobileClient.defaultMobileClient().identityManager.signOut()
+        }
         /*
         slidingMenu = SlidingMenu(this, SlidingMenu.SLIDING_WINDOW)
         slidingMenu.mode = SlidingMenu.LEFT
@@ -57,6 +65,11 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home) {
         slidingMenu.setFadeEnabled(true)
         slidingMenu.setBehindOffsetRes(R.dimen.home_sliding_menu_right_region)
 */
+    }
+
+    override fun onResume() {
+        super.onResume()
+        AWSMobileClient.defaultMobileClient().identityManager.addSignInStateChangeListener(this)
     }
 
     override fun onToolbarLeftButtonClicked() {
@@ -95,6 +108,7 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home) {
 
     override fun onPause() {
         super.onPause()
+        AWSMobileClient.defaultMobileClient().identityManager.removeSignInStateChangeListener(this)
         (application as OTApplication).syncUserToDb()
     }
 
@@ -133,5 +147,15 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home) {
 
         val requester = OTExternalService.requestCodeDict.getKeyFromId(requestCode)
         requester?.onActivityActivationResult(resultCode, data)
+    }
+
+
+    override fun onUserSignedIn() {
+    }
+
+    override fun onUserSignedOut() {
+        val intent = Intent(this, SignInActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 }

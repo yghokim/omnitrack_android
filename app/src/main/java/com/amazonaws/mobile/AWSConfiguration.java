@@ -24,6 +24,11 @@ public class AWSConfiguration {
             Regions.fromName("ap-northeast-1");
     public static final String AMAZON_COGNITO_IDENTITY_POOL_ID =
             "ap-northeast-1:ae5863dd-6ed8-419d-9cbf-06bfa6a0f88c";
+
+    // Google Client ID for Web application
+    public static final String GOOGLE_CLIENT_ID =
+            "469575618703-i5iukp79362uf8p77k67o9ra898t056g.apps.googleusercontent.com";
+
     // S3 BUCKET
     public static final String AMAZON_S3_USER_FILES_BUCKET =
             "omnitrack-userfiles-mobilehub-1262440094";
