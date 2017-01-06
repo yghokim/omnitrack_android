@@ -6,6 +6,7 @@ import android.os.Looper
 import android.os.SystemClock
 import android.support.multidex.MultiDexApplication
 import android.text.format.DateUtils
+import com.amazonaws.mobile.AWSMobileClient
 import com.squareup.leakcanary.LeakCanary
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
@@ -138,12 +139,15 @@ class OTApplication : MultiDexApplication() {
     override fun onCreate() {
         super.onCreate()
 
+        //initialize AWS client
+        AWSMobileClient.initializeMobileClientIfNecessary(applicationContext)
+
         if (LeakCanary.isInAnalyzerProcess(this)) {
             // This process is dedicated to LeakCanary for heap analysis.
             // You should not init your app in this process.
-            return;
+        } else {
+            LeakCanary.install(this)
         }
-        LeakCanary.install(this);
 
         val startedAt = SystemClock.elapsedRealtime()
 
