@@ -394,7 +394,7 @@ public class CognitoUserPoolsSignInProvider implements SignInProvider {
         // Mobile Hub does not set up email verification because it requires SES verification.
         // Hence, prompt customers to login using the username or phone number.
         final EditText emailField = (EditText) activity.findViewById(EDIT_TEXT_USERNAME_ID);
-        emailField.setHint(R.string.sign_in_username);
+        //emailField.setHint(R.string.sign_in_username);
 
         activity.findViewById(TEXT_VIEW_CREATE_ACCOUNT_ID).setOnClickListener(new View.OnClickListener() {
             @Override

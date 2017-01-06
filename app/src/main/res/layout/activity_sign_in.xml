@@ -12,29 +12,41 @@
         android:gravity="center"
         android:orientation="vertical">
 
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:src="@drawable/logo_full" />
+
         <EditText
             android:id="@+id/signIn_editText_email"
+            style="@style/ShortTextInputStyle"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/sign_in_text_margin"
-            android:layout_marginRight="@dimen/sign_in_text_margin"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
             android:hint="@string/sign_in_email"
             android:inputType="textEmailAddress" />
 
         <EditText
             android:id="@+id/signIn_editText_password"
+            style="@style/ShortTextInputStyle"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/sign_in_text_margin"
-            android:layout_marginRight="@dimen/sign_in_text_margin"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
             android:hint="@string/sign_in_password"
             android:inputType="textPassword" />
 
         <Button
             android:id="@+id/signIn_imageButton_login"
-            android:layout_width="@dimen/sign_in_button_width"
+            android:layout_width="match_parent"
             android:layout_height="@dimen/sign_in_button_height"
-            android:layout_margin="@dimen/sign_in_button_margin"
+            android:layout_marginBottom="@dimen/sign_in_button_margin"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginTop="@dimen/sign_in_button_margin"
             android:text="Sign In" />
 
         <LinearLayout
@@ -99,5 +111,16 @@
                 android:padding="5dp" />
 
         </LinearLayout>
+
+
+        <Button
+            android:id="@+id/g_login_button"
+            android:layout_width="@dimen/sign_in_button_width"
+            android:layout_height="@dimen/sign_in_button_height"
+            android:layout_marginBottom="@dimen/sign_in_button_margin"
+            android:layout_marginTop="@dimen/sign_in_button_margin"
+            android:padding="0dp"
+            android:text="Google" />
+
     </LinearLayout>
 </RelativeLayout>

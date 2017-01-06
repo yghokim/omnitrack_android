@@ -63,6 +63,12 @@
             android:layout_height="wrap_content"
             android:text="yhkim@hcil.snu.ac.kr" />
 
+        <Button
+            android:id="@+id/ui_button_sign_out"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sign Out" />
+
     </LinearLayout>
 
 </android.support.v4.widget.DrawerLayout>
