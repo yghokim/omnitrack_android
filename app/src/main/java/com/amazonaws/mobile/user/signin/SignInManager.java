@@ -47,6 +47,10 @@ public class SignInManager {
         this.context = context.getApplicationContext();
         AWSMobileClient.initializeMobileClientIfNecessary(context);
 
+        // Initialize Google SDK.
+        final GoogleSignInProvider googleSignInProvider = new GoogleSignInProvider(context);
+        addSignInProvider(googleSignInProvider);
+
         // Initialize Cognito User Pools SDK.
         final CognitoUserPoolsSignInProvider cognitoUserPoolsSignInProvider =
                 new CognitoUserPoolsSignInProvider(context);

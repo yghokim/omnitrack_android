@@ -1,9 +1,13 @@
 package com.amazonaws.activities;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.v13.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -12,6 +16,7 @@ import com.amazonaws.mobile.AWSMobileClient;
 import com.amazonaws.mobile.user.IdentityManager;
 import com.amazonaws.mobile.user.IdentityProvider;
 import com.amazonaws.mobile.user.signin.CognitoUserPoolsSignInProvider;
+import com.amazonaws.mobile.user.signin.GoogleSignInProvider;
 import com.amazonaws.mobile.user.signin.SignInManager;
 
 import kr.ac.snu.hcil.omnitrack.R;
@@ -24,9 +29,7 @@ public class SignInActivity extends Activity {
      */
     private static final int GET_ACCOUNTS_PERMISSION_REQUEST_CODE = 93;
     private SignInManager signInManager;
-    /**
-     * The Google OnClick listener, since we must override it to get permissions on Marshmallow and above.
-     */
+    /** The Google OnClick listener, since we must override it to get permissions on Marshmallow and above. */
     private View.OnClickListener googleOnClickListener;
 
     @Override
@@ -39,8 +42,44 @@ public class SignInActivity extends Activity {
         signInManager.setResultsHandler(this, new SignInResultsHandler());
 
         // Initialize sign-in buttons.
+        googleOnClickListener =
+                signInManager.initializeSignInButton(GoogleSignInProvider.class, findViewById(R.id.g_login_button));
+
+        if (googleOnClickListener != null) {
+            // if the onClick listener was null, initializeSignInButton will have removed the view.
+            this.findViewById(R.id.g_login_button).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(final View view) {
+                    final Activity thisActivity = SignInActivity.this;
+                    if (ContextCompat.checkSelfPermission(thisActivity,
+                            Manifest.permission.GET_ACCOUNTS) != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(SignInActivity.this,
+                                new String[]{Manifest.permission.GET_ACCOUNTS},
+                                GET_ACCOUNTS_PERMISSION_REQUEST_CODE);
+                        return;
+                    }
+
+                    // call the Google onClick listener.
+                    googleOnClickListener.onClick(view);
+                }
+            });
+        }
+
         signInManager.initializeSignInButton(CognitoUserPoolsSignInProvider.class,
                 this.findViewById(R.id.signIn_imageButton_login));
+    }
+
+    @Override
+    public void onRequestPermissionsResult(final int requestCode, final String permissions[],
+                                           final int[] grantResults) {
+        if (requestCode == GET_ACCOUNTS_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                this.findViewById(R.id.g_login_button).callOnClick();
+            } else {
+                Log.i(LOG_TAG, "Permissions not granted for Google sign-in. :(");
+            }
+        }
     }
 
     @Override
@@ -56,7 +95,6 @@ public class SignInActivity extends Activity {
     private class SignInResultsHandler implements IdentityManager.SignInResultsHandler {
         /**
          * Receives the successful sign-in result and starts the main activity.
-         *
          * @param provider the identity provider used for sign-in.
          */
         @Override
@@ -86,7 +124,6 @@ public class SignInActivity extends Activity {
 
         /**
          * Receives the sign-in result indicating the user canceled and shows a toast.
-         *
          * @param provider the identity provider with which the user attempted sign-in.
          */
         @Override
@@ -100,9 +137,8 @@ public class SignInActivity extends Activity {
 
         /**
          * Receives the sign-in result that an error occurred signing in and shows a toast.
-         *
          * @param provider the identity provider with which the user attempted sign-in.
-         * @param ex       the exception that occurred.
+         * @param ex the exception that occurred.
          */
         @Override
         public void onError(final IdentityProvider provider, final Exception ex) {
