@@ -51,10 +51,11 @@ public class SignInManager {
         final GoogleSignInProvider googleSignInProvider = new GoogleSignInProvider(context);
         addSignInProvider(googleSignInProvider);
 
+        /*
         // Initialize Cognito User Pools SDK.
         final CognitoUserPoolsSignInProvider cognitoUserPoolsSignInProvider =
                 new CognitoUserPoolsSignInProvider(context);
-        addSignInProvider(cognitoUserPoolsSignInProvider);
+        addSignInProvider(cognitoUserPoolsSignInProvider);*/
     }
 
     /**

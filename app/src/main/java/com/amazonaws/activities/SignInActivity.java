@@ -15,7 +15,6 @@ import android.widget.Toast;
 import com.amazonaws.mobile.AWSMobileClient;
 import com.amazonaws.mobile.user.IdentityManager;
 import com.amazonaws.mobile.user.IdentityProvider;
-import com.amazonaws.mobile.user.signin.CognitoUserPoolsSignInProvider;
 import com.amazonaws.mobile.user.signin.GoogleSignInProvider;
 import com.amazonaws.mobile.user.signin.SignInManager;
 
@@ -65,8 +64,9 @@ public class SignInActivity extends Activity {
             });
         }
 
+        /*
         signInManager.initializeSignInButton(CognitoUserPoolsSignInProvider.class,
-                this.findViewById(R.id.signIn_imageButton_login));
+                this.findViewById(R.id.signIn_imageButton_login));*/
     }
 
     @Override
