@@ -159,24 +159,7 @@
         <activity
             android:name="com.amazonaws.activities.SignInActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
-            android:label="@string/title_activity_sign_in"></activity>
-
-        <activity
-            android:name="com.amazonaws.activities.ForgotPasswordActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
-            android:label="@string/title_activity_forgot_password"></activity>
-        <activity
-            android:name="com.amazonaws.activities.SignUpActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
-            android:label="@string/title_activity_sign_up"></activity>
-        <activity
-            android:name="com.amazonaws.activities.MFAActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
-            android:label="@string/title_activity_mfa"></activity>
-        <activity
-            android:name="com.amazonaws.activities.SignUpConfirmActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
-            android:label="@string/title_activity_sign_up_confirm"></activity>
+            android:label="@string/title_activity_sign_in" />
 
     </application>
 

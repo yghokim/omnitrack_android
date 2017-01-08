@@ -56,7 +56,11 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Ident
 
         val signOutButton = drawerLayout.findViewById(R.id.ui_button_sign_out)
         signOutButton.setOnClickListener {
-            AWSMobileClient.defaultMobileClient().identityManager.signOut()
+            if (AWSMobileClient.defaultMobileClient().identityManager.isUserSignedIn) {
+                AWSMobileClient.defaultMobileClient().identityManager.signOut()
+            } else {
+                goSignInPage()
+            }
         }
         /*
         slidingMenu = SlidingMenu(this, SlidingMenu.SLIDING_WINDOW)
@@ -154,6 +158,10 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Ident
     }
 
     override fun onUserSignedOut() {
+        goSignInPage()
+    }
+
+    private fun goSignInPage() {
         val intent = Intent(this, SignInActivity::class.java)
         startActivity(intent)
         finish()
