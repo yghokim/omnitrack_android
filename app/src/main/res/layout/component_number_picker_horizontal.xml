@@ -16,10 +16,11 @@
             android:textSize="15sp"
             android:textStyle="bold" />
     -->
-    <ImageButton
+    <android.support.v7.widget.AppCompatImageButton
         android:id="@+id/ui_button_minus"
         style="@style/roundButtonStyle"
-        android:src="@drawable/left_dark" />
+        android:src="@drawable/left_dark"
+        android:tint="@color/buttonIconColorDark" />
 
     <TextView
         android:id="@+id/ui_value_field"
@@ -36,8 +37,9 @@
         android:textSize="20sp" />
 
 
-    <ImageButton
+    <android.support.v7.widget.AppCompatImageButton
         android:id="@+id/ui_button_plus"
         style="@style/roundButtonStyle"
-        android:src="@drawable/right_dark" />
+        android:src="@drawable/right_dark"
+        android:tint="@color/buttonIconColorDark" />
 </merge>

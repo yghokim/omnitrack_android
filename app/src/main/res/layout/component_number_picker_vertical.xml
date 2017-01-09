@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <ImageButton
+    <android.support.v7.widget.AppCompatImageButton
         android:id="@+id/ui_button_plus"
         android:layout_width="match_parent"
         android:layout_height="@dimen/button_height_small"
         android:background="@drawable/button_background_formlike"
         android:minWidth="@dimen/number_button_width"
-        android:src="@drawable/up_dark" />
+        android:src="@drawable/up_dark"
+        android:tint="@color/buttonIconColorDark" />
     <!--
         <EditText
             android:id="@+id/valueField"
@@ -37,11 +38,12 @@
         android:textSize="20sp" />
 
 
-    <ImageButton
+    <android.support.v7.widget.AppCompatImageButton
         android:id="@+id/ui_button_minus"
         android:layout_width="match_parent"
         android:layout_height="@dimen/button_height_small"
         android:background="@drawable/button_background_formlike"
         android:minWidth="@dimen/number_button_width"
-        android:src="@drawable/down_dark" />
+        android:src="@drawable/down_dark"
+        android:tint="@color/buttonIconColorDark" />
 </merge>
