@@ -31,6 +31,9 @@ public class SignInActivity extends Activity {
     /** The Google OnClick listener, since we must override it to get permissions on Marshmallow and above. */
     private View.OnClickListener googleOnClickListener;
 
+    private View googleLoginButton;
+    private View loginInProgressIndicator;
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,15 +43,19 @@ public class SignInActivity extends Activity {
 
         signInManager.setResultsHandler(this, new SignInResultsHandler());
 
+        googleLoginButton = findViewById(R.id.g_login_button);
+        loginInProgressIndicator = findViewById(R.id.ui_loading_indicator);
+
         // Initialize sign-in buttons.
         googleOnClickListener =
-                signInManager.initializeSignInButton(GoogleSignInProvider.class, findViewById(R.id.g_login_button));
+                signInManager.initializeSignInButton(GoogleSignInProvider.class, googleLoginButton);
 
         if (googleOnClickListener != null) {
             // if the onClick listener was null, initializeSignInButton will have removed the view.
-            this.findViewById(R.id.g_login_button).setOnClickListener(new View.OnClickListener() {
+            this.googleLoginButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(final View view) {
+                    toBusyMode();
                     final Activity thisActivity = SignInActivity.this;
                     if (ContextCompat.checkSelfPermission(thisActivity,
                             Manifest.permission.GET_ACCOUNTS) != PackageManager.PERMISSION_GRANTED) {
@@ -67,6 +74,22 @@ public class SignInActivity extends Activity {
         /*
         signInManager.initializeSignInButton(CognitoUserPoolsSignInProvider.class,
                 this.findViewById(R.id.signIn_imageButton_login));*/
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        toIdleMode();
+    }
+
+    private void toBusyMode() {
+        this.googleLoginButton.setVisibility(View.GONE);
+        this.loginInProgressIndicator.setVisibility(View.VISIBLE);
+    }
+
+    private void toIdleMode() {
+        this.googleLoginButton.setVisibility(View.VISIBLE);
+        this.loginInProgressIndicator.setVisibility(View.GONE);
     }
 
     @Override
@@ -133,6 +156,8 @@ public class SignInActivity extends Activity {
 
             Toast.makeText(SignInActivity.this, String.format("Sign-in with %s canceled.",
                     provider.getDisplayName()), Toast.LENGTH_LONG).show();
+
+            toIdleMode();
         }
 
         /**
@@ -151,6 +176,8 @@ public class SignInActivity extends Activity {
                     String.format("Sign-in with %s failed.\n%s", provider.getDisplayName(), ex.getMessage()));
             errorDialogBuilder.setNeutralButton("Ok", null);
             errorDialogBuilder.show();
+
+            toIdleMode();
         }
     }
 }
