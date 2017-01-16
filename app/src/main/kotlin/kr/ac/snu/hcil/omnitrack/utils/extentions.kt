@@ -4,12 +4,14 @@ import android.annotation.TargetApi
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.location.Address
 import android.location.Geocoder
 import android.os.Handler
 import android.os.PowerManager
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.graphics.drawable.DrawableWrapper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -248,6 +250,12 @@ fun TimePicker.setMinuteCompat(minute: Int) {
     } else {
         this.currentMinute = minute
     }
+}
+
+fun applyTint(drawable: Drawable, color: Int): DrawableWrapper {
+    val wrapped = DrawableWrapper(drawable)
+    wrapped.setTint(color)
+    return wrapped
 }
 
 

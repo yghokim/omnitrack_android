@@ -7,6 +7,7 @@ import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.MotionEvent
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.utils.applyTint
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kotlin.properties.Delegates
 
@@ -188,13 +189,16 @@ class StarRatingView : HorizontalLinearDrawableView, GestureDetector.OnGestureLi
         }
 
         private val emptyDrawableSmall: Drawable by lazy {
-            ContextCompat.getDrawable(context, R.drawable.symbol_star_empty)
+            applyTint(ContextCompat.getDrawable(context, R.drawable.symbol_star_empty),
+                    ContextCompat.getColor(context, R.color.starGold))
         }
         private val halfDrawableSmall: Drawable by lazy {
-            ContextCompat.getDrawable(context, R.drawable.symbol_star_half)
+            applyTint(ContextCompat.getDrawable(context, R.drawable.symbol_star_half),
+                    ContextCompat.getColor(context, R.color.starGold))
         }
         private val fullDrawableSmall: Drawable by lazy {
-            ContextCompat.getDrawable(context, R.drawable.symbol_star_full)
+            applyTint(ContextCompat.getDrawable(context, R.drawable.symbol_star_full),
+                    ContextCompat.getColor(context, R.color.starGold))
         }
 
         init {
