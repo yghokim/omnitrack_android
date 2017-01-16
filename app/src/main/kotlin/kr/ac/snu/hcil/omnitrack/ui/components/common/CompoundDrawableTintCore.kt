@@ -35,29 +35,10 @@ class CompoundDrawableTintCore() {
             if (hasColor) {
                 val color = a.getColor(R.styleable.DrawableTint_drawableTint,
                         Color.TRANSPARENT)
-
-                println("compound drawables:")
-                for (drawable in compoundDrawables) {
-                    if (drawable != null) {
-                        println(drawable)
-                    } else {
-                        println("null")
-                    }
-                }
-
                 compoundDrawables[LEFT] = tint(compoundDrawables[LEFT], color)
                 compoundDrawables[TOP] = tint(compoundDrawables[TOP], color)
                 compoundDrawables[RIGHT] = tint(compoundDrawables[RIGHT], color)
                 compoundDrawables[BOTTOM] = tint(compoundDrawables[BOTTOM], color)
-
-                println("compound drawables:")
-                for (drawable in compoundDrawables) {
-                    if (drawable != null) {
-                        println(drawable)
-                    } else {
-                        println("null")
-                    }
-                }
             }
         } finally {
             a.recycle()
