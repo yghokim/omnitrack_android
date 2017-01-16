@@ -50,7 +50,7 @@ class ConnectionIndicatorStubProxy(val parent: View, stubId: Int) : OnClickListe
             if (attribute.isConnectionValid(connectionInvalidMessages)) {
                 connectionIndicatorSourceNameView?.setTextColor(ResourcesCompat.getColor(parent.resources, R.color.colorPointed, null))
                 connectionIndicatorErrorMark?.visibility = View.GONE
-                connectionIndicatorLinkIconView?.setImageResource(R.drawable.link_dark)
+                connectionIndicatorLinkIconView?.setImageResource(R.drawable.link)
             } else {
                 connectionIndicatorSourceNameView?.setTextColor(ResourcesCompat.getColor(parent.resources, R.color.colorRed_Light, null))
                 connectionIndicatorErrorMark?.visibility = View.VISIBLE

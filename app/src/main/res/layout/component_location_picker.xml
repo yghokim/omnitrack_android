@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
@@ -15,7 +16,7 @@
         android:paddingBottom="3.5dp"
         android:paddingTop="1dp">
 
-        <TextView
+        <kr.ac.snu.hcil.omnitrack.ui.components.common.DrawableTintAppCompatTextView
             android:id="@+id/ui_address"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -32,6 +33,7 @@
             android:paddingStart="8dp"
             android:paddingTop="6dp"
             android:textColor="@color/textColorMid"
+            app:drawableTint="@color/textColorLight"
             />
 
         <ProgressBar
@@ -90,14 +92,16 @@
                 style="@style/mapViewOverlayButton"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentTop="true"
-                android:src="@drawable/plus_dark" />
+                android:src="@drawable/plus"
+                android:tint="@color/buttonIconColorDark" />
 
             <android.support.v7.widget.AppCompatImageButton
                 android:id="@+id/ui_button_zoom_out"
                 style="@style/mapViewOverlayButton"
                 android:layout_alignEnd="@id/ui_button_zoom_in"
                 android:layout_below="@+id/ui_button_zoom_in"
-                android:src="@drawable/minus_dark" />
+                android:src="@drawable/minus"
+                android:tint="@color/buttonIconColorDark" />
 
 
             <android.support.v7.widget.AppCompatImageButton
@@ -110,9 +114,8 @@
                 android:src="@drawable/fit" />
 
 
-            <android.support.v7.widget.AppCompatButton
+            <kr.ac.snu.hcil.omnitrack.ui.components.common.DrawableTintAppCompatButton
                 android:id="@+id/ui_button_adjust"
-
                 style="@style/mapViewOverlayButton"
                 android:layout_width="wrap_content"
                 android:layout_alignParentBottom="true"
@@ -120,7 +123,8 @@
                 android:drawableStart="@drawable/edit_location"
                 android:padding="10dp"
                 android:text="@string/adjust"
-                android:textColor="@color/textColorMid" />
+                android:textColor="@color/textColorMid"
+                app:drawableTint="@color/colorSecondary" />
         </RelativeLayout>
 
         <ViewStub

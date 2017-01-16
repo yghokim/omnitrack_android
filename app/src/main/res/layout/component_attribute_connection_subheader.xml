@@ -3,13 +3,14 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
-    <ImageView
+    <android.support.v7.widget.AppCompatImageView
         android:id="@+id/ui_icon"
         android:layout_width="19dp"
         android:layout_height="19dp"
         android:layout_gravity="center_vertical"
         android:layout_marginRight="8dp"
-        android:src="@drawable/convert_dark"></ImageView>
+        android:src="@drawable/convert"
+        android:tint="@color/buttonIconColorDark" />
 
     <TextView
         android:id="@+id/ui_label"

@@ -13,9 +13,7 @@
         android:scaleType="fitCenter"
         android:scaleX="0.9"
         android:scaleY="0.9"
-        android:src="@drawable/link_dark"
-
-
+        android:src="@drawable/link"
         android:tint="@color/textColorLight" />
 
     <TextView
