@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -19,7 +20,7 @@
         android:textStyle="bold" />
 
 
-    <android.support.v7.widget.AppCompatButton
+    <kr.ac.snu.hcil.omnitrack.ui.components.common.DrawableTintAppCompatButton
         android:id="@+id/ui_button_apply"
         style="@style/mapViewOverlayButton"
         android:layout_width="wrap_content"
@@ -27,10 +28,11 @@
         android:layout_alignParentEnd="true"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="7dp"
-        android:drawableStart="@drawable/done_dark"
+        android:drawableStart="@drawable/done"
         android:padding="10dp"
         android:text="@string/msg_apply"
-        android:textColor="@color/textColorMid" />
+        android:textColor="@color/textColorMid"
+        app:drawableTint="@color/buttonIconColorDark" />
 
     <android.support.v7.widget.AppCompatButton
         android:id="@+id/ui_button_cancel"
