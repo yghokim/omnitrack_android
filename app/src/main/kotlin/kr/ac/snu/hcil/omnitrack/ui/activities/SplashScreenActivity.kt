@@ -10,6 +10,7 @@ import com.amazonaws.mobile.AWSMobileClient
 import com.amazonaws.mobile.user.IdentityManager
 import com.amazonaws.mobile.user.IdentityProvider
 import com.amazonaws.mobile.user.signin.SignInManager
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 
 
@@ -76,22 +77,26 @@ class SplashScreenActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val thread = Thread(Runnable {
-            signInManager = SignInManager.getInstance(applicationContext)
+        if (BuildConfig.DEBUG) {
+            goMain()
+        } else {
+            val thread = Thread(Runnable {
+                signInManager = SignInManager.getInstance(applicationContext)
 
-            val provider = signInManager.previouslySignedInProvider
+                val provider = signInManager.previouslySignedInProvider
 
-            // if the user was already previously in to a provider.
-            if (provider != null) {
-                // asynchronously handle refreshing credentials and call our handler.
-                signInManager.refreshCredentialsWithProvider(this@SplashScreenActivity,
-                        provider, OmniTrackSignInResultsHandler())
-            } else {
-                // Asyncronously go to the main activity (after the splash delay has expired).
-                goSignIn()
-            }
-        })
-        thread.start()
+                // if the user was already previously in to a provider.
+                if (provider != null) {
+                    // asynchronously handle refreshing credentials and call our handler.
+                    signInManager.refreshCredentialsWithProvider(this@SplashScreenActivity,
+                            provider, OmniTrackSignInResultsHandler())
+                } else {
+                    // Asyncronously go to the main activity (after the splash delay has expired).
+                    goSignIn()
+                }
+            })
+            thread.start()
+        }
     }
 
     private fun goMain() {

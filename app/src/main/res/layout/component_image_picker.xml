@@ -20,7 +20,7 @@
         android:layout_height="@dimen/button_height_small"
         android:layout_gravity="top|right"
         android:background="@drawable/button_background_color_pointed"
-        android:src="@drawable/ex_dark"
+        android:src="@drawable/ex"
         android:tint="#fff"
         android:visibility="gone" />
 

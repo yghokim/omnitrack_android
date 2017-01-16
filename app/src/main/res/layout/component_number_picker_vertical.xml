@@ -44,6 +44,6 @@
         android:layout_height="@dimen/button_height_small"
         android:background="@drawable/button_background_formlike"
         android:minWidth="@dimen/number_button_width"
-        android:src="@drawable/down_dark"
+        android:src="@drawable/down"
         android:tint="@color/buttonIconColorDark" />
 </merge>

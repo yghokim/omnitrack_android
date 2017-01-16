@@ -59,7 +59,7 @@
         android:layout_below="@+id/ui_value_group"
         android:layout_gravity="center_horizontal"
         android:background="@drawable/button_background_formlike"
-        android:src="@drawable/down_dark"
+        android:src="@drawable/down"
         android:tint="@color/textColorLight" />
 
 </merge>

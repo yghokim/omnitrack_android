@@ -12,7 +12,7 @@
         android:background="@color/colorPointed"
         android:padding="8dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/link_dark"
+        android:src="@drawable/link"
         android:tint="#FFF" />
 
     <TextView

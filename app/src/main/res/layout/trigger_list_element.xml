@@ -160,7 +160,7 @@
             android:layout_height="@dimen/button_height_normal"
             android:layout_gravity="end"
             android:background="@drawable/transparent_button_background"
-            android:src="@drawable/down_dark"
+            android:src="@drawable/down"
             android:tint="@color/buttonIconColorDark" />
 
         <TextView

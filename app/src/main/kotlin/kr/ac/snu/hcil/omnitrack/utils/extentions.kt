@@ -10,8 +10,8 @@ import android.location.Geocoder
 import android.os.Handler
 import android.os.PowerManager
 import android.support.v4.app.Fragment
+import android.support.v4.graphics.drawable.DrawableCompat
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.graphics.drawable.DrawableWrapper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -252,9 +252,9 @@ fun TimePicker.setMinuteCompat(minute: Int) {
     }
 }
 
-fun applyTint(drawable: Drawable, color: Int): DrawableWrapper {
-    val wrapped = DrawableWrapper(drawable)
-    wrapped.setTint(color)
+fun applyTint(drawable: Drawable, color: Int): Drawable {
+    val wrapped = DrawableCompat.wrap(drawable).mutate()
+    DrawableCompat.setTint(wrapped, color)
     return wrapped
 }
 
