@@ -39,7 +39,7 @@ class AttributeConnectionViewSubHeader : LinearLayout {
         val a = context.theme.obtainStyledAttributes(attrs, R.styleable.AttributeConnectionViewSubHeader, 0, 0)
         try {
 
-            val iconResourceId = a.getResourceId(R.styleable.AttributeConnectionViewSubHeader_icon, R.drawable.link_dark)
+            val iconResourceId = a.getResourceId(R.styleable.AttributeConnectionViewSubHeader_icon, R.drawable.link)
             val label = a.getString(R.styleable.AttributeConnectionViewSubHeader_label)
 
             iconView.setImageResource(iconResourceId)

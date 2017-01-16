@@ -92,7 +92,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                app:icon="@drawable/link_dark"
+                app:icon="@drawable/link"
                 app:label="@string/msg_connection_panel_connected_with" />
 
             <TextView
@@ -158,7 +158,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
-            app:icon="@drawable/convert_dark"
+            app:icon="@drawable/convert"
             app:label="Convert Result" />
     </RelativeLayout>-->
 

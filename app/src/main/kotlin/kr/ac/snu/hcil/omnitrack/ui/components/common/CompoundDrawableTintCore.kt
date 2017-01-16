@@ -3,9 +3,9 @@ package kr.ac.snu.hcil.omnitrack.ui.components.common
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.Drawable
-import android.support.v4.graphics.drawable.DrawableCompat
 import android.util.AttributeSet
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.utils.applyTint
 
 /**
  * Created by younghokim on 2017. 1. 13..
@@ -18,7 +18,7 @@ class CompoundDrawableTintCore() {
     private val RIGHT = 2
     private val BOTTOM = 3
 
-    fun init(parent: Object, context: Context, compoundDrawables: Array<Drawable?>, attrs: AttributeSet, defStyleAttr: Int): Array<Drawable?> {
+    fun init(parent: Any, context: Context, compoundDrawables: Array<Drawable?>, attrs: AttributeSet, defStyleAttr: Int): Array<Drawable?> {
 
         /*
         val isRequired = android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.M
@@ -36,10 +36,28 @@ class CompoundDrawableTintCore() {
                 val color = a.getColor(R.styleable.DrawableTint_drawableTint,
                         Color.TRANSPARENT)
 
+                println("compound drawables:")
+                for (drawable in compoundDrawables) {
+                    if (drawable != null) {
+                        println(drawable)
+                    } else {
+                        println("null")
+                    }
+                }
+
                 compoundDrawables[LEFT] = tint(compoundDrawables[LEFT], color)
                 compoundDrawables[TOP] = tint(compoundDrawables[TOP], color)
                 compoundDrawables[RIGHT] = tint(compoundDrawables[RIGHT], color)
                 compoundDrawables[BOTTOM] = tint(compoundDrawables[BOTTOM], color)
+
+                println("compound drawables:")
+                for (drawable in compoundDrawables) {
+                    if (drawable != null) {
+                        println(drawable)
+                    } else {
+                        println("null")
+                    }
+                }
             }
         } finally {
             a.recycle()
@@ -50,9 +68,7 @@ class CompoundDrawableTintCore() {
 
     private fun tint(drawable: Drawable?, color: Int): Drawable? {
         drawable?.let {
-            val wrapped = DrawableCompat.wrap(drawable)
-            DrawableCompat.setTint(wrapped, color)
-            return wrapped
+            return applyTint(drawable, color)
         }
         return null
     }

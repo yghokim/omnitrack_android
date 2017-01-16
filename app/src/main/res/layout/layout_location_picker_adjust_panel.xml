@@ -34,17 +34,18 @@
         android:textColor="@color/textColorMid"
         app:drawableTint="@color/buttonIconColorDark" />
 
-    <android.support.v7.widget.AppCompatButton
+    <kr.ac.snu.hcil.omnitrack.ui.components.common.DrawableTintAppCompatButton
         android:id="@+id/ui_button_cancel"
 
         style="@style/mapViewOverlayButton"
         android:layout_width="wrap_content"
         android:layout_alignTop="@+id/ui_button_apply"
         android:layout_toStartOf="@+id/ui_button_apply"
-        android:drawableStart="@drawable/ex_dark"
+        android:drawableStart="@drawable/ex"
         android:padding="10dp"
         android:text="@string/msg_cancel"
-        android:textColor="@color/textColorMid" />
+        android:textColor="@color/textColorMid"
+        app:drawableTint="@color/buttonIconColorDark" />
 
     <ImageView
         android:layout_width="@dimen/mapview_adjust_marker_size"
