@@ -563,9 +563,12 @@ class TrackerListFragment : OTFragment() {
     inner class ItemEventReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (userLoaded) {
-                val trackerPosition = user.trackers.indexOf(user[intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)]!!)
-                println("tracker changed = $trackerPosition")
-                trackerListAdapter.notifyItemChanged(trackerPosition)
+                val tracker = user[intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)]
+                if (tracker != null) {
+                    val trackerPosition = user.trackers.indexOf(tracker)
+                    println("tracker changed = $trackerPosition")
+                    trackerListAdapter.notifyItemChanged(trackerPosition)
+                }
             }
         }
 

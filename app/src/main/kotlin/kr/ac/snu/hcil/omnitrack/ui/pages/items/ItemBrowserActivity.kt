@@ -11,7 +11,10 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.*
-import android.widget.*
+import android.widget.ArrayAdapter
+import android.widget.PopupMenu
+import android.widget.TextView
+import android.widget.ToggleButton
 import butterknife.bindView
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
@@ -24,6 +27,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
 import kr.ac.snu.hcil.omnitrack.ui.DragItemTouchHelperCallback
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTTrackerAttachedActivity
+import kr.ac.snu.hcil.omnitrack.ui.components.common.ExtendedSpinner
 import kr.ac.snu.hcil.omnitrack.ui.components.common.FallbackRecyclerView
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.DrawableListBottomSpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
@@ -33,7 +37,7 @@ import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.getDayOfMonth
 import java.util.*
 
-class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_browser), AdapterView.OnItemSelectedListener, View.OnClickListener {
+class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_browser), ExtendedSpinner.OnItemSelectedListener, View.OnClickListener {
 
     companion object {
         fun makeIntent(tracker: OTTracker, context: Context): Intent {
@@ -51,7 +55,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
 
     private val emptyListMessageView: TextView by bindView(R.id.ui_empty_list_message)
 
-    private val sortSpinner: Spinner by bindView(R.id.ui_spinner_sort_method)
+    private val sortSpinner: ExtendedSpinner by bindView(R.id.ui_spinner_sort_method)
 
     private val sortOrderButton: ToggleButton by bindView(R.id.ui_toggle_sort_order)
 
@@ -148,10 +152,8 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
         reSort()
     }
 
-    override fun onNothingSelected(p0: AdapterView<*>?) {
-    }
 
-    override fun onItemSelected(p0: AdapterView<*>?, p1: View?, position: Int, id: Long) {
+    override fun onItemSelected(p0: ExtendedSpinner, position: Int) {
         reSort()
     }
 

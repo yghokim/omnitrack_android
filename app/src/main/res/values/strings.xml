@@ -202,6 +202,7 @@
     <string name="msg_tracker_list_stat_total">Total</string>
     <string name="msg_attach">connect</string>
     <string name="msg_service_activating">Activating…</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
 
 
     <string-array name="choice_preview_entries">

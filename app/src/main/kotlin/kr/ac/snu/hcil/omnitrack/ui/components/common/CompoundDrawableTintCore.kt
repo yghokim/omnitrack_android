@@ -18,7 +18,7 @@ class CompoundDrawableTintCore() {
     private val RIGHT = 2
     private val BOTTOM = 3
 
-    fun init(parent: Any, context: Context, compoundDrawables: Array<Drawable?>, attrs: AttributeSet, defStyleAttr: Int): Array<Drawable?> {
+    fun init(context: Context, compoundDrawables: Array<Drawable?>, attrs: AttributeSet, defStyleAttr: Int): Array<Drawable?> {
 
         /*
         val isRequired = android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.M
