@@ -6,9 +6,13 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.ArrayAdapter
+import android.widget.EditText
+import android.widget.LinearLayout
+import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.calculation.SingleNumericComparison
+import kr.ac.snu.hcil.omnitrack.ui.components.common.ExtendedSpinner
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 
 /**
@@ -25,11 +29,11 @@ class SingleNumericConditionerSettingView : LinearLayout {
         }
         set(value) {
             println("set method: ${value.method}")
-            spinner.setSelection(value.method.ordinal, true)
+            spinner.selectedItemPosition = value.method.ordinal
             numberField.setText(value.comparedTo.toString(), TextView.BufferType.NORMAL)
         }
 
-    private val spinner: Spinner
+    private val spinner: ExtendedSpinner
     private val numberField: EditText
 
     private val adapter = ComparisonMethodAdapter()
@@ -43,7 +47,7 @@ class SingleNumericConditionerSettingView : LinearLayout {
         orientation = LinearLayout.HORIZONTAL
         inflateContent(R.layout.conditioner_setting_single_numeric_comparison, true)
 
-        spinner = findViewById(R.id.ui_comparison_method) as Spinner
+        spinner = findViewById(R.id.ui_comparison_method) as ExtendedSpinner
         spinner.adapter = adapter
 
 
@@ -79,11 +83,7 @@ class SingleNumericConditionerSettingView : LinearLayout {
 
         inner class MethodViewHolder(val view: View) {
 
-            private val iconView: AppCompatImageView
-
-            init {
-                iconView = view.findViewById(R.id.textView) as AppCompatImageView
-            }
+            private val iconView: AppCompatImageView = view.findViewById(R.id.textView) as AppCompatImageView
 
             fun bind(method: SingleNumericComparison.ComparisonMethod) {
                 iconView.setImageResource(method.symbolImageResourceId)
