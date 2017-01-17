@@ -189,6 +189,7 @@
 
     <string name="msg_attach">트래커에 추가</string>
     <string name="msg_service_activating">활성화중…</string>
+    <string name="sign_in_with_google">Google 계정으로 로그인</string>
 
 
     <string-array name="choice_preview_entries">

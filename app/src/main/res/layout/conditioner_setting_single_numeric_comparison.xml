@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin">
 
-    <Spinner
+    <kr.ac.snu.hcil.omnitrack.ui.components.common.ExtendedSpinner
         android:id="@+id/ui_comparison_method"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -13,7 +14,8 @@
         android:layout_centerVertical="true"
         android:layout_gravity="center_vertical"
         android:layout_toLeftOf="@+id/ui_compared_number_input"
-        android:background="@drawable/spinner_background" />
+        android:background="@drawable/button_background_formlike"
+        app:arrowTint="@color/buttonIconColorDark" />
 
 
     <EditText

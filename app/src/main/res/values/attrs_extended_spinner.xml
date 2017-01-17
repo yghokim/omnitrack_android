@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ExtendedSpinner">
+        <attr name="arrowResource" format="reference" />
+        <attr name="arrowTint" format="color" />
+        <attr name="showArrow" format="boolean" />
+    </declare-styleable>
+</resources>
