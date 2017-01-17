@@ -143,7 +143,7 @@
                     android:layout_gravity="center"
                     android:background="@drawable/google_button_background"
                     android:padding="0dp"
-                    android:text="Sign in with Google"
+                    android:text="@string/sign_in_with_google"
                     android:textColor="@color/buttonIconColorDark" />
 
                 <com.github.ybq.android.spinkit.SpinKitView
