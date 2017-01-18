@@ -124,8 +124,9 @@ class ExtendedSpinner : LinearLayout, View.OnClickListener {
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-        if (mWidthMeasureSpec != widthMeasureSpec) {
-            mWidthMeasureSpec = widthMeasureSpec
+        val mode = MeasureSpec.getMode(widthMeasureSpec)
+        if (mWidthMeasureSpec != mode) {
+            mWidthMeasureSpec = mode
             calculateViewWidth()
         }
     }
@@ -164,7 +165,7 @@ class ExtendedSpinner : LinearLayout, View.OnClickListener {
                 itemView = null
             }
             itemView = adapter.getView(i, itemView, this)
-            if (itemView!!.layoutParams == null) {
+            if (itemView.layoutParams == null) {
                 itemView.layoutParams = ViewGroup.LayoutParams(
                         ViewGroup.LayoutParams.WRAP_CONTENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT)
@@ -179,7 +180,12 @@ class ExtendedSpinner : LinearLayout, View.OnClickListener {
         val adapter = adapter
         if (adapter != null) {
             adapterItemMaxWidth = calcMaximumItemWidth(adapter)
-            itemView?.minimumWidth = adapterItemMaxWidth
+            if (layoutParams.width == LayoutParams.WRAP_CONTENT) {
+                itemView?.minimumWidth = adapterItemMaxWidth
+            } else {
+                itemView?.layoutParams = LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT).apply { this.weight = 1f; this.gravity = Gravity.CENTER_VERTICAL }
+                itemView?.minimumWidth = 0
+            }
         }
     }
 
@@ -192,7 +198,7 @@ class ExtendedSpinner : LinearLayout, View.OnClickListener {
                 lp.gravity = Gravity.CENTER_VERTICAL
             } else {
                 lp = LinearLayout.LayoutParams(lp)
-                (lp as LinearLayout.LayoutParams).gravity = Gravity.CENTER_VERTICAL
+                lp.gravity = Gravity.CENTER_VERTICAL
                 itemView?.layoutParams = lp
             }
             this.addView(itemView, 0)
