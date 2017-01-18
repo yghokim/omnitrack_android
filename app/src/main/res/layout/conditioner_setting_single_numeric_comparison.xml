@@ -20,7 +20,7 @@
 
     <EditText
         android:id="@+id/ui_compared_number_input"
-        style="@style/numberPropertyDigitViewStyle"
+        style="@style/ShortTextInputStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
@@ -28,9 +28,9 @@
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="12dp"
         android:layout_weight="1"
-        android:background="@drawable/text_field_singleline"
-        android:ems="10"
         android:inputType="numberDecimal|numberSigned"
         android:text="10000"
+        android:textAppearance="@style/numberPropertyDigitViewStyle"
+        android:textColor="@color/colorSecondary"
         android:textSize="25sp" />
 </merge>
