@@ -2,9 +2,11 @@ package kr.ac.snu.hcil.omnitrack.ui.components.common
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
+import android.support.v4.content.ContextCompat
 import android.support.v4.content.FileProvider
 import android.support.v7.app.AppCompatActivity
 import android.util.AttributeSet
@@ -16,6 +18,7 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import com.koushikdutta.ion.Ion
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.utils.applyTint
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import java.io.File
 import java.text.SimpleDateFormat
@@ -130,7 +133,7 @@ class ImagePicker : FrameLayout, View.OnClickListener {
     init {
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         inflater.inflate(R.layout.component_image_picker, this, true)
-        this.setBackgroundResource(R.drawable.hatching_repeated_wide_gray)
+        this.background = applyTint(ContextCompat.getDrawable(context, R.drawable.hatching_repeated_wide_gray), Color.parseColor("#e0e0e0"))
 
         cameraButton = findViewById(R.id.ui_button_camera)
         galleryButton = findViewById(R.id.ui_button_gallery)
