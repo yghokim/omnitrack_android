@@ -69,6 +69,14 @@
             android:layout_height="wrap_content"
             android:text="Sign Out" />
 
+        <Button
+            android:id="@+id/ui_button_about"
+            style="@style/Base.TextAppearance.AppCompat.Widget.Button.Borderless.Colored"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/msg_about"
+            android:textColor="@color/buttonIconColorDark" />
+
     </LinearLayout>
 
 </android.support.v4.widget.DrawerLayout>
