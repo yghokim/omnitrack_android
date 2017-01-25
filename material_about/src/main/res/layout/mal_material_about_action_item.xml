@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingBottom="@dimen/mal_baseline_half"
+    android:paddingTop="@dimen/mal_baseline_half">
+
+    <android.support.v7.widget.AppCompatImageView
+        android:id="@+id/mal_item_image"
+        android:layout_width="@dimen/mal_action_item_image_width"
+        android:layout_height="@dimen/mal_action_action_item_image_height"
+        android:layout_gravity="center"
+        android:layout_marginEnd="@dimen/mal_baseline_half"
+        android:layout_marginLeft="@dimen/mal_baseline"
+        android:layout_marginRight="@dimen/mal_baseline_half"
+        android:layout_marginStart="@dimen/mal_baseline"
+        android:adjustViewBounds="false"
+        android:contentDescription="@string/mal_content_desc_action_icon"
+        android:cropToPadding="false"
+        android:scaleType="centerInside" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginEnd="@dimen/mal_baseline"
+        android:layout_marginLeft="@dimen/mal_baseline"
+        android:layout_marginRight="@dimen/mal_baseline"
+        android:layout_marginStart="@dimen/mal_baseline"
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+        android:minHeight="@dimen/mal_action_action_item_image_height"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/mal_item_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            android:textColor="@color/mal_action_item_text" />
+
+        <TextView
+            android:id="@+id/mal_action_item_subtext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            android:textColor="@color/mal_action_item_subtext"
+            android:visibility="gone" />
+    </LinearLayout>
+
+</LinearLayout>
