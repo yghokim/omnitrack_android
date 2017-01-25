@@ -1,1 +1,1 @@
-include ':app', ':microsoft-band-1.3.20307.2', ':material_dialog_core'
+include ':app', ':microsoft-band-1.3.20307.2', ':material_dialog_core', ':UpPlatformSdk'

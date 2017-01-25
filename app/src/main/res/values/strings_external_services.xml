@@ -6,6 +6,9 @@
 
     <string name="msg_external_service_activation_requires_internet">Activation requires the internet connection.</string>
 
+    <string name="measure_steps_name">Step Count</string>
+    <string name="measure_steps_desc">Get step count during a specific range</string>
+
     <!-- microsoft band -->
     <string name="service_microsoft_band_name">Microsoft Band</string>
     <string name="service_microsoft_band_desc">Microsoft Band and Band2</string>
@@ -23,8 +26,6 @@
     <!-- google fit -->
     <string name="service_googlefit_name">Google Fit</string>
     <string name="service_googlefit_desc">Get measured data from Google health platform</string>
-    <string name="measure_googlefit_steps_name">Step Count</string>
-    <string name="measure_googlefit_steps_desc">Get step count during specific range</string>
 
 
     <!-- misfit -->
@@ -33,9 +34,6 @@
 
     <string name="measure_misfit_sleeps_name">Sleep Time</string>
     <string name="measure_misfit_sleeps_desc">Get sleep time range</string>
-
-    <string name="measure_misfit_steps_name">Step Count</string>
-    <string name="measure_misfit_steps_desc">Get step count during specific range</string>
 
 
     <!-- device -->
@@ -56,7 +54,7 @@
 
     <!-- fitbit -->
     <string name="service_fitbit_name">Fitbit</string>
-    <string name="service_fitbit_desc">Get data from Fitbit server</string>
+    <string name="service_fitbit_desc">Get data from Fitbit account</string>
 
     <string name="measure_fitbit_sleep_time_name">Sleep Time</string>
     <string name="measure_fitbit_sleep_time_desc">Get sleep time range</string>
@@ -65,11 +63,12 @@
     <string name="measure_fitbit_distance_name">Total Distance</string>
     <string name="measure_fitbit_distance_desc">Get total distance walked during a specific range</string>
 
-    <string name="measure_fitbit_steps_name">Step Count</string>
-    <string name="measure_fitbit_steps_desc">Get step count during a specific range</string>
-
     <string name="measure_fitbit_heart_rate_name">Average Heart Rate</string>
     <string name="measure_fitbit_heart_rate_desc">Get the average heart rate during a specific range</string>
+
+    <!-- Jawbone -->
+    <string name="service_jawbone_name">UP by Jawbone</string>
+    <string name="service_jawbone_desc">Get data from Jawbone UP account</string>
 
 
 </resources>

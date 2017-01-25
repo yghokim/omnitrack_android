@@ -40,9 +40,9 @@ object GoogleFitStepsFactory : GoogleFitService.GoogleFitMeasureFactory() {
     override val minimumGranularity: OTTimeRangeQuery.Granularity = OTTimeRangeQuery.Granularity.Millis
     override val isDemandingUserInput: Boolean = false
 
-    override val nameResourceId: Int = R.string.measure_googlefit_steps_name
+    override val nameResourceId: Int = R.string.measure_steps_name
 
-    override val descResourceId: Int = R.string.measure_googlefit_steps_desc
+    override val descResourceId: Int = R.string.measure_steps_desc
 
     override val usedAPI: Api<out Api.ApiOptions.NotRequiredOptions> = Fitness.HISTORY_API
     override val usedScope: Scope = Fitness.SCOPE_ACTIVITY_READ
