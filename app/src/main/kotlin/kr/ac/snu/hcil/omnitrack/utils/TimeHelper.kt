@@ -80,6 +80,53 @@ object TimeHelper {
         return timestamp / 1000 * 1000
     }
 
+    fun sliceToDate(start: Long, end: Long): List<Pair<Date, Date>> {
+        val points: Array<Long?>
+
+        val startCal = Calendar.getInstance()
+        startCal.timeInMillis = start
+
+        val dateDiff = (end / DateUtils.DAY_IN_MILLIS).toInt() - (start / DateUtils.DAY_IN_MILLIS).toInt()
+
+        if (dateDiff <= 0) {
+            points = arrayOf(start, end)
+        } else {
+            points = arrayOfNulls<Long>(if (end % DateUtils.DAY_IN_MILLIS == 0L) {
+                (2 + dateDiff - 1)
+            } else {
+                2 + dateDiff
+            })
+
+            points[0] = start
+
+            startCal.setHourOfDay(0, true)
+            for (i in 1..dateDiff) {
+                points[i] = startCal.timeInMillis + i * DateUtils.DAY_IN_MILLIS
+            }
+
+            if (end % DateUtils.DAY_IN_MILLIS != 0L) {
+                points[points.size - 1] = end
+            }
+        }
+
+        val list = ArrayList<Pair<Date, Date>>()
+
+        var startDate: Date
+        var endDate: Date
+        for (i in 0..(points.size - 2)) {
+            startDate = Date(points[i]!!)
+            endDate = if (i + 1 < points.size - 1) {
+                Date(points[i + 1]!! - DateUtils.MINUTE_IN_MILLIS)
+            } else {
+                Date(points[i + 1]!!)
+            }
+
+            list.add(Pair(startDate, endDate))
+        }
+
+        return list
+    }
+
     fun getDateText(timestamp: Long, context: Context): String{
         val cal = Calendar.getInstance()
 

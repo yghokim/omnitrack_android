@@ -1,15 +1,21 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.jawbone
 
+import com.google.gson.Gson
+import com.jawbone.upplatformsdk.api.ApiManager
+import com.jawbone.upplatformsdk.utils.UpPlatformSdkConstants
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
-import kr.ac.snu.hcil.omnitrack.core.externals.misfit.MisfitStepMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.Result
+import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableTypedQueue
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
+import retrofit.RetrofitError
+import retrofit.client.Response
 import rx.Observable
+import java.util.*
 
 /**
  * Created by younghokim on 2017. 1. 25..
@@ -26,7 +32,7 @@ object JawboneStepMeasureFactory : OTMeasureFactory() {
     }
 
     override val isRangedQueryAvailable: Boolean = true
-    override val minimumGranularity: OTTimeRangeQuery.Granularity = OTTimeRangeQuery.Granularity.Day
+    override val minimumGranularity: OTTimeRangeQuery.Granularity = OTTimeRangeQuery.Granularity.Minute
     override val isDemandingUserInput: Boolean = false
 
 
@@ -47,21 +53,85 @@ object JawboneStepMeasureFactory : OTMeasureFactory() {
 
         override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_INT
 
-        override val factory: OTMeasureFactory = MisfitStepMeasureFactory
+        override val factory: OTMeasureFactory = JawboneStepMeasureFactory
 
         constructor() : super()
         constructor(serialized: String) : super(serialized)
 
         override fun getValueRequest(start: Long, end: Long): Observable<Result<out Any>> {
-            return Observable.defer {
-                /*
-                ApiManager.getRestApiInterface().getMoveEventsList()
-                if (token != null) {
-                    return@defer MisfitApi.getStepsOnDayRequest(token, Date(start), Date(end - 1)) as Observable<Result<out Any>>
-                } else {
-                    return@defer Observable.error<Result<out Any>>(Exception("no token"))
-                }*/
-                null
+            if (TimeHelper.isSameDay(start, end - 10)) {
+                return Observable.create<Result<out Any>> {
+                    subscriber ->
+                    ApiManager.getRestApiInterface().getMoveEventsList(UpPlatformSdkConstants.API_VERSION_STRING, HashMap<String, Long>().apply { this["date"] = JawboneUpService.makeFormattedDateInteger(start).toLong() }, object : retrofit.Callback<Any> {
+                        override fun failure(error: RetrofitError) {
+                            if (!subscriber.isUnsubscribed) {
+                                subscriber.onError(error)
+                            }
+                        }
+
+                        override fun success(result: Any, response: Response) {
+
+                            if (!subscriber.isUnsubscribed) {
+                                subscriber.onNext(Result(extractStepCountFromResult(result)))
+                                subscriber.onCompleted()
+                            }
+                        }
+                    })
+                }
+            } else {
+                return Observable.create<Result<out Any>> {
+                    subscriber ->
+
+                    Observable.zip(TimeHelper.sliceToDate(start, end).map {
+                        Observable.create<Int> {
+                            subscriber ->
+                            ApiManager.getRestApiInterface().getMoveEventsList(UpPlatformSdkConstants.API_VERSION_STRING, JawboneUpService.makeIntraDayRequestQueryParams(it.first, it.second, null), object : retrofit.Callback<Any> {
+                                override fun failure(error: RetrofitError) {
+                                    if (!subscriber.isUnsubscribed) {
+                                        subscriber.onError(error)
+                                    }
+                                }
+
+                                override fun success(result: Any, response: Response) {
+                                    if (!subscriber.isUnsubscribed) {
+                                        subscriber.onNext(extractStepCountFromResult(result))
+                                        subscriber.onCompleted()
+                                    }
+                                }
+                            })
+                        }
+                    }, { values ->
+                        var sum = 0
+                        for (value in values) {
+                            if (value is Int) {
+                                sum += value
+                            }
+                        }
+                        sum
+                    }).subscribe({
+                        result ->
+                        if (!subscriber.isUnsubscribed) {
+                            subscriber.onNext(Result(result))
+                            subscriber.onCompleted()
+                        }
+                    }, {
+                        error ->
+                        subscriber.onError(error)
+                    })
+                }
+            }
+        }
+
+        private fun extractStepCountFromResult(result: Any): Int {
+            try {
+                val json = Gson().toJsonTree(result).asJsonObject
+                val items = json.getAsJsonObject("data").getAsJsonArray("items")
+                return items
+                        .map { it -> it.asJsonObject }
+                        .sumBy { it.getAsJsonObject("details").get("steps").asInt }
+            } catch(exception: Exception) {
+                exception.printStackTrace()
+                return 0
             }
         }
 
