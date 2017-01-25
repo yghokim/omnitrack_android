@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/mal_baseline_half"
+    android:paddingTop="@dimen/mal_baseline_half">
+
+    <android.support.v7.widget.AppCompatImageView
+        android:id="@+id/mal_item_image"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/mal_baseline_half"
+        android:layout_marginLeft="@dimen/mal_baseline"
+        android:layout_marginRight="@dimen/mal_baseline_half"
+
+        android:layout_marginStart="@dimen/mal_baseline"
+        android:contentDescription="@string/mal_content_desc_action_icon"
+        android:cropToPadding="false"
+
+        android:paddingLeft="@dimen/mal_baseline"
+        android:paddingRight="@dimen/mal_baseline" />
+
+    <TextView
+        android:id="@+id/mal_item_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/mal_baseline"
+        android:layout_marginLeft="@dimen/mal_baseline"
+        android:layout_marginRight="@dimen/mal_baseline"
+        android:layout_marginStart="@dimen/mal_baseline"
+        android:lineSpacingMultiplier="1.3"
+        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+        android:textColor="@color/mal_action_item_text" />
+
+
+</LinearLayout>
