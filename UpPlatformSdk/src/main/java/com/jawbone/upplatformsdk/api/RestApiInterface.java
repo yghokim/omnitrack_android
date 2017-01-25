@@ -84,7 +84,7 @@ public interface RestApiInterface {
     @GET("/nudge/api/{version}/users/@me/moves")
     void getMoveEventsList(
             @Path(UpPlatformSdkConstants.API_VERSION) String version,
-            @QueryMap HashMap<String, Integer> hashMap,
+            @QueryMap HashMap<String, Long> hashMap,
             Callback<Object> response
     );
 
