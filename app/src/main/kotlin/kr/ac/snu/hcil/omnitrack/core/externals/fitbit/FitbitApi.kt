@@ -1,9 +1,8 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.fitbit
 
-import android.text.format.DateUtils
+import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 import kr.ac.snu.hcil.omnitrack.utils.auth.AuthConstants
 import kr.ac.snu.hcil.omnitrack.utils.auth.OAuth2Client
-import kr.ac.snu.hcil.omnitrack.utils.setHourOfDay
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
@@ -32,53 +31,9 @@ object FitbitApi {
     }
 
     fun makeIntraDayRequestUrls(resourcePath: String, start: Long, end: Long): Array<String> {
-        val urls = ArrayList<String>()
-
-        val points: Array<Long?>
-
-        val startCal = Calendar.getInstance()
-        startCal.timeInMillis = start
-
-        val dateDiff = (end / DateUtils.DAY_IN_MILLIS).toInt() - (start / DateUtils.DAY_IN_MILLIS).toInt()
-
-        if (dateDiff <= 0) {
-            points = arrayOf(start, end)
-        } else {
-            points = arrayOfNulls<Long>(if (end % DateUtils.DAY_IN_MILLIS == 0L) {
-                (2 + dateDiff - 1)
-            } else {
-                2 + dateDiff
-            })
-
-            points[0] = start
-
-            startCal.setHourOfDay(0, true)
-            for (i in 1..dateDiff) {
-                points[i] = startCal.timeInMillis + i * DateUtils.DAY_IN_MILLIS
-            }
-
-            if (end % DateUtils.DAY_IN_MILLIS != 0L) {
-                points[points.size - 1] = end
-            }
-        }
-
-        var startDate: Date
-        var endDate: Date
-        for (i in 0..(points.size - 2)) {
-            startDate = Date(points[i]!!)
-            endDate = if (i + 1 < points.size - 1) {
-                Date(points[i + 1]!! - DateUtils.MINUTE_IN_MILLIS)
-            } else {
-                Date(points[i + 1]!!)
-            }
-
-            urls.add(
-                    String.format(REQUEST_URL_INTRADAY_COMMAND_FORMAT, resourcePath, AuthConstants.DATE_FORMAT.format(startDate), REQUEST_TIME_FORMAT.format(startDate), REQUEST_TIME_FORMAT.format(endDate))
-            )
-        }
-
-
-        return urls.toTypedArray()
+        return TimeHelper.sliceToDate(start, end).map {
+            String.format(REQUEST_URL_INTRADAY_COMMAND_FORMAT, resourcePath, AuthConstants.DATE_FORMAT.format(it.first), REQUEST_TIME_FORMAT.format(it.first), REQUEST_TIME_FORMAT.format(it.second))
+        }.toTypedArray()
     }
 
     abstract class AIntraDayConverter<ValueType, ResultType>(val dataSetKey: String) : OAuth2Client.OAuth2RequestConverter<ResultType?> {

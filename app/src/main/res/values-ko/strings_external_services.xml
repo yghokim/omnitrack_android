@@ -65,5 +65,12 @@
     <string name="measure_fitbit_heart_rate_name">심박 수</string>
     <string name="measure_fitbit_heart_rate_desc">특정 기간 동안의 평균 심박 수를 불러옵니다</string>
 
+    <!-- jawbone -->
+    <string name="service_jawbone_name">UP by Jawbone</string>
+    <string name="service_jawbone_desc">Jawbone UP 계정에서 데이터를 불러옵니다</string>
+
+    <string name="measure_jawbone_distance_name">총 이동거리 (미터)</string>
+    <string name="measure_jawbone_distance_desc">특정 기간 동안 걸은 총 거리를 불러옵니다</string>
+
 
 </resources>
