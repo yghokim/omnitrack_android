@@ -12,11 +12,11 @@ import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelpe
 /**
  * Created by younghokim on 2017. 1. 25..
  */
-object JawboneStepMeasureFactory : OTMeasureFactory() {
+object JawboneDistanceMeasureFactory : OTMeasureFactory() {
     override val exampleAttributeType: Int = OTAttribute.TYPE_NUMBER
 
     override fun getExampleAttributeConfigurator(): IExampleAttributeConfigurator {
-        return CONFIGURATOR_STEP_ATTRIBUTE
+        return CONFIGURATOR_DISTANCE_ATTRIBUTE
     }
 
     override fun isAttachableTo(attribute: OTAttribute<out Any>): Boolean {
@@ -29,27 +29,27 @@ object JawboneStepMeasureFactory : OTMeasureFactory() {
 
 
     override fun makeMeasure(): OTMeasure {
-        return JawboneStepMeasure()
+        return JawboneDistanceMeasure()
     }
 
     override fun makeMeasure(serialized: String): OTMeasure {
-        return JawboneStepMeasure(serialized)
+        return JawboneDistanceMeasure(serialized)
     }
 
     override val service: OTExternalService = JawboneUpService
 
-    override val descResourceId: Int = R.string.measure_steps_desc
-    override val nameResourceId: Int = R.string.measure_steps_name
+    override val descResourceId: Int = R.string.measure_jawbone_distance_desc
+    override val nameResourceId: Int = R.string.measure_jawbone_distance_name
 
-    class JawboneStepMeasure : AJawboneMoveMeasure {
+    class JawboneDistanceMeasure : AJawboneMoveMeasure {
 
         override fun extractValueFromItem(item: JsonObject): Float {
-            return item.getAsJsonObject("details").get("steps").asFloat
+            return item.getAsJsonObject("details").get("distance").asFloat
         }
 
         override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_FLOAT
 
-        override val factory: OTMeasureFactory = JawboneStepMeasureFactory
+        override val factory: OTMeasureFactory = JawboneDistanceMeasureFactory
 
         constructor() : super()
         constructor(serialized: String) : super(serialized)
@@ -62,7 +62,7 @@ object JawboneStepMeasureFactory : OTMeasureFactory() {
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
-            else return other is JawboneStepMeasure
+            else return other is JawboneDistanceMeasure
         }
 
         override fun hashCode(): Int {

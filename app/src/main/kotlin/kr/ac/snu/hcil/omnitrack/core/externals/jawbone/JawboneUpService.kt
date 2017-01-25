@@ -12,9 +12,13 @@ import com.jawbone.upplatformsdk.utils.UpPlatformSdkConstants.UP_PLATFORM_ACCESS
 import com.jawbone.upplatformsdk.utils.UpPlatformSdkConstants.UP_PLATFORM_REFRESH_TOKEN
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
+import kr.ac.snu.hcil.omnitrack.utils.getDayOfMonth
+import kr.ac.snu.hcil.omnitrack.utils.getYear
+import kr.ac.snu.hcil.omnitrack.utils.getZeroBasedMonth
 import retrofit.Callback
 import retrofit.RetrofitError
 import retrofit.client.Response
+import java.util.*
 
 
 /**
@@ -26,12 +30,36 @@ object JawboneUpService : OTExternalService("JawboneUpService", 9), Callback<Oau
     private const val CLIENT_SECRET = "af60fc1d4d06c4de0286c2403702dc5a076c7132"
     private const val REDIRECT_URI = "up-platform://redirect"
 
+    fun makeFormattedDateInteger(date: Long): Int {
+        val cal = Calendar.getInstance()
+        cal.timeInMillis = date
+        return cal.getYear() * 10000 + (cal.getZeroBasedMonth() + 1) * 100 + cal.getDayOfMonth()
+    }
+
+    fun makeIntraDayRequestQueryParams(start: Date, end: Date, data: HashMap<String, Long>?): HashMap<String, Long> {
+        val result = data ?: HashMap<String, Long>()
+
+
+
+        result.put("date", makeFormattedDateInteger(start.time).toLong())
+        result.put("start_date", start.time)
+        result.put("end_date", end.time)
+
+        return result
+    }
+
     private val SCOPES: List<UpPlatformSdkConstants.UpPlatformAuthScope> by lazy {
         arrayListOf(
                 UpPlatformSdkConstants.UpPlatformAuthScope.MOVE_READ,
                 UpPlatformSdkConstants.UpPlatformAuthScope.WEIGHT_READ,
                 UpPlatformSdkConstants.UpPlatformAuthScope.SLEEP_READ
         )
+    }
+
+    init {
+        _measureFactories.add(JawboneStepMeasureFactory)
+        _measureFactories.add(JawboneDistanceMeasureFactory)
+        assignRequestCode(this)
     }
 
     override val thumbResourceId: Int = R.drawable.service_thumb_up
