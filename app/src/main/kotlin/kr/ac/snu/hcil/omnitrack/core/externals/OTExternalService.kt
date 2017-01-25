@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.externals.fitbit.FitbitService
 import kr.ac.snu.hcil.omnitrack.core.externals.google.fit.GoogleFitService
+import kr.ac.snu.hcil.omnitrack.core.externals.jawbone.JawboneUpService
 import kr.ac.snu.hcil.omnitrack.core.externals.misfit.MisfitService
 import kr.ac.snu.hcil.omnitrack.core.externals.rescuetime.RescueTimeService
 import kr.ac.snu.hcil.omnitrack.utils.FillingIntegerIdReservationTable
@@ -35,6 +36,7 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
                     //AndroidDeviceService,
                     GoogleFitService
                     ,FitbitService
+                    , JawboneUpService
                     ,MisfitService
                     ,RescueTimeService
                     //,MicrosoftBandService
@@ -179,9 +181,13 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
         result.toTypedArray()
     }
 
-    protected fun cancelActivationProcess() {
-        pendingConnectionListener?.invoke(false)
+    protected fun finishActivationProcess(success: Boolean) {
+        pendingConnectionListener?.invoke(success)
         pendingConnectionListener = null
+    }
+
+    protected fun cancelActivationProcess() {
+        finishActivationProcess(false)
     }
 
     fun onActivityActivationResult(resultCode: Int, resultData: Intent?) {

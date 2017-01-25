@@ -45,8 +45,8 @@ object FitbitStepCountMeasureFactory : OTMeasureFactory() {
 
     override val service: OTExternalService = FitbitService
 
-    override val descResourceId: Int = R.string.measure_fitbit_steps_desc
-    override val nameResourceId: Int = R.string.measure_fitbit_steps_name
+    override val descResourceId: Int = R.string.measure_steps_desc
+    override val nameResourceId: Int = R.string.measure_steps_name
 
 
     class FitbitStepMeasure : OTRangeQueriedMeasure {

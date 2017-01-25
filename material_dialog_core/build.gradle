@@ -4,9 +4,9 @@ ext {
     PUBLISH_GROUP_ID = 'com.afollestad.material-dialogs'
     PUBLISH_ARTIFACT_ID = 'core'
     PUBLISH_VERSION = '0.9.1.0'
-    SUPPORT_LIBRARY_VERSION = '25.1.0'
-    BUILD_TOOLS = "25.0.2"
-    TARGET_SDK = 25
+    SUPPORT_LIBRARY_VERSION = rootProject.ext.android_support_version
+    BUILD_TOOLS = rootProject.ext.buildToolsVersion
+    TARGET_SDK = rootProject.ext.targetSdkVersion
 }
 
 android {

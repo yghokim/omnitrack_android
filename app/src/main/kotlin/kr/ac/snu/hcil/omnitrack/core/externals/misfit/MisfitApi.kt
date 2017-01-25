@@ -50,8 +50,6 @@ object MisfitApi {
                 .addQueryParameter(AuthConstants.PARAM_REDIRECT_URI, AuthConstants.VALUE_REDIRECT_URI)
                 .addQueryParameter(AuthConstants.PARAM_SCOPE, "tracking,sleeps")
                 .build()
-
-        println(uri.toString())
         activity.startActivityForResult(WebServiceLoginActivity.makeIntent(uri.toString(), OTApplication.getString(R.string.service_misfit_name), activity), OTExternalService.requestCodeDict[MisfitService])
     }
 
