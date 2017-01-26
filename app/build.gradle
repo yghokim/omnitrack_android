@@ -74,13 +74,8 @@ dependencies {
     compile 'com.amazonaws:aws-android-sdk-s3:2.3.8'
     compile 'com.amazonaws:aws-android-sdk-ddb:2.3.8'
     compile 'com.amazonaws:aws-android-sdk-ddb-mapper:2.3.8'
-    compile('com.h6ah4i.android.widget.advrecyclerview:advrecyclerview:0.9.3@aar') {
-        transitive = true
-    }
     compile 'jp.wasabeef:recyclerview-animators:2.2.3'
     compile 'com.github.markushi:android-ui:1.2'
-    compile 'com.kovachcode:timePickerWithSeconds:1.0.0'
-    compile 'com.github.TechFreak:WizardPager:1.0.3'
     compile 'org.apmem.tools:layouts:1.10@aar'
     compile 'com.koushikdutta.ion:ion:2.1.8'
     compile 'io.nlopez.smartlocation:library:3.2.5'
@@ -94,6 +89,8 @@ dependencies {
     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5'
     releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
     testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
+
+    compile 'us.feras.mdv:markdownview:1.1.0'
 
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
