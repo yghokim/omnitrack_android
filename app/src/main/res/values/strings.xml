@@ -204,6 +204,19 @@
     <string name="msg_service_activating">Activating…</string>
     <string name="sign_in_with_google">Sign in with Google</string>
 
+    <string name="msg_about">About OmniTrack</string>
+    <string name="msg_about_about_us">About Us</string>
+
+    <string name="msg_about_text">
+        OmniTrack is a collaborative research project of Seoul National University (Korea), Microsoft Research (USA), and the Pennsylvania State University (USA).
+    </string>
+
+    <string name="msg_version">Version</string>
+
+    <string name="msg_open_source_license">Open Source License</string>
+
+    <string name="msg_contact_us">Contact Us</string>
+    <string name="msg_contact_us_message">Send us feedback, inquiries, and bug reports</string>
 
     <string-array name="choice_preview_entries">
         <item>Choice entry 1</item>
