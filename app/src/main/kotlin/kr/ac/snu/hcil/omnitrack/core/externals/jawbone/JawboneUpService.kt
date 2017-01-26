@@ -39,8 +39,6 @@ object JawboneUpService : OTExternalService("JawboneUpService", 9), Callback<Oau
     fun makeIntraDayRequestQueryParams(start: Date, end: Date, data: HashMap<String, Long>?): HashMap<String, Long> {
         val result = data ?: HashMap<String, Long>()
 
-
-
         result.put("date", makeFormattedDateInteger(start.time).toLong())
         result.put("start_date", start.time)
         result.put("end_date", end.time)
@@ -127,6 +125,7 @@ object JawboneUpService : OTExternalService("JawboneUpService", 9), Callback<Oau
 
             println("accessToken:" + result.access_token)
             accessToken = result.access_token
+            ApiManager.getRequestInterceptor().setAccessToken(accessToken)
             finishActivationProcess(true)
         } else {
             println("accessToken not returned by Oauth call, exiting...")
