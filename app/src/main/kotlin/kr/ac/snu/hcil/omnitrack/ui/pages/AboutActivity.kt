@@ -9,6 +9,7 @@ import com.danielstone.materialaboutlibrary.model.MaterialAboutCard
 import com.danielstone.materialaboutlibrary.model.MaterialAboutList
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.MarkdownScreenDialogFragment
 
 /**
  * Created by younghokim on 2017. 1. 25..
@@ -44,7 +45,9 @@ class AboutActivity : MaterialAboutActivity() {
                                         .textColorOverrideRes(R.color.textColorMidDark)
                                         .text(R.string.msg_open_source_license)
                                         .setOnClickListener {
+                                            val licenseScreenFragment = MarkdownScreenDialogFragment.makeInstance(resources.getString(R.string.msg_open_source_license), "file:///android_asset/licenses/osl.md", "file:///android_asset/licenses/style.css")
 
+                                            licenseScreenFragment.show(fragmentManager, "Open Source License Fragment")
                                         }
                                         .build()
                         )
