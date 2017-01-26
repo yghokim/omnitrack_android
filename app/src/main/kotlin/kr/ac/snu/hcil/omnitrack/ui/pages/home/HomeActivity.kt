@@ -20,6 +20,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
+import kr.ac.snu.hcil.omnitrack.ui.pages.AboutActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.diagnostics.SystemLogActivity
 
 class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), IdentityManager.SignInStateChangeListener {
@@ -62,6 +63,13 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Ident
                 goSignInPage()
             }
         }
+
+        val aboutButton = drawerLayout.findViewById(R.id.ui_button_about)
+        aboutButton.setOnClickListener {
+            val intent = Intent(this, AboutActivity::class.java)
+            startActivity(intent)
+        }
+
         /*
         slidingMenu = SlidingMenu(this, SlidingMenu.SLIDING_WINDOW)
         slidingMenu.mode = SlidingMenu.LEFT

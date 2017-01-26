@@ -132,6 +132,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".ui.pages.AboutActivity" />
+
         <activity
             android:name=".ui.pages.home.HomeActivity"
             android:label="@string/app_name" />
