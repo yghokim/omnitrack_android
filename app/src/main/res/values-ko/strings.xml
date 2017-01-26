@@ -191,6 +191,20 @@
     <string name="msg_service_activating">활성화중…</string>
     <string name="sign_in_with_google">Google 계정으로 로그인</string>
 
+    <string name="msg_about">OmniTrack 정보</string>
+    <string name="msg_about_about_us">만든 사람들</string>
+
+    <string name="msg_about_text">
+        OmniTrack은 서울대학교(한국), 마이크로소프트 리서치(미국), 펜실베이니아 주립대학교(미국)의 공동연구 프로젝트입니다.
+    </string>
+
+
+    <string name="msg_version">버젼</string>
+
+    <string name="msg_open_source_license">오픈 소스 라이선스</string>
+
+    <string name="msg_contact_us">문의하기</string>
+    <string name="msg_contact_us_message">버그 리포트, 개선의견 등을 보내주세요</string>
 
     <string-array name="choice_preview_entries">
         <item>선택 항목 1</item>
