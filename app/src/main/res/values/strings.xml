@@ -219,6 +219,27 @@
     <string name="msg_contact_us_message">Send us feedback, inquiries, and bug reports</string>
 
     <string name="msg_informed_consent">Agree to Informed Consent</string>
+    <string name="msg_demographic_title">Insert Basic Information</string>
+
+    <string name="informed_consent_filename">informed_consent.md</string>
+
+    <string name="msg_demographic_gender">What is your gender?</string>
+    <string name="msg_demographic_occupation">Which best describes your current status?</string>
+
+    <string-array name="gender_entries">
+        <item>Male</item>
+        <item>Female</item>
+        <item>Other</item>
+    </string-array>
+
+    <string-array name="occupation_entries">
+        <item>Self-employed</item>
+        <item>Employed full-time</item>
+        <item>Employed part-time</item>
+        <item>Undergraduate student</item>
+        <item>Graduate student</item>
+        <item>Unemployed/Homemaker</item>
+    </string-array>
 
     <string-array name="choice_preview_entries">
         <item>Choice entry 1</item>

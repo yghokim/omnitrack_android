@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.Rect
 import android.graphics.Typeface
+import android.support.annotation.ArrayRes
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -53,6 +54,10 @@ class SelectionView(context: Context, attrs: AttributeSet?, defStyle: Int) : Rec
         adapter.notifyDataSetChanged()
     }
 
+    fun setValues(@ArrayRes newValuesRes: Int) {
+        setValues(resources.getStringArray(newValuesRes))
+    }
+
     init {
         buttonPadding = Rect(resources.getDimensionPixelOffset(R.dimen.selection_view_button_padding_left),
                 resources.getDimensionPixelOffset(R.dimen.selection_view_button_padding_top),
@@ -78,7 +83,7 @@ class SelectionView(context: Context, attrs: AttributeSet?, defStyle: Int) : Rec
     inner class Adapter() : RecyclerView.Adapter<Adapter.ViewHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            var view = TextView(context)
+            val view = TextView(context)
             view.layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
             view.minHeight = 0
             view.minWidth = 0

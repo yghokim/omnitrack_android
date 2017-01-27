@@ -25,6 +25,8 @@ import java.util.*
  * Created by younghokim on 16. 7. 28..
  */
 
+const val ANDROID_ASSET_PATH = "file:///android_asset"
+
 @TargetApi(23)
 fun isInDozeMode(): Boolean {
     val powerManager = OTApplication.app.getSystemService(PowerManager::class.java)
