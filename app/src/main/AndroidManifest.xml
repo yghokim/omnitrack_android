@@ -164,6 +164,11 @@
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_sign_in" />
 
+        <activity
+            android:name=".ui.pages.experiment.ExperimentSignInActivity"
+            android:theme="@style/Theme.Intro" />
+
+
     </application>
 
 </manifest>
