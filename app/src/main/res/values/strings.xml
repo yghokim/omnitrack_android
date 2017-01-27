@@ -218,6 +218,8 @@
     <string name="msg_contact_us">Contact Us</string>
     <string name="msg_contact_us_message">Send us feedback, inquiries, and bug reports</string>
 
+    <string name="msg_informed_consent">Agree to Informed Consent</string>
+
     <string-array name="choice_preview_entries">
         <item>Choice entry 1</item>
         <item>Choice entry 2</item>
