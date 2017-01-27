@@ -207,6 +207,27 @@
     <string name="msg_contact_us_message">버그 리포트, 개선의견 등을 보내주세요</string>
 
     <string name="msg_informed_consent">연구 참가 동의서에 동의해주세요</string>
+    <string name="msg_demographic_title">기본 정보를 입력해주세요</string>
+
+    <string name="informed_consent_filename">informed_consent_ko.md</string>
+
+    <string name="msg_demographic_gender">당신의 성별은 무엇인가요?</string>
+    <string name="msg_demographic_occupation">당신의 현재 상태를 가장 잘 나타내는 항목을 골라주세요.</string>
+
+    <string-array name="gender_entries">
+        <item>남성</item>
+        <item>여성</item>
+        <item>기타</item>
+    </string-array>
+
+    <string-array name="occupation_entries">
+        <item>프리랜서</item>
+        <item>전일제 근로자</item>
+        <item>파트타임 근로자</item>
+        <item>학부생</item>
+        <item>대학원생</item>
+        <item>무직/가사</item>
+    </string-array>
 
     <string-array name="choice_preview_entries">
         <item>선택 항목 1</item>

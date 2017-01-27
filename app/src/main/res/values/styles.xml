@@ -39,7 +39,11 @@
         <item name="android:textStyle">bold</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
+    </style>
 
+    <style name="PropertyHeaderStyle.withMargin" parent="PropertyHeaderStyle">
+        <item name="android:layout_marginBottom">15dp</item>
+        <item name="android:layout_marginTop">30dp</item>
     </style>
 
     <style name="HorizontalSeparator">
@@ -402,6 +406,13 @@
         <item name="ttlm_padding">20dp</item>
         <item name="android:textAppearance">@style/tooltipTextAppearance</item>
         <item name="ttlm_arrowRatio">1.4</item>
+    </style>
+
+    <style name="IntroTitleStyle" parent="Base.TextAppearance.AppCompat.Headline">
+        <item name="android:layout_marginBottom">@dimen/activity_vertical_margin</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textColor">#FFF</item>
+        <item name="android:textStyle">bold</item>
     </style>
 
 </resources>
