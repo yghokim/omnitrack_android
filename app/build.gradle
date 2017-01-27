@@ -91,6 +91,7 @@ dependencies {
     testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
 
     compile 'us.feras.mdv:markdownview:1.1.0'
+    compile 'com.heinrichreimersoftware:material-intro:1.6'
 
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 

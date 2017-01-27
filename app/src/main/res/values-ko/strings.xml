@@ -206,6 +206,8 @@
     <string name="msg_contact_us">문의하기</string>
     <string name="msg_contact_us_message">버그 리포트, 개선의견 등을 보내주세요</string>
 
+    <string name="msg_informed_consent">연구 참가 동의서에 동의해주세요</string>
+
     <string-array name="choice_preview_entries">
         <item>선택 항목 1</item>
         <item>선택 항목 2</item>
