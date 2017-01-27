@@ -97,6 +97,17 @@ Apache 2.0 license
 Copyright © 2014-2016 Aidan Michael Follestad<br>
 The MIT license (MIT)
 
+#####MarkdownView
+<https://github.com/falnatsheh/MarkdownView><br>
+Copyright 2011 Feras Alnatsheh<br>
+Apache 2.0 license
+
+#####material-intro
+<https://github.com/HeinrichReimer/material-intro><br>
+Copyright 2016 Heinrich Reimer<br>
+Apache 2.0 license
+
+
 
 ---
 
