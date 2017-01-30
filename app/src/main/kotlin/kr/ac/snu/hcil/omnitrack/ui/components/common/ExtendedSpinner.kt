@@ -6,6 +6,7 @@ import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.AppCompatImageView
+import android.support.v7.widget.AppCompatTextView
 import android.util.AttributeSet
 import android.view.Gravity
 import android.view.View
@@ -13,6 +14,7 @@ import android.view.ViewGroup
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.widget.*
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kotlin.properties.Delegates
 
 
@@ -29,6 +31,8 @@ class ExtendedSpinner : LinearLayout, View.OnClickListener {
     private var showArrow: Boolean = true
 
     private var itemView: View? = null
+
+    private val unSelectedIndicatorItemView: AppCompatTextView
 
     private var adapterItemMaxWidth: Int = 0
     private var adapterItemMaxDropdownWidth: Int = 0
@@ -72,6 +76,14 @@ class ExtendedSpinner : LinearLayout, View.OnClickListener {
             }
         }
 
+        unSelectedIndicatorItemView = AppCompatTextView(context).apply {
+            this.setText(R.string.msg_spinner_tap_to_select)
+        }
+
+        InterfaceHelper.setTextAppearance(unSelectedIndicatorItemView, R.style.TextAppearance_AppCompat_Light_Widget_PopupMenu_Small)
+
+        addView(unSelectedIndicatorItemView)
+
         addView(arrowView)
 
         setOnClickListener(this)
@@ -103,6 +115,13 @@ class ExtendedSpinner : LinearLayout, View.OnClickListener {
         } finally {
             a.recycle()
         }
+    }
+
+    fun <T> setItems(vararg items: T) {
+        adapter = ArrayAdapter(context, R.layout.simple_text_element, R.id.textView, items).apply {
+            this.setDropDownViewResource(R.layout.simple_list_element_text_dropdown)
+        }
+
     }
 
     override fun onDetachedFromWindow() {
@@ -191,17 +210,47 @@ class ExtendedSpinner : LinearLayout, View.OnClickListener {
 
     private fun onSelectedPositionChanged(newPosition: Int) {
 
-        itemView = adapter?.getView(newPosition, itemView, this)
-        if (this.indexOfChild(itemView) == -1) {
-            var lp = itemView?.layoutParams
-            if (lp is LinearLayout.LayoutParams) {
-                lp.gravity = Gravity.CENTER_VERTICAL
-            } else {
+        if (newPosition == -1) {
+            var lp = unSelectedIndicatorItemView.layoutParams
+            if (!(lp is LinearLayout.LayoutParams)) {
                 lp = LinearLayout.LayoutParams(lp)
-                lp.gravity = Gravity.CENTER_VERTICAL
-                itemView?.layoutParams = lp
             }
-            this.addView(itemView, 0)
+
+            val margin = (resources.displayMetrics.density * 6 + .5f).toInt()
+            lp.topMargin = margin
+            lp.marginStart = margin
+            lp.bottomMargin = margin
+
+            lp.gravity = Gravity.CENTER_VERTICAL
+
+            if (layoutParams.width == LayoutParams.WRAP_CONTENT) {
+                lp.width = LayoutParams.WRAP_CONTENT
+                lp.weight = 0f
+            } else {
+                lp.weight = 1f
+                lp.width = 0
+            }
+            unSelectedIndicatorItemView.layoutParams = lp
+            unSelectedIndicatorItemView.visibility = VISIBLE
+            unSelectedIndicatorItemView.setTextColor(ContextCompat.getColor(context, R.color.colorRed))
+
+            itemView?.visibility = GONE
+        } else {
+            unSelectedIndicatorItemView.visibility = GONE
+            itemView?.visibility = VISIBLE
+
+            itemView = adapter?.getView(newPosition, itemView, this)
+            if (this.indexOfChild(itemView) == -1) {
+                var lp = itemView?.layoutParams
+                if (lp is LinearLayout.LayoutParams) {
+                    lp.gravity = Gravity.CENTER_VERTICAL
+                } else {
+                    lp = LinearLayout.LayoutParams(lp)
+                    lp.gravity = Gravity.CENTER_VERTICAL
+                    itemView?.layoutParams = lp
+                }
+                this.addView(itemView, 0)
+            }
         }
 
         onItemSelectedListener?.onItemSelected(this, newPosition)

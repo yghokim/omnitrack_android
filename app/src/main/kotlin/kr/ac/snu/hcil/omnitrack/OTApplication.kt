@@ -47,6 +47,15 @@ class OTApplication : MultiDexApplication() {
         lateinit var logger: LoggingDbHelper
             private set
 
+        const val ACCOUNT_DATASET_EXPERIMENT = "experiment"
+        const val ACCOUNT_DATASET_EXPERIMENT_KEY_IS_CONSENT_APPROVED = "consent_approved"
+        const val ACCOUNT_DATASET_EXPERIMENT_KEY_GENDER = "gender"
+        const val ACCOUNT_DATASET_EXPERIMENT_KEY_OCCUPATION = "occupation"
+        const val ACCOUNT_DATASET_EXPERIMENT_KEY_AGE_GROUP = "age_group"
+        const val ACCOUNT_DATASET_EXPERIMENT_KEY_COUNTRY = "country"
+
+
+
         const val INTENT_EXTRA_OBJECT_ID_TRACKER = "trackerObjectId"
         const val INTENT_EXTRA_OBJECT_ID_ATTRIBUTE = "attributeObjectId"
         const val INTENT_EXTRA_OBJECT_ID_USER = "userObjectId"
@@ -138,6 +147,8 @@ class OTApplication : MultiDexApplication() {
 
     override fun onCreate() {
         super.onCreate()
+        app = this
+        println("set application instance.")
 
         //initialize AWS client
         AWSMobileClient.initializeMobileClientIfNecessary(applicationContext)
@@ -151,7 +162,6 @@ class OTApplication : MultiDexApplication() {
 
         val startedAt = SystemClock.elapsedRealtime()
 
-        app = this
 
         logger = LoggingDbHelper(this)
         logger.writeSystemLog("Application creates.", "OTApplication")

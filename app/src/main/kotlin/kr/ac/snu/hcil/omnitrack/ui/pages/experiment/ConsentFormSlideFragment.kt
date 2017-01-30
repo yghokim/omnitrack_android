@@ -21,8 +21,8 @@ class ConsentFormSlideFragment : SlideFragment() {
         markdownView = view.findViewById(R.id.ui_markdown) as MarkdownView
 
         markdownView.loadMarkdownFile(
-                "${ANDROID_ASSET_PATH}/consent/${resources.getString(R.string.informed_consent_filename)}",
-                "${ANDROID_ASSET_PATH}/consent/style.css"
+                "$ANDROID_ASSET_PATH/consent/${resources.getString(R.string.informed_consent_filename)}",
+                "$ANDROID_ASSET_PATH/consent/style.css"
         )
 
         markdownView.scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY
