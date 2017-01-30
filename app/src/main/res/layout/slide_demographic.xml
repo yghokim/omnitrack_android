@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -19,7 +20,7 @@
     <TextView
         style="@style/PropertyHeaderStyle.withMargin"
         android:layout_marginTop="0dp"
-        android:text="@string/msg_trigger_time_config_type" />
+        android:text="@string/msg_demographic_gender" />
 
     <kr.ac.snu.hcil.omnitrack.ui.components.common.choice.SelectionView
         android:id="@+id/ui_gender_selector"
@@ -29,10 +30,37 @@
 
     <TextView
         style="@style/PropertyHeaderStyle.withMargin"
-        android:text="@string/msg_trigger_time_config_type" />
+        android:text="@string/msg_demographic_age" />
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.ChoiceInputView
+    <kr.ac.snu.hcil.omnitrack.ui.components.common.ExtendedSpinner
+        android:id="@+id/ui_age_selector"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button_background_formlike"
+        app:arrowResource="@drawable/down" />
+
+    <TextView
+        style="@style/PropertyHeaderStyle.withMargin"
+        android:text="@string/msg_demographic_occupation" />
+
+    <kr.ac.snu.hcil.omnitrack.ui.components.common.ExtendedSpinner
         android:id="@+id/ui_occupation_selector"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:background="@drawable/button_background_formlike"
+        android:textColor="@color/textColorMidDark"
+        app:arrowResource="@drawable/down" />
+
+
+    <TextView
+        style="@style/PropertyHeaderStyle.withMargin"
+        android:text="@string/msg_demographic_nationality" />
+
+    <kr.ac.snu.hcil.omnitrack.ui.components.common.ExtendedSpinner
+        android:id="@+id/ui_country_selector"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button_background_formlike"
+        app:arrowResource="@drawable/down" />
+
 </LinearLayout>

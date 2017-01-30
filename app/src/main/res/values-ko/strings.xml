@@ -189,6 +189,9 @@
 
     <string name="msg_attach">트래커에 추가</string>
     <string name="msg_service_activating">활성화중…</string>
+
+    <string name="msg_spinner_tap_to_select">탭해서 고르기</string>
+
     <string name="sign_in_with_google">Google 계정으로 로그인</string>
 
     <string name="msg_about">OmniTrack 정보</string>
@@ -213,11 +216,22 @@
 
     <string name="msg_demographic_gender">당신의 성별은 무엇인가요?</string>
     <string name="msg_demographic_occupation">당신의 현재 상태를 가장 잘 나타내는 항목을 골라주세요.</string>
+    <string name="msg_demographic_nationality">현재 어느 나라에 살고 있나요?</string>
+    <string name="msg_demographic_complete_form">모든 정보를 입력해주세요.</string>
 
     <string-array name="gender_entries">
         <item>남성</item>
         <item>여성</item>
         <item>기타</item>
+    </string-array>
+
+    <string-array name="age_entries">
+        <item>19세 이하</item>
+        <item>20대</item>
+        <item>30대</item>
+        <item>40대</item>
+        <item>50대</item>
+        <item>60세 이상</item>
     </string-array>
 
     <string-array name="occupation_entries">

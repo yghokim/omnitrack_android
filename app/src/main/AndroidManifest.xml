@@ -124,7 +124,7 @@
         </service>
 
         <activity
-            android:name=".ui.activities.SplashScreenActivity"
+            android:name=".ui.pages.SplashScreenActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
             android:theme="@style/SplashTheme">
             <intent-filter>

@@ -202,6 +202,9 @@
     <string name="msg_tracker_list_stat_total">Total</string>
     <string name="msg_attach">connect</string>
     <string name="msg_service_activating">Activating…</string>
+
+    <string name="msg_spinner_tap_to_select">Tap to select</string>
+
     <string name="sign_in_with_google">Sign in with Google</string>
 
     <string name="msg_about">About OmniTrack</string>
@@ -225,11 +228,38 @@
 
     <string name="msg_demographic_gender">What is your gender?</string>
     <string name="msg_demographic_occupation">Which best describes your current status?</string>
+    <string name="msg_demographic_age">What is your age?</string>
+    <string name="msg_demographic_nationality">Which country you live in?</string>
+    <string name="msg_demographic_complete_form">Please complete the forms.</string>
 
     <string-array name="gender_entries">
         <item>Male</item>
         <item>Female</item>
         <item>Other</item>
+    </string-array>
+
+    <string-array name="gender_entry_keys">
+        <item>male</item>
+        <item>female</item>
+        <item>other</item>
+    </string-array>
+
+    <string-array name="age_entries">
+        <item>Under 20</item>
+        <item>20s</item>
+        <item>30s</item>
+        <item>40s</item>
+        <item>50s</item>
+        <item>Older 60</item>
+    </string-array>
+
+    <string-array name="age_entry_keys">
+        <item>under20</item>
+        <item>20s</item>
+        <item>30s</item>
+        <item>40s</item>
+        <item>50s</item>
+        <item>older60</item>
     </string-array>
 
     <string-array name="occupation_entries">
@@ -239,6 +269,15 @@
         <item>Undergraduate student</item>
         <item>Graduate student</item>
         <item>Unemployed/Homemaker</item>
+    </string-array>
+
+    <string-array name="occupation_entry_keys">
+        <item>se</item>
+        <item>ft</item>
+        <item>pt</item>
+        <item>und</item>
+        <item>grd</item>
+        <item>ue</item>
     </string-array>
 
     <string-array name="choice_preview_entries">
