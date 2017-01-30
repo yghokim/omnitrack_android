@@ -298,6 +298,21 @@ public class IdentityManager {
         }
     }
 
+    /*
+    public void deleteUser(){
+
+        Log.d(LOG_TAG, "Removing user account...");
+        if(currentIdentityProvider != null)
+        {
+            final CognitoCachingCredentialsProvider credentialsProvider =
+                    credentialsProviderHolder.getUnderlyingProvider();
+
+
+
+            credentialsProvider.
+        }
+    }*/
+
     private void refreshCredentialWithLogins(final Map<String, String> loginMap) {
         final CognitoCachingCredentialsProvider credentialsProvider =
                 credentialsProviderHolder.getUnderlyingProvider();

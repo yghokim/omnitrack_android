@@ -1,15 +1,15 @@
-package kr.ac.snu.hcil.omnitrack.ui.activities
+package kr.ac.snu.hcil.omnitrack.ui.pages
 
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import com.amazonaws.activities.SignInActivity
 import com.amazonaws.mobile.AWSMobileClient
 import com.amazonaws.mobile.user.IdentityManager
 import com.amazonaws.mobile.user.IdentityProvider
 import com.amazonaws.mobile.user.signin.SignInManager
-import kr.ac.snu.hcil.omnitrack.ui.pages.experiment.ExperimentSignInActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 
 
@@ -39,7 +39,10 @@ class SplashScreenActivity : Activity() {
 
             AWSMobileClient.defaultMobileClient()
                     .identityManager
-                    .loadUserInfoAndImage(provider) { goMain() }
+                    .loadUserInfoAndImage(provider) { //goMain()
+                        goSignIn()
+                        //
+                    }
         }
 
         /**
@@ -107,8 +110,8 @@ class SplashScreenActivity : Activity() {
     private fun goSignIn() {
         Log.d(LOG_TAG, "Launching Sign-in Activity...")
 
-        //val intent = Intent(this, SignInActivity::class.java)
-        val intent = Intent(this, ExperimentSignInActivity::class.java)
+        val intent = Intent(this, SignInActivity::class.java)
+        //val intent = Intent(this, ExperimentSignInActivity::class.java)
 
         startActivity(intent)
         finish()
