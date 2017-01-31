@@ -119,8 +119,8 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Ident
             }
 
         }
-
-        sidebar.refresh(AWSMobileClient.defaultMobileClient().identityManager.currentIdentityProvider)
+        if (AWSMobileClient.defaultMobileClient().identityManager.isUserSignedIn)
+            sidebar.refresh(AWSMobileClient.defaultMobileClient().identityManager.currentIdentityProvider)
     }
 
     override fun onPause() {
@@ -169,7 +169,7 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Ident
 
     override fun onUserSignedIn() {
         println("OMNITRACK user signed in.")
-
+        sidebar.refresh(AWSMobileClient.defaultMobileClient().identityManager.currentIdentityProvider)
     }
 
     override fun onUserSignedOut() {
