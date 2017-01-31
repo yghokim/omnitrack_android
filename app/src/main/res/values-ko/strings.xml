@@ -219,6 +219,10 @@
     <string name="msg_demographic_nationality">현재 어느 나라에 살고 있나요?</string>
     <string name="msg_demographic_complete_form">모든 정보를 입력해주세요.</string>
 
+    <string name="msg_profile_menu_unlink_account">이 기기와 연결 해제…</string>
+    <string name="msg_profile_unlink_account_confirm">서버와 동기화되지 않은 데이터는 유실될 것입니다.\n이 기기와 계정의 연결을 해제하시겠습니까?</string>
+
+
     <string-array name="gender_entries">
         <item>남성</item>
         <item>여성</item>

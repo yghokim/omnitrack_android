@@ -153,7 +153,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
     }
 
 
-    override fun onItemSelected(p0: ExtendedSpinner, position: Int) {
+    override fun onItemSelected(spinner: ExtendedSpinner, position: Int) {
         reSort()
     }
 
