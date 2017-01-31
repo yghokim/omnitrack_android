@@ -14,7 +14,7 @@ import rx.Observable
 /**
  * Created by Young-Ho Kim on 2016-10-06.
  */
-object FitbitHeartRateMeasureFactory : OTMeasureFactory() {
+object FitbitHeartRateMeasureFactory : OTMeasureFactory("heart") {
 
     override val service: OTExternalService = FitbitService
 

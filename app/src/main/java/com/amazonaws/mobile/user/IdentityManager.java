@@ -422,6 +422,10 @@ public class IdentityManager {
         return currentIdentityProvider == null ? null : currentIdentityProvider.getUserName();
     }
 
+    public String getUserEmail() {
+        return currentIdentityProvider == null ? null : currentIdentityProvider.getUserEmail();
+    }
+
     /**
      * Allows the application to get asynchronous response with user's
      * unique identifier.

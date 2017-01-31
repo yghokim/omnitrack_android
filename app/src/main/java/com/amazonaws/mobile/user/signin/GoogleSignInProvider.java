@@ -8,27 +8,31 @@ package com.amazonaws.mobile.user.signin;
 // Source code generated from template: aws-my-sample-app-android v0.13
 //
 
-import android.accounts.Account;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.ApplicationInfo;
+import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
 
 import com.amazonaws.mobile.AWSConfiguration;
 import com.amazonaws.mobile.user.IdentityManager;
-import com.amazonaws.mobile.util.ThreadUtils;
 import com.google.android.gms.auth.GoogleAuthException;
-import com.google.android.gms.auth.GoogleAuthUtil;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.OptionalPendingResult;
+import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Scope;
-import com.google.android.gms.plus.Plus;
-import com.google.android.gms.plus.model.people.Person;
+import com.google.android.gms.common.api.Status;
 
 import java.io.IOException;
 
@@ -49,12 +53,17 @@ public class GoogleSignInProvider implements SignInProvider {
     private static final int REQUEST_GOOGLE_PLAY_SERVICES = 1363;
 
     /* Request code used to invoke sign in user interactions. */
-    private static final int RC_SIGN_IN = 900913;
+    private static final int RC_SIGN_IN = 9913;
 
+
+    private final GoogleSignInOptions mGoogleSignInOptions;
     /**
      * Client used to interact with Google APIs.
      */
     private final GoogleApiClient mGoogleApiClient;
+
+
+    private GoogleSignInAccount googleSignInAccount;
 
     /**
      * Android context.
@@ -82,6 +91,8 @@ public class GoogleSignInProvider implements SignInProvider {
      */
     private volatile String authToken = null;
 
+    private String email;
+
     /**
      * User's name.
      */
@@ -104,12 +115,22 @@ public class GoogleSignInProvider implements SignInProvider {
 
         Log.d(LOG_TAG, "Initializing Google SDK...");
 
+        mGoogleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestScopes(new Scope(Scopes.PROFILE))
+                .requestProfile()
+                .requestEmail()
+                .requestIdToken(AWSConfiguration.GOOGLE_CLIENT_ID)
+                .build();
+
         // Build GoogleApiClient with access to basic profile
         mGoogleApiClient = new GoogleApiClient.Builder(context)
-                .addApi(Plus.API)
-                .addScope(new Scope(Scopes.PROFILE))
+                .addApi(Auth.GOOGLE_SIGN_IN_API, mGoogleSignInOptions)
                 .build();
         mGoogleApiClient.connect();
+        OptionalPendingResult<GoogleSignInResult> pendingResult = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
+        if (pendingResult.isDone()) {
+            googleSignInAccount = pendingResult.get().getSignInAccount();
+        }
+
     }
 
     /**
@@ -158,6 +179,7 @@ public class GoogleSignInProvider implements SignInProvider {
         Log.d(LOG_TAG, "Google provider refreshing token...");
 
         try {
+            Log.w(LOG_TAG, "update Google token");
             authToken = getGoogleAuthToken();
         } catch (Exception e) {
             Log.w(LOG_TAG, "Failed to update Google token", e);
@@ -170,6 +192,7 @@ public class GoogleSignInProvider implements SignInProvider {
      * Initiate sign-in with Google.
      */
     private void signIn() {
+        /*
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -204,12 +227,16 @@ public class GoogleSignInProvider implements SignInProvider {
                     });
                 }
             }
-        }).start();
+        }).start();*/
+
+        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+        mIntentInProgress = true;
+        signInActivity.startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
     private String getGoogleAuthToken() throws GoogleAuthException, SecurityException, IOException {
         Log.d(LOG_TAG, "Google provider getting token...");
-
+/*
         final String accountName = Plus.AccountApi.getAccountName(mGoogleApiClient);
         final Account googleAccount = new Account(accountName, GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE);
         final String scopes = "audience:server:client_id:" + AWSConfiguration.GOOGLE_CLIENT_ID;
@@ -221,7 +248,9 @@ public class GoogleSignInProvider implements SignInProvider {
             Log.d(LOG_TAG, "Google Token is NULL.");
         }
 
-        return token;
+        return token;*/
+
+        return this.googleSignInAccount.getIdToken();
     }
 
     /**
@@ -235,8 +264,15 @@ public class GoogleSignInProvider implements SignInProvider {
 
         authToken = null;
         if (mGoogleApiClient.isConnected()) {
-            Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
-            mGoogleApiClient.disconnect();
+            Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient).setResultCallback(
+                    new ResultCallback<Status>() {
+                        @Override
+                        public void onResult(@NonNull Status status) {
+                            mGoogleApiClient.disconnect();
+                        }
+                    }
+            );
+            //Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
         }
     }
 
@@ -262,7 +298,20 @@ public class GoogleSignInProvider implements SignInProvider {
                 clearUserInfo();
                 return;
             }
-            signIn();
+
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            if (result.isSuccess()) {
+                //Signed in successfully.
+                googleSignInAccount = result.getSignInAccount();
+                resultsHandler.onSuccess(GoogleSignInProvider.this);
+
+            } else {
+                resultsHandler.onError(GoogleSignInProvider.this, new Exception("failed"));
+                clearUserInfo();
+                return;
+            }
+
+            //signIn();
         }
     }
 
@@ -337,6 +386,7 @@ public class GoogleSignInProvider implements SignInProvider {
     private void clearUserInfo() {
         userName = null;
         userImageUrl = null;
+        email = null;
     }
 
     /**
@@ -355,15 +405,29 @@ public class GoogleSignInProvider implements SignInProvider {
         return userImageUrl;
     }
 
+    @Override
+    public String getUserEmail() {
+        return email;
+    }
+
     /**
      * {@inheritDoc}
      */
     public void reloadUserInfo() {
-        mGoogleApiClient.blockingConnect();
-        Person person = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
-        if (person != null) {
-            userName = person.getDisplayName();
-            userImageUrl = person.getImage().getUrl();
+        //mGoogleApiClient.blockingConnect();
+        //Person person = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
+        //if (person != null) {
+        //    userName = person.getDisplayName();
+        //    userImageUrl = person.getImage().getUrl();
+        //}
+        userName = googleSignInAccount.getDisplayName();
+        email = googleSignInAccount.getEmail();
+        Log.v("OMNITRACK", "email: " + email);
+        final Uri photoUrl = googleSignInAccount.getPhotoUrl();
+        if (photoUrl != null) {
+
+            Log.w(LOG_TAG, "Google photo uri:" + photoUrl.toString());
+            userImageUrl = photoUrl.toString();
         }
     }
 }

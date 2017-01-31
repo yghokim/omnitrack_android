@@ -17,7 +17,7 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 2016-09-02.
  */
-object RescueTimeComputerUsageDurationMeasureFactory : OTMeasureFactory() {
+object RescueTimeComputerUsageDurationMeasureFactory : OTMeasureFactory("cud") {
 
     val configurator = object : IExampleAttributeConfigurator {
         override fun configureExampleAttribute(attr: OTAttribute<out Any>): Boolean {

@@ -18,7 +18,7 @@ import rx.Observable
 /**
  * Created by Young-Ho Kim on 16. 7. 28
  */
-abstract class OTMeasureFactory() : INameDescriptionResourceProvider {
+abstract class OTMeasureFactory(val factoryTypeName: String) : INameDescriptionResourceProvider {
 
     companion object {
         val CONDITIONERS_FOR_SINGLE_NUMERIC_VALUE = intArrayOf(AConditioner.TYPECODE_SINGLE_NUMERIC_COMPARISON)
@@ -92,7 +92,7 @@ abstract class OTMeasureFactory() : INameDescriptionResourceProvider {
     }
 
     val typeCode: String by lazy {
-        this.javaClass.name
+        "${service.identifier}_${factoryTypeName}"
     }
 
     abstract val service: OTExternalService
@@ -106,7 +106,6 @@ abstract class OTMeasureFactory() : INameDescriptionResourceProvider {
     abstract val isRangedQueryAvailable: Boolean
     abstract val isDemandingUserInput: Boolean
     abstract val minimumGranularity: OTTimeRangeQuery.Granularity
-
 
     abstract fun makeMeasure(): OTMeasure
     abstract fun makeMeasure(serialized: String): OTMeasure

@@ -159,7 +159,7 @@ object GoogleFitService : OTExternalService("GoogleFitService", 19) {
         return builder
     }
 
-    abstract class GoogleFitMeasureFactory : OTMeasureFactory() {
+    abstract class GoogleFitMeasureFactory(typeKey: String) : OTMeasureFactory(typeKey) {
         abstract val usedAPI: Api<out Api.ApiOptions.NotRequiredOptions>
         abstract val usedScope: Scope
     }
