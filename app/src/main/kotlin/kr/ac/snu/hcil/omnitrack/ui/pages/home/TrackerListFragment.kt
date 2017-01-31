@@ -137,7 +137,7 @@ class TrackerListFragment : OTFragment() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putInt(STATE_EXPANDED_TRACKER_INDEX, trackerListAdapter?.currentlyExpandedIndex ?: -1)
+        outState.putInt(STATE_EXPANDED_TRACKER_INDEX, trackerListAdapter.currentlyExpandedIndex)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

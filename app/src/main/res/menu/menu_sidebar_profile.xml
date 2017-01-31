@@ -1,10 +1,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".ui.pages.home.HomeActivity">
+    tools:context=".ui.pages.attribute.AttributeDetailActivity">
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/action_unlink_with_this_device"
+        android:icon="@drawable/unlink_dark"
         android:orderInCategory="100"
-        android:title="@string/action_settings"
+        android:title="@string/msg_profile_menu_unlink_account"
         app:showAsAction="never" />
+
 </menu>

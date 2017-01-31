@@ -232,6 +232,10 @@
     <string name="msg_demographic_nationality">Which country you live in?</string>
     <string name="msg_demographic_complete_form">Please complete the forms.</string>
 
+    <string name="msg_profile_menu_unlink_account">Unlink this device…</string>
+    <string name="msg_profile_unlink_account_confirm">Any unsynchronized data will be lost.\nDo you want to unlink your account with this device?</string>
+
+
     <string-array name="gender_entries">
         <item>Male</item>
         <item>Female</item>
