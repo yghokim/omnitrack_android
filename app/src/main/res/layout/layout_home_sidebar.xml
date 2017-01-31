@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/ui_sidebar"
+    android:layout_width="@dimen/home_sidebar_width"
+    android:layout_height="match_parent"
+    android:background="@color/frontalBackground"
+    android:clickable="true"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/diagonal_gradient"
+        android:orientation="vertical"
+        android:paddingBottom="16dp"
+        android:paddingTop="24dp">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/ui_user_photo"
+            android:layout_width="@dimen/home_sidebar_profile_photo_width"
+            android:layout_height="@dimen/home_sidebar_profile_photo_width"
+            android:layout_gravity="center"
+            android:layout_marginBottom="8dp"
+            app:civ_border_color="#cfffffff"
+            app:civ_border_overlay="false"
+            app:civ_border_width="2dp" />
+
+        <TextView
+            android:id="@+id/ui_user_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textColor="#FFF"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/ui_button_sign_out"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sign Out" />
+
+    <Button
+        android:id="@+id/ui_button_about"
+        style="@style/Base.TextAppearance.AppCompat.Widget.Button.Borderless.Colored"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:text="@string/msg_about"
+        android:textColor="@color/buttonIconColorDark" />
+</RelativeLayout>
