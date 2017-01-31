@@ -93,6 +93,7 @@ dependencies {
     compile 'us.feras.mdv:markdownview:1.1.0'
     compile 'com.heinrichreimersoftware:material-intro:1.6'
     compile 'com.jaredrummler:material-spinner:1.1.0'
+    compile 'de.hdodenhof:circleimageview:2.1.0'
 
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 

@@ -20,10 +20,9 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
-import kr.ac.snu.hcil.omnitrack.ui.pages.AboutActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.diagnostics.SystemLogActivity
 
-class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), IdentityManager.SignInStateChangeListener {
+class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), IdentityManager.SignInStateChangeListener, DrawerLayout.DrawerListener {
 
     private var mSectionsPagerAdapter: SectionsPagerAdapter? = null
 
@@ -33,6 +32,8 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Ident
     private val mViewPager: ViewPager by bindView(R.id.container)
 
     private lateinit var drawerLayout: DrawerLayout
+
+    private lateinit var sidebar: SidebarWrapper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,20 +56,9 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Ident
         //Setup sliding menu
         drawerLayout = findViewById(R.id.ui_drawer_layout) as DrawerLayout
 
-        val signOutButton = drawerLayout.findViewById(R.id.ui_button_sign_out)
-        signOutButton.setOnClickListener {
-            if (AWSMobileClient.defaultMobileClient().identityManager.isUserSignedIn) {
-                AWSMobileClient.defaultMobileClient().identityManager.signOut()
-            } else {
-                goSignInPage()
-            }
-        }
+        drawerLayout.addDrawerListener(this)
 
-        val aboutButton = drawerLayout.findViewById(R.id.ui_button_about)
-        aboutButton.setOnClickListener {
-            val intent = Intent(this, AboutActivity::class.java)
-            startActivity(intent)
-        }
+        sidebar = SidebarWrapper(findViewById(R.id.ui_sidebar), this)
 
         /*
         slidingMenu = SlidingMenu(this, SlidingMenu.SLIDING_WINDOW)
@@ -98,6 +88,19 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Ident
         startActivity(intent)
     }
 
+
+    override fun onDrawerClosed(drawerView: View?) {
+    }
+
+    override fun onDrawerStateChanged(newState: Int) {
+    }
+
+    override fun onDrawerSlide(drawerView: View?, slideOffset: Float) {
+    }
+
+    override fun onDrawerOpened(drawerView: View?) {
+    }
+
     override fun onStart() {
         super.onStart()
 
@@ -116,6 +119,8 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Ident
             }
 
         }
+
+        sidebar.refresh(AWSMobileClient.defaultMobileClient().identityManager.currentIdentityProvider)
     }
 
     override fun onPause() {
@@ -163,6 +168,8 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Ident
 
 
     override fun onUserSignedIn() {
+        println("OMNITRACK user signed in.")
+
     }
 
     override fun onUserSignedOut() {
