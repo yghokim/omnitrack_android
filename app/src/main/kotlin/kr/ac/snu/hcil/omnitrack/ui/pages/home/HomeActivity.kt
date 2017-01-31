@@ -129,6 +129,14 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Ident
         (application as OTApplication).syncUserToDb()
     }
 
+    override fun onBackPressed() {
+        if (mViewPager.currentItem == 0) {
+            super.onBackPressed()
+        } else {
+            mViewPager.setCurrentItem(0, true)
+        }
+    }
+
     /**
      * A [FragmentPagerAdapter] that returns a fragment corresponding to
      * one of the sections/tabs/pages.
