@@ -17,7 +17,7 @@ import java.util.*
 /**
  * Created by younghokim on 16. 9. 3..
  */
-object FitbitDistanceMeasureFactory : OTMeasureFactory() {
+object FitbitDistanceMeasureFactory : OTMeasureFactory("dist") {
 
     override fun getExampleAttributeConfigurator(): IExampleAttributeConfigurator {
         return CONFIGURATOR_DISTANCE_ATTRIBUTE

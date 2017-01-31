@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit
  * Created by Young-Ho on 8/11/2016.
  */
 
-object GoogleFitStepsFactory : GoogleFitService.GoogleFitMeasureFactory() {
+object GoogleFitStepsFactory : GoogleFitService.GoogleFitMeasureFactory("step") {
 
     override fun getExampleAttributeConfigurator(): IExampleAttributeConfigurator {
         return CONFIGURATOR_STEP_ATTRIBUTE

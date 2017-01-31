@@ -12,7 +12,7 @@ import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelpe
 /**
  * Created by younghokim on 2017. 1. 25..
  */
-object JawboneDistanceMeasureFactory : OTMeasureFactory() {
+object JawboneDistanceMeasureFactory : OTMeasureFactory("dist") {
     override val exampleAttributeType: Int = OTAttribute.TYPE_NUMBER
 
     override fun getExampleAttributeConfigurator(): IExampleAttributeConfigurator {

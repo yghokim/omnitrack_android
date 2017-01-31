@@ -1,8 +1,8 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.Toast
 import com.amazonaws.activities.SignInActivity
@@ -10,6 +10,7 @@ import com.amazonaws.mobile.AWSMobileClient
 import com.amazonaws.mobile.user.IdentityManager
 import com.amazonaws.mobile.user.IdentityProvider
 import com.amazonaws.mobile.user.signin.SignInManager
+import kr.ac.snu.hcil.omnitrack.core.ExperimentConsentManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 
 
@@ -17,7 +18,7 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
  * Created by Young-Ho on 8/1/2016.
  * https://www.bignerdranch.com/blog/splash-screens-the-right-way/
  */
-class SplashScreenActivity : Activity() {
+class SplashScreenActivity : AppCompatActivity() {
 
     private val LOG_TAG = SplashScreenActivity::class.java.simpleName
 
@@ -37,12 +38,20 @@ class SplashScreenActivity : Activity() {
             Toast.makeText(this@SplashScreenActivity, String.format("Sign-in with %s succeeded.",
                     provider.displayName), Toast.LENGTH_LONG).show()
 
-            AWSMobileClient.defaultMobileClient()
-                    .identityManager
-                    .loadUserInfoAndImage(provider) { //goMain()
-                        goSignIn()
-                        //
-                    }
+            ExperimentConsentManager.startProcess(this@SplashScreenActivity, AWSMobileClient.defaultMobileClient().syncManager, object : ExperimentConsentManager.ResultListener {
+                override fun onConsentApproved() {
+                    goMain()
+                }
+
+                override fun onConsentFailed() {
+                    goSignIn()
+                }
+
+                override fun onConsentDenied() {
+                    goSignIn()
+                }
+
+            })
         }
 
         /**
@@ -99,6 +108,11 @@ class SplashScreenActivity : Activity() {
             })
             thread.start()
         }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        ExperimentConsentManager.handleActivityResult(false, requestCode, resultCode, data)
     }
 
     private fun goMain() {

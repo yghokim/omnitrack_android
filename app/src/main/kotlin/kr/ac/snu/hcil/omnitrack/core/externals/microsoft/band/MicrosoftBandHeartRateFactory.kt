@@ -12,7 +12,7 @@ import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 /**
  * Created by younghokim on 16. 7. 28..
  */
-class MicrosoftBandHeartRateFactory : OTMeasureFactory() {
+class MicrosoftBandHeartRateFactory : OTMeasureFactory("heart") {
 
     override fun getExampleAttributeConfigurator(): IExampleAttributeConfigurator {
         return CONFIGURATOR_FOR_HEART_RATE_ATTRIBUTE

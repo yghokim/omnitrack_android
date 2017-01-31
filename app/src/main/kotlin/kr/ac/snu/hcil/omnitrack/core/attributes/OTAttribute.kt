@@ -276,6 +276,7 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
     fun isConnectionValid(invalidMessages: MutableList<CharSequence>?): Boolean {
         val connection = valueConnection
         if (connection != null) {
+            println("OMNITRACK attribute name: ${name}, tracker: ${owner?.name}, source: ${connection.source}")
             val service = connection.source!!.factory.service
             if (service.state == OTExternalService.ServiceState.ACTIVATED) {
                 return true
