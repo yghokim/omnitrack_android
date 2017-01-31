@@ -107,6 +107,11 @@ Apache 2.0 license
 Copyright 2016 Heinrich Reimer<br>
 Apache 2.0 license
 
+#####CircleImageView
+<https://github.com/hdodenhof/CircleImageView><br>
+Copyright 2014 - 2017 Henning Dodenhof<br>
+Apache 2.0 license
+
 
 
 ---

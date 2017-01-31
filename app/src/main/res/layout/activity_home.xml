@@ -45,38 +45,9 @@
 
     </RelativeLayout>
 
-    <LinearLayout
-        android:layout_width="250dp"
+    <include
+        layout="@layout/layout_home_sidebar"
+        android:layout_width="@dimen/home_sidebar_width"
         android:layout_height="match_parent"
-        android:layout_gravity="left"
-        android:background="@color/frontalBackground"
-        android:clickable="true"
-        android:orientation="vertical">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Young-Ho Kim" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="yhkim@hcil.snu.ac.kr" />
-
-        <Button
-            android:id="@+id/ui_button_sign_out"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Sign Out" />
-
-        <Button
-            android:id="@+id/ui_button_about"
-            style="@style/Base.TextAppearance.AppCompat.Widget.Button.Borderless.Colored"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/msg_about"
-            android:textColor="@color/buttonIconColorDark" />
-
-    </LinearLayout>
-
+        android:layout_gravity="left" />
 </android.support.v4.widget.DrawerLayout>
