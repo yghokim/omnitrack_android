@@ -17,7 +17,7 @@ import java.util.*
 /**
  * Created by younghokim on 16. 9. 3..
  */
-object FitbitStepCountMeasureFactory : OTMeasureFactory() {
+object FitbitStepCountMeasureFactory : OTMeasureFactory("step") {
 
     override fun getExampleAttributeConfigurator(): IExampleAttributeConfigurator {
         return CONFIGURATOR_STEP_ATTRIBUTE

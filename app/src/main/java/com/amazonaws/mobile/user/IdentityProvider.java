@@ -66,6 +66,8 @@ public interface IdentityProvider {
      */
     String getUserImageUrl();
 
+    String getUserEmail();
+
     /**
      * Force the provider to reload user name and image.
      * Note: this is a blocking call.

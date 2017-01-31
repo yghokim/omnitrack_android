@@ -48,6 +48,7 @@ class OTApplication : MultiDexApplication() {
             private set
 
         const val ACCOUNT_DATASET_EXPERIMENT = "experiment"
+        const val ACCOUNT_DATASET_EXPERIMENT_KEY_EMAIL = "email"
         const val ACCOUNT_DATASET_EXPERIMENT_KEY_IS_CONSENT_APPROVED = "consent_approved"
         const val ACCOUNT_DATASET_EXPERIMENT_KEY_GENDER = "gender"
         const val ACCOUNT_DATASET_EXPERIMENT_KEY_OCCUPATION = "occupation"

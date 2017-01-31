@@ -17,7 +17,7 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 2016-09-02.
  */
-object RescueTimeProductivityMeasureFactory : OTMeasureFactory() {
+object RescueTimeProductivityMeasureFactory : OTMeasureFactory("prd") {
 
 
     val configurator = object : IExampleAttributeConfigurator {

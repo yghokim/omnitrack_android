@@ -14,7 +14,7 @@ import java.util.*
 /**
  * Created by Young-Ho on 9/2/2016.
  */
-object MisfitStepMeasureFactory: OTMeasureFactory() {
+object MisfitStepMeasureFactory : OTMeasureFactory("step") {
 
     override fun getExampleAttributeConfigurator(): IExampleAttributeConfigurator {
         return CONFIGURATOR_STEP_ATTRIBUTE

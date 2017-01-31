@@ -14,7 +14,7 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 2016-09-01.
  */
-object MisfitSleepMeasureFactory : OTMeasureFactory() {
+object MisfitSleepMeasureFactory : OTMeasureFactory("slp") {
 
     override fun getExampleAttributeConfigurator(): IExampleAttributeConfigurator {
         return CONFIGURATOR_FOR_TIMESPAN_ATTRIBUTE
