@@ -17,12 +17,14 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 2016-07-11.
  */
-class OTUser(val objectId: String, var name: String, _trackers: List<OTTracker>? = null) {
+class OTUser(val objectId: String, var name: String, var photoUrl: String?, _trackers: List<OTTracker>? = null) {
 
     companion object {
 
         const val PREFERENCES_KEY_OBJECT_ID = "ot_user_object_id"
         const val PREFERENCES_KEY_NAME = "ot_user_name"
+        const val PREFERENCES_KEY_PHOTO_URL = "ot_user_photo_url"
+
 
         //const val PREFERENCES_KEY_EMAIL = "user_email"
 
@@ -30,8 +32,9 @@ class OTUser(val objectId: String, var name: String, _trackers: List<OTTracker>?
             if (sp.contains(PREFERENCES_KEY_OBJECT_ID)) {
                 val objId = sp.getString(PREFERENCES_KEY_OBJECT_ID, null)
                 val name = sp.getString(PREFERENCES_KEY_NAME, null)
+                val photoUrl = sp.getString(PREFERENCES_KEY_PHOTO_URL, null)
                 if (objId != null && name != null) {
-                    return OTUser(objId, name, databaseHelper.findTrackersOfUser(objId))
+                    return OTUser(objId, name, photoUrl, databaseHelper.findTrackersOfUser(objId))
                 } else return null
             } else return null
         }
@@ -42,6 +45,7 @@ class OTUser(val objectId: String, var name: String, _trackers: List<OTTracker>?
             sp.edit()
                     .putString(PREFERENCES_KEY_OBJECT_ID, instance.objectId)
                     .putString(PREFERENCES_KEY_NAME, instance.name)
+                    .putString(PREFERENCES_KEY_PHOTO_URL, instance.photoUrl)
                     .apply()
 
             return overwritten
@@ -53,6 +57,7 @@ class OTUser(val objectId: String, var name: String, _trackers: List<OTTracker>?
             sp.edit()
                     .remove(PREFERENCES_KEY_OBJECT_ID)
                     .remove(PREFERENCES_KEY_NAME)
+                    .remove(PREFERENCES_KEY_PHOTO_URL)
                     .apply()
 
             return removed

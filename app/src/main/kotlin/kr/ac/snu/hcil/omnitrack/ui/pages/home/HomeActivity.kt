@@ -21,6 +21,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.diagnostics.SystemLogActivity
+import rx.internal.util.SubscriptionList
 
 class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), IdentityManager.SignInStateChangeListener, DrawerLayout.DrawerListener {
 
@@ -34,6 +35,8 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Ident
     private lateinit var drawerLayout: DrawerLayout
 
     private lateinit var sidebar: SidebarWrapper
+
+    private val startSubscriptions = SubscriptionList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -106,6 +109,7 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Ident
 
         //Ask permission if needed
         if (Build.VERSION.SDK_INT >= 23) {
+            startSubscriptions.add(
             OTApplication.app.currentUserObservable.subscribe {
                 user ->
                 val permissions = user.getPermissionsRequiredForFields().filter {
@@ -116,11 +120,19 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Ident
                     requestPermissions(permissions,
                             10)
                 }
-            }
 
+                AWSMobileClient.defaultMobileClient().identityManager.loadUserInfoAndImage(
+                        AWSMobileClient.defaultMobileClient().identityManager.currentIdentityProvider
+                ) {
+                    sidebar.refresh(user)
+                }
+            })
         }
-        if (AWSMobileClient.defaultMobileClient().identityManager.isUserSignedIn)
-            sidebar.refresh(AWSMobileClient.defaultMobileClient().identityManager.currentIdentityProvider)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        startSubscriptions.clear()
     }
 
     override fun onPause() {
@@ -177,7 +189,10 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Ident
 
     override fun onUserSignedIn() {
         println("OMNITRACK user signed in.")
-        sidebar.refresh(AWSMobileClient.defaultMobileClient().identityManager.currentIdentityProvider)
+        OTApplication.app.currentUserObservable.subscribe {
+            user ->
+            sidebar.refresh(user)
+        }
     }
 
     override fun onUserSignedOut() {

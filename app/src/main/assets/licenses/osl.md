@@ -23,6 +23,11 @@ Apache 2.0 license
 Copyright (c) 2016-present, RxJava Contributors<br>
 Apache 2.0 license
 
+#####Glide
+<https://github.com/bumptech/glide><br>
+Copyright 2014 Google, Inc. All rights reserved.<br>
+Apache 2.0 license
+
 #####AWS SDK for Android
 <https://github.com/aws/aws-sdk-android><br>
 The AWS SDK for Android is generally licensed under the Apache 2.0 License, with the Amazon Cognito Sync aws-android-sdk-cognito and Amazon Cognito Identity Provider aws-android-sdk-cognitoidentityprovider subcomponent being licensed under the Amazon Software License, and the Amazon Lex subcomponent under the path aws-android-sdk-deepsense/src/main/jni/ under the AWS Customer Agreement (https://aws.amazon.com/agreement/).
