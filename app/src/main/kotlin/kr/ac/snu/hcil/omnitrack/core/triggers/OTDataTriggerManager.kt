@@ -1,13 +1,10 @@
 package kr.ac.snu.hcil.omnitrack.core.triggers
 
 import android.app.AlarmManager
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
 import com.google.android.gms.gcm.GcmNetworkManager
 import kr.ac.snu.hcil.omnitrack.OTApplication
-import kr.ac.snu.hcil.omnitrack.receivers.OTSystemReceiver
 import kr.ac.snu.hcil.omnitrack.services.DataTriggerCheckService
 import java.util.*
 
@@ -35,12 +32,13 @@ object OTDataTriggerManager {
         return PREFERENCE_TRIGGER_ID_PREFIX + trigger.objectId
     }
 
+    /*
     private fun makeIntent(context: Context): PendingIntent {
         val intent = Intent(context, OTSystemReceiver::class.java)
         intent.action = OTApplication.BROADCAST_ACTION_EVENT_TRIGGER_CHECK_ALARM
         intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_USER, OTApplication.app.currentUser.objectId)
         return PendingIntent.getBroadcast(context, ALARM_ID, intent, PendingIntent.FLAG_CANCEL_CURRENT)
-    }
+    }*/
 
     private val gcmManager: GcmNetworkManager by lazy {
         GcmNetworkManager.getInstance(OTApplication.app)
@@ -86,7 +84,7 @@ object OTDataTriggerManager {
     fun checkMeasures(@Suppress("UNUSED_PARAMETER") context: Context) {
         println("checking measures for event triggers...")
 
-        val triggersToCheck = OTApplication.app.currentUser.triggerManager.getFilteredTriggers { it is OTDataTrigger && it.isOn == true }.map { it as OTDataTrigger }.toTypedArray()
+        //val triggersToCheck = OTApplication.app.currentUser.triggerManager.getFilteredTriggers { it is OTDataTrigger && it.isOn == true }.map { it as OTDataTrigger }.toTypedArray()
 /*
         batch?.cancel(true)
 

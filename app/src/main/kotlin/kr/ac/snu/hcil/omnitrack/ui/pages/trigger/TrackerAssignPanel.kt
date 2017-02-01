@@ -11,6 +11,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.TrackerPickerDialogBuilder
 import kr.ac.snu.hcil.omnitrack.utils.getActivity
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 import org.apmem.tools.layouts.FlowLayout
+import rx.internal.util.SubscriptionList
 import java.util.*
 
 /**
@@ -26,6 +27,8 @@ class TrackerAssignPanel : FlowLayout, View.OnClickListener {
 
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attributeSet: AttributeSet?) : super(context, attributeSet)
+
+    private val subscriptions = SubscriptionList()
 
     init {
         addButton = inflateContent(R.layout.layout_attached_tracker_list_add, true).findViewById(R.id.ui_button_add)
@@ -55,25 +58,41 @@ class TrackerAssignPanel : FlowLayout, View.OnClickListener {
             }
         }
 
-        for (tracker in trackerIds.map { OTApplication.app.currentUser[it]!! }.withIndex()) {
-            val vh = (getChildAt(tracker.index).tag as RemovableAttachedTrackerViewHolder)
-            vh.textView.text = tracker.value.name
-            vh.colorBar.setBackgroundColor(tracker.value.color)
-        }
+        subscriptions.add(
+                OTApplication.app.currentUserObservable.subscribe {
+                    user ->
+                    for (tracker in trackerIds.map { user[it]!! }.withIndex()) {
+                        val vh = (getChildAt(tracker.index).tag as RemovableAttachedTrackerViewHolder)
+                        vh.textView.text = tracker.value.name
+                        vh.colorBar.setBackgroundColor(tracker.value.color)
+                    }
+                }
+        )
     }
 
     override fun onClick(view: View) {
         val fm = this.getActivity()?.supportFragmentManager
         if (fm != null) {
-            val dialog = TrackerPickerDialogBuilder().createDialog(getActivity()!!, trackerIds.toTypedArray(), {
-                tracker ->
-                if (tracker != null) {
-                    trackerIds += tracker.objectId
-                    refresh()
-                }
-            })
-            dialog.show()
+            subscriptions.add(
+
+                    OTApplication.app.currentUserObservable.subscribe {
+                        user ->
+                        val dialog = TrackerPickerDialogBuilder(user.trackers.unObservedList).createDialog(getActivity()!!, trackerIds.toTypedArray(), {
+                            tracker ->
+                            if (tracker != null) {
+                                trackerIds += tracker.objectId
+                                refresh()
+                            }
+                        })
+                        dialog.show()
+                    }
+            )
         }
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        subscriptions.clear()
     }
 
     private inner class RemovableAttachedTrackerViewHolder(view: View) : ATriggerViewHolder.AttachedTrackerViewHolder(view), View.OnClickListener {

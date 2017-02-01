@@ -200,4 +200,6 @@ abstract class OTTrigger(objectId: String?, dbId: Long?, val user: OTUser, name:
     abstract fun handleOn()
     abstract fun handleOff()
 
+    abstract fun detachFromSystem()
+
 }

@@ -260,7 +260,7 @@ class OTTimeTriggerAlarmManager() {
                 val triggers = ArrayList<OTTrigger>()
                 for (triggerId in reservedTriggers) {
                     triggerTable.remove(triggerId)
-                    val trigger = OTApplication.app.currentUser.triggerManager.getTriggerWithId(triggerId)
+                    val trigger = user.triggerManager.getTriggerWithId(triggerId)
                     if (trigger != null)
                         triggers.add(trigger)
                 }
@@ -273,7 +273,7 @@ class OTTimeTriggerAlarmManager() {
             if (reservedTriggers != null) {
                 val triggers = ArrayList<OTTrigger>()
                 for (triggerId in reservedTriggers) {
-                    val trigger = OTApplication.app.currentUser.triggerManager.getTriggerWithId(triggerId)
+                    val trigger = user.triggerManager.getTriggerWithId(triggerId)
                     if (trigger != null)
                         triggers.add(trigger)
                 }

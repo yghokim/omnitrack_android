@@ -8,7 +8,6 @@ import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
-import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTProperty
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.database.NamedObject
@@ -33,7 +32,7 @@ import kotlin.properties.Delegates
 abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName: String, isRequired: Boolean, val typeId: Int, propertyData: String?, connectionData: String?) : NamedObject(objectId, dbId, columnName) {
 
     override fun makeNewObjectId(): String {
-        return owner?.owner?.makeNewObjectId() ?: UUID.randomUUID().toString()
+        return UUID.randomUUID().toString()
     }
 
     companion object {
@@ -83,8 +82,8 @@ abstract class OTAttribute<DataType>(objectId: String?, dbId: Long?, columnName:
             return attr
         }
 
-        fun createAttribute(user: OTUser, columnName: String, typeId: Int): OTAttribute<out Any> {
-            return createAttribute(user.getNewAttributeObjectId().toString(), null, columnName, false, typeId, null, null)
+        fun createAttribute(tracker: OTTracker?, columnName: String, typeId: Int): OTAttribute<out Any> {
+            return createAttribute(tracker?.getNewAttributeObjectId()?.toString(), null, columnName, false, typeId, null, null)
         }
     }
 

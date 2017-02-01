@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.externals
 import android.text.Html
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilder
+import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeSpanAttribute
@@ -124,8 +125,9 @@ abstract class OTMeasureFactory(val factoryTypeName: String) : INameDescriptionR
     protected abstract fun getExampleAttributeConfigurator(): IExampleAttributeConfigurator
 
 
-    open fun makeNewExampleAttribute(): OTAttribute<out Any> {
-        val attr = OTAttribute.Companion.createAttribute(OTApplication.app.currentUser,
+    open fun makeNewExampleAttribute(tracker: OTTracker): OTAttribute<out Any> {
+
+        val attr = OTAttribute.Companion.createAttribute(tracker,
                 "${OTApplication.app.getString(service.nameResourceId)} ${OTApplication.app.resources.getString(nameResourceId)}",
                 exampleAttributeType)
 

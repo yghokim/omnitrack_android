@@ -9,6 +9,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeSpanAttribute
 import kr.ac.snu.hcil.omnitrack.utils.serialization.ATypedQueueSerializable
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableTypedQueue
+import rx.schedulers.Schedulers
 import java.util.*
 
 /**
@@ -125,7 +126,11 @@ class OTTimeRangeQuery : ATypedQueueSerializable {
 
         if (needsLinkedAttribute) {
             val attrId = typedQueue.getString()
-            linkedAttribute = OTApplication.app.currentUser.findAttributeByObjectId(attrId) as OTTimeSpanAttribute
+            OTApplication.app.currentUserObservable.observeOn(Schedulers.immediate())
+                    .subscribe {
+                        user ->
+                        linkedAttribute = user.findAttributeByObjectId(attrId) as OTTimeSpanAttribute
+                    }
         }
     }
 

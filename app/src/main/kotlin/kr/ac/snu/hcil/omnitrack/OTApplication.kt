@@ -1,7 +1,8 @@
 package kr.ac.snu.hcil.omnitrack
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.graphics.Color
-import android.os.HandlerThread
 import android.os.Looper
 import android.os.SystemClock
 import android.support.multidex.MultiDexApplication
@@ -47,6 +48,8 @@ class OTApplication : MultiDexApplication() {
         lateinit var logger: LoggingDbHelper
             private set
 
+        const val SHARED_PREFERENCES_USER_NAME = "omnitrack_app_system"
+
         const val ACCOUNT_DATASET_EXPERIMENT = "experiment"
         const val ACCOUNT_DATASET_EXPERIMENT_KEY_EMAIL = "email"
         const val ACCOUNT_DATASET_EXPERIMENT_KEY_IS_CONSENT_APPROVED = "consent_approved"
@@ -54,7 +57,6 @@ class OTApplication : MultiDexApplication() {
         const val ACCOUNT_DATASET_EXPERIMENT_KEY_OCCUPATION = "occupation"
         const val ACCOUNT_DATASET_EXPERIMENT_KEY_AGE_GROUP = "age_group"
         const val ACCOUNT_DATASET_EXPERIMENT_KEY_COUNTRY = "country"
-
 
 
         const val INTENT_EXTRA_OBJECT_ID_TRACKER = "trackerObjectId"
@@ -90,6 +92,11 @@ class OTApplication : MultiDexApplication() {
         }
     }
 
+
+    val systemSharedPreferences: SharedPreferences by lazy {
+        getSharedPreferences(SHARED_PREFERENCES_USER_NAME, Context.MODE_PRIVATE)
+    }
+
     private var _currentUser: OTUser? = null
 
     lateinit var dbHelper: DatabaseHelper
@@ -104,7 +111,9 @@ class OTApplication : MultiDexApplication() {
     var userLoaded = false
         private set
 
-    val currentUser: OTUser
+    val isSignedIn: Boolean get() = AWSMobileClient.defaultMobileClient().identityManager.isUserSignedIn
+/*
+    private val currentUser: OTUser
         get() {
             return if (_currentUser != null) {
                 println("return cached user instance")
@@ -112,7 +121,8 @@ class OTApplication : MultiDexApplication() {
             }
             else {
                 println("load user from db")
-                val user = dbHelper.findUserById(1)
+                val cachedUserId = AWSMobileClient.defaultMobileClient().identityManager.cachedUserID
+                val user = OTUser.loadCachedInstance(systemSharedPreferences, dbHelper)
                 if (user == null) {
                     initialRun = true
                     val defaultUser = OTUser("Young-Ho Kim", "yhkim@hcil.snu.ac.kr")
@@ -124,12 +134,53 @@ class OTApplication : MultiDexApplication() {
                 _currentUser!!
             }
         }
+        */
 
     //val currentUserObservable = PublishSubject.create<OTUser>()
 
     val currentUserObservable: Observable<OTUser> =
             Observable.defer {
-                Observable.just(currentUser)
+                //Observable.just(currentUser)
+                if (_currentUser != null) {
+                    println("return cached user instance")
+                    Observable.just(_currentUser!!)
+                } else {
+                    //need login
+                    println("load user from db")
+                    val identityManager = AWSMobileClient.defaultMobileClient().identityManager
+                    val cachedUserId = identityManager.cachedUserID
+                    val cachedUser = OTUser.loadCachedInstance(systemSharedPreferences, dbHelper)
+                    if (cachedUser != null && cachedUser.objectId == cachedUserId) {
+                        _currentUser = cachedUser
+                        Observable.just(cachedUser)
+                    } else {
+                        if (identityManager.isUserSignedIn) {
+                            val user = OTUser(cachedUserId, identityManager.userName)
+                            for (tracker in user.getTrackersOnShortcut()) {
+                                OTShortcutPanelManager += tracker
+                            }
+
+                            //handle failed background logging
+                            for (pair in OTBackgroundLoggingService.getFlags()) {
+                                val tracker = user[pair.first]
+                                if (tracker != null) {
+                                    logger.writeSystemLog("${tracker.name} background logging was failed. started at ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(pair.second))}", "OmniTrack")
+                                }
+                            }
+
+                            if (initialRun) {
+                                //createExampleTrackers(user)
+                                createUsabilityTestingTrackers(user)
+                            }
+
+                            _currentUser = user
+                            Observable.just(_currentUser)
+                        } else {
+                            Observable.error(Exception("Retreiving user instance error: User didn't signed in"))
+                        }
+                    }
+                }
+
             }.subscribeOn(Schedulers.computation())
                     .observeOn(AndroidSchedulers.mainThread()).cache()
 
@@ -193,39 +244,21 @@ class OTApplication : MultiDexApplication() {
             }
         }
 
-
-        val thread = HandlerThread("User Loading Thread", HandlerThread.NORM_PRIORITY)
-        thread.start()
-        userLoadingLooper = thread.looper
-
-        currentUserObservable
-                .subscribeOn(Schedulers.newThread())
-                .subscribe {
-                    user ->
-                    for (tracker in user.getTrackersOnShortcut()) {
-                        OTShortcutPanelManager += tracker
-                    }
-
-                    //handle failed background logging
-                    for (pair in OTBackgroundLoggingService.getFlags()) {
-                        val tracker = user[pair.first]
-                        if (tracker != null) {
-                            logger.writeSystemLog("${tracker.name} background logging was failed. started at ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(pair.second))}", "OmniTrack")
-                        }
-                    }
-
-                    if (initialRun) {
-                        //createExampleTrackers(user)
-                        createUsabilityTestingTrackers(user)
-                    }
-                }
-
         println("creation took ${SystemClock.elapsedRealtime() - startedAt}")
     }
 
+    fun unlinkUser() {
+        OTShortcutPanelManager.disposeShortcutPanel()
+        _currentUser?.detachFromSystem()
+        OTUser.clearInstanceCache(systemSharedPreferences)
+        _currentUser = null
+    }
+
     fun syncUserToDb() {
-        if (_currentUser != null)
+        if (_currentUser != null) {
+            OTUser.storeOrOverwriteInstanceCache(_currentUser!!, systemSharedPreferences)
             dbHelper.save(_currentUser!!)
+        }
     }
 
     override fun onTerminate() {
@@ -241,12 +274,12 @@ class OTApplication : MultiDexApplication() {
     private fun createUsabilityTestingTrackers(user: OTUser) {
 
         val bookTracker = user.newTracker("독서록", true)
-        bookTracker.attributes += OTAttribute.createAttribute(user, "제목", OTAttribute.TYPE_SHORT_TEXT)
-        bookTracker.attributes += OTAttribute.createAttribute(user, "날짜", OTAttribute.TYPE_TIME).apply {
+        bookTracker.attributes += OTAttribute.createAttribute(bookTracker, "제목", OTAttribute.TYPE_SHORT_TEXT)
+        bookTracker.attributes += OTAttribute.createAttribute(bookTracker, "날짜", OTAttribute.TYPE_TIME).apply {
             this.setPropertyValue(OTTimeAttribute.GRANULARITY, OTTimeAttribute.GRANULARITY_DAY)
         }
-        bookTracker.attributes += OTAttribute.createAttribute(user, "감상평", OTAttribute.TYPE_LONG_TEXT)
-        bookTracker.attributes += OTAttribute.createAttribute(user, "별점", OTAttribute.TYPE_RATING)
+        bookTracker.attributes += OTAttribute.createAttribute(bookTracker, "감상평", OTAttribute.TYPE_LONG_TEXT)
+        bookTracker.attributes += OTAttribute.createAttribute(bookTracker, "별점", OTAttribute.TYPE_RATING)
 
         //===================================================================================================================================
         val stepComparisonTracker = user.newTracker("걸음 수 비교", true)
@@ -257,10 +290,10 @@ class OTApplication : MultiDexApplication() {
             this.fractionPart = 0
         }
 
-        val fitbitAttribute = OTAttribute.createAttribute(user, "Fitbit", OTAttribute.TYPE_NUMBER) as OTNumberAttribute
+        val fitbitAttribute = OTAttribute.createAttribute(stepComparisonTracker, "Fitbit", OTAttribute.TYPE_NUMBER) as OTNumberAttribute
         fitbitAttribute.numberStyle = stepNumberStyle
 
-        val googleFitAttribute = OTAttribute.createAttribute(user, "Google Fit", OTAttribute.TYPE_NUMBER) as OTNumberAttribute
+        val googleFitAttribute = OTAttribute.createAttribute(stepComparisonTracker, "Google Fit", OTAttribute.TYPE_NUMBER) as OTNumberAttribute
         googleFitAttribute.numberStyle = stepNumberStyle
 
         stepComparisonTracker.attributes.add(fitbitAttribute)
@@ -270,11 +303,11 @@ class OTApplication : MultiDexApplication() {
         //===================================================================================================================================
         val diaryTracker = user.newTracker("일기", true)
 
-        diaryTracker.attributes += OTAttribute.createAttribute(user, "날짜", OTAttribute.TYPE_TIME).apply {
+        diaryTracker.attributes += OTAttribute.createAttribute(diaryTracker, "날짜", OTAttribute.TYPE_TIME).apply {
             this.setPropertyValue(OTTimeAttribute.GRANULARITY, OTTimeAttribute.GRANULARITY_DAY)
         }
 
-        diaryTracker.attributes += OTAttribute.createAttribute(user, "기분", OTAttribute.TYPE_RATING).apply {
+        diaryTracker.attributes += OTAttribute.createAttribute(diaryTracker, "기분", OTAttribute.TYPE_RATING).apply {
             this.setPropertyValue(OTRatingAttribute.PROPERTY_OPTIONS, kr.ac.snu.hcil.omnitrack.utils.RatingOptions().apply {
                 this.allowIntermediate = true
                 this.leftLabel = "매우 나쁨"
@@ -284,21 +317,21 @@ class OTApplication : MultiDexApplication() {
             })
         }
 
-        diaryTracker.attributes += OTAttribute.createAttribute(user, "날씨", OTAttribute.TYPE_CHOICE).apply {
+        diaryTracker.attributes += OTAttribute.createAttribute(diaryTracker, "날씨", OTAttribute.TYPE_CHOICE).apply {
             this.setPropertyValue(OTChoiceAttribute.PROPERTY_ENTRIES, UniqueStringEntryList("맑음", "흐림", "비", "눈"))
             this.setPropertyValue(OTChoiceAttribute.PROPERTY_MULTISELECTION, false)
         }
-        diaryTracker.attributes += OTAttribute.Companion.createAttribute(user, "제목", OTAttribute.TYPE_SHORT_TEXT)
-        diaryTracker.attributes += OTAttribute.createAttribute(user, "내용", OTAttribute.TYPE_LONG_TEXT)
+        diaryTracker.attributes += OTAttribute.Companion.createAttribute(diaryTracker, "제목", OTAttribute.TYPE_SHORT_TEXT)
+        diaryTracker.attributes += OTAttribute.createAttribute(diaryTracker, "내용", OTAttribute.TYPE_LONG_TEXT)
 
 
         //=====================================================================================================================================
         val stressTracker = user.newTracker("스트레스", true)
-        stressTracker.attributes += OTAttribute.createAttribute(user, "시간", OTAttribute.TYPE_TIME).apply {
+        stressTracker.attributes += OTAttribute.createAttribute(stressTracker, "시간", OTAttribute.TYPE_TIME).apply {
             this.setPropertyValue(OTTimeAttribute.GRANULARITY, OTTimeAttribute.GRANULARITY_MINUTE)
         }
 
-        stressTracker.attributes += OTAttribute.createAttribute(user, "기분", OTAttribute.TYPE_RATING).apply {
+        stressTracker.attributes += OTAttribute.createAttribute(stressTracker, "기분", OTAttribute.TYPE_RATING).apply {
             this.setPropertyValue(OTRatingAttribute.PROPERTY_OPTIONS, kr.ac.snu.hcil.omnitrack.utils.RatingOptions().apply {
                 this.allowIntermediate = true
                 this.leftLabel = "매우 나쁨"
@@ -308,17 +341,17 @@ class OTApplication : MultiDexApplication() {
             })
         }
 
-        stressTracker.attributes += OTAttribute.createAttribute(user, "이유", OTAttribute.TYPE_LONG_TEXT)
+        stressTracker.attributes += OTAttribute.createAttribute(stressTracker, "이유", OTAttribute.TYPE_LONG_TEXT)
 
         //=====================================================================================================================================
         val foodTracker = user.newTracker("맛집", true)
-        foodTracker.attributes += OTAttribute.createAttribute(user, "식당명", OTAttribute.TYPE_SHORT_TEXT)
-        foodTracker.attributes += OTAttribute.createAttribute(user, "먹은 날", OTAttribute.TYPE_TIME).apply {
+        foodTracker.attributes += OTAttribute.createAttribute(foodTracker, "식당명", OTAttribute.TYPE_SHORT_TEXT)
+        foodTracker.attributes += OTAttribute.createAttribute(foodTracker, "먹은 날", OTAttribute.TYPE_TIME).apply {
             this.setPropertyValue(OTTimeAttribute.GRANULARITY, OTTimeAttribute.GRANULARITY_DAY)
         }
-        foodTracker.attributes += OTAttribute.createAttribute(user, "위치", OTAttribute.TYPE_LOCATION)
-        foodTracker.attributes += OTAttribute.createAttribute(user, "사진", OTAttribute.TYPE_IMAGE)
-        foodTracker.attributes += OTAttribute.createAttribute(user, "평점", OTAttribute.TYPE_RATING)
+        foodTracker.attributes += OTAttribute.createAttribute(foodTracker, "위치", OTAttribute.TYPE_LOCATION)
+        foodTracker.attributes += OTAttribute.createAttribute(foodTracker, "사진", OTAttribute.TYPE_IMAGE)
+        foodTracker.attributes += OTAttribute.createAttribute(foodTracker, "평점", OTAttribute.TYPE_RATING)
 
 
         dbHelper.save(user)
@@ -328,18 +361,18 @@ class OTApplication : MultiDexApplication() {
         //====================================================================================================================================================
         val coffeeTracker = user.newTracker("Coffee", true)
         coffeeTracker.isOnShortcut = true
-        coffeeTracker.attributes.add(OTAttribute.Companion.createAttribute(user, "Name", OTAttribute.TYPE_SHORT_TEXT))
-        coffeeTracker.attributes.add(OTAttribute.Companion.createAttribute(user, "Drank At", OTAttribute.TYPE_TIME))
+        coffeeTracker.attributes.add(OTAttribute.Companion.createAttribute(coffeeTracker, "Name", OTAttribute.TYPE_SHORT_TEXT))
+        coffeeTracker.attributes.add(OTAttribute.Companion.createAttribute(coffeeTracker, "Drank At", OTAttribute.TYPE_TIME))
 
         val waterTracker = user.newTracker("Water", true)
-        waterTracker.attributes.add(OTAttribute.Companion.createAttribute(user, "Drank At", OTAttribute.TYPE_TIME))
+        waterTracker.attributes.add(OTAttribute.Companion.createAttribute(waterTracker, "Drank At", OTAttribute.TYPE_TIME))
 
 
         //====================================================================================================================================================
         val sleepTracker = user.newTracker("Sleep", true)
         sleepTracker.isOnShortcut = true
 
-        val sleepTimeAttribute = OTAttribute.Companion.createAttribute(user, "Sleep Duration", OTAttribute.TYPE_TIMESPAN)
+        val sleepTimeAttribute = OTAttribute.Companion.createAttribute(sleepTracker, "Sleep Duration", OTAttribute.TYPE_TIMESPAN)
         sleepTimeAttribute.setPropertyValue(OTTimeSpanAttribute.PROPERTY_GRANULARITY, OTTimeAttribute.GRANULARITY_MINUTE)
 
         val sleepTimeConnection = OTConnection()
@@ -348,38 +381,38 @@ class OTApplication : MultiDexApplication() {
         sleepTimeAttribute.valueConnection = sleepTimeConnection
 
         sleepTracker.attributes.add(sleepTimeAttribute)
-        sleepTracker.attributes.add(OTAttribute.Companion.createAttribute(user, "Quality", OTAttribute.TYPE_RATING))
-        sleepTracker.attributes.add(OTAttribute.Companion.createAttribute(user, "Memo", OTAttribute.TYPE_LONG_TEXT))
+        sleepTracker.attributes.add(OTAttribute.Companion.createAttribute(sleepTracker, "Quality", OTAttribute.TYPE_RATING))
+        sleepTracker.attributes.add(OTAttribute.Companion.createAttribute(sleepTracker, "Memo", OTAttribute.TYPE_LONG_TEXT))
 
         //====================================================================================================================================================
         val beerTracker = user.newTracker("Beer", true)
 
-        beerTracker.attributes.add(OTAttribute.Companion.createAttribute(user, "Photo", OTAttribute.TYPE_IMAGE))
-        val dateAttribute = OTAttribute.createAttribute(user, "Date", OTAttribute.TYPE_TIME)
+        beerTracker.attributes.add(OTAttribute.Companion.createAttribute(beerTracker, "Photo", OTAttribute.TYPE_IMAGE))
+        val dateAttribute = OTAttribute.createAttribute(beerTracker, "Date", OTAttribute.TYPE_TIME)
         dateAttribute.setPropertyValue(OTTimeAttribute.GRANULARITY, OTTimeAttribute.GRANULARITY_DAY)
         beerTracker.attributes.add(dateAttribute)
 
-        beerTracker.attributes.add(OTAttribute.Companion.createAttribute(user, "Name", OTAttribute.TYPE_SHORT_TEXT))
+        beerTracker.attributes.add(OTAttribute.Companion.createAttribute(beerTracker, "Name", OTAttribute.TYPE_SHORT_TEXT))
 
-        val typeAttribute = OTAttribute.createAttribute(user, "Type", OTAttribute.TYPE_CHOICE)
+        val typeAttribute = OTAttribute.createAttribute(beerTracker, "Type", OTAttribute.TYPE_CHOICE)
         typeAttribute.setPropertyValue(OTChoiceAttribute.PROPERTY_ENTRIES, UniqueStringEntryList("Lager", "Stout", "Ale", "Hybrid"))
         typeAttribute.setPropertyValue(OTChoiceAttribute.PROPERTY_MULTISELECTION, false)
         beerTracker.attributes.add(typeAttribute)
 
-        beerTracker.attributes.add(OTAttribute.Companion.createAttribute(user, "Score", OTAttribute.TYPE_RATING))
-        beerTracker.attributes.add(OTAttribute.Companion.createAttribute(user, "Review", OTAttribute.TYPE_LONG_TEXT))
+        beerTracker.attributes.add(OTAttribute.Companion.createAttribute(beerTracker, "Score", OTAttribute.TYPE_RATING))
+        beerTracker.attributes.add(OTAttribute.Companion.createAttribute(beerTracker, "Review", OTAttribute.TYPE_LONG_TEXT))
 
 
         //====================================================================================================================================================
         val stepComparisonTracker = user.newTracker("Step Devices", true)
-        val fitbitAttribute = OTAttribute.createAttribute(user, "Fitbit", OTAttribute.TYPE_NUMBER) as OTNumberAttribute
+        val fitbitAttribute = OTAttribute.createAttribute(stepComparisonTracker, "Fitbit", OTAttribute.TYPE_NUMBER) as OTNumberAttribute
         fitbitAttribute.numberStyle.fractionPart = 0
         val fitbitStepConnection = OTConnection()
         fitbitStepConnection.source = FitbitStepCountMeasureFactory.makeMeasure()
         fitbitStepConnection.rangedQuery = OTTimeRangeQuery(OTTimeRangeQuery.TYPE_PIVOT_TIMESTAMP, OTTimeRangeQuery.BIN_SIZE_DAY, -1)
         fitbitAttribute.valueConnection = fitbitStepConnection
 
-        val misfitAttribute = OTAttribute.createAttribute(user, "MisFit", OTAttribute.TYPE_NUMBER) as OTNumberAttribute
+        val misfitAttribute = OTAttribute.createAttribute(stepComparisonTracker, "MisFit", OTAttribute.TYPE_NUMBER) as OTNumberAttribute
         misfitAttribute.numberStyle.fractionPart = 0
         val misfitStepConnection = OTConnection()
 
@@ -387,7 +420,7 @@ class OTApplication : MultiDexApplication() {
         misfitStepConnection.rangedQuery = OTTimeRangeQuery(OTTimeRangeQuery.TYPE_PIVOT_TIMESTAMP, OTTimeRangeQuery.BIN_SIZE_DAY, -1)
         misfitAttribute.valueConnection = misfitStepConnection
 
-        val googleFitAttribute = OTAttribute.createAttribute(user, "Google Fit", OTAttribute.TYPE_NUMBER) as OTNumberAttribute
+        val googleFitAttribute = OTAttribute.createAttribute(stepComparisonTracker, "Google Fit", OTAttribute.TYPE_NUMBER) as OTNumberAttribute
         googleFitAttribute.numberStyle.fractionPart = 0
         val googleFitConnection = OTConnection()
         googleFitConnection.source = GoogleFitStepsFactory.makeMeasure()

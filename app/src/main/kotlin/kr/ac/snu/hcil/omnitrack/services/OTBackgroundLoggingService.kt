@@ -122,9 +122,12 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
     }
 
     private fun handleLogging(trackerId: String, intent: Intent) {
-        val tracker = OTApplication.app.currentUser[trackerId]
-        if (tracker != null) {
-            startLoggingAsync(this, tracker, OTItem.LoggingSource.valueOf(intent.getStringExtra(INTENT_EXTRA_LOGGING_SOURCE)), true, null)
+        OTApplication.app.currentUserObservable.subscribe {
+            user ->
+            val tracker = user[trackerId]
+            if (tracker != null) {
+                startLoggingAsync(this, tracker, OTItem.LoggingSource.valueOf(intent.getStringExtra(INTENT_EXTRA_LOGGING_SOURCE)), true, null)
+            }
         }
     }
 
