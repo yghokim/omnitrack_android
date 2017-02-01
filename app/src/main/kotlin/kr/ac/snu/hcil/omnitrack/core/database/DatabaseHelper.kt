@@ -32,7 +32,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
 
     }
 
-    abstract class TableWithNameScheme : TableScheme() {
+    abstract class TableWithNameScheme(isObjectIdUnique: Boolean = true) : TableScheme() {
         val NAME = "name"
         val OBJECT_ID = "object_id"
 
@@ -40,9 +40,12 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
 
         override val creationColumnContentString: String = "${NAME} TEXT, ${OBJECT_ID} TEXT"
 
-        override val indexCreationQueryString: String = makeIndexQueryString(true, name = "obj_id_unique", columns = OBJECT_ID)
+        init {
+            if (isObjectIdUnique)
+                appendIndexQueryString(true, name = "obj_id_unique", columns = OBJECT_ID)
+        }
     }
-
+/*
     object UserScheme : TableWithNameScheme() {
         override val tableName: String
             get() = "omnitrack_users"
@@ -53,7 +56,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         override val intrinsicColumnNames = super.intrinsicColumnNames + arrayOf(EMAIL, ATTR_ID_SEED)
 
         override val creationColumnContentString: String = super.creationColumnContentString + ", ${EMAIL} TEXT, ${ATTR_ID_SEED} INTEGER"
-    }
+    }*/
 
     object TrackerScheme : TableWithNameScheme() {
         override val tableName: String
@@ -62,14 +65,19 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         val USER_ID = "user_id"
         val POSITION = "position"
         val COLOR = "color"
+        val ATTR_ID_SEED = "attribute_id_seed"
         val IS_ON_SHORTCUT = "is_on_shortcut"
 
-        override val intrinsicColumnNames = super.intrinsicColumnNames + arrayOf(USER_ID, POSITION, COLOR, IS_ON_SHORTCUT)
+        override val intrinsicColumnNames = super.intrinsicColumnNames + arrayOf(USER_ID, POSITION, COLOR, IS_ON_SHORTCUT, ATTR_ID_SEED)
 
-        override val creationColumnContentString: String = super.creationColumnContentString + ", ${makeForeignKeyStatementString(USER_ID, UserScheme.tableName)}, ${COLOR} INTEGER, ${POSITION} INTEGER, ${IS_ON_SHORTCUT} INTEGER"
+        override val creationColumnContentString: String = super.creationColumnContentString + ", ${USER_ID} TEXT, ${COLOR} INTEGER, ${POSITION} INTEGER, ${IS_ON_SHORTCUT} INTEGER, ${ATTR_ID_SEED} INTEGER"
+
+        init {
+            appendIndexQueryString(name = "user_id_index", columns = USER_ID, unique = false)
+        }
     }
 
-    object AttributeScheme : TableWithNameScheme() {
+    object AttributeScheme : TableWithNameScheme(false) {
         override val tableName: String = "omnitrack_attributes"
 
         val TRACKER_ID = "tracker_id"
@@ -82,6 +90,10 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         override val intrinsicColumnNames: Array<String> = super.intrinsicColumnNames + arrayOf(TRACKER_ID, TYPE, POSITION, IS_REQUIRED, PROPERTY_DATA, CONNECTION_DATA)
 
         override val creationColumnContentString = super.creationColumnContentString + ", ${makeForeignKeyStatementString(TRACKER_ID, TrackerScheme.tableName)}, ${AttributeScheme.POSITION} INTEGER, ${AttributeScheme.IS_REQUIRED} INTEGER, ${AttributeScheme.TYPE} INTEGER, ${AttributeScheme.PROPERTY_DATA} TEXT, ${AttributeScheme.CONNECTION_DATA} TEXT"
+
+        init {
+            appendIndexQueryString(true, "tracker_and_obj_id_unique", TRACKER_ID, OBJECT_ID)
+        }
     }
 
     object TriggerScheme : TableWithNameScheme() {
@@ -97,7 +109,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
 
         override val intrinsicColumnNames: Array<String> = super.intrinsicColumnNames + arrayOf(TRACKER_OBJECT_IDS, TYPE, POSITION, IS_ON, ACTION, LAST_TRIGGERED_TIME, PROPERTIES)
 
-        override val creationColumnContentString = super.creationColumnContentString + ", ${makeForeignKeyStatementString(USER_ID, UserScheme.tableName)}, ${TriggerScheme.TRACKER_OBJECT_IDS} TEXT, ${TriggerScheme.POSITION} INTEGER, ${TriggerScheme.IS_ON} INTEGER, ${TriggerScheme.ACTION} INTEGER, ${TriggerScheme.LAST_TRIGGERED_TIME} INTEGER, ${TriggerScheme.TYPE} INTEGER, ${TriggerScheme.PROPERTIES} TEXT"
+        override val creationColumnContentString = super.creationColumnContentString + ", ${USER_ID} TEXT, ${TriggerScheme.TRACKER_OBJECT_IDS} TEXT, ${TriggerScheme.POSITION} INTEGER, ${TriggerScheme.IS_ON} INTEGER, ${TriggerScheme.ACTION} INTEGER, ${TriggerScheme.LAST_TRIGGERED_TIME} INTEGER, ${TriggerScheme.TYPE} INTEGER, ${TriggerScheme.PROPERTIES} TEXT"
     }
 
     object ItemScheme : TableScheme() {
@@ -115,18 +127,21 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         override val intrinsicColumnNames: Array<String> = arrayOf(TRACKER_ID, SOURCE_TYPE, VALUES_JSON, KEY_TIME_TIMESTAMP, KEY_TIME_GRANULARITY, KEY_TIME_TIMEZONE)
         override val creationColumnContentString: String = "${makeForeignKeyStatementString(TRACKER_ID, TrackerScheme.tableName)}, $SOURCE_TYPE INTEGER, $VALUES_JSON TEXT, $KEY_TIME_TIMESTAMP INTEGER, $KEY_TIME_GRANULARITY TEXT, $KEY_TIME_TIMEZONE TEXT"
 
-        override val indexCreationQueryString: String =
-                makeIndexQueryString(false, "tracker_and_timestamp", TRACKER_ID, KEY_TIME_TIMESTAMP)
+        init {
+            appendIndexQueryString(false, "tracker_and_timestamp", TRACKER_ID, KEY_TIME_TIMESTAMP)
+        }
     }
 
     override fun onCreate(db: SQLiteDatabase) {
         println("Create Database Tables")
 
-        val tables = arrayOf(UserScheme, TrackerScheme, AttributeScheme, TriggerScheme, ItemScheme)
+        val tables = arrayOf(TrackerScheme, AttributeScheme, TriggerScheme, ItemScheme)
 
         for (scheme in tables) {
             db.execSQL(scheme.creationQueryString)
-            db.execSQL(scheme.indexCreationQueryString)
+            scheme.indexCreationQueries.forEach {
+                db.execSQL(it)
+            }
         }
     }
 
@@ -134,6 +149,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
+    /*
     fun findUserById(id: Long): OTUser? {
         val result = queryById(id, UserScheme)
         if (result.count == 0) {
@@ -148,11 +164,11 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
             result.close()
             return entity
         }
-    }
+    }*/
 
-    fun findTrackersOfUser(userId: Long): List<OTTracker>? {
+    fun findTrackersOfUser(userId: String): List<OTTracker>? {
 
-        val query: Cursor = readableDatabase.query(TrackerScheme.tableName, TrackerScheme.columnNames, "${TrackerScheme.USER_ID}=?", arrayOf(userId.toString()), null, null, "${TrackerScheme.POSITION} ASC")
+        val query: Cursor = readableDatabase.query(TrackerScheme.tableName, TrackerScheme.columnNames, "${TrackerScheme.USER_ID}=?", arrayOf(userId), null, null, "${TrackerScheme.POSITION} ASC")
         val result = ArrayList<OTTracker>()
         if (query.moveToFirst()) {
             do {
@@ -180,7 +196,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
     }
 
     fun findTriggersOfUser(user: OTUser): List<OTTrigger>? {
-        val query: Cursor = readableDatabase.query(TriggerScheme.tableName, TriggerScheme.columnNames, "${TriggerScheme.USER_ID}=?", arrayOf(user.dbId.toString()), null, null, "${TriggerScheme.POSITION} ASC")
+        val query: Cursor = readableDatabase.query(TriggerScheme.tableName, TriggerScheme.columnNames, "${TriggerScheme.USER_ID}=?", arrayOf(user.objectId), null, null, "${TriggerScheme.POSITION} ASC")
         if (query.moveToFirst()) {
             val result = ArrayList<OTTrigger>()
             do {
@@ -217,8 +233,9 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         val objectId = cursor.getString(cursor.getColumnIndex(TrackerScheme.OBJECT_ID))
         val color = cursor.getInt(cursor.getColumnIndex(TrackerScheme.COLOR))
         val isOnShortcut = cursor.getInt(cursor.getColumnIndex(TrackerScheme.IS_ON_SHORTCUT))
+        val attributeIdSeed = cursor.getLong(cursor.getColumnIndex(TrackerScheme.ATTR_ID_SEED))
 
-        val tracker = OTTracker(objectId, id, name, color, isOnShortcut.toBoolean(), findAttributesOfTracker(id))
+        val tracker = OTTracker(objectId, id, name, color, isOnShortcut.toBoolean(), attributeIdSeed, findAttributesOfTracker(id))
         tracker.isDirtySinceLastSync = false
 
         return tracker
@@ -310,8 +327,8 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         if (trigger.isDirtySinceLastSync) {
             val values = baseContentValuesOfNamed(trigger, TriggerScheme)
 
-            values.put(TriggerScheme.USER_ID, owner.dbId)
-            println("saving trigger with user id ${owner.dbId}")
+            values.put(TriggerScheme.USER_ID, owner.objectId)
+            println("saving trigger with user id ${owner.objectId}")
             values.put(TriggerScheme.TYPE, trigger.typeId)
             values.put(TriggerScheme.PROPERTIES, trigger.getSerializedProperties())
             values.put(TriggerScheme.TRACKER_OBJECT_IDS, trigger.trackers.map { it.objectId }.joinToString(";"))
@@ -349,8 +366,9 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
             val values = baseContentValuesOfNamed(tracker, TrackerScheme)
             values.put(TrackerScheme.POSITION, position)
             values.put(TrackerScheme.COLOR, tracker.color)
-            values.put(TrackerScheme.USER_ID, tracker.owner?.dbId)
+            values.put(TrackerScheme.USER_ID, tracker.owner?.objectId)
             values.put(TrackerScheme.IS_ON_SHORTCUT, tracker.isOnShortcut.toInt())
+            values.put(TrackerScheme.ATTR_ID_SEED, tracker.attributeIdSeed)
 
             saveObject(tracker, values, TrackerScheme)
             tracker.isDirtySinceLastSync = false
@@ -368,6 +386,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
     }
 
     fun save(user: OTUser) {
+        /*
         if (user.isDirtySinceLastSync) {
             val values = baseContentValuesOfNamed(user, UserScheme)
             values.put(UserScheme.EMAIL, user.email)
@@ -377,6 +396,8 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
             saveObject(user, values, UserScheme)
             user.isDirtySinceLastSync = false
         }
+        */
+
         writableDatabase.beginTransaction()
 
         val removedTrackerIds = user.fetchRemovedTrackerIds()

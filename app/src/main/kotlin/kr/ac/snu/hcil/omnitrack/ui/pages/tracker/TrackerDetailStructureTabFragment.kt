@@ -24,6 +24,7 @@ import jp.wasabeef.recyclerview.animators.SlideInRightAnimator
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
+import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.AttributePresetInfo
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.ui.DragItemTouchHelperCallback
@@ -71,6 +72,7 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
 
     private val subscriptions = CompositeSubscription()
 
+    private var user: OTUser? = null
     private var tracker: OTTracker? = null
 
     private val newAttributePanel: FieldPresetSelectionBottomSheetFragment by lazy {
@@ -196,6 +198,7 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
         subscriptions.add(
                 OTApplication.app.currentUserObservable.subscribe {
                     user ->
+                    this.user = user
                     if (trackerObjectId != null) {
                         tracker = user[trackerObjectId!!]
                     }
@@ -431,7 +434,7 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
     protected fun addNewAttribute(typeInfo: AttributePresetInfo) {
         val tracker = tracker
         tracker?.let {
-            val newAttribute = typeInfo.creater(OTApplication.app.currentUser, tracker.generateNewAttributeName(typeInfo.name, context))
+            val newAttribute = typeInfo.creater(tracker, tracker.generateNewAttributeName(typeInfo.name, context))
             tracker.attributes.add(newAttribute)
 
             attributeListAdapter.notifyItemInserted(tracker.attributes.size - 1)

@@ -32,14 +32,17 @@ abstract class TableScheme {
 
     abstract val creationColumnContentString: String
 
-    open val indexCreationQueryString: String = ""
+    private val indexQueries = arrayListOf<String>()
 
-    fun makeIndexQueryString(unique: Boolean, name: String, vararg columns: String): String {
-        return "CREATE${if (unique) {
+    // val indexCreationQueryString: String = indexQueries.joinToString(" ")
+    val indexCreationQueries: List<String> get() = indexQueries
+
+    protected fun appendIndexQueryString(unique: Boolean, name: String, vararg columns: String) {
+        indexQueries.add("CREATE${if (unique) {
             " UNIQUE"
         } else {
             ""
-        }} INDEX ${tableName}_$name ON $tableName (${columns.joinToString(", ")});"
+        }} INDEX ${tableName}_$name ON $tableName (${columns.joinToString(", ")});")
     }
 
     fun makeForeignKeyStatementString(column: String, foreignTable: String): String {

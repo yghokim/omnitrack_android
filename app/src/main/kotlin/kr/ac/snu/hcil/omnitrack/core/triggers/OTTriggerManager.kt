@@ -85,6 +85,12 @@ class OTTriggerManager(val user: OTUser) {
         return triggers.filter { it.action == action }.toTypedArray()
     }
 
+    fun detachFromSystem() {
+        for (trigger in triggers) {
+            trigger.detachFromSystem()
+        }
+    }
+
     fun putNewTrigger(trigger: OTTrigger) {
         if (triggers.find { it.objectId == trigger.objectId } == null) {
             triggers.add(trigger)

@@ -611,4 +611,8 @@ class OTTimeTrigger(objectId: String?, dbId: Long?, user: OTUser, name: String, 
         OTApplication.logger.writeSystemLog("Time trigger turned off. cancel trigger", TAG)
         OTApplication.app.timeTriggerAlarmManager.cancelTrigger(this)
     }
+
+    override fun detachFromSystem() {
+        OTApplication.app.timeTriggerAlarmManager.cancelTrigger(this)
+    }
 }

@@ -17,6 +17,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
+import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemEditingActivity
@@ -34,7 +35,7 @@ object OTShortcutPanelManager {
         (OTApplication.app.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
     }
 
-    private fun buildNewNotificationShortcutViews(context: Context, bigStyle: Boolean): RemoteViews
+    private fun buildNewNotificationShortcutViews(user: OTUser, context: Context, bigStyle: Boolean): RemoteViews
     {
         val rv = RemoteViews(context.packageName, if (bigStyle) R.layout.remoteview_shortcut_notification_big else R.layout.remoteview_shortcut_notification_normal)
 
@@ -54,7 +55,7 @@ object OTShortcutPanelManager {
             rv.setOnClickPendingIntent(R.id.ui_button_more, morePendingIntent)
         }
 
-        val trackers = OTApplication.app.currentUser.getTrackersOnShortcut()
+        val trackers = user.getTrackersOnShortcut()
 
         rv.removeAllViews(R.id.container)
 
@@ -104,12 +105,12 @@ object OTShortcutPanelManager {
         return rv
     }
 
-    fun refreshNotificationShortcutViews(context: Context = OTApplication.app) {
+    fun refreshNotificationShortcutViews(user: OTUser, context: Context = OTApplication.app) {
 
-        val trackers = OTApplication.app.currentUser.getTrackersOnShortcut()
+        val trackers = user.getTrackersOnShortcut()
         if (trackers.isNotEmpty()) {
-            val bigView = buildNewNotificationShortcutViews(context, true)
-            val normalView = buildNewNotificationShortcutViews(context, false)
+            val bigView = buildNewNotificationShortcutViews(user, context, true)
+            val normalView = buildNewNotificationShortcutViews(user, context, false)
 
             val noti = NotificationCompat.Builder(context)
                     .setSmallIcon(R.drawable.icon_simple_white)
@@ -137,7 +138,9 @@ object OTShortcutPanelManager {
         intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
 
         OTApplication.app.sendBroadcast(intent)*/
-        refreshNotificationShortcutViews()
+        val user = tracker.owner
+        if (user != null)
+            refreshNotificationShortcutViews(user)
     }
 
     operator fun plusAssign(@Suppress("UNUSED_PARAMETER") tracker: OTTracker)
@@ -146,7 +149,10 @@ object OTShortcutPanelManager {
         intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
 
         OTApplication.app.sendBroadcast(intent)*/
-        refreshNotificationShortcutViews()
+
+        val user = tracker.owner
+        if (user != null)
+            refreshNotificationShortcutViews(user)
     }
 
     operator fun minusAssign(@Suppress("UNUSED_PARAMETER") tracker: OTTracker)
@@ -155,6 +161,13 @@ object OTShortcutPanelManager {
         intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
 
         OTApplication.app.sendBroadcast(intent)*/
-        refreshNotificationShortcutViews()
+        val user = tracker.owner
+        if (user != null)
+            refreshNotificationShortcutViews(user)
     }
+
+    fun disposeShortcutPanel() {
+        notificationManager.cancel(NOTIFICATION_ID)
+    }
+
 }

@@ -148,6 +148,6 @@ class OTItem : ADataRow, IDatabaseStorable {
     }
 
     override fun toString(): String {
-        return "Item for [${OTApplication.app.currentUser[trackerObjectId]?.name}] ${super.toString()}"
+        return "OTItem ${super.toString()}"
     }
 }

@@ -24,7 +24,7 @@ import kotlin.properties.Delegates
 /**
  * Created by Young-Ho on 7/11/2016.
  */
-class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color.WHITE, isOnShortcut: Boolean = false, _attributes: Collection<OTAttribute<out Any>>? = null)
+class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color.WHITE, isOnShortcut: Boolean = false, attributeIdSeed: Long = 0, _attributes: Collection<OTAttribute<out Any>>? = null)
 : NamedObject(objectId, dbId, name) {
 
     val attributes = ObservableList<OTAttribute<out Any>>()
@@ -45,6 +45,15 @@ class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color
             addedToUser.invoke(this, new)
         }
     }
+
+
+    var attributeIdSeed: Long = attributeIdSeed
+        private set(value) {
+            if (field != value) {
+                field = value
+                isDirtySinceLastSync = true
+            }
+        }
 
     var color: Int by Delegates.observable(color)
     {
@@ -169,7 +178,7 @@ class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color
 
         //add line timeline if numeric variables exist
         val numberAttrs = attributes.filter { it is OTNumberAttribute }.map { it as OTNumberAttribute }
-        if (numberAttrs.size > 0) {
+        if (numberAttrs.isNotEmpty()) {
             list.add(TimelineComparisonLineChartModel(numberAttrs, this))
         }
 
@@ -201,6 +210,10 @@ class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color
         }
 
         return !invalid
+    }
+
+    fun getNewAttributeObjectId(): Long {
+        return ++attributeIdSeed
     }
 
 }

@@ -5,6 +5,8 @@ import com.google.gson.JsonObject
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
+import kr.ac.snu.hcil.omnitrack.core.OTUser
+import rx.internal.util.SubscriptionList
 
 /**
  * Created by younghokim on 2016. 11. 17..
@@ -16,19 +18,26 @@ abstract class OTTrackerAttachedActivity(layoutId: Int) : MultiButtonActionBarAc
 
     protected val tracker: OTTracker? get() = _tracker
 
+    private val startSubscriptions = SubscriptionList()
+
     override fun onStart() {
         super.onStart()
         trackerObjectId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
-        reloadTracker()
+        startSubscriptions.add(
+                OTApplication.app.currentUserObservable.subscribe {
+                    user ->
+                    reloadTracker(user)
+                }
+        )
     }
 
     override fun onResume() {
         super.onResume()
     }
 
-    protected fun reloadTracker() {
+    private fun reloadTracker(user: OTUser) {
         if (trackerObjectId != null) {
-            _tracker = OTApplication.app.currentUser[trackerObjectId!!]
+            _tracker = user[trackerObjectId!!]
             if (_tracker != null) {
                 setHeaderColor(tracker!!.color, true)
                 onTrackerLoaded(tracker!!)
