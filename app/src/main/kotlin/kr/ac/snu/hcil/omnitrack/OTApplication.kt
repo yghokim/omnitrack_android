@@ -155,7 +155,7 @@ class OTApplication : MultiDexApplication() {
                         Observable.just(cachedUser)
                     } else {
                         if (identityManager.isUserSignedIn) {
-                            val user = OTUser(cachedUserId, identityManager.userName)
+                            val user = OTUser(cachedUserId, identityManager.userName, identityManager.currentIdentityProvider.userImageUrl)
                             for (tracker in user.getTrackersOnShortcut()) {
                                 OTShortcutPanelManager += tracker
                             }
@@ -174,7 +174,7 @@ class OTApplication : MultiDexApplication() {
                             }
 
                             _currentUser = user
-                            Observable.just(_currentUser)
+                            Observable.just(user)
                         } else {
                             Observable.error(Exception("Retreiving user instance error: User didn't signed in"))
                         }

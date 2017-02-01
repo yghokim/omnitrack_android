@@ -9,10 +9,11 @@ import android.view.View
 import android.widget.PopupMenu
 import android.widget.TextView
 import com.amazonaws.mobile.AWSMobileClient
-import com.amazonaws.mobile.user.IdentityProvider
-import com.amazonaws.mobile.util.ThreadUtils
+import com.bumptech.glide.Glide
 import de.hdodenhof.circleimageview.CircleImageView
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.ui.pages.AboutActivity
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 
@@ -58,6 +59,7 @@ class SidebarWrapper(val view: View, val parentActivity: AppCompatActivity) : Po
             R.id.action_unlink_with_this_device -> {
                 DialogHelper.makeYesNoDialogBuilder(parentActivity, "OmniTrack", parentActivity.getString(R.string.msg_profile_unlink_account_confirm), {
                     AWSMobileClient.defaultMobileClient().identityManager.signOut()
+                    OTApplication.app.unlinkUser()
                 }).show()
                 return true
             }
@@ -67,15 +69,9 @@ class SidebarWrapper(val view: View, val parentActivity: AppCompatActivity) : Po
         }
     }
 
-    fun refresh(provider: IdentityProvider) {
-        val identityManager = AWSMobileClient.defaultMobileClient().identityManager
-        //TODO cache image and user name in OTUser
-        identityManager.loadUserInfoAndImage(provider) {
-            ThreadUtils.runOnUiThread {
-                photoView.setImageBitmap(identityManager.userImage)
-                nameView.text = identityManager.userName
-            }
-        }
+    fun refresh(user: OTUser) {
+        Glide.with(parentActivity).load(user.photoUrl).into(photoView)
+        nameView.text = user.name
     }
 
     fun dispose() {
