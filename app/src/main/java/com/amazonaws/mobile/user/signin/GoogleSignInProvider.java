@@ -29,7 +29,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.common.api.Status;
@@ -126,10 +125,16 @@ public class GoogleSignInProvider implements SignInProvider {
                 .addApi(Auth.GOOGLE_SIGN_IN_API, mGoogleSignInOptions)
                 .build();
         mGoogleApiClient.connect();
+
+        /*
         OptionalPendingResult<GoogleSignInResult> pendingResult = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
         if (pendingResult.isDone()) {
             googleSignInAccount = pendingResult.get().getSignInAccount();
         }
+        else{
+            pendingResult.
+            //Log.d(LOG_TAG, "Google slient login was not done. :" + pendingResult..getStatus().getStatusMessage());
+        }*/
 
     }
 
@@ -149,6 +154,7 @@ public class GoogleSignInProvider implements SignInProvider {
         final ConnectionResult result = mGoogleApiClient.blockingConnect();
         if (result.isSuccess()) {
             try {
+                googleSignInAccount = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient).await().getSignInAccount();
                 authToken = getGoogleAuthToken();
                 return true;
             } catch (Exception e) {

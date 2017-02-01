@@ -25,6 +25,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.BooleanPropertyV
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ShortTextPropertyView
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.wizard.ConnectionWizardView
 import kr.ac.snu.hcil.omnitrack.utils.*
+import rx.internal.util.SubscriptionList
 import java.util.*
 
 class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_attribute_detail), View.OnClickListener {
@@ -36,7 +37,6 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
     }
 
     var attribute: OTAttribute<out Any>? = null
-
 
     private val propertyViewContainer: LinearLayout by bindView(R.id.ui_list)
 
@@ -56,6 +56,8 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
     private var propertyViewHorizontalMargin: Int = 0
 
     private val propertyViewList = ArrayList<ReadOnlyPair<Int?, View>>()
+
+    private val startSubscriptions = SubscriptionList()
 
     override fun onSessionLogContent(contentObject: JsonObject) {
         super.onSessionLogContent(contentObject)
@@ -137,10 +139,20 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
         super.onStart()
 
         if (intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ATTRIBUTE) != null) {
-            attribute = OTApplication.app.currentUser.findAttributeByObjectId(intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ATTRIBUTE))
-            refresh()
-            applyAttributeToPropertyView(attribute!!)
+            startSubscriptions.add(
+                    OTApplication.app.currentUserObservable.subscribe {
+                        user ->
+                        attribute = user.findAttributeByObjectId(intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ATTRIBUTE))
+                        refresh()
+                        applyAttributeToPropertyView(attribute!!)
+                    }
+            )
         }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        startSubscriptions.clear()
     }
 
     override fun onToolbarLeftButtonClicked() {

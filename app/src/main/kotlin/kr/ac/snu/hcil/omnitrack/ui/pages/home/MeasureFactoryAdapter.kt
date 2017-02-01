@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
@@ -64,19 +65,22 @@ class MeasureFactoryAdapter : RecyclerView.Adapter<MeasureFactoryAdapter.Measure
 
         override fun onClick(view: View) {
             if (view === connectButton) {
-                val dialog = TrackerPickerDialogBuilder(this).createDialog(itemView.getActivity()!!, R.string.msg_pick_track_to_attach_field_with_measure, null, {
-                    tracker ->
-                    if (tracker != null) {
-                        DialogHelper.makeYesNoDialogBuilder(itemView.context, "OmniTrack", "Add a field to this tracker?", {
-                            val exampleAttribute = this.measureFactory.makeNewExampleAttribute()
-                            tracker.attributes.add(exampleAttribute)
-                            //open tracker window
-                            val intent = TrackerDetailActivity.makeIntent(tracker.objectId, exampleAttribute, itemView.context)
-                            itemView.context.startActivity(intent)
-                        }, null).show()
-                    }
-                })
-                dialog.show()
+                OTApplication.app.currentUserObservable.subscribe {
+                    user ->
+                    val dialog = TrackerPickerDialogBuilder(user.trackers.unObservedList, this).createDialog(itemView.getActivity()!!, R.string.msg_pick_track_to_attach_field_with_measure, null, {
+                        tracker ->
+                        if (tracker != null) {
+                            DialogHelper.makeYesNoDialogBuilder(itemView.context, "OmniTrack", "Add a field to this tracker?", {
+                                val exampleAttribute = this.measureFactory.makeNewExampleAttribute(tracker)
+                                tracker.attributes.add(exampleAttribute)
+                                //open tracker window
+                                val intent = TrackerDetailActivity.makeIntent(tracker.objectId, exampleAttribute, itemView.context)
+                                itemView.context.startActivity(intent)
+                            }, null).show()
+                        }
+                    })
+                    dialog.show()
+                }
             }
         }
 

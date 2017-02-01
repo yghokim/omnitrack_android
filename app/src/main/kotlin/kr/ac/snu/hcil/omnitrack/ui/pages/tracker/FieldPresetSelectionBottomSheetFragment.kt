@@ -114,22 +114,22 @@ class FieldPresetSelectionBottomSheetFragment : BottomSheetDialogFragment() {
                 //                SimpleAttributePresetInfo(OTAttribute.TYPE_TIME, R.drawable.field_icon_time, this.getString(R.string.type_timepoint_name), this.getString(R.string.type_timepoint_desc)),
 
                 AttributePresetInfo(OTAttribute.TYPE_TIME, R.drawable.field_icon_time_hour, this.getString(R.string.type_timepoint_time_name), this.getString(R.string.type_timepoint_time_desc),
-                        { user, columnName ->
-                            val attr = OTAttribute.createAttribute(user, columnName, OTAttribute.TYPE_TIME) as OTTimeAttribute
+                        { tracker, columnName ->
+                            val attr = OTAttribute.createAttribute(tracker, columnName, OTAttribute.TYPE_TIME) as OTTimeAttribute
                             attr.granularity = OTTimeAttribute.GRANULARITY_MINUTE
                             attr
                         }),
 
                 AttributePresetInfo(OTAttribute.TYPE_TIME, R.drawable.field_icon_time_date, this.getString(R.string.type_timepoint_date_name), this.getString(R.string.type_timepoint_date_desc),
-                        { user, columnName ->
-                            val attr = OTAttribute.createAttribute(user, columnName, OTAttribute.TYPE_TIME) as OTTimeAttribute
+                        { tracker, columnName ->
+                            val attr = OTAttribute.createAttribute(tracker, columnName, OTAttribute.TYPE_TIME) as OTTimeAttribute
                             attr.granularity = OTTimeAttribute.GRANULARITY_DAY
                             attr
                         }),
 
                 AttributePresetInfo(OTAttribute.TYPE_TIMESPAN, R.drawable.field_icon_timer, this.getString(R.string.type_timespan_name), this.getString(R.string.type_timespan_desc),
-                        { user, columnName ->
-                            (OTAttribute.createAttribute(user, columnName, OTAttribute.TYPE_TIMESPAN) as OTTimeSpanAttribute).apply {
+                        { tracker, columnName ->
+                            (OTAttribute.createAttribute(tracker, columnName, OTAttribute.TYPE_TIMESPAN) as OTTimeSpanAttribute).apply {
                                 setPropertyValue(OTTimeSpanAttribute.PROPERTY_GRANULARITY, OTTimeSpanAttribute.GRANULARITY_MINUTE)
                             }
                         }),
@@ -139,15 +139,15 @@ class FieldPresetSelectionBottomSheetFragment : BottomSheetDialogFragment() {
                 SimpleAttributePresetInfo(OTAttribute.TYPE_AUDIO, R.drawable.field_icon_audio, this.getString(R.string.type_audio_record_name), this.getString(R.string.type_audio_record_desc)),
 
                 AttributePresetInfo(OTAttribute.TYPE_CHOICE, R.drawable.field_icon_singlechoice, this.getString(R.string.type_single_choice_name), this.getString(R.string.type_single_choice_desc),
-                        { user, columnName ->
-                            val attr = OTAttribute.createAttribute(user, columnName, OTAttribute.TYPE_CHOICE) as OTChoiceAttribute
+                        { tracker, columnName ->
+                            val attr = OTAttribute.createAttribute(tracker, columnName, OTAttribute.TYPE_CHOICE) as OTChoiceAttribute
                             attr.allowedMultiSelection = false
                             attr
                         }),
 
                 AttributePresetInfo(OTAttribute.TYPE_CHOICE, R.drawable.field_icon_multiplechoice, this.getString(R.string.type_multiple_choices_name), this.getString(R.string.type_multiple_choices_desc),
-                        { user, columnName ->
-                            val attr = OTAttribute.createAttribute(user, columnName, OTAttribute.TYPE_CHOICE) as OTChoiceAttribute
+                        { tracker, columnName ->
+                            val attr = OTAttribute.createAttribute(tracker, columnName, OTAttribute.TYPE_CHOICE) as OTChoiceAttribute
                             attr.allowedMultiSelection = true
                             attr
                         })

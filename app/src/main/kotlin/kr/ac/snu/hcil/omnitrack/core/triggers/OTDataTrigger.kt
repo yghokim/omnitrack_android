@@ -12,6 +12,7 @@ import kr.ac.snu.hcil.omnitrack.utils.ObservableMapDelegate
  * Created by younghokim on 16. 9. 5..
  */
 class OTDataTrigger(objectId: String?, dbId: Long?, user: OTUser, name: String, trackerObjectIds: Array<String>, isOn: Boolean, action: Int, lastTriggeredTime: Long, serializedProperties: String? = null) : OTTrigger(objectId, dbId, user, name, trackerObjectIds, isOn, action, lastTriggeredTime, serializedProperties) {
+
     override val configIconId: Int = R.drawable.event_dark
     override val configTitleId: Int = R.string.trigger_desc_event
 
@@ -104,6 +105,10 @@ class OTDataTrigger(objectId: String?, dbId: Long?, user: OTUser, name: String, 
         else {
             OTDataTriggerManager.onEventTriggerOn(this)
         }
+    }
+
+    override fun detachFromSystem() {
+        OTDataTriggerManager.onEventTriggerOff(this)
     }
 
     private fun onMeasureChanged(){

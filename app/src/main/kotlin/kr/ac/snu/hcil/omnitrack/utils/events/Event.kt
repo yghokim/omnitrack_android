@@ -7,8 +7,8 @@ package kr.ac.snu.hcil.omnitrack.utils.events
  *
  */
 open class Event<T> () {
-    private var handlers = listOf<(sender: Any, args: T) -> Unit>()
-    private var listeners = listOf<IEventListener<T>>()
+    private var handlers = hashSetOf<(sender: Any, args: T) -> Unit>()
+    private var listeners = hashSetOf<IEventListener<T>>()
 
 
     var suspend: Boolean = false
@@ -16,21 +16,20 @@ open class Event<T> () {
 
     operator fun plusAssign(listener: IEventListener<T>) {
         if (!listeners.contains(listener))
-            listeners += listener
+            listeners.add(listener)
     }
 
     operator fun minusAssign(listener: IEventListener<T>) {
-        listeners -= listener
+        listeners.remove(listener)
     }
 
 
     operator fun plusAssign(handler: (sender: Any, args: T) -> Unit) {
-        if (!handlers.contains(handler))
-            handlers += handler
+        handlers.add(handler)
     }
 
     operator fun minusAssign(handler: (sender: Any, args: T) -> Unit) {
-        handlers -= handler
+        handlers.remove(handler)
     }
 
 
@@ -45,5 +44,10 @@ open class Event<T> () {
             }
 
         }
+    }
+
+    fun clear() {
+        handlers.clear()
+        listeners.clear()
     }
 }

@@ -35,7 +35,9 @@ class CacheHelper(context: Context) : SQLiteOpenHelper(context, "cache.db", null
 
         override val tableName: String = "bitmap_caches"
 
-        override val indexCreationQueryString: String = makeIndexQueryString(true, "key_unique", KEY)
+        init {
+            appendIndexQueryString(true, "key_unique", KEY)
+        }
 
     }
 
@@ -45,7 +47,9 @@ class CacheHelper(context: Context) : SQLiteOpenHelper(context, "cache.db", null
 
         for (scheme in tables) {
             db.execSQL(scheme.creationQueryString)
-            db.execSQL(scheme.indexCreationQueryString)
+            scheme.indexCreationQueries.forEach {
+                db.execSQL(it)
+            }
         }
     }
 

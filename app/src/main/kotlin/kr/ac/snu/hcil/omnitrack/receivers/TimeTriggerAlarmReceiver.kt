@@ -80,44 +80,46 @@ class TimeTriggerAlarmReceiver : BroadcastReceiver() {
     class TimeTriggerWakefulHandlingService : IntentService("TimeTriggerHandlingService") {
 
         override fun onHandleIntent(intent: Intent) {
-
             val alarmId = intent.getIntExtra(OTTimeTriggerAlarmManager.INTENT_EXTRA_ALARM_ID, -1)
             val triggerTime = intent.getLongExtra(OTTimeTriggerAlarmManager.INTENT_EXTRA_TRIGGER_TIME, System.currentTimeMillis())
 
             OTApplication.logger.writeSystemLog("Wakeful Service handleIntent, trigger time: ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(triggerTime))}", TAG)
 
-            val triggers = OTApplication.app.timeTriggerAlarmManager.notifyAlarmFiredAndGetTriggersSync(OTApplication.app.currentUser, alarmId, triggerTime, System.currentTimeMillis())
+            OTApplication.app.currentUserObservable.subscribe {
+                user ->
+                val triggers = OTApplication.app.timeTriggerAlarmManager.notifyAlarmFiredAndGetTriggersSync(user, alarmId, triggerTime, System.currentTimeMillis())
 
-            if (triggers != null) {
+                if (triggers != null) {
 
-                OTApplication.logger.writeSystemLog("${triggers.size} triggers will be fired.", TAG)
+                    OTApplication.logger.writeSystemLog("${triggers.size} triggers will be fired.", TAG)
 
-                var left = triggers.size
-                if (left == 0) {
-                    completeWakefulIntent(intent)
-                } else {
-                    for (trigger in triggers.withIndex()) {
-                        trigger.value.fire(triggerTime) {
-                            println("${trigger.index}-th trigger fire finished.")
-                            OTApplication.logger.writeSystemLog("${trigger.index}-th trigger fire finished.", TAG)
-                            left--
+                    var left = triggers.size
+                    if (left == 0) {
+                        completeWakefulIntent(intent)
+                    } else {
+                        for (trigger in triggers.withIndex()) {
+                            trigger.value.fire(triggerTime) {
+                                println("${trigger.index}-th trigger fire finished.")
+                                OTApplication.logger.writeSystemLog("${trigger.index}-th trigger fire finished.", TAG)
+                                left--
+                            }
                         }
+
+                        while (left > 0) {
+
+                        }
+
+                        OTApplication.logger.writeSystemLog("Every trigger firing was done. Release the wake lock.", TAG)
+
+                        println("every trigger was done. finish the wakeup")
+                        OTApplication.app.timeTriggerAlarmManager.storeTableToPreferences()
+                        completeWakefulIntent(intent)
                     }
-
-                    while (left > 0) {
-
-                    }
-
-                    OTApplication.logger.writeSystemLog("Every trigger firing was done. Release the wake lock.", TAG)
-
-                    println("every trigger was done. finish the wakeup")
+                } else {
                     OTApplication.app.timeTriggerAlarmManager.storeTableToPreferences()
+                    OTApplication.logger.writeSystemLog("No trigger is assigned to this alarm. Release the wake lock.", TAG)
                     completeWakefulIntent(intent)
                 }
-            } else {
-                OTApplication.app.timeTriggerAlarmManager.storeTableToPreferences()
-                OTApplication.logger.writeSystemLog("No trigger is assigned to this alarm. Release the wake lock.", TAG)
-                completeWakefulIntent(intent)
             }
         }
     }

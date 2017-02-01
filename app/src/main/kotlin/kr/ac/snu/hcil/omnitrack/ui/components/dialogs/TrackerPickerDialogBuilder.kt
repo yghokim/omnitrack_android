@@ -9,7 +9,6 @@ import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
@@ -17,7 +16,7 @@ import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 /**
  * Created by Young-Ho on 9/2/2016.
  */
-class TrackerPickerDialogBuilder(val viewHolderFactory: ViewHolderFactory = defaultViewHolderFactory) {
+class TrackerPickerDialogBuilder(val trackers: List<OTTracker>, val viewHolderFactory: ViewHolderFactory = defaultViewHolderFactory) {
 
     companion object {
         val defaultViewHolderFactory = object : ViewHolderFactory {
@@ -71,6 +70,8 @@ class TrackerPickerDialogBuilder(val viewHolderFactory: ViewHolderFactory = defa
 
         var onPicked: ((OTTracker?) -> Unit)? = null
 
+        var tracker: OTTracker? = null
+
         var active: Boolean = true
             set(value) {
                 field = value
@@ -85,7 +86,6 @@ class TrackerPickerDialogBuilder(val viewHolderFactory: ViewHolderFactory = defa
 
         override fun onClick(view: View?) {
             if (view === itemView) {
-                val tracker = OTApplication.app.currentUser.trackers[adapterPosition]
                 onPicked?.invoke(tracker)
             }
         }
@@ -98,6 +98,7 @@ class TrackerPickerDialogBuilder(val viewHolderFactory: ViewHolderFactory = defa
         }
 
         open fun bind(tracker: OTTracker) {
+            this.tracker = tracker
             circle.setColorFilter(tracker.color)
             textView.text = tracker.name
         }
@@ -113,11 +114,11 @@ class TrackerPickerDialogBuilder(val viewHolderFactory: ViewHolderFactory = defa
         }
 
         override fun getItemCount(): Int {
-            return OTApplication.app.currentUser.trackers.size
+            return trackers.size
         }
 
         override fun onBindViewHolder(holder: TrackerViewHolder, position: Int) {
-            val tracker = OTApplication.app.currentUser.trackers[position]
+            val tracker = trackers[position]
             holder.bind(tracker)
             holder.active = !(inactiveIds?.contains(tracker.objectId) ?: false)
         }

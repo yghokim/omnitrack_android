@@ -1,10 +1,11 @@
 package kr.ac.snu.hcil.omnitrack.core
 
 import android.content.Context
+import android.content.SharedPreferences
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
-import kr.ac.snu.hcil.omnitrack.core.database.NamedObject
+import kr.ac.snu.hcil.omnitrack.core.database.DatabaseHelper
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerManager
 import kr.ac.snu.hcil.omnitrack.utils.DefaultNameGenerator
@@ -12,28 +13,62 @@ import kr.ac.snu.hcil.omnitrack.utils.ObservableList
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import java.util.*
-import kotlin.properties.Delegates
 
 /**
  * Created by Young-Ho Kim on 2016-07-11.
  */
-class OTUser(objectId: String?, dbId: Long?, name: String, email: String, attributeIdSeed: Long = 0, _trackers: List<OTTracker>? = null) : NamedObject(objectId, dbId, name) {
+class OTUser(val objectId: String, var name: String, _trackers: List<OTTracker>? = null) {
 
+    companion object {
 
-    var attributeIdSeed: Long = attributeIdSeed
-        private set(value) {
-            if (field != value) {
-                isDirtySinceLastSync = true
-                field = value
-            }
+        const val PREFERENCES_KEY_OBJECT_ID = "ot_user_object_id"
+        const val PREFERENCES_KEY_NAME = "ot_user_name"
+
+        //const val PREFERENCES_KEY_EMAIL = "user_email"
+
+        fun loadCachedInstance(sp: SharedPreferences, databaseHelper: DatabaseHelper): OTUser? {
+            if (sp.contains(PREFERENCES_KEY_OBJECT_ID)) {
+                val objId = sp.getString(PREFERENCES_KEY_OBJECT_ID, null)
+                val name = sp.getString(PREFERENCES_KEY_NAME, null)
+                if (objId != null && name != null) {
+                    return OTUser(objId, name, databaseHelper.findTrackersOfUser(objId))
+                } else return null
+            } else return null
         }
 
+        fun storeOrOverwriteInstanceCache(instance: OTUser, sp: SharedPreferences): Boolean {
+            val overwritten = sp.contains(PREFERENCES_KEY_OBJECT_ID)
+
+            sp.edit()
+                    .putString(PREFERENCES_KEY_OBJECT_ID, instance.objectId)
+                    .putString(PREFERENCES_KEY_NAME, instance.name)
+                    .apply()
+
+            return overwritten
+        }
+
+        fun clearInstanceCache(sp: SharedPreferences): Boolean {
+            val removed = sp.contains(PREFERENCES_KEY_OBJECT_ID)
+
+            sp.edit()
+                    .remove(PREFERENCES_KEY_OBJECT_ID)
+                    .remove(PREFERENCES_KEY_NAME)
+                    .apply()
+
+            return removed
+        }
+    }
+
+    var isDatasetDirtySinceLastSync = false
+
+
+    /*
     val email: String by Delegates.observable(email) {
         prop, old, new ->
         if (old != new) {
             isDirtySinceLastSync = true
         }
-    }
+    }*/
 
     val trackers = ObservableList<OTTracker>()
 
@@ -51,9 +86,6 @@ class OTUser(objectId: String?, dbId: Long?, name: String, email: String, attrib
     val trackerRemoved = Event<ReadOnlyPair<OTTracker, Int>>()
     val trackerIndexChanged = Event<IntRange>()
 
-    constructor(name: String, email: String) : this(null, null, name, email) {
-
-    }
 
     init {
 
@@ -95,6 +127,10 @@ class OTUser(objectId: String?, dbId: Long?, name: String, email: String, attrib
         val list = trackers.unObservedList.toMutableList()
         list.map { OTApplication.app.dbHelper.getLastLoggingTimeAsync(it,) }
     }*/
+
+    fun detachFromSystem() {
+        triggerManager.detachFromSystem()
+    }
 
     fun newTrackerWithDefaultName(context: Context, add: Boolean): OTTracker {
         return newTracker(this.generateNewTrackerName(context), add)
@@ -177,10 +213,6 @@ class OTUser(objectId: String?, dbId: Long?, name: String, email: String, attrib
 
     operator fun get(trackerId: String): OTTracker? {
         return trackers.unObservedList.find { it.objectId == trackerId }
-    }
-
-    fun getNewAttributeObjectId(): Long {
-        return ++attributeIdSeed
     }
 
     fun generateNewTrackerName(context: Context): String {

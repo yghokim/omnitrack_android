@@ -41,7 +41,9 @@ class LoggingDbHelper(context: Context) : SQLiteOpenHelper(context, "logging.db"
 
         override val tableName: String = "session_logs"
 
-        override val indexCreationQueryString: String = makeIndexQueryString(false, "timestamp_index", LOGGED_AT)
+        init {
+            appendIndexQueryString(false, "timestamp_index", LOGGED_AT)
+        }
     }
 
 
@@ -50,8 +52,8 @@ class LoggingDbHelper(context: Context) : SQLiteOpenHelper(context, "logging.db"
 
         for (scheme in tables) {
             db.execSQL(scheme.creationQueryString)
-            if (!scheme.indexCreationQueryString.isNullOrBlank()) {
-                db.execSQL(scheme.indexCreationQueryString)
+            scheme.indexCreationQueries.forEach {
+                db.execSQL(it)
             }
         }
     }

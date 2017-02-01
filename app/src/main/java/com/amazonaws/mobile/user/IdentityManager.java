@@ -343,11 +343,13 @@ public class IdentityManager {
                 try {
                     refreshCredentialWithLogins(loginMap);
                 } catch (Exception ex) {
-                    resultsAdapter.onCognitoError(ex);
+                    if (resultsAdapter != null)
+                        resultsAdapter.onCognitoError(ex);
                     return;
                 }
 
-                resultsAdapter.onCognitoSuccess();
+                if (resultsAdapter != null)
+                    resultsAdapter.onCognitoSuccess();
 
                 // Notify state change listeners of sign out.
                 synchronized (signInStateChangeListeners) {

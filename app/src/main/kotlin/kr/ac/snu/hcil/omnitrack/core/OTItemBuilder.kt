@@ -391,8 +391,12 @@ class OTItemBuilder : Parcelable, IStringSerializable {
     }
 
     fun reloadTracker(trackerObjectId: String) {
-        setTracker(OTApplication.app.currentUser[trackerObjectId]!!)
-        syncFromTrackerScheme()
+        OTApplication.app.currentUserObservable.observeOn(Schedulers.immediate())
+                .subscribe {
+                    user ->
+                    setTracker(user[trackerObjectId]!!)
+                    syncFromTrackerScheme()
+                }
     }
 
     fun syncFromTrackerScheme() {
