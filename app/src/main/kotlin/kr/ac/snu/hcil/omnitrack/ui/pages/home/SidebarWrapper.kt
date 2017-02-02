@@ -9,6 +9,7 @@ import android.view.View
 import android.widget.PopupMenu
 import android.widget.TextView
 import com.amazonaws.mobile.AWSMobileClient
+import com.amazonaws.mobile.util.ThreadUtils
 import com.bumptech.glide.Glide
 import de.hdodenhof.circleimageview.CircleImageView
 import kr.ac.snu.hcil.omnitrack.OTApplication
@@ -70,8 +71,10 @@ class SidebarWrapper(val view: View, val parentActivity: AppCompatActivity) : Po
     }
 
     fun refresh(user: OTUser) {
-        Glide.with(parentActivity).load(user.photoUrl).into(photoView)
-        nameView.text = user.name
+        ThreadUtils.runOnUiThread {
+            Glide.with(parentActivity).load(user.photoUrl).into(photoView)
+            nameView.text = user.name
+        }
     }
 
     fun dispose() {

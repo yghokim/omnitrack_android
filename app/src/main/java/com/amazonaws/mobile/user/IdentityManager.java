@@ -400,7 +400,7 @@ public class IdentityManager {
             public void run() {
                 provider.reloadUserInfo();
                 // preload user image
-                loadUserImage(provider.getUserImageUrl());
+                //loadUserImage(provider.getUserImageUrl());
                 ThreadUtils.runOnUiThread(onReloadComplete);
             }
         });
@@ -411,9 +411,9 @@ public class IdentityManager {
      *
      * @return user image of the current identity provider, or null if not signed in or unavailable
      */
-    public Bitmap getUserImage() {
-        return userImage;
-    }
+    //public Bitmap getUserImage() {
+    //    return userImage;
+    //}
 
     /**
      * Convenient method to get the user name from the current identity provider.

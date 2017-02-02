@@ -187,7 +187,7 @@ class TrackerDetailActivity : OTTrackerAttachedActivity(R.layout.activity_tracke
         override fun getItem(position: Int): Fragment {
 
             val bundle = Bundle()
-            bundle.putString(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker?.objectId)
+            bundle.putString(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, cachedTrackerObjectId)
             bundle.putBoolean(IS_EDIT_MODE, isEditMode)
 
             val fragment =

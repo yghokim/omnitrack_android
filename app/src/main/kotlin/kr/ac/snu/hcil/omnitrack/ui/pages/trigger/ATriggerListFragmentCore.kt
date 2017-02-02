@@ -12,10 +12,10 @@ import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import android.widget.TextView
 import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator
-import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
+import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.FallbackRecyclerView
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.DrawableListBottomSpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
@@ -97,13 +97,16 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
 
     fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
 
-        subscriptions.add(
-                OTApplication.app.currentUserObservable.subscribe {
-                    user ->
-                    this.user = user
-                    adapter.notifyDataSetChanged()
-                }
-        )
+        val activity = parent.activity
+        if (activity is OTActivity) {
+            subscriptions.add(
+                    activity.signedInUserObservable.subscribe {
+                        user ->
+                        this.user = user
+                        adapter.notifyDataSetChanged()
+                    }
+            )
+        }
     }
 
     fun refresh() {

@@ -65,6 +65,7 @@ class MeasureFactoryAdapter : RecyclerView.Adapter<MeasureFactoryAdapter.Measure
 
         override fun onClick(view: View) {
             if (view === connectButton) {
+
                 OTApplication.app.currentUserObservable.subscribe {
                     user ->
                     val dialog = TrackerPickerDialogBuilder(user.trackers.unObservedList, this).createDialog(itemView.getActivity()!!, R.string.msg_pick_track_to_attach_field_with_measure, null, {
@@ -81,6 +82,7 @@ class MeasureFactoryAdapter : RecyclerView.Adapter<MeasureFactoryAdapter.Measure
                     })
                     dialog.show()
                 }
+
             }
         }
 
