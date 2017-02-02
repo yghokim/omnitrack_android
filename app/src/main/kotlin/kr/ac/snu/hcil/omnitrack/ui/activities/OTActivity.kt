@@ -118,6 +118,23 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false) : AppC
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
 
+    private fun refreshCredentialsWithFallbackSignIn() {
+        signInManager = SignInManager.getInstance(applicationContext)
+
+        val provider = signInManager.previouslySignedInProvider
+
+        // if the user was already previously in to a provider.
+        if (provider != null) {
+            // asynchronously handle refreshing credentials and call our handler.
+            signInManager.refreshCredentialsWithProvider(this@OTActivity,
+                    provider, OmniTrackSignInResultsHandler())
+        } else {
+            // Asyncronously go to the main activity (after the splash delay has expired).
+            Log.d(LOG_TAG, "Couldn't find previously-signed in provider.")
+            goSignInUnlessUserCached()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -126,20 +143,7 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false) : AppC
         } else {
             if (checkRefreshingCredential) {
                 val thread = Thread(Runnable {
-                    signInManager = SignInManager.getInstance(applicationContext)
-
-                    val provider = signInManager.previouslySignedInProvider
-
-                    // if the user was already previously in to a provider.
-                    if (provider != null) {
-                        // asynchronously handle refreshing credentials and call our handler.
-                        signInManager.refreshCredentialsWithProvider(this@OTActivity,
-                                provider, OmniTrackSignInResultsHandler())
-                    } else {
-                        // Asyncronously go to the main activity (after the splash delay has expired).
-                        Log.d(LOG_TAG, "Couldn't find previously-signed in provider.")
-                        goSignInUnlessUserCached()
-                    }
+                    refreshCredentialsWithFallbackSignIn()
                 })
                 thread.start()
             } else {
@@ -153,6 +157,44 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false) : AppC
                 OTApplication.app.currentUserObservable.subscribe({
                     user ->
                     signedInUserSubject.onNext(user)
+
+                    if (!checkRefreshingCredential) {
+                        val thread = Thread(Runnable {
+                            val identityManager = AWSMobileClient.defaultMobileClient().identityManager
+                            identityManager.loginWithProviderSilently(
+                                    identityManager.currentIdentityProvider,
+                                    object : IdentityManager.SignInResultsHandler {
+                                        override fun onCancel(provider: IdentityProvider?) {
+
+                                        }
+
+                                        override fun onError(provider: IdentityProvider?, ex: Exception?) {
+
+                                        }
+
+                                        override fun onSuccess(provider: IdentityProvider) {
+                                            identityManager.getUserID(object : IdentityManager.IdentityHandler {
+                                                override fun handleError(exception: Exception?) {
+
+                                                }
+
+                                                override fun handleIdentityID(identityId: String) {
+                                                    if (user.objectId == identityId) {
+                                                        Toast.makeText(this@OTActivity, "Background sign in check was successful.", Toast.LENGTH_LONG).show()
+                                                    } else {
+                                                        Log.e("OMNITRACK", "Something wrong with your identity id.")
+                                                    }
+                                                }
+
+                                            })
+                                        }
+
+                                    }
+                            )
+                        })
+                        thread.start()
+                    }
+
                     onSignInProcessCompletelyFinished()
                 })
                 {
@@ -212,7 +254,6 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false) : AppC
                 OTApplication.app.currentUserObservable.subscribe {
                     user ->
                     println("OMNITRACK received user from global instance")
-
                     this.signedInUserSubject.onNext(user)
                 }
         )
