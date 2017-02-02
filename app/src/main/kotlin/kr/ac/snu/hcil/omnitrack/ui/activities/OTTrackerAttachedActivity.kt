@@ -14,6 +14,7 @@ import rx.internal.util.SubscriptionList
 abstract class OTTrackerAttachedActivity(layoutId: Int) : MultiButtonActionBarActivity(layoutId) {
 
     private var trackerObjectId: String? = null
+    protected val cachedTrackerObjectId: String? get() = trackerObjectId
     private var _tracker: OTTracker? = null
 
     protected val tracker: OTTracker? get() = _tracker
@@ -24,7 +25,7 @@ abstract class OTTrackerAttachedActivity(layoutId: Int) : MultiButtonActionBarAc
         super.onStart()
         trackerObjectId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
         startSubscriptions.add(
-                OTApplication.app.currentUserObservable.subscribe {
+                signedInUserObservable.subscribe {
                     user ->
                     reloadTracker(user)
                 }

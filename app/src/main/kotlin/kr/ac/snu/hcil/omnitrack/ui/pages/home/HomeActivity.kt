@@ -106,28 +106,33 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Ident
 
     override fun onStart() {
         super.onStart()
+        startSubscriptions.add(
+                super.signedInUserObservable.subscribe {
+                    user ->
+                    println("OMNITRACK: signed in user instance received.")
+                    //Ask permission if needed
+                    if (Build.VERSION.SDK_INT >= 23) {
+                        val permissions = user.getPermissionsRequiredForFields().filter {
+                            checkSelfPermission(it) != PackageManager.PERMISSION_GRANTED
+                        }.toTypedArray()
 
-        //Ask permission if needed
-        if (Build.VERSION.SDK_INT >= 23) {
-            startSubscriptions.add(
-            OTApplication.app.currentUserObservable.subscribe {
-                user ->
-                val permissions = user.getPermissionsRequiredForFields().filter {
-                    checkSelfPermission(it) != PackageManager.PERMISSION_GRANTED
-                }.toTypedArray()
+                        if (permissions.isNotEmpty()) {
+                            requestPermissions(permissions,
+                                    10)
+                        }
+                    }
 
-                if (permissions.isNotEmpty()) {
-                    requestPermissions(permissions,
-                            10)
-                }
-
-                AWSMobileClient.defaultMobileClient().identityManager.loadUserInfoAndImage(
-                        AWSMobileClient.defaultMobileClient().identityManager.currentIdentityProvider
-                ) {
                     sidebar.refresh(user)
+                    val provider = AWSMobileClient.defaultMobileClient().identityManager.currentIdentityProvider
+                    AWSMobileClient.defaultMobileClient().identityManager.loadUserInfoAndImage(
+                            provider
+                    ) {
+                        user.name = provider.userName
+                        user.photoUrl = provider.userImageUrl
+                        sidebar.refresh(user)
+                    }
                 }
-            })
-        }
+        )
     }
 
     override fun onStop() {
@@ -188,11 +193,6 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Ident
 
 
     override fun onUserSignedIn() {
-        println("OMNITRACK user signed in.")
-        OTApplication.app.currentUserObservable.subscribe {
-            user ->
-            sidebar.refresh(user)
-        }
     }
 
     override fun onUserSignedOut() {

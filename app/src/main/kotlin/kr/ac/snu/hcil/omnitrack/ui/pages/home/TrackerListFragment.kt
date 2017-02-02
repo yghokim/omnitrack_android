@@ -37,6 +37,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
+import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.common.FallbackRecyclerView
 import kr.ac.snu.hcil.omnitrack.ui.components.common.TooltipHelper
@@ -189,13 +190,18 @@ class TrackerListFragment : OTFragment() {
         trackerListAdapter.currentlyExpandedIndex = savedInstanceState?.getInt(STATE_EXPANDED_TRACKER_INDEX, -1) ?: -1
         listView.adapter = trackerListAdapter
 
-        createViewSubscriptions.add(
-                OTApplication.app.currentUserObservable.subscribe {
-                    user ->
-                    this.user = user
-                    userLoaded = true
-                    trackerListAdapter.notifyDataSetChanged()
-                })
+        val activity = activity
+        if (activity != null) {
+            if (activity is OTActivity) {
+                createViewSubscriptions.add(
+                        activity.signedInUserObservable.subscribe {
+                            user ->
+                            this.user = user
+                            userLoaded = true
+                            trackerListAdapter.notifyDataSetChanged()
+                        })
+            }
+        }
 
         return rootView
     }

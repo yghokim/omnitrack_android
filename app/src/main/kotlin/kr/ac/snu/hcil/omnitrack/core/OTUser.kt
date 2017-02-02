@@ -17,7 +17,7 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 2016-07-11.
  */
-class OTUser(val objectId: String, var name: String, var photoUrl: String?, _trackers: List<OTTracker>? = null) {
+class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _trackers: List<OTTracker>? = null) {
 
     companion object {
 
@@ -28,8 +28,12 @@ class OTUser(val objectId: String, var name: String, var photoUrl: String?, _tra
 
         //const val PREFERENCES_KEY_EMAIL = "user_email"
 
+        fun isUserStored(sp: SharedPreferences): Boolean {
+            return sp.contains(PREFERENCES_KEY_OBJECT_ID)
+        }
+
         fun loadCachedInstance(sp: SharedPreferences, databaseHelper: DatabaseHelper): OTUser? {
-            if (sp.contains(PREFERENCES_KEY_OBJECT_ID)) {
+            if (isUserStored(sp)) {
                 val objId = sp.getString(PREFERENCES_KEY_OBJECT_ID, null)
                 val name = sp.getString(PREFERENCES_KEY_NAME, null)
                 val photoUrl = sp.getString(PREFERENCES_KEY_PHOTO_URL, null)

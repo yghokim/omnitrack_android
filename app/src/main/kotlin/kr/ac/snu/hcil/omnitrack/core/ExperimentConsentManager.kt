@@ -69,6 +69,9 @@ object ExperimentConsentManager {
                 }
 
                 override fun onFailure(dse: DataStorageException?) {
+                    dse?.printStackTrace()
+                    println(dse?.message)
+                    println(dse?.cause?.message)
                     mResultListener?.onConsentFailed()
                     finishProcess()
                 }
