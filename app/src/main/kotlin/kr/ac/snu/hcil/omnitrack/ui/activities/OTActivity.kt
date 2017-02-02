@@ -109,7 +109,7 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false) : AppC
 
     private var touchMoveAmount: PointF = PointF()
 
-    private val creationSubscriptions = CompositeSubscription()
+    protected val creationSubscriptions = CompositeSubscription()
 
     private val signedInUserSubject: BehaviorSubject<OTUser> = BehaviorSubject.create<OTUser>()
 
@@ -180,9 +180,11 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false) : AppC
 
                                                 override fun handleIdentityID(identityId: String) {
                                                     if (user.objectId == identityId) {
-                                                        Toast.makeText(this@OTActivity, "Background sign in check was successful.", Toast.LENGTH_LONG).show()
+                                                        Toast.makeText(this@OTActivity, "Background sign in check was successful.", Toast.LENGTH_SHORT).show()
                                                     } else {
                                                         Log.e("OMNITRACK", "Something wrong with your identity id.")
+                                                        Toast.makeText(this@OTActivity, "Signed-in user account id is different from what is stored. Please re-sign in.", Toast.LENGTH_SHORT).show()
+                                                        goSignIn()
                                                     }
                                                 }
 

@@ -161,7 +161,7 @@ class OTApplication : MultiDexApplication() {
                                 identityManager.getUserID(object : IdentityManager.IdentityHandler {
                                     override fun handleIdentityID(identityId: String) {
                                         println("OMNITRACK user identityId: ${identityId}, current provider: ${identityManager.currentIdentityProvider}, userName: ${identityManager.currentIdentityProvider.userName}")
-                                        val user = OTUser(identityId, identityManager.currentIdentityProvider.userName, identityManager.currentIdentityProvider.userImageUrl)
+                                        val user = OTUser(identityId, identityManager.currentIdentityProvider.userName, identityManager.currentIdentityProvider.userImageUrl, dbHelper.findTrackersOfUser(identityId))
                                         OTUser.storeOrOverwriteInstanceCache(user, systemSharedPreferences)
                                         for (tracker in user.getTrackersOnShortcut()) {
                                             OTShortcutPanelManager += tracker
@@ -204,7 +204,7 @@ class OTApplication : MultiDexApplication() {
                 }
 
             }.subscribeOn(Schedulers.computation())
-                    .observeOn(AndroidSchedulers.mainThread()).cache()
+                    .observeOn(AndroidSchedulers.mainThread()).share()
 
     val colorPalette: IntArray by lazy {
         this.resources.getStringArray(R.array.colorPaletteArray).map { Color.parseColor(it) }.toIntArray()
