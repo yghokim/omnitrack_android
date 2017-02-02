@@ -159,42 +159,47 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false) : AppC
                     signedInUserSubject.onNext(user)
 
                     if (!checkRefreshingCredential) {
-                        val thread = Thread(Runnable {
-                            val identityManager = AWSMobileClient.defaultMobileClient().identityManager
-                            identityManager.loginWithProviderSilently(
-                                    identityManager.currentIdentityProvider,
-                                    object : IdentityManager.SignInResultsHandler {
-                                        override fun onCancel(provider: IdentityProvider?) {
+                        //background sign in
+                        val ignoreFlag = intent.getBooleanExtra(OTApplication.INTENT_EXTRA_IGNORE_SIGN_IN_CHECK, false)
+                        println("OMNITRACK ignore flag: ${ignoreFlag}, current activity: ${this.localClassName}")
+                        if (!ignoreFlag) {
+                            val thread = Thread(Runnable {
+                                val identityManager = AWSMobileClient.defaultMobileClient().identityManager
+                                identityManager.loginWithProviderSilently(
+                                        identityManager.currentIdentityProvider,
+                                        object : IdentityManager.SignInResultsHandler {
+                                            override fun onCancel(provider: IdentityProvider?) {
 
-                                        }
+                                            }
 
-                                        override fun onError(provider: IdentityProvider?, ex: Exception?) {
+                                            override fun onError(provider: IdentityProvider?, ex: Exception?) {
 
-                                        }
+                                            }
 
-                                        override fun onSuccess(provider: IdentityProvider) {
-                                            identityManager.getUserID(object : IdentityManager.IdentityHandler {
-                                                override fun handleError(exception: Exception?) {
+                                            override fun onSuccess(provider: IdentityProvider) {
+                                                identityManager.getUserID(object : IdentityManager.IdentityHandler {
+                                                    override fun handleError(exception: Exception?) {
 
-                                                }
-
-                                                override fun handleIdentityID(identityId: String) {
-                                                    if (user.objectId == identityId) {
-                                                        Toast.makeText(this@OTActivity, "Background sign in check was successful.", Toast.LENGTH_SHORT).show()
-                                                    } else {
-                                                        Log.e("OMNITRACK", "Something wrong with your identity id.")
-                                                        Toast.makeText(this@OTActivity, "Signed-in user account id is different from what is stored. Please re-sign in.", Toast.LENGTH_SHORT).show()
-                                                        goSignIn()
                                                     }
-                                                }
 
-                                            })
+                                                    override fun handleIdentityID(identityId: String) {
+                                                        if (user.objectId == identityId) {
+                                                            Toast.makeText(this@OTActivity, "Background sign in check was successful.", Toast.LENGTH_SHORT).show()
+                                                        } else {
+                                                            Log.e("OMNITRACK", "Something wrong with your identity id.")
+                                                            Toast.makeText(this@OTActivity, "Signed-in user account id is different from what is stored. Please re-sign in.", Toast.LENGTH_SHORT).show()
+                                                            goSignIn()
+                                                        }
+                                                    }
+
+                                                })
+                                            }
+
                                         }
-
-                                    }
-                            )
-                        })
-                        thread.start()
+                                )
+                            })
+                            thread.start()
+                        }
                     }
 
                     onSignInProcessCompletelyFinished()
