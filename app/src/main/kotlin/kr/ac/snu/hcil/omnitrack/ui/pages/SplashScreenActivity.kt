@@ -16,10 +16,12 @@ class SplashScreenActivity : OTActivity(checkRefreshingCredential = true) {
 
     override fun onSignInProcessCompletelyFinished() {
         super.onSignInProcessCompletelyFinished()
+        println("OMNITRACK signin process finished in splashactivity.")
         creationSubscriptions.add(
-                OTApplication.app.currentUserObservable.subscribe {
+                signedInUserObservable.subscribe {
                     user ->
                     val intent = Intent(this, HomeActivity::class.java)
+                    intent.putExtra(OTApplication.INTENT_EXTRA_IGNORE_SIGN_IN_CHECK, true)
                     startActivity(intent)
                     finish()
                 }

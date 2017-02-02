@@ -17,6 +17,7 @@ import com.amazonaws.mobile.user.IdentityProvider
 import com.amazonaws.mobile.user.signin.GoogleSignInProvider
 import com.amazonaws.mobile.user.signin.SignInManager
 import com.amazonaws.mobile.util.ThreadUtils
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.ExperimentConsentManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
@@ -106,7 +107,7 @@ class SignInActivity : AppCompatActivity() {
     private fun goHomeActivity() {
         Log.d(LOG_TAG, "Launching Main Activity...");
         startActivity(Intent(this@SignInActivity, HomeActivity::class.java)
-                .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP).putExtra(OTApplication.INTENT_EXTRA_IGNORE_SIGN_IN_CHECK, true))
         // finish should always be called on the main thread.
         finish();
     }
