@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.ATriggerListFragmentCore
+import rx.subscriptions.CompositeSubscription
 
 /**
  * Created by younghokim on 16. 7. 30..
@@ -14,6 +15,8 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.ATriggerListFragmentCore
 class TrackerDetailReminderTabFragment : TrackerDetailActivity.ChildFragment() {
 
     val core: ATriggerListFragmentCore
+
+    private var resumeSubscriptions = CompositeSubscription()
 
     init {
         core = object : ATriggerListFragmentCore(this@TrackerDetailReminderTabFragment) {
@@ -45,6 +48,39 @@ class TrackerDetailReminderTabFragment : TrackerDetailActivity.ChildFragment() {
     override fun onStart() {
         super.onStart()
         core.refresh()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val activity = activity
+        if (activity is TrackerDetailActivity) {
+            resumeSubscriptions.add(
+                    activity.signedInUserObservable.subscribe {
+                        user ->
+                        if (trackerObjectId != null) {
+                            val tracker = user[trackerObjectId!!]
+                            resumeSubscriptions.add(
+                                    tracker?.colorObservable?.subscribe {
+                                        color ->
+                                        core.setFloatingButtonColor(color)
+                                    }
+                            )
+                        }
+                    }
+            )
+
+            resumeSubscriptions.add(
+                    activity.trackerColorOnUI.subscribe {
+                        color ->
+                        core.setFloatingButtonColor(color)
+                    }
+            )
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        resumeSubscriptions.clear()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

@@ -18,6 +18,7 @@ import kr.ac.snu.hcil.omnitrack.utils.DefaultNameGenerator
 import kr.ac.snu.hcil.omnitrack.utils.ObservableList
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
+import rx.subjects.BehaviorSubject
 import java.util.*
 import kotlin.properties.Delegates
 
@@ -61,9 +62,13 @@ class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color
         if (old != new) {
             colorChanged.invoke(this, new)
             OTShortcutPanelManager.notifyAppearanceChanged(this)
+            colorSubject.onNext(new)
             isDirtySinceLastSync = true
         }
     }
+
+    private val colorSubject = BehaviorSubject.create<Int>()
+    val colorObservable: rx.Observable<Int> get() = colorSubject
 
     var isOnShortcut: Boolean by Delegates.observable(isOnShortcut){
         prop, old, new->
@@ -122,6 +127,8 @@ class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color
                 attributes[i].isDirtySinceLastSync = true
             }
         }
+
+        colorSubject.onNext(color)
 
         isDirtySinceLastSync = true
     }

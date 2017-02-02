@@ -326,6 +326,7 @@ public class IdentityManager {
     public void loginWithProviderSilently(final IdentityProvider provider, final SignInResultsHandler resultHandler) {
         if (provider == null) {
             resultHandler.onError(provider, new Exception("provider is null."));
+            return;
         }
 
         Log.d(LOG_TAG, "loginWithProvider SILENTLY");

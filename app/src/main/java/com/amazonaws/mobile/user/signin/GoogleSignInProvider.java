@@ -155,6 +155,7 @@ public class GoogleSignInProvider implements SignInProvider {
         if (result.isSuccess()) {
             try {
                 googleSignInAccount = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient).await().getSignInAccount();
+                Log.d("OMNITRACK", "Google SigninAccount: " + googleSignInAccount);
                 authToken = getGoogleAuthToken();
                 return true;
             } catch (Exception e) {

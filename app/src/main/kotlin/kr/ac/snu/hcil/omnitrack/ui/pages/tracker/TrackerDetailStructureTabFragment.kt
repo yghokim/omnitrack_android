@@ -3,8 +3,9 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.tracker
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
+import android.support.v4.content.ContextCompat
+import android.support.v4.graphics.ColorUtils
 import android.support.v4.widget.NestedScrollView
 import android.support.v7.widget.AppCompatImageView
 import android.support.v7.widget.LinearLayoutManager
@@ -39,6 +40,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ShortTextPropert
 import kr.ac.snu.hcil.omnitrack.ui.pages.ConnectionIndicatorStubProxy
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeDetailActivity
 import kr.ac.snu.hcil.omnitrack.utils.startActivityOnDelay
+import net.i2p.android.ext.floatingactionbutton.FloatingActionButton
 import rx.subscriptions.CompositeSubscription
 
 /**
@@ -102,8 +104,11 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
 
         colorPropertyView.valueChanged += {
             sender, colorIndex ->
+            val activity = activity
             if (activity is TrackerDetailActivity) {
-                (activity as TrackerDetailActivity).transitionToColor(colorPropertyView.value)
+                activity.trackerColorOnUI.onNext(colorPropertyView.value)
+                applyColorTheme(colorPropertyView.value)
+
             }
         }
 
@@ -186,10 +191,18 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
         }
 
         namePropertyView.value = tracker?.name ?: ""
-        colorPropertyView.value = tracker?.color ?: Color.BLACK
+        colorPropertyView.value = tracker?.color ?: ContextCompat.getColor(context, R.color.colorPrimary)
         isOnShortcutPropertyView.value = tracker?.isOnShortcut ?: false
 
         attributeListAdapter.notifyDataSetChanged()
+
+        applyColorTheme(tracker?.color ?: ContextCompat.getColor(context, R.color.colorPrimary))
+    }
+
+    private fun applyColorTheme(color: Int) {
+        (activity as TrackerDetailActivity).transitionToColor(color)
+        newAttributeButton.colorNormal = color
+        newAttributeButton.colorPressed = ColorUtils.blendARGB(color, Color.BLACK, 0.9f)
     }
 
 

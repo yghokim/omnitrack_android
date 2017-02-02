@@ -103,13 +103,9 @@
 
     </android.support.v4.widget.NestedScrollView>
 
-    <android.support.design.widget.FloatingActionButton
+    <net.i2p.android.ext.floatingactionbutton.FloatingActionButton
         android:id="@+id/ui_button_new_attribute"
+        style="@style/FloatingActionButtonStyle"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        android:background="@color/colorPointed"
-        android:padding="4dp"
-        android:src="@drawable/plus" />
+        android:layout_height="wrap_content" />
 </android.support.design.widget.CoordinatorLayout>

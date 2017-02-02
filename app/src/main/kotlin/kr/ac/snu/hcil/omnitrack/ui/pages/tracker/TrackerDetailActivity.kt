@@ -20,6 +20,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTTrackerAttachedActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
+import rx.subjects.BehaviorSubject
 
 class TrackerDetailActivity : OTTrackerAttachedActivity(R.layout.activity_tracker_detail) {
 
@@ -51,6 +52,9 @@ class TrackerDetailActivity : OTTrackerAttachedActivity(R.layout.activity_tracke
      * The [ViewPager] that will host the section contents.
      */
     private val mViewPager: ViewPager by bindView(R.id.container)
+
+
+    val trackerColorOnUI = BehaviorSubject.create<Int>()
 
     override fun onSessionLogContent(contentObject: JsonObject) {
         super.onSessionLogContent(contentObject)
