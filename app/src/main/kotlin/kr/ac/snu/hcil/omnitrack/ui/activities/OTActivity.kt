@@ -19,7 +19,11 @@ import com.amazonaws.mobile.user.signin.SignInManager
 import com.google.gson.JsonObject
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.ExperimentConsentManager
+import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.ui.components.common.time.DurationPicker
+import rx.android.schedulers.AndroidSchedulers
+import rx.schedulers.Schedulers
+import rx.subjects.BehaviorSubject
 import java.util.*
 
 /**
@@ -36,25 +40,29 @@ abstract class OTActivity : AppCompatActivity() {
          * @param provider the identity provider used for sign-in.
          */
         override fun onSuccess(provider: IdentityProvider) {
-            Log.d(LOG_TAG, String.format("User sign-in with previous %s provider succeeded",
-                    provider.displayName))
+            /*Log.d(LOG_TAG, String.format("User sign-in with previous %s provider succeeded",
+                    provider.displayName))*/
 
             // The sign-in manager is no longer needed once signed in.
             SignInManager.dispose()
 
+            /*
             Toast.makeText(this@OTActivity, String.format("Sign-in with %s succeeded.",
                     provider.displayName), Toast.LENGTH_LONG).show()
+*/
 
             ExperimentConsentManager.startProcess(this@OTActivity, AWSMobileClient.defaultMobileClient().syncManager, object : ExperimentConsentManager.ResultListener {
                 override fun onConsentApproved() {
-                    onSignInProcessCompletelyFinished()
+                    performSignInProcessCompletelyFinished()
                 }
 
                 override fun onConsentFailed() {
+                    Log.d(LOG_TAG, "Consent process was failed. go Sign-in.")
                     goSignIn()
                 }
 
                 override fun onConsentDenied() {
+                    Log.d(LOG_TAG, "Consent was denied by user. go Sign-in.")
                     goSignIn()
                 }
 
@@ -86,7 +94,7 @@ abstract class OTActivity : AppCompatActivity() {
             Toast.makeText(this@OTActivity, String.format("Sign-in with %s failed.",
                     provider.displayName), Toast.LENGTH_LONG).show()
             //goSignIn()
-            onSignInProcessCompletelyFinished()
+            performSignInProcessCompletelyFinished()
         }
     }
 
@@ -100,10 +108,18 @@ abstract class OTActivity : AppCompatActivity() {
 
     private var touchMoveAmount: PointF = PointF()
 
+    private val signedInUserSubject: BehaviorSubject<OTUser> = BehaviorSubject.create<OTUser>()
+
+    val signedInUserObservable: rx.Observable<OTUser>
+        get() = signedInUserSubject
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         if (false/*BuildConfig.DEBUG*/) {
-            onSignInProcessCompletelyFinished()
+            performSignInProcessCompletelyFinished()
         } else {
             val thread = Thread(Runnable {
                 signInManager = SignInManager.getInstance(applicationContext)
@@ -126,7 +142,12 @@ abstract class OTActivity : AppCompatActivity() {
     }
 
     private fun goSignInUnlessUserCached() {
-        goSignIn()
+        if (OTUser.isUserStored(OTApplication.app.systemSharedPreferences)) {
+            performSignInProcessCompletelyFinished()
+        } else {
+            Log.d(LOG_TAG, "User is not stored in device. go Sign-in.")
+            goSignIn()
+        }
     }
 
     private fun goSignIn() {
@@ -170,6 +191,16 @@ abstract class OTActivity : AppCompatActivity() {
             val now = System.currentTimeMillis()
             OTApplication.logger.writeSessionLog(this, now - resumedAt, now, from, contentObject.toString())
         }
+    }
+
+    private fun performSignInProcessCompletelyFinished() {
+        OTApplication.app.currentUserObservable.subscribe {
+            user ->
+            ; this.signedInUserSubject.onNext(user)
+            this.signedInUserSubject.onCompleted()
+        }
+
+        onSignInProcessCompletelyFinished()
     }
 
     protected open fun onSignInProcessCompletelyFinished() {

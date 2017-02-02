@@ -8,6 +8,7 @@ import android.os.SystemClock
 import android.support.multidex.MultiDexApplication
 import android.text.format.DateUtils
 import com.amazonaws.mobile.AWSMobileClient
+import com.amazonaws.mobile.user.IdentityManager
 import com.squareup.leakcanary.LeakCanary
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
@@ -148,35 +149,54 @@ class OTApplication : MultiDexApplication() {
                     //need login
                     println("load user from db")
                     val identityManager = AWSMobileClient.defaultMobileClient().identityManager
-                    val cachedUserId = identityManager.cachedUserID
                     val cachedUser = OTUser.loadCachedInstance(systemSharedPreferences, dbHelper)
-                    if (cachedUser != null && cachedUser.objectId == cachedUserId) {
+                    if (cachedUser != null/*&& cachedUser.objectId == cachedUserId*/) {
                         _currentUser = cachedUser
                         Observable.just(cachedUser)
                     } else {
-                        if (identityManager.isUserSignedIn) {
-                            val user = OTUser(cachedUserId, identityManager.userName, identityManager.currentIdentityProvider.userImageUrl)
-                            for (tracker in user.getTrackersOnShortcut()) {
-                                OTShortcutPanelManager += tracker
-                            }
+                        Observable.create<OTUser> {
+                            subscriber ->
+                            if (identityManager.isUserSignedIn) {
+                                identityManager.getUserID(object : IdentityManager.IdentityHandler {
+                                    override fun handleIdentityID(identityId: String) {
+                                        println("OMNITRACK user identityId: ${identityId}, current provider: ${identityManager.currentIdentityProvider}, userName: ${identityManager.currentIdentityProvider.userName}")
+                                        val user = OTUser(identityId, identityManager.userName, identityManager.currentIdentityProvider.userImageUrl)
+                                        for (tracker in user.getTrackersOnShortcut()) {
+                                            OTShortcutPanelManager += tracker
+                                        }
 
-                            //handle failed background logging
-                            for (pair in OTBackgroundLoggingService.getFlags()) {
-                                val tracker = user[pair.first]
-                                if (tracker != null) {
-                                    logger.writeSystemLog("${tracker.name} background logging was failed. started at ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(pair.second))}", "OmniTrack")
+                                        //handle failed background logging
+                                        for (pair in OTBackgroundLoggingService.getFlags()) {
+                                            val tracker = user[pair.first]
+                                            if (tracker != null) {
+                                                logger.writeSystemLog("${tracker.name} background logging was failed. started at ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(pair.second))}", "OmniTrack")
+                                            }
+                                        }
+
+                                        if (initialRun) {
+                                            //createExampleTrackers(user)
+                                            createUsabilityTestingTrackers(user)
+                                        }
+
+                                        _currentUser = user
+                                        if (!subscriber.isUnsubscribed) {
+                                            subscriber.onNext(user)
+                                            subscriber.onCompleted()
+                                        }
+                                    }
+
+                                    override fun handleError(exception: Exception?) {
+                                        if (!subscriber.isUnsubscribed) {
+                                            subscriber.onError(Exception("Couldn't get user id from server."))
+                                        }
+                                    }
+
+                                })
+                            } else {
+                                if (!subscriber.isUnsubscribed) {
+                                    subscriber.onError(Exception("Retreiving user instance error: User didn't signed in"))
                                 }
                             }
-
-                            if (initialRun) {
-                                //createExampleTrackers(user)
-                                createUsabilityTestingTrackers(user)
-                            }
-
-                            _currentUser = user
-                            Observable.just(user)
-                        } else {
-                            Observable.error(Exception("Retreiving user instance error: User didn't signed in"))
                         }
                     }
                 }

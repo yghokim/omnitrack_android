@@ -140,7 +140,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
         if (intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ATTRIBUTE) != null) {
             startSubscriptions.add(
-                    OTApplication.app.currentUserObservable.subscribe {
+                    signedInUserObservable.subscribe {
                         user ->
                         attribute = user.findAttributeByObjectId(intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ATTRIBUTE))
                         refresh()

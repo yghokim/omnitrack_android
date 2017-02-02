@@ -89,6 +89,8 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
 
     private val createSubscriptions = CompositeSubscription()
     private val startSubscriptions = CompositeSubscription()
+    private val resumeSubscriptions = CompositeSubscription()
+
 
 
 
@@ -164,13 +166,20 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
         super.onResume()
         if (mode == Mode.New) {
             if (tracker == null) {
-                tryRestoreItemBuilderCache(tracker!!)
+                resumeSubscriptions.add(
+                        signedInUserObservable.subscribe {
+                            tryRestoreItemBuilderCache(tracker!!)
+                        }
+                )
             }
         }
     }
 
     override fun onPause() {
         super.onPause()
+
+        resumeSubscriptions.clear()
+
         for (inputView in attributeListAdapter.inputViews) {
             inputView.onPause()
         }

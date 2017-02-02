@@ -28,6 +28,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.AttributePresetInfo
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.ui.DragItemTouchHelperCallback
+import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.FallbackRecyclerView
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.SpaceItemDecoration
@@ -195,32 +196,38 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
     override fun onStart() {
         super.onStart()
 
-        subscriptions.add(
-                OTApplication.app.currentUserObservable.subscribe {
-                    user ->
-                    this.user = user
-                    if (trackerObjectId != null) {
-                        tracker = user[trackerObjectId!!]
-                    }
+        val activity = activity
+        if (activity is OTActivity) {
+            subscriptions.add(
+                    activity.signedInUserObservable.subscribe {
+                        user ->
+                        println("OMNITRACK Tracker Detail: user loaded")
+                        this.user = user
 
-                    val tracker = tracker
-                    tracker?.let {
+                        println("OMNITRACK tracker object id: ${trackerObjectId}")
+                        if (trackerObjectId != null) {
+                            tracker = user[trackerObjectId!!]
+                        }
 
-                        if (activity.intent.hasExtra(TrackerDetailActivity.INTENT_KEY_FOCUS_ATTRIBUTE_ID)) {
-                            val focusedAttributeId = activity.intent.getStringExtra(TrackerDetailActivity.INTENT_KEY_FOCUS_ATTRIBUTE_ID)
+                        val tracker = tracker
+                        tracker?.let {
 
-                            for (attr in tracker.attributes.unObservedList) {
-                                if (attr.objectId == focusedAttributeId) {
-                                    scrollToBottomReserved = true
-                                    break
+                            if (activity.intent.hasExtra(TrackerDetailActivity.INTENT_KEY_FOCUS_ATTRIBUTE_ID)) {
+                                val focusedAttributeId = activity.intent.getStringExtra(TrackerDetailActivity.INTENT_KEY_FOCUS_ATTRIBUTE_ID)
+
+                                for (attr in tracker.attributes.unObservedList) {
+                                    if (attr.objectId == focusedAttributeId) {
+                                        scrollToBottomReserved = true
+                                        break
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    refresh()
-                }
-        )
+                        refresh()
+                    }
+            )
+        }
     }
 
     override fun onStop() {
