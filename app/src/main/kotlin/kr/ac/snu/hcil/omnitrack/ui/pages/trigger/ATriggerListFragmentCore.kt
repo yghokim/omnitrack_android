@@ -1,8 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 
+import android.graphics.Color
 import android.os.Bundle
-import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.Fragment
+import android.support.v4.graphics.ColorUtils
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -19,6 +20,7 @@ import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.FallbackRecyclerView
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.DrawableListBottomSpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
+import net.i2p.android.ext.floatingactionbutton.FloatingActionButton
 import rx.subscriptions.CompositeSubscription
 import java.util.*
 
@@ -120,6 +122,11 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
 
     fun onSaveInstanceState(outState: Bundle) {
         outState.putInt(STATE_EXPANDED_POSITION, expandedTriggerPosition)
+    }
+
+    fun setFloatingButtonColor(color: Int) {
+        newTriggerButton.colorNormal = color
+        newTriggerButton.colorPressed = ColorUtils.blendARGB(color, Color.BLACK, 0.9f)
     }
 
     protected fun appendNewTrigger(trigger: OTTrigger) {

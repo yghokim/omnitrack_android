@@ -415,4 +415,14 @@
         <item name="android:textStyle">bold</item>
     </style>
 
+    <style name="FloatingActionButtonStyle">
+        <item name="android:layout_gravity">bottom|end</item>
+        <item name="android:layout_marginRight">@dimen/fab_margin_hor</item>
+        <item name="android:layout_marginBottom">@dimen/fab_margin_ver</item>
+        <item name="fab_stroke_visible">false</item>
+        <item name="fab_colorNormal">@color/colorPointed</item>
+        <item name="fab_colorPressed">@color/colorPointed.Light</item>
+        <item name="fab_icon">@drawable/plus</item>
+    </style>
+
 </resources>

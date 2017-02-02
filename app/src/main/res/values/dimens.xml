@@ -4,7 +4,11 @@
     <dimen name="activity_horizontal_margin.Negative">-16dp</dimen>
 
     <dimen name="activity_vertical_margin">16dp</dimen>
+
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="fab_margin_hor">10dp</dimen>
+    <dimen name="fab_margin_ver">8dp</dimen>
+
 
     <dimen name="home_sliding_menu_right_region">120dp</dimen>
 
