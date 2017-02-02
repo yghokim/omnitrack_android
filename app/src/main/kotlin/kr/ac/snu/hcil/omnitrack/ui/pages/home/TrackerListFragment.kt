@@ -196,6 +196,7 @@ class TrackerListFragment : OTFragment() {
                 createViewSubscriptions.add(
                         activity.signedInUserObservable.subscribe {
                             user ->
+                            println("OMNITRACK trackerListFragment received user instance! : ${user.trackers.size} trackers")
                             this.user = user
                             userLoaded = true
                             trackerListAdapter.notifyDataSetChanged()

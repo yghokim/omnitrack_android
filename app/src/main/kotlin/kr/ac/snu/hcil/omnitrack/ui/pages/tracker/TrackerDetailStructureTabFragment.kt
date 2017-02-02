@@ -107,7 +107,7 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
             val activity = activity
             if (activity is TrackerDetailActivity) {
                 activity.trackerColorOnUI.onNext(colorPropertyView.value)
-                applyColorTheme(colorPropertyView.value)
+                applyColorTheme(colorPropertyView.value, true)
 
             }
         }
@@ -196,11 +196,11 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
 
         attributeListAdapter.notifyDataSetChanged()
 
-        applyColorTheme(tracker?.color ?: ContextCompat.getColor(context, R.color.colorPrimary))
+        applyColorTheme(tracker?.color ?: ContextCompat.getColor(context, R.color.colorPrimary), false)
     }
 
-    private fun applyColorTheme(color: Int) {
-        (activity as TrackerDetailActivity).transitionToColor(color)
+    private fun applyColorTheme(color: Int, animate: Boolean) {
+        (activity as TrackerDetailActivity).transitionToColor(color, animate)
         newAttributeButton.colorNormal = color
         newAttributeButton.colorPressed = ColorUtils.blendARGB(color, Color.BLACK, 0.9f)
     }
