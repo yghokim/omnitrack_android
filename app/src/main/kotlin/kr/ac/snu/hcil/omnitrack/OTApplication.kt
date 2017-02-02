@@ -66,6 +66,8 @@ class OTApplication : MultiDexApplication() {
         const val INTENT_EXTRA_OBJECT_ID_TRIGGER = "triggerObjectId"
         const val INTENT_EXTRA_DB_ID_ITEM = "itemDbId"
 
+        const val INTENT_EXTRA_IGNORE_SIGN_IN_CHECK = "ignoreSignInCheck"
+
         const val INTENT_EXTRA_FROM = "activityOpenedFrom"
 
         const val INTENT_EXTRA_ITEMBUILDER = "itemBuilderId"
