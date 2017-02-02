@@ -270,9 +270,7 @@ public class IdentityManager {
      */
     public boolean isUserSignedIn() {
         final Map<String, String> logins = credentialsProviderHolder.getUnderlyingProvider().getLogins();
-        if (logins == null || logins.size() == 0)
-            return false;
-        return true;
+        return !(logins == null || logins.size() == 0);
     }
 
     /**
@@ -323,6 +321,39 @@ public class IdentityManager {
         credentialsProvider.refresh();
         Log.d(getClass().getSimpleName(), "Cognito ID: " + credentialsProvider.getIdentityId());
         Log.d(getClass().getSimpleName(), "Cognito Credentials: " + credentialsProvider.getCredentials());
+    }
+
+    public void loginWithProviderSilently(final IdentityProvider provider, final SignInResultsHandler resultHandler) {
+        if (provider == null) {
+            resultHandler.onError(provider, new Exception("provider is null."));
+        }
+
+        Log.d(LOG_TAG, "loginWithProvider SILENTLY");
+        final Map<String, String> loginMap = new HashMap<String, String>();
+        loginMap.put(provider.getCognitoLoginKey(), provider.getToken());
+        currentIdentityProvider = provider;
+        initializeCognito(this.appContext, this.clientConfiguration);
+
+        executorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    refreshCredentialWithLogins(loginMap);
+                } catch (Exception ex) {
+                    resultHandler.onError(provider, ex);
+                    return;
+                }
+
+                resultHandler.onSuccess(provider);
+
+                // Notify state change listeners of sign in.
+                synchronized (signInStateChangeListeners) {
+                    for (final SignInStateChangeListener listener : signInStateChangeListeners) {
+                        listener.onUserSignedIn();
+                    }
+                }
+            }
+        });
     }
 
     /**

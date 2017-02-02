@@ -104,25 +104,6 @@ public class SignInManager {
         return null;
     }
 
-    public void refreshCredentialsWithProviderSilently(final SignInProvider provider,
-                                                       final IdentityManager.SignInResultsHandler resultsHandler) {
-        if (provider == null) {
-            throw new IllegalArgumentException("The sign-in provider cannot be null.");
-        }
-
-        if (provider.getToken() == null) {
-            resultsHandler.onError(provider,
-                    new IllegalArgumentException("Given provider not previously logged in."));
-        }
-
-        final IdentityManager identityManager = AWSMobileClient.defaultMobileClient()
-                .getIdentityManager();
-
-        AWSMobileClient.defaultMobileClient()
-                .getIdentityManager()
-                .loginWithProvider(provider);
-    }
-
     /**
      * Refresh Cognito credentials with a provider.  Results handlers are always called on the main
      * thread.
@@ -149,8 +130,7 @@ public class SignInManager {
         resultsAdapter = new SignInResultsAdapter(activity, resultsHandler);
         identityManager.setResultsHandler(resultsAdapter);
 
-        AWSMobileClient.defaultMobileClient()
-                .getIdentityManager()
+        identityManager
                 .loginWithProvider(provider);
     }
 
