@@ -24,12 +24,13 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.time.DurationPicker
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 import rx.subjects.BehaviorSubject
+import rx.subscriptions.CompositeSubscription
 import java.util.*
 
 /**
  * Created by younghokim on 2016. 11. 15..
  */
-abstract class OTActivity : AppCompatActivity() {
+abstract class OTActivity(val checkRefreshingCredential: Boolean = false) : AppCompatActivity() {
 
     private val LOG_TAG = "OmniTrackActivity"
 
@@ -108,6 +109,8 @@ abstract class OTActivity : AppCompatActivity() {
 
     private var touchMoveAmount: PointF = PointF()
 
+    private val creationSubscriptions = CompositeSubscription()
+
     private val signedInUserSubject: BehaviorSubject<OTUser> = BehaviorSubject.create<OTUser>()
 
     val signedInUserObservable: rx.Observable<OTUser>
@@ -121,33 +124,42 @@ abstract class OTActivity : AppCompatActivity() {
         if (false/*BuildConfig.DEBUG*/) {
             performSignInProcessCompletelyFinished()
         } else {
-            val thread = Thread(Runnable {
-                signInManager = SignInManager.getInstance(applicationContext)
+            if (checkRefreshingCredential) {
+                val thread = Thread(Runnable {
+                    signInManager = SignInManager.getInstance(applicationContext)
 
-                val provider = signInManager.previouslySignedInProvider
+                    val provider = signInManager.previouslySignedInProvider
 
-                // if the user was already previously in to a provider.
-                if (provider != null) {
-                    // asynchronously handle refreshing credentials and call our handler.
-                    signInManager.refreshCredentialsWithProvider(this@OTActivity,
-                            provider, OmniTrackSignInResultsHandler())
-                } else {
-                    // Asyncronously go to the main activity (after the splash delay has expired).
-                    Log.d(LOG_TAG, "Couldn't find previously-signed in provider.")
-                    goSignInUnlessUserCached()
-                }
-            })
-            thread.start()
+                    // if the user was already previously in to a provider.
+                    if (provider != null) {
+                        // asynchronously handle refreshing credentials and call our handler.
+                        signInManager.refreshCredentialsWithProvider(this@OTActivity,
+                                provider, OmniTrackSignInResultsHandler())
+                    } else {
+                        // Asyncronously go to the main activity (after the splash delay has expired).
+                        Log.d(LOG_TAG, "Couldn't find previously-signed in provider.")
+                        goSignInUnlessUserCached()
+                    }
+                })
+                thread.start()
+            } else {
+                goSignInUnlessUserCached()
+            }
         }
     }
 
     private fun goSignInUnlessUserCached() {
-        if (OTUser.isUserStored(OTApplication.app.systemSharedPreferences)) {
-            performSignInProcessCompletelyFinished()
-        } else {
-            Log.d(LOG_TAG, "User is not stored in device. go Sign-in.")
-            goSignIn()
-        }
+        creationSubscriptions.add(
+                OTApplication.app.currentUserObservable.subscribe({
+                    user ->
+                    signedInUserSubject.onNext(user)
+                    onSignInProcessCompletelyFinished()
+                })
+                {
+                    e ->
+                    Log.d(LOG_TAG, "User is not stored in device. go Sign-in.")
+                    goSignIn()
+                })
     }
 
     private fun goSignIn() {
@@ -174,6 +186,7 @@ abstract class OTActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         durationPickers.clear()
+        creationSubscriptions.clear()
     }
 
     override fun onPause() {
@@ -194,11 +207,15 @@ abstract class OTActivity : AppCompatActivity() {
     }
 
     private fun performSignInProcessCompletelyFinished() {
-        OTApplication.app.currentUserObservable.subscribe {
-            user ->
-            ; this.signedInUserSubject.onNext(user)
-            this.signedInUserSubject.onCompleted()
-        }
+        println("OMNITRACK loading user from the application global instance")
+        creationSubscriptions.add(
+                OTApplication.app.currentUserObservable.subscribe {
+                    user ->
+                    println("OMNITRACK received user from global instance")
+
+                    this.signedInUserSubject.onNext(user)
+                }
+        )
 
         onSignInProcessCompletelyFinished()
     }

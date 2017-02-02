@@ -154,13 +154,15 @@ class OTApplication : MultiDexApplication() {
                         _currentUser = cachedUser
                         Observable.just(cachedUser)
                     } else {
+
                         Observable.create<OTUser> {
                             subscriber ->
                             if (identityManager.isUserSignedIn) {
                                 identityManager.getUserID(object : IdentityManager.IdentityHandler {
                                     override fun handleIdentityID(identityId: String) {
                                         println("OMNITRACK user identityId: ${identityId}, current provider: ${identityManager.currentIdentityProvider}, userName: ${identityManager.currentIdentityProvider.userName}")
-                                        val user = OTUser(identityId, identityManager.userName, identityManager.currentIdentityProvider.userImageUrl)
+                                        val user = OTUser(identityId, identityManager.currentIdentityProvider.userName, identityManager.currentIdentityProvider.userImageUrl)
+                                        OTUser.storeOrOverwriteInstanceCache(user, systemSharedPreferences)
                                         for (tracker in user.getTrackersOnShortcut()) {
                                             OTShortcutPanelManager += tracker
                                         }
@@ -239,19 +241,6 @@ class OTApplication : MultiDexApplication() {
         logger.writeSystemLog("Application creates.", "OTApplication")
 
         dbHelper = DatabaseHelper(this)
-
-        /*
-        var initialRun = false
-        val user = dbHelper.findUserById(1)
-        if (user == null) {
-            val defaultUser = OTUser("Young-Ho Kim", "yhkim@hcil.snu.ac.kr")
-            _currentUser = defaultUser
-
-            initialRun = true
-
-        } else {
-            _currentUser = user
-        }*/
 
         timeTriggerAlarmManager = OTTimeTriggerAlarmManager()
 
