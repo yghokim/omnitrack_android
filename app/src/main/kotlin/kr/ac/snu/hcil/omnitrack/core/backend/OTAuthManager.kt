@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.backend
+package kr.ac.snu.hcil.omnitrack.core.backend
 
 import android.content.Intent
 import android.content.pm.ApplicationInfo
@@ -120,22 +120,7 @@ object OTAuthManager {
     fun refreshCredentialSilently(resultsHandler: SignInResultsHandler) {
 
         mFirebaseUser = mFirebaseAuth.currentUser
-        var startOverFromGoogle = false
         if (mFirebaseUser == null) {
-            startOverFromGoogle = true
-        } else {
-            mFirebaseUser!!.reload().addOnCompleteListener {
-                task ->
-                if (task.isSuccessful) {
-                    reloadUserInfo()
-                    resultsHandler.onSuccess()
-                } else {
-                    startOverFromGoogle = true
-                }
-            }
-        }
-
-        if (startOverFromGoogle) {
             if (isGoogleSignedIn()) {
                 firebaseAuthWithGoogle(googleSignInAccount).subscribe({
                     result ->
@@ -148,6 +133,28 @@ object OTAuthManager {
                 })
             } else {
                 resultsHandler.onError(Exception("Google account silent sign in failed."))
+            }
+        } else {
+            mFirebaseUser!!.reload().addOnCompleteListener {
+                task ->
+                if (task.isSuccessful) {
+                    reloadUserInfo()
+                    resultsHandler.onSuccess()
+                } else {
+                    if (isGoogleSignedIn()) {
+                        firebaseAuthWithGoogle(googleSignInAccount).subscribe({
+                            result ->
+                            mFirebaseUser = result.user
+                            reloadUserInfo()
+                            resultsHandler.onSuccess()
+                        }, {
+                            ex ->
+                            resultsHandler.onError(ex as Exception)
+                        })
+                    } else {
+                        resultsHandler.onError(Exception("Google account silent sign in failed."))
+                    }
+                }
             }
         }
     }
