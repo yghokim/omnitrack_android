@@ -18,6 +18,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.getActivity
 import rx.Observable
 import rx.schedulers.Schedulers
+import java.util.*
 import java.util.concurrent.Executors
 
 /**
@@ -31,6 +32,12 @@ object OTAuthManager {
         fun onSuccess()
         fun onError(e: Throwable)
         fun onCancel()
+    }
+
+    interface SignInChangedListener {
+        fun onSignedIn(firebaseUser: FirebaseUser)
+
+        fun onSignedOut()
     }
 
     private const val RC_SIGN_IN = 9913
@@ -55,7 +62,10 @@ object OTAuthManager {
     private var mIntentInProgress = false
     private var mResultsHandler: SignInResultsHandler? = null
 
-    @Volatile private var authToken: String? = null
+    private val mSignInChangedListeners = HashSet<SignInChangedListener>()
+
+    @Volatile var authToken: String? = null
+        private set
 
     var email: String? = null
         private set
@@ -107,10 +117,11 @@ object OTAuthManager {
             try {
                 googleSignInAccount = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient).await().signInAccount
                 Log.d("OMNITRACK", "Google SigninAccount: " + googleSignInAccount)
-                authToken = googleSignInAccount?.idToken
+                refreshToken()
                 return true
             } catch (e: Exception) {
                 Log.w(LOG_TAG, "Failed to update Google token", e)
+                return false
             }
 
         }
@@ -119,53 +130,68 @@ object OTAuthManager {
 
     fun refreshCredentialSilently(resultsHandler: SignInResultsHandler) {
 
-        mFirebaseUser = mFirebaseAuth.currentUser
-        if (mFirebaseUser == null) {
-            if (isGoogleSignedIn()) {
-                firebaseAuthWithGoogle(googleSignInAccount).subscribe({
-                    result ->
-                    mFirebaseUser = result.user
-                    reloadUserInfo()
-                    resultsHandler.onSuccess()
-                }, {
-                    ex ->
-                    resultsHandler.onError(ex as Exception)
-                })
-            } else {
-                resultsHandler.onError(Exception("Google account silent sign in failed."))
-            }
-        } else {
-            mFirebaseUser!!.reload().addOnCompleteListener {
-                task ->
-                if (task.isSuccessful) {
-                    reloadUserInfo()
-                    resultsHandler.onSuccess()
+        executorService.submit {
+            mFirebaseUser = mFirebaseAuth.currentUser
+            if (mFirebaseUser == null) {
+
+                println("OMNITRACK firebase user does not exist.")
+                if (isGoogleSignedIn()) {
+                    firebaseAuthWithGoogle(googleSignInAccount).subscribe({
+                        result ->
+                        mFirebaseUser = result.user
+                        reloadUserInfo()
+                        resultsHandler.onSuccess()
+                    }, {
+                        ex ->
+                        resultsHandler.onError(ex as Exception)
+                    })
                 } else {
-                    if (isGoogleSignedIn()) {
-                        firebaseAuthWithGoogle(googleSignInAccount).subscribe({
-                            result ->
-                            mFirebaseUser = result.user
+                    resultsHandler.onError(Exception("Google account silent sign in failed."))
+                }
+            } else {
+                println("OMNITRACK firebase user exists.")
+                mFirebaseUser!!.reload().addOnCompleteListener {
+                    task ->
+                    if (task.isSuccessful) {
                             reloadUserInfo()
                             resultsHandler.onSuccess()
-                        }, {
-                            ex ->
-                            resultsHandler.onError(ex as Exception)
-                        })
                     } else {
-                        resultsHandler.onError(Exception("Google account silent sign in failed."))
+                        Thread(Runnable {
+                            if (isGoogleSignedIn()) {
+                                firebaseAuthWithGoogle(googleSignInAccount).subscribe({
+                                    result ->
+                                    mFirebaseUser = result.user
+                                    reloadUserInfo()
+                                    resultsHandler.onSuccess()
+                                }, {
+                                    ex ->
+                                    println("OMNITRACK firebase Auth error")
+                                    resultsHandler.onError(ex as Exception)
+                                })
+                            } else {
+                                resultsHandler.onError(Exception("Google account silent sign in failed."))
+                            }
+                        }).start()
                     }
-                }
+                    }
             }
         }
     }
 
     fun refreshCredentialWithFallbackSignIn(activity: AppCompatActivity, resultsHandler: SignInResultsHandler) {
+
+        if (authToken == null)//previously signed in
+        {
+            resultsHandler.onError(Exception("Google is not signed in."))
+        }
+
         refreshCredentialSilently(object : SignInResultsHandler {
             override fun onSuccess() {
                 resultsHandler.onSuccess()
             }
 
             override fun onError(e: Throwable) {
+                println("OMNITRACK FallbackSignIn Error")
                 startSignInProcess(activity, resultsHandler)
             }
 
@@ -177,6 +203,7 @@ object OTAuthManager {
     }
 
     fun startSignInProcess(activity: AppCompatActivity, resultsHandler: SignInResultsHandler) {
+        println("OMNITRACK start sign in activity")
         mResultsHandler = resultsHandler
         val signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient)
         mIntentInProgress = true
@@ -238,6 +265,31 @@ object OTAuthManager {
                     }
         }
 
+    }
+
+    fun signOut() {
+        clearUserInfo()
+        notifySignedOut()
+    }
+
+    fun addSignInChangedListener(signInChangedListener: SignInChangedListener) {
+        mSignInChangedListeners.add(signInChangedListener)
+    }
+
+    fun removeSignInChangedListener(signInChangedListener: SignInChangedListener) {
+        mSignInChangedListeners.remove(signInChangedListener)
+    }
+
+    private fun notifySignedIn(user: FirebaseUser) {
+        mSignInChangedListeners.forEach {
+            it.onSignedIn(user)
+        }
+    }
+
+    private fun notifySignedOut() {
+        mSignInChangedListeners.forEach {
+            it.onSignedOut()
+        }
     }
 
     private fun clearUserInfo() {

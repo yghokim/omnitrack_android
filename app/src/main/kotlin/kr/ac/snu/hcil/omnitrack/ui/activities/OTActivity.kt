@@ -102,6 +102,7 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false) : AppC
 
     private fun refreshCredentialsWithFallbackSignIn() {
         if (OTAuthManager.isGoogleSignedIn()) {
+            println("OMNITRACK Google is signed in.")
             OTAuthManager.refreshCredentialWithFallbackSignIn(this, OmniTrackSignInResultsHandler())
         } else {
             goSignInUnlessUserCached()
@@ -126,6 +127,7 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false) : AppC
     }
 
     private fun goSignInUnlessUserCached() {
+        println("OMNITRACK Check whether user is cached. Otherwise, go to sign in")
         creationSubscriptions.add(
                 OTApplication.app.currentUserObservable.subscribe({
                     user ->
@@ -143,7 +145,8 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false) : AppC
                                             }
 
                                     override fun onError(e: Throwable) {
-
+                                        Log.e("OMNITRACK", "RefreshCredential error")
+                                        e.printStackTrace()
                                             }
 
                                     override fun onSuccess() {
@@ -195,8 +198,6 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false) : AppC
         super.onResume()
 
         resumedAt = System.currentTimeMillis()
-
-
     }
 
     override fun onDestroy() {
