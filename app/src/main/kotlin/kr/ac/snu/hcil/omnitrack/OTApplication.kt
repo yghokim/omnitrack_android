@@ -7,9 +7,8 @@ import android.os.Looper
 import android.os.SystemClock
 import android.support.multidex.MultiDexApplication
 import android.text.format.DateUtils
-import com.amazonaws.mobile.AWSMobileClient
-import com.amazonaws.mobile.user.IdentityManager
 import com.squareup.leakcanary.LeakCanary
+import kr.ac.snu.hcil.omnitrack.backend.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
@@ -33,6 +32,7 @@ import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 import kr.ac.snu.hcil.omnitrack.utils.UniqueStringEntryList
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
+import rx.functions.Func1
 import rx.schedulers.Schedulers
 import java.util.*
 
@@ -111,10 +111,6 @@ class OTApplication : MultiDexApplication() {
 
     private var initialRun = false
 
-    var userLoaded = false
-        private set
-
-    val isSignedIn: Boolean get() = AWSMobileClient.defaultMobileClient().identityManager.isUserSignedIn
 /*
     private val currentUser: OTUser
         get() {
@@ -150,7 +146,6 @@ class OTApplication : MultiDexApplication() {
                 } else {
                     //need login
                     println("load user from db")
-                    val identityManager = AWSMobileClient.defaultMobileClient().identityManager
                     val cachedUser = OTUser.loadCachedInstance(systemSharedPreferences, dbHelper)
                     if (cachedUser != null/*&& cachedUser.objectId == cachedUserId*/) {
                         _currentUser = cachedUser
@@ -159,45 +154,49 @@ class OTApplication : MultiDexApplication() {
 
                         Observable.create<OTUser> {
                             subscriber ->
-                            if (identityManager.isUserSignedIn) {
-                                identityManager.getUserID(object : IdentityManager.IdentityHandler {
-                                    override fun handleIdentityID(identityId: String) {
-                                        println("OMNITRACK user identityId: ${identityId}, current provider: ${identityManager.currentIdentityProvider}, userName: ${identityManager.currentIdentityProvider.userName}")
-                                        val user = OTUser(identityId, identityManager.currentIdentityProvider.userName, identityManager.currentIdentityProvider.userImageUrl, dbHelper.findTrackersOfUser(identityId))
-                                        OTUser.storeOrOverwriteInstanceCache(user, systemSharedPreferences)
-                                        for (tracker in user.getTrackersOnShortcut()) {
-                                            OTShortcutPanelManager += tracker
-                                        }
+                            println("OMNITRACK: make new user instance from server")
+                            if (OTAuthManager.isGoogleSignedIn()) {
 
-                                        //handle failed background logging
-                                        for (pair in OTBackgroundLoggingService.getFlags()) {
-                                            val tracker = user[pair.first]
-                                            if (tracker != null) {
-                                                logger.writeSystemLog("${tracker.name} background logging was failed. started at ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(pair.second))}", "OmniTrack")
-                                            }
-                                        }
+                                println("OMNITRACK: google is signed in.")
+                                OTAuthManager.userIdObservable.map<OTUser>(Func1<String, OTUser> { identityId ->
+                                    println("OMNITRACK user identityId: ${identityId}, userName: ${OTAuthManager.userName}")
+                                    val user = OTUser(identityId, OTAuthManager.userName, OTAuthManager.userImageUrl, dbHelper.findTrackersOfUser(identityId))
+                                    OTUser.storeOrOverwriteInstanceCache(user, systemSharedPreferences)
+                                    for (tracker in user.getTrackersOnShortcut()) {
+                                        OTShortcutPanelManager += tracker
+                                    }
 
-                                        if (initialRun) {
-                                            //createExampleTrackers(user)
-                                            createUsabilityTestingTrackers(user)
-                                        }
-
-                                        _currentUser = user
-                                        if (!subscriber.isUnsubscribed) {
-                                            subscriber.onNext(user)
-                                            subscriber.onCompleted()
+                                    //handle failed background logging
+                                    for (pair in OTBackgroundLoggingService.getFlags()) {
+                                        val tracker = user[pair.first]
+                                        if (tracker != null) {
+                                            logger.writeSystemLog("${tracker.name} background logging was failed. started at ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(pair.second))}", "OmniTrack")
                                         }
                                     }
 
-                                    override fun handleError(exception: Exception?) {
-                                        if (!subscriber.isUnsubscribed) {
-                                            subscriber.onError(Exception("Couldn't get user id from server."))
-                                        }
+                                    if (initialRun) {
+                                        //createExampleTrackers(user)
+                                        createUsabilityTestingTrackers(user)
                                     }
-
+                                    _currentUser = user
+                                    user
+                                }
+                                ).subscribe({
+                                    user ->
+                                    if (!subscriber.isUnsubscribed) {
+                                        subscriber.onNext(user)
+                                    }
+                                }, {
+                                    ex ->
+                                    if (!subscriber.isUnsubscribed) {
+                                        println("OMNITRACK retreiving user instance error: User sign up with Firebase was failed.")
+                                        subscriber.onError(Exception("Retreiving user instance error: User Firebase sign up was failed"))
+                                    }
                                 })
+
                             } else {
                                 if (!subscriber.isUnsubscribed) {
+                                    println("OMNITRACK retreiving user instance error: User didn't signed in with google.")
                                     subscriber.onError(Exception("Retreiving user instance error: User didn't signed in"))
                                 }
                             }
@@ -205,7 +204,7 @@ class OTApplication : MultiDexApplication() {
                     }
                 }
 
-            }.subscribeOn(Schedulers.computation())
+            }.subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread()).share()
 
     val colorPalette: IntArray by lazy {
@@ -225,9 +224,6 @@ class OTApplication : MultiDexApplication() {
         super.onCreate()
         app = this
         println("set application instance.")
-
-        //initialize AWS client
-        AWSMobileClient.initializeMobileClientIfNecessary(applicationContext)
 
         if (LeakCanary.isInAnalyzerProcess(this)) {
             // This process is dedicated to LeakCanary for heap analysis.

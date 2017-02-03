@@ -8,8 +8,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.PopupMenu
 import android.widget.TextView
-import com.amazonaws.mobile.AWSMobileClient
-import com.amazonaws.mobile.util.ThreadUtils
+import com.badoo.mobile.util.WeakHandler
 import com.bumptech.glide.Glide
 import de.hdodenhof.circleimageview.CircleImageView
 import kr.ac.snu.hcil.omnitrack.OTApplication
@@ -59,7 +58,8 @@ class SidebarWrapper(val view: View, val parentActivity: AppCompatActivity) : Po
         when (item.itemId) {
             R.id.action_unlink_with_this_device -> {
                 DialogHelper.makeYesNoDialogBuilder(parentActivity, "OmniTrack", parentActivity.getString(R.string.msg_profile_unlink_account_confirm), {
-                    AWSMobileClient.defaultMobileClient().identityManager.signOut()
+                    //TODO: Sign out
+                    //AWSMobileClient.defaultMobileClient().identityManager.signOut()
                     OTApplication.app.unlinkUser()
                 }).show()
                 return true
@@ -71,13 +71,9 @@ class SidebarWrapper(val view: View, val parentActivity: AppCompatActivity) : Po
     }
 
     fun refresh(user: OTUser) {
-        ThreadUtils.runOnUiThread {
+        WeakHandler().post {
             Glide.with(parentActivity).load(user.photoUrl).into(photoView)
             nameView.text = user.name
         }
-    }
-
-    fun dispose() {
-
     }
 }

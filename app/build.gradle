@@ -39,6 +39,9 @@ android {
     }
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
+
+        //exclude amazon aws codes
+        main.java.exclude 'com/amazonaws/**'
     }
     lintOptions {
         checkReleaseBuilds false
@@ -58,6 +61,7 @@ dependencies {
     compile "com.google.android.gms:play-services-gcm:$rootProject.ext.google_play_version"
     compile "com.google.android.gms:play-services-plus:$rootProject.ext.google_play_version"
     compile "com.google.android.gms:play-services-auth:$rootProject.ext.google_play_version"
+    compile "com.google.firebase:firebase-auth:$rootProject.ext.google_play_version"
 
     compile project(':microsoft-band-1.3.20307.2')
     compile project(':material_dialog_core')
@@ -68,12 +72,7 @@ dependencies {
     compile 'com.google.code.gson:gson:2.7'
     compile 'io.reactivex:rxandroid:1.2.1'
     compile 'io.reactivex:rxjava:1.1.6'
-    compile 'com.amazonaws:aws-android-sdk-core:2.3.8'
-    compile 'com.amazonaws:aws-android-sdk-cognito:2.3.8'
-    compile 'com.amazonaws:aws-android-sdk-cognitoidentityprovider:2.3.8'
-    compile 'com.amazonaws:aws-android-sdk-s3:2.3.8'
-    compile 'com.amazonaws:aws-android-sdk-ddb:2.3.8'
-    compile 'com.amazonaws:aws-android-sdk-ddb-mapper:2.3.8'
+
     compile 'jp.wasabeef:recyclerview-animators:2.2.3'
     compile 'com.github.markushi:android-ui:1.2'
     compile 'org.apmem.tools:layouts:1.10@aar'
@@ -122,3 +121,5 @@ repositories {
         url "https://oss.sonatype.org/content/repositories/snapshots"
     }
 }
+
+apply plugin: 'com.google.gms.google-services'

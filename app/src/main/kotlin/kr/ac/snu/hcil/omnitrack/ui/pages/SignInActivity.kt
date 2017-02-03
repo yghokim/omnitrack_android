@@ -1,4 +1,4 @@
-package com.amazonaws.activities
+package kr.ac.snu.hcil.omnitrack.ui.pages
 
 import android.Manifest
 import android.app.AlertDialog
@@ -11,20 +11,15 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
 import android.widget.Toast
-import com.amazonaws.mobile.AWSMobileClient
-import com.amazonaws.mobile.user.IdentityManager
-import com.amazonaws.mobile.user.IdentityProvider
-import com.amazonaws.mobile.user.signin.GoogleSignInProvider
-import com.amazonaws.mobile.user.signin.SignInManager
-import com.amazonaws.mobile.util.ThreadUtils
+import com.badoo.mobile.util.WeakHandler
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.backend.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.ExperimentConsentManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 
 class SignInActivity : AppCompatActivity() {
 
-    private var signInManager: SignInManager? = null
     /** The Google OnClick listener, since we must override it to get permissions on Marshmallow and above.  */
     private var googleOnClickListener: View.OnClickListener? = null
 
@@ -35,15 +30,11 @@ class SignInActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign_in)
 
-        signInManager = SignInManager.getInstance(this)
-
-        signInManager!!.setResultsHandler(this, SignInResultsHandler())
-
         googleLoginButton = findViewById(R.id.g_login_button)
         loginInProgressIndicator = findViewById(R.id.ui_loading_indicator)
 
         // Initialize sign-in buttons.
-        googleOnClickListener = signInManager?.initializeSignInButton(GoogleSignInProvider::class.java, googleLoginButton)
+        googleOnClickListener = OTAuthManager.initializeSignInButton(googleLoginButton, SignInResultsHandler())
 
         if (googleOnClickListener != null) {
             // if the onClick listener was null, initializeSignInButton will have removed the view.
@@ -74,14 +65,14 @@ class SignInActivity : AppCompatActivity() {
     }
 
     private fun toBusyMode() {
-        ThreadUtils.runOnUiThread {
+        WeakHandler().post {
             this.googleLoginButton.visibility = View.GONE
             this.loginInProgressIndicator.visibility = View.VISIBLE
         }
     }
 
     private fun toIdleMode() {
-        ThreadUtils.runOnUiThread {
+        WeakHandler().post {
             this.googleLoginButton.visibility = View.VISIBLE
             this.loginInProgressIndicator.visibility = View.GONE
         }
@@ -91,7 +82,7 @@ class SignInActivity : AppCompatActivity() {
                                             grantResults: IntArray) {
         if (requestCode == GET_ACCOUNTS_PERMISSION_REQUEST_CODE) {
             if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                this.findViewById(R.id.g_login_button).callOnClick()
+                this.findViewById(kr.ac.snu.hcil.omnitrack.R.id.g_login_button).callOnClick()
             } else {
                 Log.i(LOG_TAG, "Permissions not granted for Google sign-in. :(")
             }
@@ -100,7 +91,7 @@ class SignInActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        signInManager?.handleActivityResult(requestCode, resultCode, data)
+        OTAuthManager.handleActivityResult(requestCode, resultCode, data)
         ExperimentConsentManager.handleActivityResult(true, requestCode, resultCode, data)
     }
 
@@ -121,24 +112,18 @@ class SignInActivity : AppCompatActivity() {
      * SignInResultsHandler handles the final result from sign in. Making it static is a best
      * practice since it may outlive the SplashActivity's life span.
      */
-    private inner class SignInResultsHandler : IdentityManager.SignInResultsHandler {
+    private inner class SignInResultsHandler : OTAuthManager.SignInResultsHandler {
         /**
          * Receives the successful sign-in result and starts the main activity.
          * @param provider the identity provider used for sign-in.
          */
-        override fun onSuccess(provider: IdentityProvider) {
-            Log.d(LOG_TAG, String.format("User sign-in with %s succeeded",
-                    provider.displayName))
+        override fun onSuccess() {
+            Log.d(LOG_TAG, String.format("User sign-in with Google succeeded"))
 
-            // The sign-in manager is no longer needed once signed in.
-            SignInManager.dispose()
+            Toast.makeText(this@SignInActivity, String.format("Sign-in with Google succeeded."), Toast.LENGTH_LONG).show()
 
-            Toast.makeText(this@SignInActivity, String.format("Sign-in with %s succeeded.",
-                    provider.displayName), Toast.LENGTH_LONG).show()
-
-            // Load user name and image.
-            AWSMobileClient.defaultMobileClient().identityManager.loadUserInfoAndImage(provider) {
-
+            if (false) {
+                /*
                 ExperimentConsentManager.startProcess(this@SignInActivity, AWSMobileClient.defaultMobileClient().syncManager, object : ExperimentConsentManager.ResultListener {
                     override fun onConsentApproved() {
                         goHomeActivity()
@@ -152,28 +137,17 @@ class SignInActivity : AppCompatActivity() {
                         toIdleMode()
                     }
 
-                })
-
-                /*
-                    Log.d(LOG_TAG, "Launching Main Activity...");
-                    startActivity(new Intent(SignInActivity.this, HomeActivity.class)
-                            .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-                    // finish should always be called on the main thread.
-                    finish();
-                    */
-            }
+                })*/
+            } else goHomeActivity()
         }
 
         /**
          * Receives the sign-in result indicating the user canceled and shows a toast.
          * @param provider the identity provider with which the user attempted sign-in.
          */
-        override fun onCancel(provider: IdentityProvider) {
-            Log.d(LOG_TAG, String.format("User sign-in with %s canceled.",
-                    provider.displayName))
-
-            Toast.makeText(this@SignInActivity, String.format("Sign-in with %s canceled.",
-                    provider.displayName), Toast.LENGTH_LONG).show()
+        override fun onCancel() {
+            Log.d(LOG_TAG, String.format("User sign-in with Google canceled."))
+            Toast.makeText(this@SignInActivity, String.format("Sign-in with Google canceled."), Toast.LENGTH_LONG).show()
 
             toIdleMode()
         }
@@ -184,14 +158,13 @@ class SignInActivity : AppCompatActivity() {
          * *
          * @param ex the exception that occurred.
          */
-        override fun onError(provider: IdentityProvider, ex: Exception) {
-            Log.e(LOG_TAG, String.format("User Sign-in failed for %s : %s",
-                    provider.displayName, ex.message), ex)
+        override fun onError(e: Throwable) {
+            Log.e(LOG_TAG, String.format("User Sign-in failed for Google : %s", e.message), e)
 
             val errorDialogBuilder = AlertDialog.Builder(this@SignInActivity)
             errorDialogBuilder.setTitle("Sign-In Error")
             errorDialogBuilder.setMessage(
-                    String.format("Sign-in with %s failed.\n%s", provider.displayName, ex.message))
+                    String.format("Sign-in with Google failed.\n%s", e.message))
             errorDialogBuilder.setNeutralButton("Ok", null)
             errorDialogBuilder.show()
 

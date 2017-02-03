@@ -13,17 +13,15 @@ import android.support.v4.widget.DrawerLayout
 import android.view.Gravity
 import android.view.View
 import butterknife.bindView
-import com.amazonaws.activities.SignInActivity
-import com.amazonaws.mobile.AWSMobileClient
-import com.amazonaws.mobile.user.IdentityManager
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
+import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.diagnostics.SystemLogActivity
 import rx.internal.util.SubscriptionList
 
-class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), IdentityManager.SignInStateChangeListener, DrawerLayout.DrawerListener {
+class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), DrawerLayout.DrawerListener {
 
     private var mSectionsPagerAdapter: SectionsPagerAdapter? = null
 
@@ -74,7 +72,7 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Ident
 
     override fun onResume() {
         super.onResume()
-        AWSMobileClient.defaultMobileClient().identityManager.addSignInStateChangeListener(this)
+        //AWSMobileClient.defaultMobileClient().identityManager.addSignInStateChangeListener(this)
     }
 
     override fun onToolbarLeftButtonClicked() {
@@ -123,6 +121,7 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Ident
                     }
 
                     sidebar.refresh(user)
+                    /*
                     val provider = AWSMobileClient.defaultMobileClient().identityManager.currentIdentityProvider
                     AWSMobileClient.defaultMobileClient().identityManager.loadUserInfoAndImage(
                             provider
@@ -130,7 +129,7 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Ident
                         user.name = provider.userName
                         user.photoUrl = provider.userImageUrl
                         sidebar.refresh(user)
-                    }
+                    }*/
                 }
         )
     }
@@ -142,7 +141,7 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Ident
 
     override fun onPause() {
         super.onPause()
-        AWSMobileClient.defaultMobileClient().identityManager.removeSignInStateChangeListener(this)
+        //AWSMobileClient.defaultMobileClient().identityManager.removeSignInStateChangeListener(this)
         (application as OTApplication).syncUserToDb()
     }
 
@@ -191,13 +190,13 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Ident
         requester?.onActivityActivationResult(resultCode, data)
     }
 
-
+/*
     override fun onUserSignedIn() {
     }
 
     override fun onUserSignedOut() {
         goSignInPage()
-    }
+    }*/
 
     private fun goSignInPage() {
         val intent = Intent(this, SignInActivity::class.java)
