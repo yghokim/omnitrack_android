@@ -2,18 +2,6 @@ package kr.ac.snu.hcil.omnitrack.core
 
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
-import com.amazonaws.mobile.AWSConfiguration
-import com.amazonaws.mobile.AWSMobileClient
-import com.amazonaws.mobileconnectors.cognito.CognitoSyncManager
-import com.amazonaws.mobileconnectors.cognito.Dataset
-import com.amazonaws.mobileconnectors.cognito.Record
-import com.amazonaws.mobileconnectors.cognito.SyncConflict
-import com.amazonaws.mobileconnectors.cognito.exceptions.DataStorageException
-import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserPool
-import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.GenericHandler
-import kr.ac.snu.hcil.omnitrack.OTApplication
-import kr.ac.snu.hcil.omnitrack.ui.pages.experiment.ExperimentSignInActivity
 
 /**
  * Created by Young-Ho Kim on 2017-01-31.
@@ -29,16 +17,14 @@ object ExperimentConsentManager {
     }
 
     private var mActivity: AppCompatActivity? = null
-    private var mSyncManager: CognitoSyncManager? = null
     private var mResultListener: ResultListener? = null
 
-    private var experimentDataset: Dataset? = null
 
-    fun startProcess(activity: AppCompatActivity, syncManager: CognitoSyncManager, resultListener: ResultListener? = null) {
+    fun startProcess(activity: AppCompatActivity, resultListener: ResultListener? = null) {
         mActivity = activity
-        mSyncManager = syncManager
         mResultListener = resultListener
 
+        /*
         experimentDataset = syncManager.openOrCreateDataset(OTApplication.ACCOUNT_DATASET_EXPERIMENT)
         if (experimentDataset != null) {
             experimentDataset?.synchronize(object : Dataset.SyncCallback {
@@ -85,6 +71,7 @@ object ExperimentConsentManager {
         } else {
 
         }
+        */
     }
 
     fun handleActivityResult(deleteAccountIfDenied: Boolean, requestCode: Int, resultCode: Int, data: Intent?) {
@@ -92,26 +79,11 @@ object ExperimentConsentManager {
             if (resultCode != AppCompatActivity.RESULT_OK || data == null) {
                 //TODO: delete user if possible.
                 if (deleteAccountIfDenied) {
-                    val userPool = CognitoUserPool(mActivity, AWSConfiguration.AMAZON_COGNITO_USER_POOL_ID, AWSConfiguration.AMAZON_COGNITO_USER_POOL_CLIENT_ID, AWSConfiguration.AMAZON_COGNITO_USER_POOL_CLIENT_SECRET)
-                    val user = userPool.getUser(AWSMobileClient.defaultMobileClient().identityManager.underlyingProvider.cachedIdentityId)
-                    user.deleteUserInBackground(object : GenericHandler {
-                        override fun onSuccess() {
-                            Log.v("OMNITRACK", "removed user.")
-                            mResultListener?.onConsentDenied()
-                            finishProcess()
-                        }
 
-                        override fun onFailure(exception: Exception) {
-                            Log.v("OMNITRACK", "removal failed.")
-                            exception.printStackTrace()
-                            mResultListener?.onConsentDenied()
-                            finishProcess()
-                        }
-
-                    })
                 }
-                AWSMobileClient.defaultMobileClient().identityManager.signOut()
+                //TODO: Sign out
             } else {
+                /*
                 experimentDataset?.put(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_IS_CONSENT_APPROVED, true.toString())
                 arrayOf(
                         OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_GENDER,
@@ -144,15 +116,13 @@ object ExperimentConsentManager {
                         return true
                     }
 
-                })
+                })*/
             }
         }
     }
 
     fun finishProcess() {
         mActivity = null
-        mSyncManager = null
         mResultListener = null
-        experimentDataset = null
     }
 }

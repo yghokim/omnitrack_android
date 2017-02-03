@@ -11,16 +11,13 @@ import android.view.MotionEvent
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.Toast
-import com.amazonaws.activities.SignInActivity
-import com.amazonaws.mobile.AWSMobileClient
-import com.amazonaws.mobile.user.IdentityManager
-import com.amazonaws.mobile.user.IdentityProvider
-import com.amazonaws.mobile.user.signin.SignInManager
 import com.google.gson.JsonObject
 import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.backend.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.ExperimentConsentManager
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.ui.components.common.time.DurationPicker
+import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 import rx.subjects.BehaviorSubject
@@ -34,40 +31,33 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false) : AppC
 
     private val LOG_TAG = "OmniTrackActivity"
 
-    private inner class OmniTrackSignInResultsHandler : IdentityManager.SignInResultsHandler {
+    private inner class OmniTrackSignInResultsHandler : OTAuthManager.SignInResultsHandler {
         /**
          * Receives the successful sign-in result for an alraedy signed in user and starts the main
          * activity.
          * @param provider the identity provider used for sign-in.
          */
-        override fun onSuccess(provider: IdentityProvider) {
-            /*Log.d(LOG_TAG, String.format("User sign-in with previous %s provider succeeded",
-                    provider.displayName))*/
+        override fun onSuccess() {
 
-            // The sign-in manager is no longer needed once signed in.
-            SignInManager.dispose()
+            if (false) {
+                /*
+                ExperimentConsentManager.startProcess(this@OTActivity, AWSMobileClient.defaultMobileClient().syncManager, object : ExperimentConsentManager.ResultListener {
+                    override fun onConsentApproved() {
+                        performSignInProcessCompletelyFinished()
+                    }
 
-            /*
-            Toast.makeText(this@OTActivity, String.format("Sign-in with %s succeeded.",
-                    provider.displayName), Toast.LENGTH_LONG).show()
-*/
+                    override fun onConsentFailed() {
+                        Log.d(LOG_TAG, "Consent process was failed. go Sign-in.")
+                        goSignIn()
+                    }
 
-            ExperimentConsentManager.startProcess(this@OTActivity, AWSMobileClient.defaultMobileClient().syncManager, object : ExperimentConsentManager.ResultListener {
-                override fun onConsentApproved() {
-                    performSignInProcessCompletelyFinished()
-                }
+                    override fun onConsentDenied() {
+                        Log.d(LOG_TAG, "Consent was denied by user. go Sign-in.")
+                        goSignIn()
+                    }
 
-                override fun onConsentFailed() {
-                    Log.d(LOG_TAG, "Consent process was failed. go Sign-in.")
-                    goSignIn()
-                }
-
-                override fun onConsentDenied() {
-                    Log.d(LOG_TAG, "Consent was denied by user. go Sign-in.")
-                    goSignIn()
-                }
-
-            })
+                })*/
+            } else performSignInProcessCompletelyFinished()
         }
 
         /**
@@ -76,7 +66,7 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false) : AppC
          * as a stub.
          * @param provider the identity provider with which the user attempted sign-in.
          */
-        override fun onCancel(provider: IdentityProvider) {
+        override fun onCancel() {
             Log.wtf(LOG_TAG, "Cancel can't happen when handling a previously sign-in user.")
         }
 
@@ -87,19 +77,11 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false) : AppC
          * *
          * @param ex the exception that occurred.
          */
-        override fun onError(provider: IdentityProvider, ex: Exception) {
-            Log.e(LOG_TAG,
-                    String.format("Cognito credentials refresh with %s provider failed. Error: %s",
-                            provider.displayName, ex.message), ex)
-
-            Toast.makeText(this@OTActivity, String.format("Sign-in with %s failed.",
-                    provider.displayName), Toast.LENGTH_LONG).show()
+        override fun onError(ex: Throwable) {
             //goSignIn()
             performSignInProcessCompletelyFinished()
         }
     }
-
-    private lateinit var signInManager: SignInManager
 
     protected var isSessionLoggingEnabled = true
 
@@ -119,18 +101,9 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false) : AppC
                 .observeOn(AndroidSchedulers.mainThread())
 
     private fun refreshCredentialsWithFallbackSignIn() {
-        signInManager = SignInManager.getInstance(applicationContext)
-
-        val provider = signInManager.previouslySignedInProvider
-
-        // if the user was already previously in to a provider.
-        if (provider != null) {
-            // asynchronously handle refreshing credentials and call our handler.
-            signInManager.refreshCredentialsWithProvider(this@OTActivity,
-                    provider, OmniTrackSignInResultsHandler())
+        if (OTAuthManager.isGoogleSignedIn()) {
+            OTAuthManager.refreshCredentialWithFallbackSignIn(this, OmniTrackSignInResultsHandler())
         } else {
-            // Asyncronously go to the main activity (after the splash delay has expired).
-            Log.d(LOG_TAG, "Couldn't find previously-signed in provider.")
             goSignInUnlessUserCached()
         }
     }
@@ -164,37 +137,31 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false) : AppC
                         println("OMNITRACK ignore flag: ${ignoreFlag}, current activity: ${this.localClassName}")
                         if (!ignoreFlag) {
                             val thread = Thread(Runnable {
-                                val identityManager = AWSMobileClient.defaultMobileClient().identityManager
-                                identityManager.loginWithProviderSilently(
-                                        identityManager.currentIdentityProvider,
-                                        object : IdentityManager.SignInResultsHandler {
-                                            override fun onCancel(provider: IdentityProvider?) {
+                                OTAuthManager.refreshCredentialSilently(object : OTAuthManager.SignInResultsHandler {
+                                    override fun onCancel() {
 
                                             }
 
-                                            override fun onError(provider: IdentityProvider?, ex: Exception?) {
+                                    override fun onError(ex: Throwable) {
 
                                             }
 
-                                            override fun onSuccess(provider: IdentityProvider) {
-                                                identityManager.getUserID(object : IdentityManager.IdentityHandler {
-                                                    override fun handleError(exception: Exception?) {
-
+                                    override fun onSuccess() {
+                                        creationSubscriptions.add(
+                                                OTAuthManager.userIdObservable.subscribe({
+                                                    identityId ->
+                                                    if (user.objectId == identityId) {
+                                                        Toast.makeText(this@OTActivity, "Background sign in check was successful.", Toast.LENGTH_SHORT).show()
+                                                    } else {
+                                                        Log.e("OMNITRACK", "Something wrong with your identity id.")
+                                                        Toast.makeText(this@OTActivity, "Signed-in user account id is different from what is stored. Please re-sign in.", Toast.LENGTH_SHORT).show()
+                                                        goSignIn()
                                                     }
-
-                                                    override fun handleIdentityID(identityId: String) {
-                                                        if (user.objectId == identityId) {
-                                                            Toast.makeText(this@OTActivity, "Background sign in check was successful.", Toast.LENGTH_SHORT).show()
-                                                        } else {
-                                                            Log.e("OMNITRACK", "Something wrong with your identity id.")
-                                                            Toast.makeText(this@OTActivity, "Signed-in user account id is different from what is stored. Please re-sign in.", Toast.LENGTH_SHORT).show()
-                                                            goSignIn()
-                                                        }
-                                                    }
+                                                }, {
 
                                                 })
+                                        )
                                             }
-
                                         }
                                 )
                             })
