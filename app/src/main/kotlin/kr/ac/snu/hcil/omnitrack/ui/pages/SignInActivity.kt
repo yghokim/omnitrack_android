@@ -14,8 +14,8 @@ import android.widget.Toast
 import com.badoo.mobile.util.WeakHandler
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.backend.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.ExperimentConsentManager
+import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 
 class SignInActivity : AppCompatActivity() {

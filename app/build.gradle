@@ -39,9 +39,6 @@ android {
     }
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
-
-        //exclude amazon aws codes
-        main.java.exclude 'com/amazonaws/**'
     }
     lintOptions {
         checkReleaseBuilds false
@@ -121,5 +118,6 @@ repositories {
         url "https://oss.sonatype.org/content/repositories/snapshots"
     }
 }
+
 
 apply plugin: 'com.google.gms.google-services'

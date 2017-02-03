@@ -13,9 +13,9 @@ import android.widget.EditText
 import android.widget.Toast
 import com.google.gson.JsonObject
 import kr.ac.snu.hcil.omnitrack.OTApplication
-import kr.ac.snu.hcil.omnitrack.backend.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.ExperimentConsentManager
 import kr.ac.snu.hcil.omnitrack.core.OTUser
+import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.ui.components.common.time.DurationPicker
 import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
 import rx.android.schedulers.AndroidSchedulers
@@ -142,7 +142,7 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false) : AppC
 
                                             }
 
-                                    override fun onError(ex: Throwable) {
+                                    override fun onError(e: Throwable) {
 
                                             }
 
