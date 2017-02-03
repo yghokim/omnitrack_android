@@ -8,11 +8,11 @@ import android.os.SystemClock
 import android.support.multidex.MultiDexApplication
 import android.text.format.DateUtils
 import com.squareup.leakcanary.LeakCanary
-import kr.ac.snu.hcil.omnitrack.backend.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.*
+import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.database.CacheHelper
