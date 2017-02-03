@@ -160,7 +160,7 @@
             android:label="System Logs" />
 
         <activity
-            android:name="com.amazonaws.activities.SignInActivity"
+            android:name=".ui.pages.SignInActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_sign_in" />
 
