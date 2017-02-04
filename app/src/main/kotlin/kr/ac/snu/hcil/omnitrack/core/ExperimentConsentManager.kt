@@ -2,6 +2,10 @@ package kr.ac.snu.hcil.omnitrack.core
 
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 
 /**
  * Created by Young-Ho Kim on 2017-01-31.
@@ -9,6 +13,14 @@ import android.support.v7.app.AppCompatActivity
 object ExperimentConsentManager {
 
     const val REQUEST_CODE_EXPERIMENT_SIGN_IN = 6550
+
+    class ExperimentProfile {
+        var isConsentApproved: Boolean = false
+        var age: String? = null
+        var gender: String? = null
+        var occupation: String? = null
+        var country: String? = null
+    }
 
     interface ResultListener {
         fun onConsentApproved()
@@ -20,9 +32,22 @@ object ExperimentConsentManager {
     private var mResultListener: ResultListener? = null
 
 
-    fun startProcess(activity: AppCompatActivity, resultListener: ResultListener? = null) {
+    fun startProcess(activity: AppCompatActivity, userId: String, resultListener: ResultListener? = null) {
         mActivity = activity
         mResultListener = resultListener
+
+        val dbRef = FirebaseDatabase.getInstance().reference;
+        val userInfoRef = dbRef.child("users").child(userId)
+        userInfoRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onCancelled(p0: DatabaseError?) {
+                println("Db Error: ${p0?.message}")
+            }
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+                snapshot.getValue()
+            }
+
+        })
 
         /*
         experimentDataset = syncManager.openOrCreateDataset(OTApplication.ACCOUNT_DATASET_EXPERIMENT)

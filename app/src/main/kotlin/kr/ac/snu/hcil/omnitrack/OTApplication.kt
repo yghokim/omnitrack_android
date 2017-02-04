@@ -151,11 +151,10 @@ class OTApplication : MultiDexApplication() {
                         _currentUser = cachedUser
                         Observable.just(cachedUser)
                     } else {
-
+                        println("OMNITRACK: make new user instance from server")
                         Observable.create<OTUser> {
                             subscriber ->
-                            println("OMNITRACK: make new user instance from server")
-                            if (OTAuthManager.isGoogleSignedIn()) {
+                            if (OTAuthManager.isUserSignedIn()) {
 
                                 println("OMNITRACK: google is signed in.")
                                 OTAuthManager.userIdObservable.map<OTUser>(Func1<String, OTUser> { identityId ->

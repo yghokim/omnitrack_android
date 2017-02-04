@@ -14,6 +14,7 @@ import de.hdodenhof.circleimageview.CircleImageView
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTUser
+import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.AboutActivity
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 
@@ -58,8 +59,7 @@ class SidebarWrapper(val view: View, val parentActivity: AppCompatActivity) : Po
         when (item.itemId) {
             R.id.action_unlink_with_this_device -> {
                 DialogHelper.makeYesNoDialogBuilder(parentActivity, "OmniTrack", parentActivity.getString(R.string.msg_profile_unlink_account_confirm), {
-                    //TODO: Sign out
-                    //AWSMobileClient.defaultMobileClient().identityManager.signOut()
+                    OTAuthManager.signOut()
                     OTApplication.app.unlinkUser()
                 }).show()
                 return true
