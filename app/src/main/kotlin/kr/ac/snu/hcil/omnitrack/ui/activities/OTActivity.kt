@@ -101,7 +101,7 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false) : AppC
                 .observeOn(AndroidSchedulers.mainThread())
 
     private fun refreshCredentialsWithFallbackSignIn() {
-        if (OTAuthManager.isGoogleSignedIn()) {
+        if (OTAuthManager.isUserSignedIn()) {
             println("OMNITRACK Google is signed in.")
             OTAuthManager.refreshCredentialWithFallbackSignIn(this, OmniTrackSignInResultsHandler())
         } else {
@@ -139,13 +139,14 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false) : AppC
                         println("OMNITRACK ignore flag: ${ignoreFlag}, current activity: ${this.localClassName}")
                         if (!ignoreFlag) {
                             val thread = Thread(Runnable {
-                                OTAuthManager.refreshCredentialSilently(object : OTAuthManager.SignInResultsHandler {
+                                OTAuthManager.refreshCredentialSilently(false, object : OTAuthManager.SignInResultsHandler {
                                     override fun onCancel() {
 
                                             }
 
                                     override fun onError(e: Throwable) {
                                         Log.e("OMNITRACK", "RefreshCredential error")
+                                        Toast.makeText(this@OTActivity, "Background sign in check failed.", Toast.LENGTH_SHORT).show()
                                         e.printStackTrace()
                                             }
 
