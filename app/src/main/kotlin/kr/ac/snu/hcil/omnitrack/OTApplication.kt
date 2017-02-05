@@ -136,69 +136,69 @@ class OTApplication : MultiDexApplication() {
 
     //val currentUserObservable = PublishSubject.create<OTUser>()
 
-    val currentUserObservable: Observable<OTUser> =
-            Observable.defer {
-                //Observable.just(currentUser)
-                if (_currentUser != null) {
-                    println("return cached user instance")
-                    Observable.just(_currentUser!!)
-                } else {
-                    //need login
-                    println("load user from db")
-                    val cachedUser = OTUser.loadCachedInstance(systemSharedPreferences, dbHelper)
-                    if (cachedUser != null/*&& cachedUser.objectId == cachedUserId*/) {
-                        _currentUser = cachedUser
-                        Observable.just(cachedUser)
-                    } else {
-                        println("OMNITRACK: make new user instance from server")
-                        Observable.create<OTUser> {
-                            subscriber ->
-                            if (OTAuthManager.isUserSignedIn()) {
+    val isUserLoaded: Boolean get() = _currentUser != null
 
-                                println("OMNITRACK: firebaseUser is signed in.")
-                                try {
-                                    val uid = OTAuthManager.userId!!
-                                    println("OMNITRACK user identityId: ${uid}, userName: ${OTAuthManager.userName}")
-                                    val user = OTUser(uid, OTAuthManager.userName, OTAuthManager.userImageUrl, dbHelper.findTrackersOfUser(uid))
-                                    OTUser.storeOrOverwriteInstanceCache(user, systemSharedPreferences)
-                                    for (tracker in user.getTrackersOnShortcut()) {
-                                        OTShortcutPanelManager += tracker
-                                    }
+    val currentUserObservable: Observable<OTUser> = Observable.create<OTUser> {
+        subscriber ->
+        fun sendUser(user: OTUser) {
+            if (!subscriber.isUnsubscribed) {
+                subscriber.onNext(user)
+                subscriber.onCompleted()
+            }
+        }
+        if (_currentUser != null) {
+            println("return cached user instance")
+            sendUser(_currentUser!!)
+        } else {
+            //need login
+            println("load user from db")
+            val cachedUser = OTUser.loadCachedInstance(systemSharedPreferences, dbHelper)
+            if (cachedUser != null/*&& cachedUser.objectId == cachedUserId*/) {
+                _currentUser = cachedUser
+                sendUser(cachedUser)
+            } else {
+                println("OMNITRACK: make new user instance from server")
+                if (OTAuthManager.isUserSignedIn()) {
+                    println("OMNITRACK: firebaseUser is signed in.")
+                    try {
+                        val uid = OTAuthManager.userId!!
+                        println("OMNITRACK user identityId: ${uid}, userName: ${OTAuthManager.userName}")
+                        val user = OTUser(uid, OTAuthManager.userName, OTAuthManager.userImageUrl, dbHelper.findTrackersOfUser(uid))
+                        OTUser.storeOrOverwriteInstanceCache(user, systemSharedPreferences)
+                        for (tracker in user.getTrackersOnShortcut()) {
+                            OTShortcutPanelManager += tracker
+                        }
 
-                                    //handle failed background logging
-                                    for (pair in OTBackgroundLoggingService.getFlags()) {
-                                        val tracker = user[pair.first]
-                                        if (tracker != null) {
-                                            logger.writeSystemLog("${tracker.name} background logging was failed. started at ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(pair.second))}", "OmniTrack")
-                                        }
-                                    }
-
-                                    if (initialRun) {
-                                        //createExampleTrackers(user)
-                                        createUsabilityTestingTrackers(user)
-                                    }
-                                    _currentUser = user
-                                    if (!subscriber.isUnsubscribed) {
-                                        subscriber.onNext(user)
-                                    }
-                                } catch(e: Exception) {
-                                    if (!subscriber.isUnsubscribed) {
-                                        subscriber.onError(e)
-                                    }
-                                }
-
-                            } else {
-                                if (!subscriber.isUnsubscribed) {
-                                    println("OMNITRACK retreiving user instance error: User didn't signed in with google.")
-                                    subscriber.onError(Exception("Retreiving user instance error: User didn't signed in"))
-                                }
+                        //handle failed background logging
+                        for (pair in OTBackgroundLoggingService.getFlags()) {
+                            val tracker = user[pair.first]
+                            if (tracker != null) {
+                                logger.writeSystemLog("${tracker.name} background logging was failed. started at ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(pair.second))}", "OmniTrack")
                             }
                         }
+
+                        if (initialRun) {
+                            //createExampleTrackers(user)
+                            createUsabilityTestingTrackers(user)
+                        }
+                        _currentUser = user
+                        sendUser(user)
+                    } catch(e: Exception) {
+                        if (!subscriber.isUnsubscribed) {
+                            subscriber.onError(e)
+                        }
+                    }
+
+                } else {
+                    if (!subscriber.isUnsubscribed) {
+                        println("OMNITRACK retreiving user instance error: User didn't signed in with google.")
+                        subscriber.onError(Exception("Retreiving user instance error: User didn't signed in"))
                     }
                 }
-
-            }.subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread()).share()
+            }
+        }
+    }.subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
 
     val colorPalette: IntArray by lazy {
         this.resources.getStringArray(R.array.colorPaletteArray).map { Color.parseColor(it) }.toIntArray()

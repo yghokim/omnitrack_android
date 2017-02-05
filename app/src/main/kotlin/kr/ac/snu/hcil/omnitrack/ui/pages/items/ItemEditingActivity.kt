@@ -109,8 +109,6 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
         attributeListView.layoutManager = layoutManager
         attributeListView.addItemDecoration(HorizontalImageDividerItemDecoration(R.drawable.horizontal_separator_pattern, this))
 
-        attributeListView.adapter = attributeListAdapter
-
         builderRestoredSnackbar = Snackbar.make(findViewById(R.id.ui_snackbar_container), resources.getText(R.string.msg_builder_restored), Snackbar.LENGTH_INDEFINITE)
         builderRestoredSnackbar.setAction(resources.getText(R.string.msg_clear_form)) {
             view ->
@@ -155,15 +153,19 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
                 builderRestoredSnackbar.show()
             } else {
                 //new builder was created
+                println("Start builder autocomplete")
                 startSubscriptions.add(
                         builder.autoComplete(this)
                 )
             }
         }
+
+        //attributeListView.adapter = attributeListAdapter
     }
 
     override fun onResume() {
         super.onResume()
+        /*
         if (mode == Mode.New) {
             if (tracker == null) {
                 resumeSubscriptions.add(
@@ -172,7 +174,7 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
                         }
                 )
             }
-        }
+        }*/
     }
 
     override fun onPause() {
@@ -271,13 +273,16 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
         Observable.merge(waitingAttributes.map {
             it.getAutoCompleteValue().map {
                 value ->
-                Pair<OTAttribute<out Any>, Any>(it, value)
+                Pair<OTAttribute<out Any>, Any>(it, value!!)
             }
         }).subscribe({
             result ->
             builder.setValueOf(result.first, result.second)
         },
-                {},
+                {
+                    ex ->
+                    ex.printStackTrace()
+                },
                 {
                     finished?.invoke()
                 })
@@ -294,18 +299,14 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
 
     private fun storeItemBuilderCache() {
         if (tracker != null) {
-
-
 //            syncViewStateToBuilderAsync {
             if (!builder.isEmpty) {
-
                 val preferences = getSharedPreferences(OTApplication.PREFERENCE_KEY_FOREGROUND_ITEM_BUILDER_STORAGE, Context.MODE_PRIVATE)
                 val editor = preferences.edit()
                 editor.putString(makeTrackerPreferenceKey(tracker!!), builder.getSerializedString())
                 editor.apply()
             }
             //          }
-
         }
     }
 

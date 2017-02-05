@@ -95,6 +95,8 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false) : AppC
 
     private val signedInUserSubject: BehaviorSubject<OTUser> = BehaviorSubject.create<OTUser>()
 
+    private var backgroundSignInCheckThread: Thread? = null
+
     val signedInUserObservable: rx.Observable<OTUser>
         get() = signedInUserSubject
                 .subscribeOn(Schedulers.computation())
@@ -138,33 +140,39 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false) : AppC
                         val ignoreFlag = intent.getBooleanExtra(OTApplication.INTENT_EXTRA_IGNORE_SIGN_IN_CHECK, false)
                         println("OMNITRACK ignore flag: ${ignoreFlag}, current activity: ${this.localClassName}")
                         if (!ignoreFlag) {
-                            val thread = Thread(Runnable {
-                                OTAuthManager.refreshCredentialSilently(false, object : OTAuthManager.SignInResultsHandler {
-                                    override fun onCancel() {
-
-                                            }
-
-                                    override fun onError(e: Throwable) {
-                                        Log.e("OMNITRACK", "RefreshCredential error")
-                                        Toast.makeText(this@OTActivity, "Background sign in check failed.", Toast.LENGTH_SHORT).show()
-                                        e.printStackTrace()
-                                            }
-
-                                    override fun onSuccess() {
-                                        Toast.makeText(this@OTActivity, "credential update was successful. Check userId...", Toast.LENGTH_SHORT).show()
-                                        if (user.objectId == OTAuthManager.userId) {
-                                            Toast.makeText(this@OTActivity, "Background sign in check was successful.", Toast.LENGTH_SHORT).show()
-                                        } else {
-                                            Log.e("OMNITRACK", "Something wrong with your identity id.")
-                                            Toast.makeText(this@OTActivity, "Signed-in user account id is different from what is stored. Please re-sign in.", Toast.LENGTH_SHORT).show()
-                                            goSignIn()
+                            if (backgroundSignInCheckThread?.isAlive ?: false == false) {
+                                backgroundSignInCheckThread = Thread(Runnable {
+                                    OTAuthManager.refreshCredentialSilently(false, object : OTAuthManager.SignInResultsHandler {
+                                        override fun onCancel() {
+                                            backgroundSignInCheckThread = null
                                         }
 
-                                            }
+                                        override fun onError(e: Throwable) {
+                                            Log.e("OMNITRACK", "RefreshCredential error")
+                                            Toast.makeText(this@OTActivity, "Background sign in check failed.", Toast.LENGTH_SHORT).show()
+                                            e.printStackTrace()
+
+                                            backgroundSignInCheckThread = null
                                         }
-                                )
-                            })
-                            thread.start()
+
+                                        override fun onSuccess() {
+                                            if (user.objectId == OTAuthManager.userId) {
+                                                Toast.makeText(this@OTActivity, "Background sign in check was successful.", Toast.LENGTH_SHORT).show()
+                                            } else {
+                                                Log.e("OMNITRACK", "Something wrong with your identity id.")
+                                                Toast.makeText(this@OTActivity, "Signed-in user account id is different from what is stored. Please re-sign in.", Toast.LENGTH_SHORT).show()
+                                                goSignIn()
+                                            }
+
+                                            backgroundSignInCheckThread = null
+                                        }
+                                    }
+                                    )
+                                })
+                                backgroundSignInCheckThread?.start()
+                            } else {
+                                println("OMNITRACK background sign in of former activity is already in progress. skip current activitiy's.")
+                            }
                         }
                     }
 
