@@ -126,6 +126,7 @@
         <activity
             android:name=".ui.pages.SplashScreenActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:noHistory="true"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

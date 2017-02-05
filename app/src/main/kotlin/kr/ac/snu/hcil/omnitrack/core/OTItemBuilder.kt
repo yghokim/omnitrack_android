@@ -13,7 +13,6 @@ import kr.ac.snu.hcil.omnitrack.utils.serialization.IStringSerializable
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Observable
 import rx.Subscription
-import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 import java.util.*
 
@@ -228,6 +227,11 @@ class OTItemBuilder : Parcelable, IStringSerializable {
     }
 
     constructor(trackerObjectId: String, mode: Int, connectedItemDbId: Long) {
+        if (!OTApplication.app.isUserLoaded) {
+            throw Exception("Do not deserialize ItemBuilder until user is loaded.")
+        }
+
+
         reloadTracker(trackerObjectId)
         this.mode = mode
         this.connectedItemDbId = connectedItemDbId
@@ -320,7 +324,7 @@ class OTItemBuilder : Parcelable, IStringSerializable {
                     subscriber ->
                     attributeStateList[i] = EAttributeValueState.GettingExternalValue
                     onAttributeStateChangedListener?.onAttributeStateChanged(attr, i, EAttributeValueState.GettingExternalValue)
-                    attr.valueConnection!!.getRequestedValue(this).subscribeOn(Schedulers.io()).subscribe({
+                    attr.valueConnection!!.getRequestedValue(this).observeOn(Schedulers.io()).subscribeOn(Schedulers.io()).subscribe({
                         data ->
                         println("result data: ")
                         println(data)
@@ -360,7 +364,7 @@ class OTItemBuilder : Parcelable, IStringSerializable {
                 }
             }
         })
-                .observeOn(AndroidSchedulers.mainThread()).subscribe(
+                .observeOn(Schedulers.io()).subscribe(
                         {
                             result ->
                             val index = result.first
@@ -391,9 +395,10 @@ class OTItemBuilder : Parcelable, IStringSerializable {
     }
 
     fun reloadTracker(trackerObjectId: String) {
-        OTApplication.app.currentUserObservable.observeOn(Schedulers.immediate())
+        OTApplication.app.currentUserObservable
                 .subscribe {
                     user ->
+                    println("ItemBuilder Found user")
                     setTracker(user[trackerObjectId]!!)
                     syncFromTrackerScheme()
                 }
