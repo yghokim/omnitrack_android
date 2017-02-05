@@ -32,7 +32,6 @@ import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 import kr.ac.snu.hcil.omnitrack.utils.UniqueStringEntryList
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
-import rx.functions.Func1
 import rx.schedulers.Schedulers
 import java.util.*
 
@@ -156,10 +155,11 @@ class OTApplication : MultiDexApplication() {
                             subscriber ->
                             if (OTAuthManager.isUserSignedIn()) {
 
-                                println("OMNITRACK: google is signed in.")
-                                OTAuthManager.userIdObservable.map<OTUser>(Func1<String, OTUser> { identityId ->
-                                    println("OMNITRACK user identityId: ${identityId}, userName: ${OTAuthManager.userName}")
-                                    val user = OTUser(identityId, OTAuthManager.userName, OTAuthManager.userImageUrl, dbHelper.findTrackersOfUser(identityId))
+                                println("OMNITRACK: firebaseUser is signed in.")
+                                try {
+                                    val uid = OTAuthManager.userId!!
+                                    println("OMNITRACK user identityId: ${uid}, userName: ${OTAuthManager.userName}")
+                                    val user = OTUser(uid, OTAuthManager.userName, OTAuthManager.userImageUrl, dbHelper.findTrackersOfUser(uid))
                                     OTUser.storeOrOverwriteInstanceCache(user, systemSharedPreferences)
                                     for (tracker in user.getTrackersOnShortcut()) {
                                         OTShortcutPanelManager += tracker
@@ -178,20 +178,14 @@ class OTApplication : MultiDexApplication() {
                                         createUsabilityTestingTrackers(user)
                                     }
                                     _currentUser = user
-                                    user
-                                }
-                                ).subscribe({
-                                    user ->
                                     if (!subscriber.isUnsubscribed) {
                                         subscriber.onNext(user)
                                     }
-                                }, {
-                                    ex ->
+                                } catch(e: Exception) {
                                     if (!subscriber.isUnsubscribed) {
-                                        println("OMNITRACK retreiving user instance error: User sign up with Firebase was failed.")
-                                        subscriber.onError(Exception("Retreiving user instance error: User Firebase sign up was failed"))
+                                        subscriber.onError(e)
                                     }
-                                })
+                                }
 
                             } else {
                                 if (!subscriber.isUnsubscribed) {

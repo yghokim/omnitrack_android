@@ -425,4 +425,13 @@
         <item name="fab_icon">@drawable/plus</item>
     </style>
 
+    <style name="SidebarButtonStyle">
+        <item name="android:padding">12dp</item>
+        <item name="android:drawablePadding">20dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:gravity">left|center_vertical</item>
+        <item name="android:background">?selectableItemBackgroundBorderless</item>
+        <item name="android:textColor">@color/buttonIconColorDark</item>
+    </style>
+
 </resources>
