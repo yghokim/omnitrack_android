@@ -7,10 +7,10 @@
     android:background="@color/frontalBackground"
     android:clickable="true"
     android:orientation="vertical"
-
     >
 
     <LinearLayout
+        android:id="@+id/ui_profile_panel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/diagonal_gradient"
@@ -48,13 +48,22 @@
         android:background="?selectableItemBackgroundBorderless"
         android:src="@drawable/more" />
 
-    <Button
-        android:id="@+id/ui_button_about"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/ui_menu_group"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:background="?selectableItemBackgroundBorderless"
-        android:text="@string/msg_about"
-        android:textColor="@color/buttonIconColorDark" />
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/ui_profile_panel"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/ui_button_about"
+            style="@style/SidebarButtonStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/help_dark"
+            android:text="@string/msg_about" />
+    </LinearLayout>
+
+
 </RelativeLayout>

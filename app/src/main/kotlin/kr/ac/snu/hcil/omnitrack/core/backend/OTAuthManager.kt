@@ -17,7 +17,6 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.getActivity
 import rx.Observable
-import rx.schedulers.Schedulers
 import java.util.*
 import java.util.concurrent.Executors
 
@@ -90,6 +89,7 @@ object OTAuthManager {
         mGoogleApiClient.connect()
     }
 
+    /*
     val userIdObservable = Observable.create<String> {
         subscriber ->
         if (mFirebaseUser != null) {
@@ -112,6 +112,8 @@ object OTAuthManager {
             }
         }
     }.share().observeOn(Schedulers.io())
+    */
+    val userId: String? get() = mFirebaseUser?.uid
 
     fun isUserSignedIn(): Boolean {
         return mFirebaseUser != null
@@ -158,9 +160,10 @@ object OTAuthManager {
     fun refreshCredentialSilently(skipValidationIfCacheHit: Boolean, resultsHandler: SignInResultsHandler) {
         if (isUserSignedIn()) {
             if (skipValidationIfCacheHit) {
+                Log.d(LOG_TAG, "Skip sign in. use cached Firebase User.")
                 resultsHandler.onSuccess()
-                return
                 } else {
+                Log.d(LOG_TAG, "Reload Firebase User to check connection.")
                 mFirebaseUser!!.reload().addOnCompleteListener {
                     task ->
                     if (task.isSuccessful) {
@@ -171,16 +174,12 @@ object OTAuthManager {
                     }
             }
             } else {
+            Log.d(LOG_TAG, "Firebase user does not exist. Sign in silently")
             signInSilently(resultsHandler)
         }
     }
 
     fun refreshCredentialWithFallbackSignIn(activity: AppCompatActivity, resultsHandler: SignInResultsHandler) {
-
-        if (authToken == null)//previously signed in
-        {
-            resultsHandler.onError(Exception("Google is not signed in."))
-        }
 
         refreshCredentialSilently(false, object : SignInResultsHandler {
             override fun onSuccess() {
@@ -253,7 +252,6 @@ object OTAuthManager {
                     .addOnCompleteListener {
                         task: Task<AuthResult> ->
                         Log.d(LOG_TAG, "signInWithCredential:onComplete:" + task.isSuccessful);
-
                         // If sign in fails, display a message to the user. If sign in succeeds
                         // the auth state listener will be notified and logic to handle the
                         // signed in user can be handled in the listener.
@@ -271,6 +269,18 @@ object OTAuthManager {
                     }
         }
 
+    }
+
+    fun deleteUser(resultsHandler: SignInResultsHandler) {
+        mFirebaseUser?.delete()?.addOnCompleteListener {
+            task ->
+            if (task.isSuccessful) {
+                resultsHandler.onSuccess()
+                signOut()
+            } else {
+                resultsHandler.onError(task.exception!!)
+            }
+        } ?: resultsHandler.onError(Exception("Not signed in."))
     }
 
     fun signOut() {
