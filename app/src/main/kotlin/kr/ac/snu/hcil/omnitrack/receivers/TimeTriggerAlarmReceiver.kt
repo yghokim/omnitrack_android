@@ -10,6 +10,7 @@ import android.util.SparseArray
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTriggerAlarmManager
+import rx.schedulers.Schedulers
 import java.util.*
 
 /**
@@ -93,34 +94,22 @@ class TimeTriggerAlarmReceiver : BroadcastReceiver() {
 
                     OTApplication.logger.writeSystemLog("${triggers.size} triggers will be fired.", TAG)
 
-                    var left = triggers.size
-                    if (left == 0) {
-                        completeWakefulIntent(intent)
-                    } else {
-                        for (trigger in triggers.withIndex()) {
-                            trigger.value.fire(triggerTime) {
-                                println("${trigger.index}-th trigger fire finished.")
-                                OTApplication.logger.writeSystemLog("${trigger.index}-th trigger fire finished.", TAG)
-                                left--
-                            }
-                        }
-
-                        while (left > 0) {
-
-                        }
-
+                    rx.Observable.merge(triggers.map { it.fire(triggerTime) }).observeOn(Schedulers.immediate()).doOnCompleted {
                         OTApplication.logger.writeSystemLog("Every trigger firing was done. Release the wake lock.", TAG)
 
                         println("every trigger was done. finish the wakeup")
                         OTApplication.app.timeTriggerAlarmManager.storeTableToPreferences()
                         completeWakefulIntent(intent)
+                    }.subscribe {
+                        trigger ->
+                        println("${trigger}-th trigger fire finished.")
                     }
                 } else {
                     OTApplication.app.timeTriggerAlarmManager.storeTableToPreferences()
                     OTApplication.logger.writeSystemLog("No trigger is assigned to this alarm. Release the wake lock.", TAG)
                     completeWakefulIntent(intent)
                 }
+                }
             }
         }
-    }
 }
