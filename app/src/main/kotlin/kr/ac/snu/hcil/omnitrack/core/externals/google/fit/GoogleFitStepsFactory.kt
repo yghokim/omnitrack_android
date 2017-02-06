@@ -69,6 +69,7 @@ object GoogleFitStepsFactory : GoogleFitService.GoogleFitMeasureFactory("step") 
         constructor(serialized: String) : super(serialized)
 
         override fun getValueRequest(start: Long, end: Long): Observable<Result<out Any>> {
+            println("Requested Google Fit Step Measure")
             return Observable.create<Result<out Any>> {
                 subscriber ->
                 if (factory.service.state == OTExternalService.ServiceState.ACTIVATED) {
@@ -81,8 +82,9 @@ object GoogleFitStepsFactory : GoogleFitService.GoogleFitMeasureFactory("step") 
 
                     GoogleFitService.getConnectedClient().subscribe({
                         client ->
-                        Fitness.HistoryApi.readData(client!!, request).setResultCallback {
-                            result ->
+                        println("Received connected client")
+
+                        val result = Fitness.HistoryApi.readData(client!!, request).await(10, TimeUnit.SECONDS)
                             var steps = 0
                             for (bucket in result.buckets) {
                                 for (dataset in bucket.dataSets) {
@@ -97,7 +99,6 @@ object GoogleFitStepsFactory : GoogleFitService.GoogleFitMeasureFactory("step") 
                                 subscriber.onNext(Result(steps))
                                 subscriber.onCompleted()
                             }
-                        }
                     }, {
                         exception ->
                         subscriber.onError(exception)

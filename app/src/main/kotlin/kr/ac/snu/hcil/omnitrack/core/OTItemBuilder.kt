@@ -10,7 +10,6 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.utils.serialization.IStringSerializable
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Observable
-import rx.Subscription
 import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Func1
 import rx.schedulers.Schedulers
@@ -343,7 +342,7 @@ class OTItemBuilder : IStringSerializable {
         return attributeStateList[position]
     }
 
-    fun autoComplete(onAttributeStateChangedListener: AttributeStateChangedListener? = null, finished: (() -> Unit)? = null): Subscription {
+    fun autoComplete(onAttributeStateChangedListener: AttributeStateChangedListener? = null): Observable<Pair<Int, Any>> {
 
         return Observable.merge(tracker.attributes.unObservedList.mapIndexed { i, attr ->
             if (attr.valueConnection != null) {
@@ -365,6 +364,7 @@ class OTItemBuilder : IStringSerializable {
                                     }
                                 }
                             } else {
+                                println("onNext to subscriber: ${data.datum}")
                                 subscriber.onNext(Pair(i, data.datum))
                                 subscriber.onCompleted()
                             }
@@ -390,26 +390,21 @@ class OTItemBuilder : IStringSerializable {
                     Pair(i, data as Any)
                 }
             }
-        })
-                .observeOn(AndroidSchedulers.mainThread()).subscribe(
-                        {
-                            result ->
-                            val index = result.first
-                            val value = result.second
-                            val attribute = tracker.attributes[index]
-                            println("${attribute.name} - $value")
-                            attributeStateList[index] = EAttributeValueState.Idle
-                            onAttributeStateChangedListener?.onAttributeStateChanged(attribute, index, EAttributeValueState.Idle)
-                            setValueOf(attribute, value)
-                        },
-                        {
+        }).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io()).doOnNext {
+            result ->
+            val index = result.first
+            val value = result.second
 
-                        },
-                        {
-                            finished?.invoke()
-                            println("finished autocompleting builder")
-                        }
-                )
+            val attribute = tracker.attributes[index]
+            attributeStateList[index] = EAttributeValueState.Idle
+
+            println("attribute ${index} (${attribute.name}) was complete: ${value}")
+
+            onAttributeStateChangedListener?.onAttributeStateChanged(attribute, index, EAttributeValueState.Idle)
+            setValueOf(attribute, value)
+        }.doOnCompleted {
+            println("finished autocompleting builder")
+        }
     }
 
     private fun setTracker(tracker: OTTracker) {

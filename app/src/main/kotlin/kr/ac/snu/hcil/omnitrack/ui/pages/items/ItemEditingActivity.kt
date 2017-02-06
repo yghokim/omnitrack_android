@@ -114,7 +114,9 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
             builder = OTItemBuilder(tracker!!, OTItemBuilder.MODE_FOREGROUND)
 
             createSubscriptions.add(
-                    builder.autoComplete(this)
+                    builder.autoComplete(this).subscribe({}, {}, {
+
+                    })
             )
 
             builderRestoredSnackbar.dismiss()
@@ -154,7 +156,7 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
                 //new builder was created
                 println("Start builder autocomplete")
                 startSubscriptions.add(
-                        builder.autoComplete(this)
+                        builder.autoComplete(this).subscribe { println("Finished builder autocomplete.") }
                 )
             }
         }

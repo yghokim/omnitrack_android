@@ -12,6 +12,8 @@ import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializedStringKeyEntry
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import kr.ac.snu.hcil.omnitrack.utils.serialization.stringKeyEntryParser
+import rx.Observable
+import rx.schedulers.Schedulers
 import java.util.*
 import kotlin.properties.Delegates
 
@@ -145,43 +147,40 @@ abstract class OTTrigger(objectId: String?, dbId: Long?, val user: OTUser, name:
         }
     }
 
-    fun fire(triggerTime: Long, finished: ((success: Boolean) -> Unit)? = null) {
-        handleFire(triggerTime)
+    fun fire(triggerTime: Long): Observable<OTTrigger> {
+        return Observable.defer<OTTrigger> {
+            handleFire(triggerTime)
 
-        when (action) {
-            OTTrigger.ACTION_BACKGROUND_LOGGING -> {
-                println("trigger fired - loggin in background")
+            when (action) {
+                OTTrigger.ACTION_BACKGROUND_LOGGING -> {
+                    println("trigger fired - logging in background")
 
-                //Toast.makeText(OTApplication.app, "Logged!", Toast.LENGTH_SHORT).show()
-
-                var left = trackers.size
-                fun onTrackerHandled() {
-                    left--
-                    if (left == 0) {
-                        finished?.invoke(true)
+                    //Toast.makeText(OTApplication.app, "Logged!", Toast.LENGTH_SHORT).show()
+                    Observable.create {
+                        subscriber ->
+                        Observable.merge(trackers.filter { it.isValid(null) }.map { OTBackgroundLoggingService.log(OTApplication.app, it, OTItem.LoggingSource.Trigger).subscribeOn(Schedulers.newThread()) })
+                                .subscribe({}, {}, {
+                                    if (!subscriber.isUnsubscribed) {
+                                        subscriber.onNext(this)
+                                        subscriber.onCompleted()
+                                    }
+                                })
                     }
-                }
 
-                for (tracker in trackers) {
-                    if (tracker.isValid(null)) {
-                        OTBackgroundLoggingService.startLoggingAsync(OTApplication.app, tracker, OTItem.LoggingSource.Trigger) {
-                            onTrackerHandled()
-                        }
-                    } else {
-                        onTrackerHandled()
-                    }
                 }
+                OTTrigger.ACTION_NOTIFICATION -> {
+                    println("trigger fired - send notification")
+                    for (tracker in trackers)
+                        OTNotificationManager.pushReminderNotification(OTApplication.app, tracker, triggerTime)
+                    Observable.just(this)
+                }
+                else -> throw Exception("Not supported Trigger type")
             }
-            OTTrigger.ACTION_NOTIFICATION -> {
-                println("trigger fired - send notification")
-                for (tracker in trackers)
-                    OTNotificationManager.pushReminderNotification(OTApplication.app, tracker, triggerTime)
-                finished?.invoke(true)
-            }
+
+        }.doOnSubscribe {
+            fired.invoke(this, triggerTime)
+            this.lastTriggeredTime = triggerTime
         }
-
-        fired.invoke(this, triggerTime)
-        this.lastTriggeredTime = triggerTime
     }
 
     fun activateOnSystem(context: Context) {
