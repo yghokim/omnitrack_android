@@ -39,9 +39,7 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false) : AppC
          */
         override fun onSuccess() {
 
-            if (false) {
-                /*
-                ExperimentConsentManager.startProcess(this@OTActivity, AWSMobileClient.defaultMobileClient().syncManager, object : ExperimentConsentManager.ResultListener {
+            ExperimentConsentManager.startProcess(this@OTActivity, OTAuthManager.userId!!, object : ExperimentConsentManager.ResultListener {
                     override fun onConsentApproved() {
                         performSignInProcessCompletelyFinished()
                     }
@@ -56,8 +54,7 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false) : AppC
                         goSignIn()
                     }
 
-                })*/
-            } else performSignInProcessCompletelyFinished()
+            })
         }
 
         /**
