@@ -114,9 +114,7 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
             builder = OTItemBuilder(tracker!!, OTItemBuilder.MODE_FOREGROUND)
 
             createSubscriptions.add(
-                    builder.autoComplete(this).subscribe({}, {}, {
-
-                    })
+                    builder.autoComplete(this).subscribe { println("Finished builder autocomplete.") }
             )
 
             builderRestoredSnackbar.dismiss()
@@ -340,8 +338,8 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
     }
 
     override fun onAttributeStateChanged(attribute: OTAttribute<*>, position: Int, state: OTItemBuilder.EAttributeValueState) {
-        println("attribute ${attribute.name} state was changed to $state")
-        attributeListAdapter.notifyItemChanged(position)
+        println("attribute ${attribute.name} state was changed to $state, thread: ${Thread.currentThread().name}")
+        runOnUiThread { attributeListAdapter.notifyItemChanged(position) }
     }
 
 

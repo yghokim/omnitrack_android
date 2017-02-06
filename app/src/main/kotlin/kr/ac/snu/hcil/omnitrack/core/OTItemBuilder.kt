@@ -346,52 +346,38 @@ class OTItemBuilder : IStringSerializable {
 
         return Observable.merge(tracker.attributes.unObservedList.mapIndexed { i, attr ->
             if (attr.valueConnection != null) {
-                Observable.create<Pair<Int, Any>> {
-                    subscriber ->
+                attr.valueConnection!!.getRequestedValue(this).flatMap { data ->
+                    try {
+                        if (data.datum == null) {
+                            attr.getAutoCompleteValue()
+                        } else {
+                            Observable.just(data.datum)
+                        }
+                    } catch(e: Exception) {
+                        attr.getAutoCompleteValue()
+                    }
+                }.map { value -> Pair(i, value) }.subscribeOn(Schedulers.io()).doOnSubscribe {
+
+                    println("RX doOnSubscribe1: ${Thread.currentThread().name}")
                     attributeStateList[i] = EAttributeValueState.GettingExternalValue
                     onAttributeStateChangedListener?.onAttributeStateChanged(attr, i, EAttributeValueState.GettingExternalValue)
-                    attr.valueConnection!!.getRequestedValue(this).subscribeOn(Schedulers.io()).subscribe({
-                        data ->
-                        println("result data: ")
-                        println(data)
-                        if (!subscriber.isUnsubscribed) {
-                            if (data.datum == null) {
-                                attr.getAutoCompleteValue().subscribe {
-                                    defaultValue ->
-                                    if (!subscriber.isUnsubscribed) {
-                                        subscriber.onNext(Pair(i, defaultValue as Any))
-                                        subscriber.onCompleted()
-                                    }
-                                }
-                            } else {
-                                println("onNext to subscriber: ${data.datum}")
-                                subscriber.onNext(Pair(i, data.datum))
-                                subscriber.onCompleted()
-                            }
-                        }
-                    },
-                            {
-                                exception ->
-                                println(exception.message)
-                                attr.getAutoCompleteValue().subscribe {
-                                    defaultValue ->
-                                    if (!subscriber.isUnsubscribed) {
-                                        subscriber.onNext(Pair(i, defaultValue as Any))
-                                        subscriber.onCompleted()
-                                    }
-                                }
-                            })
                 }
             } else {
-                attributeStateList[i] = EAttributeValueState.Processing
-                onAttributeStateChangedListener?.onAttributeStateChanged(attr, i, EAttributeValueState.Processing)
                 attr.getAutoCompleteValue().map {
                     data ->
                     Pair(i, data as Any)
+                }.doOnSubscribe {
+                    println("RX doOnSubscribe2: ${Thread.currentThread().name}")
+                    attributeStateList[i] = EAttributeValueState.Processing
+                    onAttributeStateChangedListener?.onAttributeStateChanged(attr, i, EAttributeValueState.Processing)
                 }
             }
-        }).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io()).doOnNext {
+        }).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io()).doOnSubscribe {
+            println("RX Subscribe to ITemBuilder Autocomplete: ${Thread.currentThread().name} ==========================================")
+        }.doOnNext {
             result ->
+
+            println("RX doOnNext: ${Thread.currentThread().name}")
             val index = result.first
             val value = result.second
 
@@ -403,7 +389,7 @@ class OTItemBuilder : IStringSerializable {
             onAttributeStateChangedListener?.onAttributeStateChanged(attribute, index, EAttributeValueState.Idle)
             setValueOf(attribute, value)
         }.doOnCompleted {
-            println("finished autocompleting builder")
+            println("RX finished autocompleting builder=======================")
         }
     }
 
