@@ -2,10 +2,10 @@ package kr.ac.snu.hcil.omnitrack.core
 
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.*
+import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
+import kr.ac.snu.hcil.omnitrack.ui.pages.experiment.ExperimentSignInActivity
 
 /**
  * Created by Young-Ho Kim on 2017-01-31.
@@ -14,12 +14,16 @@ object ExperimentConsentManager {
 
     const val REQUEST_CODE_EXPERIMENT_SIGN_IN = 6550
 
-    class ExperimentProfile {
-        var isConsentApproved: Boolean = false
-        var age: String? = null
-        var gender: String? = null
-        var occupation: String? = null
-        var country: String? = null
+    data class ExperimentProfile(
+            var isConsentApproved: Boolean = false,
+            var age: String? = null,
+            var gender: String? = null,
+            var occupation: String? = null,
+            var country: String? = null) {
+
+        override fun toString(): String {
+            return "isConsentApproved: ${isConsentApproved}, age: ${age}, gender: ${gender}, occupation: ${occupation}, country: ${country}"
+        }
     }
 
     interface ResultListener {
@@ -38,13 +42,25 @@ object ExperimentConsentManager {
 
         val dbRef = FirebaseDatabase.getInstance().reference;
         val userInfoRef = dbRef.child("users").child(userId)
+        println(userInfoRef)
         userInfoRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError?) {
                 println("Db Error: ${p0?.message}")
+                mResultListener?.onConsentFailed()
+                finishProcess()
             }
 
             override fun onDataChange(snapshot: DataSnapshot) {
-                snapshot.getValue()
+                val profile = snapshot.getValue(ExperimentProfile::class.java)
+                if (profile == null || !profile?.isConsentApproved) {
+                    println("consent form was not approved or is first-time login.")
+                    activity.startActivityForResult(Intent(activity, ExperimentSignInActivity::class.java), REQUEST_CODE_EXPERIMENT_SIGN_IN)
+                } else {
+                    println("consent form has been approved.")
+                    println(profile)
+                    mResultListener?.onConsentApproved()
+                    finishProcess()
+                }
             }
 
         })
@@ -108,6 +124,25 @@ object ExperimentConsentManager {
                 }
                 //TODO: Sign out
             } else {
+                val profile = ExperimentProfile()
+                profile.isConsentApproved = true
+                profile.age = data.getStringExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_AGE_GROUP)
+                profile.country = data.getStringExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_COUNTRY)
+                profile.gender = data.getStringExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_GENDER)
+                profile.occupation = data.getStringExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_OCCUPATION)
+
+                val dbRef = FirebaseDatabase.getInstance().reference;
+                val userInfoRef = dbRef.child("users").child(OTAuthManager.userId!!)
+                userInfoRef.setValue(profile, DatabaseReference.CompletionListener { databaseError, databaseReference ->
+                    if (databaseError == null) {
+                        mResultListener?.onConsentApproved()
+                        finishProcess()
+                    } else {
+                        mResultListener?.onConsentFailed()
+                        finishProcess()
+                    }
+                })
+
                 /*
                 experimentDataset?.put(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_IS_CONSENT_APPROVED, true.toString())
                 arrayOf(

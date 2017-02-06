@@ -122,9 +122,7 @@ class SignInActivity : AppCompatActivity() {
 
             Toast.makeText(this@SignInActivity, String.format("Sign-in with Google succeeded."), Toast.LENGTH_LONG).show()
 
-            if (false) {
-                /*
-                ExperimentConsentManager.startProcess(this@SignInActivity, AWSMobileClient.defaultMobileClient().syncManager, object : ExperimentConsentManager.ResultListener {
+            ExperimentConsentManager.startProcess(this@SignInActivity, OTAuthManager.userId!!, object : ExperimentConsentManager.ResultListener {
                     override fun onConsentApproved() {
                         goHomeActivity()
                     }
@@ -137,8 +135,7 @@ class SignInActivity : AppCompatActivity() {
                         toIdleMode()
                     }
 
-                })*/
-            } else goHomeActivity()
+            })
         }
 
         /**
