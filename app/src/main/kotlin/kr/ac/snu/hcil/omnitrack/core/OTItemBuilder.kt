@@ -1,7 +1,5 @@
 package kr.ac.snu.hcil.omnitrack.core
 
-import android.os.Parcel
-import android.os.Parcelable
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.TypeAdapter
@@ -13,13 +11,15 @@ import kr.ac.snu.hcil.omnitrack.utils.serialization.IStringSerializable
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Observable
 import rx.Subscription
+import rx.android.schedulers.AndroidSchedulers
+import rx.functions.Func1
 import rx.schedulers.Schedulers
 import java.util.*
 
 /**
  * Created by Young-Ho Kim on 16. 7. 25
  */
-class OTItemBuilder : Parcelable, IStringSerializable {
+class OTItemBuilder : IStringSerializable {
 
     internal data class ValueParcel(val key: String, val serializedValue: String, val timeStamp: Long)
 
@@ -117,6 +117,7 @@ class OTItemBuilder : Parcelable, IStringSerializable {
         const val MODE_FOREGROUND = 1
         const val MODE_BACKGROUND = 0
 
+        /*
         @JvmField val CREATOR: Parcelable.Creator<OTItemBuilder> = object : Parcelable.Creator<OTItemBuilder> {
             override fun createFromParcel(source: Parcel): OTItemBuilder {
                 return OTItemBuilder(source)
@@ -125,14 +126,37 @@ class OTItemBuilder : Parcelable, IStringSerializable {
             override fun newArray(size: Int): Array<OTItemBuilder?> {
                 return arrayOfNulls(size)
             }
-        }
+        }*/
 
-        val parcelParser: Gson by lazy {
+        private val parcelParser: Gson by lazy {
             GsonBuilder().registerTypeAdapter(ValueParcel::class.java, ValueParcelTypeAdapter()).create()
         }
 
-        val parser: Gson by lazy {
+        private val parser: Gson by lazy {
             GsonBuilder().registerTypeAdapter(OTItemBuilder::class.java, OTItemBuilderTypeAdapter()).create()
+        }
+
+        fun getDeserializedInstanceWithTracker(jsonString: String, tracker: OTTracker): OTItemBuilder? {
+            val instance = parser.fromJson(jsonString, OTItemBuilder::class.java)
+            if (instance.trackerObjectId == tracker.objectId) {
+                instance.setTracker(tracker)
+                instance.syncFromTrackerScheme()
+                return instance
+            } else {
+                return null
+            }
+        }
+
+        fun getDeserializedInstance(jsonString: String): Observable<OTItemBuilder> {
+            return OTApplication.app.currentUserObservable.map<OTItemBuilder>(
+                    Func1<OTUser, OTItemBuilder> {
+                        user ->
+                        val instance = parser.fromJson(jsonString, OTItemBuilder::class.java)
+                        instance.setTracker(user[instance.trackerObjectId]!!)
+                        instance.syncFromTrackerScheme()
+                        instance
+                    }
+            )
         }
     }
 
@@ -150,6 +174,7 @@ class OTItemBuilder : Parcelable, IStringSerializable {
 
     protected val valueTable = Hashtable<String, ValueInfo>()
 
+    private val trackerObjectId: String
     private lateinit var tracker: OTTracker
 
     private val connectedItemDbId: Long
@@ -164,7 +189,7 @@ class OTItemBuilder : Parcelable, IStringSerializable {
      */
     constructor(item: OTItem, tracker: OTTracker) {
         setTracker(tracker)
-
+        trackerObjectId = tracker.objectId
         this.mode = MODE_EDIT
         connectedItemDbId = item.dbId!!
         syncFromTrackerScheme()
@@ -182,6 +207,7 @@ class OTItemBuilder : Parcelable, IStringSerializable {
      */
     constructor(tracker: OTTracker, mode: Int) {
         setTracker(tracker)
+        trackerObjectId = tracker.objectId
 
         this.mode = mode
         connectedItemDbId = -1
@@ -192,6 +218,7 @@ class OTItemBuilder : Parcelable, IStringSerializable {
     /**
      * used when deserializing
      */
+    /*
     constructor(parcel: Parcel) {
 
         reloadTracker(parcel.readString())
@@ -210,8 +237,9 @@ class OTItemBuilder : Parcelable, IStringSerializable {
         }
 
         syncFromTrackerScheme()
-    }
+    }*/
 
+    /*
     override fun writeToParcel(parcel: Parcel, content: Int) {
         parcel.writeString(tracker.objectId)
         parcel.writeInt(mode)
@@ -224,16 +252,14 @@ class OTItemBuilder : Parcelable, IStringSerializable {
                             TypeStringSerializationHelper.serialize(it.value), it.value.timestamp)
                 }.toTypedArray()
                 ))
-    }
+    }*/
 
-    constructor(trackerObjectId: String, mode: Int, connectedItemDbId: Long) {
+    private constructor(trackerObjectId: String, mode: Int, connectedItemDbId: Long) {
         if (!OTApplication.app.isUserLoaded) {
             throw Exception("Do not deserialize ItemBuilder until user is loaded.")
         }
-
-
-        reloadTracker(trackerObjectId)
         this.mode = mode
+        this.trackerObjectId = trackerObjectId
         this.connectedItemDbId = connectedItemDbId
         syncFromTrackerScheme()
     }
@@ -271,9 +297,10 @@ class OTItemBuilder : Parcelable, IStringSerializable {
         throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
+    /*
     override fun describeContents(): Int {
         return 0
-    }
+    }*/
 
     fun getValueInformationOf(attribute: OTAttribute<out Any>): ValueInfo? {
         return valueTable[attribute.objectId]
@@ -324,7 +351,7 @@ class OTItemBuilder : Parcelable, IStringSerializable {
                     subscriber ->
                     attributeStateList[i] = EAttributeValueState.GettingExternalValue
                     onAttributeStateChangedListener?.onAttributeStateChanged(attr, i, EAttributeValueState.GettingExternalValue)
-                    attr.valueConnection!!.getRequestedValue(this).observeOn(Schedulers.io()).subscribeOn(Schedulers.io()).subscribe({
+                    attr.valueConnection!!.getRequestedValue(this).subscribeOn(Schedulers.io()).subscribe({
                         data ->
                         println("result data: ")
                         println(data)
@@ -364,7 +391,7 @@ class OTItemBuilder : Parcelable, IStringSerializable {
                 }
             }
         })
-                .observeOn(Schedulers.io()).subscribe(
+                .observeOn(AndroidSchedulers.mainThread()).subscribe(
                         {
                             result ->
                             val index = result.first
@@ -392,16 +419,6 @@ class OTItemBuilder : Parcelable, IStringSerializable {
         for (i in 1..tracker.attributes.size) {
             attributeStateList.add(EAttributeValueState.Idle)
         }
-    }
-
-    fun reloadTracker(trackerObjectId: String) {
-        OTApplication.app.currentUserObservable
-                .subscribe {
-                    user ->
-                    println("ItemBuilder Found user")
-                    setTracker(user[trackerObjectId]!!)
-                    syncFromTrackerScheme()
-                }
     }
 
     fun syncFromTrackerScheme() {
