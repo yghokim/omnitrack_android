@@ -93,7 +93,6 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
 
 
 
-
     override fun onSessionLogContent(contentObject: JsonObject) {
         super.onSessionLogContent(contentObject)
         contentObject.addProperty("mode", mode.name)
@@ -160,7 +159,7 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
             }
         }
 
-        //attributeListView.adapter = attributeListAdapter
+        attributeListView.adapter = attributeListAdapter
     }
 
     override fun onResume() {
@@ -314,7 +313,7 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
         val preferences = getSharedPreferences(OTApplication.PREFERENCE_KEY_FOREGROUND_ITEM_BUILDER_STORAGE, Context.MODE_PRIVATE)
         val serialized = preferences.getString(makeTrackerPreferenceKey(tracker), null)
         try {
-            val storedBuilder = OTItemBuilder.parser.fromJson(serialized, OTItemBuilder::class.java)
+            val storedBuilder = OTItemBuilder.getDeserializedInstanceWithTracker(serialized, tracker)
             /*
             if (activityResultAppliedAttributePosition != -1) {
                 storedBuilder.setValueOf(tracker.attributes[activityResultAppliedAttributePosition],

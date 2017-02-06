@@ -99,12 +99,12 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false) : AppC
 
     val signedInUserObservable: rx.Observable<OTUser>
         get() = signedInUserSubject
-                .subscribeOn(Schedulers.computation())
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
 
     private fun refreshCredentialsWithFallbackSignIn() {
         if (OTAuthManager.isUserSignedIn()) {
-            println("OMNITRACK Google is signed in.")
+            println("${LOG_TAG} OMNITRACK Google is signed in.")
             OTAuthManager.refreshCredentialWithFallbackSignIn(this, OmniTrackSignInResultsHandler())
         } else {
             goSignInUnlessUserCached()
@@ -177,12 +177,13 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false) : AppC
                     }
 
                     onSignInProcessCompletelyFinished()
-                })
+                },
                 {
                     e ->
-                    Log.d(LOG_TAG, "User is not stored in device. go Sign-in.")
+                    Log.d(LOG_TAG, "User is not stored in device. go Sign-in. ${e.message}")
                     goSignIn()
                 })
+        )
     }
 
     private fun goSignIn() {
