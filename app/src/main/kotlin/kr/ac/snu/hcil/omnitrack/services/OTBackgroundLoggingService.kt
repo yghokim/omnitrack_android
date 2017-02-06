@@ -9,6 +9,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilder
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.utils.isInDozeMode
+import rx.Observable
 
 
 /*
@@ -56,32 +57,41 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
             context.startService(makeIntent(context, tracker, source))
         }
 
-        fun startLoggingAsync(context: Context, tracker: OTTracker, source: OTItem.LoggingSource, notify: Boolean = true, finished: ((success: Boolean) -> Unit)? = null) {
-            val builder = OTItemBuilder(tracker, OTItemBuilder.MODE_BACKGROUND)
+        fun log(context: Context, tracker: OTTracker, source: OTItem.LoggingSource, notify: Boolean = true): Observable<Int> {
 
-            OTApplication.logger.writeSystemLog("start background logging of ${tracker.name}", TAG)
-            if (android.os.Build.VERSION.SDK_INT >= 23) {
-                OTApplication.logger.writeSystemLog("idleMode: ${isInDozeMode()}", TAG)
-            }
+            return Observable.create<Int> {
+                subscriber ->
+                val builder = OTItemBuilder(tracker, OTItemBuilder.MODE_BACKGROUND)
 
-            setLoggingFlag(tracker, System.currentTimeMillis())
-            sendBroadcast(context, OTApplication.BROADCAST_ACTION_BACKGROUND_LOGGING_STARTED, tracker)
-
-            builder.autoComplete {
-                val item = builder.makeItem(source)
-                OTApplication.app.dbHelper.save(item, tracker)
-                if (item.dbId != null) {
-                    sendBroadcast(context, OTApplication.BROADCAST_ACTION_BACKGROUND_LOGGING_SUCCEEDED, tracker, item.dbId!!, notify)
-
-                    OTApplication.logger.writeSystemLog("${tracker.name} background logging was successful", TAG)
-                    removeLoggingFlag(tracker)
-                    finished?.invoke(true)
-                } else {
-
-                    OTApplication.logger.writeSystemLog("${tracker.name} background logging failed", TAG)
-                    removeLoggingFlag(tracker)
-                    finished?.invoke(false)
+                OTApplication.logger.writeSystemLog("start background logging of ${tracker.name}", TAG)
+                if (android.os.Build.VERSION.SDK_INT >= 23) {
+                    OTApplication.logger.writeSystemLog("idleMode: ${isInDozeMode()}", TAG)
                 }
+
+                setLoggingFlag(tracker, System.currentTimeMillis())
+                sendBroadcast(context, OTApplication.BROADCAST_ACTION_BACKGROUND_LOGGING_STARTED, tracker)
+
+
+                builder.autoComplete().subscribe({}, {}, {
+                    val item = builder.makeItem(source)
+                    OTApplication.app.dbHelper.save(item, tracker)
+                    if (item.dbId != null) {
+                        sendBroadcast(context, OTApplication.BROADCAST_ACTION_BACKGROUND_LOGGING_SUCCEEDED, tracker, item.dbId!!, notify)
+                        OTApplication.logger.writeSystemLog("${tracker.name} background logging was successful", TAG)
+                        removeLoggingFlag(tracker)
+                        if (!subscriber.isUnsubscribed) {
+                            subscriber.onNext(0)
+                            subscriber.onCompleted()
+                        }
+                    } else {
+
+                        OTApplication.logger.writeSystemLog("${tracker.name} background logging failed", TAG)
+                        removeLoggingFlag(tracker)
+                        if (!subscriber.isUnsubscribed) {
+                            subscriber.onError(Exception("Item storing failed"))
+                        }
+                    }
+                })
             }
         }
 
@@ -126,7 +136,7 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
             user ->
             val tracker = user[trackerId]
             if (tracker != null) {
-                startLoggingAsync(this, tracker, OTItem.LoggingSource.valueOf(intent.getStringExtra(INTENT_EXTRA_LOGGING_SOURCE)), true, null)
+                log(this, tracker, OTItem.LoggingSource.valueOf(intent.getStringExtra(INTENT_EXTRA_LOGGING_SOURCE)), true).subscribe()
             }
         }
     }
