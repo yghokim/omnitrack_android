@@ -14,12 +14,11 @@ import kr.ac.snu.hcil.omnitrack.R
  */
 class HorizontalImageDividerItemDecoration(resId: Int = R.drawable.horizontal_separator_pattern, context: Context, heightMultiplier: Float = 1.0f) : RecyclerView.ItemDecoration() {
 
-    private var divider: Drawable
+    private var divider: Drawable = ContextCompat.getDrawable(context, resId)
 
     private var dividerHeight: Int = 0
 
     init {
-        divider = ContextCompat.getDrawable(context, resId)
         dividerHeight = (divider.intrinsicHeight * heightMultiplier).toInt()
     }
 
