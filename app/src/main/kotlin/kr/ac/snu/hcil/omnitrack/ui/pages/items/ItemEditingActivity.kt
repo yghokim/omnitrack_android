@@ -8,6 +8,7 @@ import android.os.PersistableBundle
 import android.support.design.widget.Snackbar
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.SimpleItemAnimator
 import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
@@ -107,6 +108,7 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
 
         attributeListView.layoutManager = layoutManager
         attributeListView.addItemDecoration(HorizontalImageDividerItemDecoration(R.drawable.horizontal_separator_pattern, this))
+        (attributeListView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
 
         builderRestoredSnackbar = Snackbar.make(findViewById(R.id.ui_snackbar_container), resources.getText(R.string.msg_builder_restored), Snackbar.LENGTH_INDEFINITE)
         builderRestoredSnackbar.setAction(resources.getText(R.string.msg_clear_form)) {
