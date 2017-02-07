@@ -3,7 +3,6 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 import android.graphics.Color
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.support.v4.graphics.ColorUtils
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -126,7 +125,10 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
 
     fun setFloatingButtonColor(color: Int) {
         newTriggerButton.colorNormal = color
-        newTriggerButton.colorPressed = ColorUtils.blendARGB(color, Color.BLACK, 0.9f)
+        val hsv = floatArrayOf(0f, 0f, 0f)
+        Color.colorToHSV(color, hsv)
+        hsv[2] *= 0.8f
+        newTriggerButton.colorPressed = Color.HSVToColor(hsv)
     }
 
     protected fun appendNewTrigger(trigger: OTTrigger) {
