@@ -26,6 +26,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/md_content_padding_top"
+                android:lineSpacingMultiplier="@integer/md_content_text_line_multiplier"
                 android:paddingLeft="@dimen/md_dialog_frame_margin"
                 android:paddingRight="@dimen/md_dialog_frame_margin"
                 android:textSize="@dimen/md_content_textsize"

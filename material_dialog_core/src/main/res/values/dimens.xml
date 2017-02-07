@@ -32,16 +32,17 @@
     <!-- Margin around the dialog, excluding the button bar -->
     <dimen name="md_dialog_frame_margin">24dp</dimen>
     <!-- Total title margin bottom is 16, but we split this between content and title -->
-    <dimen name="md_title_frame_margin_bottom">12dp</dimen>
-    <dimen name="md_title_frame_margin_bottom_less">6dp</dimen>
+    <dimen name="md_title_frame_margin_bottom">16dp</dimen>
+    <dimen name="md_title_frame_margin_bottom_less">8dp</dimen>
     <!-- The desired padding when no title is visible,
          This plus md_content_padding_top should equals md_dialog_frame_margin -->
     <dimen name="md_notitle_vertical_padding">16dp</dimen>
 
     <dimen name="md_notitle_vertical_padding_more">20dp</dimen>
 
-    <dimen name="md_content_padding_top">8dp</dimen>
+    <dimen name="md_content_padding_top">20dp</dimen>
     <dimen name="md_simplelistitem_padding_top">8dp</dimen>
+    <item name="md_content_text_line_multiplier" format="float" type="integer">1.4</item>
 
     <dimen name="md_button_min_width">72dp</dimen>
     <!-- Above and below buttons, 36+6+6=48 for the height of the button frame -->
@@ -60,8 +61,8 @@
     <dimen name="md_button_frame_vertical_padding">8dp</dimen>
     <dimen name="md_button_height">48dp</dimen>
     <dimen name="md_title_textsize">20sp</dimen>
-    <dimen name="md_content_textsize">18sp</dimen>
-    <dimen name="md_button_textsize">14sp</dimen>
+    <dimen name="md_content_textsize">16sp</dimen>
+    <dimen name="md_button_textsize">16sp</dimen>
     <dimen name="md_listitem_textsize">16sp</dimen>
     <dimen name="md_listitem_height">48dp</dimen>
     <dimen name="md_listitem_control_margin">6dp</dimen>
@@ -71,7 +72,7 @@
     <dimen name="md_action_corner_radius">2dp</dimen>
     <dimen name="md_divider_height">1dp</dimen>
 
-    <dimen name="md_bg_corner_radius">2dp</dimen>
+    <dimen name="md_bg_corner_radius">4dp</dimen>
     <dimen name="circular_progress_border">4dp</dimen>
     <dimen name="md_listitem_vertical_margin">12dp</dimen>
     <dimen name="md_listitem_vertical_margin_choice">8dp</dimen>
