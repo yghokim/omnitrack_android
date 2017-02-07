@@ -5,7 +5,6 @@ import android.graphics.Color
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
-import android.support.v4.graphics.ColorUtils
 import android.support.v4.widget.NestedScrollView
 import android.support.v7.widget.AppCompatImageView
 import android.support.v7.widget.LinearLayoutManager
@@ -202,7 +201,10 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
     private fun applyColorTheme(color: Int, animate: Boolean) {
         (activity as TrackerDetailActivity).transitionToColor(color, animate)
         newAttributeButton.colorNormal = color
-        newAttributeButton.colorPressed = ColorUtils.blendARGB(color, Color.BLACK, 0.9f)
+        val hsv = floatArrayOf(0f, 0f, 0f)
+        Color.colorToHSV(color, hsv)
+        hsv[2] *= 0.8f
+        newAttributeButton.colorPressed = Color.HSVToColor(hsv)
     }
 
 
