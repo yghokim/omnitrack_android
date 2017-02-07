@@ -355,7 +355,7 @@
     </style>
 
     <style name="linearLayoutWithHorizontalDivider">
-        <item name="android:divider">@drawable/bottom_separator_light</item>
+        <item name="android:divider">@drawable/horizontal_divider_light</item>
         <item name="android:dividerPadding">@dimen/activity_horizontal_margin</item>
         <item name="android:showDividers">middle</item>
     </style>
