@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.google.fit
 
 import com.google.android.gms.common.api.Api
+import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.common.api.Scope
 import com.google.android.gms.fitness.Fitness
 import com.google.android.gms.fitness.data.DataType
@@ -16,6 +17,7 @@ import kr.ac.snu.hcil.omnitrack.utils.Result
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableTypedQueue
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Observable
+import rx.functions.Func1
 import rx.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 
@@ -70,46 +72,31 @@ object GoogleFitStepsFactory : GoogleFitService.GoogleFitMeasureFactory("step") 
 
         override fun getValueRequest(start: Long, end: Long): Observable<Result<out Any>> {
             println("Requested Google Fit Step Measure")
-            return Observable.create<Result<out Any>> {
-                subscriber ->
-                if (factory.service.state == OTExternalService.ServiceState.ACTIVATED) {
-
-                    val request = DataReadRequest.Builder()
+            return if (factory.service.state == OTExternalService.ServiceState.ACTIVATED) {
+                GoogleFitService.getConnectedClient().map<Result<out Any>>(object : Func1<GoogleApiClient, Result<out Any>> {
+                    override fun call(client: GoogleApiClient): Result<out Any> {
+                        val request = DataReadRequest.Builder()
                             .aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
                             .bucketByTime(1, TimeUnit.DAYS)
                             .setTimeRange(start, end, TimeUnit.MILLISECONDS)
                             .build()
-
-                    GoogleFitService.getConnectedClient().subscribe({
-                        client ->
-                        println("Received connected client")
-
-                        val result = Fitness.HistoryApi.readData(client!!, request).await(10, TimeUnit.SECONDS)
-                            var steps = 0
-                            for (bucket in result.buckets) {
-                                for (dataset in bucket.dataSets) {
-                                    for (dataPoint in dataset.dataPoints) {
-                                        steps += dataPoint.getValue(Field.FIELD_STEPS).asInt()
-                                        println(dataPoint.getValue(Field.FIELD_STEPS))
-                                    }
-                                }
+                        val result = Fitness.HistoryApi.readData(client, request).await(10, TimeUnit.SECONDS)
+                        var steps = 0
+                        for (bucket in result.buckets) {
+                            for (dataset in bucket.dataSets) {
+                                for (dataPoint in dataset.dataPoints) {
+                                    steps += dataPoint.getValue(Field.FIELD_STEPS).asInt()
+                                    println(dataPoint.getValue(Field.FIELD_STEPS))
                             }
-
-                            if (!subscriber.isUnsubscribed) {
-                                subscriber.onNext(Result(steps))
-                                subscriber.onCompleted()
                             }
-                    }, {
-                        exception ->
-                        subscriber.onError(exception)
-                    })
-
-                } else {
-                    if (!subscriber.isUnsubscribed) {
-                        subscriber.onError(Exception("Service is not activated."))
                     }
-                }
-            }.subscribeOn(Schedulers.io())
+
+                        return Result(steps)
+                    }
+                }).subscribeOn(Schedulers.io())
+            } else {
+                Observable.error<Result<out Any>>(Exception("Service is not activated."))
+            }
         }
 
         override fun onSerialize(typedQueue: SerializableTypedQueue) {
