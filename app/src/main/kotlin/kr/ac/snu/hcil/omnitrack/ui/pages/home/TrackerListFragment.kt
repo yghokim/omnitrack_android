@@ -152,6 +152,10 @@ class TrackerListFragment : OTFragment() {
         //attach events
         // user.trackerAdded += onTrackerAddedHandler
         //  user.trackerRemoved += onTrackerRemovedHandler
+
+
+        trackerListAdapter = TrackerListAdapter()
+        trackerListAdapter.currentlyExpandedIndex = savedInstanceState?.getInt(STATE_EXPANDED_TRACKER_INDEX, -1) ?: -1
     }
 
     override fun onResume() {
@@ -186,8 +190,6 @@ class TrackerListFragment : OTFragment() {
         listView.addItemDecoration(HorizontalImageDividerItemDecoration(R.drawable.horizontal_separator_pattern, context, resources.getFraction(R.fraction.tracker_list_separator_height_ratio, 1, 1)))
         listView.addItemDecoration(DrawableListBottomSpaceItemDecoration(R.drawable.expanded_view_inner_shadow_top, resources.getDimensionPixelSize(R.dimen.tracker_list_bottom_space)))
 
-        trackerListAdapter = TrackerListAdapter()
-        trackerListAdapter.currentlyExpandedIndex = savedInstanceState?.getInt(STATE_EXPANDED_TRACKER_INDEX, -1) ?: -1
         listView.adapter = trackerListAdapter
 
         val activity = activity
