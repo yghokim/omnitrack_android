@@ -103,6 +103,8 @@
 
     <string name="msg_change_field_name">필드 이름 변경</string>
 
+    <string name="msg_new_tracker_name">트래커 이름을 입력하세요</string>
+
     <string name="msg_notification_content_format_new_item">"%1$s 트래커에 새로운 아이템이 기록되었습니다."</string>
 
     <string name="msg_item_list_empty_message">기록된 아이템이 없습니다.</string>

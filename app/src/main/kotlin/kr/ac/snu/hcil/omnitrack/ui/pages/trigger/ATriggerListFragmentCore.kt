@@ -13,9 +13,7 @@ import android.view.animation.DecelerateInterpolator
 import android.widget.TextView
 import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
-import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.FallbackRecyclerView
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.DrawableListBottomSpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
@@ -32,10 +30,29 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
         private const val STATE_EXPANDED_POSITION = "expandedTriggerPosition"
     }
 
-    protected var user: OTUser? = null
+    interface TriggerAdapter {
+        fun getTriggerAt(position: Int): OTTrigger
+        fun triggerCount(): Int
 
-    abstract fun makeNewTriggerInstance(type: Int): OTTrigger
-    abstract fun getTriggers(): Array<OTTrigger>
+        fun makeNewTriggerInstance(type: Int): OTTrigger
+
+        //user?.triggerManager?.removeTrigger(trigger)
+        fun onRemoveTrigger(trigger: OTTrigger)
+
+        //user?.triggerManager?.putNewTrigger(trigger)
+        fun onAddTrigger(trigger: OTTrigger)
+
+        val withIndex: Iterable<IndexedValue<OTTrigger>>
+    }
+
+    var triggerAdapter: TriggerAdapter? = null
+        set(value) {
+            if (field !== value) {
+                field = value
+                refresh()
+            }
+        }
+
     abstract val triggerActionTypeName: Int
 
     protected abstract val emptyMessageId: Int
@@ -55,10 +72,10 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
         NewTriggerTypeSelectionDialogHelper.builder(parent.context, triggerActionTypeName) {
             type ->
             println("trigger type selected - $type")
-
-            val newTrigger = makeNewTriggerInstance(type)
-            appendNewTrigger(newTrigger)
-
+            val newTrigger = triggerAdapter?.makeNewTriggerInstance(type)
+            if (newTrigger != null) {
+                appendNewTrigger(newTrigger)
+            }
             triggerTypeDialog.dismiss()
         }.create()
     }
@@ -97,7 +114,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
     }
 
     fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
-
+/*
         val activity = parent.activity
         if (activity is OTActivity) {
             subscriptions.add(
@@ -107,7 +124,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
                         adapter.notifyDataSetChanged()
                     }
             )
-        }
+        }*/
     }
 
     fun refresh() {
@@ -133,11 +150,10 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
 
     protected fun appendNewTrigger(trigger: OTTrigger) {
         adapter.notifyItemChanged(adapter.itemCount - 1)
-        user?.triggerManager?.putNewTrigger(trigger)
+        triggerAdapter?.onAddTrigger(trigger)
 
         adapter.notifyItemInserted(adapter.itemCount - 1)
         listView.smoothScrollToPosition(adapter.itemCount - 1)
-
     }
 
     protected open fun onNewTriggerButtonClicked() {
@@ -156,27 +172,29 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
         }
 
         override fun getItemViewType(position: Int): Int {
-            return getTriggers()[position].typeId
+            return triggerAdapter?.getTriggerAt(position)?.typeId ?: -1
         }
 
         override fun onBindViewHolder(holder: ATriggerViewHolder<out OTTrigger>, position: Int) {
-            holder.bind(getTriggers()[position])
-            if (expandedTriggerPosition == position) {
-                holder.setIsExpanded(true, false)
-                expandedViewHolder = holder
-            } else {
-                holder.setIsExpanded(false, false)
-                /*
+            if (triggerAdapter != null) {
+                holder.bind(triggerAdapter!!.getTriggerAt(position))
+                if (expandedTriggerPosition == position) {
+                    holder.setIsExpanded(true, false)
+                    expandedViewHolder = holder
+                } else {
+                    holder.setIsExpanded(false, false)
+                    /*
                 if (expandedTriggerPosition != -1) {
                     holder.itemView.alpha = 0.2f
                     holder.itemView.setBackgroundColor(ContextCompat.getColor(parent.context, R.color.outerBackground))
                 }*/
-            }
+                }
 
-            if (expandedTriggerPosition == position || expandedTriggerPosition == -1) {
-                /*
+                if (expandedTriggerPosition == position || expandedTriggerPosition == -1) {
+                    /*
                 holder.itemView.alpha = 1.0f
                 holder.itemView.setBackgroundColor(ContextCompat.getColor(parent.context, R.color.frontalBackground))*/
+                }
             }
         }
 
@@ -196,7 +214,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
         }
 
         override fun getItemCount(): Int {
-            return if (user != null) getTriggers().size else 0
+            return triggerAdapter?.triggerCount() ?: 0
         }
 
 
@@ -206,20 +224,22 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
 
         override fun onTriggerRemove(position: Int) {
 
-            if (expandedTriggerPosition == position) {
-                val lastExpandedIndex = expandedTriggerPosition
-                expandedTriggerPosition = -1
-                expandedViewHolder = null
-                for (triggerEntry in getTriggers().withIndex()) {
-                    if (triggerEntry.index != lastExpandedIndex) {
-                        this.notifyItemChanged(triggerEntry.index)
+            if (triggerAdapter != null) {
+                if (expandedTriggerPosition == position) {
+                    val lastExpandedIndex = expandedTriggerPosition
+                    expandedTriggerPosition = -1
+                    expandedViewHolder = null
+                    for (triggerEntry in triggerAdapter!!.withIndex) {
+                        if (triggerEntry.index != lastExpandedIndex) {
+                            this.notifyItemChanged(triggerEntry.index)
+                        }
                     }
                 }
-            }
 
-            user?.triggerManager?.removeTrigger(getTriggers()[position])
-            this.notifyItemRemoved(position)
-            newTriggerButton.visibility = View.VISIBLE
+                triggerAdapter?.onRemoveTrigger(triggerAdapter!!.getTriggerAt(position))
+                this.notifyItemRemoved(position)
+                newTriggerButton.visibility = View.VISIBLE
+            }
         }
 
         override fun onTriggerExpandRequested(position: Int, viewHolder: ATriggerViewHolder<out OTTrigger>) {

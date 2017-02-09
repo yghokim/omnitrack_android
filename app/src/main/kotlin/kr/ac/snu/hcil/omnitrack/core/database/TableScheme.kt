@@ -27,7 +27,7 @@ abstract class TableScheme {
 
 
     val creationQueryString: String by lazy {
-        "CREATE TABLE ${tableName} (${_ID} INTEGER PRIMARY KEY, ${creationColumnContentString}, ${LOGGED_AT} INTEGER, ${UPDATED_AT} INTEGER);"
+        "CREATE TABLE ${tableName} (${_ID} INTEGER PRIMARY KEY AUTOINCREMENT, ${creationColumnContentString}, ${LOGGED_AT} INTEGER, ${UPDATED_AT} INTEGER);"
     }
 
     abstract val creationColumnContentString: String

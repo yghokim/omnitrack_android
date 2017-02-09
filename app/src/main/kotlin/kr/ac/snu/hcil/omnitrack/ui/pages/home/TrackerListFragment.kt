@@ -13,6 +13,7 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.widget.AppCompatImageButton
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.text.InputType
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.AbsoluteSizeSpan
@@ -27,7 +28,6 @@ import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import android.widget.ImageButton
 import android.widget.TextView
-import android.widget.Toast
 import butterknife.bindView
 import com.afollestad.materialdialogs.MaterialDialog
 import it.sephiroth.android.library.tooltip.Tooltip
@@ -92,6 +92,15 @@ class TrackerListFragment : OTFragment() {
                 .positiveText(R.string.msg_confirm_log)
                 .negativeText(R.string.msg_cancel)
                 .neutralText(R.string.msg_go_to_add_field)
+    }
+
+    private val newTrackerNameDialog: MaterialDialog.Builder by lazy {
+        MaterialDialog.Builder(this.context)
+                .title(R.string.msg_new_tracker_name)
+                .inputType(InputType.TYPE_CLASS_TEXT)
+                .inputRangeRes(1, 20, R.color.colorRed)
+                .cancelable(true)
+                .negativeText(R.string.msg_cancel)
     }
 
     private val collapsedHeight = OTApplication.app.resources.getDimensionPixelSize(R.dimen.tracker_list_element_collapsed_height)
@@ -172,11 +181,13 @@ class TrackerListFragment : OTFragment() {
         addTrackerFloatingButton = rootView.findViewById(R.id.fab) as FloatingActionButton
         addTrackerFloatingButton.setOnClickListener { view ->
             if (userLoaded) {
-                val newTracker = user.newTrackerWithDefaultName(context, true)
+                newTrackerNameDialog.input(null, user.generateNewTrackerName(context), false) {
+                    dialog, text ->
+                    val newTracker = user.newTracker(text.toString(), true)
+                    startActivityOnDelay(TrackerDetailActivity.makeIntent(newTracker.objectId, context, true))
 
-                startActivityOnDelay(TrackerDetailActivity.makeIntent(newTracker.objectId, context))
-                Toast.makeText(context,
-                        String.format(resources.getString(R.string.sentence_new_tracker_added), newTracker.name), Toast.LENGTH_LONG).show()
+                }.show()
+                //Toast.makeText(context,String.format(resources.getString(R.string.sentence_new_tracker_added), newTracker.name), Toast.LENGTH_LONG).show()
             }
 
         }

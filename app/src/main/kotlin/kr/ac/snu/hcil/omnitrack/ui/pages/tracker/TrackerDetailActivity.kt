@@ -16,22 +16,27 @@ import com.google.gson.JsonObject
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
+import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
+import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
-import kr.ac.snu.hcil.omnitrack.ui.activities.OTTrackerAttachedActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 import rx.subjects.BehaviorSubject
+import rx.subscriptions.CompositeSubscription
 
-class TrackerDetailActivity : OTTrackerAttachedActivity(R.layout.activity_tracker_detail) {
+class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tracker_detail) {
 
     companion object {
         const val IS_EDIT_MODE = "isEditMode"
 
+        const val NEW_TRACKER_NAME = "newTrackerName"
+
         const val INTENT_KEY_FOCUS_ATTRIBUTE_ID = "focusAttributeId"
 
-        fun makeIntent(trackerId: String, context: Context): Intent {
+        fun makeIntent(trackerId: String, context: Context, new_mode: Boolean = false): Intent {
             val intent = Intent(context, TrackerDetailActivity::class.java)
             intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
+            intent.putExtra(IS_EDIT_MODE, !new_mode)
             return intent
         }
 
@@ -53,6 +58,10 @@ class TrackerDetailActivity : OTTrackerAttachedActivity(R.layout.activity_tracke
      */
     private val mViewPager: ViewPager by bindView(R.id.container)
 
+    private var user: OTUser? = null
+    private var tracker: OTTracker? = null
+
+    val trackerSubject = BehaviorSubject.create<OTTracker>()
 
     val trackerColorOnUI = BehaviorSubject.create<Int>()
 
@@ -72,9 +81,6 @@ class TrackerDetailActivity : OTTrackerAttachedActivity(R.layout.activity_tracke
         val tabLayout = findViewById(R.id.tabs) as TabLayout?
         tabLayout!!.setupWithViewPager(mViewPager)
 
-        setActionBarButtonMode(Mode.Back)
-        title = resources.getString(R.string.title_activity_tracker_edit)
-
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)) {
                 this.intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, savedInstanceState.getString(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER))
@@ -84,10 +90,18 @@ class TrackerDetailActivity : OTTrackerAttachedActivity(R.layout.activity_tracke
         }
 
         isEditMode = intent.getBooleanExtra(IS_EDIT_MODE, true)
+
+        if (isEditMode) {
+            setActionBarButtonMode(Mode.Back)
+            title = resources.getString(R.string.title_activity_tracker_edit)
+        } else {
+            setActionBarButtonMode(Mode.SaveCancel)
+            title = resources.getString(R.string.title_activity_tracker_new)
+        }
+
     }
 
-    override fun onTrackerLoaded(tracker: OTTracker) {
-        super.onTrackerLoaded(tracker)
+    private fun onTrackerLoaded(tracker: OTTracker) {
         transitionToColor(tracker.color, false)
     }
 
@@ -100,8 +114,10 @@ class TrackerDetailActivity : OTTrackerAttachedActivity(R.layout.activity_tracke
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putString(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker?.objectId)
-        outState.putBoolean(IS_EDIT_MODE, true)
+        outState.putBoolean(IS_EDIT_MODE, isEditMode)
+        if (isEditMode) {
+            outState.putString(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker?.objectId)
+        }
     }
 
     override fun onPause(){
@@ -113,6 +129,18 @@ class TrackerDetailActivity : OTTrackerAttachedActivity(R.layout.activity_tracke
     override fun onStart(){
         super.onStart()
 
+
+        val trackerObjectId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
+        signedInUserObservable.subscribe {
+            user ->
+            this.user = user
+            val tracker = user[trackerObjectId]!!
+
+            this.tracker = tracker
+            trackerSubject.onNext(tracker)
+            onTrackerLoaded(tracker)
+        }
+
         if (intent.hasExtra(INTENT_KEY_FOCUS_ATTRIBUTE_ID)) {
             //val attributeId = intent.getStringExtra(INTENT_KEY_FOCUS_ATTRIBUTE_ID)
             mViewPager.setCurrentItem(0, true)
@@ -121,12 +149,31 @@ class TrackerDetailActivity : OTTrackerAttachedActivity(R.layout.activity_tracke
     }
 
     override fun onToolbarLeftButtonClicked() {
+        if (!isEditMode) {
+            if (tracker != null) {
+                user?.trackers?.remove(tracker!!)
+            }
+        }
 
         finish()
     }
 
+    override fun onBackPressed() {
+        super.onBackPressed()
+        onToolbarLeftButtonClicked()
+    }
+
     override fun onToolbarRightButtonClicked() {
             //add
+        if (!isEditMode) {
+            finish()
+            /*
+            signedInUserObservable.subscribe(){
+                user->
+                user.trackers.add(tracker!!)
+                finish()
+            }*/
+        }
         /*
             if(namePropertyView.validate()) {
                 //modify
@@ -172,17 +219,28 @@ class TrackerDetailActivity : OTTrackerAttachedActivity(R.layout.activity_tracke
         protected var isEditMode = false
             private set
 
-        protected var trackerObjectId: String? = null
-            private set
+        protected val startSubscriptions = CompositeSubscription()
 
         override fun onStart() {
             super.onStart()
             val args = arguments
-            trackerObjectId = args.getString(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
 
             isEditMode = args.getBoolean(IS_EDIT_MODE, true)
+            val activity = activity
+            if (activity is TrackerDetailActivity) {
+                startSubscriptions.add(
+                        activity.trackerSubject.subscribe {
+                            tracker ->
+                            onTrackerLoaded(tracker)
+                        })
+            }
+        }
 
-            println(trackerObjectId)
+        protected abstract fun onTrackerLoaded(tracker: OTTracker);
+
+        override fun onStop() {
+            super.onStop()
+            startSubscriptions.clear()
         }
     }
 
@@ -191,7 +249,6 @@ class TrackerDetailActivity : OTTrackerAttachedActivity(R.layout.activity_tracke
         override fun getItem(position: Int): Fragment {
 
             val bundle = Bundle()
-            bundle.putString(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, cachedTrackerObjectId)
             bundle.putBoolean(IS_EDIT_MODE, isEditMode)
 
             val fragment =
