@@ -118,11 +118,24 @@ object ExperimentConsentManager {
     fun handleActivityResult(deleteAccountIfDenied: Boolean, requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_CODE_EXPERIMENT_SIGN_IN) {
             if (resultCode != AppCompatActivity.RESULT_OK || data == null) {
-                //TODO: delete user if possible.
                 if (deleteAccountIfDenied) {
+                    OTAuthManager.deleteUser(object : OTAuthManager.SignInResultsHandler {
+                        override fun onCancel() {
+                        }
 
+                        override fun onError(e: Throwable) {
+
+                        }
+
+                        override fun onSuccess() {
+
+                        }
+
+                    })
                 }
-                //TODO: Sign out
+
+                mResultListener?.onConsentFailed()
+                finishProcess()
             } else {
                 val profile = ExperimentProfile()
                 profile.isConsentApproved = true

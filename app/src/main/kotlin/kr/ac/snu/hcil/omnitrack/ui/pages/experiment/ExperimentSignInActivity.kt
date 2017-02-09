@@ -11,6 +11,7 @@ import android.support.v4.view.ViewPager
 import android.widget.ImageButton
 import com.heinrichreimersoftware.materialintro.app.IntroActivity
 import com.heinrichreimersoftware.materialintro.slide.FragmentSlide
+import com.heinrichreimersoftware.materialintro.slide.SimpleSlide
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 
@@ -49,10 +50,12 @@ class ExperimentSignInActivity : IntroActivity() {
         addSlide(demographicSlide)
 
         addSlide(
-                FragmentSlide.Builder()
-                        .fragment(ConsentFormSlideFragment())
-                        .background(R.color.colorPointed_Light)
-                        .backgroundDark(R.color.colorPointed)
+                SimpleSlide.Builder()
+                        .background(R.color.colorPrimary)
+                        .backgroundDark(R.color.colorPrimaryDark)
+                        .image(R.drawable.abc_btn_check_material)
+                        .title(getString(R.string.msg_signup_complete))
+                        .description(getString(R.string.msg_signup_complete_description))
                         .build()
         )
 

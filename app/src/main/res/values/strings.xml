@@ -236,6 +236,8 @@
 
     <string name="msg_profile_menu_unlink_account">Unlink this device…</string>
     <string name="msg_profile_unlink_account_confirm">Any unsynchronized data will be lost.\nDo you want to unlink your account with this device?</string>
+    <string name="msg_signup_complete">Sign up process is complete</string>
+    <string name="msg_signup_complete_description">You can now start tracking!</string>
 
 
     <string-array name="gender_entries">
