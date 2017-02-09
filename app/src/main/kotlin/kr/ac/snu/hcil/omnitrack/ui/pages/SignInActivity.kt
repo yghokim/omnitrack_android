@@ -128,10 +128,12 @@ class SignInActivity : AppCompatActivity() {
                     }
 
                     override fun onConsentFailed() {
+                        println("consent failed")
                         toIdleMode()
                     }
 
                     override fun onConsentDenied() {
+                        println("consent was denied")
                         toIdleMode()
                     }
 
