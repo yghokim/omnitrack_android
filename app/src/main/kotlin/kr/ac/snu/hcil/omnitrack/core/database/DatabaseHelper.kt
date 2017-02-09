@@ -265,7 +265,8 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
     fun deleteObjects(scheme: TableScheme, vararg ids: Long) {
         val idStringArray = ids.map { "${scheme._ID}=${it.toString()}" }.toTypedArray()
         if (idStringArray.size > 0) {
-            writableDatabase.delete(scheme.tableName, idStringArray.joinToString(" OR "), null)
+            val deleted = writableDatabase.delete(scheme.tableName, idStringArray.joinToString(" OR "), null)
+            println("removed ${scheme.tableName}, $deleted")
         }
     }
 
@@ -362,6 +363,9 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
     }
 
     fun save(tracker: OTTracker, position: Int) {
+
+
+        println("save tracker: ${tracker.name}, ${tracker.dbId}, ${tracker.objectId}")
         if (tracker.isDirtySinceLastSync) {
             val values = baseContentValuesOfNamed(tracker, TrackerScheme)
             values.put(TrackerScheme.POSITION, position)
