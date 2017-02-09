@@ -28,7 +28,6 @@ import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.AttributePresetInfo
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.ui.DragItemTouchHelperCallback
-import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.FallbackRecyclerView
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.SpaceItemDecoration
@@ -40,7 +39,6 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.ConnectionIndicatorStubProxy
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeDetailActivity
 import kr.ac.snu.hcil.omnitrack.utils.startActivityOnDelay
 import net.i2p.android.ext.floatingactionbutton.FloatingActionButton
-import rx.subscriptions.CompositeSubscription
 
 /**
  * Created by Young-Ho Kim on 16. 7. 29
@@ -71,8 +69,6 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
     private lateinit var newAttributeButton: FloatingActionButton
 
     private var scrollToBottomReserved = false
-
-    private val subscriptions = CompositeSubscription()
 
     private var user: OTUser? = null
     private var tracker: OTTracker? = null
@@ -186,7 +182,7 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
             //edit
         } else {
             //new mode
-            namePropertyView.focus()
+            //namePropertyView.focus()
         }
 
         namePropertyView.value = tracker?.name ?: ""
@@ -208,46 +204,23 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
     }
 
 
-    override fun onStart() {
-        super.onStart()
+    override fun onTrackerLoaded(tracker: OTTracker) {
+        this.tracker = tracker
+        tracker.let {
 
-        val activity = activity
-        if (activity is OTActivity) {
-            subscriptions.add(
-                    activity.signedInUserObservable.subscribe {
-                        user ->
-                        println("OMNITRACK Tracker Detail: user loaded")
-                        this.user = user
+            if (activity.intent.hasExtra(TrackerDetailActivity.INTENT_KEY_FOCUS_ATTRIBUTE_ID)) {
+                val focusedAttributeId = activity.intent.getStringExtra(TrackerDetailActivity.INTENT_KEY_FOCUS_ATTRIBUTE_ID)
 
-                        println("OMNITRACK tracker object id: ${trackerObjectId}")
-                        if (trackerObjectId != null) {
-                            tracker = user[trackerObjectId!!]
-                        }
-
-                        val tracker = tracker
-                        tracker?.let {
-
-                            if (activity.intent.hasExtra(TrackerDetailActivity.INTENT_KEY_FOCUS_ATTRIBUTE_ID)) {
-                                val focusedAttributeId = activity.intent.getStringExtra(TrackerDetailActivity.INTENT_KEY_FOCUS_ATTRIBUTE_ID)
-
-                                for (attr in tracker.attributes.unObservedList) {
-                                    if (attr.objectId == focusedAttributeId) {
-                                        scrollToBottomReserved = true
-                                        break
-                                    }
-                                }
-                            }
-                        }
-
-                        refresh()
+                for (attr in tracker.attributes.unObservedList) {
+                    if (attr.objectId == focusedAttributeId) {
+                        scrollToBottomReserved = true
+                        break
                     }
-            )
+                }
+            }
         }
-    }
 
-    override fun onStop() {
-        super.onStop()
-        subscriptions.clear()
+        refresh()
     }
 
     override fun onResume() {
