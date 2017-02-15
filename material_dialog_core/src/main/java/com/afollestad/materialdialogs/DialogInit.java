@@ -12,8 +12,11 @@ import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
 import android.text.method.LinkMovementMethod;
 import android.text.method.PasswordTransformationMethod;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -449,6 +452,44 @@ class DialogInit {
                 // If the flags contain TYPE_TEXT_VARIATION_PASSWORD, apply the password transformation method automatically
                 dialog.input.setTransformationMethod(PasswordTransformationMethod.getInstance());
             }
+        }
+
+
+        if (builder.syncWithKeyboard) {
+            Log.d("Dialog", "Sync with keyboard");
+            dialog.input.setImeOptions(EditorInfo.IME_ACTION_DONE);
+
+            dialog.input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                @Override
+                public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                    if (actionId == EditorInfo.IME_ACTION_DONE) {
+                        if (builder.inputCallback != null) {
+                            builder.inputCallback.onInput(dialog, dialog.input.getText());
+                            if (builder.autoDismiss) {
+                                dialog.dismiss();
+                            }
+                        }
+
+                        return true;
+                    }
+                    return false;
+                }
+            });
+
+            dialog.input.setOnKeyListener(new View.OnKeyListener() {
+                @Override
+                public boolean onKey(View view, int keyCode, KeyEvent keyEvent) {
+                    if (keyCode == KeyEvent.KEYCODE_BACK) {
+                        if (builder.onNeutralCallback != null) {
+                            builder.onNeutralCallback.onClick(dialog, DialogAction.NEUTRAL);
+                        }
+
+                        dialog.dismiss();
+                    }
+
+                    return false;
+                }
+            });
         }
 
         dialog.inputMinMax = (TextView) dialog.view.findViewById(R.id.md_minMax);

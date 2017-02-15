@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core
 
 import android.content.Intent
+import android.support.annotation.Keep
 import android.support.v7.app.AppCompatActivity
 import com.google.firebase.database.*
 import kr.ac.snu.hcil.omnitrack.OTApplication
@@ -14,6 +15,7 @@ object ExperimentConsentManager {
 
     const val REQUEST_CODE_EXPERIMENT_SIGN_IN = 6550
 
+    @Keep
     data class ExperimentProfile(
             var isConsentApproved: Boolean = false,
             var age: String? = null,
