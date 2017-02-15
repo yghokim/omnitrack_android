@@ -3,7 +3,6 @@ package kr.ac.snu.hcil.omnitrack.core
 //import kr.ac.snu.hcil.omnitrack.core.database.TrackerEntity
 import android.content.Context
 import android.graphics.Color
-import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AttributeSorter
@@ -169,7 +168,7 @@ class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color
     }
 
     fun generateNewAttributeName(typeName: String, context: Context): String {
-        return DefaultNameGenerator.generateName("${typeName} ${context.resources.getString(R.string.msg_attribute)}", attributes.unObservedList.map { it.name })
+        return DefaultNameGenerator.generateName(typeName, attributes.unObservedList.map { it.name }, true)
     }
 
     fun getRecommendedChartModels(): Array<ChartModel<*>> {
