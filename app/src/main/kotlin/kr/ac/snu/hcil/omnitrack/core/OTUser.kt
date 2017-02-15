@@ -225,6 +225,6 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
     }
 
     fun generateNewTrackerName(context: Context): String {
-        return DefaultNameGenerator.generateName(context.resources.getString(R.string.msg_new_tracker_prefix), trackers.unObservedList.map { it.name })
+        return DefaultNameGenerator.generateName(context.resources.getString(R.string.msg_new_tracker_prefix), trackers.unObservedList.map { it.name }, false)
     }
 }
