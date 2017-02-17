@@ -389,7 +389,7 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
                     val tracker = tracker
                     tracker?.let {
                         columnNameChangeDialog
-                                .input(null, tracker?.attributes[adapterPosition].name, false) {
+                                .input(null, tracker.attributes[adapterPosition].name, false) {
                                     dialog, input ->
                                     if (tracker.attributes[adapterPosition].name.compareTo(input.toString()) != 0) {
                                         tracker.attributes[adapterPosition].name = input.toString()

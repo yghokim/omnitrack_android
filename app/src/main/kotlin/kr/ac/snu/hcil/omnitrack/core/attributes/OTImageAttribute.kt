@@ -8,6 +8,7 @@ import android.webkit.URLUtil
 import android.widget.ImageView
 import com.koushikdutta.ion.Ion
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
@@ -16,8 +17,8 @@ import rx.Observable
 /**
  * Created by younghokim on 16. 9. 6..
  */
-class OTImageAttribute(objectId: String?, dbId: Long?, columnName: String, isRequired: Boolean, settingData: String?, connectionData: String?)
-: OTAttribute<Uri>(objectId, dbId, columnName, isRequired, TYPE_IMAGE, settingData, connectionData) {
+class OTImageAttribute(objectId: String?, parentTracker: OTTracker?, columnName: String, isRequired: Boolean, settingData: String?, connectionData: String?)
+    : OTAttribute<Uri>(objectId, parentTracker, columnName, isRequired, TYPE_IMAGE, settingData, connectionData) {
 
     override val valueNumericCharacteristics: NumericCharacteristics = NumericCharacteristics(false, false)
 

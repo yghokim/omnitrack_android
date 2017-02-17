@@ -73,7 +73,7 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false) : AppC
          * *
          * @param ex the exception that occurred.
          */
-        override fun onError(ex: Throwable) {
+        override fun onError(e: Throwable) {
             //goSignIn()
             performSignInProcessCompletelyFinished()
         }

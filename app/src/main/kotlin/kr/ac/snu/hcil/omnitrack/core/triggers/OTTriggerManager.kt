@@ -100,10 +100,6 @@ class OTTriggerManager(val user: OTUser) {
                 trigger.activateOnSystem(OTApplication.app.applicationContext)
             }
 
-            if (_removedTriggerIds.contains(trigger.dbId)) {
-                _removedTriggerIds.remove(trigger.dbId)
-            }
-
             for (tracker in trigger.trackers) {
                 if (trackerPivotedTriggerListCache.containsKey(tracker.objectId)) {
                     trackerPivotedTriggerListCache[tracker.objectId] =
@@ -119,10 +115,6 @@ class OTTriggerManager(val user: OTUser) {
 
         trigger.isOn = false
 
-        if (trigger.dbId != null)
-            _removedTriggerIds.add(trigger.dbId!!)
-
-
         //TODO handler dependencies associated with the trigger
         if (trigger is OTTimeTrigger) {
             OTApplication.app.timeTriggerAlarmManager.cancelTrigger(trigger)
@@ -133,6 +125,8 @@ class OTTriggerManager(val user: OTUser) {
                 trackerPivotedTriggerListCache[tracker.objectId] = trackerPivotedTriggerListCache[tracker.objectId]!!.filter { it != trigger }.toTypedArray()
             }
         }
+
+        //TODO remove trigger from DB
     }
 
     private fun onTriggerFired(trigger: OTTrigger, triggerTime: Long) {

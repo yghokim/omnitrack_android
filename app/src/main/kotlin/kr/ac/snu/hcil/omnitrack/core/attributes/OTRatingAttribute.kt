@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.attributes
 import android.content.Context
 import android.view.View
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTRatingOptionsProperty
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.common.StarRatingView
@@ -16,8 +17,8 @@ import rx.Observable
 /**
  * Created by younghokim on 16. 9. 6..
  */
-class OTRatingAttribute(objectId: String?, dbId: Long?, columnName: String, isRequired: Boolean, settingData: String?, connectionData: String?)
-: OTAttribute<Float>(objectId, dbId, columnName, isRequired, OTAttribute.TYPE_RATING, settingData, connectionData) {
+class OTRatingAttribute(objectId: String?, parentTracker: OTTracker?, columnName: String, isRequired: Boolean, settingData: String?, connectionData: String?)
+    : OTAttribute<Float>(objectId, parentTracker, columnName, isRequired, OTAttribute.TYPE_RATING, settingData, connectionData) {
 
     companion object {
         /*

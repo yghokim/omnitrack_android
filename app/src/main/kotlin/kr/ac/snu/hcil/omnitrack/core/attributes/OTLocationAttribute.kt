@@ -8,6 +8,7 @@ import com.google.android.gms.maps.model.LatLng
 import io.nlopez.smartlocation.SmartLocation
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.common.MapImageView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
@@ -17,7 +18,7 @@ import rx.Observable
 /**
  * Created by Young-Ho on 8/2/2016.
  */
-class OTLocationAttribute(objectId: String?, dbId: Long?, columnName: String, isRequired: Boolean, settingData: String?, connectionData: String?) : OTAttribute<LatLng>(objectId, dbId, columnName, isRequired, TYPE_LOCATION, settingData, connectionData) {
+class OTLocationAttribute(objectId: String?, parentTracker: OTTracker?, columnName: String, isRequired: Boolean, settingData: String?, connectionData: String?) : OTAttribute<LatLng>(objectId, parentTracker, columnName, isRequired, TYPE_LOCATION, settingData, connectionData) {
 
     companion object {
         fun getCachedLocation(lm: LocationManager, enabledOnly: Boolean): Location? {

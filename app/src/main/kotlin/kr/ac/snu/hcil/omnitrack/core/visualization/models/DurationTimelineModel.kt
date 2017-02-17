@@ -60,7 +60,7 @@ class DurationTimelineModel(override val attribute: OTTimeSpanAttribute) : Attri
             val to = if(xIndex < xScale.numTicks-1) xScale.binPointsOnDomain[xIndex + 1]
             else getTimeScope().to
 
-            OTApplication.app.dbHelper.getItems(attribute.owner!!, TimeSpan.fromPoints(from, to), itemsCache, true)
+            OTApplication.app.dbHelper.getItems(attribute.tracker!!, TimeSpan.fromPoints(from, to), itemsCache, true)
 
             timeSpansCache.clear()
             for(item in itemsCache)

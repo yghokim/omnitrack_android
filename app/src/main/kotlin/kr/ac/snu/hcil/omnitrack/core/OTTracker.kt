@@ -3,11 +3,13 @@ package kr.ac.snu.hcil.omnitrack.core
 //import kr.ac.snu.hcil.omnitrack.core.database.TrackerEntity
 import android.content.Context
 import android.graphics.Color
+import com.google.firebase.database.DatabaseReference
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AttributeSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
+import kr.ac.snu.hcil.omnitrack.core.database.FirebaseHelper
 import kr.ac.snu.hcil.omnitrack.core.database.NamedObject
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
@@ -25,8 +27,14 @@ import kotlin.properties.Delegates
 /**
  * Created by Young-Ho on 7/11/2016.
  */
-class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color.WHITE, isOnShortcut: Boolean = false, attributeIdSeed: Long = 0, _attributes: Collection<OTAttribute<out Any>>? = null)
-: NamedObject(objectId, dbId, name) {
+class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnShortcut: Boolean = false, attributeIdSeed: Long = 0, _attributes: Collection<OTAttribute<out Any>>? = null)
+    : NamedObject(objectId, name) {
+    override val databasePointRef: DatabaseReference?
+        get() = FirebaseHelper.dbRef?.child(FirebaseHelper.CHILD_NAME_TRACKERS)?.child(objectId)
+
+    override fun makeNewObjectId(): String {
+        return FirebaseHelper.generateNewKey(FirebaseHelper.CHILD_NAME_TRACKERS)
+    }
 
     val attributes = ObservableList<OTAttribute<out Any>>()
 
@@ -43,6 +51,8 @@ class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color
             removedFromUser.invoke(this, old)
         }
         if (new != null) {
+            if (!suspendDatabaseSync)
+                databasePointRef?.child("user")?.setValue(new.objectId)
             addedToUser.invoke(this, new)
         }
     }
@@ -52,7 +62,8 @@ class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color
         private set(value) {
             if (field != value) {
                 field = value
-                isDirtySinceLastSync = true
+                if (!suspendDatabaseSync)
+                    databasePointRef?.child("attribute_id_seed")?.setValue(value)
             }
         }
 
@@ -63,7 +74,9 @@ class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color
             colorChanged.invoke(this, new)
             OTShortcutPanelManager.notifyAppearanceChanged(this)
             colorSubject.onNext(new)
-            isDirtySinceLastSync = true
+
+            if (!suspendDatabaseSync)
+                databasePointRef?.child("color")?.setValue(new)
         }
     }
 
@@ -82,7 +95,7 @@ class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color
                 OTShortcutPanelManager -= this
             }
 
-            isDirtySinceLastSync = true
+            databasePointRef?.child("is_on_shortcut")?.setValue(new)
         }
     }
 
@@ -94,18 +107,18 @@ class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color
 
     val colorChanged = Event<Int>()
 
-    constructor(): this(null, null, "New Tracker")
+    constructor() : this(null, "New Tracker")
 
-    constructor(name: String): this(null,null, name)
+    constructor(name: String) : this(null, name)
 
     init{
-
+        suspendDatabaseSync = true
         if (_attributes != null) {
             for (attribute in _attributes) {
                 attributes.unObservedList.add(attribute)
 
                 attribute.addedToTracker.suspend = true
-                attribute.owner = this
+                attribute.tracker = this
                 attribute.addedToTracker.suspend = false
 
             }
@@ -123,14 +136,17 @@ class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color
 
         attributes.elementReordered += {
             sender, range ->
-            for (i in range) {
-                attributes[i].isDirtySinceLastSync = true
+            if (!suspendDatabaseSync) {
+                for (i in range) {
+                    attributes[i].databasePointRef?.child("position")?.setValue(i)
+                }
             }
         }
 
         colorSubject.onNext(color)
 
         isDirtySinceLastSync = true
+        suspendDatabaseSync = false
     }
 
     override fun onNameChanged(newName: String) {
@@ -139,20 +155,28 @@ class OTTracker(objectId: String?, dbId: Long?, name: String, color: Int = Color
     }
 
     private fun onAttributeAdded(new: OTAttribute<out Any>, index: Int) {
-        new.owner = this
+        new.tracker = this
+        /*
         if (new.dbId != null)
-            _removedAttributeIds.removeAll { it == new.dbId }
+            _removedAttributeIds.removeAll { it == new.dbId }*/
+
+        if (!suspendDatabaseSync)
+            FirebaseHelper.saveAttribute(this.objectId, new, index)
 
         attributeAdded.invoke(this, ReadOnlyPair(new, index))
     }
 
     private fun onAttributeRemoved(attribute: OTAttribute<out Any>, index: Int) {
-        attribute.owner = null
+        attribute.tracker = null
 
+        /*
         if (attribute.dbId != null)
-            _removedAttributeIds.add(attribute.dbId as Long)
+            _removedAttributeIds.add(attribute.dbId as Long)*/
 
         attributeRemoved.invoke(this, ReadOnlyPair(attribute, index))
+        if (!suspendDatabaseSync) {
+            FirebaseHelper.removeAttribute(objectId, attribute.objectId)
+        }
     }
 
     fun getSupportedComparators(): List<ItemComparator> {
