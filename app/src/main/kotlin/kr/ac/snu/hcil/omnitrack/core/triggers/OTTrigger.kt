@@ -98,7 +98,7 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
 
         if (old != new) {
             if (!suspendDatabaseSync) {
-                databasePointRef?.child("is_on")?.setValue(new)
+                databasePointRef?.child("on")?.setValue(new)
             }
 
             switchTurned.invoke(this, new)

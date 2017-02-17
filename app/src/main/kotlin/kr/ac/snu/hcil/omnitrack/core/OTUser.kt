@@ -120,7 +120,6 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
         triggerManager = OTTriggerManager(this)
 
         trackers.elementAdded += { sender, args ->
-            databaseRef?.child(FirebaseHelper.CHILD_NAME_TRACKERS)?.child(args.first.objectId)
             onTrackerAdded(args.first, args.second)
         }
 

@@ -21,7 +21,7 @@ import java.util.*
 /**
  * Created by younghokim on 16. 8. 12..
  */
-class OTChoiceAttribute(objectId: String?, parentTracker: OTTracker?, columnName: String, isRequired: Boolean, propertyData: String?, connectionData: String?) : OTAttribute<IntArray>(objectId, parentTracker, columnName, isRequired, TYPE_CHOICE, propertyData, connectionData) {
+class OTChoiceAttribute(objectId: String?, localKey: Int?, parentTracker: OTTracker?, columnName: String, isRequired: Boolean, propertyData: String?, connectionData: String?) : OTAttribute<IntArray>(objectId, localKey, parentTracker, columnName, isRequired, TYPE_CHOICE, propertyData, connectionData) {
 
     companion object {
         const val PROPERTY_MULTISELECTION = 0

@@ -11,8 +11,8 @@ import rx.Observable
 /**
  * Created by younghokim on 2016. 9. 26..
  */
-class OTAudioRecordAttribute(objectId: String?, parentTracker: OTTracker?, columnName: String, isRequired: Boolean, settingData: String?, connectionData: String?)
-    : OTAttribute<Uri>(objectId, parentTracker, columnName, isRequired, TYPE_AUDIO, settingData, connectionData) {
+class OTAudioRecordAttribute(objectId: String?, localKey: Int?, parentTracker: OTTracker?, columnName: String, isRequired: Boolean, settingData: String?, connectionData: String?)
+    : OTAttribute<Uri>(objectId, localKey, parentTracker, columnName, isRequired, TYPE_AUDIO, settingData, connectionData) {
 
 
     override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_URI
