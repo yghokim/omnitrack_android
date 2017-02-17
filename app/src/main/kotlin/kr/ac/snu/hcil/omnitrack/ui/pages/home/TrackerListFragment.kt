@@ -98,6 +98,7 @@ class TrackerListFragment : OTFragment() {
         MaterialDialog.Builder(this.context)
                 .title(R.string.msg_new_tracker_name)
                 .inputType(InputType.TYPE_CLASS_TEXT)
+                .setSyncWithKeyboard(true)
                 .inputRangeRes(1, 20, R.color.colorRed)
                 .cancelable(true)
                 .negativeText(R.string.msg_cancel)
