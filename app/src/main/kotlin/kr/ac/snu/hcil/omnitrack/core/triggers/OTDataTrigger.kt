@@ -72,19 +72,23 @@ class OTDataTrigger(objectId: String?, user: OTUser, name: String, trackerObject
 
 
     private var measureFactoryCode: String by ObservableMapDelegate("", properties) {
-        isDirtySinceLastSync = true
+        value ->
+        syncPropertyToDatabase("measureFactoryCode", value)
     }
 
     private var serializedMeasure: String by ObservableMapDelegate("", properties) {
-        isDirtySinceLastSync = true
+        value ->
+        syncPropertyToDatabase("serializedMeasure", value)
     }
 
     private var conditionerType: Int by ObservableMapDelegate(-1, properties) {
-        isDirtySinceLastSync = true
+        value ->
+        syncPropertyToDatabase("conditionerType", value)
     }
 
     private var serializedConditioner: String by ObservableMapDelegate("", properties) {
-        isDirtySinceLastSync = true
+        value ->
+        syncPropertyToDatabase("serializedConditioner", value)
     }
 
 
