@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.triggers
 
 import android.content.Context
+import com.google.firebase.database.DataSnapshot
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.calculation.AConditioner
@@ -11,7 +12,7 @@ import kr.ac.snu.hcil.omnitrack.utils.ObservableMapDelegate
 /**
  * Created by younghokim on 16. 9. 5..
  */
-class OTDataTrigger(objectId: String?, user: OTUser, name: String, trackerObjectIds: Array<String>, isOn: Boolean, action: Int, lastTriggeredTime: Long, serializedProperties: String? = null) : OTTrigger(objectId, user, name, trackerObjectIds, isOn, action, lastTriggeredTime, serializedProperties) {
+class OTDataTrigger(objectId: String?, user: OTUser, name: String, trackerObjectIds: Array<Pair<String?, String>>?, isOn: Boolean, action: Int, lastTriggeredTime: Long, propertyData: DataSnapshot? = null) : OTTrigger(objectId, user, name, trackerObjectIds, isOn, action, lastTriggeredTime, propertyData) {
 
     override val configIconId: Int = R.drawable.event_dark
     override val configTitleId: Int = R.string.trigger_desc_event
