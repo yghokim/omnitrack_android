@@ -4,7 +4,6 @@ package kr.ac.snu.hcil.omnitrack.core
 import android.content.Context
 import android.graphics.Color
 import com.google.firebase.database.DatabaseReference
-import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AttributeSorter
@@ -27,7 +26,7 @@ import kotlin.properties.Delegates
 /**
  * Created by Young-Ho on 7/11/2016.
  */
-class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnShortcut: Boolean = false, attributeIdSeed: Long = 0, _attributes: Collection<OTAttribute<out Any>>? = null)
+class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnShortcut: Boolean = false, attributeIdSeed: Int = 0, _attributes: Collection<OTAttribute<out Any>>? = null)
     : NamedObject(objectId, name) {
     override val databasePointRef: DatabaseReference?
         get() = FirebaseHelper.dbRef?.child(FirebaseHelper.CHILD_NAME_TRACKERS)?.child(objectId)
@@ -37,13 +36,6 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
     }
 
     val attributes = ObservableList<OTAttribute<out Any>>()
-
-    private val _removedAttributeIds = ArrayList<Long>()
-    fun fetchRemovedAttributeIds(): LongArray {
-        val result = _removedAttributeIds.toLongArray()
-        _removedAttributeIds.clear()
-        return result;
-    }
 
     var owner: OTUser? by Delegates.observable(null as OTUser?){
         prop, old, new ->
@@ -58,12 +50,12 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
     }
 
 
-    var attributeIdSeed: Long = attributeIdSeed
+    var attributeLocalKeySeed: Int = attributeIdSeed
         private set(value) {
             if (field != value) {
                 field = value
                 if (!suspendDatabaseSync)
-                    databasePointRef?.child("attribute_id_seed")?.setValue(value)
+                    databasePointRef?.child("attributeLocalKeySeed")?.setValue(value)
             }
         }
 
@@ -95,7 +87,7 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
                 OTShortcutPanelManager -= this
             }
 
-            databasePointRef?.child("is_on_shortcut")?.setValue(new)
+            databasePointRef?.child("onShortcut")?.setValue(new)
         }
     }
 
@@ -152,6 +144,10 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
     override fun onNameChanged(newName: String) {
         super.onNameChanged(newName)
         OTShortcutPanelManager.notifyAppearanceChanged(this)
+    }
+
+    fun nextAttributeLocalKey(): Int {
+        return ++attributeLocalKeySeed
     }
 
     private fun onAttributeAdded(new: OTAttribute<out Any>, index: Int) {
@@ -242,9 +238,4 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
 
         return !invalid
     }
-
-    fun getNewAttributeObjectId(): Long {
-        return ++attributeIdSeed
-    }
-
 }

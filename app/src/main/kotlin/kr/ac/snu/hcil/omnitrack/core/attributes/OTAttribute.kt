@@ -31,7 +31,7 @@ import kotlin.properties.Delegates
 /**
  * Created by Young-Ho on 7/11/2016.
  */
-abstract class OTAttribute<DataType>(objectId: String?, parentTracker: OTTracker?, columnName: String, isRequired: Boolean, val typeId: Int, propertyData: String?, connectionData: String?) : NamedObject(objectId, columnName) {
+abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTracker: OTTracker?, columnName: String, isRequired: Boolean, val typeId: Int, propertyData: String?, connectionData: String?) : NamedObject(objectId, columnName) {
 
     override val databasePointRef: DatabaseReference?
         get() {
@@ -82,25 +82,25 @@ abstract class OTAttribute<DataType>(objectId: String?, parentTracker: OTTracker
         }
 
 
-        fun createAttribute(objectId: String?, parent: OTTracker?, columnName: String, isRequired: Boolean, typeId: Int, propertyData: String?, connectionData: String?): OTAttribute<out Any> {
+        fun createAttribute(objectId: String?, localKey: Int?, parent: OTTracker?, columnName: String, isRequired: Boolean, typeId: Int, propertyData: String?, connectionData: String?): OTAttribute<out Any> {
             val attr = when (typeId) {
-                TYPE_NUMBER -> OTNumberAttribute(objectId, parent, columnName, isRequired, propertyData, connectionData)
-                TYPE_TIME -> OTTimeAttribute(objectId, parent, columnName, isRequired, propertyData, connectionData)
-                TYPE_TIMESPAN -> OTTimeSpanAttribute(objectId, parent, columnName, isRequired, propertyData, connectionData)
-                TYPE_SHORT_TEXT -> OTShortTextAttribute(objectId, parent, columnName, isRequired, propertyData, connectionData)
-                TYPE_LONG_TEXT -> OTLongTextAttribute(objectId, parent, columnName, isRequired, propertyData, connectionData)
-                TYPE_LOCATION -> OTLocationAttribute(objectId, parent, columnName, isRequired, propertyData, connectionData)
-                TYPE_CHOICE -> OTChoiceAttribute(objectId, parent, columnName, isRequired, propertyData, connectionData)
-                TYPE_RATING -> OTRatingAttribute(objectId, parent, columnName, isRequired, propertyData, connectionData)
-                TYPE_IMAGE -> OTImageAttribute(objectId, parent, columnName, isRequired, propertyData, connectionData)
-                TYPE_AUDIO -> OTAudioRecordAttribute(objectId, parent, columnName, isRequired, propertyData, connectionData)
-                else -> OTNumberAttribute(objectId, parent, columnName, isRequired, propertyData, connectionData)
+                TYPE_NUMBER -> OTNumberAttribute(objectId, localKey, parent, columnName, isRequired, propertyData, connectionData)
+                TYPE_TIME -> OTTimeAttribute(objectId, localKey, parent, columnName, isRequired, propertyData, connectionData)
+                TYPE_TIMESPAN -> OTTimeSpanAttribute(objectId, localKey, parent, columnName, isRequired, propertyData, connectionData)
+                TYPE_SHORT_TEXT -> OTShortTextAttribute(objectId, localKey, parent, columnName, isRequired, propertyData, connectionData)
+                TYPE_LONG_TEXT -> OTLongTextAttribute(objectId, localKey, parent, columnName, isRequired, propertyData, connectionData)
+                TYPE_LOCATION -> OTLocationAttribute(objectId, localKey, parent, columnName, isRequired, propertyData, connectionData)
+                TYPE_CHOICE -> OTChoiceAttribute(objectId, localKey, parent, columnName, isRequired, propertyData, connectionData)
+                TYPE_RATING -> OTRatingAttribute(objectId, localKey, parent, columnName, isRequired, propertyData, connectionData)
+                TYPE_IMAGE -> OTImageAttribute(objectId, localKey, parent, columnName, isRequired, propertyData, connectionData)
+                TYPE_AUDIO -> OTAudioRecordAttribute(objectId, localKey, parent, columnName, isRequired, propertyData, connectionData)
+                else -> OTNumberAttribute(objectId, localKey, parent, columnName, isRequired, propertyData, connectionData)
             }
             return attr
         }
 
         fun createAttribute(tracker: OTTracker, columnName: String, typeId: Int): OTAttribute<out Any> {
-            return createAttribute(FirebaseHelper.generateAttributeKey(tracker.objectId), tracker, columnName, false, typeId, null, null)
+            return createAttribute(FirebaseHelper.generateAttributeKey(tracker.objectId), tracker.nextAttributeLocalKey(), tracker, columnName, false, typeId, null, null)
         }
     }
 
@@ -117,17 +117,27 @@ abstract class OTAttribute<DataType>(objectId: String?, parentTracker: OTTracker
             }
 
             if (new != null) {
+                this.localKey = new.nextAttributeLocalKey()
                 addedToTracker.invoke(this, new)
             }
         }
     }
 
+    var localKey: Int = localKey ?: parentTracker?.nextAttributeLocalKey() ?: -1
+        private set(value) {
+            if (field != value) {
+                field = value
+
+                if (!suspendDatabaseSync)
+                    databasePointRef?.child("localKey")?.setValue(value)
+            }
+        }
 
     var isRequired: Boolean = isRequired
         set(value) {
             if (field != value) {
                 field = value
-                databasePointRef?.child("is_required")?.setValue(value)
+                databasePointRef?.child("required")?.setValue(value)
             }
         }
 
@@ -148,11 +158,11 @@ abstract class OTAttribute<DataType>(objectId: String?, parentTracker: OTTracker
     var valueConnection: OTConnection? by Delegates.observable(null as OTConnection?) {
         prop, old, new ->
         if (old != new) {
-            databasePointRef?.child("connection_serialized")?.setValue(new?.getSerializedString())
+            databasePointRef?.child("connectionSerialized")?.setValue(new?.getSerializedString())
         }
     }
 
-    constructor(parentTracker: OTTracker?, columnName: String, typeId: Int) : this(null, parentTracker, columnName, false, typeId, null, null)
+    constructor(parentTracker: OTTracker?, columnName: String, typeId: Int) : this(null, null, parentTracker, columnName, false, typeId, null, null)
 
     init {
         suspendDatabaseSync = true
@@ -166,6 +176,10 @@ abstract class OTAttribute<DataType>(objectId: String?, parentTracker: OTTracker
 
         if (connectionData != null) {
             valueConnection = OTConnection(connectionData)
+        }
+
+        if (localKey == null && parentTracker != null) {
+            this.localKey = parentTracker.nextAttributeLocalKey()
         }
         suspendDatabaseSync = false
     }
@@ -197,7 +211,7 @@ abstract class OTAttribute<DataType>(objectId: String?, parentTracker: OTTracker
 
     protected open fun onPropertyValueChanged(args: OTProperty.PropertyChangedEventArgs<out Any>) {
         propertyValueChanged.invoke(this, args)
-        databasePointRef?.child("property_serialized")?.setValue(getSerializedProperties())
+        databasePointRef?.child("propertySerialized")?.setValue(getSerializedProperties())
     }
 
     fun <T> getProperty(key: Int): OTProperty<T> {
