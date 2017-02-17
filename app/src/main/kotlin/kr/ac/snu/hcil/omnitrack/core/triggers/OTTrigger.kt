@@ -130,13 +130,17 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
         if (propertyData != null) {
             for (child in propertyData.children) {
                 val serializedValue = child.value
-                if (serializedValue is String) {
+                if (serializedValue is String && !serializedValue.isNullOrEmpty()) {
                     properties[child.key] = TypeStringSerializationHelper.deserialize(serializedValue)
                 } else properties[child.key] = null
             }
         }
 
         suspendDatabaseSync = false
+    }
+
+    protected fun syncPropertyToDatabase(propertyName: String, value: Any) {
+        databasePointRef?.child("properties")?.child(propertyName)?.setValue(TypeStringSerializationHelper.serialize(value))
     }
 
     private fun getTrackerIdDatabaseChild(dbKey: String?): DatabaseReference? {
@@ -162,7 +166,7 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
     fun writePropertiesToDatabase(propertyRef: DatabaseReference) {
         for ((key, value) in properties) {
             if (value != null) {
-                propertyRef.child(key).setValue(value)
+                propertyRef.child(key).setValue(TypeStringSerializationHelper.serialize(value))
             }
         }
     }

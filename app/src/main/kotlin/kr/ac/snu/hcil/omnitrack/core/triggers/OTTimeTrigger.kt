@@ -266,23 +266,27 @@ class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObject
     override val descriptionResourceId: Int = R.string.trigger_desc_time
 
     var configType: Int by ObservableMapDelegate(CONFIG_TYPE_ALARM, properties) {
-        isDirtySinceLastSync = true
+        value ->
+        syncPropertyToDatabase("configType", value)
         onConfigChanged()
     }
 
     var rangeVariables: Int by ObservableMapDelegate(Range.makeConfig(Range.DAYS_OF_WEEK_FLAGS_MASK), properties) {
-        isDirtySinceLastSync = true
+        value ->
+        syncPropertyToDatabase("rangeVariables", value)
         onRangeChanged()
     }
 
     private val configVariablesDelegate = ObservableMapDelegate<OTTimeTrigger, Int>(AlarmConfig.makeConfig(9, 0, 1), properties) {
-        isDirtySinceLastSync = true
+        value ->
+        syncPropertyToDatabase("configVariables", value)
         onConfigChanged()
     }
     var configVariables: Int by configVariablesDelegate
 
     private val isRepeatedDelegate = ObservableMapDelegate<OTTimeTrigger, Int>(1, properties) {
-        isDirtySinceLastSync = true
+        value ->
+        syncPropertyToDatabase("isRepeated", value)
         onRangeChanged()
     }
     private var _isRepeated: Int by isRepeatedDelegate
@@ -290,9 +294,7 @@ class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObject
 
     var isRepeated: Boolean
         get() {
-            return if (_isRepeated > 0) {
-                true
-            } else false
+            return _isRepeated > 0
         }
         set(value) {
             _isRepeated = if (value == true) 1 else 0
