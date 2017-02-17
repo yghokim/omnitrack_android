@@ -1,10 +1,12 @@
 package kr.ac.snu.hcil.omnitrack.core.triggers
 
 import android.content.Context
+import com.google.firebase.database.DatabaseReference
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
+import kr.ac.snu.hcil.omnitrack.core.database.FirebaseHelper
 import kr.ac.snu.hcil.omnitrack.core.database.NamedObject
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
 import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
@@ -20,13 +22,11 @@ import kotlin.properties.Delegates
 /**
  * Created by younghokim on 16. 7. 27..
  */
-abstract class OTTrigger(objectId: String?, dbId: Long?, val user: OTUser, name: String,
-                         trackerObjectIds: Array<String>,
+abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trackerObjectIds: Array<String>,
                          isOn: Boolean,
                          val action: Int,
                          lastTriggeredTime: Long,
-                         serializedProperties: String? = null) : NamedObject(objectId, dbId, name) {
-
+                         serializedProperties: String? = null) : NamedObject(objectId, name) {
 
     companion object {
         const val ACTION_NOTIFICATION = 0
@@ -38,18 +38,25 @@ abstract class OTTrigger(objectId: String?, dbId: Long?, val user: OTUser, name:
 
         const val TRIGGER_TIME_NEVER_TRIGGERED = -1L
 
-        fun makeInstance(objectId: String?, dbId: Long?, typeId: Int, user: OTUser, name: String, trackerObjectIds: Array<String>, isOn: Boolean, action: Int, lastTriggeredTime: Long, serializedProperties: String?): OTTrigger {
+        fun makeInstance(objectId: String?, typeId: Int, user: OTUser, name: String, trackerObjectIds: Array<String>, isOn: Boolean, action: Int, lastTriggeredTime: Long, serializedProperties: String?): OTTrigger {
             return when (typeId) {
-                TYPE_TIME -> OTTimeTrigger(objectId, dbId, user, name, trackerObjectIds, isOn, action, lastTriggeredTime, serializedProperties)
-                TYPE_DATA_THRESHOLD -> OTDataTrigger(objectId, dbId, user, name, trackerObjectIds, isOn, action, lastTriggeredTime, serializedProperties)
+                TYPE_TIME -> OTTimeTrigger(objectId, user, name, trackerObjectIds, isOn, action, lastTriggeredTime, serializedProperties)
+                TYPE_DATA_THRESHOLD -> OTDataTrigger(objectId, user, name, trackerObjectIds, isOn, action, lastTriggeredTime, serializedProperties)
                 else -> throw Exception("wrong trigger type : $typeId")
             }
         }
 
         fun makeInstance(typeId: Int, name: String, action: Int, user: OTUser, vararg trackers: OTTracker): OTTrigger {
-            return makeInstance(null, null, typeId, user, name, trackers.map { it.objectId }.toTypedArray(), false, action, TRIGGER_TIME_NEVER_TRIGGERED, null)
+            return makeInstance(null, typeId, user, name, trackers.map { it.objectId }.toTypedArray(), false, action, TRIGGER_TIME_NEVER_TRIGGERED, null)
         }
     }
+
+    override fun makeNewObjectId(): String {
+        return FirebaseHelper.generateNewKey(FirebaseHelper.CHILD_NAME_TRIGGERS)
+    }
+
+    override val databasePointRef: DatabaseReference?
+        get() = FirebaseHelper.dbRef?.child(FirebaseHelper.CHILD_NAME_TRIGGERS)?.child(objectId)
 
     abstract val typeId: Int
     abstract val typeNameResourceId: Int

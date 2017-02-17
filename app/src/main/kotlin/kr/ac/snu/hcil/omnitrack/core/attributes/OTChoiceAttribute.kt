@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.View
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTBooleanProperty
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTChoiceEntryListProperty
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
@@ -20,7 +21,7 @@ import java.util.*
 /**
  * Created by younghokim on 16. 8. 12..
  */
-class OTChoiceAttribute(objectId: String?, dbId: Long?, columnName: String, isRequired: Boolean, propertyData: String?, connectionData: String?) : OTAttribute<IntArray>(objectId, dbId, columnName, isRequired, TYPE_CHOICE, propertyData, connectionData) {
+class OTChoiceAttribute(objectId: String?, parentTracker: OTTracker?, columnName: String, isRequired: Boolean, propertyData: String?, connectionData: String?) : OTAttribute<IntArray>(objectId, parentTracker, columnName, isRequired, TYPE_CHOICE, propertyData, connectionData) {
 
     companion object {
         const val PROPERTY_MULTISELECTION = 0

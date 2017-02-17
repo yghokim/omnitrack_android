@@ -4,7 +4,6 @@ import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.database.Cursor
-import android.database.DatabaseUtils
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import kr.ac.snu.hcil.omnitrack.OTApplication
@@ -165,7 +164,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
             return entity
         }
     }*/
-
+/*
     fun findTrackersOfUser(userId: String): List<OTTracker>? {
 
         val query: Cursor = readableDatabase.query(TrackerScheme.tableName, TrackerScheme.columnNames, "${TrackerScheme.USER_ID}=?", arrayOf(userId), null, null, "${TrackerScheme.POSITION} ASC")
@@ -178,7 +177,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
             query.close()
             return result
         } else return null
-    }
+    }*/
 
     fun findAttributesOfTracker(trackerId: Long): List<OTAttribute<out Any>>? {
 
@@ -186,15 +185,19 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
 
         if (query.moveToFirst()) {
             val result = ArrayList<OTAttribute<out Any>>()
+
+            /*
             do {
                 result.add(extractAttributeEntity(query))
             } while (query.moveToNext())
+            */
 
             query.close()
             return result
         } else return null
     }
 
+    /*
     fun findTriggersOfUser(user: OTUser): List<OTTrigger>? {
         val query: Cursor = readableDatabase.query(TriggerScheme.tableName, TriggerScheme.columnNames, "${TriggerScheme.USER_ID}=?", arrayOf(user.objectId), null, null, "${TriggerScheme.POSITION} ASC")
         if (query.moveToFirst()) {
@@ -207,7 +210,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
             return result
         } else return null
 
-    }
+    }*/
 
     fun extractTriggerEntity(cursor: Cursor, user: OTUser): OTTrigger {
         val id = cursor.getLong(cursor.getColumnIndex(TriggerScheme._ID))
@@ -222,7 +225,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
 
         val lastTriggeredTime = cursor.getLong(cursor.getColumnIndex(TriggerScheme.LAST_TRIGGERED_TIME))
 
-        val trigger = OTTrigger.makeInstance(objectId, id, type, user, name, trackerObjectIds.split(";").toTypedArray(), isOn, action, lastTriggeredTime, serializedProperties)
+        val trigger = OTTrigger.makeInstance(objectId, type, user, name, trackerObjectIds.split(";").toTypedArray(), isOn, action, lastTriggeredTime, serializedProperties)
         trigger.isDirtySinceLastSync = false
         return trigger
     }
@@ -235,12 +238,13 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         val isOnShortcut = cursor.getInt(cursor.getColumnIndex(TrackerScheme.IS_ON_SHORTCUT))
         val attributeIdSeed = cursor.getLong(cursor.getColumnIndex(TrackerScheme.ATTR_ID_SEED))
 
-        val tracker = OTTracker(objectId, id, name, color, isOnShortcut.toBoolean(), attributeIdSeed, findAttributesOfTracker(id))
+        val tracker = OTTracker(objectId, name, color, isOnShortcut.toBoolean(), attributeIdSeed, findAttributesOfTracker(id))
         tracker.isDirtySinceLastSync = false
 
         return tracker
     }
 
+    /*
     fun extractAttributeEntity(cursor: Cursor): OTAttribute<out Any> {
         val id = cursor.getLong(cursor.getColumnIndex(AttributeScheme._ID))
         val name = cursor.getString(cursor.getColumnIndex(AttributeScheme.NAME))
@@ -250,11 +254,11 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         val settingData = cursor.getString(cursor.getColumnIndex(AttributeScheme.PROPERTY_DATA))
         val connectionData = cursor.getString(cursor.getColumnIndex(AttributeScheme.CONNECTION_DATA))
 
-        val attribute = OTAttribute.createAttribute(objectId, id, name, isRequired, type, settingData, connectionData)
+        val attribute = OTAttribute.createAttribute(objectId, name, isRequired, type, settingData, connectionData)
         attribute.isDirtySinceLastSync = false
 
         return attribute
-    }
+    }*/
 
     private fun queryById(id: Long, table: TableScheme): Cursor {
         val query = readableDatabase.query(table.tableName, table.columnNames, "${table._ID}=?", arrayOf(id.toString()), null, null, "${table._ID} ASC")
@@ -339,13 +343,14 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
 
             println("storing isOn : ${trigger.isOn}")
 
-            saveObject(trigger, values, TriggerScheme)
+            //saveObject(trigger, values, TriggerScheme)
             trigger.isDirtySinceLastSync = false
         }else{
             println("trigger is not dirty. Do not save. $position")
         }
     }
 
+    /*
     fun save(attribute: OTAttribute<out Any>, position: Int) {
         if (attribute.isDirtySinceLastSync) {
             val values = baseContentValuesOfNamed(attribute, AttributeScheme)
@@ -360,8 +365,9 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
             saveObject(attribute, values, AttributeScheme)
             attribute.isDirtySinceLastSync = false
         }
-    }
+    }*/
 
+    /*
     fun save(tracker: OTTracker, position: Int) {
 
 
@@ -375,7 +381,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
             values.put(TrackerScheme.ATTR_ID_SEED, tracker.attributeIdSeed)
 
             saveObject(tracker, values, TrackerScheme)
-            tracker.isDirtySinceLastSync = false
+            //tracker.isDirtySinceLastSync = false
         }
         writableDatabase.beginTransaction()
 
@@ -387,8 +393,11 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
 
         writableDatabase.setTransactionSuccessful()
         writableDatabase.endTransaction()
-    }
 
+        FirebaseHelper.saveTracker(tracker, position)
+    }*/
+
+    /*
     fun save(user: OTUser) {
         /*
         if (user.isDirtySinceLastSync) {
@@ -422,14 +431,14 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
 
         writableDatabase.setTransactionSuccessful()
         writableDatabase.endTransaction()
-    }
+    }*/
 
     //Item API===============================
 
     fun save(item: OTItem, tracker: OTTracker, notifyIntent: Boolean = true): Int {
         val values = ContentValues()
 
-        values.put(ItemScheme.TRACKER_ID, tracker.dbId)
+        //values.put(ItemScheme.TRACKER_ID, tracker.dbId)
         values.put(ItemScheme.SOURCE_TYPE, item.source.ordinal)
         values.put(ItemScheme.VALUES_JSON, item.getSerializedValueTable(tracker))
         if (item.timestamp != -1L) {
@@ -484,6 +493,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
     }
 
     fun getItems(tracker: OTTracker, listOut: ArrayList<OTItem>): Int {
+        /*
         val cursor = readableDatabase.query(ItemScheme.tableName, ItemScheme.columnNames, "${ItemScheme.TRACKER_ID}=?", arrayOf(tracker.dbId.toString()), null, null, "${ItemScheme.LOGGED_AT} DESC")
 
         var count = 0
@@ -494,10 +504,12 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
             } while (cursor.moveToNext())
         }
 
-        return count
+        return count*/
+        return 0
     }
 
     fun getItems(tracker: OTTracker, timeRange: TimeSpan, listOut: ArrayList<OTItem>, timestampAsc: Boolean = false): Int {
+        /*
         val cursor = readableDatabase.query(ItemScheme.tableName, ItemScheme.columnNames, "${ItemScheme.TRACKER_ID}=?  AND ${ItemScheme.LOGGED_AT} BETWEEN ? AND ?", arrayOf(tracker.dbId.toString(), timeRange.from.toString(), timeRange.to.toString()), null, null, "${ItemScheme.LOGGED_AT} ${if(timestampAsc){"ASC"} else "DESC"}")
 
         var count = 0
@@ -508,7 +520,8 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
             } while (cursor.moveToNext())
         }
 
-        return count
+        return count*/
+        return 0
     }
 
     fun getItem(id: Long, tracker: OTTracker): OTItem? {
@@ -545,8 +558,10 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
 
     fun getLogCountDuring(tracker: OTTracker, from: Long, to: Long): Int
     {
+        /*
         val numRows = DatabaseUtils.queryNumEntries(readableDatabase, ItemScheme.tableName, "${ItemScheme.TRACKER_ID}=? AND ${ItemScheme.LOGGED_AT} BETWEEN ? AND ?", arrayOf(tracker.dbId.toString(), from.toString(), to.toString()))
-        return numRows.toInt()
+        return numRows.toInt()*/
+        return 0
     }
 
     fun getLogCountOfDay(tracker: OTTracker): Observable<Int> {
@@ -568,22 +583,27 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
 
     fun getTotalItemCount(tracker: OTTracker): Observable<Int> {
         return Observable.defer {
+            /*
             val numRows = DatabaseUtils.queryNumEntries(readableDatabase, ItemScheme.tableName, "${ItemScheme.TRACKER_ID}=?", arrayOf(tracker.dbId.toString()))
-            Observable.just(numRows.toInt())
+            Observable.just(numRows.toInt())*/
+            Observable.just(0)
         }.subscribeOn(Schedulers.computation())
     }
 
     fun getLastLoggingTime(tracker: OTTracker): Observable<Long?> {
         return Observable.defer {
+            /*
             val cursor = readableDatabase.query(ItemScheme.tableName, arrayOf(ItemScheme.LOGGED_AT), "${ItemScheme.TRACKER_ID}=?", arrayOf(tracker.dbId.toString()), null, null, "${ItemScheme.LOGGED_AT} DESC", "1")
             if (cursor.moveToFirst()) {
+
                 val value = cursor.getLong(cursor.getColumnIndex(ItemScheme.LOGGED_AT))
                 cursor.close()
                 Observable.just(value)
             } else {
                 cursor.close()
                 Observable.just<Long?>(null)
-            }
+            }*/
+            Observable.just<Long?>(null)
         }.subscribeOn(Schedulers.computation())
     }
 

@@ -2,9 +2,13 @@ package kr.ac.snu.hcil.omnitrack.core
 
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
-import com.google.firebase.database.*
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ValueEventListener
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
+import kr.ac.snu.hcil.omnitrack.core.database.FirebaseHelper
 import kr.ac.snu.hcil.omnitrack.ui.pages.experiment.ExperimentSignInActivity
 
 /**
@@ -40,10 +44,7 @@ object ExperimentConsentManager {
         mActivity = activity
         mResultListener = resultListener
 
-        val dbRef = FirebaseDatabase.getInstance().reference;
-        val userInfoRef = dbRef.child("users").child(userId)
-        println(userInfoRef)
-        userInfoRef.addListenerForSingleValueEvent(object : ValueEventListener {
+        FirebaseHelper.experimentProfileRef?.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError?) {
                 println("Db Error: ${p0?.message}")
                 mResultListener?.onConsentFailed()
@@ -52,7 +53,7 @@ object ExperimentConsentManager {
 
             override fun onDataChange(snapshot: DataSnapshot) {
                 val profile = snapshot.getValue(ExperimentProfile::class.java)
-                if (profile == null || !profile?.isConsentApproved) {
+                if (profile == null || !profile.isConsentApproved) {
                     println("consent form was not approved or is first-time login.")
                     activity.startActivityForResult(Intent(activity, ExperimentSignInActivity::class.java), REQUEST_CODE_EXPERIMENT_SIGN_IN)
                 } else {
@@ -119,6 +120,8 @@ object ExperimentConsentManager {
         if (requestCode == REQUEST_CODE_EXPERIMENT_SIGN_IN) {
             if (resultCode != AppCompatActivity.RESULT_OK || data == null) {
                 if (deleteAccountIfDenied) {
+                    FirebaseHelper.experimentProfileRef?.removeValue()
+
                     OTAuthManager.deleteUser(object : OTAuthManager.SignInResultsHandler {
                         override fun onCancel() {
                         }
@@ -144,9 +147,8 @@ object ExperimentConsentManager {
                 profile.gender = data.getStringExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_GENDER)
                 profile.occupation = data.getStringExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_OCCUPATION)
 
-                val dbRef = FirebaseDatabase.getInstance().reference;
-                val userInfoRef = dbRef.child("users").child(OTAuthManager.userId!!)
-                userInfoRef.setValue(profile, DatabaseReference.CompletionListener { databaseError, databaseReference ->
+                val currentExpRef = FirebaseHelper.experimentProfileRef
+                currentExpRef?.setValue(profile, DatabaseReference.CompletionListener { databaseError, databaseReference ->
                     if (databaseError == null) {
                         mResultListener?.onConsentApproved()
                         finishProcess()
@@ -155,41 +157,6 @@ object ExperimentConsentManager {
                         finishProcess()
                     }
                 })
-
-                /*
-                experimentDataset?.put(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_IS_CONSENT_APPROVED, true.toString())
-                arrayOf(
-                        OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_GENDER,
-                        OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_AGE_GROUP,
-                        OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_OCCUPATION,
-                        OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_COUNTRY)
-                        .forEach {
-                            experimentDataset?.put(it, data.getStringExtra(it))
-                        }
-                experimentDataset?.put(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_EMAIL, AWSMobileClient.defaultMobileClient().identityManager.userEmail)
-
-                experimentDataset?.synchronize(object : Dataset.SyncCallback {
-                    override fun onDatasetDeleted(dataset: Dataset, datasetName: String?): Boolean {
-                        return true
-                    }
-
-                    override fun onConflict(dataset: Dataset, conflicts: MutableList<SyncConflict>?): Boolean {
-                        return true
-                    }
-
-                    override fun onSuccess(dataset: Dataset, updatedRecords: MutableList<Record>?) {
-                        mResultListener?.onConsentApproved()
-                        finishProcess()
-                    }
-
-                    override fun onFailure(dse: DataStorageException?) {
-                    }
-
-                    override fun onDatasetsMerged(dataset: Dataset, datasetNames: MutableList<String>?): Boolean {
-                        return true
-                    }
-
-                })*/
             }
         }
     }

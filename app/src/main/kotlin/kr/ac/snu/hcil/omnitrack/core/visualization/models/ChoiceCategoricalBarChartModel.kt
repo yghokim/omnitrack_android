@@ -37,7 +37,7 @@ class ChoiceCategoricalBarChartModel(override val attribute: OTChoiceAttribute) 
 
         data.clear()
 
-        val tracker = attribute.owner
+        val tracker = attribute.tracker
         if (tracker != null) {
             itemsCache.clear()
             OTApplication.app.dbHelper.getItems(tracker, getTimeScope(), itemsCache)

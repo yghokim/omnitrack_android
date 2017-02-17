@@ -2,16 +2,18 @@ package kr.ac.snu.hcil.omnitrack.core
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.google.firebase.database.DatabaseReference
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
-import kr.ac.snu.hcil.omnitrack.core.database.DatabaseHelper
+import kr.ac.snu.hcil.omnitrack.core.database.FirebaseHelper
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerManager
 import kr.ac.snu.hcil.omnitrack.utils.DefaultNameGenerator
 import kr.ac.snu.hcil.omnitrack.utils.ObservableList
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
+import rx.Observable
 import java.util.*
 
 /**
@@ -32,15 +34,25 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
             return sp.contains(PREFERENCES_KEY_OBJECT_ID)
         }
 
-        fun loadCachedInstance(sp: SharedPreferences, databaseHelper: DatabaseHelper): OTUser? {
+        fun loadCachedInstance(sp: SharedPreferences): rx.Observable<OTUser> {
             if (isUserStored(sp)) {
                 val objId = sp.getString(PREFERENCES_KEY_OBJECT_ID, null)
                 val name = sp.getString(PREFERENCES_KEY_NAME, null)
                 val photoUrl = sp.getString(PREFERENCES_KEY_PHOTO_URL, null)
                 if (objId != null && name != null) {
-                    return OTUser(objId, name, photoUrl, databaseHelper.findTrackersOfUser(objId))
-                } else return null
-            } else return null
+                    return FirebaseHelper.findTrackersOfUser(objId).flatMap {
+                        trackers ->
+                        val user = OTUser(objId, name, photoUrl, trackers)
+                        FirebaseHelper.findTriggersOfUser(user).map {
+                            triggers ->
+                            for (trigger in triggers) {
+                                user.triggerManager.putNewTrigger(trigger)
+                            }
+                            user
+                        }
+                    }
+                } else return Observable.error(Exception("UserInfo is not stored"))
+            } else return Observable.error(Exception("User is not stored"))
         }
 
         fun storeOrOverwriteInstanceCache(instance: OTUser, sp: SharedPreferences): Boolean {
@@ -79,17 +91,13 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
         }
     }*/
 
+    private val databaseRef: DatabaseReference?
+        get() = FirebaseHelper.dbRef?.child(FirebaseHelper.CHILD_NAME_USERS)?.child(objectId)
+
     val trackers = ObservableList<OTTracker>()
 
 
     val triggerManager: OTTriggerManager
-
-    private val _removedTrackerIds = ArrayList<Long>()
-    fun fetchRemovedTrackerIds(): LongArray {
-        val result = _removedTrackerIds.toLongArray()
-        _removedTrackerIds.clear()
-        return result;
-    }
 
     val trackerAdded = Event<ReadOnlyPair<OTTracker, Int>>()
     val trackerRemoved = Event<ReadOnlyPair<OTTracker, Int>>()
@@ -109,9 +117,10 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
             }
         }
 
-        triggerManager = OTTriggerManager(this, OTApplication.app.dbHelper.findTriggersOfUser(this))
+        triggerManager = OTTriggerManager(this)
 
         trackers.elementAdded += { sender, args ->
+            databaseRef?.child(FirebaseHelper.CHILD_NAME_TRACKERS)?.child(args.first.objectId)
             onTrackerAdded(args.first, args.second)
         }
 
@@ -184,16 +193,11 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
 
     private fun onTrackerAdded(new: OTTracker, index: Int) {
         new.owner = this
-        _removedTrackerIds.remove(new.dbId)
-
         trackerAdded.invoke(this, ReadOnlyPair(new, index))
     }
 
     private fun onTrackerRemoved(tracker: OTTracker, index: Int) {
         tracker.owner = null
-
-        if (tracker.dbId != null)
-            _removedTrackerIds.add(tracker.dbId as Long)
 
         trackerRemoved.invoke(this, ReadOnlyPair(tracker, index))
 
@@ -207,6 +211,8 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
             reminder.isOn = false
             triggerManager.removeTrigger(reminder)
         }
+
+        FirebaseHelper.removeTracker(objectId)
     }
 
     fun findAttributeByObjectId(id: String): OTAttribute<out Any>? {

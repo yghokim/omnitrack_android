@@ -78,7 +78,7 @@ class TimeQuerySettingPanel : LinearLayout, IEventListener<Int> {
         pivotEntryAdapter.add(PivotEntry(R.string.msg_connection_wizard_time_query_pivot_present, OTTimeRangeQuery.TYPE_PIVOT_TIMESTAMP))
 
 
-        val siblingAttributes = this.attribute?.owner?.attributes
+        val siblingAttributes = this.attribute?.tracker?.attributes
         if (siblingAttributes != null) {
 
             val fieldNameFormat = resources.getString(R.string.msg_connection_wizard_time_query_pivot_field_format)

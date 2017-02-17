@@ -1,13 +1,13 @@
 package kr.ac.snu.hcil.omnitrack.core.database
 
+import com.google.firebase.database.DatabaseReference
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
-import java.util.*
 import kotlin.properties.Delegates
 
 /**
  * Created by Young-Ho on 7/11/2016.
  */
-abstract class NamedObject(objectId: String?, dbId: Long?, name: String) : IDatabaseStorable, IDatabaseSyncedObject {
+abstract class NamedObject(objectId: String?, name: String) : IDatabaseSyncedObject {
     override var isDirtySinceLastSync: Boolean = true
 
     val nameChangeEvent = Event<String>()
@@ -16,36 +16,26 @@ abstract class NamedObject(objectId: String?, dbId: Long?, name: String) : IData
         objectId ?: makeNewObjectId()
     }
 
-    override var dbId: Long? = dbId
-        set(value){
-            if(field!= null)
-            {
-                throw Exception("dbId is already assigned once.")
-            }
-            else{
-                field = value
-            }
-        }
-        get
-
+    abstract val databasePointRef: DatabaseReference?
+    protected var suspendDatabaseSync: Boolean = false
 
     var name: String by Delegates.observable(name){
         prop, old, new ->
         if (old != new) {
+            if (!suspendDatabaseSync)
+                databasePointRef?.child("name")?.setValue(new)
             onNameChanged(new)
         }
     }
 
     init {
-        isDirtySinceLastSync = dbId == null // if it is directly loaded from db
+        isDirtySinceLastSync == null // if it is directly loaded from db
     }
 
-    constructor() : this(null, null, "Noname")
+    constructor() : this(null, "Noname")
 
 
-    open fun makeNewObjectId(): String {
-        return UUID.randomUUID().toString()
-    }
+    protected abstract fun makeNewObjectId(): String
 
     protected open fun onNameChanged(newName: String){
         isDirtySinceLastSync = true
