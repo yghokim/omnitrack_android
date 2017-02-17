@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes
 
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTNumberStyleProperty
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
@@ -15,7 +16,7 @@ import java.math.BigDecimal
  * Created by Young-Ho Kim on 2016-07-11.
  */
 
-class OTNumberAttribute(objectId: String?, dbId: Long?, columnName: String, isRequired: Boolean, settingData: String?, connectionData: String?) : OTAttribute<BigDecimal>(objectId, dbId, columnName, isRequired, OTAttribute.TYPE_NUMBER, settingData, connectionData) {
+class OTNumberAttribute(objectId: String?, parentTracker: OTTracker?, columnName: String, isRequired: Boolean, settingData: String?, connectionData: String?) : OTAttribute<BigDecimal>(objectId, parentTracker, columnName, isRequired, OTAttribute.TYPE_NUMBER, settingData, connectionData) {
 
     override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_BIGDECIMAL
 

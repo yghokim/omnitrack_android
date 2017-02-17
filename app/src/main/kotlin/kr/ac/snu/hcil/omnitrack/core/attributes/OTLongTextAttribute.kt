@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.attributes
 import android.content.Context
 import android.view.View
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.common.text.LinedTextView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
@@ -13,7 +14,7 @@ import rx.Observable
 /**
  * Created by younghokim on 16. 7. 24..
  */
-class OTLongTextAttribute(objectId: String?, dbId: Long?, columnName: String, isRequired: Boolean, settingData: String?, connectionData: String?) : OTAttribute<CharSequence>(objectId, dbId, columnName, isRequired, Companion.TYPE_LONG_TEXT, settingData, connectionData) {
+class OTLongTextAttribute(objectId: String?, parentTracker: OTTracker?, columnName: String, isRequired: Boolean, settingData: String?, connectionData: String?) : OTAttribute<CharSequence>(objectId, parentTracker, columnName, isRequired, Companion.TYPE_LONG_TEXT, settingData, connectionData) {
     override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_STRING
 
     override fun getInputViewType(previewMode: Boolean): Int {

@@ -17,6 +17,7 @@ import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.database.CacheHelper
 import kr.ac.snu.hcil.omnitrack.core.database.DatabaseHelper
+import kr.ac.snu.hcil.omnitrack.core.database.FirebaseHelper
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
@@ -146,24 +147,23 @@ class OTApplication : MultiDexApplication() {
                 subscriber.onCompleted()
             }
         }
+
         if (_currentUser != null) {
             println("return cached user instance")
             sendUser(_currentUser!!)
         } else {
             //need login
             println("load user from db")
-            val cachedUser = OTUser.loadCachedInstance(systemSharedPreferences, dbHelper)
-            if (cachedUser != null/*&& cachedUser.objectId == cachedUserId*/) {
-                _currentUser = cachedUser
-                sendUser(cachedUser)
-            } else {
-                println("OMNITRACK: make new user instance from server")
+            OTUser.loadCachedInstance(systemSharedPreferences).onErrorResumeNext {
+                error ->
+                error.printStackTrace()
                 if (OTAuthManager.isUserSignedIn()) {
-                    println("OMNITRACK: firebaseUser is signed in.")
-                    try {
-                        val uid = OTAuthManager.userId!!
-                        println("OMNITRACK user identityId: ${uid}, userName: ${OTAuthManager.userName}")
-                        val user = OTUser(uid, OTAuthManager.userName, OTAuthManager.userImageUrl, dbHelper.findTrackersOfUser(uid))
+                    val uid = OTAuthManager.userId!!
+                    println("OMNITRACK user identityId: ${uid}, userName: ${OTAuthManager.userName}")
+                    FirebaseHelper.findTrackersOfUser(uid).flatMap {
+                        trackers ->
+
+                        val user = OTUser(uid, OTAuthManager.userName, OTAuthManager.userImageUrl, trackers)
                         OTUser.storeOrOverwriteInstanceCache(user, systemSharedPreferences)
                         for (tracker in user.getTrackersOnShortcut()) {
                             OTShortcutPanelManager += tracker
@@ -181,21 +181,25 @@ class OTApplication : MultiDexApplication() {
                             //createExampleTrackers(user)
                             createUsabilityTestingTrackers(user)
                         }
-                        _currentUser = user
-                        sendUser(user)
-                    } catch(e: Exception) {
-                        if (!subscriber.isUnsubscribed) {
-                            subscriber.onError(e)
-                        }
-                    }
 
-                } else {
-                    if (!subscriber.isUnsubscribed) {
-                        println("OMNITRACK retreiving user instance error: User didn't signed in with google.")
-                        subscriber.onError(Exception("Retreiving user instance error: User didn't signed in"))
+                        FirebaseHelper.findTriggersOfUser(user).map {
+                            triggers ->
+
+                            for (trigger in triggers)
+                                user.triggerManager.putNewTrigger(trigger)
+
+                            user
+                        }
+
                     }
+                } else {
+                    println("OMNITRACK retreiving user instance error: User didn't signed in with google.")
+                    Observable.error<OTUser>(Exception("retreiving user instance error: User didn't signed in with google."))
                 }
-            }
+            }.doOnNext {
+                user ->
+                _currentUser = user
+            }.subscribe(subscriber)
         }
     }.subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -257,7 +261,8 @@ class OTApplication : MultiDexApplication() {
     fun syncUserToDb() {
         if (_currentUser != null) {
             OTUser.storeOrOverwriteInstanceCache(_currentUser!!, systemSharedPreferences)
-            dbHelper.save(_currentUser!!)
+            //dbHelper.save(_currentUser!!)
+            FirebaseHelper.saveUser(_currentUser!!)
         }
     }
 
@@ -354,7 +359,8 @@ class OTApplication : MultiDexApplication() {
         foodTracker.attributes += OTAttribute.createAttribute(foodTracker, "평점", OTAttribute.TYPE_RATING)
 
 
-        dbHelper.save(user)
+        //dbHelper.save(user)
+
     }
 
     private fun createExampleTrackers(user: OTUser) {
@@ -431,7 +437,7 @@ class OTApplication : MultiDexApplication() {
         stepComparisonTracker.attributes.add(misfitAttribute)
         stepComparisonTracker.attributes.add(googleFitAttribute)
 
-        dbHelper.save(user)
+        //dbHelper.save(user)
 
         return // skip example data
 

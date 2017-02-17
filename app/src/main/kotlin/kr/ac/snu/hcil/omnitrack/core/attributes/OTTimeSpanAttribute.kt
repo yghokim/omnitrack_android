@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.attributes
 
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTSelectionProperty
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
@@ -17,7 +18,7 @@ import java.util.*
 /**
  * Created by younghokim on 16. 8. 6..
  */
-class OTTimeSpanAttribute(objectId: String?, dbId: Long?, columnName: String, isRequired: Boolean, settingData: String?, connectionData: String?) : OTAttribute<TimeSpan>(objectId, dbId, columnName, isRequired, TYPE_TIMESPAN, settingData, connectionData) {
+class OTTimeSpanAttribute(objectId: String?, parentTracker: OTTracker?, columnName: String, isRequired: Boolean, settingData: String?, connectionData: String?) : OTAttribute<TimeSpan>(objectId, parentTracker, columnName, isRequired, TYPE_TIMESPAN, settingData, connectionData) {
 
     companion object {
         const val PROPERTY_GRANULARITY = 0

@@ -46,7 +46,6 @@ object OTAuthManager {
     private val executorService = Executors.newFixedThreadPool(2)
 
     private val mFirebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
-    private var mFirebaseUser: FirebaseUser? = null
 
     private val mGoogleApiClient: GoogleApiClient
     private var googleSignInAccount: GoogleSignInAccount? = null
@@ -63,7 +62,6 @@ object OTAuthManager {
 
     private val mSignInChangedListeners = HashSet<SignInChangedListener>()
 
-    val firebaseUser: FirebaseUser? get() = mFirebaseUser
 
     @Volatile var authToken: String? = null
         private set
@@ -113,10 +111,10 @@ object OTAuthManager {
         }
     }.share().observeOn(Schedulers.io())
     */
-    val userId: String? get() = mFirebaseUser?.uid
+    val userId: String? get() = mFirebaseAuth.currentUser?.uid
 
     fun isUserSignedIn(): Boolean {
-        return mFirebaseUser != null
+        return mFirebaseAuth.currentUser != null
     }
 
     fun refreshGoogleAccount(finished: (Boolean) -> Unit) {
@@ -143,7 +141,6 @@ object OTAuthManager {
             if (success) {
                 firebaseAuthWithGoogle(googleSignInAccount).subscribe({
                     authResult ->
-                    mFirebaseUser = authResult.user
                     reloadUserInfo()
                     notifySignedIn(authResult.user)
                     resultsHandler.onSuccess()
@@ -164,7 +161,7 @@ object OTAuthManager {
                 resultsHandler.onSuccess()
                 } else {
                 Log.d(LOG_TAG, "Reload Firebase User to check connection.")
-                mFirebaseUser!!.reload().addOnCompleteListener {
+                mFirebaseAuth.currentUser!!.reload().addOnCompleteListener {
                     task ->
                     if (task.isSuccessful) {
                             resultsHandler.onSuccess()
@@ -226,7 +223,6 @@ object OTAuthManager {
                 refreshToken()
                 firebaseAuthWithGoogle(googleSignInAccount).subscribe({
                     authResult ->
-                    mFirebaseUser = authResult.user
                     reloadUserInfo()
                     notifySignedIn(authResult.user)
                     resultHandler?.onSuccess()
@@ -272,7 +268,7 @@ object OTAuthManager {
     }
 
     fun deleteUser(resultsHandler: SignInResultsHandler) {
-        mFirebaseUser?.delete()?.addOnCompleteListener {
+        mFirebaseAuth.currentUser?.delete()?.addOnCompleteListener {
             task ->
             if (task.isSuccessful) {
                 resultsHandler.onSuccess()
@@ -314,7 +310,6 @@ object OTAuthManager {
         userName = null
         userImageUrl = null
         email = null
-        mFirebaseUser = null
     }
 
     fun refreshToken(): String? {

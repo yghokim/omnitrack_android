@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.attributes
 
 import android.net.Uri
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
@@ -10,8 +11,8 @@ import rx.Observable
 /**
  * Created by younghokim on 2016. 9. 26..
  */
-class OTAudioRecordAttribute(objectId: String?, dbId: Long?, columnName: String, isRequired: Boolean, settingData: String?, connectionData: String?)
-: OTAttribute<Uri>(objectId, dbId, columnName, isRequired, TYPE_AUDIO, settingData, connectionData) {
+class OTAudioRecordAttribute(objectId: String?, parentTracker: OTTracker?, columnName: String, isRequired: Boolean, settingData: String?, connectionData: String?)
+    : OTAttribute<Uri>(objectId, parentTracker, columnName, isRequired, TYPE_AUDIO, settingData, connectionData) {
 
 
     override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_URI
