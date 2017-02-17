@@ -193,7 +193,7 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
     }
 
     fun generateNewAttributeName(typeName: String, context: Context): String {
-        return DefaultNameGenerator.generateName("${typeName} ${context.resources.getString(R.string.msg_attribute)}", attributes.unObservedList.map { it.name })
+        return DefaultNameGenerator.generateName(typeName, attributes.unObservedList.map { it.name }, true)
     }
 
     fun getRecommendedChartModels(): Array<ChartModel<*>> {

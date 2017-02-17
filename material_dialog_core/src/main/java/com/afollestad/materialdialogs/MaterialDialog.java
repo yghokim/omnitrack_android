@@ -1008,6 +1008,10 @@ public class MaterialDialog extends DialogBase implements
         protected int inputMinLength = -1;
         protected int inputMaxLength = -1;
         protected int inputRangeErrorColor = 0;
+
+        //dismiss dialog when keyboard back button, and set positive when done button clicked on a keyboard
+        protected boolean syncWithKeyboard = true;
+
         protected int[] itemIds;
         protected CharSequence checkBoxPrompt;
         protected boolean checkBoxPromptInitiallyChecked;
@@ -1629,6 +1633,11 @@ public class MaterialDialog extends DialogBase implements
                 ((ViewGroup) view.getParent()).removeView(view);
             this.customView = view;
             this.wrapCustomViewInScroll = wrapInScrollView;
+            return this;
+        }
+
+        public Builder setSyncWithKeyboard(boolean syncWithKeyboard) {
+            this.syncWithKeyboard = syncWithKeyboard;
             return this;
         }
 
