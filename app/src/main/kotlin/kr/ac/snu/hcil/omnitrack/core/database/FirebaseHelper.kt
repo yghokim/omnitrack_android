@@ -76,6 +76,12 @@ object FirebaseHelper {
         var lastTriggeredTime: Long = 0
     }
 
+    @Keep
+    class IndexedKey(
+            var position: Int = 0,
+            var key: String? = null) {
+    }
+
     fun generateNewKey(childName: String): String {
         val newKey = dbRef!!.child(childName).push().key
         println("New Firebase Key: ${newKey}")
@@ -106,7 +112,12 @@ object FirebaseHelper {
         pojo.type = trigger.typeId
         pojo.user = userId
 
-        triggerRef(triggerId = trigger.objectId)?.setValue(pojo)
+        val ref = triggerRef(triggerId = trigger.objectId)
+        if (ref != null) {
+            ref.setValue(pojo)
+            ref.child("trackers").setValue(trigger.trackers.mapIndexed { i, tracker -> IndexedKey(i, tracker.objectId) })
+            trigger.writePropertiesToDatabase(ref.child("properties"))
+        }
     }
 
     fun findTriggersOfUser(user: OTUser): Observable<List<OTTrigger>> {
@@ -134,13 +145,24 @@ object FirebaseHelper {
                         for (child in snapshot.children) {
                             val pojo = child.getValue(TriggerPOJO::class.java)
                             if (pojo != null) {
+
+                                val trackerIds = ArrayList<Pair<String, IndexedKey>>()
+                                for (trackerIdRef in child.child("trackers").children) {
+                                    val trackerIdWithPosition = trackerIdRef.getValue(IndexedKey::class.java)
+                                    if (trackerIdWithPosition != null) {
+                                        trackerIds.add(Pair(trackerIdRef.key, trackerIdWithPosition))
+                                    }
+                                }
+                                trackerIds.sortBy { it -> it.second.position }
+
+
                                 val trigger = OTTrigger.makeInstance(
                                         child.key,
                                         pojo.type,
                                         user,
                                         pojo.name ?: "",
-                                        emptyArray<String>(),
-                                        pojo.is_on, pojo.action, pojo.lastTriggeredTime, null) //TODO properties
+                                        trackerIds.map { Pair<String?, String>(it.first, it.second.key!!) }.toTypedArray(),
+                                        pojo.is_on, pojo.action, pojo.lastTriggeredTime, child.child("properties")) //TODO properties
 
                                 triggers.add(
                                         Pair(pojo.position, trigger)

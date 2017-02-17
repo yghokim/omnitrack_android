@@ -13,7 +13,6 @@ import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
-import kr.ac.snu.hcil.omnitrack.utils.toBoolean
 import kr.ac.snu.hcil.omnitrack.utils.toInt
 import rx.Observable
 import rx.schedulers.Schedulers
@@ -211,7 +210,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         } else return null
 
     }*/
-
+/*
     fun extractTriggerEntity(cursor: Cursor, user: OTUser): OTTrigger {
         val id = cursor.getLong(cursor.getColumnIndex(TriggerScheme._ID))
         val name = cursor.getString(cursor.getColumnIndex(TriggerScheme.NAME))
@@ -244,7 +243,6 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         return tracker
     }
 
-    /*
     fun extractAttributeEntity(cursor: Cursor): OTAttribute<out Any> {
         val id = cursor.getLong(cursor.getColumnIndex(AttributeScheme._ID))
         val name = cursor.getString(cursor.getColumnIndex(AttributeScheme.NAME))

@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.triggers
 
 import android.content.Context
+import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseReference
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTItem
@@ -22,11 +23,10 @@ import kotlin.properties.Delegates
 /**
  * Created by younghokim on 16. 7. 27..
  */
-abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trackerObjectIds: Array<String>,
+abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trackerObjectIds: Array<Pair<String?, String>>?,
                          isOn: Boolean,
                          val action: Int,
-                         lastTriggeredTime: Long,
-                         serializedProperties: String? = null) : NamedObject(objectId, name) {
+                         lastTriggeredTime: Long, propertyData: DataSnapshot? = null) : NamedObject(objectId, name) {
 
     companion object {
         const val ACTION_NOTIFICATION = 0
@@ -38,16 +38,16 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
 
         const val TRIGGER_TIME_NEVER_TRIGGERED = -1L
 
-        fun makeInstance(objectId: String?, typeId: Int, user: OTUser, name: String, trackerObjectIds: Array<String>, isOn: Boolean, action: Int, lastTriggeredTime: Long, serializedProperties: String?): OTTrigger {
+        fun makeInstance(objectId: String?, typeId: Int, user: OTUser, name: String, trackerObjectIds: Array<Pair<String?, String>>?, isOn: Boolean, action: Int, lastTriggeredTime: Long, propertyData: DataSnapshot?): OTTrigger {
             return when (typeId) {
-                TYPE_TIME -> OTTimeTrigger(objectId, user, name, trackerObjectIds, isOn, action, lastTriggeredTime, serializedProperties)
-                TYPE_DATA_THRESHOLD -> OTDataTrigger(objectId, user, name, trackerObjectIds, isOn, action, lastTriggeredTime, serializedProperties)
+                TYPE_TIME -> OTTimeTrigger(objectId, user, name, trackerObjectIds, isOn, action, lastTriggeredTime, propertyData)
+                TYPE_DATA_THRESHOLD -> OTDataTrigger(objectId, user, name, trackerObjectIds, isOn, action, lastTriggeredTime, propertyData)
                 else -> throw Exception("wrong trigger type : $typeId")
             }
         }
 
         fun makeInstance(typeId: Int, name: String, action: Int, user: OTUser, vararg trackers: OTTracker): OTTrigger {
-            return makeInstance(null, typeId, user, name, trackers.map { it.objectId }.toTypedArray(), false, action, TRIGGER_TIME_NEVER_TRIGGERED, null)
+            return makeInstance(null, typeId, user, name, trackers.map { Pair<String?, String>(null, it.objectId) }.toTypedArray(), false, action, TRIGGER_TIME_NEVER_TRIGGERED, null)
         }
     }
 
@@ -58,14 +58,15 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
     override val databasePointRef: DatabaseReference?
         get() = FirebaseHelper.dbRef?.child(FirebaseHelper.CHILD_NAME_TRIGGERS)?.child(objectId)
 
+
     abstract val typeId: Int
     abstract val typeNameResourceId: Int
     abstract val descriptionResourceId: Int
 
     val trackers: List<OTTracker>
-        get() = _trackerList
+        get() = _trackerList.map { it.second }
 
-    private val _trackerList = ArrayList<OTTracker>()
+    private val _trackerList = ArrayList<Pair<String?, OTTracker>>()
 
     val fired = Event<Long>()
 
@@ -80,7 +81,9 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
     var lastTriggeredTime: Long by Delegates.observable(lastTriggeredTime) {
         prop, old, new ->
         if (old != new) {
-            isDirtySinceLastSync = true
+            if (!suspendDatabaseSync) {
+                databasePointRef?.child("lastTriggeredTime")?.setValue(new)
+            }
         }
     }
 
@@ -94,8 +97,9 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
         }
 
         if (old != new) {
-
-            isDirtySinceLastSync = true
+            if (!suspendDatabaseSync) {
+                databasePointRef?.child("is_on")?.setValue(new)
+            }
 
             switchTurned.invoke(this, new)
         }
@@ -105,21 +109,42 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
 
 
     init {
-        for (trackerId in trackerObjectIds) {
-            val tracker = user[trackerId]
-            if (tracker != null) {
-                _trackerList.add(tracker)
+        suspendDatabaseSync = true
+        if (trackerObjectIds != null) {
+            for (trackerIdPair in trackerObjectIds) {
+                val tracker = user[trackerIdPair.second]
+                if (tracker != null) {
+                    _trackerList.add(Pair(trackerIdPair.first, tracker))
+                }
             }
         }
 
+        /*
         if(serializedProperties!=null)
         {
             stringKeyEntryParser.fromJson(serializedProperties, Array<SerializedStringKeyEntry>::class.java).forEach {
                 properties[it.key] = TypeStringSerializationHelper.deserialize(it.value)
             }
+        }*/
+
+        if (propertyData != null) {
+            for (child in propertyData.children) {
+                val serializedValue = child.value
+                if (serializedValue is String) {
+                    properties[child.key] = TypeStringSerializationHelper.deserialize(serializedValue)
+                } else properties[child.key] = null
+            }
         }
 
-        isDirtySinceLastSync = true
+        suspendDatabaseSync = false
+    }
+
+    private fun getTrackerIdDatabaseChild(dbKey: String?): DatabaseReference? {
+        return if (dbKey == null) {
+            databasePointRef?.child("trackers")?.push()
+        } else {
+            databasePointRef?.child("trackers")?.child(dbKey)
+        }
     }
 
     fun getSerializedProperties(): String{
@@ -134,10 +159,21 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
         return stringKeyEntryParser.toJson(list.toTypedArray())
     }
 
+    fun writePropertiesToDatabase(propertyRef: DatabaseReference) {
+        for ((key, value) in properties) {
+            if (value != null) {
+                propertyRef.child(key).setValue(value)
+            }
+        }
+    }
+
     fun addTracker(tracker: OTTracker) {
-        if (!_trackerList.contains(tracker)) {
-            _trackerList.add(tracker)
-            isDirtySinceLastSync = true
+        if (_trackerList.filter { it.second == tracker }.isEmpty()) {
+            val dbChild = getTrackerIdDatabaseChild(null)
+            _trackerList.add(Pair(dbChild?.key, tracker))
+            if (!suspendDatabaseSync) {
+                dbChild?.setValue(FirebaseHelper.IndexedKey(_trackerList.size - 1, tracker.objectId))
+            }
         }
     }
 
@@ -149,8 +185,16 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
     }
 
     fun removeTracker(tracker: OTTracker) {
-        if (_trackerList.remove(tracker)) {
-            isDirtySinceLastSync = true
+        val pair = _trackerList.find { it.second == tracker }
+        if (pair != null) {
+            _trackerList.remove(pair)
+
+            if (!suspendDatabaseSync) {
+                if (pair.first != null) {
+                    val dbChild = getTrackerIdDatabaseChild(pair.first)
+                    dbChild?.removeValue()
+                }
+            }
         }
     }
 

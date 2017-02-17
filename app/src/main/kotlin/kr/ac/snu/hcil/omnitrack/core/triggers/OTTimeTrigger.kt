@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.triggers
 
 import android.content.Context
 import android.text.format.DateUtils
+import com.google.firebase.database.DataSnapshot
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTUser
@@ -12,7 +13,7 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 16. 7. 27
  */
-class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObjectIds: Array<String>, isOn: Boolean, action: Int, lastTriggeredTime: Long, serializedProperties: String? = null) : OTTrigger(objectId, user, name, trackerObjectIds, isOn, action, lastTriggeredTime, serializedProperties) {
+class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObjectIds: Array<Pair<String?, String>>?, isOn: Boolean, action: Int, lastTriggeredTime: Long, propertyData: DataSnapshot? = null) : OTTrigger(objectId, user, name, trackerObjectIds, isOn, action, lastTriggeredTime, propertyData) {
 
     companion object {
 
