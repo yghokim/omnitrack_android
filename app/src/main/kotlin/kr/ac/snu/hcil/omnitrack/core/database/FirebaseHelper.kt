@@ -52,18 +52,18 @@ object FirebaseHelper {
         var user: String? = null
         var position: Int = 0
         var color: Int = 0
-        var attr_id_seed: Long = 0
-        var is_on_shortcut: Boolean = false
+        var attributeLocalKeySeed: Int = 0
+        var onShortcut: Boolean = false
     }
 
     @Keep
     class AttributePOJO : NamedPOJO() {
-        var inner_id: Long = 0
+        var localKey: Int = -1
         var position: Int = 0
-        var property_serialized: String? = null
-        var connection_serialized: String? = null
+        var propertySerialized: String? = null
+        var connectionSerialized: String? = null
         var type: Int = 0
-        var is_required: Boolean = false
+        var required: Boolean = false
     }
 
     @Keep
@@ -72,7 +72,7 @@ object FirebaseHelper {
         var position: Int = 0
         var action: Int = 0
         var type: Int = 0
-        var is_on: Boolean = false
+        var on: Boolean = false
         var lastTriggeredTime: Long = 0
     }
 
@@ -106,7 +106,7 @@ object FirebaseHelper {
         val pojo = TriggerPOJO()
         pojo.action = trigger.action
         pojo.name = trigger.name
-        pojo.is_on = trigger.isOn
+        pojo.on = trigger.isOn
         pojo.lastTriggeredTime = trigger.lastTriggeredTime
         pojo.position = position
         pojo.type = trigger.typeId
@@ -162,7 +162,7 @@ object FirebaseHelper {
                                         user,
                                         pojo.name ?: "",
                                         trackerIds.map { Pair<String?, String>(it.first, it.second.key!!) }.toTypedArray(),
-                                        pojo.is_on, pojo.action, pojo.lastTriggeredTime, child.child("properties")) //TODO properties
+                                        pojo.on, pojo.action, pojo.lastTriggeredTime, child.child("properties")) //TODO properties
 
                                 triggers.add(
                                         Pair(pojo.position, trigger)
@@ -217,12 +217,13 @@ object FirebaseHelper {
             attributeList.add(
                     OTAttribute.createAttribute(
                             attrPojo.first,
+                            attrPojo.second.localKey,
                             null,
                             attrPojo.second.name ?: "noname",
-                            attrPojo.second.is_required,
+                            attrPojo.second.required,
                             attrPojo.second.type,
-                            attrPojo.second.property_serialized,
-                            attrPojo.second.connection_serialized)
+                            attrPojo.second.propertySerialized,
+                            attrPojo.second.connectionSerialized)
             )
         }
 
@@ -230,8 +231,8 @@ object FirebaseHelper {
                 snapshot.key,
                 pojo.name ?: "Noname",
                 pojo.color,
-                pojo.is_on_shortcut,
-                pojo.attr_id_seed,
+                pojo.onShortcut,
+                pojo.attributeLocalKeySeed,
                 attributeList
         ))
     }
@@ -285,9 +286,9 @@ object FirebaseHelper {
         val attributeRef = trackerRef(trackerId)?.child("attributes")?.child(attribute.objectId)
         val pojo = AttributePOJO()
         pojo.position = position
-        pojo.is_required = attribute.isRequired
-        pojo.connection_serialized = attribute.valueConnection?.getSerializedString()
-        pojo.property_serialized = attribute.getSerializedProperties()
+        pojo.required = attribute.isRequired
+        pojo.connectionSerialized = attribute.valueConnection?.getSerializedString()
+        pojo.propertySerialized = attribute.getSerializedProperties()
         pojo.type = attribute.typeId
         pojo.name = attribute.name
 
@@ -302,8 +303,8 @@ object FirebaseHelper {
         values.position = position
         values.color = tracker.color
         values.user = tracker.owner?.objectId
-        values.is_on_shortcut = tracker.isOnShortcut
-        values.attr_id_seed = tracker.attributeIdSeed
+        values.onShortcut = tracker.isOnShortcut
+        values.attributeLocalKeySeed = tracker.attributeLocalKeySeed
 
         val trackerRef = trackerRef(tracker.objectId)
 
