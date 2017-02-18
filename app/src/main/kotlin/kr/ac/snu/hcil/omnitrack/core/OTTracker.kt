@@ -39,13 +39,15 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
 
     var owner: OTUser? by Delegates.observable(null as OTUser?){
         prop, old, new ->
-        if (old != null) {
-            removedFromUser.invoke(this, old)
-        }
-        if (new != null) {
-            if (!suspendDatabaseSync)
-                databasePointRef?.child("user")?.setValue(new.objectId)
-            addedToUser.invoke(this, new)
+        if (old != new) {
+            if (old != null) {
+                removedFromUser.invoke(this, old)
+            }
+            if (new != null) {
+                if (!suspendDatabaseSync)
+                    databasePointRef?.child("user")?.setValue(new.objectId)
+                addedToUser.invoke(this, new)
+            }
         }
     }
 
@@ -87,7 +89,8 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
                 OTShortcutPanelManager -= this
             }
 
-            databasePointRef?.child("onShortcut")?.setValue(new)
+            if (!suspendDatabaseSync)
+                databasePointRef?.child("onShortcut")?.setValue(new)
         }
     }
 

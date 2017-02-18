@@ -17,7 +17,7 @@ abstract class NamedObject(objectId: String?, name: String) : IDatabaseSyncedObj
     }
 
     abstract val databasePointRef: DatabaseReference?
-    protected var suspendDatabaseSync: Boolean = false
+    var suspendDatabaseSync: Boolean = false
 
     var name: String by Delegates.observable(name){
         prop, old, new ->
