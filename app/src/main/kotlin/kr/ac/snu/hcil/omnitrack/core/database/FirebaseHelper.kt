@@ -187,8 +187,32 @@ object FirebaseHelper {
 
     }
 
-    fun removeTracker(objectId: String) {
-        dbRef?.child(CHILD_NAME_TRACKERS)?.child(objectId)?.removeValue()
+    fun removeTracker(tracker: OTTracker, formerOwner: OTUser) {
+        println("Firebase remove tracker: ${tracker.name}, ${tracker.objectId}")
+        deBelongReference(trackerRef(tracker.objectId), CHILD_NAME_TRACKERS, formerOwner.objectId)
+    }
+
+    fun removeTrigger(trigger: OTTrigger) {
+
+        println("Firebase remove tracker: ${trigger.name}, ${trigger.objectId}")
+        deBelongReference(triggerRef(trigger.objectId), CHILD_NAME_TRIGGERS, trigger.user.objectId)
+    }
+
+    private fun deBelongReference(ref: DatabaseReference?, childName: String, userId: String) {
+
+        ref?.child("removed_at")?.setValue(ServerValue.TIMESTAMP)
+        ref?.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onCancelled(p0: DatabaseError?) {
+
+            }
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val trashRef = dbRef?.child("removed")?.child(childName)?.child(snapshot.key)
+                trashRef?.setValue(snapshot.value)
+                snapshot.ref.removeValue()
+            }
+
+        })
     }
 
     fun removeAttribute(trackerId: String, objectId: String) {
@@ -285,6 +309,7 @@ object FirebaseHelper {
     fun saveAttribute(trackerId: String, attribute: OTAttribute<out Any>, position: Int) {
         val attributeRef = trackerRef(trackerId)?.child("attributes")?.child(attribute.objectId)
         val pojo = AttributePOJO()
+        pojo.localKey = attribute.localKey
         pojo.position = position
         pojo.required = attribute.isRequired
         pojo.connectionSerialized = attribute.valueConnection?.getSerializedString()
@@ -308,16 +333,13 @@ object FirebaseHelper {
 
         val trackerRef = trackerRef(tracker.objectId)
 
-        trackerRef?.setValue(values, object : DatabaseReference.CompletionListener {
-            override fun onComplete(p0: DatabaseError?, p1: DatabaseReference?) {
-                if (p0 != null) {
-                    p0.toException().printStackTrace()
-                    println("Firebase error.")
-                } else {
-                    println("No firebase error. completed.")
-                }
+        trackerRef?.setValue(values, DatabaseReference.CompletionListener { p0, p1 ->
+            if (p0 != null) {
+                p0.toException().printStackTrace()
+                println("Firebase error.")
+            } else {
+                println("No firebase error. completed.")
             }
-
         })
 
         for (attribute in tracker.attributes.unObservedList.withIndex()) {
