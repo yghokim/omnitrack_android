@@ -67,62 +67,13 @@ object ExperimentConsentManager {
             }
 
         })
-
-        /*
-        experimentDataset = syncManager.openOrCreateDataset(OTApplication.ACCOUNT_DATASET_EXPERIMENT)
-        if (experimentDataset != null) {
-            experimentDataset?.synchronize(object : Dataset.SyncCallback {
-                override fun onDatasetDeleted(dataset: Dataset?, datasetName: String?): Boolean {
-                    return false
-                }
-
-                override fun onConflict(dataset: Dataset?, conflicts: MutableList<SyncConflict>?): Boolean {
-                    return false
-                }
-
-                override fun onSuccess(dataset: Dataset?, updatedRecords: MutableList<Record>?) {
-                    val isConsentApproved = experimentDataset?.get(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_IS_CONSENT_APPROVED)
-                    Log.v("OmniTrack", "IsConsent Approved : ${isConsentApproved}")
-                    if (isConsentApproved == null || isConsentApproved.toBoolean() != true) {
-                        println("consent form was not approved or is first-time login.")
-                        activity.startActivityForResult(Intent(activity, ExperimentSignInActivity::class.java), REQUEST_CODE_EXPERIMENT_SIGN_IN)
-                    } else {
-                        println("consent form has been approved.")
-                        println(experimentDataset?.get(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_GENDER))
-                        println(experimentDataset?.get(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_AGE_GROUP))
-                        println(experimentDataset?.get(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_OCCUPATION))
-                        println(experimentDataset?.get(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_COUNTRY))
-
-                        mResultListener?.onConsentApproved()
-                        finishProcess()
-                    }
-                }
-
-                override fun onFailure(dse: DataStorageException?) {
-                    dse?.printStackTrace()
-                    println(dse?.message)
-                    println(dse?.cause?.message)
-                    mResultListener?.onConsentFailed()
-                    finishProcess()
-                }
-
-                override fun onDatasetsMerged(dataset: Dataset?, datasetNames: MutableList<String>?): Boolean {
-                    return false
-                }
-
-            })
-
-        } else {
-
-        }
-        */
     }
 
     fun handleActivityResult(deleteAccountIfDenied: Boolean, requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_CODE_EXPERIMENT_SIGN_IN) {
             if (resultCode != AppCompatActivity.RESULT_OK || data == null) {
                 if (deleteAccountIfDenied) {
-                    FirebaseHelper.experimentProfileRef?.removeValue()
+                    //FirebaseHelper.experimentProfileRef?.removeValue()
 
                     OTAuthManager.deleteUser(object : OTAuthManager.SignInResultsHandler {
                         override fun onCancel() {

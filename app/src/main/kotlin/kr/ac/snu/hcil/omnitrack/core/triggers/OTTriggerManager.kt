@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.triggers
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
+import kr.ac.snu.hcil.omnitrack.core.database.FirebaseHelper
 import java.util.*
 
 /**
@@ -127,6 +128,7 @@ class OTTriggerManager(val user: OTUser) {
         }
 
         //TODO remove trigger from DB
+        FirebaseHelper.removeTrigger(trigger)
     }
 
     private fun onTriggerFired(trigger: OTTrigger, triggerTime: Long) {

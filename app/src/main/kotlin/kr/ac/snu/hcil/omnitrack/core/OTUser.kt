@@ -130,7 +130,7 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
         trackers.elementReordered += {
             sender, range ->
             for (i in range) {
-                trackers[i].isDirtySinceLastSync = true
+                trackers[i].databasePointRef?.child("position")?.setValue(i)
             }
         }
     }
@@ -193,13 +193,16 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
     private fun onTrackerAdded(new: OTTracker, index: Int) {
         new.owner = this
         trackerAdded.invoke(this, ReadOnlyPair(new, index))
+
+        println("tracker was added")
+        FirebaseHelper.saveTracker(new, index)
     }
 
     private fun onTrackerRemoved(tracker: OTTracker, index: Int) {
         tracker.owner = null
-
         trackerRemoved.invoke(this, ReadOnlyPair(tracker, index))
 
+        tracker.suspendDatabaseSync = true
         if (tracker.isOnShortcut) {
             tracker.isOnShortcut = false
         }
@@ -211,7 +214,9 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
             triggerManager.removeTrigger(reminder)
         }
 
-        FirebaseHelper.removeTracker(objectId)
+        println("tracker was removed.")
+        tracker.suspendDatabaseSync = false
+        FirebaseHelper.removeTracker(tracker, this)
     }
 
     fun findAttributeByObjectId(id: String): OTAttribute<out Any>? {

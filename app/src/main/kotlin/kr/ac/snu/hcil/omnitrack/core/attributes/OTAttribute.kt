@@ -117,7 +117,7 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
             }
 
             if (new != null) {
-                this.localKey = new.nextAttributeLocalKey()
+                //this.localKey = new.nextAttributeLocalKey()
                 addedToTracker.invoke(this, new)
             }
         }
@@ -191,6 +191,7 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
     }
 
     fun getSerializedProperties(): String {
+        println(propertyKeys)
         return integerKeyEntryParser.toJson(
                 propertyKeys.map {
                     SerializedIntegerKeyEntry(it, getProperty<Any>(it).getSerializedValue())
@@ -211,7 +212,8 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
 
     protected open fun onPropertyValueChanged(args: OTProperty.PropertyChangedEventArgs<out Any>) {
         propertyValueChanged.invoke(this, args)
-        databasePointRef?.child("propertySerialized")?.setValue(getSerializedProperties())
+        if (!suspendDatabaseSync)
+            databasePointRef?.child("propertySerialized")?.setValue(getSerializedProperties())
     }
 
     fun <T> getProperty(key: Int): OTProperty<T> {

@@ -10,7 +10,6 @@ import android.text.style.StyleSpan
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
-import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTProperty
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTSelectionProperty
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
@@ -29,6 +28,8 @@ class OTTimeAttribute(objectId: String?, localKey: Int?, parentTracker: OTTracke
 
     override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_TIMEPOINT
 
+
+    override val propertyKeys: IntArray = intArrayOf(GRANULARITY)
 
     override fun getInputViewType(previewMode: Boolean): Int {
         return AAttributeInputView.VIEW_TYPE_TIME_POINT
@@ -64,12 +65,6 @@ class OTTimeAttribute(objectId: String?, localKey: Int?, parentTracker: OTTracke
     var granularity: Int
         get() = getPropertyValue<Int>(GRANULARITY)
         set(value) = setPropertyValue(GRANULARITY, value)
-
-    override fun onPropertyValueChanged(args: OTProperty.PropertyChangedEventArgs<out Any>) {
-        super.onPropertyValueChanged(args)
-    }
-
-    override val propertyKeys: IntArray = intArrayOf(GRANULARITY)
 
     override fun createProperties() {
         assignProperty(OTSelectionProperty(GRANULARITY,
