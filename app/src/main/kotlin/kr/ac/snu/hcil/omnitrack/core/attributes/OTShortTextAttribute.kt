@@ -21,7 +21,7 @@ class OTShortTextAttribute(objectId: String?, localKey: Int?, parentTracker: OTT
     override fun createProperties() {
     }
 
-    override val propertyKeys: IntArray = intArrayOf()
+    override val propertyKeys: Array<String> = emptyArray()
 
     override fun formatAttributeValue(value: Any): CharSequence {
         return value.toString()

@@ -21,7 +21,7 @@ class OTLongTextAttribute(objectId: String?, localKey: Int?, parentTracker: OTTr
         return AAttributeInputView.VIEW_TYPE_LONG_TEXT
     }
 
-    override val propertyKeys: IntArray = intArrayOf()
+    override val propertyKeys: Array<String> = emptyArray()
 
     override val typeNameResourceId: Int = R.string.type_longtext_name
 

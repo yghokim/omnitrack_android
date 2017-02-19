@@ -22,8 +22,6 @@ import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 import kr.ac.snu.hcil.omnitrack.utils.TextHelper
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
-import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializedIntegerKeyEntry
-import kr.ac.snu.hcil.omnitrack.utils.serialization.integerKeyEntryParser
 import rx.Observable
 import java.util.*
 import kotlin.properties.Delegates
@@ -146,14 +144,14 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
 
     abstract val valueNumericCharacteristics: NumericCharacteristics
 
-    abstract val propertyKeys: IntArray
 
     abstract val typeNameResourceId: Int
 
     abstract val typeSmallIconResourceId: Int
 
+    abstract val propertyKeys: Array<String>
     val propertyValueChanged = Event<OTProperty.PropertyChangedEventArgs<out Any>>()
-    private val settingsProperties = SparseArray<OTProperty<out Any>>()
+    private val settingsProperties = HashMap<String, OTProperty<out Any>>()
 
     var valueConnection: OTConnection? by Delegates.observable(null as OTConnection?) {
         prop, old, new ->
@@ -192,7 +190,7 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
     open fun compareValues(a: Any, b: Any): Int {
         return 0
     }
-
+/*
     fun getSerializedProperties(): String {
         println(propertyKeys)
         return integerKeyEntryParser.toJson(
@@ -200,18 +198,18 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
                     SerializedIntegerKeyEntry(it, getProperty<Any>(it).getSerializedValue())
                 }.toTypedArray()
         )
-    }
+    }*/
 
     fun writePropertiesToDatabase(ref: MutableMap<String, Any>) {
         propertyKeys.forEach {
             it ->
-            ref[it.toString()] = getProperty<Any>(it).getSerializedValue()
+            ref[it] = getProperty<Any>(it).getSerializedValue()
         }
     }
 
     fun readPropertiesFromDatabase(ref: Map<String, Any>) {
         for (child in ref.entries) {
-            setPropertyValueFromSerializedString(child.key.toInt(), child.value as String)
+            setPropertyValueFromSerializedString(child.key, child.value as String)
         }
     }
 
@@ -233,20 +231,20 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
         }
     }
 
-    fun <T> getProperty(key: Int): OTProperty<T> {
+    fun <T> getProperty(key: String): OTProperty<T> {
         @Suppress("UNCHECKED_CAST")
         return settingsProperties[key]!! as OTProperty<T>
     }
 
-    fun <T> getPropertyValue(key: Int): T {
+    fun <T> getPropertyValue(key: String): T {
         return getProperty<T>(key).value
     }
 
-    fun setPropertyValue(key: Int, value: Any) {
+    fun setPropertyValue(key: String, value: Any) {
         getProperty<Any>(key).value = value
     }
 
-    fun setPropertyValueFromSerializedString(key: Int, serializedValue: String) {
+    fun setPropertyValueFromSerializedString(key: String, serializedValue: String) {
         getProperty<Any>(key).setValueFromSerializedString(serializedValue)
     }
 
@@ -269,8 +267,8 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
 
     abstract fun getInputViewType(previewMode: Boolean = false): Int
 
-    open fun makePropertyViews(context: Context): Collection<ReadOnlyPair<Int?, View>> {
-        val result = ArrayList<ReadOnlyPair<Int?, View>>()
+    open fun makePropertyViews(context: Context): Collection<ReadOnlyPair<String, View>> {
+        val result = ArrayList<ReadOnlyPair<String, View>>()
         for (key in propertyKeys) {
             result.add(ReadOnlyPair(key, getProperty<Any>(key).buildView(context)))
         }

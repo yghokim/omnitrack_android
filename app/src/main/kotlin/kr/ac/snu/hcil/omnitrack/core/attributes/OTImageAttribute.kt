@@ -38,7 +38,7 @@ class OTImageAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrack
 
     override fun getInputViewType(previewMode: Boolean): Int = AAttributeInputView.VIEW_TYPE_IMAGE
 
-    override val propertyKeys: IntArray = intArrayOf()
+    override val propertyKeys: Array<String> = emptyArray()
 
     override fun refreshInputViewUI(inputView: AAttributeInputView<out Any>) {
 

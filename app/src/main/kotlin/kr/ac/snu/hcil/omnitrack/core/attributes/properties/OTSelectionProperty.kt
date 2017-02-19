@@ -7,7 +7,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.SelectionPropert
 /**
  * Created by younghokim on 16. 7. 12..
  */
-class OTSelectionProperty(key: Int, title: String, private val entries: Array<String>) : OTProperty<Int>(0, key, title) {
+class OTSelectionProperty(key: String, title: String, private val entries: Array<String>) : OTProperty<Int>(0, key, title) {
     override fun getSerializedValue(): String {
         return value.toString()
     }

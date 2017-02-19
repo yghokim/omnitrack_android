@@ -24,11 +24,11 @@ import java.util.*
 class OTChoiceAttribute(objectId: String?, localKey: Int?, parentTracker: OTTracker?, columnName: String, isRequired: Boolean, propertyData: Map<String, Any>?, connectionData: String?) : OTAttribute<IntArray>(objectId, localKey, parentTracker, columnName, isRequired, TYPE_CHOICE, propertyData, connectionData) {
 
     companion object {
-        const val PROPERTY_MULTISELECTION = 0
-        const val PROPERTY_ENTRIES = 1
+        const val PROPERTY_MULTISELECTION = "multiSelection"
+        const val PROPERTY_ENTRIES = "entries"
     }
 
-    override val propertyKeys: IntArray = intArrayOf(PROPERTY_MULTISELECTION, PROPERTY_ENTRIES)
+    override val propertyKeys: Array<String> = arrayOf(PROPERTY_MULTISELECTION, PROPERTY_ENTRIES)
 
     override val typeNameResourceId: Int = R.string.type_choice_name
 

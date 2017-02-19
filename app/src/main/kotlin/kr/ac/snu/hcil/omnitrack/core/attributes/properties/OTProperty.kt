@@ -9,9 +9,9 @@ import kotlin.properties.Delegates
 /**
  * Created by younghokim on 16. 7. 12..
  */
-abstract class OTProperty<T>(initialValue: T, val key: Int, val title: String?) : ISerializableValueContainer {
+abstract class OTProperty<T>(initialValue: T, val key: String, val title: String?) : ISerializableValueContainer {
 
-    data class PropertyChangedEventArgs<T>(val key: Int, val old: T, val new: T)
+    data class PropertyChangedEventArgs<T>(val key: String, val old: T, val new: T)
 
     val onValueChanged = Event<PropertyChangedEventArgs<T>>()
 
