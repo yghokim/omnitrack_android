@@ -18,7 +18,7 @@ import java.util.*
 /**
  * Created by younghokim on 16. 8. 6..
  */
-class OTTimeSpanAttribute(objectId: String?, localKey: Int?, parentTracker: OTTracker?, columnName: String, isRequired: Boolean, settingData: Map<String, Any>?, connectionData: String?) : OTAttribute<TimeSpan>(objectId, localKey, parentTracker, columnName, isRequired, TYPE_TIMESPAN, settingData, connectionData) {
+class OTTimeSpanAttribute(objectId: String?, localKey: Int?, parentTracker: OTTracker?, columnName: String, isRequired: Boolean, settingData: Map<String, Any?>?, connectionData: String?) : OTAttribute<TimeSpan>(objectId, localKey, parentTracker, columnName, isRequired, TYPE_TIMESPAN, settingData, connectionData) {
 
     companion object {
         const val PROPERTY_GRANULARITY = "granularity"

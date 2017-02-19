@@ -12,7 +12,7 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 16. 7. 27
  */
-class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObjectIds: Array<Pair<String?, String>>?, isOn: Boolean, action: Int, lastTriggeredTime: Long, propertyData: Map<String, Any>? = null) : OTTrigger(objectId, user, name, trackerObjectIds, isOn, action, lastTriggeredTime, propertyData) {
+class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObjectIds: Array<Pair<String?, String>>?, isOn: Boolean, action: Int, lastTriggeredTime: Long, propertyData: Map<String, String>? = null) : OTTrigger(objectId, user, name, trackerObjectIds, isOn, action, lastTriggeredTime, propertyData) {
 
     companion object {
 

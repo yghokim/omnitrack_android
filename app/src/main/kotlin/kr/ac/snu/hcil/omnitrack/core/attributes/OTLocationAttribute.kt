@@ -18,7 +18,7 @@ import rx.Observable
 /**
  * Created by Young-Ho on 8/2/2016.
  */
-class OTLocationAttribute(objectId: String?, localKey: Int?, parentTracker: OTTracker?, columnName: String, isRequired: Boolean, settingData: Map<String, Any>?, connectionData: String?) : OTAttribute<LatLng>(objectId, localKey, parentTracker, columnName, isRequired, TYPE_LOCATION, settingData, connectionData) {
+class OTLocationAttribute(objectId: String?, localKey: Int?, parentTracker: OTTracker?, columnName: String, isRequired: Boolean, settingData: Map<String, Any?>?, connectionData: String?) : OTAttribute<LatLng>(objectId, localKey, parentTracker, columnName, isRequired, TYPE_LOCATION, settingData, connectionData) {
 
     companion object {
         fun getCachedLocation(lm: LocationManager, enabledOnly: Boolean): Location? {
