@@ -14,7 +14,7 @@ import rx.Observable
 /**
  * Created by younghokim on 16. 7. 24..
  */
-class OTLongTextAttribute(objectId: String?, localKey: Int?, parentTracker: OTTracker?, columnName: String, isRequired: Boolean, settingData: String?, connectionData: String?) : OTAttribute<CharSequence>(objectId, localKey, parentTracker, columnName, isRequired, Companion.TYPE_LONG_TEXT, settingData, connectionData) {
+class OTLongTextAttribute(objectId: String?, localKey: Int?, parentTracker: OTTracker?, columnName: String, isRequired: Boolean, settingData: Map<String, Any>?, connectionData: String?) : OTAttribute<CharSequence>(objectId, localKey, parentTracker, columnName, isRequired, Companion.TYPE_LONG_TEXT, settingData, connectionData) {
     override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_STRING
 
     override fun getInputViewType(previewMode: Boolean): Int {

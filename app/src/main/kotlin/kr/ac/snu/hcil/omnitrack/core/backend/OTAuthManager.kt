@@ -220,6 +220,7 @@ object OTAuthManager {
             if (result.isSuccess) {
                 //Signed in successfully.
                 googleSignInAccount = result.signInAccount
+                println("signed in google account: ${result.signInAccount}")
                 refreshToken()
                 firebaseAuthWithGoogle(googleSignInAccount).subscribe({
                     authResult ->
