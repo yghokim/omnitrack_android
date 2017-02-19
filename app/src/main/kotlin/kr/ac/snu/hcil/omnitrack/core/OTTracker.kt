@@ -41,11 +41,17 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
         prop, old, new ->
         if (old != new) {
             if (old != null) {
+                if (!suspendDatabaseSync) {
+                    FirebaseHelper.setContainsFlagOfUser(old.objectId, this.objectId, FirebaseHelper.CHILD_NAME_TRACKERS, false)
+                }
+
                 removedFromUser.invoke(this, old)
             }
             if (new != null) {
-                if (!suspendDatabaseSync)
+                if (!suspendDatabaseSync) {
                     databasePointRef?.child("user")?.setValue(new.objectId)
+                    FirebaseHelper.setContainsFlagOfUser(new.objectId, this.objectId, FirebaseHelper.CHILD_NAME_TRACKERS, true)
+                }
                 addedToUser.invoke(this, new)
             }
         }

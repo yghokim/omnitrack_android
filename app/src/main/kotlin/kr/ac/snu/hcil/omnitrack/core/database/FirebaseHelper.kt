@@ -49,6 +49,11 @@ object FirebaseHelper {
         var name: String? = null
     }
 
+    @Keep class UserPOJO {
+        var trackers: HashMap<String, Int>? = null
+        var triggers: HashMap<String, Int>? = null
+    }
+
     @Keep
     class TrackerPOJO : NamedPOJO() {
         var user: String? = null
@@ -193,6 +198,18 @@ object FirebaseHelper {
 
     }
 
+    fun getContainsFlagListOfUser(userId: String, childName: String): DatabaseReference? {
+        return dbRef?.child(CHILD_NAME_USERS)?.child(userId)?.child(childName)
+    }
+
+    fun setContainsFlagOfUser(userId: String, objectId: String, childName: String, contains: Boolean) {
+        getContainsFlagListOfUser(userId, childName)?.child(objectId)?.setValue(if (contains) {
+            true
+        } else {
+            null
+        })
+    }
+
     fun removeTracker(tracker: OTTracker, formerOwner: OTUser) {
         println("Firebase remove tracker: ${tracker.name}, ${tracker.objectId}")
         deBelongReference(trackerRef(tracker.objectId), CHILD_NAME_TRACKERS, formerOwner.objectId)
@@ -205,20 +222,23 @@ object FirebaseHelper {
     }
 
     private fun deBelongReference(ref: DatabaseReference?, childName: String, userId: String) {
+        if (ref != null) {
+            setContainsFlagOfUser(userId, ref.key, childName, false)
 
-        ref?.child("removed_at")?.setValue(ServerValue.TIMESTAMP)
-        ref?.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onCancelled(p0: DatabaseError?) {
+            ref.child("removed_at")?.setValue(ServerValue.TIMESTAMP)
+            ref.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onCancelled(p0: DatabaseError?) {
 
-            }
+                }
 
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val trashRef = dbRef?.child("removed")?.child(childName)?.child(snapshot.key)
-                trashRef?.setValue(snapshot.value)
-                snapshot.ref.removeValue()
-            }
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val trashRef = dbRef?.child("removed")?.child(childName)?.child(snapshot.key)
+                    trashRef?.setValue(snapshot.value)
+                    snapshot.ref.removeValue()
+                }
 
-        })
+            })
+        }
     }
 
     fun removeAttribute(trackerId: String, objectId: String) {
@@ -236,23 +256,20 @@ object FirebaseHelper {
         val attributes = pojo.attributes
         var attributeList: ArrayList<OTAttribute<out Any>>? = null
         if (attributes != null) {
-            attributeList = ArrayList<OTAttribute<out Any>>()
             val attrPojos = ArrayList<Map.Entry<String, AttributePOJO>>(pojo.attributes?.entries)
 
             attrPojos.sortBy { it -> it.value.position }
 
-            for (attrPojo in attrPojos) {
-                attributeList.add(
-                        OTAttribute.createAttribute(
-                                attrPojo.key,
-                                attrPojo.value.localKey,
-                                null,
-                                attrPojo.value.name ?: "noname",
-                                attrPojo.value.required,
-                                attrPojo.value.type,
-                                attrPojo.value.properties,
-                                attrPojo.value.connectionSerialized)
-                )
+            attributeList = attrPojos.mapTo(ArrayList<OTAttribute<out Any>>()) {
+                OTAttribute.createAttribute(
+                        it.key,
+                        it.value.localKey,
+                        null,
+                        it.value.name ?: "noname",
+                        it.value.required,
+                        it.value.type,
+                        it.value.properties,
+                        it.value.connectionSerialized)
             }
         }
 
@@ -269,7 +286,10 @@ object FirebaseHelper {
     fun findTrackersOfUser(userId: String): Observable<List<OTTracker>> {
 
         println("userId: ${userId}")
-        val query = makeQueryOfUser(userId, CHILD_NAME_TRACKERS)
+
+
+        val query = getContainsFlagListOfUser(userId, CHILD_NAME_TRACKERS)
+
         return if (query != null) {
             Observable.create {
                 subscriber ->
@@ -290,18 +310,52 @@ object FirebaseHelper {
 
                         println("Tracker count: ${snapshot.childrenCount}")
 
-                        for (child in snapshot.children) {
-                            trackers.add(extractTrackerWithPosition(child))
-                        }
+                        Observable.zip<List<OTTracker>>(snapshot.children.filter { it.value == true }.map {
 
-                        trackers.sortBy(Pair<Int, OTTracker>::first)
+                            Observable.create<Pair<Int, OTTracker>> {
+                                subscriber ->
+                                println("querying tracker ${it.key}")
+                                val trackerRef = trackerRef(it.key)
+                                if (trackerRef == null) {
+                                    if (!subscriber.isUnsubscribed) {
+                                        subscriber.onError(Exception("query does not exists."))
+                                    }
+                                } else {
+                                    trackerRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                                        override fun onCancelled(p0: DatabaseError?) {
+                                            if (!subscriber.isUnsubscribed) {
+                                                p0?.toException()?.printStackTrace()
+                                                subscriber.onError(Exception("tracker query error."))
+                                            }
+                                        }
 
-                        if (!subscriber.isUnsubscribed) {
-                            subscriber.onNext(trackers.map { it -> it.second })
-                            subscriber.onCompleted()
-                        }
+                                        override fun onDataChange(snapshot: DataSnapshot) {
+                                            println(snapshot.value)
+                                            if (snapshot.value != null) {
+                                                if (!subscriber.isUnsubscribed) {
+                                                    subscriber.onNext(extractTrackerWithPosition(snapshot))
+                                                    subscriber.onCompleted()
+                                                }
+                                            } else {
+                                                if (!subscriber.isUnsubscribed) {
+                                                    subscriber.onError(Exception("tracker id does not exists."))
+                                                }
+                                            }
+                                        }
+
+                                    })
+                                }
+                            }.onErrorResumeNext { Observable.empty() }
+
+
+                        }, {
+                            pairs ->
+
+                            pairs.map { it as Pair<Int, OTTracker> }.sortedBy { it.first }.map {
+                                it.second
+                            }
+                        }).subscribe(subscriber)
                     }
-
                 })
 
             }
@@ -336,6 +390,10 @@ object FirebaseHelper {
 
     fun saveTracker(tracker: OTTracker, position: Int) {
         println("save tracker: ${tracker.name}, ${tracker.objectId}")
+
+        if (tracker.owner != null) {
+            FirebaseHelper.setContainsFlagOfUser(tracker.owner!!.objectId, tracker.objectId, FirebaseHelper.CHILD_NAME_TRACKERS, true)
+        }
         val values = TrackerPOJO()
         values.name = tracker.name
         values.position = position
