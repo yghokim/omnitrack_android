@@ -17,7 +17,7 @@ import rx.Observable
 /**
  * Created by younghokim on 16. 9. 6..
  */
-class OTRatingAttribute(objectId: String?, localKey: Int?, parentTracker: OTTracker?, columnName: String, isRequired: Boolean, settingData: Map<String, Any>?, connectionData: String?)
+class OTRatingAttribute(objectId: String?, localKey: Int?, parentTracker: OTTracker?, columnName: String, isRequired: Boolean, settingData: Map<String, Any?>?, connectionData: String?)
     : OTAttribute<Float>(objectId, localKey, parentTracker, columnName, isRequired, OTAttribute.TYPE_RATING, settingData, connectionData) {
 
     companion object {

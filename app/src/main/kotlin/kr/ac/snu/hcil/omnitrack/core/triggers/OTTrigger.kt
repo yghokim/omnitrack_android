@@ -26,7 +26,7 @@ import kotlin.properties.Delegates
 abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trackerObjectIds: Array<Pair<String?, String>>?,
                          isOn: Boolean,
                          val action: Int,
-                         lastTriggeredTime: Long, propertyData: Map<String, Any>? = null) : NamedObject(objectId, name) {
+                         lastTriggeredTime: Long, propertyData: Map<String, String>? = null) : NamedObject(objectId, name) {
 
     companion object {
         const val ACTION_NOTIFICATION = 0
@@ -38,7 +38,7 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
 
         const val TRIGGER_TIME_NEVER_TRIGGERED = -1L
 
-        fun makeInstance(objectId: String?, typeId: Int, user: OTUser, name: String, trackerObjectIds: Array<Pair<String?, String>>?, isOn: Boolean, action: Int, lastTriggeredTime: Long, propertyData: Map<String, Any>?): OTTrigger {
+        fun makeInstance(objectId: String?, typeId: Int, user: OTUser, name: String, trackerObjectIds: Array<Pair<String?, String>>?, isOn: Boolean, action: Int, lastTriggeredTime: Long, propertyData: Map<String, String>?): OTTrigger {
             return when (typeId) {
                 TYPE_TIME -> OTTimeTrigger(objectId, user, name, trackerObjectIds, isOn, action, lastTriggeredTime, propertyData)
                 TYPE_DATA_THRESHOLD -> OTDataTrigger(objectId, user, name, trackerObjectIds, isOn, action, lastTriggeredTime, propertyData)
@@ -163,7 +163,7 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
         return stringKeyEntryParser.toJson(list.toTypedArray())
     }
 
-    fun writePropertiesToDatabase(propertyRef: MutableMap<String, Any>) {
+    fun writePropertiesToDatabase(propertyRef: MutableMap<String, String>) {
         for ((key, value) in properties) {
             if (value != null) {
                 propertyRef[key] = TypeStringSerializationHelper.serialize(value)
