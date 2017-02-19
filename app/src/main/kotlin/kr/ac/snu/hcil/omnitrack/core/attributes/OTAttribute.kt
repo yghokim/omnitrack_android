@@ -29,7 +29,7 @@ import kotlin.properties.Delegates
 /**
  * Created by Young-Ho on 7/11/2016.
  */
-abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTracker: OTTracker?, columnName: String, isRequired: Boolean, val typeId: Int, propertyData: Map<String, Any>?, connectionData: String?) : NamedObject(objectId, columnName) {
+abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTracker: OTTracker?, columnName: String, isRequired: Boolean, val typeId: Int, propertyData: Map<String, Any?>?, connectionData: String?) : NamedObject(objectId, columnName) {
 
     override val databasePointRef: DatabaseReference?
         get() {
@@ -45,9 +45,11 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
         }
 
     override fun makeNewObjectId(): String {
+        /*
         if (tracker != null) {
             return FirebaseHelper.generateAttributeKey(tracker!!.objectId)
-        } else return UUID.randomUUID().toString()
+        } else return UUID.randomUUID().toString()*/
+        return "attr_$localKey"
     }
 
     companion object {
@@ -80,7 +82,7 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
         }
 
 
-        fun createAttribute(objectId: String?, localKey: Int?, parent: OTTracker?, columnName: String, isRequired: Boolean, typeId: Int, propertyData: Map<String, Any>?, connectionData: String?): OTAttribute<out Any> {
+        fun createAttribute(objectId: String?, localKey: Int?, parent: OTTracker?, columnName: String, isRequired: Boolean, typeId: Int, propertyData: Map<String, Any?>?, connectionData: String?): OTAttribute<out Any> {
             val attr = when (typeId) {
                 TYPE_NUMBER -> OTNumberAttribute(objectId, localKey, parent, columnName, isRequired, propertyData, connectionData)
                 TYPE_TIME -> OTTimeAttribute(objectId, localKey, parent, columnName, isRequired, propertyData, connectionData)
@@ -98,7 +100,7 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
         }
 
         fun createAttribute(tracker: OTTracker, columnName: String, typeId: Int): OTAttribute<out Any> {
-            return createAttribute(FirebaseHelper.generateAttributeKey(tracker.objectId), tracker.nextAttributeLocalKey(), tracker, columnName, false, typeId, null, null)
+            return createAttribute(null, tracker.nextAttributeLocalKey(), tracker, columnName, false, typeId, null, null)
         }
     }
 
@@ -200,14 +202,14 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
         )
     }*/
 
-    fun writePropertiesToDatabase(ref: MutableMap<String, Any>) {
+    fun writePropertiesToDatabase(ref: MutableMap<String, String>) {
         propertyKeys.forEach {
             it ->
             ref[it] = getProperty<Any>(it).getSerializedValue()
         }
     }
 
-    fun readPropertiesFromDatabase(ref: Map<String, Any>) {
+    fun readPropertiesFromDatabase(ref: Map<String, Any?>) {
         for (child in ref.entries) {
             setPropertyValueFromSerializedString(child.key, child.value as String)
         }

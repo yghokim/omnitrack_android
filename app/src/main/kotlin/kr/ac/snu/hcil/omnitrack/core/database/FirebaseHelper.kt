@@ -65,7 +65,7 @@ object FirebaseHelper {
         var connectionSerialized: String? = null
         var type: Int = 0
         var required: Boolean = false
-        var properties: Map<String, Any>? = null
+        var properties: Map<String, String>? = null
     }
 
     @Keep
@@ -75,7 +75,7 @@ object FirebaseHelper {
         var action: Int = 0
         var type: Int = 0
         var on: Boolean = false
-        var properties: Map<String, Any>? = null
+        var properties: Map<String, String>? = null
         var lastTriggeredTime: Long = 0
     }
 
@@ -114,7 +114,7 @@ object FirebaseHelper {
         pojo.position = position
         pojo.type = trigger.typeId
         pojo.user = userId
-        val properties = HashMap<String, Any>()
+        val properties = HashMap<String, String>()
         trigger.writePropertiesToDatabase(properties)
         pojo.properties = properties
 
@@ -167,7 +167,7 @@ object FirebaseHelper {
                                         user,
                                         pojo.name ?: "",
                                         trackerIds.map { Pair<String?, String>(it.first, it.second.key!!) }.toTypedArray(),
-                                        pojo.on, pojo.action, pojo.lastTriggeredTime, pojo.properties)
+                                        pojo.on, pojo.action, pojo.lastTriggeredTime, null)
 
                                 triggers.add(
                                         Pair(pojo.position, trigger)
@@ -321,7 +321,7 @@ object FirebaseHelper {
             pojo.connectionSerialized = attribute.valueConnection?.getSerializedString()
             pojo.type = attribute.typeId
             pojo.name = attribute.name
-            val properties = HashMap<String, Any>()
+            val properties = HashMap<String, String>()
             attribute.writePropertiesToDatabase(properties)
             pojo.properties = properties
 
