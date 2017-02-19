@@ -7,7 +7,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.BooleanPropertyV
 /**
  * Created by younghokim on 16. 8. 12..
  */
-class OTBooleanProperty(initialValue: Boolean, key: Int, title: String) : OTProperty<Boolean>(initialValue, key, title) {
+class OTBooleanProperty(initialValue: Boolean, key: String, title: String) : OTProperty<Boolean>(initialValue, key, title) {
 
     override fun getSerializedValue(): String {
         return value.toString()

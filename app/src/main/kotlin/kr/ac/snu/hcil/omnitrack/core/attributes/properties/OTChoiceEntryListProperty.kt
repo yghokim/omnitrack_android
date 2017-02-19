@@ -11,7 +11,7 @@ import kr.ac.snu.hcil.omnitrack.utils.UniqueStringEntryList
  * Created by younghokim on 16. 8. 13..
  */
 
-class OTChoiceEntryListProperty(key: Int, title: String) : OTProperty<UniqueStringEntryList>(UniqueStringEntryList(PREVIEW_ENTRIES), key, title) {
+class OTChoiceEntryListProperty(key: String, title: String) : OTProperty<UniqueStringEntryList>(UniqueStringEntryList(PREVIEW_ENTRIES), key, title) {
 
     companion object {
 

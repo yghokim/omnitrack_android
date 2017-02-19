@@ -55,7 +55,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
     private var propertyViewHorizontalMargin: Int = 0
 
-    private val propertyViewList = ArrayList<ReadOnlyPair<Int?, View>>()
+    private val propertyViewList = ArrayList<ReadOnlyPair<String, View>>()
 
     private val startSubscriptions = SubscriptionList()
 
@@ -208,11 +208,9 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
         }
 
         for (entry in propertyViewList) {
-            entry.first?.let {
                 if (entry.second is APropertyView<*>) {
-                    entry.second.showEdited = attribute?.getPropertyValue<Any>(it) != entry.second.value!!
+                    entry.second.showEdited = attribute?.getPropertyValue<Any>(entry.first) != entry.second.value!!
                 }
-            }
         }
     }
 
@@ -227,13 +225,11 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
         }
 
         for (entry in propertyViewList) {
-            entry.first?.let {
                 if (entry.second is APropertyView<*>) {
-                    if (attribute?.getPropertyValue<Any>(it) != entry.second.value!!) {
+                    if (attribute?.getPropertyValue<Any>(entry.first) != entry.second.value!!) {
                         return true
                     }
                 }
-            }
         }
 
         return false
@@ -247,13 +243,11 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
             attribute?.valueConnection = connectionView.connection
 
             for (entry in propertyViewList) {
-                if (entry.first != null) {
                     if (entry.second is APropertyView<*>) {
                         if (entry.second.validate()) {
                             attribute?.setPropertyValue(entry.first, entry.second.value!!)
                         }
                     }
-                }
             }
         }
     }
@@ -281,7 +275,6 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
             for (entryWithIndex in attr.makePropertyViews(this).withIndex()) {
                 val entry = entryWithIndex.value
 
-                if (entry.first != null) {
                     propertyViewList.add(entry)
 
                     @Suppress("UNCHECKED_CAST")
@@ -300,7 +293,6 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
                             }
                         }
                     }
-                }
 
                 entry.second.id = View.generateViewId()
                 propertyViewContainer.addView(entry.second, layoutParams)

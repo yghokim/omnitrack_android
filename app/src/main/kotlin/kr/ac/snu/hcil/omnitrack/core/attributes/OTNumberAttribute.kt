@@ -30,10 +30,10 @@ class OTNumberAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrac
 
     override val typeSmallIconResourceId: Int = R.drawable.icon_small_number
 
-    override val propertyKeys: IntArray = intArrayOf(NUMBERSTYLE)
+    override val propertyKeys: Array<String> = arrayOf(NUMBERSTYLE)
 
     companion object {
-        const val NUMBERSTYLE = 0
+        const val NUMBERSTYLE = "style"
     }
 
     override fun createProperties() {

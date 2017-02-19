@@ -25,7 +25,7 @@ class OTRatingAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrac
         const val PROPERTY_DISPLAY_TYPE = 0
         const val PROPERTY_LEVELS = 1
         const val PROPERTY_ALLOW_INTERMEDIATE = 2*/
-        const val PROPERTY_OPTIONS = 0
+        const val PROPERTY_OPTIONS = "options"
     }
 
     override val valueNumericCharacteristics: NumericCharacteristics = NumericCharacteristics(true, true)
@@ -41,7 +41,7 @@ class OTRatingAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrac
         }
     }
 
-    override val propertyKeys: IntArray = intArrayOf(PROPERTY_OPTIONS)
+    override val propertyKeys: Array<String> = arrayOf(PROPERTY_OPTIONS)
 
 
     override fun createProperties() {

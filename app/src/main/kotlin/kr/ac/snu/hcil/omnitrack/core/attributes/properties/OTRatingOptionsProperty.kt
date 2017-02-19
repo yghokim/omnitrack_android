@@ -9,7 +9,7 @@ import kr.ac.snu.hcil.omnitrack.utils.RatingOptions
 /**
  * Created by Young-Ho Kim on 2016-09-23.
  */
-class OTRatingOptionsProperty(key: Int) : OTProperty<RatingOptions>(RatingOptions(), key, null) {
+class OTRatingOptionsProperty(key: String) : OTProperty<RatingOptions>(RatingOptions(), key, null) {
 
     override fun parseValue(serialized: String): RatingOptions {
         return Gson().fromJson(serialized, RatingOptions::class.java)

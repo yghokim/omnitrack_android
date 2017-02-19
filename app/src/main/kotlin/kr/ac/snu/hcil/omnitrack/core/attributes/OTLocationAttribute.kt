@@ -36,7 +36,7 @@ class OTLocationAttribute(objectId: String?, localKey: Int?, parentTracker: OTTr
 
     override val valueNumericCharacteristics: NumericCharacteristics = NumericCharacteristics(false, true)
 
-    override val propertyKeys: IntArray = intArrayOf()
+    override val propertyKeys: Array<String> = emptyArray()
 
     override val typeNameResourceId: Int = R.string.type_location_name
 

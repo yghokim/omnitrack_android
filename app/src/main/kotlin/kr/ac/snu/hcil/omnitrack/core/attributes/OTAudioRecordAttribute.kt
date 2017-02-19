@@ -23,7 +23,7 @@ class OTAudioRecordAttribute(objectId: String?, localKey: Int?, parentTracker: O
 
     override val valueNumericCharacteristics: NumericCharacteristics = NumericCharacteristics(false, false)
 
-    override val propertyKeys: IntArray = intArrayOf()
+    override val propertyKeys: Array<String> = emptyArray()
 
     override fun createProperties() {
 

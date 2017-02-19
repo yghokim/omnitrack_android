@@ -29,7 +29,7 @@ class OTTimeAttribute(objectId: String?, localKey: Int?, parentTracker: OTTracke
     override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_TIMEPOINT
 
 
-    override val propertyKeys: IntArray = intArrayOf(GRANULARITY)
+    override val propertyKeys: Array<String> = arrayOf(GRANULARITY)
 
     override fun getInputViewType(previewMode: Boolean): Int {
         return AAttributeInputView.VIEW_TYPE_TIME_POINT
@@ -39,7 +39,7 @@ class OTTimeAttribute(objectId: String?, localKey: Int?, parentTracker: OTTracke
     override val typeSmallIconResourceId: Int = R.drawable.icon_small_time
 
     companion object {
-        const val GRANULARITY = 0
+        const val GRANULARITY = "granularity"
 
         const val GRANULARITY_DAY = 0
         const val GRANULARITY_MINUTE = 1
