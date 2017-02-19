@@ -129,73 +129,33 @@ object FirebaseHelper {
             ref.setValue(pojo)
             ref.child("trackers").setValue(trigger.trackers.mapIndexed { i, tracker -> IndexedKey(i, tracker.objectId) })
         }
+        setContainsFlagOfUser(userId, trigger.objectId, CHILD_NAME_TRIGGERS, true)
     }
 
     fun findTriggersOfUser(user: OTUser): Observable<List<OTTrigger>> {
-        println("userId: ${user.objectId}")
-        val query = //makeQueryOfUser(user.objectId, CHILD_NAME_TRIGGERS)
-                dbRef?.child("triggers")?.orderByChild("user")?.equalTo(user.objectId)
-        return if (query != null) {
-            Observable.create {
-                subscriber ->
-                query.addListenerForSingleValueEvent(object : ValueEventListener {
-                    override fun onCancelled(error: DatabaseError) {
-                        error.toException().printStackTrace()
-                        if (!subscriber.isUnsubscribed) {
-                            subscriber.onError(error.toException())
-                        }
-                    }
-
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        println("Trigger snapshot exists ; ${snapshot.exists()}")
-                        println("Trigger snapthot ${snapshot.value}")
-                        val triggers = ArrayList<Pair<Int, OTTrigger>>(snapshot.childrenCount.toInt())
-
-                        println("Trigger count: ${snapshot.childrenCount}")
-
-                        for (child in snapshot.children) {
-                            val pojo = child.getValue(TriggerPOJO::class.java)
-                            if (pojo != null) {
-
-                                val trackerIds = ArrayList<Pair<String, IndexedKey>>()
-                                for (trackerIdRef in child.child("trackers").children) {
-                                    val trackerIdWithPosition = trackerIdRef.getValue(IndexedKey::class.java)
-                                    if (trackerIdWithPosition != null) {
-                                        trackerIds.add(Pair(trackerIdRef.key, trackerIdWithPosition))
-                                    }
-                                }
-                                trackerIds.sortBy { it -> it.second.position }
-
-
-                                val trigger = OTTrigger.makeInstance(
-                                        child.key,
-                                        pojo.type,
-                                        user,
-                                        pojo.name ?: "",
-                                        trackerIds.map { Pair<String?, String>(it.first, it.second.key!!) }.toTypedArray(),
-                                        pojo.on, pojo.action, pojo.lastTriggeredTime, null)
-
-                                triggers.add(
-                                        Pair(pojo.position, trigger)
-                                )
-                            }
-                        }
-
-                        triggers.sortBy(Pair<Int, OTTrigger>::first)
-
-                        if (!subscriber.isUnsubscribed) {
-                            subscriber.onNext(triggers.map { it -> it.second })
-                            subscriber.onCompleted()
-                        }
-                    }
-
-                })
-
+        return findElementListOfUser(user.objectId, CHILD_NAME_TRIGGERS) {
+            child ->
+            val pojo = child.getValue(TriggerPOJO::class.java)
+            val trackerIds = ArrayList<Pair<String, IndexedKey>>()
+            for (trackerIdRef in child.child("trackers").children) {
+                val trackerIdWithPosition = trackerIdRef.getValue(IndexedKey::class.java)
+                if (trackerIdWithPosition != null) {
+                    trackerIds.add(Pair(trackerIdRef.key, trackerIdWithPosition))
+                }
             }
-        } else {
-            Observable.error<List<OTTrigger>>(Exception("Firebase db error retrieving triggers."))
-        }
+            trackerIds.sortBy { it -> it.second.position }
 
+
+            val trigger = OTTrigger.makeInstance(
+                    child.key,
+                    pojo.type,
+                    user,
+                    pojo.name ?: "",
+                    trackerIds.map { Pair<String?, String>(it.first, it.second.key!!) }.toTypedArray(),
+                    pojo.on, pojo.action, pojo.lastTriggeredTime, null)
+
+            Pair(pojo.position, trigger)
+        }
     }
 
     fun getContainsFlagListOfUser(userId: String, childName: String): DatabaseReference? {
@@ -245,10 +205,6 @@ object FirebaseHelper {
         trackerRef(trackerId)?.child(CHILD_NAME_ATTRIBUTES)?.child(objectId)?.removeValue()
     }
 
-    fun makeQueryOfUser(userId: String, childName: String): Query? {
-        return dbRef?.child(childName)?.orderByChild("user")?.equalTo(userId)
-    }
-
     fun extractTrackerWithPosition(snapshot: DataSnapshot): Pair<Int, OTTracker> {
         val pojo = snapshot.getValue(TrackerPOJO::class.java)
         //val attributesRef = snapshot.child(CHILD_NAME_ATTRIBUTES)
@@ -283,8 +239,93 @@ object FirebaseHelper {
         ))
     }
 
-    fun findTrackersOfUser(userId: String): Observable<List<OTTracker>> {
+    fun <T> findElementListOfUser(userId: String, childName: String, extractFunc: (DataSnapshot) -> Pair<Int, T>): Observable<List<T>> {
+        val query = getContainsFlagListOfUser(userId, childName)
+        return if (query != null) {
+            Observable.create {
+                subscriber ->
+                query.addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onCancelled(error: DatabaseError) {
+                        error.toException().printStackTrace()
+                        if (!subscriber.isUnsubscribed) {
+                            subscriber.onError(error.toException())
+                        }
+                    }
 
+                    override fun onDataChange(snapshot: DataSnapshot) {
+
+                        println("$childName snapshot exists ; ${snapshot.exists()}")
+                        println("$childName snapthot ${snapshot.value}")
+                        println("$childName count: ${snapshot.childrenCount}")
+
+                        if (!snapshot.exists()) {
+                            if (!subscriber.isUnsubscribed) {
+                                subscriber.onNext(emptyList())
+                                subscriber.onCompleted()
+                                return
+                            }
+                        }
+
+                        Observable.zip<List<T>>(snapshot.children.filter { it.value == true }.map {
+
+                            Observable.create<Pair<Int, T>> {
+                                subscriber ->
+                                val ref = dbRef?.child(childName)?.child(it.key)
+                                if (ref == null) {
+                                    if (!subscriber.isUnsubscribed) {
+                                        subscriber.onError(Exception("query does not exists."))
+                                    }
+                                } else {
+                                    ref.addListenerForSingleValueEvent(object : ValueEventListener {
+                                        override fun onCancelled(p0: DatabaseError?) {
+                                            if (!subscriber.isUnsubscribed) {
+                                                p0?.toException()?.printStackTrace()
+                                                subscriber.onError(Exception("$childName query error."))
+                                            }
+                                        }
+
+                                        override fun onDataChange(snapshot: DataSnapshot) {
+                                            println(snapshot.value)
+                                            if (snapshot.value != null) {
+                                                if (!subscriber.isUnsubscribed) {
+                                                    subscriber.onNext(extractFunc(snapshot))
+                                                    subscriber.onCompleted()
+                                                }
+                                            } else {
+                                                if (!subscriber.isUnsubscribed) {
+                                                    subscriber.onError(Exception("tracker id does not exists."))
+                                                }
+                                            }
+                                        }
+
+                                    })
+                                }
+                            }.onErrorResumeNext { Observable.empty() }
+
+
+                        }, {
+                            pairs ->
+
+                            pairs.map { it as Pair<Int, T> }.sortedBy { it.first }.map {
+                                it.second
+                            }
+                        }).subscribe(subscriber)
+                    }
+                })
+
+            }
+        } else {
+            Observable.error<List<T>>(Exception("Firebase db error retrieving $childName."))
+        }
+
+    }
+
+    fun findTrackersOfUser(userId: String): Observable<List<OTTracker>> {
+        return findElementListOfUser(userId, CHILD_NAME_TRACKERS) {
+            snapshot ->
+            extractTrackerWithPosition(snapshot)
+        }
+/*
         println("userId: ${userId}")
 
 
@@ -362,7 +403,7 @@ object FirebaseHelper {
         } else {
             Observable.error<List<OTTracker>>(Exception("Firebase db error retrieving trackers."))
         }
-
+*/
     }
 
     fun saveAttribute(trackerId: String, attribute: OTAttribute<out Any>, position: Int) {
