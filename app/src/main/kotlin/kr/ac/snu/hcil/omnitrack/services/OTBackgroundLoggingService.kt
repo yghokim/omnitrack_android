@@ -75,8 +75,8 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
                 builder.autoComplete().subscribe({}, {}, {
                     val item = builder.makeItem(source)
                     OTApplication.app.dbHelper.save(item, tracker)
-                    if (item.dbId != null) {
-                        sendBroadcast(context, OTApplication.BROADCAST_ACTION_BACKGROUND_LOGGING_SUCCEEDED, tracker, item.dbId!!, notify)
+                    if (item.objectId != null) {
+                        sendBroadcast(context, OTApplication.BROADCAST_ACTION_BACKGROUND_LOGGING_SUCCEEDED, tracker, item.objectId!!, notify)
                         OTApplication.logger.writeSystemLog("${tracker.name} background logging was successful", TAG)
                         removeLoggingFlag(tracker)
                         if (!subscriber.isUnsubscribed) {

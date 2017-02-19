@@ -59,7 +59,7 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
 
             val intent = Intent(context, ItemEditingActivity::class.java)
             intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
-            intent.putExtra(OTApplication.INTENT_EXTRA_DB_ID_ITEM, item.dbId)
+            intent.putExtra(OTApplication.INTENT_EXTRA_DB_ID_ITEM, item.objectId)
             return intent
         }
     }

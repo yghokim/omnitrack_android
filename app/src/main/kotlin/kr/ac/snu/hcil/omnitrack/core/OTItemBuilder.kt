@@ -190,7 +190,7 @@ class OTItemBuilder : IStringSerializable {
         setTracker(tracker)
         trackerObjectId = tracker.objectId
         this.mode = MODE_EDIT
-        connectedItemDbId = item.dbId!!
+        connectedItemDbId = item.objectId!!
         syncFromTrackerScheme()
 
         for (attribute in tracker.attributes) {
@@ -419,7 +419,7 @@ class OTItemBuilder : IStringSerializable {
         val item = OTItem(tracker.objectId, source)
         if (connectedItemDbId != -1L) {
             println("assigned db id : $connectedItemDbId")
-            item.dbId = connectedItemDbId
+            item.objectId = connectedItemDbId
         }
 
         for (attribute in tracker.attributes) {
