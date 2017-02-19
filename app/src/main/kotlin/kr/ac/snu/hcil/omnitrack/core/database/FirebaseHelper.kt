@@ -1,12 +1,18 @@
 package kr.ac.snu.hcil.omnitrack.core.database
 
+import android.content.Intent
 import android.support.annotation.Keep
 import com.google.firebase.database.*
+import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
+import kr.ac.snu.hcil.omnitrack.core.database.DatabaseHelper.Companion.SAVE_RESULT_EDIT
+import kr.ac.snu.hcil.omnitrack.core.database.DatabaseHelper.Companion.SAVE_RESULT_NEW
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
+import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Observable
 import java.util.*
 
@@ -18,6 +24,7 @@ object FirebaseHelper {
     const val CHILD_NAME_TRACKERS = "trackers"
     const val CHILD_NAME_ATTRIBUTES = "attributes"
     const val CHILD_NAME_TRIGGERS = "triggers"
+    const val CHILD_NAME_ITEMS = "items"
     const val CHILD_NAME_ATTRIBUTE_PROPERTIES = "properties"
 
 
@@ -83,6 +90,13 @@ object FirebaseHelper {
         var on: Boolean = false
         var properties: Map<String, String>? = null
         var lastTriggeredTime: Long = 0
+    }
+
+    @Keep
+    class ItemPOJO {
+        var tracker: String? = null
+        var data: HashMap<String, String>? = null
+        var sourceType: Int = -1
     }
 
     @Keep
@@ -325,85 +339,6 @@ object FirebaseHelper {
             snapshot ->
             extractTrackerWithPosition(snapshot)
         }
-/*
-        println("userId: ${userId}")
-
-
-        val query = getContainsFlagListOfUser(userId, CHILD_NAME_TRACKERS)
-
-        return if (query != null) {
-            Observable.create {
-                subscriber ->
-                query.addListenerForSingleValueEvent(object : ValueEventListener {
-                    override fun onCancelled(error: DatabaseError) {
-                        error.toException().printStackTrace()
-                        if (!subscriber.isUnsubscribed) {
-                            subscriber.onError(error.toException())
-                        }
-                    }
-
-                    override fun onDataChange(snapshot: DataSnapshot) {
-
-                        println("Tracker snapshot exists ; ${snapshot.exists()}")
-                        println("Tracker snapthot ${snapshot.value}")
-
-                        val trackers = ArrayList<Pair<Int, OTTracker>>(snapshot.childrenCount.toInt())
-
-                        println("Tracker count: ${snapshot.childrenCount}")
-
-                        Observable.zip<List<OTTracker>>(snapshot.children.filter { it.value == true }.map {
-
-                            Observable.create<Pair<Int, OTTracker>> {
-                                subscriber ->
-                                println("querying tracker ${it.key}")
-                                val trackerRef = trackerRef(it.key)
-                                if (trackerRef == null) {
-                                    if (!subscriber.isUnsubscribed) {
-                                        subscriber.onError(Exception("query does not exists."))
-                                    }
-                                } else {
-                                    trackerRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                                        override fun onCancelled(p0: DatabaseError?) {
-                                            if (!subscriber.isUnsubscribed) {
-                                                p0?.toException()?.printStackTrace()
-                                                subscriber.onError(Exception("tracker query error."))
-                                            }
-                                        }
-
-                                        override fun onDataChange(snapshot: DataSnapshot) {
-                                            println(snapshot.value)
-                                            if (snapshot.value != null) {
-                                                if (!subscriber.isUnsubscribed) {
-                                                    subscriber.onNext(extractTrackerWithPosition(snapshot))
-                                                    subscriber.onCompleted()
-                                                }
-                                            } else {
-                                                if (!subscriber.isUnsubscribed) {
-                                                    subscriber.onError(Exception("tracker id does not exists."))
-                                                }
-                                            }
-                                        }
-
-                                    })
-                                }
-                            }.onErrorResumeNext { Observable.empty() }
-
-
-                        }, {
-                            pairs ->
-
-                            pairs.map { it as Pair<Int, OTTracker> }.sortedBy { it.first }.map {
-                                it.second
-                            }
-                        }).subscribe(subscriber)
-                    }
-                })
-
-            }
-        } else {
-            Observable.error<List<OTTracker>>(Exception("Firebase db error retrieving trackers."))
-        }
-*/
     }
 
     fun saveAttribute(trackerId: String, attribute: OTAttribute<out Any>, position: Int) {
@@ -467,4 +402,78 @@ object FirebaseHelper {
             save(child.value, child.index)
         }*/
     }
+
+    fun saveItem(item: OTItem, tracker: OTTracker, notifyIntent: Boolean = true) {
+        val pojo = ItemPOJO()
+        pojo.tracker = tracker.objectId
+        pojo.sourceType = item.source.ordinal
+        val data = HashMap<String, String>()
+
+        for (attribute in tracker.attributes) {
+            val value = item.getCastedValueOf(attribute)
+            if (value != null) {
+                data[attribute.objectId] = TypeStringSerializationHelper.serialize(attribute.typeNameForSerialization, value)
+            }
+        }
+
+        pojo.data = data
+        val result = 0 //TODO
+
+        val itemRef = dbRef?.child(CHILD_NAME_ITEMS)?.child(tracker.objectId)?.child("Replace this with Unique Id") //TODO
+        itemRef?.setValue(pojo) {
+            error: DatabaseError?, ref: DatabaseReference ->
+
+            if (error != null) {
+                //success
+                if (notifyIntent) {
+                    val intent = Intent(when (result) {
+                        SAVE_RESULT_NEW -> OTApplication.BROADCAST_ACTION_ITEM_ADDED
+                        SAVE_RESULT_EDIT -> OTApplication.BROADCAST_ACTION_ITEM_EDITED
+                        else -> throw IllegalArgumentException("")
+                    })
+
+                    intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
+                    intent.putExtra(OTApplication.INTENT_EXTRA_DB_ID_ITEM, item.objectId)
+
+                    OTApplication.app.sendBroadcast(intent)
+                }
+            }
+        }
+
+        /*
+        * val values = ContentValues()
+
+        //values.put(ItemScheme.TRACKER_ID, tracker.objectId)
+        values.put(ItemScheme.SOURCE_TYPE, item.source.ordinal)
+        values.put(ItemScheme.VALUES_JSON, item.getSerializedValueTable(tracker))
+        if (item.timestamp != -1L) {
+            values.put(ItemScheme.LOGGED_AT, item.timestamp)
+        }
+
+        println("item id: ${item.objectId}")
+
+        val result = saveObject(item, values, ItemScheme)
+
+        if(result != SAVE_RESULT_FAIL) {
+            if(notifyIntent) {
+                val intent = Intent(when (result) {
+                    SAVE_RESULT_NEW -> OTApplication.BROADCAST_ACTION_ITEM_ADDED
+                    SAVE_RESULT_EDIT -> OTApplication.BROADCAST_ACTION_ITEM_EDITED
+                    else -> throw IllegalArgumentException("")
+                })
+
+                intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
+                intent.putExtra(OTApplication.INTENT_EXTRA_DB_ID_ITEM, item.objectId)
+
+                OTApplication.app.sendBroadcast(intent)
+            }
+            return result
+        }
+        else{
+            println("Item insert failed - $item")
+            return result
+        }*/
+
+    }
+
 }

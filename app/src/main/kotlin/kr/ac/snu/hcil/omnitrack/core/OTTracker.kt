@@ -162,8 +162,8 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
     private fun onAttributeAdded(new: OTAttribute<out Any>, index: Int) {
         new.tracker = this
         /*
-        if (new.dbId != null)
-            _removedAttributeIds.removeAll { it == new.dbId }*/
+        if (new.objectId != null)
+            _removedAttributeIds.removeAll { it == new.objectId }*/
 
         if (!suspendDatabaseSync)
             FirebaseHelper.saveAttribute(this.objectId, new, index)
@@ -175,8 +175,8 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
         attribute.tracker = null
 
         /*
-        if (attribute.dbId != null)
-            _removedAttributeIds.add(attribute.dbId as Long)*/
+        if (attribute.objectId != null)
+            _removedAttributeIds.add(attribute.objectId as Long)*/
 
         attributeRemoved.invoke(this, ReadOnlyPair(attribute, index))
         if (!suspendDatabaseSync) {
