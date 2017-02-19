@@ -56,6 +56,7 @@ object FirebaseHelper {
         var color: Int = 0
         var attributeLocalKeySeed: Int = 0
         var onShortcut: Boolean = false
+        var attributes: Map<String, AttributePOJO>? = null
     }
 
     @Keep
@@ -230,30 +231,29 @@ object FirebaseHelper {
 
     fun extractTrackerWithPosition(snapshot: DataSnapshot): Pair<Int, OTTracker> {
         val pojo = snapshot.getValue(TrackerPOJO::class.java)
-        val attributesRef = snapshot.child(CHILD_NAME_ATTRIBUTES)
+        //val attributesRef = snapshot.child(CHILD_NAME_ATTRIBUTES)
 
-        val attributeList = ArrayList<OTAttribute<out Any>>()
-        val attrPojos = ArrayList<Pair<String, AttributePOJO>>()
-        for (attributeRef in attributesRef.children) {
+        val attributes = pojo.attributes
+        var attributeList: ArrayList<OTAttribute<out Any>>? = null
+        if (attributes != null) {
+            attributeList = ArrayList<OTAttribute<out Any>>()
+            val attrPojos = ArrayList<Map.Entry<String, AttributePOJO>>(pojo.attributes?.entries)
 
-            val attrPojo = attributeRef.getValue(AttributePOJO::class.java)
-            attrPojos.add(Pair(attributeRef.key, attrPojo))
-        }
+            attrPojos.sortBy { it -> it.value.position }
 
-        attrPojos.sortBy { it -> it.second.position }
-
-        for (attrPojo in attrPojos) {
-            attributeList.add(
-                    OTAttribute.createAttribute(
-                            attrPojo.first,
-                            attrPojo.second.localKey,
-                            null,
-                            attrPojo.second.name ?: "noname",
-                            attrPojo.second.required,
-                            attrPojo.second.type,
-                            attrPojo.second.properties,
-                            attrPojo.second.connectionSerialized)
-            )
+            for (attrPojo in attrPojos) {
+                attributeList.add(
+                        OTAttribute.createAttribute(
+                                attrPojo.key,
+                                attrPojo.value.localKey,
+                                null,
+                                attrPojo.value.name ?: "noname",
+                                attrPojo.value.required,
+                                attrPojo.value.type,
+                                attrPojo.value.properties,
+                                attrPojo.value.connectionSerialized)
+                )
+            }
         }
 
         return Pair(pojo.position, OTTracker(
@@ -314,19 +314,24 @@ object FirebaseHelper {
     fun saveAttribute(trackerId: String, attribute: OTAttribute<out Any>, position: Int) {
         val attributeRef = trackerRef(trackerId)?.child("attributes")?.child(attribute.objectId)
         if (attributeRef != null) {
-            val pojo = AttributePOJO()
-            pojo.localKey = attribute.localKey
-            pojo.position = position
-            pojo.required = attribute.isRequired
-            pojo.connectionSerialized = attribute.valueConnection?.getSerializedString()
-            pojo.type = attribute.typeId
-            pojo.name = attribute.name
-            val properties = HashMap<String, String>()
-            attribute.writePropertiesToDatabase(properties)
-            pojo.properties = properties
-
+            val pojo = makeAttributePojo(attribute, position)
             attributeRef.setValue(pojo)
         }
+    }
+
+    private fun makeAttributePojo(attribute: OTAttribute<out Any>, position: Int): AttributePOJO {
+        val pojo = AttributePOJO()
+        pojo.localKey = attribute.localKey
+        pojo.position = position
+        pojo.required = attribute.isRequired
+        pojo.connectionSerialized = attribute.valueConnection?.getSerializedString()
+        pojo.type = attribute.typeId
+        pojo.name = attribute.name
+        val properties = HashMap<String, String>()
+        attribute.writePropertiesToDatabase(properties)
+        pojo.properties = properties
+
+        return pojo
     }
 
     fun saveTracker(tracker: OTTracker, position: Int) {
@@ -339,6 +344,12 @@ object FirebaseHelper {
         values.onShortcut = tracker.isOnShortcut
         values.attributeLocalKeySeed = tracker.attributeLocalKeySeed
 
+        val attributes = HashMap<String, AttributePOJO>()
+        for (attribute in tracker.attributes.unObservedList.withIndex()) {
+            attributes[attribute.value.objectId] = makeAttributePojo(attribute.value, attribute.index)
+        }
+        values.attributes = attributes
+
         val trackerRef = trackerRef(tracker.objectId)
 
         trackerRef?.setValue(values, DatabaseReference.CompletionListener { p0, p1 ->
@@ -349,10 +360,6 @@ object FirebaseHelper {
                 println("No firebase error. completed.")
             }
         })
-
-        for (attribute in tracker.attributes.unObservedList.withIndex()) {
-            saveAttribute(tracker.objectId, attribute.value, attribute.index)
-        }
 
         //deleteObjects(AttributeScheme, *tracker.fetchRemovedAttributeIds())
 
