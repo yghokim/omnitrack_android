@@ -21,14 +21,14 @@ import java.util.*
 class OTTimeSpanAttribute(objectId: String?, localKey: Int?, parentTracker: OTTracker?, columnName: String, isRequired: Boolean, settingData: Map<String, Any>?, connectionData: String?) : OTAttribute<TimeSpan>(objectId, localKey, parentTracker, columnName, isRequired, TYPE_TIMESPAN, settingData, connectionData) {
 
     companion object {
-        const val PROPERTY_GRANULARITY = 0
-        const val PROPERTY_TYPE = 1
+        const val PROPERTY_GRANULARITY = "granularity"
+        const val PROPERTY_TYPE = "type"
 
         const val GRANULARITY_DAY = 0
         const val GRANULARITY_MINUTE = 1
     }
 
-    override val propertyKeys: IntArray = intArrayOf(PROPERTY_GRANULARITY/*, PROPERTY_TYPE*/)
+    override val propertyKeys: Array<String> = arrayOf(PROPERTY_GRANULARITY/*, PROPERTY_TYPE*/)
 
     override val typeNameResourceId: Int = R.string.type_timespan_name
     override val typeSmallIconResourceId: Int = R.drawable.icon_small_timer

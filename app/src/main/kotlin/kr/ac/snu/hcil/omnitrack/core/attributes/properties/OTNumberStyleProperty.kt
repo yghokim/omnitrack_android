@@ -9,7 +9,7 @@ import kr.ac.snu.hcil.omnitrack.utils.NumberStyle
 /**
  * Created by Young-Ho Kim on 2016-09-05.
  */
-class OTNumberStyleProperty(key: Int) : OTProperty<NumberStyle>(NumberStyle(), key, null) {
+class OTNumberStyleProperty(key: String) : OTProperty<NumberStyle>(NumberStyle(), key, null) {
 
     override fun parseValue(serialized: String): NumberStyle {
         return Gson().fromJson(serialized, NumberStyle::class.java)
