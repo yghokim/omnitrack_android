@@ -1,7 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.triggers
 
 import android.content.Context
-import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.MutableData
 import kr.ac.snu.hcil.omnitrack.OTApplication
@@ -27,7 +26,7 @@ import kotlin.properties.Delegates
 abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trackerObjectIds: Array<Pair<String?, String>>?,
                          isOn: Boolean,
                          val action: Int,
-                         lastTriggeredTime: Long, propertyData: DataSnapshot? = null) : NamedObject(objectId, name) {
+                         lastTriggeredTime: Long, propertyData: Map<String, Any>? = null) : NamedObject(objectId, name) {
 
     companion object {
         const val ACTION_NOTIFICATION = 0
@@ -39,7 +38,7 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
 
         const val TRIGGER_TIME_NEVER_TRIGGERED = -1L
 
-        fun makeInstance(objectId: String?, typeId: Int, user: OTUser, name: String, trackerObjectIds: Array<Pair<String?, String>>?, isOn: Boolean, action: Int, lastTriggeredTime: Long, propertyData: DataSnapshot?): OTTrigger {
+        fun makeInstance(objectId: String?, typeId: Int, user: OTUser, name: String, trackerObjectIds: Array<Pair<String?, String>>?, isOn: Boolean, action: Int, lastTriggeredTime: Long, propertyData: Map<String, Any>?): OTTrigger {
             return when (typeId) {
                 TYPE_TIME -> OTTimeTrigger(objectId, user, name, trackerObjectIds, isOn, action, lastTriggeredTime, propertyData)
                 TYPE_DATA_THRESHOLD -> OTDataTrigger(objectId, user, name, trackerObjectIds, isOn, action, lastTriggeredTime, propertyData)
@@ -129,7 +128,7 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
         }*/
 
         if (propertyData != null) {
-            for (child in propertyData.children) {
+            for (child in propertyData) {
                 val serializedValue = child.value
                 if (serializedValue is String && !serializedValue.isNullOrEmpty()) {
                     properties[child.key] = TypeStringSerializationHelper.deserialize(serializedValue)
@@ -164,10 +163,10 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
         return stringKeyEntryParser.toJson(list.toTypedArray())
     }
 
-    fun writePropertiesToDatabase(propertyRef: DatabaseReference) {
+    fun writePropertiesToDatabase(propertyRef: MutableMap<String, Any>) {
         for ((key, value) in properties) {
             if (value != null) {
-                propertyRef.child(key).setValue(TypeStringSerializationHelper.serialize(value))
+                propertyRef[key] = TypeStringSerializationHelper.serialize(value)
             }
         }
     }

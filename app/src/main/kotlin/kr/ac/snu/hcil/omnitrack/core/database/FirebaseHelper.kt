@@ -75,6 +75,7 @@ object FirebaseHelper {
         var action: Int = 0
         var type: Int = 0
         var on: Boolean = false
+        var properties: Map<String, Any>? = null
         var lastTriggeredTime: Long = 0
     }
 
@@ -113,12 +114,14 @@ object FirebaseHelper {
         pojo.position = position
         pojo.type = trigger.typeId
         pojo.user = userId
+        val properties = HashMap<String, Any>()
+        trigger.writePropertiesToDatabase(properties)
+        pojo.properties = properties
 
         val ref = triggerRef(triggerId = trigger.objectId)
         if (ref != null) {
             ref.setValue(pojo)
             ref.child("trackers").setValue(trigger.trackers.mapIndexed { i, tracker -> IndexedKey(i, tracker.objectId) })
-            trigger.writePropertiesToDatabase(ref.child("properties"))
         }
     }
 
@@ -164,7 +167,7 @@ object FirebaseHelper {
                                         user,
                                         pojo.name ?: "",
                                         trackerIds.map { Pair<String?, String>(it.first, it.second.key!!) }.toTypedArray(),
-                                        pojo.on, pojo.action, pojo.lastTriggeredTime, child.child("properties")) //TODO properties
+                                        pojo.on, pojo.action, pojo.lastTriggeredTime, pojo.properties)
 
                                 triggers.add(
                                         Pair(pojo.position, trigger)
