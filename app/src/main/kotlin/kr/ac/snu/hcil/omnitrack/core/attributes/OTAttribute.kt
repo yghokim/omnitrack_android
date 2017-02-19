@@ -31,7 +31,7 @@ import kotlin.properties.Delegates
 /**
  * Created by Young-Ho on 7/11/2016.
  */
-abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTracker: OTTracker?, columnName: String, isRequired: Boolean, val typeId: Int, propertyData: String?, connectionData: String?) : NamedObject(objectId, columnName) {
+abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTracker: OTTracker?, columnName: String, isRequired: Boolean, val typeId: Int, propertyData: Map<String, Any>?, connectionData: String?) : NamedObject(objectId, columnName) {
 
     override val databasePointRef: DatabaseReference?
         get() {
@@ -82,7 +82,7 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
         }
 
 
-        fun createAttribute(objectId: String?, localKey: Int?, parent: OTTracker?, columnName: String, isRequired: Boolean, typeId: Int, propertyData: String?, connectionData: String?): OTAttribute<out Any> {
+        fun createAttribute(objectId: String?, localKey: Int?, parent: OTTracker?, columnName: String, isRequired: Boolean, typeId: Int, propertyData: Map<String, Any>?, connectionData: String?): OTAttribute<out Any> {
             val attr = when (typeId) {
                 TYPE_NUMBER -> OTNumberAttribute(objectId, localKey, parent, columnName, isRequired, propertyData, connectionData)
                 TYPE_TIME -> OTTimeAttribute(objectId, localKey, parent, columnName, isRequired, propertyData, connectionData)
@@ -167,12 +167,15 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
     init {
         suspendDatabaseSync = true
         createProperties()
+        /*
         if (propertyData != null) {
-
             integerKeyEntryParser.fromJson(propertyData, Array<SerializedIntegerKeyEntry>::class.java).forEach {
                 setPropertyValueFromSerializedString(it.key, it.value)
             }
-        }
+        }*/
+
+        if (propertyData != null)
+            readPropertiesFromDatabase(propertyData)
 
         if (connectionData != null) {
             valueConnection = OTConnection(connectionData)
@@ -199,6 +202,19 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
         )
     }
 
+    fun writePropertiesToDatabase(ref: MutableMap<String, Any>) {
+        propertyKeys.forEach {
+            it ->
+            ref[it.toString()] = getProperty<Any>(it).getSerializedValue()
+        }
+    }
+
+    fun readPropertiesFromDatabase(ref: Map<String, Any>) {
+        for (child in ref.entries) {
+            setPropertyValueFromSerializedString(child.key.toInt(), child.value as String)
+        }
+    }
+
     abstract val typeNameForSerialization: String
 
     protected fun assignProperty(property: OTProperty<out Any>) {
@@ -212,8 +228,9 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
 
     protected open fun onPropertyValueChanged(args: OTProperty.PropertyChangedEventArgs<out Any>) {
         propertyValueChanged.invoke(this, args)
-        if (!suspendDatabaseSync)
-            databasePointRef?.child("propertySerialized")?.setValue(getSerializedProperties())
+        if (!suspendDatabaseSync) {
+            databasePointRef?.child(FirebaseHelper.CHILD_NAME_ATTRIBUTE_PROPERTIES)?.child(args.key.toString())?.setValue(getProperty<String>(args.key).getSerializedValue())
+        }
     }
 
     fun <T> getProperty(key: Int): OTProperty<T> {

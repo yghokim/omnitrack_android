@@ -24,7 +24,7 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 2016-07-20.
  */
-class OTTimeAttribute(objectId: String?, localKey: Int?, parentTracker: OTTracker?, columnName: String, isRequired: Boolean, settingData: String?, connectionData: String?) : OTAttribute<TimePoint>(objectId, localKey, parentTracker, columnName, isRequired, OTAttribute.TYPE_TIME, settingData, connectionData) {
+class OTTimeAttribute(objectId: String?, localKey: Int?, parentTracker: OTTracker?, columnName: String, isRequired: Boolean, settingData: Map<String, Any>?, connectionData: String?) : OTAttribute<TimePoint>(objectId, localKey, parentTracker, columnName, isRequired, OTAttribute.TYPE_TIME, settingData, connectionData) {
 
     override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_TIMEPOINT
 
