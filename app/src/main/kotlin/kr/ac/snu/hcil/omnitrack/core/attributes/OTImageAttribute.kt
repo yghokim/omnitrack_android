@@ -17,7 +17,7 @@ import rx.Observable
 /**
  * Created by younghokim on 16. 9. 6..
  */
-class OTImageAttribute(objectId: String?, localKey: Int?, parentTracker: OTTracker?, columnName: String, isRequired: Boolean, settingData: String?, connectionData: String?)
+class OTImageAttribute(objectId: String?, localKey: Int?, parentTracker: OTTracker?, columnName: String, isRequired: Boolean, settingData: Map<String, Any>?, connectionData: String?)
     : OTAttribute<Uri>(objectId, localKey, parentTracker, columnName, isRequired, TYPE_IMAGE, settingData, connectionData) {
 
     override val valueNumericCharacteristics: NumericCharacteristics = NumericCharacteristics(false, false)

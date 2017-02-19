@@ -11,7 +11,7 @@ import rx.Observable
 /**
  * Created by younghokim on 2016. 9. 26..
  */
-class OTAudioRecordAttribute(objectId: String?, localKey: Int?, parentTracker: OTTracker?, columnName: String, isRequired: Boolean, settingData: String?, connectionData: String?)
+class OTAudioRecordAttribute(objectId: String?, localKey: Int?, parentTracker: OTTracker?, columnName: String, isRequired: Boolean, settingData: Map<String, Any>?, connectionData: String?)
     : OTAttribute<Uri>(objectId, localKey, parentTracker, columnName, isRequired, TYPE_AUDIO, settingData, connectionData) {
 
 

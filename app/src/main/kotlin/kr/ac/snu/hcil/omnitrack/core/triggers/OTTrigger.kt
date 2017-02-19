@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.triggers
 import android.content.Context
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.MutableData
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
@@ -164,6 +165,14 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
     }
 
     fun writePropertiesToDatabase(propertyRef: DatabaseReference) {
+        for ((key, value) in properties) {
+            if (value != null) {
+                propertyRef.child(key).setValue(TypeStringSerializationHelper.serialize(value))
+            }
+        }
+    }
+
+    fun writePropertiesToDatabase(propertyRef: MutableData) {
         for ((key, value) in properties) {
             if (value != null) {
                 propertyRef.child(key).setValue(TypeStringSerializationHelper.serialize(value))

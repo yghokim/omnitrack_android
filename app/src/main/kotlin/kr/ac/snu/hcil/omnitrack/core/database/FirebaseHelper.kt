@@ -18,6 +18,8 @@ object FirebaseHelper {
     const val CHILD_NAME_TRACKERS = "trackers"
     const val CHILD_NAME_ATTRIBUTES = "attributes"
     const val CHILD_NAME_TRIGGERS = "triggers"
+    const val CHILD_NAME_ATTRIBUTE_PROPERTIES = "properties"
+
 
     const val CHILD_NAME_EXPERIMENT_PROFILE = "experiment_profile"
 
@@ -60,10 +62,10 @@ object FirebaseHelper {
     class AttributePOJO : NamedPOJO() {
         var localKey: Int = -1
         var position: Int = 0
-        var propertySerialized: String? = null
         var connectionSerialized: String? = null
         var type: Int = 0
         var required: Boolean = false
+        var properties: Map<String, Any>? = null
     }
 
     @Keep
@@ -246,7 +248,7 @@ object FirebaseHelper {
                             attrPojo.second.name ?: "noname",
                             attrPojo.second.required,
                             attrPojo.second.type,
-                            attrPojo.second.propertySerialized,
+                            attrPojo.second.properties,
                             attrPojo.second.connectionSerialized)
             )
         }
@@ -308,17 +310,20 @@ object FirebaseHelper {
 
     fun saveAttribute(trackerId: String, attribute: OTAttribute<out Any>, position: Int) {
         val attributeRef = trackerRef(trackerId)?.child("attributes")?.child(attribute.objectId)
-        val pojo = AttributePOJO()
-        pojo.localKey = attribute.localKey
-        pojo.position = position
-        pojo.required = attribute.isRequired
-        pojo.connectionSerialized = attribute.valueConnection?.getSerializedString()
-        pojo.propertySerialized = attribute.getSerializedProperties()
-        pojo.type = attribute.typeId
-        pojo.name = attribute.name
+        if (attributeRef != null) {
+            val pojo = AttributePOJO()
+            pojo.localKey = attribute.localKey
+            pojo.position = position
+            pojo.required = attribute.isRequired
+            pojo.connectionSerialized = attribute.valueConnection?.getSerializedString()
+            pojo.type = attribute.typeId
+            pojo.name = attribute.name
+            val properties = HashMap<String, Any>()
+            attribute.writePropertiesToDatabase(properties)
+            pojo.properties = properties
 
-        attributeRef?.setValue(pojo)
-
+            attributeRef.setValue(pojo)
+        }
     }
 
     fun saveTracker(tracker: OTTracker, position: Int) {
