@@ -140,7 +140,8 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
     }
 
     protected fun syncPropertyToDatabase(propertyName: String, value: Any) {
-        databasePointRef?.child("properties")?.child(propertyName)?.setValue(TypeStringSerializationHelper.serialize(value))
+        if (!suspendDatabaseSync)
+            databasePointRef?.child("properties")?.child(propertyName)?.setValue(TypeStringSerializationHelper.serialize(value))
     }
 
     private fun getTrackerIdDatabaseChild(dbKey: String?): DatabaseReference? {

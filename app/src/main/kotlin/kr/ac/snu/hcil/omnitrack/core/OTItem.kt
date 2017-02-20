@@ -4,7 +4,6 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.database.IDatabaseStorable
-import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializedStringKeyEntry
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import kr.ac.snu.hcil.omnitrack.utils.serialization.stringKeyEntryParser
 
@@ -93,15 +92,16 @@ class OTItem : ADataRow, IDatabaseStorable {
         this.source = source
     }
 
-    constructor(objectId: String, trackerObjectId: String, serializedValues: String, timestamp: Long, source: LoggingSource) {
+    constructor(objectId: String, trackerObjectId: String, serializedValueTable: Map<String, String>?, timestamp: Long, source: LoggingSource) {
         this.objectId = objectId
         this.trackerObjectId = trackerObjectId
         this.timestamp = timestamp
         this.source = source
 
-        val s = stringKeyEntryParser.fromJson(serializedValues, Array<SerializedStringKeyEntry>::class.java)
-        for (entry in s) {
-            valueTable[entry.key] = TypeStringSerializationHelper.deserialize(entry.value)
+        if (serializedValueTable != null) {
+            for ((key, value) in serializedValueTable) {
+                valueTable[key] = TypeStringSerializationHelper.deserialize(value)
+            }
         }
     }
 

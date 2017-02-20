@@ -24,6 +24,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AttributeSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
+import kr.ac.snu.hcil.omnitrack.core.database.FirebaseHelper
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
 import kr.ac.snu.hcil.omnitrack.ui.DragItemTouchHelperCallback
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTTrackerAttachedActivity
@@ -35,6 +36,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDivider
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.getDayOfMonth
+import rx.internal.util.SubscriptionList
 import java.util.*
 
 class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_browser), ExtendedSpinner.OnItemSelectedListener, View.OnClickListener {
@@ -62,6 +64,8 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
     private lateinit var removalSnackbar: Snackbar
 
     private var supportedItemComparators: List<ItemComparator>? = null
+
+    private val startSubscriptions = SubscriptionList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -137,9 +141,19 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
             sortSpinner.adapter = adapter
         }
 
-        OTApplication.app.dbHelper.getItems(tracker, items)
+        startSubscriptions.add(
+                FirebaseHelper.loadItems(tracker).subscribe {
+                    loadedItems ->
+                    items.clear()
+                    items.addAll(loadedItems)
+                    onItemListChanged()
+                }
+        )
+    }
 
-        onItemListChanged()
+    override fun onStop() {
+        super.onStop()
+        startSubscriptions.clear()
     }
 
     override fun onPause() {
@@ -204,7 +218,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
 
     fun deleteItemPermanently(position: Int): OTItem {
         val removedItem = items[position]
-        OTApplication.app.dbHelper.removeItem(removedItem)
+        FirebaseHelper.removeItem(removedItem)
         items.removeAt(position)
         onItemRemoved(position)
 
@@ -217,7 +231,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
 
         fun clearTrashcan() {
             for (item in removedItems) {
-                OTApplication.app.dbHelper.removeItem(item)
+                FirebaseHelper.removeItem(item)
             }
         }
 
