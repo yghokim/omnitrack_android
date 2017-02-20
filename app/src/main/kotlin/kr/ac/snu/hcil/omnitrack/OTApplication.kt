@@ -198,6 +198,7 @@ class OTApplication : MultiDexApplication() {
                 }
             }.doOnNext {
                 user ->
+                println("cached user instance")
                 _currentUser = user
             }.subscribe(subscriber)
         }
