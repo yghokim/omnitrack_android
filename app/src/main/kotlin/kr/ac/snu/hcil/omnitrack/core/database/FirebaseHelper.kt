@@ -95,7 +95,7 @@ object FirebaseHelper {
     @Keep
     class ItemPOJO {
         var tracker: String? = null
-        var data: HashMap<String, String>? = null
+        var dataTable: Map<String, String>? = null
         var sourceType: Int = -1
     }
 
@@ -420,12 +420,16 @@ object FirebaseHelper {
             }
         }
 
-        pojo.data = data
+        println("store data ${data}")
+
+        pojo.dataTable = data
         val result = 0 //TODO
 
         val itemRef = if (item.objectId != null) {
             getItemListOfTrackerChild(tracker.objectId)?.child(item.objectId!!)
         } else getItemListOfTrackerChild(tracker.objectId)?.push()
+
+        itemRef?.child("dataTable")?.setValue(data)
         itemRef?.setValue(pojo) {
             error: DatabaseError?, ref: DatabaseReference ->
 
