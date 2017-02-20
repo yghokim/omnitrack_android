@@ -36,6 +36,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
+import kr.ac.snu.hcil.omnitrack.core.database.FirebaseHelper
 import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
@@ -517,16 +518,19 @@ class TrackerListFragment : OTFragment() {
 
 
                 subscriptions.add(
-                        OTApplication.app.dbHelper.getLogCountOfDay(tracker).observeOn(AndroidSchedulers.mainThread()).subscribe {
+                        FirebaseHelper.getLogCountOfDay(tracker).observeOn(AndroidSchedulers.mainThread()).subscribe {
                             count ->
+                            println("log count of day: $count")
                             val header = context.resources.getString(R.string.msg_todays_log).toUpperCase()
                             putStatistics(todayLoggingCountView, header, count.toString())
                         }
                 )
 
                 subscriptions.add(
-                        OTApplication.app.dbHelper.getTotalItemCount(tracker).observeOn(AndroidSchedulers.mainThread()).subscribe {
+                        FirebaseHelper.getTotalItemCount(tracker).observeOn(AndroidSchedulers.mainThread()).subscribe {
                             count ->
+
+                            println("log count total: $count")
                             val header = context.resources.getString(R.string.msg_tracker_list_stat_total).toUpperCase()
                             putStatistics(totalItemCountView, header, count.toString())
                         }

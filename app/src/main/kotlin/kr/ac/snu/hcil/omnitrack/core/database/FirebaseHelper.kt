@@ -111,6 +111,12 @@ object FirebaseHelper {
     }
 
     @Keep
+    class ItemStatisticsPOJO {
+        var totalCount: Long = -1L
+        var todayCount: Long = -1L
+    }
+
+    @Keep
     class IndexedKey(
             var position: Int = 0,
             var key: String? = null) {
@@ -407,8 +413,16 @@ object FirebaseHelper {
         })
     }
 
-    fun getItemListOfTrackerChild(trackerId: String): DatabaseReference? {
+    fun getItemListContainerOfTrackerChild(trackerId: String): DatabaseReference? {
         return dbRef?.child(CHILD_NAME_ITEMS)?.child(trackerId)
+    }
+
+    fun getItemListOfTrackerChild(trackerId: String): DatabaseReference? {
+        return getItemListContainerOfTrackerChild(trackerId)?.child("list")
+    }
+
+    fun getItemStatisticsOfTrackerChild(trackerId: String): DatabaseReference? {
+        return getItemListContainerOfTrackerChild(trackerId)?.child("statistics")
     }
 
     fun removeItem(item: OTItem) {
@@ -461,6 +475,70 @@ object FirebaseHelper {
             }
         } else return Observable.error(Exception("No reference"))
 
+    }
+
+    fun getLogCountDuring(tracker: OTTracker, from: Long, to: Long): Observable<Long> {
+        return Observable.create {
+            subscriber ->
+            getItemListOfTrackerChild(tracker.objectId)?.orderByChild("timestamp")?.startAt(from.toString())?.endAt(to.toString())
+                    ?.addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onCancelled(p0: DatabaseError) {
+                            p0.toException().printStackTrace()
+                            if (!subscriber.isUnsubscribed) {
+                                subscriber.onError(p0.toException())
+                            }
+                        }
+
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            println("item count: ${snapshot.childrenCount}")
+                            if (!subscriber.isUnsubscribed) {
+                                subscriber.onNext(snapshot.childrenCount)
+                                subscriber.onCompleted()
+                            }
+                        }
+                    })
+        }
+        /*
+        val numRows = DatabaseUtils.queryNumEntries(readableDatabase, ItemScheme.tableName, "${ItemScheme.TRACKER_ID}=? AND ${ItemScheme.LOGGED_AT} BETWEEN ? AND ?", arrayOf(tracker.objectId.toString(), from.toString(), to.toString()))
+        return numRows.toInt()*/
+    }
+
+    fun getLogCountOfDay(tracker: OTTracker): Observable<Long> {
+        val cal = Calendar.getInstance()
+        cal.set(Calendar.HOUR_OF_DAY, 0)
+        cal.set(Calendar.MINUTE, 0)
+        cal.set(Calendar.SECOND, 0)
+        cal.set(Calendar.MILLISECOND, 0)
+
+        val first = cal.timeInMillis
+
+        cal.add(Calendar.DAY_OF_YEAR, 1)
+        val second = cal.timeInMillis - 20
+
+        return getLogCountDuring(tracker, first, second)
+    }
+
+    fun getTotalItemCount(tracker: OTTracker): Observable<Long> {
+        return Observable.create {
+            subscriber ->
+            getItemListOfTrackerChild(tracker.objectId)
+                    ?.addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onCancelled(p0: DatabaseError) {
+                            p0.toException().printStackTrace()
+                            if (!subscriber.isUnsubscribed) {
+                                subscriber.onError(p0.toException())
+                            }
+                        }
+
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            println("item count: ${snapshot.childrenCount}")
+                            if (!subscriber.isUnsubscribed) {
+                                subscriber.onNext(snapshot.childrenCount)
+                                subscriber.onCompleted()
+                            }
+                        }
+                    })
+        }
     }
 
     fun saveItem(item: OTItem, tracker: OTTracker, notifyIntent: Boolean = true) {
