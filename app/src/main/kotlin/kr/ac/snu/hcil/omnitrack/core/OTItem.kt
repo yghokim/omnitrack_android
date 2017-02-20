@@ -72,7 +72,7 @@ class OTItem : ADataRow, IDatabaseStorable {
 
     val trackerObjectId: String
 
-    override var objectId: Long?
+    override var objectId: String?
         set(value) {
             if (field != null) {
                 throw Exception("objectId already assigned.")
@@ -93,7 +93,7 @@ class OTItem : ADataRow, IDatabaseStorable {
         this.source = source
     }
 
-    constructor(objectId: Long, trackerObjectId: String, serializedValues: String, timestamp: Long, source: LoggingSource) {
+    constructor(objectId: String, trackerObjectId: String, serializedValues: String, timestamp: Long, source: LoggingSource) {
         this.objectId = objectId
         this.trackerObjectId = trackerObjectId
         this.timestamp = timestamp
