@@ -38,7 +38,7 @@ class OTSystemReceiver : BroadcastReceiver() {
                         OTApplication.BROADCAST_ACTION_COMMAND_REMOVE_ITEM -> {
                             val tracker = user[intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)]
                             if (tracker != null) {
-                                val itemDbId = intent.getLongExtra(OTApplication.INTENT_EXTRA_DB_ID_ITEM, -1)
+                                val itemDbId = intent.getLongExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, -1)
                                 if (itemDbId != -1L) {
                                     OTApplication.app.dbHelper.deleteObjects(DatabaseHelper.ItemScheme, itemDbId)
                                 }
@@ -55,7 +55,7 @@ class OTSystemReceiver : BroadcastReceiver() {
                             println("background logging successful")
                             val tracker = user[intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)]
                             if (tracker != null) {
-                                val itemDbId = intent.getLongExtra(OTApplication.INTENT_EXTRA_DB_ID_ITEM, -1)
+                                val itemDbId = intent.getLongExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, -1)
                                 val notify = intent.getBooleanExtra(OTBackgroundLoggingService.INTENT_EXTRA_NOTIFY, true)
                                 if (itemDbId != -1L && notify) {
                                     OTNotificationManager.pushBackgroundLoggingSuccessNotification(context, tracker, itemDbId, System.currentTimeMillis())

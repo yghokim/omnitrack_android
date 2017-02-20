@@ -8,6 +8,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilder
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
+import kr.ac.snu.hcil.omnitrack.core.database.FirebaseHelper
 import kr.ac.snu.hcil.omnitrack.utils.isInDozeMode
 import rx.Observable
 
@@ -74,7 +75,7 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
 
                 builder.autoComplete().subscribe({}, {}, {
                     val item = builder.makeItem(source)
-                    OTApplication.app.dbHelper.save(item, tracker)
+                    FirebaseHelper.saveItem(item, tracker)
                     if (item.objectId != null) {
                         sendBroadcast(context, OTApplication.BROADCAST_ACTION_BACKGROUND_LOGGING_SUCCEEDED, tracker, item.objectId!!, notify)
                         OTApplication.logger.writeSystemLog("${tracker.name} background logging was successful", TAG)
@@ -101,10 +102,10 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
             context.sendBroadcast(intent)
         }
 
-        private fun sendBroadcast(context: Context, action: String, tracker: OTTracker, itemDbId: Long, notify: Boolean) {
+        private fun sendBroadcast(context: Context, action: String, tracker: OTTracker, itemObjectId: String, notify: Boolean) {
             val intent = Intent(action)
             intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
-            intent.putExtra(OTApplication.INTENT_EXTRA_DB_ID_ITEM, itemDbId)
+            intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, itemObjectId)
             intent.putExtra(INTENT_EXTRA_NOTIFY, notify)
             context.sendBroadcast(intent)
         }

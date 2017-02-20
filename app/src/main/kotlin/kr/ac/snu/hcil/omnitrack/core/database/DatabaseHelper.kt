@@ -297,7 +297,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
                 if (!values.containsKey(scheme.LOGGED_AT)) values.put(scheme.LOGGED_AT, now)
                 val newRowId = db.insert(scheme.tableName, null, values)
                 if (newRowId != -1L) {
-                    objRef.objectId = newRowId
+                    objRef.objectId = newRowId.toString()
                     println("added db object : ${scheme.tableName}, id: $newRowId, logged at ${now}")
                 } else {
                     throw Exception("Object insertion failed - ${scheme.tableName}")
@@ -456,7 +456,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
                 })
 
                 intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
-                intent.putExtra(OTApplication.INTENT_EXTRA_DB_ID_ITEM, item.objectId)
+                intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, item.objectId)
 
                 OTApplication.app.sendBroadcast(intent)
             }
@@ -530,7 +530,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
     }
 
     fun removeItem(item: OTItem){
-        deleteObjects(DatabaseHelper.ItemScheme, item.objectId!!)
+        //deleteObjects(DatabaseHelper.ItemScheme, item.objectId!!)
         val intent = Intent(OTApplication.BROADCAST_ACTION_ITEM_REMOVED)
 
         intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, item.trackerObjectId)
@@ -551,7 +551,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         val source = OTItem.LoggingSource.values()[cursor.getInt(cursor.getColumnIndex(ItemScheme.SOURCE_TYPE))]
         val timestamp = cursor.getLong(cursor.getColumnIndex(ItemScheme.LOGGED_AT))
 
-        return OTItem(id, tracker.objectId, serializedValues, timestamp, source)
+        return OTItem(id.toString(), tracker.objectId, serializedValues, timestamp, source)
     }
 
     fun getLogCountDuring(tracker: OTTracker, from: Long, to: Long): Int

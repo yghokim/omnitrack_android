@@ -113,7 +113,7 @@ object OTNotificationManager {
 
         val itemRemoveIntent = Intent(OTApplication.BROADCAST_ACTION_COMMAND_REMOVE_ITEM)
         itemRemoveIntent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
-        itemRemoveIntent.putExtra(OTApplication.INTENT_EXTRA_DB_ID_ITEM, itemDbId)
+        itemRemoveIntent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, itemDbId)
 
         val discardAction = NotificationCompat.Action.Builder(R.drawable.ex,
                 context.resources.getString(R.string.msg_notification_action_discard_item),

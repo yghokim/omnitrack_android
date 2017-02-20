@@ -22,6 +22,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilder
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
+import kr.ac.snu.hcil.omnitrack.core.database.FirebaseHelper
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTTrackerAttachedActivity
@@ -59,7 +60,7 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
 
             val intent = Intent(context, ItemEditingActivity::class.java)
             intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
-            intent.putExtra(OTApplication.INTENT_EXTRA_DB_ID_ITEM, item.objectId)
+            intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, item.objectId)
             return intent
         }
     }
@@ -127,9 +128,9 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
         super.onTrackerLoaded(tracker)
         title = String.format(resources.getString(R.string.title_activity_new_item), tracker.name)
 
-        if (intent.hasExtra(OTApplication.INTENT_EXTRA_DB_ID_ITEM)) {
+        if (intent.hasExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM)) {
             //contains item. Edit mode
-            val item = OTApplication.app.dbHelper.getItem(intent.getLongExtra(OTApplication.INTENT_EXTRA_DB_ID_ITEM, -1), tracker)
+            val item = OTApplication.app.dbHelper.getItem(intent.getLongExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, -1), tracker)
             if (item != null) {
                 mode = Mode.Edit
                 println("started activity with edit mode")
@@ -243,7 +244,7 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
             val item = builder.makeItem(OTItem.LoggingSource.Manual)
             println("Will push $item")
 
-            OTApplication.app.dbHelper.save(item, tracker!!)
+            FirebaseHelper.saveItem(item, tracker!!)
             builder.clear()
             clearBuilderCache()
             skipViewValueCaching = true
