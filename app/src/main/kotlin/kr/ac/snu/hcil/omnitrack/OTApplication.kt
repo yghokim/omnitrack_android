@@ -157,7 +157,7 @@ class OTApplication : MultiDexApplication() {
             OTUser.loadCachedInstance(systemSharedPreferences).onErrorResumeNext {
                 error ->
                 error.printStackTrace()
-                if (OTAuthManager.isUserSignedIn()) {
+                //if (OTAuthManager.isUserSignedIn()) {
                     val uid = OTAuthManager.userId!!
                     println("OMNITRACK user identityId: ${uid}, userName: ${OTAuthManager.userName}")
                     FirebaseHelper.findTrackersOfUser(uid).flatMap {
@@ -192,10 +192,10 @@ class OTApplication : MultiDexApplication() {
                         }
 
                     }
-                } else {
-                    println("OMNITRACK retreiving user instance error: User didn't signed in with google.")
-                    Observable.error<OTUser>(Exception("retreiving user instance error: User didn't signed in with google."))
-                }
+                //} else {
+                //    println("OMNITRACK retreiving user instance error: User didn't signed in with google.")
+                //    Observable.error<OTUser>(Exception("retreiving user instance error: User didn't signed in with google."))
+                //}
             }.doOnNext {
                 user ->
                 println("cached user instance")
