@@ -403,6 +403,10 @@ object FirebaseHelper {
         }*/
     }
 
+    fun getItemListOfTrackerChild(trackerId: String): DatabaseReference? {
+        return dbRef?.child(CHILD_NAME_ITEMS)?.child(trackerId)
+    }
+
     fun saveItem(item: OTItem, tracker: OTTracker, notifyIntent: Boolean = true) {
         val pojo = ItemPOJO()
         pojo.tracker = tracker.objectId
@@ -419,12 +423,17 @@ object FirebaseHelper {
         pojo.data = data
         val result = 0 //TODO
 
-        val itemRef = dbRef?.child(CHILD_NAME_ITEMS)?.child(tracker.objectId)?.child("Replace this with Unique Id") //TODO
+        val itemRef = if (item.objectId != null) {
+            getItemListOfTrackerChild(tracker.objectId)?.child(item.objectId!!)
+        } else getItemListOfTrackerChild(tracker.objectId)?.push()
         itemRef?.setValue(pojo) {
             error: DatabaseError?, ref: DatabaseReference ->
 
             if (error != null) {
-                //success
+                error.toException().printStackTrace()
+            } else { //success
+                item.objectId = ref.key
+
                 if (notifyIntent) {
                     val intent = Intent(when (result) {
                         SAVE_RESULT_NEW -> OTApplication.BROADCAST_ACTION_ITEM_ADDED
@@ -433,7 +442,7 @@ object FirebaseHelper {
                     })
 
                     intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
-                    intent.putExtra(OTApplication.INTENT_EXTRA_DB_ID_ITEM, item.objectId)
+                    intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, item.objectId)
 
                     OTApplication.app.sendBroadcast(intent)
                 }
@@ -463,7 +472,7 @@ object FirebaseHelper {
                 })
 
                 intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
-                intent.putExtra(OTApplication.INTENT_EXTRA_DB_ID_ITEM, item.objectId)
+                intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, item.objectId)
 
                 OTApplication.app.sendBroadcast(intent)
             }
