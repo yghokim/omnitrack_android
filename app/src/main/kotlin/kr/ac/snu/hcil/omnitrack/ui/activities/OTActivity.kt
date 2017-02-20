@@ -17,6 +17,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.ui.components.common.time.DurationPicker
 import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
+import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 import rx.subjects.BehaviorSubject
@@ -99,9 +100,11 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false) : AppC
                 .observeOn(AndroidSchedulers.mainThread())
 
     private fun refreshCredentialsWithFallbackSignIn() {
-        if (OTAuthManager.isUserSignedIn()) {
-            println("${LOG_TAG} OMNITRACK Google is signed in.")
-            OTAuthManager.refreshCredentialWithFallbackSignIn(this, OmniTrackSignInResultsHandler())
+        if (OTAuthManager.isUserSignedIn() && NetworkHelper.isConnectedToInternet()) {
+            //println("${LOG_TAG} OMNITRACK Google is signed in.")
+            if (NetworkHelper.isConnectedToInternet()) {
+                OTAuthManager.refreshCredentialWithFallbackSignIn(this, OmniTrackSignInResultsHandler())
+            }
         } else {
             goSignInUnlessUserCached()
         }
