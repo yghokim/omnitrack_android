@@ -524,9 +524,10 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
 
     fun getItem(id: Long, tracker: OTTracker): OTItem? {
         val cursor = readableDatabase.query(ItemScheme.tableName, ItemScheme.columnNames, "${ItemScheme._ID}=?", arrayOf(id.toString()), null, null, null, "1")
-        if (cursor.moveToFirst()) {
-            return extractItemEntity(cursor, tracker)
-        } else return null
+        //if (cursor.moveToFirst()) {
+        //    return extractItemEntity(cursor, tracker)
+        //}
+        /*else*/ return null
     }
 
     fun removeItem(item: OTItem){
@@ -538,7 +539,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         OTApplication.app.sendBroadcast(intent)
     }
 
-
+    /*
     fun extractItemEntity(cursor: Cursor, tracker: OTTracker): OTItem {
         val id = cursor.getLong(cursor.getColumnIndex(ItemScheme._ID))
         val serializedValues = cursor.getString(cursor.getColumnIndex(ItemScheme.VALUES_JSON))
@@ -552,7 +553,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         val timestamp = cursor.getLong(cursor.getColumnIndex(ItemScheme.LOGGED_AT))
 
         return OTItem(id.toString(), tracker.objectId, serializedValues, timestamp, source)
-    }
+    }*/
 
     fun getLogCountDuring(tracker: OTTracker, from: Long, to: Long): Int
     {

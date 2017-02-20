@@ -2,6 +2,8 @@ package kr.ac.snu.hcil.omnitrack.core.database
 
 import android.content.Intent
 import android.support.annotation.Keep
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.Task
 import com.google.firebase.database.*
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTItem
@@ -94,9 +96,18 @@ object FirebaseHelper {
 
     @Keep
     class ItemPOJO {
-        var tracker: String? = null
         var dataTable: Map<String, String>? = null
         var sourceType: Int = -1
+        var timestamp: Any = 0
+
+        @Exclude
+        fun getTimestamp(): Long {
+            if (timestamp is Int) {
+                return (timestamp as Int).toLong()
+            } else if (timestamp is Long) {
+                return (timestamp as Long)
+            } else throw Exception("Timestamp is not an integer of long.")
+        }
     }
 
     @Keep
@@ -166,7 +177,7 @@ object FirebaseHelper {
                     user,
                     pojo.name ?: "",
                     trackerIds.map { Pair<String?, String>(it.first, it.second.key!!) }.toTypedArray(),
-                    pojo.on, pojo.action, pojo.lastTriggeredTime, null)
+                    pojo.on, pojo.action, pojo.lastTriggeredTime, pojo.properties)
 
             Pair(pojo.position, trigger)
         }
@@ -394,22 +405,71 @@ object FirebaseHelper {
                 println("No firebase error. completed.")
             }
         })
-
-        //deleteObjects(AttributeScheme, *tracker.fetchRemovedAttributeIds())
-
-        /*
-        for (child in tracker.attributes.iterator().withIndex()) {
-            save(child.value, child.index)
-        }*/
     }
 
     fun getItemListOfTrackerChild(trackerId: String): DatabaseReference? {
         return dbRef?.child(CHILD_NAME_ITEMS)?.child(trackerId)
     }
 
+    fun removeItem(item: OTItem) {
+        //deleteObjects(DatabaseHelper.ItemScheme, item.objectId!!)
+        val itemId = item.objectId
+        if (itemId != null) {
+            getItemListOfTrackerChild(item.trackerObjectId)?.child(itemId)?.removeValue { databaseError, databaseReference ->
+                if (databaseError == null) {
+                    val intent = Intent(OTApplication.BROADCAST_ACTION_ITEM_REMOVED)
+
+                    intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, item.trackerObjectId)
+
+                    OTApplication.app.sendBroadcast(intent)
+                }
+            }
+        }
+    }
+
+    fun loadItems(tracker: OTTracker, page: Int = 0, pageCount: Int = Int.MAX_VALUE): Observable<List<OTItem>> {
+        val ref = getItemListOfTrackerChild(tracker.objectId)
+        if (ref != null) {
+            return Observable.create { subscriber ->
+                ref.orderByChild("timestamp").addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onCancelled(error: DatabaseError) {
+                        if (!subscriber.isUnsubscribed) {
+                            subscriber.onError(error.toException())
+                        }
+                    }
+
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        if (snapshot.exists()) {
+                            if (!subscriber.isUnsubscribed) {
+                                val list = snapshot.children.mapTo(ArrayList<OTItem>()) {
+                                    val pojo = it.getValue(ItemPOJO::class.java)
+                                    OTItem(it.key, tracker.objectId, pojo.dataTable, pojo.getTimestamp(), OTItem.LoggingSource.values()[pojo.sourceType])
+                                }
+
+                                list.sortBy { -it.timestamp }
+                                subscriber.onNext(list)
+                            }
+                        } else {
+                            if (!subscriber.isUnsubscribed) {
+                                subscriber.onNext(emptyList())
+                                subscriber.onCompleted()
+                            }
+                        }
+                    }
+
+                })
+            }
+        } else return Observable.error(Exception("No reference"))
+
+    }
+
     fun saveItem(item: OTItem, tracker: OTTracker, notifyIntent: Boolean = true) {
         val pojo = ItemPOJO()
-        pojo.tracker = tracker.objectId
+        pojo.timestamp = if (item.timestamp != -1L) {
+            item.timestamp
+        } else {
+            ServerValue.TIMESTAMP
+        }
         pojo.sourceType = item.source.ordinal
         val data = HashMap<String, String>()
 
@@ -423,35 +483,33 @@ object FirebaseHelper {
         println("store data ${data}")
 
         pojo.dataTable = data
-        val result = 0 //TODO
+        val result = SAVE_RESULT_NEW //TODO
 
         val itemRef = if (item.objectId != null) {
             getItemListOfTrackerChild(tracker.objectId)?.child(item.objectId!!)
         } else getItemListOfTrackerChild(tracker.objectId)?.push()
 
-        itemRef?.child("dataTable")?.setValue(data)
-        itemRef?.setValue(pojo) {
-            error: DatabaseError?, ref: DatabaseReference ->
+        itemRef?.setValue(pojo)?.addOnCompleteListener(object : OnCompleteListener<Void> {
+            override fun onComplete(task: Task<Void>) {
+                if (task.isSuccessful) {
+                    item.objectId = itemRef.key
 
-            if (error != null) {
-                error.toException().printStackTrace()
-            } else { //success
-                item.objectId = ref.key
+                    if (notifyIntent) {
+                        val intent = Intent(when (result) {
+                            SAVE_RESULT_NEW -> OTApplication.BROADCAST_ACTION_ITEM_ADDED
+                            SAVE_RESULT_EDIT -> OTApplication.BROADCAST_ACTION_ITEM_EDITED
+                            else -> throw IllegalArgumentException("")
+                        })
 
-                if (notifyIntent) {
-                    val intent = Intent(when (result) {
-                        SAVE_RESULT_NEW -> OTApplication.BROADCAST_ACTION_ITEM_ADDED
-                        SAVE_RESULT_EDIT -> OTApplication.BROADCAST_ACTION_ITEM_EDITED
-                        else -> throw IllegalArgumentException("")
-                    })
+                        intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
+                        intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, item.objectId)
 
-                    intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
-                    intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, item.objectId)
-
-                    OTApplication.app.sendBroadcast(intent)
+                        OTApplication.app.sendBroadcast(intent)
+                    }
                 }
             }
-        }
+
+        })
 
         /*
         * val values = ContentValues()
