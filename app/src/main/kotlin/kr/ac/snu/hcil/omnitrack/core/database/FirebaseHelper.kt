@@ -14,6 +14,7 @@ import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.DatabaseHelper.Companion.SAVE_RESULT_EDIT
 import kr.ac.snu.hcil.omnitrack.core.database.DatabaseHelper.Companion.SAVE_RESULT_NEW
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
+import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Observable
 import java.util.*
@@ -111,9 +112,10 @@ object FirebaseHelper {
     }
 
     @Keep
-    class ItemStatisticsPOJO {
-        var totalCount: Long = -1L
-        var todayCount: Long = -1L
+    class ItemListSummary {
+        var totalCount: Long? = null
+        var todayCount: Int? = null
+        var lastLoggingTime: Long? = null
     }
 
     @Keep
@@ -534,6 +536,80 @@ object FirebaseHelper {
                             println("item count: ${snapshot.childrenCount}")
                             if (!subscriber.isUnsubscribed) {
                                 subscriber.onNext(snapshot.childrenCount)
+                                subscriber.onCompleted()
+                            }
+                        }
+                    })
+        }
+    }
+
+    fun getLastLoggingTime(tracker: OTTracker): Observable<Long?> {
+        return Observable.create {
+            subscriber ->
+            getItemListOfTrackerChild(tracker.objectId)?.orderByChild("timestamp")?.limitToLast(1)
+                    ?.addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onCancelled(p0: DatabaseError) {
+                            p0.toException().printStackTrace()
+                            if (!subscriber.isUnsubscribed) {
+                                subscriber.onError(p0.toException())
+                            }
+                        }
+
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            println("latest log count: ${snapshot.childrenCount}")
+                            if (!subscriber.isUnsubscribed) {
+                                if (snapshot.exists()) {
+                                    val timestamp = snapshot.children.last().child("timestamp").value
+                                    if (timestamp is Long) {
+                                        subscriber.onNext(timestamp)
+                                    } else if (timestamp is Int) {
+                                        subscriber.onNext(timestamp.toLong())
+                                    } else subscriber.onNext(null)
+                                    subscriber.onCompleted()
+                                } else {
+                                    subscriber.onNext(null)
+                                    subscriber.onCompleted()
+                                }
+                            }
+                        }
+                    })
+        }
+    }
+
+    fun getItemListSummary(tracker: OTTracker): Observable<ItemListSummary> {
+        return Observable.create {
+            subscriber ->
+            getItemListOfTrackerChild(tracker.objectId)?.orderByChild("timestamp")
+                    ?.addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onCancelled(p0: DatabaseError) {
+                            p0.toException().printStackTrace()
+                            if (!subscriber.isUnsubscribed) {
+                                subscriber.onError(p0.toException())
+                            }
+                        }
+
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            println("item count: ${snapshot.childrenCount}")
+                            if (!subscriber.isUnsubscribed) {
+                                val info = ItemListSummary()
+                                info.totalCount = snapshot.childrenCount
+                                if (snapshot.hasChildren()) {
+                                    val lastLoggingTime = snapshot.children.last().child("timestamp").value
+                                    if (lastLoggingTime is Long) info.lastLoggingTime = lastLoggingTime
+                                    else if (lastLoggingTime is Int) info.lastLoggingTime = lastLoggingTime.toLong()
+
+                                    val startOfToday = TimeHelper.cutTimePartFromEpoch(System.currentTimeMillis())
+                                    info.todayCount = snapshot.children.filter {
+                                        val timestamp = it.child("timestamp").value
+                                        if (timestamp is Long) {
+                                            timestamp >= startOfToday
+                                        } else if (timestamp is Int) {
+                                            timestamp >= startOfToday.toInt()
+                                        } else false
+                                    }.count()
+                                }
+
+                                subscriber.onNext(info)
                                 subscriber.onCompleted()
                             }
                         }

@@ -52,7 +52,6 @@ import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 import kr.ac.snu.hcil.omnitrack.utils.startActivityOnDelay
-import rx.android.schedulers.AndroidSchedulers
 import rx.subscriptions.CompositeSubscription
 import java.text.SimpleDateFormat
 import java.util.*
@@ -481,6 +480,33 @@ class TrackerListFragment : OTFragment() {
                 }
             }
 
+            private fun setLastLoggingTime(timestamp: Long?) {
+                if (timestamp != null) {
+                    InterfaceHelper.setTextAppearance(lastLoggingTimeView, R.style.trackerListInformationTextViewStyle)
+                    val dateText = TimeHelper.getDateText(timestamp, context).toUpperCase()
+                    val timeText = lastLoggedTimeFormat.format(Date(timestamp)).toUpperCase()
+                    putStatistics(lastLoggingTimeView, dateText, timeText)
+                    todayLoggingCountView.visibility = View.VISIBLE
+                    totalItemCountView.visibility = View.VISIBLE
+
+                } else {
+                    lastLoggingTimeView.text = context.resources.getString(R.string.msg_never_logged).toUpperCase()
+                    InterfaceHelper.setTextAppearance(lastLoggingTimeView, R.style.trackerListInformationTextViewStyle_HeaderAppearance)
+                    todayLoggingCountView.visibility = View.INVISIBLE
+                    totalItemCountView.visibility = View.INVISIBLE
+                }
+            }
+
+            private fun setTodayLoggingCount(count: Int) {
+                val header = context.resources.getString(R.string.msg_todays_log).toUpperCase()
+                putStatistics(todayLoggingCountView, header, count.toString())
+            }
+
+            private fun setTotalItemCount(count: Long) {
+                val header = context.resources.getString(R.string.msg_tracker_list_stat_total).toUpperCase()
+                putStatistics(totalItemCountView, header, count.toString())
+            }
+
 
             fun bindTracker(tracker: OTTracker) {
 
@@ -497,22 +523,19 @@ class TrackerListFragment : OTFragment() {
                 subscriptions.clear()
 
                 subscriptions.add(
-                        OTApplication.app.dbHelper.getLastLoggingTime(tracker).observeOn(AndroidSchedulers.mainThread()).subscribe {
-                            timestamp ->
-                            if (timestamp != null) {
-                                InterfaceHelper.setTextAppearance(lastLoggingTimeView, R.style.trackerListInformationTextViewStyle)
-                                val dateText = TimeHelper.getDateText(timestamp, context).toUpperCase()
-                                val timeText = lastLoggedTimeFormat.format(Date(timestamp)).toUpperCase()
-                                putStatistics(lastLoggingTimeView, dateText, timeText)
-                                todayLoggingCountView.visibility = View.VISIBLE
-                                totalItemCountView.visibility = View.VISIBLE
+                        FirebaseHelper.getItemListSummary(tracker).subscribe {
+                            summary ->
+                            setLastLoggingTime(summary.lastLoggingTime)
+                            setTodayLoggingCount(summary.todayCount ?: 0)
+                            setTotalItemCount(summary.totalCount ?: 0)
+                        }
+                )
 
-                            } else {
-                                lastLoggingTimeView.text = context.resources.getString(R.string.msg_never_logged).toUpperCase()
-                                InterfaceHelper.setTextAppearance(lastLoggingTimeView, R.style.trackerListInformationTextViewStyle_HeaderAppearance)
-                                todayLoggingCountView.visibility = View.INVISIBLE
-                                totalItemCountView.visibility = View.INVISIBLE
-                            }
+                /*
+                subscriptions.add(
+                        FirebaseHelper.getLastLoggingTime(tracker).observeOn(AndroidSchedulers.mainThread()).subscribe {
+                            timestamp ->
+
                     }
                 )
 
@@ -535,6 +558,8 @@ class TrackerListFragment : OTFragment() {
                             putStatistics(totalItemCountView, header, count.toString())
                         }
                 )
+
+                */
 
 
 
