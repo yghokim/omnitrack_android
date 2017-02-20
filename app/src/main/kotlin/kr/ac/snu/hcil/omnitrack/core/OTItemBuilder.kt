@@ -31,7 +31,11 @@ class OTItemBuilder : IStringSerializable {
             input.nextName()
             val mode = input.nextInt()
 
-            val builder = OTItemBuilder(trackerObjId, mode, itemId)
+            val builder = OTItemBuilder(trackerObjId, mode, if (itemId.isBlank()) {
+                null
+            } else {
+                itemId
+            })
 
             input.nextName()
             input.beginArray()
@@ -62,7 +66,7 @@ class OTItemBuilder : IStringSerializable {
         override fun write(out: JsonWriter, builder: OTItemBuilder) {
             out.beginObject()
             out.name("tr").value(builder.tracker.objectId)
-            out.name("it").value(builder.connectedItemDbId)
+            out.name("it").value(builder.connectedItemDbId ?: "")
             out.name("md").value(builder.mode)
             out.name("v").beginArray()
 
@@ -317,16 +321,12 @@ class OTItemBuilder : IStringSerializable {
         return Observable.merge(tracker.attributes.unObservedList.mapIndexed { i, attr ->
             if (attr.valueConnection != null) {
                 attr.valueConnection!!.getRequestedValue(this).flatMap { data ->
-                    try {
                         if (data.datum == null) {
                             attr.getAutoCompleteValue()
                         } else {
                             Observable.just(data.datum)
                         }
-                    } catch(e: Exception) {
-                        attr.getAutoCompleteValue()
-                    }
-                }.map { value -> Pair(i, value) }.subscribeOn(Schedulers.io()).doOnSubscribe {
+                }.onErrorResumeNext { attr.getAutoCompleteValue() }.map { value -> Pair(i, value) }.subscribeOn(Schedulers.io()).doOnSubscribe {
 
                     println("RX doOnSubscribe1: ${Thread.currentThread().name}")
                     attributeStateList[i] = EAttributeValueState.GettingExternalValue
