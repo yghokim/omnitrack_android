@@ -3,12 +3,14 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.tracker
 import android.animation.Animator
 import android.content.Context
 import android.content.Intent
+import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
 import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
+import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewPager
 import at.markushi.ui.RevealColorView
 import butterknife.bindView
@@ -75,6 +77,9 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
 
         mSectionsPagerAdapter = SectionsPagerAdapter(supportFragmentManager)
 
+
+        mViewPager.pageMargin = resources.getDimensionPixelSize(R.dimen.viewpager_page_margin)
+        mViewPager.setPageMarginDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.darkerBackground)))
         // Set up the ViewPager with the sections adapter.
         mViewPager.adapter = mSectionsPagerAdapter
 
