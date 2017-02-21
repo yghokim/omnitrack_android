@@ -36,6 +36,7 @@
 
     <color name="titleTextColor">#666666</color>
     <color name="outerBackground">#edebe7</color>
+    <color name="darkerBackground">#dcd9d3</color>
     <color name="frontalBackground">#ffffff</color>
 
     <color name="inputTextColor">#404040</color>
