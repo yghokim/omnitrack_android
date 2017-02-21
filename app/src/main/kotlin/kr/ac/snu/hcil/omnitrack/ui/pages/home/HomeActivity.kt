@@ -2,12 +2,14 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.home
 
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
 import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
+import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewPager
 import android.support.v4.widget.DrawerLayout
 import android.view.Gravity
@@ -50,6 +52,8 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), OTAut
         // primary sections of the activity.
         mSectionsPagerAdapter = SectionsPagerAdapter(supportFragmentManager)
 
+        mViewPager.pageMargin = resources.getDimensionPixelSize(R.dimen.viewpager_page_margin)
+        mViewPager.setPageMarginDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.darkerBackground)))
         // Set up the ViewPager with the sections adapter.
         mViewPager.adapter = mSectionsPagerAdapter
 
