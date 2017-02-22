@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.attribute
 
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.transition.TransitionManager
@@ -15,6 +16,7 @@ import butterknife.bindView
 import com.google.gson.JsonObject
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
@@ -34,6 +36,14 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
         const val STATE_COLUMN_NAME = "columnName"
         const val STATE_CONNECTION = "connection"
         const val STATE_PROPERTIES = "properties"
+
+        fun makeIntent(context: Context, tracker: OTTracker, attribute: OTAttribute<out Any>): Intent {
+
+            val intent = Intent(context, AttributeDetailActivity::class.java)
+            intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ATTRIBUTE, attribute.objectId)
+            intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
+            return intent
+        }
     }
 
     var attribute: OTAttribute<out Any>? = null
@@ -137,12 +147,14 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
     override fun onStart() {
         super.onStart()
+        val attributeId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ATTRIBUTE)
+        val trackerId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
 
-        if (intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ATTRIBUTE) != null) {
+        if (!attributeId.isNullOrBlank() && !trackerId.isNullOrBlank()) {
             startSubscriptions.add(
                     signedInUserObservable.subscribe {
                         user ->
-                        attribute = user.findAttributeByObjectId(intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ATTRIBUTE))
+                        attribute = user.findAttributeByObjectId(trackerId, attributeId)
                         refresh()
                         applyAttributeToPropertyView(attribute!!)
                     }
