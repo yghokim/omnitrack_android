@@ -219,15 +219,10 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
         FirebaseHelper.removeTracker(tracker, this)
     }
 
-    fun findAttributeByObjectId(id: String): OTAttribute<out Any>? {
+    fun findAttributeByObjectId(trackerId: String, attributeId: String): OTAttribute<out Any>? {
+        val tracker = get(trackerId)
 
-        for (tracker in trackers) {
-            val result = tracker.attributes.unObservedList.find { it.objectId == id }
-            if (result != null) {
-                return result;
-            } else continue
-        }
-        return null
+        return get(trackerId)?.attributes?.unObservedList?.find { it.objectId == attributeId }
     }
 
     operator fun get(trackerId: String): OTTracker? {

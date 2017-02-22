@@ -112,6 +112,7 @@ class OTTimeRangeQuery : ATypedQueueSerializable {
         if (needsLinkedAttribute) {
             if (linkedAttribute != null) {
                 typedQueue.putString(linkedAttribute!!.objectId)
+                typedQueue.putString(linkedAttribute!!.tracker!!.objectId)
             }
         }
     }
@@ -126,10 +127,11 @@ class OTTimeRangeQuery : ATypedQueueSerializable {
 
         if (needsLinkedAttribute) {
             val attrId = typedQueue.getString()
+            val trackerId = typedQueue.getString()
             OTApplication.app.currentUserObservable.observeOn(Schedulers.immediate())
                     .subscribe {
                         user ->
-                        linkedAttribute = user.findAttributeByObjectId(attrId) as OTTimeSpanAttribute
+                        linkedAttribute = user.findAttributeByObjectId(trackerId, attrId) as OTTimeSpanAttribute
                     }
         }
     }
