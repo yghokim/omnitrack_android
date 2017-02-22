@@ -1,6 +1,5 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.tracker
 
-import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.support.design.widget.Snackbar
@@ -247,9 +246,7 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
 
 
     fun openAttributeDetailActivity(position: Int) {
-        val intent = Intent(activity, AttributeDetailActivity::class.java)
-        intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ATTRIBUTE, tracker?.attributes?.get(position)?.objectId)
-        startActivityOnDelay(intent)
+        startActivityOnDelay(AttributeDetailActivity.makeIntent(activity, tracker!!, tracker!!.attributes.get(position)))
     }
 
     fun scrollToBottom() {
