@@ -84,6 +84,18 @@ object FirebaseHelper {
         var properties: Map<String, String>? = null
     }
 
+
+    class MutableTriggerPOJO : NamedPOJO() {
+        var user: String? = null
+        var position: Int = 0
+        var action: Int = 0
+        var type: Int = 0
+        var on: Boolean = false
+        val properties = HashMap<String, String>()
+        var lastTriggeredTime: Long = 0
+        var trackers = ArrayList<IndexedKey>()
+    }
+
     @Keep
     class TriggerPOJO : NamedPOJO() {
         var user: String? = null
@@ -93,6 +105,25 @@ object FirebaseHelper {
         var on: Boolean = false
         var properties: Map<String, String>? = null
         var lastTriggeredTime: Long = 0
+        var trackers: List<IndexedKey>? = null
+
+        @Exclude
+        fun toMutable(out: MutableTriggerPOJO?): MutableTriggerPOJO {
+            val mutable = out ?: MutableTriggerPOJO()
+            mutable.user = user
+            mutable.position = position
+            mutable.action = action
+            mutable.type = type
+            mutable.on = on
+
+            if (properties != null)
+                mutable.properties.putAll(properties!!)
+
+            if (trackers != null)
+                mutable.trackers.addAll(trackers!!)
+
+            return mutable
+        }
     }
 
     @Keep
@@ -145,23 +176,8 @@ object FirebaseHelper {
     }
 
     fun saveTrigger(trigger: OTTrigger, userId: String, position: Int) {
-        val pojo = TriggerPOJO()
-        pojo.action = trigger.action
-        pojo.name = trigger.name
-        pojo.on = trigger.isOn
-        pojo.lastTriggeredTime = trigger.lastTriggeredTime
-        pojo.position = position
-        pojo.type = trigger.typeId
-        pojo.user = userId
-        val properties = HashMap<String, String>()
-        trigger.writePropertiesToDatabase(properties)
-        pojo.properties = properties
-
-        val ref = triggerRef(triggerId = trigger.objectId)
-        if (ref != null) {
-            ref.setValue(pojo)
-            ref.child("trackers").setValue(trigger.trackers.mapIndexed { i, tracker -> IndexedKey(i, tracker.objectId) })
-        }
+        val pojo = trigger.dumpDataToPojo(null)
+        triggerRef(triggerId = trigger.objectId)?.setValue(pojo)
         setContainsFlagOfUser(userId, trigger.objectId, CHILD_NAME_TRIGGERS, true)
     }
 

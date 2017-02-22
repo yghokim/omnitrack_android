@@ -139,6 +139,23 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
         suspendDatabaseSync = false
     }
 
+    fun dumpDataToPojo(out: FirebaseHelper.TriggerPOJO?): FirebaseHelper.TriggerPOJO {
+        val pojo = out ?: FirebaseHelper.TriggerPOJO()
+
+        pojo.action = this.action
+        pojo.name = this.name
+        pojo.on = this.isOn
+        pojo.lastTriggeredTime = this.lastTriggeredTime
+        pojo.type = this.typeId
+        pojo.user = user.objectId
+        val properties = HashMap<String, String>()
+        this.writePropertiesToDatabase(properties)
+        pojo.properties = properties
+        pojo.trackers = trackers.mapIndexed { i, tracker -> FirebaseHelper.IndexedKey(i, tracker.objectId) }
+
+        return pojo
+    }
+
     protected fun syncPropertyToDatabase(propertyName: String, value: Any) {
         if (!suspendDatabaseSync)
             databasePointRef?.child("properties")?.child(propertyName)?.setValue(TypeStringSerializationHelper.serialize(value))
