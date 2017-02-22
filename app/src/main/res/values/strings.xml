@@ -29,7 +29,14 @@
 
     <string name="msg_save">Save</string>
 
-    <string name="msg_confirm_apply_change">Apply changes to the field before closing?</string>
+    <string name="msg_confirm_field_apply_change">Apply changes to the field before closing?</string>
+
+    <string name="msg_confirm_tracker_apply_change">Apply changes to the tracker before closing?</string>
+    <string name="msg_confirm_trigger_apply_change">Apply changes to the trigger before closing?</string>
+
+    <string name="msg_confirm_tracker_cancel_creation">Save this tracker before closing?</string>
+    <string name="msg_confirm_trigger_cancel_creation">Save this trigger before closing?</string>
+
 
     <string name="msg_confirm_log">Log Item</string>
 
@@ -81,6 +88,8 @@
     <string name="msg_item_remove_confirm">Deleting item cannot be undone. Do you want to remove this item?</string>
 
     <string name="msg_new_item_confirm_restore_previous_input">Previously input forms are stored. Do you want to restore the data?</string>
+
+    <string name="msg_trigger_remove_confirm">Delete this trigger? This cannot be undone.</string>
 
     <string name="msg_clear_form">Reset</string>
 

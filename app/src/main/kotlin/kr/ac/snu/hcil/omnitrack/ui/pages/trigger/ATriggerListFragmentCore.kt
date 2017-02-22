@@ -27,7 +27,7 @@ import java.util.*
 abstract class ATriggerListFragmentCore(val parent: Fragment) {
 
     companion object {
-        private const val STATE_EXPANDED_POSITION = "expandedTriggerPosition"
+        // private const val STATE_EXPANDED_POSITION = "expandedTriggerPosition"
     }
 
     interface TriggerAdapter {
@@ -63,8 +63,8 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
 
     private lateinit var newTriggerButton: FloatingActionButton
 
-    private var expandedTriggerPosition: Int = -1
-    private var expandedViewHolder: ATriggerViewHolder<out OTTrigger>? = null
+    //private var expandedTriggerPosition: Int = -1
+    //private var expandedViewHolder: ATriggerViewHolder<out OTTrigger>? = null
 
     private val subscriptions = CompositeSubscription()
 
@@ -101,7 +101,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
         listView.itemAnimator = SlideInLeftAnimator(DecelerateInterpolator(2.0f))
 
         adapter = Adapter()
-        expandedTriggerPosition = savedInstanceState?.getInt(STATE_EXPANDED_POSITION, -1) ?: -1
+        //expandedTriggerPosition = savedInstanceState?.getInt(STATE_EXPANDED_POSITION, -1) ?: -1
         listView.adapter = adapter
 
         newTriggerButton = rootView.findViewById(R.id.ui_button_new_trigger) as FloatingActionButton
@@ -137,7 +137,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
     }
 
     fun onSaveInstanceState(outState: Bundle) {
-        outState.putInt(STATE_EXPANDED_POSITION, expandedTriggerPosition)
+        // outState.putInt(STATE_EXPANDED_POSITION, expandedTriggerPosition)
     }
 
     fun setFloatingButtonColor(color: Int) {
@@ -160,6 +160,12 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
         triggerTypeDialog.show()
     }
 
+    protected open fun onTriggerEditRequested(trigger: OTTrigger) {
+        parent.startActivity(
+                TriggerDetailActivity.makeEditTriggerIntent(parent.context, trigger, false)
+        )
+    }
+
     inner class Adapter() : RecyclerView.Adapter<ATriggerViewHolder<out OTTrigger>>(), ATriggerViewHolder.ITriggerControlListener {
 
         private val viewHolders = ArrayList<ATriggerViewHolder<out OTTrigger>>()
@@ -178,6 +184,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
         override fun onBindViewHolder(holder: ATriggerViewHolder<out OTTrigger>, position: Int) {
             if (triggerAdapter != null) {
                 holder.bind(triggerAdapter!!.getTriggerAt(position))
+                /*
                 if (expandedTriggerPosition == position) {
                     holder.setIsExpanded(true, false)
                     expandedViewHolder = holder
@@ -194,7 +201,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
                     /*
                 holder.itemView.alpha = 1.0f
                 holder.itemView.setBackgroundColor(ContextCompat.getColor(parent.context, R.color.frontalBackground))*/
-                }
+                }*/
             }
         }
 
@@ -222,9 +229,14 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
 
         }
 
+        override fun onTriggerEditRequested(position: Int, viewHolder: ATriggerViewHolder<out OTTrigger>) {
+            this@ATriggerListFragmentCore.onTriggerEditRequested(triggerAdapter!!.getTriggerAt(position))
+        }
+
         override fun onTriggerRemove(position: Int) {
 
             if (triggerAdapter != null) {
+                /*
                 if (expandedTriggerPosition == position) {
                     val lastExpandedIndex = expandedTriggerPosition
                     expandedTriggerPosition = -1
@@ -234,7 +246,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
                             this.notifyItemChanged(triggerEntry.index)
                         }
                     }
-                }
+                }*/
 
                 triggerAdapter?.onRemoveTrigger(triggerAdapter!!.getTriggerAt(position))
                 this.notifyItemRemoved(position)
@@ -242,6 +254,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
             }
         }
 
+        /*
         override fun onTriggerExpandRequested(position: Int, viewHolder: ATriggerViewHolder<out OTTrigger>) {
 
             if (expandedViewHolder !== viewHolder)
@@ -264,7 +277,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
 
             viewHolder.setIsExpanded(false, true)
             //adapter.notifyDataSetChanged()
-        }
+        }*/
     }
 
 }
