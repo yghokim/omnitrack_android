@@ -56,7 +56,7 @@ class TimeTriggerViewHolder(parent: ViewGroup, listener: ITriggerControlListener
 
         return view
     }
-
+/*
     override fun initExpandedViewContent(): View {
         return TimeTriggerConfigurationPanel(context = itemView.context)
     }
@@ -68,9 +68,9 @@ class TimeTriggerViewHolder(parent: ViewGroup, listener: ITriggerControlListener
             expandedView.applyConfigVariables(trigger.configVariables)
             expandedView.applyRangeVariables(trigger.rangeVariables)
         }
-    }
+    }*/
 
-
+/*
     override fun updateTriggerWithViewSettings(expandedView: View, trigger: OTTimeTrigger) {
         if (expandedView is TimeTriggerConfigurationPanel) {
             trigger.configType = expandedView.configMode
@@ -85,7 +85,7 @@ class TimeTriggerViewHolder(parent: ViewGroup, listener: ITriggerControlListener
         if (expandedView is TimeTriggerConfigurationPanel) {
             return expandedView.validateExpandedViewInputs(errorMessagesOut)
         } else return true
-    }
+    }*/
 
 
 }

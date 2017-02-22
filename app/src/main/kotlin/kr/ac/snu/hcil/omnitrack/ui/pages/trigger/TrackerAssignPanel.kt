@@ -37,9 +37,10 @@ class TrackerAssignPanel : FlowLayout, View.OnClickListener {
         this.layoutTransition = LayoutTransition()
     }
 
-    fun init(trackers: Collection<OTTracker>) {
+    fun init(trackers: Collection<OTTracker>?) {
         trackerIds.clear()
-        trackerIds.addAll(trackers.map { it.objectId })
+        if (trackers != null)
+            trackerIds.addAll(trackers.map { it.objectId })
         refresh()
     }
 

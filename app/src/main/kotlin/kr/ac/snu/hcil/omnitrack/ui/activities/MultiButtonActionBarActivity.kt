@@ -23,7 +23,7 @@ import kr.ac.snu.hcil.omnitrack.R
 abstract class MultiButtonActionBarActivity(val layoutId: Int) : OTActivity() {
 
     enum class Mode {
-        OKCancel, Back, BackAndMenu, SaveCancel, None
+        OKCancel, Back, BackAndMenu, SaveCancel, ApplyCancel, None
     }
 
     protected val header: AppBarLayout by bindView(R.id.appbar)
@@ -140,6 +140,16 @@ abstract class MultiButtonActionBarActivity(val layoutId: Int) : OTActivity() {
                 leftActionBarButton?.visibility = View.VISIBLE
                 leftActionBarButton?.setImageResource(R.drawable.cancel)
                 rightActionBarTextButton?.setText(R.string.msg_save)
+            }
+
+            Mode.ApplyCancel -> {
+
+                rightActionBarTextButton?.visibility = View.VISIBLE
+                rightActionBarButton?.visibility = View.GONE
+
+                leftActionBarButton?.visibility = View.VISIBLE
+                leftActionBarButton?.setImageResource(R.drawable.cancel)
+                rightActionBarTextButton?.setText(R.string.msg_apply)
             }
 
         }

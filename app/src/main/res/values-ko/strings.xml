@@ -18,7 +18,13 @@
 
     <string name="msg_confirm_log">아이템 기록</string>
 
-    <string name="msg_confirm_apply_change">나가기 전에 변경사항을 적용하시겠습니까?</string>
+    <string name="msg_confirm_field_apply_change">나가기 전에 변경사항을 적용하시겠습니까?</string>
+
+    <string name="msg_confirm_tracker_apply_change">@string/msg_confirm_field_apply_change</string>
+    <string name="msg_confirm_trigger_apply_change">@string/msg_confirm_field_apply_change</string>
+
+    <string name="msg_confirm_tracker_cancel_creation">종료하기 전에 트래커를 저장하시겠습니까?</string>
+    <string name="msg_confirm_trigger_cancel_creation">종료하기 전에 트리거를 저장하시겠습니까까?</string>
 
     <string name="msg_confirm_empty_tracker_log">이 트래커에는 필드가 없습니다. 현재 시각만을 기록하시겠습니까?</string>
 
@@ -58,6 +64,9 @@
     <string name="msg_item_remove_confirm">아이템을 삭제하면 되돌릴 수 없습니다. 정말 삭제하시겠습니까?</string>
 
     <string name="msg_new_item_confirm_restore_previous_input">이전에 입력한 내용이 임시로 저장되어 있습니다. 다시 불러오시겠습니까?</string>
+
+    <string name="msg_trigger_remove_confirm">트리거를 삭제하면 다시 되돌릴 수 없습니다. 정말 삭제하시겠습니까?</string>
+
 
     <string name="msg_clear_form">초기화</string>
 

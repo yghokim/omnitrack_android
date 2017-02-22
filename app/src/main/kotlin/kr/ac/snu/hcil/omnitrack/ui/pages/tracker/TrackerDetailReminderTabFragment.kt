@@ -8,6 +8,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.ATriggerListFragmentCore
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.TriggerDetailActivity
 import rx.subscriptions.CompositeSubscription
 import java.util.*
 
@@ -31,6 +32,12 @@ class TrackerDetailReminderTabFragment : TrackerDetailActivity.ChildFragment() {
                 val newTrigger = triggerAdapter?.makeNewTriggerInstance(OTTrigger.TYPE_TIME)
                 if (newTrigger != null)
                     super.appendNewTrigger(newTrigger)
+            }
+
+            override fun onTriggerEditRequested(trigger: OTTrigger) {
+                parent.startActivity(
+                        TriggerDetailActivity.makeEditTriggerIntent(parent.context, trigger, true)
+                )
             }
         }
     }

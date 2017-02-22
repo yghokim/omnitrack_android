@@ -6,4 +6,8 @@
     <string name="title_activity_item_browser">%1$s Logs</string>
     <string name="title_activity_tracker_new">New Tracker</string>
     <string name="title_activity_tracker_edit">Edit Tracker</string>
+    <string name="title_activity_trigger_edit">Edit Trigger</string>
+    <string name="title_activity_trigger_new">New Trigger</string>
+
+
 </resources>
