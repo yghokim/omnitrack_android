@@ -1,16 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/frontalBackground"
+    android:background="@drawable/frontal_color_selectable_element_background"
     android:clickable="true"
     android:orientation="vertical">
-
-    <FrameLayout
-        android:id="@+id/ui_toggle_view_container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
+    <!--
         <RelativeLayout
             android:id="@+id/ui_collapsed_view"
             android:layout_width="match_parent"
@@ -19,11 +14,12 @@
             android:orientation="vertical"
             android:paddingLeft="@dimen/activity_horizontal_margin"
             android:paddingTop="12dp">
-
+-->
             <LinearLayout
                 android:id="@+id/ui_left"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
                 android:layout_toStartOf="@+id/ui_trigger_switch"
                 android:orientation="vertical">
 
@@ -31,6 +27,7 @@
                     android:id="@+id/ui_wappen_type"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
                     android:background="@drawable/wappen_frame_dark"
                     android:orientation="horizontal"
                     android:paddingLeft="4dp">
@@ -84,28 +81,28 @@
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:textStyle="bold" />
 
-        </RelativeLayout>
+    <!-- </RelativeLayout>-->
 
 
-        <LinearLayout
-            android:id="@+id/ui_expanded_view"
+    <!--
+    <LinearLayout
+        android:id="@+id/ui_expanded_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFF"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:id="@+id/ui_control_panel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <ViewStub
+            android:id="@+id/ui_tracker_assign_panel_stub"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#FFF"
-            android:orientation="vertical">
-
-            <FrameLayout
-                android:id="@+id/ui_control_panel"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <ViewStub
-                android:id="@+id/ui_tracker_assign_panel_stub"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout="@layout/layout_tracker_assign_panel" />
-        </LinearLayout>
-    </FrameLayout>
+            android:layout="@layout/layout_tracker_assign_panel" />
+    </LinearLayout>-->
 
     <!--
         <View
@@ -118,50 +115,10 @@
     <kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
         android:id="@+id/ui_bottom_bar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="@dimen/button_height_normal"
+        android:layout_below="@+id/ui_left"
+        android:background="@color/editTextFormBackground">
 
-        <android.support.v7.widget.AppCompatImageButton
-            android:id="@+id/ui_button_remove"
-            android:layout_width="@dimen/button_height_normal"
-            android:layout_height="@dimen/button_height_normal"
-            android:layout_gravity="start"
-            android:background="@drawable/transparent_button_background"
-            android:src="@drawable/trashcan"
-            android:tint="@color/buttonIconColorDark"
-            android:visibility="invisible" />
-
-        <LinearLayout
-            android:id="@+id/ui_apply_button_group"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/ui_button_cancel"
-                style="@style/textButtonTransparentLight"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/button_height_normal"
-                android:background="@drawable/transparent_button_background"
-                android:text="@string/msg_cancel" />
-
-            <Button
-                android:id="@+id/ui_button_apply"
-                style="@style/textButtonTransparentLight"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/button_height_normal"
-                android:background="@drawable/transparent_button_background"
-                android:text="@string/msg_apply" />
-        </LinearLayout>
-
-        <android.support.v7.widget.AppCompatImageButton
-            android:id="@+id/ui_button_expand_toggle"
-            android:layout_width="@dimen/button_height_normal"
-            android:layout_height="@dimen/button_height_normal"
-            android:layout_gravity="end"
-            android:background="@drawable/transparent_button_background"
-            android:src="@drawable/down"
-            android:tint="@color/buttonIconColorDark" />
 
         <TextView
             android:id="@+id/ui_config_summary"
@@ -170,8 +127,72 @@
             android:layout_gravity="center_vertical|start"
             android:layout_marginLeft="@dimen/activity_horizontal_margin"
             android:fontFamily="sans-serif-light"
-            android:text=""
+            android:text="Trigger summary"
             android:textColor="@color/textColorMid"
             android:textSize="14sp" />
+
+
+        <android.support.v7.widget.AppCompatImageButton
+            android:id="@+id/ui_button_remove"
+            android:layout_width="@dimen/button_height_normal"
+            android:layout_height="@dimen/button_height_normal"
+            android:layout_gravity="end"
+            android:background="@drawable/transparent_button_background"
+            android:src="@drawable/trashcan"
+            android:tint="@color/buttonIconColorDark" />
+
+
     </kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout>
-</LinearLayout>
+
+    <!--
+<kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
+    android:id="@+id/ui_bottom_bar"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <android.support.v7.widget.AppCompatImageButton
+        android:id="@+id/ui_button_remove"
+        android:layout_width="@dimen/button_height_normal"
+        android:layout_height="@dimen/button_height_normal"
+        android:layout_gravity="start"
+        android:background="@drawable/transparent_button_background"
+        android:src="@drawable/trashcan"
+        android:tint="@color/buttonIconColorDark"
+        android:visibility="invisible" />
+
+    <LinearLayout
+        android:id="@+id/ui_apply_button_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/ui_button_cancel"
+            style="@style/textButtonTransparentLight"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/button_height_normal"
+            android:background="@drawable/transparent_button_background"
+            android:text="@string/msg_cancel" />
+
+        <Button
+            android:id="@+id/ui_button_apply"
+            style="@style/textButtonTransparentLight"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/button_height_normal"
+            android:background="@drawable/transparent_button_background"
+            android:text="@string/msg_apply" />
+    </LinearLayout>
+
+    <android.support.v7.widget.AppCompatImageButton
+        android:id="@+id/ui_button_expand_toggle"
+        android:layout_width="@dimen/button_height_normal"
+        android:layout_height="@dimen/button_height_normal"
+        android:layout_gravity="end"
+        android:background="@drawable/transparent_button_background"
+        android:src="@drawable/down"
+        android:tint="@color/buttonIconColorDark" />
+
+    </kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout>
+-->
+</RelativeLayout>

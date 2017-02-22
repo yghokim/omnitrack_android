@@ -157,6 +157,10 @@
         <activity android:name=".ui.components.common.activity.WebServiceLoginActivity" />
         <activity android:name=".ui.pages.visualization.ChartViewActivity" />
         <activity
+            android:name=".ui.pages.trigger.TriggerDetailActivity"
+            android:label="Trigger Detail" />
+
+        <activity
             android:name=".ui.pages.diagnostics.SystemLogActivity"
             android:label="System Logs" />
 

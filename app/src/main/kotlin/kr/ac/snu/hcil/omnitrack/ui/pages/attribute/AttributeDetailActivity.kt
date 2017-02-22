@@ -184,7 +184,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
     }
 
     private fun askChangeAndFinish(backInsteadOfFinish: Boolean = false) {
-        DialogHelper.makeYesNoDialogBuilder(this, "OmniTrack", resources.getString(R.string.msg_confirm_apply_change),
+        DialogHelper.makeYesNoDialogBuilder(this, "OmniTrack", resources.getString(R.string.msg_confirm_field_apply_change),
                 {
                     saveChanges()
                     if (backInsteadOfFinish)

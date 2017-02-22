@@ -32,7 +32,7 @@ class EventTriggerViewHolder(parent: ViewGroup, listener: ITriggerControlListene
 
         return view
     }
-
+/*
     override fun initExpandedViewContent(): View {
         return EventTriggerConfigurationPanel(itemView.context)
     }
@@ -53,7 +53,7 @@ class EventTriggerViewHolder(parent: ViewGroup, listener: ITriggerControlListene
 
     override fun validateExpandedViewInputs(expandedView: View, errorMessagesOut: MutableList<String>): Boolean {
         return true
-    }
+    }*/
 
     override fun getViewsForSwitchValidationFailedAlert(): Array<View>? {
         val superValue = super.getViewsForSwitchValidationFailedAlert()
