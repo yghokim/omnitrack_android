@@ -73,22 +73,27 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
     }
 
     override fun onToolbarLeftButtonClicked() {
-        DialogHelper.makeYesNoDialogBuilder(this, "OmniTrack",
-                resources.getString(if (isEditMode) {
-                    R.string.msg_confirm_trigger_apply_change
-                } else {
-                    R.string.msg_confirm_trigger_cancel_creation
-                }),
-                {
-                    if (validateConfigurations()) {
-                        attachedTrigger?.let {
-                            applyViewToTrigger(it)
+        if (isEditMode) {
+            DialogHelper.makeYesNoDialogBuilder(this, "OmniTrack",
+                    resources.getString(R.string.msg_confirm_trigger_apply_change),
+                    {
+                        if (validateConfigurations()) {
+                            attachedTrigger?.let {
+                                applyViewToTrigger(it)
+                            }
+                            setResult(Activity.RESULT_OK)
                             finish()
+                        } else {
+                            DialogHelper.makeSimpleAlertBuilder(this, errorMessages.joinToString("\n")).show()
                         }
-                    } else {
-                        DialogHelper.makeSimpleAlertBuilder(this, errorMessages.joinToString("\n")).show()
-                    }
-                }, { setResult(Activity.RESULT_CANCELED); finish() }).show()
+                    }, { setResult(Activity.RESULT_CANCELED); finish() }).show()
+        } else {
+            DialogHelper.makeYesNoDialogBuilder(this, "OmniTrack",
+                    resources.getString(R.string.msg_confirm_trigger_cancel_creation), {
+                setResult(Activity.RESULT_CANCELED)
+                finish()
+            }).show()
+        }
     }
 
     override fun onBackPressed() {
@@ -107,11 +112,12 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
                         }
                     }, { setResult(Activity.RESULT_CANCELED); super.onBackPressed() }).show()
         } else {
+            /*
             DialogHelper.makeYesNoDialogBuilder(this, "OmniTrack",
                     resources.getString(R.string.msg_confirm_trigger_cancel_creation), {
-                setResult(Activity.RESULT_CANCELED)
-                finish()
-            })
+                super.onBackPressed()
+            }).show()*/
+            super.onBackPressed()
         }
     }
 

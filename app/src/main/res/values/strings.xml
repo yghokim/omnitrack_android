@@ -35,7 +35,7 @@
     <string name="msg_confirm_trigger_apply_change">Apply changes to the trigger before closing?</string>
 
     <string name="msg_confirm_tracker_cancel_creation">Save this tracker before closing?</string>
-    <string name="msg_confirm_trigger_cancel_creation">Save this trigger before closing?</string>
+    <string name="msg_confirm_trigger_cancel_creation">Cancel the trigger creation?</string>
 
 
     <string name="msg_confirm_log">Log Item</string>

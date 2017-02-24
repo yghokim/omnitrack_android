@@ -23,8 +23,8 @@
     <string name="msg_confirm_tracker_apply_change">@string/msg_confirm_field_apply_change</string>
     <string name="msg_confirm_trigger_apply_change">@string/msg_confirm_field_apply_change</string>
 
-    <string name="msg_confirm_tracker_cancel_creation">종료하기 전에 트래커를 저장하시겠습니까?</string>
-    <string name="msg_confirm_trigger_cancel_creation">종료하기 전에 트리거를 저장하시겠습니까까?</string>
+    <string name="msg_confirm_tracker_cancel_creation">트래커 생성을 취소하시겠습니까?</string>
+    <string name="msg_confirm_trigger_cancel_creation">트리거 생성을 취소하시겠습니까?</string>
 
     <string name="msg_confirm_empty_tracker_log">이 트래커에는 필드가 없습니다. 현재 시각만을 기록하시겠습니까?</string>
 
