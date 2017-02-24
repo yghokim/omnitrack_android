@@ -130,15 +130,15 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
         if (trackerAssignPanel != null) {
             for (trackerId in trackerAssignPanel!!.trackerIds)
                 trigger.addTracker(trackerId)
-        }
 
-        var i = 0
-        while (i < trigger.trackers.size) {
-            val tracker = trigger.trackers[i]
-            if (!trackerAssignPanel!!.trackerIds.contains(tracker.objectId)) {
-                trigger.removeTracker(tracker)
-            } else {
-                i++
+            var i = 0
+            while (i < trigger.trackers.size) {
+                val tracker = trigger.trackers[i]
+                if (!trackerAssignPanel!!.trackerIds.contains(tracker.objectId)) {
+                    trigger.removeTracker(tracker)
+                } else {
+                    i++
+                }
             }
         }
         return true
