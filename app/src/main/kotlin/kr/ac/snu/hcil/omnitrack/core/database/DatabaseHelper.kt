@@ -9,13 +9,8 @@ import android.database.sqlite.SQLiteOpenHelper
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
-import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
-import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
-import kr.ac.snu.hcil.omnitrack.utils.toInt
-import rx.Observable
-import rx.schedulers.Schedulers
 import java.util.*
 
 /**
@@ -326,6 +321,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         return values
     }
 
+    /*
     fun save(trigger: OTTrigger, owner: OTUser, position: Int) {
         if (trigger.isDirtySinceLastSync) {
             val values = baseContentValuesOfNamed(trigger, TriggerScheme)
@@ -347,6 +343,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
             println("trigger is not dirty. Do not save. $position")
         }
     }
+*/
 
     /*
     fun save(attribute: OTAttribute<out Any>, position: Int) {
@@ -490,6 +487,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         }
     }
 
+    /*
     fun getItems(tracker: OTTracker, listOut: ArrayList<OTItem>): Int {
         /*
         val cursor = readableDatabase.query(ItemScheme.tableName, ItemScheme.columnNames, "${ItemScheme.TRACKER_ID}=?", arrayOf(tracker.objectId.toString()), null, null, "${ItemScheme.LOGGED_AT} DESC")
@@ -504,7 +502,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
 
         return count*/
         return 0
-    }
+    }*/
 
     fun getItems(tracker: OTTracker, timeRange: TimeSpan, listOut: ArrayList<OTItem>, timestampAsc: Boolean = false): Int {
         /*
@@ -522,14 +520,16 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         return 0
     }
 
+    /*
     fun getItem(id: Long, tracker: OTTracker): OTItem? {
         val cursor = readableDatabase.query(ItemScheme.tableName, ItemScheme.columnNames, "${ItemScheme._ID}=?", arrayOf(id.toString()), null, null, null, "1")
         //if (cursor.moveToFirst()) {
         //    return extractItemEntity(cursor, tracker)
         //}
         /*else*/ return null
-    }
+    }*/
 
+    /*
     fun removeItem(item: OTItem){
         //deleteObjects(DatabaseHelper.ItemScheme, item.objectId!!)
         val intent = Intent(OTApplication.BROADCAST_ACTION_ITEM_REMOVED)
@@ -537,7 +537,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, item.trackerObjectId)
 
         OTApplication.app.sendBroadcast(intent)
-    }
+    }*/
 
     /*
     fun extractItemEntity(cursor: Cursor, tracker: OTTracker): OTItem {
@@ -563,6 +563,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         return 0
     }
 
+    /*
     fun getLogCountOfDay(tracker: OTTracker): Observable<Int> {
         return Observable.defer {
             val cal = Calendar.getInstance()
@@ -578,8 +579,9 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
 
             Observable.just(getLogCountDuring(tracker, first, second))
         }.subscribeOn(Schedulers.computation())
-    }
+    }*/
 
+    /*
     fun getTotalItemCount(tracker: OTTracker): Observable<Int> {
         return Observable.defer {
             /*
@@ -587,8 +589,9 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
             Observable.just(numRows.toInt())*/
             Observable.just(0)
         }.subscribeOn(Schedulers.computation())
-    }
+    }*/
 
+    /*
     fun getLastLoggingTime(tracker: OTTracker): Observable<Long?> {
         return Observable.defer {
             /*
@@ -604,6 +607,6 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
             }*/
             Observable.just<Long?>(null)
         }.subscribeOn(Schedulers.computation())
-    }
+    }*/
 
 }

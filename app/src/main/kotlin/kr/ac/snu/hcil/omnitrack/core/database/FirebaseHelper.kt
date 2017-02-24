@@ -451,6 +451,40 @@ object FirebaseHelper {
         }
     }
 
+    fun getItem(tracker: OTTracker, itemId: String): Observable<OTItem> {
+        val ref = getItemListOfTrackerChild(tracker.objectId)?.child(itemId)
+        if (ref != null) {
+            return Observable.create {
+                subscriber ->
+
+
+                ref.addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onCancelled(error: DatabaseError) {
+                        if (!subscriber.isUnsubscribed) {
+                            subscriber.onError(error.toException())
+                        }
+                    }
+
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        if (!subscriber.isUnsubscribed) {
+                            val pojo = snapshot.getValue(ItemPOJO::class.java)
+                            if (pojo != null) {
+                                val item = OTItem(snapshot.key, tracker.objectId, pojo.dataTable, pojo.getTimestamp(), OTItem.LoggingSource.values()[pojo.sourceType])
+                                subscriber.onNext(item)
+                                subscriber.onCompleted()
+                            } else {
+                                subscriber.onError(Exception("Database parse error"))
+                            }
+                        }
+                    }
+                })
+
+            }
+        } else {
+            return Observable.error(Exception("No database reference for Item ${itemId} of tracker ${tracker.objectId}"))
+        }
+    }
+
     fun loadItems(tracker: OTTracker, page: Int = 0, pageCount: Int = Int.MAX_VALUE): Observable<List<OTItem>> {
         val ref = getItemListOfTrackerChild(tracker.objectId)
         if (ref != null) {
@@ -645,7 +679,12 @@ object FirebaseHelper {
         println("store data ${data}")
 
         pojo.dataTable = data
-        val result = SAVE_RESULT_NEW //TODO
+
+        val result = if (item.objectId != null) {
+            SAVE_RESULT_EDIT
+        } else {
+            SAVE_RESULT_NEW
+        }
 
         val itemRef = if (item.objectId != null) {
             getItemListOfTrackerChild(tracker.objectId)?.child(item.objectId!!)
@@ -654,7 +693,8 @@ object FirebaseHelper {
         itemRef?.setValue(pojo)?.addOnCompleteListener(object : OnCompleteListener<Void> {
             override fun onComplete(task: Task<Void>) {
                 if (task.isSuccessful) {
-                    item.objectId = itemRef.key
+                    if (item.objectId == null)
+                        item.objectId = itemRef.key
 
                     if (notifyIntent) {
                         val intent = Intent(when (result) {
