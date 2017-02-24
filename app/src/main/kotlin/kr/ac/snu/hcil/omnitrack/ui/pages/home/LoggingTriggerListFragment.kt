@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.home
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -22,6 +23,7 @@ class LoggingTriggerListFragment : OTFragment() {
     init {
         core = object : ATriggerListFragmentCore(this@LoggingTriggerListFragment) {
 
+            override val triggerActionType = OTTrigger.ACTION_BACKGROUND_LOGGING
             override val triggerActionTypeName: Int = R.string.msg_text_trigger
             override val emptyMessageId: Int = R.string.msg_trigger_empty
 
@@ -96,5 +98,10 @@ class LoggingTriggerListFragment : OTFragment() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         core.onSaveInstanceState(outState)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        core.onActivityResult(requestCode, resultCode, data)
     }
 }
