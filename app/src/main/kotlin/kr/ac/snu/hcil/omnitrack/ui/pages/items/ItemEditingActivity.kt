@@ -128,16 +128,43 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
         super.onTrackerLoaded(tracker)
         title = String.format(resources.getString(R.string.title_activity_new_item), tracker.name)
 
+        fun onModeSet() {
+            if (mode == Mode.New && activityResultAppliedAttributePosition == -1) {
+                if (tryRestoreItemBuilderCache(tracker)) {
+
+                    //Toast.makeText(this, "Past inputs were restored.", Toast.LENGTH_SHORT).show()
+                    builderRestoredSnackbar.show()
+                } else {
+                    //new builder was created
+                    println("Start builder autocomplete")
+                    startSubscriptions.add(
+                            builder.autoComplete(this).subscribe { println("Finished builder autocomplete.") }
+                    )
+                }
+            }
+
+            attributeListView.adapter = attributeListAdapter
+        }
+
         if (intent.hasExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM)) {
             //contains item. Edit mode
-            val item = OTApplication.app.dbHelper.getItem(intent.getLongExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, -1), tracker)
-            if (item != null) {
-                mode = Mode.Edit
-                println("started activity with edit mode")
-                builder = OTItemBuilder(item, tracker)
-            } else mode = Mode.New
+            startSubscriptions.add(
+                    FirebaseHelper.getItem(tracker, intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM)).subscribe {
+                        item ->
+                        if (item != null) {
+                            mode = Mode.Edit
+                            println("started activity with edit mode")
+                            builder = OTItemBuilder(item, tracker)
+                            onModeSet()
+                        } else {
+                            mode = Mode.New
+                            onModeSet()
+                        }
+                    }
+            )
         } else {
             mode = Mode.New
+            onModeSet()
         }
 
         //if(intent.hasExtra(INTENT_EXTRA_REMINDER_TIME))
@@ -148,21 +175,6 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
         //}
 
         //when the activity is NOT started by startActivityWithResult()
-        if (mode == Mode.New && activityResultAppliedAttributePosition == -1) {
-            if (tryRestoreItemBuilderCache(tracker)) {
-
-                //Toast.makeText(this, "Past inputs were restored.", Toast.LENGTH_SHORT).show()
-                builderRestoredSnackbar.show()
-            } else {
-                //new builder was created
-                println("Start builder autocomplete")
-                startSubscriptions.add(
-                        builder.autoComplete(this).subscribe { println("Finished builder autocomplete.") }
-                )
-            }
-        }
-
-        attributeListView.adapter = attributeListAdapter
     }
 
     override fun onResume() {
