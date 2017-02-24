@@ -17,6 +17,7 @@ import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Observable
+import java.io.Serializable
 import java.util.*
 
 /**
@@ -85,7 +86,7 @@ object FirebaseHelper {
     }
 
 
-    class MutableTriggerPOJO : NamedPOJO() {
+    class MutableTriggerPOJO : NamedPOJO(), Serializable {
         var user: String? = null
         var position: Int = 0
         var action: Int = 0
@@ -97,7 +98,7 @@ object FirebaseHelper {
     }
 
     @Keep
-    class TriggerPOJO : NamedPOJO() {
+    class TriggerPOJO : NamedPOJO(), Serializable {
         var user: String? = null
         var position: Int = 0
         var action: Int = 0
@@ -152,7 +153,7 @@ object FirebaseHelper {
     @Keep
     class IndexedKey(
             var position: Int = 0,
-            var key: String? = null) {
+            var key: String? = null) : Serializable {
     }
 
     fun generateNewKey(childName: String): String {
@@ -185,22 +186,13 @@ object FirebaseHelper {
         return findElementListOfUser(user.objectId, CHILD_NAME_TRIGGERS) {
             child ->
             val pojo = child.getValue(TriggerPOJO::class.java)
-            val trackerIds = ArrayList<Pair<String, IndexedKey>>()
-            for (trackerIdRef in child.child("trackers").children) {
-                val trackerIdWithPosition = trackerIdRef.getValue(IndexedKey::class.java)
-                if (trackerIdWithPosition != null) {
-                    trackerIds.add(Pair(trackerIdRef.key, trackerIdWithPosition))
-                }
-            }
-            trackerIds.sortBy { it -> it.second.position }
-
 
             val trigger = OTTrigger.makeInstance(
                     child.key,
                     pojo.type,
                     user,
                     pojo.name ?: "",
-                    trackerIds.map { Pair<String?, String>(it.first, it.second.key!!) }.toTypedArray(),
+                    pojo.trackers?.map { it.key!! }?.toTypedArray(),
                     pojo.on, pojo.action, pojo.lastTriggeredTime, pojo.properties)
 
             Pair(pojo.position, trigger)

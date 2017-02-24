@@ -23,7 +23,7 @@ import kotlin.properties.Delegates
 /**
  * Created by younghokim on 16. 7. 27..
  */
-abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trackerObjectIds: Array<Pair<String?, String>>?,
+abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trackerObjectIds: Array<String>?,
                          isOn: Boolean,
                          val action: Int,
                          lastTriggeredTime: Long, propertyData: Map<String, String>? = null) : NamedObject(objectId, name) {
@@ -38,7 +38,7 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
 
         const val TRIGGER_TIME_NEVER_TRIGGERED = -1L
 
-        fun makeInstance(objectId: String?, typeId: Int, user: OTUser, name: String, trackerObjectIds: Array<Pair<String?, String>>?, isOn: Boolean, action: Int, lastTriggeredTime: Long, propertyData: Map<String, String>?): OTTrigger {
+        fun makeInstance(objectId: String?, typeId: Int, user: OTUser, name: String, trackerObjectIds: Array<String>?, isOn: Boolean, action: Int, lastTriggeredTime: Long, propertyData: Map<String, String>?): OTTrigger {
             return when (typeId) {
                 TYPE_TIME -> OTTimeTrigger(objectId, user, name, trackerObjectIds, isOn, action, lastTriggeredTime, propertyData)
                 TYPE_DATA_THRESHOLD -> OTDataTrigger(objectId, user, name, trackerObjectIds, isOn, action, lastTriggeredTime, propertyData)
@@ -47,7 +47,17 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
         }
 
         fun makeInstance(typeId: Int, name: String, action: Int, user: OTUser, vararg trackers: OTTracker): OTTrigger {
-            return makeInstance(null, typeId, user, name, trackers.map { Pair<String?, String>(null, it.objectId) }.toTypedArray(), false, action, TRIGGER_TIME_NEVER_TRIGGERED, null)
+            return makeInstance(null, typeId, user, name, trackers.map { it.objectId }.toTypedArray(), false, action, TRIGGER_TIME_NEVER_TRIGGERED, null)
+        }
+
+        fun makeInstance(objectId: String?, user: OTUser, pojo: FirebaseHelper.TriggerPOJO): OTTrigger {
+            return OTTrigger.makeInstance(
+                    objectId,
+                    pojo.type,
+                    user,
+                    pojo.name ?: "",
+                    pojo.trackers?.map { it.key!! }?.toTypedArray(),
+                    pojo.on, pojo.action, pojo.lastTriggeredTime, pojo.properties)
         }
     }
 
@@ -64,9 +74,12 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
     abstract val descriptionResourceId: Int
 
     val trackers: List<OTTracker>
-        get() = _trackerList.map { it.second }
+        get() = _trackerList
 
-    private val _trackerList = ArrayList<Pair<String?, OTTracker>>()
+    val trackerIndexedIdList: List<FirebaseHelper.IndexedKey>
+        get() = _trackerList.mapIndexed { i, tracker -> FirebaseHelper.IndexedKey(i, tracker.objectId) }
+
+    private val _trackerList = ArrayList<OTTracker>()
 
     val fired = Event<Long>()
 
@@ -111,10 +124,10 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
     init {
         suspendDatabaseSync = true
         if (trackerObjectIds != null) {
-            for (trackerIdPair in trackerObjectIds) {
-                val tracker = user[trackerIdPair.second]
+            for (trackerId in trackerObjectIds) {
+                val tracker = user[trackerId]
                 if (tracker != null) {
-                    _trackerList.add(Pair(trackerIdPair.first, tracker))
+                    _trackerList.add(tracker)
                 }
             }
         }
@@ -151,7 +164,7 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
         val properties = HashMap<String, String>()
         this.writePropertiesToDatabase(properties)
         pojo.properties = properties
-        pojo.trackers = trackers.mapIndexed { i, tracker -> FirebaseHelper.IndexedKey(i, tracker.objectId) }
+        pojo.trackers = trackerIndexedIdList
 
         return pojo
     }
@@ -198,11 +211,14 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
     }
 
     fun addTracker(tracker: OTTracker) {
-        if (_trackerList.filter { it.second == tracker }.isEmpty()) {
-            val dbChild = getTrackerIdDatabaseChild(null)
-            _trackerList.add(Pair(dbChild?.key, tracker))
+        if (!_trackerList.contains(tracker)) {
+            _trackerList.add(tracker)
             if (!suspendDatabaseSync) {
-                dbChild?.setValue(FirebaseHelper.IndexedKey(_trackerList.size - 1, tracker.objectId))
+                if (!suspendDatabaseSync) {
+                    databasePointRef?.child("trackers")?.setValue(
+                            trackerIndexedIdList
+                    )
+                }
             }
         }
     }
@@ -215,15 +231,12 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
     }
 
     fun removeTracker(tracker: OTTracker) {
-        val pair = _trackerList.find { it.second == tracker }
-        if (pair != null) {
-            _trackerList.remove(pair)
+        if (_trackerList.remove(tracker)) {
 
             if (!suspendDatabaseSync) {
-                if (pair.first != null) {
-                    val dbChild = getTrackerIdDatabaseChild(pair.first)
-                    dbChild?.removeValue()
-                }
+                databasePointRef?.child("trackers")?.setValue(
+                        trackerIndexedIdList
+                )
             }
         }
     }
