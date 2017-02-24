@@ -44,7 +44,7 @@ class DurationTimelineModel(override val attribute: OTTimeSpanAttribute) : Attri
 
     private val calendarCache = Calendar.getInstance()
 
-    override fun onReload() {
+    override fun onReload(finished: (Boolean) -> Unit) {
 
         data.clear()
 

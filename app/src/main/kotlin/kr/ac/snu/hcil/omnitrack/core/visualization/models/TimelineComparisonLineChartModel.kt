@@ -40,7 +40,7 @@ class TimelineComparisonLineChartModel(override val attributes: List<OTNumberAtt
     private val values = ArrayList<BigDecimal>()
 
 
-    override fun onReload() {
+    override fun onReload(finished: (Boolean) -> Unit) {
         data.clear()
 
 

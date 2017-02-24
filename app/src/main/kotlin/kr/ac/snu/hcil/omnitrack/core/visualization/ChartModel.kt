@@ -23,11 +23,13 @@ abstract class ChartModel<T>(): IChartInterface<T> {
 
     fun reload()
     {
-        onReload()
-        onReloaded.invoke(this, true)
+        onReload {
+            success ->
+            onReloaded.invoke(this, success)
+        }
     }
 
-    abstract fun onReload()
+    abstract fun onReload(finished: (Boolean) -> Unit)
     abstract fun recycle()
 
     val isEmpty: Boolean get() = numDataPoints == 0
