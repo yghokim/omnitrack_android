@@ -13,6 +13,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.DatabaseHelper.Companion.SAVE_RESULT_EDIT
 import kr.ac.snu.hcil.omnitrack.core.database.DatabaseHelper.Companion.SAVE_RESULT_NEW
+import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
@@ -485,11 +486,16 @@ object FirebaseHelper {
         }
     }
 
-    fun loadItems(tracker: OTTracker, page: Int = 0, pageCount: Int = Int.MAX_VALUE): Observable<List<OTItem>> {
+    fun loadItems(tracker: OTTracker, timeRange: TimeSpan? = null): Observable<List<OTItem>> {
         val ref = getItemListOfTrackerChild(tracker.objectId)
         if (ref != null) {
             return Observable.create { subscriber ->
-                ref.orderByChild("timestamp").addListenerForSingleValueEvent(object : ValueEventListener {
+                var query = ref.orderByChild("timestamp")
+                if (timeRange != null) {
+                    query = query.startAt(timeRange.from.toDouble()).endAt(timeRange.to.toDouble())
+                }
+
+                query.addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onCancelled(error: DatabaseError) {
                         if (!subscriber.isUnsubscribed) {
                             subscriber.onError(error.toException())
@@ -524,7 +530,7 @@ object FirebaseHelper {
     fun getLogCountDuring(tracker: OTTracker, from: Long, to: Long): Observable<Long> {
         return Observable.create {
             subscriber ->
-            getItemListOfTrackerChild(tracker.objectId)?.orderByChild("timestamp")?.startAt(from.toString())?.endAt(to.toString())
+            getItemListOfTrackerChild(tracker.objectId)?.orderByChild("timestamp")?.startAt(from.toDouble())?.endAt(to.toDouble())
                     ?.addListenerForSingleValueEvent(object : ValueEventListener {
                         override fun onCancelled(p0: DatabaseError) {
                             p0.toException().printStackTrace()

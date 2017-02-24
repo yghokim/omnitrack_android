@@ -41,7 +41,7 @@ class LoggingHeatMapModel(tracker: OTTracker): TrackerChartModel<ITimeBinnedHeat
 
     val hoursInYBin = 2
 
-    override fun onReload() {
+    override fun onReload(finished: (Boolean) -> Unit) {
 
         val xScale = QuantizedTimeScale()
         xScale.setDomain(getTimeScope().from, getTimeScope().to)
