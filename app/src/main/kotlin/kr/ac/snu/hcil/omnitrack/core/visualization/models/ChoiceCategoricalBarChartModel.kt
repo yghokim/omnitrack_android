@@ -5,6 +5,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTChoiceAttribute
+import kr.ac.snu.hcil.omnitrack.core.database.FirebaseHelper
 import kr.ac.snu.hcil.omnitrack.core.visualization.AttributeChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.ICategoricalBarChart
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
@@ -33,54 +34,57 @@ class ChoiceCategoricalBarChartModel(override val attribute: OTChoiceAttribute) 
         data.clear()
     }
 
-    override fun onReload() {
+    override fun onReload(finished: (Boolean) -> Unit) {
 
         data.clear()
 
         val tracker = attribute.tracker
         if (tracker != null) {
             itemsCache.clear()
-            OTApplication.app.dbHelper.getItems(tracker, getTimeScope(), itemsCache)
+            FirebaseHelper.loadItems(tracker, getTimeScope()).subscribe({
+                items ->
+                itemsCache.addAll(items)
+                counterDictCache.clear()
+                categoriesCache.clear()
 
-            counterDictCache.clear()
-            categoriesCache.clear()
+                var noResponseCount = 0
 
-            var noResponseCount = 0
+                itemsCache
+                        .map { it.getValueOf(attribute) as? IntArray }
+                        .forEach {
+                            if (it != null && it.size > 0) {
+                                for (id in it) {
+                                    if (categoriesCache.contains(id) == false) {
+                                        categoriesCache.add(id)
+                                        counterDictCache.put(id, 1)
+                                    } else {
+                                        counterDictCache.put(id, counterDictCache[id] + 1)
+                                    }
+                                }
+                            } else {
+                                noResponseCount++
+                            }
+                        }
+                itemsCache.clear()
 
-            for(item in itemsCache)
-            {
-                val value = item.getValueOf(attribute) as? IntArray
-                if(value!= null && value.size > 0)
+                for (categoryId in categoriesCache)
                 {
-                    for(id in value) {
-                        if(categoriesCache.contains(id) == false)
-                        {
-                            categoriesCache.add(id)
-                            counterDictCache.put(id, 1)
-                        }
-                        else{
-                            counterDictCache.put(id, counterDictCache[id]+ 1)
-                        }
+                    val entry = attribute.entries.findWithId(categoryId)
+                    println("entry: ${entry?.text}, count: ${counterDictCache[categoryId]}")
+                    if (entry != null) {
+                        println("entry add")
+                        data.add(ICategoricalBarChart.Point(entry.text, counterDictCache[categoryId].toDouble(), categoryId))
                     }
                 }
-                else{
-                    noResponseCount ++
-                }
-            }
-            itemsCache.clear()
 
-            for(categoryId in categoriesCache)
-            {
-                val entry = attribute.entries.findWithId(categoryId)
-                if(entry != null) {
-                    data.add(ICategoricalBarChart.Point(entry.text, counterDictCache[categoryId].toDouble(), categoryId))
-                }
-            }
+                println("result data: " + data)
 
-            println(data)
-            
-            categoriesCache.clear()
-            counterDictCache.clear()
+                categoriesCache.clear()
+                counterDictCache.clear()
+                finished.invoke(true)
+            }, {
+                finished.invoke(false)
+            })
         }
     }
 
