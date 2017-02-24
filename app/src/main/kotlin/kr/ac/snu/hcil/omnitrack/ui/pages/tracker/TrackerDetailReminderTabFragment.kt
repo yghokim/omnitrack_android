@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.tracker
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,7 +9,6 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.ATriggerListFragmentCore
-import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.TriggerDetailActivity
 import rx.subscriptions.CompositeSubscription
 import java.util.*
 
@@ -24,6 +24,7 @@ class TrackerDetailReminderTabFragment : TrackerDetailActivity.ChildFragment() {
     init {
         core = object : ATriggerListFragmentCore(this@TrackerDetailReminderTabFragment) {
 
+            override val triggerActionType = OTTrigger.ACTION_NOTIFICATION
             override val triggerActionTypeName: Int = R.string.msg_text_reminder
             override val emptyMessageId: Int = R.string.msg_reminder_empty
 
@@ -34,10 +35,8 @@ class TrackerDetailReminderTabFragment : TrackerDetailActivity.ChildFragment() {
                     super.appendNewTrigger(newTrigger)
             }
 
-            override fun onTriggerEditRequested(trigger: OTTrigger) {
-                parent.startActivity(
-                        TriggerDetailActivity.makeEditTriggerIntent(parent.context, trigger, true)
-                )
+            override fun hideTrackerAssignmentInterface(): Boolean {
+                return true
             }
         }
     }
@@ -155,6 +154,11 @@ class TrackerDetailReminderTabFragment : TrackerDetailActivity.ChildFragment() {
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         core.onViewCreated(view, savedInstanceState)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        core.onActivityResult(requestCode, resultCode, data)
     }
 
 }

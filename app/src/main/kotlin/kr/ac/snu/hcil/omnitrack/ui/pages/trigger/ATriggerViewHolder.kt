@@ -21,7 +21,6 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.ValidatedSwitch
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
-import java.util.*
 
 /**
  * Created by Young-Ho Kim on 16. 8. 24
@@ -86,8 +85,6 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
     //private var collapsedHeight: Int = 0
     //private var expandedHeight: Int = 0
 
-    private val errorMessages: ArrayList<String>
-
     private val onTriggerSwitchTurned: ((sender: Any, isOn: Boolean) -> Unit) = {
         sender, isOn ->
         WeakHandler(Looper.getMainLooper()).post {
@@ -115,8 +112,6 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
     }
 
     init {
-
-        errorMessages = ArrayList<String>()
 
         triggerSwitch.switchOnValidator = triggerOnValidator
 

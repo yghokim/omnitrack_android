@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 
 import android.app.DatePickerDialog
 import android.content.Context
+import android.content.Intent
 import android.transition.TransitionManager
 import android.util.AttributeSet
 import android.view.LayoutInflater
@@ -11,6 +12,7 @@ import android.widget.*
 import butterknife.bindView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTrigger
+import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.ui.components.common.time.DateTimePicker
 import kr.ac.snu.hcil.omnitrack.ui.components.common.time.DayOfWeekSelector
 import kr.ac.snu.hcil.omnitrack.ui.components.common.time.DurationPicker
@@ -26,8 +28,7 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 2016-08-24
  */
-class TimeTriggerConfigurationPanel : LinearLayout, IEventListener<Int>, CompoundButton.OnCheckedChangeListener, DatePickerDialog.OnDateSetListener, View.OnClickListener {
-
+class TimeTriggerConfigurationPanel : LinearLayout, ITriggerConfigurationCoordinator, IEventListener<Int>, CompoundButton.OnCheckedChangeListener, DatePickerDialog.OnDateSetListener, View.OnClickListener {
 
     private val dateFormat: DateFormat
 
@@ -60,7 +61,7 @@ class TimeTriggerConfigurationPanel : LinearLayout, IEventListener<Int>, Compoun
             }
         }
 
-    var IsRepeated: Boolean get() = isRepeatedView.value
+    var isRepeated: Boolean get() = isRepeatedView.value
         set(value) {
             isRepeatedView.valueChanged.suspend = true
             isRepeatedView.value = value
@@ -95,6 +96,9 @@ class TimeTriggerConfigurationPanel : LinearLayout, IEventListener<Int>, Compoun
         timePicker.mode = DateTimePicker.MINUTE
         timePicker.isDayUsed = false
 
+        timePicker.setTime(9, 0, Calendar.PM)
+
+
         dayOfWeekPicker.allowNoneSelection = false
 
         timeSpanCheckBox.setOnCheckedChangeListener(this)
@@ -109,7 +113,7 @@ class TimeTriggerConfigurationPanel : LinearLayout, IEventListener<Int>, Compoun
         isEndSpecifiedCheckBox.setOnCheckedChangeListener(this)
 
         applyConfigMode(OTTimeTrigger.CONFIG_TYPE_ALARM, false)
-        applyIsRepeated(IsRepeated, false)
+        applyIsRepeated(isRepeated, false)
         applyRepeatEndDateToDayOffset(1)
     }
 
@@ -268,8 +272,29 @@ class TimeTriggerConfigurationPanel : LinearLayout, IEventListener<Int>, Compoun
         }
     }
 
-    fun validateExpandedViewInputs(errorMessagesOut: MutableList<String>): Boolean {
+    override fun applyConfigurationToTrigger(trigger: OTTrigger) {
+        if (trigger is OTTimeTrigger) {
+            trigger.configType = configMode
+            trigger.configVariables = extractConfigVariables()
+            trigger.rangeVariables = extractRangeVariables()
+            trigger.isRepeated = isRepeated
+        }
+    }
 
+    override fun importTriggerConfiguration(trigger: OTTrigger) {
+        if (trigger is OTTimeTrigger) {
+            configMode = trigger.configType
+            isRepeated = trigger.isRepeated
+            applyConfigVariables(trigger.configVariables)
+            applyRangeVariables(trigger.rangeVariables)
+        }
+    }
+
+    override fun writeConfigurationToIntent(out: Intent) {
+
+    }
+
+    override fun validateConfigurations(errorMessagesOut: MutableList<String>): Boolean {
         var validated = true
         when (configMode) {
             OTTimeTrigger.CONFIG_TYPE_INTERVAL -> {
@@ -286,6 +311,5 @@ class TimeTriggerConfigurationPanel : LinearLayout, IEventListener<Int>, Compoun
 
         return validated
     }
-
 
 }

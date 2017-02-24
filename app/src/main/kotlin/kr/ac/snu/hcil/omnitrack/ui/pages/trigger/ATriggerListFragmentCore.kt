@@ -1,9 +1,11 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AlertDialog
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -12,7 +14,9 @@ import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import android.widget.TextView
 import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.database.FirebaseHelper
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.ui.components.common.FallbackRecyclerView
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.DrawableListBottomSpaceItemDecoration
@@ -28,6 +32,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
 
     companion object {
         // private const val STATE_EXPANDED_POSITION = "expandedTriggerPosition"
+        const val DETAIL_REQUEST_CODE = 12214
     }
 
     interface TriggerAdapter {
@@ -55,6 +60,8 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
 
     abstract val triggerActionTypeName: Int
 
+    abstract val triggerActionType: Int
+
     protected abstract val emptyMessageId: Int
 
     private lateinit var adapter: Adapter
@@ -72,12 +79,18 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
         NewTriggerTypeSelectionDialogHelper.builder(parent.context, triggerActionTypeName) {
             type ->
             println("trigger type selected - $type")
-            val newTrigger = triggerAdapter?.makeNewTriggerInstance(type)
+            /*
+            val newTrigger = triggerAdapter?.makeNewTrfiggerInstance(type)
             if (newTrigger != null) {
                 appendNewTrigger(newTrigger)
-            }
+            }*/
+            parent.startActivityForResult(TriggerDetailActivity.makeNewTriggerIntent(parent.context, type, triggerActionType, hideTrackerAssignmentInterface()), DETAIL_REQUEST_CODE)
             triggerTypeDialog.dismiss()
         }.create()
+    }
+
+    open fun hideTrackerAssignmentInterface(): Boolean {
+        return false
     }
 
     fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, @Suppress("UNUSED_PARAMETER") savedInstanceState: Bundle?): View {
@@ -161,9 +174,28 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
     }
 
     protected open fun onTriggerEditRequested(trigger: OTTrigger) {
-        parent.startActivity(
-                TriggerDetailActivity.makeEditTriggerIntent(parent.context, trigger, false)
+        parent.startActivityForResult(
+                TriggerDetailActivity.makeEditTriggerIntent(parent.context, trigger, hideTrackerAssignmentInterface()),
+                DETAIL_REQUEST_CODE
         )
+    }
+
+    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == DETAIL_REQUEST_CODE) {
+            println("Received Trigger detail activity result")
+            if (resultCode == AppCompatActivity.RESULT_OK) {
+                if (data != null && data.hasExtra(TriggerDetailActivity.INTENT_EXTRA_TRIGGER_DATA)) {
+                    val triggerPojo = data.getSerializableExtra(TriggerDetailActivity.INTENT_EXTRA_TRIGGER_DATA)
+                    if (triggerPojo is FirebaseHelper.TriggerPOJO) {
+                        OTApplication.app.currentUserObservable.subscribe {
+                            user ->
+                            val newTrigger = OTTrigger.makeInstance(FirebaseHelper.generateNewKey(FirebaseHelper.CHILD_NAME_TRIGGERS), user, triggerPojo)
+                            appendNewTrigger(newTrigger)
+                        }
+                    }
+                }
+            }
+        }
     }
 
     inner class Adapter() : RecyclerView.Adapter<ATriggerViewHolder<out OTTrigger>>(), ATriggerViewHolder.ITriggerControlListener {
