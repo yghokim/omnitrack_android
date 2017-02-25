@@ -3,7 +3,6 @@ package kr.ac.snu.hcil.omnitrack.core.visualization.models
 import android.util.SparseIntArray
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTChoiceAttribute
 import kr.ac.snu.hcil.omnitrack.core.database.FirebaseHelper
 import kr.ac.snu.hcil.omnitrack.core.visualization.AttributeChartModel
@@ -19,7 +18,6 @@ class ChoiceCategoricalBarChartModel(override val attribute: OTChoiceAttribute) 
     private var loaded = false
     private val data = ArrayList<ICategoricalBarChart.Point>()
 
-    private val itemsCache = ArrayList<OTItem>()
     private val counterDictCache = SparseIntArray() // entry id : count
     private val categoriesCache = HashSet<Int>()
 
@@ -40,17 +38,19 @@ class ChoiceCategoricalBarChartModel(override val attribute: OTChoiceAttribute) 
 
         val tracker = attribute.tracker
         if (tracker != null) {
-            itemsCache.clear()
             FirebaseHelper.loadItems(tracker, getTimeScope()).subscribe({
                 items ->
-                itemsCache.addAll(items)
                 counterDictCache.clear()
                 categoriesCache.clear()
 
                 var noResponseCount = 0
 
-                itemsCache
-                        .map { it.getValueOf(attribute) as? IntArray }
+                println("items during ${getTimeScope()}: ${items.size}")
+                items.forEach {
+                    println(it.timestampString)
+                }
+
+                items.map { it.getValueOf(attribute) as? IntArray }
                         .forEach {
                             if (it != null && it.size > 0) {
                                 for (id in it) {
@@ -65,7 +65,6 @@ class ChoiceCategoricalBarChartModel(override val attribute: OTChoiceAttribute) 
                                 noResponseCount++
                             }
                         }
-                itemsCache.clear()
 
                 for (categoryId in categoriesCache)
                 {
