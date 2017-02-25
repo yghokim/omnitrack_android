@@ -492,7 +492,7 @@ object FirebaseHelper {
             return Observable.create { subscriber ->
                 var query = ref.orderByChild("timestamp")
                 if (timeRange != null) {
-                    query = query.startAt(timeRange.from.toDouble()).endAt(timeRange.to.toDouble())
+                    query = query.startAt(timeRange.from.toDouble(), "timestamp").endAt(timeRange.to.toDouble(), "timestamp")
                 }
 
                 query.addListenerForSingleValueEvent(object : ValueEventListener {

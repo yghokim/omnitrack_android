@@ -85,7 +85,7 @@ class OTItem : ADataRow, IDatabaseStorable {
     var timestamp: Long = -1
         private set
 
-    val timestampString: String get() = TimeHelper.FORMAT_DATETIME.format(Date(timestamp))
+    val timestampString: String get() = "${TimeHelper.FORMAT_DATETIME.format(Date(timestamp))} | $timestamp"
 
     var source: LoggingSource
         private set
