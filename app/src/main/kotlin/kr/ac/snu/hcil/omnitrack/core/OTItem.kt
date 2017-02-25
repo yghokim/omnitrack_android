@@ -4,8 +4,10 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.database.IDatabaseStorable
+import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import kr.ac.snu.hcil.omnitrack.utils.serialization.stringKeyEntryParser
+import java.util.*
 
 /**
  * Created by Young-Ho Kim on 16. 7. 22
@@ -82,6 +84,8 @@ class OTItem : ADataRow, IDatabaseStorable {
 
     var timestamp: Long = -1
         private set
+
+    val timestampString: String get() = TimeHelper.FORMAT_DATETIME.format(Date(timestamp))
 
     var source: LoggingSource
         private set
