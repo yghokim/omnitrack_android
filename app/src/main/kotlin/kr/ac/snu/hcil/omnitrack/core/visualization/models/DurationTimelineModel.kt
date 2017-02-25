@@ -10,6 +10,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeSpanAttribute
+import kr.ac.snu.hcil.omnitrack.core.database.FirebaseHelper
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.visualization.AttributeChartModel
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
@@ -22,6 +23,8 @@ import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.Qu
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers.ATimelineChartDrawer
 import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 import org.apache.commons.math3.stat.StatUtils
+import rx.Observable
+import rx.functions.Func1
 import java.util.*
 
 /**
@@ -47,56 +50,47 @@ class DurationTimelineModel(override val attribute: OTTimeSpanAttribute) : Attri
     override fun onReload(finished: (Boolean) -> Unit) {
 
         data.clear()
-
         val xScale = QuantizedTimeScale()
         xScale.setDomain(getTimeScope().from, getTimeScope().to)
         xScale.quantize(currentGranularity)
 
+        Observable.merge((0..xScale.numTicks - 1).map { xIndex ->
 
-        for(xIndex in 0..xScale.numTicks-1)
-        {
-            itemsCache.clear()
             val from = xScale.binPointsOnDomain[xIndex]
-            val to = if(xIndex < xScale.numTicks-1) xScale.binPointsOnDomain[xIndex + 1]
+            val to = if (xIndex < xScale.numTicks - 1) xScale.binPointsOnDomain[xIndex + 1]
             else getTimeScope().to
 
-            OTApplication.app.dbHelper.getItems(attribute.tracker!!, TimeSpan.fromPoints(from, to), itemsCache, true)
-
-            timeSpansCache.clear()
-            for(item in itemsCache)
-            {
-                val v = item.getValueOf(attribute)
-                if(v is TimeSpan)
-                {
-                    timeSpansCache.add(Pair(v, TimeHelper.cutTimePartFromEpoch(item.timestamp)))
+            FirebaseHelper.loadItems(attribute.tracker!!, TimeSpan.fromPoints(from, to)).flatMap<AggregatedDuration>(Func1<List<OTItem>, Observable<AggregatedDuration>> {
+                items ->
+                timeSpansCache.clear()
+                for (item in items) {
+                    val v = item.getValueOf(attribute)
+                    if (v is TimeSpan) {
+                        timeSpansCache.add(Pair(v, TimeHelper.cutTimePartFromEpoch(item.timestamp)))
+                    }
                 }
+
+                if (timeSpansCache.size > 0) {
+                    val doubleFromArray = timeSpansCache.map { timeToRatio(it.first.from, it.second).toDouble() }.toDoubleArray()
+                    val doubleToArray = timeSpansCache.map { timeToRatio(it.first.to, it.second).toDouble() }.toDoubleArray()
+
+                    Observable.just(
+                            AggregatedDuration(
+                                    from,
+                                    timeSpansCache.size,
+                                    StatUtils.mean(doubleFromArray).toFloat(),
+                                    StatUtils.mean(doubleToArray).toFloat(),
+                                    StatUtils.min(doubleFromArray).toFloat(),
+                                    StatUtils.max(doubleToArray).toFloat()
+                            ))
+                } else Observable.empty<AggregatedDuration>()
+            })
+            //OTApplication.app.dbHelper.getItems(attribute.tracker!!, TimeSpan.fromPoints(from, to), itemsCache, true)
             }
-
-            if(timeSpansCache.size  > 0)
-            {
-                val doubleFromArray = timeSpansCache.map{ timeToRatio(it.first.from, it.second).toDouble() }.toDoubleArray()
-                val doubleToArray = timeSpansCache.map{ timeToRatio(it.first.to, it.second).toDouble() }.toDoubleArray()
-
-
-                data.add(
-                        AggregatedDuration(
-                                from,
-                                timeSpansCache.size,
-                                StatUtils.mean(doubleFromArray).toFloat(),
-                                StatUtils.mean(doubleToArray).toFloat(),
-                                StatUtils.min(doubleFromArray).toFloat(),
-                                StatUtils.max(doubleToArray).toFloat()
-                                )
-                        )
-
-            }
-
-        }
-
-        println("duration data : " + data)
-
-        itemsCache.clear()
-        _isLoaded = true
+        ).doOnNext {
+            duration ->
+            data.add(duration)
+        }.subscribe({}, { finished.invoke(false) }, { println(data); finished.invoke(true) })
     }
 
     private fun timeToRatio(time: Long, pivot: Long): Float

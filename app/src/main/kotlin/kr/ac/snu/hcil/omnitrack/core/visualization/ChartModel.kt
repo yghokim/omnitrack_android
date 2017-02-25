@@ -21,11 +21,25 @@ abstract class ChartModel<T>(): IChartInterface<T> {
     protected var currentGranularity: Granularity = Granularity.WEEK
         private set
 
+    var isLoading: Boolean = false
+        private set
+
+    private var invalidated: Boolean = true
+
     fun reload()
     {
-        onReload {
-            success ->
-            onReloaded.invoke(this, success)
+        if (!isLoading) {
+            isLoading = true
+            invalidated = false
+            onReload {
+                success ->
+                isLoading = false
+                if (invalidated) {
+                    reload()
+                } else onReloaded.invoke(this, success)
+            }
+        } else {
+            invalidate()
         }
     }
 
@@ -36,9 +50,14 @@ abstract class ChartModel<T>(): IChartInterface<T> {
 
     abstract fun getChartDrawer(): AChartDrawer
 
+    fun invalidate() {
+        invalidated = true
+    }
+
     fun setTimeScope(time: Long, scope: Granularity) {
         scope.convertToRange(time, queryRange)
         currentGranularity = scope
+        invalidate()
     }
 
 
