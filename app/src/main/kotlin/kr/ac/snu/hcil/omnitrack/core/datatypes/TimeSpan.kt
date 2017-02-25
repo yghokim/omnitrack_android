@@ -50,7 +50,7 @@ class TimeSpan : IStringSerializable {
 
     override fun toString(): String {
         val format = SimpleDateFormat(OTApplication.app.resources.getString(R.string.msg_tracker_list_time_format))
-        return "${TimeHelper.getDateText(from, OTApplication.app)} ${format.format(Date(from))} \n~ ${TimeHelper.getDateText(to, OTApplication.app)} ${format.format(Date(to))}"
+        return "${TimeHelper.getDateText(from, OTApplication.app)}, ${format.format(Date(from))} \n~ ${TimeHelper.getDateText(to, OTApplication.app)}, ${format.format(Date(to))} \n ${from} ~ ${to}"
     }
 
     constructor(serialized: String) {
