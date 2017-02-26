@@ -4,8 +4,9 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
-import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
+import kr.ac.snu.hcil.omnitrack.core.database.FirebaseHelper
 import kr.ac.snu.hcil.omnitrack.core.visualization.CompoundAttributeChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.ILineChartOnTime
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
@@ -32,11 +33,6 @@ class TimelineComparisonLineChartModel(override val attributes: List<OTNumberAtt
 
     private val data = ArrayList<ILineChartOnTime.TimeSeriesTrendData>()
 
-
-    private val itemsCache = ArrayList<OTItem>()
-
-    private val pointsCache = ArrayList<Pair<Long, BigDecimal>>()
-
     private val values = ArrayList<BigDecimal>()
 
 
@@ -48,39 +44,62 @@ class TimelineComparisonLineChartModel(override val attributes: List<OTNumberAtt
         xScale.setDomain(getTimeScope().from, getTimeScope().to)
         xScale.quantize(currentGranularity)
 
-        for (attribute in attributes) {
+        FirebaseHelper.loadItems(parent, getTimeScope(), FirebaseHelper.Order.ASC).subscribe {
+            items ->
 
-            pointsCache.clear()
+            var currentItemPointer = 0
+
+            val itemBinCache = ArrayList<OTItem>()
+
+            val attrPivotedPoints = HashMap<OTAttribute<out Any>, MutableList<Pair<Long, BigDecimal>>>()
+            attributes.forEach {
+                attrPivotedPoints[it] = ArrayList()
+            }
 
             for (xIndex in 0..xScale.numTicks - 1) {
-                itemsCache.clear()
                 val from = xScale.binPointsOnDomain[xIndex]
                 val to = if (xIndex < xScale.numTicks - 1) xScale.binPointsOnDomain[xIndex + 1]
                 else getTimeScope().to
 
-                OTApplication.app.dbHelper.getItems(parent, TimeSpan.fromPoints(from, to), itemsCache, true)
+                itemBinCache.clear()
 
-                values.clear()
+                if (currentItemPointer < items.size) {
+                    var timestamp = items[currentItemPointer].timestamp
+                    while (timestamp < to) {
+                        if (timestamp >= from) {
+                            itemBinCache.add(items[currentItemPointer])
+                        }
 
-                val numPoints = OTItem.extractNotNullValues(itemsCache, attribute, values)
-                if (numPoints > 0) {
-                    pointsCache.add(
-                            Pair(from, BigDecimal(StatUtils.mean(values.map { it.toDouble() }.toDoubleArray())))
-                    )
+                        currentItemPointer++
+                        if (currentItemPointer >= items.size) {
+                            break
+                        }
+                        timestamp = items[currentItemPointer].timestamp
+                    }
                 }
+
+
+                for (attribute in attributes) {
+                    values.clear()
+
+                    val numPoints = OTItem.extractNotNullValues(itemBinCache, attribute, values)
+                    if (numPoints > 0) {
+                        attrPivotedPoints[attribute]?.add(Pair(from, BigDecimal(StatUtils.mean(values.map { it.toDouble() }.toDoubleArray()))))
+                    }
+                }
+
             }
 
-            data.add(
-                    ILineChartOnTime.TimeSeriesTrendData(pointsCache.toTypedArray(), attribute)
-            )
+            data.clear()
+            attrPivotedPoints.mapTo(data) {
+                ILineChartOnTime.TimeSeriesTrendData(it.value.toTypedArray(), it.key)
+            }
+            values.clear()
+
+
+            _isLoaded = true
+            finished.invoke(true)
         }
-
-        println(data)
-
-        values.clear()
-        pointsCache.clear()
-        itemsCache.clear()
-        _isLoaded = true
     }
 
     override fun recycle() {
