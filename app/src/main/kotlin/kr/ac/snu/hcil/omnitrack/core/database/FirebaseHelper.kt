@@ -25,6 +25,9 @@ import java.util.*
  * Created by younghokim on 2017. 2. 9..
  */
 object FirebaseHelper {
+
+    enum class Order {ASC, DESC }
+
     const val CHILD_NAME_USERS = "users"
     const val CHILD_NAME_TRACKERS = "trackers"
     const val CHILD_NAME_ATTRIBUTES = "attributes"
@@ -486,7 +489,7 @@ object FirebaseHelper {
         }
     }
 
-    fun loadItems(tracker: OTTracker, timeRange: TimeSpan? = null): Observable<List<OTItem>> {
+    fun loadItems(tracker: OTTracker, timeRange: TimeSpan? = null, order: Order = Order.DESC): Observable<List<OTItem>> {
         val ref = getItemListOfTrackerChild(tracker.objectId)
         if (ref != null) {
             return Observable.create { subscriber ->
@@ -510,7 +513,12 @@ object FirebaseHelper {
                                     OTItem(it.key, tracker.objectId, pojo.dataTable, pojo.getTimestamp(), OTItem.LoggingSource.values()[pojo.sourceType])
                                 }
 
-                                list.sortBy { -it.timestamp }
+                                list.sortBy {
+                                    when (order) {
+                                        Order.ASC -> it.timestamp
+                                        else -> -it.timestamp
+                                    }
+                                }
                                 subscriber.onNext(list)
                             }
                         } else {
