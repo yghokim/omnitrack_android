@@ -24,10 +24,16 @@ class OTItemBuilder : IStringSerializable {
 
         override fun read(input: JsonReader): OTItemBuilder {
             input.beginObject()
+
             input.nextName()
             val trackerObjId = input.nextString()
+
             input.nextName()
             val itemId = input.nextString()
+
+            input.nextName()
+            val itemTimestamp = input.nextLong()
+
             input.nextName()
             val mode = input.nextInt()
 
@@ -35,6 +41,10 @@ class OTItemBuilder : IStringSerializable {
                 null
             } else {
                 itemId
+            }, if (itemTimestamp == -1L) {
+                null
+            } else {
+                itemTimestamp
             })
 
             input.nextName()
@@ -67,6 +77,7 @@ class OTItemBuilder : IStringSerializable {
             out.beginObject()
             out.name("tr").value(builder.tracker.objectId)
             out.name("it").value(builder.connectedItemDbId ?: "")
+            out.name("ts").value(builder.connectedItemTimestamp ?: -1L)
             out.name("md").value(builder.mode)
             out.name("v").beginArray()
 
@@ -151,6 +162,7 @@ class OTItemBuilder : IStringSerializable {
     private lateinit var tracker: OTTracker
 
     private val connectedItemDbId: String?
+    private val connectedItemTimestamp: Long?
 
     private val mode: Int
 
@@ -165,6 +177,7 @@ class OTItemBuilder : IStringSerializable {
         trackerObjectId = tracker.objectId
         this.mode = MODE_EDIT
         connectedItemDbId = item.objectId
+        connectedItemTimestamp = item.timestamp
         syncFromTrackerScheme()
 
         for (attribute in tracker.attributes) {
@@ -184,6 +197,7 @@ class OTItemBuilder : IStringSerializable {
 
         this.mode = mode
         connectedItemDbId = null
+        connectedItemTimestamp = null
         syncFromTrackerScheme()
     }
 
@@ -227,13 +241,14 @@ class OTItemBuilder : IStringSerializable {
                 ))
     }*/
 
-    private constructor(trackerObjectId: String, mode: Int, connectedItemDbId: String?) {
+    private constructor(trackerObjectId: String, mode: Int, connectedItemDbId: String?, connectedItemTimestamp: Long?) {
         if (!OTApplication.app.isUserLoaded) {
             throw Exception("Do not deserialize ItemBuilder until user is loaded.")
         }
         this.mode = mode
         this.trackerObjectId = trackerObjectId
         this.connectedItemDbId = connectedItemDbId
+        this.connectedItemTimestamp = connectedItemTimestamp
         syncFromTrackerScheme()
     }
 /*
@@ -386,16 +401,11 @@ class OTItemBuilder : IStringSerializable {
     }
 
     fun makeItem(source: OTItem.LoggingSource): OTItem {
-        val item = OTItem(tracker.objectId, source)
+        val item = OTItem(tracker, connectedItemTimestamp ?: -1L, source, *(tracker.attributes.filter { hasValueOf(it) }.map { getValueInformationOf(it)!!.value }.toTypedArray()))
+
         if (connectedItemDbId != null) {
             println("assigned db id : $connectedItemDbId")
             item.objectId = connectedItemDbId
-        }
-
-        for (attribute in tracker.attributes) {
-            if (hasValueOf(attribute)) {
-                item.setValueOf(attribute, getValueInformationOf(attribute)!!.value)
-            }
         }
 
         return item
