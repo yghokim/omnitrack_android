@@ -41,56 +41,55 @@ class DurationTimelineModel(override val attribute: OTTimeSpanAttribute) : Attri
         get() = _isLoaded
 
     private val data = ArrayList<AggregatedDuration>()
-    private val itemsCache = ArrayList<OTItem>()
-
-    private val timeSpansCache = ArrayList<Pair<TimeSpan, Long>>()
-
-    private val calendarCache = Calendar.getInstance()
 
     override fun onReload(finished: (Boolean) -> Unit) {
 
-        data.clear()
         val xScale = QuantizedTimeScale()
         xScale.setDomain(getTimeScope().from, getTimeScope().to)
         xScale.quantize(currentGranularity)
 
-        Observable.merge((0..xScale.numTicks - 1).map { xIndex ->
+        Observable.zip((0..xScale.numTicks - 1).map { xIndex ->
 
             val from = xScale.binPointsOnDomain[xIndex]
             val to = if (xIndex < xScale.numTicks - 1) xScale.binPointsOnDomain[xIndex + 1]
             else getTimeScope().to
 
-            FirebaseHelper.loadItems(attribute.tracker!!, TimeSpan.fromPoints(from, to)).flatMap<AggregatedDuration>(Func1<List<OTItem>, Observable<AggregatedDuration>> {
+            FirebaseHelper.loadItems(attribute.tracker!!, TimeSpan.fromPoints(from, to)).flatMap<AggregatedDuration?>(Func1<List<OTItem>, Observable<AggregatedDuration?>> {
                 items ->
-                timeSpansCache.clear()
-                for (item in items) {
-                    val v = item.getValueOf(attribute)
-                    if (v is TimeSpan) {
-                        timeSpansCache.add(Pair(v, TimeHelper.cutTimePartFromEpoch(item.timestamp)))
+                println("items during ${TimeSpan.fromPoints(from, to).toString()}; count: ${items.size}")
+                if (items.isNotEmpty()) {
+                    val timeSpansCache = ArrayList<Pair<TimeSpan, Long>>()
+
+                    items.forEach { item ->
+                        println("item for ${item.timestampString}")
+                        val v = item.getValueOf(attribute)
+                        if (v is TimeSpan) {
+                            timeSpansCache.add(Pair(v, TimeHelper.cutTimePartFromEpoch(item.timestamp)))
+                        }
                     }
-                }
 
-                if (timeSpansCache.size > 0) {
-                    val doubleFromArray = timeSpansCache.map { timeToRatio(it.first.from, it.second).toDouble() }.toDoubleArray()
-                    val doubleToArray = timeSpansCache.map { timeToRatio(it.first.to, it.second).toDouble() }.toDoubleArray()
+                    println("timespans count: ${timeSpansCache.size}")
+                    if (timeSpansCache.size > 0) {
+                        val doubleFromArray = timeSpansCache.map { timeToRatio(it.first.from, it.second).toDouble() }.toDoubleArray()
+                        val doubleToArray = timeSpansCache.map { timeToRatio(it.first.to, it.second).toDouble() }.toDoubleArray()
 
-                    Observable.just(
-                            AggregatedDuration(
-                                    from,
-                                    timeSpansCache.size,
-                                    StatUtils.mean(doubleFromArray).toFloat(),
-                                    StatUtils.mean(doubleToArray).toFloat(),
-                                    StatUtils.min(doubleFromArray).toFloat(),
-                                    StatUtils.max(doubleToArray).toFloat()
-                            ))
-                } else Observable.empty<AggregatedDuration>()
+                        Observable.just(
+                                AggregatedDuration(
+                                        from,
+                                        timeSpansCache.size,
+                                        StatUtils.mean(doubleFromArray).toFloat(),
+                                        StatUtils.mean(doubleToArray).toFloat(),
+                                        StatUtils.min(doubleFromArray).toFloat(),
+                                        StatUtils.max(doubleToArray).toFloat()
+                                ))
+                    } else Observable.just<AggregatedDuration>(null)
+                } else Observable.just(null)
             })
             //OTApplication.app.dbHelper.getItems(attribute.tracker!!, TimeSpan.fromPoints(from, to), itemsCache, true)
-            }
-        ).doOnNext {
-            duration ->
-            data.add(duration)
-        }.subscribe({}, { finished.invoke(false) }, { println(data); finished.invoke(true) })
+        }, { it ->
+            println(it)
+            it.filter { it is AggregatedDuration }.map { it as AggregatedDuration }.toList()
+        }).subscribe({ it -> println("duration list received"); data.clear(); data.addAll(it); println(data); finished.invoke(true) }, { finished.invoke(false) })
     }
 
     private fun timeToRatio(time: Long, pivot: Long): Float
