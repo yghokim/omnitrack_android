@@ -530,7 +530,7 @@ object FirebaseHelper {
     fun getLogCountDuring(tracker: OTTracker, from: Long, to: Long): Observable<Long> {
         return Observable.create {
             subscriber ->
-            getItemListOfTrackerChild(tracker.objectId)?.orderByChild("timestamp")?.startAt(from.toDouble())?.endAt(to.toDouble())
+            getItemListOfTrackerChild(tracker.objectId)?.orderByChild("timestamp")?.startAt(from.toDouble(), "timestamp")?.endAt(to.toDouble(), "timestamp")
                     ?.addListenerForSingleValueEvent(object : ValueEventListener {
                         override fun onCancelled(p0: DatabaseError) {
                             p0.toException().printStackTrace()
