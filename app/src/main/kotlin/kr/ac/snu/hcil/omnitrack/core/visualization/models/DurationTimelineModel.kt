@@ -121,10 +121,12 @@ class DurationTimelineModel(override val attribute: OTTimeSpanAttribute) : Attri
         var drawRange: Boolean = false
         var frontalBound: RectF = RectF()
         var backBound: RectF = RectF()
+        private var rectBoundCache: RectF = RectF()
 
         var paint: Paint
 
         var pointPaint: Paint
+        var pointUnderPaint: Paint? = null
 
         var roundMode = false
 
@@ -133,9 +135,10 @@ class DurationTimelineModel(override val attribute: OTTimeSpanAttribute) : Attri
             pointPaint = Paint()
         }
 
-        constructor(paint: Paint, pointPaint: Paint){
+        constructor(paint: Paint, pointPaint: Paint, pointUnderPaint: Paint? = null) {
             this.paint = paint
             this.pointPaint = pointPaint
+            this.pointUnderPaint = pointUnderPaint
         }
 
         override fun onDraw(canvas: Canvas) {
@@ -146,9 +149,9 @@ class DurationTimelineModel(override val attribute: OTTimeSpanAttribute) : Attri
                 paint.alpha = 100
 
                 if(roundMode) {
-                    backBound.set(backBound.left, backBound.top - backBound.width() / 2, backBound.right, backBound.bottom + backBound.width() / 2)
-                    canvas.drawRoundRect(backBound, 1000f, 1000f, paint)
-                    backBound.set(backBound.left, backBound.top + backBound.width() / 2, backBound.right, backBound.bottom - backBound.width() / 2)
+                    rectBoundCache.set(backBound.left, backBound.top - backBound.width() / 2, backBound.right, backBound.bottom + backBound.width() / 2)
+                    canvas.drawRoundRect(rectBoundCache, 1000f, 1000f, paint)
+                    //backBound.set(backBound.left, backBound.top + backBound.width() / 2, backBound.right, backBound.bottom - backBound.width() / 2)
                 }
                 else{
                     canvas.drawRoundRect(backBound, 2f, 2f, paint)
@@ -160,15 +163,22 @@ class DurationTimelineModel(override val attribute: OTTimeSpanAttribute) : Attri
             paint.alpha = 200
 
             if(roundMode) {
-                frontalBound.set(frontalBound.left, frontalBound.top + frontalBound.width() / 2, frontalBound.right, frontalBound.bottom - frontalBound.width() / 2)
-                canvas.drawRoundRect(frontalBound, 1000f, 1000f, paint)
-                frontalBound.set(frontalBound.left, frontalBound.top + frontalBound.width() / 2, frontalBound.right, frontalBound.bottom - frontalBound.width() / 2)
+                rectBoundCache.set(frontalBound.left, frontalBound.top - frontalBound.width() / 2, frontalBound.right, frontalBound.bottom + frontalBound.width() / 2)
+                canvas.drawRoundRect(rectBoundCache, 1000f, 1000f, paint)
+                //frontalBound.set(frontalBound.left, frontalBound.top + frontalBound.width() / 2, frontalBound.right, frontalBound.bottom - frontalBound.width() / 2)
 
 
                 pointPaint.alpha = 255
-                canvas.drawCircle(frontalBound.centerX(), frontalBound.top, frontalBound.width() / 2 - pointPaint.strokeWidth/2, pointPaint)
 
-                canvas.drawCircle(frontalBound.centerX(), frontalBound.bottom, frontalBound.width() / 2 - pointPaint.strokeWidth/2, pointPaint)
+                if (pointUnderPaint != null) {
+                    canvas.drawCircle(frontalBound.centerX(), frontalBound.top, frontalBound.width() / 2, pointUnderPaint)
+
+                    canvas.drawCircle(frontalBound.centerX(), frontalBound.bottom, frontalBound.width() / 2, pointUnderPaint)
+                }
+
+                canvas.drawCircle(frontalBound.centerX(), frontalBound.top, frontalBound.width() / 2, pointPaint)
+
+                canvas.drawCircle(frontalBound.centerX(), frontalBound.bottom, frontalBound.width() / 2, pointPaint)
 
                 /*
                 val originalColor = pointPaint.color
@@ -198,6 +208,8 @@ class DurationTimelineModel(override val attribute: OTTimeSpanAttribute) : Attri
 
         private var paint = Paint(Paint.ANTI_ALIAS_FLAG)
         private var pointPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+        private var pointUnderPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+
 
         val durationBars = DataEncodedDrawingList<AggregatedDuration, Void?>()
 
@@ -212,6 +224,10 @@ class DurationTimelineModel(override val attribute: OTTimeSpanAttribute) : Attri
             pointPaint.strokeWidth = 2f * OTApplication.app.resources.displayMetrics.density
             pointPaint.style = Paint.Style.STROKE
             pointPaint.color = ContextCompat.getColor(OTApplication.app, R.color.colorPointed)
+
+            pointUnderPaint.style = Paint.Style.FILL
+            pointUnderPaint.color = Color.WHITE
+            pointUnderPaint.alpha = 100
 
             paddingLeft = OTApplication.app.resources.getDimension(R.dimen.vis_axis_width_extended).toFloat()
 
@@ -256,7 +272,7 @@ class DurationTimelineModel(override val attribute: OTTimeSpanAttribute) : Attri
 
             durationBars.appendEnterSelection {
                 datum->
-                    val newBar = DurationBar(paint, pointPaint)
+                val newBar = DurationBar(paint, pointPaint, pointUnderPaint)
                     updateBarSize(newBar, datum.value)
                     newBar
             }
@@ -282,6 +298,7 @@ class DurationTimelineModel(override val attribute: OTTimeSpanAttribute) : Attri
 
         private fun updateBarSize(durationBar: DurationBar, datum: AggregatedDuration)
         {
+            println("updating bar size: ${datum}")
             val centerX = xScale[datum.time]
 
             durationBar.roundMode = true
