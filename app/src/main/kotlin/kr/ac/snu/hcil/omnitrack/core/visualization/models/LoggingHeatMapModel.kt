@@ -7,6 +7,7 @@ import android.text.format.DateUtils
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
+import kr.ac.snu.hcil.omnitrack.core.database.FirebaseHelper
 import kr.ac.snu.hcil.omnitrack.core.visualization.TrackerChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.ITimeBinnedHeatMap
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
@@ -17,6 +18,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.element.R
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.CategoricalAxisScale
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.QuantizedTimeScale
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers.ATimelineChartDrawer
+import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 import kr.ac.snu.hcil.omnitrack.utils.getHourOfDay
 import kr.ac.snu.hcil.omnitrack.utils.setHourOfDay
 import java.util.*
@@ -59,55 +61,80 @@ class LoggingHeatMapModel(tracker: OTTracker): TrackerChartModel<ITimeBinnedHeat
 
         val calendarCache = Calendar.getInstance()
 
-        for(xIndex in 0..xScale.numTicks-1)
-        {
-           //from this tick to next tick
-            val from = xScale.binPointsOnDomain[xIndex]
+        FirebaseHelper.loadItems(tracker, getTimeScope(), FirebaseHelper.Order.ASC).subscribe {
+            items ->
+            println("items for loging heatmap: ${items.size}")
+            println(items)
 
-            val to = if(xIndex < xScale.numTicks-1) xScale.binPointsOnDomain[xIndex + 1]
+            var currentItemPointer = 0
+
+            for (xIndex in 0..xScale.numTicks - 1)
+            {
+                //from this tick to next tick
+                val from = xScale.binPointsOnDomain[xIndex]
+
+                val to = if (xIndex < xScale.numTicks - 1) xScale.binPointsOnDomain[xIndex + 1]
                 else getTimeScope().to
 
-            var currentTime = from
-            var binIndex: Int
-            while(currentTime< to)
-            {
-                binIndex = 0
-                while(binIndex * hoursInYBin < 24)
+                var currentTime = from
+                var binIndex: Int
+                while (currentTime < to)
                 {
-                    calendarCache.timeInMillis = currentTime + hoursInYBin * binIndex * DateUtils.HOUR_IN_MILLIS
+                    binIndex = 0
+                    while (binIndex * hoursInYBin < 24) {
+                        calendarCache.timeInMillis = currentTime + hoursInYBin * binIndex * DateUtils.HOUR_IN_MILLIS
 
-                    val hourOfDay = calendarCache.getHourOfDay()
-                    val queryFrom = calendarCache.timeInMillis
-                    val queryTo = queryFrom + hoursInYBin * DateUtils.HOUR_IN_MILLIS
-                    countMatrix[xIndex][hourOfDay/hoursInYBin] += OTApplication.app.dbHelper.getLogCountDuring(tracker, queryFrom, queryTo-1)
+                        val hourOfDay = calendarCache.getHourOfDay()
+                        val queryFrom = calendarCache.timeInMillis
+                        val queryTo = queryFrom + hoursInYBin * DateUtils.HOUR_IN_MILLIS
 
-                    binIndex++
+                        var counter = 0
+                        //counter = items.filter{ it.timestamp >= queryFrom && it.timestamp < queryTo }.size
+
+                        if (currentItemPointer < items.size) {
+                            var timestamp = items[currentItemPointer].timestamp
+
+                            while (timestamp < queryTo) {
+                                if (timestamp >= queryFrom) {
+                                    counter++
+                                }
+
+                                currentItemPointer++
+                                if (currentItemPointer >= items.size) break
+                                timestamp = items[currentItemPointer].timestamp
+                            }
+                        }
+
+                        println("rows during ${TimeHelper.FORMAT_DATETIME.format(Date(queryFrom))} ~ ${TimeHelper.FORMAT_DATETIME.format(Date(queryTo))} : count: ${counter}")
+
+                        countMatrix[xIndex][hourOfDay / hoursInYBin] += counter
+
+                        binIndex++
+                    }
+
+                    currentTime += DateUtils.DAY_IN_MILLIS
                 }
 
-                currentTime += DateUtils.DAY_IN_MILLIS
+
             }
 
+            var maxValue = Int.MIN_VALUE
+            for (x in countMatrix) {
+                for (y in x) {
+                    maxValue = Math.max(y, maxValue)
+                }
+            }
 
-        }
-
-        var maxValue = Int.MIN_VALUE
-        for(x in countMatrix)
-        {
-            for(y in x)
+            synchronized(data)
             {
-                maxValue = Math.max(y, maxValue)
+                data.clear()
+                countMatrix.withIndex().mapTo(data) { xEntry -> ITimeBinnedHeatMap.CounterVector(xScale.binPointsOnDomain[xEntry.index], xEntry.value.map { it / maxValue.toFloat() }.toFloatArray()) }
             }
+
+            _isLoaded = true
+            finished.invoke(true)
         }
 
-        data.clear()
-        for(xEntry in countMatrix.withIndex())
-        {
-            data.add(
-            ITimeBinnedHeatMap.CounterVector(xScale.binPointsOnDomain[xEntry.index], xEntry.value.map{ it/maxValue.toFloat()}.toFloatArray())
-            )
-        }
-
-        _isLoaded = true
     }
 
     override val name: String
