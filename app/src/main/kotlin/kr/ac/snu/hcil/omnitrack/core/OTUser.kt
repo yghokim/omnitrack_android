@@ -115,6 +115,10 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
     private var trackerListDbReference: DatabaseReference? = null
     private val trackerListChangeEventListener: ChildEventListener
 
+    private var triggerListDbReference: DatabaseReference? = null
+    private val triggerListChangeEventListener: ChildEventListener
+
+
     init {
 
         if (_trackers != null) {
@@ -185,7 +189,44 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
 
         }
 
+        triggerListChangeEventListener = object : ChildEventListener {
+            override fun onCancelled(error: DatabaseError) {
+                println("triggers error: ${error.toException().printStackTrace()}")
+            }
+
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildKey: String?) {
+                println("trigger child added : ${snapshot.key}")
+                val duplicate = triggerManager.getTriggerWithId(snapshot.key)
+                if (duplicate == null) {
+                    println("load tracker ${snapshot.key} from DB")
+                    FirebaseHelper.getTrigger(this@OTUser, snapshot.key).subscribe {
+                        trigger ->
+                        triggerManager.putNewTrigger(trigger)
+                    }
+                }
+            }
+
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildKey: String?) {
+                println("trigger child changed : ${snapshot.key}")
+            }
+
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildKey: String?) {
+
+                println("trigger child moved : ${snapshot.key}")
+            }
+
+            override fun onChildRemoved(snapshot: DataSnapshot) {
+                println("tracker child removed: ${snapshot.key}")
+                val duplicate = triggerManager.getTriggerWithId(snapshot.key)
+                if (duplicate != null) {
+                    triggerManager.removeTrigger(duplicate)
+                }
+            }
+
+        }
+
         trackerListDbReference?.addChildEventListener(trackerListChangeEventListener)
+        triggerListDbReference?.addChildEventListener(triggerListChangeEventListener)
 
 
     }
@@ -203,6 +244,7 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
     fun detachFromSystem() {
         triggerManager.detachFromSystem()
         trackerListDbReference?.removeEventListener(trackerListChangeEventListener)
+        triggerListDbReference?.removeEventListener(triggerListChangeEventListener)
         subscriptions.clear()
     }
 
