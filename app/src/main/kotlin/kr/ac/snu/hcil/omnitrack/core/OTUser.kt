@@ -2,6 +2,9 @@ package kr.ac.snu.hcil.omnitrack.core
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.google.firebase.database.ChildEventListener
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
@@ -12,8 +15,10 @@ import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerManager
 import kr.ac.snu.hcil.omnitrack.utils.DefaultNameGenerator
 import kr.ac.snu.hcil.omnitrack.utils.ObservableList
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
-import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import rx.Observable
+import rx.internal.util.SubscriptionList
+import rx.subjects.PublishSubject
+import rx.subjects.SerializedSubject
 import java.util.*
 
 /**
@@ -99,10 +104,16 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
 
     val triggerManager: OTTriggerManager
 
-    val trackerAdded = Event<ReadOnlyPair<OTTracker, Int>>()
-    val trackerRemoved = Event<ReadOnlyPair<OTTracker, Int>>()
-    val trackerIndexChanged = Event<IntRange>()
+    //val trackerAdded = Event<ReadOnlyPair<OTTracker, Int>>()
 
+    private val subscriptions = SubscriptionList()
+
+    val trackerAdded = SerializedSubject(PublishSubject.create<ReadOnlyPair<OTTracker, Int>>())
+    val trackerRemoved = SerializedSubject(PublishSubject.create<ReadOnlyPair<OTTracker, Int>>())
+    val trackerIndexChanged = SerializedSubject(PublishSubject.create<ReadOnlyPair<OTTracker, Int>>())
+
+    private var trackerListDbReference: DatabaseReference? = null
+    private val trackerListChangeEventListener: ChildEventListener
 
     init {
 
@@ -133,6 +144,49 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
                 trackers[i].databasePointRef?.child("position")?.setValue(i)
             }
         }
+
+        trackerListDbReference = databaseRef?.child("trackers")
+
+        trackerListChangeEventListener = object : ChildEventListener {
+            override fun onCancelled(error: DatabaseError) {
+                println("trackers error: ${error.toException().printStackTrace()}")
+            }
+
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildKey: String?) {
+                println("tracker child added : ${snapshot.key}")
+                val duplicate = trackers.unObservedList.find { it.objectId == snapshot.key }
+                if (duplicate == null) {
+                    println("load tracker ${snapshot.key} from DB")
+                    FirebaseHelper.getTracker(snapshot.key).subscribe {
+                        tracker ->
+                        tracker.owner = this@OTUser
+                        this@OTUser.trackers += tracker
+                    }
+                }
+            }
+
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildKey: String?) {
+                println("tracker child changed : ${snapshot.key}")
+            }
+
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildKey: String?) {
+
+                println("tracker child moved : ${snapshot.key}")
+            }
+
+            override fun onChildRemoved(snapshot: DataSnapshot) {
+                println("tracker child removed: ${snapshot.key}")
+                val duplicate = trackers.unObservedList.find { it.objectId == snapshot.key }
+                if (duplicate != null) {
+                    trackers.remove(duplicate)
+                }
+            }
+
+        }
+
+        trackerListDbReference?.addChildEventListener(trackerListChangeEventListener)
+
+
     }
 
     fun getTrackersOnShortcut(): List<OTTracker>{
@@ -147,6 +201,8 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
 
     fun detachFromSystem() {
         triggerManager.detachFromSystem()
+        trackerListDbReference?.removeEventListener(trackerListChangeEventListener)
+        subscriptions.clear()
     }
 
     fun newTrackerWithDefaultName(context: Context, add: Boolean): OTTracker {
@@ -192,7 +248,7 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
 
     private fun onTrackerAdded(new: OTTracker, index: Int) {
         new.owner = this
-        trackerAdded.invoke(this, ReadOnlyPair(new, index))
+        trackerAdded.onNext(ReadOnlyPair(new, index))
 
         println("tracker was added")
         FirebaseHelper.saveTracker(new, index)
@@ -200,7 +256,7 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
 
     private fun onTrackerRemoved(tracker: OTTracker, index: Int) {
         tracker.owner = null
-        trackerRemoved.invoke(this, ReadOnlyPair(tracker, index))
+        trackerRemoved.onNext(ReadOnlyPair(tracker, index))
 
         tracker.suspendDatabaseSync = true
         if (tracker.isOnShortcut) {

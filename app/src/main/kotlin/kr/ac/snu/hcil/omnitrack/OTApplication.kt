@@ -160,10 +160,10 @@ class OTApplication : MultiDexApplication() {
                 //if (OTAuthManager.isUserSignedIn()) {
                     val uid = OTAuthManager.userId!!
                     println("OMNITRACK user identityId: ${uid}, userName: ${OTAuthManager.userName}")
-                    FirebaseHelper.findTrackersOfUser(uid).flatMap {
-                        trackers ->
+                //FirebaseHelper.findTrackersOfUser(uid).flatMap {
+                //    trackers ->
 
-                        val user = OTUser(uid, OTAuthManager.userName, OTAuthManager.userImageUrl, trackers)
+                val user = OTUser(uid, OTAuthManager.userName, OTAuthManager.userImageUrl)
                         OTUser.storeOrOverwriteInstanceCache(user, systemSharedPreferences)
                         for (tracker in user.getTrackersOnShortcut()) {
                             OTShortcutPanelManager += tracker
@@ -191,7 +191,7 @@ class OTApplication : MultiDexApplication() {
                             user
                         }
 
-                    }
+                //}
                 //} else {
                 //    println("OMNITRACK retreiving user instance error: User didn't signed in with google.")
                 //    Observable.error<OTUser>(Exception("retreiving user instance error: User didn't signed in with google."))
