@@ -21,6 +21,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers.ATimelineCha
 import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 import kr.ac.snu.hcil.omnitrack.utils.getHourOfDay
 import kr.ac.snu.hcil.omnitrack.utils.setHourOfDay
+import rx.internal.util.SubscriptionList
 import java.util.*
 
 /**
@@ -43,7 +44,11 @@ class LoggingHeatMapModel(tracker: OTTracker): TrackerChartModel<ITimeBinnedHeat
 
     val hoursInYBin = 2
 
+    private val subscriptions = SubscriptionList()
+
     override fun onReload(finished: (Boolean) -> Unit) {
+
+        subscriptions.clear()
 
         val xScale = QuantizedTimeScale()
         xScale.setDomain(getTimeScope().from, getTimeScope().to)
@@ -61,79 +66,80 @@ class LoggingHeatMapModel(tracker: OTTracker): TrackerChartModel<ITimeBinnedHeat
 
         val calendarCache = Calendar.getInstance()
 
-        FirebaseHelper.loadItems(tracker, getTimeScope(), FirebaseHelper.Order.ASC).subscribe {
-            items ->
-            println("items for loging heatmap: ${items.size}")
-            println(items)
+        subscriptions.add(
+                FirebaseHelper.loadItems(tracker, getTimeScope(), FirebaseHelper.Order.ASC).subscribe {
+                    items ->
+                    println("items for loging heatmap: ${items.size}")
+                    println(items)
 
-            var currentItemPointer = 0
+                    var currentItemPointer = 0
 
-            for (xIndex in 0..xScale.numTicks - 1)
-            {
-                //from this tick to next tick
-                val from = xScale.binPointsOnDomain[xIndex]
-
-                val to = if (xIndex < xScale.numTicks - 1) xScale.binPointsOnDomain[xIndex + 1]
-                else getTimeScope().to
-
-                var currentTime = from
-                var binIndex: Int
-                while (currentTime < to)
+                    for (xIndex in 0..xScale.numTicks - 1)
                 {
-                    binIndex = 0
-                    while (binIndex * hoursInYBin < 24) {
-                        calendarCache.timeInMillis = currentTime + hoursInYBin * binIndex * DateUtils.HOUR_IN_MILLIS
+                    //from this tick to next tick
+                    val from = xScale.binPointsOnDomain[xIndex]
 
-                        val hourOfDay = calendarCache.getHourOfDay()
-                        val queryFrom = calendarCache.timeInMillis
-                        val queryTo = queryFrom + hoursInYBin * DateUtils.HOUR_IN_MILLIS
+                    val to = if (xIndex < xScale.numTicks - 1) xScale.binPointsOnDomain[xIndex + 1]
+                    else getTimeScope().to
 
-                        var counter = 0
-                        //counter = items.filter{ it.timestamp >= queryFrom && it.timestamp < queryTo }.size
+                    var currentTime = from
+                    var binIndex: Int
+                    while (currentTime < to) {
+                        binIndex = 0
+                        while (binIndex * hoursInYBin < 24) {
+                            calendarCache.timeInMillis = currentTime + hoursInYBin * binIndex * DateUtils.HOUR_IN_MILLIS
 
-                        if (currentItemPointer < items.size) {
-                            var timestamp = items[currentItemPointer].timestamp
+                            val hourOfDay = calendarCache.getHourOfDay()
+                            val queryFrom = calendarCache.timeInMillis
+                            val queryTo = queryFrom + hoursInYBin * DateUtils.HOUR_IN_MILLIS
 
-                            while (timestamp < queryTo) {
-                                if (timestamp >= queryFrom) {
-                                    counter++
+                            var counter = 0
+                            //counter = items.filter{ it.timestamp >= queryFrom && it.timestamp < queryTo }.size
+
+                            if (currentItemPointer < items.size) {
+                                var timestamp = items[currentItemPointer].timestamp
+
+                                while (timestamp < queryTo) {
+                                    if (timestamp >= queryFrom) {
+                                        counter++
+                                    }
+
+                                    currentItemPointer++
+                                    if (currentItemPointer >= items.size) break
+                                    timestamp = items[currentItemPointer].timestamp
                                 }
-
-                                currentItemPointer++
-                                if (currentItemPointer >= items.size) break
-                                timestamp = items[currentItemPointer].timestamp
                             }
+
+                            println("rows during ${TimeHelper.FORMAT_DATETIME.format(Date(queryFrom))} ~ ${TimeHelper.FORMAT_DATETIME.format(Date(queryTo))} : count: ${counter}")
+
+                            countMatrix[xIndex][hourOfDay / hoursInYBin] += counter
+
+                            binIndex++
                         }
 
-                        println("rows during ${TimeHelper.FORMAT_DATETIME.format(Date(queryFrom))} ~ ${TimeHelper.FORMAT_DATETIME.format(Date(queryTo))} : count: ${counter}")
-
-                        countMatrix[xIndex][hourOfDay / hoursInYBin] += counter
-
-                        binIndex++
+                        currentTime += DateUtils.DAY_IN_MILLIS
                     }
 
-                    currentTime += DateUtils.DAY_IN_MILLIS
+
                 }
 
-
-            }
-
-            var maxValue = Int.MIN_VALUE
-            for (x in countMatrix) {
-                for (y in x) {
-                    maxValue = Math.max(y, maxValue)
+                    var maxValue = Int.MIN_VALUE
+                    for (x in countMatrix) {
+                        for (y in x) {
+                            maxValue = Math.max(y, maxValue)
+                        }
                 }
-            }
 
-            synchronized(data)
-            {
-                data.clear()
-                countMatrix.withIndex().mapTo(data) { xEntry -> ITimeBinnedHeatMap.CounterVector(xScale.binPointsOnDomain[xEntry.index], xEntry.value.map { it / maxValue.toFloat() }.toFloatArray()) }
-            }
+                    synchronized(data)
+                    {
+                        data.clear()
+                        countMatrix.withIndex().mapTo(data) { xEntry -> ITimeBinnedHeatMap.CounterVector(xScale.binPointsOnDomain[xEntry.index], xEntry.value.map { it / maxValue.toFloat() }.toFloatArray()) }
+                    }
 
-            _isLoaded = true
-            finished.invoke(true)
-        }
+                    _isLoaded = true
+                    finished.invoke(true)
+            }
+        )
 
     }
 
@@ -142,6 +148,7 @@ class LoggingHeatMapModel(tracker: OTTracker): TrackerChartModel<ITimeBinnedHeat
 
     override fun recycle() {
         data.clear()
+        subscriptions.clear()
     }
 
     override fun getChartDrawer(): AChartDrawer {

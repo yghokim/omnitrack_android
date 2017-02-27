@@ -41,6 +41,10 @@ class TrackerChartListAdapter(_tracker: OTTracker?): RecyclerView.Adapter<Tracke
         }
     }
 
+    fun dispose() {
+        models?.forEach { it.recycle() }
+    }
+
     override fun getItemCount(): Int {
         return models?.size ?: 0
     }
