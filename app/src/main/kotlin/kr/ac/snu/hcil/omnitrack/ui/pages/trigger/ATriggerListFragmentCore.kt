@@ -18,6 +18,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.FirebaseHelper
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
+import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.FallbackRecyclerView
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.DrawableListBottomSpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
@@ -138,6 +139,28 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
                     }
             )
         }*/
+
+        val activity = parent.activity
+        if (activity is OTActivity) {
+            subscriptions.add(
+                    activity.signedInUserObservable.subscribe {
+                        user ->
+                        subscriptions.add(
+                                user.triggerManager.triggerAdded.subscribe {
+                                    trigger ->
+                                    refresh()
+                                }
+                        )
+
+                        subscriptions.add(
+                                user.triggerManager.triggerRemoved.subscribe {
+                                    trigger ->
+                                    refresh()
+                                }
+                        )
+                    }
+            )
+        }
     }
 
     fun refresh() {
