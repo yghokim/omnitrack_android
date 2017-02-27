@@ -9,6 +9,7 @@ import kr.ac.snu.hcil.omnitrack.core.visualization.AttributeChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.ICategoricalBarChart
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers.CategoricalBarChartDrawer
+import rx.internal.util.SubscriptionList
 import java.util.*
 
 /**
@@ -25,19 +26,24 @@ class ChoiceCategoricalBarChartModel(override val attribute: OTChoiceAttribute) 
 
     override val numDataPoints: Int get() = data.size
 
+    private val subscriptions = SubscriptionList()
+
     override val name: String
         get() = String.format(OTApplication.app.resources.getString(R.string.msg_vis_categorical_distribution_title_format), super.name)
 
     override fun recycle() {
         data.clear()
+        subscriptions.clear()
     }
 
     override fun onReload(finished: (Boolean) -> Unit) {
 
         data.clear()
+        subscriptions.clear()
 
         val tracker = attribute.tracker
         if (tracker != null) {
+            subscriptions.add(
             FirebaseHelper.loadItems(tracker, getTimeScope()).subscribe({
                 items ->
                 counterDictCache.clear()
@@ -84,6 +90,7 @@ class ChoiceCategoricalBarChartModel(override val attribute: OTChoiceAttribute) 
             }, {
                 finished.invoke(false)
             })
+            )
         }
     }
 
