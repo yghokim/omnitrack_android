@@ -4,6 +4,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.database.FirebaseHelper
+import rx.internal.util.SubscriptionList
 import java.util.*
 
 /**
@@ -11,18 +12,23 @@ import java.util.*
  */
 class OTTriggerManager(val user: OTUser) {
 
+    private val subscriptions = SubscriptionList()
+
     init {
-        user.trackerAdded += {
-            sender, args ->
+        subscriptions.add(
+                user.trackerAdded.subscribe {
+                    trackerPair ->
 
-        }
+                })
 
-        user.trackerRemoved += {
-            sender, args ->
-            for (trigger in getAttachedTriggers(args.first).clone()) {
-                removeTrigger(trigger)
+        subscriptions.add(
+                user.trackerRemoved.subscribe {
+                    trackerPair ->
+                    for (trigger in getAttachedTriggers(trackerPair.first).clone()) {
+                        //removeTrigger(trigger)
+                        trigger.removeTracker(trackerPair.first)
             }
-        }
+                })
     }
 
     constructor(user: OTUser, loadedTriggers: List<OTTrigger>?) : this(user) {
@@ -90,6 +96,7 @@ class OTTriggerManager(val user: OTUser) {
         for (trigger in triggers) {
             trigger.detachFromSystem()
         }
+        subscriptions.clear()
     }
 
     fun putNewTrigger(trigger: OTTrigger) {

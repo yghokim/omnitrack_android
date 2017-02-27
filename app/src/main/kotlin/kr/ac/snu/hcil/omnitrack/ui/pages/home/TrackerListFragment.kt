@@ -200,7 +200,7 @@ class TrackerListFragment : OTFragment() {
         listView.layoutManager = trackerListLayoutManager
 
         listView.addItemDecoration(HorizontalImageDividerItemDecoration(R.drawable.horizontal_separator_pattern, context, resources.getFraction(R.fraction.tracker_list_separator_height_ratio, 1, 1)))
-        listView.addItemDecoration(DrawableListBottomSpaceItemDecoration(R.drawable.expanded_view_inner_shadow_top, resources.getDimensionPixelSize(R.dimen.tracker_list_bottom_space)))
+        listView.addItemDecoration(DrawableListBottomSpaceItemDecoration(R.drawable.expanded_view_inner_shadow_top, 0))
 
         listView.adapter = trackerListAdapter
 
@@ -214,6 +214,19 @@ class TrackerListFragment : OTFragment() {
                             this.user = user
                             userLoaded = true
                             trackerListAdapter.notifyDataSetChanged()
+                            createViewSubscriptions.add(
+                                    this.user.trackerAdded.subscribe {
+                                        trackerPair ->
+                                        trackerListAdapter.notifyItemInserted(trackerPair.second)
+                                    }
+                            )
+
+                            createViewSubscriptions.add(
+                                    this.user.trackerRemoved.subscribe {
+                                        trackerPair ->
+                                        trackerListAdapter.notifyItemRemoved(trackerPair.second)
+                                    }
+                            )
                         })
             }
         }
@@ -447,7 +460,7 @@ class TrackerListFragment : OTFragment() {
                     startActivityOnDelay(ItemBrowserActivity.makeIntent(user.trackers[adapterPosition], this@TrackerListFragment.context))
                 } else if (view === removeButton) {
                     val tracker = user.trackers[adapterPosition]
-                    DialogHelper.makeYesNoDialogBuilder(context, tracker.name, getString(R.string.msg_confirm_remove_tracker), { -> user.trackers.remove(tracker); notifyItemRemoved(adapterPosition); listView.invalidateItemDecorations(); }).show()
+                    DialogHelper.makeYesNoDialogBuilder(context, tracker.name, getString(R.string.msg_confirm_remove_tracker), { -> user.trackers.remove(tracker); listView.invalidateItemDecorations(); }).show()
                 } else if (view === chartViewButton) {
                     val tracker = user.trackers[adapterPosition]
                     startActivityOnDelay(ChartViewActivity.makeIntent(tracker.objectId, this@TrackerListFragment.context))

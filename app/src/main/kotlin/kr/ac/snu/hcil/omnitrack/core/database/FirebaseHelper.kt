@@ -373,6 +373,34 @@ object FirebaseHelper {
         }
     }
 
+    fun getTracker(key: String): Observable<OTTracker> {
+        return Observable.create {
+            subscriber ->
+            val query = dbRef?.child(CHILD_NAME_TRACKERS)?.child(key)
+            if (query != null) {
+                query.addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onCancelled(error: DatabaseError) {
+                        if (!subscriber.isUnsubscribed) {
+                            subscriber.onError(Exception("Firebase query failed"))
+                        }
+                    }
+
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        val trackerWithPosition = extractTrackerWithPosition(snapshot)
+                        if (!subscriber.isUnsubscribed) {
+                            subscriber.onNext(trackerWithPosition.second)
+                        }
+                    }
+
+                })
+            } else {
+                if (!subscriber.isUnsubscribed) {
+                    subscriber.onError(NullPointerException("Firebase query is null"))
+                }
+            }
+        }
+    }
+
     fun saveAttribute(trackerId: String, attribute: OTAttribute<out Any>, position: Int) {
         val attributeRef = trackerRef(trackerId)?.child("attributes")?.child(attribute.objectId)
         if (attributeRef != null) {
