@@ -5,6 +5,8 @@ import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.database.FirebaseHelper
 import rx.internal.util.SubscriptionList
+import rx.subjects.PublishSubject
+import rx.subjects.SerializedSubject
 import java.util.*
 
 /**
@@ -46,16 +48,12 @@ class OTTriggerManager(val user: OTUser) {
         }
     }
 
-    private val _removedTriggerIds = ArrayList<Long>()
-    fun fetchRemovedTriggerIds(): LongArray {
-        val result = _removedTriggerIds.toLongArray()
-        _removedTriggerIds.clear()
-        return result;
-    }
-
     private val triggers = ArrayList<OTTrigger>()
 
     private val trackerPivotedTriggerListCache = Hashtable<String, Array<OTTrigger>>()
+
+    val triggerAdded = SerializedSubject(PublishSubject.create<OTTrigger>())
+    val triggerRemoved = SerializedSubject(PublishSubject.create<OTTrigger>())
 
     private val triggerFiredHandler = {
         sender: Any, triggerTime: Long ->
@@ -114,6 +112,8 @@ class OTTriggerManager(val user: OTUser) {
                             trackerPivotedTriggerListCache[tracker.objectId]!! + trigger
                 }
             }
+
+            triggerAdded.onNext(trigger)
         }
     }
 
@@ -121,6 +121,7 @@ class OTTriggerManager(val user: OTUser) {
         triggers.remove(trigger)
         trigger.fired -= triggerFiredHandler
 
+        trigger.suspendDatabaseSync = true
         trigger.isOn = false
 
         //TODO handler dependencies associated with the trigger
@@ -136,6 +137,8 @@ class OTTriggerManager(val user: OTUser) {
 
         //TODO remove trigger from DB
         FirebaseHelper.removeTrigger(trigger)
+
+        triggerRemoved.onNext(trigger)
     }
 
     private fun onTriggerFired(trigger: OTTrigger, triggerTime: Long) {

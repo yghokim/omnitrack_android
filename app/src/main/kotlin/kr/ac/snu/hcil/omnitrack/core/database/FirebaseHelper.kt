@@ -190,17 +190,53 @@ object FirebaseHelper {
     fun findTriggersOfUser(user: OTUser): Observable<List<OTTrigger>> {
         return findElementListOfUser(user.objectId, CHILD_NAME_TRIGGERS) {
             child ->
-            val pojo = child.getValue(TriggerPOJO::class.java)
+            extractTriggerWithPosition(user, child)
+        }
+    }
 
+    fun getTrigger(user: OTUser, key: String): Observable<OTTrigger> {
+        return Observable.create {
+            subscriber ->
+            val query = dbRef?.child(CHILD_NAME_TRIGGERS)?.child(key)
+            if (query != null) {
+                query.addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onCancelled(error: DatabaseError) {
+                        if (!subscriber.isUnsubscribed) {
+                            subscriber.onError(Exception("Firebase query failed"))
+                        }
+                    }
+
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        val triggerWithPosition = extractTriggerWithPosition(user, snapshot)
+                        if (!subscriber.isUnsubscribed) {
+                            subscriber.onNext(triggerWithPosition.second)
+                            subscriber.onCompleted()
+                        }
+                    }
+
+                })
+            } else {
+                if (!subscriber.isUnsubscribed) {
+                    subscriber.onError(NullPointerException("Firebase query is null"))
+                }
+            }
+        }
+    }
+
+    fun extractTriggerWithPosition(user: OTUser, snapshot: DataSnapshot): Pair<Int, OTTrigger> {
+        val pojo = snapshot.getValue(TriggerPOJO::class.java)
+        if (pojo.user == user.objectId) {
             val trigger = OTTrigger.makeInstance(
-                    child.key,
+                    snapshot.key,
                     pojo.type,
                     user,
                     pojo.name ?: "",
                     pojo.trackers?.map { it.key!! }?.toTypedArray(),
                     pojo.on, pojo.action, pojo.lastTriggeredTime, pojo.properties)
 
-            Pair(pojo.position, trigger)
+            return Pair(pojo.position, trigger)
+        } else {
+            throw IllegalArgumentException("user is different.")
         }
     }
 
@@ -389,6 +425,7 @@ object FirebaseHelper {
                         val trackerWithPosition = extractTrackerWithPosition(snapshot)
                         if (!subscriber.isUnsubscribed) {
                             subscriber.onNext(trackerWithPosition.second)
+                            subscriber.onCompleted()
                         }
                     }
 

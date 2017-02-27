@@ -154,7 +154,7 @@ class OTApplication : MultiDexApplication() {
         } else {
             //need login
             println("load user from db")
-            OTUser.loadCachedInstance(systemSharedPreferences).onErrorResumeNext {
+            OTUser.loadCachedInstance(systemSharedPreferences).onErrorReturn {
                 error ->
                 error.printStackTrace()
                 //if (OTAuthManager.isUserSignedIn()) {
@@ -182,14 +182,7 @@ class OTApplication : MultiDexApplication() {
                             createUsabilityTestingTrackers(user)
                         }
 
-                        FirebaseHelper.findTriggersOfUser(user).map {
-                            triggers ->
-
-                            for (trigger in triggers)
-                                user.triggerManager.putNewTrigger(trigger)
-
-                            user
-                        }
+                user
 
                 //}
                 //} else {
