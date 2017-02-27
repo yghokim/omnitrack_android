@@ -648,41 +648,49 @@ object FirebaseHelper {
     fun getItemListSummary(tracker: OTTracker): Observable<ItemListSummary> {
         return Observable.create {
             subscriber ->
-            getItemListOfTrackerChild(tracker.objectId)?.orderByChild("timestamp")
-                    ?.addListenerForSingleValueEvent(object : ValueEventListener {
-                        override fun onCancelled(p0: DatabaseError) {
-                            p0.toException().printStackTrace()
-                            if (!subscriber.isUnsubscribed) {
-                                subscriber.onError(p0.toException())
-                            }
+
+            val eventListener = object : ValueEventListener {
+                override fun onCancelled(p0: DatabaseError) {
+                    p0.toException().printStackTrace()
+                    if (!subscriber.isUnsubscribed) {
+                        subscriber.onError(p0.toException())
+                    }
+                }
+
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    println("item count: ${snapshot.childrenCount}")
+                    if (!subscriber.isUnsubscribed) {
+                        val info = ItemListSummary()
+                        info.totalCount = snapshot.childrenCount
+                        if (snapshot.hasChildren()) {
+                            val lastLoggingTime = snapshot.children.last().child("timestamp").value
+                            if (lastLoggingTime is Long) info.lastLoggingTime = lastLoggingTime
+                            else if (lastLoggingTime is Int) info.lastLoggingTime = lastLoggingTime.toLong()
+
+                            val startOfToday = TimeHelper.cutTimePartFromEpoch(System.currentTimeMillis())
+                            info.todayCount = snapshot.children.filter {
+                                val timestamp = it.child("timestamp").value
+                                if (timestamp is Long) {
+                                    timestamp >= startOfToday
+                                } else if (timestamp is Int) {
+                                    timestamp >= startOfToday.toInt()
+                                } else false
+                            }.count()
                         }
 
-                        override fun onDataChange(snapshot: DataSnapshot) {
-                            println("item count: ${snapshot.childrenCount}")
-                            if (!subscriber.isUnsubscribed) {
-                                val info = ItemListSummary()
-                                info.totalCount = snapshot.childrenCount
-                                if (snapshot.hasChildren()) {
-                                    val lastLoggingTime = snapshot.children.last().child("timestamp").value
-                                    if (lastLoggingTime is Long) info.lastLoggingTime = lastLoggingTime
-                                    else if (lastLoggingTime is Int) info.lastLoggingTime = lastLoggingTime.toLong()
+                        subscriber.onNext(info)
+                        subscriber.onCompleted()
+                    }
+                }
+            }
 
-                                    val startOfToday = TimeHelper.cutTimePartFromEpoch(System.currentTimeMillis())
-                                    info.todayCount = snapshot.children.filter {
-                                        val timestamp = it.child("timestamp").value
-                                        if (timestamp is Long) {
-                                            timestamp >= startOfToday
-                                        } else if (timestamp is Int) {
-                                            timestamp >= startOfToday.toInt()
-                                        } else false
-                                    }.count()
-                                }
+            val query = getItemListOfTrackerChild(tracker.objectId)?.orderByChild("timestamp")
 
-                                subscriber.onNext(info)
-                                subscriber.onCompleted()
-                            }
-                        }
-                    })
+            query?.addListenerForSingleValueEvent(eventListener)
+
+            subscriber.add(Subscriptions.create {
+                query?.removeEventListener(eventListener)
+            })
         }
     }
 
