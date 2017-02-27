@@ -544,6 +544,20 @@ class TrackerListFragment : OTFragment() {
                         }
                 )
 
+                subscriptions.add(
+                        tracker.colorChanged.subscribe {
+                            args ->
+                            color.setBackgroundColor(args.second)
+                        }
+                )
+
+                subscriptions.add(
+                        tracker.nameChanged.subscribe {
+                            args ->
+                            name.text = args.second
+                        }
+                )
+
                 /*
                 subscriptions.add(
                         FirebaseHelper.getLastLoggingTime(tracker).observeOn(AndroidSchedulers.mainThread()).subscribe {

@@ -1,16 +1,18 @@
 package kr.ac.snu.hcil.omnitrack.core.database
 
 import com.google.firebase.database.DatabaseReference
-import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kotlin.properties.Delegates
 
 /**
  * Created by Young-Ho on 7/11/2016.
  */
 abstract class NamedObject(objectId: String?, name: String) : IDatabaseSyncedObject {
-    override var isDirtySinceLastSync: Boolean = true
 
-    val nameChangeEvent = Event<String>()
+    companion object {
+        const val PROPERTY_NAME = "name"
+    }
+
+    override var isDirtySinceLastSync: Boolean = true
 
     open val objectId: String by lazy {
         objectId ?: makeNewObjectId()
@@ -23,7 +25,7 @@ abstract class NamedObject(objectId: String?, name: String) : IDatabaseSyncedObj
         prop, old, new ->
         if (old != new) {
             if (!suspendDatabaseSync)
-                databasePointRef?.child("name")?.setValue(new)
+                databasePointRef?.child(PROPERTY_NAME)?.setValue(new)
             onNameChanged(new)
         }
     }
@@ -38,7 +40,5 @@ abstract class NamedObject(objectId: String?, name: String) : IDatabaseSyncedObj
     protected abstract fun makeNewObjectId(): String
 
     protected open fun onNameChanged(newName: String){
-        isDirtySinceLastSync = true
-        nameChangeEvent.invoke(this, newName)
     }
 }
