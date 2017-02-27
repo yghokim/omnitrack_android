@@ -178,6 +178,7 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
                 println("tracker child removed: ${snapshot.key}")
                 val duplicate = trackers.unObservedList.find { it.objectId == snapshot.key }
                 if (duplicate != null) {
+                    duplicate.dispose()
                     trackers.remove(duplicate)
                 }
             }

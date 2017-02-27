@@ -3,6 +3,9 @@ package kr.ac.snu.hcil.omnitrack.core
 //import kr.ac.snu.hcil.omnitrack.core.database.TrackerEntity
 import android.content.Context
 import android.graphics.Color
+import com.google.firebase.database.ChildEventListener
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
@@ -20,6 +23,8 @@ import kr.ac.snu.hcil.omnitrack.utils.ObservableList
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import rx.subjects.BehaviorSubject
+import rx.subjects.PublishSubject
+import rx.subjects.SerializedSubject
 import java.util.*
 import kotlin.properties.Delegates
 
@@ -28,12 +33,21 @@ import kotlin.properties.Delegates
  */
 class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnShortcut: Boolean = false, attributeIdSeed: Int = 0, _attributes: Collection<OTAttribute<out Any>>? = null)
     : NamedObject(objectId, name) {
+
+    companion object {
+        const val PROPERTY_COLOR = "color"
+        const val PROPERTY_IS_ON_SHORTCUT = "onShortcut"
+    }
+
     override val databasePointRef: DatabaseReference?
         get() = FirebaseHelper.dbRef?.child(FirebaseHelper.CHILD_NAME_TRACKERS)?.child(objectId)
 
     override fun makeNewObjectId(): String {
         return FirebaseHelper.generateNewKey(FirebaseHelper.CHILD_NAME_TRACKERS)
     }
+
+    private var currentDbReference: DatabaseReference? = null
+    private val dbChangedListener: ChildEventListener
 
     val attributes = ObservableList<OTAttribute<out Any>>()
 
@@ -71,12 +85,12 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
     {
         prop, old, new ->
         if (old != new) {
-            colorChanged.invoke(this, new)
+            colorChanged.onNext(ReadOnlyPair(this, new))
             OTShortcutPanelManager.notifyAppearanceChanged(this)
             colorSubject.onNext(new)
 
             if (!suspendDatabaseSync)
-                databasePointRef?.child("color")?.setValue(new)
+                databasePointRef?.child(PROPERTY_COLOR)?.setValue(new)
         }
     }
 
@@ -96,7 +110,9 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
             }
 
             if (!suspendDatabaseSync)
-                databasePointRef?.child("onShortcut")?.setValue(new)
+                databasePointRef?.child(PROPERTY_IS_ON_SHORTCUT)?.setValue(new)
+
+            isOnShortcutChanged.onNext(ReadOnlyPair(this, new))
         }
     }
 
@@ -106,7 +122,10 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
     val attributeAdded = Event<ReadOnlyPair<OTAttribute<out Any>, Int>>()
     val attributeRemoved = Event<ReadOnlyPair<OTAttribute<out Any>, Int>>()
 
-    val colorChanged = Event<Int>()
+    val colorChanged = SerializedSubject(PublishSubject.create<ReadOnlyPair<OTTracker, Int>>())
+    val nameChanged = SerializedSubject(PublishSubject.create<ReadOnlyPair<OTTracker, String>>())
+    val isOnShortcutChanged = SerializedSubject(PublishSubject.create<ReadOnlyPair<OTTracker, Boolean>>())
+
 
     constructor() : this(null, "New Tracker")
 
@@ -148,11 +167,74 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
 
         isDirtySinceLastSync = true
         suspendDatabaseSync = false
+
+
+        currentDbReference = databasePointRef
+        dbChangedListener = object : ChildEventListener {
+
+            private fun handleChildChange(snapshot: DataSnapshot, remove: Boolean) {
+                when (snapshot.key) {
+                    PROPERTY_NAME ->
+                        this@OTTracker.name = if (remove) {
+                            "Noname"
+                        } else {
+                            snapshot.value.toString()
+                        }
+
+                    PROPERTY_IS_ON_SHORTCUT ->
+                        this@OTTracker.isOnShortcut = if (remove) {
+                            false
+                        } else {
+                            snapshot.value as Boolean
+                        }
+                    PROPERTY_COLOR ->
+                        this@OTTracker.color = if (remove) {
+                            Color.WHITE
+                        } else {
+                            val value = snapshot.value
+                            (value as? Long)?.toInt() ?: (value as? Int ?: Color.WHITE)
+                        }
+                }
+            }
+
+            override fun onChildAdded(snapshot: DataSnapshot, p1: String?) {
+                println("tracker ${name} child added: ${snapshot.key}")
+                handleChildChange(snapshot, false)
+            }
+
+            override fun onChildChanged(snapshot: DataSnapshot, p1: String?) {
+                println("tracker ${name} child changed: ${snapshot.key}")
+                handleChildChange(snapshot, false)
+            }
+
+            override fun onChildMoved(snapshot: DataSnapshot, p1: String?) {
+
+                println("tracker ${name} child moved: ${snapshot.key}")
+            }
+
+            override fun onChildRemoved(snapshot: DataSnapshot) {
+                println("tracker ${name} child removed: ${snapshot.key}")
+                handleChildChange(snapshot, true)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+
+            }
+        }
+
+        currentDbReference?.addChildEventListener(dbChangedListener)
     }
+
+    fun dispose() {
+        currentDbReference?.removeEventListener(dbChangedListener)
+    }
+
 
     override fun onNameChanged(newName: String) {
         super.onNameChanged(newName)
         OTShortcutPanelManager.notifyAppearanceChanged(this)
+
+        nameChanged.onNext(ReadOnlyPair(this, newName))
     }
 
     fun nextAttributeLocalKey(): Int {
