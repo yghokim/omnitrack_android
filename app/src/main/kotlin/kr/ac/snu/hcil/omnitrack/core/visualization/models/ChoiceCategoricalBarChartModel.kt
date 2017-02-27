@@ -38,7 +38,6 @@ class ChoiceCategoricalBarChartModel(override val attribute: OTChoiceAttribute) 
 
     override fun onReload(finished: (Boolean) -> Unit) {
 
-        data.clear()
         subscriptions.clear()
 
         val tracker = attribute.tracker
@@ -72,13 +71,15 @@ class ChoiceCategoricalBarChartModel(override val attribute: OTChoiceAttribute) 
                             }
                         }
 
-                for (categoryId in categoriesCache)
-                {
-                    val entry = attribute.entries.findWithId(categoryId)
-                    println("entry: ${entry?.text}, count: ${counterDictCache[categoryId]}")
-                    if (entry != null) {
-                        println("entry add")
-                        data.add(ICategoricalBarChart.Point(entry.text, counterDictCache[categoryId].toDouble(), categoryId))
+                synchronized(data) {
+                    data.clear()
+                    for (categoryId in categoriesCache) {
+                        val entry = attribute.entries.findWithId(categoryId)
+                        println("entry: ${entry?.text}, count: ${counterDictCache[categoryId]}")
+                        if (entry != null) {
+                            println("entry add")
+                            data.add(ICategoricalBarChart.Point(entry.text, counterDictCache[categoryId].toDouble(), categoryId))
+                        }
                     }
                 }
 

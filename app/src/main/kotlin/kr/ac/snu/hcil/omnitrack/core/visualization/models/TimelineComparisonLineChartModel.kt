@@ -93,10 +93,13 @@ class TimelineComparisonLineChartModel(override val attributes: List<OTNumberAtt
 
                 }
 
+                    synchronized(data) {
                     data.clear()
                     attrPivotedPoints.mapTo(data) {
                         ILineChartOnTime.TimeSeriesTrendData(it.value.toTypedArray(), it.key)
+                    }
                 }
+
                     values.clear()
 
 
