@@ -122,6 +122,11 @@ class ChartViewActivity : OTTrackerAttachedActivity(R.layout.activity_chart_view
         currentScopeView.text = currentScope.getFormattedCurrentScope(currentPoint, this)
     }
 
+    override fun onStop() {
+        super.onStop()
+        adapter.dispose()
+    }
+
 
     override fun onClick(view: View) {
         if (view === leftNavigationButton) {

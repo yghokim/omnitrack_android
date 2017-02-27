@@ -25,6 +25,7 @@ import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 import org.apache.commons.math3.stat.StatUtils
 import rx.Observable
 import rx.functions.Func1
+import rx.internal.util.SubscriptionList
 import java.util.*
 
 /**
@@ -42,54 +43,60 @@ class DurationTimelineModel(override val attribute: OTTimeSpanAttribute) : Attri
 
     private val data = ArrayList<AggregatedDuration>()
 
+    private val subscriptions = SubscriptionList()
+
     override fun onReload(finished: (Boolean) -> Unit) {
+
+        subscriptions.clear()
 
         val xScale = QuantizedTimeScale()
         xScale.setDomain(getTimeScope().from, getTimeScope().to)
         xScale.quantize(currentGranularity)
 
-        Observable.zip((0..xScale.numTicks - 1).map { xIndex ->
+        subscriptions.add(
+                Observable.zip((0..xScale.numTicks - 1).map { xIndex ->
 
-            val from = xScale.binPointsOnDomain[xIndex]
-            val to = if (xIndex < xScale.numTicks - 1) xScale.binPointsOnDomain[xIndex + 1]
-            else getTimeScope().to
+                    val from = xScale.binPointsOnDomain[xIndex]
+                    val to = if (xIndex < xScale.numTicks - 1) xScale.binPointsOnDomain[xIndex + 1]
+                    else getTimeScope().to
 
-            FirebaseHelper.loadItems(attribute.tracker!!, TimeSpan.fromPoints(from, to)).flatMap<AggregatedDuration?>(Func1<List<OTItem>, Observable<AggregatedDuration?>> {
-                items ->
-                println("items during ${TimeSpan.fromPoints(from, to).toString()}; count: ${items.size}")
-                if (items.isNotEmpty()) {
-                    val timeSpansCache = ArrayList<Pair<TimeSpan, Long>>()
+                    FirebaseHelper.loadItems(attribute.tracker!!, TimeSpan.fromPoints(from, to)).flatMap<AggregatedDuration?>(Func1<List<OTItem>, Observable<AggregatedDuration?>> {
+                        items ->
+                        println("items during ${TimeSpan.fromPoints(from, to).toString()}; count: ${items.size}")
+                        if (items.isNotEmpty()) {
+                            val timeSpansCache = ArrayList<Pair<TimeSpan, Long>>()
 
-                    items.forEach { item ->
-                        println("item for ${item.timestampString}")
-                        val v = item.getValueOf(attribute)
-                        if (v is TimeSpan) {
-                            timeSpansCache.add(Pair(v, TimeHelper.cutTimePartFromEpoch(item.timestamp)))
+                            items.forEach { item ->
+                                println("item for ${item.timestampString}")
+                                val v = item.getValueOf(attribute)
+                                if (v is TimeSpan) {
+                                    timeSpansCache.add(Pair(v, TimeHelper.cutTimePartFromEpoch(item.timestamp)))
+                                }
                         }
-                    }
 
-                    println("timespans count: ${timeSpansCache.size}")
-                    if (timeSpansCache.size > 0) {
-                        val doubleFromArray = timeSpansCache.map { timeToRatio(it.first.from, it.second).toDouble() }.toDoubleArray()
-                        val doubleToArray = timeSpansCache.map { timeToRatio(it.first.to, it.second).toDouble() }.toDoubleArray()
+                            println("timespans count: ${timeSpansCache.size}")
+                            if (timeSpansCache.size > 0) {
+                                val doubleFromArray = timeSpansCache.map { timeToRatio(it.first.from, it.second).toDouble() }.toDoubleArray()
+                                val doubleToArray = timeSpansCache.map { timeToRatio(it.first.to, it.second).toDouble() }.toDoubleArray()
 
-                        Observable.just(
-                                AggregatedDuration(
-                                        from,
-                                        timeSpansCache.size,
-                                        StatUtils.mean(doubleFromArray).toFloat(),
-                                        StatUtils.mean(doubleToArray).toFloat(),
-                                        StatUtils.min(doubleFromArray).toFloat(),
-                                        StatUtils.max(doubleToArray).toFloat()
-                                ))
-                    } else Observable.just<AggregatedDuration>(null)
-                } else Observable.just(null)
-            })
-            //OTApplication.app.dbHelper.getItems(attribute.tracker!!, TimeSpan.fromPoints(from, to), itemsCache, true)
-        }, { it ->
-            println(it)
-            it.filter { it is AggregatedDuration }.map { it as AggregatedDuration }.toList()
-        }).subscribe({ it -> println("duration list received"); data.clear(); data.addAll(it); println(data); finished.invoke(true) }, { finished.invoke(false) })
+                                Observable.just(
+                                        AggregatedDuration(
+                                                from,
+                                                timeSpansCache.size,
+                                                StatUtils.mean(doubleFromArray).toFloat(),
+                                                StatUtils.mean(doubleToArray).toFloat(),
+                                                StatUtils.min(doubleFromArray).toFloat(),
+                                                StatUtils.max(doubleToArray).toFloat()
+                                        ))
+                            } else Observable.just<AggregatedDuration>(null)
+                        } else Observable.just(null)
+                    })
+                    //OTApplication.app.dbHelper.getItems(attribute.tracker!!, TimeSpan.fromPoints(from, to), itemsCache, true)
+                }, { it ->
+                    println(it)
+                    it.filter { it is AggregatedDuration }.map { it as AggregatedDuration }.toList()
+                }).subscribe({ it -> println("duration list received"); data.clear(); data.addAll(it); println(data); finished.invoke(true) }, { finished.invoke(false) })
+        )
     }
 
     private fun timeToRatio(time: Long, pivot: Long): Float
@@ -99,6 +106,7 @@ class DurationTimelineModel(override val attribute: OTTimeSpanAttribute) : Attri
 
     override fun recycle() {
         data.clear()
+        subscriptions.clear()
     }
 
     override fun getChartDrawer(): AChartDrawer {

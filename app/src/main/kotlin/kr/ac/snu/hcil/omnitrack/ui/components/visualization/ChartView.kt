@@ -2,12 +2,9 @@ package kr.ac.snu.hcil.omnitrack.ui.components.visualization
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import android.widget.LinearLayout
-import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
-import kr.ac.snu.hcil.omnitrack.ui.components.common.choice.SelectionView
 import kr.ac.snu.hcil.omnitrack.utils.events.IEventListener
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 import kotlin.properties.Delegates
@@ -49,6 +46,7 @@ class ChartView : LinearLayout, IEventListener<ChartModel<*>?> {
             if(old!=null)
             {
                 old.onReloaded -= onModelReloaded
+                old.recycle()
             }
 
             if (new != null) {

@@ -18,6 +18,7 @@ import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Observable
+import rx.subscriptions.Subscriptions
 import java.io.Serializable
 import java.util.*
 
@@ -492,20 +493,29 @@ object FirebaseHelper {
     fun loadItems(tracker: OTTracker, timeRange: TimeSpan? = null, order: Order = Order.DESC): Observable<List<OTItem>> {
         val ref = getItemListOfTrackerChild(tracker.objectId)
         if (ref != null) {
+            var query = ref.orderByChild("timestamp")
             return Observable.create { subscriber ->
-                var query = ref.orderByChild("timestamp")
                 if (timeRange != null) {
                     query = query.startAt(timeRange.from.toDouble(), "timestamp").endAt(timeRange.to.toDouble(), "timestamp")
                 }
 
-                query.addListenerForSingleValueEvent(object : ValueEventListener {
+                val valueChangedListener = object : ValueEventListener {
                     override fun onCancelled(error: DatabaseError) {
+                        if (subscriber.isUnsubscribed) {
+                            query.removeEventListener(this)
+                        }
+
                         if (!subscriber.isUnsubscribed) {
                             subscriber.onError(error.toException())
                         }
                     }
 
                     override fun onDataChange(snapshot: DataSnapshot) {
+                        if (subscriber.isUnsubscribed) {
+                            println("auto unsubscribe")
+                            query.removeEventListener(this)
+                        }
+
                         if (snapshot.exists()) {
                             if (!subscriber.isUnsubscribed) {
                                 val list = snapshot.children.mapTo(ArrayList<OTItem>()) {
@@ -524,12 +534,15 @@ object FirebaseHelper {
                         } else {
                             if (!subscriber.isUnsubscribed) {
                                 subscriber.onNext(emptyList())
-                                subscriber.onCompleted()
                             }
                         }
                     }
 
-                })
+                }
+
+                query.addValueEventListener(valueChangedListener)
+
+                subscriber.add(Subscriptions.create { query.removeEventListener(valueChangedListener) })
             }
         } else return Observable.error(Exception("No reference"))
 
