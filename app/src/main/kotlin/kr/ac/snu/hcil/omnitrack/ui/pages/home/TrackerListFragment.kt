@@ -245,6 +245,7 @@ class TrackerListFragment : OTFragment() {
 
     override fun onPause() {
         super.onPause()
+        println("tracker list pause")
         resumeSubscriptions.clear()
         for (viewHolder in trackerListAdapter.viewHolders) {
             viewHolder.subscriptions.clear()

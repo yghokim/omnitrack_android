@@ -268,12 +268,14 @@ class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObject
         value ->
         syncPropertyToDatabase("configType", value)
         onConfigChanged()
+        notifyPropertyChanged("configType", value)
     }
 
     var rangeVariables: Int by ObservableMapDelegate(Range.makeConfig(Range.DAYS_OF_WEEK_FLAGS_MASK), properties) {
         value ->
         syncPropertyToDatabase("rangeVariables", value)
         onRangeChanged()
+        notifyPropertyChanged("rangeVariables", value)
     }
 
     private val configVariablesDelegate = ObservableMapDelegate<OTTimeTrigger, Int>(AlarmConfig.makeConfig(9, 0, 1), properties) {
@@ -614,7 +616,7 @@ class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObject
         OTApplication.app.timeTriggerAlarmManager.cancelTrigger(this)
     }
 
-    override fun detachFromSystem() {
+    override fun onDetachFromSystem() {
         OTApplication.app.timeTriggerAlarmManager.cancelTrigger(this)
     }
 }

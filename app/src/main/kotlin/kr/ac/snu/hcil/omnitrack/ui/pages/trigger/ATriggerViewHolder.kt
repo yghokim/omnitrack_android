@@ -2,7 +2,6 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 
 import android.animation.ValueAnimator
 import android.content.Context
-import android.os.Looper
 import android.support.v7.widget.AppCompatImageButton
 import android.support.v7.widget.AppCompatImageView
 import android.support.v7.widget.RecyclerView
@@ -12,7 +11,6 @@ import android.view.ViewGroup
 import android.view.ViewStub
 import android.widget.TextView
 import butterknife.bindView
-import com.badoo.mobile.util.WeakHandler
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
@@ -21,6 +19,8 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.ValidatedSwitch
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
+import rx.android.schedulers.AndroidSchedulers
+import rx.internal.util.SubscriptionList
 
 /**
  * Created by Young-Ho Kim on 16. 8. 24
@@ -37,7 +37,7 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
         //fun onTriggerCollapse(position: Int, viewHolder: ATriggerViewHolder<out OTTrigger>)
     }
 
-    private var isFirstBinding = true
+    //private var isFirstBinding = true
 
     protected lateinit var trigger: T
         private set
@@ -82,22 +82,10 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
 
     private val bottomBar: LockableFrameLayout by bindView(R.id.ui_bottom_bar)
 
+    private val subscriptions = SubscriptionList()
+
     //private var collapsedHeight: Int = 0
     //private var expandedHeight: Int = 0
-
-    private val onTriggerSwitchTurned: ((sender: Any, isOn: Boolean) -> Unit) = {
-        sender, isOn ->
-        WeakHandler(Looper.getMainLooper()).post {
-            applyTriggerStateToView()
-        }
-    }
-
-    private val onTriggerFired: ((Any, Long) -> Unit) = {
-        sender, triggeredTime ->
-        WeakHandler(Looper.getMainLooper()).post {
-            applyTriggerStateToView()
-        }
-    }
 
     private val triggerOnValidator: () -> Boolean = {
         validateTriggerSwitchOn()
@@ -318,24 +306,13 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
     }*/
 
     fun unSubscribeAll() {
-        if (!isFirstBinding) {
-            this.trigger.run {
-                switchTurned -= onTriggerSwitchTurned
-                fired -= onTriggerFired
-            }
-        }
+        subscriptions.clear()
     }
 
     @Suppress("UNCHECKED_CAST")
     fun bind(trigger: OTTrigger) {
-        if (!isFirstBinding) {
-            this.trigger.run {
-                switchTurned -= onTriggerSwitchTurned
-                fired -= onTriggerFired
-            }
-        } else {
-            isFirstBinding = false
-        }
+
+        subscriptions.clear()
 
         this.trigger = trigger as T
 
@@ -343,8 +320,23 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
         currentAlertAnimation = null
 
         this.trigger.run {
-            switchTurned += onTriggerSwitchTurned
-            fired += onTriggerFired
+            subscriptions.add(
+                    switchTurned.subscribeOn(AndroidSchedulers.mainThread()).subscribe {
+                        applyTriggerStateToView()
+                    }
+            )
+
+            subscriptions.add(
+                    propertyChanged.subscribeOn(AndroidSchedulers.mainThread()).subscribe {
+                        applyTriggerStateToView()
+                    }
+            )
+
+            subscriptions.add(
+                    fired.subscribeOn(AndroidSchedulers.mainThread()).subscribe {
+                        applyTriggerStateToView()
+                    }
+            )
         }
 
         //attached tracker list
