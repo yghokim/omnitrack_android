@@ -30,7 +30,6 @@ class OTTriggerManager(val user: OTUser) {
         subscriptions.add(
                 user.trackerAdded.subscribe {
                     trackerPair ->
-
                 })
 
         subscriptions.add(

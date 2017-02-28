@@ -10,6 +10,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.FirebaseHelper
 import kr.ac.snu.hcil.omnitrack.core.database.NamedObject
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
 import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
+import kr.ac.snu.hcil.omnitrack.utils.ListDelta
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializedStringKeyEntry
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
@@ -94,6 +95,8 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
     val switchTurned = SerializedSubject(PublishSubject.create<Boolean>())
     val propertyChanged = SerializedSubject(PublishSubject.create<ReadOnlyPair<String, Any?>>())
 
+    val attachedTrackersChanged = SerializedSubject(PublishSubject.create<ListDelta<OTTracker>>())
+
     var isActivatedOnSystem: Boolean = false
         private set
 
@@ -165,6 +168,7 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
             }
 
             private fun handleChildChange(snapshot: DataSnapshot, remove: Boolean) {
+                println("trigger child ${snapshot.key} was changed")
                 when (snapshot.key) {
                     PROPERTY_IS_ON ->
                         if (remove) {
@@ -292,6 +296,8 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
                     )
                 }
             }
+
+            attachedTrackersChanged.onNext(ListDelta())
         }
     }
 
@@ -310,6 +316,8 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
                         trackerIndexedIdList
                 )
             }
+            
+            attachedTrackersChanged.onNext(ListDelta())
         }
     }
 

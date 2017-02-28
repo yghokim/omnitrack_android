@@ -337,6 +337,12 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
                         applyTriggerStateToView()
                     }
             )
+
+            subscriptions.add(
+                    attachedTrackersChanged.subscribeOn(AndroidSchedulers.mainThread()).subscribe {
+                        applyTriggerStateToView()
+                    }
+            )
         }
 
         //attached tracker list
