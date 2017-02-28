@@ -149,7 +149,9 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
             }
         }
 
-        trackerListDbReference = databaseRef?.child("trackers")
+        trackerListDbReference = databaseRef?.child(FirebaseHelper.CHILD_NAME_TRACKERS)
+        triggerListDbReference = databaseRef?.child(FirebaseHelper.CHILD_NAME_TRIGGERS)
+
 
         trackerListChangeEventListener = object : ChildEventListener {
             override fun onCancelled(error: DatabaseError) {
@@ -198,7 +200,7 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
                 println("trigger child added : ${snapshot.key}")
                 val duplicate = triggerManager.getTriggerWithId(snapshot.key)
                 if (duplicate == null) {
-                    println("load tracker ${snapshot.key} from DB")
+                    println("load trigger ${snapshot.key} from DB")
                     FirebaseHelper.getTrigger(this@OTUser, snapshot.key).subscribe {
                         trigger ->
                         triggerManager.putNewTrigger(trigger)
@@ -216,7 +218,7 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
             }
 
             override fun onChildRemoved(snapshot: DataSnapshot) {
-                println("tracker child removed: ${snapshot.key}")
+                println("trigger child removed: ${snapshot.key}")
                 val duplicate = triggerManager.getTriggerWithId(snapshot.key)
                 if (duplicate != null) {
                     triggerManager.removeTrigger(duplicate)

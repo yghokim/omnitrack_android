@@ -148,6 +148,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
                         subscriptions.add(
                                 user.triggerManager.triggerAdded.subscribe {
                                     trigger ->
+                                    println("trigger added")
                                     refresh()
                                 }
                         )
@@ -155,6 +156,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
                         subscriptions.add(
                                 user.triggerManager.triggerRemoved.subscribe {
                                     trigger ->
+                                    println("trigger removed")
                                     refresh()
                                 }
                         )

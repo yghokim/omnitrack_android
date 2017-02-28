@@ -18,7 +18,6 @@ import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.element.R
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.CategoricalAxisScale
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.QuantizedTimeScale
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers.ATimelineChartDrawer
-import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 import kr.ac.snu.hcil.omnitrack.utils.getHourOfDay
 import kr.ac.snu.hcil.omnitrack.utils.setHourOfDay
 import rx.internal.util.SubscriptionList
@@ -70,7 +69,7 @@ class LoggingHeatMapModel(tracker: OTTracker): TrackerChartModel<ITimeBinnedHeat
                 FirebaseHelper.loadItems(tracker, getTimeScope(), FirebaseHelper.Order.ASC).subscribe {
                     items ->
                     println("items for loging heatmap: ${items.size}")
-                    println(items)
+                    //println(items)
 
                     var currentItemPointer = 0
 
@@ -110,7 +109,7 @@ class LoggingHeatMapModel(tracker: OTTracker): TrackerChartModel<ITimeBinnedHeat
                                 }
                             }
 
-                            println("rows during ${TimeHelper.FORMAT_DATETIME.format(Date(queryFrom))} ~ ${TimeHelper.FORMAT_DATETIME.format(Date(queryTo))} : count: ${counter}")
+                            //println("rows during ${TimeHelper.FORMAT_DATETIME.format(Date(queryFrom))} ~ ${TimeHelper.FORMAT_DATETIME.format(Date(queryTo))} : count: ${counter}")
 
                             countMatrix[xIndex][hourOfDay / hoursInYBin] += counter
 
