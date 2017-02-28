@@ -75,21 +75,23 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
 
                 builder.autoComplete().subscribe({}, {}, {
                     val item = builder.makeItem(source)
-                    FirebaseHelper.saveItem(item, tracker)
-                    if (item.objectId != null) {
-                        sendBroadcast(context, OTApplication.BROADCAST_ACTION_BACKGROUND_LOGGING_SUCCEEDED, tracker, item.objectId!!, notify)
-                        OTApplication.logger.writeSystemLog("${tracker.name} background logging was successful", TAG)
-                        removeLoggingFlag(tracker)
-                        if (!subscriber.isUnsubscribed) {
-                            subscriber.onNext(0)
-                            subscriber.onCompleted()
-                        }
-                    } else {
+                    FirebaseHelper.saveItem(item, tracker) {
+                        success ->
+                        if (success) {
+                            sendBroadcast(context, OTApplication.BROADCAST_ACTION_BACKGROUND_LOGGING_SUCCEEDED, tracker, item.objectId!!, notify)
+                            OTApplication.logger.writeSystemLog("${tracker.name} background logging was successful", TAG)
+                            removeLoggingFlag(tracker)
+                            if (!subscriber.isUnsubscribed) {
+                                subscriber.onNext(0)
+                                subscriber.onCompleted()
+                            }
+                        } else {
 
-                        OTApplication.logger.writeSystemLog("${tracker.name} background logging failed", TAG)
-                        removeLoggingFlag(tracker)
-                        if (!subscriber.isUnsubscribed) {
-                            subscriber.onError(Exception("Item storing failed"))
+                            OTApplication.logger.writeSystemLog("${tracker.name} background logging failed", TAG)
+                            removeLoggingFlag(tracker)
+                            if (!subscriber.isUnsubscribed) {
+                                subscriber.onError(Exception("Item storing failed"))
+                            }
                         }
                     }
                 })

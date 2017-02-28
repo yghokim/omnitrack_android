@@ -2,8 +2,6 @@ package kr.ac.snu.hcil.omnitrack.core.database
 
 import android.content.Intent
 import android.support.annotation.Keep
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.android.gms.tasks.Task
 import com.google.firebase.database.*
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTItem
@@ -509,14 +507,18 @@ object FirebaseHelper {
         //deleteObjects(DatabaseHelper.ItemScheme, item.objectId!!)
         val itemId = item.objectId
         if (itemId != null) {
-            getItemListOfTrackerChild(item.trackerObjectId)?.child(itemId)?.removeValue { databaseError, databaseReference ->
-                if (databaseError == null) {
-                    val intent = Intent(OTApplication.BROADCAST_ACTION_ITEM_REMOVED)
+            removeItem(item.trackerObjectId, itemId)
+        }
+    }
 
-                    intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, item.trackerObjectId)
+    fun removeItem(trackerId: String, itemId: String) {
+        getItemListOfTrackerChild(trackerId)?.child(itemId)?.removeValue { databaseError, databaseReference ->
+            if (databaseError == null) {
+                val intent = Intent(OTApplication.BROADCAST_ACTION_ITEM_REMOVED)
 
-                    OTApplication.app.sendBroadcast(intent)
-                }
+                intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
+
+                OTApplication.app.sendBroadcast(intent)
             }
         }
     }
@@ -759,7 +761,7 @@ object FirebaseHelper {
         }
     }
 
-    fun saveItem(item: OTItem, tracker: OTTracker, notifyIntent: Boolean = true) {
+    fun saveItem(item: OTItem, tracker: OTTracker, notifyIntent: Boolean = true, finished: ((Boolean) -> Unit)? = null) {
         val pojo = ItemPOJO()
         pojo.timestamp = if (item.timestamp != -1L) {
             item.timestamp
@@ -790,28 +792,30 @@ object FirebaseHelper {
             getItemListOfTrackerChild(tracker.objectId)?.child(item.objectId!!)
         } else getItemListOfTrackerChild(tracker.objectId)?.push()
 
-        itemRef?.setValue(pojo)?.addOnCompleteListener(object : OnCompleteListener<Void> {
-            override fun onComplete(task: Task<Void>) {
-                if (task.isSuccessful) {
-                    if (item.objectId == null)
-                        item.objectId = itemRef.key
+        itemRef?.setValue(pojo)?.addOnCompleteListener {
+            task ->
+            if (task.isSuccessful) {
+                if (item.objectId == null)
+                    item.objectId = itemRef.key
 
-                    if (notifyIntent) {
-                        val intent = Intent(when (result) {
-                            SAVE_RESULT_NEW -> OTApplication.BROADCAST_ACTION_ITEM_ADDED
-                            SAVE_RESULT_EDIT -> OTApplication.BROADCAST_ACTION_ITEM_EDITED
-                            else -> throw IllegalArgumentException("")
-                        })
+                if (notifyIntent) {
+                    val intent = Intent(when (result) {
+                        SAVE_RESULT_NEW -> OTApplication.BROADCAST_ACTION_ITEM_ADDED
+                        SAVE_RESULT_EDIT -> OTApplication.BROADCAST_ACTION_ITEM_EDITED
+                        else -> throw IllegalArgumentException("")
+                    })
 
-                        intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
-                        intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, item.objectId)
+                    intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
+                    intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, item.objectId)
 
-                        OTApplication.app.sendBroadcast(intent)
-                    }
+                    OTApplication.app.sendBroadcast(intent)
                 }
-            }
 
-        })
+                finished?.invoke(true)
+            } else {
+                finished?.invoke(false)
+            }
+        }
 
         /*
         * val values = ContentValues()
