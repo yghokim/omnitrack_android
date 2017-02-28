@@ -101,7 +101,7 @@ object OTNotificationManager {
         notificationService.cancel(getNewBackgroundLoggingNotificationId(tracker))
     }
 
-    fun pushBackgroundLoggingSuccessNotification(context: Context, tracker: OTTracker, itemDbId: Long, loggedTime: Long) {
+    fun pushBackgroundLoggingSuccessNotification(context: Context, tracker: OTTracker, itemId: String, loggedTime: Long) {
         val stackBuilder = TaskStackBuilder.create(context)
         // Adds the back stack for the Intent (but not the Intent itself)
         stackBuilder.addParentStack(ItemBrowserActivity::class.java)
@@ -113,7 +113,7 @@ object OTNotificationManager {
 
         val itemRemoveIntent = Intent(OTApplication.BROADCAST_ACTION_COMMAND_REMOVE_ITEM)
         itemRemoveIntent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
-        itemRemoveIntent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, itemDbId)
+        itemRemoveIntent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, itemId)
 
         val discardAction = NotificationCompat.Action.Builder(R.drawable.ex,
                 context.resources.getString(R.string.msg_notification_action_discard_item),
