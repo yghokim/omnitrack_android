@@ -4,6 +4,9 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.database.FirebaseHelper
+import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
+import rx.Subscription
+import rx.functions.Action1
 import rx.internal.util.SubscriptionList
 import rx.subjects.PublishSubject
 import rx.subjects.SerializedSubject
@@ -15,6 +18,13 @@ import java.util.*
 class OTTriggerManager(val user: OTUser) {
 
     private val subscriptions = SubscriptionList()
+
+    private val subscriptionListPerTrigger = HashMap<OTTrigger, SubscriptionList>()
+
+    private val onTriggerFired = Action1<ReadOnlyPair<OTTrigger, Long>> {
+        result ->
+        onTriggerFired(result.first, result.second)
+    }
 
     init {
         subscriptions.add(
@@ -42,7 +52,9 @@ class OTTriggerManager(val user: OTUser) {
             triggers += loadedTriggers
 
             triggers.forEach {
-                it.fired += triggerFiredHandler
+                addSubscriptionToTrigger(it,
+                        it.fired.subscribe(onTriggerFired))
+
                 it.activateOnSystem(OTApplication.app.applicationContext)
             }
         }
@@ -55,9 +67,11 @@ class OTTriggerManager(val user: OTUser) {
     val triggerAdded = SerializedSubject(PublishSubject.create<OTTrigger>())
     val triggerRemoved = SerializedSubject(PublishSubject.create<OTTrigger>())
 
-    private val triggerFiredHandler = {
-        sender: Any, triggerTime: Long ->
-        onTriggerFired(sender as OTTrigger, triggerTime)
+    fun addSubscriptionToTrigger(trigger: OTTrigger, subscription: Subscription) {
+        if (subscriptionListPerTrigger[trigger] == null) {
+            subscriptionListPerTrigger[trigger] = SubscriptionList()
+        }
+        subscriptionListPerTrigger[trigger]?.add(subscription)
     }
 
     fun getTriggerWithId(objId: String): OTTrigger? {
@@ -95,12 +109,15 @@ class OTTriggerManager(val user: OTUser) {
             trigger.detachFromSystem()
         }
         subscriptions.clear()
+        subscriptionListPerTrigger.clear()
     }
+
 
     fun putNewTrigger(trigger: OTTrigger) {
         if (triggers.find { it.objectId == trigger.objectId } == null) {
             triggers.add(trigger)
-            trigger.fired += triggerFiredHandler
+
+            addSubscriptionToTrigger(trigger, trigger.fired.subscribe(onTriggerFired))
 
             if (trigger.isOn) {
                 trigger.activateOnSystem(OTApplication.app.applicationContext)
@@ -119,7 +136,8 @@ class OTTriggerManager(val user: OTUser) {
 
     fun removeTrigger(trigger: OTTrigger) {
         triggers.remove(trigger)
-        trigger.fired -= triggerFiredHandler
+        subscriptionListPerTrigger[trigger]?.clear()
+        subscriptionListPerTrigger.remove(trigger)
 
         trigger.suspendDatabaseSync = true
         trigger.isOn = false
