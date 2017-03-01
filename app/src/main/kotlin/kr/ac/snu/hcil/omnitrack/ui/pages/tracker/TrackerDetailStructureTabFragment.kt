@@ -26,6 +26,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.AttributePresetInfo
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
+import kr.ac.snu.hcil.omnitrack.core.database.EventLoggingManager
 import kr.ac.snu.hcil.omnitrack.ui.DragItemTouchHelperCallback
 import kr.ac.snu.hcil.omnitrack.ui.components.common.FallbackRecyclerView
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
@@ -111,6 +112,11 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
             sender, isOnShortcut ->
             if (tracker?.isOnShortcut != isOnShortcut) {
                 tracker?.isOnShortcut = isOnShortcut
+
+                tracker?.let {
+                    EventLoggingManager.logTrackerOnShortcutChangeEvent(it, isOnShortcut)
+                }
+
                 if (tracker?.isOnShortcut == true) {
                     toastForAdded.show()
                 } else {
@@ -381,6 +387,9 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
                         tracker.attributes.remove(tracker.attributes[adapterPosition])
                         notifyItemRemoved(adapterPosition)
                         showRemovalSnackbar()
+                        if (removed != null) {
+                            EventLoggingManager.logAttributeChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_ATTRIBUTE_REMOVE, removed!!.typeId, removed!!.objectId, tracker.objectId)
+                        }
                     }
                 } else if (view === columnNameButton) {
                     val tracker = tracker
@@ -428,6 +437,7 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
         tracker?.let {
             val newAttribute = typeInfo.creater(tracker, tracker.generateNewAttributeName(typeInfo.name, context))
             tracker.attributes.add(newAttribute)
+            EventLoggingManager.logAttributeChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_ATTRIBUTE_ADD, newAttribute.typeId, newAttribute.objectId, tracker.objectId)
 
             attributeListAdapter.notifyItemInserted(tracker.attributes.size - 1)
             scrollToBottomReserved = true
