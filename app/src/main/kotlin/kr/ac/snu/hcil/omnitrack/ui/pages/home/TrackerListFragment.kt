@@ -217,6 +217,7 @@ class TrackerListFragment : OTFragment() {
                             createViewSubscriptions.add(
                                     this.user.trackerAdded.subscribe {
                                         trackerPair ->
+                                        trackerListAdapter.notifyItemChanged(trackerListAdapter.itemCount - 1)
                                         trackerListAdapter.notifyItemInserted(trackerPair.second)
                                     }
                             )
@@ -224,6 +225,7 @@ class TrackerListFragment : OTFragment() {
                             createViewSubscriptions.add(
                                     this.user.trackerRemoved.subscribe {
                                         trackerPair ->
+                                        trackerListAdapter.notifyItemChanged(trackerListAdapter.itemCount - 1)
                                         trackerListAdapter.notifyItemRemoved(trackerPair.second)
                                     }
                             )
