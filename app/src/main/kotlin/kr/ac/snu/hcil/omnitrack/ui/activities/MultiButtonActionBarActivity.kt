@@ -14,7 +14,6 @@ import android.view.View
 import android.widget.ImageButton
 import android.widget.TextView
 import butterknife.bindView
-import com.google.gson.JsonObject
 import kr.ac.snu.hcil.omnitrack.R
 
 /**
@@ -36,7 +35,7 @@ abstract class MultiButtonActionBarActivity(val layoutId: Int) : OTActivity() {
 
     private var isCanceled = false
 
-    override fun onSessionLogContent(contentObject: JsonObject) {
+    override fun onSessionLogContent(contentObject: Bundle) {
         super.onSessionLogContent(contentObject)
     }
 

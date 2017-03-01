@@ -1,8 +1,8 @@
 package kr.ac.snu.hcil.omnitrack.ui.activities
 
+import android.os.Bundle
 import android.support.v4.app.Fragment
-import com.google.gson.JsonObject
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.core.database.EventLoggingManager
 
 /**
  * Created by younghokim on 2016. 11. 15..
@@ -41,18 +41,18 @@ open class OTFragment : Fragment() {
 
             val elapsed = System.currentTimeMillis() - shownAt!!
 
-            val contentObject = JsonObject()
-            contentObject.addProperty("caused_by_activity_pause", activityPausing)
-            contentObject.addProperty("activity", activity.javaClass.simpleName)
+            val contentObject = Bundle()
+            contentObject.putBoolean("caused_by_activity_pause", activityPausing)
+            contentObject.putString("parent_activity", activity.javaClass.simpleName)
             onSessionLogContent(contentObject)
 
             val now = System.currentTimeMillis()
-            OTApplication.logger.writeSessionLog(this, elapsed, now, null, contentObject.toString())
+            EventLoggingManager.logSession(this, elapsed, now, null, contentObject)
 
             println("finished fragment ${this.javaClass.simpleName}. uptime: $elapsed, ${contentObject.toString()}")
         }
     }
 
-    protected open fun onSessionLogContent(contentObject: JsonObject) {
+    protected open fun onSessionLogContent(contentObject: Bundle) {
     }
 }
