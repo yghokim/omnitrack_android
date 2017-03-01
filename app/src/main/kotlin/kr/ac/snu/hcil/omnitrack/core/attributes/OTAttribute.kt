@@ -141,6 +141,11 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
             }
         }
 
+    /**
+     * whether default value is stable or dynamic to time
+     * */
+    open val isAutoCompleteValueStatic: Boolean = true
+
     val removedFromTracker = Event<OTTracker>()
     val addedToTracker = Event<OTTracker>()
 
