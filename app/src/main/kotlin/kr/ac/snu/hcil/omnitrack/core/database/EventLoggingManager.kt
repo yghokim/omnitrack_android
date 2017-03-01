@@ -31,6 +31,8 @@ object EventLoggingManager {
     const val EVENT_NAME_CHANGE_TRIGGER_REMOVE = "change_trigger_remove"
     const val EVENT_NAME_CHANGE_TRIGGER_SWITCH = "change_trigger_switch"
 
+    const val EVENT_NAME_SESSION = "session"
+
     private val analytics: FirebaseAnalytics by lazy {
         FirebaseAnalytics.getInstance(OTApplication.app)
     }
@@ -87,5 +89,18 @@ object EventLoggingManager {
             putInt("trigger_type", type)
             putInt("trigger_action", action)
         }
+    }
+
+    fun logSession(activity: Any, elapsed: Long, finishedAt: Long, from: String?, content: Bundle) {
+
+        content.putString("session", activity.javaClass.simpleName)
+        content.putLong("elapsed", elapsed)
+        content.putLong("finished_at", finishedAt)
+
+        if (from != null) {
+            content.putString("from", from)
+        }
+
+        logEvent(EVENT_NAME_SESSION, content)
     }
 }

@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.activities
 
+import android.os.Bundle
 import android.support.v4.content.ContextCompat
-import com.google.gson.JsonObject
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
@@ -51,10 +51,10 @@ abstract class OTTrackerAttachedActivity(layoutId: Int) : MultiButtonActionBarAc
     protected open fun onTrackerLoaded(tracker: OTTracker) {
     }
 
-    override fun onSessionLogContent(contentObject: JsonObject) {
+    override fun onSessionLogContent(contentObject: Bundle) {
         super.onSessionLogContent(contentObject)
-        contentObject.addProperty("tracker_id", tracker?.objectId)
-        contentObject.addProperty("tracker_name", tracker?.name)
+        contentObject.putString("tracker_id", tracker?.objectId)
+        contentObject.putString("tracker_name", tracker?.name)
     }
 
 }
