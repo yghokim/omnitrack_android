@@ -62,6 +62,8 @@ class OTTimeAttribute(objectId: String?, localKey: Int?, parentTracker: OTTracke
 
     private val calendar = GregorianCalendar()
 
+    override val isAutoCompleteValueStatic: Boolean = false
+
     var granularity: Int
         get() = getPropertyValue<Int>(GRANULARITY)
         set(value) = setPropertyValue(GRANULARITY, value)

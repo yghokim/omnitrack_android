@@ -14,6 +14,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.MapImageView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Observable
+import rx.subscriptions.Subscriptions
 
 /**
  * Created by Young-Ho on 8/2/2016.
@@ -42,6 +43,8 @@ class OTLocationAttribute(objectId: String?, localKey: Int?, parentTracker: OTTr
 
     override val typeSmallIconResourceId: Int = R.drawable.icon_small_location
 
+    override val isAutoCompleteValueStatic: Boolean = false
+
     override fun createProperties() {
 
     }
@@ -66,6 +69,8 @@ class OTLocationAttribute(objectId: String?, localKey: Int?, parentTracker: OTTr
                     subscriber.onCompleted()
                 }
             }
+
+            subscriber.add(Subscriptions.create { sm.stop() })
         }
 
         /*

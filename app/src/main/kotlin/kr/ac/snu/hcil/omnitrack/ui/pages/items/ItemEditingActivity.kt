@@ -89,11 +89,11 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
 
     private var itemSaved: Boolean = false
 
-    private val createSubscriptions = CompositeSubscription()
     private val startSubscriptions = CompositeSubscription()
     private val resumeSubscriptions = CompositeSubscription()
 
-
+    private val initialValueSnapshot = Hashtable<String, Any>()
+    private val snapshot = Hashtable<String, Any>()
 
     override fun onSessionLogContent(contentObject: JsonObject) {
         super.onSessionLogContent(contentObject)
@@ -116,8 +116,12 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
             view ->
             builder = OTItemBuilder(tracker!!, OTItemBuilder.MODE_FOREGROUND)
 
-            createSubscriptions.add(
-                    builder.autoComplete(this).subscribe { println("Finished builder autocomplete.") }
+            creationSubscriptions.add(
+                    builder.autoComplete(this).subscribe {
+                        println("Finished builder autocomplete.")
+                        snapshot(builder)
+                        snapshotInitialValue(builder)
+                    }
             )
 
             builderRestoredSnackbar.dismiss()
@@ -132,13 +136,20 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
             if (mode == Mode.New && activityResultAppliedAttributePosition == -1) {
                 if (tryRestoreItemBuilderCache(tracker)) {
 
+                    clearBuilderCache()
+
                     //Toast.makeText(this, "Past inputs were restored.", Toast.LENGTH_SHORT).show()
                     builderRestoredSnackbar.show()
+                    snapshot(builder)
                 } else {
                     //new builder was created
                     println("Start builder autocomplete")
                     startSubscriptions.add(
-                            builder.autoComplete(this).subscribe { println("Finished builder autocomplete.") }
+                            builder.autoComplete(this).subscribe {
+                                println("Finished builder autocomplete.");
+                                snapshot(builder)
+                                snapshotInitialValue(builder)
+                            }
                     )
                 }
             }
@@ -203,7 +214,8 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
 
         if (mode == Mode.New) {
             if (!skipViewValueCaching) {
-                storeItemBuilderCache()
+                if (needsToCacheBuilder())
+                    storeItemBuilderCache()
                 //Toast.makeText(this, "Filled form content was stored.", Toast.LENGTH_SHORT).show()
 
             } else {
@@ -226,9 +238,6 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
         for (inputView in attributeListAdapter.inputViews) {
             inputView.onDestroy()
         }
-
-        println("createSubscriptions has subscriptoin: ${createSubscriptions.hasSubscriptions()}")
-        createSubscriptions.clear()
     }
 
     override fun onStop() {
@@ -269,6 +278,34 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
         return "tracker_${tracker.objectId}"
     }
 
+    private fun snapshot(builder: OTItemBuilder) {
+        println("snapshot now")
+        snapshot.clear()
+        for (key in builder.keys) {
+            snapshot[key] = builder.getValueWithKey(key)
+        }
+    }
+
+    private fun snapshotInitialValue(builder: OTItemBuilder) {
+        println("snapshot now")
+        initialValueSnapshot.clear()
+        for (key in builder.keys) {
+            initialValueSnapshot[key] = builder.getValueWithKey(key)
+        }
+    }
+
+    private fun needsToCacheBuilder(): Boolean {
+        if (tracker?.attributes?.unObservedList?.find { (it.valueConnection != null && it.isConnectionValid(null)) || !it.isAutoCompleteValueStatic } != null) {
+            return true
+        } else {
+            //there is no connection, and every field is static
+            return tracker?.attributes?.unObservedList?.find {
+                it.valueConnection == null && it.isAutoCompleteValueStatic &&
+                        (builder.getValueWithKey(it.objectId) != initialValueSnapshot[it.objectId])
+            } != null
+        }
+    }
+
     private fun syncViewStateToBuilderAsync(finished: (() -> Unit)?) {
         println("grab inputView's values to ItemBuilder.")
         val waitingAttributes = ArrayList<OTAttribute<out Any>>()
@@ -293,10 +330,7 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
             result ->
             builder.setValueOf(result.first, result.second)
         },
-                {
-                    ex ->
-                    ex.printStackTrace()
-                },
+                Throwable::printStackTrace,
                 {
                     finished?.invoke()
                 })
@@ -364,6 +398,8 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
         if (attribute != null) {
             println("set item builder ${attribute.typeId}, ${attributeId}")
             builder.setValueOf(attribute, newVal)
+
+            builderRestoredSnackbar.dismiss()
         }
     }
 
