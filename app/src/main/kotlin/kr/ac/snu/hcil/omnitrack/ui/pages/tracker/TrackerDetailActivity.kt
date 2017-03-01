@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.tracker
 
 import android.animation.Animator
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.ColorDrawable
@@ -160,6 +161,8 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
             }
         }
 
+        setResult(Activity.RESULT_CANCELED)
+
         finish()
     }
 
@@ -171,6 +174,8 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
     override fun onToolbarRightButtonClicked() {
             //add
         if (!isEditMode) {
+
+            setResult(RESULT_OK, Intent().putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker?.objectId))
             finish()
             /*
             signedInUserObservable.subscribe(){

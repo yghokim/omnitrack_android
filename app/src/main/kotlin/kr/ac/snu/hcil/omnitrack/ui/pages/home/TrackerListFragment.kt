@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.home
 
 import android.animation.Animator
 import android.animation.ValueAnimator
+import android.app.Activity.RESULT_OK
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -36,6 +37,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
+import kr.ac.snu.hcil.omnitrack.core.database.EventLoggingManager
 import kr.ac.snu.hcil.omnitrack.core.database.FirebaseHelper
 import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
@@ -129,6 +131,8 @@ class TrackerListFragment : OTFragment() {
         const val CHANGE_TRACKER_SETTINGS = 0
         const val REMOVE_TRACKER = 1
 
+        const val REQUEST_CODE_NEW_TRACKER = 1504
+
         const val STATE_EXPANDED_TRACKER_INDEX = "expandedTrackerIndex"
 
         //val transition = AutoTransition()
@@ -185,7 +189,7 @@ class TrackerListFragment : OTFragment() {
                 newTrackerNameDialog.input(null, user.generateNewTrackerName(context), false) {
                     dialog, text ->
                     val newTracker = user.newTracker(text.toString(), true)
-                    startActivityOnDelay(TrackerDetailActivity.makeIntent(newTracker.objectId, context, true))
+                    startActivityForResult(TrackerDetailActivity.makeIntent(newTracker.objectId, context, true), REQUEST_CODE_NEW_TRACKER)
 
                 }.show()
                 //Toast.makeText(context,String.format(resources.getString(R.string.sentence_new_tracker_added), newTracker.name), Toast.LENGTH_LONG).show()
@@ -243,6 +247,33 @@ class TrackerListFragment : OTFragment() {
 
     override fun onDestroy() {
         super.onDestroy()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_CODE_NEW_TRACKER) {
+            if (resultCode == RESULT_OK) {
+                if (data != null) {
+                    if (data.hasExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)) {
+                        val newTrackerId = data.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
+                        val activity = activity
+                        if (activity != null) {
+                            if (activity is OTActivity) {
+                                resumeSubscriptions.add(
+                                        activity.signedInUserObservable.subscribe {
+                                            user ->
+                                            val newTracker = user[newTrackerId]
+                                            if (newTracker != null) {
+                                                EventLoggingManager.logTrackerChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_TRACKER_ADD, newTracker)
+                                            }
+                                        }
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     override fun onPause() {
@@ -463,7 +494,11 @@ class TrackerListFragment : OTFragment() {
                     startActivityOnDelay(ItemBrowserActivity.makeIntent(user.trackers[adapterPosition], this@TrackerListFragment.context))
                 } else if (view === removeButton) {
                     val tracker = user.trackers[adapterPosition]
-                    DialogHelper.makeYesNoDialogBuilder(context, tracker.name, getString(R.string.msg_confirm_remove_tracker), { -> user.trackers.remove(tracker); listView.invalidateItemDecorations(); }).show()
+                    DialogHelper.makeYesNoDialogBuilder(context, tracker.name, getString(R.string.msg_confirm_remove_tracker), { ->
+                        user.trackers.remove(tracker);
+                        listView.invalidateItemDecorations();
+                        EventLoggingManager.logTrackerChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_TRACKER_REMOVE, tracker)
+                    }).show()
                 } else if (view === chartViewButton) {
                     val tracker = user.trackers[adapterPosition]
                     startActivityOnDelay(ChartViewActivity.makeIntent(tracker.objectId, this@TrackerListFragment.context))

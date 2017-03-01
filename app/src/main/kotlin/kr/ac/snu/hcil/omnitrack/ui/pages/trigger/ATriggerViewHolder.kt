@@ -12,6 +12,7 @@ import android.view.ViewStub
 import android.widget.TextView
 import butterknife.bindView
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.database.EventLoggingManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.common.SwipelessSwitchCompat
@@ -469,8 +470,11 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
             listener.onTriggerCollapse(adapterPosition, this)
         }*/ else if (view === triggerSwitch) {
             trigger.isOn = triggerSwitch.isChecked
+            val eventParams = EventLoggingManager.makeTriggerChangeEventParams(trigger.objectId, trigger.typeId, trigger.action)
+            eventParams.putBoolean("switch", trigger.isOn)
+            EventLoggingManager.logEvent(EventLoggingManager.EVENT_NAME_CHANGE_TRIGGER_SWITCH, eventParams)
+
         } else if (view === itemView) {
-            //TODO open trigger editing activity
             listener.onTriggerEditRequested(adapterPosition, this)
         }
         /* else if (view === bottomBar || view === itemView) {
