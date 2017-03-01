@@ -66,10 +66,41 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
     private val errorMessages = ArrayList<String>()
 
     private var startSubscriptions = SubscriptionList()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setActionBarButtonMode(Mode.SaveCancel)
+
+        if (intent.hasExtra(INTENT_EXTRA_HIDE_ATTACHED_TRACKERS)) {
+            hideAttachedTrackers = intent.getBooleanExtra(INTENT_EXTRA_HIDE_ATTACHED_TRACKERS, false)
+        }
+
+        creationSubscriptions.add(
+                signedInUserObservable.subscribe {
+                    user ->
+                    this.user = user
+                    if (intent.hasExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRIGGER)) {
+                        val triggerId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRIGGER)
+                        attachedTrigger = user.triggerManager.getTriggerWithId(triggerId)
+                        this.triggerId = triggerId
+                        triggerType = attachedTrigger?.typeId ?: -1
+                        triggerAction = attachedTrigger?.action ?: -1
+                        //attachedTrigger?.dumpDataToPojo(null)?.toMutable(currentTriggerPojo)
+
+                        title = resources.getString(R.string.title_activity_trigger_edit)
+                        setActionBarButtonMode(Mode.ApplyCancel)
+                    } else {
+                        triggerType = intent.getIntExtra(INTENT_EXTRA_TRIGGER_TYPE, -1)
+                        triggerAction = intent.getIntExtra(INTENT_EXTRA_TRIGGER_ACTION, -1)
+
+                        title = resources.getString(R.string.title_activity_trigger_new)
+                        setActionBarButtonMode(Mode.SaveCancel)
+
+                    }
+
+
+                    onUserLoaded(user)
+                }
+        )
     }
 
     override fun onToolbarLeftButtonClicked() {
@@ -179,42 +210,6 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-
-        if (intent.hasExtra(INTENT_EXTRA_HIDE_ATTACHED_TRACKERS)) {
-            hideAttachedTrackers = intent.getBooleanExtra(INTENT_EXTRA_HIDE_ATTACHED_TRACKERS, false)
-        }
-
-        startSubscriptions.add(
-                signedInUserObservable.subscribe {
-                    user ->
-                    this.user = user
-                    if (intent.hasExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRIGGER)) {
-                        val triggerId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRIGGER)
-                        attachedTrigger = user.triggerManager.getTriggerWithId(triggerId)
-                        this.triggerId = triggerId
-                        triggerType = attachedTrigger?.typeId ?: -1
-                        triggerAction = attachedTrigger?.action ?: -1
-                        //attachedTrigger?.dumpDataToPojo(null)?.toMutable(currentTriggerPojo)
-
-                        title = resources.getString(R.string.title_activity_trigger_edit)
-                        setActionBarButtonMode(Mode.ApplyCancel)
-                    } else {
-                        triggerType = intent.getIntExtra(INTENT_EXTRA_TRIGGER_TYPE, -1)
-                        triggerAction = intent.getIntExtra(INTENT_EXTRA_TRIGGER_ACTION, -1)
-
-                        title = resources.getString(R.string.title_activity_trigger_new)
-                        setActionBarButtonMode(Mode.SaveCancel)
-
-                    }
-
-
-                    onUserLoaded(user)
-                }
-        )
-    }
-
     fun onUserLoaded(user: OTUser) {
         if (hideAttachedTrackers) {
             trackerAssignPanelContainer?.visibility = View.GONE
@@ -247,9 +242,13 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
 
     override fun onStop() {
         super.onStop()
+        startSubscriptions.clear()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
         user = null
         attachedTrigger = null
-        startSubscriptions.clear()
     }
 
 
