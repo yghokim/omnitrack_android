@@ -45,6 +45,8 @@ class OTTimeSpanAttribute(objectId: String?, localKey: Int?, parentTracker: OTTr
         setPropertyValue(PROPERTY_GRANULARITY, GRANULARITY_DAY)
     }
 
+    override val isAutoCompleteValueStatic: Boolean = false
+
     override val valueNumericCharacteristics: NumericCharacteristics = NumericCharacteristics(true, false)
 
     val granularity: Int get() = getPropertyValue(PROPERTY_GRANULARITY)
