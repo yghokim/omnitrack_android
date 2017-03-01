@@ -13,7 +13,6 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import butterknife.bindView
-import com.google.gson.JsonObject
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
@@ -69,10 +68,10 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
     private val startSubscriptions = SubscriptionList()
 
-    override fun onSessionLogContent(contentObject: JsonObject) {
+    override fun onSessionLogContent(contentObject: Bundle) {
         super.onSessionLogContent(contentObject)
-        contentObject.addProperty("attribute_id", attribute?.objectId)
-        contentObject.addProperty("attribute_name", attribute?.name)
+        contentObject.putString("attribute_id", attribute?.objectId)
+        contentObject.putString("attribute_name", attribute?.name)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

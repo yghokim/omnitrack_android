@@ -15,7 +15,6 @@ import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewPager
 import at.markushi.ui.RevealColorView
 import butterknife.bindView
-import com.google.gson.JsonObject
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
@@ -68,9 +67,9 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
 
     val trackerColorOnUI = BehaviorSubject.create<Int>()
 
-    override fun onSessionLogContent(contentObject: JsonObject) {
+    override fun onSessionLogContent(contentObject: Bundle) {
         super.onSessionLogContent(contentObject)
-        contentObject.addProperty("isEditMode", isEditMode)
+        contentObject.putBoolean("isEditMode", isEditMode)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

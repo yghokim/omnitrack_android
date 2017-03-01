@@ -15,7 +15,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import butterknife.bindView
-import com.google.gson.JsonObject
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItem
@@ -95,11 +94,11 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
     private val initialValueSnapshot = Hashtable<String, Any>()
     private val snapshot = Hashtable<String, Any>()
 
-    override fun onSessionLogContent(contentObject: JsonObject) {
+    override fun onSessionLogContent(contentObject: Bundle) {
         super.onSessionLogContent(contentObject)
-        contentObject.addProperty("mode", mode.name)
+        contentObject.putString("mode", mode.name)
         if (isFinishing) {
-            contentObject.addProperty("item_saved", itemSaved)
+            contentObject.putBoolean("item_saved", itemSaved)
         }
     }
 
