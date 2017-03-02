@@ -20,7 +20,6 @@ import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.database.CacheHelper
 import kr.ac.snu.hcil.omnitrack.core.database.DatabaseHelper
-import kr.ac.snu.hcil.omnitrack.core.database.FirebaseHelper
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
@@ -284,7 +283,7 @@ class OTApplication : MultiDexApplication() {
         if (_currentUser != null) {
             OTUser.storeOrOverwriteInstanceCache(_currentUser!!, systemSharedPreferences)
             //dbHelper.save(_currentUser!!)
-            FirebaseHelper.saveUser(_currentUser!!)
+            //FirebaseHelper.saveUser(_currentUser!!)
         }
     }
 
