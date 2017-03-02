@@ -873,7 +873,9 @@ object FirebaseHelper {
                     }
 
                     override fun onDataChange(snapshot: DataSnapshot) {
-                        subscriber.onSuccess(snapshot.exists())
+                        if (!subscriber.isUnsubscribed) {
+                            subscriber.onSuccess(snapshot.exists())
+                        }
                     }
 
                 }
