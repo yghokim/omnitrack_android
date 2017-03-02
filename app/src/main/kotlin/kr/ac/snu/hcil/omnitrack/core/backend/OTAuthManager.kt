@@ -15,8 +15,11 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.*
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.database.FirebaseHelper
 import kr.ac.snu.hcil.omnitrack.utils.getActivity
 import rx.Observable
+import rx.Single
+import rx.schedulers.Schedulers
 import java.util.*
 import java.util.concurrent.Executors
 
@@ -225,6 +228,24 @@ object OTAuthManager {
                 firebaseAuthWithGoogle(googleSignInAccount).subscribe({
                     authResult ->
                     reloadUserInfo()
+
+                    FirebaseHelper.checkHasDeviceId(authResult.user.uid, OTApplication.app.deviceId).flatMap {
+                        hasDevice: Boolean ->
+                        if (hasDevice) {
+                            Single.just(null)
+                        } else {
+                            FirebaseHelper.addDeviceInfoToUser(authResult.user.uid, OTApplication.app.deviceId)
+                        }
+                    }.subscribeOn(Schedulers.io()).subscribe({
+                        info ->
+                        if (info != null) {
+                            println("added new device info.")
+                        }
+                    }, {
+                        //TODO cache failed deviceInfo and retry later.
+                    })
+
+
                     notifySignedIn(authResult.user)
                     resultHandler?.onSuccess()
                 }, {
@@ -281,6 +302,11 @@ object OTAuthManager {
     }
 
     fun signOut() {
+        val uid = userId
+        if (uid != null) {
+            FirebaseHelper.removeDeviceInfo(uid, OTApplication.app.deviceId).subscribe { }
+        }
+
         clearUserInfo()
         mFirebaseAuth.signOut()
         Auth.GoogleSignInApi.signOut(mGoogleApiClient)

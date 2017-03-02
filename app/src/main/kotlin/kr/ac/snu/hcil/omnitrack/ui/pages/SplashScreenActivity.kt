@@ -1,6 +1,8 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages
 
+import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
@@ -13,6 +15,15 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 class SplashScreenActivity : OTActivity(checkRefreshingCredential = true) {
 
     private val LOG_TAG = SplashScreenActivity::class.java.simpleName
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val pref = getSharedPreferences("app_info", Context.MODE_PRIVATE)
+
+        if (pref.getBoolean("first_launch in this system", false)) {
+            //first run
+        }
+    }
 
     override fun onSignInProcessCompletelyFinished() {
         super.onSignInProcessCompletelyFinished()
