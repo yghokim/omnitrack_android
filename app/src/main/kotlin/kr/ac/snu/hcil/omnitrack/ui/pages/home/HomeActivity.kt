@@ -124,9 +124,25 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), OTAut
                             requestPermissions(permissions,
                                     10)
                         }
+
+
+                        startSubscriptions.add(
+                                user.trackerAdded.subscribe {
+                                    trackerPair ->
+                                    val permissionsForTracker = trackerPair.first.getRequiredPermissions().filter {
+                                        checkSelfPermission(it) != PackageManager.PERMISSION_GRANTED
+                                    }.toTypedArray()
+
+                                    if (permissionsForTracker.isNotEmpty()) {
+                                        requestPermissions(permissionsForTracker,
+                                                10)
+                                    }
+                                }
+                        )
                     }
 
                     sidebar.refresh(user)
+
                     /*
                     val provider = AWSMobileClient.defaultMobileClient().identityManager.currentIdentityProvider
                     AWSMobileClient.defaultMobileClient().identityManager.loadUserInfoAndImage(
