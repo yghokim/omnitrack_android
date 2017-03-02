@@ -16,6 +16,7 @@ import android.widget.TextView
 import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.database.EventLoggingManager
 import kr.ac.snu.hcil.omnitrack.core.database.FirebaseHelper
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
@@ -216,6 +217,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
                             user ->
                             val newTrigger = OTTrigger.makeInstance(FirebaseHelper.generateNewKey(FirebaseHelper.CHILD_NAME_TRIGGERS), user, triggerPojo)
                             appendNewTrigger(newTrigger)
+                            EventLoggingManager.logTriggerChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_TRIGGER_ADD, newTrigger.objectId, newTrigger.typeId, newTrigger.action)
                         }
                     }
                 }
@@ -305,9 +307,12 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
                     }
                 }*/
 
-                triggerAdapter?.onRemoveTrigger(triggerAdapter!!.getTriggerAt(position))
+                val trigger = triggerAdapter!!.getTriggerAt(position)
+                triggerAdapter?.onRemoveTrigger(trigger)
                 this.notifyItemRemoved(position)
                 newTriggerButton.visibility = View.VISIBLE
+
+                EventLoggingManager.logTriggerChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_TRIGGER_REMOVE, trigger.objectId, trigger.typeId, trigger.action)
             }
         }
 

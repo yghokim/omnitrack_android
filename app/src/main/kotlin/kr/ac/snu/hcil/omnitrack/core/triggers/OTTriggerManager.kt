@@ -35,9 +35,14 @@ class OTTriggerManager(val user: OTUser) {
         subscriptions.add(
                 user.trackerRemoved.subscribe {
                     trackerPair ->
+                    println("TriggerManager: tracker was removed. find trigger that contains this tracker and handle it.")
+
                     for (trigger in getAttachedTriggers(trackerPair.first).clone()) {
                         //removeTrigger(trigger)
                         trigger.removeTracker(trackerPair.first)
+                        if (trigger.trackers.isEmpty() && trigger.isOn) {
+                            trigger.isOn = false
+                        }
             }
                 })
     }
@@ -61,7 +66,7 @@ class OTTriggerManager(val user: OTUser) {
 
     private val triggers = ArrayList<OTTrigger>()
 
-    private val trackerPivotedTriggerListCache = Hashtable<String, Array<OTTrigger>>()
+    //private val trackerPivotedTriggerListCache = Hashtable<String, Array<OTTrigger>>()
 
     val triggerAdded = SerializedSubject(PublishSubject.create<OTTrigger>())
     val triggerRemoved = SerializedSubject(PublishSubject.create<OTTrigger>())
@@ -84,6 +89,7 @@ class OTTriggerManager(val user: OTUser) {
     }
 
     fun getAttachedTriggers(tracker: OTTracker): Array<OTTrigger> {
+        /*
         if (trackerPivotedTriggerListCache.containsKey(tracker.objectId)) {
             //println("triggers cache hit")
         } else {
@@ -92,7 +98,9 @@ class OTTriggerManager(val user: OTUser) {
                     triggers.filter { it.trackers.contains(tracker) }.toTypedArray())
         }
 
-        return trackerPivotedTriggerListCache[tracker.objectId]!!
+        return trackerPivotedTriggerListCache[tracker.objectId]!!*/
+
+        return triggers.filter { it.trackers.contains(tracker) }.toTypedArray()
     }
 
     fun getAttachedTriggers(tracker: OTTracker, action: Int): Array<OTTrigger> {
@@ -122,13 +130,15 @@ class OTTriggerManager(val user: OTUser) {
                 trigger.activateOnSystem(OTApplication.app.applicationContext)
             }
 
+            /*
             for (tracker in trigger.trackers) {
                 if (trackerPivotedTriggerListCache.containsKey(tracker.objectId)) {
                     trackerPivotedTriggerListCache[tracker.objectId] =
                             trackerPivotedTriggerListCache[tracker.objectId]!! + trigger
                 }
-            }
+            }*/
 
+            FirebaseHelper.saveTrigger(trigger, user.objectId, triggers.indexOf(trigger))
             triggerAdded.onNext(trigger)
         }
     }
@@ -146,11 +156,12 @@ class OTTriggerManager(val user: OTUser) {
             OTApplication.app.timeTriggerAlarmManager.cancelTrigger(trigger)
         }
 
+        /*
         for (tracker in trigger.trackers) {
             if (trackerPivotedTriggerListCache.containsKey(tracker.objectId)) {
                 trackerPivotedTriggerListCache[tracker.objectId] = trackerPivotedTriggerListCache[tracker.objectId]!!.filter { it != trigger }.toTypedArray()
             }
-        }
+        }*/
 
         //TODO remove trigger from DB
         FirebaseHelper.removeTrigger(trigger)
