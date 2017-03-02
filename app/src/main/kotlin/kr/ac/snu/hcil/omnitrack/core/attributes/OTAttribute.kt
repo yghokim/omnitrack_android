@@ -73,7 +73,7 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
 
         init {
             permissionDict.put(TYPE_LOCATION, arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION))
-            permissionDict.put(TYPE_IMAGE, arrayOf(Manifest.permission.CAMERA))
+            permissionDict.put(TYPE_IMAGE, arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE))
             permissionDict.put(TYPE_AUDIO, arrayOf(Manifest.permission.RECORD_AUDIO))
         }
 
