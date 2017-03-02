@@ -118,7 +118,6 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
     private var triggerListDbReference: DatabaseReference? = null
     private val triggerListChangeEventListener: ChildEventListener
 
-
     init {
 
         if (_trackers != null) {

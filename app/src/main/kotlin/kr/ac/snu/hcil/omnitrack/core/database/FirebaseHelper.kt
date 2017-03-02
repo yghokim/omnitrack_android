@@ -18,6 +18,7 @@ import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Observable
+import rx.Single
 import rx.subscriptions.Subscriptions
 import java.io.Serializable
 import java.util.*
@@ -90,7 +91,7 @@ object FirebaseHelper {
         var properties: Map<String, String>? = null
     }
 
-
+    @Keep
     class MutableTriggerPOJO : NamedPOJO(), Serializable {
         var user: String? = null
         var position: Int = 0
@@ -153,6 +154,12 @@ object FirebaseHelper {
         var totalCount: Long? = null
         var todayCount: Int? = null
         var lastLoggingTime: Long? = null
+    }
+
+    @Keep
+    class DeviceInfo {
+        var os: String? = "Android api-${android.os.Build.VERSION.SDK_INT}"
+        var firstLoginAt: Any? = ServerValue.TIMESTAMP
     }
 
     @Keep
@@ -849,4 +856,72 @@ object FirebaseHelper {
 
     }
 
+    fun checkHasDeviceId(userId: String, deviceId: String): Single<Boolean> {
+        val query = FirebaseHelper.dbRef?.child(FirebaseHelper.CHILD_NAME_USERS)?.child(userId)?.child("devices")?.child(deviceId)
+        if (query != null) {
+            return Single.create {
+                subscriber ->
+                val listener = object : ValueEventListener {
+                    override fun onCancelled(error: DatabaseError) {
+                        if (!subscriber.isUnsubscribed) {
+                            subscriber.onError(error.toException())
+                        }
+                    }
+
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        subscriber.onSuccess(snapshot.exists())
+                    }
+
+                }
+                query.addListenerForSingleValueEvent(listener)
+                subscriber.add(Subscriptions.create { query.removeEventListener(listener) })
+            }
+        } else {
+            return Single.error(Exception("Database reference does not exist."))
+        }
+    }
+
+    fun addDeviceInfoToUser(userId: String, deviceId: String): Single<DeviceInfo> {
+        val query = FirebaseHelper.dbRef?.child(FirebaseHelper.CHILD_NAME_USERS)?.child(userId)?.child("devices")
+        if (query != null) {
+            return Single.create {
+                subscriber ->
+
+                val info = DeviceInfo()
+                query.child(deviceId).setValue(info).addOnCompleteListener({
+                    result ->
+                    if (!subscriber.isUnsubscribed) {
+                        if (result.isSuccessful) {
+                            subscriber.onSuccess(info)
+                        } else {
+                            subscriber.onError(result.exception)
+                        }
+                    }
+                })
+            }
+        } else {
+            return Single.error(Exception("Database reference does not exist."))
+        }
+    }
+
+    fun removeDeviceInfo(userId: String, deviceId: String): Single<Boolean> {
+        val query = FirebaseHelper.dbRef?.child(FirebaseHelper.CHILD_NAME_USERS)?.child(userId)?.child("devices")
+        if (query != null) {
+            return Single.create {
+                subscriber ->
+                query.child(deviceId).removeValue().addOnCompleteListener({
+                    result ->
+                    if (!subscriber.isUnsubscribed) {
+                        if (result.isSuccessful) {
+                            subscriber.onSuccess(true)
+                        } else {
+                            subscriber.onError(result.exception)
+                        }
+                    }
+                })
+            }
+        } else {
+            return Single.error(Exception("Database reference does not exist."))
+        }
+    }
 }
