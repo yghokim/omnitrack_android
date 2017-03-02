@@ -5,7 +5,10 @@ import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Looper
 import android.os.SystemClock
+import android.preference.PreferenceManager
+import android.provider.Settings
 import android.support.multidex.MultiDexApplication
+import android.telephony.TelephonyManager
 import android.text.format.DateUtils
 import com.squareup.leakcanary.LeakCanary
 import kr.ac.snu.hcil.omnitrack.core.OTItem
@@ -34,6 +37,7 @@ import kr.ac.snu.hcil.omnitrack.utils.UniqueStringEntryList
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
+import java.nio.charset.Charset
 import java.util.*
 
 /**
@@ -97,8 +101,32 @@ class OTApplication : MultiDexApplication() {
 
 
     val systemSharedPreferences: SharedPreferences by lazy {
-        getSharedPreferences(SHARED_PREFERENCES_USER_NAME, Context.MODE_PRIVATE)
+        PreferenceManager.getDefaultSharedPreferences(this)
     }
+
+    val deviceId: String by lazy {
+        val deviceUUID: UUID
+        val cached: String? = systemSharedPreferences.getString("cached_device_id", "")
+        if (!cached.isNullOrBlank()) {
+            deviceUUID = UUID.fromString(cached)
+        } else {
+            val androidUUID = Settings.Secure.getString(this.contentResolver, Settings.Secure.ANDROID_ID)
+            if (!androidUUID.isNullOrBlank()) {
+                deviceUUID = UUID.nameUUIDFromBytes(androidUUID.toByteArray(Charset.forName("utf8")))
+            } else {
+                val phoneUUID = (getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager).deviceId
+                if (!phoneUUID.isNullOrBlank()) {
+                    deviceUUID = UUID.nameUUIDFromBytes(phoneUUID.toByteArray(Charset.forName("utf8")))
+                } else {
+                    deviceUUID = UUID.randomUUID()
+                }
+            }
+        }
+
+        systemSharedPreferences.edit().putString("cached_device_id", deviceUUID.toString()).apply()
+        deviceUUID.toString()
+    }
+
 
     private var _currentUser: OTUser? = null
 
