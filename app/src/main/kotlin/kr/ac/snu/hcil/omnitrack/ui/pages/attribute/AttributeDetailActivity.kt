@@ -13,7 +13,6 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import butterknife.bindView
-import com.google.gson.JsonObject
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
@@ -69,10 +68,10 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
     private val startSubscriptions = SubscriptionList()
 
-    override fun onSessionLogContent(contentObject: JsonObject) {
+    override fun onSessionLogContent(contentObject: Bundle) {
         super.onSessionLogContent(contentObject)
-        contentObject.addProperty("attribute_id", attribute?.objectId)
-        contentObject.addProperty("attribute_name", attribute?.name)
+        contentObject.putString("attribute_id", attribute?.objectId)
+        contentObject.putString("attribute_name", attribute?.name)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -106,6 +105,20 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
         InterfaceHelper.removeButtonTextDecoration(newConnectionButton)
 
         newConnectionButton.setOnClickListener(this)
+
+        val attributeId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ATTRIBUTE)
+        val trackerId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
+
+        if (!attributeId.isNullOrBlank() && !trackerId.isNullOrBlank()) {
+            creationSubscriptions.add(
+                    signedInUserObservable.subscribe {
+                        user ->
+                        attribute = user.findAttributeByObjectId(trackerId, attributeId)
+                        refresh()
+                        applyAttributeToPropertyView(attribute!!)
+                    }
+            )
+        }
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
@@ -125,7 +138,6 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
         }
 
 
-        refreshConnection(false)
 
         savedInstanceState.getStringArray(STATE_PROPERTIES)?.let {
             for (entry in it.withIndex()) {
@@ -133,7 +145,6 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
             }
         }
 
-        checkIsChangedAndIndicate()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -141,25 +152,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
         outState.putString(STATE_COLUMN_NAME, columnNameView.value)
         outState.putString(STATE_CONNECTION, connectionView.connection?.getSerializedString())
-
         outState.putStringArray(STATE_PROPERTIES, propertyViewList.map { (it.second as APropertyView<*>).getSerializedValue() }.toTypedArray())
-    }
-
-    override fun onStart() {
-        super.onStart()
-        val attributeId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ATTRIBUTE)
-        val trackerId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
-
-        if (!attributeId.isNullOrBlank() && !trackerId.isNullOrBlank()) {
-            startSubscriptions.add(
-                    signedInUserObservable.subscribe {
-                        user ->
-                        attribute = user.findAttributeByObjectId(trackerId, attributeId)
-                        refresh()
-                        applyAttributeToPropertyView(attribute!!)
-                    }
-            )
-        }
     }
 
     override fun onStop() {
@@ -268,6 +261,16 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
         super.onPause()
 
         (application as OTApplication).syncUserToDb()
+
+        val state = Bundle()
+        onSaveInstanceState(state)
+
+    }
+
+    override fun onResume() {
+        super.onResume()
+        refreshConnection(false)
+        checkIsChangedAndIndicate()
     }
 
     fun refresh() {

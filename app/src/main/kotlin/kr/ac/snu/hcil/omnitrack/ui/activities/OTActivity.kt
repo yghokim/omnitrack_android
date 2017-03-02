@@ -10,11 +10,11 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
-import com.google.gson.JsonObject
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.ExperimentConsentManager
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
+import kr.ac.snu.hcil.omnitrack.core.database.EventLoggingManager
 import kr.ac.snu.hcil.omnitrack.ui.components.common.time.DurationPicker
 import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
 import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
@@ -220,12 +220,12 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false) : AppC
                 intent.getStringExtra(OTApplication.INTENT_EXTRA_FROM)
             } else null
 
-            val contentObject = JsonObject()
-            contentObject.addProperty("isFinishing", isFinishing)
+            val contentObject = Bundle()
+            contentObject.putBoolean("isFinishing", isFinishing)
             onSessionLogContent(contentObject)
 
             val now = System.currentTimeMillis()
-            OTApplication.logger.writeSessionLog(this, now - resumedAt, now, from, contentObject.toString())
+            EventLoggingManager.logSession(this, now - resumedAt, now, from, contentObject)
         }
     }
 
@@ -246,7 +246,7 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false) : AppC
 
     }
 
-    protected open fun onSessionLogContent(contentObject: JsonObject) {
+    protected open fun onSessionLogContent(contentObject: Bundle) {
     }
 
 

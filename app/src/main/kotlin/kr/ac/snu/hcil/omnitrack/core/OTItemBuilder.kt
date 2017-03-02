@@ -168,6 +168,8 @@ class OTItemBuilder : IStringSerializable {
 
     val isEmpty: Boolean get() = valueTable.isEmpty
 
+    val keys: Set<String> get() = valueTable.keys
+
     /**
      * Used when editing item.
      * @param item: item should be already stored in DB. (Every item is immediately stored in DB when created.)
@@ -297,6 +299,10 @@ class OTItemBuilder : IStringSerializable {
     @Suppress("UNCHECKED_CAST")
     fun <T> getCastedValueOf(attribute: OTAttribute<T>): T? {
         return valueTable[attribute.objectId]?.value as? T
+    }
+
+    fun getValueWithKey(key: String): Any? {
+        return valueTable[key]?.value
     }
 
     fun setValueOf(attribute: OTAttribute<out Any>, value: Any, timestamp: Long = System.currentTimeMillis()) {

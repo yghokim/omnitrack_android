@@ -10,6 +10,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.database.FirebaseHelper
+import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerManager
 import kr.ac.snu.hcil.omnitrack.utils.DefaultNameGenerator
@@ -292,6 +293,10 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
 
     private fun onTrackerAdded(new: OTTracker, index: Int) {
         new.owner = this
+        if (new.isOnShortcut) {
+            OTShortcutPanelManager += new
+        }
+
         trackerAdded.onNext(ReadOnlyPair(new, index))
 
         println("tracker was added")
@@ -300,6 +305,7 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
 
     private fun onTrackerRemoved(tracker: OTTracker, index: Int) {
         tracker.owner = null
+
         trackerRemoved.onNext(ReadOnlyPair(tracker, index))
 
         tracker.suspendDatabaseSync = true

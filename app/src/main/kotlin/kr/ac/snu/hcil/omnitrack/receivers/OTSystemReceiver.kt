@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.widget.Toast
 import kr.ac.snu.hcil.omnitrack.OTApplication
-import kr.ac.snu.hcil.omnitrack.core.database.DatabaseHelper
+import kr.ac.snu.hcil.omnitrack.core.database.FirebaseHelper
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTDataTriggerManager
@@ -38,9 +38,9 @@ class OTSystemReceiver : BroadcastReceiver() {
                         OTApplication.BROADCAST_ACTION_COMMAND_REMOVE_ITEM -> {
                             val tracker = user[intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)]
                             if (tracker != null) {
-                                val itemDbId = intent.getLongExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, -1)
-                                if (itemDbId != -1L) {
-                                    OTApplication.app.dbHelper.deleteObjects(DatabaseHelper.ItemScheme, itemDbId)
+                                val itemId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM)
+                                if (itemId != null) {
+                                    FirebaseHelper.removeItem(tracker.objectId, itemId)
                                 }
 
                                 OTNotificationManager.cancelBackgroundLoggingSuccessNotification(tracker)
@@ -55,10 +55,10 @@ class OTSystemReceiver : BroadcastReceiver() {
                             println("background logging successful")
                             val tracker = user[intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)]
                             if (tracker != null) {
-                                val itemDbId = intent.getLongExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, -1)
+                                val itemId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM)
                                 val notify = intent.getBooleanExtra(OTBackgroundLoggingService.INTENT_EXTRA_NOTIFY, true)
-                                if (itemDbId != -1L && notify) {
-                                    OTNotificationManager.pushBackgroundLoggingSuccessNotification(context, tracker, itemDbId, System.currentTimeMillis())
+                                if (itemId != null && notify) {
+                                    OTNotificationManager.pushBackgroundLoggingSuccessNotification(context, tracker, itemId, System.currentTimeMillis())
                                 }
                             }
                         }
