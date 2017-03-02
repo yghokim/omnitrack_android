@@ -12,6 +12,7 @@ import rx.schedulers.Schedulers
  */
 class PackageReceiver: BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
+        println("package broadcast receiver")
         OTApplication.app.currentUserObservable.observeOn(Schedulers.immediate()).subscribe {
             user ->
             when (intent.action) {
