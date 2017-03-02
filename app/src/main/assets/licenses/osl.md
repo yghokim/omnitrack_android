@@ -117,7 +117,10 @@ Apache 2.0 license
 Copyright 2014 - 2017 Henning Dodenhof<br>
 Apache 2.0 license
 
-
+#####TedBottomPicker
+<https://github.com/ParkSangGwon/TedBottomPicker><br>
+Copyright 2017 Ted Park<br>
+Apache 2.0 liccense
 
 ---
 

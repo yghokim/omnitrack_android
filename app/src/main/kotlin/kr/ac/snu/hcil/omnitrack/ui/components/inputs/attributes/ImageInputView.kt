@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.provider.MediaStore
 import android.util.AttributeSet
+import gun0912.tedbottompicker.TedBottomPicker
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.common.ImagePicker
 import kr.ac.snu.hcil.omnitrack.utils.getActivity
@@ -64,29 +65,43 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
     override fun onRequestGalleryImage(view: ImagePicker) {
         val activity = this.getActivity()
         if (activity != null) {
-            ImagePicker.dispatchImagePickIntent(activity, makeActivityForResultRequestCode(position, REQUEST_CODE_GALLERY))
+            val pickerBottomSheet = TedBottomPicker.Builder(activity)
+                    .setOnImageSelectedListener {
+                        uri ->
+                        val resizedUri = Uri.fromFile(ImagePicker.createCacheImageFile(context))
+                        resizeImage(uri, resizedUri)
+
+                        this.picker.imageUri = resizedUri
+                    }
+                    .setSelectMaxCount(1)
+                    .showCameraTile(false)
+                    .showGalleryTile(true)
+                    .create()
+
+            pickerBottomSheet.show(activity.supportFragmentManager)
+            //ImagePicker.dispatchImagePickIntent(activity, makeActivityForResultRequestCode(position, REQUEST_CODE_GALLERY))
+        }
+    }
+
+    fun resizeImage(source: Uri, dest: Uri) {
+        val bitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, source)
+
+        val numPixels = bitmap.width * bitmap.height
+        val scale = Math.sqrt(IMAGE_MAX_PIXELS / numPixels.toDouble()).toFloat()
+
+        if (scale < 1) {
+            println("scale down camera image : ${scale * 100}%")
+
+            val scaledBitmap = Bitmap.createScaledBitmap(bitmap, (bitmap.width * scale + 0.5f).toInt(), (bitmap.height * scale + 0.5f).toInt(), true)
+            //val scaledBitmap = Bitmap.createBitmap(scaledWidth, scaledHeight, Bitmap.Config.ARGB_8888)
+            bitmap.recycle()
+            val outputStream = context.contentResolver.openOutputStream(dest)
+            scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 80, outputStream)
+            scaledBitmap.recycle()
         }
     }
 
     override fun setValueFromActivityResult(data: Intent, requestType: Int): Boolean {
-
-        fun resizeImage(source: Uri, dest: Uri) {
-            val bitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, source)
-
-            val numPixels = bitmap.width * bitmap.height
-            val scale = Math.sqrt(IMAGE_MAX_PIXELS / numPixels.toDouble()).toFloat()
-
-            if (scale < 1) {
-                println("scale down camera image : ${scale * 100}%")
-
-                val scaledBitmap = Bitmap.createScaledBitmap(bitmap, (bitmap.width * scale + 0.5f).toInt(), (bitmap.height * scale + 0.5f).toInt(), true)
-                //val scaledBitmap = Bitmap.createBitmap(scaledWidth, scaledHeight, Bitmap.Config.ARGB_8888)
-                bitmap.recycle()
-                val outputStream = context.contentResolver.openOutputStream(dest)
-                scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 80, outputStream)
-                scaledBitmap.recycle()
-            }
-        }
 
         if (requestType == REQUEST_CODE_CAMERA)
         {

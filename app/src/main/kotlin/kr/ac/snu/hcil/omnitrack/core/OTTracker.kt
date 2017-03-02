@@ -126,7 +126,6 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
     val nameChanged = SerializedSubject(PublishSubject.create<ReadOnlyPair<OTTracker, String>>())
     val isOnShortcutChanged = SerializedSubject(PublishSubject.create<ReadOnlyPair<OTTracker, Boolean>>())
 
-
     constructor() : this(null, "New Tracker")
 
     constructor(name: String) : this(null, name)
@@ -264,6 +263,18 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
         if (!suspendDatabaseSync) {
             FirebaseHelper.removeAttribute(objectId, attribute.objectId)
         }
+    }
+
+    fun getRequiredPermissions(): Array<String> {
+        val list = ArrayList<String>()
+        attributes.unObservedList.forEach {
+            val perms = it.requiredPermissions()
+            if (perms != null) {
+                list.addAll(perms)
+            }
+        }
+
+        return list.toTypedArray()
     }
 
     fun getSupportedComparators(): List<ItemComparator> {
