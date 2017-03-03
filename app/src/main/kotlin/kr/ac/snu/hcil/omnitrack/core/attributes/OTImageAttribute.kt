@@ -6,7 +6,8 @@ import android.support.v4.content.ContextCompat
 import android.view.View
 import android.webkit.URLUtil
 import android.widget.ImageView
-import com.koushikdutta.ion.Ion
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.Target
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
@@ -55,8 +56,7 @@ class OTImageAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrack
             view
         }
 
-        if (target.tag != "ImageAttribute") {
-            target.adjustViewBounds = true
+        target.adjustViewBounds = true
             target.scaleType = ImageView.ScaleType.FIT_CENTER
             target.setBackgroundColor(ContextCompat.getColor(context, R.color.editTextFormBackground))
 
@@ -65,9 +65,6 @@ class OTImageAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrack
 
             target.minimumHeight = (100 * context.resources.displayMetrics.density).toInt()
 
-            target.tag = "ImageAttribute"
-        }
-
         return target
     }
 
@@ -75,10 +72,15 @@ class OTImageAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrack
         if (view is ImageView && value != null) {
             if (value is Uri) {
                 if (URLUtil.isNetworkUrl(value.toString())) {
-                    Ion.with(view)
+
+                    Glide.with(view.context)
                             .load(value.toString())
+                            .into(view)
                 } else {
-                    view.setImageURI(value)
+                    Glide.with(view.context)
+                            .load(value.toString())
+                            .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
+                            .into(view)
                 }
                 return true
             } else return false
