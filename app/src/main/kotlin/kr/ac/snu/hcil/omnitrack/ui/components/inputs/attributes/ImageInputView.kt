@@ -88,6 +88,8 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
 
     fun resizeImage(source: Uri, dest: Uri) {
         val bitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, source)
+        println("loaded bitmap original size: ${bitmap.width} X ${bitmap.height}")
+
 
         val numPixels = bitmap.width * bitmap.height
         val scale = Math.sqrt(IMAGE_MAX_PIXELS / numPixels.toDouble()).toFloat()
@@ -101,6 +103,10 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
             val outputStream = context.contentResolver.openOutputStream(dest)
             scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 80, outputStream)
             scaledBitmap.recycle()
+        } else {
+            val outputStream = context.contentResolver.openOutputStream(dest)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+            bitmap.recycle()
         }
     }
 
