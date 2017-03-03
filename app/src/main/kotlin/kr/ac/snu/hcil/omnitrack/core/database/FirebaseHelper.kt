@@ -48,7 +48,10 @@ object FirebaseHelper {
 
     val dbRef: DatabaseReference? get() = fbInstance.reference
 
-    val currentUserRef: DatabaseReference? get() = dbRef?.child(CHILD_NAME_USERS)?.child(OTAuthManager.userId)
+    val currentUserRef: DatabaseReference? get() {
+        println("getting userReference, userId: ${OTAuthManager.userId}")
+        return dbRef?.child(CHILD_NAME_USERS)?.child(OTAuthManager.userId)
+    }
 
     val experimentProfileRef: DatabaseReference? get() = currentUserRef?.child(CHILD_NAME_EXPERIMENT_PROFILE)
 
