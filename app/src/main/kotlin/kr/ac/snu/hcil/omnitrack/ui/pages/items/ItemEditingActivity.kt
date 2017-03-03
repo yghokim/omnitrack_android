@@ -404,6 +404,7 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         println("activityResult")
+        super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK && data != null) {
             val attributePosition = AAttributeInputView.getPositionFromRequestCode(requestCode)
             val inputView = attributeListAdapter.inputViews.find { it.position == attributePosition }

@@ -65,20 +65,23 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
     override fun onRequestGalleryImage(view: ImagePicker) {
         val activity = this.getActivity()
         if (activity != null) {
-            val pickerBottomSheet = TedBottomPicker.Builder(activity)
-                    .setOnImageSelectedListener {
-                        uri ->
-                        val resizedUri = Uri.fromFile(ImagePicker.createCacheImageFile(context))
-                        resizeImage(uri, resizedUri)
+            val pickerBottomSheetBuilder = TedBottomPicker.Builder(activity.applicationContext)
 
-                        this.picker.imageUri = resizedUri
-                    }
                     .setSelectMaxCount(1)
                     .showCameraTile(false)
                     .showGalleryTile(true)
-                    .create()
 
-            pickerBottomSheet.show(activity.supportFragmentManager)
+            pickerBottomSheetBuilder.setOnImageSelectedListener(object : TedBottomPicker.OnImageSelectedListener {
+                override fun onImageSelected(uri: Uri) {
+
+                    val resizedUri = Uri.fromFile(ImagePicker.createCacheImageFile(context))
+                    resizeImage(uri, resizedUri)
+                    this@ImageInputView.picker.imageUri = resizedUri
+                    pickerBottomSheetBuilder.setOnImageSelectedListener(null)
+                }
+            })
+
+            pickerBottomSheetBuilder.create().show(activity.supportFragmentManager)
             //ImagePicker.dispatchImagePickIntent(activity, makeActivityForResultRequestCode(position, REQUEST_CODE_GALLERY))
         }
     }
