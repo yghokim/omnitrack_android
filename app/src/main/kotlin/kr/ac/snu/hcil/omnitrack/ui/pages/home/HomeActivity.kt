@@ -74,6 +74,49 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), OTAut
         slidingMenu.setFadeEnabled(true)
         slidingMenu.setBehindOffsetRes(R.dimen.home_sliding_menu_right_region)
 */
+
+        creationSubscriptions.add(
+                super.signedInUserObservable.subscribe {
+                    user ->
+                    println("OMNITRACK: signed in user instance received.")
+                    //Ask permission if needed
+                    if (Build.VERSION.SDK_INT >= 23) {
+                        val permissions = user.getPermissionsRequiredForFields().filter {
+                            checkSelfPermission(it) != PackageManager.PERMISSION_GRANTED
+                        }.toTypedArray()
+
+                        if (permissions.isNotEmpty()) {
+                            requestPermissions(permissions,
+                                    10)
+                        }
+
+
+                        startSubscriptions.add(
+                                user.trackerAdded.subscribe {
+                                    trackerPair ->
+                                    val permissionsForTracker = trackerPair.first.getRequiredPermissions().filter {
+                                        checkSelfPermission(it) != PackageManager.PERMISSION_GRANTED
+                                    }.toTypedArray()
+
+                                    if (permissionsForTracker.isNotEmpty()) {
+                                        requestPermissions(permissionsForTracker,
+                                                10)
+                                    }
+                                }
+                        )
+                    }
+
+                    /*
+                    val provider = AWSMobileClient.defaultMobileClient().identityManager.currentIdentityProvider
+                    AWSMobileClient.defaultMobileClient().identityManager.loadUserInfoAndImage(
+                            provider
+                    ) {
+                        user.name = provider.userName
+                        user.photoUrl = provider.userImageUrl
+                        sidebar.refresh(user)
+                    }*/
+                }
+        )
     }
 
     override fun onResume() {
@@ -113,45 +156,7 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), OTAut
         startSubscriptions.add(
                 super.signedInUserObservable.subscribe {
                     user ->
-                    println("OMNITRACK: signed in user instance received.")
-                    //Ask permission if needed
-                    if (Build.VERSION.SDK_INT >= 23) {
-                        val permissions = user.getPermissionsRequiredForFields().filter {
-                            checkSelfPermission(it) != PackageManager.PERMISSION_GRANTED
-                        }.toTypedArray()
-
-                        if (permissions.isNotEmpty()) {
-                            requestPermissions(permissions,
-                                    10)
-                        }
-
-
-                        startSubscriptions.add(
-                                user.trackerAdded.subscribe {
-                                    trackerPair ->
-                                    val permissionsForTracker = trackerPair.first.getRequiredPermissions().filter {
-                                        checkSelfPermission(it) != PackageManager.PERMISSION_GRANTED
-                                    }.toTypedArray()
-
-                                    if (permissionsForTracker.isNotEmpty()) {
-                                        requestPermissions(permissionsForTracker,
-                                                10)
-                                    }
-                                }
-                        )
-                    }
-
                     sidebar.refresh(user)
-
-                    /*
-                    val provider = AWSMobileClient.defaultMobileClient().identityManager.currentIdentityProvider
-                    AWSMobileClient.defaultMobileClient().identityManager.loadUserInfoAndImage(
-                            provider
-                    ) {
-                        user.name = provider.userName
-                        user.photoUrl = provider.userImageUrl
-                        sidebar.refresh(user)
-                    }*/
                 }
         )
     }

@@ -12,13 +12,15 @@ import rx.schedulers.Schedulers
  */
 class RebootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
+        println("OMNITRACK: reboot receiver called")
         when (intent.action) {
             Intent.ACTION_BOOT_COMPLETED -> {
+                println("OMNITRACK: Android system rebooted")
                 OTApplication.app.currentUserObservable.observeOn(Schedulers.immediate()).subscribe {
                     user ->
                     OTShortcutPanelManager.refreshNotificationShortcutViews(user, context)
                 }
             }
-            }
+        }
     }
 }
