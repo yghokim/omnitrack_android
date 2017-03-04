@@ -20,6 +20,7 @@ import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.database.CacheHelper
 import kr.ac.snu.hcil.omnitrack.core.database.DatabaseHelper
+import kr.ac.snu.hcil.omnitrack.core.database.FirebaseStorageHelper
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
@@ -132,6 +133,9 @@ class OTApplication : MultiDexApplication() {
     lateinit var dbHelper: DatabaseHelper
         private set
 
+    lateinit var storageHelper: FirebaseStorageHelper
+        private set
+
     val cacheHelper: CacheHelper by lazy {
         CacheHelper(this)
     }
@@ -187,7 +191,7 @@ class OTApplication : MultiDexApplication() {
                 //if (OTAuthManager.isUserSignedIn()) {
                     val uid = OTAuthManager.userId!!
                     println("OMNITRACK user identityId: ${uid}, userName: ${OTAuthManager.userName}")
-                //FirebaseHelper.findTrackersOfUser(uid).flatMap {
+                //FirebaseDbHelper.findTrackersOfUser(uid).flatMap {
                 //    trackers ->
 
                 val user = OTUser(uid, OTAuthManager.userName, OTAuthManager.userImageUrl)
@@ -258,6 +262,9 @@ class OTApplication : MultiDexApplication() {
 
         dbHelper = DatabaseHelper(this)
 
+        storageHelper = FirebaseStorageHelper(this)
+        storageHelper.restartUploadTask()
+
         timeTriggerAlarmManager = OTTimeTriggerAlarmManager()
 
         for (service in OTExternalService.availableServices) {
@@ -283,7 +290,7 @@ class OTApplication : MultiDexApplication() {
         if (_currentUser != null) {
             OTUser.storeOrOverwriteInstanceCache(_currentUser!!, systemSharedPreferences)
             //dbHelper.save(_currentUser!!)
-            //FirebaseHelper.saveUser(_currentUser!!)
+            //FirebaseDbHelper.saveUser(_currentUser!!)
         }
     }
 

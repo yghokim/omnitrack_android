@@ -4,7 +4,7 @@ import android.util.SparseIntArray
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTChoiceAttribute
-import kr.ac.snu.hcil.omnitrack.core.database.FirebaseHelper
+import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
 import kr.ac.snu.hcil.omnitrack.core.visualization.AttributeChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.ICategoricalBarChart
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
@@ -43,7 +43,7 @@ class ChoiceCategoricalBarChartModel(override val attribute: OTChoiceAttribute) 
         val tracker = attribute.tracker
         if (tracker != null) {
             subscriptions.add(
-            FirebaseHelper.loadItems(tracker, getTimeScope()).subscribe({
+                    FirebaseDbHelper.loadItems(tracker, getTimeScope()).subscribe({
                 items ->
                 counterDictCache.clear()
                 categoriesCache.clear()

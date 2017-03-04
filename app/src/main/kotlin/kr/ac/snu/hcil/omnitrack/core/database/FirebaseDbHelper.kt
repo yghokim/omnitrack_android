@@ -24,7 +24,7 @@ import java.util.*
 /**
  * Created by younghokim on 2017. 2. 9..
  */
-object FirebaseHelper {
+object FirebaseDbHelper {
 
     enum class Order {ASC, DESC }
 
@@ -473,7 +473,7 @@ object FirebaseHelper {
         println("save tracker: ${tracker.name}, ${tracker.objectId}")
 
         if (tracker.owner != null) {
-            FirebaseHelper.setContainsFlagOfUser(tracker.owner!!.objectId, tracker.objectId, FirebaseHelper.CHILD_NAME_TRACKERS, true)
+            FirebaseDbHelper.setContainsFlagOfUser(tracker.owner!!.objectId, tracker.objectId, FirebaseDbHelper.CHILD_NAME_TRACKERS, true)
         }
         val values = TrackerPOJO()
         values.name = tracker.name
@@ -772,6 +772,22 @@ object FirebaseHelper {
     }
 
     fun saveItem(item: OTItem, tracker: OTTracker, notifyIntent: Boolean = true, finished: ((Boolean) -> Unit)? = null) {
+
+        val itemRef = if (item.objectId != null) {
+            getItemListOfTrackerChild(tracker.objectId)?.child(item.objectId!!)
+        } else getItemListOfTrackerChild(tracker.objectId)?.push()
+
+        if (itemRef != null) {
+            val itemId = itemRef.key
+
+            tracker.attributes.map {
+                val value = item.getValueOf(it)
+                if (value is SynchronizedUri) {
+                    OTApplication.app.storageHelper.assignNewUploadTask(value, itemId, tracker.objectId, tracker.owner!!.objectId)
+                }
+            }
+        }
+
         val pojo = ItemPOJO()
         pojo.timestamp = if (item.timestamp != -1L) {
             item.timestamp
@@ -797,10 +813,6 @@ object FirebaseHelper {
         } else {
             SAVE_RESULT_NEW
         }
-
-        val itemRef = if (item.objectId != null) {
-            getItemListOfTrackerChild(tracker.objectId)?.child(item.objectId!!)
-        } else getItemListOfTrackerChild(tracker.objectId)?.push()
 
         itemRef?.setValue(pojo)?.addOnCompleteListener {
             task ->
@@ -864,7 +876,7 @@ object FirebaseHelper {
     }
 
     fun checkHasDeviceId(userId: String, deviceId: String): Single<Boolean> {
-        val query = FirebaseHelper.dbRef?.child(FirebaseHelper.CHILD_NAME_USERS)?.child(userId)?.child("devices")?.child(deviceId)
+        val query = FirebaseDbHelper.dbRef?.child(FirebaseDbHelper.CHILD_NAME_USERS)?.child(userId)?.child("devices")?.child(deviceId)
         if (query != null) {
             return Single.create {
                 subscriber ->
@@ -891,7 +903,7 @@ object FirebaseHelper {
     }
 
     fun addDeviceInfoToUser(userId: String, deviceId: String): Single<DeviceInfo> {
-        val query = FirebaseHelper.dbRef?.child(FirebaseHelper.CHILD_NAME_USERS)?.child(userId)?.child("devices")
+        val query = FirebaseDbHelper.dbRef?.child(FirebaseDbHelper.CHILD_NAME_USERS)?.child(userId)?.child("devices")
         if (query != null) {
             return Single.create {
                 subscriber ->
@@ -914,7 +926,7 @@ object FirebaseHelper {
     }
 
     fun removeDeviceInfo(userId: String, deviceId: String): Single<Boolean> {
-        val query = FirebaseHelper.dbRef?.child(FirebaseHelper.CHILD_NAME_USERS)?.child(userId)?.child("devices")
+        val query = FirebaseDbHelper.dbRef?.child(FirebaseDbHelper.CHILD_NAME_USERS)?.child(userId)?.child("devices")
         if (query != null) {
             return Single.create {
                 subscriber ->

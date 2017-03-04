@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.widget.Toast
 import kr.ac.snu.hcil.omnitrack.OTApplication
-import kr.ac.snu.hcil.omnitrack.core.database.FirebaseHelper
+import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTDataTriggerManager
@@ -40,7 +40,7 @@ class OTSystemReceiver : BroadcastReceiver() {
                             if (tracker != null) {
                                 val itemId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM)
                                 if (itemId != null) {
-                                    FirebaseHelper.removeItem(tracker.objectId, itemId)
+                                    FirebaseDbHelper.removeItem(tracker.objectId, itemId)
                                 }
 
                                 OTNotificationManager.cancelBackgroundLoggingSuccessNotification(tracker)

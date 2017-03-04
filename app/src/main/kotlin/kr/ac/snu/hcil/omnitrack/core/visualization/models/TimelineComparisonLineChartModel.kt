@@ -6,7 +6,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
-import kr.ac.snu.hcil.omnitrack.core.database.FirebaseHelper
+import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
 import kr.ac.snu.hcil.omnitrack.core.visualization.CompoundAttributeChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.ILineChartOnTime
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
@@ -47,7 +47,7 @@ class TimelineComparisonLineChartModel(override val attributes: List<OTNumberAtt
         xScale.quantize(currentGranularity)
 
         subscriptions.add(
-                FirebaseHelper.loadItems(parent, getTimeScope(), FirebaseHelper.Order.ASC).subscribe {
+                FirebaseDbHelper.loadItems(parent, getTimeScope(), FirebaseDbHelper.Order.ASC).subscribe {
                     items ->
 
                     var currentItemPointer = 0

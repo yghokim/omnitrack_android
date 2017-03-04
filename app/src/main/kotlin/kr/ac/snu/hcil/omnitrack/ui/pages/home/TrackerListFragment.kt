@@ -38,7 +38,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.database.EventLoggingManager
-import kr.ac.snu.hcil.omnitrack.core.database.FirebaseHelper
+import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
 import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
@@ -574,7 +574,7 @@ class TrackerListFragment : OTFragment() {
                 subscriptions.clear()
 
                 subscriptions.add(
-                        FirebaseHelper.getItemListSummary(tracker).subscribe {
+                        FirebaseDbHelper.getItemListSummary(tracker).subscribe {
                             summary ->
                             setLastLoggingTime(summary.lastLoggingTime)
                             setTodayLoggingCount(summary.todayCount ?: 0)
@@ -598,7 +598,7 @@ class TrackerListFragment : OTFragment() {
 
                 /*
                 subscriptions.add(
-                        FirebaseHelper.getLastLoggingTime(tracker).observeOn(AndroidSchedulers.mainThread()).subscribe {
+                        FirebaseDbHelper.getLastLoggingTime(tracker).observeOn(AndroidSchedulers.mainThread()).subscribe {
                             timestamp ->
 
                     }
@@ -606,7 +606,7 @@ class TrackerListFragment : OTFragment() {
 
 
                 subscriptions.add(
-                        FirebaseHelper.getLogCountOfDay(tracker).observeOn(AndroidSchedulers.mainThread()).subscribe {
+                        FirebaseDbHelper.getLogCountOfDay(tracker).observeOn(AndroidSchedulers.mainThread()).subscribe {
                             count ->
                             println("log count of day: $count")
                             val header = context.resources.getString(R.string.msg_todays_log).toUpperCase()
@@ -615,7 +615,7 @@ class TrackerListFragment : OTFragment() {
                 )
 
                 subscriptions.add(
-                        FirebaseHelper.getTotalItemCount(tracker).observeOn(AndroidSchedulers.mainThread()).subscribe {
+                        FirebaseDbHelper.getTotalItemCount(tracker).observeOn(AndroidSchedulers.mainThread()).subscribe {
                             count ->
 
                             println("log count total: $count")

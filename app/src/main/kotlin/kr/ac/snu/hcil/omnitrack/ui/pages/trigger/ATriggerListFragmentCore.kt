@@ -17,7 +17,7 @@ import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.EventLoggingManager
-import kr.ac.snu.hcil.omnitrack.core.database.FirebaseHelper
+import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.FallbackRecyclerView
@@ -212,10 +212,10 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
             if (resultCode == AppCompatActivity.RESULT_OK) {
                 if (data != null && data.hasExtra(TriggerDetailActivity.INTENT_EXTRA_TRIGGER_DATA)) {
                     val triggerPojo = data.getSerializableExtra(TriggerDetailActivity.INTENT_EXTRA_TRIGGER_DATA)
-                    if (triggerPojo is FirebaseHelper.TriggerPOJO) {
+                    if (triggerPojo is FirebaseDbHelper.TriggerPOJO) {
                         OTApplication.app.currentUserObservable.subscribe {
                             user ->
-                            val newTrigger = OTTrigger.makeInstance(FirebaseHelper.generateNewKey(FirebaseHelper.CHILD_NAME_TRIGGERS), user, triggerPojo)
+                            val newTrigger = OTTrigger.makeInstance(FirebaseDbHelper.generateNewKey(FirebaseDbHelper.CHILD_NAME_TRIGGERS), user, triggerPojo)
                             appendNewTrigger(newTrigger)
                             EventLoggingManager.logTriggerChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_TRIGGER_ADD, newTrigger.objectId, newTrigger.typeId, newTrigger.action)
                         }
