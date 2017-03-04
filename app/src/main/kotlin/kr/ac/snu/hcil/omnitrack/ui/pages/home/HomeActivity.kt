@@ -1,9 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.home
 
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.drawable.ColorDrawable
-import android.os.Build
 import android.os.Bundle
 import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
@@ -16,6 +14,7 @@ import android.view.Gravity
 import android.view.View
 import butterknife.bindView
 import com.google.firebase.auth.FirebaseUser
+import com.tbruyelle.rxpermissions.RxPermissions
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
@@ -23,6 +22,7 @@ import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.diagnostics.SystemLogActivity
+import rx.Observable
 import rx.internal.util.SubscriptionList
 
 class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), OTAuthManager.SignInChangedListener, DrawerLayout.DrawerListener {
@@ -80,41 +80,37 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), OTAut
                     user ->
                     println("OMNITRACK: signed in user instance received.")
                     //Ask permission if needed
-                    if (Build.VERSION.SDK_INT >= 23) {
-                        val permissions = user.getPermissionsRequiredForFields().filter {
-                            checkSelfPermission(it) != PackageManager.PERMISSION_GRANTED
-                        }.toTypedArray()
 
-                        if (permissions.isNotEmpty()) {
-                            requestPermissions(permissions,
-                                    10)
+
+                    val rxPermissions = RxPermissions(this)
+
+                    val permissions = user.getPermissionsRequiredForFields()
+                    if (permissions.isNotEmpty()) {
+                        rxPermissions.request(*permissions.toTypedArray()).subscribe {
+                            granted ->
+                            if (granted)
+                                println("permissions granted.")
+                            else println("permissions not granted.")
                         }
+                    }
 
+                    creationSubscriptions.add(
+                            user.trackerAdded.flatMap {
+                                trackerPair ->
+                                val permissionsForTracker = trackerPair.first.getRequiredPermissions()
+                                if (!permissionsForTracker.isEmpty()) {
+                                    rxPermissions.request(*permissionsForTracker)
+                                } else {
+                                    Observable.just(true)
+                                }
 
-                        startSubscriptions.add(
-                                user.trackerAdded.subscribe {
-                                    trackerPair ->
-                                    val permissionsForTracker = trackerPair.first.getRequiredPermissions().filter {
-                                        checkSelfPermission(it) != PackageManager.PERMISSION_GRANTED
-                                    }.toTypedArray()
-
-                                    if (permissionsForTracker.isNotEmpty()) {
-                                        requestPermissions(permissionsForTracker,
-                                                10)
+                            }.subscribe {
+                                granted ->
+                                if (granted) {
+                                    println("new tracker permission granted")
                                     }
                                 }
                         )
-                    }
-
-                    /*
-                    val provider = AWSMobileClient.defaultMobileClient().identityManager.currentIdentityProvider
-                    AWSMobileClient.defaultMobileClient().identityManager.loadUserInfoAndImage(
-                            provider
-                    ) {
-                        user.name = provider.userName
-                        user.photoUrl = provider.userImageUrl
-                        sidebar.refresh(user)
-                    }*/
                 }
         )
     }

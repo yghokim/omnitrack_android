@@ -124,11 +124,13 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
                                 if (approved) {
                                     builder.autoComplete(this)
                                 } else Observable.error(Exception("required permission not accepted."))
-                            }.subscribe {
+                            }.subscribe({
                         println("Finished builder autocomplete.")
                         snapshot(builder)
                         snapshotInitialValue(builder)
-                    }
+                    }, {
+                        //TODO handle permission not granted
+                    })
             )
 
             builderRestoredSnackbar.dismiss()
