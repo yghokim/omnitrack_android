@@ -6,7 +6,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
-import kr.ac.snu.hcil.omnitrack.core.database.FirebaseHelper
+import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
 import kr.ac.snu.hcil.omnitrack.core.database.NamedObject
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
 import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
@@ -57,7 +57,7 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
             return makeInstance(null, typeId, user, name, trackers.map { it.objectId }.toTypedArray(), false, action, TRIGGER_TIME_NEVER_TRIGGERED, null)
         }
 
-        fun makeInstance(objectId: String?, user: OTUser, pojo: FirebaseHelper.TriggerPOJO): OTTrigger {
+        fun makeInstance(objectId: String?, user: OTUser, pojo: FirebaseDbHelper.TriggerPOJO): OTTrigger {
             return OTTrigger.makeInstance(
                     objectId,
                     pojo.type,
@@ -69,11 +69,11 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
     }
 
     override fun makeNewObjectId(): String {
-        return FirebaseHelper.generateNewKey(FirebaseHelper.CHILD_NAME_TRIGGERS)
+        return FirebaseDbHelper.generateNewKey(FirebaseDbHelper.CHILD_NAME_TRIGGERS)
     }
 
     override val databasePointRef: DatabaseReference?
-        get() = FirebaseHelper.dbRef?.child(FirebaseHelper.CHILD_NAME_TRIGGERS)?.child(objectId)
+        get() = FirebaseDbHelper.dbRef?.child(FirebaseDbHelper.CHILD_NAME_TRIGGERS)?.child(objectId)
 
     private var currentDbRef: DatabaseReference?
     private val databaseEventListener: ChildEventListener
@@ -85,8 +85,8 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
     val trackers: List<OTTracker>
         get() = _trackerList
 
-    val trackerIndexedIdList: List<FirebaseHelper.IndexedKey>
-        get() = _trackerList.mapIndexed { i, tracker -> FirebaseHelper.IndexedKey(i, tracker.objectId) }
+    val trackerIndexedIdList: List<FirebaseDbHelper.IndexedKey>
+        get() = _trackerList.mapIndexed { i, tracker -> FirebaseDbHelper.IndexedKey(i, tracker.objectId) }
 
     private val _trackerList = ArrayList<OTTracker>()
 
@@ -223,8 +223,8 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
         suspendDatabaseSync = false
     }
 
-    fun dumpDataToPojo(out: FirebaseHelper.TriggerPOJO?): FirebaseHelper.TriggerPOJO {
-        val pojo = out ?: FirebaseHelper.TriggerPOJO()
+    fun dumpDataToPojo(out: FirebaseDbHelper.TriggerPOJO?): FirebaseDbHelper.TriggerPOJO {
+        val pojo = out ?: FirebaseDbHelper.TriggerPOJO()
 
         pojo.action = this.action
         pojo.name = this.name

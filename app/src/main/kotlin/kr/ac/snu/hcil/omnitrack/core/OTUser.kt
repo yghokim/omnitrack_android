@@ -9,7 +9,7 @@ import com.google.firebase.database.DatabaseReference
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
-import kr.ac.snu.hcil.omnitrack.core.database.FirebaseHelper
+import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerManager
@@ -46,10 +46,10 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
                 val name = sp.getString(PREFERENCES_KEY_NAME, null)
                 val photoUrl = sp.getString(PREFERENCES_KEY_PHOTO_URL, null)
                 if (objId != null && name != null) {
-                    return FirebaseHelper.findTrackersOfUser(objId).flatMap {
+                    return FirebaseDbHelper.findTrackersOfUser(objId).flatMap {
                         trackers ->
                         val user = OTUser(objId, name, photoUrl, trackers)
-                        FirebaseHelper.findTriggersOfUser(user).map {
+                        FirebaseDbHelper.findTriggersOfUser(user).map {
                             triggers ->
                             for (trigger in triggers) {
                                 user.triggerManager.putNewTrigger(trigger)
@@ -98,7 +98,7 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
     }*/
 
     private val databaseRef: DatabaseReference?
-        get() = FirebaseHelper.dbRef?.child(FirebaseHelper.CHILD_NAME_USERS)?.child(objectId)
+        get() = FirebaseDbHelper.dbRef?.child(FirebaseDbHelper.CHILD_NAME_USERS)?.child(objectId)
 
     val trackers = ObservableList<OTTracker>()
 
@@ -149,8 +149,8 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
             }
         }
 
-        trackerListDbReference = databaseRef?.child(FirebaseHelper.CHILD_NAME_TRACKERS)
-        triggerListDbReference = databaseRef?.child(FirebaseHelper.CHILD_NAME_TRIGGERS)
+        trackerListDbReference = databaseRef?.child(FirebaseDbHelper.CHILD_NAME_TRACKERS)
+        triggerListDbReference = databaseRef?.child(FirebaseDbHelper.CHILD_NAME_TRIGGERS)
 
 
         trackerListChangeEventListener = object : ChildEventListener {
@@ -163,7 +163,7 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
                 val duplicate = trackers.unObservedList.find { it.objectId == snapshot.key }
                 if (duplicate == null) {
                     println("load tracker ${snapshot.key} from DB")
-                    FirebaseHelper.getTracker(snapshot.key).subscribe {
+                    FirebaseDbHelper.getTracker(snapshot.key).subscribe {
                         tracker ->
                         tracker.owner = this@OTUser
                         this@OTUser.trackers += tracker
@@ -201,7 +201,7 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
                 val duplicate = triggerManager.getTriggerWithId(snapshot.key)
                 if (duplicate == null) {
                     println("load trigger ${snapshot.key} from DB")
-                    FirebaseHelper.getTrigger(this@OTUser, snapshot.key).subscribe {
+                    FirebaseDbHelper.getTrigger(this@OTUser, snapshot.key).subscribe {
                         trigger ->
                         triggerManager.putNewTrigger(trigger)
                     }
@@ -300,7 +300,7 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
         trackerAdded.onNext(ReadOnlyPair(new, index))
 
         println("tracker was added")
-        FirebaseHelper.saveTracker(new, index)
+        FirebaseDbHelper.saveTracker(new, index)
     }
 
     private fun onTrackerRemoved(tracker: OTTracker, index: Int) {
@@ -322,7 +322,7 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
 
         println("tracker was removed.")
         tracker.suspendDatabaseSync = false
-        FirebaseHelper.removeTracker(tracker, this)
+        FirebaseDbHelper.removeTracker(tracker, this)
     }
 
     fun findAttributeByObjectId(trackerId: String, attributeId: String): OTAttribute<out Any>? {

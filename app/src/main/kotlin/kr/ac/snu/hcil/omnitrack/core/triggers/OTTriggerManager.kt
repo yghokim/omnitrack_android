@@ -3,7 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.triggers
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
-import kr.ac.snu.hcil.omnitrack.core.database.FirebaseHelper
+import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 import rx.Subscription
 import rx.functions.Action1
@@ -138,7 +138,7 @@ class OTTriggerManager(val user: OTUser) {
                 }
             }*/
 
-            FirebaseHelper.saveTrigger(trigger, user.objectId, triggers.indexOf(trigger))
+            FirebaseDbHelper.saveTrigger(trigger, user.objectId, triggers.indexOf(trigger))
             triggerAdded.onNext(trigger)
         }
     }
@@ -164,7 +164,7 @@ class OTTriggerManager(val user: OTUser) {
         }*/
 
         //TODO remove trigger from DB
-        FirebaseHelper.removeTrigger(trigger)
+        FirebaseDbHelper.removeTrigger(trigger)
 
         triggerRemoved.onNext(trigger)
     }

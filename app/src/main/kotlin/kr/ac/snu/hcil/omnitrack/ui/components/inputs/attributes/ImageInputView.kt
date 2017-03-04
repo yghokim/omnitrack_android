@@ -8,13 +8,14 @@ import android.provider.MediaStore
 import android.util.AttributeSet
 import gun0912.tedbottompicker.TedBottomPicker
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.ui.components.common.ImagePicker
 import kr.ac.snu.hcil.omnitrack.utils.getActivity
 
 /**
  * Created by Young-Ho Kim on 2016-07-22.
  */
-class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttributeInputView<Uri>(R.layout.input_image, context, attrs), ImagePicker.ImagePickerCallback {
+class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttributeInputView<SynchronizedUri>(R.layout.input_image, context, attrs), ImagePicker.ImagePickerCallback {
 
     companion object{
         const val REQUEST_CODE_CAMERA = 2
@@ -26,11 +27,13 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
 
     override val typeId: Int = VIEW_TYPE_IMAGE
 
-    override var value: Uri
-        get() = picker.imageUri
+    override var value: SynchronizedUri = SynchronizedUri()
         set(value)
         {
-            picker.imageUri = value
+            if (field != value) {
+                field = value
+                picker.imageUri = field.primaryUri
+            }
         }
 
     private val picker: ImagePicker = findViewById(R.id.ui_image_picker) as ImagePicker
@@ -43,7 +46,8 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
         picker.uriChanged += {
             sender, uri->
             println("picker uri changed to ${uri.toString()}")
-            onValueChanged(uri)
+            value = SynchronizedUri(uri)
+            onValueChanged(value)
         }
     }
 

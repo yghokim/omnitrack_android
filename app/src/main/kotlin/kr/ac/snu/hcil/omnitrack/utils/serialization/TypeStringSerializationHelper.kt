@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.utils.serialization
 
 import android.net.Uri
 import com.google.android.gms.maps.model.LatLng
+import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.core.datatypes.Route
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
@@ -38,6 +39,7 @@ object TypeStringSerializationHelper {
     const val TYPENAME_ROUTE = "R"
     const val TYPENAME_TIMESPAN = "TS"
     const val TYPENAME_URI = "U"
+    const val TYPENAME_SYNCHRONIZED_URI = "SyncU"
 
 
 
@@ -56,7 +58,8 @@ object TypeStringSerializationHelper {
             LongArray::class.java.name to TYPENAME_LONG_ARRAY,
             LatLng::class.java.name to TYPENAME_LATITUDE_LONGITUDE,
             Route::class.java.name to TYPENAME_ROUTE,
-            Uri::class.java.name to TYPENAME_URI
+            Uri::class.java.name to TYPENAME_URI,
+            SynchronizedUri::class.java.name to TYPENAME_SYNCHRONIZED_URI
     )
 
     fun serialize(typeName: String, value: Any): String {
@@ -84,6 +87,7 @@ object TypeStringSerializationHelper {
             TYPENAME_LONG_ARRAY -> (value as IntArray).joinToString(",")
             TYPENAME_LATITUDE_LONGITUDE -> (value as LatLng).serialize()
             TYPENAME_ROUTE -> (value as Route).getSerializedString()
+            TYPENAME_SYNCHRONIZED_URI -> (SynchronizedUri.parser.toJson(value))
             else -> value.toString()
         }
 
@@ -125,6 +129,7 @@ object TypeStringSerializationHelper {
             TYPENAME_LATITUDE_LONGITUDE -> deserializeLatLng(value)
             TYPENAME_ROUTE -> Route(value)
             TYPENAME_URI -> Uri.parse(value)
+            TYPENAME_SYNCHRONIZED_URI -> SynchronizedUri.parser.fromJson(value, SynchronizedUri::class.java)
             else -> return value
         }
     }

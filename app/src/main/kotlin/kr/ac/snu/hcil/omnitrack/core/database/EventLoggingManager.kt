@@ -54,7 +54,7 @@ object EventLoggingManager {
         table["app_id"] = FirebaseDatabase.getInstance().app.options.applicationId
         table["device_id"] = OTApplication.app.deviceId
 
-        FirebaseHelper.dbRef?.child(CHILD_NAME_EVENTS)?.child(OTAuthManager.userId ?: CHILD_NAME_ANONYMOUS)?.push()?.setValue(table)
+        FirebaseDbHelper.dbRef?.child(CHILD_NAME_EVENTS)?.child(OTAuthManager.userId ?: CHILD_NAME_ANONYMOUS)?.push()?.setValue(table)
     }
 
     fun logAttributeChangeEvent(name: String, attributeType: Int, attributeId: String, trackerId: String) {
