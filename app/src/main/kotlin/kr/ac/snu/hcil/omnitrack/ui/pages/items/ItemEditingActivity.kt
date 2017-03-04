@@ -15,6 +15,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import butterknife.bindView
+import com.tbruyelle.rxpermissions.RxPermissions
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItem
@@ -115,8 +116,15 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
             view ->
             builder = OTItemBuilder(tracker!!, OTItemBuilder.MODE_FOREGROUND)
 
+            val rxPermissionObservable = RxPermissions(this).request(*(tracker!!.getRequiredPermissions()))
             creationSubscriptions.add(
-                    builder.autoComplete(this).subscribe {
+                    rxPermissionObservable
+                            .flatMap {
+                                approved ->
+                                if (approved) {
+                                    builder.autoComplete(this)
+                                } else Observable.error(Exception("required permission not accepted."))
+                            }.subscribe {
                         println("Finished builder autocomplete.")
                         snapshot(builder)
                         snapshotInitialValue(builder)
@@ -129,6 +137,9 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
 
     override fun onTrackerLoaded(tracker: OTTracker) {
         super.onTrackerLoaded(tracker)
+
+        val rxPermissionObservable = RxPermissions(this).request(*(tracker.getRequiredPermissions()))
+
         title = String.format(resources.getString(R.string.title_activity_new_item), tracker.name)
 
         fun onModeSet() {
@@ -144,11 +155,18 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
                     //new builder was created
                     println("Start builder autocomplete")
                     startSubscriptions.add(
-                            builder.autoComplete(this).subscribe {
+                            rxPermissionObservable.flatMap {
+                                approved: Boolean ->
+                                if (approved) {
+                                    builder.autoComplete(this)
+                                } else Observable.error(Exception("required permission not accepted."))
+                            }.subscribe({
                                 println("Finished builder autocomplete.");
                                 snapshot(builder)
                                 snapshotInitialValue(builder)
-                            }
+                            }, {
+                                //TODO handle when permission not accepted.
+                            })
                     )
                 }
             }
