@@ -4,22 +4,25 @@ import android.content.Context
 import android.net.Uri
 import android.support.v4.content.ContextCompat
 import android.view.View
-import android.webkit.URLUtil
 import android.widget.ImageView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.GlideDrawable
+import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
+import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Observable
+import java.lang.Exception
 
 /**
  * Created by younghokim on 16. 9. 6..
  */
 class OTImageAttribute(objectId: String?, localKey: Int?, parentTracker: OTTracker?, columnName: String, isRequired: Boolean, settingData: Map<String, Any?>?, connectionData: String?)
-    : OTAttribute<Uri>(objectId, localKey, parentTracker, columnName, isRequired, TYPE_IMAGE, settingData, connectionData) {
+    : OTAttribute<SynchronizedUri>(objectId, localKey, parentTracker, columnName, isRequired, TYPE_IMAGE, settingData, connectionData) {
 
     override val valueNumericCharacteristics: NumericCharacteristics = NumericCharacteristics(false, false)
 
@@ -32,8 +35,8 @@ class OTImageAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrack
         return value.toString()
     }
 
-    override fun getAutoCompleteValue(): Observable<Uri> {
-        return Observable.just(Uri.EMPTY)
+    override fun getAutoCompleteValue(): Observable<SynchronizedUri> {
+        return Observable.just(SynchronizedUri())
     }
 
 
@@ -70,24 +73,39 @@ class OTImageAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrack
 
     override fun applyValueToViewForItemList(value: Any?, view: View): Boolean {
         if (view is ImageView && value != null) {
-            if (value is Uri) {
-                if (URLUtil.isNetworkUrl(value.toString())) {
+            if (value is SynchronizedUri) {
+                if (value.primaryUri != Uri.EMPTY) {
+                    Glide.with(view.context)
+                            .load(value.localUri.toString())
+                            .listener(object : RequestListener<String, GlideDrawable> {
+                                override fun onResourceReady(resource: GlideDrawable?, model: String?, target: Target<GlideDrawable>?, isFromMemoryCache: Boolean, isFirstResource: Boolean): Boolean {
+                                    return false
+                                }
 
-                    Glide.with(view.context)
-                            .load(value.toString())
-                            .into(view)
-                } else {
-                    Glide.with(view.context)
-                            .load(value.toString())
+                                override fun onException(e: Exception, model: String?, target: Target<GlideDrawable>?, isFirstResource: Boolean): Boolean {
+                                    if (isFirstResource && e is java.io.FileNotFoundException) {
+                                        println("local uri failed. retry with server uri.")
+                                        Glide.with(view.context)
+                                                .load(value.serverUri.toString())
+                                                .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
+                                                .into(view)
+                                    }
+                                    return false
+                                }
+
+
+                            })
                             .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
                             .into(view)
+                } else {
+                    view.setImageURI(Uri.EMPTY)
                 }
                 return true
             } else return false
         } else return super.applyValueToViewForItemList(value, view)
     }
 
-    override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_URI
+    override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_SYNCHRONIZED_URI
 
     override val typeNameResourceId: Int = R.string.type_image_name
 

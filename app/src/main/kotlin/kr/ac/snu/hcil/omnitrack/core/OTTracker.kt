@@ -11,7 +11,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AttributeSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
-import kr.ac.snu.hcil.omnitrack.core.database.FirebaseHelper
+import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
 import kr.ac.snu.hcil.omnitrack.core.database.NamedObject
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
@@ -40,10 +40,10 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
     }
 
     override val databasePointRef: DatabaseReference?
-        get() = FirebaseHelper.dbRef?.child(FirebaseHelper.CHILD_NAME_TRACKERS)?.child(objectId)
+        get() = FirebaseDbHelper.dbRef?.child(FirebaseDbHelper.CHILD_NAME_TRACKERS)?.child(objectId)
 
     override fun makeNewObjectId(): String {
-        return FirebaseHelper.generateNewKey(FirebaseHelper.CHILD_NAME_TRACKERS)
+        return FirebaseDbHelper.generateNewKey(FirebaseDbHelper.CHILD_NAME_TRACKERS)
     }
 
     private var currentDbReference: DatabaseReference? = null
@@ -56,7 +56,7 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
         if (old != new) {
             if (old != null) {
                 if (!suspendDatabaseSync) {
-                    FirebaseHelper.setContainsFlagOfUser(old.objectId, this.objectId, FirebaseHelper.CHILD_NAME_TRACKERS, false)
+                    FirebaseDbHelper.setContainsFlagOfUser(old.objectId, this.objectId, FirebaseDbHelper.CHILD_NAME_TRACKERS, false)
                 }
 
                 removedFromUser.invoke(this, old)
@@ -64,7 +64,7 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
             if (new != null) {
                 if (!suspendDatabaseSync) {
                     databasePointRef?.child("user")?.setValue(new.objectId)
-                    FirebaseHelper.setContainsFlagOfUser(new.objectId, this.objectId, FirebaseHelper.CHILD_NAME_TRACKERS, true)
+                    FirebaseDbHelper.setContainsFlagOfUser(new.objectId, this.objectId, FirebaseDbHelper.CHILD_NAME_TRACKERS, true)
                 }
                 addedToUser.invoke(this, new)
             }
@@ -247,7 +247,7 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
             _removedAttributeIds.removeAll { it == new.objectId }*/
 
         if (!suspendDatabaseSync)
-            FirebaseHelper.saveAttribute(this.objectId, new, index)
+            FirebaseDbHelper.saveAttribute(this.objectId, new, index)
 
         attributeAdded.invoke(this, ReadOnlyPair(new, index))
     }
@@ -261,7 +261,7 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
 
         attributeRemoved.invoke(this, ReadOnlyPair(attribute, index))
         if (!suspendDatabaseSync) {
-            FirebaseHelper.removeAttribute(objectId, attribute.objectId)
+            FirebaseDbHelper.removeAttribute(objectId, attribute.objectId)
         }
     }
 

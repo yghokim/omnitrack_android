@@ -14,7 +14,7 @@ import kr.ac.snu.hcil.omnitrack.utils.EnterHideKeyboardEditorActionListener
  */
 abstract class ACharSequenceAttributeInputView(layoutId: Int, context: Context, attrs: AttributeSet? = null) : AAttributeInputView<CharSequence>(layoutId, context, attrs) {
     override var value: CharSequence
-        get() = valueView.text
+        get() = valueView.text.toString()
         set(value) {
             if (value != valueView.text.toString()) {
                 valueView.setText(value, TextView.BufferType.EDITABLE)

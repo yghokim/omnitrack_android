@@ -24,7 +24,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AttributeSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
-import kr.ac.snu.hcil.omnitrack.core.database.FirebaseHelper
+import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
 import kr.ac.snu.hcil.omnitrack.ui.DragItemTouchHelperCallback
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTTrackerAttachedActivity
@@ -142,7 +142,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
         }
 
         startSubscriptions.add(
-                FirebaseHelper.loadItems(tracker).subscribe {
+                FirebaseDbHelper.loadItems(tracker).subscribe {
                     loadedItems ->
                     items.clear()
                     items.addAll(loadedItems)
@@ -218,7 +218,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
 
     fun deleteItemPermanently(position: Int): OTItem {
         val removedItem = items[position]
-        FirebaseHelper.removeItem(removedItem)
+        FirebaseDbHelper.removeItem(removedItem)
         items.removeAt(position)
         onItemRemoved(position)
 
@@ -231,7 +231,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
 
         fun clearTrashcan() {
             for (item in removedItems) {
-                FirebaseHelper.removeItem(item)
+                FirebaseDbHelper.removeItem(item)
             }
         }
 
