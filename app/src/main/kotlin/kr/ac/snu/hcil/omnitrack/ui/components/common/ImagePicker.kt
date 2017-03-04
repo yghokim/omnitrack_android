@@ -16,7 +16,9 @@ import android.view.ViewGroup
 import android.webkit.URLUtil
 import android.widget.FrameLayout
 import android.widget.ImageView
-import com.koushikdutta.ion.Ion
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.Target
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.applyTint
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
@@ -62,7 +64,7 @@ class ImagePicker : FrameLayout, View.OnClickListener {
 
 
         fun createCacheImageFileUri(context: Context): Uri {
-            return FileProvider.getUriForFile(context, "kr.ac.snu.hcil.omnitrack.fileprovider", createCacheImageFile(context))
+            return FileProvider.getUriForFile(context, "${BuildConfig.APPLICATION_ID}.provider", createCacheImageFile(context))
         }
 
         fun createCacheImageFile(context: Context): File {
@@ -98,10 +100,10 @@ class ImagePicker : FrameLayout, View.OnClickListener {
 
                 if (URLUtil.isNetworkUrl(value.toString())) {
                     println("uri is network. download the image and put it to the imageview.")
-                    Ion.with(imageView)
-                            .load(value.toString())
+                    Glide.with(context).load(value.toString()).into(imageView)
+
                 } else {
-                    imageView.setImageURI(value)
+                    Glide.with(context).load(value.toString()).override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL).into(imageView)
                 }
 
                 if (value == Uri.EMPTY) {
