@@ -32,7 +32,7 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
         {
             if (field != value) {
                 field = value
-                picker.imageUri = field.primaryUri
+                picker.imageUri = value
             }
         }
 
@@ -46,7 +46,7 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
         picker.uriChanged += {
             sender, uri->
             println("picker uri changed to ${uri.toString()}")
-            value = SynchronizedUri(uri)
+            value = uri
             onValueChanged(value)
         }
     }
@@ -80,7 +80,7 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
 
                     val resizedUri = Uri.fromFile(ImagePicker.createCacheImageFile(context))
                     resizeImage(uri, resizedUri)
-                    this@ImageInputView.picker.imageUri = resizedUri
+                    this@ImageInputView.picker.imageUri = SynchronizedUri(resizedUri)
                     pickerBottomSheetBuilder.setOnImageSelectedListener(null)
                 }
             })
@@ -122,7 +122,7 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
 
                 resizeImage(cameraCacheUri!!, cameraCacheUri!!)
 
-                this.picker.imageUri = cameraCacheUri!!
+                this.picker.imageUri = SynchronizedUri(cameraCacheUri!!)
                 cameraCacheUri = null
             }
             return true
@@ -131,7 +131,7 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
                 val uri = Uri.fromFile(ImagePicker.createCacheImageFile(context))
                 resizeImage(data.data, uri)
 
-                this.picker.imageUri = uri
+                this.picker.imageUri = SynchronizedUri(uri)
             }
 
             return true
