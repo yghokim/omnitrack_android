@@ -2,11 +2,12 @@ package kr.ac.snu.hcil.omnitrack.core.database
 
 import android.content.Context
 import android.net.Uri
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageMetadata
-import com.google.firebase.storage.StorageReference
-import com.google.firebase.storage.UploadTask
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.Task
+import com.google.firebase.storage.*
 import io.realm.Realm
+import rx.Single
+import rx.subscriptions.Subscriptions
 import java.util.*
 
 
@@ -60,6 +61,58 @@ class FirebaseStorageHelper(context: Context) {
 
     fun getItemStorageReference(itemId: String, trackerId: String, userId: String): StorageReference {
         return FirebaseStorage.getInstance().reference.child("entry_data").child(userId).child(trackerId).child(itemId)
+    }
+
+    fun getDownloadUrl(pathString: String): Single<Uri> {
+        return Single.create {
+            subscriber ->
+
+            val urlTask = FirebaseStorage.getInstance().reference.child(pathString).downloadUrl
+            urlTask.addOnCompleteListener(object : OnCompleteListener<Uri> {
+                override fun onComplete(task: Task<Uri>) {
+                    if (task.isSuccessful) {
+                        if (!subscriber.isUnsubscribed) {
+                            subscriber.onSuccess(task.result)
+                        }
+                    } else {
+                        if (!subscriber.isUnsubscribed) {
+                            subscriber.onError(task.exception)
+                        }
+                    }
+                }
+
+            })
+        }
+    }
+
+    fun downloadFileTo(pathString: String, localUri: Uri): Single<Uri> {
+        return Single.create {
+            subscriber ->
+
+            val downloadTask = FirebaseStorage.getInstance().reference.child(pathString).getFile(localUri)
+            val listener = object : OnCompleteListener<FileDownloadTask.TaskSnapshot> {
+                override fun onComplete(task: Task<FileDownloadTask.TaskSnapshot>) {
+                    if (!subscriber.isUnsubscribed) {
+                        if (task.isSuccessful) {
+                            subscriber.onSuccess(localUri)
+                        } else {
+                            subscriber.onError(task.exception)
+                        }
+                    }
+                }
+
+            }
+
+            downloadTask.addOnCompleteListener(listener)
+
+            subscriber.add(
+                    Subscriptions.create {
+                        downloadTask.cancel()
+                        downloadTask.removeOnCompleteListener(listener)
+                    }
+            )
+        }
+
     }
 
     fun assignNewUploadTask(outUri: SynchronizedUri, itemId: String, trackerId: String, userId: String) {

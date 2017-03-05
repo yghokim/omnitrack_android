@@ -9,6 +9,8 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.GlideDrawable
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
+import com.firebase.ui.storage.images.FirebaseImageLoader
+import com.google.firebase.storage.FirebaseStorage
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
@@ -85,10 +87,14 @@ class OTImageAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrack
                                 override fun onException(e: Exception, model: String?, target: Target<GlideDrawable>?, isFirstResource: Boolean): Boolean {
                                     if (isFirstResource && e is java.io.FileNotFoundException) {
                                         println("local uri failed. retry with server uri.")
-                                        Glide.with(view.context)
-                                                .load(value.serverUri.toString())
-                                                .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
-                                                .into(view)
+                                        println("server uri: ${value.serverUri}")
+                                        if (value.serverUri != Uri.EMPTY) {
+                                            val firebaseFileRef = FirebaseStorage.getInstance().reference.child(value.serverUri.toString())
+                                            Glide.with(view.context).using(FirebaseImageLoader())
+                                                    .load(firebaseFileRef)
+                                                    .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
+                                                    .into(view)
+                                        }
                                     }
                                     return false
                                 }

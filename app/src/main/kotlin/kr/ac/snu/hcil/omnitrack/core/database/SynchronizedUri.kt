@@ -48,6 +48,8 @@ class SynchronizedUri {
     var serverUri: Uri = Uri.EMPTY
         private set
 
+    val isEmpty: Boolean get() = localUri == Uri.EMPTY && serverUri == Uri.EMPTY
+
     val isSynchronized: Boolean get() = Uri.EMPTY == serverUri
     val primaryUri: Uri get() = if (Uri.EMPTY != localUri) {
         if (URLUtil.isFileUrl(localUri.toString())) {
