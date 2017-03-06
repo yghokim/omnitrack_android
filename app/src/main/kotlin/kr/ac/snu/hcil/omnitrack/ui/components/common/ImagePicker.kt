@@ -13,21 +13,16 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.URLUtil
 import android.widget.FrameLayout
 import android.widget.ImageView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.drawable.GlideDrawable
-import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
-import com.firebase.ui.storage.images.FirebaseImageLoader
-import com.google.firebase.storage.FirebaseStorage
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.utils.applyTint
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import java.io.File
-import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -97,13 +92,12 @@ class ImagePicker : FrameLayout, View.OnClickListener {
 
     var callback: ImagePickerCallback? = null
 
-    var imageUri: SynchronizedUri = SynchronizedUri()
+    var imageUri: Uri = Uri.EMPTY
         set(value) {
             println("new uri _ ${value.toString()}")
             if (field != value) {
                 field = value
 
-                /*
                 if (URLUtil.isNetworkUrl(value.toString())) {
                     println("uri is network. download the image and put it to the imageview.")
                     Glide.with(context).load(value.toString()).into(imageView)
@@ -111,28 +105,8 @@ class ImagePicker : FrameLayout, View.OnClickListener {
                 } else {
                     Glide.with(context).load(value.toString()).override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL).into(imageView)
                 }
-                */
 
-                Glide.with(context).load(value.localUri.toString()).listener(
-                        object : RequestListener<String, GlideDrawable> {
-                            override fun onException(e: Exception?, model: String?, target: Target<GlideDrawable>?, isFirstResource: Boolean): Boolean {
-                                if (value.serverUri != Uri.EMPTY) {
-                                    val firebaseFileRef = FirebaseStorage.getInstance().reference.child(value.serverUri.toString())
-                                    Glide.with(context).using(FirebaseImageLoader())
-                                            .load(firebaseFileRef)
-                                            .into(imageView)
-                                }
-                                return false
-                            }
-
-                            override fun onResourceReady(resource: GlideDrawable?, model: String?, target: Target<GlideDrawable>?, isFromMemoryCache: Boolean, isFirstResource: Boolean): Boolean {
-                                return false
-                            }
-
-                        }).into(imageView)
-
-
-                if (value.isEmpty) {
+                if (value == Uri.EMPTY) {
                     removeButton.visibility = View.INVISIBLE
                     buttonGroup.visibility = View.VISIBLE
                     imageView.visibility = View.GONE
@@ -145,7 +119,7 @@ class ImagePicker : FrameLayout, View.OnClickListener {
             }
         }
 
-    val uriChanged = Event<SynchronizedUri>()
+    val uriChanged = Event<Uri>()
 
     private val cameraButton: View
     private val galleryButton: View
@@ -180,7 +154,7 @@ class ImagePicker : FrameLayout, View.OnClickListener {
         } else if (view === galleryButton) {
             callback?.onRequestGalleryImage(this)
         } else if (view === removeButton) {
-            imageUri = SynchronizedUri()
+            imageUri = Uri.EMPTY
         }
     }
 

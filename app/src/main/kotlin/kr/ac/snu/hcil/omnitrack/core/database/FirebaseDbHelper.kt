@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.database
 
 import android.content.Intent
+import android.net.Uri
 import android.support.annotation.Keep
 import com.google.firebase.database.*
 import kr.ac.snu.hcil.omnitrack.OTApplication
@@ -782,7 +783,7 @@ object FirebaseDbHelper {
 
             tracker.attributes.map {
                 val value = item.getValueOf(it)
-                if (value is SynchronizedUri) {
+                if (value is SynchronizedUri && value.localUri != Uri.EMPTY) {
                     OTApplication.app.storageHelper.assignNewUploadTask(value, itemId, tracker.objectId, tracker.owner!!.objectId)
                 }
             }

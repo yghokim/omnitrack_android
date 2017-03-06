@@ -16,6 +16,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.ChoiceInputView
 import kr.ac.snu.hcil.omnitrack.utils.UniqueStringEntryList
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Observable
+import rx.Single
 import java.util.*
 
 /**
@@ -142,29 +143,29 @@ class OTChoiceAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrac
         return inputView
     }
 
-    override fun applyValueToViewForItemList(value: Any?, view: View): Boolean {
-        if (view is WordListView) {
-            view.colorIndexList.clear()
+    override fun applyValueToViewForItemList(value: Any?, view: View): Single<Boolean> {
+        return Single.defer {
+            if (view is WordListView) {
+                view.colorIndexList.clear()
 
-            if (value is IntArray && value.size > 0) {
-                val list = ArrayList <String>()
-                for (idEntry in value.withIndex()) {
+                if (value is IntArray && value.size > 0) {
+                    val list = ArrayList <String>()
+                    for (idEntry in value.withIndex()) {
 
-                    val indexInEntries = entries.indexOf(idEntry.value)
-                    if (indexInEntries >= 0) {
-                        list.add(entries[indexInEntries].text)
-                        view.colorIndexList.add(indexInEntries)
+                        val indexInEntries = entries.indexOf(idEntry.value)
+                        if (indexInEntries >= 0) {
+                            list.add(entries[indexInEntries].text)
+                            view.colorIndexList.add(indexInEntries)
+                        }
                     }
+
+                    view.words = list.toTypedArray()
+                } else {
+                    view.words = arrayOf()
                 }
-
-                view.words = list.toTypedArray()
-
-                return true
-            } else {
-                view.words = arrayOf()
-                return true
-            }
-        } else return super.applyValueToViewForItemList(value, view)
+                Single.just(true)
+            } else super.applyValueToViewForItemList(value, view)
+        }
     }
 
     override fun getViewForItemListContainerType(): Int = OTAttribute.VIEW_FOR_ITEM_LIST_CONTAINER_TYPE_SINGLELINE

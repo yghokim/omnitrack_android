@@ -36,6 +36,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDivider
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.getDayOfMonth
+import rx.Subscription
 import rx.internal.util.SubscriptionList
 import java.util.*
 
@@ -401,6 +402,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                     val attributeNameView: TextView by bindView(R.id.ui_attribute_name)
                     var valueView: View
 
+                    var valueApplySubscription: Subscription? = null
 
                     init {
                         valueView = view.findViewById(R.id.ui_value_view_replace)
@@ -433,8 +435,14 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                         val newValueView = attribute.getViewForItemList(this@ItemBrowserActivity, valueView)
                         changeNewValueView(newValueView)
 
+                        valueApplySubscription?.unsubscribe()
                         if (getParentItem().hasValueOf(attribute)) {
-                            attribute.applyValueToViewForItemList(getParentItem().getValueOf(attribute), valueView)
+                            valueApplySubscription = attribute.applyValueToViewForItemList(getParentItem().getValueOf(attribute), valueView).subscribe({
+                                valueApplySubscription = null
+                            }, {
+                                valueApplySubscription = null
+                            })
+                            startSubscriptions.add(valueApplySubscription)
                         }
                     }
 
