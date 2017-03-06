@@ -23,6 +23,7 @@ import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 import kr.ac.snu.hcil.omnitrack.utils.TextHelper
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import rx.Observable
+import rx.Single
 import java.util.*
 import kotlin.properties.Delegates
 
@@ -286,7 +287,7 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
     open fun getInputView(context: Context, previewMode: Boolean, recycledView: AAttributeInputView<out Any>?): AAttributeInputView<out Any> {
         val view =
                 if ((recycledView?.typeId == getInputViewType(previewMode))) {
-                    recycledView!!
+                    recycledView
                 } else {
                     AAttributeInputView.makeInstance(getInputViewType(previewMode), context)
                 }
@@ -313,15 +314,17 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
         return target
     }
 
-    open fun applyValueToViewForItemList(value: Any?, view: View): Boolean {
-        if (view is TextView) {
-            if (value != null) {
-                view.text = TextHelper.stringWithFallback(formatAttributeValue(value), "-")
-            } else {
-                view.text = view.context.getString(R.string.msg_empty_value)
-            }
-            return true
-        } else return false
+    open fun applyValueToViewForItemList(value: Any?, view: View): Single<Boolean> {
+        return Single.defer<Boolean> {
+            if (view is TextView) {
+                if (value != null) {
+                    view.text = TextHelper.stringWithFallback(formatAttributeValue(value), "-")
+                } else {
+                    view.text = view.context.getString(R.string.msg_empty_value)
+                }
+                Single.just(true)
+            } else Single.just(false)
+        }
     }
 
     open fun getRecommendedChartModels(): Array<ChartModel<*>> {

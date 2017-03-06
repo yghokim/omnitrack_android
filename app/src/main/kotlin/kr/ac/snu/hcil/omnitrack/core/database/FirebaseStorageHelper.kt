@@ -8,6 +8,7 @@ import com.google.firebase.storage.*
 import io.realm.Realm
 import rx.Single
 import rx.subscriptions.Subscriptions
+import java.io.File
 import java.util.*
 
 
@@ -82,6 +83,10 @@ class FirebaseStorageHelper(context: Context) {
                 }
 
             })
+            urlTask.addOnSuccessListener {
+                uri ->
+                subscriber.onSuccess(uri)
+            }
         }
     }
 
@@ -89,13 +94,17 @@ class FirebaseStorageHelper(context: Context) {
         return Single.create {
             subscriber ->
 
-            val downloadTask = FirebaseStorage.getInstance().reference.child(pathString).getFile(localUri)
+            val file = File(localUri.path)
+            file.createNewFile()
+
+            val downloadTask = FirebaseStorage.getInstance().reference.child(pathString).getFile(file)
             val listener = object : OnCompleteListener<FileDownloadTask.TaskSnapshot> {
                 override fun onComplete(task: Task<FileDownloadTask.TaskSnapshot>) {
                     if (!subscriber.isUnsubscribed) {
                         if (task.isSuccessful) {
                             subscriber.onSuccess(localUri)
                         } else {
+                            task.exception?.printStackTrace()
                             subscriber.onError(task.exception)
                         }
                     }
@@ -107,6 +116,7 @@ class FirebaseStorageHelper(context: Context) {
 
             subscriber.add(
                     Subscriptions.create {
+                        println("download task was unsubscribed.")
                         downloadTask.cancel()
                         downloadTask.removeOnCompleteListener(listener)
                     }
