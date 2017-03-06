@@ -25,6 +25,7 @@ import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import rx.subjects.BehaviorSubject
 import rx.subjects.PublishSubject
 import rx.subjects.SerializedSubject
+import java.io.File
 import java.util.*
 import kotlin.properties.Delegates
 
@@ -228,6 +229,46 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
         currentDbReference?.removeEventListener(dbChangedListener)
     }
 
+    fun getItemCacheDir(context: Context, createIfNotExist: Boolean = true): File {
+        val file = context.externalCacheDir.resolve("${owner?.objectId ?: "anonymous"}/${objectId}")
+        if (createIfNotExist && !file.exists()) {
+            file.mkdirs()
+        }
+        return file
+    }
+
+    fun getTotalCacheFileSize(context: Context): Long {
+        val cacheDirectory = getItemCacheDir(context, false)
+        try {
+            if (cacheDirectory.isDirectory && cacheDirectory.exists()) {
+
+                fun getSizeRecur(dir: File): Long {
+                    var size = 0L
+
+                    if (dir.isDirectory) {
+                        for (file in dir.listFiles()) {
+                            if (file.isFile) {
+                                size += file.length()
+                            } else {
+                                size += getSizeRecur(file)
+                            }
+                        }
+                    } else if (dir.isFile) {
+                        size += dir.length()
+                    }
+
+                    return size
+                }
+
+                return getSizeRecur(cacheDirectory)
+            } else {
+                return 0
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return 0
+        }
+    }
 
     override fun onNameChanged(newName: String) {
         super.onNameChanged(newName)

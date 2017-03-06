@@ -1,11 +1,10 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.items
 
+import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.BaseTransientBottomBar
-import android.support.design.widget.CoordinatorLayout
-import android.support.design.widget.Snackbar
+import android.support.design.widget.*
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -78,6 +77,9 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
         leftActionBarButton?.visibility = View.VISIBLE
         leftActionBarButton?.setImageResource(R.drawable.back_rhombus)
 
+        setRightSubButtonImage(R.drawable.settings_dark)
+        showRightSubButton()
+
         itemListView.emptyView = emptyListMessageView
         itemListView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         itemListView.addItemDecoration(HorizontalImageDividerItemDecoration(context = this))
@@ -130,6 +132,9 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
 
     override fun onTrackerLoaded(tracker: OTTracker) {
         super.onTrackerLoaded(tracker)
+
+        println("Cache size: ${tracker.getTotalCacheFileSize(this)}")
+
         items.clear()
         title = String.format(resources.getString(R.string.title_activity_item_browser, tracker.name))
 
@@ -473,6 +478,33 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                         attributeNameView.text = attribute.name
                     }
                 }
+            }
+        }
+    }
+
+    class SettingsDialogFragment : BottomSheetDialogFragment() {
+
+        private val behaviorCallback = object : BottomSheetBehavior.BottomSheetCallback() {
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+
+            }
+
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                if (newState == BottomSheetBehavior.STATE_HIDDEN) {
+                    dismiss()
+                }
+            }
+
+        }
+
+        override fun setupDialog(dialog: Dialog, style: Int) {
+            super.setupDialog(dialog, style)
+            val contentView = View.inflate(context, R.layout.fragment_items_settings, null)
+            dialog.setContentView(contentView)
+            val lp = ((contentView.parent as View).layoutParams as CoordinatorLayout.LayoutParams)
+            val behavior = lp.behavior
+            if (behavior is BottomSheetBehavior) {
+                behavior.setBottomSheetCallback(behaviorCallback)
             }
         }
     }

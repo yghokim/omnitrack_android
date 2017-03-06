@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/frontalBackground"
+    android:orientation="vertical">
+
+    <TextView
+        style="@style/PropertyHeaderStyle"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/button_height_small"
+        android:gravity="center_vertical"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:text="@string/action_settings" />
+
+    <View style="@style/HorizontalSeparator.NoVerticalMargin" />
+
+    <LinearLayout
+        android:id="@+id/ui_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:divider="@color/dividerColor"
+        android:dividerPadding="@dimen/activity_horizontal_margin"
+        android:orientation="vertical"
+        android:showDividers="middle">
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/ui_button_purge_cache"
+            style="@style/SidebarButtonStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/clear_cache"
+            android:text="@string/msg_purge_cache" />
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/ui_button_remove_all"
+            style="@style/SidebarButtonStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/trashcan"
+            android:text="@string/msg_remove_all_the_items_permanently" />
+    </LinearLayout>
+
+</LinearLayout>

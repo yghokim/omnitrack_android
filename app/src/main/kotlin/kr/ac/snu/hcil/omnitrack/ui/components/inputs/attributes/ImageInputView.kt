@@ -57,7 +57,7 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
             }
         }
 
-    private val picker: ImagePicker = findViewById(R.id.ui_image_picker) as ImagePicker
+    val picker: ImagePicker = findViewById(R.id.ui_image_picker) as ImagePicker
 
     private var cameraCacheUri: Uri? = null
 
@@ -85,7 +85,7 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
     override fun onRequestCameraImage(view: ImagePicker) {
         val activity = this.getActivity()
         if(activity != null) {
-            cameraCacheUri = ImagePicker.dispatchCameraIntent(activity,  makeActivityForResultRequestCode(position, REQUEST_CODE_CAMERA))
+            cameraCacheUri = picker.dispatchCameraIntent(activity, makeActivityForResultRequestCode(position, REQUEST_CODE_CAMERA))
         }
     }
 
@@ -101,7 +101,7 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
             pickerBottomSheetBuilder.setOnImageSelectedListener(object : TedBottomPicker.OnImageSelectedListener {
                 override fun onImageSelected(uri: Uri) {
 
-                    val resizedUri = Uri.fromFile(ImagePicker.createCacheImageFile(context))
+                    val resizedUri = Uri.fromFile(picker.createCacheImageFile(context))
                     resizeImage(uri, resizedUri)
                     this@ImageInputView.picker.imageUri = resizedUri
                     pickerBottomSheetBuilder.setOnImageSelectedListener(null)
@@ -151,7 +151,7 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
             return true
         } else if (requestType == REQUEST_CODE_GALLERY) {
             if (data.data != null) {
-                val uri = Uri.fromFile(ImagePicker.createCacheImageFile(context))
+                val uri = Uri.fromFile(picker.createCacheImageFile(context))
                 resizeImage(data.data, uri)
 
                 this.picker.imageUri = uri

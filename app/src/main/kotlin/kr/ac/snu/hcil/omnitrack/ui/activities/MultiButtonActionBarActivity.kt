@@ -29,6 +29,7 @@ abstract class MultiButtonActionBarActivity(val layoutId: Int) : OTActivity() {
 
     protected var leftActionBarButton: ImageButton?=null
     protected var rightActionBarButton: ImageButton?=null
+    protected var rightActionBarSubButton: ImageButton? = null
 
     protected var rightActionBarTextButton: AppCompatButton? = null
     protected var titleView: TextView? = null
@@ -69,6 +70,11 @@ abstract class MultiButtonActionBarActivity(val layoutId: Int) : OTActivity() {
             onToolbarRightButtonClicked()
         }
 
+        rightActionBarSubButton = findViewById(R.id.ui_appbar_button_right_sub) as AppCompatImageButton
+        rightActionBarSubButton?.setOnClickListener {
+            onToolbarRightSubButtonClicked()
+        }
+
         titleView = findViewById(R.id.ui_appbar_title) as TextView?
         titleView?.setText(title)
 
@@ -107,6 +113,22 @@ abstract class MultiButtonActionBarActivity(val layoutId: Int) : OTActivity() {
     abstract protected fun onToolbarLeftButtonClicked()
 
     abstract protected fun onToolbarRightButtonClicked()
+
+    protected open fun onToolbarRightSubButtonClicked() {
+
+    }
+
+    protected fun showRightSubButton() {
+        rightActionBarSubButton?.visibility = View.VISIBLE
+    }
+
+    protected fun hideRightSubButton() {
+        rightActionBarSubButton?.visibility = View.GONE
+    }
+
+    protected fun setRightSubButtonImage(res: Int) {
+        rightActionBarSubButton?.setImageResource(res)
+    }
 
     protected fun setActionBarButtonMode(mode: Mode) {
         when (mode) {
