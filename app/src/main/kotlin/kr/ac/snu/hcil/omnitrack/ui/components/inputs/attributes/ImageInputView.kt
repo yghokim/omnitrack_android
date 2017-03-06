@@ -7,10 +7,12 @@ import android.net.Uri
 import android.provider.MediaStore
 import android.util.AttributeSet
 import gun0912.tedbottompicker.TedBottomPicker
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.ui.components.common.ImagePicker
 import kr.ac.snu.hcil.omnitrack.utils.getActivity
+import rx.internal.util.SubscriptionList
 
 /**
  * Created by Young-Ho Kim on 2016-07-22.
@@ -32,13 +34,34 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
         {
             if (field != value) {
                 field = value
-                picker.imageUri = value.primaryUri
+                if (value.isLocalUriValid) {
+                    picker.imageUri = value.localUri
+                } else if (value.isSynchronized) {
+                    picker.isEnabled = false
+                    subscriptions.add(
+                            OTApplication.app.storageHelper.downloadFileTo(value.serverUri.path, value.localUri).subscribe({
+                                uri ->
+                                picker.imageUri = uri
+                                picker.isEnabled = true
+                            }, {
+                                error ->
+                                error?.printStackTrace()
+                                picker.imageUri = Uri.EMPTY
+                                picker.isEnabled = true
+                            })
+
+                    )
+                } else {
+                    picker.imageUri = Uri.EMPTY
+                }
             }
         }
 
     private val picker: ImagePicker = findViewById(R.id.ui_image_picker) as ImagePicker
 
     private var cameraCacheUri: Uri? = null
+
+    private val subscriptions = SubscriptionList()
 
     init {
         picker.callback = this

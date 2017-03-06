@@ -73,6 +73,7 @@ class OTImageAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrack
     override fun applyValueToViewForItemList(value: Any?, view: View): Single<Boolean> {
         return Single.defer {
             if (view is ImageView && value != null) {
+                view.setImageResource(android.R.drawable.stat_sys_download)
                 if (value is SynchronizedUri) {
                     if (value.isLocalUriValid) {
                         Glide.with(view.context)
@@ -84,7 +85,7 @@ class OTImageAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrack
                         println("local uri is invalid. download server image.")
                         if (value.isSynchronized) {
                             //OTApplication.app.storageHelper.downloadFileTo(value.serverUri.toString(), value.localUri).onErrorReturn{Uri.EMPTY}
-                            OTApplication.app.storageHelper.getDownloadUrl(value.serverUri.toString()).onErrorReturn {
+                            OTApplication.app.storageHelper.downloadFileTo(value.serverUri.toString(), value.localUri).onErrorReturn {
                                 error ->
                                 error.printStackTrace()
                                 Uri.EMPTY
