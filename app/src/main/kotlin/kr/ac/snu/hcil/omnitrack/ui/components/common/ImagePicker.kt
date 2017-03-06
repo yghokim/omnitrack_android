@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
-import android.os.Environment
 import android.provider.MediaStore
 import android.support.v4.content.ContextCompat
 import android.support.v4.content.FileProvider
@@ -33,56 +32,7 @@ class ImagePicker : FrameLayout, View.OnClickListener {
 
     //https://developer.android.com/training/camera/photobasics.html
     companion object{
-        fun dispatchCameraIntent(activity: AppCompatActivity, requestCode: Int): Uri?{
-            val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
 
-            //ensure there is a camera activity
-            if (takePictureIntent.resolveActivity(activity.getPackageManager()) != null) {
-
-                val uri = createCacheImageFileUri(activity)
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
-
-                activity.startActivityForResult(takePictureIntent, requestCode)
-
-                return uri
-            }
-            else return null
-        }
-
-        fun dispatchImagePickIntent(activity: AppCompatActivity, requestCode: Int) {
-            val getIntent = Intent(Intent.ACTION_GET_CONTENT)
-            getIntent.type = "image/*"
-
-            val pickIntent = Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-            pickIntent.type = "image/*"
-
-            val chooserIntent = Intent.createChooser(getIntent, "Select Image")
-            chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf(pickIntent))
-
-            activity.startActivityForResult(chooserIntent, requestCode)
-        }
-
-
-        fun createCacheImageFileUri(context: Context): Uri {
-            return FileProvider.getUriForFile(context, "${BuildConfig.APPLICATION_ID}.provider", createCacheImageFile(context))
-        }
-
-        fun createCacheImageFile(context: Context): File {
-            // Create an image file name
-            val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-            val imageFileName = "JPEG_" + timeStamp + "_"
-            val storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-
-            val image = File.createTempFile(
-                    imageFileName, /* prefix */
-                    ".jpg", /* suffix */
-                    storageDir      /* directory */)
-
-            println("camera output : ${image.absolutePath}")
-
-            // Save a file: path for use with ACTION_VIEW intents
-            return image
-        }
     }
 
     interface ImagePickerCallback {
@@ -128,6 +78,7 @@ class ImagePicker : FrameLayout, View.OnClickListener {
     private val buttonGroup: ViewGroup
     private val imageView: ImageView
 
+    var overrideLocalUriFolderPath: File? = null
 
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
@@ -156,6 +107,58 @@ class ImagePicker : FrameLayout, View.OnClickListener {
         } else if (view === removeButton) {
             imageUri = Uri.EMPTY
         }
+    }
+
+
+    fun createCacheImageFile(context: Context): File {
+        // Create an image file name
+        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        val imageFileName = "JPEG_" + timeStamp + "_"
+        val storageDir = this.overrideLocalUriFolderPath ?: context.externalCacheDir
+        println("store file to ${storageDir}")
+
+        val image = File.createTempFile(
+                imageFileName, /* prefix */
+                ".jpg", /* suffix */
+                storageDir      /* directory */)
+
+        println("camera output : ${image.absolutePath}")
+
+        // Save a file: path for use with ACTION_VIEW intents
+        return image
+    }
+
+    fun dispatchCameraIntent(activity: AppCompatActivity, requestCode: Int): Uri? {
+        val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+
+        //ensure there is a camera activity
+        if (takePictureIntent.resolveActivity(activity.getPackageManager()) != null) {
+
+            val uri = createCacheImageFileUri(activity)
+            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
+
+            activity.startActivityForResult(takePictureIntent, requestCode)
+
+            return uri
+        } else return null
+    }
+
+    fun dispatchImagePickIntent(activity: AppCompatActivity, requestCode: Int) {
+        val getIntent = Intent(Intent.ACTION_GET_CONTENT)
+        getIntent.type = "image/*"
+
+        val pickIntent = Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        pickIntent.type = "image/*"
+
+        val chooserIntent = Intent.createChooser(getIntent, "Select Image")
+        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf(pickIntent))
+
+        activity.startActivityForResult(chooserIntent, requestCode)
+    }
+
+
+    fun createCacheImageFileUri(context: Context): Uri {
+        return FileProvider.getUriForFile(context, "${BuildConfig.APPLICATION_ID}.provider", createCacheImageFile(context))
     }
 
 }
