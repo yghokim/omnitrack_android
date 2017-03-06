@@ -50,7 +50,7 @@ class SynchronizedUri {
 
     val isEmpty: Boolean get() = localUri == Uri.EMPTY && serverUri == Uri.EMPTY
 
-    val isSynchronized: Boolean get() = Uri.EMPTY == serverUri
+    val isSynchronized: Boolean get() = Uri.EMPTY != serverUri
 
     val isLocalUriValid: Boolean get() {
         return if (Uri.EMPTY != localUri) {
