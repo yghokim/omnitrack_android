@@ -13,9 +13,11 @@ import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.ImageInputView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Observable
 import rx.Single
+import rx.schedulers.Schedulers
 
 /**
  * Created by younghokim on 16. 9. 6..
@@ -44,7 +46,9 @@ class OTImageAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrack
     override val propertyKeys: Array<String> = emptyArray()
 
     override fun refreshInputViewUI(inputView: AAttributeInputView<out Any>) {
-
+        if (inputView is ImageInputView) {
+            inputView.picker.overrideLocalUriFolderPath = tracker?.getItemCacheDir(inputView.context)
+        }
     }
 
     override fun getViewForItemListContainerType(): Int = VIEW_FOR_ITEM_LIST_CONTAINER_TYPE_MULTILINE
@@ -72,9 +76,8 @@ class OTImageAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrack
 
     override fun applyValueToViewForItemList(value: Any?, view: View): Single<Boolean> {
         return Single.defer {
-            if (view is ImageView && value != null) {
+            if (view is ImageView && value is SynchronizedUri && !value.isEmpty) {
                 view.setImageResource(android.R.drawable.stat_sys_download)
-                if (value is SynchronizedUri) {
                     if (value.isLocalUriValid) {
                         Glide.with(view.context)
                                 .load(value.localUri.toString())
@@ -98,10 +101,12 @@ class OTImageAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrack
                                                 .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
                                                 .into(view)
                                         true
-                                    }
-                        } else Single.just(false)
+                                    }.subscribeOn(Schedulers.io())
+                        } else {
+                            view.setImageResource(0)
+                            Single.just(false)
+                        }
                     }
-                } else Single.just(false)
             } else super.applyValueToViewForItemList(value, view)
         }
     }
