@@ -67,7 +67,7 @@ class FirebaseStorageHelper(context: Context) {
     fun getDownloadUrl(pathString: String): Single<Uri> {
         return Single.create {
             subscriber ->
-
+            println("getting download url from firebase : ${pathString}")
             val urlTask = FirebaseStorage.getInstance().reference.child(pathString).downloadUrl
             urlTask.addOnCompleteListener(object : OnCompleteListener<Uri> {
                 override fun onComplete(task: Task<Uri>) {
@@ -82,10 +82,13 @@ class FirebaseStorageHelper(context: Context) {
                     }
                 }
 
-            })
-            urlTask.addOnSuccessListener {
+            }).addOnSuccessListener {
                 uri ->
                 subscriber.onSuccess(uri)
+            }.addOnFailureListener {
+                error ->
+                error.printStackTrace()
+                println(error)
             }
         }
     }
@@ -94,14 +97,19 @@ class FirebaseStorageHelper(context: Context) {
         return Single.create {
             subscriber ->
 
-            val file = File(localUri.path)
-            file.createNewFile()
+            println("download firebase from ${pathString} to ${localUri}")
 
-            val downloadTask = FirebaseStorage.getInstance().reference.child(pathString).getFile(file)
+            val localFileRoot = File(localUri.path).parentFile
+            if (!localFileRoot.exists()) {
+                localFileRoot.mkdirs()
+            }
+
+            val downloadTask = FirebaseStorage.getInstance().reference.child(pathString).getFile(localUri)
             val listener = object : OnCompleteListener<FileDownloadTask.TaskSnapshot> {
                 override fun onComplete(task: Task<FileDownloadTask.TaskSnapshot>) {
                     if (!subscriber.isUnsubscribed) {
                         if (task.isSuccessful) {
+                            println("firebase storage image successfully downloaded at ${localUri}")
                             subscriber.onSuccess(localUri)
                         } else {
                             task.exception?.printStackTrace()
@@ -117,7 +125,9 @@ class FirebaseStorageHelper(context: Context) {
             subscriber.add(
                     Subscriptions.create {
                         println("download task was unsubscribed.")
-                        downloadTask.cancel()
+                        if (downloadTask.isInProgress)
+                            downloadTask.cancel()
+
                         downloadTask.removeOnCompleteListener(listener)
                     }
             )
