@@ -6,11 +6,8 @@ import android.support.v4.content.ContextCompat
 import android.view.View
 import android.widget.ImageView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.drawable.GlideDrawable
-import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
-import com.firebase.ui.storage.images.FirebaseImageLoader
-import com.google.firebase.storage.FirebaseStorage
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
@@ -18,7 +15,7 @@ import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Observable
-import java.lang.Exception
+import rx.Single
 
 /**
  * Created by younghokim on 16. 9. 6..
@@ -73,42 +70,39 @@ class OTImageAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrack
         return target
     }
 
-    override fun applyValueToViewForItemList(value: Any?, view: View): Boolean {
-        if (view is ImageView && value != null) {
-            if (value is SynchronizedUri) {
-                if (value.primaryUri != Uri.EMPTY) {
-                    Glide.with(view.context)
-                            .load(value.localUri.toString())
-                            .listener(object : RequestListener<String, GlideDrawable> {
-                                override fun onResourceReady(resource: GlideDrawable?, model: String?, target: Target<GlideDrawable>?, isFromMemoryCache: Boolean, isFirstResource: Boolean): Boolean {
-                                    return false
-                                }
-
-                                override fun onException(e: Exception, model: String?, target: Target<GlideDrawable>?, isFirstResource: Boolean): Boolean {
-                                    if (isFirstResource && e is java.io.FileNotFoundException) {
-                                        println("local uri failed. retry with server uri.")
-                                        println("server uri: ${value.serverUri}")
-                                        if (value.serverUri != Uri.EMPTY) {
-                                            val firebaseFileRef = FirebaseStorage.getInstance().reference.child(value.serverUri.toString())
-                                            Glide.with(view.context).using(FirebaseImageLoader())
-                                                    .load(firebaseFileRef)
-                                                    .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
-                                                    .into(view)
-                                        }
+    override fun applyValueToViewForItemList(value: Any?, view: View): Single<Boolean> {
+        return Single.defer {
+            if (view is ImageView && value != null) {
+                if (value is SynchronizedUri) {
+                    if (value.isLocalUriValid) {
+                        Glide.with(view.context)
+                                .load(value.localUri.toString())
+                                .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
+                                .into(view)
+                        Single.just(true)
+                    } else {
+                        println("local uri is invalid. download server image.")
+                        if (value.isSynchronized) {
+                            //OTApplication.app.storageHelper.downloadFileTo(value.serverUri.toString(), value.localUri).onErrorReturn{Uri.EMPTY}
+                            OTApplication.app.storageHelper.getDownloadUrl(value.serverUri.toString()).onErrorReturn {
+                                error ->
+                                error.printStackTrace()
+                                Uri.EMPTY
+                            }
+                                    .map {
+                                        uri ->
+                                        println("downloaded: ${uri}")
+                                        Glide.with(view.context)
+                                                .load(uri)
+                                                .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
+                                                .into(view)
+                                        true
                                     }
-                                    return false
-                                }
-
-
-                            })
-                            .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
-                            .into(view)
-                } else {
-                    view.setImageURI(Uri.EMPTY)
-                }
-                return true
-            } else return false
-        } else return super.applyValueToViewForItemList(value, view)
+                        } else Single.just(false)
+                    }
+                } else Single.just(false)
+            } else super.applyValueToViewForItemList(value, view)
+        }
     }
 
     override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_SYNCHRONIZED_URI

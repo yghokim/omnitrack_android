@@ -13,6 +13,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.StarRatingInputV
 import kr.ac.snu.hcil.omnitrack.utils.RatingOptions
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Observable
+import rx.Single
 
 /**
  * Created by younghokim on 16. 9. 6..
@@ -147,15 +148,17 @@ class OTRatingAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrac
         }
     }
 
-    override fun applyValueToViewForItemList(value: Any?, view: View): Boolean {
-        if (view is StarRatingView && value != null) {
-            if (value is Float) {
-                view.score = value
-                view.allowIntermediate = allowIntermediate
-                view.levels = level.maxScore
-                return true
-            } else return false
-        } else return super.applyValueToViewForItemList(value, view)
+    override fun applyValueToViewForItemList(value: Any?, view: View): Single<Boolean> {
+        return Single.defer {
+            if (view is StarRatingView && value != null) {
+                if (value is Float) {
+                    view.score = value
+                    view.allowIntermediate = allowIntermediate
+                    view.levels = level.maxScore
+                    Single.just(true)
+                } else Single.just(false)
+            } else super.applyValueToViewForItemList(value, view)
+        }
     }
 
 }

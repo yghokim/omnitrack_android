@@ -14,6 +14,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.MapImageView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Observable
+import rx.Single
 import rx.subscriptions.Subscriptions
 
 /**
@@ -108,12 +109,14 @@ class OTLocationAttribute(objectId: String?, localKey: Int?, parentTracker: OTTr
         return recycledView as? MapImageView ?: MapImageView(context)
     }
 
-    override fun applyValueToViewForItemList(value: Any?, view: View): Boolean {
-        if (view is MapImageView && value != null) {
-            if (value is LatLng) {
-                view.location = value
-                return true
-            } else return false
-        } else return super.applyValueToViewForItemList(value, view)
+    override fun applyValueToViewForItemList(value: Any?, view: View): Single<Boolean> {
+        return Single.defer {
+            if (view is MapImageView && value != null) {
+                if (value is LatLng) {
+                    view.location = value
+                    Single.just(true)
+                } else Single.just(false)
+            } else super.applyValueToViewForItemList(value, view)
+        }
     }
 }
