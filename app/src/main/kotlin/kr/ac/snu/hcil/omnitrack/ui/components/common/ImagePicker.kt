@@ -19,8 +19,10 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.Target
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.CameraPickDialogFragment
 import kr.ac.snu.hcil.omnitrack.utils.applyTint
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
+import kr.ac.snu.hcil.omnitrack.utils.getActivity
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -101,7 +103,14 @@ class ImagePicker : FrameLayout, View.OnClickListener {
 
     override fun onClick(view: View?) {
         if (view === cameraButton) {
-            callback?.onRequestCameraImage(this)
+            //callback?.onRequestCameraImage(this)
+            val dialog = CameraPickDialogFragment()
+            val activity = this.getActivity()
+
+            if (activity != null) {
+                dialog.show(activity.supportFragmentManager, "CAMERA")
+            }
+
         } else if (view === galleryButton) {
             callback?.onRequestGalleryImage(this)
         } else if (view === removeButton) {

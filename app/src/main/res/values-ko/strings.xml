@@ -237,6 +237,9 @@
     <string name="msg_purge_cache">임시저장 미디어 파일 비우기</string>
     <string name="msg_remove_all_the_items_permanently">모든 아이템 영구 삭제</string>
     <string name="msg_no_cache">임시저장 파일 없음</string>
+    <string name="msg_tab_to_take_a_photo">탭해서 사진을 찍습니다</string>
+    <string name="msg_turn_to_selfie">셀카 모드로 전환</string>
+    <string name="msg_turn_to_rear">후면 카메라로 전환</string>
 
 
     <string-array name="gender_entries">
