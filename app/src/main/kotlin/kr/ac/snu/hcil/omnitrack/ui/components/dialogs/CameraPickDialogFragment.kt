@@ -5,9 +5,13 @@ import android.app.Dialog
 import android.graphics.Color
 import android.os.Bundle
 import android.support.v4.app.DialogFragment
+import android.support.v4.graphics.drawable.DrawableCompat
+import android.support.v7.widget.AppCompatImageButton
 import android.view.View
 import android.widget.Button
+import android.widget.TextView
 import android.widget.ToggleButton
+import com.flurgle.camerakit.CameraKit
 import com.flurgle.camerakit.CameraView
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
@@ -18,18 +22,23 @@ import kr.ac.snu.hcil.omnitrack.utils.applyTint
  */
 class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
 
+    companion object {
+    }
+
     private lateinit var cameraView: CameraView
     private lateinit var shutterButton: Button
     private lateinit var cameraModeToggleButton: ToggleButton
+    private lateinit var titleView: TextView
+    private lateinit var cancelButton: AppCompatImageButton
 
     private val listener = CameraListener()
 
     private val cameraFrontDrawable by lazy {
-        applyTint(OTApplication.app.getDrawable(R.drawable.camera_front), Color.WHITE)
+        applyTint(DrawableCompat.wrap(OTApplication.app.getDrawable(R.drawable.camera_front)), Color.WHITE)
     }
 
     private val cameraRearDrawable by lazy {
-        applyTint(OTApplication.app.getDrawable(R.drawable.camera_rear), Color.WHITE)
+        applyTint(DrawableCompat.wrap(OTApplication.app.getDrawable(R.drawable.camera_rear)), Color.WHITE)
     }
 
     private fun findViews(view: View) {
@@ -45,10 +54,18 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
             if (checked) {
                 //true: SelfieMode on
                 compoundButton.setCompoundDrawablesRelativeWithIntrinsicBounds(cameraRearDrawable, null, null, null)
+                cameraView.setFacing(CameraKit.Constants.FACING_FRONT)
             } else {
                 compoundButton.setCompoundDrawablesRelativeWithIntrinsicBounds(cameraFrontDrawable, null, null, null)
+                cameraView.setFacing(CameraKit.Constants.FACING_BACK)
             }
         }
+
+        titleView = view.findViewById(R.id.title) as TextView
+        titleView.setText(R.string.msg_camera_input_header)
+
+        cancelButton = view.findViewById(R.id.ui_button_cancel) as AppCompatImageButton
+        cancelButton.setOnClickListener(this)
     }
 
     private fun applyTintToCompoundDrawables(button: Button) {
@@ -67,6 +84,8 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
             } catch(e: Exception) {
                 e.printStackTrace()
             }
+        } else if (view === cancelButton) {
+            dismiss()
         }
     }
 
@@ -95,6 +114,9 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
     inner class CameraListener : com.flurgle.camerakit.CameraListener() {
         override fun onPictureTaken(jpeg: ByteArray?) {
             super.onPictureTaken(jpeg)
+            if (jpeg != null) {
+
+            }
         }
 
         override fun onCameraOpened() {

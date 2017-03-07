@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:camerakit="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
+
+    <include layout="@layout/common_normal_healder_bar" />
 
     <FrameLayout
         android:id="@+id/ui_camera_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/ui_camera_shutter">
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
         <com.flurgle.camerakit.CameraView
             android:id="@+id/ui_camera_view"
@@ -21,29 +24,31 @@
             camerakit:ckFlash="off"
             camerakit:ckFocus="continuous"
             camerakit:ckJpegQuality="100" />
+
+        <ToggleButton
+            android:id="@+id/ui_button_toggle_camera"
+            style="@style/CameraViewOverlayButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/button_height_small"
+            android:layout_gravity="right|bottom"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:drawableStart="@drawable/camera_front"
+            android:textAllCaps="false"
+            android:textOff="@string/msg_turn_to_selfie"
+            android:textOn="@string/msg_turn_to_rear"
+
+            />
+
+
     </FrameLayout>
-
-    <ToggleButton
-        android:id="@+id/ui_button_toggle_camera"
-        style="@style/CameraViewOverlayButtonStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="@dimen/button_height_small"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="@dimen/activity_horizontal_margin"
-        android:drawableLeft="@drawable/camera_front"
-        android:textAllCaps="false"
-        android:textOff="@string/msg_turn_to_selfie"
-        android:textOn="@string/msg_turn_to_rear"
-
-        />
 
     <Button
         android:id="@+id/ui_camera_shutter"
         style="@style/Base.Widget.AppCompat.Button.Borderless.Colored"
         android:layout_width="match_parent"
         android:layout_height="@dimen/button_height_tall"
-        android:layout_alignParentBottom="true"
         android:background="@drawable/button_background_color_pointed"
         android:text="@string/msg_tab_to_take_a_photo"
         android:textColor="#FFF" />
-</RelativeLayout>
+</LinearLayout>

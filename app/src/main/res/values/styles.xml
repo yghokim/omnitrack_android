@@ -440,7 +440,6 @@
         <item name="android:textColor">#FFF</item>
         <item name="android:paddingStart">12dp</item>
         <item name="android:paddingEnd">15dp</item>
-        <item name="android:textStyle">bold</item>
         <item name="android:drawablePadding">4dp</item>
     </style>
 
