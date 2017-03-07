@@ -2,6 +2,9 @@ package kr.ac.snu.hcil.omnitrack.ui.components.dialogs
 
 import android.app.AlertDialog
 import android.app.Dialog
+import android.content.DialogInterface
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.Bundle
 import android.support.v4.app.DialogFragment
@@ -23,6 +26,15 @@ import kr.ac.snu.hcil.omnitrack.utils.applyTint
 class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
 
     companion object {
+        fun getInstance(handler: ImageHandler): CameraPickDialogFragment{
+            val fragment = CameraPickDialogFragment()
+            fragment.imageHandler = handler
+            return fragment
+        }
+    }
+
+    interface ImageHandler{
+        fun onReceivedImage(image: Bitmap)
     }
 
     private lateinit var cameraView: CameraView
@@ -32,6 +44,8 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
     private lateinit var cancelButton: AppCompatImageButton
 
     private val listener = CameraListener()
+
+    private var imageHandler: ImageHandler? = null
 
     private val cameraFrontDrawable by lazy {
         applyTint(DrawableCompat.wrap(OTApplication.app.getDrawable(R.drawable.camera_front)), Color.WHITE)
@@ -99,6 +113,11 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
         super.onPause()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        imageHandler = null
+    }
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
         val inflater = activity.layoutInflater
@@ -115,7 +134,19 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
         override fun onPictureTaken(jpeg: ByteArray?) {
             super.onPictureTaken(jpeg)
             if (jpeg != null) {
+                try {
+                    val bitmap = BitmapFactory.decodeByteArray(jpeg, 0, jpeg.size)
+                    if(bitmap!=null)
+                    {
+                        imageHandler?.onReceivedImage(bitmap)
+                    }
+                }
+                catch(ex: Exception)
+                {
 
+                }
+
+                dismiss()
             }
         }
 
