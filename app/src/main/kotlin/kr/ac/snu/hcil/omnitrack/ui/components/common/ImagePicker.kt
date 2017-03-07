@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.ui.components.common
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.net.Uri
 import android.provider.MediaStore
@@ -40,6 +41,7 @@ class ImagePicker : FrameLayout, View.OnClickListener {
     interface ImagePickerCallback {
         fun onRequestCameraImage(view: ImagePicker)
         fun onRequestGalleryImage(view: ImagePicker)
+        fun onBitmapInput(image: Bitmap): Uri
     }
 
     var callback: ImagePickerCallback? = null
@@ -104,7 +106,12 @@ class ImagePicker : FrameLayout, View.OnClickListener {
     override fun onClick(view: View?) {
         if (view === cameraButton) {
             //callback?.onRequestCameraImage(this)
-            val dialog = CameraPickDialogFragment()
+            val dialog = CameraPickDialogFragment.getInstance(object: CameraPickDialogFragment.ImageHandler{
+                override fun onReceivedImage(image: Bitmap) {
+                    imageUri = callback?.onBitmapInput(image) ?: Uri.EMPTY
+                }
+
+            })
             val activity = this.getActivity()
 
             if (activity != null) {

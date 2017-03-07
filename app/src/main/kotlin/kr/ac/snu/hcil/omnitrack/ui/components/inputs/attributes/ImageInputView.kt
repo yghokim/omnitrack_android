@@ -113,8 +113,20 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
         }
     }
 
+
+    override fun onBitmapInput(image: Bitmap): Uri {
+        val resizedUri = Uri.fromFile(picker.createCacheImageFile(context))
+        resizeImage(image, resizedUri)
+        return resizedUri
+    }
+
     fun resizeImage(source: Uri, dest: Uri) {
         val bitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, source)
+        resizeImage(bitmap, dest)
+    }
+
+    fun resizeImage(bitmap: Bitmap, dest: Uri)
+    {
         println("loaded bitmap original size: ${bitmap.width} X ${bitmap.height}")
 
 
