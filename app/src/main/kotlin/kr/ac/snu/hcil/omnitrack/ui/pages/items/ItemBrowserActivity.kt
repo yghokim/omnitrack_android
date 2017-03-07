@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.items
 
 import android.app.Dialog
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.*
@@ -19,6 +20,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
+import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AttributeSorter
@@ -26,9 +28,11 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
 import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
 import kr.ac.snu.hcil.omnitrack.ui.DragItemTouchHelperCallback
+import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTTrackerAttachedActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.ExtendedSpinner
 import kr.ac.snu.hcil.omnitrack.ui.components.common.FallbackRecyclerView
+import kr.ac.snu.hcil.omnitrack.ui.components.common.viewholders.RecyclerViewMenuAdapter
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.DrawableListBottomSpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
@@ -38,6 +42,7 @@ import kr.ac.snu.hcil.omnitrack.utils.getDayOfMonth
 import rx.Subscription
 import rx.internal.util.SubscriptionList
 import java.util.*
+import kotlin.properties.Delegates
 
 class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_browser), ExtendedSpinner.OnItemSelectedListener, View.OnClickListener {
 
@@ -64,6 +69,12 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
     private lateinit var removalSnackbar: Snackbar
 
     private var supportedItemComparators: List<ItemComparator>? = null
+
+    private val settingsFragment: BottomSheetDialogFragment? get() {
+        if (tracker != null)
+            return SettingsDialogFragment.getInstance(tracker!!)
+        else return null
+    }
 
     private val startSubscriptions = SubscriptionList()
 
@@ -220,6 +231,10 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
             intent.putExtra(OTApplication.INTENT_EXTRA_FROM, this@ItemBrowserActivity.javaClass.simpleName)
             startActivity(intent)
         }
+    }
+
+    override fun onToolbarRightSubButtonClicked() {
+        settingsFragment?.show(supportFragmentManager, "TRACKER_ITEMS_SETTINGS")
     }
 
     fun deleteItemPermanently(position: Int): OTItem {
@@ -484,6 +499,18 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
 
     class SettingsDialogFragment : BottomSheetDialogFragment() {
 
+        companion object {
+            fun getInstance(tracker: OTTracker): BottomSheetDialogFragment {
+                val arguments = Bundle()
+                arguments.putString(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
+
+                val fragment = SettingsDialogFragment()
+                fragment.arguments = arguments
+
+                return fragment
+            }
+        }
+
         private val behaviorCallback = object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
 
@@ -497,6 +524,32 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
 
         }
 
+        private var listView: RecyclerView by Delegates.notNull()
+
+        private var user: OTUser? = null
+        private var tracker: OTTracker? = null
+
+        private var dialogSubscriptions = SubscriptionList()
+
+        private val menuAdapter = Adapter()
+
+        private var purgeMenuItem: RecyclerViewMenuAdapter.MenuItem by Delegates.notNull()
+
+        private var deletionMenuItem: RecyclerViewMenuAdapter.MenuItem by Delegates.notNull()
+
+
+        override fun onDestroy() {
+            super.onDestroy()
+        }
+
+        override fun onDismiss(dialog: DialogInterface?) {
+            super.onDismiss(dialog)
+
+            dialogSubscriptions.clear()
+            user = null
+            tracker = null
+        }
+
         override fun setupDialog(dialog: Dialog, style: Int) {
             super.setupDialog(dialog, style)
             val contentView = View.inflate(context, R.layout.fragment_items_settings, null)
@@ -506,6 +559,74 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
             if (behavior is BottomSheetBehavior) {
                 behavior.setBottomSheetCallback(behaviorCallback)
             }
+
+
+            purgeMenuItem = RecyclerViewMenuAdapter.MenuItem(R.drawable.clear_cache, context.getString(R.string.msg_purge_cache), null, isEnabled = false, onClick = {
+                //TODO purge cache
+            })
+
+            deletionMenuItem = RecyclerViewMenuAdapter.MenuItem(R.drawable.trashcan, context.getString(R.string.msg_remove_all_the_items_permanently), null, isEnabled = false, onClick = {
+                //TODO remove all items
+            })
+
+            listView = contentView.findViewById(R.id.ui_list) as RecyclerView
+
+            listView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+            listView.adapter = menuAdapter
+
+            if (arguments != null) {
+                val activity = activity
+                if (activity is OTActivity) {
+                    dialogSubscriptions.add(
+                            activity.signedInUserObservable.subscribe {
+                                user ->
+                                this.user = user
+                                this.tracker = user[arguments.getString(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)]
+
+                                val cacheSize = this.tracker?.getTotalCacheFileSize(context) ?: 0L
+                                if (cacheSize > 0L) {
+                                    purgeMenuItem.isEnabled = true
+                                    purgeMenuItem.description = "${(cacheSize / (1024 * 102.4f) + .5f).toInt() / 10f} Mb"
+                                } else {
+                                    purgeMenuItem.isEnabled = false
+                                    purgeMenuItem.description = getString(R.string.msg_no_cache)
+                                }
+                                menuAdapter.notifyItemChanged(0)
+
+                                if (tracker != null) {
+                                    dialogSubscriptions.add(
+                                            FirebaseDbHelper.getTotalItemCount(tracker!!).subscribe {
+                                                count ->
+                                                if (count > 0) {
+                                                    deletionMenuItem.description = "Item count: ${count}"
+                                                    deletionMenuItem.isEnabled = true
+                                                } else {
+                                                    deletionMenuItem.description = "No items"
+                                                    deletionMenuItem.isEnabled = false
+                                                }
+                                                menuAdapter.notifyItemChanged(1)
+                                            }
+                                    )
+                                }
+                            })
+                }
+            }
+        }
+
+        inner class Adapter : RecyclerViewMenuAdapter() {
+
+            override fun getMenuItemAt(index: Int): MenuItem {
+                return when (index) {
+                    0 -> purgeMenuItem
+                    1 -> deletionMenuItem
+                    else -> purgeMenuItem
+                }
+            }
+
+            override fun getItemCount(): Int {
+                return 2
+            }
+
         }
     }
 

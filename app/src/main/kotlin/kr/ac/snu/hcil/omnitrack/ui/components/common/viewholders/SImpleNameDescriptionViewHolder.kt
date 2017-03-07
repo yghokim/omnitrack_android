@@ -7,13 +7,21 @@ import kr.ac.snu.hcil.omnitrack.R
 /**
  * Created by younghokim on 2016. 11. 30..
  */
-class SimpleNameDescriptionViewHolder(val view: View) {
+open class SimpleNameDescriptionViewHolder(val view: View) {
 
-    val nameView: TextView
-    val descriptionView: TextView
+    val nameView: TextView = view.findViewById(R.id.name) as TextView
+    val descriptionView: TextView = view.findViewById(R.id.description) as TextView
 
-    init {
-        descriptionView = view.findViewById(R.id.description) as TextView
-        nameView = view.findViewById(R.id.name) as TextView
-    }
+    var name: CharSequence
+        get() = nameView.text.toString()
+        set(value) {
+            nameView.text = value
+        }
+
+    var description: CharSequence
+        get() = descriptionView.text.toString()
+        set(value) {
+            descriptionView.text = value
+        }
+
 }
