@@ -241,6 +241,7 @@
     <string name="msg_turn_to_selfie">셀카 모드로 전환</string>
     <string name="msg_turn_to_rear">후면 카메라로 전환</string>
 
+    <string name="msg_camera_input_header">사진 찍기</string>
 
     <string-array name="gender_entries">
         <item>남성</item>
