@@ -249,6 +249,7 @@
     <string name="msg_signup_complete_description">You can now start tracking!</string>
     <string name="msg_purge_cache">Clear all cached media files</string>
     <string name="msg_remove_all_the_items_permanently">Remove all the items permanently</string>
+    <string name="msg_no_cache">No cache</string>
 
 
     <string-array name="gender_entries">
