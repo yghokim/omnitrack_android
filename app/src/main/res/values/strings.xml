@@ -250,7 +250,9 @@
     <string name="msg_purge_cache">Clear all cached media files</string>
     <string name="msg_remove_all_the_items_permanently">Remove all the items permanently</string>
     <string name="msg_no_cache">No cache</string>
-
+    <string name="msg_tab_to_take_a_photo">Tab to take a photo</string>
+    <string name="msg_turn_to_selfie">Turn to Selfie</string>
+    <string name="msg_turn_to_rear">Turn to Rear-cam</string>
 
     <string-array name="gender_entries">
         <item>Male</item>

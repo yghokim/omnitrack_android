@@ -98,6 +98,7 @@ dependencies {
     compile 'net.i2p.android.ext:floatingactionbutton:1.10.1'
     compile 'gun0912.ted:tedbottompicker:1.0.9'
     compile 'com.tbruyelle.rxpermissions:rxpermissions:0.9.2@aar'
+    compile 'com.flurgle:camerakit:0.9.13'
 
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 

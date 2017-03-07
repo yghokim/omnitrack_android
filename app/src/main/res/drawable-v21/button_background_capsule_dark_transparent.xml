@@ -1,0 +1,9 @@
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="?android:colorControlHighlight">
+    <item
+        android:id="@android:id/mask"
+        android:drawable="@drawable/capsule_frame_color_dark_transparent" />
+    <item
+        android:id="@android:id/background"
+        android:drawable="@drawable/capsule_frame_color_dark_transparent" />
+</ripple>
