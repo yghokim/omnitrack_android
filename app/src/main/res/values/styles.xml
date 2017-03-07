@@ -435,4 +435,13 @@
         <item name="android:textColor">@color/buttonIconColorDark</item>
     </style>
 
+    <style name="CameraViewOverlayButtonStyle" parent="Base.Widget.AppCompat.Button.Borderless">
+        <item name="android:background">@drawable/button_background_capsule_dark_transparent</item>
+        <item name="android:textColor">#FFF</item>
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingEnd">15dp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:drawablePadding">4dp</item>
+    </style>
+
 </resources>
