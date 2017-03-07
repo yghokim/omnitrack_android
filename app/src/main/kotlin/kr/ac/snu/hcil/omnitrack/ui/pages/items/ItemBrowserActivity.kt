@@ -36,9 +36,11 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.viewholders.RecyclerViewMen
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.DrawableListBottomSpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
+import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.RxProgressDialog
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.getDayOfMonth
+import kr.ac.snu.hcil.omnitrack.utils.io.FileHelper
 import rx.Subscription
 import rx.internal.util.SubscriptionList
 import java.util.*
@@ -550,6 +552,18 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
             tracker = null
         }
 
+        private fun refreshPurgeButton() {
+            val cacheSize = this.tracker?.getTotalCacheFileSize(context) ?: 0L
+            if (cacheSize > 0L) {
+                purgeMenuItem.isEnabled = true
+                purgeMenuItem.description = "${(cacheSize / (1024 * 102.4f) + .5f).toInt() / 10f} Mb"
+            } else {
+                purgeMenuItem.isEnabled = false
+                purgeMenuItem.description = getString(R.string.msg_no_cache)
+            }
+            menuAdapter.notifyItemChanged(0)
+        }
+
         override fun setupDialog(dialog: Dialog, style: Int) {
             super.setupDialog(dialog, style)
             val contentView = View.inflate(context, R.layout.fragment_items_settings, null)
@@ -563,6 +577,13 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
 
             purgeMenuItem = RecyclerViewMenuAdapter.MenuItem(R.drawable.clear_cache, context.getString(R.string.msg_purge_cache), null, isEnabled = false, onClick = {
                 //TODO purge cache
+                val cacheDir = tracker?.getItemCacheDir(context, false)
+                if (cacheDir != null) {
+                    println("purge cache dir files")
+                    RxProgressDialog.Builder(FileHelper.removeAllFilesIn(cacheDir).toObservable()).create(this@SettingsDialogFragment.activity).show().subscribe {
+                        refreshPurgeButton()
+                    }
+                }
             })
 
             deletionMenuItem = RecyclerViewMenuAdapter.MenuItem(R.drawable.trashcan, context.getString(R.string.msg_remove_all_the_items_permanently), null, isEnabled = false, onClick = {
@@ -583,15 +604,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                                 this.user = user
                                 this.tracker = user[arguments.getString(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)]
 
-                                val cacheSize = this.tracker?.getTotalCacheFileSize(context) ?: 0L
-                                if (cacheSize > 0L) {
-                                    purgeMenuItem.isEnabled = true
-                                    purgeMenuItem.description = "${(cacheSize / (1024 * 102.4f) + .5f).toInt() / 10f} Mb"
-                                } else {
-                                    purgeMenuItem.isEnabled = false
-                                    purgeMenuItem.description = getString(R.string.msg_no_cache)
-                                }
-                                menuAdapter.notifyItemChanged(0)
+                                refreshPurgeButton()
 
                                 if (tracker != null) {
                                     dialogSubscriptions.add(

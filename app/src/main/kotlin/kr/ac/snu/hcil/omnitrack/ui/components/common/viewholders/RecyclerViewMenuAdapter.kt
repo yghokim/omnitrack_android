@@ -57,9 +57,16 @@ abstract class RecyclerViewMenuAdapter : RecyclerView.Adapter<RecyclerViewMenuAd
             wrapped.nameView.text = item.name
 
             if (item.isEnabled) {
-                itemView.alpha = 1f
+                wrapped.descriptionView.alpha = 1f
+                wrapped.nameView.alpha = 1f
+                wrapped.iconView.alpha = 1f
+                itemView.isClickable = true
             } else {
-                itemView.alpha = 0.2f
+                println("disable button.")
+                wrapped.descriptionView.alpha = 0.5f
+                wrapped.nameView.alpha = 0.2f
+                wrapped.iconView.alpha = 0.2f
+                itemView.isClickable = false
             }
         }
     }
