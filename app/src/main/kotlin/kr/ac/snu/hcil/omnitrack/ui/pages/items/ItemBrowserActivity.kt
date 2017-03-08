@@ -27,6 +27,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AttributeSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
 import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
+import kr.ac.snu.hcil.omnitrack.services.OTTableExportService
 import kr.ac.snu.hcil.omnitrack.ui.DragItemTouchHelperCallback
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTTrackerAttachedActivity
@@ -594,9 +595,11 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
 
         private val menuAdapter = Adapter()
 
-        private var purgeMenuItem: RecyclerViewMenuAdapter.MenuItem by Delegates.notNull()
+        private lateinit var purgeMenuItem: RecyclerViewMenuAdapter.MenuItem
 
-        private var deletionMenuItem: RecyclerViewMenuAdapter.MenuItem by Delegates.notNull()
+        private lateinit var deletionMenuItem: RecyclerViewMenuAdapter.MenuItem
+
+        private lateinit var exportMenuItem: RecyclerViewMenuAdapter.MenuItem
 
 
         override fun onDestroy() {
@@ -649,6 +652,14 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                 //TODO remove all items
             })
 
+            exportMenuItem = RecyclerViewMenuAdapter.MenuItem(R.drawable.icon_cloud_download, getString(R.string.msg_export_to_file_tracker),
+                    description = getString(R.string.msg_desc_export_to_file_tracker), isEnabled = false, onClick = {
+                println("export item clicked.")
+                val intent = Intent(context, OTTableExportService::class.java)
+                        .putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker?.objectId)
+                this@SettingsDialogFragment.activity?.startService(intent)
+            })
+
             listView = contentView.findViewById(R.id.ui_list) as RecyclerView
 
             listView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
@@ -672,11 +683,17 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                                                 if (count > 0) {
                                                     deletionMenuItem.description = "Item count: ${count}"
                                                     deletionMenuItem.isEnabled = true
+
+                                                    exportMenuItem.isEnabled = true
                                                 } else {
                                                     deletionMenuItem.description = "No items"
                                                     deletionMenuItem.isEnabled = false
+
+                                                    exportMenuItem.isEnabled = false
                                                 }
                                                 menuAdapter.notifyItemChanged(1)
+                                                menuAdapter.notifyItemChanged(2)
+
                                             }
                                     )
                                 }
@@ -691,12 +708,13 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                 return when (index) {
                     0 -> purgeMenuItem
                     1 -> deletionMenuItem
+                    2 -> exportMenuItem
                     else -> purgeMenuItem
                 }
             }
 
             override fun getItemCount(): Int {
-                return 2
+                return 3
             }
 
         }

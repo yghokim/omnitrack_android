@@ -119,4 +119,12 @@ class OTLocationAttribute(objectId: String?, localKey: Int?, parentTracker: OTTr
             } else super.applyValueToViewForItemList(value, view)
         }
     }
+
+    override fun onAddValueToTable(value: Any?, out: MutableList<String?>) {
+        if(value is LatLng)
+        {
+            out.add("${ Location.convert(value.latitude, Location.FORMAT_DEGREES)},${Location.convert(value.longitude, Location.FORMAT_DEGREES)}")
+        }
+        else out.add(null)
+    }
 }
