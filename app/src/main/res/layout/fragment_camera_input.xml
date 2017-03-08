@@ -8,6 +8,11 @@
 
     <include layout="@layout/common_normal_healder_bar" />
 
+    <kr.ac.snu.hcil.omnitrack.ui.components.common.LoadingIndicatorBar
+        android:id="@+id/ui_loading_indicator"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"/>
+
     <FrameLayout
         android:id="@+id/ui_camera_container"
         android:layout_width="match_parent"
