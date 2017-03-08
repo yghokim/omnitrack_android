@@ -350,4 +350,20 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
             }
         } else return true
     }
+
+    protected fun getAttributeUniqueName(): String{ return "${name}(${objectId})" }
+
+    open fun onAddColumnToTable(out: MutableList<String>)
+    {
+        out.add(getAttributeUniqueName())
+    }
+
+    open fun onAddValueToTable(value: Any?, out: MutableList<String?>)
+    {
+        val str = value?.toString()
+        if(str.isNullOrBlank())
+        {
+            out.add(null)
+        }else out.add(str)
+    }
 }

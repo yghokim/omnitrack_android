@@ -168,6 +168,19 @@ class OTChoiceAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrac
         }
     }
 
+    private fun getChoiceTexts(value: IntArray): List<String>{
+        val list = ArrayList <String>()
+        for (idEntry in value.withIndex()) {
+
+            val indexInEntries = entries.indexOf(idEntry.value)
+            if (indexInEntries >= 0) {
+                list.add(entries[indexInEntries].text)
+            }
+        }
+
+        return list
+    }
+
     override fun getViewForItemListContainerType(): Int = OTAttribute.VIEW_FOR_ITEM_LIST_CONTAINER_TYPE_SINGLELINE
 
     override fun getViewForItemList(context: Context, recycledView: View?): View {
@@ -181,6 +194,14 @@ class OTChoiceAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrac
 
     override fun getRecommendedChartModels(): Array<ChartModel<*>> {
         return arrayOf(ChoiceCategoricalBarChartModel(this))
+    }
+
+    override fun onAddValueToTable(value: Any?, out: MutableList<String?>) {
+        if(value is IntArray)
+        {
+            getChoiceTexts(value).joinToString(",")
+        }
+        else out.add(null)
     }
 
 
