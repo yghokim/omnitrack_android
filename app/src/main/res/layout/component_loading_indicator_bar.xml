@@ -3,18 +3,21 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="@dimen/loading_indicator_bar_height"
-    android:background="@color/frontalBackground"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/colorPointed"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
-
+    android:layout_gravity="bottom"
     >
 
     <com.github.ybq.android.spinkit.SpinKitView
+        style="@style/SpinKitView.Small.RotatingCircle"
         android:id="@+id/ui_progress_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:indeterminate="true" />
+        android:indeterminate="true"
+        app:SpinKit_Color="#FFF" />
 
     <TextView
         android:id="@+id/ui_message"
@@ -24,5 +27,7 @@
         android:layout_centerVertical="true"
         android:layout_toRightOf="@+id/ui_progress_bar"
         android:text="Loading..."
-        android:textColor="@color/textColorMid" />
+        android:textStyle="bold"
+        android:layout_marginLeft="8dp"
+        android:textColor="#FFF" />
 </RelativeLayout>
