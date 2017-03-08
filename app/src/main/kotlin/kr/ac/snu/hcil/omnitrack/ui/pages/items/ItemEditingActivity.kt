@@ -26,6 +26,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTTrackerAttachedActivity
+import kr.ac.snu.hcil.omnitrack.ui.components.common.LoadingIndicatorBar
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
@@ -87,6 +88,8 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
 
     private lateinit var builderRestoredSnackbar: Snackbar
 
+    private val loadingIndicatorBar : LoadingIndicatorBar by bindView(R.id.ui_loading_indicator)
+
     private var itemSaved: Boolean = false
 
     private val startSubscriptions = CompositeSubscription()
@@ -111,6 +114,8 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
         attributeListView.addItemDecoration(HorizontalImageDividerItemDecoration(R.drawable.horizontal_separator_pattern, this))
         (attributeListView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
 
+        loadingIndicatorBar.setMessage(R.string.msg_indicator_message_item_autocomplete)
+
         builderRestoredSnackbar = Snackbar.make(findViewById(R.id.ui_snackbar_container), resources.getText(R.string.msg_builder_restored), Snackbar.LENGTH_INDEFINITE)
         builderRestoredSnackbar.setAction(resources.getText(R.string.msg_clear_form)) {
             view ->
@@ -122,7 +127,9 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
                             .flatMap {
                                 approved ->
                                 if (approved) {
-                                    builder.autoComplete(this)
+                                    builder.autoComplete(this).doOnSubscribe {
+                                        loadingIndicatorBar.show()
+                                    }.doOnCompleted { loadingIndicatorBar.dismiss() }
                                 } else Observable.error(Exception("required permission not accepted."))
                             }.subscribe({
                         println("Finished builder autocomplete.")
@@ -160,7 +167,9 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
                             rxPermissionObservable.flatMap {
                                 approved: Boolean ->
                                 if (approved) {
-                                    builder.autoComplete(this)
+                                    builder.autoComplete(this).doOnSubscribe {
+                                        loadingIndicatorBar.show()
+                                    }.doOnCompleted { loadingIndicatorBar.dismiss() }
                                 } else Observable.error(Exception("required permission not accepted."))
                             }.subscribe({
                                 println("Finished builder autocomplete.");

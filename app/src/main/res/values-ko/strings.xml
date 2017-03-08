@@ -243,6 +243,8 @@
 
     <string name="msg_camera_input_header">사진 찍기</string>
 
+    <string name="msg_indicator_message_item_autocomplete">필드 값 불러오는 중…</string>
+
     <string-array name="gender_entries">
         <item>남성</item>
         <item>여성</item>
