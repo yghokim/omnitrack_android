@@ -16,8 +16,10 @@ import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.common.time.DateTimePicker
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.TimePointInputView
+import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Observable
+import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -133,5 +135,28 @@ class OTTimeAttribute(objectId: String?, localKey: Int?, parentTracker: OTTracke
         if (a is TimePoint && b is TimePoint) {
             return a.compareTo(b)
         } else return 0
+    }
+
+    override fun onAddColumnToTable(out: MutableList<String>) {
+        out.add("${getAttributeUniqueName()}_timestamp_epoch")
+        out.add("${getAttributeUniqueName()}_timezone")
+        out.add("${getAttributeUniqueName()}_formatted")
+
+    }
+
+    override fun onAddValueToTable(value: Any?, out: MutableList<String?>) {
+        if(value is TimePoint)
+        {
+            val date = Date(value.timestamp)
+            TimeHelper.FORMAT_ISO_8601.timeZone = value.timeZone
+
+            out.add(value.timestamp.toString())
+            out.add(value.timeZone.getDisplayName(Locale.ENGLISH))
+            out.add(TimeHelper.FORMAT_ISO_8601.format(date))
+        }
+        else{
+            out.add(null)
+            out.add(null)
+        }
     }
 }

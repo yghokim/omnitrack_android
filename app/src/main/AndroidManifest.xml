@@ -127,6 +127,10 @@
             </intent-filter>
         </service>
 
+        <service
+            android:name=".services.OTTableExportService"
+            android:exported="false" />
+
         <activity
             android:name=".ui.pages.SplashScreenActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
