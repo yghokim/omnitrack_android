@@ -90,4 +90,6 @@
     <dimen name="home_sidebar_width">250dp</dimen>
     <dimen name="home_sidebar_profile_photo_width">65dp</dimen>
 
+    <dimen name="loading_indicator_bar_height">40dp</dimen>
+
 </resources>
