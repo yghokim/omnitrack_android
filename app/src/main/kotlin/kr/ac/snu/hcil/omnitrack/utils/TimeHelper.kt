@@ -25,6 +25,9 @@ object TimeHelper {
     val DAY_OF_WEEK_FULL_FORMAT: SimpleDateFormat by lazy { SimpleDateFormat("EEEE") }
     val DAY_OF_WEEK_SHORT_FORMAT: SimpleDateFormat by lazy { SimpleDateFormat("EEE") }
 
+    val FORMAT_ISO_8601: SimpleDateFormat by lazy{
+        SimpleDateFormat("yyyy-MM-dd'T'HH:mmZ")
+    }
 
     val FORMAT_DATETIME: SimpleDateFormat by lazy { SimpleDateFormat(OTApplication.app.resources.getString(R.string.dateformat_minute)) }
     val FORMAT_DAY :SimpleDateFormat by lazy{ SimpleDateFormat(OTApplication.app.resources.getString(R.string.msg_date_format_scope_day)) }
