@@ -256,6 +256,8 @@
 
     <string name="msg_camera_input_header">Take a Snapshot</string>
 
+    <string name="msg_indicator_message_item_autocomplete">Loading field values…</string>
+
     <string-array name="gender_entries">
         <item>Male</item>
         <item>Female</item>
