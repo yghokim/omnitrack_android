@@ -200,6 +200,10 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false) : AppC
         ExperimentConsentManager.handleActivityResult(false, requestCode, resultCode, data)
     }
 
+    fun performOnActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        onActivityResult(requestCode, resultCode, data)
+    }
+
     override fun onResume() {
         super.onResume()
 

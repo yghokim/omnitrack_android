@@ -156,7 +156,7 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
                 } else {
                     //new builder was created
                     println("Start builder autocomplete")
-                    startSubscriptions.add(
+                    creationSubscriptions.add(
                             rxPermissionObservable.flatMap {
                                 approved: Boolean ->
                                 if (approved) {
@@ -178,7 +178,7 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
 
         if (intent.hasExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM)) {
             //contains item. Edit mode
-            startSubscriptions.add(
+            creationSubscriptions.add(
                     FirebaseDbHelper.getItem(tracker, intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM)).subscribe {
                         item ->
                         if (item != null) {
@@ -205,20 +205,6 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
         //}
 
         //when the activity is NOT started by startActivityWithResult()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        /*
-        if (mode == Mode.New) {
-            if (tracker == null) {
-                resumeSubscriptions.add(
-                        signedInUserObservable.subscribe {
-                            tryRestoreItemBuilderCache(tracker!!)
-                        }
-                )
-            }
-        }*/
     }
 
     override fun onPause() {

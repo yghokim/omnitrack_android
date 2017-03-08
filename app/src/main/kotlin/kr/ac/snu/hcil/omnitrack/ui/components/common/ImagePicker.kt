@@ -2,7 +2,6 @@ package kr.ac.snu.hcil.omnitrack.ui.components.common
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
 import android.graphics.Color
 import android.net.Uri
 import android.provider.MediaStore
@@ -23,7 +22,6 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.CameraPickDialogFragment
 import kr.ac.snu.hcil.omnitrack.utils.applyTint
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
-import kr.ac.snu.hcil.omnitrack.utils.getActivity
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -41,7 +39,6 @@ class ImagePicker : FrameLayout, View.OnClickListener {
     interface ImagePickerCallback {
         fun onRequestCameraImage(view: ImagePicker)
         fun onRequestGalleryImage(view: ImagePicker)
-        fun onBitmapInput(image: Bitmap): Uri
     }
 
     var callback: ImagePickerCallback? = null
@@ -105,18 +102,7 @@ class ImagePicker : FrameLayout, View.OnClickListener {
 
     override fun onClick(view: View?) {
         if (view === cameraButton) {
-            //callback?.onRequestCameraImage(this)
-            val dialog = CameraPickDialogFragment.getInstance(object: CameraPickDialogFragment.ImageHandler{
-                override fun onReceivedImage(image: Bitmap) {
-                    imageUri = callback?.onBitmapInput(image) ?: Uri.EMPTY
-                }
-
-            })
-            val activity = this.getActivity()
-
-            if (activity != null) {
-                dialog.show(activity.supportFragmentManager, "CAMERA")
-            }
+            callback?.onRequestCameraImage(this)
 
         } else if (view === galleryButton) {
             callback?.onRequestGalleryImage(this)
@@ -170,6 +156,11 @@ class ImagePicker : FrameLayout, View.OnClickListener {
         chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf(pickIntent))
 
         activity.startActivityForResult(chooserIntent, requestCode)
+    }
+
+    fun showCameraPickDialog(activity: AppCompatActivity, requestCode: Int) {
+        val dialog = CameraPickDialogFragment.getInstance(requestCode)
+        dialog.show(activity.supportFragmentManager, "CAMERA")
     }
 
 
