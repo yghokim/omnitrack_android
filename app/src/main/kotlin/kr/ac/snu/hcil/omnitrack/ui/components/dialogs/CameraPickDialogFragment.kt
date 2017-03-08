@@ -1,10 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.dialogs
 
+import android.app.Activity.RESULT_OK
 import android.app.AlertDialog
 import android.app.Dialog
-import android.content.DialogInterface
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.support.v4.app.DialogFragment
@@ -18,6 +17,7 @@ import com.flurgle.camerakit.CameraKit
 import com.flurgle.camerakit.CameraView
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.utils.applyTint
 
 /**
@@ -26,15 +26,17 @@ import kr.ac.snu.hcil.omnitrack.utils.applyTint
 class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
 
     companion object {
-        fun getInstance(handler: ImageHandler): CameraPickDialogFragment{
+
+        const val ARG_REQUEST_CODE = "req"
+        const val EXTRA_IMAGE_DATA = "image"
+
+        fun getInstance(requestCode: Int): CameraPickDialogFragment {
             val fragment = CameraPickDialogFragment()
-            fragment.imageHandler = handler
+            val args = Bundle()
+            args.putInt(ARG_REQUEST_CODE, requestCode)
+            fragment.arguments = args
             return fragment
         }
-    }
-
-    interface ImageHandler{
-        fun onReceivedImage(image: Bitmap)
     }
 
     private lateinit var cameraView: CameraView
@@ -44,8 +46,6 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
     private lateinit var cancelButton: AppCompatImageButton
 
     private val listener = CameraListener()
-
-    private var imageHandler: ImageHandler? = null
 
     private val cameraFrontDrawable by lazy {
         applyTint(DrawableCompat.wrap(OTApplication.app.getDrawable(R.drawable.camera_front)), Color.WHITE)
@@ -113,11 +113,6 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
         super.onPause()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        imageHandler = null
-    }
-
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
         val inflater = activity.layoutInflater
@@ -134,18 +129,14 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
         override fun onPictureTaken(jpeg: ByteArray?) {
             super.onPictureTaken(jpeg)
             if (jpeg != null) {
-                try {
-                    val bitmap = BitmapFactory.decodeByteArray(jpeg, 0, jpeg.size)
-                    if(bitmap!=null)
-                    {
-                        imageHandler?.onReceivedImage(bitmap)
+                val activity = activity
+                if (activity is OTActivity) {
+                    arguments?.getInt(ARG_REQUEST_CODE)?.let {
+                        val data = Intent()
+                        data.putExtra(EXTRA_IMAGE_DATA, jpeg)
+                        activity.performOnActivityResult(it, RESULT_OK, data)
                     }
                 }
-                catch(ex: Exception)
-                {
-
-                }
-
                 dismiss()
             }
         }
