@@ -49,6 +49,10 @@ import kotlin.properties.Delegates
 class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_browser), ExtendedSpinner.OnItemSelectedListener, View.OnClickListener {
 
     companion object {
+
+        const val REQUEST_CODE_NEW_ITEM = 151
+        const val REQUEST_CODE_EDIT_ITEM = 150
+
         fun makeIntent(tracker: OTTracker, context: Context): Intent {
             val intent = Intent(context, ItemBrowserActivity::class.java)
             intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
@@ -160,14 +164,54 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
             sortSpinner.adapter = adapter
         }
 
-        startSubscriptions.add(
-                FirebaseDbHelper.loadItems(tracker).subscribe {
-                    loadedItems ->
-                    items.clear()
-                    items.addAll(loadedItems)
-                    onItemListChanged()
+        creationSubscriptions.add(
+                //loadWholeItems(tracker)
+                FirebaseDbHelper.makeItemQueryStream(tracker).subscribe {
+                    action ->
+                    when (action.action) {
+                        FirebaseDbHelper.ElementActionType.Added -> {
+                            action.element?.let {
+                                synchronized(items) {
+                                    items.add(it)
+                                    reSort()
+                                }
+                            }
+                        }
+                        FirebaseDbHelper.ElementActionType.Removed -> {
+                            synchronized(items) {
+                                val toRemoveIndex = items.indexOfFirst { it.objectId == action.itemId }
+                                if (toRemoveIndex != -1) {
+                                    items.removeAt(toRemoveIndex)
+                                    itemListViewAdapter.notifyItemRemoved(toRemoveIndex)
+                                }
+                            }
+                        }
+                        FirebaseDbHelper.ElementActionType.Modified -> {
+                            println("Item was modified.")
+                            val changed = items.find { it.objectId == action.itemId }
+                            if (changed != null) {
+                                synchronized(items)
+                                {
+                                    action.pojo?.let {
+                                        pojo ->
+                                        changed.overwriteWithPojo(pojo)
+                                        reSort()
+                                    }
+                                }
+                            }
+                        }
+                }
                 }
         )
+    }
+
+    private fun loadWholeItems(tracker: OTTracker): Subscription {
+        return FirebaseDbHelper.loadItems(tracker).subscribe {
+            loadedItems ->
+            items.clear()
+            items.addAll(loadedItems)
+            onItemListChanged()
+        }
     }
 
     override fun onStop() {
@@ -231,7 +275,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
         if (tracker != null) {
             val intent = ItemEditingActivity.makeIntent(tracker!!.objectId, this)
             intent.putExtra(OTApplication.INTENT_EXTRA_FROM, this@ItemBrowserActivity.javaClass.simpleName)
-            startActivity(intent)
+            startActivityForResult(intent, REQUEST_CODE_NEW_ITEM)
         }
     }
 
@@ -246,6 +290,21 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
         onItemRemoved(position)
 
         return removedItem
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (resultCode == RESULT_OK) {
+            when (requestCode) {
+                REQUEST_CODE_EDIT_ITEM -> {
+                    println("activity result OK with edit item:")
+                }
+                REQUEST_CODE_NEW_ITEM -> {
+                    println("activity result OK with new item:")
+                }
+            }
+        }
     }
 
     inner class ItemListViewAdapter : RecyclerView.Adapter<ItemListViewAdapter.ItemElementViewHolder>(), DragItemTouchHelperCallback.ItemDragHelperAdapter {
@@ -351,7 +410,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                     R.id.action_edit -> {
                         val intent = ItemEditingActivity.makeIntent(items[adapterPosition], tracker!!, this@ItemBrowserActivity)
                         intent.putExtra(OTApplication.INTENT_EXTRA_FROM, this@ItemBrowserActivity.javaClass.simpleName)
-                        startActivity(intent)
+                        startActivityForResult(intent, REQUEST_CODE_EDIT_ITEM)
                         return true
                     }
                     R.id.action_remove -> {
