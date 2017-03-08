@@ -54,7 +54,6 @@ class OTImageAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrack
     override fun getViewForItemListContainerType(): Int = VIEW_FOR_ITEM_LIST_CONTAINER_TYPE_MULTILINE
 
     override fun getViewForItemList(context: Context, recycledView: View?): View {
-
         val target = if (recycledView is ImageView) {
             recycledView
         } else {
@@ -76,8 +75,9 @@ class OTImageAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrack
 
     override fun applyValueToViewForItemList(value: Any?, view: View): Single<Boolean> {
         return Single.defer {
-            if (view is ImageView && value is SynchronizedUri && !value.isEmpty) {
-                view.setImageResource(android.R.drawable.stat_sys_download)
+            if (view is ImageView) {
+                if (value is SynchronizedUri && !value.isEmpty) {
+                    view.setImageResource(android.R.drawable.stat_sys_download)
                     if (value.isLocalUriValid) {
                         Glide.with(view.context)
                                 .load(value.localUri.toString())
@@ -107,7 +107,11 @@ class OTImageAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrack
                             Single.just(false)
                         }
                     }
-            } else super.applyValueToViewForItemList(value, view)
+                } else {
+                    view.setImageResource(0)
+                    Single.just(false)
+                }
+            } else super.applyValueToViewForItemList(null, view)
         }
     }
 
