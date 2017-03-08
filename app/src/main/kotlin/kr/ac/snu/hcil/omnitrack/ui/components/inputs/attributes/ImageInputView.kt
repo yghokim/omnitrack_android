@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.provider.MediaStore
 import android.util.AttributeSet
@@ -11,6 +12,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.ui.components.common.ImagePicker
+import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.CameraPickDialogFragment
 import kr.ac.snu.hcil.omnitrack.utils.getActivity
 import rx.internal.util.SubscriptionList
 
@@ -58,9 +60,6 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
         }
 
     val picker: ImagePicker = findViewById(R.id.ui_image_picker) as ImagePicker
-
-    private var cameraCacheUri: Uri? = null
-
     private val subscriptions = SubscriptionList()
 
     init {
@@ -85,7 +84,7 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
     override fun onRequestCameraImage(view: ImagePicker) {
         val activity = this.getActivity()
         if(activity != null) {
-            cameraCacheUri = picker.dispatchCameraIntent(activity, makeActivityForResultRequestCode(position, REQUEST_CODE_CAMERA))
+            picker.showCameraPickDialog(activity, makeActivityForResultRequestCode(position, REQUEST_CODE_CAMERA))
         }
     }
 
@@ -111,13 +110,6 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
             pickerBottomSheetBuilder.create().show(activity.supportFragmentManager)
             //ImagePicker.dispatchImagePickIntent(activity, makeActivityForResultRequestCode(position, REQUEST_CODE_GALLERY))
         }
-    }
-
-
-    override fun onBitmapInput(image: Bitmap): Uri {
-        val resizedUri = Uri.fromFile(picker.createCacheImageFile(context))
-        resizeImage(image, resizedUri)
-        return resizedUri
     }
 
     fun resizeImage(source: Uri, dest: Uri) {
@@ -153,12 +145,21 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
 
         if (requestType == REQUEST_CODE_CAMERA)
         {
-            if(cameraCacheUri != null) {
+            val imageBytes = data.getByteArrayExtra(CameraPickDialogFragment.EXTRA_IMAGE_DATA)
 
-                resizeImage(cameraCacheUri!!, cameraCacheUri!!)
+            println("camerapick result: ${imageBytes}")
 
-                this.picker.imageUri = cameraCacheUri!!
-                cameraCacheUri = null
+            if (imageBytes != null) {
+                try {
+                    val image = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+
+                    val resizedUri = Uri.fromFile(picker.createCacheImageFile(context))
+                    resizeImage(image, resizedUri)
+
+                    this.picker.imageUri = resizedUri!!
+                } catch(ex: Exception) {
+                    ex.printStackTrace()
+                }
             }
             return true
         } else if (requestType == REQUEST_CODE_GALLERY) {

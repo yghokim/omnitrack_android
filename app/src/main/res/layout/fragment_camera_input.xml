@@ -20,6 +20,7 @@
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
 
+            camerakit:ckCropOutput="true"
             camerakit:ckFacing="back"
             camerakit:ckFlash="off"
             camerakit:ckFocus="continuous"
