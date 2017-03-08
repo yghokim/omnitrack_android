@@ -18,6 +18,7 @@ import com.flurgle.camerakit.CameraView
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
+import kr.ac.snu.hcil.omnitrack.ui.components.common.LoadingIndicatorBar
 import kr.ac.snu.hcil.omnitrack.utils.applyTint
 
 /**
@@ -44,6 +45,8 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
     private lateinit var cameraModeToggleButton: ToggleButton
     private lateinit var titleView: TextView
     private lateinit var cancelButton: AppCompatImageButton
+
+    private lateinit var loadingIndicator: LoadingIndicatorBar
 
     private val listener = CameraListener()
 
@@ -80,6 +83,9 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
 
         cancelButton = view.findViewById(R.id.ui_button_cancel) as AppCompatImageButton
         cancelButton.setOnClickListener(this)
+
+        loadingIndicator = view.findViewById(R.id.ui_loading_indicator) as LoadingIndicatorBar
+        loadingIndicator.setMessage(R.string.msg_indicator_message_processing)
     }
 
     private fun applyTintToCompoundDrawables(button: Button) {
@@ -94,6 +100,9 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
     override fun onClick(view: View) {
         if (view === shutterButton) {
             try {
+                shutterButton.isEnabled = false
+                shutterButton.alpha = 0.5f
+                loadingIndicator.show()
                 cameraView.captureImage()
             } catch(e: Exception) {
                 e.printStackTrace()
