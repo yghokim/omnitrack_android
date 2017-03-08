@@ -266,7 +266,7 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
 
     override fun onToolbarRightButtonClicked() {
         //push item to db
-        syncViewStateToBuilderAsync {
+        //syncViewStateToBuilderAsync {
             val item = builder.makeItem(OTItem.LoggingSource.Manual)
             println("Will push $item")
 
@@ -275,8 +275,9 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
             clearBuilderCache()
             skipViewValueCaching = true
             itemSaved = true
+        setResult(RESULT_OK, Intent().putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, item.objectId))
             finish()
-        }
+        //}
     }
 
     private fun makeTrackerPreferenceKey(tracker: OTTracker): String {

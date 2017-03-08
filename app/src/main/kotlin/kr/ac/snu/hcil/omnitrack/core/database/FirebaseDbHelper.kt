@@ -36,6 +36,8 @@ object FirebaseDbHelper {
     const val CHILD_NAME_ITEMS = "items"
     const val CHILD_NAME_ATTRIBUTE_PROPERTIES = "properties"
 
+    enum class ElementActionType {Added, Removed, Modified }
+    data class ItemAction(val itemId: String, val action: ElementActionType, val element: OTItem? = null, val pojo: ItemPOJO? = null)
 
     const val CHILD_NAME_EXPERIMENT_PROFILE = "experiment_profile"
 
@@ -566,6 +568,54 @@ object FirebaseDbHelper {
         } else {
             return Observable.error(Exception("No database reference for Item ${itemId} of tracker ${tracker.objectId}"))
         }
+    }
+
+    fun makeItemQueryStream(tracker: OTTracker, timeRange: TimeSpan? = null, order: Order = Order.DESC): Observable<ItemAction> {
+        val ref = getItemListOfTrackerChild(tracker.objectId)
+        if (ref != null) {
+            var query = ref.orderByChild("timestamp")
+            return Observable.create { subscriber ->
+                if (timeRange != null) {
+                    query = query.startAt(timeRange.from.toDouble(), "timestamp").endAt(timeRange.to.toDouble(), "timestamp")
+                }
+
+                val listener = object : ChildEventListener {
+                    override fun onCancelled(error: DatabaseError) {
+                        subscriber.onCompleted()
+                    }
+
+                    override fun onChildMoved(snapshot: DataSnapshot, p1: String?) {
+
+                    }
+
+                    override fun onChildChanged(snapshot: DataSnapshot, p1: String?) {
+                        subscriber.onNext(ItemAction(snapshot.key, ElementActionType.Modified, null, snapshot.getValue(ItemPOJO::class.java)))
+                    }
+
+                    override fun onChildAdded(snapshot: DataSnapshot, p1: String?) {
+                        subscriber.onNext(ItemAction(snapshot.key, ElementActionType.Added, makeItemFromSnapshot(snapshot, tracker.objectId)))
+                    }
+
+                    override fun onChildRemoved(snapshot: DataSnapshot) {
+                        subscriber.onNext(ItemAction(snapshot.key, ElementActionType.Removed))
+                    }
+                }
+
+                query.addChildEventListener(listener)
+
+                subscriber.add(Subscriptions.create {
+                    query.removeEventListener(listener)
+                })
+            }
+        } else return Observable.empty()
+    }
+
+
+    fun makeItemFromSnapshot(snapshot: DataSnapshot, trackerId: String): OTItem? {
+        val pojo = snapshot.getValue(ItemPOJO::class.java)
+        return if (pojo != null)
+            OTItem(snapshot.key, trackerId, pojo.dataTable, pojo.getTimestamp(), OTItem.LoggingSource.values()[pojo.sourceType])
+        else null
     }
 
     fun loadItems(tracker: OTTracker, timeRange: TimeSpan? = null, order: Order = Order.DESC): Observable<List<OTItem>> {

@@ -407,7 +407,7 @@ class OTItemBuilder : IStringSerializable {
     }
 
     fun makeItem(source: OTItem.LoggingSource): OTItem {
-        val item = OTItem(tracker, connectedItemTimestamp ?: -1L, source, *(tracker.attributes.filter { hasValueOf(it) }.map { getValueInformationOf(it)!!.value }.toTypedArray()))
+        val item = OTItem(tracker, connectedItemTimestamp ?: -1L, source, *(tracker.attributes.map { getValueInformationOf(it)?.value }.toTypedArray()))
 
         if (connectedItemDbId != null) {
             println("assigned db id : $connectedItemDbId")
