@@ -161,4 +161,13 @@ class OTRatingAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrac
         }
     }
 
+    override fun onAddValueToTable(value: Any?, out: MutableList<String?>) {
+        if(value is Float) {
+            out.add(formatAttributeValue(value).toString())
+        }
+        else{
+            out.add(null)
+        }
+    }
+
 }
