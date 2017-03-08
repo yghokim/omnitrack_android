@@ -11,6 +11,7 @@ import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.common.time.TimeRangePicker
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.TimeRangePickerInputView
+import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Observable
 import java.util.*
@@ -102,6 +103,32 @@ class OTTimeSpanAttribute(objectId: String?, localKey: Int?, parentTracker: OTTr
 
     override fun getRecommendedChartModels(): Array<ChartModel<*>> {
         return arrayOf(DurationTimelineModel(this))
+    }
+
+    override fun onAddColumnToTable(out: MutableList<String>) {
+        out.add("${getAttributeUniqueName()}_start_epoch")
+        out.add("${getAttributeUniqueName()}_duration_millis")
+        out.add("${getAttributeUniqueName()}_timezone")
+        out.add("${getAttributeUniqueName()}_formatted")
+    }
+
+    override fun onAddValueToTable(value: Any?, out: MutableList<String?>) {
+        if(value is TimeSpan)
+        {
+            out.add(value.from.toString())
+            out.add(value.duration.toString())
+            out.add(value.timeZone.getDisplayName(Locale.ENGLISH))
+
+            TimeHelper.FORMAT_ISO_8601.timeZone = value.timeZone
+
+            out.add("${TimeHelper.FORMAT_ISO_8601.format(Date(value.from))} - ${TimeHelper.FORMAT_ISO_8601.format(Date(value.to))}")
+        }
+        else{
+            out.add(null)
+            out.add(null)
+            out.add(null)
+            out.add(null)
+        }
     }
 
 
