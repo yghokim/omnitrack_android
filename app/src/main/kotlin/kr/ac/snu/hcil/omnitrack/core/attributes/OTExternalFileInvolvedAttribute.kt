@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes
 
+import android.net.Uri
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import rx.Single
 import java.io.OutputStream
@@ -12,13 +13,13 @@ abstract class OTExternalFileInvolvedAttribute<T>(objectId: String?, localKey: I
 
     override val isExternalFile: Boolean = true
 
-    abstract fun storeValueFile(value: Any?, outputStream: OutputStream): Single<Void>
+    abstract fun storeValueFile(value: Any?, outputUri: Uri): Single<Uri>
 
     override fun onAddColumnToTable(out: MutableList<String>) {
         out.add("${getAttributeUniqueName()}_filepath")
     }
 
-    protected abstract fun isValueContainingFileInfo(value: Any?): Boolean
+    abstract fun isValueContainingFileInfo(value: Any?): Boolean
 
     abstract fun makeRelativeFilePathFromValue(value: Any?, uniqKey: String?): String
 
