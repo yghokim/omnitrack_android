@@ -147,6 +147,8 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
      * */
     open val isAutoCompleteValueStatic: Boolean = true
 
+    open val isExternalFile: Boolean = false
+
     val removedFromTracker = Event<OTTracker>()
     val addedToTracker = Event<OTTracker>()
 

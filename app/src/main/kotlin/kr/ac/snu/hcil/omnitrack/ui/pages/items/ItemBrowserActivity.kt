@@ -44,6 +44,7 @@ import kr.ac.snu.hcil.omnitrack.utils.getDayOfMonth
 import kr.ac.snu.hcil.omnitrack.utils.io.FileHelper
 import rx.Subscription
 import rx.internal.util.SubscriptionList
+import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.properties.Delegates
 
@@ -562,6 +563,9 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
     class SettingsDialogFragment : BottomSheetDialogFragment() {
 
         companion object {
+
+            const val REQUEST_CODE_FILE_LOCATION_PICK = 300
+
             fun getInstance(tracker: OTTracker): BottomSheetDialogFragment {
                 val arguments = Bundle()
                 arguments.putString(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
@@ -655,6 +659,15 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
             exportMenuItem = RecyclerViewMenuAdapter.MenuItem(R.drawable.icon_cloud_download, getString(R.string.msg_export_to_file_tracker),
                     description = getString(R.string.msg_desc_export_to_file_tracker), isEnabled = false, onClick = {
                 println("export item clicked.")
+                tracker?.let {
+
+                    val extension = if (it.attributes.unObservedList.find { attr -> attr.isExternalFile } != null) {
+                        "zip"
+                    } else "csv"
+
+                    val intent = FileHelper.makeSaveLocationPickIntent("omnitrack_export_${it.name}_${SimpleDateFormat("yyyyMMddHHmmss").format(Date())}.$extension")
+                    this@SettingsDialogFragment.startActivityForResult(intent, kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemBrowserActivity.SettingsDialogFragment.REQUEST_CODE_FILE_LOCATION_PICK)
+                }
                 val intent = Intent(context, OTTableExportService::class.java)
                         .putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker?.objectId)
                 this@SettingsDialogFragment.activity?.startService(intent)
@@ -698,6 +711,22 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                                     )
                                 }
                             })
+                }
+            }
+        }
+
+        override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+            super.onActivityResult(requestCode, resultCode, data)
+            if (requestCode == REQUEST_CODE_FILE_LOCATION_PICK) {
+                if (resultCode == RESULT_OK && data != null) {
+                    val exportUri = data.data
+                    if (exportUri != null) {
+                        println(exportUri.toString())
+                        tracker?.let {
+                            val serviceIntent = OTTableExportService.makeIntent(this@SettingsDialogFragment.context, it, exportUri.toString())
+                            activity?.startService(serviceIntent)
+                        }
+                    }
                 }
             }
         }
