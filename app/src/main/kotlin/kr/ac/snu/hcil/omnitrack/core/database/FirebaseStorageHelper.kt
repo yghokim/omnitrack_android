@@ -9,6 +9,7 @@ import io.realm.Realm
 import rx.Single
 import rx.subscriptions.Subscriptions
 import java.io.File
+import java.io.InputStream
 import java.util.*
 
 
@@ -90,6 +91,39 @@ class FirebaseStorageHelper(context: Context) {
                 error.printStackTrace()
                 println(error)
             }
+        }
+    }
+
+    fun downloadFileAsStream(pathString: String): Single<InputStream> {
+        return Single.create {
+            subscriber ->
+
+            val downloadTask = FirebaseStorage.getInstance().reference.child(pathString).stream
+            val listener = object : OnCompleteListener<StreamDownloadTask.TaskSnapshot> {
+                override fun onComplete(task: Task<StreamDownloadTask.TaskSnapshot>) {
+                    if (task.isSuccessful) {
+                        if (!subscriber.isUnsubscribed) {
+                            val inputStream = task.result.stream
+                            subscriber.onSuccess(inputStream)
+                        }
+                    } else {
+                        if (!subscriber.isUnsubscribed) {
+                            subscriber.onError(task.exception)
+                        }
+                    }
+                }
+
+            }
+
+            downloadTask.addOnCompleteListener(listener)
+
+
+            subscriber.add(Subscriptions.create {
+                if (downloadTask.isInProgress) {
+                    downloadTask.cancel()
+                }
+            })
+
         }
     }
 

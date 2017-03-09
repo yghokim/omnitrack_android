@@ -6,6 +6,7 @@ import android.content.Intent
 import android.net.Uri
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTExternalFileInvolvedAttribute
 import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
 import kr.ac.snu.hcil.omnitrack.utils.io.StringTableSheet
 import rx.Observable
@@ -40,12 +41,13 @@ class OTTableExportService : IntentService("Table Export Service") {
 
             var externalFilesInvolved: Boolean = false
 
-            val table = OTApplication.app.currentUserObservable
+
+            val table = StringTableSheet()
+            OTApplication.app.currentUserObservable
                     .flatMap {
                         user ->
                         val tracker = user[trackerId]
                         if (tracker != null) {
-                            val table = StringTableSheet()
 
                             externalFilesInvolved = tracker.attributes.unObservedList.find { it.isExternalFile } != null
 
@@ -63,7 +65,7 @@ class OTTableExportService : IntentService("Table Export Service") {
                                 it.onAddColumnToTable(table.columns)
                             }
 
-                            FirebaseDbHelper.loadItems(tracker).map {
+                            FirebaseDbHelper.loadItems(tracker).doOnNext {
                                 items ->
                                 items.withIndex().forEach {
                                     itemWithIndex ->
@@ -74,12 +76,38 @@ class OTTableExportService : IntentService("Table Export Service") {
                                     row.add(item.source.name)
                                     tracker.attributes.unObservedList.forEach {
                                         attribute ->
-                                        attribute.onAddValueToTable(item.getValueOf(attribute), row)
+                                        attribute.onAddValueToTable(item.getValueOf(attribute), row, itemWithIndex.index.toString())
                                     }
                                     table.rows.add(row)
                                 }
-
                                 table
+                            }.flatMap {
+                                items ->
+                                val storeObservables = ArrayList<Observable<Void>>()
+                                tracker.attributes.unObservedList.filter { it is OTExternalFileInvolvedAttribute }.forEach {
+                                    attr ->
+                                    if (attr is OTExternalFileInvolvedAttribute) {
+                                        items.withIndex().forEach {
+                                            itemWithIndex ->
+                                            val itemValue = itemWithIndex.value.getValueOf(attr)
+                                            if (itemValue != null) {
+                                                val cacheFilePath = cacheDir?.resolve(attr.makeRelativeFilePathFromValue(itemValue, itemWithIndex.index.toString()))
+                                                if (cacheFilePath != null) {
+                                                    val cacheFileLocation = cacheFilePath.parentFile
+                                                    if (!cacheFileLocation.exists()) {
+                                                        cacheFileLocation.createNewFile()
+                                                    }
+
+                                                    val outputStream = cacheFilePath.outputStream()
+                                                    storeObservables.add(attr.storeValueFile(itemValue, outputStream).toObservable())
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                Observable.merge(storeObservables)
+
                             }
                         } else {
                             Observable.error(Exception("tracker does not exists."))

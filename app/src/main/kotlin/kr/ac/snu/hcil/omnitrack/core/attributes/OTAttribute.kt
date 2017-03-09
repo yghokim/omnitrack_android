@@ -360,7 +360,7 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
         out.add(getAttributeUniqueName())
     }
 
-    open fun onAddValueToTable(value: Any?, out: MutableList<String?>)
+    open fun onAddValueToTable(value: Any?, out: MutableList<String?>, uniqKey: String?)
     {
         val str = value?.toString()
         if(str.isNullOrBlank())
