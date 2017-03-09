@@ -27,6 +27,8 @@ class OTImageAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrack
 
     override val valueNumericCharacteristics: NumericCharacteristics = NumericCharacteristics(false, false)
 
+    override val isExternalFile: Boolean = true
+
     override fun createProperties() {
 
     }
