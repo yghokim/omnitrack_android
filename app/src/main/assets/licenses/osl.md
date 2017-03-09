@@ -13,6 +13,12 @@ Apache 2.0 License
 Copyright 2008 Google Inc.<br>
 Apache 2.0 license
 
+#####OpenCSV
+<http://opencsv.sourceforge.net/><br>
+Copyright 2017<br>
+Apache 2.0 license
+
+
 #####RxAndroid: Reactive Extensions for Android
 <https://github.com/ReactiveX/RxAndroid><br>
 Copyright 2015 The RxAndroid authors<br>

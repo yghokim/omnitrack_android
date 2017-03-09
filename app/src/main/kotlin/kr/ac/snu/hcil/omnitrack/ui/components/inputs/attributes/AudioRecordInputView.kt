@@ -1,22 +1,22 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes
 
 import android.content.Context
-import android.net.Uri
 import android.util.AttributeSet
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioRecorderView
 
 /**
  * Created by Young-Ho Kim on 2016-07-22.
  */
-class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAttributeInputView<Uri>(R.layout.input_audio_record, context, attrs) {
+class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAttributeInputView<SynchronizedUri>(R.layout.input_audio_record, context, attrs) {
     override val typeId: Int = VIEW_TYPE_AUDIO_RECORD
 
 
-    override var value: Uri
-        get() = valueView.audioFileUri
+    override var value: SynchronizedUri
+        get() = SynchronizedUri(valueView.audioFileUri)
         set(value) {
-            valueView.audioFileUri = value
+            valueView.audioFileUri = value.localUri
         }
 
     private val valueView: AudioRecorderView
@@ -26,12 +26,12 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
 
         valueView.fileRemoved += {
             sender, time ->
-            this.onValueChanged(valueView.audioFileUri)
+            this.onValueChanged(SynchronizedUri(valueView.audioFileUri))
         }
 
         valueView.recordingComplete += {
             sender, length ->
-            this.onValueChanged(valueView.audioFileUri)
+            this.onValueChanged(SynchronizedUri(valueView.audioFileUri))
         }
     }
 

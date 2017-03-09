@@ -13,10 +13,12 @@ object FileHelper {
         return Single.just(FileUtility.deleteDirectory(dir))
     }
 
-    fun makeSaveLocationPickIntent(filename: String, mimeType: String): Intent {
+    fun makeSaveLocationPickIntent(filename: String): Intent {
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
         intent.addCategory(Intent.CATEGORY_OPENABLE)
-        intent.setType("application/zip")
+        intent.setType("*/*")
+        intent.putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("text/csv", "application/zip"))
+        intent.putExtra(Intent.EXTRA_TITLE, filename)
 
         return intent
     }
