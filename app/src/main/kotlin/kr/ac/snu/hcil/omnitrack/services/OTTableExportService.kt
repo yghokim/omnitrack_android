@@ -9,9 +9,15 @@ import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTExternalFileInvolvedAttribute
 import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
 import kr.ac.snu.hcil.omnitrack.utils.io.StringTableSheet
+import org.apache.commons.compress.archivers.zip.ZipUtil
 import rx.Observable
+import rx.Single
 import rx.internal.util.SubscriptionList
+import rx.schedulers.Schedulers
 import java.io.File
+import java.io.FileOutputStream
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 
 /**
  * Created by Young-Ho on 3/9/2017.
@@ -40,9 +46,11 @@ class OTTableExportService : IntentService("Table Export Service") {
         if (trackerId != null && exportUri != null) {
 
             var externalFilesInvolved: Boolean = false
-
+            var cacheDirectory: File? = null
 
             val table = StringTableSheet()
+            var involvedFileList: MutableList<String>? = null
+
             OTApplication.app.currentUserObservable
                     .flatMap {
                         user ->
@@ -51,11 +59,14 @@ class OTTableExportService : IntentService("Table Export Service") {
 
                             externalFilesInvolved = tracker.attributes.unObservedList.find { it.isExternalFile } != null
 
-                            var cacheDir: File? = null
                             if (externalFilesInvolved) {
-                                cacheDir = this.cacheDir.resolve("export_${System.currentTimeMillis()}")
-                                if (!cacheDir.exists())
-                                    cacheDir.mkdirs()
+                                cacheDirectory = this.cacheDir.resolve("export_${System.currentTimeMillis()}")
+                                cacheDirectory?.let{
+                                    if(!it.exists())
+                                        cacheDirectory?.mkdirs()
+                                }
+
+                                involvedFileList = ArrayList<String>()
                             }
 
                             table.columns.add("index")
@@ -80,33 +91,55 @@ class OTTableExportService : IntentService("Table Export Service") {
                                     }
                                     table.rows.add(row)
                                 }
-                                table
+
+                                if(externalFilesInvolved)
+                                {
+                                    val tablePath = cacheDirectory?.resolve("table.csv")
+                                    if(tablePath!=null)
+                                    {
+                                        val fileOutputStream = FileOutputStream(tablePath)
+                                        table.storeToStream(fileOutputStream)
+                                        fileOutputStream.close()
+
+                                        involvedFileList?.add(tablePath.path)
+                                    }
+                                }
+
                             }.flatMap {
                                 items ->
-                                val storeObservables = ArrayList<Observable<Void>>()
+                                val storeObservables = ArrayList<Single<Uri>>()
                                 tracker.attributes.unObservedList.filter { it is OTExternalFileInvolvedAttribute }.forEach {
                                     attr ->
                                     if (attr is OTExternalFileInvolvedAttribute) {
                                         items.withIndex().forEach {
                                             itemWithIndex ->
                                             val itemValue = itemWithIndex.value.getValueOf(attr)
-                                            if (itemValue != null) {
-                                                val cacheFilePath = cacheDir?.resolve(attr.makeRelativeFilePathFromValue(itemValue, itemWithIndex.index.toString()))
+                                            if (itemValue != null && attr.isValueContainingFileInfo(itemValue)) {
+                                                val cacheFilePath = cacheDirectory?.resolve(attr.makeRelativeFilePathFromValue(itemValue, itemWithIndex.index.toString()))
                                                 if (cacheFilePath != null) {
                                                     val cacheFileLocation = cacheFilePath.parentFile
                                                     if (!cacheFileLocation.exists()) {
-                                                        cacheFileLocation.createNewFile()
+                                                        cacheFileLocation.mkdirs()
                                                     }
 
-                                                    val outputStream = cacheFilePath.outputStream()
-                                                    storeObservables.add(attr.storeValueFile(itemValue, outputStream).toObservable())
+                                                    if(!cacheFilePath.exists())
+                                                    {
+                                                        cacheFilePath.createNewFile()
+                                                    }
+                                                    storeObservables.add(attr.storeValueFile(itemValue, Uri.parse(cacheFilePath.path)).onErrorReturn { ex-> Uri.EMPTY })
                                                 }
                                             }
                                         }
                                     }
                                 }
 
-                                Observable.merge(storeObservables)
+                                Single.zip(storeObservables){
+                                    uris->
+                                    uris.filter{ it != Uri.EMPTY }.map{it.toString()}
+                                }.toObservable().doOnNext {
+                                    uris->
+                                    involvedFileList?.addAll(uris)
+                                }
 
                             }
                         } else {
@@ -114,21 +147,44 @@ class OTTableExportService : IntentService("Table Export Service") {
                         }
                     }.toBlocking().first()
 
-            if (externalFilesInvolved) {
+            println("file making task finished")
 
+            val successful: Boolean = if (externalFilesInvolved) {
+                involvedFileList?.let{
+                    list->
+                    println("Involved files: ")
+                    for(path in list)
+                    {
+                        println(path)
+                    }
+
+                    try {
+                        val outputStream = contentResolver.openOutputStream(Uri.parse(exportUri))
+                        kr.ac.snu.hcil.omnitrack.utils.io.ZipUtil.zip(cacheDirectory!!.absolutePath, outputStream)
+                    } catch(ex: Exception) {
+                        //fail
+                        ex.printStackTrace()
+                        false
+                    }
+                } ?: false
             } else {
-                val successful = try {
+                try {
                     val outputStream = contentResolver.openOutputStream(Uri.parse(exportUri))
                     table.storeToStream(outputStream)
                     true
                 } catch(ex: Exception) {
                     //fail
+                    ex.printStackTrace()
                     false
                 }
             }
 
-            println("created table successfully.")
-            println(table)
+
+            if(successful)
+            {
+                println("created table successfully.")
+                println(table)
+            }
         }
     }
 
