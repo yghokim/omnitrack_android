@@ -196,7 +196,7 @@ class OTChoiceAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrac
         return arrayOf(ChoiceCategoricalBarChartModel(this))
     }
 
-    override fun onAddValueToTable(value: Any?, out: MutableList<String?>) {
+    override fun onAddValueToTable(value: Any?, out: MutableList<String?>, uniqKey: String?) {
         if(value is IntArray)
         {
             getChoiceTexts(value).joinToString(",")

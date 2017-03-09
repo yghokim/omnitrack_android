@@ -13,4 +13,18 @@ abstract class OTExternalFileInvolvedAttribute<T>(objectId: String?, localKey: I
     override val isExternalFile: Boolean = true
 
     abstract fun storeValueFile(value: Any?, outputStream: OutputStream): Single<Void>
+
+    override fun onAddColumnToTable(out: MutableList<String>) {
+        out.add("${getAttributeUniqueName()}_filepath")
+    }
+
+    protected abstract fun isValueContainingFileInfo(value: Any?): Boolean
+
+    abstract fun makeRelativeFilePathFromValue(value: Any?, uniqKey: String?): String
+
+    override fun onAddValueToTable(value: Any?, out: MutableList<String?>, uniqKey: String?) {
+        if (isValueContainingFileInfo(value)) {
+            out.add(makeRelativeFilePathFromValue(value, uniqKey))
+        } else out.add(null)
+    }
 }

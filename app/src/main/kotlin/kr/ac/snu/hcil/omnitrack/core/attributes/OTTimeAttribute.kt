@@ -19,7 +19,6 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.TimePointInputVi
 import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Observable
-import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -144,7 +143,7 @@ class OTTimeAttribute(objectId: String?, localKey: Int?, parentTracker: OTTracke
 
     }
 
-    override fun onAddValueToTable(value: Any?, out: MutableList<String?>) {
+    override fun onAddValueToTable(value: Any?, out: MutableList<String?>, uniqKey: String?) {
         if(value is TimePoint)
         {
             val date = Date(value.timestamp)

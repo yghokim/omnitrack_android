@@ -4,6 +4,8 @@ import android.content.Intent
 import com.koushikdutta.async.util.FileUtility
 import rx.Single
 import java.io.File
+import java.io.InputStream
+import java.io.OutputStream
 
 /**
  * Created by Young-Ho Kim on 2017-03-07.
@@ -21,5 +23,14 @@ object FileHelper {
         intent.putExtra(Intent.EXTRA_TITLE, filename)
 
         return intent
+    }
+
+    fun dumpStreamToOther(inputStream: InputStream, outputStream: OutputStream) {
+        val buf = ByteArray(1024)
+        var len = inputStream.read(buf)
+        while (len > 0) {
+            outputStream.write(buf, 0, len)
+            len = inputStream.read(buf)
+        }
     }
 }
