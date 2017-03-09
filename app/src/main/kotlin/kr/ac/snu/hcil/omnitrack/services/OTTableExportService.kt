@@ -26,15 +26,22 @@ class OTTableExportService : IntentService("Table Export Service") {
                         val tracker = user[trackerId]
                         if (tracker != null) {
                             val table = StringTableSheet()
+                            table.columns.add("index")
+                            table.columns.add("logged_at")
+                            table.columns.add("source")
                             tracker.attributes.unObservedList.forEach {
                                 it.onAddColumnToTable(table.columns)
                             }
 
                             FirebaseDbHelper.loadItems(tracker).map {
                                 items ->
-                                items.forEach {
-                                    item ->
+                                items.withIndex().forEach {
+                                    itemWithIndex ->
+                                    val item = itemWithIndex.value
                                     val row = ArrayList<String?>()
+                                    row.add(itemWithIndex.index.toString())
+                                    row.add(item.timestamp.toString())
+                                    row.add(item.source.name)
                                     tracker.attributes.unObservedList.forEach {
                                         attribute ->
                                         attribute.onAddValueToTable(item.getValueOf(attribute), row)
