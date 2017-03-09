@@ -18,6 +18,10 @@ Apache 2.0 license
 Copyright 2017<br>
 Apache 2.0 license
 
+#####Kiss Tools
+<https://github.com/dawsonice/KissTools><br>
+Copyright 2014 Dawson Dong<br>
+Apache 2.0 license
 
 #####RxAndroid: Reactive Extensions for Android
 <https://github.com/ReactiveX/RxAndroid><br>
