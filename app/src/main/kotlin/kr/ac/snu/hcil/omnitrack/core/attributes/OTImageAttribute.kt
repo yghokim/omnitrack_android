@@ -23,7 +23,7 @@ import rx.schedulers.Schedulers
  * Created by younghokim on 16. 9. 6..
  */
 class OTImageAttribute(objectId: String?, localKey: Int?, parentTracker: OTTracker?, columnName: String, isRequired: Boolean, settingData: Map<String, Any?>?, connectionData: String?)
-    : OTAttribute<SynchronizedUri>(objectId, localKey, parentTracker, columnName, isRequired, TYPE_IMAGE, settingData, connectionData) {
+    : OTSynchronizedUriAttribute(objectId, localKey, parentTracker, columnName, isRequired, TYPE_IMAGE, settingData, connectionData) {
 
     override val valueNumericCharacteristics: NumericCharacteristics = NumericCharacteristics(false, false)
 
