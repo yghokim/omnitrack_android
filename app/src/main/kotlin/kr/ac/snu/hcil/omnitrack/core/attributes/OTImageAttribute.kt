@@ -18,6 +18,7 @@ import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelpe
 import rx.Observable
 import rx.Single
 import rx.schedulers.Schedulers
+import java.util.*
 
 /**
  * Created by younghokim on 16. 9. 6..
@@ -113,6 +114,10 @@ class OTImageAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrack
                 }
             } else super.applyValueToViewForItemList(null, view)
         }
+    }
+
+    override fun makeRelativeFilePathFromValue(value: Any?, uniqKey: String?): String {
+        return "images/${objectId}_${uniqKey ?: UUID.randomUUID().toString()}_image.jpg"
     }
 
     override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_SYNCHRONIZED_URI

@@ -120,7 +120,7 @@ class OTLocationAttribute(objectId: String?, localKey: Int?, parentTracker: OTTr
         }
     }
 
-    override fun onAddValueToTable(value: Any?, out: MutableList<String?>) {
+    override fun onAddValueToTable(value: Any?, out: MutableList<String?>, uniqKey: String?) {
         if(value is LatLng)
         {
             out.add("${ Location.convert(value.latitude, Location.FORMAT_DEGREES)},${Location.convert(value.longitude, Location.FORMAT_DEGREES)}")

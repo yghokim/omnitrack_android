@@ -110,7 +110,7 @@ class OTTimeSpanAttribute(objectId: String?, localKey: Int?, parentTracker: OTTr
         out.add("${getAttributeUniqueName()}_formatted")
     }
 
-    override fun onAddValueToTable(value: Any?, out: MutableList<String?>) {
+    override fun onAddValueToTable(value: Any?, out: MutableList<String?>, uniqKey: String?) {
         if (value is TimeSpan) {
             out.add(value.from.toString())
             out.add(value.duration.toString())
