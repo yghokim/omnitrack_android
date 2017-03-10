@@ -494,7 +494,7 @@ class TrackerListFragment : OTFragment() {
                     startActivityOnDelay(ItemBrowserActivity.makeIntent(user.trackers[adapterPosition], this@TrackerListFragment.context))
                 } else if (view === removeButton) {
                     val tracker = user.trackers[adapterPosition]
-                    DialogHelper.makeYesNoDialogBuilder(context, tracker.name, getString(R.string.msg_confirm_remove_tracker), { ->
+                    DialogHelper.makeNegativePhrasedYesNoDialogBuilder(context, tracker.name, getString(R.string.msg_confirm_remove_tracker), R.string.msg_remove, onYes= { ->
                         user.trackers.remove(tracker);
                         listView.invalidateItemDecorations();
                         EventLoggingManager.logTrackerChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_TRACKER_REMOVE, tracker)
