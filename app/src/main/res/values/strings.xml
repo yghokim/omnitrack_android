@@ -210,6 +210,15 @@
 
     <string name="msg_empty_value">Empty value</string>
 
+    <string name="msg_delete">Delete</string>
+    <string name="msg_add">Add</string>
+
+    <string name="msg_logout">Logout</string>
+
+    <string name="msg_export">Export</string>
+
+    <string name="msg_cancel_creation_and_exit">Discard and Exit</string>
+
     <string name="msg_tracker_list_stat_total">Total</string>
     <string name="msg_attach">connect</string>
     <string name="msg_service_activating">Activating…</string>

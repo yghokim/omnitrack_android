@@ -1,0 +1,204 @@
+package kr.ac.snu.hcil.omnitrack.ui.components.common.choice
+
+import android.content.Context
+import android.support.annotation.Keep
+import android.support.v7.widget.RecyclerView
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.AttributeSet
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.*
+import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.ChoiceInputView
+import kr.ac.snu.hcil.omnitrack.utils.UniqueStringEntryList
+import kr.ac.snu.hcil.omnitrack.utils.events.Event
+import kr.ac.snu.hcil.omnitrack.utils.inflateContent
+import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializedStringKeyEntry
+import java.util.SortedSet
+import kotlin.properties.Delegates
+
+/**
+ * Created by Young-Ho on 3/11/2017.
+ */
+class ChoiceFormView : LinearLayout {
+
+    data class Entry(val id: String, var text: String, var isCustom:Boolean = false)
+
+    var allowMultipleSelection: Boolean by Delegates.observable(false){
+        prop, old, new->
+        if(old!=new)
+        {
+            adapter.notifyDataSetChanged()
+        }
+    }
+
+    var entries: Array<Entry>? by Delegates.observable(null as Array<Entry>?){
+        prop, old, new->
+        if(old!=new)
+        {
+            selectedIndices.clear()
+            adapter.notifyDataSetChanged()
+        }
+    }
+
+    private val selectedIndices = java.util.TreeSet<Int>()
+
+    val selectedEntries : Array<Entry> get(){
+        return selectedIndices.map{ entries?.get(it)!!}.toTypedArray()
+    }
+
+    private val recyclerView: RecyclerView
+
+    private val adapter: Adapter = Adapter()
+
+    constructor(context: Context?) : super(context)
+    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
+    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes)
+
+    init{
+        orientation = LinearLayout.VERTICAL
+        recyclerView = RecyclerView(context)
+        recyclerView.layoutParams = LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+
+    }
+
+    val VIEWHOLDER_TYPE_NORMAL = 0
+    val VIEWHOLDER_TYPE_CUSTOM = 1
+
+    private inner class Adapter : RecyclerView.Adapter<Adapter.ViewHolder>() {
+
+        override fun getItemViewType(position: Int): Int {
+            if(entries?.get(position)?.isCustom == true)
+            {
+                return VIEWHOLDER_TYPE_CUSTOM
+            }
+            else{
+                return VIEWHOLDER_TYPE_NORMAL
+            }
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Adapter.ViewHolder {
+            return when(viewType){
+                   VIEWHOLDER_TYPE_NORMAL->
+                   {
+                       val view = LayoutInflater.from(parent.context).inflate(R.layout.choice_entry_list_element, parent, false)
+                       NormalViewHolder(view)
+                   }
+                VIEWHOLDER_TYPE_CUSTOM-> {
+                    val view = LayoutInflater.from(parent.context).inflate(R.layout.choice_entry_list_element_custom, parent, false)
+                    CustomViewHolder(view)
+                }
+                else->{
+                    val view = LayoutInflater.from(parent.context).inflate(R.layout.choice_entry_list_element, parent, false)
+                    NormalViewHolder(view)
+                }
+            }
+        }
+
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            entries?.let{
+                holder.bind(it[position])
+            }
+        }
+
+        val valueChanged = Event<Void?>()
+
+        override fun getItemCount(): Int = entries?.size ?: 0
+
+        inner open class ViewHolder(view: View) : RecyclerView.ViewHolder(view), OnClickListener {
+
+            protected val indicator: ImageView = view.findViewById(R.id.ui_checked) as ImageView
+
+            protected var entry: Entry? = null
+                private set
+
+            init {
+                view.setOnClickListener(this)
+            }
+
+            open fun bind(entry: Entry) {
+                this.entry = entry
+                if (selectedIndices.contains(adapterPosition)) {
+                    //checked or selected
+                    indicator.setImageResource(if (allowMultipleSelection) {
+                        R.drawable.checkbox_checked
+                    } else {
+                        R.drawable.radiobutton_selected
+                    })
+
+                    //textView.setTextColor(resources.getColor(R.color.textColorMid, null))
+                } else {
+                    indicator.setImageResource(
+                            if (allowMultipleSelection) {
+                                R.drawable.checkbox_empty
+                            } else {
+                                R.drawable.radiobutton_empty
+                            })
+                    //textView.setTextColor(resources.getColor(R.color.textColorLight, null))
+                }
+            }
+
+            override fun onClick(view: View) {
+                if (allowMultipleSelection) {
+                    if (selectedIndices.contains(adapterPosition)) {
+                        selectedIndices.remove(adapterPosition)
+                    } else {
+                        selectedIndices.add(adapterPosition)
+                    }
+                    notifyItemChanged(adapterPosition)
+                }
+                else{
+                    val removedIndices = selectedIndices.toTypedArray()
+                    selectedIndices.clear()
+                    for(i in removedIndices)
+                    {
+                        notifyItemChanged(i)
+                    }
+                    selectedIndices.add(adapterPosition)
+                    notifyItemChanged(adapterPosition)
+                }
+
+                valueChanged.invoke(this@ChoiceFormView, null)
+            }
+        }
+
+        inner class NormalViewHolder(view: View): ViewHolder(view){
+            private val textView: TextView = view.findViewById(R.id.ui_text) as TextView
+
+            override fun bind(entry: Entry) {
+                super.bind(entry)
+                this.textView.text = entry.text
+            }
+        }
+
+        inner class CustomViewHolder(view:View): ViewHolder(view){
+            private val customInputView: EditText = view.findViewById(R.id.ui_input) as EditText
+
+            init{
+                customInputView.addTextChangedListener(object: TextWatcher {
+                    override fun afterTextChanged(p0: Editable?) {
+
+                    }
+
+                    override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                    }
+
+                    override fun onTextChanged(changed: CharSequence, p1: Int, p2: Int, p3: Int) {
+                        entry?.text = changed.toString()
+                        valueChanged.invoke(this@ChoiceFormView, null)
+                    }
+
+                })
+            }
+
+            override fun bind(entry: Entry) {
+                super.bind(entry)
+                this.customInputView.setText(entry.text, TextView.BufferType.EDITABLE)
+            }
+        }
+    }
+
+}

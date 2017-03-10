@@ -96,7 +96,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
         connectionView.onRemoveButtonClicked += {
             sender, arg ->
-            DialogHelper.makeYesNoDialogBuilder(this, "OmniTrack", resources.getString(R.string.msg_confirm_remove_connection), {
+            DialogHelper.makeNegativePhrasedYesNoDialogBuilder(this, "OmniTrack", resources.getString(R.string.msg_confirm_remove_connection), R.string.msg_remove, onYes= {
                 connectionView.connection = null
                 refreshConnection(true)
             }).show()
@@ -177,15 +177,13 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
     }
 
     private fun askChangeAndFinish(backInsteadOfFinish: Boolean = false) {
-        DialogHelper.makeYesNoDialogBuilder(this, "OmniTrack", resources.getString(R.string.msg_confirm_field_apply_change),
-                {
+        DialogHelper.makeYesNoDialogBuilder(this, "OmniTrack", resources.getString(R.string.msg_confirm_field_apply_change), R.string.msg_apply, onYes = {
                     saveChanges()
                     if (backInsteadOfFinish)
                         super.onBackPressed()
                     else
                         finish()
-                },
-                {
+                }, onNo = {
                     if (backInsteadOfFinish)
                         super.onBackPressed()
                     else

@@ -417,7 +417,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                         return true
                     }
                     R.id.action_remove -> {
-                        DialogHelper.makeYesNoDialogBuilder(this@ItemBrowserActivity, "OmniTrack", resources.getString(R.string.msg_item_remove_confirm), {
+                        DialogHelper.makeNegativePhrasedYesNoDialogBuilder(this@ItemBrowserActivity, "OmniTrack", resources.getString(R.string.msg_item_remove_confirm), R.string.msg_remove, onYes= {
                             deleteItemPermanently(adapterPosition)
                         }).show()
                         return true
@@ -672,7 +672,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                     if (it.attributes.unObservedList.find { it.isExternalFile == true } != null) {
                         val currentNetworkConnectionInfo = NetworkHelper.getCurrentNetworkConnectionInfo()
                         if (currentNetworkConnectionInfo.mobileConnected && !currentNetworkConnectionInfo.wifiConnected) {
-                            DialogHelper.makeYesNoDialogBuilder(this@SettingsDialogFragment.context, "OmniTrack", getString(R.string.msg_export_warning_mobile_network), {
+                            DialogHelper.makeYesNoDialogBuilder(this@SettingsDialogFragment.context, "OmniTrack", getString(R.string.msg_export_warning_mobile_network), R.string.msg_export, onYes= {
                                 this@SettingsDialogFragment.startActivityForResult(intent, ItemBrowserActivity.SettingsDialogFragment.REQUEST_CODE_FILE_LOCATION_PICK)
                             })
                                     .show()

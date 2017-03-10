@@ -106,7 +106,7 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
     override fun onToolbarLeftButtonClicked() {
         if (isEditMode) {
             DialogHelper.makeYesNoDialogBuilder(this, "OmniTrack",
-                    resources.getString(R.string.msg_confirm_trigger_apply_change),
+                    resources.getString(R.string.msg_confirm_trigger_apply_change), R.string.msg_apply, onYes=
                     {
                         if (validateConfigurations()) {
                             attachedTrigger?.let {
@@ -117,10 +117,10 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
                         } else {
                             DialogHelper.makeSimpleAlertBuilder(this, errorMessages.joinToString("\n")).show()
                         }
-                    }, { setResult(Activity.RESULT_CANCELED); finish() }).show()
+                    }, onNo= { setResult(Activity.RESULT_CANCELED); finish() }).show()
         } else {
-            DialogHelper.makeYesNoDialogBuilder(this, "OmniTrack",
-                    resources.getString(R.string.msg_confirm_trigger_cancel_creation), {
+            DialogHelper.makeNegativePhrasedYesNoDialogBuilder(this, "OmniTrack",
+                    resources.getString(R.string.msg_confirm_trigger_cancel_creation), R.string.msg_cancel_creation_and_exit, onYes= {
                 setResult(Activity.RESULT_CANCELED)
                 finish()
             }).show()
@@ -131,8 +131,7 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
         //super.onBackPressed()
         if (isEditMode) {
             DialogHelper.makeYesNoDialogBuilder(this, "OmniTrack",
-                    resources.getString(R.string.msg_confirm_trigger_apply_change),
-                    {
+                    resources.getString(R.string.msg_confirm_trigger_apply_change), R.string.msg_apply, onYes={
                         if (validateConfigurations()) {
                             attachedTrigger?.let {
                                 applyViewToTrigger(it)
@@ -141,7 +140,7 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
                         } else {
                             DialogHelper.makeSimpleAlertBuilder(this, errorMessages.joinToString("\n")).show()
                         }
-                    }, { setResult(Activity.RESULT_CANCELED); super.onBackPressed() }).show()
+                    }, onNo= { setResult(Activity.RESULT_CANCELED); super.onBackPressed() }).show()
         } else {
             /*
             DialogHelper.makeYesNoDialogBuilder(this, "OmniTrack",

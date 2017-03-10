@@ -77,7 +77,7 @@ class SidebarWrapper(val view: View, val parentActivity: AppCompatActivity) : Po
     override fun onMenuItemClick(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_unlink_with_this_device -> {
-                DialogHelper.makeYesNoDialogBuilder(parentActivity, "OmniTrack", parentActivity.getString(R.string.msg_profile_unlink_account_confirm), {
+                DialogHelper.makeNegativePhrasedYesNoDialogBuilder(parentActivity, "OmniTrack", parentActivity.getString(R.string.msg_profile_unlink_account_confirm), R.string.msg_logout, onYes= {
                     OTAuthManager.signOut()
                     OTApplication.app.unlinkUser()
                 }).show()

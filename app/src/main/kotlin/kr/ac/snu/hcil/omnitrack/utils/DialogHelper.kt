@@ -9,26 +9,36 @@ import kr.ac.snu.hcil.omnitrack.R
  */
 
 object DialogHelper {
-    fun makeYesNoDialogBuilder(context: Context, title: String, message: String, onYes: (() -> Unit)?, onNo: (() -> Unit)? = null): MaterialDialog.Builder {
+    fun makeYesNoDialogBuilder(context: Context, title: String, message: String, yesLabel: Int = R.string.msg_yes, noLabel: Int = R.string.msg_no, onYes: (() -> Unit)?, onNo: (() -> Unit)? = null): MaterialDialog.Builder {
         val builder = MaterialDialog.Builder(context)
                 .title(title)
                 .content(message)
                 .cancelable(true)
                 .positiveColorRes(R.color.colorPointed)
                 .negativeColorRes(R.color.colorRed_Light)
-                .positiveText(R.string.msg_yes)
-                .negativeText(R.string.msg_no)
+                .positiveText(yesLabel)
+                .negativeText(noLabel)
                 .onPositive { materialDialog, dialogAction ->
 
-                        if (onYes != null) onYes()
+                    if (onYes != null) onYes()
                 }
                 .onNegative { materialDialog, dialogAction ->
 
-                        if (onNo != null) onNo()
-                    }
+                    if (onNo != null) onNo()
+                }
 
-            return builder
-        }
+        return builder
+    }
+
+    fun makeNegativePhrasedYesNoDialogBuilder(context: Context, title: String, message: String, yesLabel: Int = R.string.msg_yes, noLabel: Int = R.string.msg_no, onYes: (() -> Unit)?, onNo: (() -> Unit)? = null): MaterialDialog.Builder {
+        return makeYesNoDialogBuilder(context, title, message, yesLabel, noLabel, onYes, onNo)
+                .positiveColorRes(R.color.colorRed_Light)
+                .negativeColorRes(R.color.colorPointed)
+    }
+
+    fun makeYesNoDialogBuilder(context: Context, title: String, message: String, onYes: (() -> Unit)?, onNo: (() -> Unit)? = null): MaterialDialog.Builder {
+        return makeYesNoDialogBuilder(context, title, message, R.string.msg_yes, R.string.msg_no, onYes, onNo)
+    }
 
     fun makeSimpleAlertBuilder(context: Context, message: String, onOk: (() -> Unit)? = null): MaterialDialog.Builder {
         return MaterialDialog.Builder(context)
