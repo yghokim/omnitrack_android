@@ -42,6 +42,7 @@ import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.getDayOfMonth
 import kr.ac.snu.hcil.omnitrack.utils.io.FileHelper
+import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
 import rx.Subscription
 import rx.internal.util.SubscriptionList
 import java.text.SimpleDateFormat
@@ -659,6 +660,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
             exportMenuItem = RecyclerViewMenuAdapter.MenuItem(R.drawable.icon_cloud_download, getString(R.string.msg_export_to_file_tracker),
                     description = getString(R.string.msg_desc_export_to_file_tracker), isEnabled = false, onClick = {
                 println("export item clicked.")
+
                 tracker?.let {
 
                     val extension = if (it.attributes.unObservedList.find { attr -> attr.isExternalFile } != null) {
@@ -666,11 +668,19 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                     } else "csv"
 
                     val intent = FileHelper.makeSaveLocationPickIntent("omnitrack_export_${it.name}_${SimpleDateFormat("yyyyMMddHHmmss").format(Date())}.$extension")
-                    this@SettingsDialogFragment.startActivityForResult(intent, kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemBrowserActivity.SettingsDialogFragment.REQUEST_CODE_FILE_LOCATION_PICK)
+
+                    if (it.attributes.unObservedList.find { it.isExternalFile == true } != null) {
+                        val currentNetworkConnectionInfo = NetworkHelper.getCurrentNetworkConnectionInfo()
+                        if (currentNetworkConnectionInfo.mobileConnected && !currentNetworkConnectionInfo.wifiConnected) {
+                            DialogHelper.makeYesNoDialogBuilder(this@SettingsDialogFragment.context, "OmniTrack", getString(R.string.msg_export_warning_mobile_network), {
+                                this@SettingsDialogFragment.startActivityForResult(intent, ItemBrowserActivity.SettingsDialogFragment.REQUEST_CODE_FILE_LOCATION_PICK)
+                            })
+                                    .show()
+                        }
+                    } else {
+                        this@SettingsDialogFragment.startActivityForResult(intent, ItemBrowserActivity.SettingsDialogFragment.REQUEST_CODE_FILE_LOCATION_PICK)
+                    }
                 }
-                val intent = Intent(context, OTTableExportService::class.java)
-                        .putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker?.objectId)
-                this@SettingsDialogFragment.activity?.startService(intent)
             })
 
             listView = contentView.findViewById(R.id.ui_list) as RecyclerView

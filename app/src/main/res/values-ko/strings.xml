@@ -248,7 +248,9 @@
     <string name="msg_indicator_message_processing">처리중…</string>
     <string name="msg_export_to_file_tracker">파일로 내보내기..</string>
     <string name="msg_desc_export_to_file_tracker">트래커의 전체 아이템을 표로 불러옵니다</string>
-
+    <string name="msg_export_success_notification_message">트래킹 데이터를 성공적으로 저장했습니다.</string>
+    <string name="msg_export_title_progress">트래킹 데이터 내보내는 중…</string>
+    <string name="msg_export_warning_mobile_network">3G 혹은 LTE 환경에서 트래킹 데이터를 다운로드할 경우, 요금제에 따라 많은 요금이 청구될 수 있습니다. 계속 진행하시겠습니까?</string>
 
     <string-array name="gender_entries">
         <item>남성</item>
