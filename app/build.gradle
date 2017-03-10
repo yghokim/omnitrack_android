@@ -93,6 +93,8 @@ dependencies {
     compile 'gun0912.ted:tedbottompicker:1.0.9'
     compile 'com.tbruyelle.rxpermissions:rxpermissions:0.9.2@aar'
     compile 'com.flurgle:camerakit:0.9.13'
+    compile 'com.github.halysongoncalves:pugnotification:1.8.1'
+
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile files('libs/opencsv-3.9.jar')
 }

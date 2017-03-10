@@ -8,7 +8,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
 import kr.ac.snu.hcil.omnitrack.core.database.NamedObject
-import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
+import kr.ac.snu.hcil.omnitrack.core.system.OTTrackingNotificationManager
 import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
 import kr.ac.snu.hcil.omnitrack.utils.ListDelta
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
@@ -345,7 +345,7 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
                 OTTrigger.ACTION_NOTIFICATION -> {
                     println("trigger fired - send notification")
                     for (tracker in trackers)
-                        OTNotificationManager.pushReminderNotification(OTApplication.app, tracker, triggerTime)
+                        OTTrackingNotificationManager.pushReminderNotification(OTApplication.app, tracker, triggerTime)
                     Observable.just(this)
                 }
                 else -> throw Exception("Not supported Trigger type")

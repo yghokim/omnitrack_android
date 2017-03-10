@@ -172,6 +172,35 @@ object FirebaseDbHelper {
             var key: String? = null) : Serializable {
     }
 
+    fun isConnected(): Single<Boolean> {
+        return Single.create {
+            subscriber ->
+
+            val connectedRef = fbInstance.getReference(".info/connected")
+            val listener = object : ValueEventListener {
+                override fun onCancelled(error: DatabaseError) {
+                    if (!subscriber.isUnsubscribed) {
+                        subscriber.onError(error.toException())
+                    }
+                }
+
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (!subscriber.isUnsubscribed) {
+                        val connected = snapshot.value as? Boolean
+                        subscriber.onSuccess(connected == true)
+                    }
+                }
+
+            }
+
+            connectedRef?.addListenerForSingleValueEvent(listener)
+
+            subscriber.add(Subscriptions.create {
+                connectedRef?.removeEventListener(listener)
+            })
+        }
+    }
+
     fun generateNewKey(childName: String): String {
         val newKey = dbRef!!.child(childName).push().key
         println("New Firebase Key: ${newKey}")

@@ -724,6 +724,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                         println(exportUri.toString())
                         tracker?.let {
                             val serviceIntent = OTTableExportService.makeIntent(this@SettingsDialogFragment.context, it, exportUri.toString())
+                            this@SettingsDialogFragment.dismiss()
                             activity?.startService(serviceIntent)
                         }
                     }
