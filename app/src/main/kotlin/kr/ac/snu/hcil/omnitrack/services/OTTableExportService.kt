@@ -6,16 +6,20 @@ import android.content.Intent
 import android.net.Uri
 import android.os.IBinder
 import android.os.PowerManager
+import br.com.goncalves.pugnotification.notification.PugNotification
 import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTExternalFileInvolvedAttribute
 import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
+import kr.ac.snu.hcil.omnitrack.core.system.OTTaskNotificationManager
 import kr.ac.snu.hcil.omnitrack.utils.io.StringTableSheet
 import rx.Observable
 import rx.Single
 import rx.internal.util.SubscriptionList
 import java.io.File
 import java.io.FileOutputStream
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * Created by Young-Ho on 3/9/2017.
@@ -25,6 +29,12 @@ class OTTableExportService : Service() {
     companion object {
 
         val TAG = OTTableExportService::class.java.simpleName.toString()
+
+        private val uniqueNotificationIdPointer = AtomicInteger()
+
+        fun makeUniqueNotificationId(): Int {
+            return uniqueNotificationIdPointer.addAndGet(1)
+        }
 
         const val EXTRA_EXPORT_URI = "export_uri"
 
@@ -58,27 +68,53 @@ class OTTableExportService : Service() {
             wakeLock?.release()
         }
 
+        OTApplication.app.setTrackerItemExportInProgress(false)
+
         subscriptions.clear()
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         println("table export service started.")
         val trackerId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
-        if (OTApplication.app.isTrackerItemExportInProgress(trackerId)) {
+        if (OTApplication.app.isTrackerItemExportInProgress()) {
             println("another export task is in progress")
             return START_NOT_STICKY
         }
-
-        OTApplication.app.setTrackerItemExportInProgress(trackerId, true)
-
         val exportUri = intent.getStringExtra(EXTRA_EXPORT_URI)
         if (trackerId != null && exportUri != null) {
+
+            OTApplication.app.setTrackerItemExportInProgress(true)
+            OTTaskNotificationManager.setTaskProgressNotification(this, TAG, 100, "Exporting tracker data...", "downloading", OTTaskNotificationManager.PROGRESS_INDETERMINATE)
+
 
             var externalFilesInvolved: Boolean = false
             var cacheDirectory: File? = null
 
             val table = StringTableSheet()
             var involvedFileList: MutableList<String>? = null
+
+            fun finish(successful: Boolean) {
+                println("export observable completed")
+                OTTaskNotificationManager.dismissNotification(this, 100, TAG)
+
+                if (successful) {
+                    val id = System.currentTimeMillis().toInt()
+                    println("show complete notification - ${id}")
+                    PugNotification.with(this)
+                            .load()
+                            .title("Tracking data export completed.")
+                            .`when`(System.currentTimeMillis())
+                            .tag(TAG)
+                            .identifier(makeUniqueNotificationId())
+                            .smallIcon(R.drawable.done)
+                            .largeIcon(R.drawable.icon_cloud_download)
+                            .simple()
+                            .build()
+                }
+
+                OTApplication.app.setTrackerItemExportInProgress(false)
+                stopSelf(startId)
+            }
 
             val subscription =
             OTApplication.app.currentUserObservable
@@ -106,7 +142,7 @@ class OTTableExportService : Service() {
                                 it.onAddColumnToTable(table.columns)
                             }
 
-                            FirebaseDbHelper.loadItems(tracker).doOnNext {
+                            val tableObservable = FirebaseDbHelper.loadItems(tracker).doOnNext {
                                 items ->
                                 items.withIndex().forEach {
                                     itemWithIndex ->
@@ -135,47 +171,53 @@ class OTTableExportService : Service() {
                                     }
                                 }
 
-                            }.flatMap {
-                                items ->
-                                val storeObservables = ArrayList<Single<Uri>>()
-                                tracker.attributes.unObservedList.filter { it is OTExternalFileInvolvedAttribute }.forEach {
-                                    attr ->
-                                    if (attr is OTExternalFileInvolvedAttribute) {
-                                        items.withIndex().forEach {
-                                            itemWithIndex ->
-                                            val itemValue = itemWithIndex.value.getValueOf(attr)
-                                            if (itemValue != null && attr.isValueContainingFileInfo(itemValue)) {
-                                                val cacheFilePath = cacheDirectory?.resolve(attr.makeRelativeFilePathFromValue(itemValue, itemWithIndex.index.toString()))
-                                                if (cacheFilePath != null) {
-                                                    val cacheFileLocation = cacheFilePath.parentFile
-                                                    if (!cacheFileLocation.exists()) {
-                                                        cacheFileLocation.mkdirs()
-                                                    }
+                            }
 
-                                                    if(!cacheFilePath.exists())
-                                                    {
-                                                        cacheFilePath.createNewFile()
+                            if (externalFilesInvolved) {
+                                tableObservable.flatMap {
+                                    items ->
+                                    val storeObservables = ArrayList<Single<Uri>>()
+                                    tracker.attributes.unObservedList.filter { it is OTExternalFileInvolvedAttribute }.forEach {
+                                        attr ->
+                                        if (attr is OTExternalFileInvolvedAttribute) {
+                                            items.withIndex().forEach {
+                                                itemWithIndex ->
+                                                val itemValue = itemWithIndex.value.getValueOf(attr)
+                                                if (itemValue != null && attr.isValueContainingFileInfo(itemValue)) {
+                                                    val cacheFilePath = cacheDirectory?.resolve(attr.makeRelativeFilePathFromValue(itemValue, itemWithIndex.index.toString()))
+                                                    if (cacheFilePath != null) {
+                                                        val cacheFileLocation = cacheFilePath.parentFile
+                                                        if (!cacheFileLocation.exists()) {
+                                                            cacheFileLocation.mkdirs()
+                                                        }
+
+                                                        if (!cacheFilePath.exists()) {
+                                                            cacheFilePath.createNewFile()
+                                                        }
+                                                        storeObservables.add(attr.storeValueFile(itemValue, Uri.parse(cacheFilePath.path)).onErrorReturn { ex -> Uri.EMPTY })
                                                     }
-                                                    storeObservables.add(attr.storeValueFile(itemValue, Uri.parse(cacheFilePath.path)).onErrorReturn { ex-> Uri.EMPTY })
                                                 }
                                             }
                                         }
                                     }
-                                }
 
-                                Single.zip(storeObservables){
-                                    uris->
-                                    uris.filter{ it != Uri.EMPTY }.map{it.toString()}
-                                }.toObservable().doOnNext {
-                                    uris->
-                                    involvedFileList?.addAll(uris)
-                                }
+                                    Single.zip(storeObservables) {
+                                        uris ->
+                                        println("uris")
+                                        uris.filter { it != Uri.EMPTY }.map { it.toString() }
+                                    }.toObservable().doOnNext {
+                                        uris ->
+                                        involvedFileList?.addAll(uris)
+                                    }
 
+                                }
+                            } else {
+                                tableObservable
                             }
                         } else {
                             Observable.error(Exception("tracker does not exists."))
                         }
-                    }.subscribe {
+                    }.subscribe({
                 println("file making task finished")
 
                 val successful: Boolean = if (externalFilesInvolved) {
@@ -197,6 +239,7 @@ class OTTableExportService : Service() {
                     } ?: false
                 } else {
                     try {
+                        println("store table itself to output")
                         val outputStream = contentResolver.openOutputStream(Uri.parse(exportUri))
                         table.storeToStream(outputStream)
                         true
@@ -211,15 +254,15 @@ class OTTableExportService : Service() {
                 if (successful) {
                     println("created table successfully.")
                     println(table)
+
+                    finish(true)
+                } else {
+                    finish(false)
                 }
-
-
-                OTApplication.app.setTrackerItemExportInProgress(trackerId, false)
-                stopSelf(startId)
-                    }
+            }, { finish(false) })
 
             subscriptions.add(subscription)
-            return START_STICKY
+            return START_NOT_STICKY
         } else {
             stopSelf(startId)
             return START_NOT_STICKY

@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger
 /**
  * Created by Young-Ho Kim on 16. 9. 1
  */
-object OTNotificationManager {
+object OTTrackingNotificationManager {
 
     private val increment = AtomicInteger(500)
 
