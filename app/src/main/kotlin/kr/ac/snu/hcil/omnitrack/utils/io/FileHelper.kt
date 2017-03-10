@@ -19,7 +19,7 @@ object FileHelper {
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
         intent.addCategory(Intent.CATEGORY_OPENABLE)
         intent.setType("*/*")
-        intent.putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("text/csv", "application/zip"))
+        intent.putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("text/csv", "application/zip", "text/comma-separated-values", "text/plain"))
         intent.putExtra(Intent.EXTRA_TITLE, filename)
 
         return intent

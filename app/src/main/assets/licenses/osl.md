@@ -61,6 +61,11 @@ Apache 2.0 license
 Copyright 2011, Artem Votincev (apmem.org)<br>
 Apache 2.0 license
 
+#####Pugnotification
+<https://github.com/halysongoncalves/Pugnotification><br>
+Copyright 2013 Halyson L. Gonçalves, Inc.
+Apache 2.0 license
+
 #####Ion: Android Asynchronous Networking and Image Loading
 <https://github.com/koush/ion><br>
 Copyright 2013 Koushik Dutta<br>

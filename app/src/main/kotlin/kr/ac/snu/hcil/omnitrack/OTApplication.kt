@@ -575,11 +575,11 @@ class OTApplication : MultiDexApplication() {
 
     }
 
-    fun isTrackerItemExportInProgress(trackerId: String): Boolean {
-        return systemSharedPreferences.getBoolean("${PREFERENCE_KEY_TRACKER_ITEMS_EXPORTING_PREFIX}_$trackerId", false)
+    fun isTrackerItemExportInProgress(): Boolean {
+        return systemSharedPreferences.getBoolean(PREFERENCE_KEY_TRACKER_ITEMS_EXPORTING_PREFIX, false)
     }
 
-    fun setTrackerItemExportInProgress(trackerId: String, inProgress: Boolean) {
-        systemSharedPreferences.edit().putBoolean(trackerId, inProgress).apply()
+    fun setTrackerItemExportInProgress(inProgress: Boolean) {
+        systemSharedPreferences.edit().putBoolean(PREFERENCE_KEY_TRACKER_ITEMS_EXPORTING_PREFIX, inProgress).apply()
     }
 }
