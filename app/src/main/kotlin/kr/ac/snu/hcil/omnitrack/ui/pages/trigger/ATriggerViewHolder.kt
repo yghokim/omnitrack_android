@@ -462,9 +462,9 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
     override fun onClick(view: View?) {
 
         if (view === removeButton) {
-            DialogHelper.makeYesNoDialogBuilder(itemView.context, "OmniTrack", itemView.context.resources.getString(R.string.msg_trigger_remove_confirm), {
+            DialogHelper.makeNegativePhrasedYesNoDialogBuilder(itemView.context, "OmniTrack", itemView.context.resources.getString(R.string.msg_trigger_remove_confirm), R.string.msg_remove, onYes= {
                 listener.onTriggerRemove(adapterPosition)
-            }, null).show()
+            }).show()
         }
         /*else if (view === expandToggleButton) {
             listener.onTriggerCollapse(adapterPosition, this)

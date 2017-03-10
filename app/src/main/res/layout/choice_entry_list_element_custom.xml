@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/button_height_normal"
+    android:orientation="horizontal"
+    android:background="@drawable/transparent_button_background">
+
+    <ImageView
+        android:id="@+id/ui_checked"
+        android:layout_width="@dimen/choice_indicator_size"
+        android:layout_height="@dimen/choice_indicator_size"
+        android:layout_marginRight="@dimen/choice_indicator_spacing"
+        android:scaleType="fitStart"
+        android:layout_gravity="center_vertical"
+        android:src="@drawable/checkbox_checked" />
+
+    <TextView
+        android:id="@+id/ui_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:text="Other: "
+        android:textColor="@color/textColorMid"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/ui_input"
+        android:layout_marginLeft="4dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:hint="Your own answer"
+        android:textColorHint="@color/textColorLight"
+        android:background="@drawable/form_rounded"
+        />
+
+</LinearLayout>

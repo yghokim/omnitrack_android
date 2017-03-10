@@ -196,6 +196,15 @@
 
     <string name="msg_empty_value">값 없음</string>
 
+    <string name="msg_delete">지우기</string>
+    <string name="msg_add">추가</string>
+
+    <string name="msg_export">내보내기</string>
+
+    <string name="msg_logout">로그아웃</string>
+
+    <string name="msg_cancel_creation_and_exit">취소 후 종료</string>
+
     <string name="msg_tracker_list_stat_total">전체</string>
 
     <string name="msg_attach">트래커에 추가</string>
