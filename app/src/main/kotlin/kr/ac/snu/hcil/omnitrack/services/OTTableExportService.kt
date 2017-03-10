@@ -84,7 +84,7 @@ class OTTableExportService : Service() {
         if (trackerId != null && exportUri != null) {
 
             OTApplication.app.setTrackerItemExportInProgress(true)
-            OTTaskNotificationManager.setTaskProgressNotification(this, TAG, 100, "Exporting tracker data...", "downloading", OTTaskNotificationManager.PROGRESS_INDETERMINATE)
+            OTTaskNotificationManager.setTaskProgressNotification(this, TAG, 100, getString(R.string.msg_export_title_progress), "downloading", OTTaskNotificationManager.PROGRESS_INDETERMINATE)
 
 
             var externalFilesInvolved: Boolean = false
@@ -98,11 +98,9 @@ class OTTableExportService : Service() {
                 OTTaskNotificationManager.dismissNotification(this, 100, TAG)
 
                 if (successful) {
-                    val id = System.currentTimeMillis().toInt()
-                    println("show complete notification - ${id}")
                     PugNotification.with(this)
                             .load()
-                            .title("Tracking data export completed.")
+                            .title(getString(R.string.msg_export_success_notification_message))
                             .`when`(System.currentTimeMillis())
                             .tag(TAG)
                             .identifier(makeUniqueNotificationId())
