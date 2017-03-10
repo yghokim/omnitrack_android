@@ -94,6 +94,8 @@ class OTApplication : MultiDexApplication() {
 
         const val PREFERENCE_KEY_BACKGROUND_ITEM_BUILDER_STORAGE = "item_builder_storage_background"
 
+        const val PREFERENCE_KEY_TRACKER_ITEMS_EXPORTING_PREFIX = "exporting_tracker"
+
         fun getString(resId: Int): String {
             return app.resources.getString(resId)
         }
@@ -571,5 +573,13 @@ class OTApplication : MultiDexApplication() {
                 }, beerTracker)
 
 
+    }
+
+    fun isTrackerItemExportInProgress(trackerId: String): Boolean {
+        return systemSharedPreferences.getBoolean("${PREFERENCE_KEY_TRACKER_ITEMS_EXPORTING_PREFIX}_$trackerId", false)
+    }
+
+    fun setTrackerItemExportInProgress(trackerId: String, inProgress: Boolean) {
+        systemSharedPreferences.edit().putBoolean(trackerId, inProgress).apply()
     }
 }
