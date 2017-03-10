@@ -261,6 +261,9 @@
     <string name="msg_indicator_message_processing">Processing…</string>
     <string name="msg_export_to_file_tracker">Export items to file..</string>
     <string name="msg_desc_export_to_file_tracker">Store the items of the tracker to table</string>
+    <string name="msg_export_success_notification_message">Exported tracking data successfully.</string>
+    <string name="msg_export_title_progress">Exporting tracker data...</string>
+    <string name="msg_export_warning_mobile_network">If you download tracking data vis 3G/LTE connection, it may impact your mobile data usage. Do you want to continue export?</string>
 
     <string-array name="gender_entries">
         <item>Male</item>
