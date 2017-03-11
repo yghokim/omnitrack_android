@@ -23,6 +23,9 @@ class ExperimentSignInActivity : IntroActivity() {
     internal lateinit var buttonNext: ImageButton
 
     private lateinit var demographicSlide: FragmentSlide
+    private lateinit var purposeSlide: FragmentSlide
+
+    private var isComponentsCreated: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,6 +52,15 @@ class ExperimentSignInActivity : IntroActivity() {
 
         addSlide(demographicSlide)
 
+        purposeSlide = FragmentSlide.Builder()
+                .fragment(PurposeChoiceFragment())
+                .background(R.color.frontalBackground)
+                .backgroundDark(R.color.colorSecondary)
+                .canGoForward(false)
+                .build()
+
+        addSlide(purposeSlide)
+
         addSlide(
                 SimpleSlide.Builder()
                         .background(R.color.colorPrimary)
@@ -67,6 +79,8 @@ class ExperimentSignInActivity : IntroActivity() {
                 if (slide === demographicSlide) {
 
                     Snackbar.make(contentView, R.string.msg_demographic_complete_form, Snackbar.LENGTH_LONG).show()
+                } else if (slide === purposeSlide) {
+                    Snackbar.make(contentView, getString(R.string.msg_choose_one_or_more), Snackbar.LENGTH_LONG).show()
                 }
             }
         }
@@ -84,7 +98,7 @@ class ExperimentSignInActivity : IntroActivity() {
                     override fun onPageSelected(position: Int) {
                         println("page changed to ${position}")
                         val slide = getSlide(position)
-                        if (slide === demographicSlide) {
+                        if (slide === demographicSlide || slide === purposeSlide) {
                             if (slide.canGoForward()) {
                                 buttonNext.alpha = 1f
                             } else {
@@ -98,6 +112,8 @@ class ExperimentSignInActivity : IntroActivity() {
                 }
         )
 
+        isComponentsCreated = true
+
     }
 
     fun setButtonNextBackgroundTint(color: Int) {
@@ -110,12 +126,19 @@ class ExperimentSignInActivity : IntroActivity() {
 
     override fun onSendActivityResult(result: Int): Intent? {
         return Intent().apply {
-            val fragment = demographicSlide.fragment as? DemographicInputFragment
-            if (fragment != null) {
-                putExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_AGE_GROUP, fragment.selectedAgeKey)
-                putExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_GENDER, fragment.selectedGenderKey)
-                putExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_OCCUPATION, fragment.selectedOccupationKey)
-                putExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_COUNTRY, fragment.selectedCountryInfo?.key)
+            if (isComponentsCreated) {
+                val demographicFragment = demographicSlide.fragment as? DemographicInputFragment
+                if (demographicFragment != null) {
+                    putExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_AGE_GROUP, demographicFragment.selectedAgeKey)
+                    putExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_GENDER, demographicFragment.selectedGenderKey)
+                    //putExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_OCCUPATION, fragment.selectedOccupationKey)
+                    putExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_COUNTRY, demographicFragment.selectedCountryInfo?.key)
+                }
+
+                val purposeFragment = purposeSlide.fragment as? PurposeChoiceFragment
+                if (purposeFragment != null) {
+                    putExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_PURPOSES, ArrayList<String>(purposeFragment.selectedPurposes.toList()))
+                }
             }
         }
     }
