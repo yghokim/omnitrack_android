@@ -59,6 +59,7 @@ class SelectionView(context: Context, attrs: AttributeSet?, defStyle: Int) : Rec
     }
 
     init {
+        overScrollMode = View.OVER_SCROLL_NEVER
         buttonPadding = Rect(resources.getDimensionPixelOffset(R.dimen.selection_view_button_padding_left),
                 resources.getDimensionPixelOffset(R.dimen.selection_view_button_padding_top),
                 resources.getDimensionPixelOffset(R.dimen.selection_view_button_padding_right),

@@ -231,6 +231,11 @@
 
     <string name="msg_informed_consent">연구 참가 동의서에 동의해주세요</string>
     <string name="msg_demographic_title">기본 정보를 입력해주세요</string>
+    <string name="msg_purpose_slide_title">트래킹의 목적</string>
+    <string name="msg_why_did_you_download_omnitrack">옴니트랙을 어떤 목적으로 사용하기 위해 다운받으셨나요?\n(복수응답)</string>
+
+    <string name="msg_consent_promote_message">제공해주신 정보는 옴니트랙 앱을 개선하는 데에 큰 도움이 됩니다. 감사합니다.</string>
+
 
     <string name="informed_consent_filename">informed_consent_ko.md</string>
 
@@ -260,6 +265,8 @@
     <string name="msg_export_success_notification_message">트래킹 데이터를 성공적으로 저장했습니다.</string>
     <string name="msg_export_title_progress">트래킹 데이터 내보내는 중…</string>
     <string name="msg_export_warning_mobile_network">3G 혹은 LTE 환경에서 트래킹 데이터를 다운로드할 경우, 요금제에 따라 많은 요금이 청구될 수 있습니다. 계속 진행하시겠습니까?</string>
+    <string name="msg_other">기타:</string>
+    <string name="msg_choose_one_or_more">하나 이상의 항목을 선택하세요.</string>
 
     <string-array name="gender_entries">
         <item>남성</item>

@@ -179,7 +179,8 @@
 
         <activity
             android:name=".ui.pages.experiment.ExperimentSignInActivity"
-            android:theme="@style/Theme.Intro" />
+            android:theme="@style/Theme.Intro"
+            android:windowSoftInputMode="adjustPan" />
 
 
     </application>

@@ -242,7 +242,12 @@
     <string name="msg_contact_us_message">Send us feedback, inquiries, and bug reports</string>
 
     <string name="msg_informed_consent">Agree to Informed Consent</string>
-    <string name="msg_demographic_title">Insert Basic Information</string>
+    <string name="msg_demographic_title">Demographic Information</string>
+    <string name="msg_purpose_slide_title">Purpose of Tracking</string>
+
+    <string name="msg_why_did_you_download_omnitrack">What purposes did you download OmniTrack for?\n(Multiple choices)</string>
+
+    <string name="msg_consent_promote_message">The information you gave us will be really helpful for us to improve OmniTrack. Thank you!</string>
 
     <string name="informed_consent_filename">informed_consent.md</string>
 
@@ -273,6 +278,9 @@
     <string name="msg_export_success_notification_message">Exported tracking data successfully.</string>
     <string name="msg_export_title_progress">Exporting tracker data...</string>
     <string name="msg_export_warning_mobile_network">If you download tracking data vis 3G/LTE connection, it may impact your mobile data usage. Do you want to continue export?</string>
+    <string name="msg_other">Other:</string>
+    <string name="msg_choose_one_or_more">Choose one or more items to proceed.</string>
+
 
     <string-array name="gender_entries">
         <item>Male</item>
@@ -304,6 +312,17 @@
         <item>older60</item>
     </string-array>
 
+
+    <string-array name="purpose_entries">
+        <item>directive|To record health-related info</item>
+        <item>documentary|For document reviews or diaries</item>
+        <item>track|To keep track of habits or routines</item>
+        <item>diagnostic|To find causes of problems of myself</item>
+        <item>self-knowledge|To understand myself better</item>
+        <item>social|To track something together with other people</item>
+        <item>fetishised|Just for technological curiosity</item>
+    </string-array>
+
     <string-array name="occupation_entries">
         <item>Self-employed</item>
         <item>Employed full-time</item>
@@ -327,4 +346,5 @@
         <item>Choice entry 2</item>
         <item>Choice entry 3</item>
     </string-array>
+
 </resources>
