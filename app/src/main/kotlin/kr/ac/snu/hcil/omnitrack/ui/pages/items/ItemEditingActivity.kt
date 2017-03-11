@@ -121,7 +121,12 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
             view ->
             builder = OTItemBuilder(tracker!!, OTItemBuilder.MODE_FOREGROUND)
 
-            val rxPermissionObservable = RxPermissions(this).request(*(tracker!!.getRequiredPermissions()))
+            val requiredPermissions = tracker!!.getRequiredPermissions()
+            val rxPermissionObservable = if (requiredPermissions.isNotEmpty()) {
+                RxPermissions(this).request(*requiredPermissions)
+            } else {
+                Observable.just(true)
+            }
             creationSubscriptions.add(
                     rxPermissionObservable
                             .flatMap {
@@ -147,7 +152,10 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
     override fun onTrackerLoaded(tracker: OTTracker) {
         super.onTrackerLoaded(tracker)
 
-        val rxPermissionObservable = RxPermissions(this).request(*(tracker.getRequiredPermissions()))
+        val requiredPermissions = tracker.getRequiredPermissions()
+        val rxPermissionObservable = if (requiredPermissions.isNotEmpty()) {
+            RxPermissions(this).request(*requiredPermissions)
+        } else Observable.just(true)
 
         title = String.format(resources.getString(R.string.title_activity_new_item), tracker.name)
 
