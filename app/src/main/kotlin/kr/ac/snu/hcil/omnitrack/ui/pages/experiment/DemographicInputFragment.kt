@@ -24,9 +24,10 @@ class DemographicInputFragment : SlideFragment(), ExtendedSpinner.OnItemSelected
         resources.getStringArray(R.array.age_entry_keys)
     }
 
+    /*
     val occupationKeys: Array<String> by lazy {
         resources.getStringArray(R.array.occupation_entry_keys)
-    }
+    }*/
 
     val selectedGenderKey: String? get() {
         return if (genderSelector.selectedIndex != -1)
@@ -40,11 +41,12 @@ class DemographicInputFragment : SlideFragment(), ExtendedSpinner.OnItemSelected
         else null
     }
 
+    /*
     val selectedOccupationKey: String? get() {
         return if (occupationSpinner.selectedItemPosition != -1)
             occupationKeys[occupationSpinner.selectedItemPosition]
         else null
-    }
+    }*/
 
     val selectedCountryInfo: TextHelper.CountryInfo? get() {
         return countrySpinner.selectedItem as? TextHelper.CountryInfo
@@ -52,7 +54,7 @@ class DemographicInputFragment : SlideFragment(), ExtendedSpinner.OnItemSelected
 
     private lateinit var genderSelector: SelectionView
     private lateinit var ageSpinner: ExtendedSpinner
-    private lateinit var occupationSpinner: ExtendedSpinner
+    //private lateinit var occupationSpinner: ExtendedSpinner
     private lateinit var countrySpinner: ExtendedSpinner
 
     private var isComplete: Boolean = false
@@ -67,9 +69,11 @@ class DemographicInputFragment : SlideFragment(), ExtendedSpinner.OnItemSelected
         ageSpinner.setItems(*resources.getStringArray(R.array.age_entries))
         ageSpinner.selectedItemPosition = -1
 
+        /*
         occupationSpinner = view.findViewById(R.id.ui_occupation_selector) as ExtendedSpinner
         occupationSpinner.setItems(*resources.getStringArray(R.array.occupation_entries))
         occupationSpinner.selectedItemPosition = -1
+*/
 
         countrySpinner = view.findViewById(R.id.ui_country_selector) as ExtendedSpinner
         countrySpinner.setItems(*TextHelper.countryNames)
@@ -77,7 +81,9 @@ class DemographicInputFragment : SlideFragment(), ExtendedSpinner.OnItemSelected
 
 
         ageSpinner.onItemSelectedListener = this
+        /*
         occupationSpinner.onItemSelectedListener = this
+        */
         countrySpinner.onItemSelectedListener = this
 
         /*
@@ -97,7 +103,7 @@ class DemographicInputFragment : SlideFragment(), ExtendedSpinner.OnItemSelected
     }
 
     override fun onItemSelected(spinner: ExtendedSpinner, position: Int) {
-        if (ageSpinner.selectedItem != null && occupationSpinner.selectedItem != null && countrySpinner.selectedItem != null) {
+        if (ageSpinner.selectedItem != null /*&& occupationSpinner.selectedItem != null*/ && countrySpinner.selectedItem != null) {
             println("Demographic information complete!")
             isComplete = true
             val activity = activity
@@ -105,6 +111,9 @@ class DemographicInputFragment : SlideFragment(), ExtendedSpinner.OnItemSelected
                 activity.buttonNextFunction = IntroActivity.BUTTON_NEXT_FUNCTION_NEXT_FINISH
                 activity.buttonNext.alpha = 1f
             }
+            updateNavigation()
+        } else {
+            isComplete = false
             updateNavigation()
         }
     }

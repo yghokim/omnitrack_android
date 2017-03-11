@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.common.choice
 
 import android.content.Context
-import android.support.annotation.Keep
+import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.Editable
 import android.text.TextWatcher
@@ -9,14 +9,12 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.ChoiceInputView
-import kr.ac.snu.hcil.omnitrack.utils.UniqueStringEntryList
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
-import kr.ac.snu.hcil.omnitrack.utils.inflateContent
-import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializedStringKeyEntry
-import java.util.SortedSet
 import kotlin.properties.Delegates
 
 /**
@@ -24,7 +22,14 @@ import kotlin.properties.Delegates
  */
 class ChoiceFormView : LinearLayout {
 
-    data class Entry(val id: String, var text: String, var isCustom:Boolean = false)
+    data class Entry(val id: String, var text: String, var isCustom: Boolean = false) {
+        val isValid: Boolean
+            get() = if (isCustom) {
+                text.isNotBlank()
+            } else {
+                true
+            }
+    }
 
     var allowMultipleSelection: Boolean by Delegates.observable(false){
         prop, old, new->
@@ -43,7 +48,11 @@ class ChoiceFormView : LinearLayout {
         }
     }
 
+    val isSelectionEmpty: Boolean get() = selectedIndices.isEmpty()
+
     private val selectedIndices = java.util.TreeSet<Int>()
+
+    val valueChanged = Event<Void?>()
 
     val selectedEntries : Array<Entry> get(){
         return selectedIndices.map{ entries?.get(it)!!}.toTypedArray()
@@ -61,7 +70,15 @@ class ChoiceFormView : LinearLayout {
     init{
         orientation = LinearLayout.VERTICAL
         recyclerView = RecyclerView(context)
+        recyclerView.isNestedScrollingEnabled = false
+        recyclerView.overScrollMode = RecyclerView.OVER_SCROLL_NEVER
+        recyclerView.preserveFocusAfterLayout = true
+        recyclerView.descendantFocusability = ViewGroup.FOCUS_AFTER_DESCENDANTS
         recyclerView.layoutParams = LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+        recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        recyclerView.adapter = adapter
+
+        addView(recyclerView)
 
     }
 
@@ -104,8 +121,6 @@ class ChoiceFormView : LinearLayout {
             }
         }
 
-        val valueChanged = Event<Void?>()
-
         override fun getItemCount(): Int = entries?.size ?: 0
 
         inner open class ViewHolder(view: View) : RecyclerView.ViewHolder(view), OnClickListener {
@@ -142,26 +157,27 @@ class ChoiceFormView : LinearLayout {
             }
 
             override fun onClick(view: View) {
-                if (allowMultipleSelection) {
-                    if (selectedIndices.contains(adapterPosition)) {
-                        selectedIndices.remove(adapterPosition)
+                if (view === itemView) {
+                    println("element clicked")
+                    if (allowMultipleSelection) {
+                        if (selectedIndices.contains(adapterPosition)) {
+                            selectedIndices.remove(adapterPosition)
+                        } else {
+                            selectedIndices.add(adapterPosition)
+                        }
+                        notifyItemChanged(adapterPosition)
                     } else {
+                        val removedIndices = selectedIndices.toTypedArray()
+                        selectedIndices.clear()
+                        for (i in removedIndices) {
+                            notifyItemChanged(i)
+                        }
                         selectedIndices.add(adapterPosition)
+                        notifyItemChanged(adapterPosition)
                     }
-                    notifyItemChanged(adapterPosition)
-                }
-                else{
-                    val removedIndices = selectedIndices.toTypedArray()
-                    selectedIndices.clear()
-                    for(i in removedIndices)
-                    {
-                        notifyItemChanged(i)
-                    }
-                    selectedIndices.add(adapterPosition)
-                    notifyItemChanged(adapterPosition)
-                }
 
-                valueChanged.invoke(this@ChoiceFormView, null)
+                    valueChanged.invoke(this@ChoiceFormView, null)
+                }
             }
         }
 

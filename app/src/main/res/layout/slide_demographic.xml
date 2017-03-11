@@ -39,6 +39,7 @@
         android:background="@drawable/button_background_formlike"
         app:arrowResource="@drawable/down" />
 
+    <!--
     <TextView
         style="@style/PropertyHeaderStyle.withMargin"
         android:text="@string/msg_demographic_occupation" />
@@ -49,7 +50,7 @@
         android:layout_height="wrap_content"
         android:background="@drawable/button_background_formlike"
         android:textColor="@color/textColorMidDark"
-        app:arrowResource="@drawable/down" />
+        app:arrowResource="@drawable/down" />-->
 
 
     <TextView

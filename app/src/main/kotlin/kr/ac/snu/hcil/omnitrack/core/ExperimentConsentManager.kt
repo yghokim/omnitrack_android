@@ -24,11 +24,11 @@ object ExperimentConsentManager {
             var isConsentApproved: Boolean = false,
             var age: String? = null,
             var gender: String? = null,
-            var occupation: String? = null,
+            var purposes: List<String>? = null,
             var country: String? = null) {
 
         override fun toString(): String {
-            return "isConsentApproved: ${isConsentApproved}, age: ${age}, gender: ${gender}, occupation: ${occupation}, country: ${country}"
+            return "isConsentApproved: ${isConsentApproved}, age: ${age}, gender: ${gender}, country: ${country}, purposes: ${purposes?.joinToString(",")}"
         }
     }
 
@@ -98,7 +98,7 @@ object ExperimentConsentManager {
                 profile.age = data.getStringExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_AGE_GROUP)
                 profile.country = data.getStringExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_COUNTRY)
                 profile.gender = data.getStringExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_GENDER)
-                profile.occupation = data.getStringExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_OCCUPATION)
+                profile.purposes = data.getStringArrayListExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_PURPOSES)
 
                 val currentExpRef = FirebaseDbHelper.experimentProfileRef
                 currentExpRef?.setValue(profile, DatabaseReference.CompletionListener { databaseError, databaseReference ->

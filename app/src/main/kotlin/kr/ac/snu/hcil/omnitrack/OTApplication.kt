@@ -62,6 +62,8 @@ class OTApplication : MultiDexApplication() {
         const val ACCOUNT_DATASET_EXPERIMENT_KEY_OCCUPATION = "occupation"
         const val ACCOUNT_DATASET_EXPERIMENT_KEY_AGE_GROUP = "age_group"
         const val ACCOUNT_DATASET_EXPERIMENT_KEY_COUNTRY = "country"
+        const val ACCOUNT_DATASET_EXPERIMENT_KEY_PURPOSES = "purpose"
+
 
 
         const val INTENT_EXTRA_OBJECT_ID_TRACKER = "trackerObjectId"
