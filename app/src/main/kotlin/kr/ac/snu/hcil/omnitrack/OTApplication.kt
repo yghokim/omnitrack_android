@@ -174,7 +174,7 @@ class OTApplication : MultiDexApplication() {
 
     val isUserLoaded: Boolean get() = _currentUser != null
 
-    val currentUserObservable: Observable<OTUser> = Observable.create<OTUser> {
+    val currentUserObservable: Observable<OTUser> = Observable.unsafeCreate<OTUser> {
         subscriber ->
         fun sendUser(user: OTUser) {
             if (!subscriber.isUnsubscribed) {
@@ -189,9 +189,9 @@ class OTApplication : MultiDexApplication() {
         } else {
             //need login
             println("load user from db")
-            OTUser.loadCachedInstance(systemSharedPreferences).onErrorReturn {
-                error ->
-                error.printStackTrace()
+            val cachedUser = OTUser.loadCachedInstance(systemSharedPreferences)
+
+            if (cachedUser == null) {
                 //if (OTAuthManager.isUserSignedIn()) {
                     val uid = OTAuthManager.userId!!
                     println("OMNITRACK user identityId: ${uid}, userName: ${OTAuthManager.userName}")
@@ -217,18 +217,16 @@ class OTApplication : MultiDexApplication() {
                             createUsabilityTestingTrackers(user)
                         }
 
-                user
+                _currentUser = user
 
                 //}
                 //} else {
                 //    println("OMNITRACK retreiving user instance error: User didn't signed in with google.")
                 //    Observable.error<OTUser>(Exception("retreiving user instance error: User didn't signed in with google."))
                 //}
-            }.doOnNext {
-                user ->
-                println("cached user instance")
-                _currentUser = user
-            }.subscribe(subscriber)
+            } else {
+                _currentUser = cachedUser
+            }
         }
     }.subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())

@@ -16,7 +16,6 @@ import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerManager
 import kr.ac.snu.hcil.omnitrack.utils.DefaultNameGenerator
 import kr.ac.snu.hcil.omnitrack.utils.ObservableList
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
-import rx.Observable
 import rx.internal.util.SubscriptionList
 import rx.subjects.PublishSubject
 import rx.subjects.SerializedSubject
@@ -40,12 +39,13 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
             return sp.contains(PREFERENCES_KEY_OBJECT_ID)
         }
 
-        fun loadCachedInstance(sp: SharedPreferences): rx.Observable<OTUser> {
+        fun loadCachedInstance(sp: SharedPreferences): OTUser? {
             if (isUserStored(sp)) {
                 val objId = sp.getString(PREFERENCES_KEY_OBJECT_ID, null)
                 val name = sp.getString(PREFERENCES_KEY_NAME, null)
                 val photoUrl = sp.getString(PREFERENCES_KEY_PHOTO_URL, null)
                 if (objId != null && name != null) {
+                    /*
                     return FirebaseDbHelper.findTrackersOfUser(objId).flatMap {
                         trackers ->
                         val user = OTUser(objId, name, photoUrl, trackers)
@@ -56,9 +56,10 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
                             }
                             user
                         }
-                    }
-                } else return Observable.error(Exception("UserInfo is not stored"))
-            } else return Observable.error(Exception("User is not stored"))
+                    }*/
+                    return OTUser(objId, name, photoUrl)
+                } else return null
+            } else return null
         }
 
         fun storeOrOverwriteInstanceCache(instance: OTUser, sp: SharedPreferences): Boolean {
