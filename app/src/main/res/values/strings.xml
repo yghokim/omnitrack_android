@@ -280,6 +280,7 @@
     <string name="msg_export_warning_mobile_network">If you download tracking data vis 3G/LTE connection, it may impact your mobile data usage. Do you want to continue export?</string>
     <string name="msg_other">Other:</string>
     <string name="msg_choose_one_or_more">Choose one or more items to proceed.</string>
+    <string name="msg_network_error_tap_to_retry">Network Error. Tap to Retry</string>
 
 
     <string-array name="gender_entries">
