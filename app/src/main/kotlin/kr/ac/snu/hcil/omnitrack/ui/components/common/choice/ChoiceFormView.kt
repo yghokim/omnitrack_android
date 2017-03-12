@@ -212,7 +212,7 @@ class ChoiceFormView : LinearLayout {
 
             override fun bind(entry: Entry) {
                 super.bind(entry)
-                this.customInputView.setText(entry.text, TextView.BufferType.EDITABLE)
+                //this.customInputView.setText(entry.text, TextView.BufferType.EDITABLE)
             }
         }
     }
