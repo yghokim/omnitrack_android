@@ -15,6 +15,7 @@ import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.common.PlaceHolderImageView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.ImageInputView
+import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Observable
 import rx.Single
@@ -71,56 +72,72 @@ class OTImageAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrack
         return Single.defer {
             if (view is PlaceHolderImageView) {
                 view.currentMode = PlaceHolderImageView.Mode.EMPTY
-                if (value is SynchronizedUri && !value.isEmpty) {
-                    if (value.isLocalUriValid) {
-                        view.currentMode = PlaceHolderImageView.Mode.IMAGE
-                        Glide.with(view.context)
-                                .load(value.localUri.toString())
-                                .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
-                                .into(view.imageView)
-                        Single.just(true)
-                    } else {
-                        println("local uri is invalid. download server image.")
-                        if (value.isSynchronized) {
-                            view.currentMode = PlaceHolderImageView.Mode.LOADING
-                            //OTApplication.app.storageHelper.downloadFileTo(value.serverUri.toString(), value.localUri).onErrorReturn{Uri.EMPTY}
-                            OTApplication.app.storageHelper.downloadFileTo(value.serverUri.toString(), value.localUri).doOnError {
-                                error ->
-                                error.printStackTrace()
-                                view.currentMode = PlaceHolderImageView.Mode.EMPTY
-                            }
-                                    .map {
-                                        uri ->
-                                        println("downloaded: ${uri}")
-                                        Glide.with(view.context)
-                                                .load(uri)
-                                                .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
-                                                .listener(object : RequestListener<Uri, GlideDrawable> {
-                                                    override fun onException(e: Exception?, model: Uri?, target: Target<GlideDrawable>?, isFirstResource: Boolean): Boolean {
-                                                        view.currentMode = PlaceHolderImageView.Mode.ERROR
-                                                        return false
-                                                    }
 
-                                                    override fun onResourceReady(resource: GlideDrawable?, model: Uri?, target: Target<GlideDrawable>?, isFromMemoryCache: Boolean, isFirstResource: Boolean): Boolean {
-                                                        if (resource != null) {
-                                                            view.currentMode = PlaceHolderImageView.Mode.IMAGE
-                                                        }
-                                                        return false
-                                                    }
-
-                                                }).into(view.imageView)
-                                        true
-                                    }.subscribeOn(Schedulers.io())
+                fun function(): Single<Boolean> {
+                    if (value is SynchronizedUri && !value.isEmpty) {
+                        if (value.isLocalUriValid) {
+                            view.currentMode = PlaceHolderImageView.Mode.IMAGE
+                            Glide.with(view.context)
+                                    .load(value.localUri.toString())
+                                    .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
+                                    .into(view.imageView)
+                            return Single.just(true)
                         } else {
-                            //not synchronized yet.
-                            view.currentMode = PlaceHolderImageView.Mode.ERROR
-                            Single.just(false)
+                            println("local uri is invalid. download server image.")
+                            if (value.isSynchronized) {
+
+                                if (!NetworkHelper.isConnectedToInternet()) {
+                                    println("internet is not connected.")
+                                    view.setErrorMode(OTApplication.app.getString(R.string.msg_network_error_tap_to_retry))
+                                    return@function Single.just(false)
+                                }
+
+                                view.currentMode = PlaceHolderImageView.Mode.LOADING
+                                //OTApplication.app.storageHelper.downloadFileTo(value.serverUri.toString(), value.localUri).onErrorReturn{Uri.EMPTY}
+                                return OTApplication.app.storageHelper.downloadFileTo(value.serverUri.toString(), value.localUri).doOnError {
+                                    error ->
+                                    error.printStackTrace()
+                                    view.currentMode = PlaceHolderImageView.Mode.EMPTY
+                                }
+                                        .map {
+                                            uri ->
+                                            println("downloaded: ${uri}")
+                                            Glide.with(view.context)
+                                                    .load(uri)
+                                                    .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
+                                                    .listener(object : RequestListener<Uri, GlideDrawable> {
+                                                        override fun onException(e: Exception?, model: Uri?, target: Target<GlideDrawable>?, isFirstResource: Boolean): Boolean {
+                                                            view.currentMode = PlaceHolderImageView.Mode.ERROR
+                                                            return false
+                                                        }
+
+                                                        override fun onResourceReady(resource: GlideDrawable?, model: Uri?, target: Target<GlideDrawable>?, isFromMemoryCache: Boolean, isFirstResource: Boolean): Boolean {
+                                                            if (resource != null) {
+                                                                view.currentMode = PlaceHolderImageView.Mode.IMAGE
+                                                            }
+                                                            return false
+                                                        }
+
+                                                    }).into(view.imageView)
+                                            true
+                                        }.subscribeOn(Schedulers.io())
+                            } else {
+                                //not synchronized yet.
+                                view.setErrorMode(OTApplication.app.getString(R.string.msg_network_error_tap_to_retry))
+                                return Single.just(false)
+                            }
                         }
+                    } else {
+                        view.currentMode = PlaceHolderImageView.Mode.EMPTY
+                        return Single.just(false)
                     }
-                } else {
-                    view.currentMode = PlaceHolderImageView.Mode.EMPTY
-                    Single.just(false)
                 }
+
+                view.onRetryHandler = {
+                    function().subscribe()
+                }
+
+                function()
             } else super.applyValueToViewForItemList(null, view)
         }
     }
