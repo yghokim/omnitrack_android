@@ -137,6 +137,9 @@ class ExperimentSignInActivity : IntroActivity() {
 
                 val purposeFragment = purposeSlide.fragment as? PurposeChoiceFragment
                 if (purposeFragment != null) {
+                    for (purpose in purposeFragment.selectedPurposes) {
+                        println(purpose)
+                    }
                     putExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_PURPOSES, ArrayList<String>(purposeFragment.selectedPurposes.toList()))
                 }
             }

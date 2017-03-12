@@ -2,22 +2,24 @@ package kr.ac.snu.hcil.omnitrack.core.attributes
 
 import android.content.Context
 import android.net.Uri
-import android.support.v4.content.ContextCompat
 import android.view.View
-import android.widget.ImageView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.GlideDrawable
+import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
+import kr.ac.snu.hcil.omnitrack.ui.components.common.PlaceHolderImageView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.ImageInputView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Observable
 import rx.Single
 import rx.schedulers.Schedulers
+import java.lang.Exception
 import java.util.*
 
 /**
@@ -55,44 +57,37 @@ class OTImageAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrack
     override fun getViewForItemListContainerType(): Int = VIEW_FOR_ITEM_LIST_CONTAINER_TYPE_MULTILINE
 
     override fun getViewForItemList(context: Context, recycledView: View?): View {
-        val target = if (recycledView is ImageView) {
+        val target = if (recycledView is PlaceHolderImageView) {
             recycledView
         } else {
-            val view = ImageView(context)
+            val view = PlaceHolderImageView(context)
             view
         }
-
-        target.adjustViewBounds = true
-            target.scaleType = ImageView.ScaleType.FIT_CENTER
-            target.setBackgroundColor(ContextCompat.getColor(context, R.color.editTextFormBackground))
-
-            val padding = (8 * context.resources.displayMetrics.density).toInt()
-            target.setPadding(padding, padding, padding, padding)
-
-            target.minimumHeight = (100 * context.resources.displayMetrics.density).toInt()
 
         return target
     }
 
     override fun applyValueToViewForItemList(value: Any?, view: View): Single<Boolean> {
         return Single.defer {
-            if (view is ImageView) {
+            if (view is PlaceHolderImageView) {
+                view.currentMode = PlaceHolderImageView.Mode.EMPTY
                 if (value is SynchronizedUri && !value.isEmpty) {
-                    view.setImageResource(android.R.drawable.stat_sys_download)
                     if (value.isLocalUriValid) {
+                        view.currentMode = PlaceHolderImageView.Mode.IMAGE
                         Glide.with(view.context)
                                 .load(value.localUri.toString())
                                 .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
-                                .into(view)
+                                .into(view.imageView)
                         Single.just(true)
                     } else {
                         println("local uri is invalid. download server image.")
                         if (value.isSynchronized) {
+                            view.currentMode = PlaceHolderImageView.Mode.LOADING
                             //OTApplication.app.storageHelper.downloadFileTo(value.serverUri.toString(), value.localUri).onErrorReturn{Uri.EMPTY}
-                            OTApplication.app.storageHelper.downloadFileTo(value.serverUri.toString(), value.localUri).onErrorReturn {
+                            OTApplication.app.storageHelper.downloadFileTo(value.serverUri.toString(), value.localUri).doOnError {
                                 error ->
                                 error.printStackTrace()
-                                Uri.EMPTY
+                                view.currentMode = PlaceHolderImageView.Mode.EMPTY
                             }
                                     .map {
                                         uri ->
@@ -100,16 +95,30 @@ class OTImageAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrack
                                         Glide.with(view.context)
                                                 .load(uri)
                                                 .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
-                                                .into(view)
+                                                .listener(object : RequestListener<Uri, GlideDrawable> {
+                                                    override fun onException(e: Exception?, model: Uri?, target: Target<GlideDrawable>?, isFirstResource: Boolean): Boolean {
+                                                        view.currentMode = PlaceHolderImageView.Mode.ERROR
+                                                        return false
+                                                    }
+
+                                                    override fun onResourceReady(resource: GlideDrawable?, model: Uri?, target: Target<GlideDrawable>?, isFromMemoryCache: Boolean, isFirstResource: Boolean): Boolean {
+                                                        if (resource != null) {
+                                                            view.currentMode = PlaceHolderImageView.Mode.IMAGE
+                                                        }
+                                                        return false
+                                                    }
+
+                                                }).into(view.imageView)
                                         true
                                     }.subscribeOn(Schedulers.io())
                         } else {
-                            view.setImageResource(0)
+                            //not synchronized yet.
+                            view.currentMode = PlaceHolderImageView.Mode.ERROR
                             Single.just(false)
                         }
                     }
                 } else {
-                    view.setImageResource(0)
+                    view.currentMode = PlaceHolderImageView.Mode.EMPTY
                     Single.just(false)
                 }
             } else super.applyValueToViewForItemList(null, view)
