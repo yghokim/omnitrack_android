@@ -218,7 +218,7 @@ class OTApplication : MultiDexApplication() {
                         }
 
                 _currentUser = user
-
+                sendUser(user)
                 //}
                 //} else {
                 //    println("OMNITRACK retreiving user instance error: User didn't signed in with google.")
@@ -226,6 +226,7 @@ class OTApplication : MultiDexApplication() {
                 //}
             } else {
                 _currentUser = cachedUser
+                sendUser(cachedUser)
             }
         }
     }.subscribeOn(Schedulers.io())
