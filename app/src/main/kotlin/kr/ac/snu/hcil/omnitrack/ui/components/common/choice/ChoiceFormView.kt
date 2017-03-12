@@ -3,16 +3,15 @@ package kr.ac.snu.hcil.omnitrack.ui.components.common.choice
 import android.content.Context
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.text.Editable
-import android.text.TextWatcher
+import android.text.InputType
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import com.afollestad.materialdialogs.MaterialDialog
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kotlin.properties.Delegates
@@ -166,6 +165,7 @@ class ChoiceFormView : LinearLayout {
                             selectedIndices.add(adapterPosition)
                         }
                         notifyItemChanged(adapterPosition)
+
                     } else {
                         val removedIndices = selectedIndices.toTypedArray()
                         selectedIndices.clear()
@@ -190,29 +190,62 @@ class ChoiceFormView : LinearLayout {
             }
         }
 
-        inner class CustomViewHolder(view:View): ViewHolder(view){
-            private val customInputView: EditText = view.findViewById(R.id.ui_input) as EditText
+        inner class CustomViewHolder(view: View) : ViewHolder(view), OnClickListener {
+            private val customInputView: TextView = view.findViewById(R.id.ui_input) as TextView
 
             init{
-                customInputView.addTextChangedListener(object: TextWatcher {
-                    override fun afterTextChanged(p0: Editable?) {
-
-                    }
-
-                    override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                    }
-
-                    override fun onTextChanged(changed: CharSequence, p1: Int, p2: Int, p3: Int) {
-                        entry?.text = changed.toString()
-                        valueChanged.invoke(this@ChoiceFormView, null)
-                    }
-
-                })
+                customInputView.setOnClickListener(this)
             }
 
             override fun bind(entry: Entry) {
                 super.bind(entry)
-                //this.customInputView.setText(entry.text, TextView.BufferType.EDITABLE)
+                this.customInputView.text = entry.text
+            }
+
+            override fun onClick(view: View) {
+                if (view === itemView && entry?.text?.isNullOrBlank() == true && !selectedIndices.contains(adapterPosition)) {
+                    showCustomAnswerDialog(false)
+                } else super.onClick(view)
+
+
+                if (view === customInputView) {
+                    showCustomAnswerDialog(false)
+                }
+            }
+
+            private fun showCustomAnswerDialog(preserveSelection: Boolean) {
+                MaterialDialog.Builder(context)
+                        .title("Provide your own answer")
+                        .inputType(InputType.TYPE_CLASS_TEXT)
+                        .setSyncWithKeyboard(true)
+                        .inputRangeRes(0, 200, R.color.colorRed)
+                        .backgroundColorRes(R.color.frontalBackground)
+                        .titleColorRes(R.color.textColorDark)
+                        .contentColorRes(R.color.textColorMidDark)
+                        .positiveColor(R.color.colorPointed)
+                        .negativeColor(R.color.colorRed_Light)
+                        .cancelable(true)
+                        .negativeText(R.string.msg_cancel)
+                        .input(null, entry?.text, true, {
+                            dialog, text ->
+                            val oldText = entry?.text
+                            entry?.text = text.toString()
+                            customInputView.text = text.toString()
+                            if (oldText?.compareTo(text.toString()) != 0) {
+
+                                if (!preserveSelection) {
+                                    if (!selectedIndices.contains(adapterPosition) && text.isNotBlank()) {
+                                        selectedIndices.add(adapterPosition)
+                                        adapter.notifyItemChanged(adapterPosition)
+                                    } else if (selectedIndices.contains(adapterPosition) && !oldText.isNullOrBlank() && text.isNullOrBlank()) {
+                                        selectedIndices.remove(adapterPosition)
+                                        adapter.notifyItemChanged(adapterPosition)
+                                    }
+                                }
+
+                                valueChanged.invoke(this@ChoiceFormView, null)
+                            }
+                        }).show()
             }
         }
     }
