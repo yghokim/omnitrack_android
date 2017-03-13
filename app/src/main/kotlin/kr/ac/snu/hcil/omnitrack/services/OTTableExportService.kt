@@ -1,11 +1,13 @@
 package kr.ac.snu.hcil.omnitrack.services
 
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.IBinder
 import android.os.PowerManager
+import android.webkit.MimeTypeMap
 import br.com.goncalves.pugnotification.notification.PugNotification
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
@@ -80,12 +82,14 @@ class OTTableExportService : Service() {
             println("another export task is in progress")
             return START_NOT_STICKY
         }
-        val exportUri = intent.getStringExtra(EXTRA_EXPORT_URI)
-        if (trackerId != null && exportUri != null) {
+        val exportUriString = intent.getStringExtra(EXTRA_EXPORT_URI)
+        if (trackerId != null && exportUriString != null) {
+            val exportUri = Uri.parse(exportUriString)
 
             OTApplication.app.setTrackerItemExportInProgress(true)
             OTTaskNotificationManager.setTaskProgressNotification(this, TAG, 100, getString(R.string.msg_export_title_progress), "downloading", OTTaskNotificationManager.PROGRESS_INDETERMINATE)
 
+            var loadedTracker: OTTracker? = null
 
             var externalFilesInvolved: Boolean = false
             var cacheDirectory: File? = null
@@ -95,15 +99,49 @@ class OTTableExportService : Service() {
 
             fun finish(successful: Boolean) {
                 println("export observable completed")
+
+                cacheDirectory?.let {
+                    if (it.exists()) {
+                        if (it.deleteRecursively()) {
+                            println("export cache files successfully removed.")
+                        }
+                    }
+                }
+
                 OTTaskNotificationManager.dismissNotification(this, 100, TAG)
 
-                if (successful) {
+                if (successful && loadedTracker != null) {
+
+                    val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(if (externalFilesInvolved) {
+                        "zip"
+                    } else {
+                        "csv"
+                    })
+                    println("mimeType is ${mimeType}")
+
                     PugNotification.with(this)
                             .load()
-                            .title(getString(R.string.msg_export_success_notification_message))
+                            .title(String.format(getString(R.string.msg_export_success_notification_message), loadedTracker?.name))
                             .`when`(System.currentTimeMillis())
                             .tag(TAG)
                             .identifier(makeUniqueNotificationId())
+                            .color(R.color.colorPrimary)
+                            .button(0, getString(R.string.msg_open)) {
+
+                                val choiceIntent = Intent.createChooser(Intent(Intent.ACTION_VIEW).putExtra(Intent.EXTRA_STREAM, exportUri).setDataAndType(exportUri, mimeType).apply { this.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION },
+                                        getString(R.string.msg_open_exported_file))
+
+                                PendingIntent.getActivity(this, makeUniqueNotificationId(),
+                                        choiceIntent, PendingIntent.FLAG_CANCEL_CURRENT)
+                            }
+                            .button(0, getString(R.string.msg_share)) {
+
+                                val choiceIntent = Intent.createChooser(Intent(Intent.ACTION_SEND).setDataAndType(exportUri, mimeType).putExtra(Intent.EXTRA_STREAM, exportUri).apply { this.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION },
+                                        getString(R.string.msg_share_exported_file))
+
+                                PendingIntent.getActivity(this, makeUniqueNotificationId(),
+                                        choiceIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+                            }
                             .smallIcon(R.drawable.done)
                             .largeIcon(R.drawable.icon_cloud_download)
                             .simple()
@@ -120,7 +158,7 @@ class OTTableExportService : Service() {
                         user ->
                         val tracker = user[trackerId]
                         if (tracker != null) {
-
+                            loadedTracker = tracker
                             externalFilesInvolved = tracker.attributes.unObservedList.find { it.isExternalFile } != null
 
                             if (externalFilesInvolved) {
@@ -227,7 +265,7 @@ class OTTableExportService : Service() {
                         }
 
                         try {
-                            val outputStream = contentResolver.openOutputStream(Uri.parse(exportUri))
+                            val outputStream = contentResolver.openOutputStream(exportUri)
                             kr.ac.snu.hcil.omnitrack.utils.io.ZipUtil.zip(cacheDirectory!!.absolutePath, outputStream)
                         } catch(ex: Exception) {
                             //fail
@@ -238,7 +276,7 @@ class OTTableExportService : Service() {
                 } else {
                     try {
                         println("store table itself to output")
-                        val outputStream = contentResolver.openOutputStream(Uri.parse(exportUri))
+                        val outputStream = contentResolver.openOutputStream(exportUri)
                         table.storeToStream(outputStream)
                         true
                     } catch(ex: Exception) {
@@ -257,7 +295,7 @@ class OTTableExportService : Service() {
                 } else {
                     finish(false)
                 }
-            }, { finish(false) })
+            }, { ex -> ex.printStackTrace(); finish(false) })
 
             subscriptions.add(subscription)
             return START_NOT_STICKY
