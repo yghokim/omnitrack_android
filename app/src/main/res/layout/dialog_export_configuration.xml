@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:divider="@drawable/horizontal_divider_light"
+    android:orientation="vertical"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:showDividers="middle">
+
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/button_height_normal"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/ui_radio_export_type_excel"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:checked="true"
+            android:text="@string/msg_export_type_excel"
+            android:textColor="@color/textColorDark"
+            android:textSize="16sp" />
+
+        <RadioButton
+            android:id="@+id/ui_radio_export_type_csv"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="12dp"
+            android:text="@string/msg_export_type_csv"
+            android:textColor="@color/textColorDark"
+            android:textSize="16sp" />
+    </RadioGroup>
+
+    <android.support.v7.widget.AppCompatCheckBox
+        android:id="@+id/ui_include_external_files"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/button_height_normal"
+        android:text="@string/msg_include_media_attribute_files"
+        android:textColor="@color/textColorDark"
+        android:textSize="16sp" />
+</LinearLayout>
