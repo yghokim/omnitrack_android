@@ -7,7 +7,6 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
-import android.widget.ProgressBar
 import android.widget.TextView
 import com.github.ybq.android.spinkit.SpinKitView
 import kr.ac.snu.hcil.omnitrack.R
@@ -30,11 +29,14 @@ class LoadingIndicatorBar : FrameLayout {
         private set(value)
         {
             if(value!=field) {
+                /*
                 if (value == true) {
                     this.layoutParams?.height = expandedHeight
+                    this.visibility = View.VISIBLE
                 } else {
                     this.layoutParams?.height = 0
-                }
+                    this.visibility = View.GONE
+                }*/
 
                 field = value
             }
@@ -73,7 +75,6 @@ class LoadingIndicatorBar : FrameLayout {
             addUpdateListener(animationUpdateListener)
             addListener(object: Animator.AnimatorListener {
                 override fun onAnimationEnd(p0: Animator?) {
-
                 }
 
                 override fun onAnimationCancel(p0: Animator?) {
@@ -83,7 +84,6 @@ class LoadingIndicatorBar : FrameLayout {
                 override fun onAnimationStart(p0: Animator?) {
                     this@LoadingIndicatorBar.visibility = View.VISIBLE
                     this@LoadingIndicatorBar.layoutParams?.height = 0
-                    isIndicatorShown = true
                 }
 
                 override fun onAnimationRepeat(p0: Animator?) {
@@ -129,20 +129,20 @@ class LoadingIndicatorBar : FrameLayout {
     fun show(){
         if(!isIndicatorShown) {
             if (dismissAnimator.isRunning) {
-                dismissAnimator.cancel()
-            }
+                dismissAnimator.reverse()
+            } else showAnimator.start()
 
-            showAnimator.start()
+            isIndicatorShown = true
         }
     }
 
     fun dismiss(){
         if(isIndicatorShown) {
             if (showAnimator.isRunning) {
-                showAnimator.cancel()
-            }
+                showAnimator.reverse()
+            } else dismissAnimator.start()
 
-            dismissAnimator.start()
+            isIndicatorShown = false
         }
     }
 
