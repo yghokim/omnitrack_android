@@ -285,6 +285,10 @@
     <string name="msg_open">Open</string>
     <string name="msg_open_exported_file">Open exported file</string>
     <string name="msg_share_exported_file">Share exported file</string>
+    <string name="msg_configure_export">Configure Export</string>
+    <string name="msg_include_media_attribute_files">Include media field files</string>
+    <string name="msg_export_type_excel">Excel (.xslx)</string>
+    <string name="msg_export_type_csv">CSV text (.csv)</string>
 
 
     <string-array name="gender_entries">
