@@ -17,6 +17,7 @@ object OTTaskNotificationManager {
                 .title(title)
                 .identifier(id)
                 .smallIcon(smallIcon)
+                .color(R.color.colorPrimary)
                 .largeIcon(largeIcon)
 
         if (tag != null) {
