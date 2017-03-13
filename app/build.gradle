@@ -93,6 +93,8 @@ dependencies {
     compile 'com.tbruyelle.rxpermissions:rxpermissions:0.9.3@aar'
     compile 'com.flurgle:camerakit:0.9.15'
     compile 'com.github.halysongoncalves:pugnotification:1.8.1'
+    compile 'com.github.mukeshsolanki:country-picker-android:1.1.7'
+
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile files('libs/opencsv-3.9.jar')
     compile files('libs/jxl.jar')
