@@ -289,6 +289,7 @@
     <string name="msg_include_media_attribute_files">Include media field files</string>
     <string name="msg_export_type_excel">Excel (.xls)</string>
     <string name="msg_export_type_csv">CSV text (.csv)</string>
+    <string name="msg_select_country">Select country</string>
 
 
     <string-array name="gender_entries">

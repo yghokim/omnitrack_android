@@ -1,15 +1,16 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.experiment
 
 import android.os.Bundle
+import android.support.v7.widget.AppCompatButton
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.heinrichreimersoftware.materialintro.app.IntroActivity
 import com.heinrichreimersoftware.materialintro.app.SlideFragment
+import com.mukesh.countrypicker.fragments.CountryPicker
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.common.ExtendedSpinner
 import kr.ac.snu.hcil.omnitrack.ui.components.common.choice.SelectionView
-import kr.ac.snu.hcil.omnitrack.utils.TextHelper
 
 /**
  * Created by younghokim on 2017. 1. 27..
@@ -48,18 +49,25 @@ class DemographicInputFragment : SlideFragment(), ExtendedSpinner.OnItemSelected
         else null
     }*/
 
-    val selectedCountryInfo: TextHelper.CountryInfo? get() {
-        return countrySpinner.selectedItem as? TextHelper.CountryInfo
-    }
 
     private lateinit var genderSelector: SelectionView
     private lateinit var ageSpinner: ExtendedSpinner
     //private lateinit var occupationSpinner: ExtendedSpinner
-    private lateinit var countrySpinner: ExtendedSpinner
+    private lateinit var countryButton: AppCompatButton
+
+    private lateinit var countryPicker: CountryPicker
+
+    private var selectedCountryName: String? = null
+
+    var selectedCountryCode: String? = null
+        private set
+
+    private var selectedCountryFlagId: Int? = null
 
     private var isComplete: Boolean = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+
         val view = inflater.inflate(R.layout.slide_demographic, container, false)
 
         genderSelector = view.findViewById(R.id.ui_gender_selector) as SelectionView
@@ -75,16 +83,36 @@ class DemographicInputFragment : SlideFragment(), ExtendedSpinner.OnItemSelected
         occupationSpinner.selectedItemPosition = -1
 */
 
-        countrySpinner = view.findViewById(R.id.ui_country_selector) as ExtendedSpinner
-        countrySpinner.setItems(*TextHelper.countryNames)
-        countrySpinner.selectedItemPosition = -1
+        countryButton = view.findViewById(R.id.ui_country_selector) as AppCompatButton
+
+        countryPicker = CountryPicker.newInstance(getString(R.string.msg_select_country))
+        countryPicker.setListener { name, code, dialCode, flagDrawableResID ->
+            selectedCountryName = name
+            selectedCountryCode = code
+            selectedCountryFlagId = flagDrawableResID
+
+            countryButton.text = name
+            countryButton.setCompoundDrawablesRelativeWithIntrinsicBounds(flagDrawableResID, 0, 0, 0)
+
+            countryPicker.dismiss()
+        }
+
+        val userCountry = countryPicker.getUserCountryInfo(context)
+        selectedCountryCode = userCountry.code
+        selectedCountryName = userCountry.name
+        selectedCountryFlagId = userCountry.flag
+        countryButton.text = selectedCountryName
+        countryButton.setCompoundDrawablesRelativeWithIntrinsicBounds(userCountry.flag, 0, 0, 0)
+
+        countryButton.setOnClickListener {
+            countryPicker.show(fragmentManager, "COUNTRY_PICKER")
+        }
 
 
         ageSpinner.onItemSelectedListener = this
         /*
         occupationSpinner.onItemSelectedListener = this
         */
-        countrySpinner.onItemSelectedListener = this
 
         /*
         occupationChoiceInputView = view.findViewById(R.id.ui_occupation_selector) as ChoiceInputView
@@ -103,7 +131,11 @@ class DemographicInputFragment : SlideFragment(), ExtendedSpinner.OnItemSelected
     }
 
     override fun onItemSelected(spinner: ExtendedSpinner, position: Int) {
-        if (ageSpinner.selectedItem != null /*&& occupationSpinner.selectedItem != null*/ && countrySpinner.selectedItem != null) {
+        checkInputsValid()
+    }
+
+    private fun checkInputsValid() {
+        if (ageSpinner.selectedItem != null /*&& occupationSpinner.selectedItem != null*/ && selectedCountryCode != null) {
             println("Demographic information complete!")
             isComplete = true
             val activity = activity

@@ -276,6 +276,17 @@
     <string name="msg_include_media_attribute_files">이미지 등의 미디어 파일들을 포함합니다</string>
     <string name="msg_export_type_excel">엑셀 시트 (.xls)</string>
     <string name="msg_export_type_csv">CSV 텍스트 (.csv)</string>
+    <string name="msg_select_country">국가를 선택하세요</string>
+
+    <string-array name="purpose_entries">
+        <item>directive|건강 관련 정보를 기록하기 위해서</item>
+        <item>documentary|리뷰/일기 등을 기록하기 위해서</item>
+        <item>track|생활 습관이나 반복적 일과를 기록하기 위해서</item>
+        <item>diagnostic|삶 속의 어떤 문제점을 파악하기 위해서</item>
+        <item>self-knowledge|스스로에 대해 더 잘 알기 위해서</item>
+        <item>social|주변 사람들과 무언가를 함께 기록하기 위해서</item>
+        <item>fetishised|기술적인 호기심으로 인해</item>
+    </string-array>
 
     <string-array name="gender_entries">
         <item>남성</item>

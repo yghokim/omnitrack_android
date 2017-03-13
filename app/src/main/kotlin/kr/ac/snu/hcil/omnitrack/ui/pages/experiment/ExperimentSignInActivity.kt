@@ -132,7 +132,7 @@ class ExperimentSignInActivity : IntroActivity() {
                     putExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_AGE_GROUP, demographicFragment.selectedAgeKey)
                     putExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_GENDER, demographicFragment.selectedGenderKey)
                     //putExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_OCCUPATION, fragment.selectedOccupationKey)
-                    putExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_COUNTRY, demographicFragment.selectedCountryInfo?.key)
+                    putExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_COUNTRY, demographicFragment.selectedCountryCode)
                 }
 
                 val purposeFragment = purposeSlide.fragment as? PurposeChoiceFragment
