@@ -7,8 +7,11 @@ import android.content.Intent
 import android.net.Uri
 import android.os.IBinder
 import android.os.PowerManager
+import android.support.v7.widget.AppCompatCheckBox
+import android.view.LayoutInflater
 import android.webkit.MimeTypeMap
 import br.com.goncalves.pugnotification.notification.PugNotification
+import com.afollestad.materialdialogs.MaterialDialog
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
@@ -28,6 +31,9 @@ import java.util.concurrent.atomic.AtomicInteger
  */
 class OTTableExportService : Service() {
 
+    enum class TableFileType(val extension: String) { CSV("csv"), EXCEL("xslx")
+    }
+
     companion object {
 
         val TAG = OTTableExportService::class.java.simpleName.toString()
@@ -39,12 +45,49 @@ class OTTableExportService : Service() {
         }
 
         const val EXTRA_EXPORT_URI = "export_uri"
+        const val EXTRA_EXPORT_CONFIG_INCLUDE_FILE = "export_config_include_files"
+        const val EXTRA_EXPORT_CONFIG_TABLE_FILE_TYPE = "export_config_table_file_type"
+
 
         fun makeIntent(context: Context, tracker: OTTracker, exportUri: String): Intent {
             val intent = Intent(context, OTTableExportService::class.java)
                     .putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
                     .putExtra(EXTRA_EXPORT_URI, exportUri)
             return intent
+        }
+
+        fun makeConfigurationDialog(context: Context, tracker: OTTracker): MaterialDialog.Builder {
+
+            val view = LayoutInflater.from(context).inflate(R.layout.dialog_export_configuration, null, false)
+
+            val includeFilesCheckbox = view.findViewById(R.id.ui_include_external_files) as AppCompatCheckBox
+            if (tracker.isExternalFilesInvolved) {
+                includeFilesCheckbox.isEnabled = true
+                includeFilesCheckbox.isChecked = true
+            } else {
+                includeFilesCheckbox.isEnabled = false
+                includeFilesCheckbox.isChecked = false
+                includeFilesCheckbox.alpha = 0.3f
+            }
+
+            val builder = MaterialDialog.Builder(context)
+                    .title(context.getString(R.string.msg_configure_export))
+                    .cancelable(true)
+                    .customView(view, false)
+                    .positiveColorRes(R.color.colorPointed)
+                    .negativeColorRes(R.color.colorRed_Light)
+                    .positiveText(R.string.msg_ok)
+                    .negativeText(R.string.msg_cancel)
+                    .onPositive { materialDialog, dialogAction ->
+
+                        //if (onYes != null) onYes()
+                    }
+                    .onNegative { materialDialog, dialogAction ->
+
+                        //if (onNo != null) onNo()
+                    }
+
+            return builder
         }
 
     }

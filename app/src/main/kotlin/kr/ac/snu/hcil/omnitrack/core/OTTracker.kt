@@ -127,6 +127,8 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
     val nameChanged = SerializedSubject(PublishSubject.create<ReadOnlyPair<OTTracker, String>>())
     val isOnShortcutChanged = SerializedSubject(PublishSubject.create<ReadOnlyPair<OTTracker, Boolean>>())
 
+    val isExternalFilesInvolved: Boolean get() = attributes.unObservedList.find { it.isExternalFile } != null
+
     constructor() : this(null, "New Tracker")
 
     constructor(name: String) : this(null, name)

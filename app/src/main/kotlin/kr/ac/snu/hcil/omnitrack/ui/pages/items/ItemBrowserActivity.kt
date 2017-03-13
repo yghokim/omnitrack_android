@@ -42,10 +42,8 @@ import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.getDayOfMonth
 import kr.ac.snu.hcil.omnitrack.utils.io.FileHelper
-import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
 import rx.Subscription
 import rx.internal.util.SubscriptionList
-import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.properties.Delegates
 
@@ -663,6 +661,10 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
 
                 tracker?.let {
 
+                    val configDialog = OTTableExportService.makeConfigurationDialog(context, it)
+                    configDialog.show()
+
+                    /*
                     val extension = if (it.attributes.unObservedList.find { attr -> attr.isExternalFile } != null) {
                         "zip"
                     } else "csv"
@@ -681,7 +683,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                         }
                     } else {
                         this@SettingsDialogFragment.startActivityForResult(intent, ItemBrowserActivity.SettingsDialogFragment.REQUEST_CODE_FILE_LOCATION_PICK)
-                    }
+                    }*/
                 }
             })
 
