@@ -274,7 +274,7 @@
     <string name="msg_share_exported_file">내보낸 파일 공유하기</string>
     <string name="msg_configure_export">내보내기 설정</string>
     <string name="msg_include_media_attribute_files">이미지 등의 미디어 파일들을 포함합니다</string>
-    <string name="msg_export_type_excel">엑셀 시트 (.xslx)</string>
+    <string name="msg_export_type_excel">엑셀 시트 (.xls)</string>
     <string name="msg_export_type_csv">CSV 텍스트 (.csv)</string>
 
     <string-array name="gender_entries">

@@ -42,8 +42,10 @@ import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.getDayOfMonth
 import kr.ac.snu.hcil.omnitrack.utils.io.FileHelper
+import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
 import rx.Subscription
 import rx.internal.util.SubscriptionList
+import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.properties.Delegates
 
@@ -604,6 +606,26 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
 
         private lateinit var exportMenuItem: RecyclerViewMenuAdapter.MenuItem
 
+        private var exportConfigIncludeFile: Boolean = false
+        private var exportConfigTableFileType: OTTableExportService.TableFileType = OTTableExportService.TableFileType.CSV
+
+        override fun onViewStateRestored(savedInstanceState: Bundle?) {
+            super.onViewStateRestored(savedInstanceState)
+            if (savedInstanceState != null) {
+                try {
+                    exportConfigIncludeFile = savedInstanceState.getBoolean(OTTableExportService.EXTRA_EXPORT_CONFIG_INCLUDE_FILE, false)
+                    exportConfigTableFileType = OTTableExportService.TableFileType.valueOf(savedInstanceState.getString(OTTableExportService.EXTRA_EXPORT_CONFIG_TABLE_FILE_TYPE))
+                } catch(ex: Exception) {
+                    ex.printStackTrace()
+                }
+            }
+        }
+
+        override fun onSaveInstanceState(outState: Bundle) {
+            super.onSaveInstanceState(outState)
+            outState.putBoolean(OTTableExportService.EXTRA_EXPORT_CONFIG_INCLUDE_FILE, exportConfigIncludeFile)
+            outState.putString(OTTableExportService.EXTRA_EXPORT_CONFIG_TABLE_FILE_TYPE, exportConfigTableFileType.toString())
+        }
 
         override fun onDestroy() {
             super.onDestroy()
@@ -659,9 +681,33 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                     description = getString(R.string.msg_desc_export_to_file_tracker), isEnabled = false, onClick = {
                 println("export item clicked.")
 
+
                 tracker?.let {
 
-                    val configDialog = OTTableExportService.makeConfigurationDialog(context, it)
+                    val configDialog = OTTableExportService.makeConfigurationDialog(context, it) {
+                        includeFile, tableFileType ->
+                        exportConfigIncludeFile = includeFile
+                        exportConfigTableFileType = tableFileType
+
+                        val extension = if (includeFile) {
+                            "zip"
+                        } else tableFileType.extension
+                        val intent = FileHelper.makeSaveLocationPickIntent("omnitrack_export_${it.name}_${SimpleDateFormat("yyyyMMddHHmmss").format(Date())}.$extension")
+
+                        if (includeFile) {
+                            val currentNetworkConnectionInfo = NetworkHelper.getCurrentNetworkConnectionInfo()
+                            if (currentNetworkConnectionInfo.mobileConnected && !currentNetworkConnectionInfo.wifiConnected) {
+                                DialogHelper.makeYesNoDialogBuilder(this@SettingsDialogFragment.context, "OmniTrack", getString(R.string.msg_export_warning_mobile_network), R.string.msg_export, onYes = {
+                                    this@SettingsDialogFragment.startActivityForResult(intent, ItemBrowserActivity.SettingsDialogFragment.REQUEST_CODE_FILE_LOCATION_PICK)
+                                })
+                                        .show()
+                            } else {
+                                this@SettingsDialogFragment.startActivityForResult(intent, ItemBrowserActivity.SettingsDialogFragment.REQUEST_CODE_FILE_LOCATION_PICK)
+                            }
+                        } else {
+                            this@SettingsDialogFragment.startActivityForResult(intent, ItemBrowserActivity.SettingsDialogFragment.REQUEST_CODE_FILE_LOCATION_PICK)
+                        }
+                    }
                     configDialog.show()
 
                     /*
@@ -737,7 +783,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                     if (exportUri != null) {
                         println(exportUri.toString())
                         tracker?.let {
-                            val serviceIntent = OTTableExportService.makeIntent(this@SettingsDialogFragment.context, it, exportUri.toString())
+                            val serviceIntent = OTTableExportService.makeIntent(this@SettingsDialogFragment.context, it, exportUri.toString(), exportConfigIncludeFile, exportConfigTableFileType)
                             this@SettingsDialogFragment.dismiss()
                             activity?.startService(serviceIntent)
                         }

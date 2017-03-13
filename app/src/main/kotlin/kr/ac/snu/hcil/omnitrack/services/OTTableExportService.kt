@@ -10,6 +10,8 @@ import android.os.PowerManager
 import android.support.v7.widget.AppCompatCheckBox
 import android.view.LayoutInflater
 import android.webkit.MimeTypeMap
+import android.widget.RadioButton
+import android.widget.Toast
 import br.com.goncalves.pugnotification.notification.PugNotification
 import com.afollestad.materialdialogs.MaterialDialog
 import kr.ac.snu.hcil.omnitrack.OTApplication
@@ -31,7 +33,7 @@ import java.util.concurrent.atomic.AtomicInteger
  */
 class OTTableExportService : Service() {
 
-    enum class TableFileType(val extension: String) { CSV("csv"), EXCEL("xslx")
+    enum class TableFileType(val extension: String) { CSV("csv"), EXCEL("xls")
     }
 
     companion object {
@@ -49,14 +51,16 @@ class OTTableExportService : Service() {
         const val EXTRA_EXPORT_CONFIG_TABLE_FILE_TYPE = "export_config_table_file_type"
 
 
-        fun makeIntent(context: Context, tracker: OTTracker, exportUri: String): Intent {
+        fun makeIntent(context: Context, tracker: OTTracker, exportUri: String, includeFiles: Boolean, tableFileType: TableFileType): Intent {
             val intent = Intent(context, OTTableExportService::class.java)
                     .putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
                     .putExtra(EXTRA_EXPORT_URI, exportUri)
+                    .putExtra(EXTRA_EXPORT_CONFIG_INCLUDE_FILE, includeFiles)
+                    .putExtra(EXTRA_EXPORT_CONFIG_TABLE_FILE_TYPE, tableFileType.toString())
             return intent
         }
 
-        fun makeConfigurationDialog(context: Context, tracker: OTTracker): MaterialDialog.Builder {
+        fun makeConfigurationDialog(context: Context, tracker: OTTracker, onConfigured: (includeFiles: Boolean, tableFileType: TableFileType) -> Unit): MaterialDialog.Builder {
 
             val view = LayoutInflater.from(context).inflate(R.layout.dialog_export_configuration, null, false)
 
@@ -69,6 +73,8 @@ class OTTableExportService : Service() {
                 includeFilesCheckbox.isChecked = false
                 includeFilesCheckbox.alpha = 0.3f
             }
+            val excelRadioButton = view.findViewById(R.id.ui_radio_export_type_excel) as RadioButton
+            val csvRadioButton = view.findViewById(R.id.ui_radio_export_type_csv) as RadioButton
 
             val builder = MaterialDialog.Builder(context)
                     .title(context.getString(R.string.msg_configure_export))
@@ -79,12 +85,11 @@ class OTTableExportService : Service() {
                     .positiveText(R.string.msg_ok)
                     .negativeText(R.string.msg_cancel)
                     .onPositive { materialDialog, dialogAction ->
-
-                        //if (onYes != null) onYes()
-                    }
-                    .onNegative { materialDialog, dialogAction ->
-
-                        //if (onNo != null) onNo()
+                        onConfigured.invoke(includeFilesCheckbox.isChecked, if (excelRadioButton.isChecked) {
+                            TableFileType.EXCEL
+                        } else {
+                            TableFileType.CSV
+                        })
                     }
 
             return builder
@@ -123,6 +128,7 @@ class OTTableExportService : Service() {
         val trackerId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
         if (OTApplication.app.isTrackerItemExportInProgress()) {
             println("another export task is in progress")
+            Toast.makeText(this, "Another export task is in progress.", Toast.LENGTH_LONG).show()
             return START_NOT_STICKY
         }
         val exportUriString = intent.getStringExtra(EXTRA_EXPORT_URI)
@@ -134,7 +140,12 @@ class OTTableExportService : Service() {
 
             var loadedTracker: OTTracker? = null
 
-            var externalFilesInvolved: Boolean = false
+            val externalFilesInvolved: Boolean = intent.getBooleanExtra(EXTRA_EXPORT_CONFIG_INCLUDE_FILE, false)
+            val tableType = TableFileType.valueOf(intent.getStringExtra(EXTRA_EXPORT_CONFIG_TABLE_FILE_TYPE))
+
+            println("include external files:${externalFilesInvolved}")
+            println("table file type: ${tableType}")
+
             var cacheDirectory: File? = null
 
             val table = StringTableSheet()
@@ -158,7 +169,7 @@ class OTTableExportService : Service() {
                     val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(if (externalFilesInvolved) {
                         "zip"
                     } else {
-                        "csv"
+                        tableType.extension
                     })
                     println("mimeType is ${mimeType}")
 
@@ -202,7 +213,6 @@ class OTTableExportService : Service() {
                         val tracker = user[trackerId]
                         if (tracker != null) {
                             loadedTracker = tracker
-                            externalFilesInvolved = tracker.attributes.unObservedList.find { it.isExternalFile } != null
 
                             if (externalFilesInvolved) {
                                 cacheDirectory = this.cacheDir.resolve("export_${System.currentTimeMillis()}")
@@ -239,12 +249,19 @@ class OTTableExportService : Service() {
 
                                 if(externalFilesInvolved)
                                 {
-                                    val tablePath = cacheDirectory?.resolve("table.csv")
+                                    val tablePath = cacheDirectory?.resolve("table.${tableType.extension}")
                                     if(tablePath!=null)
                                     {
                                         val fileOutputStream = FileOutputStream(tablePath)
-                                        table.storeToStream(fileOutputStream)
-                                        fileOutputStream.close()
+                                        when (tableType) {
+                                            TableFileType.CSV -> {
+                                                table.storeCsvToStream(fileOutputStream)
+                                                fileOutputStream.close()
+                                            }
+                                            TableFileType.EXCEL -> {
+                                                table.storeExcelToStream(fileOutputStream)
+                                            }
+                                        }
 
                                         involvedFileList?.add(tablePath.path)
                                     }
@@ -280,13 +297,17 @@ class OTTableExportService : Service() {
                                         }
                                     }
 
-                                    Single.zip(storeObservables) {
-                                        uris ->
-                                        println("uris")
-                                        uris.filter { it != Uri.EMPTY }.map { it.toString() }
-                                    }.toObservable().doOnNext {
-                                        uris ->
-                                        involvedFileList?.addAll(uris)
+                                    if (storeObservables.isNotEmpty()) {
+                                        Single.zip(storeObservables) {
+                                            uris ->
+                                            println("uris")
+                                            uris.filter { it != Uri.EMPTY }.map { it.toString() }
+                                        }.toObservable().doOnNext {
+                                            uris ->
+                                            involvedFileList?.addAll(uris)
+                                        }
+                                    } else {
+                                        tableObservable
                                     }
 
                                 }
@@ -320,7 +341,15 @@ class OTTableExportService : Service() {
                     try {
                         println("store table itself to output")
                         val outputStream = contentResolver.openOutputStream(exportUri)
-                        table.storeToStream(outputStream)
+                        when (tableType) {
+                            TableFileType.EXCEL -> {
+                                table.storeExcelToStream(outputStream)
+                            }
+                            TableFileType.CSV -> {
+                                table.storeCsvToStream(outputStream)
+                                outputStream.close()
+                            }
+                        }
                         true
                     } catch(ex: Exception) {
                         //fail
