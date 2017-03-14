@@ -1,12 +1,10 @@
 package kr.ac.snu.hcil.omnitrack.services
 
 import android.app.PendingIntent
-import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.IBinder
-import android.os.PowerManager
 import android.support.v7.widget.AppCompatCheckBox
 import android.view.LayoutInflater
 import android.webkit.MimeTypeMap
@@ -31,7 +29,7 @@ import java.util.concurrent.atomic.AtomicInteger
 /**
  * Created by Young-Ho on 3/9/2017.
  */
-class OTTableExportService : Service() {
+class OTTableExportService : WakefulService(TAG) {
 
     enum class TableFileType(val extension: String) { CSV("csv"), EXCEL("xls")
     }
@@ -99,24 +97,8 @@ class OTTableExportService : Service() {
 
     private val subscriptions = SubscriptionList()
 
-    private var wakeLock: PowerManager.WakeLock? = null
-
-    override fun onCreate() {
-        super.onCreate()
-
-        val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
-        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG)
-        if (!(wakeLock?.isHeld ?: false)) {
-            wakeLock?.acquire()
-        }
-    }
-
     override fun onDestroy() {
         super.onDestroy()
-
-        if (wakeLock?.isHeld() ?: false) {
-            wakeLock?.release()
-        }
 
         OTApplication.app.setTrackerItemExportInProgress(false)
 
@@ -136,6 +118,8 @@ class OTTableExportService : Service() {
             val exportUri = Uri.parse(exportUriString)
 
             OTApplication.app.setTrackerItemExportInProgress(true)
+
+            Toast.makeText(this, R.string.msg_export_title_progress, Toast.LENGTH_SHORT).show()
             OTTaskNotificationManager.setTaskProgressNotification(this, TAG, 100, getString(R.string.msg_export_title_progress), "downloading", OTTaskNotificationManager.PROGRESS_INDETERMINATE)
 
             var loadedTracker: OTTracker? = null
