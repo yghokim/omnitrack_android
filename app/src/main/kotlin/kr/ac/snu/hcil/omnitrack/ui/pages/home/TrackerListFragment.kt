@@ -31,7 +31,6 @@ import android.widget.ImageButton
 import android.widget.TextView
 import butterknife.bindView
 import com.afollestad.materialdialogs.MaterialDialog
-import it.sephiroth.android.library.tooltip.Tooltip
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItem
@@ -521,12 +520,10 @@ class TrackerListFragment : OTFragment() {
 
                 } else if (view === errorIndicator) {
                     if (validationErrorMessages.size > 0) {
-                        val tooltipView = Tooltip.make(context, TooltipHelper.makeTooltipBuilder(adapterPosition, errorIndicator).build())
-
-                        tooltipView.setText(
+                        TooltipHelper.makeTooltipBuilder(adapterPosition, errorIndicator)
+                                .text(
                                 validationErrorMessages.joinToString("\n")
-                        )
-                        tooltipView.show()
+                                ).show()
                     }
                 }
             }

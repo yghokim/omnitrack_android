@@ -6,7 +6,6 @@ import android.view.View
 import android.view.View.OnClickListener
 import android.view.ViewStub
 import android.widget.TextView
-import it.sephiroth.android.library.tooltip.Tooltip
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.ui.components.common.TooltipHelper
@@ -15,8 +14,7 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 2016-11-04.
  */
-class ConnectionIndicatorStubProxy(val parent: View, stubId: Int) : OnClickListener {
-
+class ConnectionIndicatorStubProxy(val parent: View, stubId: Int) : OnClickListener, View.OnAttachStateChangeListener {
 
     private val connectionIndicatorStub: ViewStub
     private var connectionIndicator: View? = null
@@ -27,6 +25,7 @@ class ConnectionIndicatorStubProxy(val parent: View, stubId: Int) : OnClickListe
 
     init {
         connectionIndicatorStub = parent.findViewById(stubId) as ViewStub
+        parent.addOnAttachStateChangeListener(this)
     }
 
     fun onBind(attribute: OTAttribute<out Any>) {
@@ -62,17 +61,24 @@ class ConnectionIndicatorStubProxy(val parent: View, stubId: Int) : OnClickListe
 
     }
 
+
     override fun onClick(view: View?) {
         if (view === connectionIndicatorErrorMark && connectionIndicatorErrorMark != null) {
             if (connectionInvalidMessages?.size ?: 0 > 0) {
-                val tooltipView = Tooltip.make(parent.context, TooltipHelper.makeTooltipBuilder(0, connectionIndicatorErrorMark!!).build())
-
-                tooltipView.setText(
-                        connectionInvalidMessages?.joinToString("\n") ?: ""
-                )
-                tooltipView.show()
+                TooltipHelper.makeTooltipBuilder(0, connectionIndicatorErrorMark!!)
+                        .text(connectionInvalidMessages?.joinToString("\n") ?: "")
+                        .show()
             }
         }
     }
+
+    override fun onViewDetachedFromWindow(v: View?) {
+        //tooltipView?.remove()
+    }
+
+    override fun onViewAttachedToWindow(v: View?) {
+
+    }
+
 
 }
