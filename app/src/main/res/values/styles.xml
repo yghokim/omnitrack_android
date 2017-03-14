@@ -401,8 +401,7 @@
     </style>
 
     <style name="tooltipStyle">
-        <item name="ttlm_backgroundColor">#bb252525</item>
-        <item name="ttlm_elevation">2dp</item>
+        <item name="ttlm_strokeWeight">0dp</item>
         <item name="ttlm_cornerRadius">2dp</item>
         <item name="ttlm_padding">20dp</item>
         <item name="android:textAppearance">@style/tooltipTextAppearance</item>
