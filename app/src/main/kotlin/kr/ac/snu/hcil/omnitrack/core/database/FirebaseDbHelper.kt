@@ -14,6 +14,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.DatabaseHelper.Companion.SAVE_RESU
 import kr.ac.snu.hcil.omnitrack.core.database.DatabaseHelper.Companion.SAVE_RESULT_NEW
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
+import kr.ac.snu.hcil.omnitrack.services.OTFirebaseUploadService
 import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Observable
@@ -860,10 +861,16 @@ object FirebaseDbHelper {
         if (itemRef != null) {
             val itemId = itemRef.key
 
-            tracker.attributes.map {
+            tracker.attributes.unObservedList.forEach {
                 val value = item.getValueOf(it)
                 if (value is SynchronizedUri && value.localUri != Uri.EMPTY) {
-                    OTApplication.app.storageHelper.assignNewUploadTask(value, itemId, tracker.objectId, tracker.owner!!.objectId)
+
+                    val storageRef = OTFirebaseUploadService.getItemStorageReference(itemId, tracker.objectId, tracker.owner!!.objectId).child(value.localUri.lastPathSegment)
+                    value.setSynchronized(Uri.parse(storageRef.path))
+
+                    OTApplication.app.startService(
+                            OTFirebaseUploadService.makeUploadTaskIntent(OTApplication.app, value, itemId, tracker.objectId, tracker.owner!!.objectId)
+                    )
                 }
             }
         }

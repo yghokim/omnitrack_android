@@ -277,6 +277,8 @@
     <string name="msg_export_type_excel">엑셀 시트 (.xls)</string>
     <string name="msg_export_type_csv">CSV 텍스트 (.csv)</string>
     <string name="msg_select_country">국가를 선택하세요</string>
+    <string name="msg_uploading_file_to_server">서버로 파일을 업로드중입니다</string>
+    <string name="msg_uploading">업로드 하는중...</string>
 
     <string-array name="purpose_entries">
         <item>directive|건강 관련 정보를 기록하기 위해서</item>

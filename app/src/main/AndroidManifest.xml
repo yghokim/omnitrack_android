@@ -131,6 +131,11 @@
             android:name=".services.OTTableExportService"
             android:exported="false" />
 
+
+        <service
+            android:name=".services.OTFirebaseUploadService"
+            android:exported="false" />
+
         <activity
             android:name=".ui.pages.SplashScreenActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
