@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.support.design.widget.Snackbar
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -160,6 +159,16 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
         title = String.format(resources.getString(R.string.title_activity_new_item), tracker.name)
 
         fun onModeSet() {
+
+            when (mode) {
+                Mode.Edit -> {
+                    title = String.format(getString(R.string.title_activity_edit_item), tracker.name)
+                }
+                Mode.New -> {
+                    title = String.format(resources.getString(R.string.title_activity_new_item), tracker.name)
+                }
+            }
+
             if (mode == Mode.New && activityResultAppliedAttributePosition == -1) {
                 if (tryRestoreItemBuilderCache(tracker)) {
 
@@ -248,10 +257,30 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
         this.activityResultAppliedAttributePosition = -1
     }
 
-    override fun onSaveInstanceState(outState: Bundle?, outPersistentState: PersistableBundle?) {
-        super.onSaveInstanceState(outState, outPersistentState)
+    override fun onSaveInstanceState(outState: Bundle?) {
+        super.onSaveInstanceState(outState)
         for (inputView in attributeListAdapter.inputViews) {
             inputView.onSaveInstanceState(outState)
+        }
+
+        outState?.putString("mode", mode.toString())
+        outState?.putString("builder", builder.getSerializedString())
+
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
+        super.onRestoreInstanceState(savedInstanceState)
+
+        if (savedInstanceState != null) {
+            println("restore item editing activity instance state")
+            mode = Mode.valueOf(savedInstanceState.getString("mode"))
+            if (tracker != null) {
+                println("tracker exists. get builder cache.")
+                val builder = OTItemBuilder.getDeserializedInstanceWithTracker(savedInstanceState.getString("builder"), tracker!!)
+                if (builder != null) {
+                    this.builder = builder
+                }
+            }
         }
     }
 

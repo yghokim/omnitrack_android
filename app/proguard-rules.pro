@@ -27,6 +27,11 @@
 -dontwarn okio.**
 
 -dontwarn org.apache.commons.math3.**
+-dontwarn java.beans.**
+-dontwarn org.apache.commons.beanutils.**
+-dontwarn org.apache.commons.lang3.**
+-dontwarn org.apache.commons.collections.**
+
 
 -dontwarn io.nlopez.smartlocation.rx.**
 

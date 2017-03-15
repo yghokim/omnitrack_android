@@ -2,6 +2,7 @@
 <resources>
     <string name="title_activity_attribute_detail">필드 상세설정</string>
     <string name="title_activity_new_item">새로운 [%1$s] 아이템</string>
+    <string name="title_activity_edit_item">[%1$s] 아이템 수정하기</string>
     <string name="title_activity_chart_view">%1$s 시각화</string>
     <string name="title_activity_item_browser">%1$s 기록</string>
     <string name="title_activity_tracker_new">새 트래커 만들기</string>
