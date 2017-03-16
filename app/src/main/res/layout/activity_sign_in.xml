@@ -1,4 +1,4 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.percent.PercentRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -162,11 +162,28 @@
 
     <ImageView
         android:id="@+id/ui_logos"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/ui_copyright"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="4dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:src="@drawable/ic_icon_snu_hcil_logos"
+        app:layout_widthPercent="55%" />
+
+    <TextView
+        android:id="@+id/ui_copyright"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:src="@drawable/ic_three_logos" />
-</RelativeLayout>
+        android:layout_marginBottom="12dp"
+        android:fontFamily="sans-serif-condensed"
+        android:gravity="center"
+        android:text="Copyright © 2016-2017 the OmniTrack team. All Rights Reserved."
+        android:textColor="@color/textColorMidLight"
+        android:textSize="10sp"
+        android:textStyle="bold" />
+
+</android.support.percent.PercentRelativeLayout>
