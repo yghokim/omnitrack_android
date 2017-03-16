@@ -121,30 +121,31 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
         }
     }
 
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
         println("restore state")
 
-        savedInstanceState.getString(STATE_COLUMN_NAME)?.let {
-            columnNameView.value = it
-        }
+        if (savedInstanceState != null) {
+            savedInstanceState.getString(STATE_COLUMN_NAME)?.let {
+                columnNameView.value = it
+            }
 
-        connectionView.connection = null
-        savedInstanceState.getString(STATE_CONNECTION)?.let {
-            try {
-                connectionView.connection = OTConnection(it)
-            } catch(e: Exception) {
-                connectionView.connection = null
+            connectionView.connection = null
+            savedInstanceState.getString(STATE_CONNECTION)?.let {
+                try {
+                    connectionView.connection = OTConnection(it)
+                } catch(e: Exception) {
+                    connectionView.connection = null
+                }
+            }
+
+
+
+            savedInstanceState.getStringArray(STATE_PROPERTIES)?.let {
+                for (entry in it.withIndex()) {
+                    (propertyViewList[entry.index].second as? APropertyView<*>)?.setSerializedValue(entry.value)
+                }
             }
         }
-
-
-
-        savedInstanceState.getStringArray(STATE_PROPERTIES)?.let {
-            for (entry in it.withIndex()) {
-                (propertyViewList[entry.index].second as? APropertyView<*>)?.setSerializedValue(entry.value)
-            }
-        }
-
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

@@ -120,6 +120,7 @@ object OTTrackingNotificationManager {
                 PendingIntent.getBroadcast(context, 0, itemRemoveIntent, PendingIntent.FLAG_UPDATE_CURRENT)).build()
 
         val builder = makeBaseBuilder(context, Type.BACKGROUND_LOGGING_NOTIFICATION.priority, loggedTime)
+                .setSmallIcon(R.drawable.icon_simple_plus)
                 .setContentIntent(resultPendingIntent)
                 .setContentText(
                         String.format(OTApplication.app.resources.getString(R.string.msg_notification_content_format_new_item),

@@ -304,13 +304,18 @@ object OTAuthManager {
     fun signOut() {
         val uid = userId
         if (uid != null) {
-            FirebaseDbHelper.removeDeviceInfo(uid, OTApplication.app.deviceId).subscribe { }
+            FirebaseDbHelper.removeDeviceInfo(uid, OTApplication.app.deviceId).subscribe {
+                clearUserInfo()
+                mFirebaseAuth.signOut()
+                Auth.GoogleSignInApi.signOut(mGoogleApiClient)
+                notifySignedOut()
+            }
+        } else {
+            clearUserInfo()
+            mFirebaseAuth.signOut()
+            Auth.GoogleSignInApi.signOut(mGoogleApiClient)
+            notifySignedOut()
         }
-
-        clearUserInfo()
-        mFirebaseAuth.signOut()
-        Auth.GoogleSignInApi.signOut(mGoogleApiClient)
-        notifySignedOut()
     }
 
     fun addSignInChangedListener(signInChangedListener: SignInChangedListener) {
