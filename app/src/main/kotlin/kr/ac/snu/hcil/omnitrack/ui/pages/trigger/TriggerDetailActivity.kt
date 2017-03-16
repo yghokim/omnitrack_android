@@ -74,33 +74,37 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
             hideAttachedTrackers = intent.getBooleanExtra(INTENT_EXTRA_HIDE_ATTACHED_TRACKERS, false)
         }
 
-        creationSubscriptions.add(
-                signedInUserObservable.subscribe {
-                    user ->
-                    this.user = user
-                    if (intent.hasExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRIGGER)) {
-                        val triggerId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRIGGER)
-                        attachedTrigger = user.triggerManager.getTriggerWithId(triggerId)
-                        this.triggerId = triggerId
-                        triggerType = attachedTrigger?.typeId ?: -1
-                        triggerAction = attachedTrigger?.action ?: -1
+
+        if (intent.hasExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRIGGER)) {
+            val triggerId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRIGGER)
+            if (!triggerId.isNullOrBlank()) {
+                creationSubscriptions.add(
+                        signedInUserObservable.flatMap {
+                            user ->
+                            user.getTriggerObservable(triggerId)
+                        }.doOnNext {
+                            trigger ->
+                            attachedTrigger = trigger
+                            this.triggerId = trigger.objectId
+                        }.subscribe {
+                            trigger ->
+                            triggerType = trigger.typeId
+                            triggerAction = trigger.action
                         //attachedTrigger?.dumpDataToPojo(null)?.toMutable(currentTriggerPojo)
 
                         title = resources.getString(R.string.title_activity_trigger_edit)
                         setActionBarButtonMode(Mode.ApplyCancel)
-                    } else {
-                        triggerType = intent.getIntExtra(INTENT_EXTRA_TRIGGER_TYPE, -1)
-                        triggerAction = intent.getIntExtra(INTENT_EXTRA_TRIGGER_ACTION, -1)
 
-                        title = resources.getString(R.string.title_activity_trigger_new)
-                        setActionBarButtonMode(Mode.SaveCancel)
+                            onUserLoaded()
+                        })
+            }
+        } else {
+            triggerType = intent.getIntExtra(INTENT_EXTRA_TRIGGER_TYPE, -1)
+            triggerAction = intent.getIntExtra(INTENT_EXTRA_TRIGGER_ACTION, -1)
 
-                    }
-
-
-                    onUserLoaded(user)
-                }
-        )
+            title = resources.getString(R.string.title_activity_trigger_new)
+            setActionBarButtonMode(Mode.SaveCancel)
+        }
     }
 
     override fun onToolbarLeftButtonClicked() {
@@ -209,7 +213,7 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
         }
     }
 
-    fun onUserLoaded(user: OTUser) {
+    fun onUserLoaded() {
         if (hideAttachedTrackers) {
             trackerAssignPanelContainer?.visibility = View.GONE
         } else {

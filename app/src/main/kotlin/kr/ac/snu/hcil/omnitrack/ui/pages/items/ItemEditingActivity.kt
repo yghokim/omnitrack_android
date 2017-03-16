@@ -157,6 +157,8 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
     override fun onTrackerLoaded(tracker: OTTracker) {
         super.onTrackerLoaded(tracker)
 
+        println("tracker attribute count: ${tracker.attributes.size}")
+
         val requiredPermissions = tracker.getRequiredPermissions()
         val rxPermissionObservable = if (requiredPermissions.isNotEmpty()) {
             RxPermissions(this).request(*requiredPermissions)

@@ -5,7 +5,6 @@ import android.support.v4.content.ContextCompat
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
-import kr.ac.snu.hcil.omnitrack.core.OTUser
 
 /**
  * Created by younghokim on 2016. 11. 17..
@@ -21,24 +20,27 @@ abstract class OTTrackerAttachedActivity(layoutId: Int) : MultiButtonActionBarAc
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        trackerObjectId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
-        creationSubscriptions.add(
-                signedInUserObservable.subscribe {
-                    user ->
-                    reloadTracker(user)
-                }
-        )
-    }
+        val trackerObjectId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
+        if (!trackerObjectId.isNullOrBlank()) {
+            this.trackerObjectId = trackerObjectId
+            creationSubscriptions.add(
+                    signedInUserObservable.flatMap {
+                        user ->
+                        user.getTrackerObservable(trackerObjectId)
+                    }.doOnNext { tracker ->
+                        this._tracker = tracker
+                    }.subscribe({
+                        tracker ->
+                        setHeaderColor(tracker.color, true)
+                        onTrackerLoaded(tracker)
 
-    private fun reloadTracker(user: OTUser) {
-        if (trackerObjectId != null) {
-            _tracker = user[trackerObjectId!!]
-            if (_tracker != null) {
-                setHeaderColor(tracker!!.color, true)
-                onTrackerLoaded(tracker!!)
-            } else {
-                setHeaderColor(ContextCompat.getColor(this, R.color.colorPrimary), false)
-            }
+                    }, {
+                        ex ->
+                        ex.printStackTrace()
+                        println("tracker loading error")
+                        setHeaderColor(ContextCompat.getColor(this, R.color.colorPrimary), false)
+                    })
+            )
         }
     }
 
@@ -62,15 +64,14 @@ abstract class OTTrackerAttachedActivity(layoutId: Int) : MultiButtonActionBarAc
         val trackerId = savedInstanceState?.getString(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
         if (trackerId != null) {
             println("loading tracker with restored id")
-            getUserOrGotoSignIn().subscribe({
-                user ->
-                val tracker = user[trackerId]
-                if (tracker != null) {
+            creationSubscriptions.add(
+                    getUserOrGotoSignIn().toObservable().flatMap { user -> user.getTrackerObservable(trackerId) }.subscribe({
+                        tracker ->
                     println("restored tracker.")
                     this._tracker = tracker
                     onRestoredInstanceStateWithTracker(savedInstanceState, tracker)
-                }
             }, { println("user error. to go sign in.") })
+            )
         }
     }
 
