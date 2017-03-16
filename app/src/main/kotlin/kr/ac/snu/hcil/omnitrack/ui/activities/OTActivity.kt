@@ -18,6 +18,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.EventLoggingManager
 import kr.ac.snu.hcil.omnitrack.ui.components.common.time.DurationPicker
 import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
 import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
+import rx.Single
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 import rx.subjects.BehaviorSubject
@@ -124,6 +125,12 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false) : AppC
             } else {
                 goSignInUnlessUserCached()
             }
+        }
+    }
+
+    protected fun getUserOrGotoSignIn(): Single<OTUser> {
+        return OTApplication.app.currentUserObservable.toSingle().doOnError {
+            goSignIn()
         }
     }
 
