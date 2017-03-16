@@ -73,7 +73,6 @@ dependencies {
     compile 'com.github.markushi:android-ui:1.2'
     compile 'org.apmem.tools:layouts:1.10@aar'
     compile 'com.koushikdutta.ion:ion:2.1.8'
-    compile 'io.nlopez.smartlocation:library:3.2.5'
     compile 'com.github.ybq:Android-SpinKit:1.1.0'
     compile 'com.badoo.mobile:android-weak-handler:1.1'
     compile 'com.squareup.okhttp3:okhttp:3.6.0'
@@ -95,6 +94,7 @@ dependencies {
     compile 'com.flurgle:camerakit:0.9.15'
     compile 'com.github.halysongoncalves:pugnotification:1.8.1'
     compile 'com.github.mukeshsolanki:country-picker-android:1.1.7'
+    compile 'pl.charmas.android:android-reactive-location:0.10@aar'
 
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile files('libs/opencsv-3.9.jar')

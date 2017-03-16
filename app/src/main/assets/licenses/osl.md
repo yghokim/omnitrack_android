@@ -71,10 +71,12 @@ Apache 2.0 license
 Copyright 2013 Koushik Dutta<br>
 Apache 2.0 license
 
-#####Smart Location Library
-<https://github.com/mrmans0n/smart-location-lib><br>
-Copyright © 2013-2016 Nacho Lopez<br>
-The MIT license (MIT)
+
+#####ReactiveLocation library for Android
+<https://github.com/mcharmas/Android-ReactiveLocation><br>
+Copyright (C) 2015 Michał Charmas (http://blog.charmas.pl)
+Apache 2.0 license
+
 
 #####Android-SpinKit
 <https://github.com/ybq/Android-SpinKit><br>

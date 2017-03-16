@@ -4,8 +4,8 @@ import android.content.Context
 import android.location.Location
 import android.location.LocationManager
 import android.view.View
+import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.maps.model.LatLng
-import io.nlopez.smartlocation.SmartLocation
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
@@ -13,9 +13,10 @@ import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.common.MapImageView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
+import pl.charmas.android.reactivelocation.ReactiveLocationProvider
 import rx.Observable
 import rx.Single
-import rx.subscriptions.Subscriptions
+
 
 /**
  * Created by Young-Ho on 8/2/2016.
@@ -23,6 +24,9 @@ import rx.subscriptions.Subscriptions
 class OTLocationAttribute(objectId: String?, localKey: Int?, parentTracker: OTTracker?, columnName: String, isRequired: Boolean, settingData: Map<String, Any?>?, connectionData: String?) : OTAttribute<LatLng>(objectId, localKey, parentTracker, columnName, isRequired, TYPE_LOCATION, settingData, connectionData) {
 
     companion object {
+
+        const val NUM_UPDATES = 2
+
         fun getCachedLocation(lm: LocationManager, enabledOnly: Boolean): Location? {
             var bestLocation: Location? = null
             for (provider in lm.getProviders(enabledOnly)) {
@@ -57,32 +61,24 @@ class OTLocationAttribute(objectId: String?, localKey: Int?, parentTracker: OTTr
     }
 
     override fun getAutoCompleteValue(): Observable<LatLng> {
+        return Observable.defer {
+            val request = LocationRequest.create() //standard GMS LocationRequest
+                    .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                    .setNumUpdates(NUM_UPDATES)
+                    .setInterval(100)
 
-        return Observable.create {
-            subscriber ->
-            val sm = SmartLocation.with(OTApplication.app).location().oneFix()
-            sm.start {
+            val locationProvider = ReactiveLocationProvider(OTApplication.app)
+
+            var count = 0
+
+            locationProvider.getUpdatedLocation(request).doOnNext {
+                count++
+            }.map {
                 location ->
-
-                sm.stop()
-                if (!subscriber.isUnsubscribed) {
-                    subscriber.onNext(LatLng(location?.latitude ?: 0.0, location?.longitude ?: 0.0))
-                    subscriber.onCompleted()
-                }
-            }
-
-            subscriber.add(Subscriptions.create { sm.stop() })
+                println("location update - ${count}")
+                LatLng(location?.latitude ?: 0.0, location?.longitude ?: 0.0)
+            }.takeUntil { count == NUM_UPDATES }.last()
         }
-
-        /*
-        return ObservableFactory.from(SmartLocation.with(OTApplication.app).location())
-                .map {
-                    location ->
-                    LatLng(location.latitude, location.longitude)
-                }
-                .onErrorReturn {
-                    LatLng(0.0, 0.0)
-                }.single()*/
     }
 
 
