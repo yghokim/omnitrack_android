@@ -42,6 +42,38 @@ abstract class OTTrackerAttachedActivity(layoutId: Int) : MultiButtonActionBarAc
         }
     }
 
+    protected open fun onRestoredInstanceStateWithTracker(savedInstanceState: Bundle, tracker: OTTracker) {
+
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?) {
+        super.onSaveInstanceState(outState)
+        val trackerId = if (tracker == null) {
+            intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
+        } else tracker?.objectId
+
+        println("saving instance state of tracker : ${trackerId}")
+
+        outState?.putString(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
+        super.onRestoreInstanceState(savedInstanceState)
+        val trackerId = savedInstanceState?.getString(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
+        if (trackerId != null) {
+            println("loading tracker with restored id")
+            getUserOrGotoSignIn().subscribe({
+                user ->
+                val tracker = user[trackerId]
+                if (tracker != null) {
+                    println("restored tracker.")
+                    this._tracker = tracker
+                    onRestoredInstanceStateWithTracker(savedInstanceState, tracker)
+                }
+            }, { println("user error. to go sign in.") })
+        }
+    }
+
     protected open fun onTrackerLoaded(tracker: OTTracker) {
     }
 

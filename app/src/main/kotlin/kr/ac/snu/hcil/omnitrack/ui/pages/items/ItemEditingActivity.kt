@@ -72,7 +72,7 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
 
     private val attributeListAdapter = AttributeListAdapter()
 
-    private lateinit var builder: OTItemBuilder
+    private var builder: OTItemBuilder? = null
 
     private val attributeListView: RecyclerView by bindView(R.id.ui_attribute_list)
     private val layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
@@ -131,14 +131,20 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
                             .flatMap {
                                 approved ->
                                 if (approved) {
-                                    builder.autoComplete(this).doOnSubscribe {
-                                        loadingIndicatorBar.show()
-                                    }.doOnCompleted { loadingIndicatorBar.dismiss() }
+                                    if (builder != null) {
+                                        builder!!.autoComplete(this).doOnSubscribe {
+                                            loadingIndicatorBar.show()
+                                        }.doOnCompleted { loadingIndicatorBar.dismiss() }
+                                    } else {
+                                        Observable.just(false)
+                                    }
                                 } else Observable.error(Exception("required permission not accepted."))
                             }.subscribe({
                         println("Finished builder autocomplete.")
-                        snapshot(builder)
-                        snapshotInitialValue(builder)
+                        if (builder != null) {
+                            snapshot(builder!!)
+                            snapshotInitialValue(builder!!)
+                        }
                     }, {
                         //TODO handle permission not granted
                     })
@@ -176,7 +182,9 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
 
                     //Toast.makeText(this, "Past inputs were restored.", Toast.LENGTH_SHORT).show()
                     builderRestoredSnackbar.show()
-                    snapshot(builder)
+                    if (builder != null) {
+                        snapshot(builder!!)
+                    }
                 } else {
                     //new builder was created
                     println("Start builder autocomplete")
@@ -184,14 +192,20 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
                             rxPermissionObservable.flatMap {
                                 approved: Boolean ->
                                 if (approved) {
-                                    builder.autoComplete(this).doOnSubscribe {
-                                        loadingIndicatorBar.show()
-                                    }.doOnCompleted { loadingIndicatorBar.dismiss() }
+                                    if (builder != null) {
+                                        builder!!.autoComplete(this).doOnSubscribe {
+                                            loadingIndicatorBar.show()
+                                        }.doOnCompleted { loadingIndicatorBar.dismiss() }
+                                    } else {
+                                        Observable.just(false)
+                                    }
                                 } else Observable.error(Exception("required permission not accepted."))
                             }.subscribe({
                                 println("Finished builder autocomplete.");
-                                snapshot(builder)
-                                snapshotInitialValue(builder)
+                                if (builder != null) {
+                                    snapshot(builder!!)
+                                    snapshotInitialValue(builder!!)
+                                }
                             }, {
                                 //TODO handle when permission not accepted.
                             })
@@ -264,22 +278,31 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
         }
 
         outState?.putString("mode", mode.toString())
-        outState?.putString("builder", builder.getSerializedString())
+        outState?.putString("builder", builder?.getSerializedString())
 
     }
 
-    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
-        super.onRestoreInstanceState(savedInstanceState)
-
-        if (savedInstanceState != null) {
-            println("restore item editing activity instance state")
-            mode = Mode.valueOf(savedInstanceState.getString("mode"))
-            if (tracker != null) {
-                println("tracker exists. get builder cache.")
-                val builder = OTItemBuilder.getDeserializedInstanceWithTracker(savedInstanceState.getString("builder"), tracker!!)
-                if (builder != null) {
-                    this.builder = builder
-                }
+    override fun onRestoredInstanceStateWithTracker(savedInstanceState: Bundle, tracker: OTTracker) {
+        super.onRestoredInstanceStateWithTracker(savedInstanceState, tracker)
+        println("restore item editing activity instance state")
+        mode = Mode.valueOf(savedInstanceState.getString("mode"))
+        when (mode) {
+            Mode.Edit -> {
+                title = String.format(getString(R.string.title_activity_edit_item), tracker.name)
+            }
+            Mode.New -> {
+                title = String.format(resources.getString(R.string.title_activity_new_item), tracker.name)
+            }
+        }
+        println("tracker exists. get builder cache.")
+        if (savedInstanceState.containsKey("builder")) {
+            val builder = OTItemBuilder.getDeserializedInstanceWithTracker(savedInstanceState.getString("builder"), tracker)
+            if (builder != null) {
+                this.builder = builder
+                attributeListAdapter.notifyDataSetChanged()
+            } else {
+                tryRestoreItemBuilderCache(tracker)
+                attributeListAdapter.notifyDataSetChanged()
             }
         }
     }
@@ -313,15 +336,18 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
     override fun onToolbarRightButtonClicked() {
         //push item to db
         //syncViewStateToBuilderAsync {
-            val item = builder.makeItem(OTItem.LoggingSource.Manual)
+        builder?.let {
+            val item = it.makeItem(OTItem.LoggingSource.Manual)
             println("Will push $item")
 
+
             FirebaseDbHelper.saveItem(item, tracker!!)
-            builder.clear()
+            it.clear()
             clearBuilderCache()
             skipViewValueCaching = true
             itemSaved = true
-        setResult(RESULT_OK, Intent().putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, item.objectId))
+            setResult(RESULT_OK, Intent().putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, item.objectId))
+        }
             finish()
         //}
     }
@@ -353,11 +379,11 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
             //there is no connection, and every field is static
             return tracker?.attributes?.unObservedList?.find {
                 it.valueConnection == null && it.isAutoCompleteValueStatic &&
-                        (builder.getValueWithKey(it.objectId) != initialValueSnapshot[it.objectId])
+                        (builder?.getValueWithKey(it.objectId) != initialValueSnapshot[it.objectId])
             } != null
         }
     }
-
+/*
     private fun syncViewStateToBuilderAsync(finished: (() -> Unit)?) {
         println("grab inputView's values to ItemBuilder.")
         val waitingAttributes = ArrayList<OTAttribute<out Any>>()
@@ -386,7 +412,7 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
                 {
                     finished?.invoke()
                 })
-    }
+    }*/
 
     private fun clearBuilderCache() {
         if (tracker != null) {
@@ -400,10 +426,10 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
     private fun storeItemBuilderCache() {
         if (tracker != null) {
 //            syncViewStateToBuilderAsync {
-            if (!builder.isEmpty) {
+            if (builder?.isEmpty == false) {
                 val preferences = getSharedPreferences(OTApplication.PREFERENCE_KEY_FOREGROUND_ITEM_BUILDER_STORAGE, Context.MODE_PRIVATE)
                 val editor = preferences.edit()
-                editor.putString(makeTrackerPreferenceKey(tracker!!), builder.getSerializedString())
+                editor.putString(makeTrackerPreferenceKey(tracker!!), builder?.getSerializedString())
                 editor.apply()
             }
             //          }
@@ -449,7 +475,7 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
         val attribute = tracker?.attributes?.unObservedList?.find { it.objectId == attributeId }
         if (attribute != null) {
             println("set item builder ${attribute.typeId}, ${attributeId}")
-            builder.setValueOf(attribute, newVal)
+            builder?.setValueOf(attribute, newVal)
 
             builderRestoredSnackbar.dismiss()
         }
@@ -558,15 +584,40 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
 
                 connectionIndicatorStubProxy.onBind(attribute)
 
+                builder?.let {
+                    if (it.hasValueOf(attribute)) {
+                        val valueInfo = it.getValueInformationOf(attribute)!!
 
-                if (builder.hasValueOf(attribute)) {
-                    val valueInfo = builder.getValueInformationOf(attribute)!!
+                        inputView.valueChanged.suspend = true
+                        inputView.setAnyValue(valueInfo.value)
+                        inputView.valueChanged.suspend = false
 
-                    inputView.valueChanged.suspend = true
-                    inputView.setAnyValue(valueInfo.value)
-                    inputView.valueChanged.suspend = false
+                        setTimestampIndicatorText(valueInfo.timestamp)
+                    }
 
-                    setTimestampIndicatorText(valueInfo.timestamp)
+                    val state = it.getAttributeValueState(adapterPosition)
+
+                    if (state == OTItemBuilder.EAttributeValueState.Idle) {
+                        container.locked = false
+                        inputView.alpha = 1.0f
+                    } else {
+                        container.locked = true
+                        inputView.alpha = 0.12f
+                    }
+
+                    println("current builder attribute state: ${it.getAttributeValueState(adapterPosition)}")
+
+                    when (it.getAttributeValueState(adapterPosition)) {
+                        OTItemBuilder.EAttributeValueState.Idle -> {
+                            loadingIndicatorInContainer.visibility = View.GONE
+                        }
+                        OTItemBuilder.EAttributeValueState.Processing -> {
+                            loadingIndicatorInContainer.visibility = View.VISIBLE
+                        }
+                        OTItemBuilder.EAttributeValueState.GettingExternalValue -> {
+                            loadingIndicatorInContainer.visibility = View.VISIBLE
+                        }
+                    }
                 }
 
                 attributeValueExtractors[attributeId] = {
@@ -575,29 +626,6 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
 
                 inputView.boundAttributeId = attribute.objectId
 
-                val state = builder.getAttributeValueState(adapterPosition)
-
-                if (state == OTItemBuilder.EAttributeValueState.Idle) {
-                    container.locked = false
-                    inputView.alpha = 1.0f
-                } else {
-                    container.locked = true
-                    inputView.alpha = 0.12f
-                }
-
-                println("current builder attribute state: ${builder.getAttributeValueState(adapterPosition)}")
-
-                when (builder.getAttributeValueState(adapterPosition)) {
-                    OTItemBuilder.EAttributeValueState.Idle -> {
-                        loadingIndicatorInContainer.visibility = View.GONE
-                    }
-                    OTItemBuilder.EAttributeValueState.Processing -> {
-                        loadingIndicatorInContainer.visibility = View.VISIBLE
-                    }
-                    OTItemBuilder.EAttributeValueState.GettingExternalValue -> {
-                        loadingIndicatorInContainer.visibility = View.VISIBLE
-                    }
-                }
 
                 inputView.onResume()
             }
