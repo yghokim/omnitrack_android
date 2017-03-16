@@ -60,7 +60,7 @@ class AboutActivity : MaterialAboutActivity() {
                         .title(R.string.msg_about_about_us)
                         .addItem(
                                 MaterialAboutImageItem.Builder()
-                                        .icon(R.drawable.ic_three_logos)
+                                        .icon(R.drawable.ic_icon_snu_hcil_logos)
                                         .text(R.string.msg_about_text)
                                         .textColorOverrideRes(R.color.textColorMid)
                                         .build()
