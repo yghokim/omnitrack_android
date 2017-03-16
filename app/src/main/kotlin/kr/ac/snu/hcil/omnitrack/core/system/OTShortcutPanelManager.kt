@@ -113,7 +113,7 @@ object OTShortcutPanelManager {
             val normalView = buildNewNotificationShortcutViews(user, context, false)
 
             val noti = NotificationCompat.Builder(context)
-                    .setSmallIcon(R.drawable.icon_simple_white)
+                    .setSmallIcon(R.drawable.icon_simple)
                     .setContentTitle(context.resources.getString(R.string.app_name))
                     .setCustomBigContentView(bigView)
                     .setCustomContentView(normalView)

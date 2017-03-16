@@ -16,6 +16,7 @@ import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerManager
 import kr.ac.snu.hcil.omnitrack.utils.DefaultNameGenerator
 import kr.ac.snu.hcil.omnitrack.utils.ObservableList
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
+import rx.Observable
 import rx.internal.util.SubscriptionList
 import rx.subjects.PublishSubject
 import rx.subjects.SerializedSubject
@@ -102,7 +103,6 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
         get() = FirebaseDbHelper.dbRef?.child(FirebaseDbHelper.CHILD_NAME_USERS)?.child(objectId)
 
     val trackers = ObservableList<OTTracker>()
-
 
     val triggerManager: OTTriggerManager
 
@@ -338,5 +338,37 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
 
     fun generateNewTrackerName(context: Context): String {
         return DefaultNameGenerator.generateName(context.resources.getString(R.string.msg_new_tracker_prefix), trackers.unObservedList.map { it.name }, false)
+    }
+
+    fun getTrackerObservable(trackerId: String): Observable<OTTracker> {
+        return Observable.defer {
+            val tracker = get(trackerId)
+            if (tracker != null) {
+                println("user already contains the tracker")
+                Observable.just(tracker)
+            } else {
+
+                println("user is not containing the tracker. wait")
+                trackerAdded.filter {
+                    pair ->
+                    pair.first.objectId == trackerId
+                }.map { it.first }
+            }
+        }
+    }
+
+
+    fun getTriggerObservable(triggerId: String): Observable<OTTrigger> {
+        return Observable.defer {
+            val trigger = triggerManager.getTriggerWithId(triggerId)
+            if (trigger != null) {
+                Observable.just(trigger)
+            } else {
+                triggerManager.triggerAdded.filter {
+                    trigger ->
+                    trigger.objectId == triggerId
+                }
+            }
+        }
     }
 }

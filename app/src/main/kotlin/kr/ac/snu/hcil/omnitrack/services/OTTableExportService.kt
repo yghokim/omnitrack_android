@@ -180,8 +180,8 @@ class OTTableExportService : WakefulService(TAG) {
                                 PendingIntent.getActivity(this, makeUniqueNotificationId(),
                                         choiceIntent, PendingIntent.FLAG_UPDATE_CURRENT)
                             }
-                            .smallIcon(R.drawable.done)
-                            .largeIcon(R.drawable.icon_cloud_download)
+                            .smallIcon(R.drawable.icon_simple_check)
+                            .largeIcon(R.drawable.icon_simple_check)
                             .simple()
                             .build()
                 }
@@ -194,8 +194,10 @@ class OTTableExportService : WakefulService(TAG) {
             OTApplication.app.currentUserObservable
                     .flatMap {
                         user ->
-                        val tracker = user[trackerId]
-                        if (tracker != null) {
+                        user.getTrackerObservable(trackerId)
+                    }.onErrorReturn { null }.flatMap {
+                tracker: OTTracker? ->
+                if (tracker != null) {
                             loadedTracker = tracker
 
                             if (externalFilesInvolved) {
@@ -298,10 +300,10 @@ class OTTableExportService : WakefulService(TAG) {
                             } else {
                                 tableObservable
                             }
-                        } else {
-                            Observable.error(Exception("tracker does not exists."))
-                        }
-                    }.subscribe({
+                } else {
+                    Observable.error(Exception("tracker does not exists."))
+                }
+            }.subscribe({
                 println("file making task finished")
 
                 val successful: Boolean = if (externalFilesInvolved) {
