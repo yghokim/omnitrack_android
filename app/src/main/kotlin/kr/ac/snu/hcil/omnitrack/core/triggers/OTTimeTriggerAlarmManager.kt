@@ -10,7 +10,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
 import kr.ac.snu.hcil.omnitrack.receivers.TimeTriggerAlarmReceiver
 import kr.ac.snu.hcil.omnitrack.utils.FillingIntegerIdReservationTable
 import kr.ac.snu.hcil.omnitrack.utils.TimeKeyValueSetTable
-import rx.Observable
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -23,16 +22,6 @@ class OTTimeTriggerAlarmManager() {
         const val TAG = "TimeTriggerAlarmManager"
 
         const val PREFERENCE_NAME = "TimeTriggerReservationTable"
-
-        const val RESERVATION_TABLE_STORED = "reservationTableStored"
-        const val RESERVATION_TABLE_MEMBER_THRESHOLD = "thresholdMillis"
-        const val RESERVATION_TABLE_MEMBER_KEYS = "timestampList"
-
-        const val TRIGGER_TABLE_STORED = "triggerTableStored"
-        const val TRIGGER_TABLE_KEYS = "triggerTableKeys"
-
-        const val ID_TABLE_STORED = "idTableStored"
-        const val ID_TABLE_IDS = "idTableIds"
 
         const val INTENT_EXTRA_TRIGGER_TIME = "triggerTime"
         const val INTENT_EXTRA_ALARM_ID = "alarmId"
@@ -280,13 +269,6 @@ class OTTimeTriggerAlarmManager() {
                 return triggers
             } else return null
         } else return null
-    }
-
-    fun notifyAlarmFiredAndGetTriggers(alarmId: Int, intentTriggerTime: Long, reallyFiredAt: Long): Observable<List<OTTrigger>?> {
-        return OTApplication.app.currentUserObservable.map {
-            user ->
-            notifyAlarmFiredAndGetTriggersSync(user, alarmId, intentTriggerTime, reallyFiredAt)
-        }
     }
 
 }
