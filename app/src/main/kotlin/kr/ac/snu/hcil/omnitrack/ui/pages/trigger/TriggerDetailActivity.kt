@@ -79,7 +79,7 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
             val triggerId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRIGGER)
             if (!triggerId.isNullOrBlank()) {
                 creationSubscriptions.add(
-                        signedInUserObservable.flatMap {
+                        signedInUserObservable.doOnNext { user -> this.user = user }.flatMap {
                             user ->
                             user.getTriggerObservable(triggerId)
                         }.doOnNext {
@@ -104,6 +104,12 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
 
             title = resources.getString(R.string.title_activity_trigger_new)
             setActionBarButtonMode(Mode.SaveCancel)
+            creationSubscriptions.add(
+                    signedInUserObservable.doOnNext { user -> this.user = user }.subscribe {
+
+                        onUserLoaded()
+                    }
+            )
         }
     }
 
@@ -252,6 +258,16 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
         super.onDestroy()
         user = null
         attachedTrigger = null
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?) {
+        super.onSaveInstanceState(outState)
+
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
+        super.onRestoreInstanceState(savedInstanceState)
+
     }
 
 

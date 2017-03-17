@@ -17,6 +17,7 @@ import kr.ac.snu.hcil.omnitrack.utils.DefaultNameGenerator
 import kr.ac.snu.hcil.omnitrack.utils.ObservableList
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 import rx.Observable
+import rx.Single
 import rx.internal.util.SubscriptionList
 import rx.subjects.PublishSubject
 import rx.subjects.SerializedSubject
@@ -327,8 +328,6 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
     }
 
     fun findAttributeByObjectId(trackerId: String, attributeId: String): OTAttribute<out Any>? {
-        val tracker = get(trackerId)
-
         return get(trackerId)?.attributes?.unObservedList?.find { it.objectId == attributeId }
     }
 
@@ -370,5 +369,26 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
                 }
             }
         }
+    }
+
+    fun crawlAllTrackersAndTriggerAtOnce(): Single<OTUser> {
+        return FirebaseDbHelper.findTrackersOfUser(objectId).doOnNext {
+            trackers ->
+            println("crawled trackers")
+            for (tracker in trackers) {
+                if (trackers.find { it.objectId == tracker.objectId } == null)
+                    this.trackers.add(tracker)
+            }
+        }.concatMap {
+            trackers ->
+
+            println("crawled triggers")
+            FirebaseDbHelper.findTriggersOfUser(this).doOnNext {
+                triggers ->
+                for (trigger in triggers) {
+                    this.triggerManager.putNewTrigger(trigger)
+                }
+            }.map { this }
+        }.toSingle()
     }
 }

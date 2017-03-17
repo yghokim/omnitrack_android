@@ -110,7 +110,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_toEndOf="@+id/color_bar"
-        android:background="@color/colorSecondary"
+        android:background="@drawable/main_gradient"
         android:orientation="horizontal"
         android:textAlignment="viewEnd"
         android:visibility="gone">
