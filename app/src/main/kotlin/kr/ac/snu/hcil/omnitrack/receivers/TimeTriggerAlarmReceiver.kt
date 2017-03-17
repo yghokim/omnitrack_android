@@ -86,7 +86,7 @@ class TimeTriggerAlarmReceiver : BroadcastReceiver() {
 
             OTApplication.logger.writeSystemLog("Wakeful Service handleIntent, trigger time: ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(triggerTime))}", TAG)
 
-            OTApplication.app.currentUserObservable.subscribe {
+            OTApplication.app.currentUserObservable.first().toSingle().flatMap { user -> user.crawlAllTrackersAndTriggerAtOnce() }.subscribe {
                 user ->
                 val triggers = OTApplication.app.timeTriggerAlarmManager.notifyAlarmFiredAndGetTriggersSync(user, alarmId, triggerTime, System.currentTimeMillis())
 
