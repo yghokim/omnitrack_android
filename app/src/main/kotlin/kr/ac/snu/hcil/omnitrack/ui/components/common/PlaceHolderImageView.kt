@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger
 /**
  * Created by younghokim on 2017. 3. 12..
  */
-class PlaceHolderImageView : FrameLayout {
+open class PlaceHolderImageView : FrameLayout {
 
     companion object {
         private val tooltipIdSeed = AtomicInteger()

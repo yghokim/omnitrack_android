@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 import android.app.DatePickerDialog
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import android.transition.TransitionManager
 import android.util.AttributeSet
 import android.view.LayoutInflater
@@ -24,6 +25,7 @@ import kr.ac.snu.hcil.omnitrack.utils.events.IEventListener
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
+
 
 /**
  * Created by Young-Ho Kim on 2016-08-24
@@ -186,6 +188,8 @@ class TimeTriggerConfigurationPanel : LinearLayout, ITriggerConfigurationCoordin
         if (OTTimeTrigger.Range.isEndSpecified(variables)) {
             isEndSpecifiedCheckBox.isChecked = true
             applyRepeatEndDate(OTTimeTrigger.Range.getEndYear(variables), OTTimeTrigger.Range.getEndZeroBasedMonth(variables), OTTimeTrigger.Range.getEndDay(variables))
+        } else {
+            isEndSpecifiedCheckBox.isChecked = false
         }
     }
 
@@ -207,11 +211,16 @@ class TimeTriggerConfigurationPanel : LinearLayout, ITriggerConfigurationCoordin
 
     fun extractRangeVariables(): Int {
 
-        return if (isEndSpecifiedCheckBox.isChecked) {
-            OTTimeTrigger.Range.makeConfig(dayOfWeekPicker.checkedFlagsInteger, repeatEndDate.getYear(), repeatEndDate.getZeroBasedMonth(), repeatEndDate.getDayOfMonth())
-        } else {
-            OTTimeTrigger.Range.makeConfig(dayOfWeekPicker.checkedFlagsInteger)
-        }
+        return if (isRepeated) {
+
+            if (isEndSpecifiedCheckBox.isChecked) {
+                println("end specified.")
+                OTTimeTrigger.Range.makeConfig(dayOfWeekPicker.checkedFlagsInteger, repeatEndDate.getYear(), repeatEndDate.getZeroBasedMonth(), repeatEndDate.getDayOfMonth())
+            } else {
+                println("end not specified")
+                OTTimeTrigger.Range.makeConfig(dayOfWeekPicker.checkedFlagsInteger)
+            }
+        } else OTTimeTrigger.Range.makeConfig(0)
     }
 
     override fun onClick(view: View) {
@@ -275,9 +284,9 @@ class TimeTriggerConfigurationPanel : LinearLayout, ITriggerConfigurationCoordin
     override fun applyConfigurationToTrigger(trigger: OTTrigger) {
         if (trigger is OTTimeTrigger) {
             trigger.configType = configMode
+            trigger.isRepeated = isRepeated
             trigger.configVariables = extractConfigVariables()
             trigger.rangeVariables = extractRangeVariables()
-            trigger.isRepeated = isRepeated
         }
     }
 
@@ -310,6 +319,20 @@ class TimeTriggerConfigurationPanel : LinearLayout, ITriggerConfigurationCoordin
         }
 
         return validated
+    }
+
+    override fun writeConfiguratinoToBundle(out: Bundle) {
+        out.putInt("configMode", configMode)
+        out.putBoolean("isRepeated", isRepeated)
+        out.putInt("configVariables", extractConfigVariables())
+        out.putInt("rangeVariables", extractRangeVariables())
+    }
+
+    override fun readConfigurationFromBundle(bundle: Bundle) {
+        configMode = bundle.getInt("configMode")
+        isRepeated = bundle.getBoolean("isRepeated")
+        applyConfigVariables(bundle.getInt("configVariables"))
+        applyRangeVariables(bundle.getInt("rangeVariables"))
     }
 
 }

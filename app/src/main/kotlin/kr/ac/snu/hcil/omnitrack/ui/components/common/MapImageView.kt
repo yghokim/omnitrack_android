@@ -1,17 +1,20 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.common
 
 import android.content.Context
-import android.net.Uri
 import android.util.AttributeSet
-import android.widget.ImageView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.drawable.GlideDrawable
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.google.android.gms.maps.model.LatLng
 import kr.ac.snu.hcil.omnitrack.OTApplication
-import kr.ac.snu.hcil.omnitrack.core.database.CacheHelper
+import java.lang.Exception
 
 /**
  * Created by Young-Ho Kim on 16. 8. 18
  */
-class MapImageView : ImageView, CacheHelper.ICachedBitmapListener /*FutureCallback<ImageView>*/ {
+class MapImageView : PlaceHolderImageView /*FutureCallback<ImageView>*/ {
 
     companion object {
 
@@ -72,20 +75,39 @@ class MapImageView : ImageView, CacheHelper.ICachedBitmapListener /*FutureCallba
     private var suspendReloading = false
 
     private fun reloadMap(location: LatLng, zoom: Int) {
-        if ((width > 0 && height > 0)) {
+        if ((width > 0)) {
+            val desiredHeight = (width * aspectRatio).toInt()
             if (isLoadingMap) {
-                if (ongoingLocation != location || ongoingZoom != zoom || ongoingWidth != width || ongoingHeight != height)
+                if (ongoingLocation != location || ongoingZoom != zoom || ongoingWidth != width || ongoingHeight != desiredHeight)
                     reservedReloading = true
             } else {
                 isLoadingMap = true
                 ongoingLocation = location
                 ongoingZoom = zoom
                 ongoingWidth = width
-                ongoingHeight = height
+                ongoingHeight = desiredHeight
 
-                OTApplication.app.cacheHelper.downloadBitmapAsync(this.context,
-                        makeGoogleMapQuery(location, zoom, width, height),
-                        this)
+
+                Glide.with(context).load(makeGoogleMapQuery(location, zoom, width, desiredHeight))
+                        .diskCacheStrategy(DiskCacheStrategy.RESULT)
+                        .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
+                        .listener(object : RequestListener<String, GlideDrawable> {
+                            override fun onException(e: Exception?, model: String?, target: Target<GlideDrawable>?, isFirstResource: Boolean): Boolean {
+                                currentMode = PlaceHolderImageView.Mode.ERROR
+                                onBitmapRetrieved()
+                                return false
+                            }
+
+                            override fun onResourceReady(resource: GlideDrawable?, model: String?, target: Target<GlideDrawable>?, isFromMemoryCache: Boolean, isFirstResource: Boolean): Boolean {
+                                if (resource != null) {
+                                    currentMode = PlaceHolderImageView.Mode.IMAGE
+                                }
+                                onBitmapRetrieved()
+                                return false
+                            }
+
+                        })
+                        .into(this.imageView)
                 /*
             Ion.with(this)
                     .load(makeGoogleMapQuery(location, zoom, width, height)).setCallback(this)*/
@@ -94,9 +116,7 @@ class MapImageView : ImageView, CacheHelper.ICachedBitmapListener /*FutureCallba
     }
 
 
-    override fun onBitmapRetrieved(uri: Uri?) {
-        setImageURI(uri)
-
+    fun onBitmapRetrieved() {
         isLoadingMap = false
 
         ongoingZoom = 0
@@ -134,6 +154,7 @@ class MapImageView : ImageView, CacheHelper.ICachedBitmapListener /*FutureCallba
         }
     }
 
+    /*
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val originalWidth = MeasureSpec.getSize(widthMeasureSpec)
         //val widthMode = MeasureSpec.getMode(widthMeasureSpec)
@@ -157,5 +178,5 @@ class MapImageView : ImageView, CacheHelper.ICachedBitmapListener /*FutureCallba
 
         setMeasuredDimension(finalWidth, finalHeight)
 
-    }
+    }*/
 }

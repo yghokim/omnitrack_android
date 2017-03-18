@@ -358,5 +358,6 @@
         <item>Choice entry 2</item>
         <item>Choice entry 3</item>
     </string-array>
+    <string name="title_activity_trigger_details">TriggerDetailsActivity</string>
 
 </resources>

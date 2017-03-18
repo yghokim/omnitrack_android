@@ -4,15 +4,18 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewStub
-import butterknife.bindView
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
+import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
+import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import rx.internal.util.SubscriptionList
 import java.util.*
@@ -44,93 +47,67 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
         }
     }
 
-    private var triggerId: String? = null
-    private var attachedTrigger: OTTrigger? = null
+    private var contentFragment: TriggerDetailFragment? = null
 
-    private var triggerType: Int = -1
-    private var triggerAction: Int = -1
-
-    private var user: OTUser? = null
-
-    private val isEditMode: Boolean get() = triggerId != null
-
-    private var configurationCoordinatorView: ITriggerConfigurationCoordinator? = null
-
-    private val controlPanelContainer: ViewGroup by bindView(R.id.ui_control_panel)
-    private val trackerAssignPanelStub: ViewStub by bindView(R.id.ui_tracker_assign_panel_stub)
-    private var trackerAssignPanelContainer: View? = null
-    private var trackerAssignPanel: TrackerAssignPanel? = null
-
-    private var hideAttachedTrackers: Boolean = false
-
-    private val errorMessages = ArrayList<String>()
-
-    private var startSubscriptions = SubscriptionList()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setActionBarButtonMode(Mode.SaveCancel)
 
+        var hideAttachedTrackers: Boolean = false
         if (intent.hasExtra(INTENT_EXTRA_HIDE_ATTACHED_TRACKERS)) {
             hideAttachedTrackers = intent.getBooleanExtra(INTENT_EXTRA_HIDE_ATTACHED_TRACKERS, false)
         }
 
-
-        if (intent.hasExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRIGGER)) {
             val triggerId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRIGGER)
             if (!triggerId.isNullOrBlank()) {
-                creationSubscriptions.add(
-                        signedInUserObservable.doOnNext { user -> this.user = user }.flatMap {
-                            user ->
-                            user.getTriggerObservable(triggerId)
-                        }.doOnNext {
-                            trigger ->
-                            attachedTrigger = trigger
-                            this.triggerId = trigger.objectId
-                        }.subscribe {
-                            trigger ->
-                            triggerType = trigger.typeId
-                            triggerAction = trigger.action
-                        //attachedTrigger?.dumpDataToPojo(null)?.toMutable(currentTriggerPojo)
 
-                        title = resources.getString(R.string.title_activity_trigger_edit)
-                        setActionBarButtonMode(Mode.ApplyCancel)
+                title = resources.getString(R.string.title_activity_trigger_edit)
+                setActionBarButtonMode(Mode.ApplyCancel)
 
-                            onUserLoaded()
-                        })
+            } else {
+                title = resources.getString(R.string.title_activity_trigger_new)
             }
+
+        val frag = supportFragmentManager.findFragmentByTag("TriggerDetailContent") as? TriggerDetailFragment
+        if (frag != null) {
+            contentFragment = frag
         } else {
-            triggerType = intent.getIntExtra(INTENT_EXTRA_TRIGGER_TYPE, -1)
-            triggerAction = intent.getIntExtra(INTENT_EXTRA_TRIGGER_ACTION, -1)
+            contentFragment = if (!triggerId.isNullOrBlank()) {
+                TriggerDetailFragment.Companion.getInstance(triggerId, hideAttachedTrackers)
+            } else {
+                val triggerType = intent.getIntExtra(INTENT_EXTRA_TRIGGER_TYPE, -1)
+                val triggerAction = intent.getIntExtra(INTENT_EXTRA_TRIGGER_ACTION, -1)
+                TriggerDetailFragment.Companion.getInstance(triggerType, triggerAction, hideAttachedTrackers)
+            }
 
-            title = resources.getString(R.string.title_activity_trigger_new)
-            setActionBarButtonMode(Mode.SaveCancel)
-            creationSubscriptions.add(
-                    signedInUserObservable.doOnNext { user -> this.user = user }.subscribe {
-
-                        onUserLoaded()
-                    }
-            )
+            val transaction = supportFragmentManager.beginTransaction()
+            transaction.replace(R.id.ui_content_replace, contentFragment, "TriggerDetailContent")
+            transaction.commit()
         }
+
+
+
     }
 
     override fun onToolbarLeftButtonClicked() {
-        if (isEditMode) {
+        if (contentFragment?.isEditMode == true) {
             DialogHelper.makeYesNoDialogBuilder(this, "OmniTrack",
-                    resources.getString(R.string.msg_confirm_trigger_apply_change), R.string.msg_apply, onYes=
-                    {
-                        if (validateConfigurations()) {
-                            attachedTrigger?.let {
-                                applyViewToTrigger(it)
-                            }
-                            setResult(Activity.RESULT_OK)
-                            finish()
-                        } else {
-                            DialogHelper.makeSimpleAlertBuilder(this, errorMessages.joinToString("\n")).show()
-                        }
-                    }, onNo= { setResult(Activity.RESULT_CANCELED); finish() }).show()
+                    resources.getString(R.string.msg_confirm_trigger_apply_change), R.string.msg_apply, onYes =
+            {
+                val errorMessages = contentFragment?.validateAndApplyViewStateToTrigger()
+                if (errorMessages == null) {
+
+                    setResult(Activity.RESULT_OK)
+                    finish()
+                } else {
+
+                    DialogHelper.makeSimpleAlertBuilder(this, errorMessages.joinToString("\n")).show()
+                }
+            }, onNo = { setResult(Activity.RESULT_CANCELED); finish() }).show()
         } else {
             DialogHelper.makeNegativePhrasedYesNoDialogBuilder(this, "OmniTrack",
-                    resources.getString(R.string.msg_confirm_trigger_cancel_creation), R.string.msg_cancel_creation_and_exit, onYes= {
+                    resources.getString(R.string.msg_confirm_trigger_cancel_creation), R.string.msg_cancel_creation_and_exit, onYes = {
                 setResult(Activity.RESULT_CANCELED)
                 finish()
             }).show()
@@ -139,18 +116,17 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
 
     override fun onBackPressed() {
         //super.onBackPressed()
-        if (isEditMode) {
+        if (contentFragment?.isEditMode == true) {
             DialogHelper.makeYesNoDialogBuilder(this, "OmniTrack",
-                    resources.getString(R.string.msg_confirm_trigger_apply_change), R.string.msg_apply, onYes={
-                        if (validateConfigurations()) {
-                            attachedTrigger?.let {
-                                applyViewToTrigger(it)
-                            }
-                            super.onBackPressed()
-                        } else {
-                            DialogHelper.makeSimpleAlertBuilder(this, errorMessages.joinToString("\n")).show()
-                        }
-                    }, onNo= { setResult(Activity.RESULT_CANCELED); super.onBackPressed() }).show()
+                    resources.getString(R.string.msg_confirm_trigger_apply_change), R.string.msg_apply, onYes = {
+
+                val errorMessages = contentFragment?.validateAndApplyViewStateToTrigger()
+                if (errorMessages != null) {
+                    DialogHelper.makeSimpleAlertBuilder(this, errorMessages.joinToString("\n")).show()
+                } else {
+                    super.onBackPressed()
+                }
+            }, onNo = { setResult(Activity.RESULT_CANCELED); super.onBackPressed() }).show()
         } else {
             /*
             DialogHelper.makeYesNoDialogBuilder(this, "OmniTrack",
@@ -161,113 +137,328 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
         }
     }
 
-    private fun validateConfigurations(): Boolean {
-        val configView = configurationCoordinatorView
-        if (configView != null) {
-            errorMessages.clear()
-            return configView.validateConfigurations(errorMessages)
-        } else {
-            return true
-        }
-    }
 
-    private fun applyViewToTrigger(trigger: OTTrigger): Boolean {
-        configurationCoordinatorView?.applyConfigurationToTrigger(trigger)
-        if (trackerAssignPanel != null) {
-            for (trackerId in trackerAssignPanel!!.trackerIds)
-                trigger.addTracker(trackerId)
-
-            var i = 0
-            while (i < trigger.trackers.size) {
-                val tracker = trigger.trackers[i]
-                if (!trackerAssignPanel!!.trackerIds.contains(tracker.objectId)) {
-                    trigger.removeTracker(tracker)
-                } else {
-                    i++
-                }
-            }
-        }
-        return true
-    }
 
     override fun onToolbarRightButtonClicked() {
 
-        if (validateConfigurations()) {
-            if (isEditMode) {
-                attachedTrigger?.let {
-                    if (applyViewToTrigger(it)) {
+        if (contentFragment?.validateConfigurations() == true) {
+            if (contentFragment?.isEditMode == true) {
+                contentFragment?.attachedTrigger?.let {
+                    if (contentFragment?.applyViewToTrigger(it) == true) {
                         setResult(Activity.RESULT_OK)
                         finish()
                     }
                 }
 
             } else {
-                val resultData = Intent()
-                val newTrigger = OTTrigger.makeInstance(triggerType, "My Trigger", triggerAction, user!!)
-                newTrigger.suspendDatabaseSync = true
+                contentFragment?.let {
+                    contentFragment ->
+                    val resultData = Intent()
+                    val newTrigger = OTTrigger.makeInstance(contentFragment.triggerType, "My Trigger", contentFragment.triggerAction, contentFragment.user!!)
+                    newTrigger.suspendDatabaseSync = true
 
-                applyViewToTrigger(newTrigger)
-                val pojo = newTrigger.dumpDataToPojo(null)
-                println(pojo.properties)
+                    contentFragment.applyViewToTrigger(newTrigger)
+                    val pojo = newTrigger.dumpDataToPojo(null)
+                    println(pojo.properties)
 
-                resultData.putExtra(INTENT_EXTRA_TRIGGER_DATA, pojo)
-                setResult(RESULT_OK, resultData)
-                finish()
+                    resultData.putExtra(INTENT_EXTRA_TRIGGER_DATA, pojo)
+                    setResult(RESULT_OK, resultData)
+                    finish()
+                } ?: finish()
+
             }
         } else {
-            DialogHelper.makeSimpleAlertBuilder(this, errorMessages.joinToString("\n")).show()
-        }
-    }
-
-    fun onUserLoaded() {
-        if (hideAttachedTrackers) {
-            trackerAssignPanelContainer?.visibility = View.GONE
-        } else {
-            if (trackerAssignPanelContainer == null) {
-                trackerAssignPanelContainer = trackerAssignPanelStub.inflate()
-                trackerAssignPanel = trackerAssignPanelContainer?.findViewById(R.id.ui_tracker_assign_list) as TrackerAssignPanel
-                trackerAssignPanel?.init(attachedTrigger?.trackers)
-            } else {
-                trackerAssignPanelContainer?.visibility = View.VISIBLE
+            contentFragment?.let {
+                DialogHelper.makeSimpleAlertBuilder(this, it.errorMessages.joinToString("\n")).show()
             }
         }
-
-        when (triggerType) {
-            OTTrigger.TYPE_TIME -> {
-                configurationCoordinatorView = TimeTriggerConfigurationPanel(this)
-            }
-            OTTrigger.TYPE_DATA_THRESHOLD -> {
-                configurationCoordinatorView = EventTriggerConfigurationPanel(this)
-            }
-        }
-
-        if (isEditMode)
-            configurationCoordinatorView?.importTriggerConfiguration(attachedTrigger!!)
-
-        if (configurationCoordinatorView != null)
-            controlPanelContainer.addView(configurationCoordinatorView as? View)
-
     }
 
-    override fun onStop() {
-        super.onStop()
-        startSubscriptions.clear()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        user = null
-        attachedTrigger = null
-    }
-
+    /*
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
+
+        outState?.putBoolean("isEditMode", isEditMode)
+        if(isEditMode)
+        {
+            outState?.putString(OTApplication.INTENT_EXTRA_OBJECT_ID_TRIGGER, triggerId)
+        }
+        else{
+            outState?.putInt(INTENT_EXTRA_TRIGGER_TYPE, triggerType)
+            outState?.putInt(INTENT_EXTRA_TRIGGER_ACTION, triggerAction)
+        }
+
+        outState?.putBoolean(INTENT_EXTRA_HIDE_ATTACHED_TRACKERS, hideAttachedTrackers)
 
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
         super.onRestoreInstanceState(savedInstanceState)
 
+        if(savedInstanceState!=null)
+        {
+
+
+            hideAttachedTrackers = savedInstanceState.getBoolean(INTENT_EXTRA_HIDE_ATTACHED_TRACKERS)
+
+            val isEditMode = savedInstanceState.getBoolean("isEditMode")
+            if(isEditMode)
+            {
+                val triggerId = savedInstanceState.getString(OTApplication.INTENT_EXTRA_OBJECT_ID_TRIGGER)
+                if(!triggerId.isNullOrBlank())
+                {
+                    this.triggerId = triggerId
+                    getUserOrGotoSignIn().toObservable().doOnNext { user->this.user = user }.flatMap{user->user.getTriggerObservable(triggerId)}
+                            .doOnNext {
+                                trigger->
+                                this.attachedTrigger = trigger
+                            }
+                            .first()
+                            .subscribe({
+                                trigger->
+                                triggerType = trigger.typeId
+                                triggerAction = trigger.action
+                                //attachedTrigger?.dumpDataToPojo(null)?.toMutable(currentTriggerPojo)
+
+                                title = resources.getString(R.string.title_activity_trigger_edit)
+                                setActionBarButtonMode(Mode.ApplyCancel)
+                            }, {
+                                finish()
+                            })
+                }
+            }
+            else{
+                triggerType = savedInstanceState.getInt(INTENT_EXTRA_TRIGGER_TYPE)
+                triggerAction = savedInstanceState.getInt(INTENT_EXTRA_TRIGGER_ACTION)
+
+                getUserOrGotoSignIn().subscribe({
+                    user->
+                    this.user = user
+                },{finish()})
+            }
+
+
+        }
+    }*/
+
+    class TriggerDetailFragment : OTFragment() {
+        companion object {
+            fun getInstance(triggerId: String, hideAttachedTrackers: Boolean): TriggerDetailFragment {
+                val args = Bundle()
+                args.putString(OTApplication.INTENT_EXTRA_OBJECT_ID_TRIGGER, triggerId)
+                args.putBoolean(INTENT_EXTRA_HIDE_ATTACHED_TRACKERS, hideAttachedTrackers)
+
+                val fragment = TriggerDetailFragment()
+                fragment.arguments = args
+                return fragment
+            }
+
+            fun getInstance(triggerType: Int, triggerAction: Int, hideAttachedTrackers: Boolean): TriggerDetailFragment {
+                val args = Bundle()
+                args.putInt(INTENT_EXTRA_TRIGGER_ACTION, triggerAction)
+                args.putInt(INTENT_EXTRA_TRIGGER_TYPE, triggerType)
+                args.putBoolean(INTENT_EXTRA_HIDE_ATTACHED_TRACKERS, hideAttachedTrackers)
+
+                val fragment = TriggerDetailFragment()
+                fragment.arguments = args
+                return fragment
+            }
+
+
+        }
+
+
+        private var triggerId: String? = null
+        var attachedTrigger: OTTrigger? = null
+            private set
+
+        var triggerType: Int = -1
+            private set
+
+        var triggerAction: Int = -1
+            private set
+
+        var user: OTUser? = null
+            private set
+
+        val isEditMode: Boolean get() = triggerId != null
+
+        private var configurationCoordinatorView: ITriggerConfigurationCoordinator? = null
+
+        private lateinit var controlPanelContainer: ViewGroup
+        private lateinit var trackerAssignPanelStub: ViewStub
+        private var trackerAssignPanelContainer: View? = null
+        private var trackerAssignPanel: TrackerAssignPanel? = null
+
+        private var hideAttachedTrackers: Boolean = false
+
+        val errorMessages = ArrayList<String>()
+
+        private var startSubscriptions = SubscriptionList()
+        private var createViewSubscriptions = SubscriptionList()
+
+        override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+
+            println("create view")
+
+            val view = inflater.inflate(R.layout.activity_trigger_detail_fragment, container, false)
+            controlPanelContainer = view.findViewById(R.id.ui_control_panel) as ViewGroup
+            trackerAssignPanelStub = view.findViewById(R.id.ui_tracker_assign_panel_stub) as ViewStub
+
+            val triggerId = arguments.getString(OTApplication.INTENT_EXTRA_OBJECT_ID_TRIGGER)
+            if (!triggerId.isNullOrBlank()) {
+                val activity = activity
+                if (activity is OTActivity) {
+                    createViewSubscriptions.add(
+                            activity.signedInUserObservable.doOnNext { user -> this.user = user }.flatMap {
+                                user ->
+                                user.getTriggerObservable(triggerId)
+                            }.doOnNext {
+                                trigger ->
+                                attachedTrigger = trigger
+                                this.triggerId = trigger.objectId
+                            }.subscribe {
+                                trigger ->
+                                triggerType = trigger.typeId
+                                triggerAction = trigger.action
+                                //attachedTrigger?.dumpDataToPojo(null)?.toMutable(currentTriggerPojo)
+
+                                onUserLoaded(savedInstanceState)
+                            })
+                }
+            } else {
+                triggerType = arguments.getInt(INTENT_EXTRA_TRIGGER_TYPE, -1)
+                triggerAction = arguments.getInt(INTENT_EXTRA_TRIGGER_ACTION, -1)
+                val activity = activity
+                if (activity is OTActivity) {
+                    createViewSubscriptions.add(
+                            activity.signedInUserObservable.doOnNext { user -> this.user = user }.subscribe {
+                                onUserLoaded(savedInstanceState)
+                            }
+                    )
+                }
+            }
+
+            return view
+        }
+
+        override fun onCreate(savedInstanceState: Bundle?) {
+            super.onCreate(savedInstanceState)
+
+            println("create trigger detail content fragment")
+
+            retainInstance = true
+        }
+
+        override fun onSaveInstanceState(outState: Bundle?) {
+            super.onSaveInstanceState(outState)
+            if (outState != null) {
+                configurationCoordinatorView?.writeConfiguratinoToBundle(outState)
+                if (!hideAttachedTrackers) {
+                    outState.putStringArrayList("assignedTrackers", trackerAssignPanel?.trackerIds)
+                }
+            }
+        }
+
+        fun validateAndApplyViewStateToTrigger(): List<String>? {
+            if (validateConfigurations()) {
+                attachedTrigger?.let {
+                    applyViewToTrigger(it)
+                }
+                return null
+            } else return errorMessages
+        }
+
+        fun onUserLoaded(savedInstanceState: Bundle?) {
+            if (hideAttachedTrackers) {
+                trackerAssignPanelContainer?.visibility = View.GONE
+            } else {
+                if (trackerAssignPanelContainer == null) {
+                    trackerAssignPanelContainer = trackerAssignPanelStub.inflate()
+                    trackerAssignPanel = trackerAssignPanelContainer?.findViewById(R.id.ui_tracker_assign_list) as TrackerAssignPanel
+                    trackerAssignPanel?.init(attachedTrigger?.trackers)
+                } else {
+                    trackerAssignPanelContainer?.visibility = View.VISIBLE
+                }
+            }
+
+            when (triggerType) {
+                OTTrigger.TYPE_TIME -> {
+                    configurationCoordinatorView = TimeTriggerConfigurationPanel(this.context)
+                }
+                OTTrigger.TYPE_DATA_THRESHOLD -> {
+                    configurationCoordinatorView = EventTriggerConfigurationPanel(this.context)
+                }
+            }
+
+            if (isEditMode)
+                configurationCoordinatorView?.importTriggerConfiguration(attachedTrigger!!)
+
+            if (configurationCoordinatorView != null) {
+                controlPanelContainer.addView(configurationCoordinatorView as? View)
+            }
+
+            if (savedInstanceState != null) {
+                if (!hideAttachedTrackers) {
+                    val trackers = savedInstanceState.getStringArrayList("assignedTrackers")
+                    if (trackers != null) {
+                        val activity = activity
+                        if (activity is OTActivity) {
+                            createViewSubscriptions.add(
+                                    activity.signedInUserObservable.flatMap {
+                                        user ->
+                                        user.crawlAllTrackersAndTriggerAtOnce().toObservable()
+                                    }.subscribe { user ->
+                                        trackerAssignPanel?.init(trackers.map { it -> user[it] }.filter { it != null }.map { it as OTTracker })
+                                    }
+                            )
+                        }
+                    }
+                }
+
+                configurationCoordinatorView?.readConfigurationFromBundle(savedInstanceState)
+            }
+
+        }
+
+        fun validateConfigurations(): Boolean {
+            val configView = configurationCoordinatorView
+            if (configView != null) {
+                errorMessages.clear()
+                return configView.validateConfigurations(errorMessages)
+            } else {
+                return true
+            }
+        }
+
+        fun applyViewToTrigger(trigger: OTTrigger): Boolean {
+            configurationCoordinatorView?.applyConfigurationToTrigger(trigger)
+            if (trackerAssignPanel != null) {
+                for (trackerId in trackerAssignPanel!!.trackerIds)
+                    trigger.addTracker(trackerId)
+
+                var i = 0
+                while (i < trigger.trackers.size) {
+                    val tracker = trigger.trackers[i]
+                    if (!trackerAssignPanel!!.trackerIds.contains(tracker.objectId)) {
+                        trigger.removeTracker(tracker)
+                    } else {
+                        i++
+                    }
+                }
+            }
+            return true
+        }
+
+        override fun onStop() {
+            super.onStop()
+            startSubscriptions.clear()
+        }
+
+        override fun onDestroyView() {
+            super.onDestroyView()
+            createViewSubscriptions.clear()
+        }
     }
 
 
