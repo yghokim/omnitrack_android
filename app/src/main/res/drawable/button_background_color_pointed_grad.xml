@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:drawable="@drawable/pointed_gradient" />
+    <item android:drawable="@drawable/transparent_button_background" />
+</layer-list>

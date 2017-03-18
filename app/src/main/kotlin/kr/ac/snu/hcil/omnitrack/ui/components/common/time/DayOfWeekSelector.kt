@@ -39,6 +39,8 @@ class DayOfWeekSelector : LinearLayout, View.OnClickListener {
             flags = flags or ((if (flag.value) 1 else 0) shl (6 - flag.index))
         }
 
+        println("checked day of week flags: ${flags}")
+
         return flags
     }
         set(value) {

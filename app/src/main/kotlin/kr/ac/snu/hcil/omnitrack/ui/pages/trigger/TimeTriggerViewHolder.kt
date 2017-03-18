@@ -17,6 +17,9 @@ class TimeTriggerViewHolder(parent: ViewGroup, listener: ITriggerControlListener
 
         }
 
+        println("trigger range specified: ${trigger.isRangeSpecified}")
+        println("trigger range repeated: ${trigger.isRepeated}")
+
         if (trigger.isRangeSpecified && trigger.isRepeated) {
             //display only days of weeks
             if (OTTimeTrigger.Range.isAllDayUsed(trigger.rangeVariables)) {

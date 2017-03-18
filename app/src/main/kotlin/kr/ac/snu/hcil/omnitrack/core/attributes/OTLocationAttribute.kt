@@ -2,7 +2,6 @@ package kr.ac.snu.hcil.omnitrack.core.attributes
 
 import android.content.Context
 import android.location.Location
-import android.location.LocationManager
 import android.view.View
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.maps.model.LatLng
@@ -26,18 +25,6 @@ class OTLocationAttribute(objectId: String?, localKey: Int?, parentTracker: OTTr
     companion object {
 
         const val NUM_UPDATES = 2
-
-        fun getCachedLocation(lm: LocationManager, enabledOnly: Boolean): Location? {
-            var bestLocation: Location? = null
-            for (provider in lm.getProviders(enabledOnly)) {
-                val l = lm.getLastKnownLocation(provider) ?: continue
-                if (bestLocation == null || l.accuracy < bestLocation.accuracy) {
-                    // Found best last known location: %s", l);
-                    bestLocation = l
-                }
-            }
-            return bestLocation
-        }
     }
 
     override val valueNumericCharacteristics: NumericCharacteristics = NumericCharacteristics(false, true)
@@ -101,7 +88,6 @@ class OTLocationAttribute(objectId: String?, localKey: Int?, parentTracker: OTTr
     override fun getViewForItemListContainerType(): Int = VIEW_FOR_ITEM_LIST_CONTAINER_TYPE_MULTILINE
 
     override fun getViewForItemList(context: Context, recycledView: View?): View {
-
         return recycledView as? MapImageView ?: MapImageView(context)
     }
 
