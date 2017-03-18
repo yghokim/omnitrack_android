@@ -3,7 +3,7 @@
     android:id="@+id/ui_new_attribute_panel"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/colorSecondary"
+    android:background="@drawable/main_gradient_mild"
     android:orientation="vertical">
 
     <TextView

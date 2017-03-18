@@ -98,10 +98,6 @@ class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObject
             return BitwiseOperationHelper.getIntAt(range, DAYS_OF_WEEK_FLAGS_SHIFT, DAYS_OF_WEEK_FLAGS_MASK)
         }
 
-        fun setIsDayOfWeekUsed(range: Int, dayOfWeek: Int, isUsed: Boolean): Int {
-            return BitwiseOperationHelper.setBooleanAt(range, isUsed, DAYS_OF_WEEK_FLAGS_SHIFT + (7 - dayOfWeek - 1))
-        }
-
         fun getEndYear(range: Int): Int {
             return 2016 + BitwiseOperationHelper.getIntAt(range, YEAR_SHIFT, YEAR_MASK)
         }
@@ -282,13 +278,15 @@ class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObject
         value ->
         syncPropertyToDatabase("configVariables", value)
         onConfigChanged()
+        notifyPropertyChanged("configVariables", value)
     }
     var configVariables: Int by configVariablesDelegate
 
     private val isRepeatedDelegate = ObservableMapDelegate<OTTimeTrigger, Int>(1, properties) {
         value ->
-        syncPropertyToDatabase("isRepeated", value)
+        syncPropertyToDatabase("_isRepeated", value)
         onRangeChanged()
+        notifyPropertyChanged("isRepeated", value)
     }
     private var _isRepeated: Int by isRepeatedDelegate
 

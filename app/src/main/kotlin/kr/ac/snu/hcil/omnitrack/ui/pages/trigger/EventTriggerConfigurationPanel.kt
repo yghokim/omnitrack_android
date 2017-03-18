@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -23,6 +24,7 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditionerviews.SingleNumericC
  * Created by younghokim on 16. 9. 5..
  */
 class EventTriggerConfigurationPanel : FrameLayout, ITriggerConfigurationCoordinator {
+
 
     var selectedMeasureFactory: OTMeasureFactory?
         get() {
@@ -137,5 +139,13 @@ class EventTriggerConfigurationPanel : FrameLayout, ITriggerConfigurationCoordin
 
     override fun validateConfigurations(errorMessagesOut: MutableList<String>): Boolean {
         return true
+    }
+
+    override fun writeConfiguratinoToBundle(out: Bundle) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun readConfigurationFromBundle(bundle: Bundle) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }
