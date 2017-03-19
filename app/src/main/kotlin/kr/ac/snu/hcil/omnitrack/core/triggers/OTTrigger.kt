@@ -43,6 +43,7 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
         const val PROPERTY_IS_ON = "on"
         const val PROPERTY_LAST_TRIGGERED_TIME = "lastTriggeredTime"
         const val PROPERTY_PROPERTY_DATA = "properties"
+        const val PROPERTY_ATTACHED_TRACKERS = "trackers"
 
 
         fun makeInstance(objectId: String?, typeId: Int, user: OTUser, name: String, trackerObjectIds: Array<String>?, isOn: Boolean, action: Int, lastTriggeredTime: Long, propertyData: Map<String, String>?): OTTrigger {
@@ -103,11 +104,14 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
     abstract val configIconId: Int
     abstract val configTitleId: Int
 
-    var lastTriggeredTime: Long by Delegates.observable(lastTriggeredTime) {
-        prop, old, new ->
-        if (old != new) {
+    var lastTriggeredTime: Long = lastTriggeredTime
+        set(value) {
+
+            println("lasttrigger time old: ${field}, new: ${value}")
+            if (field != value) {
+                field = value
             if (!suspendDatabaseSync) {
-                databasePointRef?.child(PROPERTY_LAST_TRIGGERED_TIME)?.setValue(new)
+                databasePointRef?.child(PROPERTY_LAST_TRIGGERED_TIME)?.setValue(value)
             }
         }
     }
@@ -177,12 +181,13 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
                             this@OTTrigger.isOn = snapshot.value as Boolean
                         }
 
-                    PROPERTY_LAST_TRIGGERED_TIME ->
-                        if (remove) {
-                            this@OTTrigger.lastTriggeredTime = -1
-                        } else {
-                            this@OTTrigger.lastTriggeredTime = snapshot.value.toString().toLong()
-                        }
+                /*
+                PROPERTY_LAST_TRIGGERED_TIME ->
+                    if (remove) {
+                        this@OTTrigger.lastTriggeredTime = -1
+                    } else {
+                        this@OTTrigger.lastTriggeredTime = snapshot.value.toString().toLong()
+                    }*/
                     PROPERTY_PROPERTY_DATA ->
                         if (remove) {
                             //TODO set properties to intitial values
@@ -197,6 +202,32 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
                                 }
                             }
                         }
+
+                /*
+                PROPERTY_ATTACHED_TRACKERS->
+                {
+                    if(remove){
+                        _trackerList.clear()
+                        attachedTrackersChanged.onNext(ListDelta())
+                    }
+                    else{
+                        _trackerList.clear()
+                        println("tracker list db type:")
+                        println(snapshot.value)
+                        val list = snapshot.value as? List<HashMap<String, Any>>
+                        if(list != null)
+                        {
+                            for(id in list)
+                            {
+                                val tracker = user[id["key"].toString()]
+                                if(tracker!=null)
+                                {
+                                    addTracker(tracker)
+                                }
+                            }
+                        }
+                    }
+                }*/
                 }
             }
 
@@ -332,7 +363,7 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
                     //Toast.makeText(OTApplication.app, "Logged!", Toast.LENGTH_SHORT).show()
                     Observable.create {
                         subscriber ->
-                        Observable.merge(trackers.filter { it.isValid(null) }.map { OTBackgroundLoggingService.log(OTApplication.app, it, OTItem.LoggingSource.Trigger).subscribeOn(Schedulers.newThread()) })
+                        Observable.merge(trackers./*filter { it.isValid(null) }.*/map { OTBackgroundLoggingService.log(OTApplication.app, it, OTItem.LoggingSource.Trigger).subscribeOn(Schedulers.newThread()) })
                                 .subscribe({}, {}, {
                                     if (!subscriber.isUnsubscribed) {
                                         subscriber.onNext(this)

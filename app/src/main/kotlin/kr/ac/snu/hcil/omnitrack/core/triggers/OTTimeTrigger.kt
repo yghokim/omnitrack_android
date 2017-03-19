@@ -282,21 +282,21 @@ class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObject
     }
     var configVariables: Int by configVariablesDelegate
 
-    private val isRepeatedDelegate = ObservableMapDelegate<OTTimeTrigger, Int>(1, properties) {
+    private val repeatedDelegate = ObservableMapDelegate<OTTimeTrigger, Int>(1, properties) {
         value ->
-        syncPropertyToDatabase("_isRepeated", value)
+        syncPropertyToDatabase("repeated", value)
         onRangeChanged()
         notifyPropertyChanged("isRepeated", value)
     }
-    private var _isRepeated: Int by isRepeatedDelegate
+    private var repeated: Int by repeatedDelegate
 
 
     var isRepeated: Boolean
         get() {
-            return _isRepeated > 0
+            return repeated > 0
         }
         set(value) {
-            _isRepeated = if (value == true) 1 else 0
+            repeated = if (value == true) 1 else 0
         }
 
 
@@ -536,6 +536,10 @@ class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObject
             var daysLeft = 1
             while (!Range.isDayOfWeekUsed(rangeVariables, (((pivotDayOfWeek - 1) + daysLeft) % 7) + 1)) {
                 daysLeft++
+
+                if (daysLeft > 7) {
+                    break;
+                }
             }
 
             cacheCalendar.timeInMillis = from
@@ -572,7 +576,10 @@ class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObject
         if (isOn) {
             //TODO need to check current alarmmanager to avoid duplicate alarm
             if (!reserveNextAlarmToSystem(lastTriggeredTime)) {
+                println("didn't reserve next alarm. turn off")
                 isOn = false
+            } else {
+                println("reserved next alarm.")
             }
         }
     }

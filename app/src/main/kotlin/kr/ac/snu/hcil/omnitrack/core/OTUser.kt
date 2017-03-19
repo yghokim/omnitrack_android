@@ -381,7 +381,6 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
             }
         }.concatMap {
             trackers ->
-
             println("crawled triggers")
             FirebaseDbHelper.findTriggersOfUser(this).doOnNext {
                 triggers ->
@@ -389,6 +388,6 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
                     this.triggerManager.putNewTrigger(trigger)
                 }
             }.map { this }
-        }.toSingle()
+        }.first().toSingle()
     }
 }

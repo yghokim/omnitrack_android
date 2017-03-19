@@ -220,7 +220,7 @@ class TimeTriggerConfigurationPanel : LinearLayout, ITriggerConfigurationCoordin
                 println("end not specified")
                 OTTimeTrigger.Range.makeConfig(dayOfWeekPicker.checkedFlagsInteger)
             }
-        } else OTTimeTrigger.Range.makeConfig(0)
+        } else 0
     }
 
     override fun onClick(view: View) {
