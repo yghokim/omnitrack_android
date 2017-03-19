@@ -17,11 +17,11 @@ import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
  */
 object NewTriggerTypeSelectionDialogHelper {
 
-    data class TriggerTypeEntry(val typeCode: Int, val iconId: Int, val nameId: Int, val descId: Int)
+    data class TriggerTypeEntry(val typeCode: Int, val iconId: Int, val nameId: Int, val descId: Int, val enabled: Boolean = true)
 
     val triggerTypes = arrayOf(
             TriggerTypeEntry(OTTrigger.TYPE_TIME, R.drawable.alarm_dark, R.string.trigger_name_time, R.string.trigger_desc_time),
-            TriggerTypeEntry(OTTrigger.TYPE_DATA_THRESHOLD, R.drawable.event_dark, R.string.trigger_name_event, R.string.trigger_desc_event)
+            TriggerTypeEntry(OTTrigger.TYPE_DATA_THRESHOLD, R.drawable.event_dark, R.string.trigger_name_event, R.string.trigger_desc_event, enabled = false)
     )
 
     fun builder(context: Context, triggerActionTypeName: Int, listener: (Int) -> Unit): AlertDialog.Builder {

@@ -84,9 +84,9 @@ class TimeTriggerAlarmReceiver : BroadcastReceiver() {
             val alarmId = intent.getIntExtra(OTTimeTriggerAlarmManager.INTENT_EXTRA_ALARM_ID, -1)
             val triggerTime = intent.getLongExtra(OTTimeTriggerAlarmManager.INTENT_EXTRA_TRIGGER_TIME, System.currentTimeMillis())
 
-            OTApplication.logger.writeSystemLog("Wakeful Service handleIntent, trigger time: ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(triggerTime))}", TAG)
+            println("Wakeful Service handleIntent, trigger time: ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(triggerTime))}")
 
-            OTApplication.app.currentUserObservable.first().toSingle().flatMap { user -> user.crawlAllTrackersAndTriggerAtOnce() }.subscribe {
+            OTApplication.app.currentUserObservable.subscribe {
                 user ->
                 val triggers = OTApplication.app.timeTriggerAlarmManager.notifyAlarmFiredAndGetTriggersSync(user, alarmId, triggerTime, System.currentTimeMillis())
 
@@ -106,7 +106,7 @@ class TimeTriggerAlarmReceiver : BroadcastReceiver() {
                     }
                 } else {
                     OTApplication.app.timeTriggerAlarmManager.storeTableToPreferences()
-                    OTApplication.logger.writeSystemLog("No trigger is assigned to this alarm. Release the wake lock.", TAG)
+                    println("No trigger is assigned to this alarm. Release the wake lock.")
                     completeWakefulIntent(intent)
                 }
                 }
