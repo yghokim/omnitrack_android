@@ -7,6 +7,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.support.v4.app.DialogFragment
+import android.support.v4.content.ContextCompat
 import android.support.v4.graphics.drawable.DrawableCompat
 import android.support.v7.widget.AppCompatImageButton
 import android.view.View
@@ -55,7 +56,7 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
     }
 
     private val cameraRearDrawable by lazy {
-        applyTint(DrawableCompat.wrap(OTApplication.app.getDrawable(R.drawable.camera_rear)), Color.WHITE)
+        applyTint(DrawableCompat.wrap(ContextCompat.getDrawable(OTApplication.app, R.drawable.camera_rear)), Color.WHITE)
     }
 
     private fun findViews(view: View) {

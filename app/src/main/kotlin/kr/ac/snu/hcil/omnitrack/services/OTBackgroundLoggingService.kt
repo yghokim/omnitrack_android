@@ -11,6 +11,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
 import kr.ac.snu.hcil.omnitrack.utils.isInDozeMode
 import rx.Observable
+import java.util.concurrent.atomic.AtomicInteger
 
 
 /*
@@ -27,6 +28,12 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
 
         private const val INTENT_EXTRA_LOGGING_SOURCE = "loggingSource"
         const val INTENT_EXTRA_NOTIFY = "logging_sendNotification"
+
+        private val notificationIdSeed = AtomicInteger(0)
+
+        private fun makeNewNotificationIdSeed(): Int {
+            return notificationIdSeed.addAndGet(1)
+        }
 
         private val flagPreferences: SharedPreferences by lazy {
             OTApplication.app.getSharedPreferences("pref_background_logging_service", Context.MODE_PRIVATE)
@@ -70,7 +77,8 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
                 }
 
                 setLoggingFlag(tracker, System.currentTimeMillis())
-                sendBroadcast(context, OTApplication.BROADCAST_ACTION_BACKGROUND_LOGGING_STARTED, tracker)
+                val notificationId = makeNewNotificationIdSeed()
+                sendBroadcast(context, OTApplication.BROADCAST_ACTION_BACKGROUND_LOGGING_STARTED, tracker, notificationId)
 
 
                 builder.autoComplete().subscribe({}, {}, {
@@ -78,7 +86,7 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
                     FirebaseDbHelper.saveItem(item, tracker) {
                         success ->
                         if (success) {
-                            sendBroadcast(context, OTApplication.BROADCAST_ACTION_BACKGROUND_LOGGING_SUCCEEDED, tracker, item.objectId!!, notify)
+                            sendBroadcast(context, OTApplication.BROADCAST_ACTION_BACKGROUND_LOGGING_SUCCEEDED, tracker, item.objectId!!, notify, notificationId)
                             OTApplication.logger.writeSystemLog("${tracker.name} background logging was successful", TAG)
                             removeLoggingFlag(tracker)
                             if (!subscriber.isUnsubscribed) {
@@ -98,17 +106,19 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
             }
         }
 
-        private fun sendBroadcast(context: Context, action: String, tracker: OTTracker) {
+        private fun sendBroadcast(context: Context, action: String, tracker: OTTracker, notificationIdSeed: Int) {
             val intent = Intent(action)
-            intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
+                    .putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
+                    .putExtra(OTApplication.INTENT_EXTRA_NOTIFICATION_ID_SEED, notificationIdSeed)
             context.sendBroadcast(intent)
         }
 
-        private fun sendBroadcast(context: Context, action: String, tracker: OTTracker, itemObjectId: String, notify: Boolean) {
+        private fun sendBroadcast(context: Context, action: String, tracker: OTTracker, itemObjectId: String, notify: Boolean, notificationIdSeed: Int) {
             val intent = Intent(action)
-            intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
-            intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, itemObjectId)
-            intent.putExtra(INTENT_EXTRA_NOTIFY, notify)
+                    .putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
+                    .putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, itemObjectId)
+                    .putExtra(OTApplication.INTENT_EXTRA_NOTIFICATION_ID_SEED, notificationIdSeed)
+                    .putExtra(INTENT_EXTRA_NOTIFY, notify)
             context.sendBroadcast(intent)
         }
 
