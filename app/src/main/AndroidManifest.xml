@@ -181,6 +181,10 @@
             android:theme="@style/Theme.Intro"
             android:windowSoftInputMode="adjustPan" />
 
+        <activity
+            android:name=".ui.pages.SendReportActivity"
+            android:label="@string/msg_send_report" />
+
 
     </application>
 
