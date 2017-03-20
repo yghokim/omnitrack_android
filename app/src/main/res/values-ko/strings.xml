@@ -38,6 +38,8 @@
     <string name="msg_apply">적용</string>
     <string name="msg_cancel">취소</string>
 
+    <string name="msg_send">보내기</string>
+
     <string name="msg_tab_trackers">트래커</string>
     <string name="msg_tab_services">외부 서비스</string>
     <string name="msg_tab_background_loggers">트리거</string>
@@ -218,7 +220,7 @@
     <string name="msg_about_about_us">만든 사람들</string>
 
     <string name="msg_about_text">
-        OmniTrack은 서울대학교(한국), 마이크로소프트 리서치(미국), 펜실베이니아 주립대학교(미국)의 공동연구 프로젝트입니다.
+        OmniTrack은 서울대학교 컴퓨터공학부 HCI 연구실(한국)과 미국 연구진의 공동연구 프로젝트입니다.
     </string>
 
 
@@ -279,6 +281,10 @@
     <string name="msg_select_country">국가를 선택하세요</string>
     <string name="msg_uploading_file_to_server">서버로 파일을 업로드중입니다</string>
     <string name="msg_uploading">업로드 하는중...</string>
+    <string name="msg_send_report">문의하기</string>
+    <string name="msg_send_report_to_omnitrack_team">개발진에게 문의사항을 전송하시겠습니까?</string>
+    <string name="msg_send_report_error_message">에러로 메시지를 전송하지 못했습니다. 다음에 다시 시도해 주세요.</string>
+    <string name="msg_send_report_success_message">문의 메시지를 성공적으로 전송했습니다.</string>
 
     <string-array name="purpose_entries">
         <item>directive|건강 관련 정보를 기록하기 위해서</item>
@@ -287,7 +293,15 @@
         <item>diagnostic|삶 속의 어떤 문제점을 파악하기 위해서</item>
         <item>self-knowledge|스스로에 대해 더 잘 알기 위해서</item>
         <item>social|주변 사람들과 무언가를 함께 기록하기 위해서</item>
-        <item>fetishised|기술적인 호기심으로 인해</item>
+        <item>fetishised|단순한 호기심으로 인해</item>
+    </string-array>
+
+
+    <string-array name="send_report_type">
+        <item>inquiry|일반 문의</item>
+        <item>bug|오작동 및 버그</item>
+        <item>experiment|실험 관련 문의</item>
+        <item>improvement|개선 의견 및 건의사항</item>
     </string-array>
 
     <string-array name="gender_entries">
