@@ -8,6 +8,9 @@
         <item name="android:textSize">16sp</item>
         <item name="android:textColor">@color/buttonIconColorDark</item>
         <item name="android:includeFontPadding">false</item>
+        <item name="android:paddingLeft">12dp</item>
+        <item name="android:paddingRight">12dp</item>
+
     </style>
 
     <style name="timeRangePickerBulletStyle">
