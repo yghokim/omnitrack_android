@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages
 
 import android.content.Context
+import android.content.Intent
 import com.danielstone.materialaboutlibrary.MaterialAboutActivity
 import com.danielstone.materialaboutlibrary.items.MaterialAboutActionItem
 import com.danielstone.materialaboutlibrary.items.MaterialAboutImageItem
@@ -16,6 +17,11 @@ import kr.ac.snu.hcil.omnitrack.utils.ANDROID_ASSET_PATH
  * Created by younghokim on 2017. 1. 25..
  */
 class AboutActivity : MaterialAboutActivity() {
+
+    companion object {
+        const val REQUEST_CODE_SEND_REPORT = 0
+    }
+
     override fun getActivityTitle(): CharSequence {
         return resources.getString(R.string.msg_about)
     }
@@ -73,7 +79,7 @@ class AboutActivity : MaterialAboutActivity() {
                                         .textColorOverrideRes(R.color.textColorMidDark)
                                         .subText(R.string.msg_contact_us_message)
                                         .setOnClickListener {
-
+                                            startActivityForResult(Intent(this, SendReportActivity::class.java), REQUEST_CODE_SEND_REPORT)
                                         }
                                         .build()
                         )

@@ -28,6 +28,7 @@
     <string name="msg_no">No</string>
 
     <string name="msg_save">Save</string>
+    <string name="msg_send">Send</string>
 
     <string name="msg_confirm_field_apply_change">Apply changes to the field before closing?</string>
 
@@ -231,7 +232,7 @@
     <string name="msg_about_about_us">About Us</string>
 
     <string name="msg_about_text">
-        OmniTrack is a collaborative research project of Seoul National University (Korea), Microsoft Research (USA), and the Pennsylvania State University (USA).
+        OmniTrack is a collaborative research project of HCI Lab, Dept. of Computer Science and Engineering, Seoul National University (Korea), and researchers from the United States.
     </string>
 
     <string name="msg_version">Version</string>
@@ -335,6 +336,13 @@
         <item>fetishised|Just for technological curiosity</item>
     </string-array>
 
+    <string-array name="send_report_type">
+        <item>inquiry|General inquiries</item>
+        <item>bug|Malfunctions and bugs</item>
+        <item>experiment|About the experiment</item>
+        <item>improvement|Opinion to improve the OmniTrack</item>
+    </string-array>
+
     <string-array name="occupation_entries">
         <item>Self-employed</item>
         <item>Employed full-time</item>
@@ -359,5 +367,9 @@
         <item>Choice entry 3</item>
     </string-array>
     <string name="title_activity_trigger_details">TriggerDetailsActivity</string>
+    <string name="msg_send_report">Send Inquiry</string>
+    <string name="msg_send_report_to_omnitrack_team">Send inquiry to OmniTrack Team?</string>
+    <string name="msg_send_report_error_message">Couldn\'t send inquiry because of an error. Please try it later.</string>
+    <string name="msg_send_report_success_message">Sent inquiry successfully.</string>
 
 </resources>
