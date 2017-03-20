@@ -67,7 +67,9 @@ class OTTimeAttribute(objectId: String?, localKey: Int?, parentTracker: OTTracke
 
     var granularity: Int
         get() = getPropertyValue<Int>(GRANULARITY)
-        set(value) = setPropertyValue(GRANULARITY, value)
+        set(value) {
+            setPropertyValue(GRANULARITY, value)
+        }
 
     override fun createProperties() {
         assignProperty(OTSelectionProperty(GRANULARITY,

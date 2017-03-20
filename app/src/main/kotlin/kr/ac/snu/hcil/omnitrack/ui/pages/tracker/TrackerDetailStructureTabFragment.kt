@@ -39,6 +39,7 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.ConnectionIndicatorStubProxy
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeDetailActivity
 import kr.ac.snu.hcil.omnitrack.utils.startActivityOnDelay
 import net.i2p.android.ext.floatingactionbutton.FloatingActionButton
+import rx.internal.util.SubscriptionList
 
 /**
  * Created by Young-Ho Kim on 16. 7. 29
@@ -72,6 +73,8 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
 
     private var user: OTUser? = null
     private var tracker: OTTracker? = null
+
+    private val viewHolderSubscriptions = SubscriptionList()
 
     private val newAttributePanel: FieldPresetSelectionBottomSheetFragment by lazy {
 
@@ -225,7 +228,27 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
             }
         }
 
+        startSubscriptions.add(
+                tracker.attributes.elementAddedSubject.subscribe {
+                    pair ->
+                    attributeListAdapter.notifyItemInserted(pair.second.second)
+                }
+        )
+
+        startSubscriptions.add(
+                tracker.attributes.elementRemovedSubject.subscribe {
+                    pair ->
+                    attributeListAdapter.notifyItemRemoved(pair.second.second)
+                }
+        )
+
         refresh()
+    }
+
+    override fun onStop() {
+        super.onStop()
+
+        viewHolderSubscriptions.clear()
     }
 
     override fun onResume() {
@@ -427,6 +450,20 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
                 preview = attribute.getInputView(context, true, preview)
 
                 connectionIndicatorStubProxy.onBind(attribute)
+
+                val propertySub =
+                        attribute.propertyValueChangedSubject.subscribe {
+                            preview = attribute.getInputView(context, true, preview)
+                        }
+
+                val nameSub =
+                        attribute.nameChanged.subscribe {
+                            args ->
+                            columnNameView.text = args.second
+                        }
+
+                viewHolderSubscriptions.add(propertySub)
+                viewHolderSubscriptions.add(nameSub)
             }
         }
 

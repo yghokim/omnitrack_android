@@ -53,11 +53,15 @@ class OTChoiceAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrac
 
     var allowedMultiSelection: Boolean
         get() = getPropertyValue(PROPERTY_MULTISELECTION)
-        set(value) = setPropertyValue(PROPERTY_MULTISELECTION, value)
+        set(value) {
+            setPropertyValue(PROPERTY_MULTISELECTION, value)
+        }
 
     var entries: UniqueStringEntryList
         get() = getPropertyValue(PROPERTY_ENTRIES)
-        set(value) = setPropertyValue(PROPERTY_ENTRIES, value)
+        set(value) {
+            setPropertyValue(PROPERTY_ENTRIES, value)
+        }
 
     init {
         //entries = UniqueStringEntryList(PREVIEW_ENTRIES)
