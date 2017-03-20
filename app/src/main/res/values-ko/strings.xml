@@ -285,6 +285,8 @@
     <string name="msg_send_report_to_omnitrack_team">개발진에게 문의사항을 전송하시겠습니까?</string>
     <string name="msg_send_report_error_message">에러로 메시지를 전송하지 못했습니다. 다음에 다시 시도해 주세요.</string>
     <string name="msg_send_report_success_message">문의 메시지를 성공적으로 전송했습니다.</string>
+    <string name="msg_background_logging_started_notification_message">새 아이템 값을 생성중입니다...</string>
+    <string name="msg_background_logging_notification_title_format">%1$s 아이템 로깅</string>
 
     <string-array name="purpose_entries">
         <item>directive|건강 관련 정보를 기록하기 위해서</item>

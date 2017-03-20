@@ -294,6 +294,7 @@
     <string name="msg_uploading_file_to_server">Uploading file to Server</string>
     <string name="msg_uploading">Uploading...</string>
 
+    <string name="msg_background_logging_notification_title_format">Logging %1$s item</string>
 
     <string-array name="gender_entries">
         <item>Male</item>
@@ -371,5 +372,6 @@
     <string name="msg_send_report_to_omnitrack_team">Send inquiry to OmniTrack Team?</string>
     <string name="msg_send_report_error_message">Couldn\'t send inquiry because of an error. Please try it later.</string>
     <string name="msg_send_report_success_message">Sent inquiry successfully.</string>
+    <string name="msg_background_logging_started_notification_message">Processing new item...</string>
 
 </resources>
