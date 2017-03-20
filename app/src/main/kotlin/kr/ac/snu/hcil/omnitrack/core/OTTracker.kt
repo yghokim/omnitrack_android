@@ -38,6 +38,7 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
     companion object {
         const val PROPERTY_COLOR = "color"
         const val PROPERTY_IS_ON_SHORTCUT = "onShortcut"
+        const val PROPERTY_ATTRIBUTES = "attributes"
     }
 
     override val databasePointRef: DatabaseReference?
@@ -49,6 +50,9 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
 
     private var currentDbReference: DatabaseReference? = null
     private val dbChangedListener: ChildEventListener
+
+    private var currentAttributesDbReference: DatabaseReference? = null
+    private val attributesDbChangedListener: ChildEventListener
 
     val attributes = ObservableList<OTAttribute<out Any>>()
 
@@ -124,7 +128,6 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
     val attributeRemoved = Event<ReadOnlyPair<OTAttribute<out Any>, Int>>()
 
     val colorChanged = SerializedSubject(PublishSubject.create<ReadOnlyPair<OTTracker, Int>>())
-    val nameChanged = SerializedSubject(PublishSubject.create<ReadOnlyPair<OTTracker, String>>())
     val isOnShortcutChanged = SerializedSubject(PublishSubject.create<ReadOnlyPair<OTTracker, Boolean>>())
 
     val isExternalFilesInvolved: Boolean get() = attributes.unObservedList.find { it.isExternalFile } != null
@@ -224,11 +227,72 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
             }
         }
 
+        currentAttributesDbReference = databasePointRef?.child(FirebaseDbHelper.CHILD_NAME_ATTRIBUTES)
+
+        println("attributes reference: ")
+        println(currentAttributesDbReference)
+
+        attributesDbChangedListener = object : ChildEventListener {
+            override fun onCancelled(p0: DatabaseError?) {
+                p0?.toException()?.printStackTrace()
+            }
+
+            override fun onChildMoved(snapshot: DataSnapshot, p1: String?) {
+
+            }
+
+            override fun onChildChanged(snapshot: DataSnapshot, p1: String?) {
+                val attribute = attributes.unObservedList.find { it.objectId == snapshot.key }
+                if (attribute != null) {
+                    val pojo = snapshot.getValue(FirebaseDbHelper.AttributePOJO::class.java)
+                    if (pojo != null) {
+                        attribute.suspendDatabaseSync = true
+
+                        attribute.name = pojo.name ?: "Noname"
+                        var changedValue = false
+                        val properties = pojo.properties
+                        if (properties != null) {
+                            attribute.readPropertiesFromDatabase(properties)
+                        }
+                        attribute.suspendDatabaseSync = false
+                    }
+                }
+            }
+
+            override fun onChildAdded(snapshot: DataSnapshot, p1: String?) {
+                synchronized(attributes.unObservedList)
+                {
+                    val attrId = snapshot.key
+                    if (attributes.unObservedList.find { it.objectId == attrId } == null) {
+                        val pojo = snapshot.getValue(FirebaseDbHelper.AttributePOJO::class.java)
+                        if (pojo != null) {
+                            attributes.addAt(OTAttribute.Companion.createAttribute(snapshot.key, pojo), pojo.position)
+                        }
+                    }
+                }
+            }
+
+            override fun onChildRemoved(snapshot: DataSnapshot) {
+                synchronized(attributes.unObservedList)
+                {
+                    val attrId = snapshot.key
+
+                    val attribute = attributes.unObservedList.find { it.objectId == attrId }
+                    if (attribute != null) {
+                        attributes.remove(attribute)
+                    }
+                }
+            }
+
+        }
+
         currentDbReference?.addChildEventListener(dbChangedListener)
+        currentAttributesDbReference?.addChildEventListener(attributesDbChangedListener)
     }
 
     fun dispose() {
         currentDbReference?.removeEventListener(dbChangedListener)
+        currentAttributesDbReference?.removeEventListener(attributesDbChangedListener)
     }
 
     fun getItemCacheDir(context: Context, createIfNotExist: Boolean = true): File {
@@ -276,7 +340,7 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
         super.onNameChanged(newName)
         OTShortcutPanelManager.notifyAppearanceChanged(this)
 
-        nameChanged.onNext(ReadOnlyPair(this, newName))
+        nameChanged.onNext(Pair(this, newName))
     }
 
     fun nextAttributeLocalKey(): Int {

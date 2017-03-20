@@ -24,6 +24,8 @@ import kr.ac.snu.hcil.omnitrack.utils.TextHelper
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import rx.Observable
 import rx.Single
+import rx.subjects.PublishSubject
+import rx.subjects.SerializedSubject
 import java.util.*
 import kotlin.properties.Delegates
 
@@ -103,6 +105,18 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
         fun createAttribute(tracker: OTTracker, columnName: String, typeId: Int): OTAttribute<out Any> {
             return createAttribute(null, tracker.nextAttributeLocalKey(), tracker, columnName, false, typeId, null, null)
         }
+
+        fun createAttribute(attributeId: String, pojo: FirebaseDbHelper.AttributePOJO): OTAttribute<out Any> {
+            return OTAttribute.createAttribute(
+                    attributeId,
+                    pojo.localKey,
+                    null,
+                    pojo.name ?: "noname",
+                    pojo.required,
+                    pojo.type,
+                    pojo.properties,
+                    pojo.connectionSerialized)
+        }
     }
 
     fun requiredPermissions(): Array<String>? {
@@ -162,6 +176,8 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
     abstract val propertyKeys: Array<String>
     val propertyValueChanged = Event<OTProperty.PropertyChangedEventArgs<out Any>>()
     private val settingsProperties = HashMap<String, OTProperty<out Any>>()
+
+    val propertyValueChangedSubject = SerializedSubject(PublishSubject.create<Pair<OTAttribute<DataType>, OTProperty.PropertyChangedEventArgs<out Any>>>())
 
     var valueConnection: OTConnection? by Delegates.observable(null as OTConnection?) {
         prop, old, new ->
@@ -236,6 +252,7 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
 
     protected open fun onPropertyValueChanged(args: OTProperty.PropertyChangedEventArgs<out Any>) {
         propertyValueChanged.invoke(this, args)
+        propertyValueChangedSubject.onNext(Pair(this, args))
         if (!suspendDatabaseSync) {
             databasePointRef?.child(FirebaseDbHelper.CHILD_NAME_ATTRIBUTE_PROPERTIES)?.child(args.key.toString())?.setValue(getProperty<String>(args.key).getSerializedValue())
         }
@@ -250,8 +267,12 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
         return getProperty<T>(key).value
     }
 
-    fun setPropertyValue(key: String, value: Any) {
-        getProperty<Any>(key).value = value
+    fun setPropertyValue(key: String, value: Any): Boolean {
+        val prop = getProperty<Any>(key)
+        if (prop.value != value) {
+            prop.value = value
+            return true
+        } else return false
     }
 
     fun setPropertyValueFromSerializedString(key: String, serializedValue: String) {

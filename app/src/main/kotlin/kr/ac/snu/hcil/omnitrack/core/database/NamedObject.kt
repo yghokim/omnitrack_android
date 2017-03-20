@@ -1,6 +1,8 @@
 package kr.ac.snu.hcil.omnitrack.core.database
 
 import com.google.firebase.database.DatabaseReference
+import rx.subjects.PublishSubject
+import rx.subjects.SerializedSubject
 import kotlin.properties.Delegates
 
 /**
@@ -18,6 +20,8 @@ abstract class NamedObject(objectId: String?, name: String) : IDatabaseSyncedObj
         objectId ?: makeNewObjectId()
     }
 
+    val nameChanged = SerializedSubject(PublishSubject.create<Pair<NamedObject, String>>())
+
     abstract val databasePointRef: DatabaseReference?
     var suspendDatabaseSync: Boolean = false
 
@@ -26,6 +30,8 @@ abstract class NamedObject(objectId: String?, name: String) : IDatabaseSyncedObj
         if (old != new) {
             if (!suspendDatabaseSync)
                 databasePointRef?.child(PROPERTY_NAME)?.setValue(new)
+
+            nameChanged.onNext(Pair(this, new))
             onNameChanged(new)
         }
     }
