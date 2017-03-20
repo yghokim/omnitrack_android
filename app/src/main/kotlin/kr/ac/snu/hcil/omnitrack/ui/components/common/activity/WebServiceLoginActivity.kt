@@ -86,12 +86,14 @@ open class WebServiceLoginActivity : AppCompatActivity(), View.OnClickListener {
 
     open fun finishIfPossible(redirectedUrl: String) {
         val parsedUrl = HttpUrl.parse(redirectedUrl)
-        val code = parsedUrl.queryParameter(AuthConstants.PARAM_CODE)
-        if (!code.isNullOrBlank()) {
-            val result = Intent()
-            result.putExtra(AuthConstants.PARAM_CODE, code)
-            setResult(Activity.RESULT_OK, result)
-            finish()
+        if (parsedUrl != null) {
+            val code = parsedUrl.queryParameter(AuthConstants.PARAM_CODE)
+            if (!code.isNullOrBlank()) {
+                val result = Intent()
+                result.putExtra(AuthConstants.PARAM_CODE, code)
+                setResult(Activity.RESULT_OK, result)
+                finish()
+            }
         }
     }
 
