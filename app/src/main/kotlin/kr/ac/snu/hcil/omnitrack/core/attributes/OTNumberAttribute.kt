@@ -63,7 +63,9 @@ class OTNumberAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrac
 
     var numberStyle: NumberStyle
         get() = getPropertyValue<NumberStyle>(NUMBERSTYLE)
-        set(value) = setPropertyValue(NUMBERSTYLE, value)
+        set(value) {
+            setPropertyValue(NUMBERSTYLE, value)
+        }
 
     override fun formatAttributeValue(value: Any): CharSequence {
         return numberStyle.formatNumber(value)
