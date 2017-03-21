@@ -72,6 +72,8 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
 
     private lateinit var newTriggerButton: FloatingActionButton
 
+    private var newlyAddedTriggerId: String? = null
+
     //private var expandedTriggerPosition: Int = -1
     //private var expandedViewHolder: ATriggerViewHolder<out OTTrigger>? = null
 
@@ -216,6 +218,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
                         OTApplication.app.currentUserObservable.subscribe {
                             user ->
                             val newTrigger = OTTrigger.makeInstance(FirebaseDbHelper.generateNewKey(FirebaseDbHelper.CHILD_NAME_TRIGGERS), user, triggerPojo)
+                            newlyAddedTriggerId = newTrigger.objectId
                             appendNewTrigger(newTrigger)
                             EventLoggingManager.logTriggerChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_TRIGGER_ADD, newTrigger.objectId, newTrigger.typeId, newTrigger.action)
                         }
@@ -242,7 +245,8 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
 
         override fun onBindViewHolder(holder: ATriggerViewHolder<out OTTrigger>, position: Int) {
             if (triggerAdapter != null) {
-                holder.bind(triggerAdapter!!.getTriggerAt(position))
+                val trigger = triggerAdapter!!.getTriggerAt(position)
+                holder.bind(trigger, trigger.objectId == newlyAddedTriggerId)
                 /*
                 if (expandedTriggerPosition == position) {
                     holder.setIsExpanded(true, false)

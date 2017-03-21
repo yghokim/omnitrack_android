@@ -137,7 +137,12 @@ Apache 2.0 license
 #####TedBottomPicker
 <https://github.com/ParkSangGwon/TedBottomPicker><br>
 Copyright 2017 Ted Park<br>
-Apache 2.0 liccense
+Apache 2.0 license
+
+#####Material Tap Target Prompt
+<https://github.com/sjwall/MaterialTapTargetPrompt><br>
+Copyright (C) 2016 Samuel Wall<br>
+Apache 2.0 license
 
 ---
 

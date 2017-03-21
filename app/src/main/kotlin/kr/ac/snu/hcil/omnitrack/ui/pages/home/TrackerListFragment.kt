@@ -45,6 +45,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.FallbackRecyclerView
 import kr.ac.snu.hcil.omnitrack.ui.components.common.TooltipHelper
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.DrawableListBottomSpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
+import kr.ac.snu.hcil.omnitrack.ui.components.tutorial.TutorialManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemBrowserActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemEditingActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.tracker.TrackerDetailActivity
@@ -237,6 +238,14 @@ class TrackerListFragment : OTFragment() {
         }
 
         return rootView
+    }
+
+    override fun onStart() {
+        super.onStart()
+        TutorialManager.checkAndShowTargetPrompt("tracker_list_add_tracker", true, this.activity, addTrackerFloatingButton,
+                R.string.msg_tutorial_add_tracker_primary,
+                R.string.msg_tutorial_add_tracker_secondary,
+                ContextCompat.getColor(context, R.color.colorPointed))
     }
 
     override fun onDestroyView() {

@@ -96,6 +96,7 @@ dependencies {
     compile 'com.github.halysongoncalves:pugnotification:1.8.1'
     compile 'com.github.mukeshsolanki:country-picker-android:1.1.7'
     compile 'pl.charmas.android:android-reactive-location:0.10@aar'
+    compile 'uk.co.samuelwall:material-tap-target-prompt:1.9.3'
 
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile files('libs/opencsv-3.9.jar')
