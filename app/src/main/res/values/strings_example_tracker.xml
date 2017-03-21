@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="msg_example_tracker_diary">Diary</string>
+    <string name="msg_example_trackers_date">Date</string>
+    <string name="msg_example_trackers_mood">Mood</string>
+    <string name="msg_example_trackers_mood_very_bad">Very bad</string>
+    <string name="msg_example_trackers_mood_normal">Normal</string>
+    <string name="msg_example_trackers_mood_very_good">Very good</string>
+    <string name="msg_example_trackers_weather">Weather</string>
+
+    <string-array name="example_trackers_weather_list">
+        <item>Sunny</item>
+        <item>Cloudy</item>
+        <item>Rainy</item>
+        <item>Snowy</item>
+
+    </string-array>
+
+    <string name="msg_example_trackers_diary_content">Content</string>
+
+    <string name="msg_example_trackers_coffee">Coffee</string>
+
+    <string name="msg_example_trackers_coffee_drank_at">Drank at</string>
+
+    <string name="msg_example_trackers_daily_activity">Daily activity</string>
+
+    <string name="msg_example_trackers_step_count">Step count</string>
+
+    <string name="msg_example_trackers_step_count_unit">step</string>
+
+    <string name="msg_example_trackers_sleep_time">Sleep duration</string>
+
+    <string name="msg_example_trackers_restaurant">Visited Restaurant</string>
+
+    <string name="msg_example_trackers_restaurant_name">Restaurant</string>
+    <string name="msg_example_trackers_restaurant_menu">Menu</string>
+
+
+    <string name="msg_example_trackers_restaurant_location">Location</string>
+
+    <string name="msg_example_trackers_restaurant_date">Visited date</string>
+    <string name="msg_example_trackers_restaurant_photo">Photo</string>
+    <string name="msg_example_trackers_restaurant_rating">Rating</string>
+    <string name="msg_example_trackers_restaurant_review">Review</string>
+
+
+</resources>

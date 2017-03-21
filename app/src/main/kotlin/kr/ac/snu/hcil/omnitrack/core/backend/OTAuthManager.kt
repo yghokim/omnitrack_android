@@ -15,6 +15,7 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.*
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
 import kr.ac.snu.hcil.omnitrack.utils.getActivity
 import rx.Observable
@@ -88,6 +89,12 @@ object OTAuthManager {
                 .addApi(Auth.GOOGLE_SIGN_IN_API, mGoogleSignInOptions)
                 .build()
         mGoogleApiClient.connect()
+    }
+
+    fun makeUserInstance(): OTUser? {
+        if (userId != null) {
+            return OTUser(userId!!, userName, userImageUrl)
+        } else return null
     }
 
     /*

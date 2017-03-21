@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="msg_example_tracker_diary">일기</string>
+    <string name="msg_example_trackers_date">날짜</string>
+    <string name="msg_example_trackers_mood">기분</string>
+    <string name="msg_example_trackers_mood_very_bad">매우 나쁨</string>
+    <string name="msg_example_trackers_mood_normal">보통</string>
+    <string name="msg_example_trackers_mood_very_good">매우 좋음</string>
+    <string name="msg_example_trackers_weather">날씨</string>
+
+    <string-array name="example_trackers_weather_list">
+        <item>맑음</item>
+        <item>흐림</item>
+        <item>비</item>
+        <item>눈</item>
+
+    </string-array>
+
+    <string name="msg_example_trackers_diary_content">내용</string>
+
+    <string name="msg_example_trackers_coffee">커피</string>
+
+    <string name="msg_example_trackers_coffee_drank_at">마신 시각</string>
+
+    <string name="msg_example_trackers_daily_activity">일일 신체활동</string>
+
+    <string name="msg_example_trackers_step_count">걸음 수</string>
+
+    <string name="msg_example_trackers_step_count_unit">걸음</string>
+
+    <string name="msg_example_trackers_sleep_time">수면 시간</string>
+
+    <string name="msg_example_trackers_restaurant">맛집</string>
+
+    <string name="msg_example_trackers_restaurant_name">식당명</string>
+    <string name="msg_example_trackers_restaurant_menu">메뉴</string>
+
+
+    <string name="msg_example_trackers_restaurant_location">위치</string>
+
+    <string name="msg_example_trackers_restaurant_date">먹은 날</string>
+    <string name="msg_example_trackers_restaurant_photo">사진</string>
+    <string name="msg_example_trackers_restaurant_rating">평점</string>
+    <string name="msg_example_trackers_restaurant_review">리뷰</string>
+
+
+</resources>

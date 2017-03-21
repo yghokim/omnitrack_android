@@ -27,18 +27,25 @@ import rx.subjects.PublishSubject
 import rx.subjects.SerializedSubject
 import java.io.File
 import java.util.*
+import kotlin.collections.HashMap
 import kotlin.properties.Delegates
 
 /**
  * Created by Young-Ho on 7/11/2016.
  */
-class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnShortcut: Boolean = false, attributeIdSeed: Int = 0, _attributes: Collection<OTAttribute<out Any>>? = null)
+class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnShortcut: Boolean = false, attributeIdSeed: Int = 0, _attributes: Collection<OTAttribute<out Any>>? = null, val creationFlags: Map<String, String>? = null)
     : NamedObject(objectId, name) {
 
     companion object {
         const val PROPERTY_COLOR = "color"
         const val PROPERTY_IS_ON_SHORTCUT = "onShortcut"
         const val PROPERTY_ATTRIBUTES = "attributes"
+
+        val CREATION_FLAG_TUTORIAL: Map<String, String> by lazy {
+            val result = HashMap<String, String>()
+            result["source"] = "generated_example"
+            result
+        }
     }
 
     override val databasePointRef: DatabaseReference?
@@ -178,6 +185,7 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
         dbChangedListener = object : ChildEventListener {
 
             private fun handleChildChange(snapshot: DataSnapshot, remove: Boolean) {
+                suspendDatabaseSync = true
                 when (snapshot.key) {
                     PROPERTY_NAME ->
                         this@OTTracker.name = if (remove) {
@@ -187,10 +195,11 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
                         }
 
                     PROPERTY_IS_ON_SHORTCUT ->
-                        this@OTTracker.isOnShortcut = if (remove) {
-                            false
+                        if (remove) {
+
+                            this@OTTracker.isOnShortcut = false
                         } else {
-                            snapshot.value as Boolean
+                            this@OTTracker.isOnShortcut = snapshot.value as Boolean
                         }
                     PROPERTY_COLOR ->
                         this@OTTracker.color = if (remove) {
@@ -200,6 +209,7 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
                             (value as? Long)?.toInt() ?: (value as? Int ?: Color.WHITE)
                         }
                 }
+                suspendDatabaseSync = false
             }
 
             override fun onChildAdded(snapshot: DataSnapshot, p1: String?) {
@@ -242,6 +252,7 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
             }
 
             override fun onChildChanged(snapshot: DataSnapshot, p1: String?) {
+                suspendDatabaseSync = true
                 val attribute = attributes.unObservedList.find { it.objectId == snapshot.key }
                 if (attribute != null) {
                     val pojo = snapshot.getValue(FirebaseDbHelper.AttributePOJO::class.java)
@@ -257,11 +268,13 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
                         attribute.suspendDatabaseSync = false
                     }
                 }
+                suspendDatabaseSync = false
             }
 
             override fun onChildAdded(snapshot: DataSnapshot, p1: String?) {
                 synchronized(attributes.unObservedList)
                 {
+                    suspendDatabaseSync = true
                     val attrId = snapshot.key
                     if (attributes.unObservedList.find { it.objectId == attrId } == null) {
                         val pojo = snapshot.getValue(FirebaseDbHelper.AttributePOJO::class.java)
@@ -269,18 +282,22 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
                             attributes.addAt(OTAttribute.Companion.createAttribute(snapshot.key, pojo), pojo.position)
                         }
                     }
+
+                    suspendDatabaseSync = false
                 }
             }
 
             override fun onChildRemoved(snapshot: DataSnapshot) {
                 synchronized(attributes.unObservedList)
                 {
+                    suspendDatabaseSync = true
                     val attrId = snapshot.key
 
                     val attribute = attributes.unObservedList.find { it.objectId == attrId }
                     if (attribute != null) {
                         attributes.remove(attribute)
                     }
+                    suspendDatabaseSync = false
                 }
             }
 
