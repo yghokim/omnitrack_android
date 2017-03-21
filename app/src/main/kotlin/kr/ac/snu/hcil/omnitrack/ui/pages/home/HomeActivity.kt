@@ -57,8 +57,9 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), OTAut
         // Set up the ViewPager with the sections adapter.
         mViewPager.adapter = mSectionsPagerAdapter
 
-        val tabLayout = findViewById(R.id.tabs) as TabLayout?
-        tabLayout!!.setupWithViewPager(mViewPager)
+        val tabLayout = findViewById(R.id.tabs) as TabLayout
+        tabLayout.setupWithViewPager(mViewPager)
+
 
         //Setup sliding menu
         drawerLayout = findViewById(R.id.ui_drawer_layout) as DrawerLayout

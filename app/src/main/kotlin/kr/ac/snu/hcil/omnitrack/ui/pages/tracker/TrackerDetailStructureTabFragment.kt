@@ -35,6 +35,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputV
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.BooleanPropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ColorPalettePropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ShortTextPropertyView
+import kr.ac.snu.hcil.omnitrack.ui.components.tutorial.TutorialManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.ConnectionIndicatorStubProxy
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeDetailActivity
 import kr.ac.snu.hcil.omnitrack.utils.startActivityOnDelay
@@ -243,6 +244,8 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
         )
 
         refresh()
+
+        TutorialManager.checkAndShowTargetPrompt("TrackerDetail_add_attribute", true, this.activity, newAttributeButton, R.string.msg_tutorial_add_attribute_primary, R.string.msg_tutorial_add_attribute_secondary, tracker.color)
     }
 
     override fun onStop() {
