@@ -133,17 +133,20 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
 
     override fun onStart(){
         super.onStart()
-
-
         val trackerObjectId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
         signedInUserObservable.subscribe {
             user ->
             this.user = user
-            val tracker = user[trackerObjectId]!!
-
-            this.tracker = tracker
-            trackerSubject.onNext(tracker)
-            onTrackerLoaded(tracker)
+            val tracker = user[trackerObjectId]
+            if (tracker != null) {
+                this.tracker = tracker
+                trackerSubject.onNext(tracker)
+                onTrackerLoaded(tracker)
+            } else {
+                val intent = Intent(this, HomeActivity::class.java)
+                startActivity(intent)
+                finish()
+            }
         }
 
         if (intent.hasExtra(INTENT_KEY_FOCUS_ATTRIBUTE_ID)) {

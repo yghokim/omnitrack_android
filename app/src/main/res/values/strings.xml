@@ -375,5 +375,6 @@
     <string name="msg_background_logging_started_notification_message">Processing new item...</string>
     <string name="msg_sign_in_google_succeeded">Sign-in with Google succeeded.</string>
     <string name="msg_sign_in_google_canceled">Sign-in with Google canceled.</string>
+    <string name="msg_under_development">This feature is under development. It will be unlocked soon!</string>
 
 </resources>
