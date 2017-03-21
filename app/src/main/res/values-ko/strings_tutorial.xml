@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="msg_tutorial_add_attribute_primary">트래커에 필드 추가하기</string>
+    <string name="msg_tutorial_add_attribute_secondary">플러스 버튼을 누르면 원하는 타입의 필드를 추가할 수 있습니다</string>
+
+    <string name="msg_tutorial_add_tracker_primary">트래커를 만들어 보세요</string>
+    <string name="msg_tutorial_add_tracker_secondary">플러스 버튼을 누르면 새 트래커를 생성할 수 있습니다</string>
+
+    <string name="msg_tutorial_new_trigger_switch_primary">스위치를 켜세요</string>
+    <string name="msg_tutorial_new_trigger_switch_secondary">트리거나 리마인더는 스위치를 켜야 작동합니다</string>
+</resources>

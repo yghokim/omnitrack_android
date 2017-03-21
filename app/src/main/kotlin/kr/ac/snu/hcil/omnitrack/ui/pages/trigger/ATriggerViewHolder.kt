@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 
 import android.animation.ValueAnimator
 import android.content.Context
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.AppCompatImageButton
 import android.support.v7.widget.AppCompatImageView
 import android.support.v7.widget.RecyclerView
@@ -17,8 +18,10 @@ import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.common.SwipelessSwitchCompat
 import kr.ac.snu.hcil.omnitrack.ui.components.common.ValidatedSwitch
+import kr.ac.snu.hcil.omnitrack.ui.components.tutorial.TutorialManager
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
+import kr.ac.snu.hcil.omnitrack.utils.getActivity
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 import rx.android.schedulers.AndroidSchedulers
 import rx.internal.util.SubscriptionList
@@ -311,7 +314,7 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun bind(trigger: OTTrigger) {
+    fun bind(trigger: OTTrigger, newCreated: Boolean) {
 
         subscriptions.clear()
 
@@ -371,6 +374,15 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
 
 
         applyTriggerStateToView()
+        if (newCreated) {
+            val activity = itemView.getActivity()
+            if (activity != null) {
+                TutorialManager.checkAndShowTargetPrompt("has_created_trigger", true, activity, triggerSwitch,
+                        R.string.msg_tutorial_new_trigger_switch_primary,
+                        R.string.msg_tutorial_new_trigger_switch_secondary,
+                        ContextCompat.getColor(itemView.context, R.color.colorPointed))
+            }
+        }
     }
 
     protected fun applyTriggerStateToView() {
