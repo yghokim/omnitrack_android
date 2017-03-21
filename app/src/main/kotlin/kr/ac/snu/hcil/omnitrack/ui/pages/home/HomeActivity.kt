@@ -12,6 +12,7 @@ import android.support.v4.view.ViewPager
 import android.support.v4.widget.DrawerLayout
 import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup
 import butterknife.bindView
 import com.google.firebase.auth.FirebaseUser
 import com.tbruyelle.rxpermissions.RxPermissions
@@ -20,12 +21,20 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
+import kr.ac.snu.hcil.omnitrack.ui.components.tutorial.TutorialManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.diagnostics.SystemLogActivity
 import rx.Observable
 import rx.internal.util.SubscriptionList
 
 class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), OTAuthManager.SignInChangedListener, DrawerLayout.DrawerListener {
+
+    companion object {
+        const val TAB_INDEX_TRACKERS = 0
+        const val TAB_INDEX_TRIGGERS = 1
+        const val TAB_INDEX_SERVICES = 2
+
+    }
 
     private var mSectionsPagerAdapter: SectionsPagerAdapter? = null
 
@@ -39,6 +48,8 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), OTAut
     private lateinit var sidebar: SidebarWrapper
 
     private val startSubscriptions = SubscriptionList()
+
+    private lateinit var tabLayout: TabLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,7 +68,7 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), OTAut
         // Set up the ViewPager with the sections adapter.
         mViewPager.adapter = mSectionsPagerAdapter
 
-        val tabLayout = findViewById(R.id.tabs) as TabLayout
+        tabLayout = findViewById(R.id.tabs) as TabLayout
         tabLayout.setupWithViewPager(mViewPager)
 
 
@@ -154,6 +165,28 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), OTAut
                 super.signedInUserObservable.subscribe {
                     user ->
                     sidebar.refresh(user)
+
+                    if (TutorialManager.hasShownTutorials(TutorialManager.FLAG_TRACKER_LIST_ADD_TRACKER)) {
+                        val tabs = tabLayout.getChildAt(0) as ViewGroup
+                        TutorialManager.checkAndShowSequence("home_main_tabs", true, this, false,
+                                listOf(
+                                        TutorialManager.TapTargetInfo(R.string.msg_tutorial_home_tab_trackers_primary,
+                                                R.string.msg_tutorial_home_tab_trackers_secondary,
+                                                ContextCompat.getColor(this, R.color.colorPointed),
+                                                tabs.getChildAt(TAB_INDEX_TRACKERS), 50
+                                        ),
+                                        TutorialManager.TapTargetInfo(R.string.msg_tutorial_home_tab_triggers_primary,
+                                                R.string.msg_tutorial_home_tab_triggers_secondary,
+                                                ContextCompat.getColor(this, R.color.colorPointed),
+                                                tabs.getChildAt(TAB_INDEX_TRIGGERS), 50
+                                        ),
+                                        TutorialManager.TapTargetInfo(R.string.msg_tutorial_home_tab_services_primary,
+                                                R.string.msg_tutorial_home_tab_services_secondary,
+                                                ContextCompat.getColor(this, R.color.colorPointed),
+                                                tabs.getChildAt(TAB_INDEX_SERVICES), 50
+                                        )
+                                ))
+                    }
                 }
         )
     }

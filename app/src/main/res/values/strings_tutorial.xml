@@ -9,5 +9,12 @@
     <string name="msg_tutorial_new_trigger_switch_primary">Turn the switch on</string>
     <string name="msg_tutorial_new_trigger_switch_secondary">Tap the switch to activate triggers or reminders</string>
 
+    <string name="msg_tutorial_home_tab_trackers_primary">Trackers</string>
+    <string name="msg_tutorial_home_tab_trackers_secondary">Allows to design your own data collection format</string>
+    <string name="msg_tutorial_home_tab_triggers_primary">Triggers</string>
+    <string name="msg_tutorial_home_tab_triggers_secondary">Use triggers to automatically record data</string>
+    <string name="msg_tutorial_home_tab_services_primary">Services</string>
+    <string name="msg_tutorial_home_tab_services_secondary">Connect existing tracking application with your trackers</string>
+
 
 </resources>

@@ -242,7 +242,7 @@ class TrackerListFragment : OTFragment() {
 
     override fun onStart() {
         super.onStart()
-        TutorialManager.checkAndShowTargetPrompt("tracker_list_add_tracker", true, this.activity, addTrackerFloatingButton,
+        TutorialManager.checkAndShowTargetPrompt(TutorialManager.FLAG_TRACKER_LIST_ADD_TRACKER, true, this.activity, addTrackerFloatingButton,
                 R.string.msg_tutorial_add_tracker_primary,
                 R.string.msg_tutorial_add_tracker_secondary,
                 ContextCompat.getColor(context, R.color.colorPointed))
