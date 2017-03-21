@@ -12,11 +12,17 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.badoo.mobile.util.WeakHandler
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ValueEventListener
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.ExperimentConsentManager
 import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
+import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
+import rx.internal.util.SubscriptionList
 
 class SignInActivity : AppCompatActivity() {
 
@@ -25,6 +31,8 @@ class SignInActivity : AppCompatActivity() {
 
     private lateinit var googleLoginButton: View
     private lateinit var loginInProgressIndicator: View
+
+    private val creationSubscription = SubscriptionList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -106,6 +114,7 @@ class SignInActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         ExperimentConsentManager.finishProcess()
+        creationSubscription.clear()
     }
 
     /**
@@ -120,11 +129,40 @@ class SignInActivity : AppCompatActivity() {
         override fun onSuccess() {
             Log.d(LOG_TAG, String.format("User sign-in with Google succeeded"))
 
-            Toast.makeText(this@SignInActivity, String.format("Sign-in with Google succeeded."), Toast.LENGTH_LONG).show()
+            Toast.makeText(this@SignInActivity, String.format(getString(R.string.msg_sign_in_google_succeeded)), Toast.LENGTH_LONG).show()
 
             ExperimentConsentManager.startProcess(this@SignInActivity, OTAuthManager.userId!!, object : ExperimentConsentManager.ResultListener {
                     override fun onConsentApproved() {
-                        goHomeActivity()
+                        val activatedRef = FirebaseDbHelper.currentUserRef?.child("examples_generated")
+                        activatedRef?.addListenerForSingleValueEvent(object : ValueEventListener {
+                            override fun onCancelled(error: DatabaseError?) {
+                                goHomeActivity()
+                            }
+
+                            override fun onDataChange(snapshot: DataSnapshot) {
+                                if (snapshot.exists() && snapshot.value == true) {
+                                    goHomeActivity()
+                                } else {
+                                    creationSubscription.add(
+                                            OTApplication.app.currentUserObservable.subscribe {
+                                                user ->
+                                                user.addExampleTrackers()
+                                                activatedRef.setValue(true, object : DatabaseReference.CompletionListener {
+                                                    override fun onComplete(error: DatabaseError?, ref: DatabaseReference?) {
+                                                        if (error == null) {
+                                                            goHomeActivity()
+                                                        }
+                                                    }
+
+                                                })
+                                            }
+                                    )
+                                }
+
+
+                            }
+
+                        }) ?: goHomeActivity()
                     }
 
                     override fun onConsentFailed() {
@@ -146,7 +184,7 @@ class SignInActivity : AppCompatActivity() {
          */
         override fun onCancel() {
             Log.d(LOG_TAG, String.format("User sign-in with Google canceled."))
-            Toast.makeText(this@SignInActivity, String.format("Sign-in with Google canceled."), Toast.LENGTH_LONG).show()
+            Toast.makeText(this@SignInActivity, String.format(getString(R.string.msg_sign_in_google_canceled)), Toast.LENGTH_LONG).show()
 
             toIdleMode()
         }

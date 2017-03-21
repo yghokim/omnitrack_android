@@ -84,6 +84,7 @@ object FirebaseDbHelper {
         var attributeLocalKeySeed: Int = 0
         var onShortcut: Boolean = false
         var attributes: Map<String, AttributePOJO>? = null
+        var creationFlags: Map<String, String>? = null
     }
 
     @Keep
@@ -358,7 +359,8 @@ object FirebaseDbHelper {
                 pojo.color,
                 pojo.onShortcut,
                 pojo.attributeLocalKeySeed,
-                attributeList
+                attributeList,
+                pojo.creationFlags
         ))
     }
 
@@ -515,6 +517,7 @@ object FirebaseDbHelper {
         values.user = tracker.owner?.objectId
         values.onShortcut = tracker.isOnShortcut
         values.attributeLocalKeySeed = tracker.attributeLocalKeySeed
+        values.creationFlags = tracker.creationFlags
 
         val attributes = HashMap<String, AttributePOJO>()
         for (attribute in tracker.attributes.unObservedList.withIndex()) {
