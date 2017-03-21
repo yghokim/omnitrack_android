@@ -8,14 +8,16 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
+import kr.ac.snu.hcil.omnitrack.core.attributes.*
+import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
+import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
+import kr.ac.snu.hcil.omnitrack.core.externals.fitbit.FitbitRecentSleepTimeMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
+import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTrigger
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerManager
-import kr.ac.snu.hcil.omnitrack.utils.DefaultNameGenerator
-import kr.ac.snu.hcil.omnitrack.utils.ObservableList
-import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
+import kr.ac.snu.hcil.omnitrack.utils.*
 import rx.Observable
 import rx.Single
 import rx.internal.util.SubscriptionList
@@ -89,9 +91,6 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
         }
     }
 
-    var isDatasetDirtySinceLastSync = false
-
-
     /*
     val email: String by Delegates.observable(email) {
         prop, old, new ->
@@ -120,6 +119,8 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
 
     private var triggerListDbReference: DatabaseReference? = null
     private val triggerListChangeEventListener: ChildEventListener
+
+    var suspendDatabaseSync: Boolean = false
 
     init {
 
@@ -167,8 +168,13 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
                     println("load tracker ${snapshot.key} from DB")
                     FirebaseDbHelper.getTracker(snapshot.key).subscribe {
                         tracker ->
+
+                        suspendDatabaseSync = true
+                        tracker.suspendDatabaseSync = true
                         tracker.owner = this@OTUser
                         this@OTUser.trackers += tracker
+                        tracker.suspendDatabaseSync = false
+                        suspendDatabaseSync = false
                     }
                 }
             }
@@ -186,8 +192,10 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
                 println("tracker child removed: ${snapshot.key}")
                 val duplicate = trackers.unObservedList.find { it.objectId == snapshot.key }
                 if (duplicate != null) {
+                    suspendDatabaseSync = true
                     duplicate.dispose()
                     trackers.remove(duplicate)
+                    suspendDatabaseSync = false
                 }
             }
 
@@ -256,8 +264,8 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
         return newTracker(this.generateNewTrackerName(context), add)
     }
 
-    fun newTracker(name: String, add: Boolean): OTTracker {
-        val tracker = OTTracker(name)
+    fun newTracker(name: String, add: Boolean, creationFlags: Map<String, String>? = null): OTTracker {
+        val tracker = OTTracker(null, name, creationFlags = creationFlags)
         val unOccupied = OTApplication.app.colorPalette.filter {
             color ->
             trackers.unObservedList.find {
@@ -302,7 +310,8 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
         trackerAdded.onNext(ReadOnlyPair(new, index))
 
         println("tracker was added")
-        FirebaseDbHelper.saveTracker(new, index)
+        if (!suspendDatabaseSync)
+            FirebaseDbHelper.saveTracker(new, index)
     }
 
     private fun onTrackerRemoved(tracker: OTTracker, index: Int) {
@@ -324,7 +333,9 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
 
         println("tracker was removed.")
         tracker.suspendDatabaseSync = false
-        FirebaseDbHelper.removeTracker(tracker, this)
+
+        if (!suspendDatabaseSync)
+            FirebaseDbHelper.removeTracker(tracker, this)
     }
 
     fun findAttributeByObjectId(trackerId: String, attributeId: String): OTAttribute<out Any>? {
@@ -390,4 +401,87 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
             }.map { this }
         }.first().toSingle()
     }
+
+
+    fun addExampleTrackers() {
+        val context = OTApplication.app
+        val diaryTracker = newTracker(context.getString(R.string.msg_example_tracker_diary), true, OTTracker.CREATION_FLAG_TUTORIAL)
+        diaryTracker.isOnShortcut = true
+
+        diaryTracker.attributes += OTAttribute.createAttribute(diaryTracker, context.getString(R.string.msg_example_trackers_date), OTAttribute.TYPE_TIME).apply {
+            this.setPropertyValue(OTTimeAttribute.GRANULARITY, OTTimeAttribute.GRANULARITY_DAY)
+        }
+
+        diaryTracker.attributes += OTAttribute.createAttribute(diaryTracker, context.getString(R.string.msg_example_trackers_mood), OTAttribute.TYPE_RATING).apply {
+            this.setPropertyValue(OTRatingAttribute.PROPERTY_OPTIONS, kr.ac.snu.hcil.omnitrack.utils.RatingOptions().apply {
+                this.allowIntermediate = true
+                this.leftLabel = context.getString(R.string.msg_example_trackers_mood_very_bad)
+                this.middleLabel = context.getString(R.string.msg_example_trackers_mood_normal)
+                this.rightLabel = context.getString(R.string.msg_example_trackers_mood_very_good)
+                this.type = kr.ac.snu.hcil.omnitrack.utils.RatingOptions.DisplayType.Likert
+            })
+        }
+
+        diaryTracker.attributes += OTAttribute.createAttribute(diaryTracker, context.getString(R.string.msg_example_trackers_weather), OTAttribute.TYPE_CHOICE).apply {
+            this.setPropertyValue(OTChoiceAttribute.PROPERTY_ENTRIES,
+                    UniqueStringEntryList(*context.resources.getStringArray(R.array.example_trackers_weather_list)))
+            this.setPropertyValue(OTChoiceAttribute.PROPERTY_MULTISELECTION, false)
+        }
+
+        diaryTracker.attributes += OTAttribute.createAttribute(diaryTracker, context.getString(R.string.msg_example_trackers_diary_content), OTAttribute.TYPE_LONG_TEXT)
+
+
+        val coffeeTracker = newTracker(context.getString(R.string.msg_example_trackers_coffee), true, OTTracker.CREATION_FLAG_TUTORIAL)
+        coffeeTracker.isOnShortcut = true
+        coffeeTracker.attributes += OTAttribute.createAttribute(diaryTracker, context.getString(R.string.msg_example_trackers_coffee_drank_at), OTAttribute.TYPE_TIME).apply {
+            this.setPropertyValue(OTTimeAttribute.GRANULARITY, OTTimeAttribute.GRANULARITY_MINUTE)
+        }
+
+
+        val dailyActivityTracker = newTracker(context.getString(R.string.msg_example_trackers_daily_activity), true, OTTracker.CREATION_FLAG_TUTORIAL)
+        dailyActivityTracker.attributes += OTAttribute.createAttribute(dailyActivityTracker, context.getString(R.string.msg_example_trackers_date), OTAttribute.TYPE_TIME).apply {
+            this.setPropertyValue(OTTimeAttribute.GRANULARITY, OTTimeAttribute.GRANULARITY_DAY)
+        }
+
+        dailyActivityTracker.attributes += (OTAttribute.createAttribute(dailyActivityTracker, context.getString(R.string.msg_example_trackers_step_count), OTAttribute.TYPE_NUMBER) as OTNumberAttribute).apply {
+            numberStyle = NumberStyle().apply {
+                this.unit = context.getString(R.string.msg_example_trackers_step_count_unit)
+                this.unitPosition = NumberStyle.UnitPosition.Rear
+                this.fractionPart = 0
+            }
+        }
+
+        val sleepTimeAttribute = OTAttribute.Companion.createAttribute(dailyActivityTracker,
+                context.getString(R.string.msg_example_trackers_sleep_time), OTAttribute.TYPE_TIMESPAN)
+        sleepTimeAttribute.setPropertyValue(OTTimeSpanAttribute.PROPERTY_GRANULARITY, OTTimeAttribute.GRANULARITY_MINUTE)
+
+        val sleepTimeConnection = OTConnection()
+        sleepTimeConnection.source = FitbitRecentSleepTimeMeasureFactory.makeMeasure()
+        sleepTimeConnection.rangedQuery = OTTimeRangeQuery(OTTimeRangeQuery.TYPE_PIVOT_TIMESTAMP, OTTimeRangeQuery.BIN_SIZE_DAY, 0)
+        sleepTimeAttribute.valueConnection = sleepTimeConnection
+
+        dailyActivityTracker.attributes += sleepTimeAttribute
+
+        val dailyActivityTrigger = OTTimeTrigger(null, this, "", arrayOf(dailyActivityTracker.objectId), true, OTTrigger.ACTION_BACKGROUND_LOGGING, -1)
+        dailyActivityTrigger.configType = OTTimeTrigger.CONFIG_TYPE_ALARM
+        dailyActivityTrigger.configVariables = OTTimeTrigger.AlarmConfig.makeConfig(11, 55, Calendar.PM)
+        dailyActivityTrigger.isRepeated = true
+        dailyActivityTrigger.rangeVariables = OTTimeTrigger.Range.makeConfig(0b1111111)
+        triggerManager.putNewTrigger(dailyActivityTrigger)
+
+
+        //=====================================================================================================================================
+        val foodTracker = newTracker(context.getString(R.string.msg_example_trackers_restaurant), true, OTTracker.CREATION_FLAG_TUTORIAL)
+        foodTracker.isOnShortcut = true
+        foodTracker.attributes += OTAttribute.createAttribute(foodTracker, context.getString(R.string.msg_example_trackers_restaurant_name), OTAttribute.TYPE_SHORT_TEXT)
+        foodTracker.attributes += OTAttribute.createAttribute(foodTracker, context.getString(R.string.msg_example_trackers_restaurant_date), OTAttribute.TYPE_TIME).apply {
+            this.setPropertyValue(OTTimeAttribute.GRANULARITY, OTTimeAttribute.GRANULARITY_DAY)
+        }
+        foodTracker.attributes += OTAttribute.createAttribute(foodTracker, context.getString(R.string.msg_example_trackers_restaurant_location), OTAttribute.TYPE_LOCATION)
+        foodTracker.attributes += OTAttribute.createAttribute(foodTracker, context.getString(R.string.msg_example_trackers_restaurant_menu), OTAttribute.TYPE_SHORT_TEXT)
+        foodTracker.attributes += OTAttribute.createAttribute(foodTracker, context.getString(R.string.msg_example_trackers_restaurant_photo), OTAttribute.TYPE_IMAGE)
+        foodTracker.attributes += OTAttribute.createAttribute(foodTracker, context.getString(R.string.msg_example_trackers_restaurant_rating), OTAttribute.TYPE_RATING)
+        foodTracker.attributes += OTAttribute.createAttribute(foodTracker, context.getString(R.string.msg_example_trackers_restaurant_review), OTAttribute.TYPE_LONG_TEXT)
+    }
+
 }

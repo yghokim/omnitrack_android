@@ -373,5 +373,7 @@
     <string name="msg_send_report_error_message">Couldn\'t send inquiry because of an error. Please try it later.</string>
     <string name="msg_send_report_success_message">Sent inquiry successfully.</string>
     <string name="msg_background_logging_started_notification_message">Processing new item...</string>
+    <string name="msg_sign_in_google_succeeded">Sign-in with Google succeeded.</string>
+    <string name="msg_sign_in_google_canceled">Sign-in with Google canceled.</string>
 
 </resources>
