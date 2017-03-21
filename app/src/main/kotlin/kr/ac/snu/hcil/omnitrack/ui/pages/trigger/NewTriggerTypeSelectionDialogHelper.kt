@@ -48,9 +48,22 @@ object NewTriggerTypeSelectionDialogHelper {
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.iconView.setImageResource(triggerTypes[position].iconId)
-            holder.nameView.setText(triggerTypes[position].nameId)
-            holder.descView.setText(triggerTypes[position].descId)
+            val element = triggerTypes[position]
+            holder.item = element
+            holder.iconView.setImageResource(element.iconId)
+            holder.nameView.setText(element.nameId)
+            holder.descView.setText(element.descId)
+            if (element.enabled) {
+                holder.iconView.alpha = 1f
+                holder.nameView.alpha = 1f
+                holder.descView.alpha = 1f
+                holder.disabledMessageView.visibility = View.GONE
+            } else {
+                holder.iconView.alpha = 0.2f
+                holder.nameView.alpha = 0.2f
+                holder.descView.alpha = 0.2f
+                holder.disabledMessageView.visibility = View.VISIBLE
+            }
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -60,20 +73,24 @@ object NewTriggerTypeSelectionDialogHelper {
 
 
         inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view), View.OnClickListener {
+            var item: TriggerTypeEntry? = null
 
             val iconView: AppCompatImageView
             val nameView: TextView
             val descView: TextView
+            val disabledMessageView: TextView
 
             init {
                 iconView = view.findViewById(R.id.ui_icon) as AppCompatImageView
                 nameView = view.findViewById(R.id.ui_name) as TextView
                 descView = view.findViewById(R.id.ui_description) as TextView
+                disabledMessageView = view.findViewById(R.id.ui_disabled_message) as TextView
                 view.setOnClickListener(this)
             }
 
             override fun onClick(p0: View?) {
-                listener.invoke(triggerTypes[adapterPosition].typeCode)
+                if (item?.enabled == true)
+                    listener.invoke(triggerTypes[adapterPosition].typeCode)
             }
         }
 
