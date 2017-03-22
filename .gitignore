@@ -9,9 +9,6 @@
 app/app.iml
 *.iml
 
-.idea/misc.xml
-.idea/vcs.xml
-.idea/gradle.xml
-.idea/modules.xml
+.idea/*
 
 Thumbs.db
