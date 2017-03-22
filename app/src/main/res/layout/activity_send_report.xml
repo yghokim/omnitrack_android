@@ -51,7 +51,8 @@
 
         android:background="@drawable/form_rounded"
         android:padding="12dp"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        app:lined_drawOuterLines="false" />
 
 
 </LinearLayout>
