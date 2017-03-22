@@ -4,6 +4,7 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
 import android.support.v4.content.ContextCompat
+import android.util.AttributeSet
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
@@ -13,7 +14,7 @@ import kotlin.properties.Delegates
 /**
  * Created by Young-Ho Kim on 16. 8. 16
  */
-class LinedTextBase(val textView: View) {
+class LinedTextBase(val textView: View, attrs: AttributeSet?, defStyleAttr: Int = 0) {
 
     private var numLines: Int = 1
     private val lineBounds = Rect()
@@ -50,6 +51,15 @@ class LinedTextBase(val textView: View) {
         linePaint.color = ContextCompat.getColor(textView.context, R.color.editTextLine)
 
         lineOffset = 5 * textView.resources.displayMetrics.density
+
+        val a = textView.context.obtainStyledAttributes(attrs, R.styleable.LinedTextView, defStyleAttr, 0)
+
+        try {
+            drawOuterLines = a.getBoolean(R.styleable.LinedTextView_lined_drawOuterLines, true)
+        } finally {
+            a.recycle()
+        }
+
         refresh()
 
     }
