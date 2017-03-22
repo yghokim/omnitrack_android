@@ -9,11 +9,10 @@ import kr.ac.snu.hcil.omnitrack.R
  */
 
 object DialogHelper {
-    fun makeYesNoDialogBuilder(context: Context, title: String, message: String, yesLabel: Int = R.string.msg_yes, noLabel: Int = R.string.msg_no, onYes: (() -> Unit)?, onNo: (() -> Unit)? = null): MaterialDialog.Builder {
+    fun makeYesNoDialogBuilder(context: Context, title: String, message: String, yesLabel: Int = R.string.msg_yes, noLabel: Int = R.string.msg_no, onYes: (() -> Unit)?, onNo: (() -> Unit)? = null, cancelable: Boolean = true, onCancel: (() -> Unit)? = null): MaterialDialog.Builder {
         val builder = MaterialDialog.Builder(context)
                 .title(title)
                 .content(message)
-                .cancelable(true)
                 .positiveColorRes(R.color.colorPointed)
                 .negativeColorRes(R.color.colorRed_Light)
                 .positiveText(yesLabel)
@@ -25,6 +24,10 @@ object DialogHelper {
                 .onNegative { materialDialog, dialogAction ->
 
                     if (onNo != null) onNo()
+                }
+                .cancelable(cancelable)
+                .cancelListener {
+                    if (onCancel != null) onCancel()
                 }
 
         return builder

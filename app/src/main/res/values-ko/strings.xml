@@ -16,6 +16,8 @@
 
     <string name="msg_save">저장</string>
 
+    <string name="msg_allow_permission">권한 허용하기</string>
+
     <string name="msg_confirm_log">아이템 기록</string>
 
     <string name="msg_confirm_field_apply_change">나가기 전에 변경사항을 적용하시겠습니까?</string>
@@ -290,6 +292,9 @@
     <string name="msg_sign_in_google_succeeded">구글 계정으로 로그인에 성공했습니다</string>
     <string name="msg_sign_in_google_canceled">구글 계정 로그인이 취소되었습니다.</string>
     <string name="msg_under_development">이 기능은 아직 구현중입니다. 곧 언락하겠습니다!</string>
+    <string name="msg_contacts_permission_required">주소록 접근 권한 필요</string>
+    <string name="msg_contacts_permission_rationale">디바이스에 로그인된 구글 계정을 선택하실 수 있도록 목록을 불러오는 데에만 사용됩니다.</string>
+
 
     <string-array name="purpose_entries">
         <item>directive|건강 관련 정보를 기록하기 위해서</item>
