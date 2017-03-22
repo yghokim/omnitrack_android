@@ -5,7 +5,6 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.support.v13.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
@@ -16,12 +15,14 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
+import com.tbruyelle.rxpermissions.RxPermissions
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.ExperimentConsentManager
 import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
+import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import rx.internal.util.SubscriptionList
 
 class SignInActivity : AppCompatActivity() {
@@ -49,16 +50,35 @@ class SignInActivity : AppCompatActivity() {
             this.googleLoginButton.setOnClickListener(View.OnClickListener { view ->
                 toBusyMode()
                 val thisActivity = this@SignInActivity
+
                 if (ContextCompat.checkSelfPermission(thisActivity,
                         Manifest.permission.GET_ACCOUNTS) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(this@SignInActivity,
-                            arrayOf(Manifest.permission.GET_ACCOUNTS),
-                            GET_ACCOUNTS_PERMISSION_REQUEST_CODE)
-                    return@OnClickListener
-                }
 
-                // call the Google onClick listener.
-                googleOnClickListener!!.onClick(view)
+                    DialogHelper.makeYesNoDialogBuilder(this, getString(R.string.msg_contacts_permission_required),
+                            getString(R.string.msg_contacts_permission_rationale),
+                            yesLabel = R.string.msg_allow_permission, noLabel = R.string.msg_cancel, onYes = {
+                        val permissions = RxPermissions(this)
+                        permissions.request(Manifest.permission.GET_ACCOUNTS)
+                                .subscribe {
+                                    granted ->
+                                    if (granted) {
+                                        this.findViewById(kr.ac.snu.hcil.omnitrack.R.id.g_login_button).callOnClick()
+                                    } else {
+                                        Log.i(LOG_TAG, "Permissions not granted for Google sign-in. :(")
+                                        toIdleMode()
+                                    }
+                                }
+                    }, onNo = {
+                        toIdleMode()
+                    }, onCancel = {
+                        toIdleMode()
+                    }, cancelable = false).show()
+                    return@OnClickListener
+                } else {
+
+                    // call the Google onClick listener.
+                    googleOnClickListener!!.onClick(view)
+                }
             })
         }
 
@@ -83,17 +103,6 @@ class SignInActivity : AppCompatActivity() {
         WeakHandler().post {
             this.googleLoginButton.visibility = View.VISIBLE
             this.loginInProgressIndicator.visibility = View.GONE
-        }
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>,
-                                            grantResults: IntArray) {
-        if (requestCode == GET_ACCOUNTS_PERMISSION_REQUEST_CODE) {
-            if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                this.findViewById(kr.ac.snu.hcil.omnitrack.R.id.g_login_button).callOnClick()
-            } else {
-                Log.i(LOG_TAG, "Permissions not granted for Google sign-in. :(")
-            }
         }
     }
 
