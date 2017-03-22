@@ -16,18 +16,22 @@ class LinedEditText : EditText {
     val base: LinedTextBase
 
     constructor(context: Context?) : super(context) {
+
+        base = LinedTextBase(this, null, 0)
+        init()
     }
 
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {
+        base = LinedTextBase(this, attrs, 0)
+        init()
     }
 
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
-
+        base = LinedTextBase(this, attrs, defStyleAttr)
+        init()
     }
 
-    init {
-
-        base = LinedTextBase(this)
+    fun init() {
         addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
 
