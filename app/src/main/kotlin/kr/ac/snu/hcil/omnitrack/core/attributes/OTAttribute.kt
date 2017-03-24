@@ -1,11 +1,16 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
+import android.content.pm.PackageManager
+import android.support.v4.content.ContextCompat
 import android.util.SparseArray
 import android.view.View
 import android.widget.TextView
+import com.afollestad.materialdialogs.MaterialDialog
 import com.google.firebase.database.DatabaseReference
+import com.tbruyelle.rxpermissions.RxPermissions
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
@@ -18,6 +23,7 @@ import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
+import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 import kr.ac.snu.hcil.omnitrack.utils.TextHelper
@@ -116,6 +122,41 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
                     pojo.type,
                     pojo.properties,
                     pojo.connectionSerialized)
+        }
+
+        fun showPermissionCheckDialog(activity: Activity, typeId: Int, typeName: String, onGranted: (Boolean) -> Unit, onDenied: (() -> Unit)? = null): MaterialDialog? {
+            val requiredPermissions = OTAttribute.getPermissionsForAttribute(typeId)
+            if (requiredPermissions != null) {
+                val notGrantedPermissions = requiredPermissions.filter { ContextCompat.checkSelfPermission(activity, it) != PackageManager.PERMISSION_GRANTED }
+                if (notGrantedPermissions.isNotEmpty()) {
+                    val dialog = DialogHelper.makeYesNoDialogBuilder(activity, activity.resources.getString(R.string.msg_permission_required),
+                            String.format(activity.resources.getString(R.string.msg_format_permission_request_of_field), typeName),
+                            cancelable = false,
+                            onYes = {
+                                val rxPermissions = RxPermissions(activity)
+                                rxPermissions.request(*requiredPermissions)
+                                        .subscribe {
+                                            granted ->
+                                            if (granted) {
+                                                onGranted.invoke(true)
+                                            } else {
+                                                onDenied?.invoke()
+                                            }
+                                        }
+                            },
+                            onCancel = null,
+                            yesLabel = R.string.msg_allow_permission,
+                            noLabel = R.string.msg_cancel
+                    )
+                    return dialog.show()
+                } else {
+                    onGranted.invoke(false)
+                    return null
+                }
+            } else {
+                onGranted.invoke(false)
+                return null
+            }
         }
     }
 

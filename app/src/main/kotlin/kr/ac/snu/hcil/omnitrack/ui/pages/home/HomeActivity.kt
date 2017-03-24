@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.home
 
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.support.design.widget.TabLayout
@@ -24,7 +25,7 @@ import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.tutorial.TutorialManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.diagnostics.SystemLogActivity
-import rx.Observable
+import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import rx.internal.util.SubscriptionList
 
 class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), OTAuthManager.SignInChangedListener, DrawerLayout.DrawerListener {
@@ -96,32 +97,49 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), OTAut
 
                     val rxPermissions = RxPermissions(this)
 
-                    val permissions = user.getPermissionsRequiredForFields()
+                    val permissions = user.getPermissionsRequiredForFields().filter { ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED }
+
                     if (permissions.isNotEmpty()) {
-                        rxPermissions.request(*permissions.toTypedArray()).subscribe {
-                            granted ->
-                            if (granted)
-                                println("permissions granted.")
-                            else println("permissions not granted.")
-                        }
+                        DialogHelper.makeYesNoDialogBuilder(this, resources.getString(R.string.msg_permission_required),
+                                String.format(resources.getString(R.string.msg_permission_request_of_tracker)),
+                                cancelable = false,
+                                onYes = {
+                                    rxPermissions.request(*permissions.toTypedArray()).subscribe {
+                                        granted ->
+                                        if (granted)
+                                            println("permissions granted.")
+                                        else println("permissions not granted.")
+                                    }
+                                },
+                                onCancel = null,
+                                yesLabel = R.string.msg_allow_permission,
+                                noLabel = R.string.msg_cancel
+                        ).show()
                     }
 
                     creationSubscriptions.add(
-                            user.trackerAdded.flatMap {
-                                trackerPair ->
-                                val permissionsForTracker = trackerPair.first.getRequiredPermissions()
-                                if (!permissionsForTracker.isEmpty()) {
-                                    rxPermissions.request(*permissionsForTracker)
-                                } else {
-                                    Observable.just(true)
-                                }
-
-                            }.subscribe {
-                                granted ->
-                                if (granted) {
-                                    println("new tracker permission granted")
+                            user.trackerAdded
+                                    .subscribe {
+                                        trackerPair ->
+                                        val permissionsForTracker = trackerPair.first.getRequiredPermissions().filter { ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED }
+                                        if (!permissionsForTracker.isEmpty()) {
+                                            DialogHelper.makeYesNoDialogBuilder(this, resources.getString(R.string.msg_permission_required),
+                                                    String.format(resources.getString(R.string.msg_format_permission_request_of_tracker_single), trackerPair.first.name),
+                                                    cancelable = false,
+                                                    onYes = {
+                                                        rxPermissions.request(*permissionsForTracker.toTypedArray()).subscribe {
+                                                            granted ->
+                                                            if (granted)
+                                                                println("permissions granted.")
+                                                            else println("permissions not granted.")
+                                                        }
+                                                    },
+                                                    onCancel = null,
+                                                    yesLabel = R.string.msg_allow_permission,
+                                                    noLabel = R.string.msg_cancel
+                                            ).show()
+                                        }
                                     }
-                                }
                         )
                 }
         )

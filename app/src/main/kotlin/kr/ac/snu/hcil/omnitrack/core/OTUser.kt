@@ -211,10 +211,10 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
                 val duplicate = triggerManager.getTriggerWithId(snapshot.key)
                 if (duplicate == null) {
                     println("load trigger ${snapshot.key} from DB")
-                    FirebaseDbHelper.getTrigger(this@OTUser, snapshot.key).subscribe {
+                    FirebaseDbHelper.getTrigger(this@OTUser, snapshot.key).subscribe({
                         trigger ->
                         triggerManager.putNewTrigger(trigger)
-                    }
+                    }, {})
                 }
             }
 

@@ -241,7 +241,7 @@ object FirebaseDbHelper {
             subscriber ->
             val query = dbRef?.child(CHILD_NAME_TRIGGERS)?.child(key)
             if (query != null) {
-                query.addListenerForSingleValueEvent(object : ValueEventListener {
+                val listener = object : ValueEventListener {
                     override fun onCancelled(error: DatabaseError) {
                         if (!subscriber.isUnsubscribed) {
                             subscriber.onError(Exception("Firebase query failed"))
@@ -249,14 +249,19 @@ object FirebaseDbHelper {
                     }
 
                     override fun onDataChange(snapshot: DataSnapshot) {
-                        val triggerWithPosition = extractTriggerWithPosition(user, snapshot)
-                        if (!subscriber.isUnsubscribed) {
-                            subscriber.onNext(triggerWithPosition.second)
-                            subscriber.onCompleted()
+                        if (snapshot.exists()) {
+                            val triggerWithPosition = extractTriggerWithPosition(user, snapshot)
+                            if (!subscriber.isUnsubscribed) {
+                                subscriber.onNext(triggerWithPosition.second)
+                                subscriber.onCompleted()
+                            }
                         }
                     }
 
-                })
+                }
+
+                query.addValueEventListener(listener)
+                subscriber.add(Subscriptions.create { query.removeEventListener(listener) })
             } else {
                 if (!subscriber.isUnsubscribed) {
                     subscriber.onError(NullPointerException("Firebase query is null"))
