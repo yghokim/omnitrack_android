@@ -16,7 +16,7 @@
 
     <string name="msg_save">저장</string>
 
-    <string name="msg_allow_permission">권한 허용하기</string>
+    <string name="msg_allow_permission">권한 확인하기</string>
 
     <string name="msg_confirm_log">아이템 기록</string>
 
@@ -293,7 +293,13 @@
     <string name="msg_sign_in_google_canceled">구글 계정 로그인이 취소되었습니다.</string>
     <string name="msg_under_development">이 기능은 아직 구현중입니다. 곧 언락하겠습니다!</string>
     <string name="msg_contacts_permission_required">주소록 접근 권한 필요</string>
+    <string name="msg_permission_required">접근 권한 필요</string>
     <string name="msg_contacts_permission_rationale">디바이스에 로그인된 구글 계정을 선택하실 수 있도록 목록을 불러오는 데에만 사용됩니다.</string>
+    <string name="msg_contacts_permission_denied_message">주소록 권한 없이는 구글 계정으로 로그인하실 수 없습니다 :(</string>
+
+    <string name="msg_permission_request_of_tracker">하나 이상의 트래커가 추가적인 접근 권한이 필요한 필드를 포함하고 있습니다</string>
+    <string name="msg_format_permission_request_of_field">%1$s 필드를 사용하려면 추가적인 접근 권한을 허용해주셔야 합니다.</string>
+    <string name="msg_format_permission_request_of_tracker_single">%1$s 트래커가 추가적인 접근 권한이 필요한 필드를 포함하고 있습니다.</string>
 
 
     <string-array name="purpose_entries">

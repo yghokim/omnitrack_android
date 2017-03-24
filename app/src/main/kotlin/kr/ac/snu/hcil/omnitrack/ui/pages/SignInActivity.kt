@@ -65,6 +65,7 @@ class SignInActivity : AppCompatActivity() {
                                         this.findViewById(kr.ac.snu.hcil.omnitrack.R.id.g_login_button).callOnClick()
                                     } else {
                                         Log.i(LOG_TAG, "Permissions not granted for Google sign-in. :(")
+                                        Toast.makeText(this, getString(R.string.msg_contacts_permission_denied_message), Toast.LENGTH_LONG).show()
                                         toIdleMode()
                                     }
                                 }

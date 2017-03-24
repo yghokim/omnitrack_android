@@ -1,7 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.tracker
 
 import android.app.Dialog
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.support.design.widget.BottomSheetBehavior
 import android.support.design.widget.BottomSheetDialogFragment
@@ -47,8 +46,6 @@ class FieldPresetSelectionBottomSheetFragment : BottomSheetDialogFragment() {
 
     private lateinit var gridAdapter: GridAdapter
 
-    private var permissionWaitingTypeInfo: AttributePresetInfo? = null
-
     var callback: Callback? = null
 
 
@@ -91,19 +88,6 @@ class FieldPresetSelectionBottomSheetFragment : BottomSheetDialogFragment() {
         newAttributeGrid.adapter = gridAdapter
     }
 
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
-        if (grantResults.filter { it != PackageManager.PERMISSION_GRANTED }.isEmpty()) {
-            //granted
-            if (permissionWaitingTypeInfo != null) {
-                dismiss()
-                callback?.onAttributePermittedToAdd(permissionWaitingTypeInfo!!)
-                permissionWaitingTypeInfo = null
-            }
-        }
-    }
 
     private fun makeAttributePresets(): Array<AttributePresetInfo> {
         return arrayOf(
@@ -190,14 +174,16 @@ class FieldPresetSelectionBottomSheetFragment : BottomSheetDialogFragment() {
                 view.setOnClickListener {
                     val typeInfo = presets?.get(adapterPosition)
                     if (typeInfo != null) {
-                        val requiredPermissions = OTAttribute.getPermissionsForAttribute(typeInfo.typeId)
-                        if (requiredPermissions != null) {
-                            permissionWaitingTypeInfo = typeInfo
-                            requestPermissions(requiredPermissions, 10)
-                        } else {
-                            dismiss()
-                            callback?.onAttributePermittedToAdd(typeInfo)
-                        }
+
+                        OTAttribute.showPermissionCheckDialog(this@FieldPresetSelectionBottomSheetFragment.activity,
+                                typeInfo.typeId, typeInfo.name,
+                                {
+                                    dismiss()
+                                    callback?.onAttributePermittedToAdd(typeInfo)
+                                },
+                                {
+
+                                })
                     }
                 }
             }
