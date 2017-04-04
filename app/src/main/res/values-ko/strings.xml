@@ -302,6 +302,7 @@
     <string name="msg_format_permission_request_of_tracker_single">%1$s 트래커가 추가적인 접근 권한이 필요한 필드를 포함하고 있습니다.</string>
     <string name="msg_sign_in">로그인</string>
     <string name="msg_sentence_widget_sign_in">위젯을 사용하려면 먼저 로그인해야 합니다</string>
+    <string name="msg_shortcut_widget_name">미니 옴니트랙</string>
 
 
     <string-array name="purpose_entries">

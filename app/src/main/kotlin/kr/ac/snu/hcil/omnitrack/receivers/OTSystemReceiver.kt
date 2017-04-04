@@ -12,6 +12,7 @@ import kr.ac.snu.hcil.omnitrack.core.system.OTTaskNotificationManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTTrackingNotificationManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTDataTriggerManager
 import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
+import kr.ac.snu.hcil.omnitrack.widgets.OTShortcutPanelWidgetUpdateService
 
 /**
  * Created by Young-Ho Kim on 16. 7. 28
@@ -37,6 +38,12 @@ class OTSystemReceiver : BroadcastReceiver() {
                         Toast.makeText(OTApplication.app, "${tracker.name} item was logged", Toast.LENGTH_SHORT).show()
                         }
                 }
+
+                context.startService(OTShortcutPanelWidgetUpdateService.makeNotifyDatesetChangedIntentToAllWidgets(context))
+            }
+
+            OTApplication.BROADCAST_ACTION_ITEM_REMOVED -> {
+                context.startService(OTShortcutPanelWidgetUpdateService.makeNotifyDatesetChangedIntentToAllWidgets(context))
             }
 
             OTApplication.BROADCAST_ACTION_COMMAND_REMOVE_ITEM -> {
@@ -53,6 +60,8 @@ class OTSystemReceiver : BroadcastReceiver() {
                         OTTrackingNotificationManager.cancelBackgroundLoggingSuccessNotification(tracker, notificationId)
                         }
                 }
+
+                context.startService(OTShortcutPanelWidgetUpdateService.makeNotifyDatesetChangedIntentToAllWidgets(context))
             }
 
             OTApplication.BROADCAST_ACTION_BACKGROUND_LOGGING_STARTED -> {

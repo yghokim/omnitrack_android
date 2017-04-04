@@ -113,7 +113,9 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".widgets.OTShortcutPanelWidgetProvider">
+        <receiver
+            android:name=".widgets.OTShortcutPanelWidgetProvider"
+            android:label="@string/msg_shortcut_widget_name">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="kr.ac.snu.hcil.omnitrack.action.USER_SIGNED_IN" />

@@ -87,12 +87,12 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
 
                     itemSummary.todayCount?.let {
                         text.append(context.getString(R.string.msg_todays_log)).append(": ").append(it)
-                                .append("   ")
+                                .append("\n")
                     }
 
                     itemSummary.lastLoggingTime?.let {
-                        val dateText = TimeHelper.getDateText(it, context).toUpperCase()
-                        val timeText = lastLoggedTimeFormat.format(Date(it)).toUpperCase()
+                        val dateText = TimeHelper.getDateText(it, context)
+                        val timeText = lastLoggedTimeFormat.format(Date(it))
 
                         text.append(dateText).append(" ").append(timeText)
                     }
@@ -100,7 +100,7 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
                     rv.setTextViewText(R.id.ui_text_statistics, text)
                 }
 
-                val buttonSize = OTApplication.app.resources.getDimensionPixelSize(R.dimen.button_height_small)
+                val buttonSize = OTApplication.app.resources.getDimensionPixelSize(R.dimen.app_widget_instant_logging_button_height)
                 val buttonRadius = buttonSize * .5f
                 val paint = Paint(Paint.ANTI_ALIAS_FLAG)
                 paint.style = Paint.Style.FILL
@@ -112,7 +112,7 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
                 rv.setImageViewBitmap(R.id.ui_background_image, buttonBitmap)
 
                 val baseTrackerIntent = Intent().putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
-                rv.setOnClickFillInIntent(R.id.fillButton, Intent(baseTrackerIntent).putExtra(OTShortcutPanelWidgetProvider.EXTRA_CLICK_COMMAND, OTShortcutPanelWidgetProvider.CLICK_COMMAND_ROW))
+                rv.setOnClickFillInIntent(R.id.ui_clickable_area, Intent(baseTrackerIntent).putExtra(OTShortcutPanelWidgetProvider.EXTRA_CLICK_COMMAND, OTShortcutPanelWidgetProvider.CLICK_COMMAND_ROW))
                 rv.setOnClickFillInIntent(R.id.ui_button_instant, Intent(baseTrackerIntent).putExtra(OTShortcutPanelWidgetProvider.EXTRA_CLICK_COMMAND, OTShortcutPanelWidgetProvider.CLICK_COMMAND_INSTANT_LOGGING))
 
                 return rv

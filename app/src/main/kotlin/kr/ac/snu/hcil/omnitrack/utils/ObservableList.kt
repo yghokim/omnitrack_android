@@ -16,6 +16,8 @@ class ObservableList<T>(){
     val elementRemoved = Event<ReadOnlyPair<T, Int>>()
     val elementReordered = Event<IntRange>()
 
+    val listModified = Event<Void?>()
+
     val elementAddedSubject = SerializedSubject(PublishSubject.create<Pair<ObservableList<T>, ReadOnlyPair<T, Int>>>())
     val elementRemovedSubject = SerializedSubject(PublishSubject.create<Pair<ObservableList<T>, ReadOnlyPair<T, Int>>>())
 
@@ -26,6 +28,7 @@ class ObservableList<T>(){
         if(list.add(element)) {
             elementAdded.invoke(this, ReadOnlyPair(element, list.size - 1))
             elementAddedSubject.onNext(Pair(this, ReadOnlyPair(element, list.size - 1)))
+            listModified.invoke(this, null)
             return true
         }
         else{
@@ -38,6 +41,7 @@ class ObservableList<T>(){
             list.add(position, element)
             elementAdded.invoke(this, ReadOnlyPair(element, position))
             elementAddedSubject.onNext(Pair(this, ReadOnlyPair(element, position)))
+            listModified.invoke(this, null)
             return true
         } catch(e: Exception) {
             return false
@@ -64,6 +68,8 @@ class ObservableList<T>(){
             } else {
                 elementReordered.invoke(this, IntRange(toPosition, fromPosition))
             }
+
+            listModified.invoke(this, null)
         }
     }
 
@@ -78,6 +84,7 @@ class ObservableList<T>(){
             list.removeAt(index)
             elementRemoved.invoke(this, ReadOnlyPair(element, index))
             elementRemovedSubject.onNext(Pair(this, ReadOnlyPair(element, index)))
+            listModified.invoke(this, null)
             return true
         }
         else{
