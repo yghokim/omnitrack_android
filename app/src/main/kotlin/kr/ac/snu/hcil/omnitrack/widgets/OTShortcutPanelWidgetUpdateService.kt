@@ -31,6 +31,9 @@ class OTShortcutPanelWidgetUpdateService : Service() {
 
             rv.setRemoteAdapter(R.id.ui_list, intent)
 
+            rv.setPendingIntentTemplate(R.id.ui_list, PendingIntent.getBroadcast(context, widgetId ?: AppWidgetManager.INVALID_APPWIDGET_ID,
+                    Intent(OTShortcutPanelWidgetProvider.ACTION_TRACKER_CLICK_EVENT), PendingIntent.FLAG_UPDATE_CURRENT))
+
             return rv
         }
 
