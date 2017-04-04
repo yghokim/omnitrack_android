@@ -1,6 +1,5 @@
 package kr.ac.snu.hcil.omnitrack.widgets
 
-import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
@@ -12,11 +11,8 @@ import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
-import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
-import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemEditingActivity
 import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 import java.text.SimpleDateFormat
 import java.util.*
@@ -115,11 +111,9 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
                 buttonCanvas.drawCircle(buttonRadius, buttonRadius, buttonRadius, paint)
                 rv.setImageViewBitmap(R.id.ui_background_image, buttonBitmap)
 
-
-                val instantLoggingIntent = PendingIntent.getService(context, 0, OTBackgroundLoggingService.makeIntent(context, tracker, OTItem.LoggingSource.Shortcut), PendingIntent.FLAG_UPDATE_CURRENT)
-
-                rv.setOnClickPendingIntent(R.id.ui_button_instant, instantLoggingIntent)
-                rv.setOnClickFillInIntent(R.id.group, ItemEditingActivity.makeIntent(tracker.objectId, context))
+                val baseTrackerIntent = Intent().putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
+                rv.setOnClickFillInIntent(R.id.fillButton, Intent(baseTrackerIntent).putExtra(OTShortcutPanelWidgetProvider.EXTRA_CLICK_COMMAND, OTShortcutPanelWidgetProvider.CLICK_COMMAND_ROW))
+                rv.setOnClickFillInIntent(R.id.ui_button_instant, Intent(baseTrackerIntent).putExtra(OTShortcutPanelWidgetProvider.EXTRA_CLICK_COMMAND, OTShortcutPanelWidgetProvider.CLICK_COMMAND_INSTANT_LOGGING))
 
                 return rv
             } else return null

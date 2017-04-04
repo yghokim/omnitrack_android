@@ -118,6 +118,7 @@
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="kr.ac.snu.hcil.omnitrack.action.USER_SIGNED_IN" />
                 <action android:name="kr.ac.snu.hcil.omnitrack.action.USER_SIGNED_OUT" />
+                <action android:name="kr.ac.snu.hcil.omnitrack.action.APP_WIDGET_SHORTCUT_TRACKER_CLICKED" />
             </intent-filter>
 
             <meta-data
