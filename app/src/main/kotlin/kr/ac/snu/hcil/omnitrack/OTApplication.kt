@@ -81,6 +81,10 @@ class OTApplication : MultiDexApplication() {
 
         const val INTENT_EXTRA_ITEMBUILDER = "itemBuilderId"
 
+        const val BROADCAST_ACTION_USER_SIGNED_IN = "kr.ac.snu.hcil.omnitrack.action.USER_SIGNED_IN"
+        const val BROADCAST_ACTION_USER_SIGNED_OUT = "kr.ac.snu.hcil.omnitrack.action.USER_SIGNED_OUT"
+
+
         const val BROADCAST_ACTION_TIME_TRIGGER_ALARM = "kr.ac.snu.hcil.omnitrack.action.ALARM"
         const val BROADCAST_ACTION_EVENT_TRIGGER_CHECK_ALARM = "kr.ac.snu.hcil.omnitrack.action.EVENT_TRIGGER_ALARM"
 

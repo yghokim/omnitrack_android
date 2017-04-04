@@ -53,7 +53,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/ui_header"
-        android:background="@color/frontalBackground"
+        android:background="@color/outerBackground"
         android:divider="@drawable/vertical_separator_shadowed"
         android:showDividers="middle" />
 
