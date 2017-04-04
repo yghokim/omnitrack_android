@@ -4,17 +4,20 @@
     android:id="@+id/group"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/frontal_color_selectable_element_background">
+    android:background="@color/editTextFormBackground">
 
     <LinearLayout
+        android:id="@+id/ui_clickable_area"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:layout_marginBottom="8dp"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="8dp"
         android:layout_toStartOf="@id/ui_button_container"
-        android:orientation="vertical">
+        android:background="@drawable/frontal_color_selectable_element_background"
+        android:clickable="true"
+        android:orientation="vertical"
+        android:paddingBottom="10dp"
+        android:paddingLeft="12dp"
+        android:paddingTop="10dp">
 
         <TextView
             android:id="@+id/ui_tracker_name"
@@ -22,6 +25,7 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:textColor="@color/textColorMidDark"
+            android:textIsSelectable="false"
             android:textSize="14sp"
             android:textStyle="bold"
             tools:text="Physical activity" />
@@ -32,28 +36,23 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="1dp"
             android:ellipsize="end"
+            android:textIsSelectable="false"
             android:textSize="10sp"
             tools:text="Today: 0    06:30 Yesterday" />
 
     </LinearLayout>
 
-
-    <ImageButton
-        android:id="@+id/fillButton"
-        style="@style/Base.Widget.AppCompat.Button.Borderless"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_toStartOf="@+id/ui_button_container" />
-
     <FrameLayout
         android:id="@+id/ui_button_container"
         style="@style/shortcut_ButtonContainerStyle"
+        android:layout_width="@dimen/app_widget_instant_logging_button_height"
+        android:layout_height="@dimen/app_widget_instant_logging_button_height"
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="12dp"
-        android:layout_marginTop="8dp">
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+
+        >
 
         <ImageView
             android:id="@+id/ui_background_image"

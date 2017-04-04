@@ -18,6 +18,7 @@ import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTrigger
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerManager
 import kr.ac.snu.hcil.omnitrack.utils.*
+import kr.ac.snu.hcil.omnitrack.widgets.OTShortcutPanelWidgetUpdateService
 import rx.Observable
 import rx.Single
 import rx.internal.util.SubscriptionList
@@ -150,6 +151,11 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
             for (i in range) {
                 trackers[i].databasePointRef?.child("position")?.setValue(i)
             }
+        }
+
+        trackers.listModified += {
+            sender, args ->
+            OTApplication.app.startService(OTShortcutPanelWidgetUpdateService.makeNotifyDatesetChangedIntentToAllWidgets(OTApplication.app))
         }
 
         trackerListDbReference = databaseRef?.child(FirebaseDbHelper.CHILD_NAME_TRACKERS)

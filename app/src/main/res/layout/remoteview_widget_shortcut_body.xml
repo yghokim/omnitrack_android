@@ -8,7 +8,7 @@
     <RelativeLayout
         android:id="@+id/ui_header"
         android:layout_width="match_parent"
-        android:layout_height="22dp"
+        android:layout_height="30dp"
         android:background="@drawable/main_gradient">
 
         <ImageView
@@ -17,20 +17,24 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:alpha="0.6"
-            android:paddingBottom="3dp"
-            android:paddingLeft="3dp"
-            android:paddingTop="3dp"
+            android:paddingBottom="5dp"
+            android:paddingLeft="4dp"
+            android:paddingTop="4dp"
             android:scaleType="fitCenter"
             android:src="@drawable/icon_simple" />
 
         <TextView
+            android:id="@+id/ui_app_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
+            android:layout_marginLeft="3dp"
             android:layout_toRightOf="@+id/icon"
+            android:clickable="true"
             android:text="@string/app_name"
             android:textColor="#fafafa"
-            android:textSize="11sp"
+            android:textIsSelectable="false"
+            android:textSize="13sp"
             android:textStyle="bold" />
 
         <ImageButton
@@ -40,10 +44,10 @@
             android:layout_alignParentEnd="true"
             android:layout_alignTop="@+id/icon"
             android:background="@drawable/transparent_button_background"
-            android:paddingBottom="2dp"
+            android:paddingBottom="4dp"
             android:paddingLeft="6dp"
             android:paddingRight="6dp"
-            android:paddingTop="2dp"
+            android:paddingTop="4dp"
             android:scaleType="fitCenter"
             android:src="@drawable/icon_refresh" />
     </RelativeLayout>
