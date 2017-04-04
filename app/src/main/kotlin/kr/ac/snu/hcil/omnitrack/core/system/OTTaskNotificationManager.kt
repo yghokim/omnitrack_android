@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.system
 
+import android.app.PendingIntent
 import android.content.Context
 import br.com.goncalves.pugnotification.notification.PugNotification
 import kr.ac.snu.hcil.omnitrack.R
@@ -11,7 +12,7 @@ object OTTaskNotificationManager {
 
     const val PROGRESS_INDETERMINATE = -1
 
-    fun setTaskProgressNotification(context: Context, tag: String? = null, id: Int, title: String, content: String, progress: Int, largeIcon: Int = R.drawable.icon_cloud_download, smallIcon: Int = android.R.drawable.stat_sys_download) {
+    fun setTaskProgressNotification(context: Context, tag: String? = null, id: Int, title: String, content: String, progress: Int, largeIcon: Int = R.drawable.icon_cloud_download, smallIcon: Int = android.R.drawable.stat_sys_download, dismissedIntent: PendingIntent? = null) {
         val noti = PugNotification.with(context)
                 .load()
                 .title(title)
@@ -19,6 +20,11 @@ object OTTaskNotificationManager {
                 .smallIcon(smallIcon)
                 .color(R.color.colorPrimary)
                 .largeIcon(largeIcon)
+                .apply {
+                    if (dismissedIntent != null) {
+                        this.dismiss(dismissedIntent)
+                    }
+                }
 
         if (tag != null) {
             noti.tag(tag)

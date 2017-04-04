@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/group"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="12dp"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="12dp"
+    android:paddingTop="12dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@id/ui_button_container"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/ui_tracker_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:textColor="@color/textColorMidDark"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            tools:text="Physical activity" />
+
+        <TextView
+            android:id="@+id/ui_text_statistics"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:ellipsize="end"
+            android:textSize="12sp"
+            tools:text="Today: 0    06:30 Yesterday" />
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/ui_button_container"
+        style="@style/shortcut_ButtonContainerStyle"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true">
+
+        <ImageView
+            android:id="@+id/ui_background_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <ImageButton
+            android:id="@+id/ui_button_instant"
+            style="@style/shortcut_ButtonStyle" />
+    </FrameLayout>
+
+
+</RelativeLayout>
