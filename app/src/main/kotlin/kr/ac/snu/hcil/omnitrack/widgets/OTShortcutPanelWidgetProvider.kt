@@ -21,6 +21,10 @@ class OTShortcutPanelWidgetProvider : AppWidgetProvider() {
         const val CLICK_COMMAND_ROW = "rowClicked"
         const val CLICK_COMMAND_INSTANT_LOGGING = "instantLoggingClicked"
 
+        fun getAppWidgetIds(context: Context, appWidgetManager: AppWidgetManager?): IntArray {
+            val _appWidgetManager = appWidgetManager ?: AppWidgetManager.getInstance(context)
+            return _appWidgetManager.getAppWidgetIds(ComponentName(context, OTShortcutPanelWidgetProvider::class.java))
+        }
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -36,7 +40,7 @@ class OTShortcutPanelWidgetProvider : AppWidgetProvider() {
             }
             val appWidgetManager = AppWidgetManager.getInstance(context)
 
-            updateIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetManager.getAppWidgetIds(ComponentName(context, OTShortcutPanelWidgetProvider::class.java)))
+            updateIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, getAppWidgetIds(context, appWidgetManager))
 
             context.startService(updateIntent)
         } else if (intent.action == ACTION_TRACKER_CLICK_EVENT) {

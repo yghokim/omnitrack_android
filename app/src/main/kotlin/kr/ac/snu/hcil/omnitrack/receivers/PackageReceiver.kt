@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
+import kr.ac.snu.hcil.omnitrack.widgets.OTShortcutPanelWidgetUpdateService
 import rx.schedulers.Schedulers
 
 /**
@@ -18,14 +19,17 @@ class PackageReceiver: BroadcastReceiver() {
             when (intent.action) {
                 Intent.ACTION_INSTALL_PACKAGE -> {
                     OTShortcutPanelManager.refreshNotificationShortcutViews(user, context)
+                    context.startService(OTShortcutPanelWidgetUpdateService.makeNotifyDatesetChangedIntentToAllWidgets(context))
                 }
 
                 Intent.ACTION_PACKAGE_REPLACED -> {
                     OTShortcutPanelManager.refreshNotificationShortcutViews(user, context)
+                    context.startService(OTShortcutPanelWidgetUpdateService.makeNotifyDatesetChangedIntentToAllWidgets(context))
                 }
 
                 Intent.ACTION_PACKAGE_ADDED -> {
                     OTShortcutPanelManager.refreshNotificationShortcutViews(user, context)
+                    context.startService(OTShortcutPanelWidgetUpdateService.makeNotifyDatesetChangedIntentToAllWidgets(context))
                 }
             }
         }
