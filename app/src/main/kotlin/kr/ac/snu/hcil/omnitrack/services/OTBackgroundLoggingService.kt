@@ -11,6 +11,8 @@ import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
 import kr.ac.snu.hcil.omnitrack.utils.isInDozeMode
 import rx.Observable
+import rx.Subscription
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 
 
@@ -60,6 +62,12 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
             flagPreferences.edit().remove(tracker.objectId).apply()
         }
 
+        private val currentBuilderSubscriptionDict = ConcurrentHashMap<String, Subscription>()
+
+        fun cancelBuilderTask(trackerId: String): Boolean {
+            return currentBuilderSubscriptionDict.remove(trackerId) != null
+        }
+
         fun startLoggingInService(context: Context, tracker: OTTracker, source: OTItem.LoggingSource) {
 
             context.startService(makeIntent(context, tracker, source))
@@ -81,28 +89,33 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
                 sendBroadcast(context, OTApplication.BROADCAST_ACTION_BACKGROUND_LOGGING_STARTED, tracker, notificationId)
 
 
-                builder.autoComplete().subscribe({}, {}, {
-                    val item = builder.makeItem(source)
-                    FirebaseDbHelper.saveItem(item, tracker) {
-                        success ->
-                        if (success) {
-                            sendBroadcast(context, OTApplication.BROADCAST_ACTION_BACKGROUND_LOGGING_SUCCEEDED, tracker, item.objectId!!, notify, notificationId)
-                            OTApplication.logger.writeSystemLog("${tracker.name} background logging was successful", TAG)
-                            removeLoggingFlag(tracker)
-                            if (!subscriber.isUnsubscribed) {
-                                subscriber.onNext(0)
-                                subscriber.onCompleted()
-                            }
-                        } else {
+                if (currentBuilderSubscriptionDict.contains(tracker.objectId)) {
+                    currentBuilderSubscriptionDict[tracker.objectId]?.unsubscribe()
+                    currentBuilderSubscriptionDict.remove(tracker.objectId)
+                } else {
+                    currentBuilderSubscriptionDict[tracker.objectId] = builder.autoComplete().doOnCompleted { currentBuilderSubscriptionDict.remove(tracker.objectId) }.subscribe({}, {}, {
+                        val item = builder.makeItem(source)
+                        FirebaseDbHelper.saveItem(item, tracker) {
+                            success ->
+                            if (success) {
+                                sendBroadcast(context, OTApplication.BROADCAST_ACTION_BACKGROUND_LOGGING_SUCCEEDED, tracker, item.objectId!!, notify, notificationId)
+                                OTApplication.logger.writeSystemLog("${tracker.name} background logging was successful", TAG)
+                                removeLoggingFlag(tracker)
+                                if (!subscriber.isUnsubscribed) {
+                                    subscriber.onNext(0)
+                                    subscriber.onCompleted()
+                                }
+                            } else {
 
-                            OTApplication.logger.writeSystemLog("${tracker.name} background logging failed", TAG)
-                            removeLoggingFlag(tracker)
-                            if (!subscriber.isUnsubscribed) {
-                                subscriber.onError(Exception("Item storing failed"))
+                                OTApplication.logger.writeSystemLog("${tracker.name} background logging failed", TAG)
+                                removeLoggingFlag(tracker)
+                                if (!subscriber.isUnsubscribed) {
+                                    subscriber.onError(Exception("Item storing failed"))
+                                }
                             }
                         }
-                    }
-                })
+                    })
+                }
             }
         }
 

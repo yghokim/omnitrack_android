@@ -300,6 +300,8 @@
     <string name="msg_permission_request_of_tracker">하나 이상의 트래커가 추가적인 접근 권한이 필요한 필드를 포함하고 있습니다</string>
     <string name="msg_format_permission_request_of_field">%1$s 필드를 사용하려면 추가적인 접근 권한을 허용해주셔야 합니다.</string>
     <string name="msg_format_permission_request_of_tracker_single">%1$s 트래커가 추가적인 접근 권한이 필요한 필드를 포함하고 있습니다.</string>
+    <string name="msg_sign_in">로그인</string>
+    <string name="msg_sentence_widget_sign_in">위젯을 사용하려면 먼저 로그인해야 합니다</string>
 
 
     <string-array name="purpose_entries">

@@ -387,6 +387,8 @@
     <string name="msg_format_permission_request_of_tracker_single">%1$s tracker contains fields which require additional permissions.</string>
 
     <string name="msg_format_permission_request_of_field">You need to allow additional permissions to use %1$s field</string>
+    <string name="msg_sign_in">Sign In</string>
+    <string name="msg_sentence_widget_sign_in">Please sign in first to use the widgets</string>
 
 
 </resources>

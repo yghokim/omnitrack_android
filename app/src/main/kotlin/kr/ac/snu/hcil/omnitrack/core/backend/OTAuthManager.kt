@@ -31,6 +31,10 @@ object OTAuthManager {
 
     const val LOG_TAG = "OMNITRACK Auth Manager"
 
+    enum class SignedInLevel {
+        NONE, AUTHORIZED, CACHED
+    }
+
     interface SignInResultsHandler {
         fun onSuccess()
         fun onError(e: Throwable)
@@ -125,6 +129,21 @@ object OTAuthManager {
 
     fun isUserSignedIn(): Boolean {
         return mFirebaseAuth.currentUser != null
+    }
+
+    val currentSignedInLevel: SignedInLevel get() {
+        val result = try {
+            if (isUserSignedIn()) {
+                SignedInLevel.AUTHORIZED
+            } else if (OTUser.isUserStored(OTApplication.app.systemSharedPreferences)) {
+                SignedInLevel.CACHED
+            } else return SignedInLevel.NONE
+        } catch(ex: Exception) {
+            SignedInLevel.NONE
+        }
+
+        println("Current signed in leve: ${result}")
+        return result
     }
 
     fun refreshGoogleAccount(finished: (Boolean) -> Unit) {
