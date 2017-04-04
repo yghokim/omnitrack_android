@@ -356,12 +356,14 @@ object OTAuthManager {
         mSignInChangedListeners.forEach {
             it.onSignedIn(user)
         }
+        OTApplication.app.sendBroadcast(Intent(OTApplication.BROADCAST_ACTION_USER_SIGNED_IN).putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_USER, userId))
     }
 
     private fun notifySignedOut() {
         mSignInChangedListeners.forEach {
             it.onSignedOut()
         }
+        OTApplication.app.sendBroadcast(Intent(OTApplication.BROADCAST_ACTION_USER_SIGNED_OUT).putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_USER, userId))
     }
 
     private fun clearUserInfo() {

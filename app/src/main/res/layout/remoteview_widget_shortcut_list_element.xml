@@ -4,6 +4,7 @@
     android:id="@+id/group"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@drawable/frontal_color_selectable_element_background"
     android:paddingBottom="12dp"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="12dp"
@@ -22,7 +23,7 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:textColor="@color/textColorMidDark"
-            android:textSize="13sp"
+            android:textSize="14sp"
             android:textStyle="bold"
             tools:text="Physical activity" />
 
@@ -30,9 +31,9 @@
             android:id="@+id/ui_text_statistics"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="3dp"
+            android:layout_marginTop="1dp"
             android:ellipsize="end"
-            android:textSize="12sp"
+            android:textSize="10sp"
             tools:text="Today: 0    06:30 Yesterday" />
 
     </LinearLayout>

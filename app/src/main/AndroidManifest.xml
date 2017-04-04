@@ -116,12 +116,18 @@
         <receiver android:name=".widgets.OTShortcutPanelWidgetProvider">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="kr.ac.snu.hcil.omnitrack.action.USER_SIGNED_IN" />
+                <action android:name="kr.ac.snu.hcil.omnitrack.action.USER_SIGNED_OUT" />
             </intent-filter>
 
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/shortcut_widget_info" />
         </receiver>
+
+        <service
+            android:name=".widgets.OTShortcutPanelWidgetUpdateService"
+            android:exported="false"></service>
 
         <service
             android:name=".receivers.TimeTriggerAlarmReceiver$TimeTriggerWakefulHandlingService"
