@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:configure="kr.ac.snu.hcil.omnitrack.ui.pages.configs.ShortcutPanelWidgetConfigActivity"
     android:initialLayout="@layout/remoteview_widget_shortcut_body"
     android:minHeight="110dp"
     android:minWidth="180dp"

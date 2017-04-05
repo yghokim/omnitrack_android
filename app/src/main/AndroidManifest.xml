@@ -209,6 +209,11 @@
             android:name=".ui.pages.SendReportActivity"
             android:label="@string/msg_send_report" />
 
+        <activity
+            android:name=".ui.pages.configs.ShortcutPanelWidgetConfigActivity"
+            android:excludeFromRecents="true"
+            android:taskAffinity="kr.ac.snu.hcil.omnitrack.shortcutPanelWidgetConfigTask"
+            android:theme="@style/AppTheme.Dialog.DimmedBackground" />
 
     </application>
 
