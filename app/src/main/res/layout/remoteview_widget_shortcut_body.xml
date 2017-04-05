@@ -38,7 +38,7 @@
             android:textStyle="bold" />
 
         <ImageButton
-            android:id="@+id/ui_button_sync"
+            android:id="@+id/ui_button_more"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_alignParentEnd="true"
@@ -49,7 +49,7 @@
             android:paddingRight="6dp"
             android:paddingTop="4dp"
             android:scaleType="fitCenter"
-            android:src="@drawable/icon_refresh" />
+            android:src="@drawable/more" />
     </RelativeLayout>
 
     <ListView

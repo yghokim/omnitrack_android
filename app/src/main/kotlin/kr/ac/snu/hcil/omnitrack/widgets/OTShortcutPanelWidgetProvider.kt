@@ -27,6 +27,15 @@ class OTShortcutPanelWidgetProvider : AppWidgetProvider() {
         }
     }
 
+    override fun onDeleted(context: Context, appWidgetIds: IntArray) {
+        super.onDeleted(context, appWidgetIds)
+        val editor = OTShortcutPanelWidgetUpdateService.getPreferences(context).edit()
+        for (id in appWidgetIds) {
+            OTShortcutPanelWidgetUpdateService.removeVariables(id, editor)
+        }
+        editor.apply()
+    }
+
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
 
