@@ -2,6 +2,8 @@
 <resources>
     <color name="transparent">#00000000</color>
 
+    <color name="semiTransparentWhite">#c8ffffff</color>
+
     <color name="colorPrimary">#6c314a</color>
     <color name="colorPrimaryDark">#512135</color>
     <color name="colorPrimarySemiLight">#8c4563</color>

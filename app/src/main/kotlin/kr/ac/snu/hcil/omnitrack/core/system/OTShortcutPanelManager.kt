@@ -21,6 +21,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemEditingActivity
+import kr.ac.snu.hcil.omnitrack.widgets.OTShortcutPanelWidgetUpdateService
 
 /**
  * Created by Young-Ho Kim on 9/4/2016
@@ -151,8 +152,11 @@ object OTShortcutPanelManager {
         OTApplication.app.sendBroadcast(intent)*/
 
         val user = tracker.owner
-        if (user != null)
+        if (user != null) {
             refreshNotificationShortcutViews(user)
+        }
+
+        OTApplication.app.startService(OTShortcutPanelWidgetUpdateService.makeNotifyDatesetChangedIntentToAllWidgets(OTApplication.app))
     }
 
     operator fun minusAssign(@Suppress("UNUSED_PARAMETER") tracker: OTTracker)
@@ -164,6 +168,8 @@ object OTShortcutPanelManager {
         val user = tracker.owner
         if (user != null)
             refreshNotificationShortcutViews(user)
+
+        OTApplication.app.startService(OTShortcutPanelWidgetUpdateService.makeNotifyDatesetChangedIntentToAllWidgets(OTApplication.app))
     }
 
     fun disposeShortcutPanel() {

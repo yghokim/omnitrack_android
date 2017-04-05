@@ -5,6 +5,8 @@ import android.app.Service
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
+import android.net.Uri
 import android.os.IBinder
 import android.support.v4.app.TaskStackBuilder
 import android.view.View
@@ -12,6 +14,7 @@ import android.widget.RemoteViews
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
+import kr.ac.snu.hcil.omnitrack.ui.pages.configs.ShortcutPanelWidgetConfigActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 
 /**
@@ -25,23 +28,83 @@ class OTShortcutPanelWidgetUpdateService : Service() {
         const val ACTION_TO_MAIN_MODE = "kr.ac.snu.hcil.omnitrack.action.APP_WIDGET_SHORTCUT_TO_MAIN_MODE"
         const val ACTION_NOTIFY_DATA_CHANGED = "kr.ac.snu.hcil.omnitrack.action.APP_WIDGET_SHORTCUT_NOTIFY_DATA_CHANGED"
 
+        const val EXTRA_MODE = "widgetMode"
+
+        const val MODE_SHORTCUT = "mode_shortcuts"
+        const val MODE_SELECTIVE = "mode_selective"
+        const val MODE_ALL = "mode_all"
+
+        const val EXTRA_SELECTED_TRACKER_IDS = "selectedTrackerIds"
+
+        const val EXTRA_TITLE = "widgetTitle"
+
+        fun getPreferences(context: Context): SharedPreferences {
+            return context.applicationContext.getSharedPreferences("shortcutPanelWidget", Context.MODE_PRIVATE)
+        }
+
+        fun removeVariables(widgetId: Int, editor: SharedPreferences.Editor) {
+            editor
+                    .remove("${EXTRA_MODE}_${widgetId}")
+                    .remove("${EXTRA_TITLE}_${widgetId}")
+        }
+
+        fun getMode(widgetId: Int, pref: SharedPreferences): String {
+            return pref.getString("${EXTRA_MODE}_${widgetId}", MODE_ALL)
+        }
+
+        fun setMode(widgetId: Int, mode: String, editor: SharedPreferences.Editor) {
+            editor.putString("${EXTRA_MODE}_${widgetId}", mode)
+        }
+
+        fun getTitle(widgetId: Int, pref: SharedPreferences): String {
+            return pref.getString("${EXTRA_TITLE}_${widgetId}", "OmniTrack")
+        }
+
+        fun setTitle(widgetId: Int, title: String, editor: SharedPreferences.Editor) {
+            editor.putString("${EXTRA_TITLE}_${widgetId}", title)
+        }
+
+        fun getSelectedTrackerIds(widgetId: Int, pref: SharedPreferences): Set<String>? {
+            return pref.getStringSet("${EXTRA_SELECTED_TRACKER_IDS}_${widgetId}", HashSet<String>())
+        }
+
+        fun setSelectedTrackerIds(widgetId: Int, value: Set<String>, editor: SharedPreferences.Editor) {
+            editor.putStringSet("${EXTRA_SELECTED_TRACKER_IDS}_${widgetId}", value)
+        }
+
         fun makeRemoteViewsForNormalMode(context: Context, widgetId: Int): RemoteViews {
+            val pref = getPreferences(context)
+            val title = getTitle(widgetId, pref)
+
             val rv = RemoteViews(context.packageName, R.layout.remoteview_widget_shortcut_body)
             rv.setViewVisibility(R.id.ui_progress_bar, View.INVISIBLE)
 
+            rv.setTextViewText(R.id.ui_app_title, title)
+
             val intent = Intent(context, OTShortcutPanelWidgetService::class.java)
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
+            intent.data = Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME))
 
             rv.setRemoteAdapter(R.id.ui_list, intent)
 
             rv.setPendingIntentTemplate(R.id.ui_list, PendingIntent.getBroadcast(context, widgetId,
                     Intent(OTShortcutPanelWidgetProvider.ACTION_TRACKER_CLICK_EVENT), PendingIntent.FLAG_UPDATE_CURRENT))
 
+            /*
             rv.setOnClickPendingIntent(R.id.ui_button_sync,
                     PendingIntent.getService(context, widgetId,
                             OTShortcutPanelWidgetUpdateService.makeNotifyDatesetChangedIntentToAllWidgets(context).putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, intArrayOf(widgetId)),
                             PendingIntent.FLAG_UPDATE_CURRENT
-                    ))
+                    ))*/
+
+            rv.setOnClickPendingIntent(R.id.ui_button_more,
+                    PendingIntent.getActivity(context, widgetId,
+                            Intent(context, ShortcutPanelWidgetConfigActivity::class.java)
+                                    .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
+                            ,
+                            PendingIntent.FLAG_UPDATE_CURRENT
+                    )
+            )
 
             val stackBuilder = TaskStackBuilder.create(context)
             // Adds the back stack for the Intent (but not the Intent itself)
@@ -99,6 +162,7 @@ class OTShortcutPanelWidgetUpdateService : Service() {
 
         val appWidgetIds = intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS) ?: intArrayOf()
         if (appWidgetIds.isNotEmpty()) {
+            println("widget ids: ${appWidgetIds.joinToString(", ")}")
             val appWidgetManager = AppWidgetManager.getInstance(this)
             when (intent.action) {
                 ACTION_INITIALIZE -> {
@@ -107,6 +171,7 @@ class OTShortcutPanelWidgetUpdateService : Service() {
                         for (id in appWidgetIds) {
                             val rv = makeRemoteViewsForNormalMode(this, id)
                             appWidgetManager.updateAppWidget(id, rv)
+                            appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.ui_list)
                         }
                     } else {
                         for (id in appWidgetIds) {

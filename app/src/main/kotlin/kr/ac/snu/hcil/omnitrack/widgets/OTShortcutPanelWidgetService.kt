@@ -7,10 +7,12 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.support.v4.graphics.ColorUtils
+import android.util.Log
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
 import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
@@ -38,6 +40,10 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
 
         private var user: OTUser? = null
 
+        private var mode: String = OTShortcutPanelWidgetUpdateService.MODE_ALL
+
+        private var trackers = ArrayList<OTTracker>()
+
         init {
             widgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
         }
@@ -64,6 +70,21 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
 
         override fun onDataSetChanged() {
             loadUser()
+            Log.d("WIDGET", "widget id: ${widgetId}")
+            val pref = OTShortcutPanelWidgetUpdateService.getPreferences(context)
+            mode = OTShortcutPanelWidgetUpdateService.getMode(widgetId, pref)
+            Log.d("WIDGET", "mode: ${mode}")
+            trackers.clear()
+            when (mode) {
+                OTShortcutPanelWidgetUpdateService.MODE_ALL -> trackers.addAll(user?.trackers?.unObservedList ?: emptyList())
+                OTShortcutPanelWidgetUpdateService.MODE_SHORTCUT -> trackers.addAll(user?.getTrackersOnShortcut() ?: emptyList())
+                OTShortcutPanelWidgetUpdateService.MODE_SELECTIVE -> {
+                    val selectedTrackerIds = OTShortcutPanelWidgetUpdateService.getSelectedTrackerIds(widgetId, pref)
+                    if (selectedTrackerIds?.isNotEmpty() == true) {
+                        trackers.addAll(user?.trackers?.filter { selectedTrackerIds.contains(it.objectId) } ?: emptyList())
+                    }
+                }
+            }
         }
 
         override fun hasStableIds(): Boolean {
@@ -71,9 +92,7 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
         }
 
         override fun getViewAt(position: Int): RemoteViews? {
-            val tracker = user?.trackers?.get(position)
-            if (tracker != null) {
-
+            val tracker = trackers[position]
                 val itemSummary = FirebaseDbHelper.getItemListSummary(tracker).first().toBlocking().first()
 
                 val rv = RemoteViews(context.packageName, R.layout.remoteview_widget_shortcut_list_element)
@@ -116,11 +135,10 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
                 rv.setOnClickFillInIntent(R.id.ui_button_instant, Intent(baseTrackerIntent).putExtra(OTShortcutPanelWidgetProvider.EXTRA_CLICK_COMMAND, OTShortcutPanelWidgetProvider.CLICK_COMMAND_INSTANT_LOGGING))
 
                 return rv
-            } else return null
         }
 
         override fun getCount(): Int {
-            return user?.trackers?.size ?: 0
+            return trackers.size
         }
 
         override fun getViewTypeCount(): Int {
@@ -129,6 +147,7 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
 
         override fun onDestroy() {
             user = null
+            trackers.clear()
         }
 
     }
