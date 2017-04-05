@@ -18,6 +18,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.ui.activities.AppWidgetConfigurationActivity
+import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.WritablePair
 import kr.ac.snu.hcil.omnitrack.widgets.OTShortcutPanelWidgetUpdateService
 
@@ -107,6 +108,8 @@ class ShortcutPanelWidgetConfigActivity : AppWidgetConfigurationActivity(R.layou
 
         if (modeRadioGroup.checkedRadioButtonId == R.id.ui_radio_mode_selective) {
             if (trackerList?.filter { it.second == true }?.isNotEmpty() != true) {
+                DialogHelper.makeSimpleAlertBuilder(this,
+                        getString(R.string.msg_at_least_one_tracker_must_be_selected)).show()
                 return false
             }
         }
