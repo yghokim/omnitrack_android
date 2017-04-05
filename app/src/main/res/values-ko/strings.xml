@@ -303,6 +303,13 @@
     <string name="msg_sign_in">로그인</string>
     <string name="msg_sentence_widget_sign_in">위젯을 사용하려면 먼저 로그인해야 합니다</string>
     <string name="msg_shortcut_widget_name">미니 옴니트랙</string>
+    <string name="msg_form_widget_title">상단 레이블</string>
+    <string name="msg_widget_list_type">리스트 표시 방식</string>
+    <string name="msg_widget_mode_display_all_trackers">모든 트래커 표시</string>
+    <string name="msg_widget_mode_display_shortcut_trackers">바로가기에 등록된 트래커만 표시</string>
+    <string name="msg_widget_mode_display_selected_trackers">리스트 직접 만들기</string>
+    <string name="msg_widget_mode_selected_trackers">트래커 목록</string>
+    <string name="msg_at_least_one_tracker_must_be_selected">한 개 이상의 트래커를 선택하여야 합니다.</string>
 
 
     <string-array name="purpose_entries">

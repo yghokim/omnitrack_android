@@ -390,6 +390,13 @@
     <string name="msg_sign_in">Sign In</string>
     <string name="msg_sentence_widget_sign_in">Please sign in first to use the widgets</string>
     <string name="msg_shortcut_widget_name">Mini OmniTrack</string>
+    <string name="msg_form_widget_title">Widget Title</string>
+    <string name="msg_widget_list_type">List Type</string>
+    <string name="msg_widget_mode_display_all_trackers">Display all trackers</string>
+    <string name="msg_widget_mode_display_shortcut_trackers">Display shortcut trackers</string>
+    <string name="msg_widget_mode_display_selected_trackers">Display selected trackers</string>
+    <string name="msg_widget_mode_selected_trackers">Tracker List</string>
+    <string name="msg_at_least_one_tracker_must_be_selected">At least one tracker must be selected.</string>
 
 
 </resources>
