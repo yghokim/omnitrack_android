@@ -7,7 +7,6 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.support.v4.graphics.ColorUtils
-import android.util.Log
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import kr.ac.snu.hcil.omnitrack.OTApplication
@@ -25,6 +24,7 @@ import java.util.*
 class OTShortcutPanelWidgetService : RemoteViewsService() {
 
     companion object {
+
         val lastLoggedTimeFormat by lazy {
             SimpleDateFormat(OTApplication.app.resources.getString(R.string.msg_tracker_list_time_format))
         }
@@ -70,10 +70,8 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
 
         override fun onDataSetChanged() {
             loadUser()
-            Log.d("WIDGET", "widget id: ${widgetId}")
             val pref = OTShortcutPanelWidgetUpdateService.getPreferences(context)
             mode = OTShortcutPanelWidgetUpdateService.getMode(widgetId, pref)
-            Log.d("WIDGET", "mode: ${mode}")
             trackers.clear()
             when (mode) {
                 OTShortcutPanelWidgetUpdateService.MODE_ALL -> trackers.addAll(user?.trackers?.unObservedList ?: emptyList())
