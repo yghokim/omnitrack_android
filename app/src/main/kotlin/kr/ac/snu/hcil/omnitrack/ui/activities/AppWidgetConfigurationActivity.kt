@@ -8,8 +8,9 @@ import android.os.Bundle
  */
 open class AppWidgetConfigurationActivity(val layoutId: Int) : OTActivity() {
 
-    protected var appWidgetId: Int = AppWidgetManager.INVALID_APPWIDGET_ID
-        private set
+    private var _appWidgetId: Int = AppWidgetManager.INVALID_APPWIDGET_ID
+
+    protected val appWidgetId: Int get() = _appWidgetId
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -17,14 +18,14 @@ open class AppWidgetConfigurationActivity(val layoutId: Int) : OTActivity() {
         setResult(RESULT_CANCELED)
 
         intent?.let {
-            appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
+            _appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
         }
 
-        if (appWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
+        if (_appWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
             finish()
             return
         } else {
-            onCreateWithWidget(appWidgetId)
+            onCreateWithWidget(_appWidgetId)
         }
     }
 

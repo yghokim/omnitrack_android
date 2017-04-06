@@ -15,20 +15,21 @@
         android:background="@drawable/frontal_color_selectable_element_background"
         android:clickable="true"
         android:orientation="vertical"
-        android:paddingBottom="10dp"
-        android:paddingLeft="12dp"
-        android:paddingTop="10dp">
+        android:paddingBottom="8dp"
+        android:paddingLeft="8dp"
+        android:paddingTop="8dp">
 
         <TextView
             android:id="@+id/ui_tracker_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ellipsize="end"
+            android:maxLines="1"
             android:textColor="@color/textColorMidDark"
             android:textIsSelectable="false"
             android:textSize="14sp"
             android:textStyle="bold"
-            tools:text="Physical activity" />
+            tools:text="Physical activity adsf asdkf slj fajf lasdkfja; kf dksjf a;sldf kjds;f ;als" />
 
         <TextView
             android:id="@+id/ui_text_statistics"
@@ -49,8 +50,8 @@
         android:layout_height="@dimen/app_widget_instant_logging_button_height"
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginStart="5dp"
 
         >
 

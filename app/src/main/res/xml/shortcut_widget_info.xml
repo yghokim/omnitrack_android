@@ -3,6 +3,8 @@
     android:configure="kr.ac.snu.hcil.omnitrack.ui.pages.configs.ShortcutPanelWidgetConfigActivity"
     android:initialLayout="@layout/remoteview_widget_shortcut_body"
     android:minHeight="110dp"
+    android:minResizeHeight="40dp"
+    android:minResizeWidth="110dp"
     android:minWidth="180dp"
     android:previewImage="@drawable/widget_shortcut_preview"
     android:resizeMode="horizontal|vertical"
