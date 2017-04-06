@@ -50,6 +50,7 @@
     rx.internal.util.atomic.LinkedQueueNode consumerNode;
 }
 
+-dontnote rx.internal.util.PlatformDependent
 
 # Class names are needed in reflection
 -keepnames class com.amazonaws.**

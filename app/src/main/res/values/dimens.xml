@@ -87,7 +87,7 @@
     <dimen name="tooltip_max_width">250dp</dimen>
     <dimen name="tracker_list_stat_paddingRight">30dp</dimen>
 
-    <dimen name="shortcut_panel_button_size">35dp</dimen>
+    <dimen name="shortcut_panel_button_size">32dp</dimen>
 
     <dimen name="home_sidebar_width">250dp</dimen>
     <dimen name="home_sidebar_profile_photo_width">65dp</dimen>

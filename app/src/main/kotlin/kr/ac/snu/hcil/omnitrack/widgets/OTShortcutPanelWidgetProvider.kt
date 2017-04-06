@@ -5,6 +5,7 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
@@ -80,5 +81,13 @@ class OTShortcutPanelWidgetProvider : AppWidgetProvider() {
         context.startService(intent)
 
         super.onUpdate(context, appWidgetManager, appWidgetIds)
+    }
+
+    override fun onAppWidgetOptionsChanged(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int, newOptions: Bundle) {
+        val intent = Intent(context, OTShortcutPanelWidgetUpdateService::class.java)
+                .putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, intArrayOf(appWidgetId))
+        intent.action = OTShortcutPanelWidgetUpdateService.ACTION_RESIZED
+
+        context.startService(intent)
     }
 }
