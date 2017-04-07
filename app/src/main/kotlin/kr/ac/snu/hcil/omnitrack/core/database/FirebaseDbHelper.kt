@@ -92,7 +92,7 @@ object FirebaseDbHelper {
         var localKey: Int = -1
         var position: Int = 0
         var connectionSerialized: String? = null
-        var type: Int = 0
+        var type: Int? = null
         var required: Boolean = false
         var properties: Map<String, String>? = null
     }
@@ -339,22 +339,31 @@ object FirebaseDbHelper {
         //val attributesRef = snapshot.child(CHILD_NAME_ATTRIBUTES)
 
         val attributes = pojo.attributes
-        var attributeList: ArrayList<OTAttribute<out Any>>? = null
+
+        val attributeList = ArrayList<OTAttribute<out Any>>()
         if (attributes != null) {
-            val attrPojos = ArrayList<Map.Entry<String, AttributePOJO>>(pojo.attributes?.entries)
+            val attrPojos = ArrayList<Map.Entry<String, AttributePOJO>>(pojo.attributes?.entries).filter {
+                it ->
+                it.value.type != null
+            }.toMutableList()
+
 
             attrPojos.sortBy { it -> it.value.position }
 
-            attributeList = attrPojos.mapTo(ArrayList<OTAttribute<out Any>>()) {
-                OTAttribute.createAttribute(
-                        it.key,
-                        it.value.localKey,
-                        null,
-                        it.value.name ?: "noname",
-                        it.value.required,
-                        it.value.type,
-                        it.value.properties,
-                        it.value.connectionSerialized)
+            attrPojos.forEach {
+                try {
+                    attributeList.add(OTAttribute.createAttribute(
+                            it.key,
+                            it.value.localKey,
+                            null,
+                            it.value.name ?: "noname",
+                            it.value.required,
+                            it.value.type!!,
+                            it.value.properties,
+                            it.value.connectionSerialized)
+                    )
+                } catch(ex: Exception) {
+                }
             }
         }
 
@@ -490,6 +499,7 @@ object FirebaseDbHelper {
         val attributeRef = trackerRef(trackerId)?.child("attributes")?.child(attribute.objectId)
         if (attributeRef != null) {
             val pojo = makeAttributePojo(attribute, position)
+            println(pojo)
             attributeRef.setValue(pojo)
         }
     }
