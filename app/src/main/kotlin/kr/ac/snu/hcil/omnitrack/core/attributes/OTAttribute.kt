@@ -119,7 +119,7 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
                     null,
                     pojo.name ?: "noname",
                     pojo.required,
-                    pojo.type,
+                    pojo.type!!,
                     pojo.properties,
                     pojo.connectionSerialized)
         }
@@ -309,15 +309,24 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
     }
 
     fun setPropertyValue(key: String, value: Any): Boolean {
-        val prop = getProperty<Any>(key)
-        if (prop.value != value) {
-            prop.value = value
-            return true
-        } else return false
+        try {
+            val prop = getProperty<Any>(key)
+            if (prop.value != value) {
+                prop.value = value
+                return true
+            } else return false
+        } catch(ex: Exception) {
+            ex.printStackTrace()
+            return false
+        }
     }
 
     fun setPropertyValueFromSerializedString(key: String, serializedValue: String) {
-        getProperty<Any>(key).setValueFromSerializedString(serializedValue)
+        try {
+            getProperty<Any>(key).setValueFromSerializedString(serializedValue)
+        } catch(ex: Exception) {
+            ex.printStackTrace()
+        }
     }
 
     abstract fun formatAttributeValue(value: Any): CharSequence

@@ -278,7 +278,7 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
                     val attrId = snapshot.key
                     if (attributes.unObservedList.find { it.objectId == attrId } == null) {
                         val pojo = snapshot.getValue(FirebaseDbHelper.AttributePOJO::class.java)
-                        if (pojo != null) {
+                        if (pojo != null && pojo.type != null) {
                             attributes.addAt(OTAttribute.Companion.createAttribute(snapshot.key, pojo), pojo.position)
                         }
                     }
