@@ -794,17 +794,18 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
 
         inner class Adapter : RecyclerViewMenuAdapter() {
 
+            //TODO hid deletion
             override fun getMenuItemAt(index: Int): MenuItem {
                 return when (index) {
                     0 -> purgeMenuItem
-                    1 -> deletionMenuItem
-                    2 -> exportMenuItem
+                //1 -> deletionMenuItem
+                    1 -> exportMenuItem
                     else -> purgeMenuItem
                 }
             }
 
             override fun getItemCount(): Int {
-                return 3
+                return 2
             }
 
         }

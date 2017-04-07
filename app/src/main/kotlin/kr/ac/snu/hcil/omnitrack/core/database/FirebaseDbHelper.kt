@@ -71,11 +71,6 @@ object FirebaseDbHelper {
         var name: String? = null
     }
 
-    @Keep class UserPOJO {
-        var trackers: HashMap<String, Int>? = null
-        var triggers: HashMap<String, Int>? = null
-    }
-
     @Keep
     class TrackerPOJO : NamedPOJO() {
         var user: String? = null
@@ -616,6 +611,10 @@ object FirebaseDbHelper {
         } else {
             return Observable.error(Exception("No database reference for Item ${itemId} of tracker ${tracker.objectId}"))
         }
+    }
+
+    fun setUsedAppWidget(widgetName: String, used: Boolean) {
+        currentUserRef?.child("used_widgets")?.child(widgetName)?.setValue(used)
     }
 
     fun makeItemQueryStream(tracker: OTTracker, timeRange: TimeSpan? = null, order: Order = Order.DESC): Observable<ItemAction> {
