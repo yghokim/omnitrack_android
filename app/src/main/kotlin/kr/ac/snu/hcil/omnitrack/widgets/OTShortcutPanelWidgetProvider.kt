@@ -8,6 +8,7 @@ import android.content.Intent
 import android.os.Bundle
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTItem
+import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
 import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemEditingActivity
 
@@ -17,6 +18,9 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemEditingActivity
 class OTShortcutPanelWidgetProvider : AppWidgetProvider() {
 
     companion object {
+
+        const val WIDGET_NAME = "Shortcut Panel Widget"
+
         const val ACTION_TRACKER_CLICK_EVENT = "kr.ac.snu.hcil.omnitrack.action.APP_WIDGET_SHORTCUT_TRACKER_CLICKED"
         const val EXTRA_CLICK_COMMAND = "clickCommand"
         const val CLICK_COMMAND_ROW = "rowClicked"
@@ -35,6 +39,16 @@ class OTShortcutPanelWidgetProvider : AppWidgetProvider() {
             OTShortcutPanelWidgetUpdateService.removeVariables(id, editor)
         }
         editor.apply()
+    }
+
+    override fun onEnabled(context: Context?) {
+        super.onEnabled(context)
+        FirebaseDbHelper.setUsedAppWidget(WIDGET_NAME, true)
+    }
+
+    override fun onDisabled(context: Context?) {
+        super.onDisabled(context)
+        FirebaseDbHelper.setUsedAppWidget(WIDGET_NAME, false)
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -79,8 +93,9 @@ class OTShortcutPanelWidgetProvider : AppWidgetProvider() {
         intent.action = OTShortcutPanelWidgetUpdateService.ACTION_INITIALIZE
 
         context.startService(intent)
-
         super.onUpdate(context, appWidgetManager, appWidgetIds)
+        FirebaseDbHelper.setUsedAppWidget(WIDGET_NAME, true)
+
     }
 
     override fun onAppWidgetOptionsChanged(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int, newOptions: Bundle) {
