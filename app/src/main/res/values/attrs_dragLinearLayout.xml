@@ -1,0 +1,5 @@
+<resources>
+    <declare-styleable name="DragLinearLayout">
+        <attr name="scrollSensitiveHeight" format="reference" />
+    </declare-styleable>
+</resources>

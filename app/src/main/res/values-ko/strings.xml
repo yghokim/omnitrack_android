@@ -310,6 +310,8 @@
     <string name="msg_widget_mode_display_selected_trackers">리스트 직접 만들기</string>
     <string name="msg_widget_mode_selected_trackers">트래커 목록</string>
     <string name="msg_at_least_one_tracker_must_be_selected">한 개 이상의 트래커를 선택하여야 합니다.</string>
+    <string name="msg_remove_field">필드 삭제</string>
+    <string name="msg_format_confirm_remove_field">%1$s 필드를 삭제하시겠습니까?</string>
 
 
     <string-array name="purpose_entries">

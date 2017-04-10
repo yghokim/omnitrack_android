@@ -5,6 +5,7 @@ import android.app.Dialog
 import android.app.Fragment
 import android.support.v7.widget.RecyclerView.ViewHolder
 import android.view.View
+import kr.ac.snu.hcil.omnitrack.ui.components.common.AdapterLinearLayout
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 import android.support.v4.app.Fragment as SupportFragment
@@ -26,6 +27,10 @@ public fun <V : View> SupportFragment.bindView(id: Int)
 
 public fun <V : View> ViewHolder.bindView(id: Int)
         : ReadOnlyProperty<ViewHolder, V> = required(id, viewFinder)
+
+
+public fun <V : View> AdapterLinearLayout.AViewHolder.bindView(id: Int)
+        : ReadOnlyProperty<AdapterLinearLayout.AViewHolder, V> = required(id, viewFinder)
 
 public fun <V : View> View.bindOptionalView(id: Int)
         : ReadOnlyProperty<View, V?> = optional(id, viewFinder)
@@ -93,6 +98,9 @@ private val SupportFragment.viewFinder: SupportFragment.(Int) -> View?
     get() = { view!!.findViewById(it) }
 private val ViewHolder.viewFinder: ViewHolder.(Int) -> View?
     get() = { itemView.findViewById(it) }
+private val AdapterLinearLayout.AViewHolder.viewFinder: AdapterLinearLayout.AViewHolder.(Int) -> View?
+    get() = { itemView.findViewById(it) }
+
 
 private fun viewNotFound(id: Int, desc: KProperty<*>): Nothing =
         throw IllegalStateException("View ID $id for '${desc.name}' not found.")

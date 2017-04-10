@@ -1,29 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginLeft="@dimen/attribute_list_element_horizontal_padding"
-    android:layout_marginRight="@dimen/attribute_list_element_horizontal_padding"
-    android:background="@drawable/attribute_card"
-    >
+    android:layout_height="wrap_content">
 
-    <ImageView
-        android:id="@+id/ui_drag_handle"
-        android:layout_width="@dimen/attribute_list_element_drag_area_width"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:padding="12dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/drag_handle" />
-
-    <LinearLayout
-        android:id="@+id/ui_attribute_card_header"
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/parent"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/attribute_list_element_header_height"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/attribute_list_element_vertical_padding"
+        android:layout_marginLeft="@dimen/attribute_list_element_horizontal_padding"
+        android:layout_marginRight="@dimen/attribute_list_element_horizontal_padding"
+        android:layout_marginTop="@dimen/attribute_list_element_vertical_padding"
+        android:background="@drawable/attribute_card">
+
+        <ImageView
+            android:id="@+id/ui_drag_handle"
+            android:layout_width="35dp"
+            android:layout_height="0dp"
+            android:layout_centerVertical="true"
+            android:padding="12dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/drag_handle"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <LinearLayout
+        android:id="@+id/ui_attribute_card_header"
+            android:layout_width="0dp"
+            android:layout_height="45dp"
         android:layout_toEndOf="@+id/ui_drag_handle"
         android:background="@drawable/bottom_separator_light_light"
         android:orientation="horizontal"
-        android:paddingEnd="0dp">
+            android:paddingEnd="0dp"
+            app:layout_constraintLeft_toRightOf="@+id/ui_drag_handle"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
         <android.support.v7.widget.AppCompatImageView
             android:id="@+id/ui_attribute_type"
@@ -88,7 +101,7 @@
 
     <kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
         android:id="@+id/ui_preview_container"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
 
         android:layout_below="@+id/ui_attribute_card_header"
@@ -97,17 +110,26 @@
         android:minHeight="15dp"
         android:paddingBottom="@dimen/activity_vertical_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
-        android:paddingTop="@dimen/activity_vertical_margin" />
+        android:paddingTop="@dimen/activity_vertical_margin"
+        app:layout_constraintLeft_toRightOf="@+id/ui_drag_handle"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ui_attribute_card_header" />
 
-    <ViewStub
-        android:id="@+id/ui_connection_indicator_stub"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/ui_preview_container"
-        android:layout_gravity="left"
-        android:layout_marginBottom="@dimen/activity_vertical_margin"
-        android:layout_toEndOf="@+id/ui_drag_handle"
-        android:inflatedId="@+id/ui_connection_indicator"
-        android:layout="@layout/layout_connection_indicator_light" />
+        <ViewStub
+            android:id="@+id/ui_connection_indicator_stub"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ui_preview_container"
+            android:layout_gravity="left"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_marginLeft="8dp"
+            android:layout_toEndOf="@+id/ui_drag_handle"
+            android:inflatedId="@+id/ui_connection_indicator"
+            android:layout="@layout/layout_connection_indicator_light"
+            app:layout_constraintBottom_toBottomOf="@+id/parent"
+            app:layout_constraintLeft_toRightOf="@+id/ui_drag_handle"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ui_preview_container" />
 
-</RelativeLayout>
+    </android.support.constraint.ConstraintLayout>
+</FrameLayout>

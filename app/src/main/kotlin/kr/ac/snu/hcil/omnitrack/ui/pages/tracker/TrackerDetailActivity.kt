@@ -25,6 +25,7 @@ import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 import rx.subjects.BehaviorSubject
 import rx.subscriptions.CompositeSubscription
+import java.util.concurrent.TimeUnit
 
 class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tracker_detail) {
 
@@ -104,6 +105,34 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
             title = resources.getString(R.string.title_activity_tracker_new)
         }
 
+
+        val trackerObjectId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
+        creationSubscriptions.add(
+                signedInUserObservable.doOnNext { user -> this.user = user }
+                        .flatMap {
+                            user ->
+                            user.getTrackerObservable(trackerObjectId)
+                        }.first().toSingle().timeout(2, TimeUnit.SECONDS).subscribe({
+                    tracker ->
+                    this.tracker = tracker
+                    trackerSubject.onNext(tracker)
+                    onTrackerLoaded(tracker)
+                }, {
+                    ex ->
+                    ex.printStackTrace()
+                    println("Warning: tracker does not exists. wait.")
+                    val intent = Intent(this, HomeActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                })
+        )
+
+        if (intent.hasExtra(INTENT_KEY_FOCUS_ATTRIBUTE_ID)) {
+            //val attributeId = intent.getStringExtra(INTENT_KEY_FOCUS_ATTRIBUTE_ID)
+            mViewPager.setCurrentItem(0, true)
+
+        }
+
     }
 
     private fun onTrackerLoaded(tracker: OTTracker) {
@@ -133,27 +162,6 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
 
     override fun onStart(){
         super.onStart()
-        val trackerObjectId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
-        signedInUserObservable.subscribe {
-            user ->
-            this.user = user
-            val tracker = user[trackerObjectId]
-            if (tracker != null) {
-                this.tracker = tracker
-                trackerSubject.onNext(tracker)
-                onTrackerLoaded(tracker)
-            } else {
-                val intent = Intent(this, HomeActivity::class.java)
-                startActivity(intent)
-                finish()
-            }
-        }
-
-        if (intent.hasExtra(INTENT_KEY_FOCUS_ATTRIBUTE_ID)) {
-            //val attributeId = intent.getStringExtra(INTENT_KEY_FOCUS_ATTRIBUTE_ID)
-            mViewPager.setCurrentItem(0, true)
-
-        }
     }
 
     override fun onToolbarLeftButtonClicked() {
