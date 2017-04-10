@@ -11,6 +11,7 @@
 
     <dimen name="viewpager_page_margin">7dp</dimen>
 
+    <dimen name="button_corner_radius">4dp</dimen>
 
     <dimen name="home_sliding_menu_right_region">120dp</dimen>
 

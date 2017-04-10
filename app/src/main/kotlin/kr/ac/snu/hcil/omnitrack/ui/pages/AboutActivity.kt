@@ -11,6 +11,7 @@ import com.danielstone.materialaboutlibrary.model.MaterialAboutList
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.MarkdownScreenDialogFragment
+import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.VersionCheckDialogFragment
 import kr.ac.snu.hcil.omnitrack.utils.ANDROID_ASSET_PATH
 
 /**
@@ -43,6 +44,10 @@ class AboutActivity : MaterialAboutActivity() {
                                 .text(R.string.msg_version)
                                 .textColorOverrideRes(R.color.textColorMidDark)
                                 .subText(BuildConfig.VERSION_NAME)
+                                .setOnClickListener {
+                                    val versionCheckDialog = VersionCheckDialogFragment()
+                                    versionCheckDialog.show(supportFragmentManager, "VersionCheck")
+                                }
                                 .build()
                         )
                         .addItem(
