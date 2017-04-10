@@ -19,4 +19,6 @@
 
     <color name="md_edittext_error">#DD2C00</color>
 
+    <color name="md_header_background">#cfcfcf</color>
+
 </resources>
