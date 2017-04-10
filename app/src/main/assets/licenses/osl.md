@@ -144,6 +144,11 @@ Apache 2.0 license
 Copyright (C) 2016 Samuel Wall<br>
 Apache 2.0 license
 
+#####Material DateTime Picker
+<https://github.com/wdullaer/MaterialDateTimePicker><br>
+Copyright (c) 2015 Wouter Dullaert<br>
+Apache 2.0 license
+
 ---
 
 ---
