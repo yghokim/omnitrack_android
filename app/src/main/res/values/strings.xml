@@ -401,5 +401,10 @@
     <string name="msg_format_confirm_remove_field">Do you want to remove %1$s field?</string>
 
     <string name="msg_next">Next</string>
+    <string name="msg_current_version">Current Version</string>
+    <string name="msg_latest_version">Latest Version</string>
+    <string name="msg_button_label_latest_version">This is the latest version.</string>
+    <string name="msg_button_label_new_version_available">Go to Play store to update the app</string>
+    <string name="msg_close">Close</string>
 
 </resources>

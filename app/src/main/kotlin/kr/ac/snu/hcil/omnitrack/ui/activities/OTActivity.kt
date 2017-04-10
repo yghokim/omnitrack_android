@@ -10,12 +10,15 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.ExperimentConsentManager
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.EventLoggingManager
+import kr.ac.snu.hcil.omnitrack.core.database.RemoteConfigManager
 import kr.ac.snu.hcil.omnitrack.ui.components.common.time.DurationPicker
+import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.VersionCheckDialogFragment
 import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
 import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
 import rx.Single
@@ -28,7 +31,7 @@ import java.util.*
 /**
  * Created by younghokim on 2016. 11. 15..
  */
-abstract class OTActivity(val checkRefreshingCredential: Boolean = false) : AppCompatActivity() {
+abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val checkUpdateAvailable: Boolean = true) : AppCompatActivity() {
 
     private val LOG_TAG = "OmniTrackActivity"
 
@@ -125,6 +128,19 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false) : AppC
             } else {
                 goSignInUnlessUserCached()
             }
+        }
+
+        if (checkUpdateAvailable) {
+            println("start checking version compare")
+            creationSubscriptions.add(
+                    RemoteConfigManager.getServerLatestVersionName().subscribe {
+                        versionName ->
+                        println("version name: ${versionName}")
+                        if (BuildConfig.DEBUG || RemoteConfigManager.isNewVersionGreater(BuildConfig.VERSION_NAME, versionName)) {
+                            VersionCheckDialogFragment.makeInstance(versionName)
+                                    .show(supportFragmentManager, "VersionCheck")
+                        }
+                    })
         }
     }
 
