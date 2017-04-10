@@ -397,6 +397,8 @@
     <string name="msg_widget_mode_display_selected_trackers">Display selected trackers</string>
     <string name="msg_widget_mode_selected_trackers">Tracker List</string>
     <string name="msg_at_least_one_tracker_must_be_selected">At least one tracker must be selected.</string>
+    <string name="msg_remove_field">Remove Field</string>
+    <string name="msg_format_confirm_remove_field">Do you want to remove %1$s field?</string>
 
 
 </resources>
