@@ -21,6 +21,8 @@
     <dimen name="attribute_list_element_spacing">2dp</dimen>
 
     <dimen name="attribute_list_element_horizontal_padding">10dp</dimen>
+    <dimen name="attribute_list_element_vertical_padding">5dp</dimen>
+
 
     <dimen name="attribute_input_header_margin_bottom">20dp</dimen>
 

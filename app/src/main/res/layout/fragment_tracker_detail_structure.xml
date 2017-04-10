@@ -83,12 +83,15 @@
                     android:paddingRight="@dimen/activity_horizontal_margin"
                     android:text="@string/msg_attributes" />
 
-                <kr.ac.snu.hcil.omnitrack.ui.components.common.FallbackRecyclerView
+                <kr.ac.snu.hcil.omnitrack.ui.components.common.AdapterLinearLayout
                     android:id="@+id/ui_attribute_list"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="80dp"
-                    android:paddingBottom="@dimen/activity_vertical_margin" />
+                    android:divider="@color/transparent"
+                    android:orientation="vertical"
+                    android:paddingBottom="@dimen/activity_vertical_margin"
+                    android:showDividers="middle" />
 
                 <TextView
                     android:id="@+id/ui_empty_list_message"
