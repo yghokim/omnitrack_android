@@ -13,6 +13,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.CalendarPickerDialogFragme
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.DateTimePickerDialogFragment
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
+import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kr.ac.snu.hcil.omnitrack.utils.getActivity
 import java.text.SimpleDateFormat
 import java.util.*
@@ -32,6 +33,8 @@ class TimeRangePicker : FrameLayout, View.OnClickListener {
     private var fromButton: Button
     private var toButton: Button
     private var durationIndicator: TextView
+
+    val timeRangeChanged = Event<TimeSpan>()
 
     private var from: Long = TimeHelper.cutMillisecond(System.currentTimeMillis())
         set(value) {
@@ -79,7 +82,6 @@ class TimeRangePicker : FrameLayout, View.OnClickListener {
     }
 
     fun setTimeSpan(value: TimeSpan) {
-        println("${value}, ${value.from}) ~ ${value.to}")
         from = value.from
         to = value.from + value.duration
         invalidateViewSettings()
@@ -166,22 +168,36 @@ class TimeRangePicker : FrameLayout, View.OnClickListener {
 
                     CalendarPickerDialogFragment.getInstance(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).showDialog(activity.supportFragmentManager) {
                         timestamp: Long, year: Int, month: Int, day: Int ->
+
+                        val beforeFrom = from
+                        val beforeTo = to
+
                         if (button === fromButton) {
                             from = timestamp
                         } else if (button === toButton) {
                             to = timestamp
                         }
+
+                        if (beforeFrom != from || beforeTo != to) {
+                            timeRangeChanged.invoke(this@TimeRangePicker, getTimeSpan())
+                        }
                     }
                 } else {
                     //datetime picking
-
-
                     DateTimePickerDialogFragment.getInstance(timestamp).showDialog(activity.supportFragmentManager) {
                         timestamp ->
+
+                        val beforeFrom = from
+                        val beforeTo = to
+
                         if (button === fromButton) {
                             from = timestamp
                         } else if (button === toButton) {
                             to = timestamp
+                        }
+
+                        if (beforeFrom != from || beforeTo != to) {
+                            timeRangeChanged.invoke(this@TimeRangePicker, getTimeSpan())
                         }
                     }
                 }
