@@ -400,5 +400,6 @@
     <string name="msg_remove_field">Remove Field</string>
     <string name="msg_format_confirm_remove_field">Do you want to remove %1$s field?</string>
 
+    <string name="msg_next">Next</string>
 
 </resources>

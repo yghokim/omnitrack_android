@@ -313,6 +313,7 @@
     <string name="msg_remove_field">필드 삭제</string>
     <string name="msg_format_confirm_remove_field">%1$s 필드를 삭제하시겠습니까?</string>
 
+    <string name="msg_next">다음</string>
 
     <string-array name="purpose_entries">
         <item>directive|건강 관련 정보를 기록하기 위해서</item>
