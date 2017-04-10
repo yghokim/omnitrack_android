@@ -15,14 +15,20 @@ class TimeRangePickerInputView(context: Context, attrs: AttributeSet? = null) : 
     private var valueView: TimeRangePicker
 
     override var value: TimeSpan
-        get() = valueView.getTimeSpan()
+        get() {
+            val timeSpan = valueView.getTimeSpan()
+            return timeSpan
+        }
         set(value) {
             valueView.setTimeSpan(value)
         }
 
     init {
         valueView = findViewById(R.id.value) as TimeRangePicker
-
+        valueView.timeRangeChanged += {
+            sender, timeSpan ->
+            onValueChanged(timeSpan)
+        }
     }
 
     override fun focus() {
