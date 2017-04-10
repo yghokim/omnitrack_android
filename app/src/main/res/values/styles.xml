@@ -469,6 +469,11 @@
         <item name="android:textColor">@color/textColorMid</item>
     </style>
 
+    <style name="PointedColoredButtonStyle" parent="Widget.AppCompat.Button.Colored">
+        <item name="colorButtonNormal">@color/colorPointed</item>
+        <item name="android:textColor">#FFF</item>
+    </style>
+
     <style name="AppTheme.NoActionBar.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.NoActionBar.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />

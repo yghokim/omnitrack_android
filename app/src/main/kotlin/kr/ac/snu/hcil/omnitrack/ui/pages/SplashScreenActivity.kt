@@ -12,7 +12,7 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
  * Created by Young-Ho on 8/1/2016.
  * https://www.bignerdranch.com/blog/splash-screens-the-right-way/
  */
-class SplashScreenActivity : OTActivity(checkRefreshingCredential = true) {
+class SplashScreenActivity : OTActivity(checkRefreshingCredential = true, checkUpdateAvailable = false) {
 
     private val LOG_TAG = SplashScreenActivity::class.java.simpleName
 

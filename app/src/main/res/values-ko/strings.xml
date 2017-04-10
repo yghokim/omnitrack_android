@@ -314,6 +314,12 @@
     <string name="msg_format_confirm_remove_field">%1$s 필드를 삭제하시겠습니까?</string>
 
     <string name="msg_next">다음</string>
+    <string name="msg_current_version">설치된 버젼</string>
+    <string name="msg_latest_version">최신 버젼</string>
+    <string name="msg_button_label_latest_version">현재 최신 버젼이 설치되어 있습니다.</string>
+    <string name="msg_button_label_new_version_available">스토어로 최신 버젼 업데이트하러 가기</string>
+    <string name="msg_close">닫기</string>
+
 
     <string-array name="purpose_entries">
         <item>directive|건강 관련 정보를 기록하기 위해서</item>
