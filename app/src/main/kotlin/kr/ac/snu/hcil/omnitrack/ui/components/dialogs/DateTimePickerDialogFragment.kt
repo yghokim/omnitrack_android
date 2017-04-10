@@ -23,13 +23,20 @@ class DateTimePickerDialogFragment : DialogFragment() {
             labelView.text = "${year}-${zeroBasedMonth + 1}-${day}"
         }
 
-        private fun setTimeLabel(tabHost: TabHost, hour: Int, minute: Int) {
+        private fun setTimeLabel(tabHost: TabHost, hourOfDay: Int, minute: Int) {
             val labelView = tabHost.tabWidget.getChildAt(1).findViewById(android.R.id.title) as TextView
-            labelView.text = "${if (hour < 12) {
-                "AM"
+            if (hourOfDay == 12 && minute == 0) {
+                //PM 12:00 : Noon
+                labelView.setText(R.string.msg_noon)
             } else {
-                "PM"
-            }} ${String.format("%02d", hour)}:${String.format("%02d", minute)}"
+                var hour = hourOfDay % 12
+                if (hour == 0) hour = 12
+                labelView.text = "${if (hourOfDay < 12) {
+                    "AM"
+                } else {
+                    "PM"
+                }} ${String.format("%02d", hour)}:${String.format("%02d", minute)}"
+            }
         }
 
         fun getInstance(timestamp: Long): DateTimePickerDialogFragment {
@@ -121,7 +128,7 @@ class DateTimePickerDialogFragment : DialogFragment() {
 
         //apply labels
         setDateLabel(tabHost, year, zeroBasedMonth, day)
-        setTimeLabel(tabHost, calendar.getHour(), calendar.getMinute())
+        setTimeLabel(tabHost, calendar.getHourOfDay(), calendar.getMinute())
 
         val calendarView = view.findViewById(R.id.ui_calendar_view) as CalendarView
 
