@@ -72,4 +72,22 @@
         android:textSize="16sp"
 
         tools:text="@string/msg_button_label_latest_version" />
+
+    <View
+        style="@style/HorizontalSeparator.NoVerticalMargin"
+        android:layout_marginTop="12dp" />
+
+    <TextView
+        android:id="@+id/caption"
+        style="@style/TextAppearance.AppCompat.Caption"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="12dp"
+        android:lineSpacingMultiplier="1.2"
+        android:text="@string/msg_beta_msg_version_play_store"
+        android:textColor="@color/textColorMid"
+        android:textSize="14sp"
+
+        android:visibility="gone" />
 </LinearLayout>

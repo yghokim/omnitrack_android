@@ -131,16 +131,22 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
         }
 
         if (checkUpdateAvailable) {
-            println("start checking version compare")
             creationSubscriptions.add(
-                    RemoteConfigManager.getServerLatestVersionName().subscribe {
+                    RemoteConfigManager.getServerLatestVersionName().subscribe({
                         versionName ->
-                        println("version name: ${versionName}")
                         if (BuildConfig.DEBUG || RemoteConfigManager.isNewVersionGreater(BuildConfig.VERSION_NAME, versionName)) {
-                            VersionCheckDialogFragment.makeInstance(versionName)
-                                    .show(supportFragmentManager, "VersionCheck")
+                            val lastNotifiedVersion = OTApplication.app.systemSharedPreferences.getString(VersionCheckDialogFragment.PREF_LAST_NOTIFIED_VERSION, "")
+                            if (lastNotifiedVersion != versionName) {
+                                try {
+                                    VersionCheckDialogFragment.makeInstance(versionName, true)
+                                            .show(supportFragmentManager, "VersionCheck")
+                                } catch(ex: Exception) {
+                                    ex.printStackTrace()
+                                }
+                            }
                         }
-                    })
+                    }, {})
+            )
         }
     }
 

@@ -404,7 +404,8 @@
     <string name="msg_current_version">Current Version</string>
     <string name="msg_latest_version">Latest Version</string>
     <string name="msg_button_label_latest_version">This is the latest version.</string>
-    <string name="msg_button_label_new_version_available">Go to Play store to update the app</string>
+    <string name="msg_button_label_new_version_available">Visit Play store to update the app</string>
     <string name="msg_close">Close</string>
+    <string name="msg_beta_msg_version_play_store">The OmniTrack account should be selected in Play Store app to see the Store page.</string>
 
 </resources>
