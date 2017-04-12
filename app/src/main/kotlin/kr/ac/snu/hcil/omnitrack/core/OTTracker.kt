@@ -33,12 +33,13 @@ import kotlin.properties.Delegates
 /**
  * Created by Young-Ho on 7/11/2016.
  */
-class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnShortcut: Boolean = false, attributeIdSeed: Int = 0, _attributes: Collection<OTAttribute<out Any>>? = null, val creationFlags: Map<String, String>? = null)
+class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnShortcut: Boolean = false, isEditable: Boolean = true, attributeIdSeed: Int = 0, _attributes: Collection<OTAttribute<out Any>>? = null, val creationFlags: Map<String, String>? = null)
     : NamedObject(objectId, name) {
 
     companion object {
         const val PROPERTY_COLOR = "color"
         const val PROPERTY_IS_ON_SHORTCUT = "onShortcut"
+        const val PROPERTY_IS_EDITABLE = "editable"
         const val PROPERTY_ATTRIBUTES = "attributes"
 
         val CREATION_FLAG_TUTORIAL: Map<String, String> by lazy {
@@ -46,6 +47,13 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
             result["source"] = "generated_example"
             result
         }
+
+        val CREATION_FLAG_OPEN_OMNITRACK: Map<String, String> by lazy {
+            val result = HashMap<String, String>()
+            result["source"] = "generated_omnitrack_open_format"
+            result
+        }
+
     }
 
     override val databasePointRef: DatabaseReference?
@@ -62,6 +70,9 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
     private val attributesDbChangedListener: ChildEventListener
 
     val attributes = ObservableList<OTAttribute<out Any>>()
+
+    var isEditable: Boolean = isEditable
+        private set
 
     var owner: OTUser? by Delegates.observable(null as OTUser?){
         prop, old, new ->
@@ -139,9 +150,9 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
 
     val isExternalFilesInvolved: Boolean get() = attributes.unObservedList.find { it.isExternalFile } != null
 
-    constructor() : this(null, "New Tracker")
+    constructor() : this(null, "New Tracker", isEditable = true)
 
-    constructor(name: String) : this(null, name)
+    constructor(name: String) : this(null, name, isEditable = true)
 
     init{
         suspendDatabaseSync = true
@@ -208,6 +219,13 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
                             val value = snapshot.value
                             (value as? Long)?.toInt() ?: (value as? Int ?: Color.WHITE)
                         }
+                    PROPERTY_IS_EDITABLE -> {
+                        this@OTTracker.isEditable = if (remove) {
+                            true
+                        } else {
+                            snapshot.value as Boolean
+                        }
+                    }
                 }
                 suspendDatabaseSync = false
             }
