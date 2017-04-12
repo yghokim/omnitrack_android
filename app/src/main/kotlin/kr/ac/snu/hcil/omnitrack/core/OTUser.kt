@@ -267,11 +267,11 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
     }
 
     fun newTrackerWithDefaultName(context: Context, add: Boolean): OTTracker {
-        return newTracker(this.generateNewTrackerName(context), add)
+        return newTracker(this.generateNewTrackerName(context), add, isEditable = true)
     }
 
-    fun newTracker(name: String, add: Boolean, creationFlags: Map<String, String>? = null): OTTracker {
-        val tracker = OTTracker(null, name, creationFlags = creationFlags)
+    fun newTracker(name: String, add: Boolean, creationFlags: Map<String, String>? = null, isEditable: Boolean = true): OTTracker {
+        val tracker = OTTracker(null, name, isOnShortcut = false, isEditable = isEditable, creationFlags = creationFlags)
         val unOccupied = OTApplication.app.colorPalette.filter {
             color ->
             trackers.unObservedList.find {
@@ -341,7 +341,7 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
         tracker.suspendDatabaseSync = false
 
         if (!suspendDatabaseSync)
-            FirebaseDbHelper.removeTracker(tracker, this)
+            FirebaseDbHelper.removeTracker(tracker, this, true)
     }
 
     fun findAttributeByObjectId(trackerId: String, attributeId: String): OTAttribute<out Any>? {
@@ -411,7 +411,7 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
 
     fun addExampleTrackers() {
         val context = OTApplication.app
-        val diaryTracker = newTracker(context.getString(R.string.msg_example_tracker_diary), true, OTTracker.CREATION_FLAG_TUTORIAL)
+        val diaryTracker = newTracker(context.getString(R.string.msg_example_tracker_diary), true, OTTracker.CREATION_FLAG_TUTORIAL, true)
         diaryTracker.isOnShortcut = true
 
         diaryTracker.attributes += OTAttribute.createAttribute(diaryTracker, context.getString(R.string.msg_example_trackers_date), OTAttribute.TYPE_TIME).apply {
@@ -437,14 +437,14 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
         diaryTracker.attributes += OTAttribute.createAttribute(diaryTracker, context.getString(R.string.msg_example_trackers_diary_content), OTAttribute.TYPE_LONG_TEXT)
 
 
-        val coffeeTracker = newTracker(context.getString(R.string.msg_example_trackers_coffee), true, OTTracker.CREATION_FLAG_TUTORIAL)
+        val coffeeTracker = newTracker(context.getString(R.string.msg_example_trackers_coffee), true, OTTracker.CREATION_FLAG_TUTORIAL, true)
         coffeeTracker.isOnShortcut = true
         coffeeTracker.attributes += OTAttribute.createAttribute(diaryTracker, context.getString(R.string.msg_example_trackers_coffee_drank_at), OTAttribute.TYPE_TIME).apply {
             this.setPropertyValue(OTTimeAttribute.GRANULARITY, OTTimeAttribute.GRANULARITY_MINUTE)
         }
 
 
-        val dailyActivityTracker = newTracker(context.getString(R.string.msg_example_trackers_daily_activity), true, OTTracker.CREATION_FLAG_TUTORIAL)
+        val dailyActivityTracker = newTracker(context.getString(R.string.msg_example_trackers_daily_activity), true, OTTracker.CREATION_FLAG_TUTORIAL, true)
         dailyActivityTracker.attributes += OTAttribute.createAttribute(dailyActivityTracker, context.getString(R.string.msg_example_trackers_date), OTAttribute.TYPE_TIME).apply {
             this.setPropertyValue(OTTimeAttribute.GRANULARITY, OTTimeAttribute.GRANULARITY_DAY)
         }
@@ -477,7 +477,7 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
 
 
         //=====================================================================================================================================
-        val foodTracker = newTracker(context.getString(R.string.msg_example_trackers_restaurant), true, OTTracker.CREATION_FLAG_TUTORIAL)
+        val foodTracker = newTracker(context.getString(R.string.msg_example_trackers_restaurant), true, OTTracker.CREATION_FLAG_TUTORIAL, true)
         foodTracker.isOnShortcut = true
         foodTracker.attributes += OTAttribute.createAttribute(foodTracker, context.getString(R.string.msg_example_trackers_restaurant_name), OTAttribute.TYPE_SHORT_TEXT)
         foodTracker.attributes += OTAttribute.createAttribute(foodTracker, context.getString(R.string.msg_example_trackers_restaurant_date), OTAttribute.TYPE_TIME).apply {

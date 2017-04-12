@@ -188,7 +188,7 @@ class TrackerListFragment : OTFragment() {
             if (userLoaded) {
                 newTrackerNameDialog.input(null, user.generateNewTrackerName(context), false) {
                     dialog, text ->
-                    val newTracker = user.newTracker(text.toString(), true)
+                    val newTracker = user.newTracker(text.toString(), true, isEditable = true)
                     startActivityForResult(TrackerDetailActivity.makeIntent(newTracker.objectId, context, true), REQUEST_CODE_NEW_TRACKER)
 
                 }.show()
@@ -380,6 +380,7 @@ class TrackerListFragment : OTFragment() {
 
             val name: TextView by bindView(R.id.name)
             val color: View by bindView(R.id.color_bar)
+            val lockedIndicator: View by bindView(R.id.ui_locked_indicator)
             val expandButton: ImageButton by bindView(R.id.ui_expand_button)
 
             val lastLoggingTimeView: TextView by bindView(R.id.ui_last_logging_time)
@@ -575,6 +576,16 @@ class TrackerListFragment : OTFragment() {
                     View.INVISIBLE
                 } else {
                     View.VISIBLE
+                }
+
+                if (tracker.isEditable) {
+                    lockedIndicator.visibility = View.GONE
+                    editButton.visibility = View.VISIBLE
+                    removeButton.visibility = View.VISIBLE
+                } else {
+                    lockedIndicator.visibility = View.VISIBLE
+                    editButton.visibility = View.GONE
+                    removeButton.visibility = View.GONE
                 }
 
                 subscriptions.clear()
