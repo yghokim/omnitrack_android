@@ -121,7 +121,9 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
                     pojo.required,
                     pojo.type!!,
                     pojo.properties,
-                    pojo.connectionSerialized)
+                    pojo.connectionSerialized).apply {
+                this.createdAt = pojo.createdAt
+            }
         }
 
         fun showPermissionCheckDialog(activity: Activity, typeId: Int, typeName: String, onGranted: (Boolean) -> Unit, onDenied: (() -> Unit)? = null): MaterialDialog? {
@@ -164,6 +166,8 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
         return getPermissionsForAttribute(typeId)
     }
 
+    var createdAt: Any? = null
+        private set
 
     var tracker: OTTracker? by Delegates.observable(parentTracker) {
         prop, old, new ->

@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.support.annotation.Keep
 import com.google.firebase.database.*
+import com.google.firebase.iid.FirebaseInstanceId
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
@@ -80,6 +81,7 @@ object FirebaseDbHelper {
         var onShortcut: Boolean = false
         var attributes: Map<String, AttributePOJO>? = null
         var creationFlags: Map<String, String>? = null
+        var createdAt: Any? = ServerValue.TIMESTAMP
     }
 
     @Keep
@@ -90,6 +92,7 @@ object FirebaseDbHelper {
         var type: Int? = null
         var required: Boolean = false
         var properties: Map<String, String>? = null
+        var createdAt: Any? = ServerValue.TIMESTAMP
     }
 
     @Keep
@@ -160,6 +163,7 @@ object FirebaseDbHelper {
     @Keep
     class DeviceInfo {
         var os: String? = "Android api-${android.os.Build.VERSION.SDK_INT}"
+        var instanceId: String? = FirebaseInstanceId.getInstance().getToken()
         var firstLoginAt: Any? = ServerValue.TIMESTAMP
     }
 
@@ -208,6 +212,7 @@ object FirebaseDbHelper {
         return trackerRef(trackerId)!!.child(CHILD_NAME_ATTRIBUTES)!!.push().key
     }
 
+    /*
     fun saveUser(user: OTUser) {
         for (child in user.trackers.iterator().withIndex()) {
             saveTracker(child.value, child.index)
@@ -216,7 +221,7 @@ object FirebaseDbHelper {
         for (triggerEntry in user.triggerManager.withIndex()) {
             saveTrigger(triggerEntry.value, user.objectId, triggerEntry.index)
         }
-    }
+    }*/
 
     fun saveTrigger(trigger: OTTrigger, userId: String, position: Int) {
         val pojo = trigger.dumpDataToPojo(null)
@@ -510,6 +515,9 @@ object FirebaseDbHelper {
         val properties = HashMap<String, String>()
         attribute.writePropertiesToDatabase(properties)
         pojo.properties = properties
+        if (attribute.createdAt != null) {
+            pojo.createdAt = attribute.createdAt
+        }
 
         return pojo
     }
@@ -1006,6 +1014,10 @@ object FirebaseDbHelper {
         }
     }
 
+    fun getDeviceInfoChild(): DatabaseReference? {
+        return FirebaseDbHelper.currentUserRef?.child("devices")?.child(OTApplication.app.deviceId)
+    }
+
     fun addDeviceInfoToUser(userId: String, deviceId: String): Single<DeviceInfo> {
         val query = FirebaseDbHelper.dbRef?.child(FirebaseDbHelper.CHILD_NAME_USERS)?.child(userId)?.child("devices")
         if (query != null) {
@@ -1017,6 +1029,7 @@ object FirebaseDbHelper {
                     result ->
                     if (!subscriber.isUnsubscribed) {
                         if (result.isSuccessful) {
+                            refreshInstanceIdToServerIfExists(false)
                             subscriber.onSuccess(info)
                         } else {
                             subscriber.onError(result.exception)
@@ -1027,6 +1040,25 @@ object FirebaseDbHelper {
         } else {
             return Single.error(Exception("Database reference does not exist."))
         }
+    }
+
+    fun refreshInstanceIdToServerIfExists(ignoreIfStored: Boolean): Boolean {
+        if (ignoreIfStored) {
+            if (OTApplication.app.systemSharedPreferences.contains(OTApplication.PREFERENCE_KEY_FIREBASE_INSTANCE_ID)) {
+                return false
+            }
+        }
+
+        val token = FirebaseInstanceId.getInstance().token
+        if (token != null) {
+            OTApplication.app.systemSharedPreferences.edit().putString(OTApplication.PREFERENCE_KEY_FIREBASE_INSTANCE_ID, token)
+                    .apply()
+            FirebaseDbHelper.getDeviceInfoChild()?.child("instanceId")?.setValue(token)
+            return true
+        } else {
+            return false
+        }
+
     }
 
     fun removeDeviceInfo(userId: String, deviceId: String): Single<Boolean> {
