@@ -31,6 +31,8 @@ object EventLoggingManager {
     const val EVENT_NAME_CHANGE_TRIGGER_REMOVE = "change_trigger_remove"
     const val EVENT_NAME_CHANGE_TRIGGER_SWITCH = "change_trigger_switch"
 
+    const val EVENT_NAME_TRACKER_DATA_EXPORT = "tracker_export_data"
+
     const val EVENT_NAME_SESSION = "session"
 
     private val analytics: FirebaseAnalytics by lazy {
@@ -103,5 +105,11 @@ object EventLoggingManager {
         }
 
         logEvent(EVENT_NAME_SESSION, content)
+    }
+
+    fun logExport(trackerId: String) {
+        val bundle = Bundle()
+        bundle.putString(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
+        logEvent(EVENT_NAME_TRACKER_DATA_EXPORT, bundle)
     }
 }

@@ -16,6 +16,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTExternalFileInvolvedAttribute
+import kr.ac.snu.hcil.omnitrack.core.database.EventLoggingManager
 import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
 import kr.ac.snu.hcil.omnitrack.core.system.OTTaskNotificationManager
 import kr.ac.snu.hcil.omnitrack.utils.io.StringTableSheet
@@ -138,6 +139,8 @@ class OTTableExportService : WakefulService(TAG) {
             fun finish(successful: Boolean) {
                 println("export observable completed")
 
+                EventLoggingManager.logExport(trackerId)
+
                 cacheDirectory?.let {
                     if (it.exists()) {
                         if (it.deleteRecursively()) {
@@ -155,7 +158,6 @@ class OTTableExportService : WakefulService(TAG) {
                     } else {
                         tableType.extension
                     })
-                    println("mimeType is ${mimeType}")
 
                     PugNotification.with(this)
                             .load()
