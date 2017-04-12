@@ -78,6 +78,38 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
         const val TYPE_IMAGE = 8
         const val TYPE_AUDIO = 9
 
+        fun getTypeString(typeId: Int): String {
+            return when (typeId) {
+                TYPE_NUMBER -> "number"
+                TYPE_TIME -> "time"
+                TYPE_TIMESPAN -> "timespan"
+                TYPE_SHORT_TEXT -> "short_text"
+                TYPE_LONG_TEXT -> "long_text"
+                TYPE_LOCATION -> "location"
+                TYPE_CHOICE -> "choice"
+                TYPE_RATING -> "rating"
+                TYPE_IMAGE -> "image"
+                TYPE_AUDIO -> "audio"
+                else -> throw IllegalArgumentException("Unsupported attribute type: ${typeId}")
+            }
+        }
+
+        fun getTypeIdFromString(typeString: String): Int {
+            return when (typeString.toLowerCase()) {
+                "number" -> TYPE_NUMBER
+                "time" -> TYPE_TIME
+                "timespan" -> TYPE_TIMESPAN
+                "short_text" -> TYPE_SHORT_TEXT
+                "long_text" -> TYPE_LONG_TEXT
+                "location" -> TYPE_LOCATION
+                "choice" -> TYPE_CHOICE
+                "rating" -> TYPE_RATING
+                "image" -> TYPE_IMAGE
+                "audio" -> TYPE_AUDIO
+                else -> throw IllegalArgumentException("Unsupported attribute type string: ${typeString}")
+            }
+        }
+
         private val permissionDict = SparseArray<Array<String>>()
 
         init {

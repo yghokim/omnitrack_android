@@ -82,6 +82,7 @@ object FirebaseDbHelper {
         var attributes: Map<String, AttributePOJO>? = null
         var creationFlags: Map<String, String>? = null
         var createdAt: Any? = ServerValue.TIMESTAMP
+        var editable: Boolean = true
     }
 
     @Keep
@@ -299,9 +300,18 @@ object FirebaseDbHelper {
         })
     }
 
-    fun removeTracker(tracker: OTTracker, formerOwner: OTUser) {
+    fun removeTracker(tracker: OTTracker, formerOwner: OTUser, archive: Boolean = true) {
         println("Firebase remove tracker: ${tracker.name}, ${tracker.objectId}")
-        deBelongReference(trackerRef(tracker.objectId), CHILD_NAME_TRACKERS, formerOwner.objectId)
+        if (archive) {
+            deBelongReference(trackerRef(tracker.objectId), CHILD_NAME_TRACKERS, formerOwner.objectId)
+        } else {
+            setContainsFlagOfUser(formerOwner.objectId, tracker.objectId, CHILD_NAME_TRACKERS, false)
+            trackerRef(tracker.objectId)?.removeValue { databaseError, databaseReference ->
+                if (databaseError != null) {
+                    databaseError.toException().printStackTrace()
+                }
+            }
+        }
     }
 
     fun removeTrigger(trigger: OTTrigger) {
@@ -372,9 +382,9 @@ object FirebaseDbHelper {
                 pojo.name ?: "Noname",
                 pojo.color,
                 pojo.onShortcut,
+                pojo.editable,
                 pojo.attributeLocalKeySeed,
-                attributeList,
-                pojo.creationFlags
+                attributeList, pojo.creationFlags
         ))
     }
 
@@ -536,6 +546,7 @@ object FirebaseDbHelper {
         values.onShortcut = tracker.isOnShortcut
         values.attributeLocalKeySeed = tracker.attributeLocalKeySeed
         values.creationFlags = tracker.creationFlags
+        values.editable = tracker.isEditable
 
         val attributes = HashMap<String, AttributePOJO>()
         for (attribute in tracker.attributes.unObservedList.withIndex()) {
