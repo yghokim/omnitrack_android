@@ -104,6 +104,8 @@ class OTApplication : MultiDexApplication() {
 
         const val PREFERENCE_KEY_TRACKER_ITEMS_EXPORTING_PREFIX = "exporting_tracker"
 
+        const val PREFERENCE_KEY_FIREBASE_INSTANCE_ID = "firebase_instance_id"
+
         fun getString(resId: Int): String {
             return app.resources.getString(resId)
         }
