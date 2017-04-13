@@ -55,7 +55,7 @@ object FirebaseDbHelper {
 
     val currentUserRef: DatabaseReference? get() {
         println("getting userReference, userId: ${OTAuthManager.userId}")
-        return dbRef?.child(CHILD_NAME_USERS)?.child(OTAuthManager.userId)
+        return OTAuthManager.userId?.let { dbRef?.child(CHILD_NAME_USERS)?.child(it) }
     }
 
     val experimentProfileRef: DatabaseReference? get() = currentUserRef?.child(CHILD_NAME_EXPERIMENT_PROFILE)
@@ -1061,7 +1061,7 @@ object FirebaseDbHelper {
         }
 
         val token = FirebaseInstanceId.getInstance().token
-        if (token != null) {
+        if (token != null && OTAuthManager.currentSignedInLevel > OTAuthManager.SignedInLevel.NONE) {
             OTApplication.app.systemSharedPreferences.edit().putString(OTApplication.PREFERENCE_KEY_FIREBASE_INSTANCE_ID, token)
                     .apply()
             FirebaseDbHelper.getDeviceInfoChild()?.child("instanceId")?.setValue(token)
