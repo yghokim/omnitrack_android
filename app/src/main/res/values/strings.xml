@@ -407,5 +407,8 @@
     <string name="msg_button_label_new_version_available">Visit Play store to update the app</string>
     <string name="msg_close">Close</string>
     <string name="msg_beta_msg_version_play_store">The OmniTrack account should be selected in Play Store app to see the Store page.</string>
+    <string name="msg_attribute_edit_dialog_title">Modify Field Value</string>
+    <string name="msg_format_attribute_edit_dialog_title">Modify $1%s</string>
+
 
 </resources>
