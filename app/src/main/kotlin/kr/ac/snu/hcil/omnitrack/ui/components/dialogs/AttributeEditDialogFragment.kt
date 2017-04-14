@@ -48,7 +48,7 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
     }
 
     interface Listener {
-        fun onOkAttributeEditDialog(changed: Boolean, value: Any, tracker: OTTracker, attribute: OTAttribute<out Any>, Item: OTItem?)
+        fun onOkAttributeEditDialog(changed: Boolean, value: Any, tracker: OTTracker, attribute: OTAttribute<out Any>, itemId: String?)
     }
 
     private lateinit var container: ViewGroup
@@ -83,14 +83,20 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
                     val attribute = this.attribute
 
                     if (tracker != null && attribute != null) {
+                        val value = this.valueView?.value
                         val changed: Boolean
                         if (this.item == null) {
                             changed = true
+                        } else {
+                            val itemValue = this.item?.getValueOf(attribute)
+                            changed = value != itemValue
                         }
 
-                        for (listener in listeners) {
+                        if (value != null) {
 
-                            listener.onOkAttributeEditDialog(true, 3, tracker, attribute, item)
+                            for (listener in listeners) {
+                                listener.onOkAttributeEditDialog(changed, value, tracker, attribute, item?.objectId)
+                            }
                         }
                     }
                 }
