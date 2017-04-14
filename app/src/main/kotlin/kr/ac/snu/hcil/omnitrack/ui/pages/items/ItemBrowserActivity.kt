@@ -223,14 +223,13 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
         Log.d(AttributeEditDialogFragment.TAG, "changed: ${changed}, value: ${value}")
         if (this.tracker?.objectId == tracker.objectId) {
             if (itemId != null) {
-                val item = items.find { item -> item.objectId == item.objectId }
+                val item = items.find { item -> item.objectId == itemId }
                 if (item != null) {
                     item.setValueOf(attribute, value)
                     FirebaseDbHelper.saveItem(item, tracker, false)
                     itemListViewAdapter.notifyItemChanged(items.indexOf(item))
                 }
             }
-            val attributePosition = tracker.attributes.indexOf(attribute)
         }
     }
 
