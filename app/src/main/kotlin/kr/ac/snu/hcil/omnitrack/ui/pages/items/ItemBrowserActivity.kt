@@ -10,6 +10,7 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
+import android.util.Log
 import android.view.*
 import android.widget.ArrayAdapter
 import android.widget.PopupMenu
@@ -217,8 +218,20 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
         }
     }
 
-    override fun onOkAttributeEditDialog(changed: Boolean, value: Any, tracker: OTTracker, attribute: OTAttribute<out Any>, Item: OTItem?) {
+    override fun onOkAttributeEditDialog(changed: Boolean, value: Any, tracker: OTTracker, attribute: OTAttribute<out Any>, itemId: String?) {
         println("dismiss handler")
+        Log.d(AttributeEditDialogFragment.TAG, "changed: ${changed}, value: ${value}")
+        if (this.tracker?.objectId == tracker.objectId) {
+            if (itemId != null) {
+                val item = items.find { item -> item.objectId == item.objectId }
+                if (item != null) {
+                    item.setValueOf(attribute, value)
+                    FirebaseDbHelper.saveItem(item, tracker, false)
+                    itemListViewAdapter.notifyItemChanged(items.indexOf(item))
+                }
+            }
+            val attributePosition = tracker.attributes.indexOf(attribute)
+        }
     }
 
 
