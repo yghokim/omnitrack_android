@@ -37,6 +37,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.viewholders.RecyclerViewMen
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.DrawableListBottomSpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
+import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.AttributeEditDialogFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.RxProgressDialog
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
@@ -49,7 +50,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.properties.Delegates
 
-class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_browser), ExtendedSpinner.OnItemSelectedListener, View.OnClickListener {
+class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_browser), ExtendedSpinner.OnItemSelectedListener, View.OnClickListener, AttributeEditDialogFragment.Listener {
 
     companion object {
 
@@ -147,7 +148,6 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
             }
 
         })
-
     }
 
     override fun onTrackerLoaded(tracker: OTTracker) {
@@ -216,6 +216,11 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
             onItemListChanged()
         }
     }
+
+    override fun onOkAttributeEditDialog(changed: Boolean, value: Any, tracker: OTTracker, attribute: OTAttribute<out Any>, Item: OTItem?) {
+        println("dismiss handler")
+    }
+
 
     override fun onStop() {
         super.onStop()
@@ -481,15 +486,23 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                     } else TableRowViewHolder(view as ViewGroup)
                 }
 
-                inner open class TableRowViewHolder(val view: ViewGroup) : RecyclerView.ViewHolder(view) {
+                inner open class TableRowViewHolder(val view: ViewGroup) : RecyclerView.ViewHolder(view), View.OnClickListener {
 
                     val attributeNameView: TextView by bindView(R.id.ui_attribute_name)
                     var valueView: View
 
                     var valueApplySubscription: Subscription? = null
 
+                    var attributeId: String? = null
+
                     init {
                         valueView = view.findViewById(R.id.ui_value_view_replace)
+                        view.setOnClickListener(this)
+                    }
+
+                    override fun onClick(v: View?) {
+                        AttributeEditDialogFragment.makeInstance(getParentItem().objectId!!, attributeId!!, getParentItem().trackerObjectId, this@ItemBrowserActivity)
+                                .show(this@ItemBrowserActivity.supportFragmentManager, "ValueModifyDialog")
                     }
 
                     open fun bindRawValue(name: String, value: String) {
@@ -509,6 +522,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
 
                     open fun bindAttribute(attribute: OTAttribute<out Any>) {
                         attributeNameView.text = attribute.name
+                        attributeId = attribute.objectId
                         val sort = getCurrentSort()
                         attributeNameView.setTextColor(
                                 if (sort is AttributeSorter && sort.attribute === attribute) {
@@ -554,6 +568,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                     }
 
                     override fun bindAttribute(attribute: OTAttribute<out Any>) {
+                        attributeId = attribute.objectId
                         attributeNameView.text = attribute.name
                     }
                 }
