@@ -5,8 +5,6 @@ import android.os.Bundle
 import android.support.v4.app.FragmentManager
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.FrameLayout
 import android.widget.TextView
 import com.afollestad.materialdialogs.MaterialDialog
 import kr.ac.snu.hcil.omnitrack.OTApplication
@@ -16,12 +14,14 @@ import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
+import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.common.RxBoundDialogFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Observable
 import rx.Subscription
 import rx.android.schedulers.AndroidSchedulers
+import rx.schedulers.Schedulers
 import rx.subscriptions.Subscriptions
 
 /**
@@ -51,7 +51,8 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
         fun onOkAttributeEditDialog(changed: Boolean, value: Any, tracker: OTTracker, attribute: OTAttribute<out Any>, itemId: String?)
     }
 
-    private lateinit var container: ViewGroup
+    private lateinit var container: LockableFrameLayout
+    private lateinit var progressBar: View
 
     private var titleView: TextView? = null
     private var tracker: OTTracker? = null
@@ -118,6 +119,10 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
     override fun onBind(savedInstanceState: Bundle?): Subscription {
         val bundle = savedInstanceState ?: arguments
 
+        container.locked = true
+        container.alpha = 0.25f
+        progressBar.visibility = View.VISIBLE
+
         if (bundle.containsKey(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
                 && bundle.containsKey(OTApplication.INTENT_EXTRA_OBJECT_ID_ATTRIBUTE)) {
             val trackerId = bundle.getString(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
@@ -126,12 +131,12 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
 
             val activity = activity
             if (activity is OTActivity) {
-                return activity.signedInUserObservable.subscribeOn(AndroidSchedulers.mainThread()).doOnNext {
+                return activity.signedInUserObservable.observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io()).doOnNext {
                     user ->
                     this.tracker = user[trackerId]
                     this.attribute = user.findAttributeByObjectId(trackerId, attributeId)
 
-                    this.titleView?.setText(String.format(resources.getString(R.string.msg_format_attribute_edit_dialog_title), this.attribute?.name))
+                    this.titleView?.text = String.format(resources.getString(R.string.msg_format_attribute_edit_dialog_title), this.attribute?.name)
 
                     this.valueView = this.attribute?.getInputView(context, false, this.valueView)
 
@@ -164,6 +169,9 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
                         }
                     }
 
+                    progressBar.visibility = View.GONE
+                    container.alpha = 1f
+                    container.locked = false
                     isContentLoaded = true
                 }
             } else return Subscriptions.empty()
@@ -198,13 +206,18 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
     }
 
     private fun setupViews(inflater: LayoutInflater, savedInstanceState: Bundle?): View {
+
+        /*
         val layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         val view = FrameLayout(activity)
         view.layoutParams = layoutParams
         val horizontalPadding = resources.getDimensionPixelSize(R.dimen.activity_horizontal_margin)
         val verticalPadding = resources.getDimensionPixelSize(R.dimen.activity_vertical_margin)
         view.setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding)
-        container = view
+        */
+        val view = inflater.inflate(R.layout.layout_item_field_edit_dialog, null, false)
+        progressBar = view.findViewById(R.id.ui_progress_bar)
+        container = view.findViewById(R.id.container) as LockableFrameLayout
         return view
     }
 
