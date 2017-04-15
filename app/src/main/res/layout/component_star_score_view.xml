@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <android.support.v7.widget.AppCompatImageView
+        android:layout_width="27dp"
+        android:layout_height="27dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginRight="2dp"
+        android:src="@drawable/symbol_star_full" />
+
+    <TextView
+        android:id="@+id/ui_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:fontFamily="sans-serif-light"
+        android:gravity="center_vertical"
+        android:maxLines="1"
+        android:textColor="@color/textColorLight"
+        android:textSize="15sp"
+        android:textStyle="italic"
+        tools:text="3.5/10" />
+
+</merge>
