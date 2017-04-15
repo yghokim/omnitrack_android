@@ -8,6 +8,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
+import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckService
 import kr.ac.snu.hcil.omnitrack.widgets.OTShortcutPanelWidgetUpdateService
 import rx.schedulers.Schedulers
 
@@ -37,6 +38,7 @@ class PackageReceiver: BroadcastReceiver() {
                             FirebaseDbHelper.getDeviceInfoChild()?.child("appVersion")?.setValue(BuildConfig.VERSION_NAME)
                         }
                     }
+                    OTVersionCheckService.setupServiceAlarm(context)
                 }
 
                 Intent.ACTION_PACKAGE_ADDED -> {

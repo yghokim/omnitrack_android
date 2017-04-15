@@ -11,7 +11,7 @@ import rx.Single
 object RemoteConfigManager {
     private val configInstance: FirebaseRemoteConfig by lazy {
         val settings = FirebaseRemoteConfigSettings.Builder()
-                //.setDeveloperModeEnabled(BuildConfig.DEBUG)
+                .setDeveloperModeEnabled(BuildConfig.DEBUG)
                 .build();
         val instance = FirebaseRemoteConfig.getInstance()
         instance.setConfigSettings(settings)
@@ -38,7 +38,7 @@ object RemoteConfigManager {
                         subscriber.onError(Exception("no value returned."))
                     }
                 } else {
-                    subscriber.onError(Exception("grabbing failed"))
+                    subscriber.onError(task.exception)
                 }
             }
         }

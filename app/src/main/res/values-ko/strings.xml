@@ -323,6 +323,9 @@
     <string name="msg_attribute_edit_dialog_title">필드 값 수정하기</string>
     <string name="msg_format_attribute_edit_dialog_title">%1$s 수정하기</string>
 
+    <string name="msg_notification_new_version_detected_title">앱 업데이트 출시</string>
+    <string name="msg_notification_new_version_detected_text">Play 스토어에서 OmniTrack을 업데이트 해주세요!</string>
+
 
     <string-array name="purpose_entries">
         <item>directive|건강 관련 정보를 기록하기 위해서</item>

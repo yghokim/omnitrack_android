@@ -25,19 +25,14 @@ class VersionCheckDialogFragment : DialogFragment() {
 
     companion object {
 
-        const val EXTRA_LATEST_VERSION = "latest_version"
-        const val EXTRA_SHOW_DIALOG_ONCE_PER_UPDATE = "show_dialog_per_update"
-        const val PREF_LAST_NOTIFIED_VERSION = "last_notified_version"
-
         fun makeInstance(): VersionCheckDialogFragment {
             return VersionCheckDialogFragment()
         }
 
-        fun makeInstance(alreadyCheckedLatestVersion: String?, showDialogOncePerUpdate: Boolean = false): VersionCheckDialogFragment {
+        fun makeInstance(alreadyCheckedLatestVersion: String?): VersionCheckDialogFragment {
             val instance = VersionCheckDialogFragment()
             val bundle = Bundle()
-            bundle.putString(EXTRA_LATEST_VERSION, alreadyCheckedLatestVersion)
-            bundle.putBoolean(EXTRA_SHOW_DIALOG_ONCE_PER_UPDATE, showDialogOncePerUpdate)
+            bundle.putString(OTApplication.INTENT_EXTRA_LATEST_VERSION_NAME, alreadyCheckedLatestVersion)
             instance.arguments = bundle
             return instance
         }
@@ -71,7 +66,7 @@ class VersionCheckDialogFragment : DialogFragment() {
         val view = inflater.inflate(R.layout.layout_version_compare, null)
         setupViews(view)
 
-        latestVersion = arguments?.getString(EXTRA_LATEST_VERSION)
+        latestVersion = arguments?.getString(OTApplication.INTENT_EXTRA_LATEST_VERSION_NAME)
         if (latestVersion != null) {
             compareVersions(latestVersion!!)
         } else {
@@ -88,15 +83,6 @@ class VersionCheckDialogFragment : DialogFragment() {
     override fun onDismiss(dialog: DialogInterface?) {
         super.onDismiss(dialog)
 
-        println("dialog dismissed")
-        if (arguments?.getBoolean(EXTRA_SHOW_DIALOG_ONCE_PER_UPDATE, false) == true) {
-            if (latestVersion != null) {
-                println("store to preference : ${latestVersion}")
-                OTApplication.app.systemSharedPreferences.edit()
-                        .putString(PREF_LAST_NOTIFIED_VERSION, latestVersion)
-                        .apply()
-            }
-        }
         dialogSubscriptions.clear()
     }
 
