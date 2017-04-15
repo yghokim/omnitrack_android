@@ -1,8 +1,10 @@
 package kr.ac.snu.hcil.omnitrack
 
+import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Color
+import android.os.Bundle
 import android.os.Looper
 import android.os.SystemClock
 import android.preference.PreferenceManager
@@ -32,6 +34,7 @@ import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTriggerAlarmManager
 import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
 import kr.ac.snu.hcil.omnitrack.services.OTFirebaseUploadService
+import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckService
 import kr.ac.snu.hcil.omnitrack.utils.NumberStyle
 import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 import kr.ac.snu.hcil.omnitrack.utils.UniqueStringEntryList
@@ -40,6 +43,7 @@ import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 import java.nio.charset.Charset
 import java.util.*
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * Created by Young-Ho Kim on 2016-07-11.
@@ -78,6 +82,9 @@ class OTApplication : MultiDexApplication() {
         const val INTENT_EXTRA_FROM = "activityOpenedFrom"
 
         const val INTENT_EXTRA_ITEMBUILDER = "itemBuilderId"
+
+        const val BROADCAST_ACTION_NEW_VERSION_DETECTED = "kr.ac.snu.hcil.omnitrack.action.NEW_VERSION_DETECTED"
+        const val INTENT_EXTRA_LATEST_VERSION_NAME = "latest_version"
 
         const val BROADCAST_ACTION_USER_SIGNED_IN = "kr.ac.snu.hcil.omnitrack.action.USER_SIGNED_IN"
         const val BROADCAST_ACTION_USER_SIGNED_OUT = "kr.ac.snu.hcil.omnitrack.action.USER_SIGNED_OUT"
@@ -150,8 +157,13 @@ class OTApplication : MultiDexApplication() {
         CacheHelper(this)
     }
 
+    val isAppInForeground: Boolean get() {
+        return numActivitiesActive.get() > 0
+    }
+
     private var initialRun = false
 
+    private val numActivitiesActive = AtomicInteger(0)
 /*
     private val currentUser: OTUser
         get() {
@@ -285,7 +297,39 @@ class OTApplication : MultiDexApplication() {
             }
         }
 
+        registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks {
+            override fun onActivityPaused(activity: Activity?) {
+
+            }
+
+            override fun onActivityResumed(activity: Activity?) {
+
+            }
+
+            override fun onActivityStarted(activity: Activity?) {
+                numActivitiesActive.incrementAndGet()
+            }
+
+            override fun onActivityDestroyed(activity: Activity?) {
+
+            }
+
+            override fun onActivitySaveInstanceState(activity: Activity?, outState: Bundle?) {
+
+            }
+
+            override fun onActivityStopped(activity: Activity?) {
+                numActivitiesActive.decrementAndGet()
+            }
+
+            override fun onActivityCreated(activity: Activity?, savedInstanceState: Bundle?) {
+
+            }
+        })
+
         startService(OTFirebaseUploadService.makeResumeUploadIntent(this))
+
+        OTVersionCheckService.setupServiceAlarm(this)
 
         println("creation took ${SystemClock.elapsedRealtime() - startedAt}")
     }

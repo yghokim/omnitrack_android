@@ -410,5 +410,8 @@
     <string name="msg_attribute_edit_dialog_title">Modify Field Value</string>
     <string name="msg_format_attribute_edit_dialog_title">Modify %1$s</string>
 
+    <string name="msg_notification_new_version_detected_title">New update available</string>
+    <string name="msg_notification_new_version_detected_text">Tap to visit Play store to update OmniTrack</string>
+
 
 </resources>

@@ -1,7 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.ui.activities
 
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.PointF
 import android.graphics.Rect
 import android.os.Bundle
@@ -10,14 +12,13 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
-import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.ExperimentConsentManager
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.EventLoggingManager
 import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
-import kr.ac.snu.hcil.omnitrack.core.database.RemoteConfigManager
+import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckService
 import kr.ac.snu.hcil.omnitrack.ui.components.common.time.DurationPicker
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.VersionCheckDialogFragment
 import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
@@ -35,6 +36,10 @@ import java.util.*
 abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val checkUpdateAvailable: Boolean = true) : AppCompatActivity() {
 
     private val LOG_TAG = "OmniTrackActivity"
+
+    companion object {
+        val intentFilter: IntentFilter by lazy { IntentFilter(OTApplication.BROADCAST_ACTION_NEW_VERSION_DETECTED) }
+    }
 
     private inner class OmniTrackSignInResultsHandler : OTAuthManager.SignInResultsHandler {
         /**
@@ -99,6 +104,23 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
 
     private var backgroundSignInCheckThread: Thread? = null
 
+    private val broadcastReceiver: BroadcastReceiver by lazy {
+        object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                if (intent?.action == OTApplication.BROADCAST_ACTION_NEW_VERSION_DETECTED) {
+                    val versionName = intent.getStringExtra(OTApplication.INTENT_EXTRA_LATEST_VERSION_NAME)
+                    VersionCheckDialogFragment.makeInstance(versionName)
+                            .show(supportFragmentManager, "VersionCheck")
+
+                    OTApplication.app.systemSharedPreferences.edit()
+                            .putString(OTVersionCheckService.PREF_LAST_NOTIFIED_VERSION, versionName)
+                            .apply()
+                }
+            }
+
+        }
+    }
+
     val signedInUserObservable: rx.Observable<OTUser>
         get() = signedInUserSubject
                 .subscribeOn(Schedulers.io())
@@ -130,25 +152,6 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
             } else {
                 goSignInUnlessUserCached()
             }
-        }
-
-        if (checkUpdateAvailable) {
-            creationSubscriptions.add(
-                    RemoteConfigManager.getServerLatestVersionName().subscribe({
-                        versionName ->
-                        if (BuildConfig.DEBUG || RemoteConfigManager.isNewVersionGreater(BuildConfig.VERSION_NAME, versionName)) {
-                            val lastNotifiedVersion = OTApplication.app.systemSharedPreferences.getString(VersionCheckDialogFragment.PREF_LAST_NOTIFIED_VERSION, "")
-                            if (lastNotifiedVersion != versionName) {
-                                try {
-                                    VersionCheckDialogFragment.makeInstance(versionName, true)
-                                            .show(supportFragmentManager, "VersionCheck")
-                                } catch(ex: Exception) {
-                                    ex.printStackTrace()
-                                }
-                            }
-                        }
-                    }, {})
-            )
         }
     }
 
@@ -239,6 +242,10 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
         super.onResume()
 
         resumedAt = System.currentTimeMillis()
+
+        if (checkUpdateAvailable) {
+            registerReceiver(broadcastReceiver, intentFilter)
+        }
     }
 
     override fun onDestroy() {
@@ -261,6 +268,10 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
 
             val now = System.currentTimeMillis()
             EventLoggingManager.logSession(this, now - resumedAt, now, from, contentObject)
+        }
+
+        if (checkUpdateAvailable) {
+            unregisterReceiver(broadcastReceiver)
         }
     }
 

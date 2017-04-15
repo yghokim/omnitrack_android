@@ -131,13 +131,16 @@
 
         <service
             android:name=".widgets.OTShortcutPanelWidgetUpdateService"
-            android:exported="false"></service>
+            android:exported="false" />
 
         <service
             android:name=".receivers.TimeTriggerAlarmReceiver$TimeTriggerWakefulHandlingService"
             android:exported="false" />
         <service
             android:name=".services.OTBackgroundLoggingService"
+            android:exported="false" />
+        <service
+            android:name=".services.OTVersionCheckService"
             android:exported="false" />
         <service
             android:name=".services.DataTriggerCheckService"
