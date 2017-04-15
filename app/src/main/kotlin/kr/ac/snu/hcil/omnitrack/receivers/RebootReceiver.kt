@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
+import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckService
 import rx.schedulers.Schedulers
 
 /**
@@ -20,6 +21,8 @@ class RebootReceiver : BroadcastReceiver() {
                     user ->
                     OTShortcutPanelManager.refreshNotificationShortcutViews(user, context)
                 }
+
+                OTVersionCheckService.setupServiceAlarm(context)
             }
         }
     }
