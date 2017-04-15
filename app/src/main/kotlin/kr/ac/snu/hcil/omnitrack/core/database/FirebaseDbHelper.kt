@@ -5,6 +5,7 @@ import android.net.Uri
 import android.support.annotation.Keep
 import com.google.firebase.database.*
 import com.google.firebase.iid.FirebaseInstanceId
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
@@ -166,6 +167,7 @@ object FirebaseDbHelper {
         var os: String? = "Android api-${android.os.Build.VERSION.SDK_INT}"
         var instanceId: String? = FirebaseInstanceId.getInstance().getToken()
         var firstLoginAt: Any? = ServerValue.TIMESTAMP
+        var appVersion: String? = BuildConfig.VERSION_NAME
     }
 
     @Keep
