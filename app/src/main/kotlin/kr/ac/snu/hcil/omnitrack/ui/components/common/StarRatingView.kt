@@ -190,15 +190,15 @@ class StarRatingView : HorizontalLinearDrawableView, GestureDetector.OnGestureLi
 
         private val emptyDrawableSmall: Drawable by lazy {
             applyTint(ContextCompat.getDrawable(context, R.drawable.symbol_star_empty),
-                    ContextCompat.getColor(context, R.color.starGold))
+                    ContextCompat.getColor(context, R.color.starColorItemList))
         }
         private val halfDrawableSmall: Drawable by lazy {
             applyTint(ContextCompat.getDrawable(context, R.drawable.symbol_star_half),
-                    ContextCompat.getColor(context, R.color.starGold))
+                    ContextCompat.getColor(context, R.color.starColorItemList))
         }
         private val fullDrawableSmall: Drawable by lazy {
             applyTint(ContextCompat.getDrawable(context, R.drawable.symbol_star_full),
-                    ContextCompat.getColor(context, R.color.starGold))
+                    ContextCompat.getColor(context, R.color.starColorItemList))
         }
 
         init {

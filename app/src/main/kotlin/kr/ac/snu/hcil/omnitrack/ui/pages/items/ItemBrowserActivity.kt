@@ -9,7 +9,6 @@ import android.support.design.widget.*
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.helper.ItemTouchHelper
 import android.util.Log
 import android.view.*
 import android.widget.ArrayAdapter
@@ -122,8 +121,8 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
         })
 
 
-        ItemTouchHelper(DragItemTouchHelperCallback(itemListViewAdapter, this, false, true))
-                .attachToRecyclerView(itemListView)
+        /*ItemTouchHelper(DragItemTouchHelperCallback(itemListViewAdapter, this, false, true))
+                .attachToRecyclerView(itemListView)*/
 
 
         sortOrderButton.setOnCheckedChangeListener { compoundButton, b ->
@@ -563,7 +562,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                             val container = valueView.parent as ViewGroup
 
                             val index = container.indexOfChild(valueView)
-                            container.removeView(valueView)
+                            container.removeViewInLayout(valueView)
                             newValueView.layoutParams = lp
                             container.addView(newValueView, index)
                             valueView = newValueView
