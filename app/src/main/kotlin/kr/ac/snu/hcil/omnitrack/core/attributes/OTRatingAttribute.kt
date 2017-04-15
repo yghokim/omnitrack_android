@@ -7,6 +7,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTRatingOptionsProperty
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.common.StarRatingView
+import kr.ac.snu.hcil.omnitrack.ui.components.common.StarScoreView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.LikertScaleInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.StarRatingInputView
@@ -130,16 +131,18 @@ class OTRatingAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrac
     override fun getViewForItemList(context: Context, recycledView: View?): View {
         when (displayType) {
             RatingOptions.DisplayType.Star -> {
-                val target = if (recycledView is StarRatingView) {
-                    recycledView
-                } else {
-                    StarRatingView(context)
-                }
 
-                target.isLightMode = true
-                target.overridenIntrinsicWidth = context.resources.getDimensionPixelSize(R.dimen.star_rating_item_list_view_unit_size)
-                target.overridenIntrinsicHeight = target.overridenIntrinsicWidth
-                return target
+                if (ratingOptions.starLevels <= RatingOptions.StarLevel.Level5) {
+                    val target = recycledView as? StarRatingView ?: StarRatingView(context)
+
+                    target.isLightMode = true
+                    target.overridenIntrinsicWidth = context.resources.getDimensionPixelSize(R.dimen.star_rating_item_list_view_unit_size)
+                    target.overridenIntrinsicHeight = target.overridenIntrinsicWidth
+                    return target
+                } else {
+                    val target = recycledView as? StarScoreView ?: StarScoreView(context)
+                    return target
+                }
             }
 
             RatingOptions.DisplayType.Likert -> {
@@ -150,13 +153,16 @@ class OTRatingAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrac
 
     override fun applyValueToViewForItemList(value: Any?, view: View): Single<Boolean> {
         return Single.defer {
-            if (view is StarRatingView && value != null) {
+            if (view is StarRatingView && value is Float) {
                 if (value is Float) {
                     view.score = value
                     view.allowIntermediate = allowIntermediate
                     view.levels = level.maxScore
                     Single.just(true)
                 } else Single.just(false)
+            } else if (view is StarScoreView && value is Float) {
+                view.setScore(value, ratingOptions.starLevels.maxScore.toFloat())
+                Single.just(true)
             } else super.applyValueToViewForItemList(value, view)
         }
     }

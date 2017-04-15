@@ -36,7 +36,8 @@
 
     <color name="editModeOverlay">#c116afa3</color>
 
-    <color name="starGold">#ababab</color>
+    <color name="starColorItemList">#ababab</color>
+    <color name="starGold">#ffbe69</color>
 
     <color name="titleTextColor">#666666</color>
     <color name="outerBackground">#edebe7</color>
