@@ -531,7 +531,7 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
 
             private val columnNameView: TextView by bindView(R.id.ui_column_name)
             private val requiredMarker: View by bindView(R.id.ui_required_marker)
-            private val attributeTypeView: TextView by bindView(R.id.ui_attribute_type)
+            //private val attributeTypeView: TextView by bindView(R.id.ui_attribute_type)
 
             private val container: LockableFrameLayout by bindView(R.id.ui_input_view_container)
 
@@ -582,7 +582,7 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
                 } else {
                     View.INVISIBLE
                 }
-                attributeTypeView.text = resources.getString(attribute.typeNameResourceId)
+                //attributeTypeView.text = resources.getString(attribute.typeNameResourceId)
 
                 connectionIndicatorStubProxy.onBind(attribute)
 

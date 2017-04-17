@@ -4,7 +4,9 @@ import android.animation.Animator
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
 import android.support.design.widget.TabLayout
@@ -13,6 +15,9 @@ import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewPager
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ImageSpan
 import at.markushi.ui.RevealColorView
 import butterknife.bindView
 import kr.ac.snu.hcil.omnitrack.OTApplication
@@ -23,6 +28,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
+import kr.ac.snu.hcil.omnitrack.utils.applyTint
 import rx.subjects.BehaviorSubject
 import rx.subscriptions.CompositeSubscription
 import java.util.concurrent.TimeUnit
@@ -52,7 +58,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
 
     private var isEditMode = true
 
-    private var mSectionsPagerAdapter: SectionsPagerAdapter? = null
+    private lateinit var mSectionsPagerAdapter: SectionsPagerAdapter
 
     private val appBarRevealView: RevealColorView by bindView(R.id.ui_appbar_reveal)
 
@@ -79,13 +85,15 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
         mSectionsPagerAdapter = SectionsPagerAdapter(supportFragmentManager)
 
 
+
         mViewPager.pageMargin = resources.getDimensionPixelSize(R.dimen.viewpager_page_margin)
         mViewPager.setPageMarginDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.darkerBackground)))
         // Set up the ViewPager with the sections adapter.
         mViewPager.adapter = mSectionsPagerAdapter
 
-        val tabLayout = findViewById(R.id.tabs) as TabLayout?
-        tabLayout!!.setupWithViewPager(mViewPager)
+
+        val tabLayout = findViewById(R.id.tabs) as TabLayout
+        tabLayout.setupWithViewPager(mViewPager)
 
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)) {
@@ -287,12 +295,27 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
             return 2
         }
 
+        fun getIcon(position: Int): Drawable {
+            return applyTint(ContextCompat.getDrawable(this@TrackerDetailActivity, when (position) {
+                0 -> R.drawable.icon_structure
+                1 -> R.drawable.alarm_dark
+                else -> R.drawable.icon_structure
+            }), Color.WHITE)
+        }
+
         override fun getPageTitle(position: Int): CharSequence? {
-            when (position) {
-                0 -> return resources.getString(R.string.msg_tab_tracker_detail_structure)
-                1 -> return resources.getString(R.string.msg_tab_tracker_detail_reminders)
+            val titleText = when (position) {
+                0 -> resources.getString(R.string.msg_tab_tracker_detail_structure)
+                1 -> resources.getString(R.string.msg_tab_tracker_detail_reminders)
+                else -> ""
             }
-            return null
+
+            val spanned = SpannableString(" $titleText")
+
+            spanned.setSpan(
+                    ImageSpan(getIcon(position)), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+            return spanned
         }
     }
 }

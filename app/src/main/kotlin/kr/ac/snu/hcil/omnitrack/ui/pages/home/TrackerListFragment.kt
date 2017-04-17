@@ -38,6 +38,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.database.EventLoggingManager
 import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
+import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
@@ -387,6 +388,8 @@ class TrackerListFragment : OTFragment() {
             val todayLoggingCountView: TextView by bindView(R.id.ui_today_logging_count)
             val totalItemCountView: TextView by bindView(R.id.ui_total_item_count)
 
+            val alarmIcon: View by bindView(R.id.alarm_icon)
+            val alarmText: TextView by bindView(R.id.alarm_text)
 
             val expandedView: View by bindView(R.id.ui_expanded_view)
 
@@ -612,6 +615,18 @@ class TrackerListFragment : OTFragment() {
                             name.text = args.second
                         }
                 )
+
+                val activeNotificationTriggers = tracker.owner?.triggerManager?.getAttachedTriggers(tracker, OTTrigger.ACTION_NOTIFICATION)?.filter { it.isOn == true }
+                if (activeNotificationTriggers?.isNotEmpty() == true) {
+
+                    alarmIcon.visibility = View.VISIBLE
+                    alarmText.visibility = View.VISIBLE
+
+                    alarmText.setText(activeNotificationTriggers.size.toString())
+                } else {
+                    alarmIcon.visibility = View.INVISIBLE
+                    alarmText.visibility = View.INVISIBLE
+                }
 
                 /*
                 subscriptions.add(
