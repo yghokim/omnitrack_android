@@ -1,8 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.utils.io
 
 import android.content.Intent
-import com.koushikdutta.async.util.FileUtility
-import rx.Single
 import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
@@ -11,8 +9,21 @@ import java.io.OutputStream
  * Created by Young-Ho Kim on 2017-03-07.
  */
 object FileHelper {
-    fun removeAllFilesIn(dir: File): Single<Boolean> {
-        return Single.just(FileUtility.deleteDirectory(dir))
+
+    fun deleteDirectory(path: File): Boolean {
+        if (path.exists()) {
+            val files = path.listFiles()
+            if (files != null) {
+                for (i in files.indices) {
+                    if (files[i].isDirectory) {
+                        deleteDirectory(files[i])
+                    } else {
+                        files[i].delete()
+                    }
+                }
+            }
+        }
+        return path.delete()
     }
 
     fun makeSaveLocationPickIntent(filename: String): Intent {

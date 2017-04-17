@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/frontalBackground"
@@ -8,74 +9,68 @@
     android:paddingBottom="30dp"
     android:paddingRight="@dimen/activity_horizontal_margin">
 
-    <RelativeLayout
+    <com.google.android.flexbox.FlexboxLayout
         android:id="@+id/header"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:layout_marginTop="5dp">
-
-        <FrameLayout
-            android:layout_width="?attr/actionBarSize"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true">
-
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:minHeight="?attr/actionBarSize"
+        android:paddingBottom="12dp"
+        android:paddingTop="12dp"
+        app:flexWrap="nowrap">
             <View
                 android:id="@+id/ui_state_indicator"
                 android:layout_width="15dp"
                 android:layout_height="15dp"
                 android:layout_gravity="center"
-                android:background="@drawable/green_circle" />
-        </FrameLayout>
-
+                android:layout_marginLeft="17dp"
+                android:layout_marginRight="17dp"
+                android:background="@drawable/green_circle"
+                app:layout_alignSelf="center"
+                app:layout_flexShrink="0" />
 
         <TextView
             android:id="@+id/ui_column_name"
             style="@style/PropertyHeaderStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="?attr/actionBarSize"
-            android:text="Text"
-            android:textSize="16sp" />
+            android:lineSpacingMultiplier="1.2"
+            android:textSize="16sp"
+            app:layout_alignSelf="center"
+            tools:text="Text aoewfi af; ioeadk awdfk djk jaw;oefij ao;ewij ew;ofkj wdkfj dw;kfj " />
 
         <android.support.v7.widget.AppCompatImageView
             android:id="@+id/ui_required_marker"
             android:layout_width="11dp"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
             android:layout_marginLeft="4dp"
-            android:layout_toRightOf="@+id/ui_column_name"
+            android:layout_marginRight="8dp"
+            android:minWidth="11dp"
             android:paddingBottom="5dp"
             android:scaleType="fitStart"
             android:src="@drawable/icon_asterisk"
-            android:tint="@color/colorAccent" />
-
-        <TextView
-            android:id="@+id/ui_attribute_type"
-            style="@style/BadgeText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="15dp"
-            android:text="Attribute Type"
-            android:textAllCaps="true"
-            android:visibility="gone" />
+            android:tint="@color/colorAccent"
+            app:layout_alignSelf="center"
+            app:layout_flexShrink="0" />
 
         <TextView
             android:id="@+id/ui_timestamp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
             android:layout_marginStart="15dp"
             android:fontFamily="sans-serif-light"
-            android:text=""
+            android:gravity="right"
+            android:maxLines="1"
             android:textColor="@color/textColorMid"
             android:textSize="14sp"
-            android:textStyle="italic" />
+            android:textStyle="italic"
+            app:layout_alignSelf="center"
+            app:layout_flexGrow="100000"
+            app:layout_flexShrink="0"
+            tools:text="Just now"
 
-    </RelativeLayout>
+            />
+    </com.google.android.flexbox.FlexboxLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
