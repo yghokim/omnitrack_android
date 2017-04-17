@@ -15,6 +15,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
 import kr.ac.snu.hcil.omnitrack.core.database.NamedObject
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
+import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.models.LoggingHeatMapModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.models.TimelineComparisonLineChartModel
@@ -25,6 +26,8 @@ import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import rx.subjects.BehaviorSubject
 import rx.subjects.PublishSubject
 import rx.subjects.SerializedSubject
+import rx.subscriptions.SerialSubscription
+import rx.subscriptions.Subscriptions
 import java.io.File
 import java.util.*
 import kotlin.collections.HashMap
@@ -69,6 +72,10 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
     private var currentAttributesDbReference: DatabaseReference? = null
     private val attributesDbChangedListener: ChildEventListener
 
+    private var onReminderAddedSubscription = SerialSubscription()
+    private var onReminderRemovedSubscription = SerialSubscription()
+
+
     val attributes = ObservableList<OTAttribute<out Any>>()
 
     var isEditable: Boolean = isEditable
@@ -89,7 +96,31 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
                     databasePointRef?.child("user")?.setValue(new.objectId)
                     FirebaseDbHelper.setContainsFlagOfUser(new.objectId, this.objectId, FirebaseDbHelper.CHILD_NAME_TRACKERS, true)
                 }
+
+                onReminderAddedSubscription.set(
+                        new.triggerManager.triggerAdded.filter {
+                            trigger ->
+                            trigger.trackers.contains(this) && trigger.action == OTTrigger.ACTION_NOTIFICATION
+                        }.subscribe {
+                            trigger ->
+                            reminderAdded.onNext(ReadOnlyPair(this, trigger))
+                        }
+                )
+
+                onReminderRemovedSubscription.set(
+                        new.triggerManager.triggerRemoved.filter {
+                            trigger ->
+                            trigger.trackers.contains(this) && trigger.action == OTTrigger.ACTION_NOTIFICATION
+                        }.subscribe {
+                            trigger ->
+                            reminderRemoved.onNext(ReadOnlyPair(this, trigger))
+                        }
+                )
+
                 addedToUser.invoke(this, new)
+            } else {
+                onReminderAddedSubscription.set(Subscriptions.empty())
+                onReminderRemovedSubscription.set(Subscriptions.empty())
             }
         }
     }
@@ -147,6 +178,10 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
 
     val colorChanged = SerializedSubject(PublishSubject.create<ReadOnlyPair<OTTracker, Int>>())
     val isOnShortcutChanged = SerializedSubject(PublishSubject.create<ReadOnlyPair<OTTracker, Boolean>>())
+
+    val reminderAdded = SerializedSubject(PublishSubject.create<ReadOnlyPair<OTTracker, OTTrigger>>())
+    val reminderRemoved = SerializedSubject(PublishSubject.create<ReadOnlyPair<OTTracker, OTTrigger>>())
+
 
     val isExternalFilesInvolved: Boolean get() = attributes.unObservedList.find { it.isExternalFile } != null
 
@@ -328,6 +363,9 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
     fun dispose() {
         currentDbReference?.removeEventListener(dbChangedListener)
         currentAttributesDbReference?.removeEventListener(attributesDbChangedListener)
+        onReminderRemovedSubscription.set(Subscriptions.empty())
+        onReminderAddedSubscription.set(Subscriptions.empty())
+
     }
 
     fun getItemCacheDir(context: Context, createIfNotExist: Boolean = true): File {

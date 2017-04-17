@@ -30,19 +30,30 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
         const val INTENT_EXTRA_TRIGGER_ACTION = "trigger_action"
         const val INTENT_EXTRA_HIDE_ATTACHED_TRACKERS = "hide_attached_trackers"
         const val INTENT_EXTRA_TRIGGER_DATA = "trigger_data"
+        const val INTENT_EXTRA_OVERRIDE_TITLE = "overrideTitle"
 
-        fun makeNewTriggerIntent(context: Context, triggerType: Int, triggerAction: Int, hideAttachedTrackers: Boolean = false): Intent {
+        fun makeNewTriggerIntent(context: Context, triggerType: Int, triggerAction: Int, hideAttachedTrackers: Boolean = false, overrideTitle: String? = null): Intent {
             val intent = Intent(context, TriggerDetailActivity::class.java)
                     .putExtra(INTENT_EXTRA_TRIGGER_TYPE, triggerType)
                     .putExtra(INTENT_EXTRA_TRIGGER_ACTION, triggerAction)
                     .putExtra(INTENT_EXTRA_HIDE_ATTACHED_TRACKERS, hideAttachedTrackers)
+
+            if (overrideTitle != null) {
+                intent.putExtra(INTENT_EXTRA_OVERRIDE_TITLE, overrideTitle)
+            }
+
             return intent
         }
 
-        fun makeEditTriggerIntent(context: Context, trigger: OTTrigger, hideAttachedTrackers: Boolean = false): Intent {
+        fun makeEditTriggerIntent(context: Context, trigger: OTTrigger, hideAttachedTrackers: Boolean = false, overrideTitle: String? = null): Intent {
             val intent = Intent(context, TriggerDetailActivity::class.java)
                     .putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRIGGER, trigger.objectId)
                     .putExtra(INTENT_EXTRA_HIDE_ATTACHED_TRACKERS, hideAttachedTrackers)
+
+            if (overrideTitle != null) {
+                intent.putExtra(INTENT_EXTRA_OVERRIDE_TITLE, overrideTitle)
+            }
+
             return intent
         }
     }
@@ -68,6 +79,11 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
             } else {
                 title = resources.getString(R.string.title_activity_trigger_new)
             }
+
+        val overrideTitle = intent.getStringExtra(INTENT_EXTRA_OVERRIDE_TITLE)
+        if (overrideTitle.isNotBlank()) {
+            title = overrideTitle
+        }
 
         val frag = supportFragmentManager.findFragmentByTag("TriggerDetailContent") as? TriggerDetailFragment
         if (frag != null) {
@@ -304,6 +320,8 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
             val view = inflater.inflate(R.layout.activity_trigger_detail_fragment, container, false)
             controlPanelContainer = view.findViewById(R.id.ui_control_panel) as ViewGroup
             trackerAssignPanelStub = view.findViewById(R.id.ui_tracker_assign_panel_stub) as ViewStub
+
+            this.hideAttachedTrackers = arguments.getBoolean(INTENT_EXTRA_HIDE_ATTACHED_TRACKERS, false)
 
             val triggerId = arguments.getString(OTApplication.INTENT_EXTRA_OBJECT_ID_TRIGGER)
             if (!triggerId.isNullOrBlank()) {
