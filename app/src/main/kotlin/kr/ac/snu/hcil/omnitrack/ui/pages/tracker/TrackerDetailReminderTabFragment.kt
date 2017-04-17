@@ -9,6 +9,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.ATriggerListFragmentCore
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.TriggerDetailActivity
 import rx.subscriptions.CompositeSubscription
 import java.util.*
 
@@ -37,6 +38,13 @@ class TrackerDetailReminderTabFragment : TrackerDetailActivity.ChildFragment() {
 
             override fun hideTrackerAssignmentInterface(): Boolean {
                 return true
+            }
+
+            override fun onTriggerEditRequested(trigger: OTTrigger) {
+                parent.startActivityForResult(
+                        TriggerDetailActivity.makeEditTriggerIntent(parent.context, trigger, hideTrackerAssignmentInterface(), resources.getString(R.string.title_activity_reminder_edit)),
+                        DETAIL_REQUEST_CODE
+                )
             }
         }
     }

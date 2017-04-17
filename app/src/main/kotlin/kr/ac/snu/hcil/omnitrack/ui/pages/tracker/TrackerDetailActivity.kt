@@ -180,8 +180,27 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
 
     private fun onTrackerLoaded(tracker: OTTracker) {
         transitionToColor(tracker.color, false)
-        val reminders = tracker.owner?.triggerManager?.getAttachedTriggers(tracker, OTTrigger.ACTION_NOTIFICATION)
-        (tabLayout.getTabAt(TAB_INDEX_REMINDERS)?.customView?.tag as? TabViewHolder)?.setValue(mSectionsPagerAdapter.getPageTitle(TAB_INDEX_REMINDERS) ?: "Reminders", reminders?.size ?: 0)
+        refreshReminderCount()
+
+        creationSubscriptions.add(
+                tracker.reminderAdded.subscribe {
+                    refreshReminderCount()
+                }
+        )
+
+        creationSubscriptions.add(
+                tracker.reminderRemoved.subscribe {
+                    refreshReminderCount()
+                }
+        )
+    }
+
+    private fun refreshReminderCount() {
+        tracker?.let {
+            tracker ->
+            val reminders = tracker.owner?.triggerManager?.getAttachedTriggers(tracker, OTTrigger.ACTION_NOTIFICATION)
+            (tabLayout.getTabAt(TAB_INDEX_REMINDERS)?.customView?.tag as? TabViewHolder)?.setValue(mSectionsPagerAdapter.getPageTitle(TAB_INDEX_REMINDERS) ?: "Reminders", reminders?.size ?: 0)
+        }
     }
 
     private fun tossToHome() {
