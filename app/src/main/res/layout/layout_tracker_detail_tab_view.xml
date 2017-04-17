@@ -11,8 +11,8 @@
 
     <android.support.v7.widget.AppCompatImageView
         android:id="@+id/icon"
-        android:layout_width="16dp"
-        android:layout_height="16dp"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
         android:src="@drawable/alarm_dark"
         android:tint="#FFF"
         app:layout_alignSelf="center"
@@ -22,14 +22,16 @@
         android:id="@+id/text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="2dp"
+        android:layout_marginLeft="4dp"
         android:ellipsize="end"
+        android:fontFamily="sans-serif-medium"
         android:maxLines="1"
+        android:textAllCaps="true"
         android:textColor="#FFF"
         android:textSize="14sp"
-        android:textStyle="bold"
         app:layout_alignSelf="center"
         app:layout_flexShrink="0"
-        tools:text="Structure" />
+        tools:text="Reminders (0)" />
+
 
 </com.google.android.flexbox.FlexboxLayout>
