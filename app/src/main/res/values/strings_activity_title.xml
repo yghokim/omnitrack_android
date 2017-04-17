@@ -10,5 +10,8 @@
     <string name="title_activity_trigger_edit">Edit Trigger</string>
     <string name="title_activity_trigger_new">New Trigger</string>
 
+    <string name="title_activity_reminder_edit">Edit Reminder</string>
+    <string name="title_activity_reminder_new">New Reminder</string>
+
 
 </resources>
