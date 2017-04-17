@@ -15,9 +15,10 @@ import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewPager
-import android.text.Spannable
-import android.text.SpannableString
-import android.text.style.ImageSpan
+import android.view.LayoutInflater
+import android.view.View
+import android.widget.ImageView
+import android.widget.TextView
 import at.markushi.ui.RevealColorView
 import butterknife.bindView
 import kr.ac.snu.hcil.omnitrack.OTApplication
@@ -25,6 +26,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
+import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
@@ -41,6 +43,9 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
         const val NEW_TRACKER_NAME = "newTrackerName"
 
         const val INTENT_KEY_FOCUS_ATTRIBUTE_ID = "focusAttributeId"
+
+        const val TAB_INDEX_STRUCTURE = 0
+        const val TAB_INDEX_REMINDERS = 1
 
         fun makeIntent(trackerId: String, context: Context, new_mode: Boolean = false): Intent {
             val intent = Intent(context, TrackerDetailActivity::class.java)
@@ -67,6 +72,8 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
      */
     private val mViewPager: ViewPager by bindView(R.id.container)
 
+    private val tabLayout: TabLayout by bindView(R.id.tabs)
+
     private var user: OTUser? = null
     private var tracker: OTTracker? = null
 
@@ -91,9 +98,37 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
         // Set up the ViewPager with the sections adapter.
         mViewPager.adapter = mSectionsPagerAdapter
 
-
-        val tabLayout = findViewById(R.id.tabs) as TabLayout
         tabLayout.setupWithViewPager(mViewPager)
+        val numPages = mSectionsPagerAdapter.count
+        val inflater = LayoutInflater.from(this)
+        for (i in 0..numPages - 1) {
+            val tabView = inflater.inflate(R.layout.layout_tracker_detail_tab_view, tabLayout, false)
+            tabLayout.getTabAt(i)?.setCustomView(tabView)
+
+            val viewHolder = TabViewHolder(tabView)
+            viewHolder.iconView.setImageResource(mSectionsPagerAdapter.getIconId(i))
+            viewHolder.textView.setText(mSectionsPagerAdapter.getPageTitle(i))
+            tabView.tag = viewHolder
+            if (tabLayout.getTabAt(i)?.isSelected == false) {
+                tabView.alpha = 0.5f
+            }
+        }
+
+        tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+                tab?.customView?.alpha = 0.5f
+            }
+
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                tab?.customView?.alpha = 1f
+            }
+
+        })
+
 
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)) {
@@ -145,6 +180,8 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
 
     private fun onTrackerLoaded(tracker: OTTracker) {
         transitionToColor(tracker.color, false)
+        val reminders = tracker.owner?.triggerManager?.getAttachedTriggers(tracker, OTTrigger.ACTION_NOTIFICATION)
+        (tabLayout.getTabAt(TAB_INDEX_REMINDERS)?.customView?.tag as? TabViewHolder)?.setValue(mSectionsPagerAdapter.getPageTitle(TAB_INDEX_REMINDERS) ?: "Reminders", reminders?.size ?: 0)
     }
 
     private fun tossToHome() {
@@ -295,27 +332,40 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
             return 2
         }
 
+        fun getIconId(position: Int): Int {
+            return when (position) {
+                TAB_INDEX_STRUCTURE -> R.drawable.icon_structure
+                TAB_INDEX_REMINDERS -> R.drawable.alarm_dark
+                else -> R.drawable.icon_structure
+            }
+        }
+
         fun getIcon(position: Int): Drawable {
             return applyTint(ContextCompat.getDrawable(this@TrackerDetailActivity, when (position) {
-                0 -> R.drawable.icon_structure
-                1 -> R.drawable.alarm_dark
+                TAB_INDEX_STRUCTURE -> R.drawable.icon_structure
+                TAB_INDEX_REMINDERS -> R.drawable.alarm_dark
                 else -> R.drawable.icon_structure
             }), Color.WHITE)
         }
 
         override fun getPageTitle(position: Int): CharSequence? {
-            val titleText = when (position) {
-                0 -> resources.getString(R.string.msg_tab_tracker_detail_structure)
-                1 -> resources.getString(R.string.msg_tab_tracker_detail_reminders)
-                else -> ""
+            when (position) {
+                TAB_INDEX_STRUCTURE -> return resources.getString(R.string.msg_tab_tracker_detail_structure)
+                TAB_INDEX_REMINDERS -> return resources.getString(R.string.msg_tab_tracker_detail_reminders)
             }
+            return null
+        }
+    }
 
-            val spanned = SpannableString(" $titleText")
+    class TabViewHolder(val view: View) {
 
-            spanned.setSpan(
-                    ImageSpan(getIcon(position)), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        val iconView: ImageView = view.findViewById(R.id.icon) as ImageView
+        val textView: TextView = view.findViewById(R.id.text) as TextView
 
-            return spanned
+        fun setValue(text: CharSequence, count: Int? = null) {
+            textView.setText(if (count != null) {
+                "$text ($count)"
+            } else text)
         }
     }
 }
