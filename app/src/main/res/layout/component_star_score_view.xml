@@ -10,7 +10,8 @@
         android:layout_height="27dp"
         android:layout_gravity="center_vertical"
         android:layout_marginRight="2dp"
-        android:src="@drawable/symbol_star_full" />
+        android:src="@drawable/symbol_star_full"
+        android:tint="@color/starGold" />
 
     <TextView
         android:id="@+id/ui_text"

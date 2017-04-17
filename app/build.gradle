@@ -26,6 +26,10 @@ android {
         //multidex support
         multiDexEnabled true
     }
+    dexOptions {
+        javaMaxHeapSize "4g"
+    }
+
     buildTypes {
         release {
             minifyEnabled true
@@ -79,7 +83,6 @@ dependencies {
     compile 'jp.wasabeef:recyclerview-animators:2.2.3'
     compile 'com.github.markushi:android-ui:1.2'
     compile 'org.apmem.tools:layouts:1.10@aar'
-    compile 'com.koushikdutta.ion:ion:2.1.8'
     compile 'com.github.ybq:Android-SpinKit:1.1.0'
     compile 'com.badoo.mobile:android-weak-handler:1.1'
     compile 'com.squareup.okhttp3:okhttp:3.6.0'

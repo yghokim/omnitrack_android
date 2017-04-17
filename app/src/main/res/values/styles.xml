@@ -32,13 +32,17 @@
         <item name="android:windowFullscreen">true</item>
     </style>
 
-    <style name="TabLayoutStyle">
+    <style name="TabLayoutStyle" parent="Widget.Design.TabLayout">
         <item name="android:background">@color/appBarOverlayElementColor</item>
+        <item name="tabTextAppearance">@style/TabTextStyle</item>
+        <item name="tabSelectedTextColor">#FFF</item>
     </style>
 
     <style name="TabTextStyle" parent="TextAppearance.Design.Tab">
         <item name="android:textSize">14sp</item>
         <item name="android:textStyle">normal</item>
+        <item name="android:drawableLeft">@drawable/alarm_dark</item>
+        <item name="textAllCaps">true</item>
     </style>
 
     <style name="PropertyHeaderStyle">

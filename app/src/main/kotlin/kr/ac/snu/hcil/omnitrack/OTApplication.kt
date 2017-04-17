@@ -12,6 +12,7 @@ import android.provider.Settings
 import android.support.multidex.MultiDexApplication
 import android.telephony.TelephonyManager
 import android.text.format.DateUtils
+import com.google.firebase.crash.FirebaseCrash
 import com.squareup.leakcanary.LeakCanary
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
@@ -20,7 +21,6 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.*
 import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
-import kr.ac.snu.hcil.omnitrack.core.database.CacheHelper
 import kr.ac.snu.hcil.omnitrack.core.database.DatabaseHelper
 import kr.ac.snu.hcil.omnitrack.core.database.FirebaseStorageHelper
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
@@ -153,10 +153,6 @@ class OTApplication : MultiDexApplication() {
     lateinit var storageHelper: FirebaseStorageHelper
         private set
 
-    val cacheHelper: CacheHelper by lazy {
-        CacheHelper(this)
-    }
-
     val isAppInForeground: Boolean get() {
         return numActivitiesActive.get() > 0
     }
@@ -247,6 +243,10 @@ class OTApplication : MultiDexApplication() {
                 sendUser(cachedUser)
             }
         }
+    }.doOnError {
+        error ->
+        error.printStackTrace()
+        FirebaseCrash.report(Throwable("getting user observable failed", error))
     }.subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
 

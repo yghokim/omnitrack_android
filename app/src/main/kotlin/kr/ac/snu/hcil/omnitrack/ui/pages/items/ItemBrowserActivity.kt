@@ -38,7 +38,6 @@ import kr.ac.snu.hcil.omnitrack.ui.components.decorations.DrawableListBottomSpac
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.AttributeEditDialogFragment
-import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.RxProgressDialog
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.getDayOfMonth
@@ -512,8 +511,14 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                     }
 
                     override fun onClick(v: View?) {
-                        AttributeEditDialogFragment.makeInstance(getParentItem().objectId!!, attributeId!!, getParentItem().trackerObjectId, this@ItemBrowserActivity)
-                                .show(this@ItemBrowserActivity.supportFragmentManager, "ValueModifyDialog")
+                        try {
+                            val item = getParentItem()
+                            AttributeEditDialogFragment.makeInstance(item.objectId!!, attributeId!!, item.trackerObjectId, this@ItemBrowserActivity)
+                                    .show(this@ItemBrowserActivity.supportFragmentManager, "ValueModifyDialog")
+
+                        } catch(e: Exception) {
+                            e.printStackTrace()
+                        }
                     }
 
                     open fun bindRawValue(name: String, value: String) {
@@ -693,9 +698,12 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                 val cacheDir = tracker?.getItemCacheDir(context, false)
                 if (cacheDir != null) {
                     println("purge cache dir files")
+                    /*
                     RxProgressDialog.Builder(FileHelper.removeAllFilesIn(cacheDir).toObservable()).create(this@SettingsDialogFragment.activity).show().subscribe {
                         refreshPurgeButton()
-                    }
+                    }*/
+                    FileHelper.deleteDirectory(cacheDir)
+                    refreshPurgeButton()
                 }
             })
 
