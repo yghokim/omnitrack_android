@@ -2,7 +2,6 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 
 import android.app.DatePickerDialog
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.transition.TransitionManager
 import android.util.AttributeSet
@@ -299,10 +298,6 @@ class TimeTriggerConfigurationPanel : LinearLayout, ITriggerConfigurationCoordin
         }
     }
 
-    override fun writeConfigurationToIntent(out: Intent) {
-
-    }
-
     override fun validateConfigurations(errorMessagesOut: MutableList<String>): Boolean {
         var validated = true
         when (configMode) {
@@ -321,7 +316,7 @@ class TimeTriggerConfigurationPanel : LinearLayout, ITriggerConfigurationCoordin
         return validated
     }
 
-    override fun writeConfiguratinoToBundle(out: Bundle) {
+    override fun writeConfigurationToBundle(out: Bundle) {
         out.putInt("configMode", configMode)
         out.putBoolean("isRepeated", isRepeated)
         out.putInt("configVariables", extractConfigVariables())

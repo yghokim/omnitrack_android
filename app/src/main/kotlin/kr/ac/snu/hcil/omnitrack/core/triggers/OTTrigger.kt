@@ -1,22 +1,20 @@
 package kr.ac.snu.hcil.omnitrack.core.triggers
 
 import android.content.Context
+import android.content.SharedPreferences
 import com.google.firebase.database.*
 import kr.ac.snu.hcil.omnitrack.OTApplication
-import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
 import kr.ac.snu.hcil.omnitrack.core.database.NamedObject
-import kr.ac.snu.hcil.omnitrack.core.system.OTTrackingNotificationManager
-import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
+import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTTriggerAction
 import kr.ac.snu.hcil.omnitrack.utils.ListDelta
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializedStringKeyEntry
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import kr.ac.snu.hcil.omnitrack.utils.serialization.stringKeyEntryParser
 import rx.Observable
-import rx.schedulers.Schedulers
 import rx.subjects.PublishSubject
 import rx.subjects.SerializedSubject
 import java.util.*
@@ -67,11 +65,18 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
                     pojo.trackers?.map { it.key!! }?.toTypedArray(),
                     pojo.on, pojo.action, pojo.lastTriggeredTime, pojo.properties)
         }
+
+
+        val localSettingsPreferences: SharedPreferences by lazy {
+            OTApplication.app.getSharedPreferences("Trigger_local_settings", Context.MODE_PRIVATE)
+        }
     }
 
     override fun makeNewObjectId(): String {
         return FirebaseDbHelper.generateNewKey(FirebaseDbHelper.CHILD_NAME_TRIGGERS)
     }
+
+    val triggerAction: OTTriggerAction
 
     override val databasePointRef: DatabaseReference?
         get() = FirebaseDbHelper.dbRef?.child(FirebaseDbHelper.CHILD_NAME_TRIGGERS)?.child(objectId)
@@ -134,7 +139,7 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
         }
     }
 
-    protected val properties = HashMap<String, Any?>()
+    internal val properties = HashMap<String, Any?>()
 
 
     init {
@@ -164,6 +169,8 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
                 } else properties[child.key] = null
             }
         }
+
+        triggerAction = OTTriggerAction.extractTriggerActionInstance(this)
 
         currentDbRef = databasePointRef
         databaseEventListener = object : ChildEventListener {
@@ -271,17 +278,17 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
         return pojo
     }
 
-    protected fun notifyPropertyChanged(propertyName: String, value: Any?) {
+    fun notifyPropertyChanged(propertyName: String, value: Any?) {
         propertyChanged.onNext(ReadOnlyPair(propertyName, value))
     }
 
-    protected fun syncPropertyToDatabase(propertyName: String, value: Any?) {
+    internal fun syncPropertyToDatabase(propertyName: String, value: Any?) {
         if (!suspendDatabaseSync)
             databasePointRef?.child(PROPERTY_PROPERTY_DATA)?.child(propertyName)
                     ?.setValue(value?.run { TypeStringSerializationHelper.serialize(value) })
     }
 
-    private fun getTrackerIdDatabaseChild(dbKey: String?): DatabaseReference? {
+    internal fun getTrackerIdDatabaseChild(dbKey: String?): DatabaseReference? {
         return if (dbKey == null) {
             databasePointRef?.child("trackers")?.push()
         } else {
@@ -352,36 +359,10 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
         }
     }
 
-    fun fire(triggerTime: Long): Observable<OTTrigger> {
+    fun fire(triggerTime: Long, context: Context): Observable<OTTrigger> {
         return Observable.defer<OTTrigger> {
             handleFire(triggerTime)
-
-            when (action) {
-                OTTrigger.ACTION_BACKGROUND_LOGGING -> {
-                    println("trigger fired - logging in background")
-
-                    //Toast.makeText(OTApplication.app, "Logged!", Toast.LENGTH_SHORT).show()
-                    Observable.create {
-                        subscriber ->
-                        Observable.merge(trackers./*filter { it.isValid(null) }.*/map { OTBackgroundLoggingService.log(OTApplication.app, it, OTItem.LoggingSource.Trigger).subscribeOn(Schedulers.newThread()) })
-                                .subscribe({}, {}, {
-                                    if (!subscriber.isUnsubscribed) {
-                                        subscriber.onNext(this)
-                                        subscriber.onCompleted()
-                                    }
-                                })
-                    }
-
-                }
-                OTTrigger.ACTION_NOTIFICATION -> {
-                    println("trigger fired - send notification")
-                    for (tracker in trackers)
-                        OTTrackingNotificationManager.pushReminderNotification(OTApplication.app, tracker, triggerTime)
-                    Observable.just(this)
-                }
-                else -> throw Exception("Not supported Trigger type")
-            }
-
+            triggerAction.performAction(triggerTime, context)
         }.doOnSubscribe {
             fired.onNext(ReadOnlyPair(this, triggerTime))
             this.lastTriggeredTime = triggerTime

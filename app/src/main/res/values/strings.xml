@@ -413,5 +413,13 @@
     <string name="msg_notification_new_version_detected_title">New update available</string>
     <string name="msg_notification_new_version_detected_text">Tap to visit Play store to update OmniTrack</string>
 
+    <string name="msg_notification_trigger_level_noti_name">Push Notification</string>
+    <string name="msg_notification_trigger_level_noti_desc">Sends just simple push notification. It is often ignorable so suitable for trackers that simply reminding tracking is OK like diaries.</string>
+    <string name="msg_notification_trigger_level_popup_name">Popup</string>
+    <string name="msg_notification_trigger_level_popup_desc">Shows a dialog popup like messenger apps.</string>
+    <string name="msg_notification_trigger_level_impose_name">Fullscreen</string>
+    <string name="msg_notification_trigger_level_impose_desc">Shows fullscreen and plays ringtone or vibration like alarm apps until you go to the input screen or dismiss. It is very invasive so suitable for trackers that must be tracked at that time like pill intakes.</string>
+    <string name="msg_notification_level">Notification Level</string>
+
 
 </resources>

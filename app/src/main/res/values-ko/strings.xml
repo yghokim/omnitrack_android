@@ -325,7 +325,13 @@
 
     <string name="msg_notification_new_version_detected_title">앱 업데이트 출시</string>
     <string name="msg_notification_new_version_detected_text">Play 스토어에서 OmniTrack을 업데이트 해주세요!</string>
-
+    <string name="msg_notification_level">알림 수준</string>
+    <string name="msg_notification_trigger_level_noti_name">푸시 알림</string>
+    <string name="msg_notification_trigger_level_noti_desc">푸시 알림을 보냅니다. 푸시 알림은 무시하기 쉽기 때문에 \'일기\'처럼 트래커의 존재를 일깨워주는 것만으로 충분한 트래커에 사용하기 적합합니다.</string>
+    <string name="msg_notification_trigger_level_popup_name">팝업 표시</string>
+    <string name="msg_notification_trigger_level_popup_desc">메신져 어플처럼 팝업 대화창을 띄웁니다. 푸시 알림보다 주목도가 높습니다.</string>
+    <string name="msg_notification_trigger_level_impose_name">전체화면 알림</string>
+    <string name="msg_notification_trigger_level_impose_desc">알람 어플처럼 전체화면으로 알림을 띄우고 해당 트래커를 기록하거나 알림을 취소하기 전까지 벨소리나 진동을 보냅니다. \'약물 섭취\'처럼 정해진 때에 반드시 기록되어야 하는 트래커에 사용하기 적합합니다.</string>
 
     <string-array name="purpose_entries">
         <item>directive|건강 관련 정보를 기록하기 위해서</item>

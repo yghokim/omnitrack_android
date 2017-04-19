@@ -20,7 +20,7 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature
@@ -235,6 +235,13 @@
             android:name=".ui.pages.configs.ShortcutPanelWidgetConfigActivity"
             android:excludeFromRecents="true"
             android:taskAffinity="kr.ac.snu.hcil.omnitrack.shortcutPanelWidgetConfigTask"
+            android:theme="@style/AppTheme.Dialog.DimmedBackground" />
+
+        <activity
+            android:name=".ui.activities.ReminderPopupActivity"
+            android:excludeFromRecents="true"
+            android:showOnLockScreen="true"
+            android:taskAffinity="kr.ac.snu.hcil.omnitrack.reminderPopup"
             android:theme="@style/AppTheme.Dialog.DimmedBackground" />
 
     </application>

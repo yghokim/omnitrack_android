@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.percent.PercentFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.CardView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="24dp"
+        app:cardElevation="8dp"
+        app:cardPreventCornerOverlap="true"
+        app:cardUseCompatPadding="true">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="@drawable/main_gradient"
+                app:layout_constraintBottom_toTopOf="@+id/guideline_header"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+            <ImageView
+                android:id="@+id/ui_icon"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:src="@drawable/icon_simple"
+                app:layout_constraintBottom_toTopOf="@+id/guideline_header"
+
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                style="@style/Base.TextAppearance.AppCompat.Widget.PopupMenu.Header"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                android:layout_marginLeft="8dp"
+                android:paddingLeft="4dp"
+                android:text="OmniTrack"
+                android:textColor="#FFF"
+                app:layout_constraintBottom_toBottomOf="@+id/ui_icon"
+                app:layout_constraintLeft_toRightOf="@+id/ui_icon"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/ui_icon" />
+
+            <android.support.constraint.Guideline
+                android:id="@+id/guideline_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/buttonIconColorDark"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_begin="@dimen/button_height_small"
+                tools:layout_editor_absoluteX="142dp"
+                tools:layout_editor_absoluteY="341dp" />
+
+            <TextView
+                android:id="@+id/ui_content"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:layout_marginTop="8dp"
+                android:text="Tracker alarm!"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/guideline_header" />
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/ui_button_skip"
+                style="@style/TransparentButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="7dp"
+                android:text="Skip"
+                android:textAllCaps="false"
+                android:textColor="@color/colorRed.Light"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toLeftOf="@+id/ui_button_snooze"
+                app:layout_constraintTop_toBottomOf="@+id/ui_content" />
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="0dp"
+                android:background="@color/separator.Light"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toRightOf="@+id/ui_button_skip"
+                app:layout_constraintTop_toTopOf="@+id/ui_button_skip" />
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/ui_button_snooze"
+                style="@style/TransparentButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Snooze for \n10 mins"
+                android:textAllCaps="false"
+                android:textColor="@color/textColorMid"
+                app:layout_constraintLeft_toRightOf="@+id/ui_button_skip"
+                app:layout_constraintRight_toLeftOf="@+id/ui_button_proceed"
+                app:layout_constraintTop_toTopOf="@+id/ui_button_skip" />
+
+            <android.support.v7.widget.AppCompatButton
+
+                android:id="@+id/ui_button_proceed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/button_background_color_pointed"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:text="Open Tracker"
+                android:textAllCaps="false"
+                android:textColor="#FFF"
+                android:textStyle="bold"
+                app:layout_constraintLeft_toRightOf="@+id/ui_button_snooze"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/ui_button_skip" />
+
+
+        </android.support.constraint.ConstraintLayout>
+    </android.support.v7.widget.CardView>
+
+</android.support.percent.PercentFrameLayout>
