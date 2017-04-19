@@ -16,6 +16,10 @@ import kr.ac.snu.hcil.omnitrack.R
  */
 class ReminderPopupActivity : OTActivity(false, false), View.OnClickListener {
 
+    companion object {
+        private val VISIBILITY_FLAGS = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+    }
+
     private val skipButton: Button by bindView(R.id.ui_button_skip)
     private val snoozeButton: Button by bindView(R.id.ui_button_snooze)
     private val proceedButton: Button by bindView(R.id.ui_button_proceed)
@@ -37,19 +41,23 @@ class ReminderPopupActivity : OTActivity(false, false), View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_reminder_popup_dialog)
+        window.decorView.systemUiVisibility = VISIBILITY_FLAGS
 
-        window.addFlags(
-                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON + WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD or +WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or +WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON)
+        skipButton.setOnClickListener(this)
+        snoozeButton.setOnClickListener(this)
+        proceedButton.setOnClickListener(this)
 
+        /*
         val root = findViewById(R.id.root)
         root.setOnClickListener {
-
-        }
+            finish()
+        }*/
 
     }
 
     override fun onStart() {
         super.onStart()
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON + WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or +WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON)
 
         val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
 
@@ -58,10 +66,6 @@ class ReminderPopupActivity : OTActivity(false, false), View.OnClickListener {
             //val wakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK)
 
         }
-
-        skipButton.setOnClickListener(this)
-        snoozeButton.setOnClickListener(this)
-        proceedButton.setOnClickListener(this)
     }
 
     override fun onPause() {

@@ -1,20 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.percent.PercentFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
     <android.support.v7.widget.CardView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_margin="24dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
         app:cardElevation="8dp"
-        app:cardPreventCornerOverlap="true"
-        app:cardUseCompatPadding="true">
+        app:cardUseCompatPadding="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.13999999">
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="wrap_content"
@@ -69,10 +76,12 @@
                 android:id="@+id/ui_content"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
                 android:layout_marginLeft="@dimen/activity_horizontal_margin"
                 android:layout_marginRight="@dimen/activity_horizontal_margin"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="12dp"
                 android:text="Tracker alarm!"
+                android:textSize="16sp"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/guideline_header" />
 
@@ -81,7 +90,7 @@
                 style="@style/TransparentButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="7dp"
+                android:layout_marginTop="12dp"
                 android:text="Skip"
                 android:textAllCaps="false"
                 android:textColor="@color/colorRed.Light"
@@ -105,22 +114,21 @@
                 android:text="Snooze for \n10 mins"
                 android:textAllCaps="false"
                 android:textColor="@color/textColorMid"
+                android:visibility="gone"
                 app:layout_constraintLeft_toRightOf="@+id/ui_button_skip"
                 app:layout_constraintRight_toLeftOf="@+id/ui_button_proceed"
                 app:layout_constraintTop_toTopOf="@+id/ui_button_skip" />
 
             <android.support.v7.widget.AppCompatButton
-
                 android:id="@+id/ui_button_proceed"
+                style="@style/TransparentButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/button_background_color_pointed"
                 android:paddingLeft="@dimen/activity_horizontal_margin"
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:text="Open Tracker"
                 android:textAllCaps="false"
-                android:textColor="#FFF"
-                android:textStyle="bold"
+                android:textColor="@color/colorPointed"
                 app:layout_constraintLeft_toRightOf="@+id/ui_button_snooze"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/ui_button_skip" />
@@ -129,4 +137,4 @@
         </android.support.constraint.ConstraintLayout>
     </android.support.v7.widget.CardView>
 
-</android.support.percent.PercentFrameLayout>
+</android.support.constraint.ConstraintLayout>

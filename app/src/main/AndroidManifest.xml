@@ -242,7 +242,7 @@
             android:excludeFromRecents="true"
             android:showOnLockScreen="true"
             android:taskAffinity="kr.ac.snu.hcil.omnitrack.reminderPopup"
-            android:theme="@style/AppTheme.Dialog.DimmedBackground" />
+            android:theme="@style/AppTheme.Dialog.TransparentBackground" />
 
     </application>
 
