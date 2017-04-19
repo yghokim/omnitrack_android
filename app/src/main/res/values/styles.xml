@@ -481,6 +481,12 @@
         <item name="android:textColor">#FFF</item>
     </style>
 
+    <style name="TransparentButtonStyle" parent="Base.Widget.AppCompat.Button.Borderless">
+        <item name="android:background">?android:selectableItemBackground</item>
+        <item name="android:paddingRight">@dimen/activity_horizontal_margin</item>
+        <item name="android:paddingLeft">@dimen/activity_horizontal_margin</item>
+    </style>
+
     <style name="AppTheme.NoActionBar.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.NoActionBar.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />

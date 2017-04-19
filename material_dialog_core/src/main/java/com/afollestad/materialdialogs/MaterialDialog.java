@@ -1041,6 +1041,8 @@ public class MaterialDialog extends DialogBase implements
         @DrawableRes
         protected int btnSelectorNegative;
 
+        protected Integer customViewHorizontalPaddingOverride = null;
+
         public Builder(@NonNull Context context) {
             this.context = context;
             final int materialBlue = DialogUtils.getColor(context, R.color.md_material_blue_600);
@@ -1197,6 +1199,15 @@ public class MaterialDialog extends DialogBase implements
 
         public Builder titleColorAttr(@AttrRes int colorAttr) {
             return titleColor(DialogUtils.resolveColor(this.context, colorAttr));
+        }
+
+        public Builder customViewHorizontalPadding(int size) {
+            this.customViewHorizontalPaddingOverride = size;
+            return this;
+        }
+
+        public Builder customViewHorizontalPaddingRes(@DimenRes int sizeRes) {
+            return customViewHorizontalPadding(this.context.getResources().getDimensionPixelSize(sizeRes));
         }
 
         /**

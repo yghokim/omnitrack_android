@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/ui_title"
+        style="@style/PropertyHeaderStyle"
+        android:layout_gravity="center_vertical"
+        android:text="Notification Type" />
+
+    <TextView
+        android:id="@+id/ui_indicator"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="12dp"
+        android:ellipsize="end"
+        android:gravity="center_vertical|right"
+        android:maxLines="1"
+        android:text="Show Popup"
+        android:textColor="@color/colorSecondary"
+        android:textSize="16sp" />
+
+</merge>

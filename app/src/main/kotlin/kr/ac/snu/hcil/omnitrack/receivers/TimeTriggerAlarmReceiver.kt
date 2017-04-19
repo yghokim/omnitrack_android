@@ -94,7 +94,7 @@ class TimeTriggerAlarmReceiver : BroadcastReceiver() {
 
                     OTApplication.logger.writeSystemLog("${triggers.size} triggers will be fired.", TAG)
 
-                    rx.Observable.merge(triggers.map { it.fire(triggerTime) }).observeOn(Schedulers.immediate()).doOnCompleted {
+                    rx.Observable.merge(triggers.map { it.fire(triggerTime, this) }).observeOn(Schedulers.immediate()).doOnCompleted {
                         OTApplication.logger.writeSystemLog("Every trigger firing was done. Release the wake lock.", TAG)
 
                         println("every trigger was done. finish the wakeup")
