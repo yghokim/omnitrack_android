@@ -1,7 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.util.AttributeSet
 import android.view.LayoutInflater
@@ -133,15 +132,11 @@ class EventTriggerConfigurationPanel : FrameLayout, ITriggerConfigurationCoordin
         }
     }
 
-    override fun writeConfigurationToIntent(out: Intent) {
-
-    }
-
     override fun validateConfigurations(errorMessagesOut: MutableList<String>): Boolean {
         return true
     }
 
-    override fun writeConfiguratinoToBundle(out: Bundle) {
+    override fun writeConfigurationToBundle(out: Bundle) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 

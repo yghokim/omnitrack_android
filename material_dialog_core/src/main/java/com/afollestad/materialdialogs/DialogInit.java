@@ -314,7 +314,15 @@ class DialogInit {
                 /* Apply the frame padding to the content, this allows the ScrollView to draw it's
                    over scroll glow without clipping */
                 final Resources r = dialog.getContext().getResources();
-                final int framePadding = r.getDimensionPixelSize(R.dimen.md_dialog_frame_margin);
+
+
+                final int framePadding;
+                if (builder.customViewHorizontalPaddingOverride != null) {
+                    framePadding = builder.customViewHorizontalPaddingOverride;
+                } else {
+                    framePadding = r.getDimensionPixelSize(R.dimen.md_dialog_frame_margin);
+                }
+
                 final ScrollView sv = new ScrollView(dialog.getContext());
                 int paddingTop = r.getDimensionPixelSize(R.dimen.md_content_padding_top);
                 int paddingBottom = r.getDimensionPixelSize(R.dimen.md_content_padding_bottom);

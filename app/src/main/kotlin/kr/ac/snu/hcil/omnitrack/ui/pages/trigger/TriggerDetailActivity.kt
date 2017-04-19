@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewStub
+import android.widget.FrameLayout
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
@@ -16,6 +17,7 @@ import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.actions.NotificationSettingsPanelView
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import rx.internal.util.SubscriptionList
 import java.util.*
@@ -190,73 +192,6 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
         }
     }
 
-    /*
-    override fun onSaveInstanceState(outState: Bundle?) {
-        super.onSaveInstanceState(outState)
-
-        outState?.putBoolean("isEditMode", isEditMode)
-        if(isEditMode)
-        {
-            outState?.putString(OTApplication.INTENT_EXTRA_OBJECT_ID_TRIGGER, triggerId)
-        }
-        else{
-            outState?.putInt(INTENT_EXTRA_TRIGGER_TYPE, triggerType)
-            outState?.putInt(INTENT_EXTRA_TRIGGER_ACTION, triggerAction)
-        }
-
-        outState?.putBoolean(INTENT_EXTRA_HIDE_ATTACHED_TRACKERS, hideAttachedTrackers)
-
-    }
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
-        super.onRestoreInstanceState(savedInstanceState)
-
-        if(savedInstanceState!=null)
-        {
-
-
-            hideAttachedTrackers = savedInstanceState.getBoolean(INTENT_EXTRA_HIDE_ATTACHED_TRACKERS)
-
-            val isEditMode = savedInstanceState.getBoolean("isEditMode")
-            if(isEditMode)
-            {
-                val triggerId = savedInstanceState.getString(OTApplication.INTENT_EXTRA_OBJECT_ID_TRIGGER)
-                if(!triggerId.isNullOrBlank())
-                {
-                    this.triggerId = triggerId
-                    getUserOrGotoSignIn().toObservable().doOnNext { user->this.user = user }.flatMap{user->user.getTriggerObservable(triggerId)}
-                            .doOnNext {
-                                trigger->
-                                this.attachedTrigger = trigger
-                            }
-                            .first()
-                            .subscribe({
-                                trigger->
-                                triggerType = trigger.typeId
-                                triggerAction = trigger.action
-                                //attachedTrigger?.dumpDataToPojo(null)?.toMutable(currentTriggerPojo)
-
-                                title = resources.getString(R.string.title_activity_trigger_edit)
-                                setActionBarButtonMode(Mode.ApplyCancel)
-                            }, {
-                                finish()
-                            })
-                }
-            }
-            else{
-                triggerType = savedInstanceState.getInt(INTENT_EXTRA_TRIGGER_TYPE)
-                triggerAction = savedInstanceState.getInt(INTENT_EXTRA_TRIGGER_ACTION)
-
-                getUserOrGotoSignIn().subscribe({
-                    user->
-                    this.user = user
-                },{finish()})
-            }
-
-
-        }
-    }*/
-
     class TriggerDetailFragment : OTFragment() {
         companion object {
             fun getInstance(triggerId: String, hideAttachedTrackers: Boolean): TriggerDetailFragment {
@@ -299,10 +234,15 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
 
         val isEditMode: Boolean get() = triggerId != null
 
+        private var actionSettingsView: ITriggerConfigurationCoordinator? = null
+
         private var configurationCoordinatorView: ITriggerConfigurationCoordinator? = null
 
         private lateinit var controlPanelContainer: ViewGroup
         private lateinit var trackerAssignPanelStub: ViewStub
+
+        private lateinit var actionSettingsContainer: ViewGroup
+
         private var trackerAssignPanelContainer: View? = null
         private var trackerAssignPanel: TrackerAssignPanel? = null
 
@@ -320,6 +260,7 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
             val view = inflater.inflate(R.layout.activity_trigger_detail_fragment, container, false)
             controlPanelContainer = view.findViewById(R.id.ui_control_panel) as ViewGroup
             trackerAssignPanelStub = view.findViewById(R.id.ui_tracker_assign_panel_stub) as ViewStub
+            actionSettingsContainer = view.findViewById(R.id.ui_action_settings_container) as ViewGroup
 
             this.hideAttachedTrackers = arguments.getBoolean(INTENT_EXTRA_HIDE_ATTACHED_TRACKERS, false)
 
@@ -371,9 +312,39 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
         override fun onSaveInstanceState(outState: Bundle?) {
             super.onSaveInstanceState(outState)
             if (outState != null) {
-                configurationCoordinatorView?.writeConfiguratinoToBundle(outState)
+                configurationCoordinatorView?.writeConfigurationToBundle(outState)
                 if (!hideAttachedTrackers) {
                     outState.putStringArrayList("assignedTrackers", trackerAssignPanel?.trackerIds)
+                }
+            }
+        }
+
+        private fun setupTriggerActionPanel(triggerAction: Int, trigger: OTTrigger?) {
+            val view = when (triggerAction) {
+                OTTrigger.ACTION_BACKGROUND_LOGGING -> {
+                    null
+                }
+                OTTrigger.ACTION_NOTIFICATION -> {
+                    actionSettingsView = actionSettingsView as? NotificationSettingsPanelView ?:
+                            NotificationSettingsPanelView(context).apply {
+                                this.layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT)
+                            }
+
+                    actionSettingsView as? View
+                }
+                else -> null
+            }
+
+            if (view != null) {
+                if (isEditMode)
+                    (view as? ITriggerConfigurationCoordinator)?.importTriggerConfiguration(attachedTrigger!!)
+
+                if (view.parent !== actionSettingsContainer) {
+                    if (view.parent != null) {
+                        (view.parent as ViewGroup).removeView(view)
+                    }
+
+                    actionSettingsContainer.addView(view)
                 }
             }
         }
@@ -408,6 +379,8 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
                     configurationCoordinatorView = EventTriggerConfigurationPanel(this.context)
                 }
             }
+
+            setupTriggerActionPanel(triggerAction, attachedTrigger)
 
             if (isEditMode)
                 configurationCoordinatorView?.importTriggerConfiguration(attachedTrigger!!)
@@ -465,6 +438,8 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
                     }
                 }
             }
+
+            actionSettingsView?.applyConfigurationToTrigger(trigger)
             return true
         }
 

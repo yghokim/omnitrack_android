@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingBottom="8dp"
+    android:paddingLeft="4dp"
+    android:paddingRight="8dp"
+    android:paddingTop="4dp">
+
+    <ImageView
+        android:id="@+id/ui_radio"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:clickable="false"
+        android:src="@drawable/radiobutton_selected"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/ui_thumb"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="10dp"
+        android:clickable="false"
+        android:src="@drawable/thumb_notifications_popup"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="h,1:1"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/guideline_thumb"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/ui_title"
+        style="@style/TextAppearance.AppCompat.Title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="4dp"
+        android:clickable="false"
+        android:textColor="@color/textColorDark"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toTopOf="@+id/ui_description"
+        app:layout_constraintLeft_toLeftOf="@+id/guideline_thumb"
+        app:layout_constraintRight_toLeftOf="@+id/ui_radio"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="@string/msg_notification_trigger_level_popup_name" />
+
+    <TextView
+        android:id="@+id/ui_description"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="3dp"
+        android:clickable="false"
+        android:textSize="13sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="@+id/ui_title"
+        app:layout_constraintRight_toLeftOf="@+id/ui_radio"
+        app:layout_constraintTop_toBottomOf="@+id/ui_title"
+        tools:text="f ;iaewfj eo;wi je; ijeiej;owifj e;ofijaf o;iej e;oi ja;fijef jaew;fi jew;oif ja;eowif jae;woi fjew;i ;ijefo;aijw ;ewijfow;fijwe;oeijf;woijfa;ewoifje;foijeaw;ofijaew;foijew;aofij ewif jea;oi ej ;ijewiof jae;wfiejw ;foijwf ;aoij a;ewofij ewa;ofij aewoifj a;ewfoifj a;ewifj ;ewoaifj w;eoif j;ewaofj waeoij e;wiofj ;weafi jewao;ifj a;weoijf ew;aoifj ae;wofij ew;aifj aw;oifj ew;oifj wa;eoifj a;weo ijf i;j" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline_thumb"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.3" />
+
+</android.support.constraint.ConstraintLayout>
