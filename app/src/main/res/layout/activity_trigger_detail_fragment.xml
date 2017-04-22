@@ -23,7 +23,8 @@
             <FrameLayout
                 android:id="@+id/ui_action_settings_container"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
 
             <ViewStub
                 android:id="@+id/ui_tracker_assign_panel_stub"
