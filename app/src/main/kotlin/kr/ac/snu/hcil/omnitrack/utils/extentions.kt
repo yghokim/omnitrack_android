@@ -1,12 +1,14 @@
 package kr.ac.snu.hcil.omnitrack.utils
 
 import android.annotation.TargetApi
+import android.app.KeyguardManager
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.location.Address
 import android.location.Geocoder
+import android.os.Build
 import android.os.Handler
 import android.os.PowerManager
 import android.support.v4.app.Fragment
@@ -258,6 +260,22 @@ fun applyTint(drawable: Drawable, color: Int): Drawable {
     val wrapped = DrawableCompat.wrap(drawable).mutate()
     DrawableCompat.setTint(wrapped, color)
     return wrapped
+}
+
+val PowerManager.isInteractiveCompat: Boolean get() {
+    if (Build.VERSION.SDK_INT <= 19) {
+        return this.isScreenOn
+    } else {
+        return this.isInteractive
+    }
+}
+
+val KeyguardManager.isDeviceLockedCompat: Boolean get() {
+    if (Build.VERSION.SDK_INT < 22) {
+        return this.isKeyguardLocked
+    } else {
+        return this.isDeviceLocked
+    }
 }
 
 

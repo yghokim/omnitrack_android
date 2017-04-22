@@ -15,6 +15,7 @@
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginTop="8dp"
+        app:cardCornerRadius="4dp"
         app:cardElevation="8dp"
         app:cardUseCompatPadding="true"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -27,22 +28,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
 
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:background="@drawable/main_gradient"
-                app:layout_constraintBottom_toTopOf="@+id/guideline_header"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-
             <ImageView
                 android:id="@+id/ui_icon"
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                android:src="@drawable/icon_simple"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginLeft="12dp"
+                android:src="@drawable/icon"
                 app:layout_constraintBottom_toTopOf="@+id/guideline_header"
 
                 app:layout_constraintLeft_toLeftOf="parent"
@@ -56,7 +47,8 @@
                 android:layout_marginLeft="8dp"
                 android:paddingLeft="4dp"
                 android:text="OmniTrack"
-                android:textColor="#FFF"
+                android:textColor="@color/textColorLight"
+                android:textSize="16sp"
                 app:layout_constraintBottom_toBottomOf="@+id/ui_icon"
                 app:layout_constraintLeft_toRightOf="@+id/ui_icon"
                 app:layout_constraintRight_toRightOf="parent"
@@ -68,7 +60,7 @@
                 android:layout_height="wrap_content"
                 android:background="@color/buttonIconColorDark"
                 android:orientation="horizontal"
-                app:layout_constraintGuide_begin="@dimen/button_height_small"
+                app:layout_constraintGuide_begin="@dimen/button_height_normal"
                 tools:layout_editor_absoluteX="142dp"
                 tools:layout_editor_absoluteY="341dp" />
 
@@ -85,18 +77,28 @@
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/guideline_header" />
 
+            <View
+                android:id="@+id/ui_button_separator_horizontal"
+                style="@style/HorizontalSeparator.NoVerticalMargin"
+                android:layout_width="0dp"
+                android:layout_marginTop="12dp"
+                android:background="@color/separator.Light"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/ui_content" />
+
             <android.support.v7.widget.AppCompatButton
                 android:id="@+id/ui_button_skip"
                 style="@style/TransparentButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:minHeight="@dimen/button_height_normal"
                 android:text="Skip"
                 android:textAllCaps="false"
                 android:textColor="@color/colorRed.Light"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toLeftOf="@+id/ui_button_snooze"
-                app:layout_constraintTop_toBottomOf="@+id/ui_content" />
+                app:layout_constraintTop_toBottomOf="@+id/ui_button_separator_horizontal" />
 
             <View
                 android:layout_width="1dp"
@@ -111,6 +113,7 @@
                 style="@style/TransparentButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:minHeight="@dimen/button_height_normal"
                 android:text="Snooze for \n10 mins"
                 android:textAllCaps="false"
                 android:textColor="@color/textColorMid"
@@ -124,6 +127,7 @@
                 style="@style/TransparentButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:minHeight="@dimen/button_height_normal"
                 android:paddingLeft="@dimen/activity_horizontal_margin"
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:text="Open Tracker"

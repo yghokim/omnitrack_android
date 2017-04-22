@@ -10,6 +10,7 @@ import android.util.SparseArray
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTriggerAlarmManager
+import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTNotificationTriggerAction
 import rx.schedulers.Schedulers
 import java.util.*
 
@@ -99,6 +100,9 @@ class TimeTriggerAlarmReceiver : BroadcastReceiver() {
 
                         println("every trigger was done. finish the wakeup")
                         OTApplication.app.timeTriggerAlarmManager.storeTableToPreferences()
+
+                        OTNotificationTriggerAction.notifyPopupQueue(this)
+
                         completeWakefulIntent(intent)
                     }.subscribe {
                         trigger ->
