@@ -75,6 +75,8 @@ class OTApplication : MultiDexApplication() {
         const val INTENT_EXTRA_OBJECT_ID_TRIGGER = "triggerObjectId"
         const val INTENT_EXTRA_OBJECT_ID_ITEM = "itemDbId"
 
+        const val INTENT_EXTRA_TRIGGER_TIME = "triggerTime"
+
         const val INTENT_EXTRA_NOTIFICATION_ID_SEED = "notificationIdSeed"
 
         const val INTENT_EXTRA_IGNORE_SIGN_IN_CHECK = "ignoreSignInCheck"
