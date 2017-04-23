@@ -902,7 +902,7 @@ object FirebaseDbHelper {
             tracker.attributes.unObservedList.forEach {
                 val value = item.getValueOf(it)
                 if (value is SynchronizedUri && value.localUri != Uri.EMPTY) {
-
+                    println("upload Synchronized Uri file to server...")
                     val storageRef = OTFirebaseUploadService.getItemStorageReference(itemId, tracker.objectId, tracker.owner!!.objectId).child(value.localUri.lastPathSegment)
                     value.setSynchronized(Uri.parse(storageRef.path))
 

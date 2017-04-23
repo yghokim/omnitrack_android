@@ -149,6 +149,7 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
         reset()
 
         currentPlayer = null
+        currentFile = null
     }
 
     private fun stopMedia(): Boolean {

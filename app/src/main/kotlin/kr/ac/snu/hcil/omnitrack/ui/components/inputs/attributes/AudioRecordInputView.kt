@@ -19,7 +19,7 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
             valueView.audioFileUri = value.localUri
         }
 
-    private val valueView: AudioRecorderView
+    val valueView: AudioRecorderView
 
     init {
         valueView = findViewById(R.id.ui_audio_recorder) as AudioRecorderView
