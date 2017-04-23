@@ -18,6 +18,7 @@ import kr.ac.snu.hcil.omnitrack.services.OTAudioPlayService
 import kr.ac.snu.hcil.omnitrack.utils.Ticker
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
+import java.io.File
 import java.util.*
 import kotlin.properties.Delegates
 
@@ -94,8 +95,10 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
             if (field != value) {
                 field = value
                 if (value != Uri.EMPTY) {
-                    state = State.FILE_MOUNTED
-                    mountNewFile(value)
+                    if (File(value.toString()).exists()) {
+                        state = State.FILE_MOUNTED
+                        mountNewFile(value)
+                    } else state = State.RECORD
                 } else {
                     state = State.RECORD
                 }
@@ -110,6 +113,7 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
             }
         }
 
+    var recordingOutputDirectoryPathOverride: File? = null
 
     var currentAudioSeconds: Int = 0
         set(value) {
@@ -321,7 +325,14 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
             context.stopService(Intent(context, OTAudioPlayService::class.java))
         }
 
-        Companion.registerNewRecordingModule(mediaSessionId, AudioRecordingModule(this, context.filesDir.path + "/audio_record_${System.currentTimeMillis()}.3gp"))
+        val dirPath: File = recordingOutputDirectoryPathOverride ?: context.filesDir
+        val recordingOutputPath = File.createTempFile(
+                "audio_record_${System.currentTimeMillis()}", /* prefix */
+                ".3gp", /* suffix */
+                dirPath      /* directory */)
+
+
+        Companion.registerNewRecordingModule(mediaSessionId, AudioRecordingModule(this, recordingOutputPath.path))
         Companion.currentRecordingModule?.startAsync()
 
         playBar.currentProgressRatio = 0f
@@ -360,6 +371,7 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
 
     private fun mountNewFile(fileUri: Uri) {
 
+        println("fileUri: ${fileUri.toString()}")
         val mmr = MediaMetadataRetriever()
         mmr.setDataSource(context, fileUri)
         val duration = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION).toInt()
