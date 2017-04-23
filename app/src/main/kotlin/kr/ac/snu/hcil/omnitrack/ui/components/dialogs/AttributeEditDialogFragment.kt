@@ -141,6 +141,7 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
                     this.valueView = this.attribute?.getInputView(context, false, this.valueView)
 
                     if (valueView != null) {
+                        valueView?.onCreate(savedInstanceState)
                         if (this.container.getChildAt(0) !== valueView) {
                             this.container.removeAllViewsInLayout()
                             this.container.addView(valueView)
@@ -164,8 +165,10 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
                     } else if (item != null) {
                         if (this.attribute != null) {
                             val value = item.getValueOf(this.attribute!!)
-                            if (value != null)
+                            if (value != null) {
+                                println("value : ${value.toString()}")
                                 this.valueView?.setAnyValue(value)
+                            }
                         }
                     }
 
@@ -178,12 +181,27 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
         } else return Subscriptions.empty()
     }
 
+    override fun onLowMemory() {
+        super.onLowMemory()
+        valueView?.onLowMemory()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        valueView?.onResume()
+    }
 
     override fun onDestroy() {
         super.onDestroy()
         tracker = null
         item = null
         attribute = null
+        valueView?.onDestroy()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        valueView?.onPause()
     }
 
     override fun onSaveInstanceState(outState: Bundle?) {
