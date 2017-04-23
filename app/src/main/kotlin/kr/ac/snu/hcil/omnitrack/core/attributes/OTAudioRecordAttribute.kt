@@ -1,11 +1,16 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes
 
+import android.content.Context
+import android.view.View
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
+import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioItemListView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AudioRecordInputView
 import rx.Observable
+import rx.Single
 import java.util.*
 
 /**
@@ -40,7 +45,9 @@ class OTAudioRecordAttribute(objectId: String?, localKey: Int?, parentTracker: O
     }
 
     override fun refreshInputViewUI(inputView: AAttributeInputView<out Any>) {
-
+        if (inputView is AudioRecordInputView) {
+            inputView.valueView.recordingOutputDirectoryPathOverride = tracker?.getItemCacheDir(inputView.context, true)
+        }
     }
 
     override fun makeRelativeFilePathFromValue(value: Any?, uniqKey: String?): String {
@@ -48,4 +55,16 @@ class OTAudioRecordAttribute(objectId: String?, localKey: Int?, parentTracker: O
         return "audios/${objectId}_${uniqKey ?: UUID.randomUUID().toString()}_audio.3gp"
     }
 
+    override fun getViewForItemList(context: Context, recycledView: View?): View {
+        val view = recycledView as? AudioItemListView ?: AudioItemListView(context)
+
+        return view
+    }
+
+    override fun applyValueToViewForItemList(value: Any?, view: View): Single<Boolean> {
+        if (view is AudioItemListView && value is SynchronizedUri) {
+            view.mountedUri = value
+        }
+        return super.applyValueToViewForItemList(value, view)
+    }
 }

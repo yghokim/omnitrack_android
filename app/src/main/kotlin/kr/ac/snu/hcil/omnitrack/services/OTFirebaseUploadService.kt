@@ -103,7 +103,7 @@ class OTFirebaseUploadService : WakefulService(TAG) {
                     realm.commitTransaction()
                 }.addOnCompleteListener {
 
-                    println("image upload complete.")
+                    println("file upload complete.")
                     currentTasks.remove(taskInfo.id)
                     realm.beginTransaction()
                     taskInfo.deleteFromRealm()
