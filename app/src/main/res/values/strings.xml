@@ -420,6 +420,8 @@
     <string name="msg_notification_trigger_level_impose_name">Fullscreen</string>
     <string name="msg_notification_trigger_level_impose_desc">Shows fullscreen and plays ringtone or vibration like alarm apps until you go to the input screen or dismiss. It is very invasive so suitable for trackers that must be tracked at that time like pill intakes.</string>
     <string name="msg_notification_level">Notification Level</string>
+    <string name="msg_no_audio">No record</string>
 
+    <string name="msg_data_error">Data error</string>
 
 </resources>

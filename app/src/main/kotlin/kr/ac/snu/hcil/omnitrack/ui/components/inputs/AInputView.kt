@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
+import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import java.util.*
@@ -11,7 +12,7 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 2016-07-13.
  */
-abstract class AInputView<T>(layoutId: Int, context: Context, attrs: AttributeSet?) : FrameLayout(context, attrs) {
+abstract class AInputView<T>(layoutId: Int, context: Context, attrs: AttributeSet?) : LockableFrameLayout(context, attrs) {
 
     val valueChanged = Event<T>()
 

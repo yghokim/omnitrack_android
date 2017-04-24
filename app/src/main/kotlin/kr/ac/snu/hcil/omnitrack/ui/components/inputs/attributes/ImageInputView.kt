@@ -35,20 +35,27 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
         set(value)
         {
             if (field != value) {
+                subscriptions.clear()
                 field = value
                 if (value.isLocalUriValid) {
+                    picker.uriChanged.suspend = true
                     picker.imageUri = value.localUri
+                    picker.uriChanged.suspend = false
                 } else if (value.isSynchronized) {
                     picker.isEnabled = false
                     subscriptions.add(
                             OTApplication.app.storageHelper.downloadFileTo(value.serverUri.path, value.localUri).subscribe({
                                 uri ->
+                                picker.uriChanged.suspend = true
                                 picker.imageUri = uri
+                                picker.uriChanged.suspend = false
                                 picker.isEnabled = true
                             }, {
                                 error ->
                                 error?.printStackTrace()
+                                picker.uriChanged.suspend = true
                                 picker.imageUri = Uri.EMPTY
+                                picker.uriChanged.suspend = false
                                 picker.isEnabled = true
                             })
 
