@@ -1,53 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:camerakit="http://schemas.android.com/apk/res-auto"
+<com.google.android.flexbox.FlexboxLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    app:alignContent="stretch"
+    app:alignItems="stretch"
+    app:flexDirection="column"
+    app:justifyContent="space_between">
+
+    <include layout="@layout/common_normal_header_bar" />
 
 
-    <include layout="@layout/common_normal_healder_bar" />
-
-    <kr.ac.snu.hcil.omnitrack.ui.components.common.LoadingIndicatorBar
-        android:id="@+id/ui_loading_indicator"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"/>
-
-    <FrameLayout
+    <android.support.constraint.ConstraintLayout
         android:id="@+id/ui_camera_container"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_height="wrap_content"
+        android:background="@color/dark.transparent">
+
+        <kr.ac.snu.hcil.omnitrack.ui.components.common.LoadingIndicatorBar
+            android:id="@+id/ui_loading_indicator"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <com.flurgle.camerakit.CameraView
             android:id="@+id/ui_camera_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             android:adjustViewBounds="true"
 
-            camerakit:ckCropOutput="true"
-            camerakit:ckFacing="back"
-            camerakit:ckFlash="off"
-            camerakit:ckFocus="continuous"
-            camerakit:ckJpegQuality="100" />
+            app:ckCropOutput="true"
+            app:ckFacing="back"
+            app:ckFlash="off"
+            app:ckFocus="continuous"
+            app:ckJpegQuality="100"
+            app:ckMethod="still"
+
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ToggleButton
             android:id="@+id/ui_button_toggle_camera"
             style="@style/CameraViewOverlayButtonStyle"
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/button_height_small"
+            android:layout_height="48dp"
             android:layout_gravity="right|bottom"
-            android:layout_marginBottom="@dimen/activity_vertical_margin"
-            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginBottom="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="8dp"
             android:drawableStart="@drawable/camera_front"
+
             android:textAllCaps="false"
             android:textOff="@string/msg_turn_to_selfie"
             android:textOn="@string/msg_turn_to_rear"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent" />
 
-            />
-
-
-    </FrameLayout>
+    </android.support.constraint.ConstraintLayout>
 
     <Button
         android:id="@+id/ui_camera_shutter"
@@ -56,5 +70,7 @@
         android:layout_height="@dimen/button_height_tall"
         android:background="@drawable/button_background_color_pointed_grad"
         android:text="@string/msg_tab_to_take_a_photo"
-        android:textColor="#FFF" />
-</LinearLayout>
+        android:textColor="#FFF"
+        app:layout_flexGrow="0"
+        app:layout_flexShrink="0" />
+</com.google.android.flexbox.FlexboxLayout>

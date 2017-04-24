@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/ui_header"
     android:layout_width="match_parent"
     android:layout_height="@dimen/button_height_normal"
-    android:layout_alignParentTop="true">
+    android:layout_alignParentTop="true"
+    app:layout_flexGrow="1"
+    app:layout_flexShrink="0">
 
     <TextView
         android:id="@+id/title"
