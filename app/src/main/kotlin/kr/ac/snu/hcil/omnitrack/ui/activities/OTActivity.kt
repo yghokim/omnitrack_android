@@ -235,7 +235,9 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
     }
 
     fun performOnActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        onActivityResult(requestCode, resultCode, data)
+        runOnUiThread {
+            onActivityResult(requestCode, resultCode, data)
+        }
     }
 
     override fun onResume() {

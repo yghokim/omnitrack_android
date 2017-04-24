@@ -158,8 +158,8 @@ class ImagePicker : FrameLayout, View.OnClickListener {
         activity.startActivityForResult(chooserIntent, requestCode)
     }
 
-    fun showCameraPickDialog(activity: AppCompatActivity, requestCode: Int) {
-        val dialog = CameraPickDialogFragment.getInstance(requestCode)
+    fun showCameraPickDialog(activity: AppCompatActivity, requestKey: String) {
+        val dialog = CameraPickDialogFragment.getInstance(requestKey)
         dialog.show(activity.supportFragmentManager, "CAMERA")
     }
 
