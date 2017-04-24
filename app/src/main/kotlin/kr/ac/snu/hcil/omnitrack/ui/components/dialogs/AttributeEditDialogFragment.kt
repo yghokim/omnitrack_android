@@ -164,6 +164,7 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
                         this.valueView?.setAnyValue(value)
                     } else if (item != null) {
                         if (this.attribute != null) {
+                            this.valueView?.boundAttributeId = this.attribute?.objectId
                             val value = item.getValueOf(this.attribute!!)
                             if (value != null) {
                                 println("value : ${value.toString()}")

@@ -1,6 +1,5 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.dialogs
 
-import android.app.Activity.RESULT_OK
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Intent
@@ -8,6 +7,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.support.v4.app.DialogFragment
 import android.support.v4.content.ContextCompat
+import android.support.v4.content.LocalBroadcastManager
 import android.support.v4.graphics.drawable.DrawableCompat
 import android.support.v7.widget.AppCompatImageButton
 import android.view.View
@@ -18,7 +18,6 @@ import com.flurgle.camerakit.CameraKit
 import com.flurgle.camerakit.CameraView
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LoadingIndicatorBar
 import kr.ac.snu.hcil.omnitrack.utils.applyTint
 
@@ -29,13 +28,14 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
 
     companion object {
 
-        const val ARG_REQUEST_CODE = "req"
+        const val EXTRA_REQUEST_KEY = "req"
         const val EXTRA_IMAGE_DATA = "image"
+        const val EXTRA_ACTION_PHOTO_TAKEN = "kr.ac.snu.hcil.omnitrack.ACTION_CAMERA_PHOTO_TAKEN"
 
-        fun getInstance(requestCode: Int): CameraPickDialogFragment {
+        fun getInstance(requestKey: String): CameraPickDialogFragment {
             val fragment = CameraPickDialogFragment()
             val args = Bundle()
-            args.putInt(ARG_REQUEST_CODE, requestCode)
+            args.putString(EXTRA_REQUEST_KEY, requestKey)
             fragment.arguments = args
             return fragment
         }
@@ -139,6 +139,7 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
         override fun onPictureTaken(jpeg: ByteArray?) {
             super.onPictureTaken(jpeg)
             if (jpeg != null) {
+                /*
                 val activity = activity
                 if (activity is OTActivity) {
                     arguments?.getInt(ARG_REQUEST_CODE)?.let {
@@ -146,6 +147,11 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
                         data.putExtra(EXTRA_IMAGE_DATA, jpeg)
                         activity.performOnActivityResult(it, RESULT_OK, data)
                     }
+                }*/
+
+                arguments?.getString(EXTRA_REQUEST_KEY)?.let {
+                    LocalBroadcastManager.getInstance(context)
+                            .sendBroadcast(Intent(EXTRA_ACTION_PHOTO_TAKEN).putExtra(EXTRA_IMAGE_DATA, jpeg).putExtra(EXTRA_REQUEST_KEY, it))
                 }
                 dismiss()
             }
