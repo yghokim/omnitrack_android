@@ -84,13 +84,7 @@ abstract class AAttributeInputView<DataType>(layoutId: Int, context: Context, at
     }
 
     protected open fun onSetPreviewMode(mode: Boolean) {
-        if (mode) {
-            isEnabled = false
-            //alpha = 0.5f
-        } else {
-            isEnabled = true
-            //alpha = 1.0f
-        }
+        isEnabled = !mode
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

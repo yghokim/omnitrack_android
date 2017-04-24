@@ -21,32 +21,32 @@ class PackageReceiver: BroadcastReceiver() {
             when (intent.action) {
                 Intent.ACTION_INSTALL_PACKAGE -> {
 
-                    OTApplication.app.currentUserObservable.observeOn(Schedulers.immediate()).subscribe {
+                    OTApplication.app.currentUserObservable.observeOn(Schedulers.immediate()).subscribe({
                         user ->
                         OTShortcutPanelManager.refreshNotificationShortcutViews(user, context)
                         context.startService(OTShortcutPanelWidgetUpdateService.makeNotifyDatesetChangedIntentToAllWidgets(context))
-                    }
+                    },{})
                 }
 
                 Intent.ACTION_MY_PACKAGE_REPLACED -> {
                     println("app package replaced")
-                    OTApplication.app.currentUserObservable.observeOn(Schedulers.immediate()).subscribe {
+                    OTApplication.app.currentUserObservable.observeOn(Schedulers.immediate()).subscribe({
                         user ->
                         OTShortcutPanelManager.refreshNotificationShortcutViews(user, context)
                         context.startService(OTShortcutPanelWidgetUpdateService.makeNotifyDatesetChangedIntentToAllWidgets(context))
                         if (OTAuthManager.currentSignedInLevel > OTAuthManager.SignedInLevel.NONE) {
                             FirebaseDbHelper.getDeviceInfoChild()?.child("appVersion")?.setValue(BuildConfig.VERSION_NAME)
                         }
-                    }
+                    },{})
                     OTVersionCheckService.setupServiceAlarm(context)
                 }
 
                 Intent.ACTION_PACKAGE_ADDED -> {
-                    OTApplication.app.currentUserObservable.observeOn(Schedulers.immediate()).subscribe {
+                    OTApplication.app.currentUserObservable.observeOn(Schedulers.immediate()).subscribe({
                         user ->
                         OTShortcutPanelManager.refreshNotificationShortcutViews(user, context)
                         context.startService(OTShortcutPanelWidgetUpdateService.makeNotifyDatesetChangedIntentToAllWidgets(context))
-                    }
+                    },{})
                 }
             }
     }

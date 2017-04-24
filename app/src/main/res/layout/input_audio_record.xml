@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -7,4 +8,14 @@
         android:id="@+id/ui_audio_recorder"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+
+    <com.github.ybq.android.spinkit.SpinKitView
+        android:id="@+id/ui_loading_indicator"
+        android:visibility="gone"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        app:SpinKit_Color="@color/colorPointed"
+        app:SpinKit_Style="ThreeBounce"
+        android:layout_gravity="center"
+        />
 </merge>
