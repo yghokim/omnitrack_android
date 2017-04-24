@@ -54,9 +54,12 @@ class SynchronizedUri {
 
     val isLocalUriValid: Boolean get() {
         return if (Uri.EMPTY != localUri) {
-            if (URLUtil.isFileUrl(localUri.toString())) {
+            if (localUri.scheme=="file") {
                 File(localUri.path).exists()
-            } else false
+            } else{
+                println("uri ${localUri.path} is not file.")
+                false
+            }
         } else false
     }
 

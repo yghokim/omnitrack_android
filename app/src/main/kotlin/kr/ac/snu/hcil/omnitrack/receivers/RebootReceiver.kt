@@ -17,10 +17,10 @@ class RebootReceiver : BroadcastReceiver() {
         when (intent.action) {
             Intent.ACTION_BOOT_COMPLETED -> {
                 println("OMNITRACK: Android system rebooted")
-                OTApplication.app.currentUserObservable.observeOn(Schedulers.immediate()).subscribe {
+                OTApplication.app.currentUserObservable.observeOn(Schedulers.immediate()).subscribe({
                     user ->
                     OTShortcutPanelManager.refreshNotificationShortcutViews(user, context)
-                }
+                },{})
 
                 OTVersionCheckService.setupServiceAlarm(context)
             }

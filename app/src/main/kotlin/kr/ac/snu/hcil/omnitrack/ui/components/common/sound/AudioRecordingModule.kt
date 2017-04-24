@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.common.sound
 
 import android.media.MediaRecorder
+import android.net.Uri
 import android.text.format.DateUtils
 import java.io.File
 import java.io.IOException
@@ -10,13 +11,13 @@ import java.util.*
  * Created by younghokim on 2016. 9. 27..
  */
 class AudioRecordingModule(var listener: RecordingListener?,
-                           val filePath: String, val samplingRate: Int = 11025,
+                           val fileUri: Uri, val samplingRate: Int = 11025,
                            val maxLengthMillis: Int = DateUtils.MINUTE_IN_MILLIS.toInt(),
                            progressTerm: Int = 200) : AAudioModule(progressTerm), MediaRecorder.OnInfoListener, AudioRecorderProgressBar.AmplitudeTimelineProvider {
 
     interface RecordingListener {
         fun onRecordingProgress(module: AudioRecordingModule, volume: Int)
-        fun onRecordingFinished(module: AudioRecordingModule, resultPath: String?)
+        fun onRecordingFinished(module: AudioRecordingModule, resultUri: Uri?)
     }
 
     private val recorder: MediaRecorder
@@ -33,7 +34,7 @@ class AudioRecordingModule(var listener: RecordingListener?,
         recorder.setAudioSource(MediaRecorder.AudioSource.MIC)
         recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
         recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
-        recorder.setOutputFile(filePath)
+        recorder.setOutputFile(fileUri.path)
         recorder.setAudioSamplingRate(samplingRate)
         recorder.setMaxDuration(maxLengthMillis)
 
@@ -81,11 +82,11 @@ class AudioRecordingModule(var listener: RecordingListener?,
         recorder.release()
         _isRecording = false
         if (cancel) {
-            File(filePath).delete()
+            File(fileUri.path).delete()
             listener?.onRecordingFinished(this, null)
             println("canceled the audio recording.")
         } else {
-            listener?.onRecordingFinished(this, filePath)
+            listener?.onRecordingFinished(this, fileUri)
             println("successfully finished the audio recording.")
         }
     }

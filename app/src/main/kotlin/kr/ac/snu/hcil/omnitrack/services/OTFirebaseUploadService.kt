@@ -14,6 +14,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.core.database.UploadTaskInfo
 import kr.ac.snu.hcil.omnitrack.core.system.OTTaskNotificationManager
+import java.io.FileInputStream
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -88,7 +89,14 @@ class OTFirebaseUploadService : WakefulService(TAG) {
 
             if (!currentTasks.containsKey(taskInfo.id)) {
                 println("restart uploading ${taskInfo.localUri}")
-                val localUri = Uri.parse(taskInfo.localUri)
+                var localUri = Uri.parse(taskInfo.localUri)
+                if(localUri.scheme == null)
+                {
+                    localUri = Uri.Builder()
+                            .scheme("file")
+                            .path(localUri.path)
+                            .build()
+                }
                 val storageRef = getItemStorageReference(taskInfo.itemId, taskInfo.trackerId, taskInfo.userId).child(localUri.lastPathSegment)
 
                 val task = storageRef.putFile(localUri, StorageMetadata.Builder().build(), if (taskInfo.sessionUri != null) Uri.parse(taskInfo.sessionUri!!) else null)
@@ -135,8 +143,16 @@ class OTFirebaseUploadService : WakefulService(TAG) {
                     getString(R.string.msg_uploading_file_to_server), getString(R.string.msg_uploading), OTTaskNotificationManager.PROGRESS_INDETERMINATE,
                     R.drawable.icon_cloud_upload, R.drawable.icon_cloud_upload)
 
-            val task = storageRef.putFile(outUri.localUri)
 
+            println("local uri info: ${outUri.localUri.scheme}, isAbsolute: ${outUri.localUri.isAbsolute}, isRelative: ${outUri.localUri.isRelative}, scheme: ${outUri.localUri.scheme}")
+
+            val task = if(outUri.localUri.scheme == null)
+            {
+                storageRef.putFile(Uri.Builder().scheme("file").path(outUri.localUri.path).build())
+            }
+            else{
+                storageRef.putFile(outUri.localUri)
+            }
 
             val realm = Realm.getDefaultInstance()
             realm.beginTransaction()
@@ -168,7 +184,7 @@ class OTFirebaseUploadService : WakefulService(TAG) {
                 println("paused: ${taskSnapshot.uploadSessionUri?.toString()}")
             }.addOnCompleteListener {
                 task ->
-                println("image upload complete.")
+                println("file upload complete.")
                 if (task.isSuccessful) {
                     println("result: success")
                     //upload success

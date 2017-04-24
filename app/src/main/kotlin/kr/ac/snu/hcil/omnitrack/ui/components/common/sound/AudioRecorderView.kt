@@ -95,13 +95,19 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
             if (field != value) {
                 field = value
                 if (value != Uri.EMPTY) {
-                    if (File(value.toString()).exists()) {
+                    if (File(value.path).exists()) {
                         state = State.FILE_MOUNTED
                         mountNewFile(value)
-                    } else state = State.RECORD
+                    } else
+                    {
+                        println("recorded file does not exists.")
+                        state = State.RECORD
+                    }
                 } else {
                     state = State.RECORD
                 }
+
+                audioFileUriChanged.invoke(this, value)
             }
         }
 
@@ -114,6 +120,8 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
         }
 
     var recordingOutputDirectoryPathOverride: File? = null
+
+    val audioFileUriChanged = Event<Uri>()
 
     var currentAudioSeconds: Int = 0
         set(value) {
@@ -331,8 +339,13 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
                 ".3gp", /* suffix */
                 dirPath      /* directory */)
 
+        val uri = Uri.Builder().scheme("file")
+                .path(recordingOutputPath.path)
+                .build()
 
-        Companion.registerNewRecordingModule(mediaSessionId, AudioRecordingModule(this, recordingOutputPath.path))
+        println("recording uri: ${uri.path}, string: ${uri.toString()}, isAbsolute: ${uri.isAbsolute}, scheme: ${uri.scheme}")
+
+        Companion.registerNewRecordingModule(mediaSessionId, AudioRecordingModule(this, uri))
         Companion.currentRecordingModule?.startAsync()
 
         playBar.currentProgressRatio = 0f
@@ -423,15 +436,15 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
         }
     }
 
-    override fun onRecordingFinished(module: AudioRecordingModule, resultPath: String?) {
+    override fun onRecordingFinished(module: AudioRecordingModule, resultUri: Uri?) {
         if (module === currentRecordingModule && currentRecorderId == mediaSessionId) {
             playBar.clear()
             secondTicker.stop()
             val soundLength = System.currentTimeMillis() - currentRecordingModule!!.startedAt
             Companion.clearModule()
 
-            if (resultPath != null) {
-                this.audioFileUri = Uri.parse(resultPath)
+            if (resultUri != null) {
+                this.audioFileUri = resultUri
                 recordingComplete.invoke(this, soundLength)
             } else {
                 state = State.RECORD
@@ -448,6 +461,7 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
         if (isPlaying) {
             // println("cancel recording")
             // cancelCurrentPlayer()
+            stopFile()
         }
     }
 
