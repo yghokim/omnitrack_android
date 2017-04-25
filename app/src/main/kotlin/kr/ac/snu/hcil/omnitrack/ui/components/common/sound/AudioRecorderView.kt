@@ -119,6 +119,8 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
             }
         }
 
+    var audioTitle: String = ""
+
     var recordingOutputDirectoryPathOverride: File? = null
 
     val audioFileUriChanged = Event<Uri>()
@@ -364,7 +366,7 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
     private fun playFile() {
         if (state == State.FILE_MOUNTED) {
 
-            context.startService(OTAudioPlayService.makePlayIntent(context, audioFileUri, mediaSessionId))
+            context.startService(OTAudioPlayService.makePlayIntent(context, audioFileUri, mediaSessionId, audioTitle))
 
             playerButton.setImageResource(R.drawable.stop_dark)
 /*
@@ -378,7 +380,7 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
 
     private fun stopFile() {
         LocalBroadcastManager.getInstance(context)
-                .sendBroadcast(OTAudioPlayService.makeStopCommandIntent(context, mediaSessionId))
+                .sendBroadcast(OTAudioPlayService.makeStopCommandIntent(mediaSessionId))
     }
 
 
@@ -461,7 +463,7 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
         if (isPlaying) {
             // println("cancel recording")
             // cancelCurrentPlayer()
-            stopFile()
+            //stopFile()
         }
     }
 

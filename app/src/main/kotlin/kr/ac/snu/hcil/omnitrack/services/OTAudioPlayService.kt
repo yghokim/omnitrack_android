@@ -1,5 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.services
 
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -11,8 +13,16 @@ import android.net.Uri
 import android.os.Binder
 import android.os.IBinder
 import android.support.v4.content.LocalBroadcastManager
+import android.support.v7.app.NotificationCompat
 import android.util.Log
+import android.widget.RemoteViews
+import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioRecordMetadata
+import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioRecorderView
 import kr.ac.snu.hcil.omnitrack.utils.Ticker
+import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
+import java.util.*
 
 /**
  * Created by Young-Ho on 4/22/2017.
@@ -23,6 +33,13 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
 
     companion object {
         const val TAG = "AudioService"
+
+        const val AUDIO_NOTIFICATION_ID = 2442
+
+        const val INTENT_EXTRA_SESSION_ID = "audioPlaySessionId"
+        const val INTENT_EXTRA_CURRENT_POSITION_SECONDS = "audioCurrentDurationSeconds"
+        const val INTENT_EXTRA_CURRENT_PROGRESS_RATIO = "audioCurrentProgressRatio"
+        const val INTENT_EXTRA_AUDIO_TITLE = "audioTitle"
 
         const val INTENT_ACTION_PLAY = "kr.ac.snu.hcil.omnitrack.action.ACTION_AUDIO_PLAY"
         const val INTENT_ACTION_STOP = "kr.ac.snu.hcil.omnitrack.action.ACTION_AUDIO_STOP"
@@ -71,16 +88,14 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
             addAction(INTENT_ACTION_STOP)
         }
 
-        const val INTENT_EXTRA_SESSION_ID = "audioPlaySessionId"
-        const val INTENT_EXTRA_CURRENT_POSITION_SECONDS = "audioCurrentDurationSeconds"
-        const val INTENT_EXTRA_CURRENT_PROGRESS_RATIO = "audioCurrentProgressRatio"
 
-
-        fun makePlayIntent(context: Context, file: Uri, sessionId: String): Intent {
-            return Intent(context, OTAudioPlayService::class.java).setAction(INTENT_ACTION_PLAY).setData(file).putExtra(INTENT_EXTRA_SESSION_ID, sessionId)
+        fun makePlayIntent(context: Context, file: Uri, sessionId: String, title: String = "Audio Record"): Intent {
+            return Intent(context, OTAudioPlayService::class.java).setAction(INTENT_ACTION_PLAY).setData(file)
+                    .putExtra(INTENT_EXTRA_SESSION_ID, sessionId)
+                    .putExtra(INTENT_EXTRA_AUDIO_TITLE, title)
         }
 
-        fun makeStopCommandIntent(context: Context, sessionId: String): Intent {
+        fun makeStopCommandIntent(sessionId: String): Intent {
             return Intent(INTENT_ACTION_STOP).putExtra(INTENT_EXTRA_SESSION_ID, sessionId)
         }
 
@@ -94,6 +109,42 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
                     .putExtra(INTENT_EXTRA_CURRENT_POSITION_SECONDS, progressDurationSecond)
                     .putExtra(INTENT_EXTRA_CURRENT_PROGRESS_RATIO, progressRatio)
         }
+
+        private fun makeAudioNotificationRemoteViews(context: Context, title: String, description: String, currentProgressSeconds: Int): RemoteViews {
+            val remoteViews = RemoteViews(context.packageName, R.layout.remoteview_notification_audio_player)
+            remoteViews.setTextViewText(R.id.ui_title, title)
+            remoteViews.setTextViewText(R.id.ui_description, description)
+
+            remoteViews.setTextViewText(R.id.ui_duration_view, AudioRecorderView.formatTime(currentProgressSeconds))
+
+            currentSessionId?.let {
+
+                val stopIntent = Intent(context, OTAudioPlayService::class.java).setAction(INTENT_ACTION_STOP_ALL)
+
+                remoteViews.setOnClickPendingIntent(R.id.ui_player_button, PendingIntent.getService(context, AUDIO_NOTIFICATION_ID, stopIntent, PendingIntent.FLAG_ONE_SHOT))
+            }
+
+            return remoteViews
+        }
+
+        private fun putNotificationControl(context: Context, rv: RemoteViews) {
+            val noti = NotificationCompat.Builder(context)
+                    .setCustomContentView(rv)
+                    .setSmallIcon(R.drawable.icon_simple)
+                    .setContentTitle("OmniTrack Audio Record Player")
+                    .build()
+
+            notificationManager.notify(TAG, AUDIO_NOTIFICATION_ID, noti)
+        }
+
+        private fun dismissNotificationControl(context: Context) {
+            notificationManager.cancel(TAG, AUDIO_NOTIFICATION_ID)
+        }
+
+
+        private val notificationManager: NotificationManager by lazy {
+            (OTApplication.app.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
+        }
     }
 
     private val binder = AudioServiceBinder(this)
@@ -106,6 +157,9 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
     private val audioManager: AudioManager by lazy {
         getSystemService(Context.AUDIO_SERVICE) as AudioManager
     }
+
+    private var title: String = ""
+    private var description: String = ""
 
     private val commandReceiver = CommandReceiver()
 
@@ -126,6 +180,8 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
             if (isSoundPlaying && currentSessionId != null) {
                 LocalBroadcastManager.getInstance(this)
                         .sendBroadcast(makeOnProgressEventIntent(currentSessionId!!, currentPlayPositionSecond, currentProgressRatio))
+
+                putNotificationControl(this, makeAudioNotificationRemoteViews(this, title, description, currentPlayPositionSecond))
             }
         }
     }
@@ -150,6 +206,8 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
 
         currentPlayer = null
         currentFile = null
+
+        dismissNotificationControl(this)
     }
 
     private fun stopMedia(): Boolean {
@@ -205,6 +263,7 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
             println("play current media")
             currentPlayer?.start()
             secondTicker.start()
+            putNotificationControl(this, makeAudioNotificationRemoteViews(this, title, description, 0))
         }
     }
 
@@ -213,6 +272,11 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
             currentPlayer?.let {
                 it.setDataSource(file.path)
                 this.currentFile = file
+                val metadata = AudioRecordMetadata.readMetadata(file.path)
+                if (metadata != null) {
+                    description = "Recorded at ${TimeHelper.FORMAT_DATETIME.format(Date(metadata.recordedAt))}"
+                }
+
                 Thread {
                     it.prepare()
                     println("sound player prepared.")
@@ -276,6 +340,7 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
             INTENT_ACTION_PLAY -> {
                 val filePath = intent.data
                 val sessionId = intent.getStringExtra(INTENT_EXTRA_SESSION_ID)
+                title = intent.getStringExtra(INTENT_EXTRA_AUDIO_TITLE)
                 if (filePath != null && sessionId != null) {
                     Log.d(TAG, "Play audio file: ${filePath}, ${sessionId}")
                     if (currentSessionId != sessionId && currentPlayer?.isPlaying == true) {

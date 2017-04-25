@@ -13,6 +13,7 @@ import android.support.multidex.MultiDexApplication
 import android.telephony.TelephonyManager
 import android.text.format.DateUtils
 import com.google.firebase.crash.FirebaseCrash
+import com.jakewharton.threetenabp.AndroidThreeTen
 import com.squareup.leakcanary.LeakCanary
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
@@ -269,6 +270,8 @@ class OTApplication : MultiDexApplication() {
         super.onCreate()
         app = this
         println("set application instance.")
+
+        AndroidThreeTen.init(this);
 
         if (LeakCanary.isInAnalyzerProcess(this)) {
             // This process is dedicated to LeakCanary for heap analysis.
