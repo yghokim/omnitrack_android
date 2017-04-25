@@ -140,6 +140,7 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
                     this.titleView?.text = String.format(resources.getString(R.string.msg_format_attribute_edit_dialog_title), this.attribute?.name)
 
                     this.valueView = this.attribute?.getInputView(context, false, this.valueView)
+                    this.valueView?.boundAttribute = this.attribute
 
                     if (valueView != null) {
                         valueView?.onCreate(savedInstanceState)
@@ -165,7 +166,6 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
                         this.valueView?.setAnyValue(value)
                     } else if (item != null) {
                         if (this.attribute != null) {
-                            this.valueView?.boundAttribute = this.attribute
                             val value = item.getValueOf(this.attribute!!)
                             if (value != null) {
                                 println("value : ${value.toString()}")

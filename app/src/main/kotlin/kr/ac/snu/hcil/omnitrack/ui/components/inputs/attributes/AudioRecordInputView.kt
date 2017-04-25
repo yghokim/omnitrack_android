@@ -110,7 +110,6 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
     }
 
     override fun onAttributeBound(attribute: OTAttribute<out Any>) {
-        println("onAttribute Bound: ${attribute.name}")
         valueView.mediaSessionId = attribute.objectId
 
         val trackerName = attribute.tracker?.name ?: "No Tracker"
@@ -120,7 +119,6 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
 
     override fun onPause() {
         super.onPause()
-        println("dispose audio recorder view")
         valueView.dispose()
     }
 }

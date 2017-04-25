@@ -3,7 +3,6 @@ package kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.widget.FrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
@@ -21,6 +20,8 @@ abstract class AInputView<T>(layoutId: Int, context: Context, attrs: AttributeSe
     private val validators: ArrayList<ReadOnlyPair<CharSequence?, (T) -> Boolean>> = ArrayList<ReadOnlyPair<CharSequence?, (T) -> Boolean>>()
 
     protected val validationErrorMessageList = ArrayList<CharSequence>()
+
+    abstract var value: T
 
     constructor(layoutId: Int, context: Context): this(layoutId, context, null)
 
@@ -77,8 +78,6 @@ abstract class AInputView<T>(layoutId: Int, context: Context, attrs: AttributeSe
         validate()
         valueChanged.invoke(this, newValue)
     }
-
-    abstract var value : T
 
     @Suppress("UNCHECKED_CAST")
     open fun setAnyValue(value: Any) {
