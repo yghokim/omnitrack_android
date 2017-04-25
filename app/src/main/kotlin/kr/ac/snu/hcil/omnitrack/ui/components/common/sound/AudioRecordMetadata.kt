@@ -14,7 +14,7 @@ data class AudioRecordMetadata(var durationMillis: Int, var fileSizeBytes: Long,
     companion object{
 
         val formatter: DateTimeFormatter by lazy {
-            DateTimeFormatter.ofPattern("yyyyMMdd'T'hhmmss.SSSX")
+            DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss.SSSX")
         }
 
         fun readMetadata(filePath: String): AudioRecordMetadata?
@@ -30,7 +30,7 @@ data class AudioRecordMetadata(var durationMillis: Int, var fileSizeBytes: Long,
                         parsed.get(ChronoField.YEAR),
                         parsed.get(ChronoField.MONTH_OF_YEAR),
                         parsed.get(ChronoField.DAY_OF_MONTH),
-                        parsed.get(ChronoField.HOUR_OF_AMPM),
+                        parsed.get(ChronoField.HOUR_OF_DAY),
                         parsed.get(ChronoField.MINUTE_OF_HOUR),
                         parsed.get(ChronoField.SECOND_OF_MINUTE),
                         0,

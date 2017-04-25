@@ -226,7 +226,6 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
         secondTicker.tick += {
             sender, time ->
 
-            println("tick!")
             when (state) {
                 State.RECORD -> {
                 }
@@ -344,8 +343,6 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
         val uri = Uri.Builder().scheme("file")
                 .path(recordingOutputPath.path)
                 .build()
-
-        println("recording uri: ${uri.path}, string: ${uri.toString()}, isAbsolute: ${uri.isAbsolute}, scheme: ${uri.scheme}")
 
         Companion.registerNewRecordingModule(mediaSessionId, AudioRecordingModule(this, uri))
         Companion.currentRecordingModule?.startAsync()

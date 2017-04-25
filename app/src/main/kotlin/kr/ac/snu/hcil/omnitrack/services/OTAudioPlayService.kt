@@ -274,7 +274,7 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
                 this.currentFile = file
                 val metadata = AudioRecordMetadata.readMetadata(file.path)
                 if (metadata != null) {
-                    description = "Recorded at ${TimeHelper.FORMAT_DATETIME.format(Date(metadata.recordedAt))}"
+                    description = String.format(resources.getString(R.string.msg_audio_record_player_description_recorded_at_format), TimeHelper.FORMAT_DATETIME.format(Date(metadata.recordedAt)))
                 }
 
                 Thread {
