@@ -334,7 +334,7 @@
     <string name="msg_notification_trigger_level_impose_desc">알람 어플처럼 전체화면으로 알림을 띄우고 해당 트래커를 기록하거나 알림을 취소하기 전까지 벨소리나 진동을 보냅니다. \'약물 섭취\'처럼 정해진 때에 반드시 기록되어야 하는 트래커에 사용하기 적합합니다.</string>
     <string name="msg_no_audio">녹음 없음</string>
     <string name="msg_data_error">데이터 에러</string>
-    <string name="msg_audio_record_player_description_recorded_at_format">녹음 시각: %1$s</string>
+    <string name="msg_audio_record_player_description_recorded_at_format">%1$s에 녹음됨</string>
 
     <string-array name="purpose_entries">
         <item>directive|건강 관련 정보를 기록하기 위해서</item>
