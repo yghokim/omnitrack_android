@@ -5,7 +5,7 @@
     <string name="time_pm">오후</string>
 
     <string name="dateformat_ymd">yyyy년 M월 d일, E요일</string>
-    <string name="dateformat_minute">a h시 m분, yyyy년 M월 d일</string>
+    <string name="dateformat_minute">yyyy년 M월 d일 a h시 m분</string>
 
     <string name="format_hour_am">오전 %1$s시</string>
     <string name="format_hour_pm">오후 %1$s시</string>
@@ -69,7 +69,7 @@
 
 
     <string name="msg_date_format_scope_day_for_week">MMM dd</string>
-    <string name="msg_date_format_scope_day">MMM dd, yyyy</string>
+    <string name="msg_date_format_scope_day">yyyy년 M월 d일</string>
     <string name="msg_date_format_scope_month">MMMM</string>
     <string name="msg_date_format_scope_month_short">MMM</string>
 
