@@ -424,4 +424,6 @@
 
     <string name="msg_data_error">Data error</string>
 
+    <string name="msg_audio_record_player_description_recorded_at_format">Recorded at %1$s</string>
+
 </resources>
