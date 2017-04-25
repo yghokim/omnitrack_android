@@ -7,6 +7,7 @@ import android.view.View
 import com.github.ybq.android.spinkit.SpinKitView
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioRecorderView
 import rx.internal.util.SubscriptionList
@@ -74,6 +75,8 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
     val valueView: AudioRecorderView
     val loadingIndicator: SpinKitView
 
+    private var audioTitleInformation: String = ""
+
     private var subscriptions = SubscriptionList()
 
     init {
@@ -106,8 +109,13 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
         subscriptions.clear()
     }
 
-    override fun onAttributeBound(attributeId: String) {
-        valueView.mediaSessionId = attributeId
+    override fun onAttributeBound(attribute: OTAttribute<out Any>) {
+        println("onAttribute Bound: ${attribute.name}")
+        valueView.mediaSessionId = attribute.objectId
+
+        val trackerName = attribute.tracker?.name ?: "No Tracker"
+
+        valueView.audioTitle = "${attribute.name} | ${trackerName}"
     }
 
     override fun onPause() {

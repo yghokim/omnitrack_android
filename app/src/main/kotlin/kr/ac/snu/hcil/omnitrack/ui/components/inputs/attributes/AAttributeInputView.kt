@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.AttributeSet
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.ui.IActivityLifeCycle
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.AInputView
 import kotlin.properties.Delegates
@@ -63,7 +64,7 @@ abstract class AAttributeInputView<DataType>(layoutId: Int, context: Context, at
     abstract val typeId: Int
         get
 
-    var boundAttributeId: String? by Delegates.observable(null as String?) {
+    var boundAttribute: OTAttribute<out Any>? by Delegates.observable(null as OTAttribute<out Any>?) {
         prop, old, new ->
         if (old != new) {
             if (new != null) {
@@ -105,7 +106,7 @@ abstract class AAttributeInputView<DataType>(layoutId: Int, context: Context, at
     override fun onLowMemory() {
     }
 
-    protected open fun onAttributeBound(attributeId: String) {
+    protected open fun onAttributeBound(attribute: OTAttribute<out Any>) {
 
     }
 

@@ -626,7 +626,7 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
                     inputView.value
                 }
 
-                inputView.boundAttributeId = attribute.objectId
+                inputView.boundAttribute = attribute
 
 
                 inputView.onResume()

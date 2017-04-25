@@ -78,6 +78,7 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
                 .positiveText(R.string.msg_apply)
                 .negativeColorRes(R.color.colorRed_Light)
                 .negativeText(R.string.msg_cancel)
+                .cancelable(false)
                 .title(getString(R.string.msg_attribute_edit_dialog_title))
                 .onPositive { dialog, which ->
                     val tracker = this.tracker
@@ -164,7 +165,7 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
                         this.valueView?.setAnyValue(value)
                     } else if (item != null) {
                         if (this.attribute != null) {
-                            this.valueView?.boundAttributeId = this.attribute?.objectId
+                            this.valueView?.boundAttribute = this.attribute
                             val value = item.getValueOf(this.attribute!!)
                             if (value != null) {
                                 println("value : ${value.toString()}")
