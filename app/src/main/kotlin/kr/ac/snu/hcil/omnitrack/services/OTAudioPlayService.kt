@@ -21,8 +21,6 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioRecordMetadata
 import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioRecorderView
 import kr.ac.snu.hcil.omnitrack.utils.Ticker
-import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
-import java.util.*
 
 /**
  * Created by Young-Ho on 4/22/2017.
@@ -127,14 +125,20 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
             return remoteViews
         }
 
+        private var lastNotificationBuilder: NotificationCompat.Builder? = null
+
         private fun putNotificationControl(context: Context, rv: RemoteViews) {
-            val noti = NotificationCompat.Builder(context)
-                    .setCustomContentView(rv)
+            val builder = lastNotificationBuilder ?: NotificationCompat.Builder(context)
                     .setSmallIcon(R.drawable.icon_simple)
-                    .setContentTitle("OmniTrack Audio Record Player")
+                    .setAutoCancel(false)
+                    .setContentTitle("OmniTrack Audio Record Player") as NotificationCompat.Builder
+
+            lastNotificationBuilder = builder
+
+            val notification = builder.setContent(rv)
                     .build()
 
-            notificationManager.notify(TAG, AUDIO_NOTIFICATION_ID, noti)
+            notificationManager.notify(TAG, AUDIO_NOTIFICATION_ID, notification)
         }
 
         private fun dismissNotificationControl(context: Context) {
@@ -274,7 +278,7 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
                 this.currentFile = file
                 val metadata = AudioRecordMetadata.readMetadata(file.path)
                 if (metadata != null) {
-                    description = String.format(resources.getString(R.string.msg_audio_record_player_description_recorded_at_format), TimeHelper.FORMAT_DATETIME.format(Date(metadata.recordedAt)))
+                    description = String.format(resources.getString(R.string.msg_audio_record_player_description_recorded_at_format), metadata.recordedAt)
                 }
 
                 Thread {

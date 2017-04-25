@@ -4,14 +4,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/main_gradient_mild"
-    tools:layout_height="84dp">
+    tools:layout_height="64dp">
 
     <ImageView
         android:id="@+id/ui_icon"
-        android:layout_width="16dp"
-        android:layout_height="16dp"
+        android:layout_width="14dp"
+        android:layout_height="14dp"
         android:layout_marginLeft="12dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="6dp"
         android:alpha="0.7"
         android:scaleType="fitEnd"
         android:src="@drawable/icon_simple" />
@@ -50,14 +50,13 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="2dp"
         android:layout_toStartOf="@+id/ui_duration_view"
         android:ellipsize="end"
         android:fontFamily="sans-serif-normal"
         android:maxLines="1"
-        android:paddingBottom="12dp"
+        android:paddingBottom="8dp"
         android:textColor="#aaffffff"
-        android:textSize="13sp"
+        android:textSize="12sp"
         android:textStyle="italic"
         tools:text="Logged at 19:00 PM, Mar 25, 2017" />
 
