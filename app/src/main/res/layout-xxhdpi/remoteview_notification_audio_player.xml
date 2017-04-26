@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/main_gradient_mild"
-    tools:layout_height="64dp">
+    tools:layout_height="96dp">
 
     <ImageView
         android:id="@+id/ui_icon"

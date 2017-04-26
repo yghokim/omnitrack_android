@@ -115,6 +115,7 @@ class AudioItemListView : ConstraintLayout {
             Mode.Empty->{
                 loadingIndicatorView.visibility = View.INVISIBLE
                 iconView.visibility = View.VISIBLE
+                iconView.setImageResource(R.drawable.icon_waveform_unavailable)
                 iconView.setImageResource(R.drawable.icon_waveform)
                 durationView.visibility = View.GONE
                 unitView.setText(R.string.msg_no_audio)
