@@ -363,6 +363,10 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
     private fun playFile() {
         if (state == State.FILE_MOUNTED) {
 
+            if (!Companion.isRecordingSourceFree) {
+                Companion.cancelCurrentRecording()
+            }
+
             context.startService(OTAudioPlayService.makePlayIntent(context, audioFileUri, mediaSessionId, audioTitle))
 
             playerButton.setImageResource(R.drawable.stop_dark)
