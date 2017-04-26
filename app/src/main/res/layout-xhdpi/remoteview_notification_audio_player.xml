@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/main_gradient_mild"
+    tools:layout_height="64dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_toStartOf="@+id/ui_duration_view"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/ui_audio"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:layout_gravity="center_vertical"
+                android:alpha="0.7"
+                android:scaleType="fitEnd"
+                android:src="@drawable/icon_small_audio" />
+
+            <TextView
+                android:id="@+id/ui_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="4dp"
+                android:ellipsize="end"
+                android:fontFamily="sans-serif-normal"
+                android:maxLines="1"
+                android:textColor="#aaffffff"
+                android:textSize="12sp"
+                android:textStyle="italic"
+                tools:text="Logged at 19:00 PM, Mar 25, 2017" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/ui_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="3dp"
+            android:layout_marginTop="4dp"
+            android:ellipsize="marquee"
+            android:fontFamily="sans-serif-condensed"
+            android:maxLines="1"
+            android:textColor="#FFF"
+            android:textSize="18sp"
+            tools:text="Voice Log | Diary" />
+    </LinearLayout>
+
+
+    <TextView
+        android:id="@+id/ui_duration_view"
+        style="@style/numberPropertyDigitViewStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="12dp"
+        android:layout_toStartOf="@+id/ui_player_button_container"
+        android:fontFamily="sans-serif-thin"
+        android:textColor="#afffffff"
+        android:textStyle="italic"
+        tools:text="0:30" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_toStartOf="@+id/ui_player_button_container"
+        android:src="@drawable/left_separator" />
+
+    <FrameLayout
+        android:id="@+id/ui_player_button_container"
+        android:layout_width="@dimen/button_height_tall"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:background="#22ffffff">
+
+        <ImageButton
+            android:id="@+id/ui_player_button"
+            android:layout_width="@dimen/button_height_tall"
+            android:layout_height="match_parent"
+            android:background="@drawable/transparent_button_background"
+            android:src='@drawable/ex' />
+    </FrameLayout>
+
+</RelativeLayout>
