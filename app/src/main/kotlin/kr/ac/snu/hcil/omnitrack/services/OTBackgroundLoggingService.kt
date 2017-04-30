@@ -142,7 +142,7 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
 
         fun makeIntent(context: Context, trackerId: String, source: OTItem.LoggingSource): Intent {
             val intent = Intent(context, OTBackgroundLoggingService::class.java)
-            intent.action = ACTION_LOG
+            intent.action = "${ACTION_LOG}${trackerId}"
             intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
             intent.putExtra(INTENT_EXTRA_LOGGING_SOURCE, source.toString())
             return intent
@@ -153,7 +153,7 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
         //tracker_id
         if (intent != null) {
             val action = intent.action
-            if (ACTION_LOG == action) {
+            if (action.startsWith(ACTION_LOG, true)) {
                 println("try background logging..")
                 val trackerId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
                 handleLogging(trackerId, intent)
