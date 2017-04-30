@@ -14,7 +14,6 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.core.database.UploadTaskInfo
 import kr.ac.snu.hcil.omnitrack.core.system.OTTaskNotificationManager
-import java.io.FileInputStream
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -108,13 +107,14 @@ class OTFirebaseUploadService : WakefulService(TAG) {
 
                     realm.beginTransaction()
                     taskInfo.sessionUri = snapshot.uploadSessionUri?.toString()
+                    realm.copyToRealmOrUpdate(taskInfo)
                     realm.commitTransaction()
                 }.addOnCompleteListener {
 
                     println("file upload complete.")
                     currentTasks.remove(taskInfo.id)
                     realm.beginTransaction()
-                    taskInfo.deleteFromRealm()
+                    realm.where(UploadTaskInfo::class.java).equalTo("id", taskInfo.id).findAll().deleteAllFromRealm()
                     realm.commitTransaction()
                 }
             }
@@ -156,12 +156,17 @@ class OTFirebaseUploadService : WakefulService(TAG) {
 
             val realm = Realm.getDefaultInstance()
             realm.beginTransaction()
-            val dbObject = realm.createObject(UploadTaskInfo::class.java, UUID.randomUUID().toString())
+            val dbObject = UploadTaskInfo()
+            dbObject.id = UUID.randomUUID().toString()
+
+            //realm.createObject(UploadTaskInfo::class.java, UUID.randomUUID().toString())
             dbObject.itemId = itemId
             dbObject.trackerId = trackerId
             dbObject.userId = userId
             dbObject.localUri = outUri.localUri.toString()
             dbObject.serverUri = outUri.serverUri.toString()
+
+            realm.copyToRealmOrUpdate(dbObject)
 
             realm.commitTransaction()
 
@@ -173,6 +178,7 @@ class OTFirebaseUploadService : WakefulService(TAG) {
 
                 realm.beginTransaction()
                 dbObject.sessionUri = snapshot.uploadSessionUri?.toString()
+                realm.copyToRealmOrUpdate(dbObject)
                 realm.commitTransaction()
 
             }.addOnFailureListener {
@@ -195,7 +201,7 @@ class OTFirebaseUploadService : WakefulService(TAG) {
 
                 currentTasks.remove(dbObject.id)
                 realm.beginTransaction()
-                dbObject.deleteFromRealm()
+                realm.where(UploadTaskInfo::class.java).equalTo("id", dbObject.id).findAll().deleteAllFromRealm()
                 realm.commitTransaction()
                 stopSelf(startId)
                 finishIfAllTasksDone()
