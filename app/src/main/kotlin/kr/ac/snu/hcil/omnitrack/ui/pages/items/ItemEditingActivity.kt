@@ -53,6 +53,7 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
             val intent = Intent(context, ItemEditingActivity::class.java)
             intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
             intent.putExtra(INTENT_EXTRA_REMINDER_TIME, reminderTime)
+            intent.setAction("item_edit:${trackerId}")
             return intent
         }
 
