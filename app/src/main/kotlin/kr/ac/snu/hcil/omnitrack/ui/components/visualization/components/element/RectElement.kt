@@ -26,8 +26,9 @@ class RectElement<T> : ADataEncodedDrawer<T> {
 
     override fun onDraw(canvas: Canvas) {
         paint.color = color
-        if(Color.alpha(color) > 5)
+        if (Color.alpha(color) > 5) {
             canvas.drawRect(bound, paint)
+        }
     }
 
 }
