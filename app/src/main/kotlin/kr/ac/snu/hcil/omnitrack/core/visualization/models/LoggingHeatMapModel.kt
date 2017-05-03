@@ -235,10 +235,10 @@ class LoggingHeatMapModel(tracker: OTTracker): TrackerChartModel<ITimeBinnedHeat
         private fun mapCellRectToSpace(cell: RectElement<Float>, x: Long, y: Int) {
             val centerX = xScale[x]
             val centerY = yScale[y]
-            val width  = xScale.getTickInterval()- 4
-            val height = yScale.getTickInterval()
+            val width = Math.abs(xScale.getTickInterval()) - 4
+            val height = Math.abs(yScale.getTickInterval()) - 4
 
-            cell.bound.set(centerX - width/2, centerY - height/2 - 2, centerX + width/2, centerY + height/2 + 2)
+            cell.bound.set(centerX - width / 2, centerY - height / 2, centerX + width / 2, centerY + height / 2)
         }
 
         override fun onRefresh() {
