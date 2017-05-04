@@ -5,7 +5,6 @@ import android.net.Uri
 import android.support.annotation.Keep
 import com.google.firebase.database.*
 import com.google.firebase.iid.FirebaseInstanceId
-import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
@@ -788,6 +787,7 @@ object FirebaseDbHelper {
     fun getTotalItemCount(tracker: OTTracker): Observable<Long> {
         return Observable.create {
             subscriber ->
+            /*
             getItemListOfTrackerChild(tracker.objectId)
                     ?.addListenerForSingleValueEvent(object : ValueEventListener {
                         override fun onCancelled(p0: DatabaseError) {
@@ -802,6 +802,29 @@ object FirebaseDbHelper {
                             if (!subscriber.isUnsubscribed) {
                                 subscriber.onNext(snapshot.childrenCount)
                                 subscriber.onCompleted()
+                            }
+                        }
+                    })*/
+            getItemListContainerOfTrackerChild(tracker.objectId)?.child("item_count")
+                    ?.addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onCancelled(p0: DatabaseError) {
+                            p0.toException().printStackTrace()
+                            if (!subscriber.isUnsubscribed) {
+                                subscriber.onError(p0.toException())
+                            }
+                        }
+
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            val value = snapshot.value
+                            println("item count: $value")
+                            val longValue = (value as? Int)?.toLong() ?: if (value is Long) {
+                                value
+                            } else null
+                            if (longValue != null) {
+                                if (!subscriber.isUnsubscribed) {
+                                    subscriber.onNext(longValue)
+                                    subscriber.onCompleted()
+                                }
                             }
                         }
                     })
