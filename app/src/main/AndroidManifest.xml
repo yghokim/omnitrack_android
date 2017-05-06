@@ -95,14 +95,13 @@
         </receiver>
         <receiver
             android:name=".receivers.RebootReceiver"
-            android:enabled="true"
-            android:exported="true">
+            android:directBootAware="true"
+            android:enabled="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
                 <action android:name="android.intent.action.REBOOT" />
-
-                <category android:name="ANDROID.INTENT.CATEGORY.HOME" />
+                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
         <receiver
