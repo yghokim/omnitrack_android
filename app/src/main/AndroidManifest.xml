@@ -236,7 +236,12 @@
             android:name=".ui.pages.configs.ShortcutPanelWidgetConfigActivity"
             android:excludeFromRecents="true"
             android:taskAffinity="kr.ac.snu.hcil.omnitrack.shortcutPanelWidgetConfigTask"
-            android:theme="@style/AppTheme.Dialog.DimmedBackground" />
+            android:theme="@style/AppTheme.Dialog.DimmedBackground">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
+
 
         <activity
             android:name=".ui.activities.ReminderPopupActivity"

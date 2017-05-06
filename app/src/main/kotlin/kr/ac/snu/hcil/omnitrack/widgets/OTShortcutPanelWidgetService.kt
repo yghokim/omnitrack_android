@@ -13,8 +13,6 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
-import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
-import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -94,16 +92,18 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
             var lastLoggingTime: Long? = null
             var todayCount: Long? = null
 
+            /*
             val totalItemCount = DatabaseManager.getTotalItemCount(tracker).first().toBlocking().first().first
             if (totalItemCount != 0L) {
                 lastLoggingTime = DatabaseManager.getLastLoggingTime(tracker).first().toBlocking().first()
                 todayCount = DatabaseManager.getLogCountOfDay(tracker).first().toBlocking().first()
-            }
+            }*/
 
                 val rv = RemoteViews(context.packageName, R.layout.remoteview_widget_shortcut_list_element)
 
                 rv.setTextViewText(R.id.ui_tracker_name, tracker.name)
 
+            /*
             if (lastLoggingTime == null) {
                     rv.setTextViewText(R.id.ui_text_statistics, context.getString(R.string.msg_never_logged))
                 } else {
@@ -122,7 +122,7 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
                     }
 
                     rv.setTextViewText(R.id.ui_text_statistics, text)
-                }
+                }*/
 
                 val buttonSize = OTApplication.app.resources.getDimensionPixelSize(R.dimen.app_widget_instant_logging_button_height)
                 val buttonRadius = buttonSize * .5f
