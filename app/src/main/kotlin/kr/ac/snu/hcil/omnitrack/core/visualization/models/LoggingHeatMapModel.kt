@@ -7,7 +7,7 @@ import android.text.format.DateUtils
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
-import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
+import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.visualization.TrackerChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.ITimeBinnedHeatMap
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
@@ -66,7 +66,7 @@ class LoggingHeatMapModel(tracker: OTTracker): TrackerChartModel<ITimeBinnedHeat
         val calendarCache = Calendar.getInstance()
 
         subscriptions.add(
-                FirebaseDbHelper.loadItems(tracker, getTimeScope(), FirebaseDbHelper.Order.ASC).subscribe {
+                DatabaseManager.loadItems(tracker, getTimeScope(), DatabaseManager.Order.ASC).subscribe {
                     items ->
                     println("items for loging heatmap: ${items.size}")
                     //println(items)

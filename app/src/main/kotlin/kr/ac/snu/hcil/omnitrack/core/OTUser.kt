@@ -11,7 +11,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.*
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
-import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
+import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.externals.fitbit.FitbitRecentSleepTimeMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTrigger
@@ -51,10 +51,10 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
                 val photoUrl = sp.getString(PREFERENCES_KEY_PHOTO_URL, null)
                 if (objId != null && name != null) {
                     /*
-                    return FirebaseDbHelper.findTrackersOfUser(objId).flatMap {
+                    return DatabaseManager.findTrackersOfUser(objId).flatMap {
                         trackers ->
                         val user = OTUser(objId, name, photoUrl, trackers)
-                        FirebaseDbHelper.findTriggersOfUser(user).map {
+                        DatabaseManager.findTriggersOfUser(user).map {
                             triggers ->
                             for (trigger in triggers) {
                                 user.triggerManager.putNewTrigger(trigger)
@@ -101,7 +101,7 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
     }*/
 
     private val databaseRef: DatabaseReference?
-        get() = FirebaseDbHelper.dbRef?.child(FirebaseDbHelper.CHILD_NAME_USERS)?.child(objectId)
+        get() = DatabaseManager.dbRef?.child(DatabaseManager.CHILD_NAME_USERS)?.child(objectId)
 
     val trackers = ObservableList<OTTracker>()
 
@@ -158,8 +158,8 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
             OTApplication.app.startService(OTShortcutPanelWidgetUpdateService.makeNotifyDatesetChangedIntentToAllWidgets(OTApplication.app))
         }
 
-        trackerListDbReference = databaseRef?.child(FirebaseDbHelper.CHILD_NAME_TRACKERS)
-        triggerListDbReference = databaseRef?.child(FirebaseDbHelper.CHILD_NAME_TRIGGERS)
+        trackerListDbReference = databaseRef?.child(DatabaseManager.CHILD_NAME_TRACKERS)
+        triggerListDbReference = databaseRef?.child(DatabaseManager.CHILD_NAME_TRIGGERS)
 
 
         trackerListChangeEventListener = object : ChildEventListener {
@@ -172,7 +172,7 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
                 val duplicate = trackers.unObservedList.find { it.objectId == snapshot.key }
                 if (duplicate == null) {
                     println("load tracker ${snapshot.key} from DB")
-                    FirebaseDbHelper.getTracker(snapshot.key).subscribe {
+                    DatabaseManager.getTracker(snapshot.key).subscribe {
                         tracker ->
 
                         suspendDatabaseSync = true
@@ -217,7 +217,7 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
                 val duplicate = triggerManager.getTriggerWithId(snapshot.key)
                 if (duplicate == null) {
                     println("load trigger ${snapshot.key} from DB")
-                    FirebaseDbHelper.getTrigger(this@OTUser, snapshot.key).subscribe({
+                    DatabaseManager.getTrigger(this@OTUser, snapshot.key).subscribe({
                         trigger ->
                         triggerManager.putNewTrigger(trigger)
                     }, {})
@@ -317,7 +317,7 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
 
         println("tracker was added")
         if (!suspendDatabaseSync)
-            FirebaseDbHelper.saveTracker(new, index)
+            DatabaseManager.saveTracker(new, index)
     }
 
     private fun onTrackerRemoved(tracker: OTTracker, index: Int) {
@@ -341,7 +341,7 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
         tracker.suspendDatabaseSync = false
 
         if (!suspendDatabaseSync)
-            FirebaseDbHelper.removeTracker(tracker, this, true)
+            DatabaseManager.removeTracker(tracker, this, true)
     }
 
     fun findAttributeByObjectId(trackerId: String, attributeId: String): OTAttribute<out Any>? {
@@ -389,7 +389,7 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
     }
 
     fun crawlAllTrackersAndTriggerAtOnce(): Single<OTUser> {
-        return FirebaseDbHelper.findTrackersOfUser(objectId).doOnNext {
+        return DatabaseManager.findTrackersOfUser(objectId).doOnNext {
             trackers ->
             println("crawled trackers")
             for (tracker in trackers) {
@@ -399,7 +399,7 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
         }.concatMap {
             trackers ->
             println("crawled triggers")
-            FirebaseDbHelper.findTriggersOfUser(this).doOnNext {
+            DatabaseManager.findTriggersOfUser(this).doOnNext {
                 triggers ->
                 for (trigger in triggers) {
                     this.triggerManager.putNewTrigger(trigger)

@@ -212,7 +212,7 @@ class OTApplication : MultiDexApplication() {
                 //if (OTAuthManager.isUserSignedIn()) {
                     val uid = OTAuthManager.userId!!
                     println("OMNITRACK user identityId: ${uid}, userName: ${OTAuthManager.userName}")
-                //FirebaseDbHelper.findTrackersOfUser(uid).flatMap {
+                //DatabaseManager.findTrackersOfUser(uid).flatMap {
                 //    trackers ->
 
                 val user = OTUser(uid, OTAuthManager.userName, OTAuthManager.userImageUrl)
@@ -350,7 +350,7 @@ class OTApplication : MultiDexApplication() {
         if (_currentUser != null) {
             OTUser.storeOrOverwriteInstanceCache(_currentUser!!, systemSharedPreferences)
             //dbHelper.save(_currentUser!!)
-            //FirebaseDbHelper.saveUser(_currentUser!!)
+            //DatabaseManager.saveUser(_currentUser!!)
         }
     }
 

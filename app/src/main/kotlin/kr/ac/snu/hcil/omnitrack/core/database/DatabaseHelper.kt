@@ -389,7 +389,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         writableDatabase.setTransactionSuccessful()
         writableDatabase.endTransaction()
 
-        FirebaseDbHelper.saveTracker(tracker, position)
+        DatabaseManager.saveTracker(tracker, position)
     }*/
 
     /*

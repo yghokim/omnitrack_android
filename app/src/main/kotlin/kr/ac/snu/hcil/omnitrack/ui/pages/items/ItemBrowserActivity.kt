@@ -25,7 +25,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AttributeSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
-import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
+import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
 import kr.ac.snu.hcil.omnitrack.services.OTTableExportService
 import kr.ac.snu.hcil.omnitrack.ui.DragItemTouchHelperCallback
@@ -168,10 +168,10 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
 
         creationSubscriptions.add(
                 //loadWholeItems(tracker)
-                FirebaseDbHelper.makeItemQueryStream(tracker).subscribe {
+                DatabaseManager.makeItemQueryStream(tracker).subscribe {
                     action ->
                     when (action.action) {
-                        FirebaseDbHelper.ElementActionType.Added -> {
+                        DatabaseManager.ElementActionType.Added -> {
                             action.element?.let {
                                 synchronized(items) {
                                     items.add(it)
@@ -179,7 +179,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                                 }
                             }
                         }
-                        FirebaseDbHelper.ElementActionType.Removed -> {
+                        DatabaseManager.ElementActionType.Removed -> {
                             synchronized(items) {
                                 val toRemoveIndex = items.indexOfFirst { it.objectId == action.itemId }
                                 if (toRemoveIndex != -1) {
@@ -188,7 +188,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                                 }
                             }
                         }
-                        FirebaseDbHelper.ElementActionType.Modified -> {
+                        DatabaseManager.ElementActionType.Modified -> {
                             println("Item was modified.")
                             val changed = items.find { it.objectId == action.itemId }
                             if (changed != null) {
@@ -208,7 +208,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
     }
 
     private fun loadWholeItems(tracker: OTTracker): Subscription {
-        return FirebaseDbHelper.loadItems(tracker).subscribe {
+        return DatabaseManager.loadItems(tracker).subscribe {
             loadedItems ->
             items.clear()
             items.addAll(loadedItems)
@@ -224,7 +224,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                 val item = items.find { item -> item.objectId == itemId }
                 if (item != null) {
                     item.setValueOf(attribute, value)
-                    FirebaseDbHelper.saveItem(item, tracker, false)
+                    DatabaseManager.saveItem(item, tracker, false)
                     itemListViewAdapter.notifyItemChanged(items.indexOf(item))
                 }
             }
@@ -303,7 +303,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
 
     fun deleteItemPermanently(position: Int): OTItem {
         val removedItem = items[position]
-        FirebaseDbHelper.removeItem(removedItem)
+        DatabaseManager.removeItem(removedItem)
         items.removeAt(position)
         onItemRemoved(position)
 
@@ -331,7 +331,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
 
         fun clearTrashcan() {
             for (item in removedItems) {
-                FirebaseDbHelper.removeItem(item)
+                DatabaseManager.removeItem(item)
             }
         }
 
@@ -785,7 +785,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
 
                                 if (tracker != null) {
                                     dialogSubscriptions.add(
-                                            FirebaseDbHelper.getTotalItemCount(tracker!!).subscribe {
+                                            DatabaseManager.getTotalItemCount(tracker!!).subscribe {
                                                 count ->
                                                 if (count > 0) {
                                                     deletionMenuItem.description = "Item count: ${count}"

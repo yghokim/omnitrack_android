@@ -10,7 +10,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeSpanAttribute
-import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
+import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.visualization.AttributeChartModel
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
@@ -60,7 +60,7 @@ class DurationTimelineModel(override val attribute: OTTimeSpanAttribute) : Attri
                     val to = if (xIndex < xScale.numTicks - 1) xScale.binPointsOnDomain[xIndex + 1]
                     else getTimeScope().to
 
-                    FirebaseDbHelper.loadItems(attribute.tracker!!, TimeSpan.fromPoints(from, to)).flatMap<AggregatedDuration?>(Func1<List<OTItem>, Observable<AggregatedDuration?>> {
+                    DatabaseManager.loadItems(attribute.tracker!!, TimeSpan.fromPoints(from, to)).flatMap<AggregatedDuration?>(Func1<List<OTItem>, Observable<AggregatedDuration?>> {
                         items ->
                         println("items during ${TimeSpan.fromPoints(from, to).toString()}; count: ${items.size}")
                         if (items.isNotEmpty()) {
