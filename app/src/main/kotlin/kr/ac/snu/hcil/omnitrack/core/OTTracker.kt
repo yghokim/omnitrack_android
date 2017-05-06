@@ -11,7 +11,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AttributeSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
-import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
+import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.NamedObject
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
@@ -60,10 +60,10 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
     }
 
     override val databasePointRef: DatabaseReference?
-        get() = FirebaseDbHelper.dbRef?.child(FirebaseDbHelper.CHILD_NAME_TRACKERS)?.child(objectId)
+        get() = DatabaseManager.dbRef?.child(DatabaseManager.CHILD_NAME_TRACKERS)?.child(objectId)
 
     override fun makeNewObjectId(): String {
-        return FirebaseDbHelper.generateNewKey(FirebaseDbHelper.CHILD_NAME_TRACKERS)
+        return DatabaseManager.generateNewKey(DatabaseManager.CHILD_NAME_TRACKERS)
     }
 
     private var currentDbReference: DatabaseReference? = null
@@ -86,7 +86,7 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
         if (old != new) {
             if (old != null) {
                 if (!suspendDatabaseSync) {
-                    FirebaseDbHelper.setContainsFlagOfUser(old.objectId, this.objectId, FirebaseDbHelper.CHILD_NAME_TRACKERS, false)
+                    DatabaseManager.setContainsFlagOfUser(old.objectId, this.objectId, DatabaseManager.CHILD_NAME_TRACKERS, false)
                 }
 
                 removedFromUser.invoke(this, old)
@@ -94,7 +94,7 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
             if (new != null) {
                 if (!suspendDatabaseSync) {
                     databasePointRef?.child("user")?.setValue(new.objectId)
-                    FirebaseDbHelper.setContainsFlagOfUser(new.objectId, this.objectId, FirebaseDbHelper.CHILD_NAME_TRACKERS, true)
+                    DatabaseManager.setContainsFlagOfUser(new.objectId, this.objectId, DatabaseManager.CHILD_NAME_TRACKERS, true)
                 }
 
                 onReminderAddedSubscription.set(
@@ -290,7 +290,7 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
             }
         }
 
-        currentAttributesDbReference = databasePointRef?.child(FirebaseDbHelper.CHILD_NAME_ATTRIBUTES)
+        currentAttributesDbReference = databasePointRef?.child(DatabaseManager.CHILD_NAME_ATTRIBUTES)
 
         println("attributes reference: ")
         println(currentAttributesDbReference)
@@ -308,7 +308,7 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
                 suspendDatabaseSync = true
                 val attribute = attributes.unObservedList.find { it.objectId == snapshot.key }
                 if (attribute != null) {
-                    val pojo = snapshot.getValue(FirebaseDbHelper.AttributePOJO::class.java)
+                    val pojo = snapshot.getValue(DatabaseManager.AttributePOJO::class.java)
                     if (pojo != null) {
                         attribute.suspendDatabaseSync = true
 
@@ -330,7 +330,7 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
                     suspendDatabaseSync = true
                     val attrId = snapshot.key
                     if (attributes.unObservedList.find { it.objectId == attrId } == null) {
-                        val pojo = snapshot.getValue(FirebaseDbHelper.AttributePOJO::class.java)
+                        val pojo = snapshot.getValue(DatabaseManager.AttributePOJO::class.java)
                         if (pojo != null && pojo.type != null) {
                             attributes.addAt(OTAttribute.Companion.createAttribute(snapshot.key, pojo), pojo.position)
                         }
@@ -427,7 +427,7 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
             _removedAttributeIds.removeAll { it == new.objectId }*/
 
         if (!suspendDatabaseSync)
-            FirebaseDbHelper.saveAttribute(this.objectId, new, index)
+            DatabaseManager.saveAttribute(this.objectId, new, index)
 
         attributeAdded.invoke(this, ReadOnlyPair(new, index))
     }
@@ -441,7 +441,7 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
 
         attributeRemoved.invoke(this, ReadOnlyPair(attribute, index))
         if (!suspendDatabaseSync) {
-            FirebaseDbHelper.removeAttribute(objectId, attribute.objectId)
+            DatabaseManager.removeAttribute(objectId, attribute.objectId)
         }
     }
 

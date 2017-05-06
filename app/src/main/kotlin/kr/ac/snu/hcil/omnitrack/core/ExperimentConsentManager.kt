@@ -9,7 +9,7 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
+import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.experiment.ExperimentSignInActivity
 
 /**
@@ -46,7 +46,7 @@ object ExperimentConsentManager {
         mActivity = activity
         mResultListener = resultListener
 
-        FirebaseDbHelper.experimentProfileRef?.addListenerForSingleValueEvent(object : ValueEventListener {
+        DatabaseManager.experimentProfileRef?.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError?) {
                 println("Db Error: ${p0?.message}")
                 mResultListener?.onConsentFailed()
@@ -73,7 +73,7 @@ object ExperimentConsentManager {
         if (requestCode == REQUEST_CODE_EXPERIMENT_SIGN_IN) {
             if (resultCode != AppCompatActivity.RESULT_OK || data == null) {
                 if (deleteAccountIfDenied) {
-                    //FirebaseDbHelper.experimentProfileRef?.removeValue()
+                    //DatabaseManager.experimentProfileRef?.removeValue()
 
                     OTAuthManager.deleteUser(object : OTAuthManager.SignInResultsHandler {
                         override fun onCancel() {
@@ -100,7 +100,7 @@ object ExperimentConsentManager {
                 profile.gender = data.getStringExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_GENDER)
                 profile.purposes = data.getStringArrayListExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_PURPOSES)
 
-                val currentExpRef = FirebaseDbHelper.experimentProfileRef
+                val currentExpRef = DatabaseManager.experimentProfileRef
                 currentExpRef?.setValue(profile, DatabaseReference.CompletionListener { databaseError, databaseReference ->
                     if (databaseError == null) {
                         mResultListener?.onConsentApproved()

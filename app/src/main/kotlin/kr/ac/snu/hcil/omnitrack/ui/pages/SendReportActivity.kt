@@ -11,7 +11,7 @@ import butterknife.bindView
 import com.jaredrummler.materialspinner.MaterialSpinner
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
+import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 
@@ -130,7 +130,7 @@ class SendReportActivity : MultiButtonActionBarActivity(R.layout.activity_send_r
 
                 println(inquiry)
 
-                FirebaseDbHelper.dbRef?.child("inquiries")?.push()?.setValue(inquiry)?.addOnCompleteListener {
+                DatabaseManager.dbRef?.child("inquiries")?.push()?.setValue(inquiry)?.addOnCompleteListener {
                     task ->
                     if (task.isSuccessful) {
                         Toast.makeText(this, getString(R.string.msg_send_report_success_message), Toast.LENGTH_SHORT).show()

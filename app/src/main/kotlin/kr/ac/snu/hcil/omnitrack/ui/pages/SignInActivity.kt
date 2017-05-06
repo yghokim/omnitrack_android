@@ -20,7 +20,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.ExperimentConsentManager
 import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
+import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import rx.internal.util.SubscriptionList
@@ -143,7 +143,7 @@ class SignInActivity : AppCompatActivity() {
 
             ExperimentConsentManager.startProcess(this@SignInActivity, OTAuthManager.userId!!, object : ExperimentConsentManager.ResultListener {
                     override fun onConsentApproved() {
-                        val activatedRef = FirebaseDbHelper.currentUserRef?.child("examples_generated")
+                        val activatedRef = DatabaseManager.currentUserRef?.child("examples_generated")
                         activatedRef?.addListenerForSingleValueEvent(object : ValueEventListener {
                             override fun onCancelled(error: DatabaseError?) {
                                 goHomeActivity()

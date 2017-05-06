@@ -16,7 +16,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTProperty
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
-import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
+import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.NamedObject
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
@@ -43,10 +43,10 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
     override val databasePointRef: DatabaseReference?
         get() {
             if (tracker != null) {
-                return FirebaseDbHelper.dbRef
-                        ?.child(FirebaseDbHelper.CHILD_NAME_TRACKERS)
+                return DatabaseManager.dbRef
+                        ?.child(DatabaseManager.CHILD_NAME_TRACKERS)
                         ?.child(tracker!!.objectId)
-                        ?.child(FirebaseDbHelper.CHILD_NAME_ATTRIBUTES)
+                        ?.child(DatabaseManager.CHILD_NAME_ATTRIBUTES)
                         ?.child(objectId)
             } else {
                 return null
@@ -56,7 +56,7 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
     override fun makeNewObjectId(): String {
         /*
         if (tracker != null) {
-            return FirebaseDbHelper.generateAttributeKey(tracker!!.objectId)
+            return DatabaseManager.generateAttributeKey(tracker!!.objectId)
         } else return UUID.randomUUID().toString()*/
         return "attr_$localKey"
     }
@@ -144,7 +144,7 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
             return createAttribute(null, tracker.nextAttributeLocalKey(), tracker, columnName, false, typeId, null, null)
         }
 
-        fun createAttribute(attributeId: String, pojo: FirebaseDbHelper.AttributePOJO): OTAttribute<out Any> {
+        fun createAttribute(attributeId: String, pojo: DatabaseManager.AttributePOJO): OTAttribute<out Any> {
             return OTAttribute.createAttribute(
                     attributeId,
                     pojo.localKey,
@@ -331,7 +331,7 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
         propertyValueChanged.invoke(this, args)
         propertyValueChangedSubject.onNext(Pair(this, args))
         if (!suspendDatabaseSync) {
-            databasePointRef?.child(FirebaseDbHelper.CHILD_NAME_ATTRIBUTE_PROPERTIES)?.child(args.key.toString())?.setValue(getProperty<String>(args.key).getSerializedValue())
+            databasePointRef?.child(DatabaseManager.CHILD_NAME_ATTRIBUTE_PROPERTIES)?.child(args.key.toString())?.setValue(getProperty<String>(args.key).getSerializedValue())
         }
     }
 

@@ -8,7 +8,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilder
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
-import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
+import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.utils.isInDozeMode
 import rx.Observable
 import rx.Subscription
@@ -95,7 +95,7 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
                 } else {
                     currentBuilderSubscriptionDict[tracker.objectId] = builder.autoComplete().doOnCompleted { currentBuilderSubscriptionDict.remove(tracker.objectId) }.subscribe({}, {}, {
                         val item = builder.makeItem(source)
-                        FirebaseDbHelper.saveItem(item, tracker) {
+                        DatabaseManager.saveItem(item, tracker) {
                             success ->
                             if (success) {
                                 sendBroadcast(context, OTApplication.BROADCAST_ACTION_BACKGROUND_LOGGING_SUCCEEDED, tracker, item.objectId!!, notify, notificationId)

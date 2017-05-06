@@ -16,7 +16,7 @@ import com.google.firebase.auth.*
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTUser
-import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
+import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.utils.getActivity
 import rx.Observable
 import rx.Single
@@ -255,12 +255,12 @@ object OTAuthManager {
                     authResult ->
                     reloadUserInfo()
 
-                    FirebaseDbHelper.checkHasDeviceId(authResult.user.uid, OTApplication.app.deviceId).flatMap {
+                    DatabaseManager.checkHasDeviceId(authResult.user.uid, OTApplication.app.deviceId).flatMap {
                         hasDevice: Boolean ->
                         if (hasDevice) {
                             Single.just(null)
                         } else {
-                            FirebaseDbHelper.addDeviceInfoToUser(authResult.user.uid, OTApplication.app.deviceId)
+                            DatabaseManager.addDeviceInfoToUser(authResult.user.uid, OTApplication.app.deviceId)
                         }
                     }.subscribeOn(Schedulers.io()).subscribe({
                         info ->
@@ -330,7 +330,7 @@ object OTAuthManager {
     fun signOut() {
         val uid = userId
         if (uid != null) {
-            FirebaseDbHelper.removeDeviceInfo(uid, OTApplication.app.deviceId).subscribe {
+            DatabaseManager.removeDeviceInfo(uid, OTApplication.app.deviceId).subscribe {
                 clearUserInfo()
                 mFirebaseAuth.signOut()
                 Auth.GoogleSignInApi.signOut(mGoogleApiClient)

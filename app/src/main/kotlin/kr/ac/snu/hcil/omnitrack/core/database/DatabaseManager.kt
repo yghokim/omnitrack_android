@@ -5,6 +5,7 @@ import android.net.Uri
 import android.support.annotation.Keep
 import com.google.firebase.database.*
 import com.google.firebase.iid.FirebaseInstanceId
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
@@ -16,7 +17,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.DatabaseHelper.Companion.SAVE_RESU
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.services.OTFirebaseUploadService
-import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Observable
 import rx.Single
@@ -27,7 +27,7 @@ import java.util.*
 /**
  * Created by younghokim on 2017. 2. 9..
  */
-object FirebaseDbHelper {
+object DatabaseManager {
 
     enum class Order {ASC, DESC }
 
@@ -537,7 +537,7 @@ object FirebaseDbHelper {
         println("save tracker: ${tracker.name}, ${tracker.objectId}")
 
         if (tracker.owner != null) {
-            FirebaseDbHelper.setContainsFlagOfUser(tracker.owner!!.objectId, tracker.objectId, FirebaseDbHelper.CHILD_NAME_TRACKERS, true)
+            DatabaseManager.setContainsFlagOfUser(tracker.owner!!.objectId, tracker.objectId, DatabaseManager.CHILD_NAME_TRACKERS, true)
         }
         val values = TrackerPOJO()
         values.name = tracker.name
@@ -743,11 +743,34 @@ object FirebaseDbHelper {
 
     }
 
+    fun getItemListRefDuring(tracker: OTTracker, from: Long, to: Long): Query? {
+        return getItemListOfTrackerChild(tracker.objectId)
+                ?.orderByChild("timestamp")
+                ?.startAt(from.toDouble(), "timestamp")
+                ?.endAt(to.toDouble(), "timestamp")
+    }
+
+    fun getItemListRefOfDay(tracker: OTTracker, pivot: Long): Query? {
+        val cal = Calendar.getInstance()
+        cal.timeInMillis = pivot
+        cal.set(Calendar.HOUR_OF_DAY, 0)
+        cal.set(Calendar.MINUTE, 0)
+        cal.set(Calendar.SECOND, 0)
+        cal.set(Calendar.MILLISECOND, 0)
+
+        val first = cal.timeInMillis
+
+        cal.add(Calendar.DAY_OF_YEAR, 1)
+        val second = cal.timeInMillis - 20
+
+        return getItemListRefDuring(tracker, first, second)
+    }
+
     fun getLogCountDuring(tracker: OTTracker, from: Long, to: Long): Observable<Long> {
         return Observable.create {
             subscriber ->
-            getItemListOfTrackerChild(tracker.objectId)?.orderByChild("timestamp")?.startAt(from.toDouble(), "timestamp")?.endAt(to.toDouble(), "timestamp")
-                    ?.addListenerForSingleValueEvent(object : ValueEventListener {
+            getItemListRefDuring(tracker, from, to)
+                    ?.addValueEventListener(object : ValueEventListener {
                         override fun onCancelled(p0: DatabaseError) {
                             p0.toException().printStackTrace()
                             if (!subscriber.isUnsubscribed) {
@@ -759,7 +782,6 @@ object FirebaseDbHelper {
                             println("item count: ${snapshot.childrenCount}")
                             if (!subscriber.isUnsubscribed) {
                                 subscriber.onNext(snapshot.childrenCount)
-                                subscriber.onCompleted()
                             }
                         }
                     })
@@ -806,7 +828,7 @@ object FirebaseDbHelper {
                         }
                     })*/
             getItemListContainerOfTrackerChild(tracker.objectId)?.child("item_count")
-                    ?.addListenerForSingleValueEvent(object : ValueEventListener {
+                    ?.addValueEventListener(object : ValueEventListener {
                         override fun onCancelled(p0: DatabaseError) {
                             p0.toException().printStackTrace()
                             if (!subscriber.isUnsubscribed) {
@@ -816,16 +838,11 @@ object FirebaseDbHelper {
 
                         override fun onDataChange(snapshot: DataSnapshot) {
                             val value = snapshot.value
-                            println("item count: $value")
-                            val longValue = (value as? Int)?.toLong() ?: if (value is Long) {
-                                value
-                            } else null
-                            if (longValue != null) {
+                            println("item count of ${tracker.name}: $value")
+                            val longValue = (value as? Int)?.toLong() ?: (value as? Long ?: 0)
                                 if (!subscriber.isUnsubscribed) {
                                     subscriber.onNext(longValue)
-                                    subscriber.onCompleted()
                                 }
-                            }
                         }
                     })
         }
@@ -835,7 +852,7 @@ object FirebaseDbHelper {
         return Observable.create {
             subscriber ->
             getItemListOfTrackerChild(tracker.objectId)?.orderByChild("timestamp")?.limitToLast(1)
-                    ?.addListenerForSingleValueEvent(object : ValueEventListener {
+                    ?.addValueEventListener(object : ValueEventListener {
                         override fun onCancelled(p0: DatabaseError) {
                             p0.toException().printStackTrace()
                             if (!subscriber.isUnsubscribed) {
@@ -844,7 +861,7 @@ object FirebaseDbHelper {
                         }
 
                         override fun onDataChange(snapshot: DataSnapshot) {
-                            println("latest log count: ${snapshot.childrenCount}")
+                            println("latest log count of ${tracker.name}: ${snapshot.childrenCount}")
                             if (!subscriber.isUnsubscribed) {
                                 if (snapshot.exists()) {
                                     val timestamp = snapshot.children.last().child("timestamp").value
@@ -853,10 +870,8 @@ object FirebaseDbHelper {
                                     } else if (timestamp is Int) {
                                         subscriber.onNext(timestamp.toLong())
                                     } else subscriber.onNext(null)
-                                    subscriber.onCompleted()
                                 } else {
                                     subscriber.onNext(null)
-                                    subscriber.onCompleted()
                                 }
                             }
                         }
@@ -864,6 +879,7 @@ object FirebaseDbHelper {
         }
     }
 
+    /*
     fun getItemListSummary(tracker: OTTracker): Observable<ItemListSummary> {
         return Observable.create {
             subscriber ->
@@ -898,20 +914,19 @@ object FirebaseDbHelper {
                         }
 
                         subscriber.onNext(info)
-                        subscriber.onCompleted()
                     }
                 }
             }
 
-            val query = getItemListOfTrackerChild(tracker.objectId)?.orderByChild("timestamp")
+            val query = getItemListRefOfDay(tracker, System.currentTimeMillis())
 
-            query?.addListenerForSingleValueEvent(eventListener)
+            query?.addValueEventListener(eventListener)
 
             subscriber.add(Subscriptions.create {
                 query?.removeEventListener(eventListener)
             })
         }
-    }
+    }*/
 
     fun saveItem(item: OTItem, tracker: OTTracker, notifyIntent: Boolean = true, finished: ((Boolean) -> Unit)? = null) {
 
@@ -934,75 +949,39 @@ object FirebaseDbHelper {
                     )
                 }
             }
-        }
 
-        val pojo = ItemPOJO()
-        pojo.timestamp = if (item.timestamp != -1L) {
-            item.timestamp
-        } else {
-            ServerValue.TIMESTAMP
-        }
-        pojo.sourceType = item.source.ordinal
-        val data = HashMap<String, String>()
-
-        for (attribute in tracker.attributes) {
-            val value = item.getCastedValueOf(attribute)
-            if (value != null) {
-                data[attribute.objectId] = TypeStringSerializationHelper.serialize(attribute.typeNameForSerialization, value)
-            }
-        }
-
-        println("store data ${data}")
-
-        pojo.dataTable = data
-
-        val result = if (item.objectId != null) {
-            SAVE_RESULT_EDIT
-        } else {
-            SAVE_RESULT_NEW
-        }
-
-        itemRef?.setValue(pojo)?.addOnCompleteListener {
-            task ->
-            if (task.isSuccessful) {
-                if (item.objectId == null)
-                    item.objectId = itemRef.key
-
-                if (notifyIntent) {
-                    val intent = Intent(when (result) {
-                        SAVE_RESULT_NEW -> OTApplication.BROADCAST_ACTION_ITEM_ADDED
-                        SAVE_RESULT_EDIT -> OTApplication.BROADCAST_ACTION_ITEM_EDITED
-                        else -> throw IllegalArgumentException("")
-                    })
-
-                    intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
-                    intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, item.objectId)
-
-                    OTApplication.app.sendBroadcast(intent)
-                }
-
-                finished?.invoke(true)
+            val pojo = ItemPOJO()
+            pojo.timestamp = if (item.timestamp != -1L) {
+                item.timestamp
             } else {
-                finished?.invoke(false)
+                ServerValue.TIMESTAMP
             }
-        }
+            pojo.sourceType = item.source.ordinal
+            val data = HashMap<String, String>()
 
-        /*
-        * val values = ContentValues()
+            for (attribute in tracker.attributes) {
+                val value = item.getCastedValueOf(attribute)
+                if (value != null) {
+                    data[attribute.objectId] = TypeStringSerializationHelper.serialize(attribute.typeNameForSerialization, value)
+                }
+            }
 
-        //values.put(ItemScheme.TRACKER_ID, tracker.objectId)
-        values.put(ItemScheme.SOURCE_TYPE, item.source.ordinal)
-        values.put(ItemScheme.VALUES_JSON, item.getSerializedValueTable(tracker))
-        if (item.timestamp != -1L) {
-            values.put(ItemScheme.LOGGED_AT, item.timestamp)
-        }
+            println("store data ${data}")
 
-        println("item id: ${item.objectId}")
+            pojo.dataTable = data
 
-        val result = saveObject(item, values, ItemScheme)
+            val result = if (item.objectId != null) {
+                SAVE_RESULT_EDIT
+            } else {
+                SAVE_RESULT_NEW
+            }
 
-        if(result != SAVE_RESULT_FAIL) {
-            if(notifyIntent) {
+            itemRef.setValue(pojo)
+
+            if (item.objectId == null)
+                item.objectId = itemId
+
+            if (notifyIntent) {
                 val intent = Intent(when (result) {
                     SAVE_RESULT_NEW -> OTApplication.BROADCAST_ACTION_ITEM_ADDED
                     SAVE_RESULT_EDIT -> OTApplication.BROADCAST_ACTION_ITEM_EDITED
@@ -1014,17 +993,13 @@ object FirebaseDbHelper {
 
                 OTApplication.app.sendBroadcast(intent)
             }
-            return result
-        }
-        else{
-            println("Item insert failed - $item")
-            return result
-        }*/
 
+            finished?.invoke(true)
+        } else finished?.invoke(false)
     }
 
     fun checkHasDeviceId(userId: String, deviceId: String): Single<Boolean> {
-        val query = FirebaseDbHelper.dbRef?.child(FirebaseDbHelper.CHILD_NAME_USERS)?.child(userId)?.child("devices")?.child(deviceId)
+        val query = DatabaseManager.dbRef?.child(DatabaseManager.CHILD_NAME_USERS)?.child(userId)?.child("devices")?.child(deviceId)
         if (query != null) {
             return Single.create {
                 subscriber ->
@@ -1051,11 +1026,11 @@ object FirebaseDbHelper {
     }
 
     fun getDeviceInfoChild(): DatabaseReference? {
-        return FirebaseDbHelper.currentUserRef?.child("devices")?.child(OTApplication.app.deviceId)
+        return DatabaseManager.currentUserRef?.child("devices")?.child(OTApplication.app.deviceId)
     }
 
     fun addDeviceInfoToUser(userId: String, deviceId: String): Single<DeviceInfo> {
-        val query = FirebaseDbHelper.dbRef?.child(FirebaseDbHelper.CHILD_NAME_USERS)?.child(userId)?.child("devices")
+        val query = DatabaseManager.dbRef?.child(DatabaseManager.CHILD_NAME_USERS)?.child(userId)?.child("devices")
         if (query != null) {
             return Single.create {
                 subscriber ->
@@ -1089,7 +1064,7 @@ object FirebaseDbHelper {
         if (token != null && OTAuthManager.currentSignedInLevel > OTAuthManager.SignedInLevel.NONE) {
             OTApplication.app.systemSharedPreferences.edit().putString(OTApplication.PREFERENCE_KEY_FIREBASE_INSTANCE_ID, token)
                     .apply()
-            FirebaseDbHelper.getDeviceInfoChild()?.child("instanceId")?.setValue(token)
+            DatabaseManager.getDeviceInfoChild()?.child("instanceId")?.setValue(token)
             return true
         } else {
             return false
@@ -1098,7 +1073,7 @@ object FirebaseDbHelper {
     }
 
     fun removeDeviceInfo(userId: String, deviceId: String): Single<Boolean> {
-        val query = FirebaseDbHelper.dbRef?.child(FirebaseDbHelper.CHILD_NAME_USERS)?.child(userId)?.child("devices")
+        val query = DatabaseManager.dbRef?.child(DatabaseManager.CHILD_NAME_USERS)?.child(userId)?.child("devices")
         if (query != null) {
             return Single.create {
                 subscriber ->

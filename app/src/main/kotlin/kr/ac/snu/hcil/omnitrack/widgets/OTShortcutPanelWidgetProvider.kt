@@ -8,7 +8,7 @@ import android.content.Intent
 import android.os.Bundle
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTItem
-import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
+import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemEditingActivity
 
@@ -43,12 +43,12 @@ class OTShortcutPanelWidgetProvider : AppWidgetProvider() {
 
     override fun onEnabled(context: Context?) {
         super.onEnabled(context)
-        FirebaseDbHelper.setUsedAppWidget(WIDGET_NAME, true)
+        DatabaseManager.setUsedAppWidget(WIDGET_NAME, true)
     }
 
     override fun onDisabled(context: Context?) {
         super.onDisabled(context)
-        FirebaseDbHelper.setUsedAppWidget(WIDGET_NAME, false)
+        DatabaseManager.setUsedAppWidget(WIDGET_NAME, false)
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -94,7 +94,7 @@ class OTShortcutPanelWidgetProvider : AppWidgetProvider() {
 
         context.startService(intent)
         super.onUpdate(context, appWidgetManager, appWidgetIds)
-        FirebaseDbHelper.setUsedAppWidget(WIDGET_NAME, true)
+        DatabaseManager.setUsedAppWidget(WIDGET_NAME, true)
 
     }
 
