@@ -588,14 +588,18 @@ object DatabaseManager {
     }
 
     fun removeItem(trackerId: String, itemId: String) {
-        getItemListOfTrackerChild(trackerId)?.child(itemId)?.removeValue { databaseError, databaseReference ->
-            if (databaseError == null) {
-                val intent = Intent(OTApplication.BROADCAST_ACTION_ITEM_REMOVED)
+        val itemRef = getItemListOfTrackerChild(trackerId)?.child(itemId)
 
-                intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
+        if (itemRef != null) {
+            ItemCountTracer.setCounterCache(trackerId, ItemCountTracer.getCachedCount(trackerId) - 1, System.currentTimeMillis())
 
-                OTApplication.app.sendBroadcast(intent)
-            }
+            itemRef.removeValue()
+
+            val intent = Intent(OTApplication.BROADCAST_ACTION_ITEM_REMOVED)
+
+            intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
+
+            OTApplication.app.sendBroadcast(intent)
         }
     }
 
@@ -779,7 +783,6 @@ object DatabaseManager {
                         }
 
                         override fun onDataChange(snapshot: DataSnapshot) {
-                            println("item count: ${snapshot.childrenCount}")
                             if (!subscriber.isUnsubscribed) {
                                 subscriber.onNext(snapshot.childrenCount)
                             }
@@ -806,7 +809,7 @@ object DatabaseManager {
         return getLogCountDuring(tracker, first, second)
     }
 
-    fun getTotalItemCount(tracker: OTTracker): Observable<Long> {
+    fun getTotalItemCount(tracker: OTTracker): Observable<Pair<Long, Long>> {
         return Observable.create {
             subscriber ->
             /*
@@ -837,12 +840,15 @@ object DatabaseManager {
                         }
 
                         override fun onDataChange(snapshot: DataSnapshot) {
-                            val value = snapshot.value
-                            println("item count of ${tracker.name}: $value")
-                            val longValue = (value as? Int)?.toLong() ?: (value as? Long ?: 0)
+                            if (snapshot.exists()) {
+                                val countValue = snapshot.child("count").value
+                                val updatedAtValue = snapshot.child("updated_at").value
+                                val count = (countValue as? Int)?.toLong() ?: (countValue as? Long ?: 0)
+                                val updatedAt = (updatedAtValue as? Int)?.toLong() ?: (updatedAtValue as? Long ?: 0)
                                 if (!subscriber.isUnsubscribed) {
-                                    subscriber.onNext(longValue)
+                                    subscriber.onNext(Pair(count, updatedAt))
                                 }
+                            }
                         }
                     })
         }
@@ -861,7 +867,6 @@ object DatabaseManager {
                         }
 
                         override fun onDataChange(snapshot: DataSnapshot) {
-                            println("latest log count of ${tracker.name}: ${snapshot.childrenCount}")
                             if (!subscriber.isUnsubscribed) {
                                 if (snapshot.exists()) {
                                     val timestamp = snapshot.children.last().child("timestamp").value
@@ -977,6 +982,10 @@ object DatabaseManager {
             }
 
             itemRef.setValue(pojo)
+
+            if (result == SAVE_RESULT_NEW) {
+                ItemCountTracer.setCounterCache(tracker.objectId, ItemCountTracer.getCachedCount(tracker.objectId) + 1, System.currentTimeMillis())
+            }
 
             if (item.objectId == null)
                 item.objectId = itemId

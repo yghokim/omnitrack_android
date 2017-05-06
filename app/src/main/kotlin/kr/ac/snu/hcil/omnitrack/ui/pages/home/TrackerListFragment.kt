@@ -55,7 +55,9 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.visualization.ChartViewActivity
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
+import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kr.ac.snu.hcil.omnitrack.utils.startActivityOnDelay
+import rx.internal.util.SubscriptionList
 import rx.subscriptions.CompositeSubscription
 import java.text.SimpleDateFormat
 import java.util.*
@@ -128,7 +130,7 @@ class TrackerListFragment : OTFragment() {
     private val createViewSubscriptions: CompositeSubscription = CompositeSubscription()
     private val resumeSubscriptions: CompositeSubscription = CompositeSubscription()
 
-    private val itemCountTracers = HashMap<String, ItemCountTracer>()
+    private val itemStatisticsDict = HashMap<String, ItemStatisticsUnit>()
 
     companion object {
         const val CHANGE_TRACKER_SETTINGS = 0
@@ -178,9 +180,10 @@ class TrackerListFragment : OTFragment() {
     override fun onResume() {
         super.onResume()
 
-        context.registerReceiver(itemEventReceiver, itemEventIntentFilter)
+
+        //context.registerReceiver(itemEventReceiver, itemEventIntentFilter)
         trackerListAdapter.notifyDataSetChanged()
-        itemCountTracers.forEach { key, tracer -> tracer.register() }
+        itemStatisticsDict.forEach { (key, tracer) -> tracer.register() }
 
     }
 
@@ -213,19 +216,27 @@ class TrackerListFragment : OTFragment() {
 
         listView.adapter = trackerListAdapter
 
-        val activity = activity
+        val activity = activity as? OTActivity
         if (activity != null) {
-            if (activity is OTActivity) {
                 createViewSubscriptions.add(
                         activity.signedInUserObservable.subscribe {
                             user ->
                             println("OMNITRACK trackerListFragment received user instance! : ${user.trackers.size} trackers")
                             this.user = user
                             userLoaded = true
+
+                            itemStatisticsDict.forEach { (key, value) -> value.unregister() }
+                            itemStatisticsDict.clear()
+                            user.trackers.unObservedList.forEach {
+                                tracker ->
+                                itemStatisticsDict.put(tracker.objectId, ItemStatisticsUnit(tracker).apply { this.register() })
+                            }
+
                             trackerListAdapter.notifyDataSetChanged()
                             createViewSubscriptions.add(
                                     this.user.trackerAdded.subscribe {
                                         trackerPair ->
+                                        itemStatisticsDict.put(trackerPair.first.objectId, ItemStatisticsUnit(trackerPair.first).apply { this.register() })
                                         trackerListAdapter.notifyItemChanged(trackerListAdapter.itemCount - 1)
                                         trackerListAdapter.notifyItemInserted(trackerPair.second)
                                     }
@@ -234,12 +245,14 @@ class TrackerListFragment : OTFragment() {
                             createViewSubscriptions.add(
                                     this.user.trackerRemoved.subscribe {
                                         trackerPair ->
+                                        itemStatisticsDict[trackerPair.first.objectId]?.unregister()
+                                        itemStatisticsDict.remove(trackerPair.first.objectId)
                                         trackerListAdapter.notifyItemChanged(trackerListAdapter.itemCount - 1)
                                         trackerListAdapter.notifyItemRemoved(trackerPair.second)
                                     }
                             )
-                        })
-            }
+                        }
+                )
         }
 
         return rootView
@@ -298,12 +311,11 @@ class TrackerListFragment : OTFragment() {
         }
         trackerListAdapter.viewHolders.clear()
 
-        context.unregisterReceiver(itemEventReceiver)
+        //context.unregisterReceiver(itemEventReceiver)
 
-        for (tracer in itemCountTracers) {
+        for (tracer in itemStatisticsDict) {
             tracer.value.unregister()
         }
-        itemCountTracers.clear()
     }
 
     /*
@@ -619,41 +631,33 @@ class TrackerListFragment : OTFragment() {
                             setTotalItemCount(count ?: 0)
                         }
                 )*/
-                val countTracer = if (itemCountTracers[tracker.objectId] != null) {
-                    itemCountTracers[tracker.objectId]!!
-                } else {
-                    val newInstance = ItemCountTracer(tracker)
-                    itemCountTracers.put(tracker.objectId, newInstance)
-                    newInstance
+                val itemStatisticsUnit = itemStatisticsDict[tracker.objectId]
+                if (itemStatisticsUnit != null) {
+                    itemStatisticsUnit.onTotalItemCountChanged.clear()
+                    itemStatisticsUnit.onLastLoggingTimeChanged.clear()
+                    itemStatisticsUnit.onTodayCountChanged.clear()
+
+                    itemStatisticsUnit.refresh()
+
+                    itemStatisticsUnit.onTotalItemCountChanged += {
+                        sender, count ->
+                        setTotalItemCount(count ?: 0)
+                    }
+                    setTotalItemCount(itemStatisticsUnit.totalItemCount ?: 0)
+
+
+                    itemStatisticsUnit.onLastLoggingTimeChanged += {
+                        sender, time ->
+                        setLastLoggingTime(time)
+                    }
+                    setLastLoggingTime(itemStatisticsUnit.lastLoggingTime)
+
+                    itemStatisticsUnit.onTodayCountChanged += {
+                        sender, count ->
+                        setTodayLoggingCount(count ?: 0)
+                    }
+                    setTodayLoggingCount(itemStatisticsUnit.todayCount ?: 0)
                 }
-                if (!countTracer.isRegistered) {
-                    println("register new count tracer")
-                    countTracer.register()
-                }
-
-                subscriptions.add(
-                        countTracer.itemCountObservable.subscribe {
-                            count ->
-                            println("tracer total count updated: ${count}")
-                            setTotalItemCount(count ?: 0)
-                        }
-                )
-                countTracer.notifyConnected()
-
-                subscriptions.add(
-                        DatabaseManager.getLogCountOfDay(tracker).subscribe {
-                            count ->
-                            setTodayLoggingCount(count ?: 0)
-                        }
-                )
-
-                subscriptions.add(
-                        DatabaseManager.getLastLoggingTime(tracker).subscribe {
-                            time ->
-                            setLastLoggingTime(time)
-                        }
-                )
-
 
                 subscriptions.add(
                         tracker.colorChanged.subscribe {
@@ -772,5 +776,79 @@ class TrackerListFragment : OTFragment() {
             }
         }
 
+    }
+
+    inner class ItemStatisticsUnit(val tracker: OTTracker) {
+        var totalItemCount: Long? = null
+            set(value) {
+                if (field != value) {
+                    field = value
+                    onTotalItemCountChanged.invoke(this, value)
+                }
+            }
+
+        var todayCount: Long? = null
+            set(value) {
+                if (field != value) {
+                    field = value
+                    onTodayCountChanged.invoke(this, value)
+                }
+            }
+
+        var lastLoggingTime: Long? = null
+            set(value) {
+                if (field != value) {
+                    field = value
+                    onLastLoggingTimeChanged.invoke(this, value)
+                }
+            }
+
+        val countTracer: ItemCountTracer = ItemCountTracer(tracker)
+
+        val subscriptions = SubscriptionList()
+
+        val onTotalItemCountChanged = Event<Long?>()
+        val onTodayCountChanged = Event<Long?>()
+        val onLastLoggingTimeChanged = Event<Long?>()
+
+        init {
+        }
+
+        fun refresh() {
+            countTracer.notifyConnected()
+        }
+
+        fun register() {
+            subscriptions.add(
+                    countTracer.itemCountObservable.subscribe {
+                        count ->
+                        totalItemCount = count
+                    }
+            )
+
+            subscriptions.add(
+                    DatabaseManager.getLogCountOfDay(tracker).subscribe {
+                        count ->
+                        todayCount = count
+                    }
+            )
+
+            subscriptions.add(
+                    DatabaseManager.getLastLoggingTime(tracker).subscribe {
+                        time ->
+                        lastLoggingTime = time
+                    }
+            )
+
+            countTracer.register()
+            countTracer.notifyConnected()
+        }
+
+        fun unregister() {
+            if (countTracer.isRegistered)
+                countTracer.unregister()
+
+            subscriptions.clear()
+        }
     }
 }
