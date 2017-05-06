@@ -22,8 +22,8 @@ android {
         applicationId "kr.ac.snu.hcil.omnitrack"
         minSdkVersion 19
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 15
-        versionName "1.0.3.8 beta"
+        versionCode 16
+        versionName "1.0.3.9 beta"
         //multidex support
         multiDexEnabled true
     }
