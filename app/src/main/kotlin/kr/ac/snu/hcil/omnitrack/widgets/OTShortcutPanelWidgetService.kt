@@ -13,7 +13,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
-import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
+import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 import java.text.SimpleDateFormat
 import java.util.*
@@ -91,23 +91,30 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
 
         override fun getViewAt(position: Int): RemoteViews? {
             val tracker = trackers[position]
-                val itemSummary = FirebaseDbHelper.getItemListSummary(tracker).first().toBlocking().first()
+            var lastLoggingTime: Long? = null
+            var todayCount: Long? = null
+
+            val totalItemCount = DatabaseManager.getTotalItemCount(tracker).first().toBlocking().first()
+            if (totalItemCount != 0L) {
+                lastLoggingTime = DatabaseManager.getLastLoggingTime(tracker).first().toBlocking().first()
+                todayCount = DatabaseManager.getLogCountOfDay(tracker).first().toBlocking().first()
+            }
 
                 val rv = RemoteViews(context.packageName, R.layout.remoteview_widget_shortcut_list_element)
 
                 rv.setTextViewText(R.id.ui_tracker_name, tracker.name)
 
-                if (itemSummary.lastLoggingTime == null) {
+            if (lastLoggingTime == null) {
                     rv.setTextViewText(R.id.ui_text_statistics, context.getString(R.string.msg_never_logged))
                 } else {
                     val text = StringBuilder()
 
-                    itemSummary.todayCount?.let {
+                todayCount?.let {
                         text.append(context.getString(R.string.msg_todays_log)).append(": ").append(it)
                                 .append("\n")
                     }
 
-                    itemSummary.lastLoggingTime?.let {
+                lastLoggingTime.let {
                         val dateText = TimeHelper.getDateText(it, context)
                         val timeText = lastLoggedTimeFormat.format(Date(it))
 

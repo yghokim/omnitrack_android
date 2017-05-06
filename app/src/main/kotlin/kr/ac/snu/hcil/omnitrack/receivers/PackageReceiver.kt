@@ -6,7 +6,7 @@ import android.content.Intent
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
+import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckService
 import kr.ac.snu.hcil.omnitrack.widgets.OTShortcutPanelWidgetUpdateService
@@ -35,7 +35,7 @@ class PackageReceiver: BroadcastReceiver() {
                         OTShortcutPanelManager.refreshNotificationShortcutViews(user, context)
                         context.startService(OTShortcutPanelWidgetUpdateService.makeNotifyDatesetChangedIntentToAllWidgets(context))
                         if (OTAuthManager.currentSignedInLevel > OTAuthManager.SignedInLevel.NONE) {
-                            FirebaseDbHelper.getDeviceInfoChild()?.child("appVersion")?.setValue(BuildConfig.VERSION_NAME)
+                            DatabaseManager.getDeviceInfoChild()?.child("appVersion")?.setValue(BuildConfig.VERSION_NAME)
                         }
                     },{})
                     OTVersionCheckService.setupServiceAlarm(context)

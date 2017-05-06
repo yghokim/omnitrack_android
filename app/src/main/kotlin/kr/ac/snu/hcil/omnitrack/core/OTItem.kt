@@ -3,7 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
-import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
+import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.IDatabaseStorable
 import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
@@ -133,7 +133,7 @@ class OTItem : ADataRow, IDatabaseStorable {
         }
     }
 
-    fun overwriteWithPojo(pojo: FirebaseDbHelper.ItemPOJO) {
+    fun overwriteWithPojo(pojo: DatabaseManager.ItemPOJO) {
         this.timestamp = pojo.getTimestamp()
         this.source = OTItem.LoggingSource.values()[pojo.sourceType]
         valueTable.clear()

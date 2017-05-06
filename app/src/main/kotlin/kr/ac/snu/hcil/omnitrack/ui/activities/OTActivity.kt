@@ -16,8 +16,8 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.ExperimentConsentManager
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
+import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.EventLoggingManager
-import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
 import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckService
 import kr.ac.snu.hcil.omnitrack.ui.components.common.time.DurationPicker
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.VersionCheckDialogFragment
@@ -130,7 +130,7 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
         if (OTAuthManager.isUserSignedIn() && NetworkHelper.isConnectedToInternet()) {
             //println("${LOG_TAG} OMNITRACK Google is signed in.")
             if (NetworkHelper.isConnectedToInternet()) {
-                FirebaseDbHelper.refreshInstanceIdToServerIfExists(true)
+                DatabaseManager.refreshInstanceIdToServerIfExists(true)
                 OTAuthManager.refreshCredentialWithFallbackSignIn(this, OmniTrackSignInResultsHandler())
             }
         } else {

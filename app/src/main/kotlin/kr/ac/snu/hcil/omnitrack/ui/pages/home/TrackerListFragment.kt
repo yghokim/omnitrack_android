@@ -36,8 +36,9 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
+import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.EventLoggingManager
-import kr.ac.snu.hcil.omnitrack.core.database.FirebaseDbHelper
+import kr.ac.snu.hcil.omnitrack.core.database.ItemCountTracer
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
@@ -127,6 +128,7 @@ class TrackerListFragment : OTFragment() {
     private val createViewSubscriptions: CompositeSubscription = CompositeSubscription()
     private val resumeSubscriptions: CompositeSubscription = CompositeSubscription()
 
+    private val itemCountTracers = HashMap<String, ItemCountTracer>()
 
     companion object {
         const val CHANGE_TRACKER_SETTINGS = 0
@@ -178,6 +180,8 @@ class TrackerListFragment : OTFragment() {
 
         context.registerReceiver(itemEventReceiver, itemEventIntentFilter)
         trackerListAdapter.notifyDataSetChanged()
+        itemCountTracers.forEach { key, tracer -> tracer.register() }
+
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
@@ -295,6 +299,11 @@ class TrackerListFragment : OTFragment() {
         trackerListAdapter.viewHolders.clear()
 
         context.unregisterReceiver(itemEventReceiver)
+
+        for (tracer in itemCountTracers) {
+            tracer.value.unregister()
+        }
+        itemCountTracers.clear()
     }
 
     /*
@@ -558,7 +567,7 @@ class TrackerListFragment : OTFragment() {
                 }
             }
 
-            private fun setTodayLoggingCount(count: Int) {
+            private fun setTodayLoggingCount(count: Long) {
                 val header = context.resources.getString(R.string.msg_todays_log).toUpperCase()
                 putStatistics(todayLoggingCountView, header, count.toString())
             }
@@ -593,14 +602,58 @@ class TrackerListFragment : OTFragment() {
 
                 subscriptions.clear()
 
+                /*
                 subscriptions.add(
-                        FirebaseDbHelper.getItemListSummary(tracker).subscribe {
+                        DatabaseManager.getItemListSummary(tracker).subscribe {
                             summary ->
                             setLastLoggingTime(summary.lastLoggingTime)
                             setTodayLoggingCount(summary.todayCount ?: 0)
                             setTotalItemCount(summary.totalCount ?: 0)
                         }
+                )*/
+
+                /*
+                subscriptions.add(
+                        DatabaseManager.getTotalItemCount(tracker).subscribe{
+                            count->
+                            setTotalItemCount(count ?: 0)
+                        }
+                )*/
+                val countTracer = if (itemCountTracers[tracker.objectId] != null) {
+                    itemCountTracers[tracker.objectId]!!
+                } else {
+                    val newInstance = ItemCountTracer(tracker)
+                    itemCountTracers.put(tracker.objectId, newInstance)
+                    newInstance
+                }
+                if (!countTracer.isRegistered) {
+                    println("register new count tracer")
+                    countTracer.register()
+                }
+
+                subscriptions.add(
+                        countTracer.itemCountObservable.subscribe {
+                            count ->
+                            println("tracer total count updated: ${count}")
+                            setTotalItemCount(count ?: 0)
+                        }
                 )
+                countTracer.notifyConnected()
+
+                subscriptions.add(
+                        DatabaseManager.getLogCountOfDay(tracker).subscribe {
+                            count ->
+                            setTodayLoggingCount(count ?: 0)
+                        }
+                )
+
+                subscriptions.add(
+                        DatabaseManager.getLastLoggingTime(tracker).subscribe {
+                            time ->
+                            setLastLoggingTime(time)
+                        }
+                )
+
 
                 subscriptions.add(
                         tracker.colorChanged.subscribe {
@@ -630,7 +683,7 @@ class TrackerListFragment : OTFragment() {
 
                 /*
                 subscriptions.add(
-                        FirebaseDbHelper.getLastLoggingTime(tracker).observeOn(AndroidSchedulers.mainThread()).subscribe {
+                        DatabaseManager.getLastLoggingTime(tracker).observeOn(AndroidSchedulers.mainThread()).subscribe {
                             timestamp ->
 
                     }
@@ -638,7 +691,7 @@ class TrackerListFragment : OTFragment() {
 
 
                 subscriptions.add(
-                        FirebaseDbHelper.getLogCountOfDay(tracker).observeOn(AndroidSchedulers.mainThread()).subscribe {
+                        DatabaseManager.getLogCountOfDay(tracker).observeOn(AndroidSchedulers.mainThread()).subscribe {
                             count ->
                             println("log count of day: $count")
                             val header = context.resources.getString(R.string.msg_todays_log).toUpperCase()
@@ -647,7 +700,7 @@ class TrackerListFragment : OTFragment() {
                 )
 
                 subscriptions.add(
-                        FirebaseDbHelper.getTotalItemCount(tracker).observeOn(AndroidSchedulers.mainThread()).subscribe {
+                        DatabaseManager.getTotalItemCount(tracker).observeOn(AndroidSchedulers.mainThread()).subscribe {
                             count ->
 
                             println("log count total: $count")
