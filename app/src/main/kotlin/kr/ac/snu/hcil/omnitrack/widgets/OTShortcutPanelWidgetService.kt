@@ -94,7 +94,7 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
             var lastLoggingTime: Long? = null
             var todayCount: Long? = null
 
-            val totalItemCount = DatabaseManager.getTotalItemCount(tracker).first().toBlocking().first()
+            val totalItemCount = DatabaseManager.getTotalItemCount(tracker).first().toBlocking().first().first
             if (totalItemCount != 0L) {
                 lastLoggingTime = DatabaseManager.getLastLoggingTime(tracker).first().toBlocking().first()
                 todayCount = DatabaseManager.getLogCountOfDay(tracker).first().toBlocking().first()

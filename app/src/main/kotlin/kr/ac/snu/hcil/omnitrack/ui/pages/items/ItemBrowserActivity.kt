@@ -787,7 +787,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                                     dialogSubscriptions.add(
                                             DatabaseManager.getTotalItemCount(tracker!!).subscribe {
                                                 count ->
-                                                if (count > 0) {
+                                                if (count.first > 0) {
                                                     deletionMenuItem.description = "Item count: ${count}"
                                                     deletionMenuItem.isEnabled = true
 
