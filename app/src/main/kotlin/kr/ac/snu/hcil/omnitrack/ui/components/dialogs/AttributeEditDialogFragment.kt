@@ -144,6 +144,7 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
 
                     if (valueView != null) {
                         valueView?.onCreate(savedInstanceState)
+                        valueView?.onResume()
                         if (this.container.getChildAt(0) !== valueView) {
                             this.container.removeAllViewsInLayout()
                             this.container.addView(valueView)

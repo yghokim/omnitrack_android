@@ -330,6 +330,13 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        for (inputView in attributeListAdapter.inputViews) {
+            inputView.onResume()
+        }
+    }
+
     override fun onToolbarLeftButtonClicked() {
         //back button
         itemSaved = false
