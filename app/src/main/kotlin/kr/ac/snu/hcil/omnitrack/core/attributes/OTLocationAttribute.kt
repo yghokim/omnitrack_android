@@ -15,6 +15,7 @@ import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelpe
 import pl.charmas.android.reactivelocation.ReactiveLocationProvider
 import rx.Observable
 import rx.Single
+import java.util.concurrent.TimeUnit
 
 
 /**
@@ -49,23 +50,31 @@ class OTLocationAttribute(objectId: String?, localKey: Int?, parentTracker: OTTr
 
     override fun getAutoCompleteValue(): Observable<LatLng> {
         return Observable.defer {
+            val locationProvider = ReactiveLocationProvider(OTApplication.app)
+
             val request = LocationRequest.create() //standard GMS LocationRequest
                     .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                     .setNumUpdates(NUM_UPDATES)
                     .setInterval(100)
+                    .setMaxWaitTime(500)
+                    .setExpirationDuration(2000)
 
-            val locationProvider = ReactiveLocationProvider(OTApplication.app)
-
-            var count = 0
-
-            locationProvider.getUpdatedLocation(request).doOnNext {
-                count++
-            }.map {
+            locationProvider.getUpdatedLocation(request).map {
                 location ->
-                println("location update - ${count}")
                 LatLng(location?.latitude ?: 0.0, location?.longitude ?: 0.0)
-            }.takeUntil { count == NUM_UPDATES }.last()
+            }.timeout(2L, TimeUnit.SECONDS, locationProvider.lastKnownLocation.map { location -> LatLng(location?.latitude ?: 0.0, location?.longitude ?: 0.0) }).first()
         }
+
+        /*
+        Observable.defer{
+            val locationProvider = ReactiveLocationProvider(OTApplication.app)
+            locationProvider.lastKnownLocation.first().map{
+                location ->
+                println("last known position")
+                LatLng(location?.latitude ?: 0.0, location?.longitude ?: 0.0)
+            }
+        }
+        */
     }
 
 

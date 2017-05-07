@@ -297,10 +297,12 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
     }
 
     override fun onResume() {
+        println("resume map view")
         mapView.onResume()
     }
 
     override fun onPause() {
+        println("pause map view")
         mapView.onPause()
     }
 
