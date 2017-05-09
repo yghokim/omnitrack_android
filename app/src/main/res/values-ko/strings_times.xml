@@ -98,7 +98,7 @@
     <string name="saturday_oneletter">토</string>
 
     <string name="granularity_day">일</string>
-    <string name="granularity_week">주</string>
+    <string name="granularity_week">1주</string>
 
     <string name="granularity_week_2">지난 2주</string>
     <string name="granularity_week_4">지난 4주</string>

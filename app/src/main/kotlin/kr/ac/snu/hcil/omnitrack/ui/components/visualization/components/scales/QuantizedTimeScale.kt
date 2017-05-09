@@ -167,8 +167,6 @@ class QuantizedTimeScale : IAxisScale<Long> {
             calendarCache.add(calendarLevel, every)
             current = calendarCache.timeInMillis
         }
-
-        println("binPoints: ${domainBinPoints}")
     }
 
     fun quantize(granularity: Granularity)
@@ -238,8 +236,12 @@ class QuantizedTimeScale : IAxisScale<Long> {
         return this[domainBinPoints[index]]
     }
 
+    fun indexOfBinPoint(time: Long): Int {
+        return domainBinPoints.indexOf(time)
+    }
+
     override fun get(domain: Long): Float {
-        val index = domainBinPoints.indexOf(domain)
+        val index = indexOfBinPoint(domain)
         if(index!=-1)
         {
             val coord = rangeMin + getTickInterval() * index
@@ -248,6 +250,14 @@ class QuantizedTimeScale : IAxisScale<Long> {
             else return coord
         }
         else return 0f //TODO quantize
+    }
+
+    fun domainIndexContaining(time: Long): Int {
+        if (time < domainTimeMin || time > domainTimeMax) {
+            return -1
+        } else {
+            return ((time - domainTimeMin) / (binPointsOnDomain[1] - binPointsOnDomain[0])).toInt()
+        }
     }
 
 
