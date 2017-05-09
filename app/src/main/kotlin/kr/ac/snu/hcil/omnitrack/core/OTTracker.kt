@@ -17,6 +17,7 @@ import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
+import kr.ac.snu.hcil.omnitrack.core.visualization.models.DailyCountChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.models.LoggingHeatMapModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.models.TimelineComparisonLineChartModel
 import kr.ac.snu.hcil.omnitrack.utils.DefaultNameGenerator
@@ -481,9 +482,8 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
 
         //generate tracker-level charts
 
-        list.add(
-                LoggingHeatMapModel(this)
-        )
+        list += DailyCountChartModel(this)
+        list += LoggingHeatMapModel(this)
 
         //add line timeline if numeric variables exist
         val numberAttrs = attributes.filter { it is OTNumberAttribute }.map { it as OTNumberAttribute }

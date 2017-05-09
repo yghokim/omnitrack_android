@@ -5,6 +5,7 @@
 
     <string name="msg_vis_logging_heatmap_title_format">%1$s Logging Time</string>
 
+    <string name="msg_vis_daily_count_title_format">Daily %1$s Count</string>
 
     <string name="msg_vis_numeric_line_timeline_title">Numeric Fields on Timeline</string>
 </resources>
