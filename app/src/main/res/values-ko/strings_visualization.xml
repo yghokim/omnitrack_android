@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="msg_vis_categorical_distribution_title_format">%1$s 분포</string>
+
+    <string name="msg_vis_logging_heatmap_title_format">일일 시간대별 기록</string>
+
+    <string name="msg_vis_daily_count_title_format">일일 %1$s 기록</string>
+
+    <string name="msg_vis_numeric_line_timeline_title">Numeric Fields on Timeline</string>
+</resources>
