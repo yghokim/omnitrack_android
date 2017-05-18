@@ -1,8 +1,10 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.home
 
 import android.content.pm.PackageManager
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
+import android.support.v7.widget.AppCompatButton
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.transition.TransitionManager
@@ -17,7 +19,6 @@ import com.afollestad.materialdialogs.MaterialDialog
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
-import kr.ac.snu.hcil.omnitrack.ui.components.common.ManualSwitch
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
@@ -101,15 +102,25 @@ class ServiceListFragment : OTFragment() {
             val nameView: TextView
             val descriptionView: TextView
 
-            val activationButton: ManualSwitch
+            val activationButton: AppCompatButton
             val progressBar: ProgressBar
-
-            val activationSwitchGroup: ViewGroup
-            val activationIndicator: TextView
 
             val measureFactoryListView: RecyclerView
 
             val measureFactoryAdapter = MeasureFactoryAdapter()
+
+            private val activateColor: ColorStateList by lazy {
+                ColorStateList.valueOf(ContextCompat.getColor(context, R.color.colorPointed))
+            }
+
+            private val deactivateColor: ColorStateList by lazy {
+                ColorStateList.valueOf(ContextCompat.getColor(context, R.color.colorRed_Light))
+            }
+
+            private val onActivatingColor: ColorStateList by lazy {
+                ColorStateList.valueOf(ContextCompat.getColor(context, R.color.material_grey_100))
+            }
+
 
             var holderState: OTExternalService.ServiceState = OTExternalService.ServiceState.DEACTIVATED
                 set(value) {
@@ -131,13 +142,8 @@ class ServiceListFragment : OTFragment() {
                 measureFactoryListView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
                 measureFactoryListView.addItemDecoration(HorizontalDividerItemDecoration(ContextCompat.getColor(context, R.color.separator_Light), (0.6f * resources.displayMetrics.density + .5f).toInt()))
 
-                activationSwitchGroup = view.findViewById(R.id.ui_activation_switch_group) as ViewGroup
-
-                activationIndicator = view.findViewById(R.id.ui_activation_indicator_text) as TextView
-
-                activationButton = view.findViewById(R.id.ui_button_activate) as ManualSwitch
-
-                activationSwitchGroup.setOnClickListener {
+                activationButton = view.findViewById(R.id.ui_button_activate) as AppCompatButton
+                activationButton.setOnClickListener {
                     val service = getService(adapterPosition)
 
                     println("service state: ${service.state}")
@@ -179,21 +185,21 @@ class ServiceListFragment : OTFragment() {
                 when (state) {
                     OTExternalService.ServiceState.ACTIVATED -> {
                         progressBar.visibility = View.GONE
-                        activationIndicator.visibility = View.GONE
-                        activationButton.visibility = View.VISIBLE
-                        activationButton.isChecked = true
+                        activationButton.setText(R.string.msg_deactivate)
+                        activationButton.supportBackgroundTintList = deactivateColor
+                        activationButton.isEnabled = true
                     }
                     OTExternalService.ServiceState.ACTIVATING -> {
-                        activationButton.visibility = View.GONE
                         progressBar.visibility = View.VISIBLE
-                        activationButton.isChecked = false
-                        activationIndicator.visibility = View.VISIBLE
+                        activationButton.supportBackgroundTintList = onActivatingColor
+                        activationButton.setText(R.string.msg_service_activating)
+                        activationButton.isEnabled = false
                     }
                     OTExternalService.ServiceState.DEACTIVATED -> {
                         progressBar.visibility = View.GONE
-                        activationIndicator.visibility = View.GONE
-                        activationButton.visibility = View.VISIBLE
-                        activationButton.isChecked = false
+                        activationButton.setText(R.string.msg_activate)
+                        activationButton.supportBackgroundTintList = activateColor
+                        activationButton.isEnabled = true
                     }
                 }
             }

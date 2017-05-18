@@ -7,6 +7,7 @@ import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.support.v4.app.Fragment
 import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.core.dependency.OTSystemDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.externals.fitbit.FitbitService
 import kr.ac.snu.hcil.omnitrack.core.externals.google.fit.GoogleFitService
 import kr.ac.snu.hcil.omnitrack.core.externals.jawbone.JawboneUpService
@@ -97,6 +98,9 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
     }
 
     open val isInternetRequiredForActivation = true
+
+    protected val _dependencyList = ArrayList<OTSystemDependencyResolver>()
+    val dependencyList: List<OTSystemDependencyResolver> get() = _dependencyList
 
     open val permissionGranted: Boolean
         get() {

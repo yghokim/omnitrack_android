@@ -426,4 +426,12 @@
 
     <string name="msg_audio_record_player_description_recorded_at_format">Recorded at %1$s</string>
 
+    <string name="msg_format_third_party_app_dependency_non_fatal_failed_message">%1$s is not installed, which is necessary.</string>
+    <string name="msg_format_third_party_app_dependency_fatal_failed_message">%1$s is not installed, which is recommended.</string>
+    <string name="msg_format_third_party_app_dependency_passed_message">%1$s is installed in this device.</string>
+    <string name="msg_format_third_party_app_dependency_play_store_toss_message">OmniTrack may grab the value from the service without %1$s app. However, if you need data measured with your phone, you have to install the application and activate it.</string>
+
+    <string name="msg_activate">Activate</string>
+    <string name="msg_deactivate">Deactivate</string>
+
 </resources>

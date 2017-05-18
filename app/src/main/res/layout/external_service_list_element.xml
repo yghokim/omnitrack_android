@@ -35,7 +35,7 @@
             android:layout_alignParentTop="true"
             android:layout_marginStart="@dimen/service_list_element_horizontal_padding"
             android:layout_marginTop="@dimen/service_list_element_vertical_padding"
-            android:layout_toStartOf="@+id/ui_activation_switch_group"
+            android:layout_toStartOf="@+id/ui_button_activate"
             android:text="Microsoft Band"
             android:textColor="@color/textColorMidDark"
             android:textSize="18sp"
@@ -53,36 +53,21 @@
             android:textColor="@color/textColorMidLight"
             android:textSize="14sp" />
 
-        <FrameLayout
-            android:id="@+id/ui_activation_switch_group"
-            android:layout_width="wrap_content"
-
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginLeft="12dp"
-            android:paddingLeft="@dimen/service_list_element_horizontal_padding">
-
-            <TextView
-                android:id="@+id/ui_activation_indicator_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:paddingEnd="@dimen/service_list_element_horizontal_padding"
-                android:text="@string/msg_service_activating"
-                android:visibility="gone" />
-
-            <kr.ac.snu.hcil.omnitrack.ui.components.common.ManualSwitch
+        <android.support.v7.widget.AppCompatButton
                 android:id="@+id/ui_button_activate"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/button_height_normal"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
                 android:layout_gravity="center"
-                android:gravity="center_vertical|end"
+            android:layout_marginLeft="@dimen/service_list_element_horizontal_padding"
+            android:layout_marginRight="@dimen/service_list_element_horizontal_padding"
+            android:backgroundTint="@color/colorPointed"
                 android:paddingEnd="@dimen/service_list_element_horizontal_padding"
-                android:paddingStart="@dimen/service_list_element_horizontal_padding"
-                android:switchMinWidth="60dp" />
 
-        </FrameLayout>
+            android:paddingStart="@dimen/service_list_element_horizontal_padding"
+            android:text="Activate"
+            android:textColor="#fff" />
 
     </RelativeLayout>
 
