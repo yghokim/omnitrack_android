@@ -83,7 +83,7 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
             }
 
         val overrideTitle = intent.getStringExtra(INTENT_EXTRA_OVERRIDE_TITLE)
-        if (overrideTitle.isNotBlank()) {
+        if (!overrideTitle.isNullOrBlank()) {
             title = overrideTitle
         }
 

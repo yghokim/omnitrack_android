@@ -179,7 +179,7 @@ class DailyCountChartModel(tracker: OTTracker) : TrackerChartModel<Pair<Long, In
             } else normalTextColor
 
 
-            if (this@DailyCountChartModel.currentGranularity <=
+            if (this@DailyCountChartModel.getCurrentScopeGranularity() <=
                     Granularity.WEEK_2_REL) {
                 bar.textPaint.textSize = 14 * OTApplication.app.resources.displayMetrics.density
             } else {
