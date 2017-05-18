@@ -9,6 +9,7 @@ import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.common.api.Scope
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.dependency.ThirdPartyAppDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import rx.Observable
@@ -73,6 +74,14 @@ object GoogleFitService : OTExternalService("GoogleFitService", 19) {
     init {
         _measureFactories.add(GoogleFitStepsFactory)
         assignRequestCode(this)
+
+        _dependencyList.add(
+                ThirdPartyAppDependencyResolver.Builder(OTApplication.app)
+                        .setPackageName("com.google.android.apps.fitness")
+                        .isMandatory(false)
+                        .setAppName(R.string.service_googlefit_app_name)
+                        .build()
+        )
     }
 
     override fun onActivateAsync(context: Context, connectedHandler: ((Boolean) -> Unit)?) {

@@ -27,6 +27,7 @@
     <string name="service_googlefit_name">Google 피트니스</string>
     <string name="service_googlefit_desc">구글 헬스케어 데이터를 불러옵니다</string>
 
+    <string name="service_googlefit_app_name">Google 피트니스</string>
 
     <!-- misfit -->
     <string name="service_misfit_name">Misfit</string>

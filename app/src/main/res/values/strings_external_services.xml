@@ -27,6 +27,8 @@
     <string name="service_googlefit_name">Google Fit</string>
     <string name="service_googlefit_desc">Get measured data from Google health platform</string>
 
+    <string name="service_googlefit_app_name">Google Fitness</string>
+
 
     <!-- misfit -->
     <string name="service_misfit_name">Misfit</string>

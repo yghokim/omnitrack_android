@@ -35,7 +35,6 @@ import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTriggerAlarmManager
 import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
 import kr.ac.snu.hcil.omnitrack.services.OTFirebaseUploadService
-import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckService
 import kr.ac.snu.hcil.omnitrack.utils.NumberStyle
 import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 import kr.ac.snu.hcil.omnitrack.utils.UniqueStringEntryList
@@ -334,7 +333,7 @@ class OTApplication : MultiDexApplication() {
 
         startService(OTFirebaseUploadService.makeResumeUploadIntent(this))
 
-        OTVersionCheckService.setupServiceAlarm(this)
+        //OTVersionCheckService.setupServiceAlarm(this)
 
         println("creation took ${SystemClock.elapsedRealtime() - startedAt}")
     }
