@@ -242,6 +242,10 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".ui.pages.settings.SettingsActivity"
+            android:label="@string/title_activity_settings" />
+
 
         <activity
             android:name=".ui.activities.ReminderPopupActivity"

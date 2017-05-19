@@ -4,7 +4,7 @@
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
+            android:layout_height="@dimen/action_bar_height"
             android:contentInsetEnd="0dp"
             android:contentInsetLeft="0dp"
             android:contentInsetRight="0dp"
@@ -25,7 +25,7 @@
                     android:layout_alignParentStart="true"
                     android:layout_marginRight="-8dp"
                     android:background="?selectableItemBackgroundBorderless"
-                    android:minWidth="?attr/actionBarSize"
+                    android:minWidth="@dimen/action_bar_height"
                     android:src="@drawable/cancel"
                     android:tint="#FFF" />
 
@@ -40,7 +40,8 @@
                     android:layout_toLeftOf="@+id/ui_right_buttons_container"
                     android:layout_toRightOf="@+id/ui_appbar_button_left"
                     android:text="Title"
-                    android:textColor="#ffffff" />
+                    android:textColor="#ffffff"
+                    android:textSize="20sp" />
 
                 <LinearLayout
                     android:id="@+id/ui_right_buttons_container"
@@ -54,7 +55,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:background="?selectableItemBackgroundBorderless"
-                        android:minWidth="?attr/actionBarSize"
+                        android:minWidth="@dimen/action_bar_height"
                         android:src="@drawable/more"
                         android:tint="#FFF"
                         android:visibility="gone" />
@@ -64,7 +65,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:background="?selectableItemBackgroundBorderless"
-                        android:minWidth="?attr/actionBarSize"
+                        android:minWidth="@dimen/action_bar_height"
                         android:src="@drawable/done"
                         android:tint="#FFF" />
 
@@ -73,7 +74,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:background="?selectableItemBackgroundBorderless"
-                        android:minWidth="?attr/actionBarSize"
+                        android:minWidth="@dimen/action_bar_height"
                         android:paddingLeft="12dp"
                         android:paddingRight="12dp"
                         android:text="Save"

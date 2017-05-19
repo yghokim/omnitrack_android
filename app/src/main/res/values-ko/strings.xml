@@ -343,7 +343,12 @@
 
     <string name="msg_activate">활성화</string>
     <string name="msg_deactivate">비활성화</string>
-
+    <string name="msg_pref_title_show_shortcut_panel">알림 바에 바로가기 패널 유지</string>
+    <string name="msg_pref_summary_show_shortcut_panel">즐겨찾기로 설정된 트래커들을 상단 알림 바에 고정합니다</string>
+    <string name="msg_pref_summary_notify_new_update">Notify me when new update available. We frequently release new features, so stay tuned!</string>
+    <string name="msg_pref_title_notify_new_update">Notify New Update</string>
+    <string name="msg_settings">설정</string>
+    <string name="title_activity_settings">설정</string>
 
     <string-array name="purpose_entries">
         <item>directive|건강 관련 정보를 기록하기 위해서</item>

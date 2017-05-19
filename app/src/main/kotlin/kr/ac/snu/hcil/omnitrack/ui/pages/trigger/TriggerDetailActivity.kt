@@ -25,7 +25,7 @@ import java.util.*
 /**
  * Created by younghokim on 2017. 2. 21..
  */
-class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_trigger_detail) {
+class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_multibutton_single_fragment) {
 
     companion object {
         const val INTENT_EXTRA_TRIGGER_TYPE = "trigger_type"

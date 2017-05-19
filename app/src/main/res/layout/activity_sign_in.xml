@@ -133,7 +133,7 @@
                 android:id="@+id/ui_login_group_switcher"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/sign_in_button_margin"
+                android:layout_marginBottom="8dp"
                 android:layout_marginTop="30dp">
 
                 <android.support.v7.widget.AppCompatButton
