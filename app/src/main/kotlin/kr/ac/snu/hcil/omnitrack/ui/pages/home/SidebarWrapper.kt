@@ -1,14 +1,13 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.home
 
 import android.content.Intent
-import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.AppCompatImageButton
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
-import android.widget.Button
 import android.widget.PopupMenu
 import android.widget.TextView
 import com.badoo.mobile.util.WeakHandler
@@ -18,9 +17,10 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
+import kr.ac.snu.hcil.omnitrack.ui.components.common.viewholders.RecyclerViewMenuAdapter
 import kr.ac.snu.hcil.omnitrack.ui.pages.AboutActivity
+import kr.ac.snu.hcil.omnitrack.ui.pages.settings.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
-import kr.ac.snu.hcil.omnitrack.utils.applyTint
 
 /**
  * Created by Young-Ho Kim on 2017-01-31.
@@ -31,8 +31,7 @@ class SidebarWrapper(val view: View, val parentActivity: AppCompatActivity) : Po
     private val nameView: TextView = view.findViewById(R.id.ui_user_name) as TextView
     private val profileMenuButton: AppCompatImageButton = view.findViewById(R.id.ui_button_profile_menu) as AppCompatImageButton
 
-    private val menuListGroup: ViewGroup = view.findViewById(R.id.ui_menu_group) as ViewGroup
-
+    private val menuList: RecyclerView = view.findViewById(R.id.ui_menu_list) as RecyclerView
     init {
         /*
         val signOutButton = view.findViewById(R.id.ui_button_sign_out)
@@ -54,24 +53,8 @@ class SidebarWrapper(val view: View, val parentActivity: AppCompatActivity) : Po
             popupMenu.show()
         }
 
-        val aboutButton = view.findViewById(R.id.ui_button_about)
-        aboutButton.setOnClickListener {
-            val intent = Intent(parentActivity, AboutActivity::class.java)
-            parentActivity.startActivity(intent)
-        }
-
-        val iconColor = ContextCompat.getColor(parentActivity, R.color.buttonIconColorDark)
-        for (i in (0..menuListGroup.childCount - 1)) {
-            val child = menuListGroup.getChildAt(i)
-            if (child is Button) {
-                val compoundDrawables = child.compoundDrawablesRelative
-                for (k in (0..3)) {
-                    compoundDrawables[k]?.let {
-                        compoundDrawables[k] = applyTint(it, iconColor)
-                    }
-                }
-            }
-        }
+        menuList.layoutManager = LinearLayoutManager(parentActivity, LinearLayoutManager.VERTICAL, false)
+        menuList.adapter = SidebarMenuAdapter()
     }
 
     override fun onMenuItemClick(item: MenuItem): Boolean {
@@ -94,5 +77,37 @@ class SidebarWrapper(val view: View, val parentActivity: AppCompatActivity) : Po
             Glide.with(parentActivity).load(user.photoUrl).into(photoView)
             nameView.text = user.name
         }
+    }
+
+    inner class SidebarMenuAdapter : RecyclerViewMenuAdapter() {
+
+        private val menus = arrayListOf(
+                RecyclerViewMenuAdapter.MenuItem(R.drawable.settings_dark, parentActivity.getString(R.string.msg_settings), null, {
+                    val intent = Intent(parentActivity, SettingsActivity::class.java)
+                    parentActivity.startActivity(intent)
+                }, true),
+
+                RecyclerViewMenuAdapter.MenuItem(R.drawable.help_dark, parentActivity.getString(R.string.msg_about), null, {
+                    val intent = Intent(parentActivity, AboutActivity::class.java)
+                    parentActivity.startActivity(intent)
+                }, true)
+        )
+
+        init {
+        }
+
+        override fun getLayout(viewType: Int): Int {
+            return R.layout.simple_menu_element_with_icon_title_description_small
+        }
+
+        override fun getMenuItemAt(index: Int): MenuItem {
+            return menus[index]
+        }
+
+        override fun getItemCount(): Int {
+            return menus.size
+        }
+
+
     }
 }

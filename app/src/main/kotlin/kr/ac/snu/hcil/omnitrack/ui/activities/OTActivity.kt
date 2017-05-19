@@ -7,12 +7,14 @@ import android.content.IntentFilter
 import android.graphics.PointF
 import android.graphics.Rect
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.MotionEvent
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.ExperimentConsentManager
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
@@ -153,6 +155,8 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
                 goSignInUnlessUserCached()
             }
         }
+
+        PreferenceManager.setDefaultValues(this, R.xml.global_preferences, false)
     }
 
     protected fun getUserOrGotoSignIn(): Single<OTUser> {
