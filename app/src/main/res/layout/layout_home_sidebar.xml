@@ -48,6 +48,7 @@
         android:background="?selectableItemBackgroundBorderless"
         android:src="@drawable/more" />
 
+    <!--
     <LinearLayout
         android:id="@+id/ui_menu_group"
         android:layout_width="match_parent"
@@ -63,7 +64,18 @@
             android:layout_height="wrap_content"
             android:drawableStart="@drawable/help_dark"
             android:text="@string/msg_about" />
-    </LinearLayout>
+    </LinearLayout>-->
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/ui_menu_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/ui_profile_panel"
+        android:layout_marginTop="8dp"
+        android:orientation="vertical">
+
+    </android.support.v7.widget.RecyclerView>
 
 
 </RelativeLayout>

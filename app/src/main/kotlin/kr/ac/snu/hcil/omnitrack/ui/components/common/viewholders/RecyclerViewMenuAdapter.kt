@@ -16,8 +16,12 @@ abstract class RecyclerViewMenuAdapter : RecyclerView.Adapter<RecyclerViewMenuAd
         holder.bind(getMenuItemAt(position))
     }
 
+    open protected fun getLayout(viewType: Int): Int {
+        return R.layout.simple_menu_element_with_icon_title_description
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MenuViewHolder {
-        return MenuViewHolder(parent.inflateContent(R.layout.simple_menu_element_with_icon_title_description, false))
+        return MenuViewHolder(parent.inflateContent(getLayout(viewType), false))
     }
 
     data class MenuItem(var iconRes: Int?, var name: String?, var description: String?, var onClick: () -> Unit, var isEnabled: Boolean = true)
