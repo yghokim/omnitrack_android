@@ -38,6 +38,8 @@ class PackageReceiver: BroadcastReceiver() {
                             DatabaseManager.getDeviceInfoChild()?.child("appVersion")?.setValue(BuildConfig.VERSION_NAME)
                         }
                     },{})
+
+
                     OTVersionCheckService.setupServiceAlarm(context)
                 }
 

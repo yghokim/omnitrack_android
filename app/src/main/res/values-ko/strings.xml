@@ -349,6 +349,8 @@
     <string name="msg_pref_title_notify_new_update">Notify New Update</string>
     <string name="msg_settings">설정</string>
     <string name="title_activity_settings">설정</string>
+    <string name="msg_pref_reminder_noti_rington_title">리마인더 알림음</string>
+    <string name="msg_pref_category_general">일반</string>
 
     <string-array name="purpose_entries">
         <item>directive|건강 관련 정보를 기록하기 위해서</item>

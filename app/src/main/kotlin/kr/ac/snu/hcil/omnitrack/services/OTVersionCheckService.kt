@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.IBinder
+import android.preference.PreferenceManager
 import android.util.Log
 import br.com.goncalves.pugnotification.notification.PugNotification
 import kr.ac.snu.hcil.omnitrack.BuildConfig
@@ -36,7 +37,13 @@ class OTVersionCheckService : Service() {
             val pendingIntent = PendingIntent.getService(context, REQUEST_CODE, serviceIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-            alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, 1000, 7200 * 1000, pendingIntent)
+
+            if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("pref_check_updates", false)) {
+                alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, 1000, 7200 * 1000, pendingIntent)
+            } else {
+                alarmManager.cancel(pendingIntent)
+                context.stopService(serviceIntent)
+            }
         }
     }
 
