@@ -8,6 +8,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.preference.PreferenceManager
 import android.support.v4.app.TaskStackBuilder
 import android.support.v4.graphics.ColorUtils
 import android.support.v7.app.NotificationCompat
@@ -31,6 +32,10 @@ object OTShortcutPanelManager {
     const val NOTIFICATION_ID = 200000
 
     const val MAX_NUM_SHORTCUTS = 5
+
+    val showPanels: Boolean get() {
+        return PreferenceManager.getDefaultSharedPreferences(OTApplication.app).getBoolean("pref_show_shortcut_panel", false)
+    }
 
     private val notificationManager: NotificationManager by lazy {
         (OTApplication.app.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
@@ -108,26 +113,31 @@ object OTShortcutPanelManager {
 
     fun refreshNotificationShortcutViews(user: OTUser, context: Context = OTApplication.app) {
 
-        val trackers = user.getTrackersOnShortcut()
-        if (trackers.isNotEmpty()) {
-            val bigView = buildNewNotificationShortcutViews(user, context, true)
-            val normalView = buildNewNotificationShortcutViews(user, context, false)
+        if (showPanels) {
+            val trackers = user.getTrackersOnShortcut()
+            if (trackers.isNotEmpty()) {
+                val bigView = buildNewNotificationShortcutViews(user, context, true)
+                val normalView = buildNewNotificationShortcutViews(user, context, false)
 
-            val noti = NotificationCompat.Builder(context)
-                    .setSmallIcon(R.drawable.icon_simple)
-                    .setContentTitle(context.resources.getString(R.string.app_name))
-                    .setCustomBigContentView(bigView)
-                    .setCustomContentView(normalView)
-                    .setVisibility(Notification.VISIBILITY_PUBLIC)
-                    .setAutoCancel(false)
-                    .setOngoing(true)
-                    .setPriority(Notification.PRIORITY_MAX)
-                    .build()
+                val noti = NotificationCompat.Builder(context)
+                        .setSmallIcon(R.drawable.icon_simple)
+                        .setContentTitle(context.resources.getString(R.string.app_name))
+                        .setCustomBigContentView(bigView)
+                        .setCustomContentView(normalView)
+                        .setVisibility(Notification.VISIBILITY_PUBLIC)
+                        .setAutoCancel(false)
+                        .setOngoing(true)
+                        .setPriority(Notification.PRIORITY_MAX)
+                        .build()
 
-            notificationManager
-                    .notify(NOTIFICATION_ID, noti)
+                notificationManager
+                        .notify(NOTIFICATION_ID, noti)
+            } else {
+                //dismiss notification
+                notificationManager.cancel(NOTIFICATION_ID)
+            }
         } else {
-            //dismiss notification
+            //dismiss
             notificationManager.cancel(NOTIFICATION_ID)
         }
     }

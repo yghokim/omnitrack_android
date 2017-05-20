@@ -511,5 +511,7 @@
     <string name="pref_ringtone_silent">Silent</string>
 
     <string name="pref_title_vibrate">Vibrate</string>
+    <string name="msg_pref_reminder_noti_rington_title">Reminder Notification Ringtone</string>
+    <string name="msg_pref_category_general">General</string>
 
 </resources>
