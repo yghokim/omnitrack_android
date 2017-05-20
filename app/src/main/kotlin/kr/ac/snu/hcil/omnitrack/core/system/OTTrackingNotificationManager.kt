@@ -5,7 +5,9 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
+import android.preference.PreferenceManager
 import android.support.v4.app.NotificationCompat
 import android.support.v4.app.TaskStackBuilder
 import android.support.v4.content.ContextCompat
@@ -71,10 +73,15 @@ object OTTrackingNotificationManager {
         val resultPendingIntent = stackBuilder.getPendingIntent(0,
                 PendingIntent.FLAG_UPDATE_CURRENT)
 
+        val ringtone = PreferenceManager.getDefaultSharedPreferences(context).getString("pref_reminder_noti_ringtone", android.provider.Settings.System.DEFAULT_NOTIFICATION_URI.toString())
+
         val builder = makeBaseBuilder(context, Type.TRACKING_REMINDER.priority, reminderTime)
                 .setContentIntent(resultPendingIntent)
                 .setContentText(String.format(context.resources.getString(R.string.msg_noti_tap_for_tracking_format), tracker.name))
-                .setDefaults(Notification.DEFAULT_ALL)
+                .setDefaults(Notification.DEFAULT_VIBRATE or Notification.DEFAULT_LIGHTS)
+                .setSound(Uri.parse(
+                        ringtone
+                ))
 
         if (reminderTrackerPendingCounts.containsKey(tracker.objectId)) {
             println("merge reminder - ${tracker.name}")

@@ -333,6 +333,7 @@ class OTApplication : MultiDexApplication() {
 
         startService(OTFirebaseUploadService.makeResumeUploadIntent(this))
 
+
         //OTVersionCheckService.setupServiceAlarm(this)
 
         println("creation took ${SystemClock.elapsedRealtime() - startedAt}")

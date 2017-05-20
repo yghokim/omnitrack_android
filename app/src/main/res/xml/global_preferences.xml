@@ -1,16 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory android:title="General">
+    <PreferenceCategory android:title="@string/msg_pref_category_general">
         <SwitchPreference
             android:defaultValue="true"
             android:key="pref_show_shortcut_panel"
             android:summary="@string/msg_pref_summary_show_shortcut_panel"
             android:title="@string/msg_pref_title_show_shortcut_panel" />
         <SwitchPreference
+            android:defaultValue="false"
             android:key="pref_check_updates"
             android:summary="@string/msg_pref_summary_notify_new_update"
             android:title="@string/msg_pref_title_notify_new_update" />
+
+        <RingtonePreference
+            android:defaultValue="content://settings/system/notification_sound"
+            android:key="pref_reminder_noti_ringtone"
+            android:ringtoneType="notification"
+            android:showDefault="true"
+            android:showSilent="true"
+            android:title="@string/msg_pref_reminder_noti_rington_title" />
     </PreferenceCategory>
+
 
 </PreferenceScreen>
