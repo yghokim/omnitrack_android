@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:descendantFocusability="blocksDescendants">
+
+    <mehdi.sakout.fancybuttons.FancyButton xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/ui_button"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        app:fb_borderColor="#e0e0e0"
+        app:fb_borderWidth="2dp"
+        app:fb_radius="@dimen/button_height_small"
+        app:fb_text="" />
+
+</FrameLayout>

@@ -16,6 +16,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemBrowserActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemEditingActivity
+import kr.ac.snu.hcil.omnitrack.ui.pages.settings.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.utils.FillingIntegerIdReservationTable
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
@@ -73,15 +74,17 @@ object OTTrackingNotificationManager {
         val resultPendingIntent = stackBuilder.getPendingIntent(0,
                 PendingIntent.FLAG_UPDATE_CURRENT)
 
-        val ringtone = PreferenceManager.getDefaultSharedPreferences(context).getString("pref_reminder_noti_ringtone", android.provider.Settings.System.DEFAULT_NOTIFICATION_URI.toString())
+        val ringtone = PreferenceManager.getDefaultSharedPreferences(context).getString(SettingsActivity.PREF_REMINDER_NOTI_RINGTONE, android.provider.Settings.System.DEFAULT_NOTIFICATION_URI.toString())
+        val lightColor = PreferenceManager.getDefaultSharedPreferences(context).getInt(SettingsActivity.PREF_REMINDER_LIGHT_COLOR, ContextCompat.getColor(context, R.color.colorPrimary))
 
         val builder = makeBaseBuilder(context, Type.TRACKING_REMINDER.priority, reminderTime)
                 .setContentIntent(resultPendingIntent)
                 .setContentText(String.format(context.resources.getString(R.string.msg_noti_tap_for_tracking_format), tracker.name))
-                .setDefaults(Notification.DEFAULT_VIBRATE or Notification.DEFAULT_LIGHTS)
+                .setDefaults(Notification.DEFAULT_VIBRATE)
                 .setSound(Uri.parse(
                         ringtone
                 ))
+                .setLights(lightColor, 1000, 500)
 
         if (reminderTrackerPendingCounts.containsKey(tracker.objectId)) {
             println("merge reminder - ${tracker.name}")
