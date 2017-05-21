@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <com.larswerkman.lobsterpicker.LobsterPicker
+        android:id="@+id/ui_color_picker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:color_history_enabled="true"
+        app:color_wheel_thickness="12dp" />
+
+    <com.larswerkman.lobsterpicker.sliders.LobsterShadeSlider
+        android:id="@+id/ui_color_slider"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/button_height_normal"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="8dp"
+        app:color_slider_pointer_radius="10dp"
+        app:color_slider_thickness="8dp" />
+
+</LinearLayout>

@@ -13,6 +13,9 @@
             android:summary="@string/msg_pref_summary_notify_new_update"
             android:title="@string/msg_pref_title_notify_new_update" />
 
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Notification">
         <RingtonePreference
             android:defaultValue="content://settings/system/notification_sound"
             android:key="pref_reminder_noti_ringtone"
@@ -20,6 +23,11 @@
             android:showDefault="true"
             android:showSilent="true"
             android:title="@string/msg_pref_reminder_noti_rington_title" />
+
+        <kr.ac.snu.hcil.omnitrack.ui.components.common.preference.ColorPreference
+            android:defaultValue="@color/colorPrimary"
+            android:key="pref_reminder_light_color"
+            android:title="Reminder Light Color" />
     </PreferenceCategory>
 
 
