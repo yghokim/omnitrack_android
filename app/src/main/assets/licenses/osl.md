@@ -154,6 +154,16 @@ Apache 2.0 license
 Copyright (C) 2015 Jake Wharton<br>
 Apache 2.0 license
 
+#####Lobsterpicker
+<https://github.com/LarsWerkman/Lobsterpicker><br>
+Copyright (C) 2015 Marie Schweiz & Lars Werkman<br>
+Apache 2.0 license
+
+#####Fancybuttons
+<https://github.com/medyo/Fancybuttons>
+El Mehdi Sakout
+MIT license
+
 ---
 
 ---

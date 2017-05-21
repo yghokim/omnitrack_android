@@ -21,6 +21,7 @@ class SettingsActivity : MultiButtonActionBarActivity(R.layout.activity_multibut
 
     companion object {
         const val PREF_REMINDER_NOTI_RINGTONE = "pref_reminder_noti_ringtone"
+        const val PREF_REMINDER_LIGHT_COLOR = "pref_reminder_light_color"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
