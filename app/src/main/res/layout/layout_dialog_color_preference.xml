@@ -9,6 +9,7 @@
         android:id="@+id/ui_color_picker"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
         app:color_history_enabled="true"
         app:color_wheel_thickness="12dp" />
 

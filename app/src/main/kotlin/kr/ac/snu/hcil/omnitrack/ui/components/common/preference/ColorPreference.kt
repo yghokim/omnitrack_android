@@ -7,6 +7,7 @@ import android.preference.DialogPreference
 import android.util.AttributeSet
 import android.view.View
 import com.larswerkman.lobsterpicker.LobsterPicker
+import com.larswerkman.lobsterpicker.adapters.BitmapColorAdapter
 import com.larswerkman.lobsterpicker.sliders.LobsterShadeSlider
 import kr.ac.snu.hcil.omnitrack.R
 import mehdi.sakout.fancybuttons.FancyButton
@@ -45,6 +46,7 @@ class ColorPreference : DialogPreference {
     override fun onBindDialogView(view: View) {
 
         colorPicker = view.findViewById(R.id.ui_color_picker) as LobsterPicker
+        colorPicker?.colorAdapter = BitmapColorAdapter(context, R.drawable.lights_pallete)
         colorSlider = view.findViewById(R.id.ui_color_slider) as LobsterShadeSlider
 
         if (colorSlider != null) {
@@ -52,6 +54,7 @@ class ColorPreference : DialogPreference {
         }
 
         colorPicker?.color = currentColor
+        colorPicker?.history = currentColor
 
         super.onBindDialogView(view)
     }
@@ -77,6 +80,9 @@ class ColorPreference : DialogPreference {
 
         colorButton = view.findViewById(R.id.ui_button) as FancyButton
         colorButton?.setBackgroundColor(currentColor)
+        colorButton?.setOnClickListener {
+            onClick()
+        }
     }
 
     override fun onSetInitialValue(restorePersistedValue: Boolean, defaultValue: Any?) {
