@@ -22,6 +22,8 @@
     <dimen name="property_top_padding">12dp</dimen>
     <dimen name="property_bottom_padding">16dp</dimen>
 
+    <dimen name="drag_linear_layout_shadow_offset">12dp</dimen>
+
     <dimen name="list_element_vertical_space">7dp</dimen>
 
     <dimen name="color_selection_button_size">36dp</dimen>

@@ -22,6 +22,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemEditingActivity
+import kr.ac.snu.hcil.omnitrack.utils.VectorIconHelper
 import kr.ac.snu.hcil.omnitrack.widgets.OTShortcutPanelWidgetUpdateService
 
 /**
@@ -93,6 +94,7 @@ object OTShortcutPanelManager {
                     paint.color = ColorUtils.setAlphaComponent(trackers[i].color, 200)
                     buttonCanvas.drawCircle(buttonRadius, buttonRadius, buttonRadius, paint)
                     element.setImageViewBitmap(R.id.ui_background_image, buttonBitmap)
+                    element.setImageViewBitmap(R.id.ui_button_instant, VectorIconHelper.getConvertedBitmap(context, R.drawable.instant_add))
                 } else {
                     element.setInt(R.id.ui_button_container, "setBackgroundColor", ColorUtils.setAlphaComponent(trackers[i].color, 200))
                     element.setViewVisibility(R.id.ui_background_image, View.INVISIBLE)
@@ -121,6 +123,7 @@ object OTShortcutPanelManager {
 
                 val noti = NotificationCompat.Builder(context)
                         .setSmallIcon(R.drawable.icon_simple)
+                        .setLargeIcon(VectorIconHelper.getConvertedBitmap(context, R.drawable.icon_simple))
                         .setContentTitle(context.resources.getString(R.string.app_name))
                         .setCustomBigContentView(bigView)
                         .setCustomContentView(normalView)

@@ -21,6 +21,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioRecordMetadata
 import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioRecorderView
 import kr.ac.snu.hcil.omnitrack.utils.Ticker
+import kr.ac.snu.hcil.omnitrack.utils.VectorIconHelper
 
 /**
  * Created by Young-Ho on 4/22/2017.
@@ -114,6 +115,8 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
             remoteViews.setTextViewText(R.id.ui_description, description)
 
             remoteViews.setTextViewText(R.id.ui_duration_view, AudioRecorderView.formatTime(currentProgressSeconds))
+
+            remoteViews.setImageViewBitmap(R.id.ui_player_button, VectorIconHelper.getConvertedBitmap(context, R.drawable.ex))
 
             currentSessionId?.let {
 

@@ -9,6 +9,7 @@ import com.google.firebase.storage.StorageMetadata
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import io.realm.Realm
+import io.realm.RealmConfiguration
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
@@ -34,6 +35,11 @@ class OTFirebaseUploadService : WakefulService(TAG) {
 
         //string: Realm id of taskInfo
         private val currentTasks = ConcurrentHashMap<String, UploadTask>()
+
+
+        private val realmConfiguration: RealmConfiguration by lazy {
+            RealmConfiguration.Builder().name("uploadTask").deleteRealmIfMigrationNeeded().build()
+        }
 
 
         fun makeUploadTaskIntent(context: Context, outUri: SynchronizedUri, itemId: String, trackerId: String, userId: String): Intent {
@@ -80,7 +86,7 @@ class OTFirebaseUploadService : WakefulService(TAG) {
     private fun resumeCachedUploads() {
         Realm.init(this)
 
-        val realm = Realm.getDefaultInstance()
+        val realm = Realm.getInstance(realmConfiguration)
         val tasks = realm.where(UploadTaskInfo::class.java).findAll()
         println("${tasks.size} upload tasks were hanging.")
 
