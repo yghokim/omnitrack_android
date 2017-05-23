@@ -1,0 +1,85 @@
+package kr.ac.snu.hcil.omnitrack.utils
+
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Canvas
+import android.os.Build
+import android.support.annotation.DrawableRes
+import android.support.v4.graphics.drawable.DrawableCompat
+import android.support.v7.content.res.AppCompatResources
+import io.realm.Realm
+import io.realm.RealmConfiguration
+import java.io.File
+import java.io.FileOutputStream
+
+/**
+ * Created by Young-Ho on 5/23/2017.
+ */
+object VectorIconHelper {
+
+    private val realmConfiguration: RealmConfiguration by lazy {
+        RealmConfiguration.Builder().name("vectorIconCache").deleteRealmIfMigrationNeeded().build()
+    }
+
+    fun getConvertedBitmap(context: Context, @DrawableRes vectorDrawableRes: Int, sizeDp: Int? = 24, tint: Int? = null): Bitmap {
+        Realm.init(context)
+        val realm = Realm.getInstance(realmConfiguration)
+        val cache = realm.where(VectorIconBitmapCache::class.java).equalTo("resourceId", vectorDrawableRes).equalTo("sizeDp", sizeDp).equalTo("tint", tint).findAll()
+
+        if (cache.size > 0) {
+            println("icon cache hit")
+            return BitmapFactory.decodeFile(cache[0].uri)
+        } else {
+            println("icon cache miss")
+            var drawable = AppCompatResources.getDrawable(context, vectorDrawableRes)!!
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                drawable = (DrawableCompat.wrap(drawable)).mutate();
+            }
+            val width: Int = if (sizeDp != null) {
+                (context.resources.displayMetrics.density * sizeDp + 0.5f).toInt()
+            } else drawable.intrinsicWidth
+            val height: Int = if (sizeDp != null) {
+                (context.resources.displayMetrics.density * sizeDp + 0.5f).toInt()
+            } else drawable.intrinsicHeight
+
+            val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+            val canvas = Canvas(bitmap)
+            drawable.setBounds(0, 0, width, height)
+            drawable.draw(canvas)
+
+            var outputStream: FileOutputStream? = null
+            try {
+                val cacheDirectory = File(context.externalCacheDir, "converted_vector_icons")
+                if (!cacheDirectory.exists())
+                    cacheDirectory.mkdirs()
+
+                val output = File.createTempFile("cache_", "png", cacheDirectory)
+                outputStream = output.outputStream()
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+
+                val newCache = VectorIconBitmapCache()
+                newCache.resourceId = vectorDrawableRes
+                newCache.sizeDp = sizeDp
+                newCache.tint = tint
+                newCache.uri = output.absolutePath
+
+                realm.executeTransaction {
+                    rlm ->
+                    rlm.insert(newCache)
+                }
+
+            } catch(ex: Exception) {
+                ex.printStackTrace()
+            } finally {
+                try {
+                    outputStream?.close()
+                } catch(ex: Exception) {
+                    ex.printStackTrace()
+                }
+
+                return bitmap
+            }
+        }
+    }
+}

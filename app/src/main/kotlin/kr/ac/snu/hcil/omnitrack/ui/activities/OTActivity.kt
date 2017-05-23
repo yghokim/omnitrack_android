@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.PointF
 import android.graphics.Rect
+import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.v7.app.AppCompatActivity
@@ -303,7 +304,11 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
     }
 
     override fun attachBaseContext(newBase: Context?) {
-        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase))
+        if (Build.VERSION.SDK_INT > 19) {
+            super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase))
+        } else {
+            super.attachBaseContext(newBase)
+        }
     }
 
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
