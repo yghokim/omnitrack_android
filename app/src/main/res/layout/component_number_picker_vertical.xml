@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android">
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <android.support.v7.widget.AppCompatImageButton
         android:id="@+id/ui_button_plus"
@@ -7,8 +8,8 @@
         android:layout_height="@dimen/button_height_small"
         android:background="@drawable/button_background_formlike"
         android:minWidth="@dimen/number_button_width"
-        android:src="@drawable/up_dark"
-        android:tint="@color/buttonIconColorDark" />
+        android:tint="@color/buttonIconColorDark"
+        app:srcCompat="@drawable/up_dark" />
     <!--
         <EditText
             android:id="@+id/valueField"
@@ -44,6 +45,6 @@
         android:layout_height="@dimen/button_height_small"
         android:background="@drawable/button_background_formlike"
         android:minWidth="@dimen/number_button_width"
-        android:src="@drawable/down"
-        android:tint="@color/buttonIconColorDark" />
+        android:tint="@color/buttonIconColorDark"
+        app:srcCompat="@drawable/down" />
 </merge>

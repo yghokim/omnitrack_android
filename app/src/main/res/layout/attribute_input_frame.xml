@@ -48,10 +48,10 @@
             android:minWidth="11dp"
             android:paddingBottom="5dp"
             android:scaleType="fitStart"
-            android:src="@drawable/icon_asterisk"
             android:tint="@color/colorAccent"
             app:layout_alignSelf="center"
-            app:layout_flexShrink="0" />
+            app:layout_flexShrink="0"
+            app:srcCompat="@drawable/icon_asterisk" />
 
         <TextView
             android:id="@+id/ui_timestamp"

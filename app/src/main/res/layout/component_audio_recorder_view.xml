@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="70dp"
     android:orientation="horizontal">
@@ -59,8 +60,8 @@
             <android.support.v7.widget.AppCompatImageButton
                 android:id="@+id/ui_player_button"
                 style="@style/audioPlayerControlButton"
-                android:src="@drawable/play_dark"
-                android:visibility="gone" />
+                android:visibility="gone"
+                app:srcCompat="@drawable/play_dark" />
         </LinearLayout>
 
     </FrameLayout>

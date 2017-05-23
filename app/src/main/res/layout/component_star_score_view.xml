@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
@@ -10,8 +11,8 @@
         android:layout_height="27dp"
         android:layout_gravity="center_vertical"
         android:layout_marginRight="2dp"
-        android:src="@drawable/symbol_star_full"
-        android:tint="@color/starGold" />
+        android:tint="@color/starGold"
+        app:srcCompat="@drawable/symbol_star_full" />
 
     <TextView
         android:id="@+id/ui_text"

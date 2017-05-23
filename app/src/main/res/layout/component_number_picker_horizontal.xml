@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android">
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <!--
         <EditText
@@ -19,8 +20,8 @@
     <android.support.v7.widget.AppCompatImageButton
         android:id="@+id/ui_button_minus"
         style="@style/roundButtonStyle"
-        android:src="@drawable/left_dark"
-        android:tint="@color/buttonIconColorDark" />
+        android:tint="@color/buttonIconColorDark"
+        app:srcCompat="@drawable/left_dark" />
 
     <TextView
         android:id="@+id/ui_value_field"
@@ -40,6 +41,6 @@
     <android.support.v7.widget.AppCompatImageButton
         android:id="@+id/ui_button_plus"
         style="@style/roundButtonStyle"
-        android:src="@drawable/right_dark"
-        android:tint="@color/buttonIconColorDark" />
+        android:tint="@color/buttonIconColorDark"
+        app:srcCompat="@drawable/right_dark" />
 </merge>

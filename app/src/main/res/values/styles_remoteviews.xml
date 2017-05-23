@@ -34,7 +34,7 @@
     <style name="shortcut_ButtonStyle">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>
-        <item name="android:src">@drawable/instant_add</item>
+        <item name="srcCompat">@drawable/instant_add</item>
         <item name="android:tint">#FFF</item>
         <item name="android:background">@drawable/transparent_button_background</item>
     </style>

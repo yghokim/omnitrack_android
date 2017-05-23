@@ -26,8 +26,8 @@
                     android:layout_marginRight="-8dp"
                     android:background="?selectableItemBackgroundBorderless"
                     android:minWidth="@dimen/action_bar_height"
-                    android:src="@drawable/cancel"
-                    android:tint="#FFF" />
+                    android:tint="#FFF"
+                    app:srcCompat="@drawable/cancel" />
 
                 <TextView
                     android:id="@+id/ui_appbar_title"
@@ -56,9 +56,9 @@
                         android:layout_height="match_parent"
                         android:background="?selectableItemBackgroundBorderless"
                         android:minWidth="@dimen/action_bar_height"
-                        android:src="@drawable/more"
                         android:tint="#FFF"
-                        android:visibility="gone" />
+                        android:visibility="gone"
+                        app:srcCompat="@drawable/more" />
 
                     <android.support.v7.widget.AppCompatImageButton
                         android:id="@+id/ui_appbar_button_right"
@@ -66,8 +66,8 @@
                         android:layout_height="match_parent"
                         android:background="?selectableItemBackgroundBorderless"
                         android:minWidth="@dimen/action_bar_height"
-                        android:src="@drawable/done"
-                        android:tint="#FFF" />
+                        android:tint="#FFF"
+                        app:srcCompat="@drawable/done" />
 
                     <android.support.v7.widget.AppCompatButton
                         android:id="@+id/ui_appbar_text_button_right"

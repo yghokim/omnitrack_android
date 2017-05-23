@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     >
@@ -20,9 +21,9 @@
         android:layout_height="@dimen/button_height_small"
         android:layout_gravity="top|right"
         android:background="@drawable/button_background_color_pointed"
-        android:src="@drawable/ex"
         android:tint="#fff"
-        android:visibility="gone" />
+        android:visibility="gone"
+        app:srcCompat="@drawable/ex" />
 
     <LinearLayout
         android:id="@+id/ui_button_container"
@@ -40,8 +41,8 @@
             android:layout_height="@dimen/button_height_tall"
 
             android:padding="16dp"
-            android:src="@drawable/camera"
-            android:tint="@color/buttonIconColorDark" />
+            android:tint="@color/buttonIconColorDark"
+            app:srcCompat="@drawable/camera" />
 
         <android.support.v7.widget.AppCompatImageButton
             android:id="@+id/ui_button_gallery"
@@ -51,7 +52,7 @@
             android:layout_marginLeft="@dimen/button_height_tall"
 
             android:padding="16dp"
-            android:src="@drawable/gallery"
-            android:tint="@color/buttonIconColorDark" />
+            android:tint="@color/buttonIconColorDark"
+            app:srcCompat="@drawable/gallery" />
     </LinearLayout>
 </merge>
