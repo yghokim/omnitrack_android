@@ -127,10 +127,10 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical|start"
             android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:fontFamily="sans-serif-light"
             android:text="Trigger summary"
             android:textColor="@color/textColorMid"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            app:fontPath="fonts/Roboto-Light.ttf" />
 
 
         <android.support.v7.widget.AppCompatImageButton
