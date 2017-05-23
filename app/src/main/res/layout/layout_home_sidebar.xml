@@ -46,7 +46,7 @@
         android:layout_height="@dimen/button_height_small"
         android:layout_alignParentEnd="true"
         android:background="?selectableItemBackgroundBorderless"
-        android:src="@drawable/more" />
+        app:srcCompat="@drawable/more" />
 
     <!--
     <LinearLayout

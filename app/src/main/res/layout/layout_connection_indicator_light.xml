@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
@@ -13,8 +14,8 @@
         android:scaleType="fitCenter"
         android:scaleX="0.9"
         android:scaleY="0.9"
-        android:src="@drawable/link"
-        android:tint="@color/textColorLight" />
+        android:tint="@color/textColorLight"
+        app:srcCompat="@drawable/link" />
 
     <TextView
         android:id="@+id/ui_connection_source_name"
@@ -32,7 +33,7 @@
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="8dp"
         android:background="@null"
-        android:src="@drawable/error_dark"
         android:tint="@color/colorRed.Light"
-        android:visibility="invisible" />
+        android:visibility="invisible"
+        app:srcCompat="@drawable/error_dark" />
 </LinearLayout>

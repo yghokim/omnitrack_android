@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -34,8 +35,8 @@
             android:layout_width="18dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:src="@drawable/time_digit_separator"
-            android:tint="@color/textColorLight" />
+            android:tint="@color/textColorLight"
+            app:srcCompat="@drawable/time_digit_separator" />
 
         <kr.ac.snu.hcil.omnitrack.ui.components.common.NumericUpDown
             android:id="@+id/ui_middle_picker"
@@ -48,8 +49,8 @@
             android:layout_width="18dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:src="@drawable/time_digit_separator"
-            android:tint="@color/textColorLight" />
+            android:tint="@color/textColorLight"
+            app:srcCompat="@drawable/time_digit_separator" />
 
         <kr.ac.snu.hcil.omnitrack.ui.components.common.NumericUpDown
             android:id="@+id/ui_right_picker"

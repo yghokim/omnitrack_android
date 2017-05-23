@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -24,8 +25,8 @@
             android:layout_height="@dimen/button_height_tall"
             android:layout_gravity="right"
             android:background="@drawable/transparent_button_background"
-            android:src="@drawable/ex"
-            android:tint="@color/colorRed" />
+            android:tint="@color/colorRed"
+            app:srcCompat="@drawable/ex" />
 
 
     </FrameLayout>
@@ -43,5 +44,5 @@
         android:layout_below="@+id/ui_header"
         android:clickable="false"
         android:scaleType="fitXY"
-        android:src="@drawable/expanded_view_inner_shadow_top" />
+        app:srcCompat="@drawable/expanded_view_inner_shadow_top" />
 </RelativeLayout>

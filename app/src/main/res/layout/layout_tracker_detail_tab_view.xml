@@ -13,10 +13,10 @@
         android:id="@+id/icon"
         android:layout_width="20dp"
         android:layout_height="20dp"
-        android:src="@drawable/alarm_dark"
         android:tint="#FFF"
         app:layout_alignSelf="center"
-        app:layout_flexShrink="1" />
+        app:layout_flexShrink="1"
+        app:srcCompat="@drawable/alarm_dark" />
 
     <TextView
         android:id="@+id/text"
