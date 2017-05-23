@@ -1,9 +1,12 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
+import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.Fragment
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
@@ -23,7 +26,6 @@ import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.FallbackRecyclerView
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.DrawableListBottomSpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
-import net.i2p.android.ext.floatingactionbutton.FloatingActionButton
 import rx.subscriptions.CompositeSubscription
 import java.util.*
 
@@ -123,6 +125,8 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
 
         newTriggerButton = rootView.findViewById(R.id.ui_button_new_trigger) as FloatingActionButton
 
+        setFloatingButtonColor(ContextCompat.getColor(rootView.context, R.color.colorPointed))
+
         newTriggerButton.setOnClickListener {
             onNewTriggerButtonClicked()
         }
@@ -182,11 +186,11 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
     }
 
     fun setFloatingButtonColor(color: Int) {
-        newTriggerButton.colorNormal = color
+        newTriggerButton.backgroundTintList = ColorStateList.valueOf(color)
         val hsv = floatArrayOf(0f, 0f, 0f)
         Color.colorToHSV(color, hsv)
         hsv[2] *= 0.8f
-        newTriggerButton.colorPressed = Color.HSVToColor(hsv)
+        newTriggerButton.rippleColor = Color.HSVToColor(hsv)
     }
 
     protected fun appendNewTrigger(trigger: OTTrigger) {

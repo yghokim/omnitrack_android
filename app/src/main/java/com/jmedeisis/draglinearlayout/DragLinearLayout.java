@@ -100,7 +100,7 @@ public class DragLinearLayout extends LinearLayout {
         final Resources resources = getResources();
         dragTopShadowDrawable = ContextCompat.getDrawable(context, R.drawable.expanded_view_inner_shadow_bottom);
         dragBottomShadowDrawable = ContextCompat.getDrawable(context, R.drawable.expanded_view_inner_shadow_top);
-        dragShadowHeight = resources.getDimensionPixelSize(R.dimen.fab_shadow_offset);
+        dragShadowHeight = resources.getDimensionPixelSize(R.dimen.drag_linear_layout_shadow_offset);
 
         TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.DragLinearLayout, 0, 0);
         try {

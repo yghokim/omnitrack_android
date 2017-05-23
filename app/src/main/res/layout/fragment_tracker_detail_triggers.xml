@@ -15,10 +15,8 @@
         android:text="@string/msg_trigger_empty" />
 
 
-    <net.i2p.android.ext.floatingactionbutton.FloatingActionButton
+    <android.support.design.widget.FloatingActionButton
         android:id="@+id/ui_button_new_trigger"
-        style="@style/FloatingActionButtonStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        style="@style/FloatingActionButtonStyle" />
 
 </android.support.design.widget.CoordinatorLayout>
