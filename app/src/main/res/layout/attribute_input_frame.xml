@@ -64,6 +64,7 @@
             android:textColor="@color/textColorMid"
             android:textSize="14sp"
             android:textStyle="italic"
+            app:fontPath="fonts/Roboto-Light.ttf"
             app:layout_alignSelf="center"
             app:layout_flexGrow="100000"
             app:layout_flexShrink="0"
