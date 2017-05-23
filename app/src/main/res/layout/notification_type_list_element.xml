@@ -30,13 +30,13 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="10dp"
         android:clickable="false"
-        android:src="@drawable/thumb_notifications_popup"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="h,1:1"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toLeftOf="@+id/guideline_thumb"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/thumb_notifications_popup" />
 
     <TextView
         android:id="@+id/ui_title"

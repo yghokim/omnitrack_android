@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/transparent_button_background"
@@ -20,8 +21,8 @@
             android:layout_height="50dp"
             android:layout_gravity="center_horizontal"
             android:scaleType="fitCenter"
-            android:src="@drawable/event_dark"
-            android:tint="@color/colorSecondary" />
+            android:tint="@color/colorSecondary"
+            app:srcCompat="@drawable/event_dark" />
 
         <TextView
             android:id="@+id/ui_name"

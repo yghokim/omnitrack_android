@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
@@ -9,8 +10,8 @@
         android:layout_height="19dp"
         android:layout_gravity="center_vertical"
         android:layout_marginRight="8dp"
-        android:src="@drawable/convert"
-        android:tint="@color/buttonIconColorDark" />
+        android:tint="@color/buttonIconColorDark"
+        app:srcCompat="@drawable/convert" />
 
     <TextView
         android:id="@+id/ui_label"

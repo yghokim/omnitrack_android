@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -14,7 +15,7 @@
         android:layout_marginTop="6dp"
         android:alpha="0.7"
         android:scaleType="fitEnd"
-        android:src="@drawable/icon_simple" />
+        app:srcCompat="@drawable/icon_simple" />
 
     <TextView
         android:layout_width="match_parent"
@@ -69,9 +70,8 @@
         android:layout_marginLeft="4dp"
         android:layout_marginRight="12dp"
         android:layout_toStartOf="@+id/ui_player_button_container"
-        android:fontFamily="sans-serif-thin"
+        android:fontFamily="sans-serif-light"
         android:textColor="#afffffff"
-        android:textStyle="italic"
         tools:text="0:30" />
 
     <ImageView
@@ -93,7 +93,7 @@
             android:layout_width="@dimen/button_height_tall"
             android:layout_height="match_parent"
             android:background="@drawable/transparent_button_background"
-            android:src='@drawable/ex' />
+            app:srcCompat='@drawable/ex' />
     </FrameLayout>
 
 </RelativeLayout>

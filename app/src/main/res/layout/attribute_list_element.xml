@@ -21,10 +21,10 @@
             android:layout_centerVertical="true"
             android:padding="12dp"
             android:scaleType="fitCenter"
-            android:src="@drawable/drag_handle"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/drag_handle" />
 
         <LinearLayout
         android:id="@+id/ui_attribute_card_header"
@@ -46,8 +46,8 @@
             android:layout_gravity="top"
             android:paddingBottom="@dimen/attribute_list_element_header_type_icon_padding"
             android:paddingTop="@dimen/attribute_list_element_header_type_icon_padding"
-            android:src="@drawable/icon_small_location"
-            android:tint="@color/titleTextColor" />
+            android:tint="@color/titleTextColor"
+            app:srcCompat="@drawable/icon_small_location" />
 
         <LinearLayout
             android:id="@+id/ui_column_name_button"
@@ -78,8 +78,8 @@
                 android:layout_marginLeft="2.5dp"
                 android:clickable="false"
                 android:scaleType="fitStart"
-                android:src="@drawable/icon_asterisk"
-                android:tint="@color/colorAccent" />
+                android:tint="@color/colorAccent"
+                app:srcCompat="@drawable/icon_asterisk" />
         </LinearLayout>
 
 
@@ -91,8 +91,8 @@
             android:background="@drawable/transparent_button_background"
             android:padding="@dimen/attribute_list_element_edit_padding"
             android:scaleType="fitCenter"
-            android:src="@drawable/edit_dark"
-            android:tint="@color/textColorLight" />
+            android:tint="@color/textColorLight"
+            app:srcCompat="@drawable/edit_dark" />
 
         <ImageButton
             android:id="@+id/ui_button_remove"
@@ -102,8 +102,8 @@
             android:background="@drawable/transparent_button_background"
             android:padding="@dimen/attribute_list_element_remove_padding"
             android:scaleType="fitCenter"
-            android:src="@drawable/icon_ex_big"
-            android:tint="@color/textColorLight" />
+            android:tint="@color/textColorLight"
+            app:srcCompat="@drawable/icon_ex_big" />
 
     </LinearLayout>
 

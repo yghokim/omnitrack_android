@@ -92,16 +92,16 @@
                 style="@style/mapViewOverlayButton"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentTop="true"
-                android:src="@drawable/plus"
-                android:tint="@color/buttonIconColorDark" />
+                android:tint="@color/buttonIconColorDark"
+                app:srcCompat="@drawable/plus" />
 
             <android.support.v7.widget.AppCompatImageButton
                 android:id="@+id/ui_button_zoom_out"
                 style="@style/mapViewOverlayButton"
                 android:layout_alignEnd="@id/ui_button_zoom_in"
                 android:layout_below="@+id/ui_button_zoom_in"
-                android:src="@drawable/minus"
-                android:tint="@color/buttonIconColorDark" />
+                android:tint="@color/buttonIconColorDark"
+                app:srcCompat="@drawable/minus" />
 
 
             <android.support.v7.widget.AppCompatImageButton
@@ -111,7 +111,7 @@
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
                 android:padding="12dp"
-                android:src="@drawable/fit" />
+                app:srcCompat="@drawable/fit" />
 
 
             <kr.ac.snu.hcil.omnitrack.ui.components.common.DrawableTintAppCompatButton

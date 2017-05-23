@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -67,9 +68,9 @@
             android:background="@drawable/transparent_button_background"
             android:padding="8dp"
             android:scaleType="fitCenter"
-            android:src="@drawable/backspace_dark"
             android:tint="@color/inputTextColor"
-            android:visibility="gone" />
+            android:visibility="gone"
+            app:srcCompat="@drawable/backspace_dark" />
     </FrameLayout>
 
     <LinearLayout
@@ -187,8 +188,8 @@
                 style="@style/durationPickerKeyPadStyle"
                 android:layout_width="0dp"
                 android:layout_weight="1"
-                android:src="@drawable/up_dark"
-                android:tint="@color/buttonIconColorDark" />
+                android:tint="@color/buttonIconColorDark"
+                app:srcCompat="@drawable/up_dark" />
         </LinearLayout>
     </LinearLayout>
 </RelativeLayout>

@@ -24,7 +24,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="right"
         android:background="@drawable/transparent_button_background"
-        android:src="@drawable/ex"
-        android:tint="@color/colorRed" />
+        android:tint="@color/colorRed"
+        app:srcCompat="@drawable/ex" />
 
 </FrameLayout>
