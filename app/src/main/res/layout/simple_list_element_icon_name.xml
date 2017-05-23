@@ -28,10 +28,10 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="6dp"
-        android:fontFamily="sans-serif-light"
         android:text="Repeat with Interval"
         android:textColor="@color/textColorDark"
-
         android:textSize="16sp"
-        android:textStyle="italic" />
+
+        android:textStyle="italic"
+        app:fontPath="fonts/Roboto-Light.ttf" />
 </LinearLayout>

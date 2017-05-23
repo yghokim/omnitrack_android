@@ -30,6 +30,7 @@ import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 import rx.subjects.BehaviorSubject
 import rx.subscriptions.CompositeSubscription
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper
 import java.util.*
 
 /**
@@ -301,6 +302,9 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
     protected open fun onSessionLogContent(contentObject: Bundle) {
     }
 
+    override fun attachBaseContext(newBase: Context?) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase))
+    }
 
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
         if (event.action == MotionEvent.ACTION_DOWN) {

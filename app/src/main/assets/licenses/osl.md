@@ -160,9 +160,14 @@ Copyright (C) 2015 Marie Schweiz & Lars Werkman<br>
 Apache 2.0 license
 
 #####Fancybuttons
-<https://github.com/medyo/Fancybuttons>
-El Mehdi Sakout
+<https://github.com/medyo/Fancybuttons><br>
+El Mehdi Sakout<br>
 MIT license
+
+#####Calligraphy
+<https://github.com/chrisjenx/Calligraphy><br>
+Copyright 2013 Christopher Jenkins<br>
+Apache 2.0 license
 
 ---
 

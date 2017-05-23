@@ -281,7 +281,6 @@ class OTApplication : MultiDexApplication() {
 
         val startedAt = SystemClock.elapsedRealtime()
 
-
         logger = LoggingDbHelper(this)
         logger.writeSystemLog("Application creates.", "OTApplication")
 

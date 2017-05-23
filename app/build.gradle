@@ -124,6 +124,7 @@ dependencies {
     releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
     compile 'com.github.medyo:fancybuttons:1.8.3'
     compile 'com.larswerkman:lobsterpicker:1.0.1'
+    compile 'uk.co.chrisjenx:calligraphy:2.3.0'
 }
 
 kapt {
