@@ -22,7 +22,6 @@
             android:layout_height="match_parent"
             android:background="@color/editTextFormBackground"
             android:drawablePadding="4dp"
-            android:drawableStart="@drawable/map_dark"
             android:ellipsize="marquee"
             android:gravity="center_vertical"
             android:lines="1"
@@ -33,6 +32,7 @@
             android:paddingStart="8dp"
             android:paddingTop="6dp"
             android:textColor="@color/textColorMid"
+            app:drawableStartCompat="@drawable/map_dark"
             app:drawableTint="@color/textColorLight"
             />
 
@@ -49,7 +49,7 @@
             android:visibility="invisible" />
     </FrameLayout>
 
-    <Button
+    <kr.ac.snu.hcil.omnitrack.ui.components.common.DrawableTintAppCompatButton
         android:id="@+id/ui_button_search"
         style="@style/mapViewOverlayButton"
         android:layout_width="wrap_content"
@@ -57,15 +57,15 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
         android:height="@dimen/button_height_small"
-        android:drawableLeft="@drawable/search_dark"
-
         android:paddingEnd="12dp"
+
         android:paddingStart="8dp"
         android:text="@string/btn_search"
         android:textColor="@color/buttonIconColorDark"
         android:textSize="13sp"
+        android:visibility="gone"
 
-        android:visibility="gone" />
+        app:drawableStartCompat="@drawable/search_dark" />
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -120,10 +120,10 @@
                 android:layout_width="wrap_content"
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentEnd="true"
-                android:drawableStart="@drawable/edit_location"
                 android:padding="10dp"
                 android:text="@string/adjust"
                 android:textColor="@color/textColorMid"
+                app:drawableStartCompat="@drawable/edit_location"
                 app:drawableTint="@color/colorSecondary" />
         </RelativeLayout>
 

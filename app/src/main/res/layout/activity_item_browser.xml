@@ -49,7 +49,7 @@
                 app:arrowResource="@drawable/down"
                 app:arrowTint="#FFF" />
 
-            <ToggleButton
+            <kr.ac.snu.hcil.omnitrack.ui.components.common.DrawableTintToggleButton
                 android:id="@+id/ui_toggle_sort_order"
                 style="@style/Base.Widget.AppCompat.Button.Borderless"
                 android:layout_width="wrap_content"
@@ -58,11 +58,11 @@
                 android:layout_marginLeft="8dp"
                 android:background="@drawable/button_background_rounded_semitransparent"
                 android:drawablePadding="3dp"
-                android:drawableRight="@drawable/descending"
                 android:text="New ToggleButton"
                 android:textColor="#FFF"
                 android:textOff="@string/msg_sort_descending"
-                android:textOn="@string/msg_sort_ascending" />
+                android:textOn="@string/msg_sort_ascending"
+                app:drawableEndCompat="@drawable/descending" />
         </LinearLayout>
 
     </android.support.design.widget.AppBarLayout>
