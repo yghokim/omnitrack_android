@@ -90,7 +90,7 @@ class ExtendedSpinner : LinearLayout, View.OnClickListener {
     }
 
     constructor(context: Context) : super(context) {
-        arrowView?.setImageResource(R.drawable.down_dark)
+        arrowView?.setImageResource(R.drawable.down)
         popup = DropdownPopup(context, null, 0, 0)
     }
 
@@ -109,7 +109,7 @@ class ExtendedSpinner : LinearLayout, View.OnClickListener {
         val a = context.obtainStyledAttributes(attrs, R.styleable.ExtendedSpinner, defStyleAttr, 0)
 
         try {
-            arrowView?.setImageResource(a.getResourceId(R.styleable.ExtendedSpinner_arrowResource, R.drawable.down_dark))
+            arrowView?.setImageResource(a.getResourceId(R.styleable.ExtendedSpinner_arrowResource, R.drawable.down))
             arrowView?.setColorFilter(a.getColor(R.styleable.ExtendedSpinner_arrowTint, ContextCompat.getColor(context, R.color.buttonIconColorDark)))
 
         } finally {
