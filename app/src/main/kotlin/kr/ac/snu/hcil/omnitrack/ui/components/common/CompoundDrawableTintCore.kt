@@ -65,7 +65,7 @@ class CompoundDrawableTintCore() {
     private fun getDrawableCompat(attrId: Int, a: TypedArray, context: Context): Drawable? {
         return try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                a.getDrawable(R.styleable.DrawableTint_drawableStartCompat)
+                a.getDrawable(attrId)
             } else {
                 val resourceId = a.getResourceId(attrId, -1)
                 AppCompatResources.getDrawable(context, resourceId)
