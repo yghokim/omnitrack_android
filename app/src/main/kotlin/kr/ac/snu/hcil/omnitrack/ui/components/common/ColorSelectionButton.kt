@@ -7,7 +7,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
 import android.graphics.drawable.Drawable
-import android.support.v4.content.ContextCompat
+import android.support.v4.content.res.ResourcesCompat
 import android.util.AttributeSet
 import android.view.animation.DecelerateInterpolator
 import android.widget.Button
@@ -76,7 +76,7 @@ class ColorSelectionButton : Button, ValueAnimator.AnimatorUpdateListener {
         // Set up a default TextPaint object
         shapePaint.flags = Paint.ANTI_ALIAS_FLAG
 
-        checkedDrawable = ContextCompat.getDrawable(context, R.drawable.done)
+        checkedDrawable = ResourcesCompat.getDrawable(context.resources, R.drawable.done, null)!!
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {

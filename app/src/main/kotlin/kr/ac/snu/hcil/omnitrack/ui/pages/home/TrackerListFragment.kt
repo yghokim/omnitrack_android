@@ -379,9 +379,14 @@ class TrackerListFragment : OTFragment() {
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            val view = LayoutInflater.from(parent.context).inflate(R.layout.tracker_list_element, parent, false)
-            return ViewHolder(view).apply {
-                viewHolders.add(this)
+            try {
+                val view = LayoutInflater.from(parent.context).inflate(R.layout.tracker_list_element, parent, false)
+                return ViewHolder(view).apply {
+                    viewHolders.add(this)
+                }
+            } catch(ex: Exception) {
+                ex.printStackTrace()
+                throw Exception("Inflation failed")
             }
         }
 

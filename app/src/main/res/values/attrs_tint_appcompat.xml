@@ -7,6 +7,9 @@
         <!-- Tint to apply to the button drawable. -->
         <attr name="drawableTint" format="color" />
 
+        <attr name="drawableStartCompat" format="integer" />
+        <attr name="drawableEndCompat" format="integer" />
+
         <!-- Blending mode used to apply the button tint. -->
         <attr name="drawableTintMode">
             <!-- The tint is drawn on top of the drawable.

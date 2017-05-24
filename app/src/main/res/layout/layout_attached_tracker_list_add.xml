@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android">
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <android.support.v7.widget.AppCompatButton
+    <kr.ac.snu.hcil.omnitrack.ui.components.common.DrawableTintAppCompatButton
         android:id="@+id/ui_button_add"
         style="@style/Base.Widget.AppCompat.Button.Borderless.Colored"
         android:layout_width="wrap_content"
@@ -9,12 +10,12 @@
         android:layout_marginBottom="8dp"
         android:layout_marginRight="16dp"
         android:background="@drawable/button_background_formlike"
-        android:drawableLeft="@drawable/plus_small_dark"
         android:drawablePadding="5dp"
         android:includeFontPadding="false"
         android:paddingEnd="12dp"
         android:paddingStart="5dp"
-
         android:paddingTop="5dp"
-        android:text="@string/msg_trigger_assign_tracker" />
+
+        android:text="@string/msg_trigger_assign_tracker"
+        app:drawableStartCompat="@drawable/plus_small_dark" />
 </merge>

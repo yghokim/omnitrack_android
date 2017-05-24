@@ -14,14 +14,14 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:drawablePadding="5dp"
-        android:drawableStart="@drawable/rounded_plus_light"
         android:includeFontPadding="false"
-
         android:paddingLeft="@dimen/activity_horizontal_margin"
+
         android:paddingRight="12dp"
         android:text="@string/property_choice_add_new_entry"
         android:textAlignment="viewStart"
         android:textColor="@color/buttonIconColorDark"
+        app:drawableStartCompat="@drawable/rounded_plus_light"
         app:drawableTint="@color/colorSecondary" />
 
 

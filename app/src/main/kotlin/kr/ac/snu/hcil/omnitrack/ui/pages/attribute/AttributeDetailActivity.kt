@@ -8,7 +8,6 @@ import android.transition.TransitionManager
 import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -25,7 +24,11 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.BooleanPropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ShortTextPropertyView
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.wizard.ConnectionWizardView
-import kr.ac.snu.hcil.omnitrack.utils.*
+import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
+import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
+import kr.ac.snu.hcil.omnitrack.utils.setPaddingLeft
+import kr.ac.snu.hcil.omnitrack.utils.setPaddingRight
+import mehdi.sakout.fancybuttons.FancyButton
 import rx.internal.util.SubscriptionList
 import java.util.*
 
@@ -57,7 +60,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
     private val connectionFrame: FrameLayout by bindView(R.id.ui_attribute_connection_frame)
 
-    private val newConnectionButton: Button by bindView(R.id.ui_button_new_connection)
+    private val newConnectionButton: FancyButton by bindView(R.id.ui_button_new_connection)
     private val connectionView: AttributeConnectionView by  bindView(R.id.ui_attribute_connection)
 
     private val connectionViewTitle: TextView by bindView(R.id.ui_property_title_value_connection)
@@ -101,8 +104,6 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
                 refreshConnection(true)
             }).show()
         }
-
-        InterfaceHelper.removeButtonTextDecoration(newConnectionButton)
 
         newConnectionButton.setOnClickListener(this)
 

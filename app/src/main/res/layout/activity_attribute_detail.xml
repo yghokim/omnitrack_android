@@ -88,20 +88,22 @@
                     android:layout_marginTop="@dimen/activity_vertical_margin"
                     android:background="@drawable/attribute_card">
 
-                    <kr.ac.snu.hcil.omnitrack.ui.components.common.DrawableTintAppCompatButton
+                    <kr.ac.snu.hcil.omnitrack.ui.components.common.VerticalCenterAlignedIconTextButton
                         android:id="@+id/ui_button_new_connection"
-                        style="@style/Base.Widget.AppCompat.Button.Borderless"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:drawablePadding="8dp"
-                        android:drawableStart="@drawable/link"
                         android:paddingBottom="14dp"
                         android:paddingStart="12dp"
                         android:paddingTop="14dp"
-                        android:text="@string/msg_set_new_connection"
-                        android:textAlignment="viewStart"
-                        android:textColor="@color/buttonIconColorDark"
-                        app:drawableTint="@color/buttonIconColorDark" />
+                        app:drawableTint="@color/buttonIconColorDark"
+                        app:fb_defaultColor="#00ffffff"
+                        app:fb_focusColor="@color/textColorLight"
+                        app:fb_iconPaddingRight="4dp"
+                        app:fb_iconResource="@drawable/link"
+                        app:fb_radius="12dp"
+                        app:fb_text="@string/msg_set_new_connection"
+                        app:fb_textColor="@color/buttonIconColorDark"
+                        app:fb_useSystemFont="true" />
 
                     <kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeConnectionView
                         android:id="@+id/ui_attribute_connection"

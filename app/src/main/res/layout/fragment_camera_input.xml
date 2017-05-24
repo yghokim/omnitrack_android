@@ -44,7 +44,7 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <ToggleButton
+        <kr.ac.snu.hcil.omnitrack.ui.components.common.DrawableTintToggleButton
             android:id="@+id/ui_button_toggle_camera"
             style="@style/CameraViewOverlayButtonStyle"
             android:layout_width="wrap_content"
@@ -53,11 +53,11 @@
             android:layout_marginBottom="8dp"
             android:layout_marginRight="8dp"
             android:layout_marginTop="8dp"
-            android:drawableStart="@drawable/camera_front"
-
             android:textAllCaps="false"
+
             android:textOff="@string/msg_turn_to_selfie"
             android:textOn="@string/msg_turn_to_rear"
+            app:drawableStartCompat="@drawable/camera_front"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent" />
 
