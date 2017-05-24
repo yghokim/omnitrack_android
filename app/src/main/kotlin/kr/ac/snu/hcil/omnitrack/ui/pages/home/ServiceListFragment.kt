@@ -143,6 +143,7 @@ class ServiceListFragment : OTFragment() {
                 measureFactoryListView.addItemDecoration(HorizontalDividerItemDecoration(ContextCompat.getColor(context, R.color.separator_Light), (0.6f * resources.displayMetrics.density + .5f).toInt()))
 
                 activationButton = view.findViewById(R.id.ui_button_activate) as AppCompatButton
+                activationButton.supportBackgroundTintList = activateColor
                 activationButton.setOnClickListener {
                     val service = getService(adapterPosition)
 
