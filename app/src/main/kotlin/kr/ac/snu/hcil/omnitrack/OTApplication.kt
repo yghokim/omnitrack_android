@@ -9,7 +9,9 @@ import android.os.Looper
 import android.os.SystemClock
 import android.preference.PreferenceManager
 import android.provider.Settings
+import android.support.multidex.MultiDex
 import android.support.multidex.MultiDexApplication
+import android.support.v7.app.AppCompatDelegate
 import android.telephony.TelephonyManager
 import android.text.format.DateUtils
 import com.google.firebase.crash.FirebaseCrash
@@ -115,6 +117,10 @@ class OTApplication : MultiDexApplication() {
 
         fun getString(resId: Int): String {
             return app.resources.getString(resId)
+        }
+
+        init {
+            AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
         }
     }
 
@@ -264,6 +270,11 @@ class OTApplication : MultiDexApplication() {
         private set
 
     private lateinit var userLoadingLooper: Looper
+
+    override fun attachBaseContext(base: Context?) {
+        super.attachBaseContext(base)
+        MultiDex.install(this)
+    }
 
     override fun onCreate() {
         super.onCreate()

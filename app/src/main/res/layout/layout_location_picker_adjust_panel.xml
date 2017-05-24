@@ -28,10 +28,10 @@
         android:layout_alignParentEnd="true"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="7dp"
-        android:drawableStart="@drawable/done"
         android:padding="10dp"
         android:text="@string/msg_apply"
         android:textColor="@color/textColorMid"
+        app:drawableStartCompat="@drawable/done"
         app:drawableTint="@color/buttonIconColorDark" />
 
     <kr.ac.snu.hcil.omnitrack.ui.components.common.DrawableTintAppCompatButton
@@ -41,10 +41,10 @@
         android:layout_width="wrap_content"
         android:layout_alignTop="@+id/ui_button_apply"
         android:layout_toStartOf="@+id/ui_button_apply"
-        android:drawableStart="@drawable/ex"
         android:padding="10dp"
         android:text="@string/msg_cancel"
         android:textColor="@color/textColorMid"
+        app:drawableStartCompat="@drawable/ex"
         app:drawableTint="@color/buttonIconColorDark" />
 
     <ImageView

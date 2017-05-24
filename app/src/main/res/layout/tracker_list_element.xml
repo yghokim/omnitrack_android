@@ -153,7 +153,7 @@
     <LinearLayout
         android:id="@+id/ui_expanded_view"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/button_height_normal"
         android:layout_alignParentBottom="true"
         android:layout_toEndOf="@+id/color_bar"
         android:background="@drawable/main_gradient"
@@ -164,29 +164,29 @@
         app:layout_constraintLeft_toRightOf="@+id/color_bar"
         app:layout_constraintRight_toRightOf="parent">
 
-        <Button
+        <kr.ac.snu.hcil.omnitrack.ui.components.common.VerticalCenterAlignedIconTextButton
             android:id="@+id/ui_button_edit"
             style="@style/expandedPanelButton"
-            android:drawableStart="@drawable/pen"
-            android:text="@string/msg_edit" />
+            app:fb_iconResource="@drawable/pen"
+            app:fb_text="@string/msg_edit" />
 
-        <Button
+        <kr.ac.snu.hcil.omnitrack.ui.components.common.VerticalCenterAlignedIconTextButton
             android:id="@+id/ui_button_list"
             style="@style/expandedPanelButton"
-            android:drawableStart="@drawable/list"
-            android:text="@string/msg_data_list" />
+            app:fb_iconResource="@drawable/list"
+            app:fb_text="@string/msg_data_list" />
 
-        <Button
+        <kr.ac.snu.hcil.omnitrack.ui.components.common.VerticalCenterAlignedIconTextButton
             android:id="@+id/ui_button_charts"
             style="@style/expandedPanelButton"
-            android:drawableStart="@drawable/chart"
-            android:text="@string/msg_charts" />
+            app:fb_iconResource="@drawable/chart"
+            app:fb_text="@string/msg_charts" />
 
-        <Button
+        <kr.ac.snu.hcil.omnitrack.ui.components.common.VerticalCenterAlignedIconTextButton
             android:id="@+id/ui_button_remove"
             style="@style/expandedPanelButton"
-            android:drawableStart="@drawable/ex"
-            android:text="@string/msg_remove" />
+            app:fb_iconResource="@drawable/ex"
+            app:fb_text="@string/msg_remove" />
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>
