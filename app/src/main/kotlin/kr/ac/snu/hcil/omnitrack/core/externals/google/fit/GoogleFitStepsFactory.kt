@@ -33,8 +33,9 @@ object GoogleFitStepsFactory : GoogleFitService.GoogleFitMeasureFactory("step") 
 
     override val supportedConditionerTypes: IntArray = CONDITIONERS_FOR_SINGLE_NUMERIC_VALUE
 
-    override val service: OTExternalService = GoogleFitService
-
+    override fun getService(): OTExternalService {
+        return GoogleFitService
+    }
 
     override val exampleAttributeType: Int = OTAttribute.TYPE_NUMBER
 
@@ -72,7 +73,7 @@ object GoogleFitStepsFactory : GoogleFitService.GoogleFitMeasureFactory("step") 
 
         override fun getValueRequest(start: Long, end: Long): Observable<Result<out Any>> {
             println("Requested Google Fit Step Measure")
-            return if (factory.service.state == OTExternalService.ServiceState.ACTIVATED) {
+            return if (factory.getService().state == OTExternalService.ServiceState.ACTIVATED) {
                 GoogleFitService.getConnectedClient().map<Result<out Any>>(object : Func1<GoogleApiClient, Result<out Any>> {
                     override fun call(client: GoogleApiClient): Result<out Any> {
                         val request = DataReadRequest.Builder()

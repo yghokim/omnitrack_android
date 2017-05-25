@@ -43,7 +43,9 @@ object FitbitDistanceMeasureFactory : OTMeasureFactory("dist") {
         return FitbitDistanceMeasure(serialized)
     }
 
-    override val service: OTExternalService = FitbitService
+    override fun getService(): OTExternalService {
+        return FitbitService
+    }
 
     override val descResourceId: Int = R.string.measure_fitbit_distance_desc
     override val nameResourceId: Int = R.string.measure_fitbit_distance_name

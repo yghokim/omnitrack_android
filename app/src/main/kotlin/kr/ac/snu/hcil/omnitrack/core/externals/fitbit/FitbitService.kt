@@ -2,7 +2,10 @@ package kr.ac.snu.hcil.omnitrack.core.externals.fitbit
 
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.dependency.OTSystemDependencyResolver
+import kr.ac.snu.hcil.omnitrack.core.dependency.ThirdPartyAppDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.externals.OAuth2BasedExternalService
+import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.auth.OAuth2Client
 
 /**
@@ -26,12 +29,26 @@ object FitbitService : OAuth2BasedExternalService("FitbitService", 0) {
     override val nameResourceId: Int = R.string.service_fitbit_name
 
     init {
-        _measureFactories.add(FitbitStepCountMeasureFactory)
-        _measureFactories.add(FitbitDistanceMeasureFactory)
-        _measureFactories.add(FitbitRecentSleepTimeMeasureFactory)
-        _measureFactories.add(FitbitHeartRateMeasureFactory)
-
         assignRequestCode(this)
+    }
+
+    override fun onRegisterMeasureFactories(): Array<OTMeasureFactory> {
+        return arrayOf(
+                FitbitStepCountMeasureFactory,
+                FitbitDistanceMeasureFactory,
+                FitbitRecentSleepTimeMeasureFactory,
+                FitbitHeartRateMeasureFactory
+        )
+    }
+
+    override fun onRegisterDependencies(): Array<OTSystemDependencyResolver> {
+        return arrayOf(
+                ThirdPartyAppDependencyResolver.Builder(OTApplication.app)
+                        .setAppName("Fitbit")
+                        .setPackageName("com.fitbit.FitbitMobile")
+                        .isMandatory(false)
+                        .build()
+        )
     }
 
     override fun makeNewAuth2Client(requestCode: Int): OAuth2Client {

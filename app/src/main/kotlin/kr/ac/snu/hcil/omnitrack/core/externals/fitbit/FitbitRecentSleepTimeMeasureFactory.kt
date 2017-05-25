@@ -43,9 +43,12 @@ object FitbitRecentSleepTimeMeasureFactory : OTMeasureFactory("slp") {
         return FitbitRecentSleepTimeMeasure(serialized)
     }
 
-    override val service: OTExternalService = FitbitService
     override val descResourceId: Int = R.string.measure_fitbit_sleep_time_desc
     override val nameResourceId: Int = R.string.measure_fitbit_sleep_time_name
+
+    override fun getService(): OTExternalService {
+        return FitbitService
+    }
 
     class FitbitRecentSleepTimeMeasure : OTRangeQueriedMeasure {
 

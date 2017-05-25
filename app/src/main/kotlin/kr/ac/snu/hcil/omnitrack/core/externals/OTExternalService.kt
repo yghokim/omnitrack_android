@@ -1,13 +1,12 @@
 package kr.ac.snu.hcil.omnitrack.core.externals
 
-import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.support.v4.app.Fragment
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.dependency.OTSystemDependencyResolver
+import kr.ac.snu.hcil.omnitrack.core.dependency.PermissionDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.externals.fitbit.FitbitService
 import kr.ac.snu.hcil.omnitrack.core.externals.google.fit.GoogleFitService
 import kr.ac.snu.hcil.omnitrack.core.externals.jawbone.JawboneUpService
@@ -15,7 +14,7 @@ import kr.ac.snu.hcil.omnitrack.core.externals.misfit.MisfitService
 import kr.ac.snu.hcil.omnitrack.core.externals.rescuetime.RescueTimeService
 import kr.ac.snu.hcil.omnitrack.utils.FillingIntegerIdReservationTable
 import kr.ac.snu.hcil.omnitrack.utils.INameDescriptionResourceProvider
-import kr.ac.snu.hcil.omnitrack.utils.events.Event
+import rx.Observable
 import java.util.*
 
 /**
@@ -65,12 +64,11 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
 
         val preferences: SharedPreferences by lazy { OTApplication.app.getSharedPreferences("ExternalServices", Context.MODE_PRIVATE) }
 
-
-        var pendingConnectionListener: ((Boolean) -> Unit)? = null
-
-        init {
+        fun init() {
             for (service in availableServices) {
                 for (factory in service.measureFactories) {
+                    println("service: ${service.identifier}")
+                    println("factory service: ${factory.getService()}")
                     factoryCodeDict.put(factory.typeCode, factory)
                 }
             }
@@ -99,12 +97,12 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
 
     open val isInternetRequiredForActivation = true
 
-    protected val _dependencyList = ArrayList<OTSystemDependencyResolver>()
+    private val _dependencyList = ArrayList<OTSystemDependencyResolver>()
     val dependencyList: List<OTSystemDependencyResolver> get() = _dependencyList
 
     open val permissionGranted: Boolean
         get() {
-            for (permission in requiredPermissionsRecursive) {
+            for (permission in getRequiredPermissionsRecursive()) {
                 if (OTApplication.app.checkCallingOrSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
                     return false
                 }
@@ -112,7 +110,7 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
             return true
         }
 
-    protected open val _measureFactories = ArrayList<OTMeasureFactory>()
+    private val _measureFactories = ArrayList<OTMeasureFactory>()
 
     val measureFactories: List<OTMeasureFactory> get() {
         return _measureFactories
@@ -123,34 +121,56 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
 
 
     init {
+
         state = if (getIsActivatedFlag(identifier) == true) {
             ServiceState.ACTIVATED
         } else {
             ServiceState.DEACTIVATED
         }
+
+        initialize()
     }
 
-    fun activateAsync(context: Context, connectedHandler: ((Boolean) -> Unit)? = null) {
-        state = ServiceState.ACTIVATING
+    private fun initialize() {
+        _measureFactories += onRegisterMeasureFactories()
 
-        pendingConnectionListener = {
-            result ->
-            if (result == true) {
-                setIsActivatedFlag(this, true)
-                state = ServiceState.ACTIVATED
-            } else {
-                setIsActivatedFlag(this, false)
-                state = ServiceState.DEACTIVATED
-            }
-
-            connectedHandler?.invoke(result)
-            pendingConnectionListener = null
+        println("measure factories")
+        println(_measureFactories)
+        val permissions = getRequiredPermissionsRecursive()
+        if (permissions.isNotEmpty()) {
+            _dependencyList.add(
+                    PermissionDependencyResolver(*permissions)
+            )
         }
 
-        onActivateAsync(context, pendingConnectionListener)
+        _dependencyList += onRegisterDependencies()
     }
 
-    abstract fun onActivateAsync(context: Context, connectedHandler: ((Boolean) -> Unit)? = null)
+    protected abstract fun onRegisterMeasureFactories(): Array<OTMeasureFactory>
+
+    protected open fun onRegisterDependencies(): Array<OTSystemDependencyResolver> {
+        return emptyArray()
+    }
+
+    fun activateAsync(context: Context): Observable<Boolean> {
+
+        return onActivateAsync(context)
+                .doOnSubscribe {
+                    state = ServiceState.ACTIVATING
+                }
+                .doOnNext {
+                    result ->
+                    if (result == true) {
+                        setIsActivatedFlag(this, true)
+                        state = ServiceState.ACTIVATED
+                    } else {
+                        setIsActivatedFlag(this, false)
+                        state = ServiceState.DEACTIVATED
+                    }
+                }
+    }
+
+    abstract fun onActivateAsync(context: Context): Observable<Boolean>
 
 
     fun deactivate() {
@@ -161,29 +181,25 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
 
     abstract fun onDeactivate()
 
-    val activated = Event<Any>()
-    val deactivated = Event<Any>()
-
-    open val requiredPermissions: Array<String> = arrayOf()
-
     abstract val thumbResourceId: Int
 
     fun grantPermissions(caller: Fragment, requestCode: Int) {
-        caller.requestPermissions(requiredPermissionsRecursive, requestCode)
+        caller.requestPermissions(getRequiredPermissionsRecursive(), requestCode)
     }
 
     abstract fun prepareServiceAsync(preparedHandler: ((Boolean) -> Unit)?)
 
-    protected val requiredPermissionsRecursive: Array<String> by lazy {
+    protected fun getRequiredPermissionsRecursive(): Array<String> {
         val result = HashSet<String>()
 
-        result.addAll(requiredPermissions)
         for (factory in _measureFactories) {
             result.addAll(factory.requiredPermissions)
         }
 
-        result.toTypedArray()
+        return result.toTypedArray()
     }
+
+    /*
 
     protected fun finishActivationProcess(success: Boolean) {
         pendingConnectionListener?.invoke(success)
@@ -199,7 +215,7 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
             println("activation result failed")
             cancelActivationProcess()
         } else handleActivityActivationResultOk(resultData)
-    }
+    }*/
 
-    abstract fun handleActivityActivationResultOk(resultData: Intent?)
+    //abstract fun handleActivityActivationResultOk(resultData: Intent?)
 }

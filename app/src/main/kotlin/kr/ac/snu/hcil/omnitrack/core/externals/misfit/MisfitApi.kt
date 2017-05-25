@@ -1,14 +1,14 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.misfit
 
 import android.accounts.NetworkErrorException
-import android.support.v4.app.FragmentActivity
+import android.app.Activity
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
-import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.ui.components.common.activity.WebServiceLoginActivity
 import kr.ac.snu.hcil.omnitrack.utils.Result
 import kr.ac.snu.hcil.omnitrack.utils.auth.AuthConstants
+import kr.ac.snu.hcil.omnitrack.utils.convertToRx1Observable
 import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
 import okhttp3.FormBody
 import okhttp3.HttpUrl
@@ -16,6 +16,9 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject
 import rx.Observable
+import rx.android.schedulers.AndroidSchedulers
+import rx.schedulers.Schedulers
+import rx_activity_result2.RxActivityResult
 import java.util.*
 
 /**
@@ -43,14 +46,33 @@ object MisfitApi {
         return HttpUrl.Builder().scheme("https").host(URL_ROOT)
     }
 
-    fun authorize(activity: FragmentActivity) {
+    /***
+     * authrize and observe access token
+     */
+    fun authorize(activity: Activity): Observable<String> {
+
         val uri = makeUriBuilderRoot().addPathSegments(SUBURL_LOGIN)
                 .addQueryParameter(AuthConstants.PARAM_CLIENT_ID, activity.resources.getString(R.string.misfit_app_key))
                 .addQueryParameter(AuthConstants.PARAM_RESPONSE_TYPE, AuthConstants.VALUE_RESPONSE_TYPE_CODE)
                 .addQueryParameter(AuthConstants.PARAM_REDIRECT_URI, AuthConstants.VALUE_REDIRECT_URI)
                 .addQueryParameter(AuthConstants.PARAM_SCOPE, "tracking,sleeps")
                 .build()
-        activity.startActivityForResult(WebServiceLoginActivity.makeIntent(uri.toString(), OTApplication.getString(R.string.service_misfit_name), activity), OTExternalService.requestCodeDict[MisfitService])
+        return RxActivityResult.on(activity).startIntent(WebServiceLoginActivity.makeIntent(uri.toString(), OTApplication.getString(R.string.service_misfit_name), activity))
+                .convertToRx1Observable()
+                .flatMap {
+                    result ->
+                    if (result.resultCode() == Activity.RESULT_OK) {
+                        val code = result.data().getStringExtra(AuthConstants.PARAM_CODE)
+                        if (code != null) {
+                            MisfitApi.getTokenExchangeRequest(code).subscribeOn(Schedulers.io())
+                                    .observeOn(AndroidSchedulers.mainThread())
+                        } else {
+                            Observable.error<String>(Exception("access token was not received."))
+                        }
+                    } else {
+                        Observable.error<String>(Exception("login activity was canceled."))
+                    }
+                }
     }
 
     fun getLatestSleepOnDayRequest(token: String, start: Date, end: Date): Observable<Result<TimeSpan>> {

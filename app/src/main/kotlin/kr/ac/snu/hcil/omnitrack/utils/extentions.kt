@@ -20,6 +20,8 @@ import android.view.ViewGroup
 import android.widget.TimePicker
 import com.google.android.gms.maps.model.LatLng
 import kr.ac.snu.hcil.omnitrack.OTApplication
+import rx.Observable
+import rx.subscriptions.Subscriptions
 import java.math.BigDecimal
 import java.util.*
 
@@ -275,6 +277,33 @@ val KeyguardManager.isDeviceLockedCompat: Boolean get() {
         return this.isKeyguardLocked
     } else {
         return this.isDeviceLocked
+    }
+}
+
+fun <T> io.reactivex.Observable<T>.convertToRx1Observable(): rx.Observable<T> {
+    return Observable.unsafeCreate<T> {
+        subscriber ->
+        val subscription = this.subscribe({
+            result ->
+            println("Rx2 observable onNext: ${result}")
+            if (!subscriber.isUnsubscribed) {
+                subscriber.onNext(result)
+            }
+        }, { t ->
+
+            println("Rx2 observable error: ${t.message}")
+            if (!subscriber.isUnsubscribed) {
+                subscriber.onError(t)
+            }
+        }, {
+
+            println("Rx2 observable complete")
+            if (!subscriber.isUnsubscribed) {
+                subscriber.onCompleted()
+            }
+        })
+
+        subscriber.add(Subscriptions.create { subscription.dispose() })
     }
 }
 

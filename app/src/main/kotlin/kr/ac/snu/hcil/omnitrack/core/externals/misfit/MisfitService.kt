@@ -1,13 +1,11 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.misfit
 
+import android.app.Activity
 import android.content.Context
-import android.content.Intent
-import android.support.v4.app.FragmentActivity
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
-import kr.ac.snu.hcil.omnitrack.utils.auth.AuthConstants
-import rx.android.schedulers.AndroidSchedulers
-import rx.schedulers.Schedulers
+import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
+import rx.Observable
 
 /**
  * Created by Young-Ho on 9/1/2016.
@@ -17,9 +15,11 @@ object MisfitService : OTExternalService("MisfitService", 0) {
     const val PREFERENCE_ACCESS_TOKEN = "misfit_access_token"
 
     init {
-        _measureFactories.add(MisfitSleepMeasureFactory)
-        _measureFactories.add(MisfitStepMeasureFactory)
         assignRequestCode(this)
+    }
+
+    override fun onRegisterMeasureFactories(): Array<OTMeasureFactory> {
+        return arrayOf(MisfitStepMeasureFactory, MisfitSleepMeasureFactory)
     }
 
     fun getStoredAccessToken(): String? {
@@ -28,8 +28,12 @@ object MisfitService : OTExternalService("MisfitService", 0) {
         } else return null
     }
 
-    override fun onActivateAsync(context: Context, connectedHandler: ((Boolean) -> Unit)?) {
-        MisfitApi.authorize(context as FragmentActivity)
+    override fun onActivateAsync(context: Context): Observable<Boolean> {
+        return MisfitApi.authorize(context as Activity).doOnNext {
+            token ->
+            OTExternalService.preferences.edit().putString(MisfitService.PREFERENCE_ACCESS_TOKEN, token).apply()
+        }.onErrorReturn { err -> null }
+                .map { token -> !token.isNullOrBlank() }
     }
 
     override fun onDeactivate() {
@@ -46,6 +50,7 @@ object MisfitService : OTExternalService("MisfitService", 0) {
         }
     }
 
+    /*
     override fun handleActivityActivationResultOk(resultData: Intent?) {
 
         val code = resultData?.getStringExtra(AuthConstants.PARAM_CODE)
@@ -62,7 +67,7 @@ object MisfitService : OTExternalService("MisfitService", 0) {
                         cancelActivationProcess()
                     })
         }
-    }
+    }*/
 
     override val nameResourceId: Int = R.string.service_misfit_name
     override val descResourceId: Int = R.string.service_misfit_desc

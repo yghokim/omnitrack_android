@@ -22,6 +22,7 @@ import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
+import rx.internal.util.SubscriptionList
 
 /**
  * Created by Young-Ho on 7/29/2016.
@@ -33,6 +34,8 @@ class ServiceListFragment : OTFragment() {
     private lateinit var adapter: Adapter
 
     private val pendedActivations = SparseArray<Adapter.ViewHolder>()
+
+    private val creationSubscriptions = SubscriptionList()
 
     private val internetRequiredAlertBuilder: MaterialDialog.Builder by lazy {
         DialogHelper.makeSimpleAlertBuilder(context, context.getString(R.string.msg_external_service_activation_requires_internet))
@@ -54,20 +57,27 @@ class ServiceListFragment : OTFragment() {
         return rootView
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        creationSubscriptions.clear()
+    }
+
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         println("permission result: $requestCode ${pendedActivations.size()}")
         if (pendedActivations[requestCode] != null) {
             if (grantResults.indexOf(PackageManager.PERMISSION_DENIED) == -1) {
-                OTExternalService.availableServices[requestCode].activateAsync(context) {
-                    success ->
-                    if (success) {
-                        pendedActivations[requestCode].holderState = OTExternalService.ServiceState.ACTIVATED
-                    } else {
-                        pendedActivations[requestCode].holderState = OTExternalService.ServiceState.DEACTIVATED
-                    }
-                    pendedActivations.removeAt(requestCode)
-                }
+                creationSubscriptions.add(
+                        OTExternalService.availableServices[requestCode].activateAsync(context).subscribe({
+                            success ->
+                            if (success) {
+                                pendedActivations[requestCode].holderState = OTExternalService.ServiceState.ACTIVATED
+                            } else {
+                                pendedActivations[requestCode].holderState = OTExternalService.ServiceState.DEACTIVATED
+                            }
+                            pendedActivations.removeAt(requestCode)
+                        }, { pendedActivations[requestCode].holderState = OTExternalService.ServiceState.DEACTIVATED }, { pendedActivations.removeAt(requestCode) })
+                )
             } else {
                 //activation failed.
                 println("some permissions not granted. activation failed.")
@@ -166,14 +176,16 @@ class ServiceListFragment : OTFragment() {
                                     pendedActivations.setValueAt(adapterPosition, this@ViewHolder)
                                     service.grantPermissions(this@ServiceListFragment, adapterPosition)
                                 } else {
-                                    service.activateAsync(context) {
-                                        success ->
-                                        if (success) {
-                                            holderState = OTExternalService.ServiceState.ACTIVATED
-                                        } else {
-                                            holderState = OTExternalService.ServiceState.DEACTIVATED
-                                        }
-                                    }
+                                    creationSubscriptions.add(
+                                            service.activateAsync(context).subscribe({
+                                                success ->
+                                                if (success) {
+                                                    holderState = OTExternalService.ServiceState.ACTIVATED
+                                                } else {
+                                                    holderState = OTExternalService.ServiceState.DEACTIVATED
+                                                }
+                                            }, { holderState = OTExternalService.ServiceState.DEACTIVATED })
+                                    )
                                 }
                             }
                         }
