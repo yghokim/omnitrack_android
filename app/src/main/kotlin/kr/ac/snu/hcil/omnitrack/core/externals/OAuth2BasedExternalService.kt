@@ -1,8 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.externals
 
+import android.app.Activity
 import android.content.Context
-import android.content.Intent
-import android.support.v4.app.FragmentActivity
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.utils.Result
 import kr.ac.snu.hcil.omnitrack.utils.auth.OAuth2Client
@@ -11,7 +10,7 @@ import rx.Observable
 /**
  * Created by Young-Ho Kim on 16. 9. 3
  */
-abstract class OAuth2BasedExternalService(identifier: String, minimumSDK: Int) : OTExternalService(identifier, minimumSDK), OAuth2Client.OAuth2ResultListener, OAuth2Client.OAuth2CredentialRefreshedListener {
+abstract class OAuth2BasedExternalService(identifier: String, minimumSDK: Int) : OTExternalService(identifier, minimumSDK), OAuth2Client.OAuth2CredentialRefreshedListener {
 
     private val authClient: OAuth2Client by lazy {
         makeNewAuth2Client(OTExternalService.requestCodeDict[this])
@@ -29,8 +28,16 @@ abstract class OAuth2BasedExternalService(identifier: String, minimumSDK: Int) :
 
     abstract fun makeNewAuth2Client(requestCode: Int): OAuth2Client
 
-    override fun onActivateAsync(context: Context, connectedHandler: ((Boolean) -> Unit)?) {
-        authClient.authorize(context as FragmentActivity, this, OTApplication.getString(nameResourceId))
+    override fun onActivateAsync(context: Context): Observable<Boolean> {
+        return authClient.authorize(context as Activity, OTApplication.getString(nameResourceId))
+                .doOnNext { credential ->
+                    credential.store(preferences, identifier)
+                }
+                .onErrorReturn { error -> null }
+                .map {
+                    credential ->
+                    credential != null
+                }
     }
 
     override fun onDeactivate() {
@@ -54,16 +61,6 @@ abstract class OAuth2BasedExternalService(identifier: String, minimumSDK: Int) :
         }
     }
 
-    override fun onFailed(error: String?) {
-        println("OAuth2Service auth error: $error")
-        pendingConnectionListener?.invoke(false)
-    }
-
-    override fun onSuccess(credential: OAuth2Client.Credential) {
-        credential.store(preferences, identifier)
-        pendingConnectionListener?.invoke(true)
-    }
-
     override fun onCredentialRefreshed(newCredential: OAuth2Client.Credential) {
         println("store refreshed credential")
         credential = newCredential
@@ -74,11 +71,6 @@ abstract class OAuth2BasedExternalService(identifier: String, minimumSDK: Int) :
         return if (credential != null) {
             authClient.getRequest(credential, converter, this, *requestUrls)
         } else Observable.error(Exception("Auth Credential is not stored."))
-    }
-
-    override fun handleActivityActivationResultOk(resultData: Intent?) {
-        if (resultData != null)
-            authClient.handleLoginActivityResult(resultData)
     }
 
 }

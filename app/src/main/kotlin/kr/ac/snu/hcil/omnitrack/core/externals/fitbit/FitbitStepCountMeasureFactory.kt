@@ -43,7 +43,9 @@ object FitbitStepCountMeasureFactory : OTMeasureFactory("step") {
         return FitbitStepMeasure(serialized)
     }
 
-    override val service: OTExternalService = FitbitService
+    override fun getService(): OTExternalService {
+        return FitbitService
+    }
 
     override val descResourceId: Int = R.string.measure_steps_desc
     override val nameResourceId: Int = R.string.measure_steps_name

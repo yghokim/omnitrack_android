@@ -37,7 +37,9 @@ object RescueTimeProductivityMeasureFactory : OTMeasureFactory("prd") {
 
     override val exampleAttributeType: Int = OTAttribute.TYPE_NUMBER
 
-    override val service: OTExternalService = RescueTimeService
+    override fun getService(): OTExternalService {
+        return RescueTimeService
+    }
 
     override fun isAttachableTo(attribute: OTAttribute<out Any>): Boolean {
         return attribute.typeId == OTAttribute.TYPE_NUMBER

@@ -23,10 +23,10 @@ public class Utils {
         return Math.round(sp * context.getResources().getDisplayMetrics().scaledDensity);
     }
 
-    public static Typeface findFont(Context context, String fontPath, String defaultFontPath) {
+    public static Typeface findFont(Context context, String fontPath, String defaultFontPath, int styleIndex) {
 
         if (fontPath == null) {
-            return Typeface.DEFAULT;
+            return Typeface.defaultFromStyle(styleIndex);
         }
 
         String fontName = new File(fontPath).getName();
@@ -43,18 +43,22 @@ public class Utils {
 
                 if (Arrays.asList(assets.list("")).contains(fontPath)) {
                     Typeface typeface = Typeface.createFromAsset(context.getAssets(), fontName);
+                    typeface = Typeface.create(typeface, styleIndex);
                     cachedFontMap.put(fontName, typeface);
                     return typeface;
                 } else if (Arrays.asList(assets.list("fonts")).contains(fontName)) {
                     Typeface typeface = Typeface.createFromAsset(context.getAssets(), String.format("fonts/%s", fontName));
+                    typeface = Typeface.create(typeface, styleIndex);
                     cachedFontMap.put(fontName, typeface);
                     return typeface;
                 } else if (Arrays.asList(assets.list("iconfonts")).contains(fontName)) {
                     Typeface typeface = Typeface.createFromAsset(context.getAssets(), String.format("iconfonts/%s", fontName));
+                    typeface = Typeface.create(typeface, styleIndex);
                     cachedFontMap.put(fontName, typeface);
                     return typeface;
                 } else if (!TextUtils.isEmpty(defaultFontPath) && Arrays.asList(assets.list("")).contains(defaultFontPath)) {
                     Typeface typeface = Typeface.createFromAsset(context.getAssets(), defaultFontPath);
+                    typeface = Typeface.create(typeface, styleIndex);
                     cachedFontMap.put(defaultFontName, typeface);
                     return typeface;
                 } else {
@@ -63,8 +67,9 @@ public class Utils {
 
             } catch (Exception e) {
                 Log.e(FancyButton.TAG, String.format("Unable to find %s font. Using Typeface.DEFAULT instead.", fontName));
-                cachedFontMap.put(fontName, Typeface.DEFAULT);
-                return Typeface.DEFAULT;
+                Typeface def = Typeface.defaultFromStyle(styleIndex);
+                cachedFontMap.put(fontName, def);
+                return def;
             }
         }
     }

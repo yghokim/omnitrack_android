@@ -9,10 +9,12 @@ import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.common.api.Scope
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.dependency.OTSystemDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.dependency.ThirdPartyAppDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import rx.Observable
+import rx_activity_result2.RxActivityResult
 import java.util.*
 
 /**
@@ -29,7 +31,7 @@ object GoogleFitService : OTExternalService("GoogleFitService", 19) {
     val usedApis: Array<Api<out Api.ApiOptions.NotRequiredOptions>> by lazy {
 
         val set = HashSet<Api<out Api.ApiOptions.NotRequiredOptions>>()
-        for (m in _measureFactories) {
+        for (m in measureFactories) {
             if (m is GoogleFitMeasureFactory) {
                 set.add(m.usedAPI)
             }
@@ -41,7 +43,7 @@ object GoogleFitService : OTExternalService("GoogleFitService", 19) {
     val usedScopes: Array<Scope> by lazy {
 
         val set = HashSet<Scope>()
-        for (m in _measureFactories) {
+        for (m in measureFactories) {
             if (m is GoogleFitMeasureFactory) {
                 set.add(m.usedScope)
             }
@@ -51,31 +53,16 @@ object GoogleFitService : OTExternalService("GoogleFitService", 19) {
     }
 
 
-    //===================================================================================================
-    private var currentActivationHandler: ((Boolean) -> Unit)? = null
-
-    //private var currentPreparationHandler: ((Boolean) -> Unit)? = null
-
-
-    private val activationConnectionCallbacks = object : GoogleApiClient.ConnectionCallbacks {
-        override fun onConnectionSuspended(reason: Int) {
-            println("Google Fit activation connection is pending.. - $reason")
-        }
-
-        override fun onConnected(reason: Bundle?) {
-            println("activation success.")
-            currentActivationHandler?.invoke(true)
-        }
+    init {
+        assignRequestCode(this)
     }
 
-    //==================================================================================================
+    override fun onRegisterMeasureFactories(): Array<OTMeasureFactory> {
+        return arrayOf(GoogleFitStepsFactory)
+    }
 
-
-    init {
-        _measureFactories.add(GoogleFitStepsFactory)
-        assignRequestCode(this)
-
-        _dependencyList.add(
+    override fun onRegisterDependencies(): Array<OTSystemDependencyResolver> {
+        return arrayOf(
                 ThirdPartyAppDependencyResolver.Builder(OTApplication.app)
                         .setPackageName("com.google.android.apps.fitness")
                         .isMandatory(false)
@@ -84,33 +71,63 @@ object GoogleFitService : OTExternalService("GoogleFitService", 19) {
         )
     }
 
-    override fun onActivateAsync(context: Context, connectedHandler: ((Boolean) -> Unit)?) {
-        println("activate Google Fit...")
-        if (client?.isConnected == true) {
-            connectedHandler?.invoke(true)
-        } else {
-            currentActivationHandler = connectedHandler
-            client = buildClientBuilderBase(context)
-                    .addConnectionCallbacks(activationConnectionCallbacks)
-                    .addOnConnectionFailedListener {
-                        result ->
-                        println("connectionFailed - ${result.errorCode}, ${result.errorMessage}")
-                        if (result.hasResolution()) {
-                            result.startResolutionForResult(context as Activity, requestCodeDict[this])
-                        }
-                    }
-                    .build()
-            client?.connect()
+    override fun onActivateAsync(context: Context): Observable<Boolean> {
+        return Observable.defer {
+            if (client?.isConnected == true) {
+                return@defer Observable.just(true)
+            } else {
+                return@defer Observable.unsafeCreate<GoogleApiClient> {
+                    subscriber ->
+                    client = buildClientBuilderBase(context)
+                            .addConnectionCallbacks(object : GoogleApiClient.ConnectionCallbacks {
+                                override fun onConnectionSuspended(reason: Int) {
+                                    println("Google Fit activation connection is pending.. - $reason")
+                                }
+
+                                override fun onConnected(reason: Bundle?) {
+                                    println("activation success.")
+                                    if (!subscriber.isUnsubscribed) {
+                                        subscriber.onNext(client)
+                                        subscriber.onCompleted()
+                                    }
+                                }
+                            })
+                            .addOnConnectionFailedListener {
+                                result ->
+                                println("connectionFailed - ${result.errorCode}, ${result.errorMessage}")
+                                if (result.hasResolution()) {
+                                    val resolutionPendingIntent = result.resolution!!
+                                    //result.startResolutionForResult(context as Activity, requestCodeDict[this])
+                                    RxActivityResult.on(context as Activity)
+                                            .startIntentSender(resolutionPendingIntent.intentSender, Intent(), 0, 0, 0)
+                                            .subscribe {
+                                                result ->
+                                                if (result.resultCode() == Activity.RESULT_OK) {
+                                                    client?.connect()
+                                                } else {
+                                                    if (!subscriber.isUnsubscribed) {
+                                                        subscriber.onError(Exception("resolution was canceled by user."))
+                                                    }
+                                                }
+                                            }
+
+                                }
+                            }.build()
+                    client?.connect()
+                }.onErrorReturn { err ->
+                    err.printStackTrace()
+                    return@onErrorReturn null
+                }.map {
+                    client ->
+                    client != null
+                }
+            }
         }
     }
 
     override fun onDeactivate() {
         client?.disconnect()
         client = null
-    }
-
-    override fun handleActivityActivationResultOk(resultData: Intent?) {
-        prepareServiceAsync(currentActivationHandler)
     }
 
     override fun prepareServiceAsync(preparedHandler: ((Boolean) -> Unit)?) {

@@ -20,7 +20,9 @@ object MisfitSleepMeasureFactory : OTMeasureFactory("slp") {
         return CONFIGURATOR_FOR_TIMESPAN_ATTRIBUTE
     }
 
-    override val service: OTExternalService = MisfitService
+    override fun getService(): OTExternalService {
+        return MisfitService
+    }
 
     override val exampleAttributeType: Int = OTAttribute.TYPE_TIMESPAN
 

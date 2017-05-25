@@ -10,7 +10,7 @@ import rx.Single
 /**
  * Created by younghokim on 2017. 5. 18..
  */
-class OTPermissionDependencyResolver(vararg permissions: String) : OTSystemDependencyResolver() {
+class PermissionDependencyResolver(vararg permissions: String) : OTSystemDependencyResolver() {
 
     private val permissionNames = ArrayList<String>()
 

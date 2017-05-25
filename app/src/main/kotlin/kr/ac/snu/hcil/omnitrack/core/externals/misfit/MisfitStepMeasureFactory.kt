@@ -22,7 +22,9 @@ object MisfitStepMeasureFactory : OTMeasureFactory("step") {
 
     override val supportedConditionerTypes: IntArray = CONDITIONERS_FOR_SINGLE_NUMERIC_VALUE
 
-    override val service: OTExternalService = MisfitService
+    override fun getService(): OTExternalService {
+        return MisfitService
+    }
 
     override val exampleAttributeType: Int = OTAttribute.TYPE_NUMBER
 

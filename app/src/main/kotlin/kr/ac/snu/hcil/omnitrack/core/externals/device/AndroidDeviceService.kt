@@ -1,27 +1,29 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.device
 
 import android.content.Context
-import android.content.Intent
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
+import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
+import rx.Observable
 
 /**
  * Created by younghokim on 16. 8. 4..
  */
 object AndroidDeviceService : OTExternalService("AndroidDeviceService", 19) {
-    override fun handleActivityActivationResultOk(resultData: Intent?) {
+    override fun onActivateAsync(context: Context): Observable<Boolean> {
+        return Observable.error(NotImplementedError(""))
     }
 
     override fun prepareServiceAsync(preparedHandler: ((Boolean) -> Unit)?) {
 
     }
 
-    override fun onActivateAsync(context: Context, connectedHandler: ((Boolean) -> Unit)?) {
+    override fun onDeactivate() {
 
     }
 
-    override fun onDeactivate() {
-
+    override fun onRegisterMeasureFactories(): Array<OTMeasureFactory> {
+        return emptyArray()
     }
 
     override val thumbResourceId: Int = R.drawable.service_thumb_androiddevice

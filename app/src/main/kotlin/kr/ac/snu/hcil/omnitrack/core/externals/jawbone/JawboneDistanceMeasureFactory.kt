@@ -36,7 +36,9 @@ object JawboneDistanceMeasureFactory : OTMeasureFactory("dist") {
         return JawboneDistanceMeasure(serialized)
     }
 
-    override val service: OTExternalService = JawboneUpService
+    override fun getService(): OTExternalService {
+        return JawboneUpService
+    }
 
     override val descResourceId: Int = R.string.measure_jawbone_distance_desc
     override val nameResourceId: Int = R.string.measure_jawbone_distance_name

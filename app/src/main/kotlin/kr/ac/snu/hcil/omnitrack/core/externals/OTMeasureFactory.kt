@@ -93,10 +93,10 @@ abstract class OTMeasureFactory(val factoryTypeName: String) : INameDescriptionR
     }
 
     val typeCode: String by lazy {
-        "${service.identifier}_${factoryTypeName}"
+        "${getService().identifier}_${factoryTypeName}"
     }
 
-    abstract val service: OTExternalService
+    abstract fun getService(): OTExternalService;
 
     open val supportedConditionerTypes: IntArray = intArrayOf()
 
@@ -112,7 +112,7 @@ abstract class OTMeasureFactory(val factoryTypeName: String) : INameDescriptionR
     abstract fun makeMeasure(serialized: String): OTMeasure
 
     open fun getFormattedName(): CharSequence {
-        val html = "<b>${OTApplication.app.resources.getString(nameResourceId)}</b> | ${OTApplication.app.getString(service.nameResourceId)}"
+        val html = "<b>${OTApplication.app.resources.getString(nameResourceId)}</b> | ${OTApplication.app.getString(getService().nameResourceId)}"
         return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY)
         } else {
@@ -128,7 +128,7 @@ abstract class OTMeasureFactory(val factoryTypeName: String) : INameDescriptionR
     open fun makeNewExampleAttribute(tracker: OTTracker): OTAttribute<out Any> {
 
         val attr = OTAttribute.Companion.createAttribute(tracker,
-                "${OTApplication.app.getString(service.nameResourceId)} ${OTApplication.app.resources.getString(nameResourceId)}",
+                "${OTApplication.app.getString(getService().nameResourceId)} ${OTApplication.app.resources.getString(nameResourceId)}",
                 exampleAttributeType)
 
         getExampleAttributeConfigurator().configureExampleAttribute(attr)

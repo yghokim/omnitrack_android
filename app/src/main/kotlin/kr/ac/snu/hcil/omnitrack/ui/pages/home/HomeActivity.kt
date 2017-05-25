@@ -20,7 +20,6 @@ import com.tbruyelle.rxpermissions.RxPermissions
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.tutorial.TutorialManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
@@ -260,9 +259,6 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), OTAut
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
-        val requester = OTExternalService.requestCodeDict.getKeyFromId(requestCode)
-        requester?.onActivityActivationResult(resultCode, data)
     }
 
     override fun onSignedIn(firebaseUser: FirebaseUser) {
