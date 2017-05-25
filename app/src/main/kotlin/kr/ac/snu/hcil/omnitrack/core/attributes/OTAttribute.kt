@@ -448,7 +448,7 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
         val connection = valueConnection
         if (connection != null) {
             println("OMNITRACK attribute name: ${name}, tracker: ${tracker?.name}, source: ${connection.source}")
-            val service = connection.source!!.factory.service
+            val service = connection.source!!.factory.getService()
             if (service.state == OTExternalService.ServiceState.ACTIVATED) {
                 return true
             } else {

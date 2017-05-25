@@ -16,8 +16,9 @@ import rx.Observable
  */
 object FitbitHeartRateMeasureFactory : OTMeasureFactory("heart") {
 
-    override val service: OTExternalService = FitbitService
-
+    override fun getService(): OTExternalService {
+        return FitbitService
+    }
     override fun isAttachableTo(attribute: OTAttribute<out Any>): Boolean {
         return attribute.typeId == OTAttribute.TYPE_NUMBER
     }

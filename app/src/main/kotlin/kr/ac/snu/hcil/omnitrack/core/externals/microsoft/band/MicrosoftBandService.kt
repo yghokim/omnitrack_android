@@ -1,7 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.microsoft.band
 
 import android.content.Context
-import android.content.Intent
 import android.os.AsyncTask
 import com.microsoft.band.BandClient
 import com.microsoft.band.BandClientManager
@@ -10,13 +9,15 @@ import com.microsoft.band.ConnectionState
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
+import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
+import rx.Observable
 
 /**
  * Created by younghokim on 16. 7. 28..
  */
 object MicrosoftBandService : OTExternalService("MicrosoftBandService", 19) {
-    override fun handleActivityActivationResultOk(resultData: Intent?) {
-
+    override fun onActivateAsync(context: Context): Observable<Boolean> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun prepareServiceAsync(preparedHandler: ((Boolean) -> Unit)?) {
@@ -33,8 +34,8 @@ object MicrosoftBandService : OTExternalService("MicrosoftBandService", 19) {
 
     private var connectionState: ConnectionState? = null
 
-    init {
-        _measureFactories += MicrosoftBandHeartRateFactory()
+    override fun onRegisterMeasureFactories(): Array<OTMeasureFactory> {
+        return arrayOf(MicrosoftBandHeartRateFactory())
     }
 
     /*
@@ -46,7 +47,7 @@ object MicrosoftBandService : OTExternalService("MicrosoftBandService", 19) {
         } else return ServiceState.DEACTIVATED
     }*/
 
-
+/*
     override fun onActivateAsync(context: Context, connectedHandler: ((Boolean) -> Unit)?) {
             val client = getClient()
             if(client!=null)
@@ -57,7 +58,7 @@ object MicrosoftBandService : OTExternalService("MicrosoftBandService", 19) {
                 connectionTask?.execute(null);
             }
 
-    }
+    }*/
 
     override fun onDeactivate() {
 

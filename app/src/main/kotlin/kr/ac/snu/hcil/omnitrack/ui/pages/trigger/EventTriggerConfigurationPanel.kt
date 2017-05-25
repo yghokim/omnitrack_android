@@ -113,7 +113,7 @@ class EventTriggerConfigurationPanel : FrameLayout, ITriggerConfigurationCoordin
         }
 
         fun bind(factory: OTMeasureFactory) {
-            categoryView.setText(factory.service.nameResourceId)
+            categoryView.setText(factory.getService().nameResourceId)
             titleView.setText(factory.nameResourceId)
         }
     }

@@ -43,6 +43,7 @@ import kr.ac.snu.hcil.omnitrack.utils.UniqueStringEntryList
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
+import rx_activity_result2.RxActivityResult
 import java.nio.charset.Charset
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
@@ -282,6 +283,7 @@ class OTApplication : MultiDexApplication() {
         println("set application instance.")
 
         AndroidThreeTen.init(this);
+        RxActivityResult.register(this);
 
         if (LeakCanary.isInAnalyzerProcess(this)) {
             // This process is dedicated to LeakCanary for heap analysis.
@@ -302,6 +304,7 @@ class OTApplication : MultiDexApplication() {
 
         timeTriggerAlarmManager = OTTimeTriggerAlarmManager()
 
+        OTExternalService.init()
         for (service in OTExternalService.availableServices) {
             if (service.state == OTExternalService.ServiceState.ACTIVATED) {
                 service.prepareServiceAsync({

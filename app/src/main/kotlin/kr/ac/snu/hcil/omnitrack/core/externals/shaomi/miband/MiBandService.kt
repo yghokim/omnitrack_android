@@ -3,14 +3,15 @@ package kr.ac.snu.hcil.omnitrack.core.externals.shaomi.miband
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.content.Context
-import android.content.Intent
 import com.zhaoxiaodan.miband.ActionCallback
 import com.zhaoxiaodan.miband.MiBand
 import com.zhaoxiaodan.miband.model.UserInfo
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
+import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.AsyncTaskWithResultHandler
+import rx.Observable
 
 /**
  * Created by Young-Ho Kim on 2016-07-29.
@@ -18,8 +19,12 @@ import kr.ac.snu.hcil.omnitrack.utils.AsyncTaskWithResultHandler
 
 //@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 object MiBandService : OTExternalService("ShaomiMiBand", 21) {
-    override fun handleActivityActivationResultOk(resultData: Intent?) {
-        throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun onRegisterMeasureFactories(): Array<OTMeasureFactory> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun onActivateAsync(context: Context): Observable<Boolean> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun prepareServiceAsync(preparedHandler: ((Boolean) -> Unit)?) {
@@ -33,7 +38,7 @@ object MiBandService : OTExternalService("ShaomiMiBand", 21) {
     override val nameResourceId: Int = R.string.service_mi_band_name
     override val descResourceId: Int = R.string.service_mi_band_desc
 
-    override val requiredPermissions = arrayOf(android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION)
+    //override val requiredPermissions = arrayOf(android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION)
 
     private var device: BluetoothDevice? = null
 
@@ -41,10 +46,11 @@ object MiBandService : OTExternalService("ShaomiMiBand", 21) {
         MiBand(OTApplication.app)
     }
 
+    /*
     override fun onActivateAsync(context: Context, connectedHandler: ((Boolean) -> Unit)?) {
             val task = ConnectionTask(connectedHandler)
             task.execute()
-    }
+    }*/
 
     override fun onDeactivate() {
 

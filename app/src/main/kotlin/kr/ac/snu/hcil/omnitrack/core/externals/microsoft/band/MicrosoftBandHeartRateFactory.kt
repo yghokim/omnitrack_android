@@ -23,7 +23,9 @@ class MicrosoftBandHeartRateFactory : OTMeasureFactory("heart") {
 
     override val supportedConditionerTypes: IntArray = CONDITIONERS_FOR_SINGLE_NUMERIC_VALUE
 
-    override val service: OTExternalService = MicrosoftBandService
+    override fun getService(): OTExternalService {
+        return MicrosoftBandService
+    }
 
     override fun makeMeasure(serialized: String): OTMeasure {
         throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.

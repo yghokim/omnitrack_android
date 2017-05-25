@@ -70,6 +70,8 @@ public class FancyButton extends LinearLayout {
     private String mDefaultIconFont = "fontawesome.ttf";
     private String mDefaultTextFont = "robotoregular.ttf";
 
+    private int mStyleIndex = 0;
+
     private ImageView mIconView;
     private TextView mFontIconView;
     private TextView mTextView;
@@ -87,8 +89,8 @@ public class FancyButton extends LinearLayout {
         super(context);
         this.mContext = context;
 
-        mTextTypeFace = Utils.findFont(mContext, mDefaultTextFont, null);
-        mIconTypeFace = Utils.findFont(mContext, mDefaultIconFont, null);
+        mTextTypeFace = Utils.findFont(mContext, mDefaultTextFont, null, mStyleIndex);
+        mIconTypeFace = Utils.findFont(mContext, mDefaultIconFont, null, mStyleIndex);
         initializeFancyButton();
     }
 
@@ -125,6 +127,8 @@ public class FancyButton extends LinearLayout {
         mTextView = setupTextView();
         mIconView = setupIconView();
         mFontIconView = setupFontIconView();
+
+        mTextView.setTypeface(mTextTypeFace);
 
         int iconIndex, textIndex;
         View view1, view2;
@@ -313,6 +317,10 @@ public class FancyButton extends LinearLayout {
             text = attrsArray.getString(R.styleable.FancyButtonsAttrs_android_text);
         }
 
+        mStyleIndex = attrsArray.getInt(R.styleable.FancyButtonsAttrs_android_textStyle, 0);
+        Log.d("FANCY", "style index: " + mStyleIndex);
+
+
         mIconPosition = attrsArray.getInt(R.styleable.FancyButtonsAttrs_fb_iconPosition, mIconPosition);
 
         String fontIcon = attrsArray.getString(R.styleable.FancyButtonsAttrs_fb_fontIconResource);
@@ -342,15 +350,15 @@ public class FancyButton extends LinearLayout {
 
         if (!isInEditMode()) {
             if (iconFontFamily != null) {
-                mIconTypeFace = Utils.findFont(mContext, iconFontFamily, mDefaultIconFont);
+                mIconTypeFace = Utils.findFont(mContext, iconFontFamily, mDefaultIconFont, mStyleIndex);
             } else {
-                mIconTypeFace = Utils.findFont(mContext, mDefaultIconFont, null);
+                mIconTypeFace = Utils.findFont(mContext, mDefaultIconFont, null, mStyleIndex);
             }
 
             if (textFontFamily != null) {
-                mTextTypeFace = Utils.findFont(mContext, textFontFamily, mDefaultTextFont);
+                mTextTypeFace = Utils.findFont(mContext, textFontFamily, mDefaultTextFont, mStyleIndex);
             } else {
-                mTextTypeFace = Utils.findFont(mContext, mDefaultTextFont, null);
+                mTextTypeFace = Utils.findFont(mContext, mDefaultTextFont, null, mStyleIndex);
             }
         }
     }
@@ -735,7 +743,7 @@ public class FancyButton extends LinearLayout {
      *                 Place your text fonts in assets
      */
     public void setCustomTextFont(String fontName) {
-        mTextTypeFace = Utils.findFont(mContext, fontName, mDefaultTextFont);
+        mTextTypeFace = Utils.findFont(mContext, fontName, mDefaultTextFont, mStyleIndex);
 
         if (mTextView == null)
             initializeFancyButton();
@@ -752,7 +760,7 @@ public class FancyButton extends LinearLayout {
      */
     public void setCustomIconFont(String fontName) {
 
-        mIconTypeFace = Utils.findFont(mContext, fontName, mDefaultIconFont);
+        mIconTypeFace = Utils.findFont(mContext, fontName, mDefaultIconFont, mStyleIndex);
 
         if (mFontIconView == null)
             initializeFancyButton();
