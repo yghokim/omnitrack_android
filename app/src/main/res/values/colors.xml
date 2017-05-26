@@ -15,7 +15,7 @@
 
     <color name="colorAccent">#ff8940</color>
 
-    <color name="colorAccent.Background.Light">#f7f3ec</color>
+    <color name="colorAccent.Light">#ffab44</color>
 
     <color name="dark.transparent">#2d000000</color>
 
@@ -49,9 +49,14 @@
     <color name="dividerColor">#bcbcbc</color>
 
     <color name="colorGreen">#9fea75</color>
+    <color name="colorGreen.Light.Very">#c9e6a1</color>
+
+    <color name="colorNoticeable">#ffbe58</color>
 
     <color name="colorRed">#ee695f</color>
     <color name="colorRed.Light">#fc8370</color>
+
+    <color name="colorRed.Light.Very">#ffcdbb</color>
 
     <color name="editTextLine">#cfcfcf</color>
 

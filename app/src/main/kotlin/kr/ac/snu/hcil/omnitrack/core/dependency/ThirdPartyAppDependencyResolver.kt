@@ -7,6 +7,8 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.support.annotation.StringRes
+import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.utils.TextHelper
 import rx.Single
 
 /**
@@ -20,11 +22,11 @@ class ThirdPartyAppDependencyResolver(val packageName: String, val appName: Stri
         private var mandatory: Boolean = false
 
 
-        private var fatalFailedMessage: String? = null
-        private var nonFatalFailedMessage: String? = null
-        private var passedMessage: String? = null
+        private var fatalFailedMessage: CharSequence? = null
+        private var nonFatalFailedMessage: CharSequence? = null
+        private var passedMessage: CharSequence? = null
 
-        private var playStoreTossMessage: String? = null
+        private var playStoreTossMessage: CharSequence? = null
 
         fun setPackageName(packageName: String): Builder {
             this.packageName = packageName
@@ -46,36 +48,42 @@ class ThirdPartyAppDependencyResolver(val packageName: String, val appName: Stri
             return this
         }
 
-        fun fatalFailedMessage(message: String): Builder {
+        fun fatalFailedMessage(message: CharSequence): Builder {
             this.fatalFailedMessage = message
             return this
         }
 
-        fun nonFatalFailedMessage(message: String): Builder {
+        fun nonFatalFailedMessage(message: CharSequence): Builder {
             this.nonFatalFailedMessage = message
             return this
         }
 
-        fun passedMessage(message: String): Builder {
+        fun passedMessage(message: CharSequence): Builder {
             this.passedMessage = message
             return this
         }
 
-        fun playStoreTossMessage(message: String): Builder {
+        fun playStoreTossMessage(message: CharSequence): Builder {
             this.playStoreTossMessage = message
             return this
         }
 
         fun build(): ThirdPartyAppDependencyResolver {
             return ThirdPartyAppDependencyResolver(packageName ?: "PackageNameNull", appName ?: "AppNameNull", mandatory)
+                    .apply {
+                        this.passedMessage = this@Builder.passedMessage ?: TextHelper.fromHtml(TextHelper.formatWithResources(context, R.string.msg_format_third_party_app_dependency_passed_message, appName))
+                        this.nonFatalFailedMessage = this@Builder.nonFatalFailedMessage ?: TextHelper.fromHtml(TextHelper.formatWithResources(context, R.string.msg_format_third_party_app_dependency_non_fatal_failed_message, appName))
+                        this.fatalFailedMessage = this@Builder.fatalFailedMessage ?: TextHelper.fromHtml(TextHelper.formatWithResources(context, R.string.msg_format_third_party_app_dependency_fatal_failed_message, appName))
+                        this.playStoreTossMessage = this@Builder.playStoreTossMessage ?: context.getString(R.string.msg_go_to_store)
+                    }
         }
     }
 
-    private var fatalFailedMessage: String? = null
-    private var nonFatalFailedMessage: String? = null
-    private var passedMessage: String? = null
+    private var fatalFailedMessage: CharSequence? = null
+    private var nonFatalFailedMessage: CharSequence? = null
+    private var passedMessage: CharSequence? = null
 
-    private var playStoreTossMessage: String? = null
+    private var playStoreTossMessage: CharSequence? = null
 
     override fun checkDependencySatisfied(context: Context, selfResolve: Boolean): Single<DependencyCheckResult> {
         return Single.defer {
@@ -88,9 +96,9 @@ class ThirdPartyAppDependencyResolver(val packageName: String, val appName: Stri
             }
         }.map { state ->
             when (state) {
-                DependencyState.Passed -> DependencyCheckResult(state, passedMessage ?: "", "")
-                DependencyState.FatalFailed -> DependencyCheckResult(state, fatalFailedMessage ?: "", "")
-                DependencyState.NonFatalFailed -> DependencyCheckResult(state, nonFatalFailedMessage ?: "", "")
+                DependencyState.Passed -> DependencyCheckResult(state, passedMessage ?: "", playStoreTossMessage ?: context.getString(R.string.msg_go_to_store))
+                DependencyState.FatalFailed -> DependencyCheckResult(state, fatalFailedMessage ?: "", playStoreTossMessage ?: context.getString(R.string.msg_go_to_store))
+                DependencyState.NonFatalFailed -> DependencyCheckResult(state, nonFatalFailedMessage ?: "", playStoreTossMessage ?: context.getString(R.string.msg_go_to_store))
             }
         }
     }
@@ -98,10 +106,10 @@ class ThirdPartyAppDependencyResolver(val packageName: String, val appName: Stri
     override fun tryResolve(activity: Activity): Single<Boolean> {
         return Single.defer {
             try {
-                activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=kr.ac.snu.hcil.omnitrack")))
+                activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=${packageName}")))
             } catch(ex: ActivityNotFoundException) {
                 ex.printStackTrace()
-                activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=kr.ac.snu.hcil.omnitrack")))
+                activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=${packageName}")))
             } finally {
 
             }

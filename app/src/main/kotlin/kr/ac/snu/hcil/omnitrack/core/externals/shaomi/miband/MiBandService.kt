@@ -27,9 +27,6 @@ object MiBandService : OTExternalService("ShaomiMiBand", 21) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun prepareServiceAsync(preparedHandler: ((Boolean) -> Unit)?) {
-
-    }
 
     const val PREFERENCE_KEY = "OmniTrack_MiBandService"
     const val PREFERENCE_VALUE_MAC = "deviceMac"

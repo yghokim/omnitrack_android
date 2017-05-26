@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/frontalBackground"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical"
+    tools:theme="@style/AppTheme.NoActionBar.ActionBarOverlay">
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/editTextFormBackground">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/ui_thumb"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                tools:src="@drawable/service_thumb_up" />
+
+            <TextView
+                android:id="@+id/ui_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:layout_marginTop="@dimen/service_list_element_vertical_padding"
+                android:textColor="@color/textColorMidDark"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                tools:text="Microsoft Band" />
+
+            <TextView
+                android:id="@+id/ui_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/service_list_element_vertical_padding"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:layout_marginTop="5dp"
+                android:textColor="@color/textColorMidLight"
+                android:textSize="14sp"
+                tools:text="ms band description" />
+
+
+            <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:layout_marginLeft="12dp"
+
+                android:layout_marginRight="12dp"
+
+                android:background="@android:color/white"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <kr.ac.snu.hcil.omnitrack.ui.components.common.DrawableTintAppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="6dp"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginTop="12dp"
+                        android:drawablePadding="4dp"
+                        android:gravity="center_vertical"
+                        android:text="Checklist"
+                        android:textColor="@color/textColorLight"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        app:drawableStartCompat="@drawable/done"
+                        app:drawableTint="@color/textColorLight" />
+
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/ui_dependency_list"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:verticalScrollbarPosition="right" />
+
+
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
+
+
+        </LinearLayout>
+
+
+    </android.support.v4.widget.NestedScrollView>
+
+
+    <ProgressBar
+        android:id="@+id/ui_progress_bar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="-8dp"
+        android:layout_marginTop="-8dp"
+        android:indeterminate="false"
+        android:indeterminateOnly="true" />
+
+
+    <kr.ac.snu.hcil.omnitrack.ui.components.common.TintFancyButton
+        android:id="@+id/ui_button_activate"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:enabled="false"
+        android:fontFamily="sans-serif-regular"
+        android:textAllCaps="false"
+        app:drawableTint="@android:color/white"
+        app:fb_defaultColor="@color/colorPointed"
+        app:fb_disabledColor="@color/textColorLight"
+        app:fb_focusColor="@color/colorPointed.Light"
+        app:fb_iconResource="@drawable/link"
+        app:fb_text="Activate Fitbit in OmniTrack"
+        app:fb_textColor="@android:color/white"
+        app:fb_textSize="16sp"
+        app:fb_useSystemFont="true" />
+
+
+</LinearLayout>

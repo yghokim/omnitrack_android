@@ -19,7 +19,7 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 2016-09-01.
  */
-class OAuth2Client(val config: OAuth2Config, val activityRequestCode: Int) {
+class OAuth2Client(val config: OAuth2Config) {
 
     class OAuth2Config() {
         var authorizationUrl: String = ""

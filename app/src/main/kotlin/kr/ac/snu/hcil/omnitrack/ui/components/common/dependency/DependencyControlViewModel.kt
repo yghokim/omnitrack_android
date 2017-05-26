@@ -12,7 +12,7 @@ import rx.subjects.BehaviorSubject
 class DependencyControlViewModel(val dependencyResolver: OTSystemDependencyResolver) {
 
     enum class State {
-        FAILED, SATISFIED, CHECKING, RESOLVING
+        FAILED_FATAL, FAILED_NON_FATAL, SATISFIED, CHECKING, RESOLVING
     }
 
     val onStatusChanged: BehaviorSubject<State> = BehaviorSubject.create()
@@ -35,16 +35,19 @@ class DependencyControlViewModel(val dependencyResolver: OTSystemDependencyResol
                 dependencyResolver.checkDependencySatisfied(context, true)
                         .doOnSuccess {
                             result ->
-                            onStatusChanged.onNext(if (result.state == OTSystemDependencyResolver.DependencyState.Passed) {
-                                State.SATISFIED
-                            } else {
-                                State.FAILED
-                            })
+                            onStatusChanged.onNext(
+                                    when (result.state) {
+                                        OTSystemDependencyResolver.DependencyState.Passed -> State.SATISFIED
+                                        OTSystemDependencyResolver.DependencyState.FatalFailed -> State.FAILED_FATAL
+                                        OTSystemDependencyResolver.DependencyState.NonFatalFailed -> State.FAILED_NON_FATAL
+                                        else -> State.FAILED_FATAL
+                                    }
+                            )
 
                             onDependencyCheckResult.onNext(result)
                         }
                         .doOnError {
-                            onStatusChanged.onNext(State.FAILED)
+                            onStatusChanged.onNext(State.FAILED_FATAL)
                         }
                         .subscribe({
                             result ->
@@ -62,15 +65,16 @@ class DependencyControlViewModel(val dependencyResolver: OTSystemDependencyResol
                     }.doOnSuccess {
                 result ->
                 onStatusChanged.onNext(
-                        if (result.state == OTSystemDependencyResolver.DependencyState.Passed) {
-                            State.SATISFIED
-                        } else {
-                            State.FAILED
+                        when (result.state) {
+                            OTSystemDependencyResolver.DependencyState.Passed -> State.SATISFIED
+                            OTSystemDependencyResolver.DependencyState.FatalFailed -> State.FAILED_FATAL
+                            OTSystemDependencyResolver.DependencyState.NonFatalFailed -> State.FAILED_NON_FATAL
+                            else -> State.FAILED_FATAL
                         }
                 )
                 onDependencyCheckResult.onNext(result)
             }.doOnError {
-                onStatusChanged.onNext(State.FAILED)
+                onStatusChanged.onNext(State.FAILED_FATAL)
             }.subscribe({ }, { })
             )
             return true
@@ -81,6 +85,6 @@ class DependencyControlViewModel(val dependencyResolver: OTSystemDependencyResol
 
     fun dispose() {
         subscriptions.clear()
-        onStatusChanged.onNext(State.FAILED)
+        onStatusChanged.onNext(State.FAILED_FATAL)
     }
 }

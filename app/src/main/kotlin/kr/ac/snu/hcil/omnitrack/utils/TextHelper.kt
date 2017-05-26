@@ -1,5 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.utils
 
+import android.content.Context
+import android.support.annotation.StringRes
 import android.text.Html
 import android.text.Spanned
 import java.util.*
@@ -24,12 +26,22 @@ object TextHelper {
         return stringWithFallback(value, nullOrBlankFallback, nullOrBlankFallback)
     }
 
-    fun fromHtml(source: String): Spanned {
+    fun formatWithResources(context: Context, @StringRes formatResId: Int, vararg args: Any): CharSequence {
+        return String.format(context.getString(formatResId), *(args.map {
+            if (it is Int) {
+                context.getString(it)
+            } else {
+                it.toString()
+            }
+        }.toTypedArray()))
+    }
+
+    fun fromHtml(source: CharSequence): Spanned {
         return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            Html.fromHtml(source, Html.FROM_HTML_MODE_LEGACY)
+            Html.fromHtml(source.toString(), Html.FROM_HTML_MODE_LEGACY)
         } else {
             @Suppress("DEPRECATION")
-            Html.fromHtml(source)
+            Html.fromHtml(source.toString())
         }
     }
 

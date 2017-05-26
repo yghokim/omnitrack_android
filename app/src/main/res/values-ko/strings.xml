@@ -336,10 +336,9 @@
     <string name="msg_data_error">데이터 에러</string>
     <string name="msg_audio_record_player_description_recorded_at_format">%1$s에 녹음됨</string>
 
-    <string name="msg_format_third_party_app_dependency_non_fatal_failed_message">%1$s 앱을 설치해야 합니다.</string>
-    <string name="msg_format_third_party_app_dependency_fatal_failed_message">%1$s 앱이 설치되어 있지 않습니다.</string>
-    <string name="msg_format_third_party_app_dependency_passed_message">%1$s 앱이 설치되어 있습니다.</string>
-    <string name="msg_format_third_party_app_dependency_play_store_toss_message">OmniTrack은 %1$s 앱이 설치되어 있지 않아도 서버에서 값을 가져옵니다. 하지만, 이 디바이스에서 측정된 값을 가져오려면 %1$s 앱을 별도로 설치하고 활성화해야 합니다.</string>
+    <string name="msg_format_third_party_app_dependency_fatal_failed_message"><b>%1$s</b> 앱이 설치되어 있지 않습니다.</string>
+    <string name="msg_format_third_party_app_dependency_passed_message"><b>%1$s</b> 앱이 설치되어 있습니다.</string>
+    <string name="msg_format_third_party_app_dependency_non_fatal_failed_message"><b>%1$s</b> 앱이 설치되어 있지 않습니다. OmniTrack은 <b>%1$s</b> 앱이 설치되어 있지 않아도 서버에서 값을 가져옵니다. 하지만, 이 디바이스에서 측정된 값을 가져오려면 앱을 설치하고 활성화해야 합니다.</string>
 
     <string name="msg_activate">활성화</string>
     <string name="msg_deactivate">비활성화</string>
@@ -351,6 +350,11 @@
     <string name="title_activity_settings">설정</string>
     <string name="msg_pref_reminder_noti_rington_title">리마인더 알림음</string>
     <string name="msg_pref_category_general">일반</string>
+    <string name="msg_checking">체크하는 중…</string>
+    <string name="msg_go_to_store">스토어로 가기</string>
+    <string name="msg_format_dependency_sign_in_passed"><b>%1$s</b> 서비스에 로그인되어 있습니다.</string>
+    <string name="msg_format_dependency_sign_in_failed"><b>%1$s</b> 서비스에 로그인되어 있지 않습니다.</string>
+
 
     <string-array name="purpose_entries">
         <item>directive|건강 관련 정보를 기록하기 위해서</item>

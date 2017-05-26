@@ -58,9 +58,6 @@ object JawboneUpService : OTExternalService("JawboneUpService", 9) {
         )
     }
 
-    init {
-        assignRequestCode(this)
-    }
 
     override fun onRegisterMeasureFactories(): Array<OTMeasureFactory> {
         return arrayOf(JawboneStepMeasureFactory, JawboneDistanceMeasureFactory)
@@ -144,6 +141,7 @@ object JawboneUpService : OTExternalService("JawboneUpService", 9) {
                 .apply()
     }
 
+    /*
     override fun prepareServiceAsync(preparedHandler: ((Boolean) -> Unit)?) {
         val token = preferences.getString(UP_PLATFORM_ACCESS_TOKEN, null)
         if (token != null) {
@@ -153,6 +151,6 @@ object JawboneUpService : OTExternalService("JawboneUpService", 9) {
         } else {
             preparedHandler?.invoke(false)
         }
-    }
+    }*/
 
 }
