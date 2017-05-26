@@ -3,6 +3,8 @@ package kr.ac.snu.hcil.omnitrack.core.externals
 import android.app.Activity
 import android.content.Context
 import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.core.dependency.OAuth2LoginDependencyResolver
+import kr.ac.snu.hcil.omnitrack.core.dependency.OTSystemDependencyResolver
 import kr.ac.snu.hcil.omnitrack.utils.Result
 import kr.ac.snu.hcil.omnitrack.utils.auth.OAuth2Client
 import rx.Observable
@@ -12,8 +14,8 @@ import rx.Observable
  */
 abstract class OAuth2BasedExternalService(identifier: String, minimumSDK: Int) : OTExternalService(identifier, minimumSDK), OAuth2Client.OAuth2CredentialRefreshedListener {
 
-    private val authClient: OAuth2Client by lazy {
-        makeNewAuth2Client(OTExternalService.requestCodeDict[this])
+    protected val authClient: OAuth2Client by lazy {
+        makeNewAuth2Client()
     }
 
     var credential: OAuth2Client.Credential?
@@ -26,7 +28,14 @@ abstract class OAuth2BasedExternalService(identifier: String, minimumSDK: Int) :
             }
         }
 
-    abstract fun makeNewAuth2Client(requestCode: Int): OAuth2Client
+    override fun onRegisterDependencies(): Array<OTSystemDependencyResolver> {
+        return super.onRegisterDependencies() + arrayOf(
+                OAuth2LoginDependencyResolver(authClient, identifier, preferences, OTApplication.app.getString(nameResourceId))
+
+        )
+    }
+
+    abstract fun makeNewAuth2Client(): OAuth2Client
 
     override fun onActivateAsync(context: Context): Observable<Boolean> {
         return authClient.authorize(context as Activity, OTApplication.getString(nameResourceId))
@@ -49,16 +58,6 @@ abstract class OAuth2BasedExternalService(identifier: String, minimumSDK: Int) :
                     credential = null
                 }
             }
-    }
-
-    override fun prepareServiceAsync(preparedHandler: ((Boolean) -> Unit)?) {
-        val credential = credential
-        if (credential != null) {
-            //TODO check token expiration
-            preparedHandler?.invoke(true)
-        } else {
-            preparedHandler?.invoke(false)
-        }
     }
 
     override fun onCredentialRefreshed(newCredential: OAuth2Client.Credential) {

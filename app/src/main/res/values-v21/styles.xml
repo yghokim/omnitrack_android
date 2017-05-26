@@ -7,6 +7,10 @@
         <item name="android:statusBarColor">@color/colorPrimaryDark</item>
     </style>
 
+    <style name="AppTheme.NoActionBar.ActionBarOverlay" parent="AppTheme.NoActionBar">
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
+
     <style name="PointedColoredButtonStyle" parent="Widget.AppCompat.Button.Colored">
         <item name="colorButtonNormal">@color/colorPointed</item>
         <item name="android:textColor">#FFF</item>

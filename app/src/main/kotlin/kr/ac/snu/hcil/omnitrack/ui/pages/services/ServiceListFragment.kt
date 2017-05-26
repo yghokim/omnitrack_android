@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.pages.home
+package kr.ac.snu.hcil.omnitrack.ui.pages.services
 
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
@@ -20,6 +20,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
+import kr.ac.snu.hcil.omnitrack.ui.pages.home.MeasureFactoryAdapter
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
 import rx.internal.util.SubscriptionList
@@ -68,7 +69,7 @@ class ServiceListFragment : OTFragment() {
         if (pendedActivations[requestCode] != null) {
             if (grantResults.indexOf(PackageManager.PERMISSION_DENIED) == -1) {
                 creationSubscriptions.add(
-                        OTExternalService.availableServices[requestCode].activateAsync(context).subscribe({
+                        OTExternalService.availableServices[requestCode].startActivationActivityAsync(context).subscribe({
                             success ->
                             if (success) {
                                 pendedActivations[requestCode].holderState = OTExternalService.ServiceState.ACTIVATED
@@ -177,7 +178,7 @@ class ServiceListFragment : OTFragment() {
                                     service.grantPermissions(this@ServiceListFragment, adapterPosition)
                                 } else {
                                     creationSubscriptions.add(
-                                            service.activateAsync(context).subscribe({
+                                            service.startActivationActivityAsync(context).subscribe({
                                                 success ->
                                                 if (success) {
                                                     holderState = OTExternalService.ServiceState.ACTIVATED

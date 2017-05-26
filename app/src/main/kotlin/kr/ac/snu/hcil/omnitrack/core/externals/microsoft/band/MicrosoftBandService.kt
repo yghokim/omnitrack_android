@@ -20,10 +20,6 @@ object MicrosoftBandService : OTExternalService("MicrosoftBandService", 19) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun prepareServiceAsync(preparedHandler: ((Boolean) -> Unit)?) {
-
-    }
-
     override val permissionGranted: Boolean = true
 
     override val thumbResourceId: Int = R.drawable.service_thumb_microsoftband

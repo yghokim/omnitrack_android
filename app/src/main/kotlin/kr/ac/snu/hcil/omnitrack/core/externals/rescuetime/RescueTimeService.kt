@@ -46,15 +46,12 @@ object RescueTimeService : OAuth2BasedExternalService("RescueTimeService", 0) {
 
     override val descResourceId: Int = R.string.service_rescuetime_desc
 
-    init {
-        assignRequestCode(this)
-    }
 
     override fun onRegisterMeasureFactories(): Array<OTMeasureFactory> {
         return arrayOf(RescueTimeProductivityMeasureFactory, RescueTimeComputerUsageDurationMeasureFactory)
     }
 
-    override fun makeNewAuth2Client(requestCode: Int): OAuth2Client {
+    override fun makeNewAuth2Client(): OAuth2Client {
         val config = OAuth2Client.OAuth2Config()
         config.clientId = OTApplication.app.resources.getString(R.string.rescuetime_client_id)
         config.clientSecret = OTApplication.app.resources.getString(R.string.rescuetime_client_secret)
@@ -64,7 +61,7 @@ object RescueTimeService : OAuth2BasedExternalService("RescueTimeService", 0) {
         config.scope = DEFAULT_SCOPES
         config.redirectUri = OTApplication.app.resources.getString(R.string.rescuetime_redirect_uri)
 
-        return OAuth2Client(config, requestCode)
+        return OAuth2Client(config)
     }
 
     fun makeSummaryRequestUrl(subUrl: String, parameters: Map<String, String> = mapOf()): String {

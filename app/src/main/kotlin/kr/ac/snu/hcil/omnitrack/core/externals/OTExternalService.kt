@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.externals
 
+import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
@@ -12,9 +13,12 @@ import kr.ac.snu.hcil.omnitrack.core.externals.google.fit.GoogleFitService
 import kr.ac.snu.hcil.omnitrack.core.externals.jawbone.JawboneUpService
 import kr.ac.snu.hcil.omnitrack.core.externals.misfit.MisfitService
 import kr.ac.snu.hcil.omnitrack.core.externals.rescuetime.RescueTimeService
-import kr.ac.snu.hcil.omnitrack.utils.FillingIntegerIdReservationTable
+import kr.ac.snu.hcil.omnitrack.ui.pages.services.ExternalServiceActivationActivity
 import kr.ac.snu.hcil.omnitrack.utils.INameDescriptionResourceProvider
+import kr.ac.snu.hcil.omnitrack.utils.convertToRx1Observable
 import rx.Observable
+import rx.Single
+import rx_activity_result2.RxActivityResult
 import java.util.*
 
 /**
@@ -22,12 +26,6 @@ import java.util.*
  */
 abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : INameDescriptionResourceProvider {
     companion object {
-
-        val requestCodeDict = FillingIntegerIdReservationTable<OTExternalService>()
-
-        fun assignRequestCode(service: OTExternalService) {
-            requestCodeDict[service]
-        }
 
         private val factoryCodeDict = HashMap<String, OTMeasureFactory>()
 
@@ -42,6 +40,10 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
                     //,MicrosoftBandService
                     //,MiBandService
             )
+        }
+
+        fun findServiceByIdentifier(identifier: String): OTExternalService? {
+            return availableServices.find { it.identifier == identifier }
         }
 
         fun getFilteredMeasureFactories(filter: (OTMeasureFactory) -> Boolean): List<OTMeasureFactory> {
@@ -66,6 +68,7 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
 
         fun init() {
             for (service in availableServices) {
+                service.initialize()
                 for (factory in service.measureFactories) {
                     println("service: ${service.identifier}")
                     println("factory service: ${factory.getService()}")
@@ -127,8 +130,6 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
         } else {
             ServiceState.DEACTIVATED
         }
-
-        initialize()
     }
 
     private fun initialize() {
@@ -152,8 +153,36 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
         return emptyArray()
     }
 
-    fun activateAsync(context: Context): Observable<Boolean> {
+    fun activateSilently(): Single<Boolean> {
+        return prepareServiceAsync()
+                .map {
+                    resultState ->
+                    resultState >= OTSystemDependencyResolver.DependencyState.NonFatalFailed
+                }
+                .doOnSuccess {
+                    result ->
+                    if (result == true) {
+                        setIsActivatedFlag(this, true)
+                        state = ServiceState.ACTIVATED
+                    } else {
+                        setIsActivatedFlag(this, false)
+                        state = ServiceState.DEACTIVATED
+                    }
+                }
+    }
 
+    fun startActivationActivityAsync(context: Context): Observable<Boolean> {
+
+        return RxActivityResult.on(context as Activity)
+                .startIntent(ExternalServiceActivationActivity.makeIntent(context, this))
+                .convertToRx1Observable()
+                .map {
+                    result ->
+                    result.resultCode() == Activity.RESULT_OK
+                }
+
+
+        /*
         return onActivateAsync(context)
                 .doOnSubscribe {
                     state = ServiceState.ACTIVATING
@@ -167,7 +196,7 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
                         setIsActivatedFlag(this, false)
                         state = ServiceState.DEACTIVATED
                     }
-                }
+                }*/
     }
 
     abstract fun onActivateAsync(context: Context): Observable<Boolean>
@@ -187,7 +216,16 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
         caller.requestPermissions(getRequiredPermissionsRecursive(), requestCode)
     }
 
-    abstract fun prepareServiceAsync(preparedHandler: ((Boolean) -> Unit)?)
+    open fun prepareServiceAsync(): Single<OTSystemDependencyResolver.DependencyState> {
+
+        return Single.zip(dependencyList.map { it.checkDependencySatisfied(OTApplication.app, false) },
+                { results ->
+                    OTSystemDependencyResolver.combineDependencyState(*(results.map {
+                        (it as OTSystemDependencyResolver.DependencyCheckResult).state
+                    }.toTypedArray()))
+                })
+
+    }
 
     protected fun getRequiredPermissionsRecursive(): Array<String> {
         val result = HashSet<String>()
@@ -198,24 +236,4 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
 
         return result.toTypedArray()
     }
-
-    /*
-
-    protected fun finishActivationProcess(success: Boolean) {
-        pendingConnectionListener?.invoke(success)
-        pendingConnectionListener = null
-    }
-
-    protected fun cancelActivationProcess() {
-        finishActivationProcess(false)
-    }
-
-    fun onActivityActivationResult(resultCode: Int, resultData: Intent?) {
-        if (resultCode != Activity.RESULT_OK) {
-            println("activation result failed")
-            cancelActivationProcess()
-        } else handleActivityActivationResultOk(resultData)
-    }*/
-
-    //abstract fun handleActivityActivationResultOk(resultData: Intent?)
 }
