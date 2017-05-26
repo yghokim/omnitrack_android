@@ -426,10 +426,12 @@
 
     <string name="msg_audio_record_player_description_recorded_at_format">Recorded at %1$s</string>
 
-    <string name="msg_format_third_party_app_dependency_non_fatal_failed_message">%1$s is not installed, which is necessary.</string>
-    <string name="msg_format_third_party_app_dependency_fatal_failed_message">%1$s is not installed, which is recommended.</string>
-    <string name="msg_format_third_party_app_dependency_passed_message">%1$s is installed in this device.</string>
-    <string name="msg_format_third_party_app_dependency_play_store_toss_message">OmniTrack may grab the value from the service without %1$s app. However, if you need data measured with your phone, you have to install the application and activate it.</string>
+    <string name="msg_format_third_party_app_dependency_fatal_failed_message"><b>%1$s</b> is not installed, which is necessary.</string>
+    <string name="msg_format_third_party_app_dependency_passed_message">The <b>%1$s</b> app is installed in this device.</string>
+    <string name="msg_format_third_party_app_dependency_non_fatal_failed_message"><b>%1$s</b> is not installed, which is recommended. OmniTrack may grab the value from the service without the <b>%1$s</b> app. However, if you need data measured by your phone, you have to install the application and activate it.</string>
+    <string name="msg_format_dependency_sign_in_passed">You are signed in the <b>%1$s</b> service.</string>
+    <string name="msg_format_dependency_sign_in_failed">You are not signed in the <b>%1$s</b> service.</string>
+
 
     <string name="msg_activate">Activate</string>
     <string name="msg_deactivate">Deactivate</string>
@@ -513,5 +515,7 @@
     <string name="pref_title_vibrate">Vibrate</string>
     <string name="msg_pref_reminder_noti_rington_title">Reminder Notification Ringtone</string>
     <string name="msg_pref_category_general">General</string>
+    <string name="msg_checking">Checking…</string>
+    <string name="msg_go_to_store">Go to Store</string>
 
 </resources>

@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.RelativeLayout
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.utils.getActivity
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 import mehdi.sakout.fancybuttons.FancyButton
 import rx.android.schedulers.AndroidSchedulers
@@ -55,6 +56,12 @@ class DependencyControlView : RelativeLayout {
         resolveButton = findViewById(R.id.ui_button) as FancyButton
         busyIndicator = findViewById(R.id.ui_loading_indicator)
         checkedView = findViewById(R.id.ui_checked)
+
+        resolveButton.setOnClickListener {
+            val activity = getActivity()
+            if (activity != null)
+                viewModel?.resolveDependency(activity)
+        }
     }
 
     override fun onAttachedToWindow() {
@@ -70,7 +77,7 @@ class DependencyControlView : RelativeLayout {
                                 .subscribe {
                                     state ->
                                     when (state) {
-                                        DependencyControlViewModel.State.FAILED -> {
+                                        DependencyControlViewModel.State.FAILED_FATAL, DependencyControlViewModel.State.FAILED_NON_FATAL -> {
                                             checkedView.visibility = View.GONE
                                             busyIndicator.visibility = View.GONE
                                             resolveButton.visibility = View.VISIBLE
@@ -83,10 +90,23 @@ class DependencyControlView : RelativeLayout {
                                         }
 
                                         DependencyControlViewModel.State.CHECKING, DependencyControlViewModel.State.RESOLVING -> {
+                                            descriptionView.setText(R.string.msg_checking)
                                             busyIndicator.visibility = View.VISIBLE
                                             resolveButton.visibility = View.GONE
                                         }
                                     }
+/*
+                                    if(state == DependencyControlViewModel.State.FAILED_FATAL)
+                                    {
+                                        descriptionView.setTextColor(ContextCompat.getColor(context, R.color.colorRed_Light))
+                                    }
+                                    else if(state == DependencyControlViewModel.State.FAILED_NON_FATAL)
+                                    {
+                                        descriptionView.setTextColor(ContextCompat.getColor(context, R.color.colorNoticeable))
+                                    }
+                                    else{
+                                        descriptionView.setTextColor()
+                                    }*/
                                 }
                 )
 

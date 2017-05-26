@@ -12,7 +12,26 @@ import rx.Single
 abstract class OTSystemDependencyResolver {
     enum class DependencyState {FatalFailed, NonFatalFailed, Passed }
 
-    data class DependencyCheckResult(val state: DependencyState, val message: String, val resolveText: String)
+    data class DependencyCheckResult(val state: DependencyState, val message: CharSequence, val resolveText: CharSequence)
+
+    companion object {
+        fun combineDependencyState(vararg states: DependencyState): DependencyState {
+            if (states.isNotEmpty()) {
+                var currentState = DependencyState.Passed
+                for (state in states) {
+                    if (state == DependencyState.NonFatalFailed) {
+                        currentState = DependencyState.NonFatalFailed
+                    } else if (state == DependencyState.FatalFailed) {
+                        return DependencyState.FatalFailed
+                    }
+                }
+                return currentState
+            } else {
+                return DependencyState.Passed
+            }
+        }
+
+    }
 
     abstract fun checkDependencySatisfied(context: Context, selfResolve: Boolean): Single<DependencyCheckResult>
 

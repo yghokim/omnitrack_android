@@ -52,11 +52,6 @@ object GoogleFitService : OTExternalService("GoogleFitService", 19) {
         set.toTypedArray()
     }
 
-
-    init {
-        assignRequestCode(this)
-    }
-
     override fun onRegisterMeasureFactories(): Array<OTMeasureFactory> {
         return arrayOf(GoogleFitStepsFactory)
     }
@@ -130,6 +125,7 @@ object GoogleFitService : OTExternalService("GoogleFitService", 19) {
         client = null
     }
 
+    /*
     override fun prepareServiceAsync(preparedHandler: ((Boolean) -> Unit)?) {
         getConnectedClient().subscribe({
             client ->
@@ -137,7 +133,7 @@ object GoogleFitService : OTExternalService("GoogleFitService", 19) {
         }, {
             preparedHandler?.invoke(false)
         })
-    }
+    }*/
 
     fun getConnectedClient(): Observable<GoogleApiClient> {
         return Observable.create {

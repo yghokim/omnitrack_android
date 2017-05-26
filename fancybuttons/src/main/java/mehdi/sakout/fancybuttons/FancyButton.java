@@ -50,7 +50,7 @@ public class FancyButton extends LinearLayout {
     private int mTextPosition = 1;
     private int mDefaultTextSize = Utils.spToPx(getContext(), 15);
     private int mDefaultTextGravity = 0x11; // Gravity.CENTER
-    private String mText = null;
+    private CharSequence mText = null;
     // # Icon Attributes
     private Drawable mIconResource = null;
     private int mFontIconSize = Utils.spToPx(getContext(), 15);
@@ -256,7 +256,7 @@ public class FancyButton extends LinearLayout {
                 if (mIconPosition == POSITION_TOP || mIconPosition == POSITION_BOTTOM)
                     iconViewParams.gravity = Gravity.CENTER;
                 else
-                    iconViewParams.gravity = Gravity.START;
+                    iconViewParams.gravity = Gravity.START | Gravity.CENTER_VERTICAL;
 
                 iconViewParams.rightMargin = 10;
                 iconViewParams.leftMargin = 10;
@@ -823,8 +823,8 @@ public class FancyButton extends LinearLayout {
      *
      * @param text : Text
      */
-    public void setText(String text) {
-        text = mTextAllCaps ? text.toUpperCase() : text;
+    public void setText(CharSequence text) {
+        text = mTextAllCaps ? text.toString().toUpperCase() : text;
         this.mText = text;
         if (mTextView == null)
             initializeFancyButton();

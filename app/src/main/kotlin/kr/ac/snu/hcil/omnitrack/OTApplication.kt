@@ -307,10 +307,10 @@ class OTApplication : MultiDexApplication() {
         OTExternalService.init()
         for (service in OTExternalService.availableServices) {
             if (service.state == OTExternalService.ServiceState.ACTIVATED) {
-                service.prepareServiceAsync({
-                    result ->
+                service.activateSilently().subscribe {
+                    state ->
 
-                })
+                }
             }
         }
 

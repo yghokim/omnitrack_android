@@ -28,10 +28,6 @@ object FitbitService : OAuth2BasedExternalService("FitbitService", 0) {
     override val descResourceId: Int = R.string.service_fitbit_desc
     override val nameResourceId: Int = R.string.service_fitbit_name
 
-    init {
-        assignRequestCode(this)
-    }
-
     override fun onRegisterMeasureFactories(): Array<OTMeasureFactory> {
         return arrayOf(
                 FitbitStepCountMeasureFactory,
@@ -42,7 +38,7 @@ object FitbitService : OAuth2BasedExternalService("FitbitService", 0) {
     }
 
     override fun onRegisterDependencies(): Array<OTSystemDependencyResolver> {
-        return arrayOf(
+        return super.onRegisterDependencies() + arrayOf(
                 ThirdPartyAppDependencyResolver.Builder(OTApplication.app)
                         .setAppName("Fitbit")
                         .setPackageName("com.fitbit.FitbitMobile")
@@ -51,7 +47,7 @@ object FitbitService : OAuth2BasedExternalService("FitbitService", 0) {
         )
     }
 
-    override fun makeNewAuth2Client(requestCode: Int): OAuth2Client {
+    override fun makeNewAuth2Client(): OAuth2Client {
         val config = OAuth2Client.OAuth2Config()
         config.clientId = OTApplication.app.resources.getString(R.string.fitbit_client_id)
         config.clientSecret = OTApplication.app.resources.getString(R.string.fitbit_client_secret)
@@ -60,7 +56,7 @@ object FitbitService : OAuth2BasedExternalService("FitbitService", 0) {
         config.tokenRequestUrl = TOKEN_REQUEST_URL
         config.revokeUrl = REVOKE_URL
 
-        return OAuth2Client(config, requestCode)
+        return OAuth2Client(config)
     }
 
 }

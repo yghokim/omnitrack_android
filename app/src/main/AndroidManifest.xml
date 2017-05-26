@@ -254,6 +254,10 @@
             android:taskAffinity="kr.ac.snu.hcil.omnitrack.reminderPopup"
             android:theme="@style/AppTheme.Dialog.DimmedBackground" />
 
+        <activity
+            android:name=".ui.pages.services.ExternalServiceActivationActivity"
+            android:theme="@style/AppTheme.NoActionBar.ActionBarOverlay" />
+
     </application>
 
 </manifest>

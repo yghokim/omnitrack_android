@@ -13,11 +13,6 @@ object AndroidDeviceService : OTExternalService("AndroidDeviceService", 19) {
     override fun onActivateAsync(context: Context): Observable<Boolean> {
         return Observable.error(NotImplementedError(""))
     }
-
-    override fun prepareServiceAsync(preparedHandler: ((Boolean) -> Unit)?) {
-
-    }
-
     override fun onDeactivate() {
 
     }

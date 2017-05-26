@@ -5,7 +5,12 @@
 
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:paddingBottom="4dp"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="4dp"
+
+    >
 
     <kr.ac.snu.hcil.omnitrack.ui.components.common.DrawableTintAppCompatTextView
         android:id="@+id/ui_description"
@@ -16,6 +21,8 @@
         android:layout_marginRight="8dp"
         android:layout_toLeftOf="@+id/ui_button_container"
         android:lineSpacingMultiplier="1.2"
+        android:textColor="@color/textColorMidDark"
+        android:textSize="16sp"
         tools:text="Permissions need to be approved. hahahaha ah ah ahahah ha ha ah ah ah a haha ha h" />
 
     <FrameLayout
@@ -29,14 +36,16 @@
             android:id="@+id/ui_button"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/button_height_small"
-            android:paddingLeft="20dp"
-
-            android:paddingRight="20dp"
+            android:paddingLeft="12dp"
+            android:paddingRight="12dp"
             android:textStyle="bold"
             android:visibility="gone"
-            app:fb_defaultColor="@color/colorPointed"
-            app:fb_focusColor="@color/colorPointed.Light"
-            app:fb_radius="30dp"
+            app:fb_borderColor="@color/colorAccent.Light"
+            app:fb_borderWidth="1dp"
+            app:fb_defaultColor="@android:color/transparent"
+            app:fb_focusColor="@color/colorAccent.Light"
+            app:fb_radius="5dp"
+            app:fb_textColor="@color/colorAccent"
             app:fb_useSystemFont="true" />
 
         <com.github.ybq.android.spinkit.SpinKitView
@@ -52,7 +61,7 @@
             android:id="@+id/ui_checked"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:background="@drawable/accent_circle"
+            android:background="@drawable/green_circle"
             android:padding="5dp"
             android:tint="@color/semiTransparentWhite"
             app:srcCompat="@drawable/done" />

@@ -14,10 +14,6 @@ object MisfitService : OTExternalService("MisfitService", 0) {
 
     const val PREFERENCE_ACCESS_TOKEN = "misfit_access_token"
 
-    init {
-        assignRequestCode(this)
-    }
-
     override fun onRegisterMeasureFactories(): Array<OTMeasureFactory> {
         return arrayOf(MisfitStepMeasureFactory, MisfitSleepMeasureFactory)
     }
@@ -41,6 +37,7 @@ object MisfitService : OTExternalService("MisfitService", 0) {
 
     override val thumbResourceId: Int = R.drawable.service_thumb_misfit
 
+    /*
     override fun prepareServiceAsync(preparedHandler: ((Boolean) -> Unit)?) {
         println("stored Misfit Token: ${getStoredAccessToken()}")
         if (getStoredAccessToken() != null) {
@@ -48,7 +45,7 @@ object MisfitService : OTExternalService("MisfitService", 0) {
         } else {
             preparedHandler?.invoke(false)
         }
-    }
+    }*/
 
     /*
     override fun handleActivityActivationResultOk(resultData: Intent?) {
