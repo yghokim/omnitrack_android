@@ -1,8 +1,11 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.common.dependency
 
 import android.content.Context
+import android.graphics.PorterDuff
+import android.support.v4.content.ContextCompat
 import android.util.AttributeSet
 import android.view.View
+import android.view.ViewGroup
 import android.widget.RelativeLayout
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
@@ -43,6 +46,8 @@ class DependencyControlView : RelativeLayout {
     private val resolveButton: FancyButton
     private val busyIndicator: View
     private val checkedView: View
+    private val resolveButtonContainer: ViewGroup
+    private val resolveTypeWappen: TextView
 
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
@@ -56,6 +61,8 @@ class DependencyControlView : RelativeLayout {
         resolveButton = findViewById(R.id.ui_button) as FancyButton
         busyIndicator = findViewById(R.id.ui_loading_indicator)
         checkedView = findViewById(R.id.ui_checked)
+        resolveButtonContainer = findViewById(R.id.ui_resolve_button_container) as ViewGroup
+        resolveTypeWappen = findViewById(R.id.ui_resolve_type_wappen) as TextView
 
         resolveButton.setOnClickListener {
             val activity = getActivity()
@@ -80,33 +87,34 @@ class DependencyControlView : RelativeLayout {
                                         DependencyControlViewModel.State.FAILED_FATAL, DependencyControlViewModel.State.FAILED_NON_FATAL -> {
                                             checkedView.visibility = View.GONE
                                             busyIndicator.visibility = View.GONE
-                                            resolveButton.visibility = View.VISIBLE
+                                            resolveButtonContainer.visibility = View.VISIBLE
                                         }
                                         DependencyControlViewModel.State.SATISFIED -> {
 
                                             checkedView.visibility = View.VISIBLE
                                             busyIndicator.visibility = View.GONE
-                                            resolveButton.visibility = View.GONE
+                                            resolveButtonContainer.visibility = View.GONE
                                         }
 
                                         DependencyControlViewModel.State.CHECKING, DependencyControlViewModel.State.RESOLVING -> {
                                             descriptionView.setText(R.string.msg_checking)
                                             busyIndicator.visibility = View.VISIBLE
-                                            resolveButton.visibility = View.GONE
+                                            resolveButtonContainer.visibility = View.GONE
                                         }
                                     }
-/*
+
                                     if(state == DependencyControlViewModel.State.FAILED_FATAL)
                                     {
-                                        descriptionView.setTextColor(ContextCompat.getColor(context, R.color.colorRed_Light))
+                                        resolveTypeWappen.setText(R.string.msg_mandatory)
+                                        resolveTypeWappen.background.setColorFilter(ContextCompat.getColor(context, R.color.colorRed_Light), PorterDuff.Mode.SRC_ATOP)
+                                        //.setTextColor(ContextCompat.getColor(context, R.color.colorRed_Light))
                                     }
                                     else if(state == DependencyControlViewModel.State.FAILED_NON_FATAL)
                                     {
-                                        descriptionView.setTextColor(ContextCompat.getColor(context, R.color.colorNoticeable))
+                                        resolveTypeWappen.setText(R.string.msg_optional)
+                                        resolveTypeWappen.background.setColorFilter(ContextCompat.getColor(context, R.color.colorNoticeable), PorterDuff.Mode.SRC_ATOP)
+                                        //descriptionView.setTextColor(ContextCompat.getColor(context, R.color.colorNoticeable))
                                     }
-                                    else{
-                                        descriptionView.setTextColor()
-                                    }*/
                                 }
                 )
 

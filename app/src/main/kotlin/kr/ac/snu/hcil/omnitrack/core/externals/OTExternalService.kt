@@ -18,6 +18,7 @@ import kr.ac.snu.hcil.omnitrack.utils.INameDescriptionResourceProvider
 import kr.ac.snu.hcil.omnitrack.utils.convertToRx1Observable
 import rx.Observable
 import rx.Single
+import rx.subjects.BehaviorSubject
 import rx_activity_result2.RxActivityResult
 import java.util.*
 
@@ -119,9 +120,14 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
         return _measureFactories
     }
 
-    var state: ServiceState = ServiceState.DEACTIVATED
-        protected set
+    var state: ServiceState get() = onStateChanged.value
+        protected set(value) {
+            if (onStateChanged.value != value) {
+                onStateChanged.onNext(value)
+            }
+        }
 
+    val onStateChanged: BehaviorSubject<ServiceState> = BehaviorSubject.create<ServiceState>().apply { onNext(ServiceState.DEACTIVATED) }
 
     init {
 

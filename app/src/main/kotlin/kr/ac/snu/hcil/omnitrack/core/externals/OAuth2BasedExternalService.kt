@@ -51,13 +51,17 @@ abstract class OAuth2BasedExternalService(identifier: String, minimumSDK: Int) :
 
     override fun onDeactivate() {
         val cd = credential
-        if (cd != null)
+        if (cd != null) {
             authClient.signOut(cd) {
                 result ->
                 if (result) {
-                    credential = null
+                    println("${identifier} OAuth2 signed out.")
+                } else {
+                    println("${identifier} OAuth2 sign out failed.")
                 }
             }
+            credential = null
+        }
     }
 
     override fun onCredentialRefreshed(newCredential: OAuth2Client.Credential) {
