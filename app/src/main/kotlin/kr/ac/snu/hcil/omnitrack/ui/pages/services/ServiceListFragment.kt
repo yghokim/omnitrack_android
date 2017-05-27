@@ -1,6 +1,5 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.services
 
-import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
@@ -8,7 +7,6 @@ import android.support.v7.widget.AppCompatButton
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.transition.TransitionManager
-import android.util.SparseArray
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,6 +22,7 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.home.MeasureFactoryAdapter
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
 import rx.internal.util.SubscriptionList
+import rx.subscriptions.SerialSubscription
 
 /**
  * Created by Young-Ho on 7/29/2016.
@@ -33,8 +32,6 @@ class ServiceListFragment : OTFragment() {
     private lateinit var listView: RecyclerView
 
     private lateinit var adapter: Adapter
-
-    private val pendedActivations = SparseArray<Adapter.ViewHolder>()
 
     private val creationSubscriptions = SubscriptionList()
 
@@ -63,6 +60,7 @@ class ServiceListFragment : OTFragment() {
         creationSubscriptions.clear()
     }
 
+    /*
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         println("permission result: $requestCode ${pendedActivations.size()}")
@@ -86,7 +84,7 @@ class ServiceListFragment : OTFragment() {
                 pendedActivations.removeAt(requestCode)
             }
         }
-    }
+    }*/
 
     private inner class Adapter : RecyclerView.Adapter<Adapter.ViewHolder>() {
 
@@ -119,6 +117,8 @@ class ServiceListFragment : OTFragment() {
             val measureFactoryListView: RecyclerView
 
             val measureFactoryAdapter = MeasureFactoryAdapter()
+
+            val serviceStateSubscription = SerialSubscription()
 
             private val activateColor: ColorStateList by lazy {
                 ColorStateList.valueOf(ContextCompat.getColor(context, R.color.colorPointed))
@@ -162,7 +162,6 @@ class ServiceListFragment : OTFragment() {
                     when (service.state) {
                         OTExternalService.ServiceState.ACTIVATED -> {
                             service.deactivate()
-                            holderState = OTExternalService.ServiceState.DEACTIVATED
                         }
                         OTExternalService.ServiceState.ACTIVATING -> {
 
@@ -171,23 +170,18 @@ class ServiceListFragment : OTFragment() {
                             if (service.isInternetRequiredForActivation && !NetworkHelper.isConnectedToInternet()) {
                                 internetRequiredAlertBuilder.show()
                             } else {
-                                holderState = OTExternalService.ServiceState.ACTIVATING
-
+                                /*
                                 if (!service.permissionGranted) {
                                     pendedActivations.setValueAt(adapterPosition, this@ViewHolder)
                                     service.grantPermissions(this@ServiceListFragment, adapterPosition)
                                 } else {
+                                */
                                     creationSubscriptions.add(
                                             service.startActivationActivityAsync(context).subscribe({
                                                 success ->
-                                                if (success) {
-                                                    holderState = OTExternalService.ServiceState.ACTIVATED
-                                                } else {
-                                                    holderState = OTExternalService.ServiceState.DEACTIVATED
-                                                }
-                                            }, { holderState = OTExternalService.ServiceState.DEACTIVATED })
+                                            }, { })
                                     )
-                                }
+                                //}
                             }
                         }
                     }
@@ -226,6 +220,14 @@ class ServiceListFragment : OTFragment() {
                 measureFactoryAdapter.service = service
 
                 holderState = service.state
+
+                val serviceStateSubscription = service.onStateChanged.subscribe {
+                    state ->
+                    holderState = state
+                }
+
+                this.serviceStateSubscription.set(serviceStateSubscription)
+                creationSubscriptions.add(serviceStateSubscription)
             }
         }
     }

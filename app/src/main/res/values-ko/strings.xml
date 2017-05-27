@@ -355,6 +355,10 @@
     <string name="msg_format_dependency_sign_in_passed"><b>%1$s</b> 서비스에 로그인되어 있습니다.</string>
     <string name="msg_format_dependency_sign_in_failed"><b>%1$s</b> 서비스에 로그인되어 있지 않습니다.</string>
 
+    <string name="msg_mandatory">필수사항</string>
+    <string name="msg_optional">선택사항</string>
+    <string name="msg_format_service_activate_button">OmniTrack에서 %1$s 활성화</string>
+
 
     <string-array name="purpose_entries">
         <item>directive|건강 관련 정보를 기록하기 위해서</item>

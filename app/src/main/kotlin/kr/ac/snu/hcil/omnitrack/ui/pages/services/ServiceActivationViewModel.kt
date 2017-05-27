@@ -18,12 +18,11 @@ class ServiceActivationViewModel : ViewModel() {
 
     private val subscriptions = SubscriptionList()
 
-    private val dependencyCheckSubscriptions = SubscriptionList()
-
     var attachedService: OTExternalService? = null
         set(value) {
             if (field != value) {
                 field = value
+                subscriptions.clear()
                 if (value != null) {
                     serviceThumbnailResId.onNext(value.thumbResourceId)
                     serviceNameResId.onNext(value.nameResourceId)
@@ -54,13 +53,43 @@ class ServiceActivationViewModel : ViewModel() {
                 }
 
                 field = value
-                dependencyCheckSubscriptions.clear()
+
+                value?.let {
+                    subscriptions.add(
+                            Observable.merge(it.map { model -> model.onStatusChanged.map { state -> Pair(model, state) } })
+                                    .subscribe {
+                                        pair ->
+                                        currentState.onNext(combineCurrentDependencyViewModelState())
+                                    }
+                    )
+                }
+
                 serviceDependencyViewModels.onNext(value)
             }
         }
 
     init {
         currentState.onNext(State.IdleNotSatistified)
+    }
+
+    private fun combineCurrentDependencyViewModelState(): State {
+        var nullCount = 0
+        var fatalFailedExists = false
+        currentDependencyViewModels?.forEach { model ->
+            if (model.onStatusChanged.hasValue()) {
+                if (model.onStatusChanged.value == DependencyControlViewModel.State.CHECKING || model.onStatusChanged.value == DependencyControlViewModel.State.RESOLVING) {
+                    return State.Checking
+                } else if (model.onStatusChanged.value == DependencyControlViewModel.State.FAILED_FATAL) {
+                    fatalFailedExists = true
+                }
+            } else {
+                nullCount++
+            }
+        }
+
+        if (fatalFailedExists) {
+            return State.IdleNotSatistified
+        } else return if (nullCount == 0) State.Satisfied else State.IdleNotSatistified
     }
 
     fun startDependencyCheck(context: Context): Boolean {
@@ -70,12 +99,11 @@ class ServiceActivationViewModel : ViewModel() {
 
         val dependencyModels = serviceDependencyViewModels.value ?: return false
 
-        currentState.onNext(State.Checking)
-
         dependencyModels.forEach { it.checkDependency(context) }
 
         val observables = dependencyModels.map { it.onStatusChanged.takeUntil { state -> state != DependencyControlViewModel.State.CHECKING } }
 
+        /*
         dependencyCheckSubscriptions.add(
                 Observable.zip<State>(observables, {
                     stateArray ->
@@ -93,7 +121,7 @@ class ServiceActivationViewModel : ViewModel() {
                             state ->
                             println("Service Activation Dependency Check finished.")
                         }
-        )
+        )*/
 
 
         return true

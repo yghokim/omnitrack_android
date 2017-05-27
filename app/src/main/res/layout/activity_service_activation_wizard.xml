@@ -46,7 +46,7 @@
                 android:layout_marginStart="@dimen/activity_horizontal_margin"
                 android:layout_marginTop="5dp"
                 android:textColor="@color/textColorMidLight"
-                android:textSize="14sp"
+                android:textSize="16sp"
                 tools:text="ms band description" />
 
 
@@ -109,23 +109,33 @@
         android:indeterminate="false"
         android:indeterminateOnly="true" />
 
-
-    <kr.ac.snu.hcil.omnitrack.ui.components.common.TintFancyButton
-        android:id="@+id/ui_button_activate"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:enabled="false"
-        android:fontFamily="sans-serif-regular"
-        android:textAllCaps="false"
-        app:drawableTint="@android:color/white"
-        app:fb_defaultColor="@color/colorPointed"
-        app:fb_disabledColor="@color/textColorLight"
-        app:fb_focusColor="@color/colorPointed.Light"
-        app:fb_iconResource="@drawable/link"
-        app:fb_text="Activate Fitbit in OmniTrack"
-        app:fb_textColor="@android:color/white"
-        app:fb_textSize="16sp"
-        app:fb_useSystemFont="true" />
+        android:layout_height="60dp">
+
+        <at.markushi.ui.RevealColorView
+            android:id="@+id/ui_reveal_color_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/textColorLight" />
+
+        <kr.ac.snu.hcil.omnitrack.ui.components.common.TintFancyButton
+            android:id="@+id/ui_button_activate"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:enabled="false"
+            android:fontFamily="sans-serif-regular"
+            android:textAllCaps="false"
+            app:drawableTint="@android:color/white"
+            app:fb_defaultColor="@android:color/transparent"
+            app:fb_disabledColor="@android:color/transparent"
+            app:fb_focusColor="@color/colorPointed.Light"
+            app:fb_iconResource="@drawable/link"
+            app:fb_text="Activate Fitbit in OmniTrack"
+            app:fb_textColor="@android:color/white"
+            app:fb_textSize="16sp"
+            app:fb_useSystemFont="true" />
+    </FrameLayout>
 
 
 </LinearLayout>
