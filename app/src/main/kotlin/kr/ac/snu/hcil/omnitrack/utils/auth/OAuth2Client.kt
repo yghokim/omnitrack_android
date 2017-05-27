@@ -232,12 +232,21 @@ class OAuth2Client(val config: OAuth2Config) {
             if (NetworkHelper.isConnectedToInternet()) {
                 try {
                     val response = OkHttpClient().newCall(request).execute()
-                    return response.code() == 200
+                    if (response.code() == 200) {
+                        return true
+                    } else {
+                        println("result code is not 200. sign out failed.")
+                        println(response.message())
+                        return false
+                    }
                 } catch(e: Exception) {
                     e.printStackTrace()
                     return false
                 }
-            } else return false
+            } else {
+                println("internet is not connected. Sign out was failed.")
+                return false
+            }
 
         }
 

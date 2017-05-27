@@ -13,6 +13,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import at.markushi.ui.RevealColorView
 import butterknife.bindView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
@@ -20,6 +21,7 @@ import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.dependency.DependencyControlView
 import kr.ac.snu.hcil.omnitrack.ui.components.common.dependency.DependencyControlViewModel
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
+import kr.ac.snu.hcil.omnitrack.utils.TextHelper
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 import mehdi.sakout.fancybuttons.FancyButton
 import rx.android.schedulers.AndroidSchedulers
@@ -57,6 +59,8 @@ class ExternalServiceActivationActivity : OTActivity(false, false) {
 
     private lateinit var dependencyListView: RecyclerView
 
+    private lateinit var buttonColorRevealView: RevealColorView
+
     private var dependencyList: List<DependencyControlViewModel>? = null
     private val dependencyAdapter = DependencyAdapter()
 
@@ -73,6 +77,8 @@ class ExternalServiceActivationActivity : OTActivity(false, false) {
 
         nameView = findViewById(R.id.ui_name) as TextView
         descriptionView = findViewById(R.id.ui_description) as TextView
+
+        buttonColorRevealView = findViewById(R.id.ui_reveal_color_view) as RevealColorView
 
         dependencyListView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         dependencyListView.adapter = dependencyAdapter
@@ -91,6 +97,21 @@ class ExternalServiceActivationActivity : OTActivity(false, false) {
         }
 
         viewModel.attachedService = OTExternalService.findServiceByIdentifier(serviceIdentifier)
+
+        if (savedInstanceState != null) {
+            when (viewModel.currentState.value) {
+                ServiceActivationViewModel.State.Satisfied ->
+                    activateButton.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPointed))
+                else ->
+                    activateButton.setBackgroundColor(ContextCompat.getColor(this, R.color.textColorLight))
+            }
+        }
+
+        creationSubscriptions.add(
+                viewModel.serviceNameResId.subscribe { nameId ->
+                    activateButton.text = TextHelper.formatWithResources(this, R.string.msg_format_service_activate_button, nameId)
+                }
+        )
 
         creationSubscriptions.add(
                 viewModel.serviceThumbnailResId.subscribe {
@@ -125,21 +146,25 @@ class ExternalServiceActivationActivity : OTActivity(false, false) {
         creationSubscriptions.add(
                 viewModel.currentState.subscribeOn(AndroidSchedulers.mainThread()).subscribe {
                     state ->
+                    println("Service Activation ViewModel state changed to ${state}")
                     when (state) {
                         ServiceActivationViewModel.State.Satisfied -> {
                             progressBar.visibility = View.GONE
                             activateButton.isEnabled = true
+                            buttonColorRevealView.reveal(buttonColorRevealView.width / 2, buttonColorRevealView.height / 2, ContextCompat.getColor(this, R.color.colorPointed), 0, 500, null)
                         }
 
                         ServiceActivationViewModel.State.Checking -> {
                             progressBar.visibility = View.VISIBLE
                             activateButton.isEnabled = false
+                            buttonColorRevealView.reveal(buttonColorRevealView.width / 2, buttonColorRevealView.height / 2, ContextCompat.getColor(this, R.color.textColorLight), 0, 500, null)
                         }
 
                         ServiceActivationViewModel.State.IdleNotSatistified -> {
 
                             progressBar.visibility = View.GONE
                             activateButton.isEnabled = false
+                            buttonColorRevealView.reveal(buttonColorRevealView.width / 2, buttonColorRevealView.height / 2, ContextCompat.getColor(this, R.color.textColorLight), 0, 500, null)
                         }
                     }
                 }

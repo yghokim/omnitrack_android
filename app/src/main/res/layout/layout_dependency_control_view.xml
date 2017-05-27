@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
 
@@ -32,21 +32,44 @@
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true">
 
-        <kr.ac.snu.hcil.omnitrack.ui.components.common.VerticalCenterAlignedIconTextButton
-            android:id="@+id/ui_button"
+
+        <FrameLayout
+            android:id="@+id/ui_resolve_button_container"
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/button_height_small"
-            android:paddingLeft="12dp"
-            android:paddingRight="12dp"
-            android:textStyle="bold"
-            android:visibility="gone"
-            app:fb_borderColor="@color/colorAccent.Light"
-            app:fb_borderWidth="1dp"
-            app:fb_defaultColor="@android:color/transparent"
-            app:fb_focusColor="@color/colorAccent.Light"
-            app:fb_radius="5dp"
-            app:fb_textColor="@color/colorAccent"
-            app:fb_useSystemFont="true" />
+            android:layout_height="wrap_content">
+
+            <kr.ac.snu.hcil.omnitrack.ui.components.common.VerticalCenterAlignedIconTextButton
+                android:id="@+id/ui_button"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/button_height_small"
+                android:layout_gravity="end"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="12dp"
+                android:paddingLeft="12dp"
+                android:paddingRight="12dp"
+                android:textStyle="bold"
+                app:fb_borderColor="@color/colorAccent.Light"
+                app:fb_borderWidth="1dp"
+                app:fb_defaultColor="@android:color/transparent"
+                app:fb_focusColor="@color/colorAccent.Light"
+                app:fb_radius="5dp"
+                app:fb_text="Sign In"
+                app:fb_textColor="@color/colorAccent"
+                app:fb_useSystemFont="true" />
+
+            <TextView
+                android:id="@+id/ui_resolve_type_wappen"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_marginEnd="12dp"
+                android:background="@drawable/wappen_frame_dark"
+                android:focusable="false"
+                android:text="Mandatory"
+                android:textAllCaps="true"
+                android:textColor="@android:color/white"
+                android:textSize="10dp" />
+        </FrameLayout>
 
         <com.github.ybq.android.spinkit.SpinKitView
             android:id="@+id/ui_loading_indicator"
@@ -64,7 +87,8 @@
             android:background="@drawable/green_circle"
             android:padding="5dp"
             android:tint="@color/semiTransparentWhite"
+            android:visibility="gone"
             app:srcCompat="@drawable/done" />
     </FrameLayout>
 
-</merge>
+</RelativeLayout>
