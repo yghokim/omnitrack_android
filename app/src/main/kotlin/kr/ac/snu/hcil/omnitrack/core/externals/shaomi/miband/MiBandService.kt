@@ -11,7 +11,6 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.AsyncTaskWithResultHandler
-import rx.Observable
 
 /**
  * Created by Young-Ho Kim on 2016-07-29.
@@ -22,11 +21,6 @@ object MiBandService : OTExternalService("ShaomiMiBand", 21) {
     override fun onRegisterMeasureFactories(): Array<OTMeasureFactory> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
-
-    override fun onActivateAsync(context: Context): Observable<Boolean> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
 
     const val PREFERENCE_KEY = "OmniTrack_MiBandService"
     const val PREFERENCE_VALUE_MAC = "deviceMac"

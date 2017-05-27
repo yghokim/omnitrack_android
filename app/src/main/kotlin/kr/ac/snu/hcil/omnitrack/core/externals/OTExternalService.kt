@@ -186,26 +186,7 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
                     result ->
                     result.resultCode() == Activity.RESULT_OK
                 }
-
-
-        /*
-        return onActivateAsync(context)
-                .doOnSubscribe {
-                    state = ServiceState.ACTIVATING
-                }
-                .doOnNext {
-                    result ->
-                    if (result == true) {
-                        setIsActivatedFlag(this, true)
-                        state = ServiceState.ACTIVATED
-                    } else {
-                        setIsActivatedFlag(this, false)
-                        state = ServiceState.DEACTIVATED
-                    }
-                }*/
     }
-
-    abstract fun onActivateAsync(context: Context): Observable<Boolean>
 
 
     fun deactivate() {
