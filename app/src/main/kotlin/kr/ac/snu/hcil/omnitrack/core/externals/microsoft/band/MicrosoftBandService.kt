@@ -1,6 +1,5 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.microsoft.band
 
-import android.content.Context
 import android.os.AsyncTask
 import com.microsoft.band.BandClient
 import com.microsoft.band.BandClientManager
@@ -10,15 +9,11 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
-import rx.Observable
 
 /**
  * Created by younghokim on 16. 7. 28..
  */
 object MicrosoftBandService : OTExternalService("MicrosoftBandService", 19) {
-    override fun onActivateAsync(context: Context): Observable<Boolean> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
 
     override val permissionGranted: Boolean = true
 
