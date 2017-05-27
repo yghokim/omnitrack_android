@@ -411,4 +411,9 @@ public interface RestApiInterface {
             @Path(UpPlatformSdkConstants.API_VERSION) String version,
             Callback<Object> response
     );
+
+    @DELETE("/nudge/api/{version}/users/@me/PartnerAppMembership")
+    void revokeUser(
+            @Path(UpPlatformSdkConstants.API_VERSION) String version, Callback<Object> response
+    );
 }

@@ -1,7 +1,5 @@
 package kr.ac.snu.hcil.omnitrack.core.externals
 
-import android.app.Activity
-import android.content.Context
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.dependency.OAuth2LoginDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.dependency.OTSystemDependencyResolver
@@ -36,18 +34,6 @@ abstract class OAuth2BasedExternalService(identifier: String, minimumSDK: Int) :
     }
 
     abstract fun makeNewAuth2Client(): OAuth2Client
-
-    override fun onActivateAsync(context: Context): Observable<Boolean> {
-        return authClient.authorize(context as Activity, OTApplication.getString(nameResourceId))
-                .doOnNext { credential ->
-                    credential.store(preferences, identifier)
-                }
-                .onErrorReturn { error -> null }
-                .map {
-                    credential ->
-                    credential != null
-                }
-    }
 
     override fun onDeactivate() {
         val cd = credential
