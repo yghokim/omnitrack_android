@@ -20,4 +20,10 @@
         <item>@string/friday_oneletter</item>
         <item>@string/saturday_oneletter</item>
     </string-array>
+
+    <string-array name="supported_language_codes">
+        <item>en</item>
+        <item>ko</item>
+    </string-array>
+
 </resources>

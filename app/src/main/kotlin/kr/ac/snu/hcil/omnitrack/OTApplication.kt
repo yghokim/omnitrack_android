@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack
 import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.res.Resources
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Looper
@@ -37,6 +38,7 @@ import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTriggerAlarmManager
 import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
 import kr.ac.snu.hcil.omnitrack.services.OTFirebaseUploadService
+import kr.ac.snu.hcil.omnitrack.utils.LocaleHelper
 import kr.ac.snu.hcil.omnitrack.utils.NumberStyle
 import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 import kr.ac.snu.hcil.omnitrack.utils.UniqueStringEntryList
@@ -125,6 +127,9 @@ class OTApplication : MultiDexApplication() {
         }
     }
 
+    override fun getResources(): Resources {
+        return wrappedContext.resources
+    }
 
     val systemSharedPreferences: SharedPreferences by lazy {
         PreferenceManager.getDefaultSharedPreferences(this)
@@ -169,6 +174,9 @@ class OTApplication : MultiDexApplication() {
     private var initialRun = false
 
     private val numActivitiesActive = AtomicInteger(0)
+
+    private lateinit var wrappedContext: Context
+
 /*
     private val currentUser: OTUser
         get() {
@@ -272,9 +280,19 @@ class OTApplication : MultiDexApplication() {
 
     private lateinit var userLoadingLooper: Looper
 
-    override fun attachBaseContext(base: Context?) {
-        super.attachBaseContext(base)
+    override fun attachBaseContext(base: Context) {
+        refreshConfiguration(base)
+        super.attachBaseContext(wrappedContext)
         MultiDex.install(this)
+    }
+
+    fun refreshConfiguration(context: Context) {
+        wrappedContext = LocaleHelper.wrapContextWithLocale(context.applicationContext ?: context, LocaleHelper.getLanguageCode(context))
+    }
+
+
+    fun getWrappedResources(): Resources {
+        return wrappedContext.resources
     }
 
     override fun onCreate() {

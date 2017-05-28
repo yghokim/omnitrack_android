@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.PointF
 import android.graphics.Rect
+import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.v7.app.AppCompatActivity
@@ -24,6 +25,7 @@ import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckService
 import kr.ac.snu.hcil.omnitrack.ui.components.common.time.DurationPicker
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.VersionCheckDialogFragment
 import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
+import kr.ac.snu.hcil.omnitrack.utils.LocaleHelper
 import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
 import rx.Single
 import rx.android.schedulers.AndroidSchedulers
@@ -158,6 +160,19 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
         }
 
         PreferenceManager.setDefaultValues(this, R.xml.global_preferences, false)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val contextLocale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            getResources().getConfiguration().getLocales().get(0);
+        } else {
+            //noinspection deprecation
+            getResources().getConfiguration().locale;
+        }
+        if (contextLocale.language != LocaleHelper.getLanguageCode(this)) {
+            recreate()
+        }
     }
 
     protected fun getUserOrGotoSignIn(): Single<OTUser> {
@@ -302,9 +317,9 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
     protected open fun onSessionLogContent(contentObject: Bundle) {
     }
 
-    override fun attachBaseContext(newBase: Context?) {
+    override fun attachBaseContext(newBase: Context) {
 
-        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase))
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(LocaleHelper.wrapContextWithLocale(newBase, LocaleHelper.getLanguageCode(newBase))))
         /*
         if (Build.VERSION.SDK_INT > 19) {
             super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase))
