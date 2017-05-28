@@ -84,7 +84,7 @@ class SidebarWrapper(val view: View, val parentActivity: AppCompatActivity) : Po
         private val menus = arrayListOf(
                 RecyclerViewMenuAdapter.MenuItem(R.drawable.settings_dark, parentActivity.getString(R.string.msg_settings), null, {
                     val intent = Intent(parentActivity, SettingsActivity::class.java)
-                    parentActivity.startActivity(intent)
+                    parentActivity.startActivityForResult(intent, SettingsActivity.REQUEST_CODE)
                 }, true),
 
                 RecyclerViewMenuAdapter.MenuItem(R.drawable.help_dark, parentActivity.getString(R.string.msg_about), null, {

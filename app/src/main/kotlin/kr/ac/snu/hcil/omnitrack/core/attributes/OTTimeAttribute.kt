@@ -48,14 +48,14 @@ class OTTimeAttribute(objectId: String?, localKey: Int?, parentTracker: OTTracke
 
 
         val formats = mapOf<Int, SimpleDateFormat>(
-                Pair(GRANULARITY_DAY, SimpleDateFormat(OTApplication.app.getString(R.string.property_time_format_granularity_day))),
-                Pair(GRANULARITY_MINUTE, SimpleDateFormat(OTApplication.app.getString(R.string.property_time_format_granularity_minute))),
-                Pair(GRANULARITY_SECOND, SimpleDateFormat(OTApplication.app.getString(R.string.property_time_format_granularity_second)))
+                Pair(GRANULARITY_DAY, SimpleDateFormat(OTApplication.getString(R.string.property_time_format_granularity_day))),
+                Pair(GRANULARITY_MINUTE, SimpleDateFormat(OTApplication.getString(R.string.property_time_format_granularity_minute))),
+                Pair(GRANULARITY_SECOND, SimpleDateFormat(OTApplication.getString(R.string.property_time_format_granularity_second)))
         )
 
         private val timezoneSizeSpan = AbsoluteSizeSpan(OTApplication.app.resources.getDimensionPixelSize(R.dimen.tracker_list_element_information_text_headerSize))
         private val timezoneStyleSpan = StyleSpan(Typeface.BOLD)
-        private val timezoneColorSpan = ForegroundColorSpan(ContextCompat.getColor(OTApplication.app, R.color.textColorLight))
+        private val timezoneColorSpan = ForegroundColorSpan(ContextCompat.getColor(OTApplication.app.contextCompat, R.color.textColorLight))
     }
 
 
