@@ -4,14 +4,17 @@ import android.content.SharedPreferences
 import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Bundle
+import android.preference.ListPreference
 import android.preference.Preference
 import android.preference.PreferenceFragment
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckService
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
+import kr.ac.snu.hcil.omnitrack.utils.LocaleHelper
 
 
 /**
@@ -45,18 +48,33 @@ class SettingsActivity : MultiButtonActionBarActivity(R.layout.activity_multibut
 
     class SettingsFragment : PreferenceFragment(), SharedPreferences.OnSharedPreferenceChangeListener, Preference.OnPreferenceChangeListener {
 
+        init {
+            retainInstance = true
+        }
+
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
 
             addPreferencesFromResource(R.xml.global_preferences)
 
-            findPreference(PREF_REMINDER_NOTI_RINGTONE)?.summary = getCurrentReminderNotificationRingtoneName()
-            findPreference(PREF_REMINDER_NOTI_RINGTONE).setOnPreferenceChangeListener(this)
+            findPreference(PREF_REMINDER_NOTI_RINGTONE)?.run {
+                summary = getCurrentReminderNotificationRingtoneName()
+                onPreferenceChangeListener = this@SettingsFragment
+            }
+
+            findPreference(LocaleHelper.PREF_KEY_SELECTED_LANGUAGE)?.run {
+                (this as? ListPreference)?.let {
+                    pref ->
+                    summary = pref.entries[pref.findIndexOfValue(LocaleHelper.getNearestLanguageToDevice(activity))]
+                }
+                onPreferenceChangeListener = this@SettingsFragment
+            }
         }
 
         override fun onDestroy() {
             super.onDestroy()
             findPreference(PREF_REMINDER_NOTI_RINGTONE).setOnPreferenceChangeListener(null)
+            findPreference(LocaleHelper.PREF_KEY_SELECTED_LANGUAGE).setOnPreferenceChangeListener(null)
         }
 
         override fun onResume() {
@@ -81,6 +99,18 @@ class SettingsActivity : MultiButtonActionBarActivity(R.layout.activity_multibut
                 if (newValue is String) {
                     val ringtone = RingtoneManager.getRingtone(activity, Uri.parse(newValue))
                     preference.summary = ringtone.getTitle(activity)
+                    return true
+                }
+            } else if (preference.key == LocaleHelper.PREF_KEY_SELECTED_LANGUAGE && preference is ListPreference) {
+                if (newValue is String) {
+                    try {
+                        preference.summary = preference.entries[preference.findIndexOfValue(newValue)]
+                    } catch(ex: Exception) {
+                        preference.summary = newValue
+                    }
+
+                    OTApplication.app.refreshConfiguration(activity)
+                    activity.recreate()
                     return true
                 }
             }

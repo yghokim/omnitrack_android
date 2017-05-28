@@ -189,6 +189,7 @@
     <string name="msg_rescuetime_api_key_input_hint">Paste RescueTime api key here.</string>
 
     <string name="msg_service_is_not_activated_format">%1$s 서비스가 활성화되지 않았습니다.</string>
+    <string name="msg_service_is_activated_format">%1$s 서비스가 활성화되어 있습니다.</string>
 
     <string name="msg_tracking_source_unspecified">Source Unspecified</string>
     <string name="msg_tracking_source_trigger">Logged by Trigger</string>
@@ -344,8 +345,8 @@
     <string name="msg_deactivate">비활성화</string>
     <string name="msg_pref_title_show_shortcut_panel">알림 바에 바로가기 패널 유지</string>
     <string name="msg_pref_summary_show_shortcut_panel">즐겨찾기로 설정된 트래커들을 상단 알림 바에 고정합니다</string>
-    <string name="msg_pref_summary_notify_new_update">Notify me when new update available. We frequently release new features, so stay tuned!</string>
-    <string name="msg_pref_title_notify_new_update">Notify New Update</string>
+    <string name="msg_pref_summary_notify_new_update">새로운 업데이트가 출시되었을 때 알림을 보냅니다. 업데이트가 자주 출시되고 있으니 항상 최신 버젼을 유지해 주세요!</string>
+    <string name="msg_pref_title_notify_new_update">새로운 업데이트 출시시 알림</string>
     <string name="msg_settings">설정</string>
     <string name="title_activity_settings">설정</string>
     <string name="msg_pref_reminder_noti_rington_title">리마인더 알림음</string>
@@ -358,6 +359,11 @@
     <string name="msg_mandatory">필수사항</string>
     <string name="msg_optional">선택사항</string>
     <string name="msg_format_service_activate_button">OmniTrack에서 %1$s 활성화</string>
+    <string name="msg_pref_category_language">언어</string>
+    <string name="msg_pref_follow_device_language">기기 설정과 동일한 언어 사용</string>
+    <string name="msg_pref_follow_device_language_summary">운영체제 언어 설정을 따릅니다. 영어가 기본값으로 사용됩니다.</string>
+    <string name="msg_pref_application_langauge">앱 언어</string>
+    <string name="msg_pref_reminder_light_color">리마인더 알림 LED 색</string>
 
 
     <string-array name="purpose_entries">
@@ -406,6 +412,12 @@
         <item>선택 항목 1</item>
         <item>선택 항목 2</item>
         <item>선택 항목 3</item>
+    </string-array>
+
+
+    <string-array name="supported_language_names">
+        <item>영어</item>
+        <item>한국어</item>
     </string-array>
 
 </resources>

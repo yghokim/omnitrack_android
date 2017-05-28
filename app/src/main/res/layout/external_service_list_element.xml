@@ -66,8 +66,9 @@
                 android:paddingEnd="@dimen/service_list_element_horizontal_padding"
 
             android:paddingStart="@dimen/service_list_element_horizontal_padding"
-            android:text="Activate"
-            android:textColor="#fff" />
+            android:text="@string/msg_activate"
+            android:textColor="#fff"
+            android:textStyle="bold" />
 
     </RelativeLayout>
 
