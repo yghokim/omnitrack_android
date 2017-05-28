@@ -25,6 +25,8 @@ class SettingsActivity : MultiButtonActionBarActivity(R.layout.activity_multibut
     companion object {
         const val PREF_REMINDER_NOTI_RINGTONE = "pref_reminder_noti_ringtone"
         const val PREF_REMINDER_LIGHT_COLOR = "pref_reminder_light_color"
+
+        const val REQUEST_CODE = 3423
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -108,9 +110,6 @@ class SettingsActivity : MultiButtonActionBarActivity(R.layout.activity_multibut
                     } catch(ex: Exception) {
                         preference.summary = newValue
                     }
-
-                    OTApplication.app.refreshConfiguration(activity)
-                    activity.recreate()
                     return true
                 }
             }
@@ -147,6 +146,11 @@ class SettingsActivity : MultiButtonActionBarActivity(R.layout.activity_multibut
                 PREF_REMINDER_NOTI_RINGTONE -> {
                     println("ringtone was changed to ${sharedPreferences.getString(PREF_REMINDER_NOTI_RINGTONE, "")}")
                     findPreference(key).summary = getCurrentReminderNotificationRingtoneName()
+                }
+
+                LocaleHelper.PREF_KEY_SELECTED_LANGUAGE -> {
+                    OTApplication.app.refreshConfiguration(activity)
+                    activity.recreate()
                 }
             }
         }
