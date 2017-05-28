@@ -28,7 +28,7 @@ abstract class OAuth2BasedExternalService(identifier: String, minimumSDK: Int) :
 
     override fun onRegisterDependencies(): Array<OTSystemDependencyResolver> {
         return super.onRegisterDependencies() + arrayOf(
-                OAuth2LoginDependencyResolver(authClient, identifier, preferences, OTApplication.app.getString(nameResourceId))
+                OAuth2LoginDependencyResolver(authClient, identifier, preferences, OTApplication.getString(nameResourceId))
 
         )
     }

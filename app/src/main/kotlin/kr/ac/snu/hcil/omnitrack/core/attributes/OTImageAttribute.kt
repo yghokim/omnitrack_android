@@ -90,7 +90,7 @@ class OTImageAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrack
 
                                 if (!NetworkHelper.isConnectedToInternet()) {
                                     println("internet is not connected.")
-                                    view.setErrorMode(OTApplication.app.getString(R.string.msg_network_error_tap_to_retry))
+                                    view.setErrorMode(OTApplication.getString(R.string.msg_network_error_tap_to_retry))
                                     return@function Single.just(false)
                                 }
 
@@ -126,7 +126,7 @@ class OTImageAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrack
                             } else {
                                 println("image is not synchronized. serverUri is empty.")
                                 //not synchronized yet.
-                                view.setErrorMode(OTApplication.app.getString(R.string.msg_network_error_tap_to_retry))
+                                view.setErrorMode(OTApplication.getString(R.string.msg_network_error_tap_to_retry))
                                 return Single.just(false)
                             }
                         }

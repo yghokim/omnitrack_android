@@ -25,6 +25,7 @@ import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckService
 import kr.ac.snu.hcil.omnitrack.ui.components.common.time.DurationPicker
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.VersionCheckDialogFragment
 import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
+import kr.ac.snu.hcil.omnitrack.ui.pages.settings.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.utils.LocaleHelper
 import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
 import rx.Single
@@ -44,6 +45,8 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
 
     companion object {
         val intentFilter: IntentFilter by lazy { IntentFilter(OTApplication.BROADCAST_ACTION_NEW_VERSION_DETECTED) }
+
+        const val INTENT_KEY_LANGUAGE_AT_CREATION = "language_at_creation"
     }
 
     private inner class OmniTrackSignInResultsHandler : OTAuthManager.SignInResultsHandler {
@@ -109,6 +112,8 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
 
     private var backgroundSignInCheckThread: Thread? = null
 
+    private var languageAtCreation: String = "en"
+
     private val broadcastReceiver: BroadcastReceiver by lazy {
         object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
@@ -159,20 +164,13 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
             }
         }
 
-        PreferenceManager.setDefaultValues(this, R.xml.global_preferences, false)
-    }
-
-    override fun onStart() {
-        super.onStart()
-        val contextLocale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            getResources().getConfiguration().getLocales().get(0);
+        languageAtCreation = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            getResources().getConfiguration().getLocales().get(0).language
         } else {
             //noinspection deprecation
-            getResources().getConfiguration().locale;
+            getResources().getConfiguration().locale.language
         }
-        if (contextLocale.language != LocaleHelper.getLanguageCode(this)) {
-            recreate()
-        }
+        PreferenceManager.setDefaultValues(this, R.xml.global_preferences, false)
     }
 
     protected fun getUserOrGotoSignIn(): Single<OTUser> {
@@ -251,7 +249,15 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        ExperimentConsentManager.handleActivityResult(false, requestCode, resultCode, data)
+
+        if (requestCode == SettingsActivity.REQUEST_CODE) {
+            if (languageAtCreation != LocaleHelper.getLanguageCode(this)) {
+                recreate()
+            }
+        } else {
+            ExperimentConsentManager.handleActivityResult(false, requestCode, resultCode, data)
+        }
+
     }
 
     fun performOnActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

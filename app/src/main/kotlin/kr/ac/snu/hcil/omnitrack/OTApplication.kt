@@ -119,7 +119,7 @@ class OTApplication : MultiDexApplication() {
         const val PREFERENCE_KEY_FIREBASE_INSTANCE_ID = "firebase_instance_id"
 
         fun getString(resId: Int): String {
-            return app.resources.getString(resId)
+            return app.getResources().getString(resId)
         }
 
         init {
@@ -128,7 +128,11 @@ class OTApplication : MultiDexApplication() {
     }
 
     override fun getResources(): Resources {
-        return wrappedContext.resources
+        return wrappedContext?.resources ?: super.getResources()
+    }
+
+    val contextCompat: Context get() {
+        return wrappedContext ?: this
     }
 
     val systemSharedPreferences: SharedPreferences by lazy {
@@ -175,7 +179,7 @@ class OTApplication : MultiDexApplication() {
 
     private val numActivitiesActive = AtomicInteger(0)
 
-    private lateinit var wrappedContext: Context
+    private var wrappedContext: Context? = null
 
 /*
     private val currentUser: OTUser
@@ -288,11 +292,6 @@ class OTApplication : MultiDexApplication() {
 
     fun refreshConfiguration(context: Context) {
         wrappedContext = LocaleHelper.wrapContextWithLocale(context.applicationContext ?: context, LocaleHelper.getLanguageCode(context))
-    }
-
-
-    fun getWrappedResources(): Resources {
-        return wrappedContext.resources
     }
 
     override fun onCreate() {
