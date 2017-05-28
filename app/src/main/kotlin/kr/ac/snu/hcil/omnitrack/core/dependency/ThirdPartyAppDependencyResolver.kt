@@ -14,19 +14,22 @@ import rx.Single
 /**
  * Created by younghokim on 2017. 5. 17..
  */
-class ThirdPartyAppDependencyResolver(val packageName: String, val appName: String, val mandatory: Boolean) : OTSystemDependencyResolver() {
+
+typealias TextEmitter = (context: Context) -> CharSequence
+class ThirdPartyAppDependencyResolver(val packageName: String, val appName: TextEmitter, val mandatory: Boolean) : OTSystemDependencyResolver() {
+
 
     class Builder(private val context: Context) {
         private var packageName: String? = null
-        private var appName: String? = null
+        private var appName: TextEmitter? = null
         private var mandatory: Boolean = false
 
 
-        private var fatalFailedMessage: CharSequence? = null
-        private var nonFatalFailedMessage: CharSequence? = null
-        private var passedMessage: CharSequence? = null
+        private var fatalFailedMessage: TextEmitter? = null
+        private var nonFatalFailedMessage: TextEmitter? = null
+        private var passedMessage: TextEmitter? = null
 
-        private var playStoreTossMessage: CharSequence? = null
+        private var playStoreTossMessage: TextEmitter? = null
 
         fun setPackageName(packageName: String): Builder {
             this.packageName = packageName
@@ -34,12 +37,13 @@ class ThirdPartyAppDependencyResolver(val packageName: String, val appName: Stri
         }
 
         fun setAppName(appName: String): Builder {
-            this.appName = appName
+            this.appName = { appName }
+
             return this
         }
 
         fun setAppName(@StringRes appNameRes: Int): Builder {
-            this.appName = context.getString(appNameRes)
+            this.appName = { context.getString(appNameRes) }
             return this
         }
 
@@ -48,42 +52,42 @@ class ThirdPartyAppDependencyResolver(val packageName: String, val appName: Stri
             return this
         }
 
-        fun fatalFailedMessage(message: CharSequence): Builder {
+        fun fatalFailedMessage(message: TextEmitter): Builder {
             this.fatalFailedMessage = message
             return this
         }
 
-        fun nonFatalFailedMessage(message: CharSequence): Builder {
+        fun nonFatalFailedMessage(message: TextEmitter): Builder {
             this.nonFatalFailedMessage = message
             return this
         }
 
-        fun passedMessage(message: CharSequence): Builder {
+        fun passedMessage(message: TextEmitter): Builder {
             this.passedMessage = message
             return this
         }
 
-        fun playStoreTossMessage(message: CharSequence): Builder {
+        fun playStoreTossMessage(message: TextEmitter): Builder {
             this.playStoreTossMessage = message
             return this
         }
 
         fun build(): ThirdPartyAppDependencyResolver {
-            return ThirdPartyAppDependencyResolver(packageName ?: "PackageNameNull", appName ?: "AppNameNull", mandatory)
+            return ThirdPartyAppDependencyResolver(packageName ?: "PackageNameNull", appName ?: { "AppNameNull" }, mandatory)
                     .apply {
-                        this.passedMessage = this@Builder.passedMessage ?: TextHelper.fromHtml(TextHelper.formatWithResources(context, R.string.msg_format_third_party_app_dependency_passed_message, appName))
-                        this.nonFatalFailedMessage = this@Builder.nonFatalFailedMessage ?: TextHelper.fromHtml(TextHelper.formatWithResources(context, R.string.msg_format_third_party_app_dependency_non_fatal_failed_message, appName))
-                        this.fatalFailedMessage = this@Builder.fatalFailedMessage ?: TextHelper.fromHtml(TextHelper.formatWithResources(context, R.string.msg_format_third_party_app_dependency_fatal_failed_message, appName))
-                        this.playStoreTossMessage = this@Builder.playStoreTossMessage ?: context.getString(R.string.msg_go_to_store)
+                        this.passedMessage = this@Builder.passedMessage
+                        this.nonFatalFailedMessage = this@Builder.nonFatalFailedMessage
+                        this.fatalFailedMessage = this@Builder.fatalFailedMessage
+                        this.playStoreTossMessage = this@Builder.playStoreTossMessage
                     }
         }
     }
 
-    private var fatalFailedMessage: CharSequence? = null
-    private var nonFatalFailedMessage: CharSequence? = null
-    private var passedMessage: CharSequence? = null
+    private var fatalFailedMessage: TextEmitter? = null
+    private var nonFatalFailedMessage: TextEmitter? = null
+    private var passedMessage: TextEmitter? = null
 
-    private var playStoreTossMessage: CharSequence? = null
+    private var playStoreTossMessage: TextEmitter? = null
 
     override fun checkDependencySatisfied(context: Context, selfResolve: Boolean): Single<DependencyCheckResult> {
         return Single.defer {
@@ -96,9 +100,9 @@ class ThirdPartyAppDependencyResolver(val packageName: String, val appName: Stri
             }
         }.map { state ->
             when (state) {
-                DependencyState.Passed -> DependencyCheckResult(state, passedMessage ?: "", playStoreTossMessage ?: context.getString(R.string.msg_go_to_store))
-                DependencyState.FatalFailed -> DependencyCheckResult(state, fatalFailedMessage ?: "", playStoreTossMessage ?: context.getString(R.string.msg_go_to_store))
-                DependencyState.NonFatalFailed -> DependencyCheckResult(state, nonFatalFailedMessage ?: "", playStoreTossMessage ?: context.getString(R.string.msg_go_to_store))
+                DependencyState.Passed -> DependencyCheckResult(state, passedMessage?.invoke(context) ?: TextHelper.fromHtml(TextHelper.formatWithResources(context, R.string.msg_format_third_party_app_dependency_passed_message, appName.invoke(context))), playStoreTossMessage?.invoke(context) ?: context.getString(R.string.msg_go_to_store))
+                DependencyState.FatalFailed -> DependencyCheckResult(state, fatalFailedMessage?.invoke(context) ?: TextHelper.fromHtml(TextHelper.formatWithResources(context, R.string.msg_format_third_party_app_dependency_non_fatal_failed_message, appName.invoke(context))), playStoreTossMessage?.invoke(context) ?: context.getString(R.string.msg_go_to_store))
+                DependencyState.NonFatalFailed -> DependencyCheckResult(state, nonFatalFailedMessage?.invoke(context) ?: TextHelper.fromHtml(TextHelper.formatWithResources(context, R.string.msg_format_third_party_app_dependency_fatal_failed_message, appName.invoke(context))), playStoreTossMessage?.invoke(context) ?: context.getString(R.string.msg_go_to_store))
             }
         }
     }

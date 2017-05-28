@@ -27,8 +27,27 @@
         <kr.ac.snu.hcil.omnitrack.ui.components.common.preference.ColorPreference
             android:defaultValue="@color/colorPrimary"
             android:key="pref_reminder_light_color"
-            android:title="Reminder Light Color" />
+            android:title="@string/msg_pref_reminder_light_color" />
     </PreferenceCategory>
 
+    <PreferenceCategory android:title="@string/msg_pref_category_language">
+
+        <SwitchPreference
+            android:defaultValue="true"
+            android:disableDependentsState="true"
+            android:key="pref_language_follow_device_setting"
+            android:summary="@string/msg_pref_follow_device_language_summary"
+            android:title="@string/msg_pref_follow_device_language" />
+
+        <ListPreference
+            android:defaultValue="en"
+            android:dependency="pref_language_follow_device_setting"
+            android:entries="@array/supported_language_names"
+            android:entryValues="@array/supported_language_codes"
+            android:key="pref_selected_language"
+            android:summary="%s"
+            android:title="@string/msg_pref_application_langauge" />
+
+    </PreferenceCategory>
 
 </PreferenceScreen>
