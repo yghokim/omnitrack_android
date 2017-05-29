@@ -1,5 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.settings
 
+import android.app.Activity
+import android.content.Intent
 import android.content.SharedPreferences
 import android.media.RingtoneManager
 import android.net.Uri
@@ -7,6 +9,7 @@ import android.os.Bundle
 import android.preference.ListPreference
 import android.preference.Preference
 import android.preference.PreferenceFragment
+import android.widget.Toast
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
@@ -26,18 +29,34 @@ class SettingsActivity : MultiButtonActionBarActivity(R.layout.activity_multibut
         const val PREF_REMINDER_NOTI_RINGTONE = "pref_reminder_noti_ringtone"
         const val PREF_REMINDER_LIGHT_COLOR = "pref_reminder_light_color"
 
+        const val FLAG_CONFIGURATION_CHANGED = "flag_configuration_changed"
+
         const val REQUEST_CODE = 3423
     }
+
+    private var fragment: SettingsFragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setActionBarButtonMode(Mode.Back)
 
-        fragmentManager.beginTransaction()
-                .replace(R.id.ui_content_replace, SettingsFragment())
-                .commit()
+        fragment = fragmentManager.findFragmentById(R.id.ui_content_replace) as? SettingsFragment ?: SettingsFragment().apply {
+            this@SettingsActivity.fragmentManager.beginTransaction()
+                    .replace(R.id.ui_content_replace, this)
+                    .commit()
+        }
 
+    }
+
+    override fun finish() {
+        setResult(fragment?.resultCode ?: Activity.RESULT_CANCELED, fragment?.resultData)
+        super.finish()
+    }
+
+    override fun onBackPressed() {
+        setResult(fragment?.resultCode ?: Activity.RESULT_CANCELED, fragment?.resultData)
+        super.onBackPressed()
     }
 
     override fun onToolbarLeftButtonClicked() {
@@ -49,6 +68,14 @@ class SettingsActivity : MultiButtonActionBarActivity(R.layout.activity_multibut
     }
 
     class SettingsFragment : PreferenceFragment(), SharedPreferences.OnSharedPreferenceChangeListener, Preference.OnPreferenceChangeListener {
+
+        private var languageOnCreation: String? = null
+
+        var resultCode: Int = Activity.RESULT_CANCELED
+            private set
+
+        var resultData: Intent? = null
+            private set
 
         init {
             retainInstance = true
@@ -73,6 +100,12 @@ class SettingsActivity : MultiButtonActionBarActivity(R.layout.activity_multibut
             }
         }
 
+        override fun onActivityCreated(savedInstanceState: Bundle?) {
+            super.onActivityCreated(savedInstanceState)
+
+            languageOnCreation = LocaleHelper.getLanguageCode(activity)
+        }
+
         override fun onDestroy() {
             super.onDestroy()
             findPreference(PREF_REMINDER_NOTI_RINGTONE).setOnPreferenceChangeListener(null)
@@ -93,6 +126,11 @@ class SettingsActivity : MultiButtonActionBarActivity(R.layout.activity_multibut
             val ringtoneUri = Uri.parse(preferenceManager.sharedPreferences.getString(PREF_REMINDER_NOTI_RINGTONE, android.provider.Settings.System.DEFAULT_NOTIFICATION_URI.toString()))
             val ringtone = RingtoneManager.getRingtone(activity, ringtoneUri)
             return ringtone.getTitle(activity)
+        }
+
+        fun setResult(resultCode: Int, data: Intent?) {
+            this.resultCode = resultCode
+            this.resultData = data
         }
 
         override fun onPreferenceChange(preference: Preference, newValue: Any?): Boolean {
@@ -148,9 +186,11 @@ class SettingsActivity : MultiButtonActionBarActivity(R.layout.activity_multibut
                     findPreference(key).summary = getCurrentReminderNotificationRingtoneName()
                 }
 
-                LocaleHelper.PREF_KEY_SELECTED_LANGUAGE -> {
+                LocaleHelper.PREF_USE_DEVICE_DEFAULT, LocaleHelper.PREF_KEY_SELECTED_LANGUAGE -> {
                     OTApplication.app.refreshConfiguration(activity)
-                    activity.recreate()
+                    Toast.makeText(activity, R.string.msg_language_change_applied_after_exit_this_screen, Toast.LENGTH_LONG).show()
+                    setResult(Activity.RESULT_OK, Intent().apply { putExtra(FLAG_CONFIGURATION_CHANGED, true) })
+                    println("activity: ${activity}")
                 }
             }
         }

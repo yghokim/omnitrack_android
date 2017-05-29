@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.PointF
 import android.graphics.Rect
-import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.v7.app.AppCompatActivity
@@ -112,8 +111,6 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
 
     private var backgroundSignInCheckThread: Thread? = null
 
-    private var languageAtCreation: String = "en"
-
     private val broadcastReceiver: BroadcastReceiver by lazy {
         object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
@@ -164,12 +161,6 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
             }
         }
 
-        languageAtCreation = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            getResources().getConfiguration().getLocales().get(0).language
-        } else {
-            //noinspection deprecation
-            getResources().getConfiguration().locale.language
-        }
         PreferenceManager.setDefaultValues(this, R.xml.global_preferences, false)
     }
 
@@ -251,7 +242,9 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == SettingsActivity.REQUEST_CODE) {
-            if (languageAtCreation != LocaleHelper.getLanguageCode(this)) {
+            println("returned from settings activity: ${resultCode == RESULT_OK}")
+            if (data?.getBooleanExtra(SettingsActivity.FLAG_CONFIGURATION_CHANGED, false) == true) {
+                println("configuration was changed from settings")
                 recreate()
             }
         } else {
