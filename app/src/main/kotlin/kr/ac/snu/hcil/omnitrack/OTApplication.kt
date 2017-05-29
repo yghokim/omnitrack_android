@@ -285,6 +285,7 @@ class OTApplication : MultiDexApplication() {
     private lateinit var userLoadingLooper: Looper
 
     override fun attachBaseContext(base: Context) {
+        LocaleHelper.init(base);
         refreshConfiguration(base)
         super.attachBaseContext(wrappedContext)
         MultiDex.install(this)
