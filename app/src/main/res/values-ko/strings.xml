@@ -364,6 +364,7 @@
     <string name="msg_pref_follow_device_language_summary">운영체제 언어 설정을 따릅니다. 영어가 기본값으로 사용됩니다.</string>
     <string name="msg_pref_application_langauge">앱 언어</string>
     <string name="msg_pref_reminder_light_color">리마인더 알림 LED 색</string>
+    <string name="msg_language_change_applied_after_exit_this_screen">언어 설정은 본 화면을 닫은 뒤에 적용됩니다.</string>
 
 
     <string-array name="purpose_entries">
