@@ -36,7 +36,7 @@ class MultiLineChartDrawer() : ATimelineChartDrawer() {
 
     init {
 
-        paddingBottom = OTApplication.app.resources.getDimension(R.dimen.vis_axis_height_with_legend)
+        paddingBottom = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_axis_height_with_legend)
 
         linePaint.style = Paint.Style.STROKE
 
@@ -107,7 +107,7 @@ class MultiLineChartDrawer() : ATimelineChartDrawer() {
                         datum ->
                         val lines = PolyLineElement<ILineChartOnTime.TimeSeriesTrendData>(linePaint, markerPaint)
 
-                        lines.thickness = OTApplication.app.resources.getDimension(R.dimen.vis_line_chart_thickness)
+                        lines.thickness = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_line_chart_thickness)
 
                         refreshPolyLine(datum, lines)
 
@@ -128,9 +128,9 @@ class MultiLineChartDrawer() : ATimelineChartDrawer() {
                         lines.drawLine = false
                         lines.drawMarker = true
 
-                        lines.markerRadius = OTApplication.app.resources.getDimension(R.dimen.vis_line_chart_marker_radius)
-                        lines.markerThickness = OTApplication.app.resources.getDimension(R.dimen.vis_line_chart_marker_stroke)
-                        lines.thickness = OTApplication.app.resources.getDimension(R.dimen.vis_line_chart_thickness)
+                        lines.markerRadius = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_line_chart_marker_radius)
+                        lines.markerThickness = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_line_chart_marker_stroke)
+                        lines.thickness = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_line_chart_thickness)
 
                         refreshPolyLine(datum, lines)
 

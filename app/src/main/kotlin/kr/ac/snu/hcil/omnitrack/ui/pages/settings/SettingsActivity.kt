@@ -94,7 +94,7 @@ class SettingsActivity : MultiButtonActionBarActivity(R.layout.activity_multibut
             findPreference(LocaleHelper.PREF_KEY_SELECTED_LANGUAGE)?.run {
                 (this as? ListPreference)?.let {
                     pref ->
-                    summary = pref.entries[pref.findIndexOfValue(LocaleHelper.getNearestLanguageToDevice(activity))]
+                    summary = pref.entry
                 }
                 onPreferenceChangeListener = this@SettingsFragment
             }

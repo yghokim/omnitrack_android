@@ -66,7 +66,7 @@ object OTShortcutPanelManager {
 
         rv.removeAllViews(R.id.container)
 
-        val buttonSize = OTApplication.app.resources.getDimensionPixelSize(R.dimen.button_height_small)
+        val buttonSize = OTApplication.app.resourcesWrapped.getDimensionPixelSize(R.dimen.button_height_small)
         val buttonRadius = buttonSize * .5f
         val paint = Paint(Paint.ANTI_ALIAS_FLAG)
         paint.style = Paint.Style.FILL

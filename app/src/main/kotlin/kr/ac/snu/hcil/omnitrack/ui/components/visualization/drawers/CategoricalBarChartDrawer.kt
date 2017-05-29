@@ -48,9 +48,9 @@ class CategoricalBarChartDrawer(): AChartDrawer() {
     private val barElements = DataEncodedDrawingList<ICategoricalBarChart.Point, Void?>()
 
     init{
-        paddingBottom = OTApplication.app.resources.getDimension(R.dimen.vis_axis_height).toFloat()
-        paddingLeft = OTApplication.app.resources.getDimension(R.dimen.vis_axis_width).toFloat()
-        paddingTop = OTApplication.app.resources.getDimension(R.dimen.vis_axis_label_numeric_size).toFloat()
+        paddingBottom = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_axis_height).toFloat()
+        paddingLeft = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_axis_width).toFloat()
+        paddingTop = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_axis_label_numeric_size).toFloat()
 
         verticalAxis.drawBar = false
         verticalAxis.drawGridLines = true
@@ -59,7 +59,7 @@ class CategoricalBarChartDrawer(): AChartDrawer() {
         verticalAxis.scale = verticalAxisScale
         verticalAxis.drawBar = false
         verticalAxis.drawGridLines = true
-        verticalAxis.labelPaint.textSize = OTApplication.app.resources.getDimension(R.dimen.vis_axis_label_numeric_size).toFloat()
+        verticalAxis.labelPaint.textSize = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_axis_label_numeric_size).toFloat()
 
         children.add(horizontalAxis)
         children.add(verticalAxis)
@@ -84,11 +84,11 @@ class CategoricalBarChartDrawer(): AChartDrawer() {
         println("bar X : $dataX")
         val dataY = verticalAxisScale[datum.value.value.toFloat()]
         val barWidth = Math.min(
-                horizontalAxisScale.getTickInterval() - OTApplication.app.resources.getDimension(R.dimen.vis_bar_spacing),
-                OTApplication.app.resources.getDimension(R.dimen.vis_bar_max_width)
+                horizontalAxisScale.getTickInterval() - OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_bar_spacing),
+                OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_bar_max_width)
         )
 
-        bar.bound.set(dataX - barWidth / 2, dataY, dataX + barWidth / 2, plotAreaRect.bottom - OTApplication.app.resources.getDimension(R.dimen.vis_bar_axis_spacing))
+        bar.bound.set(dataX - barWidth / 2, dataY, dataX + barWidth / 2, plotAreaRect.bottom - OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_bar_axis_spacing))
 
     }
 

@@ -18,7 +18,7 @@ class OTChoiceEntryListProperty(key: String, title: String) : OTProperty<UniqueS
         val PREVIEW_ENTRIES: Array<UniqueStringEntryList.Entry>
 
         init {
-            PREVIEW_ENTRIES = OTApplication.app.resources.getStringArray(R.array.choice_preview_entries).mapIndexed {
+            PREVIEW_ENTRIES = OTApplication.app.resourcesWrapped.getStringArray(R.array.choice_preview_entries).mapIndexed {
                 i, s ->
                 UniqueStringEntryList.Entry(i, s)
             }.toTypedArray()

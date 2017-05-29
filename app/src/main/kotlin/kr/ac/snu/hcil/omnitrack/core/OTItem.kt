@@ -22,7 +22,7 @@ class OTItem : ADataRow, IDatabaseStorable {
         Manual(R.string.msg_tracking_source_manual);
 
         val sourceText: String by lazy {
-            OTApplication.app.resources.getString(nameResId)
+            OTApplication.app.resourcesWrapped.getString(nameResId)
         }
     }
 

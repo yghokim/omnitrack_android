@@ -265,7 +265,12 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
         resumedAt = System.currentTimeMillis()
 
         if (checkUpdateAvailable) {
-            registerReceiver(broadcastReceiver, intentFilter)
+            try {
+                registerReceiver(broadcastReceiver, intentFilter)
+            } catch(ex: Exception) {
+                ex.printStackTrace()
+                println("failed to register update check receiver")
+            }
         }
     }
 
@@ -292,7 +297,12 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
         }
 
         if (checkUpdateAvailable) {
-            unregisterReceiver(broadcastReceiver)
+            try {
+                unregisterReceiver(broadcastReceiver)
+            } catch(ex: Exception) {
+                ex.printStackTrace()
+                println("failed to unregister update check receiver")
+            }
         }
     }
 

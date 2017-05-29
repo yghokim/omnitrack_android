@@ -51,18 +51,18 @@ class OTRatingAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrac
 
         /*
         assignProperty(OTSelectionProperty(PROPERTY_DISPLAY_TYPE,
-                OTApplication.app.resources.getString(R.string.property_rating_display_type),
-                DisplayType.values().map { OTApplication.app.resources.getString(it.nameResourceId) }.toTypedArray()
+                OTApplication.app.resourcesWrapped.getString(R.string.property_rating_display_type),
+                DisplayType.values().map { OTApplication.app.resourcesWrapped.getString(it.nameResourceId) }.toTypedArray()
         ))
 
         assignProperty(OTSelectionProperty(PROPERTY_LEVELS,
-                OTApplication.app.resources.getString(R.string.property_rating_levels),
+                OTApplication.app.resourcesWrapped.getString(R.string.property_rating_levels),
                 Level.values().map { it.maxScore.toString() }.toTypedArray()))
 
         assignProperty(OTBooleanProperty(
                 true,
                 PROPERTY_ALLOW_INTERMEDIATE,
-                OTApplication.app.resources.getString(R.string.property_rating_allow_intermediate)))
+                OTApplication.app.resourcesWrapped.getString(R.string.property_rating_allow_intermediate)))
 */
     }
 

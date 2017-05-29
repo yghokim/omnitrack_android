@@ -29,7 +29,7 @@ class QuantizedTimeScale : IAxisScale<Long> {
                 val hourOfDay = calendarCache.getHourOfDay()
 
                 return if (hourOfDay == 12) {
-                    OTApplication.app.resources.getString(R.string.msg_noon)
+                    OTApplication.app.resourcesWrapped.getString(R.string.msg_noon)
                 } else if (hourOfDay == 0 || hourOfDay == 23) {
                     TimeHelper.FORMAT_DAY.format(Date(value))
                 } else {

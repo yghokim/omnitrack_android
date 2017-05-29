@@ -35,7 +35,7 @@ object OTTrackingNotificationManager {
 
     /*
     private val icon_ex: Icon by lazy{
-        Icon.createWithBitmap(BitmapFactory.decodeResource(OTApplication.app.resources, R.drawable.ex_dark))
+        Icon.createWithBitmap(BitmapFactory.decodeResource(OTApplication.app.resourcesWrapped, R.drawable.ex_dark))
     }*/
 
     private fun getNewReminderNotificationId(tracker: OTTracker): Int {
@@ -133,7 +133,7 @@ object OTTrackingNotificationManager {
                 .setSmallIcon(R.drawable.icon_simple_plus)
                 .setContentIntent(resultPendingIntent)
                 .setContentText(
-                        String.format(OTApplication.app.resources.getString(R.string.msg_notification_content_format_new_item),
+                        String.format(OTApplication.app.resourcesWrapped.getString(R.string.msg_notification_content_format_new_item),
                                 tracker.name
                         ))
                 .addAction(discardAction)

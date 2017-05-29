@@ -453,8 +453,8 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
                 return true
             } else {
                 invalidMessages?.add(TextHelper.fromHtml(String.format(
-                        "<font color=\"blue\">${OTApplication.app.resources.getString(R.string.msg_service_is_not_activated_format)}</font>",
-                        OTApplication.app.resources.getString(service.nameResourceId))))
+                        "<font color=\"blue\">${OTApplication.app.resourcesWrapped.getString(R.string.msg_service_is_not_activated_format)}</font>",
+                        OTApplication.app.resourcesWrapped.getString(service.nameResourceId))))
                 return false
             }
         } else return true

@@ -53,7 +53,7 @@ class OTTimeAttribute(objectId: String?, localKey: Int?, parentTracker: OTTracke
                 Pair(GRANULARITY_SECOND, SimpleDateFormat(OTApplication.getString(R.string.property_time_format_granularity_second)))
         )
 
-        private val timezoneSizeSpan = AbsoluteSizeSpan(OTApplication.app.resources.getDimensionPixelSize(R.dimen.tracker_list_element_information_text_headerSize))
+        private val timezoneSizeSpan = AbsoluteSizeSpan(OTApplication.app.resourcesWrapped.getDimensionPixelSize(R.dimen.tracker_list_element_information_text_headerSize))
         private val timezoneStyleSpan = StyleSpan(Typeface.BOLD)
         private val timezoneColorSpan = ForegroundColorSpan(ContextCompat.getColor(OTApplication.app.contextCompat, R.color.textColorLight))
     }
@@ -73,10 +73,10 @@ class OTTimeAttribute(objectId: String?, localKey: Int?, parentTracker: OTTracke
 
     override fun createProperties() {
         assignProperty(OTSelectionProperty(GRANULARITY,
-                OTApplication.app.resources.getString(R.string.property_time_granularity),
-                arrayOf(OTApplication.app.resources.getString(R.string.property_time_granularity_day),
-                        OTApplication.app.resources.getString(R.string.property_time_granularity_minute),
-                        OTApplication.app.resources.getString(R.string.property_time_granularity_second)
+                OTApplication.app.resourcesWrapped.getString(R.string.property_time_granularity),
+                arrayOf(OTApplication.app.resourcesWrapped.getString(R.string.property_time_granularity_day),
+                        OTApplication.app.resourcesWrapped.getString(R.string.property_time_granularity_minute),
+                        OTApplication.app.resourcesWrapped.getString(R.string.property_time_granularity_second)
 
                 )))
 

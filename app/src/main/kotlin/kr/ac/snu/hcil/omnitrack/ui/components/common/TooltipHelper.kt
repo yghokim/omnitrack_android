@@ -16,7 +16,7 @@ object TooltipHelper {
                 .fitToScreen(true).fadeDuration(250)
                 .activateDelay(200)
                 .background("#af000000")
-                .maxWidth(OTApplication.app.resources.getDimensionPixelSize(R.dimen.tooltip_max_width))
+                .maxWidth(OTApplication.app.resourcesWrapped.getDimensionPixelSize(R.dimen.tooltip_max_width))
                 .withStyleId(R.style.tooltipStyle)
                 .anchor(anchorView, TooltipManager.Gravity.TOP)
     }

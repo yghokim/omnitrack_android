@@ -110,8 +110,8 @@ class TrackerListFragment : OTFragment() {
                 .negativeText(R.string.msg_cancel)
     }
 
-    private val collapsedHeight = OTApplication.app.resources.getDimensionPixelSize(R.dimen.tracker_list_element_collapsed_height)
-    private val expandedHeight = OTApplication.app.resources.getDimensionPixelSize(R.dimen.tracker_list_element_expanded_height)
+    private val collapsedHeight = OTApplication.app.resourcesWrapped.getDimensionPixelSize(R.dimen.tracker_list_element_collapsed_height)
+    private val expandedHeight = OTApplication.app.resourcesWrapped.getDimensionPixelSize(R.dimen.tracker_list_element_expanded_height)
 
 
     private val itemEventReceiver: BroadcastReceiver by lazy {
