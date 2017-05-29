@@ -13,7 +13,6 @@ import android.graphics.drawable.StateListDrawable;
 import android.os.Build;
 import android.support.v4.content.res.ResourcesCompat;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
@@ -318,8 +317,6 @@ public class FancyButton extends LinearLayout {
         }
 
         mStyleIndex = attrsArray.getInt(R.styleable.FancyButtonsAttrs_android_textStyle, 0);
-        Log.d("FANCY", "style index: " + mStyleIndex);
-
 
         mIconPosition = attrsArray.getInt(R.styleable.FancyButtonsAttrs_fb_iconPosition, mIconPosition);
 
@@ -402,8 +399,6 @@ public class FancyButton extends LinearLayout {
 
 
         if (mUseRippleEffect && SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-
-            Log.d("FANCY", "version  >= Lollipop");
             Drawable background;
             if (!mEnabled) {
                 background = disabledDrawable;
@@ -413,8 +408,6 @@ public class FancyButton extends LinearLayout {
             this.setBackground(background);
 
         } else {
-            Log.d("FANCY", "version < Lollipop");
-
             StateListDrawable states = new StateListDrawable();
 
             // Focus/Pressed Drawable
