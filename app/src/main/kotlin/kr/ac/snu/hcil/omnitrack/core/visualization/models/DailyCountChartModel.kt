@@ -103,7 +103,7 @@ class DailyCountChartModel(tracker: OTTracker) : TrackerChartModel<Pair<Long, In
         private val todayPaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
         init {
-            paddingTop = 17 * OTApplication.app.resources.displayMetrics.density
+            paddingTop = 17 * OTApplication.app.resourcesWrapped.displayMetrics.density
 
             yAxis.style = Axis.TickLabelStyle.Small
             yAxis.drawBar = false
@@ -112,7 +112,7 @@ class DailyCountChartModel(tracker: OTTracker) : TrackerChartModel<Pair<Long, In
 
             horizontalAxis.drawGridLines = false
 
-            textPadding = 5 * OTApplication.app.resources.displayMetrics.density
+            textPadding = 5 * OTApplication.app.resourcesWrapped.displayMetrics.density
 
             todayPaint.color = todayBackgroundColor
 
@@ -181,9 +181,9 @@ class DailyCountChartModel(tracker: OTTracker) : TrackerChartModel<Pair<Long, In
 
             if (this@DailyCountChartModel.getCurrentScopeGranularity() <=
                     Granularity.WEEK_2_REL) {
-                bar.textPaint.textSize = 14 * OTApplication.app.resources.displayMetrics.density
+                bar.textPaint.textSize = 14 * OTApplication.app.resourcesWrapped.displayMetrics.density
             } else {
-                bar.textPaint.textSize = 10 * OTApplication.app.resources.displayMetrics.density
+                bar.textPaint.textSize = 10 * OTApplication.app.resourcesWrapped.displayMetrics.density
             }
         }
 

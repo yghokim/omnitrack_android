@@ -17,10 +17,10 @@ abstract class ATimelineChartDrawer : AChartDrawer(){
     val horizontalAxis = Axis(Axis.Pivot.BOTTOM)
 
     init{
-        paddingBottom = OTApplication.app.resources.getDimension(R.dimen.vis_axis_height).toFloat()
-        paddingLeft = OTApplication.app.resources.getDimension(R.dimen.vis_axis_width).toFloat()
-        paddingTop = OTApplication.app.resources.getDimension(R.dimen.vis_axis_label_numeric_size).toFloat()
-        paddingRight = OTApplication.app.resources.getDimension(R.dimen.vis_right_margin).toFloat()
+        paddingBottom = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_axis_height).toFloat()
+        paddingLeft = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_axis_width).toFloat()
+        paddingTop = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_axis_label_numeric_size).toFloat()
+        paddingRight = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_right_margin).toFloat()
 
         horizontalAxis.drawBar = true
         horizontalAxis.drawGridLines = true

@@ -23,7 +23,7 @@ import java.util.*
 class TimelineComparisonLineChartModel(override val attributes: List<OTNumberAttribute>, parent: OTTracker)
 : CompoundAttributeChartModel<ILineChartOnTime.TimeSeriesTrendData>(attributes, parent), ILineChartOnTime {
 
-    override val name: String = OTApplication.app.resources.getString(R.string.msg_vis_numeric_line_timeline_title)
+    override val name: String = OTApplication.app.resourcesWrapped.getString(R.string.msg_vis_numeric_line_timeline_title)
 
     override val numDataPoints: Int get() = data.size
 
@@ -120,7 +120,7 @@ class TimelineComparisonLineChartModel(override val attributes: List<OTNumberAtt
 
 
         drawer.verticalAxis.labelPaint.isFakeBoldText = true
-        drawer.verticalAxis.labelPaint.textSize = OTApplication.app.resources.getDimension(R.dimen.vis_axis_label_numeric_size)
+        drawer.verticalAxis.labelPaint.textSize = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_axis_label_numeric_size)
         return drawer
     }
 

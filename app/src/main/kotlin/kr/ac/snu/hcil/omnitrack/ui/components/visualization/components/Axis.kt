@@ -25,17 +25,17 @@ class Axis(var pivot: Pivot): IDrawer {
         Small {
             override fun applyStyle(axis: Axis) {
 
-                axis.labelPaint.textSize = OTApplication.app.resources.getDimension(R.dimen.vis_axis_label_numeric_size)
+                axis.labelPaint.textSize = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_axis_label_numeric_size)
                 axis.labelPaint.isFakeBoldText = true
-                axis.labelSpacing = 2 * OTApplication.app.resources.displayMetrics.density
+                axis.labelSpacing = 2 * OTApplication.app.resourcesWrapped.displayMetrics.density
             }
 
         },
         Normal {
             override fun applyStyle(axis: Axis) {
-                axis.labelPaint.textSize = OTApplication.app.resources.getDimension(R.dimen.vis_axis_label_categorical_size)
+                axis.labelPaint.textSize = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_axis_label_categorical_size)
                 axis.labelPaint.isFakeBoldText = false
-                axis.labelSpacing = OTApplication.app.resources.getDimension(R.dimen.vis_axis_label_spacing)
+                axis.labelSpacing = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_axis_label_spacing)
             }
         };
 
@@ -81,18 +81,18 @@ class Axis(var pivot: Pivot): IDrawer {
     init{
         linePaint.color = ContextCompat.getColor(OTApplication.app, R.color.vis_color_axis)
         linePaint.style = Paint.Style.STROKE
-        linePaint.strokeWidth = OTApplication.app.resources.getDimension(R.dimen.vis_axis_thickness)
+        linePaint.strokeWidth = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_axis_thickness)
 
         gridLinePaint.color = ColorUtils.setAlphaComponent(linePaint.color, 50)
         gridLinePaint.style = Paint.Style.STROKE
-        gridLinePaint.strokeWidth = OTApplication.app.resources.getDimension(R.dimen.vis_axis_grid_thickness)
+        gridLinePaint.strokeWidth = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_axis_grid_thickness)
 
         labelPaint.style = Paint.Style.FILL
         labelPaint.color = ContextCompat.getColor(OTApplication.app, R.color.textColorMid)
         labelPaint.textAlign = Paint.Align.CENTER
-        labelPaint.textSize = OTApplication.app.resources.getDimension(R.dimen.vis_axis_label_categorical_size)
+        labelPaint.textSize = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_axis_label_categorical_size)
 
-        labelSpacing = OTApplication.app.resources.getDimension(R.dimen.vis_axis_label_spacing)
+        labelSpacing = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_axis_label_spacing)
     }
 
     override fun onDraw(canvas: Canvas) {
