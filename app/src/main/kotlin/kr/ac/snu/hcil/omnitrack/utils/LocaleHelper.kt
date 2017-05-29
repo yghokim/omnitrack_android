@@ -15,6 +15,22 @@ object LocaleHelper {
     const val PREF_KEY_SELECTED_LANGUAGE = "pref_selected_language"
     const val PREF_USE_DEVICE_DEFAULT = "pref_language_follow_device_setting"
 
+    //stored on the first creation of the application context
+    const val PREF_KEY_SYSTEM_LANGUAGE = "pref_system_language"
+
+    fun init(context: Context) {
+        val pref = PreferenceManager.getDefaultSharedPreferences(context)
+
+        val locale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            context.resources.configuration.locales.get(0)
+        } else {
+            context.resources.configuration.locale;
+        }
+        println("system default language is ${locale.language}")
+
+        pref.edit().putString(PREF_KEY_SYSTEM_LANGUAGE, locale.language).apply()
+    }
+
     fun useDeviceLanguage(context: Context): Boolean {
         val pref = PreferenceManager.getDefaultSharedPreferences(context)
         return pref.getBoolean(PREF_USE_DEVICE_DEFAULT, true)
@@ -32,7 +48,8 @@ object LocaleHelper {
     }
 
     fun getNearestLanguageToDevice(context: Context): String {
-        val deviceLanguage = Locale.getDefault().language
+        val pref = PreferenceManager.getDefaultSharedPreferences(context)
+        val deviceLanguage = pref.getString(PREF_KEY_SYSTEM_LANGUAGE, "en")
         val supportedLanguages = context.resources.getStringArray(R.array.supported_language_codes)
         if (supportedLanguages.contains(deviceLanguage)) {
             return deviceLanguage
