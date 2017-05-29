@@ -112,7 +112,7 @@ abstract class OTMeasureFactory(val factoryTypeName: String) : INameDescriptionR
     abstract fun makeMeasure(serialized: String): OTMeasure
 
     open fun getFormattedName(): CharSequence {
-        val html = "<b>${OTApplication.app.resources.getString(nameResourceId)}</b> | ${OTApplication.app.getString(getService().nameResourceId)}"
+        val html = "<b>${OTApplication.app.resourcesWrapped.getString(nameResourceId)}</b> | ${OTApplication.app.getString(getService().nameResourceId)}"
         return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY)
         } else {
@@ -128,7 +128,7 @@ abstract class OTMeasureFactory(val factoryTypeName: String) : INameDescriptionR
     open fun makeNewExampleAttribute(tracker: OTTracker): OTAttribute<out Any> {
 
         val attr = OTAttribute.Companion.createAttribute(tracker,
-                "${OTApplication.app.getString(getService().nameResourceId)} ${OTApplication.app.resources.getString(nameResourceId)}",
+                "${OTApplication.app.getString(getService().nameResourceId)} ${OTApplication.app.resourcesWrapped.getString(nameResourceId)}",
                 exampleAttributeType)
 
         getExampleAttributeConfigurator().configureExampleAttribute(attr)

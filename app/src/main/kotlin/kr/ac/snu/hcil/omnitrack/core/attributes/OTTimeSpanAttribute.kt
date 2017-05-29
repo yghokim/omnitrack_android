@@ -37,9 +37,9 @@ class OTTimeSpanAttribute(objectId: String?, localKey: Int?, parentTracker: OTTr
 
     override fun createProperties() {
         assignProperty(OTSelectionProperty(PROPERTY_GRANULARITY,
-                OTApplication.app.resources.getString(R.string.property_time_granularity),
-                arrayOf(OTApplication.app.resources.getString(R.string.property_time_granularity_day),
-                        OTApplication.app.resources.getString(R.string.property_time_granularity_minute)
+                OTApplication.app.resourcesWrapped.getString(R.string.property_time_granularity),
+                arrayOf(OTApplication.app.resourcesWrapped.getString(R.string.property_time_granularity_day),
+                        OTApplication.app.resourcesWrapped.getString(R.string.property_time_granularity_minute)
                 )))
         //assignProperty(OTSelectionProperty(PROPERTY_TYPE, "Interface Type", arrayOf("Range Picker", "Stopwatch")))
 

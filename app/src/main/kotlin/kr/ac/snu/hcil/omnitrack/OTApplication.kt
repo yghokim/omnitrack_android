@@ -119,7 +119,7 @@ class OTApplication : MultiDexApplication() {
         const val PREFERENCE_KEY_FIREBASE_INSTANCE_ID = "firebase_instance_id"
 
         fun getString(resId: Int): String {
-            return app.getResources().getString(resId)
+            return app.resourcesWrapped.getString(resId)
         }
 
         init {
@@ -127,8 +127,8 @@ class OTApplication : MultiDexApplication() {
         }
     }
 
-    override fun getResources(): Resources {
-        return wrappedContext?.resources ?: super.getResources()
+    val resourcesWrapped: Resources get() {
+        return wrappedContext?.resources ?: resources
     }
 
     val contextCompat: Context get() {

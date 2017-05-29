@@ -24,7 +24,7 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
     companion object {
 
         val lastLoggedTimeFormat by lazy {
-            SimpleDateFormat(OTApplication.app.resources.getString(R.string.msg_tracker_list_time_format))
+            SimpleDateFormat(OTApplication.app.resourcesWrapped.getString(R.string.msg_tracker_list_time_format))
         }
     }
 
@@ -124,7 +124,7 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
                     rv.setTextViewText(R.id.ui_text_statistics, text)
                 }*/
 
-                val buttonSize = OTApplication.app.resources.getDimensionPixelSize(R.dimen.app_widget_instant_logging_button_height)
+            val buttonSize = OTApplication.app.resourcesWrapped.getDimensionPixelSize(R.dimen.app_widget_instant_logging_button_height)
                 val buttonRadius = buttonSize * .5f
                 val paint = Paint(Paint.ANTI_ALIAS_FLAG)
                 paint.style = Paint.Style.FILL

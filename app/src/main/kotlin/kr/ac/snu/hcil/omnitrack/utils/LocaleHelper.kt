@@ -24,6 +24,7 @@ object LocaleHelper {
         val pref = PreferenceManager.getDefaultSharedPreferences(context)
         val nearestDeviceLanguage = getNearestLanguageToDevice(context)
         if (useDeviceLanguage(context)) {
+            println("nearest device language is ${nearestDeviceLanguage}")
             return nearestDeviceLanguage
         } else {
             return pref.getString(PREF_KEY_SELECTED_LANGUAGE, nearestDeviceLanguage)

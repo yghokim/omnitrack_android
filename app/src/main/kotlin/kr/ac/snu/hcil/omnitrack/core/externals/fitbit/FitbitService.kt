@@ -49,8 +49,8 @@ object FitbitService : OAuth2BasedExternalService("FitbitService", 0) {
 
     override fun makeNewAuth2Client(): OAuth2Client {
         val config = OAuth2Client.OAuth2Config()
-        config.clientId = OTApplication.app.resources.getString(R.string.fitbit_client_id)
-        config.clientSecret = OTApplication.app.resources.getString(R.string.fitbit_client_secret)
+        config.clientId = OTApplication.app.resourcesWrapped.getString(R.string.fitbit_client_id)
+        config.clientSecret = OTApplication.app.resourcesWrapped.getString(R.string.fitbit_client_secret)
         config.scope = DEFAULT_SCOPES
         config.authorizationUrl = AUTHORIZATION_URL
         config.tokenRequestUrl = TOKEN_REQUEST_URL

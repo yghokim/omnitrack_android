@@ -192,9 +192,9 @@ class DurationTimelineModel(override val attribute: OTTimeSpanAttribute) : Attri
                 val originalColor = pointPaint.color
                 pointPaint.color = Color.WHITE
                 pointPaint.alpha = 200
-                canvas.drawCircle(frontalBound.centerX(), frontalBound.top, frontalBound.width() / 2 - 2 * OTApplication.app.resources.displayMetrics.density, pointPaint)
+                canvas.drawCircle(frontalBound.centerX(), frontalBound.top, frontalBound.width() / 2 - 2 * OTApplication.app.resourcesWrapped.displayMetrics.density, pointPaint)
 
-                canvas.drawCircle(frontalBound.centerX(), frontalBound.bottom, frontalBound.width() / 2 - 2 * OTApplication.app.resources.displayMetrics.density, pointPaint)
+                canvas.drawCircle(frontalBound.centerX(), frontalBound.bottom, frontalBound.width() / 2 - 2 * OTApplication.app.resourcesWrapped.displayMetrics.density, pointPaint)
 
                 pointPaint.color = originalColor
 */
@@ -221,7 +221,7 @@ class DurationTimelineModel(override val attribute: OTTimeSpanAttribute) : Attri
 
         val durationBars = DataEncodedDrawingList<AggregatedDuration, Void?>()
 
-        val durationBarMaxWidth:Float by lazy{ OTApplication.app.resources.getDimension(R.dimen.vis_duration_bar_max_width) }
+        val durationBarMaxWidth: Float by lazy { OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_duration_bar_max_width) }
         var durationBarWidth: Float = 0f
 
         init{
@@ -229,7 +229,7 @@ class DurationTimelineModel(override val attribute: OTTimeSpanAttribute) : Attri
             paint.style = Paint.Style.FILL
             paint.color = ContextCompat.getColor(OTApplication.app, R.color.colorPointed_Light)
 
-            pointPaint.strokeWidth = 2f * OTApplication.app.resources.displayMetrics.density
+            pointPaint.strokeWidth = 2f * OTApplication.app.resourcesWrapped.displayMetrics.density
             pointPaint.style = Paint.Style.STROKE
             pointPaint.color = ContextCompat.getColor(OTApplication.app, R.color.colorPointed)
 
@@ -237,7 +237,7 @@ class DurationTimelineModel(override val attribute: OTTimeSpanAttribute) : Attri
             pointUnderPaint.color = Color.WHITE
             pointUnderPaint.alpha = 100
 
-            paddingLeft = OTApplication.app.resources.getDimension(R.dimen.vis_axis_width_extended).toFloat()
+            paddingLeft = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_axis_width_extended).toFloat()
 
             verticalAxis.style = Axis.TickLabelStyle.Small
             verticalAxis.drawBar = false
@@ -252,9 +252,9 @@ class DurationTimelineModel(override val attribute: OTTimeSpanAttribute) : Attri
                 override fun format(value: Float, index: Int): String {
 
                     return when (value.toInt()) {
-                        0 -> OTApplication.app.resources.getString(R.string.msg_midnight)
-                        -12 -> OTApplication.app.resources.getString(R.string.msg_noon)
-                        12-> OTApplication.app.resources.getString(R.string.msg_noon)
+                        0 -> OTApplication.app.resourcesWrapped.getString(R.string.msg_midnight)
+                        -12 -> OTApplication.app.resourcesWrapped.getString(R.string.msg_noon)
+                        12 -> OTApplication.app.resourcesWrapped.getString(R.string.msg_noon)
                         else -> String.format("%02d", ((12 + value.toInt()) % 12)) + ":00"
                     }
 
@@ -274,7 +274,7 @@ class DurationTimelineModel(override val attribute: OTTimeSpanAttribute) : Attri
         override fun onRefresh() {
             super.onRefresh()
 
-            durationBarWidth = Math.min(durationBarMaxWidth, xScale.getTickInterval() - 2.5f * OTApplication.app.resources.displayMetrics.density)
+            durationBarWidth = Math.min(durationBarMaxWidth, xScale.getTickInterval() - 2.5f * OTApplication.app.resourcesWrapped.displayMetrics.density)
 
             durationBars.setData(this@DurationTimelineModel.data)
 

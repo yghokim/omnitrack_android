@@ -29,7 +29,7 @@ class ChoiceCategoricalBarChartModel(override val attribute: OTChoiceAttribute) 
     private val subscriptions = SubscriptionList()
 
     override val name: String
-        get() = String.format(OTApplication.app.resources.getString(R.string.msg_vis_categorical_distribution_title_format), super.name)
+        get() = String.format(OTApplication.app.resourcesWrapped.getString(R.string.msg_vis_categorical_distribution_title_format), super.name)
 
     override fun recycle() {
         data.clear()

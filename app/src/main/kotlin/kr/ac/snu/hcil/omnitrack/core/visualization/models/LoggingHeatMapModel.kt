@@ -143,7 +143,7 @@ class LoggingHeatMapModel(tracker: OTTracker): TrackerChartModel<ITimeBinnedHeat
     }
 
     override val name: String
-        get() = String.format(OTApplication.app.resources.getString(R.string.msg_vis_logging_heatmap_title_format), tracker.name)
+        get() = String.format(OTApplication.app.resourcesWrapped.getString(R.string.msg_vis_logging_heatmap_title_format), tracker.name)
 
     override fun recycle() {
         data.clear()

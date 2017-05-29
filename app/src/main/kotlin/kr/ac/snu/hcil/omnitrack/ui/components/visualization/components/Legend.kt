@@ -23,12 +23,12 @@ class Legend: IDrawer {
     val labelPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     val rectPaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
-    val rectSize: Float = OTApplication.app.resources.getDimension(R.dimen.vis_legend_rect_width)
-    val rectMargin: Float = OTApplication.app.resources.getDimension(R.dimen.vis_legend_label_spacing)
-    val textSize: Float = OTApplication.app.resources.getDimension(R.dimen.vis_legend_label_size)
-    val spacing = OTApplication.app.resources.getDimension(R.dimen.vis_legend_entry_spacing)
+    val rectSize: Float = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_legend_rect_width)
+    val rectMargin: Float = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_legend_label_spacing)
+    val textSize: Float = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_legend_label_size)
+    val spacing = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_legend_entry_spacing)
 
-    private val topMargin = OTApplication.app.resources.getDimension(R.dimen.visi_legend_margin)
+    private val topMargin = OTApplication.app.resourcesWrapped.getDimension(R.dimen.visi_legend_margin)
 
     private val rectBound = RectF()
 
@@ -47,7 +47,7 @@ class Legend: IDrawer {
         }
 
     init{
-        labelPaint.textSize = OTApplication.app.resources.getDimension(R.dimen.vis_legend_label_size)
+        labelPaint.textSize = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_legend_label_size)
         labelPaint.isFakeBoldText = true
         labelPaint.color = ContextCompat.getColor(OTApplication.app, R.color.textColorMid)
     }
