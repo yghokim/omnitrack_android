@@ -180,7 +180,6 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
                     if (!checkRefreshingCredential) {
                         //background sign in
                         val ignoreFlag = intent.getBooleanExtra(OTApplication.INTENT_EXTRA_IGNORE_SIGN_IN_CHECK, false)
-                        println("OMNITRACK ignore flag: ${ignoreFlag}, current activity: ${this.localClassName}")
                         /*
                         if (!ignoreFlag) {
                             if (backgroundSignInCheckThread?.isAlive ?: false == false) {
