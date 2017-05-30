@@ -38,7 +38,7 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.ConnectionIndicatorStubProxy
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeDetailActivity
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.startActivityOnDelay
-import rx.internal.util.SubscriptionList
+import rx.subscriptions.CompositeSubscription
 
 /**
  * Created by Young-Ho Kim on 16. 7. 29
@@ -73,7 +73,7 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
     private var user: OTUser? = null
     private var tracker: OTTracker? = null
 
-    private val viewHolderSubscriptions = SubscriptionList()
+    private val viewHolderSubscriptions = CompositeSubscription()
 
     private val newAttributePanel: FieldPresetSelectionBottomSheetFragment by lazy {
 

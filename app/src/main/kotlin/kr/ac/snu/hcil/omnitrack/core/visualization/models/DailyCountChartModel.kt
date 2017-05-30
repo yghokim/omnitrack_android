@@ -17,7 +17,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.Nu
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.QuantizedTimeScale
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers.ATimelineChartDrawer
 import kr.ac.snu.hcil.omnitrack.utils.DataHelper
-import rx.internal.util.SubscriptionList
+import rx.subscriptions.CompositeSubscription
 import java.util.*
 
 /**
@@ -27,7 +27,7 @@ class DailyCountChartModel(tracker: OTTracker) : TrackerChartModel<Pair<Long, In
 
     private val dataPoints = ArrayList<Pair<Long, Int>>()
     private var _isLoaded = false
-    private var subscriptions = SubscriptionList()
+    private var subscriptions = CompositeSubscription()
 
     override fun getDataPointAt(position: Int): Pair<Long, Int> {
         return dataPoints[position]

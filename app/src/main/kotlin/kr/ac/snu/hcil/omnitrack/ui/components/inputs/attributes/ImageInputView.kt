@@ -17,7 +17,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.ui.components.common.ImagePicker
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.CameraPickDialogFragment
 import kr.ac.snu.hcil.omnitrack.utils.getActivity
-import rx.internal.util.SubscriptionList
+import rx.subscriptions.CompositeSubscription
 
 /**
  * Created by Young-Ho Kim on 2016-07-22.
@@ -74,7 +74,7 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
         }
 
     val picker: ImagePicker = findViewById(R.id.ui_image_picker) as ImagePicker
-    private val subscriptions = SubscriptionList()
+    private val subscriptions = CompositeSubscription()
 
     private val eventReceiver: BroadcastReceiver by lazy {
         object : BroadcastReceiver() {

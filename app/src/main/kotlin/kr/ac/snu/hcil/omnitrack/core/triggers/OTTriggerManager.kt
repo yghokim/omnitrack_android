@@ -7,9 +7,9 @@ import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 import rx.Subscription
 import rx.functions.Action1
-import rx.internal.util.SubscriptionList
 import rx.subjects.PublishSubject
 import rx.subjects.SerializedSubject
+import rx.subscriptions.CompositeSubscription
 import java.util.*
 
 /**
@@ -17,9 +17,9 @@ import java.util.*
  */
 class OTTriggerManager(val user: OTUser) {
 
-    private val subscriptions = SubscriptionList()
+    private val subscriptions = CompositeSubscription()
 
-    private val subscriptionListPerTrigger = HashMap<OTTrigger, SubscriptionList>()
+    private val subscriptionListPerTrigger = HashMap<OTTrigger, CompositeSubscription>()
 
     private val onTriggerFired = Action1<ReadOnlyPair<OTTrigger, Long>> {
         result ->
@@ -73,7 +73,7 @@ class OTTriggerManager(val user: OTUser) {
 
     fun addSubscriptionToTrigger(trigger: OTTrigger, subscription: Subscription) {
         if (subscriptionListPerTrigger[trigger] == null) {
-            subscriptionListPerTrigger[trigger] = SubscriptionList()
+            subscriptionListPerTrigger[trigger] = CompositeSubscription()
         }
         subscriptionListPerTrigger[trigger]?.add(subscription)
     }

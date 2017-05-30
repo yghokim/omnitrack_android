@@ -18,6 +18,7 @@ import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.configs.ShortcutPanelWidgetConfigActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
+import kr.ac.snu.hcil.omnitrack.utils.VectorIconHelper
 
 /**
  * Created by Young-Ho Kim on 2017-04-04.
@@ -107,6 +108,9 @@ class OTShortcutPanelWidgetUpdateService : Service() {
                             OTShortcutPanelWidgetUpdateService.makeNotifyDatesetChangedIntentToAllWidgets(context).putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, intArrayOf(widgetId)),
                             PendingIntent.FLAG_UPDATE_CURRENT
                     ))*/
+
+            rv.setImageViewBitmap(R.id.icon, VectorIconHelper.getConvertedBitmap(context, R.drawable.icon_simple))
+            rv.setImageViewBitmap(R.id.ui_button_more, VectorIconHelper.getConvertedBitmap(context, R.drawable.more))
 
             rv.setOnClickPendingIntent(R.id.ui_button_more,
                     PendingIntent.getActivity(context, widgetId,

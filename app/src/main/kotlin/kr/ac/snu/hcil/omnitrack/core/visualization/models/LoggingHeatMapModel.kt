@@ -20,7 +20,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.Qu
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers.ATimelineChartDrawer
 import kr.ac.snu.hcil.omnitrack.utils.getHourOfDay
 import kr.ac.snu.hcil.omnitrack.utils.setHourOfDay
-import rx.internal.util.SubscriptionList
+import rx.subscriptions.CompositeSubscription
 import java.util.*
 
 /**
@@ -43,7 +43,7 @@ class LoggingHeatMapModel(tracker: OTTracker): TrackerChartModel<ITimeBinnedHeat
 
     val hoursInYBin = 2
 
-    private val subscriptions = SubscriptionList()
+    private val subscriptions = CompositeSubscription()
 
     override fun onReload(finished: (Boolean) -> Unit) {
 

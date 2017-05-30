@@ -22,7 +22,7 @@ import kr.ac.snu.hcil.omnitrack.core.system.OTTaskNotificationManager
 import kr.ac.snu.hcil.omnitrack.utils.io.StringTableSheet
 import rx.Observable
 import rx.Single
-import rx.internal.util.SubscriptionList
+import rx.subscriptions.CompositeSubscription
 import java.io.File
 import java.io.FileOutputStream
 import java.util.concurrent.atomic.AtomicInteger
@@ -96,7 +96,7 @@ class OTTableExportService : WakefulService(TAG) {
 
     }
 
-    private val subscriptions = SubscriptionList()
+    private val subscriptions = CompositeSubscription()
 
     override fun onDestroy() {
         super.onDestroy()

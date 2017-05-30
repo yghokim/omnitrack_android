@@ -44,7 +44,7 @@ import kr.ac.snu.hcil.omnitrack.utils.getDayOfMonth
 import kr.ac.snu.hcil.omnitrack.utils.io.FileHelper
 import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
 import rx.Subscription
-import rx.internal.util.SubscriptionList
+import rx.subscriptions.CompositeSubscription
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.properties.Delegates
@@ -85,7 +85,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
         else return null
     }
 
-    private val startSubscriptions = SubscriptionList()
+    private val startSubscriptions = CompositeSubscription()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -627,7 +627,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
         private var user: OTUser? = null
         private var tracker: OTTracker? = null
 
-        private var dialogSubscriptions = SubscriptionList()
+        private var dialogSubscriptions = CompositeSubscription()
 
         private val menuAdapter = Adapter()
 
