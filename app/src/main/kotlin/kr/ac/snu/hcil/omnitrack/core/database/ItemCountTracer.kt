@@ -6,8 +6,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import rx.subjects.PublishSubject
 import rx.subjects.SerializedSubject
-import rx.subscriptions.SerialSubscription
-import rx.subscriptions.Subscriptions
+import rx.subscriptions.CompositeSubscription
 import java.lang.ref.WeakReference
 
 /**
@@ -45,7 +44,7 @@ class ItemCountTracer(tracker: OTTracker) {
 
     val itemCountObservable = SerializedSubject(PublishSubject.create<Long>())
 
-    private val itemCountDatabaseSubscription: SerialSubscription = SerialSubscription()
+    private val itemCountDatabaseSubscription = CompositeSubscription()
 
     private var preferenceChangedListener: SharedPreferences.OnSharedPreferenceChangeListener? = null
 
@@ -61,7 +60,7 @@ class ItemCountTracer(tracker: OTTracker) {
     fun register() {
         val tracker = trackerWeak.get()
         if (tracker != null) {
-            itemCountDatabaseSubscription.set(DatabaseManager.getTotalItemCount(tracker).subscribe {
+            itemCountDatabaseSubscription.add(DatabaseManager.getTotalItemCount(tracker).subscribe {
                 result ->
                 setCounterCache(result.first, result.second)
             })
@@ -83,7 +82,7 @@ class ItemCountTracer(tracker: OTTracker) {
     }
 
     fun unregister() {
-        itemCountDatabaseSubscription.set(Subscriptions.empty())
+        itemCountDatabaseSubscription.clear()
         if (preferenceChangedListener != null) {
             preferences.unregisterOnSharedPreferenceChangeListener(preferenceChangedListener)
         }
