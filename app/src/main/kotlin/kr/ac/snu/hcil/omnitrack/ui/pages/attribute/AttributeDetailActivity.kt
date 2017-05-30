@@ -29,7 +29,7 @@ import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 import kr.ac.snu.hcil.omnitrack.utils.setPaddingLeft
 import kr.ac.snu.hcil.omnitrack.utils.setPaddingRight
 import mehdi.sakout.fancybuttons.FancyButton
-import rx.internal.util.SubscriptionList
+import rx.subscriptions.CompositeSubscription
 import java.util.*
 
 class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_attribute_detail), View.OnClickListener {
@@ -69,7 +69,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
     private val propertyViewList = ArrayList<ReadOnlyPair<String, View>>()
 
-    private val startSubscriptions = SubscriptionList()
+    private val startSubscriptions = CompositeSubscription()
 
     override fun onSessionLogContent(contentObject: Bundle) {
         super.onSessionLogContent(contentObject)

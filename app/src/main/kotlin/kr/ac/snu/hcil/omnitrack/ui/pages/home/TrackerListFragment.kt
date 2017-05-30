@@ -57,7 +57,6 @@ import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kr.ac.snu.hcil.omnitrack.utils.startActivityOnDelay
-import rx.internal.util.SubscriptionList
 import rx.subscriptions.CompositeSubscription
 import java.text.SimpleDateFormat
 import java.util.*
@@ -316,6 +315,8 @@ class TrackerListFragment : OTFragment() {
         for (tracer in itemStatisticsDict) {
             tracer.value.unregister()
         }
+
+        itemStatisticsDict
     }
 
     /*
@@ -783,7 +784,7 @@ class TrackerListFragment : OTFragment() {
 
     }
 
-    inner class ItemStatisticsUnit(val tracker: OTTracker) {
+    class ItemStatisticsUnit(val tracker: OTTracker) {
         var totalItemCount: Long? = null
             set(value) {
                 if (field != value) {
@@ -810,7 +811,7 @@ class TrackerListFragment : OTFragment() {
 
         val countTracer: ItemCountTracer = ItemCountTracer(tracker)
 
-        val subscriptions = SubscriptionList()
+        val subscriptions = CompositeSubscription()
 
         val onTotalItemCountChanged = Event<Long?>()
         val onTodayCountChanged = Event<Long?>()

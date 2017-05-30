@@ -13,14 +13,14 @@ import kr.ac.snu.hcil.omnitrack.utils.getActivity
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 import mehdi.sakout.fancybuttons.FancyButton
 import rx.android.schedulers.AndroidSchedulers
-import rx.internal.util.SubscriptionList
+import rx.subscriptions.CompositeSubscription
 
 /**
  * Created by younghokim on 2017. 5. 24..
  */
 class DependencyControlView : RelativeLayout {
 
-    private val subscriptions = SubscriptionList()
+    private val subscriptions = CompositeSubscription()
 
     var viewModel: DependencyControlViewModel? = null
         set(value) {

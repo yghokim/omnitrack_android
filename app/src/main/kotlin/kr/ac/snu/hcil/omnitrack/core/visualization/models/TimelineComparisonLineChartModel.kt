@@ -13,7 +13,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.QuantizedTimeScale
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers.MultiLineChartDrawer
 import org.apache.commons.math3.stat.StatUtils
-import rx.internal.util.SubscriptionList
+import rx.subscriptions.CompositeSubscription
 import java.math.BigDecimal
 import java.util.*
 
@@ -36,7 +36,7 @@ class TimelineComparisonLineChartModel(override val attributes: List<OTNumberAtt
 
     private val values = ArrayList<BigDecimal>()
 
-    private val subscriptions = SubscriptionList()
+    private val subscriptions = CompositeSubscription()
 
     override fun onReload(finished: (Boolean) -> Unit) {
         data.clear()

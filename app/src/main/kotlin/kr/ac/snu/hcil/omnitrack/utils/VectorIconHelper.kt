@@ -23,7 +23,7 @@ object VectorIconHelper {
         RealmConfiguration.Builder().name("vectorIconCache").deleteRealmIfMigrationNeeded().build()
     }
 
-    private val memCache = object : LruCache<String, Bitmap>(10) {
+    private val memCache = object : LruCache<String, Bitmap>(20) {
         override fun entryRemoved(evicted: Boolean, key: String?, oldValue: Bitmap?, newValue: Bitmap?) {
             super.entryRemoved(evicted, key, oldValue, newValue)
             oldValue?.recycle()

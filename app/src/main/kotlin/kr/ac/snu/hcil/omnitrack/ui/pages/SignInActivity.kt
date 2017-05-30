@@ -23,7 +23,7 @@ import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
-import rx.internal.util.SubscriptionList
+import rx.subscriptions.CompositeSubscription
 
 class SignInActivity : AppCompatActivity() {
 
@@ -33,7 +33,7 @@ class SignInActivity : AppCompatActivity() {
     private lateinit var googleLoginButton: View
     private lateinit var loginInProgressIndicator: View
 
-    private val creationSubscription = SubscriptionList()
+    private val creationSubscription = CompositeSubscription()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -25,7 +25,7 @@ import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 import org.apache.commons.math3.stat.StatUtils
 import rx.Observable
 import rx.functions.Func1
-import rx.internal.util.SubscriptionList
+import rx.subscriptions.CompositeSubscription
 import java.util.*
 
 /**
@@ -43,7 +43,7 @@ class DurationTimelineModel(override val attribute: OTTimeSpanAttribute) : Attri
 
     private val data = ArrayList<AggregatedDuration>()
 
-    private val subscriptions = SubscriptionList()
+    private val subscriptions = CompositeSubscription()
 
     override fun onReload(finished: (Boolean) -> Unit) {
 

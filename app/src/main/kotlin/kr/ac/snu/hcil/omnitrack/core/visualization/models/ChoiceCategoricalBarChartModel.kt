@@ -9,7 +9,7 @@ import kr.ac.snu.hcil.omnitrack.core.visualization.AttributeChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.ICategoricalBarChart
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers.CategoricalBarChartDrawer
-import rx.internal.util.SubscriptionList
+import rx.subscriptions.CompositeSubscription
 import java.util.*
 
 /**
@@ -26,7 +26,7 @@ class ChoiceCategoricalBarChartModel(override val attribute: OTChoiceAttribute) 
 
     override val numDataPoints: Int get() = data.size
 
-    private val subscriptions = SubscriptionList()
+    private val subscriptions = CompositeSubscription()
 
     override val name: String
         get() = String.format(OTApplication.app.resourcesWrapped.getString(R.string.msg_vis_categorical_distribution_title_format), super.name)

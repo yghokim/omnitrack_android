@@ -21,9 +21,9 @@ import kr.ac.snu.hcil.omnitrack.utils.*
 import kr.ac.snu.hcil.omnitrack.widgets.OTShortcutPanelWidgetUpdateService
 import rx.Observable
 import rx.Single
-import rx.internal.util.SubscriptionList
 import rx.subjects.PublishSubject
 import rx.subjects.SerializedSubject
+import rx.subscriptions.CompositeSubscription
 import java.util.*
 
 /**
@@ -109,7 +109,7 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
 
     //val trackerAdded = Event<ReadOnlyPair<OTTracker, Int>>()
 
-    private val subscriptions = SubscriptionList()
+    private val subscriptions = CompositeSubscription()
 
     val trackerAdded = SerializedSubject(PublishSubject.create<ReadOnlyPair<OTTracker, Int>>())
     val trackerRemoved = SerializedSubject(PublishSubject.create<ReadOnlyPair<OTTracker, Int>>())

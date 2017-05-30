@@ -26,7 +26,7 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.diagnostics.SystemLogActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.services.ServiceListFragment
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
-import rx.internal.util.SubscriptionList
+import rx.subscriptions.CompositeSubscription
 
 class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), OTAuthManager.SignInChangedListener, DrawerLayout.DrawerListener {
 
@@ -48,7 +48,7 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), OTAut
 
     private lateinit var sidebar: SidebarWrapper
 
-    private val startSubscriptions = SubscriptionList()
+    private val startSubscriptions = CompositeSubscription()
 
     private lateinit var tabLayout: TabLayout
 

@@ -6,8 +6,8 @@ import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.ui.components.common.dependency.DependencyControlViewModel
 import rx.Observable
 import rx.Single
-import rx.internal.util.SubscriptionList
 import rx.subjects.BehaviorSubject
+import rx.subscriptions.CompositeSubscription
 
 /**
  * Created by younghokim on 2017. 5. 25..
@@ -16,7 +16,7 @@ class ServiceActivationViewModel : ViewModel() {
 
     enum class State { Checking, IdleNotSatistified, Satisfied }
 
-    private val subscriptions = SubscriptionList()
+    private val subscriptions = CompositeSubscription()
 
     var attachedService: OTExternalService? = null
         set(value) {

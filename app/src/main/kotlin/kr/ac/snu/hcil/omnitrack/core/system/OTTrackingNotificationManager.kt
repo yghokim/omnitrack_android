@@ -125,7 +125,7 @@ object OTTrackingNotificationManager {
         itemRemoveIntent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, itemId)
         itemRemoveIntent.putExtra(OTApplication.INTENT_EXTRA_NOTIFICATION_ID_SEED, idSeed)
 
-        val discardAction = NotificationCompat.Action.Builder(R.drawable.ex,
+        val discardAction = NotificationCompat.Action.Builder(0,
                 context.resources.getString(R.string.msg_notification_action_discard_item),
                 PendingIntent.getBroadcast(context, 0, itemRemoveIntent, PendingIntent.FLAG_UPDATE_CURRENT)).build()
 
