@@ -45,7 +45,7 @@
 
     <plurals name="time_duration_hour_short">
         <item quantity="zero">0 hrs</item>
-        <item quantity="one">one hr</item>
+        <item quantity="one">1 hr</item>
         <item quantity="other">%d hrs</item>
     </plurals>
 

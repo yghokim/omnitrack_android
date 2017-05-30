@@ -13,6 +13,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
+import kr.ac.snu.hcil.omnitrack.utils.VectorIconHelper
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -99,9 +100,9 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
                 todayCount = DatabaseManager.getLogCountOfDay(tracker).first().toBlocking().first()
             }*/
 
-                val rv = RemoteViews(context.packageName, R.layout.remoteview_widget_shortcut_list_element)
+            val rv = RemoteViews(context.packageName, R.layout.remoteview_widget_shortcut_list_element)
 
-                rv.setTextViewText(R.id.ui_tracker_name, tracker.name)
+            rv.setTextViewText(R.id.ui_tracker_name, tracker.name)
 
             /*
             if (lastLoggingTime == null) {
@@ -125,21 +126,23 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
                 }*/
 
             val buttonSize = OTApplication.app.resourcesWrapped.getDimensionPixelSize(R.dimen.app_widget_instant_logging_button_height)
-                val buttonRadius = buttonSize * .5f
-                val paint = Paint(Paint.ANTI_ALIAS_FLAG)
-                paint.style = Paint.Style.FILL
+            val buttonRadius = buttonSize * .5f
+            val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+            paint.style = Paint.Style.FILL
 
-                val buttonBitmap = Bitmap.createBitmap(buttonSize, buttonSize, Bitmap.Config.ARGB_8888)
-                val buttonCanvas = Canvas(buttonBitmap)
-                paint.color = ColorUtils.setAlphaComponent(tracker.color, 200)
-                buttonCanvas.drawCircle(buttonRadius, buttonRadius, buttonRadius, paint)
-                rv.setImageViewBitmap(R.id.ui_background_image, buttonBitmap)
+            val buttonBitmap = Bitmap.createBitmap(buttonSize, buttonSize, Bitmap.Config.ARGB_8888)
+            val buttonCanvas = Canvas(buttonBitmap)
+            paint.color = ColorUtils.setAlphaComponent(tracker.color, 200)
+            buttonCanvas.drawCircle(buttonRadius, buttonRadius, buttonRadius, paint)
+            rv.setImageViewBitmap(R.id.ui_background_image, buttonBitmap)
 
-                val baseTrackerIntent = Intent().putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
-                rv.setOnClickFillInIntent(R.id.ui_clickable_area, Intent(baseTrackerIntent).putExtra(OTShortcutPanelWidgetProvider.EXTRA_CLICK_COMMAND, OTShortcutPanelWidgetProvider.CLICK_COMMAND_ROW))
-                rv.setOnClickFillInIntent(R.id.ui_button_instant, Intent(baseTrackerIntent).putExtra(OTShortcutPanelWidgetProvider.EXTRA_CLICK_COMMAND, OTShortcutPanelWidgetProvider.CLICK_COMMAND_INSTANT_LOGGING))
+            val baseTrackerIntent = Intent().putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
+            rv.setOnClickFillInIntent(R.id.ui_clickable_area, Intent(baseTrackerIntent).putExtra(OTShortcutPanelWidgetProvider.EXTRA_CLICK_COMMAND, OTShortcutPanelWidgetProvider.CLICK_COMMAND_ROW))
+            rv.setOnClickFillInIntent(R.id.ui_button_instant, Intent(baseTrackerIntent).putExtra(OTShortcutPanelWidgetProvider.EXTRA_CLICK_COMMAND, OTShortcutPanelWidgetProvider.CLICK_COMMAND_INSTANT_LOGGING))
 
-                return rv
+            rv.setImageViewBitmap(R.id.ui_button_instant, VectorIconHelper.getConvertedBitmap(context, R.drawable.instant_add))
+
+            return rv
         }
 
         override fun getCount(): Int {

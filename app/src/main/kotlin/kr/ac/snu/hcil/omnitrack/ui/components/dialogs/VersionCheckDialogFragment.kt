@@ -16,7 +16,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.RemoteConfigManager
 import rx.Subscription
-import rx.internal.util.SubscriptionList
+import rx.subscriptions.CompositeSubscription
 
 /**
  * Created by Young-Ho Kim on 2017-04-10.
@@ -45,7 +45,7 @@ class VersionCheckDialogFragment : DialogFragment() {
 
     private var latestVersion: String? = null
 
-    private val dialogSubscriptions = SubscriptionList()
+    private val dialogSubscriptions = CompositeSubscription()
 
     /*
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

@@ -24,7 +24,7 @@ import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.getActivity
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 import rx.android.schedulers.AndroidSchedulers
-import rx.internal.util.SubscriptionList
+import rx.subscriptions.CompositeSubscription
 
 /**
  * Created by Young-Ho Kim on 16. 8. 24
@@ -86,7 +86,7 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
 
     private val bottomBar: LockableFrameLayout by bindView(R.id.ui_bottom_bar)
 
-    private val subscriptions = SubscriptionList()
+    private val subscriptions = CompositeSubscription()
 
     //private var collapsedHeight: Int = 0
     //private var expandedHeight: Int = 0

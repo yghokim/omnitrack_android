@@ -19,7 +19,7 @@ import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.actions.NotificationSettingsPanelView
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
-import rx.internal.util.SubscriptionList
+import rx.subscriptions.CompositeSubscription
 import java.util.*
 
 /**
@@ -250,8 +250,8 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_mul
 
         val errorMessages = ArrayList<String>()
 
-        private var startSubscriptions = SubscriptionList()
-        private var createViewSubscriptions = SubscriptionList()
+        private var startSubscriptions = CompositeSubscription()
+        private var createViewSubscriptions = CompositeSubscription()
 
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 

@@ -295,8 +295,7 @@
 
     <style name="durationPickerDigitViewStyle">
         <item name="android:textSize">@dimen/number_digit_size</item>
-        <item name="android:textStyle">italic</item>
-        <item name="fontPath">fonts/Roboto-Light.ttf</item>
+        <item name="fontPath">fonts/Roboto-ThinItalic.ttf</item>
         <item name="android:textColor">@color/colorSecondary</item>
     </style>
 
@@ -374,7 +373,7 @@
     </style>
 
     <style name="hourPickerHourStyle" parent="durationPickerDigitViewStyle">
-        <item name="android:textStyle">normal</item>
+        <item name="fontPath">fonts/Roboto-Light.ttf</item>
     </style>
 
 

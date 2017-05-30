@@ -21,7 +21,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemD
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.MeasureFactoryAdapter
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
-import rx.internal.util.SubscriptionList
+import rx.subscriptions.CompositeSubscription
 import rx.subscriptions.SerialSubscription
 
 /**
@@ -33,7 +33,7 @@ class ServiceListFragment : OTFragment() {
 
     private lateinit var adapter: Adapter
 
-    private val creationSubscriptions = SubscriptionList()
+    private val creationSubscriptions = CompositeSubscription()
 
     private val internetRequiredAlertBuilder: MaterialDialog.Builder by lazy {
         DialogHelper.makeSimpleAlertBuilder(context, context.getString(R.string.msg_external_service_activation_requires_internet))

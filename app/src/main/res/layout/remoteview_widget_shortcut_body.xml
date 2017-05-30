@@ -9,13 +9,15 @@
     <RelativeLayout
         android:id="@+id/ui_header"
         android:layout_width="match_parent"
-        android:layout_height="30dp"
+        android:layout_height="@dimen/screen_widget_shortcut_panel_header_height"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
         android:background="@drawable/main_gradient">
 
         <ImageView
             android:id="@+id/icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="@dimen/screen_widget_shortcut_panel_header_height"
+            android:layout_height="@dimen/screen_widget_shortcut_panel_header_height"
             android:layout_centerVertical="true"
             android:alpha="0.6"
             android:paddingBottom="5dp"
@@ -40,8 +42,8 @@
 
         <ImageButton
             android:id="@+id/ui_button_more"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_width="@dimen/screen_widget_shortcut_panel_header_height"
+            android:layout_height="@dimen/screen_widget_shortcut_panel_header_height"
             android:layout_alignParentEnd="true"
             android:layout_alignTop="@+id/icon"
             android:background="@drawable/transparent_button_background"

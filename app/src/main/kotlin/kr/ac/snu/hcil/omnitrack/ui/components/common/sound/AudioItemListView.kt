@@ -11,7 +11,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
-import rx.internal.util.SubscriptionList
+import rx.subscriptions.CompositeSubscription
 
 /**
  * Created by Young-Ho on 4/23/2017.
@@ -30,7 +30,7 @@ class AudioItemListView : ConstraintLayout {
             }
         }
 
-    private val subscriptions = SubscriptionList()
+    private val subscriptions = CompositeSubscription()
 
     var mountedUri: SynchronizedUri = SynchronizedUri()
         set(value) {

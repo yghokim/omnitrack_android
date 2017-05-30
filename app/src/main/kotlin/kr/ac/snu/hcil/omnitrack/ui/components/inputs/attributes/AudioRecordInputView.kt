@@ -10,7 +10,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioRecorderView
-import rx.internal.util.SubscriptionList
+import rx.subscriptions.CompositeSubscription
 
 /**
  * Created by Young-Ho Kim on 2016-07-22.
@@ -77,7 +77,7 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
 
     private var audioTitleInformation: String = ""
 
-    private var subscriptions = SubscriptionList()
+    private var subscriptions = CompositeSubscription()
 
     init {
         valueView = findViewById(R.id.ui_audio_recorder) as AudioRecorderView
