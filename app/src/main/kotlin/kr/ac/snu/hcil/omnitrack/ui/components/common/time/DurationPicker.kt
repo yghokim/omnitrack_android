@@ -16,8 +16,8 @@ import butterknife.bindView
 import butterknife.bindViews
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
-import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 import kr.ac.snu.hcil.omnitrack.utils.getActivity
+import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 
 /**
  * Created by younghokim on 16. 8. 23..

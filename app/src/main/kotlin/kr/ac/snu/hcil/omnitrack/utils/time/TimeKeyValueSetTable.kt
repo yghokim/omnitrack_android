@@ -1,5 +1,6 @@
-package kr.ac.snu.hcil.omnitrack.utils
+package kr.ac.snu.hcil.omnitrack.utils.time
 
+import kr.ac.snu.hcil.omnitrack.utils.WritablePair
 import java.util.*
 
 /**
