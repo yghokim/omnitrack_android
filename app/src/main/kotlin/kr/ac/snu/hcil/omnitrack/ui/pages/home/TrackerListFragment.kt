@@ -3,14 +3,13 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.home
 import android.animation.Animator
 import android.animation.ValueAnimator
 import android.app.Activity.RESULT_OK
-import android.content.BroadcastReceiver
-import android.content.Context
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
-import android.content.IntentFilter
 import android.graphics.Typeface
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.v4.content.ContextCompat
+import android.support.v7.util.DiffUtil
 import android.support.v7.widget.AppCompatImageButton
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -36,10 +35,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
-import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.EventLoggingManager
-import kr.ac.snu.hcil.omnitrack.core.database.ItemCountTracer
-import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
@@ -52,10 +48,10 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemBrowserActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemEditingActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.tracker.TrackerDetailActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.visualization.ChartViewActivity
+import kr.ac.snu.hcil.omnitrack.ui.viewmodels.TrackerListViewModel
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
-import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kr.ac.snu.hcil.omnitrack.utils.startActivityOnDelay
 import rx.subscriptions.CompositeSubscription
 import java.text.SimpleDateFormat
@@ -112,24 +108,12 @@ class TrackerListFragment : OTFragment() {
     private val collapsedHeight = OTApplication.app.resourcesWrapped.getDimensionPixelSize(R.dimen.tracker_list_element_collapsed_height)
     private val expandedHeight = OTApplication.app.resourcesWrapped.getDimensionPixelSize(R.dimen.tracker_list_element_expanded_height)
 
-
-    private val itemEventReceiver: BroadcastReceiver by lazy {
-        ItemEventReceiver()
-    }
-
-    private val itemEventIntentFilter: IntentFilter by lazy {
-        val filter = IntentFilter()
-        filter.addAction(OTApplication.BROADCAST_ACTION_ITEM_ADDED)
-        filter.addAction(OTApplication.BROADCAST_ACTION_ITEM_EDITED)
-        filter.addAction(OTApplication.BROADCAST_ACTION_ITEM_REMOVED)
-
-        filter
-    }
-
     private val createViewSubscriptions: CompositeSubscription = CompositeSubscription()
     private val resumeSubscriptions: CompositeSubscription = CompositeSubscription()
 
-    private val itemStatisticsDict = HashMap<String, ItemStatisticsUnit>()
+    private val currentTrackerViewModelList = ArrayList<TrackerListViewModel.TrackerInformationViewModel>()
+
+    private lateinit var viewModel: TrackerListViewModel
 
     companion object {
         const val CHANGE_TRACKER_SETTINGS = 0
@@ -172,18 +156,16 @@ class TrackerListFragment : OTFragment() {
         //  user.trackerRemoved += onTrackerRemovedHandler
 
 
+        viewModel = ViewModelProviders.of(this).get(TrackerListViewModel::class.java)
+
+
         trackerListAdapter = TrackerListAdapter()
         trackerListAdapter.currentlyExpandedIndex = savedInstanceState?.getInt(STATE_EXPANDED_TRACKER_INDEX, -1) ?: -1
     }
 
     override fun onResume() {
         super.onResume()
-
-
         //context.registerReceiver(itemEventReceiver, itemEventIntentFilter)
-        trackerListAdapter.notifyDataSetChanged()
-        itemStatisticsDict.forEach { (key, tracer) -> tracer.register() }
-
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
@@ -220,34 +202,22 @@ class TrackerListFragment : OTFragment() {
                 createViewSubscriptions.add(
                         activity.signedInUserObservable.subscribe {
                             user ->
-                            println("OMNITRACK trackerListFragment received user instance! : ${user.trackers.size} trackers")
                             this.user = user
                             userLoaded = true
 
-                            itemStatisticsDict.forEach { (key, value) -> value.unregister() }
-                            itemStatisticsDict.clear()
-                            user.trackers.unObservedList.forEach {
-                                tracker ->
-                                itemStatisticsDict.put(tracker.objectId, ItemStatisticsUnit(tracker).apply { this.register() })
-                            }
-
-                            trackerListAdapter.notifyDataSetChanged()
+                            viewModel.user = user
                             createViewSubscriptions.add(
-                                    this.user.trackerAdded.subscribe {
-                                        trackerPair ->
-                                        itemStatisticsDict.put(trackerPair.first.objectId, ItemStatisticsUnit(trackerPair.first).apply { this.register() })
-                                        trackerListAdapter.notifyItemChanged(trackerListAdapter.itemCount - 1)
-                                        trackerListAdapter.notifyItemInserted(trackerPair.second)
-                                    }
-                            )
+                                    viewModel.trackerViewModels.subscribe {
+                                        trackerViewModelList ->
+                                        println("tracker viewmodel list refresh")
 
-                            createViewSubscriptions.add(
-                                    this.user.trackerRemoved.subscribe {
-                                        trackerPair ->
-                                        itemStatisticsDict[trackerPair.first.objectId]?.unregister()
-                                        itemStatisticsDict.remove(trackerPair.first.objectId)
-                                        trackerListAdapter.notifyItemChanged(trackerListAdapter.itemCount - 1)
-                                        trackerListAdapter.notifyItemRemoved(trackerPair.second)
+                                        val diffResult = DiffUtil.calculateDiff(
+                                                TrackerListViewModel.TrackerViewModelListDiffUtilCallback(currentTrackerViewModelList, trackerViewModelList)
+                                        )
+
+                                        currentTrackerViewModelList.clear()
+                                        currentTrackerViewModelList.addAll(trackerViewModelList)
+                                        diffResult.dispatchUpdatesTo(trackerListAdapter)
                                     }
                             )
                         }
@@ -268,6 +238,11 @@ class TrackerListFragment : OTFragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         createViewSubscriptions.clear()
+        for (viewHolder in trackerListAdapter.viewHolders) {
+            println("viewHolder viewmodel subscriptions clear: ${viewHolder.subscriptions.hasSubscriptions()}, ${viewHolder.subscriptions.isUnsubscribed}")
+            viewHolder.subscriptions.clear()
+        }
+        trackerListAdapter.viewHolders.clear()
     }
 
     override fun onDestroy() {
@@ -305,34 +280,7 @@ class TrackerListFragment : OTFragment() {
         super.onPause()
         println("tracker list pause")
         resumeSubscriptions.clear()
-        for (viewHolder in trackerListAdapter.viewHolders) {
-            viewHolder.subscriptions.clear()
-        }
-        trackerListAdapter.viewHolders.clear()
-
-        //context.unregisterReceiver(itemEventReceiver)
-
-        for (tracer in itemStatisticsDict) {
-            tracer.value.unregister()
-        }
-
-        itemStatisticsDict
     }
-
-    /*
-
-    private val onTrackerAddedHandler = {
-        sender: Any, args: ReadOnlyPair<OTTracker, Int> ->
-        println("tracker added - ${args.second}")
-        trackerListAdapter.notifyItemInserted(args.second)
-        listView.scrollToPosition(args.second)
-    }
-
-    private val onTrackerRemovedHandler = {
-        sender: Any, args: ReadOnlyPair<OTTracker, Int> ->
-        println("tracker removed - ${args.second}")
-        trackerListAdapter.notifyItemRemoved(args.second)
-    }*/
 
     private fun handleTrackerClick(tracker: OTTracker) {
         if (tracker.attributes.size == 0) {
@@ -392,11 +340,11 @@ class TrackerListFragment : OTFragment() {
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.bindTracker(user.trackers[position])
+            holder.bindViewModel(currentTrackerViewModelList[position])
         }
 
         override fun getItemCount(): Int {
-            return if (userLoaded) user.trackers.size else 0
+            return currentTrackerViewModelList.size
         }
 
         override fun getItemId(position: Int): Long {
@@ -591,137 +539,67 @@ class TrackerListFragment : OTFragment() {
             }
 
             private fun setTotalItemCount(count: Long) {
-                val header = context.resources.getString(R.string.msg_tracker_list_stat_total).toUpperCase()
+                val header = OTApplication.app.resourcesWrapped.getString(R.string.msg_tracker_list_stat_total).toUpperCase()
                 putStatistics(totalItemCountView, header, count.toString())
             }
 
+            fun bindViewModel(viewModel: TrackerListViewModel.TrackerInformationViewModel) {
+                println("bind viewmodel to viewholder, ${viewModel.tracker.name}, ${viewModel.isActive}, ${viewModel.trackerName.hasValue()}")
+                subscriptions.clear()
+                subscriptions.add(
+                        viewModel.trackerName.subscribe {
+                            nameText ->
+                            name.text = nameText
+                        }
+                )
 
-            fun bindTracker(tracker: OTTracker) {
+                subscriptions.add(
+                        viewModel.trackerColor.subscribe {
+                            colorInt ->
+                            color.setBackgroundColor(colorInt)
+                        }
+                )
 
-                name.text = tracker.name
-                color.setBackgroundColor(tracker.color)
+                subscriptions.add(
+                        viewModel.trackerEditable.subscribe {
+                            editable ->
+                            if (editable) {
+                                lockedIndicator.visibility = View.GONE
+                                editButton.visibility = View.VISIBLE
+                                removeButton.visibility = View.VISIBLE
+                            } else {
+                                lockedIndicator.visibility = View.VISIBLE
+                                editButton.visibility = View.GONE
+                                removeButton.visibility = View.GONE
+                            }
+                        }
+                )
+
+                subscriptions.add(
+                        viewModel.activeNotificationCount.subscribe {
+                            count ->
+                            if (count > 0) {
+                                alarmIcon.visibility = View.VISIBLE
+                                alarmText.visibility = View.VISIBLE
+                                alarmText.setText(count.toString())
+                            } else {
+                                alarmIcon.visibility = View.INVISIBLE
+                                alarmText.visibility = View.INVISIBLE
+                            }
+
+                        }
+                )
+
+                subscriptions.add(viewModel.lastLoggingTime.subscribe { time -> setLastLoggingTime(time) })
+                subscriptions.add(viewModel.todayCount.subscribe { count -> setTodayLoggingCount(count) })
+                subscriptions.add(viewModel.totalItemCount.subscribe { count -> setTotalItemCount(count) })
 
                 validationErrorMessages.clear()
-                errorIndicator.visibility = if (tracker.isValid(validationErrorMessages)) {
+                errorIndicator.visibility = if (viewModel.tracker.isValid(validationErrorMessages)) {
                     View.INVISIBLE
                 } else {
                     View.VISIBLE
                 }
-
-                if (tracker.isEditable) {
-                    lockedIndicator.visibility = View.GONE
-                    editButton.visibility = View.VISIBLE
-                    removeButton.visibility = View.VISIBLE
-                } else {
-                    lockedIndicator.visibility = View.VISIBLE
-                    editButton.visibility = View.GONE
-                    removeButton.visibility = View.GONE
-                }
-
-                subscriptions.clear()
-
-                /*
-                subscriptions.add(
-                        DatabaseManager.getItemListSummary(tracker).subscribe {
-                            summary ->
-                            setLastLoggingTime(summary.lastLoggingTime)
-                            setTodayLoggingCount(summary.todayCount ?: 0)
-                            setTotalItemCount(summary.totalCount ?: 0)
-                        }
-                )*/
-
-                /*
-                subscriptions.add(
-                        DatabaseManager.getTotalItemCount(tracker).subscribe{
-                            count->
-                            setTotalItemCount(count ?: 0)
-                        }
-                )*/
-                val itemStatisticsUnit = itemStatisticsDict[tracker.objectId]
-                if (itemStatisticsUnit != null) {
-                    itemStatisticsUnit.onTotalItemCountChanged.clear()
-                    itemStatisticsUnit.onLastLoggingTimeChanged.clear()
-                    itemStatisticsUnit.onTodayCountChanged.clear()
-
-                    itemStatisticsUnit.refresh()
-
-                    itemStatisticsUnit.onTotalItemCountChanged += {
-                        sender, count ->
-                        setTotalItemCount(count ?: 0)
-                    }
-                    setTotalItemCount(itemStatisticsUnit.totalItemCount ?: 0)
-
-
-                    itemStatisticsUnit.onLastLoggingTimeChanged += {
-                        sender, time ->
-                        setLastLoggingTime(time)
-                    }
-                    setLastLoggingTime(itemStatisticsUnit.lastLoggingTime)
-
-                    itemStatisticsUnit.onTodayCountChanged += {
-                        sender, count ->
-                        setTodayLoggingCount(count ?: 0)
-                    }
-                    setTodayLoggingCount(itemStatisticsUnit.todayCount ?: 0)
-                }
-
-                subscriptions.add(
-                        tracker.colorChanged.subscribe {
-                            args ->
-                            color.setBackgroundColor(args.second)
-                        }
-                )
-
-                subscriptions.add(
-                        tracker.nameChanged.subscribe {
-                            args ->
-                            name.text = args.second
-                        }
-                )
-
-                val activeNotificationTriggers = tracker.owner?.triggerManager?.getAttachedTriggers(tracker, OTTrigger.ACTION_NOTIFICATION)?.filter { it.isOn == true }
-                if (activeNotificationTriggers?.isNotEmpty() == true) {
-
-                    alarmIcon.visibility = View.VISIBLE
-                    alarmText.visibility = View.VISIBLE
-
-                    alarmText.setText(activeNotificationTriggers.size.toString())
-                } else {
-                    alarmIcon.visibility = View.INVISIBLE
-                    alarmText.visibility = View.INVISIBLE
-                }
-
-                /*
-                subscriptions.add(
-                        DatabaseManager.getLastLoggingTime(tracker).observeOn(AndroidSchedulers.mainThread()).subscribe {
-                            timestamp ->
-
-                    }
-                )
-
-
-                subscriptions.add(
-                        DatabaseManager.getLogCountOfDay(tracker).observeOn(AndroidSchedulers.mainThread()).subscribe {
-                            count ->
-                            println("log count of day: $count")
-                            val header = context.resources.getString(R.string.msg_todays_log).toUpperCase()
-                            putStatistics(todayLoggingCountView, header, count.toString())
-                        }
-                )
-
-                subscriptions.add(
-                        DatabaseManager.getTotalItemCount(tracker).observeOn(AndroidSchedulers.mainThread()).subscribe {
-                            count ->
-
-                            println("log count total: $count")
-                            val header = context.resources.getString(R.string.msg_tracker_list_stat_total).toUpperCase()
-                            putStatistics(totalItemCountView, header, count.toString())
-                        }
-                )
-
-                */
-
-
 
                 if (currentlyExpandedIndex == adapterPosition) {
                     lastExpandedViewHolder = this
@@ -730,6 +608,7 @@ class TrackerListFragment : OTFragment() {
                     collapse(false)
                 }
             }
+
 
             private fun putStatistics(view: TextView, header: CharSequence, content: CharSequence) {
                 val builder = SpannableString("$header\n$content").apply {
@@ -767,94 +646,6 @@ class TrackerListFragment : OTFragment() {
                     collapsed = false
                 }
             }
-        }
-    }
-
-    inner class ItemEventReceiver : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            if (userLoaded) {
-                val tracker = user[intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)]
-                if (tracker != null) {
-                    val trackerPosition = user.trackers.indexOf(tracker)
-                    println("tracker changed = $trackerPosition")
-                    trackerListAdapter.notifyItemChanged(trackerPosition)
-                }
-            }
-        }
-
-    }
-
-    class ItemStatisticsUnit(val tracker: OTTracker) {
-        var totalItemCount: Long? = null
-            set(value) {
-                if (field != value) {
-                    field = value
-                    onTotalItemCountChanged.invoke(this, value)
-                }
-            }
-
-        var todayCount: Long? = null
-            set(value) {
-                if (field != value) {
-                    field = value
-                    onTodayCountChanged.invoke(this, value)
-                }
-            }
-
-        var lastLoggingTime: Long? = null
-            set(value) {
-                if (field != value) {
-                    field = value
-                    onLastLoggingTimeChanged.invoke(this, value)
-                }
-            }
-
-        val countTracer: ItemCountTracer = ItemCountTracer(tracker)
-
-        val subscriptions = CompositeSubscription()
-
-        val onTotalItemCountChanged = Event<Long?>()
-        val onTodayCountChanged = Event<Long?>()
-        val onLastLoggingTimeChanged = Event<Long?>()
-
-        init {
-        }
-
-        fun refresh() {
-            countTracer.notifyConnected()
-        }
-
-        fun register() {
-            subscriptions.add(
-                    countTracer.itemCountObservable.subscribe {
-                        count ->
-                        totalItemCount = count
-                    }
-            )
-
-            subscriptions.add(
-                    DatabaseManager.getLogCountOfDay(tracker).subscribe {
-                        count ->
-                        todayCount = count
-                    }
-            )
-
-            subscriptions.add(
-                    DatabaseManager.getLastLoggingTime(tracker).subscribe {
-                        time ->
-                        lastLoggingTime = time
-                    }
-            )
-
-            countTracer.register()
-            countTracer.notifyConnected()
-        }
-
-        fun unregister() {
-            if (countTracer.isRegistered)
-                countTracer.unregister()
-
-            subscriptions.clear()
         }
     }
 }
