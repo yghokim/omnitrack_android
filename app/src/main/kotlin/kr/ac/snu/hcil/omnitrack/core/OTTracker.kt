@@ -37,13 +37,14 @@ import kotlin.properties.Delegates
 /**
  * Created by Young-Ho on 7/11/2016.
  */
-class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnShortcut: Boolean = false, isEditable: Boolean = true, attributeIdSeed: Int = 0, _attributes: Collection<OTAttribute<out Any>>? = null, val creationFlags: Map<String, String>? = null)
+class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnShortcut: Boolean = false, isEditable: Boolean = true, attributeIdSeed: Int = 0, _attributes: Collection<OTAttribute<out Any>>? = null, val creationFlags: Map<String, String>? = null, _intrinsicPosition: Int = 0)
     : NamedObject(objectId, name) {
 
     companion object {
         const val PROPERTY_COLOR = "color"
         const val PROPERTY_IS_ON_SHORTCUT = "onShortcut"
         const val PROPERTY_IS_EDITABLE = "editable"
+        const val PROPERTY_POSITION = "position"
         const val PROPERTY_ATTRIBUTES = "attributes"
 
         val CREATION_FLAG_TUTORIAL: Map<String, String> by lazy {
@@ -136,6 +137,16 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
             }
         }
 
+    var intrinsicPosition: Int by Delegates.observable(_intrinsicPosition)
+    {
+        prop, old, new ->
+        if (old != new) {
+            if (!suspendDatabaseSync) {
+                databasePointRef?.child(PROPERTY_POSITION)?.setValue(new)
+            }
+        }
+    }
+
     var color: Int by Delegates.observable(color)
     {
         prop, old, new ->
@@ -182,7 +193,6 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
 
     val reminderAdded = SerializedSubject(PublishSubject.create<ReadOnlyPair<OTTracker, OTTrigger>>())
     val reminderRemoved = SerializedSubject(PublishSubject.create<ReadOnlyPair<OTTracker, OTTrigger>>())
-
 
     val isExternalFilesInvolved: Boolean get() = attributes.unObservedList.find { it.isExternalFile } != null
 
