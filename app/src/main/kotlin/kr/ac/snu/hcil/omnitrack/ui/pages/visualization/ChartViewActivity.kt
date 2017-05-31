@@ -15,7 +15,7 @@ import kr.ac.snu.hcil.omnitrack.core.visualization.Granularity
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTTrackerAttachedActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.choice.SelectionView
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
-import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
+import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 
 class ChartViewActivity : OTTrackerAttachedActivity(R.layout.activity_chart_view), View.OnClickListener {
 

@@ -16,7 +16,7 @@ import android.widget.TextView
 import butterknife.bindView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.Ticker
-import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
+import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 import java.util.*
 import java.util.regex.Pattern
 import kotlin.properties.Delegates

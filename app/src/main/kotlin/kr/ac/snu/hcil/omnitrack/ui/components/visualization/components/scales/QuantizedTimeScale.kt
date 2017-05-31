@@ -4,10 +4,10 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.visualization.Granularity
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.IAxisScale
-import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
 import kr.ac.snu.hcil.omnitrack.utils.getDayOfMonth
 import kr.ac.snu.hcil.omnitrack.utils.getDayOfWeek
 import kr.ac.snu.hcil.omnitrack.utils.getHourOfDay
+import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 import java.util.*
 
 /**
