@@ -385,7 +385,7 @@ object DatabaseManager {
                 pojo.onShortcut,
                 pojo.editable,
                 pojo.attributeLocalKeySeed,
-                attributeList, pojo.creationFlags
+                attributeList, pojo.creationFlags, pojo.position
         ))
     }
 
