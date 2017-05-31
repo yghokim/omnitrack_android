@@ -21,7 +21,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.element.D
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.NumericScale
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.QuantizedTimeScale
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers.ATimelineChartDrawer
-import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
+import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 import org.apache.commons.math3.stat.StatUtils
 import rx.Observable
 import rx.functions.Func1

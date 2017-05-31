@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.common.sound
 
 import android.media.MediaMetadataRetriever
-import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
+import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 import org.threeten.bp.ZoneId
 import org.threeten.bp.ZoneOffset
 import org.threeten.bp.ZonedDateTime

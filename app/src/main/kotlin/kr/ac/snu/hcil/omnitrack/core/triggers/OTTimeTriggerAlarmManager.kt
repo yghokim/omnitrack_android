@@ -9,7 +9,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
 import kr.ac.snu.hcil.omnitrack.receivers.TimeTriggerAlarmReceiver
 import kr.ac.snu.hcil.omnitrack.utils.FillingIntegerIdReservationTable
-import kr.ac.snu.hcil.omnitrack.utils.TimeKeyValueSetTable
+import kr.ac.snu.hcil.omnitrack.utils.time.TimeKeyValueSetTable
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 

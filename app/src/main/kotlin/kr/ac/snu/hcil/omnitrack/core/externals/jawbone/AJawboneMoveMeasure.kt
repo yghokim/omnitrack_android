@@ -6,7 +6,7 @@ import com.jawbone.upplatformsdk.api.ApiManager
 import com.jawbone.upplatformsdk.utils.UpPlatformSdkConstants
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.Result
-import kr.ac.snu.hcil.omnitrack.utils.TimeHelper
+import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 import retrofit.Callback
 import retrofit.RetrofitError
 import retrofit.client.Response
