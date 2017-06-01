@@ -99,7 +99,6 @@ class TimeTriggerAlarmReceiver : BroadcastReceiver() {
                         OTApplication.logger.writeSystemLog("Every trigger firing was done. Release the wake lock.", TAG)
 
                         println("every trigger was done. finish the wakeup")
-                        OTApplication.app.timeTriggerAlarmManager.storeTableToPreferences()
 
                         OTNotificationTriggerAction.notifyPopupQueue(this)
 
@@ -109,7 +108,6 @@ class TimeTriggerAlarmReceiver : BroadcastReceiver() {
                         println("${trigger}-th trigger fire finished.")
                     }
                 } else {
-                    OTApplication.app.timeTriggerAlarmManager.storeTableToPreferences()
                     println("No trigger is assigned to this alarm. Release the wake lock.")
                     completeWakefulIntent(intent)
                 }
