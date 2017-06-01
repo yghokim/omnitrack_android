@@ -29,16 +29,16 @@ abstract class TimeScheduleCalculator<T> where T : TimeScheduleCalculator<T> {
     }
 
     fun calculateNext(last: Long?, now: Long): Long? {
-        if (now > endAt) {
+        if (now > endAt || availableDaysOfWeek.find { it == true } == null) {
             return null
         } else {
             val next = calculateInfiniteNextTime(last, now)
-            if (next > endAt) {
+            if (next == null || next > endAt) {
                 return null
             } else return next
         }
 
     }
 
-    protected abstract fun calculateInfiniteNextTime(last: Long?, now: Long): Long
+    protected abstract fun calculateInfiniteNextTime(last: Long?, now: Long): Long?
 }

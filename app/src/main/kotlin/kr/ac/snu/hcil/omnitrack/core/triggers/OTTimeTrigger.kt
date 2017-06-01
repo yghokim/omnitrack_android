@@ -5,9 +5,10 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
-import kr.ac.snu.hcil.omnitrack.utils.*
+import kr.ac.snu.hcil.omnitrack.utils.BitwiseOperationHelper
+import kr.ac.snu.hcil.omnitrack.utils.ObservableMapDelegate
+import kr.ac.snu.hcil.omnitrack.utils.time.DesignatedTimeScheduleCalculator
 import kr.ac.snu.hcil.omnitrack.utils.time.IntervalTimeScheduleCalculator
-import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 import java.util.*
 
 /**
@@ -332,64 +333,43 @@ class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObject
                 cacheCalendar.timeInMillis
             } else Long.MAX_VALUE
 
-            val intrinsicNext = when (configType) {
+            val nextTimeCalculator = when (configType) {
                 CONFIG_TYPE_ALARM -> {
 
-                    cacheCalendar.timeInMillis = now
-                    cacheCalendar2.set(0, 0, 0, AlarmConfig.getHourOfDay(configVariables), AlarmConfig.getMinute(configVariables), 0)
-                    cacheCalendar2.set(Calendar.MILLISECOND, 0)
-                    cacheCalendar2.set(Calendar.YEAR, cacheCalendar.getYear())
-                    cacheCalendar2.set(Calendar.MONTH, cacheCalendar.getZeroBasedMonth())
-                    cacheCalendar2.set(Calendar.DAY_OF_MONTH, cacheCalendar.getDayOfMonth())
+                    val calculator = DesignatedTimeScheduleCalculator().setAlarmTime(AlarmConfig.getHourOfDay(configVariables), AlarmConfig.getMinute(configVariables), 0)
+                    if (isRepeated) {
+                        calculator.setAvailableDaysOfWeekFlag(Range.getAllDayOfWeekFlags(rangeVariables))
+                                .setEndAt(limitExclusive)
+                    }
 
-                    if (!isRepeated) {
-                        if (pivot == TRIGGER_TIME_NEVER_TRIGGERED) {
-
-                            if (TimeHelper.compareTimePortions(cacheCalendar, cacheCalendar2) >= -MILLISECOND_TOLERANCE) {
-                                //next day
-                                cacheCalendar2.add(Calendar.DAY_OF_YEAR, 1)
-
-                            }
-                            cacheCalendar2.timeInMillis
-                        } else {
-                            0L
-                        }
-                    } else if (!Range.isAllDayNotUsed(rangeVariables)) {
-                        //repetition
-                        if (TimeHelper.compareTimePortions(cacheCalendar, cacheCalendar2) >= -MILLISECOND_TOLERANCE) {
-
-                            var closestDayOfWeek = cacheCalendar2.getDayOfWeek() + 1 // today
-
-                            while (!Range.isDayOfWeekUsed(rangeVariables, closestDayOfWeek)) {
-                                closestDayOfWeek = ((closestDayOfWeek - 1) + 1 % 7) + 1
-                            }
-
-
-                            val leftDays = if (closestDayOfWeek == cacheCalendar2.getDayOfWeek()) {
-                                7
-                            } else TimeHelper.getDaysLeftToClosestDayOfWeek(cacheCalendar2, closestDayOfWeek)
-
-                            println(leftDays)
-
-                            cacheCalendar2.add(Calendar.DAY_OF_YEAR, leftDays)
-                        }
-
-                        cacheCalendar2.timeInMillis
-                    } else 0L
+                    calculator
                 }
                 CONFIG_TYPE_INTERVAL -> {
                     val intervalMillis = IntervalConfig.getIntervalSeconds(configVariables) * 1000
                     val startBoundHourOfDay = IntervalConfig.getStartHour(configVariables)
                     val endBoundHourOfDay = IntervalConfig.getEndHour(configVariables)
 
-                    val calculator = IntervalTimeScheduleCalculator().setInterval(intervalMillis.toLong()).setHourBoundingRange(startBoundHourOfDay, endBoundHourOfDay)
-                            .setAvailableDaysOfWeekFlag(Range.getAllDayOfWeekFlags(rangeVariables)).setEndAt(limitExclusive)
-                    calculator.calculateNext(if (pivot == TRIGGER_TIME_NEVER_TRIGGERED) {
-                        null
-                    } else pivot, now) ?: 0
+                    val calculator = IntervalTimeScheduleCalculator().setInterval(intervalMillis.toLong())
+
+                    if (isRepeated) {
+                        calculator
+                                .setHourBoundingRange(startBoundHourOfDay, endBoundHourOfDay)
+                                .setAvailableDaysOfWeekFlag(Range.getAllDayOfWeekFlags(rangeVariables))
+                                .setEndAt(limitExclusive)
+                    } else {
+                        calculator.setNoLimit()
+                    }
+
+                    calculator
                 }
-                else -> 0L
+                else -> throw Exception("Unsupported Time Config Type")
             }
+
+
+            val intrinsicNext = nextTimeCalculator.calculateNext(if (pivot == TRIGGER_TIME_NEVER_TRIGGERED) {
+                null
+            } else pivot, now) ?: 0
+
             if (intrinsicNext < limitExclusive) {
                 return intrinsicNext
             } else {
