@@ -1,12 +1,16 @@
 package kr.ac.snu.hcil.omnitrack.utils.time
 
+import android.text.format.DateUtils
 import kr.ac.snu.hcil.omnitrack.utils.getDayOfWeek
+import kr.ac.snu.hcil.omnitrack.utils.getHourOfDay
+import kr.ac.snu.hcil.omnitrack.utils.setHourOfDay
 import java.util.*
 
 /**
  * Created by Young-Ho on 5/31/2017.
  */
-class IntervalTimeScheduleCalculator : TimeScheduleCalculator() {
+class IntervalTimeScheduleCalculator : TimeScheduleCalculator<IntervalTimeScheduleCalculator>() {
+
 
     var intervalMillis: Long = 0
 
@@ -14,6 +18,22 @@ class IntervalTimeScheduleCalculator : TimeScheduleCalculator() {
     var toHourOfDay: Int = 24
 
     val cacheCalendar = GregorianCalendar.getInstance()
+
+    fun setHourBoundingRange(fromHourOfDay: Int, toHourOfDay: Int): IntervalTimeScheduleCalculator {
+        if ((fromHourOfDay < 0 || fromHourOfDay > 24) || (toHourOfDay < 0 || toHourOfDay > 24)) {
+            throw IllegalArgumentException("boundingHours are out of range.")
+        }
+
+        this.fromHourOfDay = fromHourOfDay
+        this.toHourOfDay = toHourOfDay
+
+        return this
+    }
+
+    fun setInterval(millis: Long): IntervalTimeScheduleCalculator {
+        this.intervalMillis = millis
+        return this
+    }
 
     private fun getNearestFutureNextIntervalTime(pivot: Long, now: Long, interval: Long): Long {
         val skipIntervalCount = (now - pivot) / interval
@@ -30,14 +50,35 @@ class IntervalTimeScheduleCalculator : TimeScheduleCalculator() {
         pivotCalendar.timeInMillis = realPivot
 
         if (isHourRangeBound) {
-            //TODO
+            val boundRangeOffset: Int = fromHourOfDay
+            val boundRangeLength: Int = if (toHourOfDay > fromHourOfDay) {
+                //normal case
+                toHourOfDay - fromHourOfDay
+            } else {
+                24 - fromHourOfDay + toHourOfDay
+            }
+
+            val realPivotContainingRangeStart = checkTimePointWithinAvailableRange(realPivot, boundRangeOffset, boundRangeLength)
+            if (realPivotContainingRangeStart == null) {
+                //return start point of the next available range
+                return getStartOfNextAvailableRange(now, boundRangeOffset, boundRangeLength)
+            } else {
+                val next = getNearestFutureNextIntervalTime(realPivot, now, intervalMillis)
+                if (checkTimePointWithinAvailableRange(next, boundRangeOffset, boundRangeLength) != null) {
+                    return next
+                } else {
+                    //return start point of the next available range
+                    return getStartOfNextAvailableRange(now, boundRangeOffset, boundRangeLength)
+                }
+            }
+
 
         } else {
             val next = getNearestFutureNextIntervalTime(realPivot, now, intervalMillis)
             cacheCalendar.timeInMillis = next
             val dayOfWeekOfNextTime = cacheCalendar.getDayOfWeek()
             var dayPlus = 0
-            while (availableDaysOfWeek[(dayOfWeekOfNextTime + dayPlus) % 7] == false) {
+            while (!isAvailableDayOfWeek((dayOfWeekOfNextTime + dayPlus) % 7)) {
                 dayPlus++
             }
 
@@ -48,135 +89,57 @@ class IntervalTimeScheduleCalculator : TimeScheduleCalculator() {
                 return TimeHelper.addDays(TimeHelper.cutTimePartFromEpoch(next), dayPlus)
             }
         }
-
-        return 0L
     }
 
-/*
-        val intervalMillis = IntervalConfig.getIntervalSeconds(configVariables) * 1000
-        val startBoundHourOfDay = IntervalConfig.getStartHour(configVariables)
-        val endBoundHourOfDay = IntervalConfig.getEndHour(configVariables)
+    private fun getStartOfNextAvailableRange(pivot: Long, rangeOffsetHour: Int, rangeLengthHour: Int): Long {
+        cacheCalendar.timeInMillis = TimeHelper.cutTimePartFromEpoch(pivot)
+        var currentStartPoint: Long
+        while (true) {
+            currentStartPoint = cacheCalendar.timeInMillis + rangeOffsetHour * DateUtils.HOUR_IN_MILLIS
+            val dow = cacheCalendar.getDayOfWeek()
+            if (isAvailableDayOfWeek(dow) && currentStartPoint > pivot) {
+                break
+            } else {
+                cacheCalendar.add(Calendar.DAY_OF_YEAR, 1)
+                continue
+            }
+        }
+        return currentStartPoint
+    }
 
-
-        val isRangeBounded = startBoundHourOfDay != endBoundHourOfDay
-
-        val realPivot = if (pivot == TRIGGER_TIME_NEVER_TRIGGERED) {
-            now
-        } else pivot
-
-        val intrinsicNextTime =
-                if (!isRangeBounded) {
-                    if (isRepeated) {
-                        cacheCalendar.timeInMillis = now
-                        if (Range.isDayOfWeekUsed(rangeVariables, cacheCalendar.getDayOfWeek())) {
-                            //yesterday is used
-                            getIntrinsicNextIntervalTime(realPivot, now, intervalMillis)
-                        } else {
-                            getClosestLowerBoundOfInterval(now, startBoundHourOfDay)
-                        }
-                    } else {
-                        cacheCalendar.timeInMillis = now
-                        cacheCalendar.setHourOfDay(0, true)
-
-                        val intrinsic = getIntrinsicNextIntervalTime(realPivot, now, intervalMillis)
-                        if (intrinsic < cacheCalendar.timeInMillis + DateUtils.DAY_IN_MILLIS) {
-                            intrinsic
-                        } else {
-                            if (pivot == TRIGGER_TIME_NEVER_TRIGGERED) {
-                                cacheCalendar.timeInMillis + DateUtils.DAY_IN_MILLIS
-                            } else 0L
-                        }
-                    }
+    private fun checkTimePointWithinAvailableRange(timePoint: Long, rangeOffsetHour: Int, rangeLengthHour: Int): Long? {
+        val pivotCalendar = GregorianCalendar.getInstance()
+        pivotCalendar.timeInMillis = timePoint
+        if (fromHourOfDay < toHourOfDay) {
+            //range is within a single day: simple range calculation
+            val dow = pivotCalendar.getDayOfWeek()
+            if (isAvailableDayOfWeek(dow)) {
+                val hourOfDay = pivotCalendar.getHourOfDay()
+                if (hourOfDay in fromHourOfDay..(toHourOfDay - 1)) {
+                    val startOfPivotDate = TimeHelper.cutTimePartFromEpoch(timePoint)
+                    cacheCalendar.timeInMillis = startOfPivotDate
+                    cacheCalendar.setHourOfDay(fromHourOfDay, true)
+                    return cacheCalendar.timeInMillis
                 } else {
-                    //extract hour range of today
-                    cacheCalendar.timeInMillis = now
-
-                    cacheCalendar.setHourOfDay(startBoundHourOfDay, cutUnder = true)
-                    val lowerBoundToday = cacheCalendar.timeInMillis
-
-                    cacheCalendar.setHourOfDay(endBoundHourOfDay, cutUnder = true)
-                    if (startBoundHourOfDay >= endBoundHourOfDay) {
-                        cacheCalendar.add(Calendar.DAY_OF_YEAR, 1)
-                    }
-                    val upperBoundToday = cacheCalendar.timeInMillis
-
-                    val upperBoundLastDay = TimeHelper.addDays(upperBoundToday, -1)
-
-                    if (now < upperBoundLastDay) {
-                        if (isRepeated) {
-                            cacheCalendar.timeInMillis = now
-                            cacheCalendar.add(Calendar.DAY_OF_YEAR, -1)
-                            if (Range.isDayOfWeekUsed(rangeVariables, cacheCalendar.getDayOfWeek())) {
-                                //yesterday is used
-                                val intrinsic = getIntrinsicNextIntervalTime(realPivot, now, intervalMillis)
-                                if (intrinsic < upperBoundLastDay) {
-                                    intrinsic
-                                } else {
-                                    getClosestLowerBoundOfInterval(now, startBoundHourOfDay)
-                                }
-                            } else {
-                                getClosestLowerBoundOfInterval(now, startBoundHourOfDay)
-                            }
-                        } else {
-
-                            val intrinsic = getIntrinsicNextIntervalTime(realPivot, now, intervalMillis)
-                            if (intrinsic < upperBoundLastDay) {
-                                intrinsic
-                            } else {
-                                if (pivot == TRIGGER_TIME_NEVER_TRIGGERED) {
-                                    lowerBoundToday
-                                } else 0L
-                            }
-                        }
-                    } else if (upperBoundLastDay <= now && now < lowerBoundToday) {
-                        if (isRepeated) {
-                            getClosestLowerBoundOfInterval(now, startBoundHourOfDay)
-                        } else {
-                            if (pivot == TRIGGER_TIME_NEVER_TRIGGERED) {
-                                lowerBoundToday
-                            } else {
-                                0L
-                            }
-                        }
-                    } else if (lowerBoundToday <= now && now < upperBoundToday) {
-                        //now is later than upperBound
-                        if (isRepeated) {
-                            cacheCalendar.timeInMillis = now
-                            if (Range.isDayOfWeekUsed(rangeVariables, cacheCalendar.getDayOfWeek())) {
-                                //yesterday is used
-                                val intrinsic = getIntrinsicNextIntervalTime(realPivot, now, intervalMillis)
-                                if (intrinsic < upperBoundToday) {
-                                    intrinsic
-                                } else {
-                                    getClosestLowerBoundOfInterval(now, startBoundHourOfDay)
-                                }
-                            } else {
-                                getClosestLowerBoundOfInterval(now, startBoundHourOfDay)
-                            }
-                        } else {
-                            val intrinsic = getIntrinsicNextIntervalTime(realPivot, now, intervalMillis)
-                            if (intrinsic < upperBoundToday) {
-                                intrinsic
-                            } else {
-                                if (pivot == TRIGGER_TIME_NEVER_TRIGGERED) {
-                                    TimeHelper.addDays(lowerBoundToday, 1)
-                                } else 0L
-                            }
-                        }
-                    } else {
-                        if (isRepeated) {
-                            getClosestLowerBoundOfInterval(now, startBoundHourOfDay)
-                        } else {
-                            if (pivot == TRIGGER_TIME_NEVER_TRIGGERED) {
-                                TimeHelper.addDays(lowerBoundToday, 1)
-                            } else {
-                                0L
-                            }
-                        }
+                    return null
+                }
+            } else {
+                return null
+            }
+        } else {
+            //boundHourRange is reversed. check the day and the previous day.
+            var currentPivotStartValue: Long? = null
+            for (offset in -1..0) {
+                cacheCalendar.timeInMillis = TimeHelper.cutTimePartFromEpoch(timePoint) + offset * DateUtils.DAY_IN_MILLIS
+                if (isAvailableDayOfWeek(cacheCalendar.getDayOfWeek())) {
+                    val rangeStartAt = cacheCalendar.timeInMillis + rangeOffsetHour * DateUtils.HOUR_IN_MILLIS
+                    if (timePoint in (rangeStartAt..rangeStartAt + rangeLengthHour * DateUtils.HOUR_IN_MILLIS - 1)) {
+                        currentPivotStartValue = rangeStartAt
+                        break
                     }
                 }
-
-        intrinsicNextTime*/
-
-
+            }
+            return currentPivotStartValue
+        }
+    }
 }
