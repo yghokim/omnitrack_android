@@ -11,11 +11,10 @@ import java.util.*
  */
 class IntervalTimeScheduleCalculator : TimeScheduleCalculator<IntervalTimeScheduleCalculator>() {
 
-
     var intervalMillis: Long = 0
 
     var fromHourOfDay: Int = 0
-    var toHourOfDay: Int = 24
+    var toHourOfDay: Int = 0
 
     val cacheCalendar = GregorianCalendar.getInstance()
 
@@ -35,13 +34,20 @@ class IntervalTimeScheduleCalculator : TimeScheduleCalculator<IntervalTimeSchedu
         return this
     }
 
+    fun setNoLimit(): IntervalTimeScheduleCalculator {
+        this.fromHourOfDay = 0
+        this.toHourOfDay = 0
+        this.endAt = Long.MAX_VALUE
+        return this
+    }
+
     private fun getNearestFutureNextIntervalTime(pivot: Long, now: Long, interval: Long): Long {
         val skipIntervalCount = (now - pivot) / interval
 
         return pivot + (skipIntervalCount + 1) * interval
     }
 
-    override fun calculateInfiniteNextTime(last: Long?, now: Long): Long {
+    override fun calculateInfiniteNextTime(last: Long?, now: Long): Long? {
 
         val realPivot: Long = last ?: now
         val isHourRangeBound = fromHourOfDay != toHourOfDay
@@ -78,7 +84,7 @@ class IntervalTimeScheduleCalculator : TimeScheduleCalculator<IntervalTimeSchedu
             cacheCalendar.timeInMillis = next
             val dayOfWeekOfNextTime = cacheCalendar.getDayOfWeek()
             var dayPlus = 0
-            while (!isAvailableDayOfWeek((dayOfWeekOfNextTime + dayPlus) % 7)) {
+            while (!isAvailableDayOfWeek(((dayOfWeekOfNextTime + dayPlus) % 7) + 1) && dayPlus <= 7) {
                 dayPlus++
             }
 
