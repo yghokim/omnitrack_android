@@ -4,9 +4,13 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import io.realm.Realm
+import io.realm.RealmConfiguration
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
+import kr.ac.snu.hcil.omnitrack.core.triggers.database.AlarmInstance
+import kr.ac.snu.hcil.omnitrack.core.triggers.database.TriggerSchedule
 import kr.ac.snu.hcil.omnitrack.receivers.TimeTriggerAlarmReceiver
 import kr.ac.snu.hcil.omnitrack.utils.FillingIntegerIdReservationTable
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeKeyValueSetTable
@@ -26,6 +30,14 @@ class OTTimeTriggerAlarmManager() {
         const val INTENT_EXTRA_TRIGGER_TIME = "triggerTime"
         const val INTENT_EXTRA_ALARM_ID = "alarmId"
 
+        const val DB_ALARM_SCHEDULE_UNIT_FILENAME = "alarmSchedules.db"
+
+        const val ALARM_TOLERANCE = 300
+
+        val realmDbConfiguration: RealmConfiguration by lazy {
+            RealmConfiguration.Builder().name(DB_ALARM_SCHEDULE_UNIT_FILENAME).deleteRealmIfMigrationNeeded().build()
+        }
+
         private fun makeIntent(context: Context, user: OTUser, triggerTime: Long, alarmId: Int): PendingIntent {
             val intent = Intent(context, TimeTriggerAlarmReceiver::class.java)
             intent.action = OTApplication.BROADCAST_ACTION_TIME_TRIGGER_ALARM
@@ -33,6 +45,10 @@ class OTTimeTriggerAlarmManager() {
             intent.putExtra(INTENT_EXTRA_ALARM_ID, alarmId)
             intent.putExtra(INTENT_EXTRA_TRIGGER_TIME, triggerTime)
             return PendingIntent.getBroadcast(context, alarmId, intent, PendingIntent.FLAG_CANCEL_CURRENT)
+        }
+
+        private fun findNearestAlarmInstance(alarmTime: Long, realm: Realm): AlarmInstance? {
+            return realm.where(AlarmInstance::class.java).between("reservedAlarmTime", alarmTime - ALARM_TOLERANCE, alarmTime + ALARM_TOLERANCE).findFirst()
         }
     }
 
@@ -104,43 +120,102 @@ class OTTimeTriggerAlarmManager() {
         //}
     }
 
-    fun storeTableToPreferences(): Unit {
-        /*
-        val editor = preferences.edit()
-
-        //reservation table
-        editor.putBoolean(RESERVATION_TABLE_STORED, true)
-        editor.putInt(RESERVATION_TABLE_MEMBER_THRESHOLD, reservationTable.thresholdMillis)
-        editor.putStringSet(RESERVATION_TABLE_MEMBER_KEYS, reservationTable.timeKeys.map { it.toString() }.toMutableSet())
-
-
-        for (entry in reservationTable) {
-            editor.putStringSet(entry.key.toString(), entry.value)
-        }
-
-        //trigger table
-
-        editor.putBoolean(TRIGGER_TABLE_STORED, true)
-        editor.putStringSet(TRIGGER_TABLE_KEYS, triggerTable.keys)
-
-        for (entry in triggerTable) {
-            editor.putLong(entry.key, entry.value)
-        }
-
-        //id table
-        editor.putBoolean(ID_TABLE_STORED, true)
-        val ids = idTable.ids
-        editor.putStringSet(ID_TABLE_IDS, ids.map { it.toString() }.toSet())
-
-        for (id in ids) {
-            editor.putLong("id_table_key_" + id.toString(), idTable.getKeyFromId(id)!!)
-        }
-
-        editor.apply()
-        */
-    }
 
     //==========================================================
+
+    fun reserveAlarm(trigger: OTTrigger, alarmTime: Long, oneShot: Boolean) {
+        val realm = Realm.getInstance(realmDbConfiguration)
+        realm.beginTransaction()
+        val result = realm.where(TriggerSchedule::class.java).equalTo("triggerId", trigger.objectId).findAll()
+        val schedule = TriggerSchedule().apply {
+            this.triggerId = trigger.objectId
+            this.intrinsicAlarmTime = alarmTime
+            this.oneShot = oneShot
+        }
+
+        val appendableAlarm = findNearestAlarmInstance(alarmTime, realm)
+        if (appendableAlarm != null) {
+            appendableAlarm.triggerSchedules.add(schedule)
+            schedule.parentAlarm = appendableAlarm
+            realm.copyToRealm(schedule)
+            realm.insertOrUpdate(appendableAlarm)
+
+            realm.commitTransaction()
+            realm.close()
+        } else {
+            //make new alarm
+            val newAlarmId = (realm.where(AlarmInstance::class.java).max("alarmId") ?: 0).toInt() + 1
+            val alarmInstance = realm.createObject(AlarmInstance::class.java)
+            alarmInstance.alarmId = newAlarmId
+            alarmInstance.reservedAlarmTime = alarmTime
+            alarmInstance.triggerSchedules.add(schedule)
+            schedule.parentAlarm = alarmInstance
+
+            realm.copyToRealm(schedule)
+            realm.insertOrUpdate(alarmInstance)
+
+            realm.commitTransaction()
+            realm.close()
+
+            if (android.os.Build.VERSION.SDK_INT >= 23) {
+                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, alarmTime, makeIntent(OTApplication.app, trigger.user, alarmTime, newAlarmId))
+            } else {
+                alarmManager.setExact(AlarmManager.RTC_WAKEUP, alarmTime, makeIntent(OTApplication.app, trigger.user, alarmTime, newAlarmId))
+            }
+        }
+    }
+
+    fun cancelTrigger2(trigger: OTTrigger) {
+        val realm = Realm.getInstance(realmDbConfiguration)
+
+        val pendingTriggerSchedules = realm.where(TriggerSchedule::class.java)
+                .equalTo(TriggerSchedule.FIELD_TRIGGER_ID, trigger.objectId)
+                .equalTo(TriggerSchedule.FIELD_FIRED, false)
+                .equalTo(TriggerSchedule.FIELD_SKIPPED, false)
+                .findAll()
+
+        realm.beginTransaction()
+        pendingTriggerSchedules.forEach {
+            schedule ->
+            val parentAlarm = schedule.parentAlarm
+            if (parentAlarm != null) {
+                parentAlarm.triggerSchedules.removeIf { s -> s.triggerId == trigger.objectId }
+                if (parentAlarm.triggerSchedules.isEmpty()) {
+                    //cancel system alarm.
+                    val pendingIntent = makeIntent(OTApplication.app, trigger.user, parentAlarm.reservedAlarmTime, parentAlarm.alarmId)
+                    alarmManager.cancel(pendingIntent)
+                    pendingIntent.cancel()
+                    parentAlarm.deleteFromRealm()
+                }
+            }
+        }
+        pendingTriggerSchedules.deleteAllFromRealm()
+        realm.commitTransaction()
+
+        realm.close()
+    }
+
+
+    fun handleAlarmAndGetTriggerIds(user: OTUser, alarmId: Int, intentTriggerTime: Long, reallyFiredAt: Long): List<String>? {
+        val realm = Realm.getInstance(realmDbConfiguration)
+        val alarmInstance = realm.where(AlarmInstance::class.java)
+                .equalTo(AlarmInstance.FIELD_ALARM_ID, alarmId)
+                .equalTo(AlarmInstance.FIELD_FIRED, false)
+                .equalTo(AlarmInstance.FIELD_SKIPPED, false)
+                .findFirst()
+
+        if (alarmInstance != null) {
+            realm.beginTransaction()
+
+            alarmInstance.triggerSchedules.forEach { schedule ->
+                schedule.fired = true
+                schedule.skipped = false
+            }
+            realm.commitTransaction()
+
+            return alarmInstance.triggerSchedules.map { it.triggerId }
+        } else return null
+    }
 
     fun reserveAlarm(trigger: OTTrigger, alarmTime: Long) {
 
