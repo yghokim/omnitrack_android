@@ -120,10 +120,14 @@ class TimeTriggerConfigurationPanel : LinearLayout, ITriggerConfigurationCoordin
 
     private fun applyIsRepeated(isRepeated: Boolean, animate: Boolean) {
         if (animate) TransitionManager.beginDelayedTransition(this)
-        if (isRepeated)
+        if (isRepeated) {
             repetitionConfigGroup.visibility = View.VISIBLE
-        else
+            timeSpanCheckBox.isEnabled = true
+        } else {
             repetitionConfigGroup.visibility = View.GONE
+            timeSpanCheckBox.isChecked = false
+            timeSpanCheckBox.isEnabled = false
+        }
     }
 
 
