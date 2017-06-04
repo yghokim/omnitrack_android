@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.triggers
 
 import android.content.Context
+import android.util.Log
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTUser
@@ -9,12 +10,13 @@ import kr.ac.snu.hcil.omnitrack.utils.BitwiseOperationHelper
 import kr.ac.snu.hcil.omnitrack.utils.ObservableMapDelegate
 import kr.ac.snu.hcil.omnitrack.utils.time.DesignatedTimeScheduleCalculator
 import kr.ac.snu.hcil.omnitrack.utils.time.IntervalTimeScheduleCalculator
+import rx.subjects.BehaviorSubject
 import java.util.*
 
 /**
  * Created by Young-Ho Kim on 16. 7. 27
  */
-class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObjectIds: Array<String>?, isOn: Boolean, action: Int, lastTriggeredTime: Long, propertyData: Map<String, String>? = null) : OTTrigger(objectId, user, name, trackerObjectIds, isOn, action, lastTriggeredTime, propertyData) {
+class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObjectIds: Array<String>?, isOn: Boolean, action: Int, lastTriggeredTime: Long?, propertyData: Map<String, String>? = null) : OTTrigger(objectId, user, name, trackerObjectIds, isOn, action, lastTriggeredTime, propertyData) {
 
     companion object {
 
@@ -303,8 +305,6 @@ class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObject
 
 
     private var cacheCalendar = Calendar.getInstance()
-    private var cacheCalendar2 = Calendar.getInstance()
-
 
     val isRangeSpecified: Boolean get() = OTTimeTrigger.Range.isSpecified(rangeVariables)
     val isConfigSpecified: Boolean get() {
@@ -323,7 +323,9 @@ class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObject
         } else return true
     }*/
 
-    fun getNextAlarmTime(pivot: Long): Long {
+    val nextAlarmTime: BehaviorSubject<Long?> = BehaviorSubject.create()
+
+    fun getNextAlarmTime(pivot: Long?): Long? {
         if (isOn) {
 
             val now = System.currentTimeMillis()
@@ -364,19 +366,9 @@ class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObject
                 }
                 else -> throw Exception("Unsupported Time Config Type")
             }
+            return nextTimeCalculator.calculateNext(pivot, now)
 
-
-            val intrinsicNext = nextTimeCalculator.calculateNext(if (pivot == TRIGGER_TIME_NEVER_TRIGGERED) {
-                null
-            } else pivot, now) ?: 0
-
-            if (intrinsicNext < limitExclusive) {
-                return intrinsicNext
-            } else {
-                return 0
-            }
-
-        } else return 0
+        } else return null
     }
 
 
@@ -403,6 +395,11 @@ class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObject
 
 
     override fun handleActivationOnSystem(context: Context) {
+
+        if (isOn == false) {
+            handleOff()
+        }
+        /*
         println("trigger activated")
         if (isOn) {
             //TODO need to check current alarmmanager to avoid duplicate alarm
@@ -412,42 +409,46 @@ class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObject
             } else {
                 println("reserved next alarm.")
             }
-        }
+        }*/
     }
 
-    private fun reserveNextAlarmToSystem(currentTriggerTime: Long): Boolean {
+    fun reserveNextAlarmToSystem(currentTriggerTime: Long?): Boolean {
+
+        println("current trigger time: ${currentTriggerTime}")
 
         val nextAlarmTime = getNextAlarmTime(currentTriggerTime)
 
-        if (nextAlarmTime > 0L) {
+        if (nextAlarmTime != null) {
 
             cacheCalendar.timeInMillis = nextAlarmTime
             println("next alarm will be fired at $cacheCalendar")
 
             OTApplication.logger.writeSystemLog("Next alarm is reserved at ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(nextAlarmTime))}", TAG)
 
-            OTApplication.app.timeTriggerAlarmManager.reserveAlarm(this, nextAlarmTime)
+            val nextAlarmInfo = OTApplication.app.timeTriggerAlarmManager.reserveAlarm(this, nextAlarmTime, !isRepeated)
+            this.nextAlarmTime.onNext(nextAlarmInfo.reservedAlarmTime)
             return true
         } else {
             println("Finish trigger. Do not repeat.")
+            this.nextAlarmTime.onNext(null)
             return false
         }
     }
 
     override fun handleFire(triggerTime: Long) {
-        if (!reserveNextAlarmToSystem(triggerTime)) {
-            isOn = false
-        }
+
     }
 
     override fun handleOn() {
-        if (!reserveNextAlarmToSystem(TRIGGER_TIME_NEVER_TRIGGERED)) {
+        Log.d(TAG, "handle Time trigger on.")
+        if (!reserveNextAlarmToSystem(null)) {
             isOn = false
         }
     }
 
     override fun handleOff() {
-
+        Log.d(TAG, "handle Time trigger off.")
+        lastTriggeredTime = null
         OTApplication.logger.writeSystemLog("Time trigger turned off. cancel trigger", TAG)
         OTApplication.app.timeTriggerAlarmManager.cancelTrigger(this)
     }

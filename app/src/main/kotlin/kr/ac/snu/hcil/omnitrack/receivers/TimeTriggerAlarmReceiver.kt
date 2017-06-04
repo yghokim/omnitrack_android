@@ -9,8 +9,11 @@ import android.os.PowerManager
 import android.util.SparseArray
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
+import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTrigger
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTriggerAlarmManager
+import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTNotificationTriggerAction
+import rx.Observable
 import rx.schedulers.Schedulers
 import java.util.*
 
@@ -85,33 +88,48 @@ class TimeTriggerAlarmReceiver : BroadcastReceiver() {
             val alarmId = intent.getIntExtra(OTTimeTriggerAlarmManager.INTENT_EXTRA_ALARM_ID, -1)
             val triggerTime = intent.getLongExtra(OTTimeTriggerAlarmManager.INTENT_EXTRA_TRIGGER_TIME, System.currentTimeMillis())
 
+
             println("Wakeful Service handleIntent, trigger time: ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(triggerTime))}")
 
-            OTApplication.app.currentUserObservable.subscribe {
+            OTApplication.app.currentUserObservable.first().flatMap {
                 user ->
-                val triggers = OTApplication.app.timeTriggerAlarmManager.notifyAlarmFiredAndGetTriggersSync(user, alarmId, triggerTime, System.currentTimeMillis())
+                println("Returned user")
+                val triggerSchedules = OTApplication.app.timeTriggerAlarmManager.handleAlarmAndGetTriggerInfo(user, alarmId, triggerTime, System.currentTimeMillis())
+                println("Handled system alarm and retrieved corresponding trigger schedules - ${triggerSchedules?.size}")
 
-                if (triggers != null) {
+                OTApplication.logger.writeSystemLog("Handled system alarm and retrieved corresponding trigger schedules: ${triggerSchedules?.size}", TAG)
+                if (triggerSchedules != null) {
 
-                    OTApplication.logger.writeSystemLog("${triggers.size} triggers will be fired.", TAG)
+                    OTApplication.logger.writeSystemLog("${triggerSchedules.size} triggers will be fired.", TAG)
 
-                    rx.Observable.merge(triggers.map { it.fire(triggerTime, this) }).observeOn(Schedulers.immediate()).doOnCompleted {
+                    Observable.merge(triggerSchedules.map {
+                        schedule ->
+                        user.getTriggerObservable(schedule.triggerId).onErrorReturn { err -> null }.flatMap {
+                            trigger: OTTrigger? ->
+                            trigger?.fire(triggerTime, this) ?: Observable.just(null)
+                        }.doOnNext {
+                            trigger: OTTrigger? ->
+                            if (trigger != null) {
+                                if (schedule.oneShot) {
+                                    trigger.isOn = false
+                                } else {
+                                    (trigger as OTTimeTrigger).reserveNextAlarmToSystem(triggerTime)
+                                }
+                            }
+                        }
+                    }).observeOn(Schedulers.immediate()).doOnCompleted {
                         OTApplication.logger.writeSystemLog("Every trigger firing was done. Release the wake lock.", TAG)
 
                         println("every trigger was done. finish the wakeup")
 
                         OTNotificationTriggerAction.notifyPopupQueue(this)
-
-                        completeWakefulIntent(intent)
-                    }.subscribe {
-                        trigger ->
-                        println("${trigger}-th trigger fire finished.")
                     }
                 } else {
-                    println("No trigger is assigned to this alarm. Release the wake lock.")
-                    completeWakefulIntent(intent)
+                    Observable.just(null)
                 }
-                }
+            }.subscribe({
+
+            }, { }, { completeWakefulIntent(intent) })
             }
         }
 }
