@@ -267,4 +267,15 @@ object TimeHelper {
     }
 
 
+    fun roundToSeconds(time: Long): Long {
+        val cal = Calendar.getInstance()
+        cal.timeInMillis = time
+        val millis = cal.get(Calendar.MILLISECOND)
+        cal.set(Calendar.MILLISECOND, 0)
+        if (millis >= 500) {
+            cal.add(Calendar.SECOND, 1)
+        }
+
+        return cal.timeInMillis
+    }
 }
