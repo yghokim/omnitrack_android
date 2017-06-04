@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -62,6 +63,8 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
             }
         }
 
+    private lateinit var viewModel: TriggerListViewModel
+
     abstract val triggerActionTypeName: Int
 
     abstract val triggerActionType: Int
@@ -79,7 +82,8 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
     //private var expandedTriggerPosition: Int = -1
     //private var expandedViewHolder: ATriggerViewHolder<out OTTrigger>? = null
 
-    private val subscriptions = CompositeSubscription()
+    private val createViewSubscriptions = CompositeSubscription()
+    private val creationSubscriptions = CompositeSubscription()
 
     private val triggerTypeDialog: AlertDialog by lazy {
         NewTriggerTypeSelectionDialogHelper.builder(parent.context, triggerActionTypeName) {
@@ -97,6 +101,24 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
 
     open fun hideTrackerAssignmentInterface(): Boolean {
         return false
+    }
+
+    fun onCreate(savedInstanceState: Bundle?) {
+        viewModel = ViewModelProviders.of(parent).get(TriggerListViewModel::class.java)
+
+        val activity = parent.activity
+        if (activity is OTActivity) {
+            creationSubscriptions.add(
+                    activity.signedInUserObservable.subscribe {
+                        user ->
+                        viewModel.user = user
+                    }
+            )
+        }
+    }
+
+    fun onDestroy() {
+        creationSubscriptions.clear()
     }
 
     fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, @Suppress("UNUSED_PARAMETER") savedInstanceState: Bundle?): View {
@@ -138,7 +160,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
 /*
         val activity = parent.activity
         if (activity is OTActivity) {
-            subscriptions.add(
+            createViewSubscriptions.add(
                     activity.signedInUserObservable.subscribe {
                         user ->
                         this.user = user
@@ -149,10 +171,10 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
 
         val activity = parent.activity
         if (activity is OTActivity) {
-            subscriptions.add(
+            createViewSubscriptions.add(
                     activity.signedInUserObservable.subscribe {
                         user ->
-                        subscriptions.add(
+                        createViewSubscriptions.add(
                                 user.triggerManager.triggerAdded.subscribe {
                                     trigger ->
                                     println("trigger added")
@@ -160,7 +182,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
                                 }
                         )
 
-                        subscriptions.add(
+                        createViewSubscriptions.add(
                                 user.triggerManager.triggerRemoved.subscribe {
                                     trigger ->
                                     println("trigger removed")
@@ -177,7 +199,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
     }
 
     fun onDestroyView() {
-        subscriptions.clear()
+        createViewSubscriptions.clear()
         adapter.unSubscribeAll()
     }
 

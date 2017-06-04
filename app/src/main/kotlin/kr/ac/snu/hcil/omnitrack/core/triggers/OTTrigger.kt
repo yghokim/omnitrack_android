@@ -26,7 +26,7 @@ import kotlin.properties.Delegates
 abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trackerObjectIds: Array<String>?,
                          isOn: Boolean,
                          val action: Int,
-                         lastTriggeredTime: Long, propertyData: Map<String, String>? = null) : NamedObject(objectId, name) {
+                         lastTriggeredTime: Long?, propertyData: Map<String, String>? = null) : NamedObject(objectId, name) {
 
     companion object {
         const val ACTION_NOTIFICATION = 0
@@ -44,7 +44,7 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
         const val PROPERTY_ATTACHED_TRACKERS = "trackers"
 
 
-        fun makeInstance(objectId: String?, typeId: Int, user: OTUser, name: String, trackerObjectIds: Array<String>?, isOn: Boolean, action: Int, lastTriggeredTime: Long, propertyData: Map<String, String>?): OTTrigger {
+        fun makeInstance(objectId: String?, typeId: Int, user: OTUser, name: String, trackerObjectIds: Array<String>?, isOn: Boolean, action: Int, lastTriggeredTime: Long?, propertyData: Map<String, String>?): OTTrigger {
             return when (typeId) {
                 TYPE_TIME -> OTTimeTrigger(objectId, user, name, trackerObjectIds, isOn, action, lastTriggeredTime, propertyData)
                 TYPE_DATA_THRESHOLD -> OTDataTrigger(objectId, user, name, trackerObjectIds, isOn, action, lastTriggeredTime, propertyData)
@@ -109,7 +109,7 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
     abstract val configIconId: Int
     abstract val configTitleId: Int
 
-    var lastTriggeredTime: Long = lastTriggeredTime
+    var lastTriggeredTime: Long? = lastTriggeredTime
         set(value) {
 
             println("lasttrigger time old: ${field}, new: ${value}")
@@ -123,14 +123,15 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
 
     var isOn: Boolean by Delegates.observable(isOn) {
         prop, old, new ->
-        if (new) {
-            this.lastTriggeredTime = -1L
-            handleOn()
-        } else {
-            handleOff()
-        }
 
         if (old != new) {
+            if (new) {
+                this.lastTriggeredTime = null
+                handleOn()
+            } else {
+                handleOff()
+            }
+
             if (!suspendDatabaseSync) {
                 databasePointRef?.child(PROPERTY_IS_ON)?.setValue(new)
             }
