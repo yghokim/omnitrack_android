@@ -49,6 +49,7 @@ class IntervalTimeScheduleCalculator : TimeScheduleCalculator<IntervalTimeSchedu
 
     override fun calculateInfiniteNextTime(last: Long?, now: Long): Long? {
 
+        println("trigger time last: ${last}, now: ${now}")
         val realPivot: Long = last ?: now
         val isHourRangeBound = fromHourOfDay != toHourOfDay
 

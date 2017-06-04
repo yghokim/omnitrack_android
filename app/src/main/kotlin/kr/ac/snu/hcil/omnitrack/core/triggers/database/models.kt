@@ -3,16 +3,21 @@ package kr.ac.snu.hcil.omnitrack.core.triggers.database
 import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.annotations.Index
+import io.realm.annotations.PrimaryKey
 
 /**
  * Created by younghokim on 2017-06-01.
  */
+
+data class TriggerSchedulePOJO(val triggerId: String, val intrinsicAlarmTime: Long, val oneShot: Boolean)
+
 open class TriggerSchedule : RealmObject() {
 
     companion object {
         const val FIELD_TRIGGER_ID = "triggerId"
         const val FIELD_FIRED = "fired"
         const val FIELD_SKIPPED = "skipped"
+        const val FIELD_INTRINSIC_ALARM_TIME = "intrinsicAlarmTime"
     }
 
     @Index
@@ -29,9 +34,14 @@ open class TriggerSchedule : RealmObject() {
     @Index
     var skipped: Boolean = false
 
-    var parentAlarm: AlarmInstance? = null
+    var parentAlarmId: Long? = null
+
+    fun getPOJO(): TriggerSchedulePOJO {
+        return TriggerSchedulePOJO(triggerId, intrinsicAlarmTime, oneShot)
+    }
 }
 
+data class AlarmInfo(val systemAlarmId: Int, val reservedAlarmTime: Long) {}
 
 open class AlarmInstance : RealmObject() {
     companion object {
@@ -40,6 +50,8 @@ open class AlarmInstance : RealmObject() {
         const val FIELD_SKIPPED = "skipped"
     }
 
+    @PrimaryKey
+    var id: Long = 0
 
     @Index
     var reservedAlarmTime: Long = 0L
@@ -51,4 +63,8 @@ open class AlarmInstance : RealmObject() {
     var skipped: Boolean = false
 
     var triggerSchedules = RealmList<TriggerSchedule>()
+
+    fun getInfo(): AlarmInfo {
+        return AlarmInfo(alarmId, reservedAlarmTime)
+    }
 }

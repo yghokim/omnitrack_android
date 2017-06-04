@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTrigger
 
@@ -45,7 +46,9 @@ class TimeTriggerViewHolder(parent: ViewGroup, listener: ITriggerControlListener
     override fun getHeaderView(current: View?, trigger: OTTimeTrigger): View {
         val view = if (current is TimeTriggerDisplayView) current else TimeTriggerDisplayView(itemView.context)
 
-        view.nextTriggerTime = trigger.getNextAlarmTime(trigger.lastTriggeredTime)
+        val nextTriggerTime = OTApplication.app.timeTriggerAlarmManager.getNearestAlarmTime(trigger, System.currentTimeMillis())
+        println("refresh Trigger viewholder header - ${nextTriggerTime}")
+        view.nextTriggerTime = OTApplication.app.timeTriggerAlarmManager.getNearestAlarmTime(trigger, System.currentTimeMillis()) ?: 0L
 
         when (trigger.configType) {
             OTTimeTrigger.CONFIG_TYPE_ALARM ->

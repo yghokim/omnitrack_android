@@ -11,7 +11,7 @@ import kr.ac.snu.hcil.omnitrack.utils.ObservableMapDelegate
 /**
  * Created by younghokim on 16. 9. 5..
  */
-class OTDataTrigger(objectId: String?, user: OTUser, name: String, trackerObjectIds: Array<String>?, isOn: Boolean, action: Int, lastTriggeredTime: Long, propertyData: Map<String, String>? = null) : OTTrigger(objectId, user, name, trackerObjectIds, isOn, action, lastTriggeredTime, propertyData) {
+class OTDataTrigger(objectId: String?, user: OTUser, name: String, trackerObjectIds: Array<String>?, isOn: Boolean, action: Int, lastTriggeredTime: Long?, propertyData: Map<String, String>? = null) : OTTrigger(objectId, user, name, trackerObjectIds, isOn, action, lastTriggeredTime, propertyData) {
 
     override val configIconId: Int = R.drawable.event_dark
     override val configTitleId: Int = R.string.trigger_desc_event
