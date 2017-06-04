@@ -23,6 +23,7 @@ import rx.Single
 import rx.subscriptions.Subscriptions
 import java.io.Serializable
 import java.util.*
+import kotlin.NoSuchElementException
 
 /**
  * Created by younghokim on 2017. 2. 9..
@@ -104,7 +105,7 @@ object DatabaseManager {
         var type: Int = 0
         var on: Boolean = false
         val properties = HashMap<String, String>()
-        var lastTriggeredTime: Long = 0
+        var lastTriggeredTime: Long? = null
         var trackers = ArrayList<IndexedKey>()
     }
 
@@ -116,7 +117,7 @@ object DatabaseManager {
         var type: Int = 0
         var on: Boolean = false
         var properties: Map<String, String>? = null
-        var lastTriggeredTime: Long = 0
+        var lastTriggeredTime: Long? = null
         var trackers: List<IndexedKey>? = null
 
         @Exclude
@@ -127,6 +128,7 @@ object DatabaseManager {
             mutable.action = action
             mutable.type = type
             mutable.on = on
+            mutable.lastTriggeredTime = lastTriggeredTime
 
             if (properties != null)
                 mutable.properties.putAll(properties!!)
@@ -257,12 +259,14 @@ object DatabaseManager {
                                 subscriber.onNext(triggerWithPosition.second)
                                 subscriber.onCompleted()
                             }
+                        } else {
+                            if (!subscriber.isUnsubscribed) {
+                                subscriber.onError(NoSuchElementException("No Such Trigger"))
+                            }
                         }
                     }
-
                 }
-
-                query.addValueEventListener(listener)
+                query.addListenerForSingleValueEvent(listener)
                 subscriber.add(Subscriptions.create { query.removeEventListener(listener) })
             } else {
                 if (!subscriber.isUnsubscribed) {
