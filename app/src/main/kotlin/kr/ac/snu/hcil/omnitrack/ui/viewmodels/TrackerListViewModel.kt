@@ -1,6 +1,5 @@
 package kr.ac.snu.hcil.omnitrack.ui.viewmodels
 
-import android.arch.lifecycle.ViewModel
 import android.support.v7.util.DiffUtil
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
@@ -17,20 +16,7 @@ import rx.subscriptions.CompositeSubscription
  */
 
 typealias TrackerWithIndex = Pair<OTTracker, Int>
-class TrackerListViewModel : ViewModel() {
-    var user: OTUser? = null
-        set(value) {
-            if (field != value) {
-                field = value
-                if (value != null) {
-                    onUserChanged(value)
-                } else {
-                    internalSubscriptions.clear()
-                    clearTrackerViewModelList()
-                    user = null
-                }
-            }
-        }
+class TrackerListViewModel : UserAttachedViewModel() {
 
     private var trackerViewModelListSubject: BehaviorSubject<List<TrackerInformationViewModel>> = BehaviorSubject.create()
 
@@ -39,10 +25,9 @@ class TrackerListViewModel : ViewModel() {
     val trackerViewModels: Observable<List<TrackerInformationViewModel>>
         get() = trackerViewModelListSubject
 
-    private val internalSubscriptions = CompositeSubscription()
+    override fun onUserAttached(newUser: OTUser) {
+        super.onUserAttached(newUser)
 
-
-    private fun onUserChanged(newUser: OTUser) {
         clearTrackerViewModelList()
         val viewModels = newUser.trackers.map { TrackerInformationViewModel(it).apply { this.register() } }
         currentTrackerViewModelList.addAll(viewModels)
@@ -72,19 +57,17 @@ class TrackerListViewModel : ViewModel() {
         )
     }
 
+    override fun onDispose() {
+        super.onDispose()
+        clearTrackerViewModelList()
+    }
+
     private fun clearTrackerViewModelList() {
         currentTrackerViewModelList.forEach {
             it.unregister()
         }
         currentTrackerViewModelList.clear()
         trackerViewModelListSubject.onNext(emptyList())
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        internalSubscriptions.clear()
-        clearTrackerViewModelList()
-        user = null
     }
 
     class TrackerInformationViewModel(val tracker: OTTracker) {

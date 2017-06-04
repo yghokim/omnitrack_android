@@ -38,6 +38,16 @@ class LoggingTriggerListFragment : OTFragment() {
         }
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        core.onCreate(savedInstanceState)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        core.onDestroy()
+    }
+
     override fun onStart() {
         super.onStart()
         val activity = activity

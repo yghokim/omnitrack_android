@@ -2,10 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.google.firebase.database.ChildEventListener
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.*
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.*
@@ -24,7 +21,10 @@ import rx.Single
 import rx.subjects.PublishSubject
 import rx.subjects.SerializedSubject
 import rx.subscriptions.CompositeSubscription
+import rx.subscriptions.Subscriptions
+import java.net.ConnectException
 import java.util.*
+import kotlin.NoSuchElementException
 
 /**
  * Created by Young-Ho Kim on 2016-07-11.
@@ -32,6 +32,8 @@ import java.util.*
 class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _trackers: List<OTTracker>? = null) {
 
     companion object {
+
+        const val TAG = "OTUser"
 
         const val PREFERENCES_KEY_OBJECT_ID = "ot_user_object_id"
         const val PREFERENCES_KEY_NAME = "ot_user_name"
@@ -378,13 +380,42 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
         return Observable.defer {
             val trigger = triggerManager.getTriggerWithId(triggerId)
             if (trigger != null) {
+                OTApplication.logger.writeSystemLog("return trigger from triggerManager", TAG)
                 Observable.just(trigger)
             } else {
-                triggerManager.triggerAdded.filter {
-                    trigger ->
-                    trigger.objectId == triggerId
+                //check if the user has a trigger with the id
+                Observable.unsafeCreate<OTTrigger> {
+                    subscriber ->
+                    val dbRef = triggerListDbReference?.child(triggerId)
+                    if (dbRef != null) {
+                        val listener = object : ValueEventListener {
+                            override fun onCancelled(error: DatabaseError) {
+                                subscriber.onError(error.toException())
+                            }
+
+                            override fun onDataChange(snapshot: DataSnapshot) {
+                                if (snapshot.exists()) {
+                                    DatabaseManager.getTrigger(this@OTUser, triggerId).subscribe(subscriber)
+                                } else {
+                                    subscriber.onError(NoSuchElementException("No such trigger in db"))
+                                }
+                            }
+
+                        }
+
+                        dbRef.addListenerForSingleValueEvent(listener)
+
+                        subscriber.add(Subscriptions.create {
+                            //unsubscribe
+                            triggerListDbReference?.removeEventListener(listener)
+                        })
+                    } else {
+                        subscriber.onError(ConnectException("no database reference"))
+                    }
                 }
             }
+        }.doOnError { error ->
+            OTApplication.logger.writeSystemLog("trigger observable error: ${error.message}", TAG)
         }
     }
 
