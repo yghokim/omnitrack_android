@@ -59,6 +59,8 @@ open class AlarmInstance : RealmObject() {
     @Index
     var alarmId: Int = -1
 
+    var userId: String? = null
+
     var fired: Boolean = false
     var skipped: Boolean = false
 

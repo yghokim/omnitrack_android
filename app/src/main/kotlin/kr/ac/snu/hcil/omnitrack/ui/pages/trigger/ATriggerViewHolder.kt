@@ -13,12 +13,14 @@ import android.view.ViewStub
 import android.widget.TextView
 import butterknife.bindView
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.database.EventLoggingManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.common.SwipelessSwitchCompat
 import kr.ac.snu.hcil.omnitrack.ui.components.common.ValidatedSwitch
 import kr.ac.snu.hcil.omnitrack.ui.components.tutorial.TutorialManager
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.TriggerViewModel
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.getActivity
@@ -29,22 +31,17 @@ import rx.subscriptions.CompositeSubscription
 /**
  * Created by Young-Ho Kim on 16. 8. 24
  */
-abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener: ITriggerControlListener, context: Context) :
+abstract class ATriggerViewHolder<T>(parent: ViewGroup, val listener: ITriggerControlListener, context: Context) :
         RecyclerView.ViewHolder(LayoutInflater.from(context).inflate(R.layout.trigger_list_element, parent, false))
-        , View.OnClickListener, ValidatedSwitch.IValidationListener {
+        , View.OnClickListener, ValidatedSwitch.IValidationListener where T : TriggerViewModel<out OTTrigger> {
 
     interface ITriggerControlListener {
         fun onTriggerRemove(position: Int)
         fun onTriggerEdited(position: Int)
-        fun onTriggerEditRequested(position: Int, viewHolder: ATriggerViewHolder<out OTTrigger>)
+        fun onTriggerEditRequested(position: Int, viewHolder: ATriggerViewHolder<out TriggerViewModel<out OTTrigger>>)
         //fun onTriggerExpandRequested(position: Int, viewHolder: ATriggerViewHolder<out OTTrigger>)
         //fun onTriggerCollapse(position: Int, viewHolder: ATriggerViewHolder<out OTTrigger>)
     }
-
-    //private var isFirstBinding = true
-
-    protected lateinit var trigger: T
-        private set
 
     /*
     var isExpanded: Boolean = true
@@ -66,6 +63,10 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
     //private val controlPanelContainer: ViewGroup by bindView(R.id.ui_control_panel)
     //private val collapsedView: ViewGroup by bindView(R.id.ui_collapsed_view)
     protected val headerViewContainer: ViewGroup by bindView(R.id.ui_header_view_container)
+
+    private var currentHeaderView: View? = null
+
+    protected val headerViewSubscriptions = CompositeSubscription()
 
     //private val applyButtonGroup: ViewGroup by bindView(R.id.ui_apply_button_group)
     //private val applyButton: View by bindView(R.id.ui_button_apply)
@@ -100,8 +101,10 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
         return if (trackerAssignPanelContainer != null) {
             trigger.trackers.isNotEmpty()
         } else true*/
-        return trigger.trackers.isNotEmpty()
+        return viewModel?.currentAttachedTrackers?.isNotEmpty() ?: false
     }
+
+    private var viewModel: T? = null
 
     init {
 
@@ -119,261 +122,102 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
         triggerSwitch.addValidationListener(this)
 
         removeButton.setOnClickListener(this)
-
-        //expandToggleButton.setOnClickListener(this)
-
-        //bottomBar.setOnClickListener(this)
-
-        //applyButton.setOnClickListener(this)
-
-        //cancelButton.setOnClickListener(this)
     }
-
-    /*
-    fun setIsExpanded(isExpanded: Boolean, animate: Boolean) {
-        if (this.isExpanded != isExpanded) {
-
-            currentAlertAnimation?.cancel()
-            currentAlertAnimation = null
-
-            if (!isFirstBinding)
-                applyTriggerStateToView()
-
-            this.isExpanded = isExpanded
-
-            if (isExpanded) {
-
-                removeButton.visibility = View.VISIBLE
-                configSummaryView.visibility = View.INVISIBLE
-                expandToggleButton.setImageResource(R.drawable.up_dark)
-                if (controlPanelContainer.childCount == 0) {
-                    val lp = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT)
-                    controlPanelContainer.addView(initExpandedViewContent(), lp)
-                }
-
-
-                if (trackerAssignPanel != null) {
-                    trackerAssignPanel?.init(trigger.trackers)
-                }
-                updateExpandedViewContent(controlPanelContainer.getChildAt(0), trigger)
-
-
-                bottomBar.locked = false
-                bottomBar.setBackgroundColor(ContextCompat.getColor(itemView.context, R.color.colorSecondary))
-                removeButton.setColorFilter(Color.WHITE)
-                applyButtonGroup.visibility = View.VISIBLE
-                expandToggleButton.visibility = View.INVISIBLE
-
-                if (animate) {
-                    measureCollapsedAndExpandedHeight()
-
-                    val animator = ValueAnimator.ofFloat(0f, 1f)
-                            .apply {
-                                duration = 200
-                                interpolator = DecelerateInterpolator()
-
-                                addListener(object : Animator.AnimatorListener {
-                                    override fun onAnimationCancel(p0: Animator?) {
-
-                                    }
-
-                                    override fun onAnimationEnd(p0: Animator?) {
-                                        collapsedView.run {
-                                            visibility = View.GONE
-                                            alpha = 1f
-                                        }
-
-                                        toggleViewContainer.run {
-                                            layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
-                                            requestLayout()
-                                        }
-                                    }
-
-                                    override fun onAnimationRepeat(p0: Animator?) {
-                                    }
-
-                                    override fun onAnimationStart(p0: Animator?) {
-                                        expandedView.visibility = View.VISIBLE
-                                        collapsedView.visibility = View.VISIBLE
-                                    }
-
-                                })
-
-                                addUpdateListener {
-                                    val ratio = animatedValue as Float
-                                    collapsedView.alpha = 1 - ratio
-                                    expandedView.alpha = ratio
-                                    toggleViewContainer.run {
-                                        layoutParams.height = (0.5f + collapsedHeight + (expandedHeight - collapsedHeight) * ratio).toInt()
-                                        requestLayout()
-                                    }
-                                }
-
-                            }
-                    animator.start()
-                } else {
-                    toggleViewContainer.run {
-                        layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
-                        requestLayout()
-                    }
-                    collapsedView.visibility = View.GONE
-                    expandedView.visibility = View.VISIBLE
-
-                }
-
-
-            } else {
-
-                removeButton.run {
-                    visibility = View.INVISIBLE
-                    setColorFilter(ContextCompat.getColor(itemView.context, R.color.buttonIconColorDark))
-                }
-
-                configSummaryView.visibility = View.VISIBLE
-
-                expandToggleButton.run {
-                    setImageResource(R.drawable.down_dark)
-                    visibility = View.VISIBLE
-                }
-
-                bottomBar.run {
-                    locked = true
-                    setBackgroundColor(ContextCompat.getColor(itemView.context, R.color.editTextFormBackground))
-                }
-
-                applyButtonGroup.visibility = View.INVISIBLE
-
-
-                if (animate) {
-                    measureCollapsedAndExpandedHeight()
-
-                    val animator = ValueAnimator.ofFloat(1f, 0f)
-                            .apply {
-                                duration = 200
-                                interpolator = AccelerateInterpolator()
-
-                                addListener(object : Animator.AnimatorListener {
-                                    override fun onAnimationCancel(p0: Animator?) {
-
-                                    }
-
-                                    override fun onAnimationEnd(p0: Animator?) {
-                                        expandedView.run {
-                                            visibility = View.GONE
-                                            alpha = 1f
-                                        }
-                                        toggleViewContainer.run {
-                                            layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
-                                            requestLayout()
-                                        }
-                                    }
-
-                                    override fun onAnimationRepeat(p0: Animator?) {
-                                    }
-
-                                    override fun onAnimationStart(p0: Animator?) {
-                                        collapsedView.visibility = View.VISIBLE
-                                        expandedView.visibility = View.VISIBLE
-                                    }
-
-                                })
-
-                                addUpdateListener {
-                                    val ratio = animatedValue as Float
-                                    collapsedView.alpha = 1 - ratio
-                                    expandedView.alpha = ratio
-                                    toggleViewContainer.run {
-                                        layoutParams.height = (0.5f + collapsedHeight + (expandedHeight - collapsedHeight) * ratio).toInt()
-                                        requestLayout()
-                                    }
-                                }
-
-                            }
-                    animator.start()
-
-                } else {
-                    expandedView.visibility = View.GONE
-                    collapsedView.visibility = View.VISIBLE
-                }
-            }
-        }
-    }*/
-/*
-    private fun measureCollapsedAndExpandedHeight() {
-        collapsedView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
-        collapsedHeight = collapsedView.measuredHeight
-
-        expandedView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
-        expandedHeight = expandedView.measuredHeight
-
-        println("measured trigger view sizes: $collapsedHeight, $expandedHeight")
-    }*/
 
     fun unSubscribeAll() {
         subscriptions.clear()
+        headerViewSubscriptions.clear()
+        currentHeaderView = null
+        viewModel = null
     }
 
-    @Suppress("UNCHECKED_CAST")
-    fun bind(trigger: OTTrigger, newCreated: Boolean) {
 
-        subscriptions.clear()
+    fun bind(viewModel: T, newCreated: Boolean) {
+        unSubscribeAll()
 
-        this.trigger = trigger as T
+        this.viewModel = viewModel
 
         currentAlertAnimation?.cancel()
         currentAlertAnimation = null
 
-        this.trigger.run {
-            subscriptions.add(
-                    switchTurned.subscribeOn(AndroidSchedulers.mainThread()).subscribe {
-                        applyTriggerStateToView()
-                    }
-            )
-
-            subscriptions.add(
-                    propertyChanged.subscribeOn(AndroidSchedulers.mainThread()).subscribe {
-                        applyTriggerStateToView()
-                    }
-            )
-
+        /*
             subscriptions.add(
                     fired.subscribeOn(AndroidSchedulers.mainThread()).subscribe {
                         applyTriggerStateToView()
                     }
-            )
-
-            subscriptions.add(
-                    attachedTrackersChanged.subscribeOn(AndroidSchedulers.mainThread()).subscribe {
-                        applyTriggerStateToView()
-                    }
-            )
-        }
+            )*/
 
         //attached tracker list
-        if (this.trigger.action == OTTrigger.ACTION_BACKGROUND_LOGGING) {
-            if (attachedTrackerListView == null) {
-                attachedTrackerListView = attachedTrackerListStub.inflate()
-                attachedTrackerList = attachedTrackerListView?.findViewById(R.id.ui_attached_tracker_list) as ViewGroup
-                attachedTrackerNoTrackerFallbackView = attachedTrackerListView?.findViewById(R.id.ui_attached_tracker_list_empty_fallback)
-            } else {
-                attachedTrackerListView?.visibility = View.VISIBLE
+        subscriptions.add(
+                viewModel.triggerAction.subscribe {
+                    action ->
+                    if (action == OTTrigger.ACTION_BACKGROUND_LOGGING) {
+                        if (attachedTrackerListView == null) {
+                            attachedTrackerListView = attachedTrackerListStub.inflate()
+                            attachedTrackerList = attachedTrackerListView?.findViewById(R.id.ui_attached_tracker_list) as ViewGroup
+                            attachedTrackerNoTrackerFallbackView = attachedTrackerListView?.findViewById(R.id.ui_attached_tracker_list_empty_fallback)
+                        } else {
+                            attachedTrackerListView?.visibility = View.VISIBLE
+                    }
+
+                    } else {
+                        attachedTrackerListView?.visibility = View.GONE
+                        //trackerAssignPanelContainer?.visibility = View.GONE
+                }
+                }
+        )
+
+        subscriptions.add(
+                viewModel.triggerSwitch.subscribeOn(AndroidSchedulers.mainThread()).subscribe {
+                    isOn ->
+                    triggerSwitch.isChecked = isOn
+                }
+        )
+
+        subscriptions.add(
+                viewModel.triggerConfigIconResId.subscribe {
+                    iconId ->
+                    if (iconId != null)
+                        typeIconView.setImageResource(iconId)
+                }
+        )
+
+        subscriptions.add(
+                viewModel.triggerDescResId.subscribe {
+                    nameId ->
+                    typeDescriptionView.setText(nameId)
+                }
+        )
+
+        subscriptions.add(
+                viewModel.triggerConfigSummary.subscribe {
+                    message ->
+                    configSummaryView.text = message
+                }
+        )
+
+
+        /*
+        if (headerViewContainer.childCount > 0) {
+            val headerView = getHeaderView(headerViewContainer.getChildAt(0), trigger)
+            if (headerView !== headerViewContainer.getChildAt(0)) {
+                headerViewContainer.removeAllViews()
+                headerViewContainer.addView(headerView)
             }
-/*
-            if (trackerAssignPanelContainer == null) {
-                trackerAssignPanelContainer = trackerAssignPanelStub.inflate()
-                trackerAssignPanel = trackerAssignPanelContainer?.findViewById(R.id.ui_tracker_assign_list) as TrackerAssignPanel
-                trackerAssignPanel?.init(trigger.trackers)
-            } else {
-                trackerAssignPanelContainer?.visibility = View.VISIBLE
-            }*/
-
         } else {
-            attachedTrackerListView?.visibility = View.GONE
-            //trackerAssignPanelContainer?.visibility = View.GONE
-        }
+            headerViewContainer.addView(getHeaderView(null, trigger))
+        }*/
+
+        refreshHeaderView(getHeaderView(currentHeaderView, viewModel))
+
+        subscriptions.add(
+                viewModel.attachedTriggers.subscribe {
+                    list ->
+                    refreshAttachedTrackerList(list)
+                }
+        )
 
 
-        applyTriggerStateToView()
         if (newCreated) {
             val activity = itemView.getActivity()
             if (activity != null) {
@@ -385,34 +229,30 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
         }
     }
 
-    protected fun applyTriggerStateToView() {
-        triggerSwitch.isChecked = trigger.isOn
+    protected abstract fun getHeaderView(current: View?, viewModel: T): View
 
-        configSummaryView.text = getConfigSummary(trigger)
-
-        typeIconView.setImageResource(trigger.configIconId)
-        typeDescriptionView.setText(trigger.configTitleId)
-
-        if (headerViewContainer.childCount > 0) {
-            val headerView = getHeaderView(headerViewContainer.getChildAt(0), trigger)
-            if (headerView !== headerViewContainer.getChildAt(0)) {
+    protected fun refreshHeaderView(headerView: View) {
+        if (currentHeaderView !== headerView) {
+            if (currentHeaderView != null) {
                 headerViewContainer.removeAllViews()
-                headerViewContainer.addView(headerView)
             }
-        } else {
-            headerViewContainer.addView(getHeaderView(null, trigger))
-        }
 
+            headerViewContainer.addView(headerView)
+            currentHeaderView = headerView
+        }
+    }
+
+    protected open fun refreshAttachedTrackerList(trackers: List<OTTracker>) {
         val listView = attachedTrackerList
         if (listView != null) {
-            if (trigger.trackers.isEmpty()) {
+            if (trackers.isEmpty()) {
                 attachedTrackerNoTrackerFallbackView?.visibility = View.VISIBLE
                 listView.visibility = View.GONE
             } else {
                 attachedTrackerNoTrackerFallbackView?.visibility = View.INVISIBLE
                 listView.visibility = View.VISIBLE
                 //sync
-                val differ = trigger.trackers.size - listView.childCount
+                val differ = trackers.size - listView.childCount
                 if (differ > 0) {
                     for (i in 1..differ) {
                         val newView = listView.inflateContent(R.layout.layout_attached_tracker_list_element, false)
@@ -425,7 +265,7 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
                     }
                 }
 
-                for (tracker in trigger.trackers.withIndex()) {
+                for (tracker in trackers.withIndex()) {
                     val vh = (listView.getChildAt(tracker.index).tag as AttachedTrackerViewHolder)
                     vh.textView.text = tracker.value.name
                     vh.colorBar.setBackgroundColor(tracker.value.color)
@@ -434,20 +274,15 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
         }
     }
 
-
-    protected abstract fun getHeaderView(current: View?, trigger: T): View
-
     //protected abstract fun initExpandedViewContent(): View
 
     //protected abstract fun updateExpandedViewContent(expandedView: View, trigger: T): Unit
     //abstract fun updateTriggerWithViewSettings(expandedView: View, trigger: T): Unit
 
-    protected abstract fun getConfigSummary(trigger: T): CharSequence
-
     //protected abstract fun validateExpandedViewInputs(expandedView: View, errorMessagesOut: MutableList<String>): Boolean
 
     override fun onValidationFailed(switch: SwipelessSwitchCompat, on: Boolean) {
-        if (switch === triggerSwitch && on == true) {
+        if (switch === triggerSwitch && on) {
             onSwitchOnValidationFailed()
         }
     }
@@ -473,54 +308,25 @@ abstract class ATriggerViewHolder<T : OTTrigger>(parent: ViewGroup, val listener
 
     override fun onClick(view: View?) {
 
+        println("clicked : ${view?.javaClass}")
+
         if (view === removeButton) {
             DialogHelper.makeNegativePhrasedYesNoDialogBuilder(itemView.context, "OmniTrack", itemView.context.resources.getString(R.string.msg_trigger_remove_confirm), R.string.msg_remove, onYes= {
                 listener.onTriggerRemove(adapterPosition)
             }).show()
-        }
-        /*else if (view === expandToggleButton) {
-            listener.onTriggerCollapse(adapterPosition, this)
-        }*/ else if (view === triggerSwitch) {
-            trigger.isOn = triggerSwitch.isChecked
-            val eventParams = EventLoggingManager.makeTriggerChangeEventParams(trigger.objectId, trigger.typeId, trigger.action)
-            eventParams.putBoolean("switch", trigger.isOn)
-            EventLoggingManager.logEvent(EventLoggingManager.EVENT_NAME_CHANGE_TRIGGER_SWITCH, eventParams)
+        } else if (view === triggerSwitch) {
+            viewModel?.let {
+                viewModel ->
+                println("trigger switch pressed")
+                viewModel.setTriggerSwitch(triggerSwitch.isChecked)
+                val eventParams = EventLoggingManager.makeTriggerChangeEventParams(viewModel.triggerId.value, viewModel.triggerType.value, viewModel.triggerAction.value)
+                eventParams.putBoolean("switch", viewModel.triggerSwitch.value)
+                EventLoggingManager.logEvent(EventLoggingManager.EVENT_NAME_CHANGE_TRIGGER_SWITCH, eventParams)
+            }
 
         } else if (view === itemView) {
             listener.onTriggerEditRequested(adapterPosition, this)
         }
-        /* else if (view === bottomBar || view === itemView) {
-            if (!isExpanded) {
-                listener.onTriggerExpandRequested(adapterPosition, this)
-            }
-        } else if (view === applyButton) {
-            if (validateExpandedViewInputs(controlPanelContainer.getChildAt(0), errorMessages)) {
-                updateTriggerWithViewSettings(controlPanelContainer.getChildAt(0), trigger)
-
-                if (trackerAssignPanel != null) {
-                    for (trackerId in trackerAssignPanel!!.trackerIds) {
-                        trigger.addTracker(trackerId)
-                    }
-
-                    var i = 0
-                    while (i < trigger.trackers.size) {
-                        val tracker = trigger.trackers[i]
-                        if (!trackerAssignPanel!!.trackerIds.contains(tracker.objectId)) {
-                            trigger.removeTracker(tracker)
-                        } else {
-                            i++
-                        }
-                    }
-                }
-
-                listener.onTriggerCollapse(adapterPosition, this)
-            } else {
-                //validation failed
-                DialogHelper.makeSimpleAlertBuilder(itemView.context, errorMessages.joinToString("\n")).show()
-            }
-        } else if (view === cancelButton) {
-            listener.onTriggerCollapse(adapterPosition, this)
-        }*/
     }
 
     open class AttachedTrackerViewHolder(val view: View) {

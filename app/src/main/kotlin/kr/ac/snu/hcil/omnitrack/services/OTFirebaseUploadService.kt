@@ -84,8 +84,6 @@ class OTFirebaseUploadService : WakefulService(TAG) {
     }
 
     private fun resumeCachedUploads() {
-        Realm.init(this)
-
         val realm = Realm.getInstance(realmConfiguration)
         val tasks = realm.where(UploadTaskInfo::class.java).findAll()
         println("${tasks.size} upload tasks were hanging.")

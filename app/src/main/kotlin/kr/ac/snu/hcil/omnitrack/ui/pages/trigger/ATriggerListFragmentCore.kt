@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.util.DiffUtil
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -27,6 +28,10 @@ import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.FallbackRecyclerView
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.DrawableListBottomSpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.DataTriggerViewModel
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.TimeTriggerViewModel
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.TriggerListViewModel
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.TriggerViewModel
 import rx.subscriptions.CompositeSubscription
 import java.util.*
 
@@ -39,7 +44,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
         // private const val STATE_EXPANDED_POSITION = "expandedTriggerPosition"
         const val DETAIL_REQUEST_CODE = 12214
     }
-
+/*
     interface TriggerAdapter {
         fun getTriggerAt(position: Int): OTTrigger
         fun triggerCount(): Int
@@ -53,15 +58,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
         fun onAddTrigger(trigger: OTTrigger)
 
         val withIndex: Iterable<IndexedValue<OTTrigger>>
-    }
-
-    var triggerAdapter: TriggerAdapter? = null
-        set(value) {
-            if (field !== value) {
-                field = value
-                refresh()
-            }
-        }
+    }*/
 
     private lateinit var viewModel: TriggerListViewModel
 
@@ -71,6 +68,8 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
 
     protected abstract val emptyMessageId: Int
 
+    protected abstract val triggerFilter: (OTTrigger) -> Boolean
+
     private lateinit var adapter: Adapter
 
     private lateinit var listView: FallbackRecyclerView
@@ -78,6 +77,8 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
     private lateinit var newTriggerButton: FloatingActionButton
 
     private var newlyAddedTriggerId: String? = null
+
+    private val currentTriggerViewModels = ArrayList<TriggerViewModel<out OTTrigger>>()
 
     //private var expandedTriggerPosition: Int = -1
     //private var expandedViewHolder: ATriggerViewHolder<out OTTrigger>? = null
@@ -105,6 +106,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
 
     fun onCreate(savedInstanceState: Bundle?) {
         viewModel = ViewModelProviders.of(parent).get(TriggerListViewModel::class.java)
+        viewModel.triggerFilter = this.triggerFilter
 
         val activity = parent.activity
         if (activity is OTActivity) {
@@ -112,6 +114,16 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
                     activity.signedInUserObservable.subscribe {
                         user ->
                         viewModel.user = user
+
+                        creationSubscriptions.add(
+                                viewModel.triggerViewModelListSubject.subscribe {
+                                    list ->
+                                    val diffResult = DiffUtil.calculateDiff(TriggerListViewModel.TriggerViewModelListDiffUtilCallback(currentTriggerViewModels, list))
+                                    currentTriggerViewModels.clear()
+                                    currentTriggerViewModels.addAll(list)
+                                    diffResult.dispatchUpdatesTo(adapter)
+                                }
+                        )
                     }
             )
         }
@@ -216,10 +228,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
     }
 
     protected fun appendNewTrigger(trigger: OTTrigger) {
-        adapter.notifyItemChanged(adapter.itemCount - 1)
-        triggerAdapter?.onAddTrigger(trigger)
-
-        adapter.notifyItemInserted(adapter.itemCount - 1)
+        viewModel.addTrigger(trigger)
         listView.smoothScrollToPosition(adapter.itemCount - 1)
     }
 
@@ -227,11 +236,15 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
         triggerTypeDialog.show()
     }
 
-    protected open fun onTriggerEditRequested(trigger: OTTrigger) {
+    protected open fun onTriggerEditRequested(triggerId: String) {
         parent.startActivityForResult(
-                TriggerDetailActivity.makeEditTriggerIntent(parent.context, trigger, hideTrackerAssignmentInterface()),
+                TriggerDetailActivity.makeEditTriggerIntent(parent.context, triggerId, hideTrackerAssignmentInterface()),
                 DETAIL_REQUEST_CODE
         )
+    }
+
+    protected open fun postProcessNewlyAddedTrigger(newTrigger: OTTrigger) {
+
     }
 
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -245,6 +258,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
                             user ->
                             val newTrigger = OTTrigger.makeInstance(DatabaseManager.generateNewKey(DatabaseManager.CHILD_NAME_TRIGGERS), user, triggerPojo)
                             newlyAddedTriggerId = newTrigger.objectId
+                            postProcessNewlyAddedTrigger(newTrigger)
                             appendNewTrigger(newTrigger)
                             EventLoggingManager.logTriggerChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_TRIGGER_ADD, newTrigger.objectId, newTrigger.typeId, newTrigger.action)
                         }
@@ -254,9 +268,9 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
         }
     }
 
-    inner class Adapter() : RecyclerView.Adapter<ATriggerViewHolder<out OTTrigger>>(), ATriggerViewHolder.ITriggerControlListener {
+    inner class Adapter() : RecyclerView.Adapter<ATriggerViewHolder<*>>(), ATriggerViewHolder.ITriggerControlListener {
 
-        private val viewHolders = ArrayList<ATriggerViewHolder<out OTTrigger>>()
+        private val viewHolders = ArrayList<ATriggerViewHolder<*>>()
 
         fun unSubscribeAll() {
             for (viewHolder in viewHolders) {
@@ -266,35 +280,19 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
         }
 
         override fun getItemViewType(position: Int): Int {
-            return triggerAdapter?.getTriggerAt(position)?.typeId ?: -1
+            return currentTriggerViewModels[position].triggerType.value ?: -1
         }
 
-        override fun onBindViewHolder(holder: ATriggerViewHolder<out OTTrigger>, position: Int) {
-            if (triggerAdapter != null) {
-                val trigger = triggerAdapter!!.getTriggerAt(position)
-                holder.bind(trigger, trigger.objectId == newlyAddedTriggerId)
-                /*
-                if (expandedTriggerPosition == position) {
-                    holder.setIsExpanded(true, false)
-                    expandedViewHolder = holder
-                } else {
-                    holder.setIsExpanded(false, false)
-                    /*
-                if (expandedTriggerPosition != -1) {
-                    holder.itemView.alpha = 0.2f
-                    holder.itemView.setBackgroundColor(ContextCompat.getColor(parent.context, R.color.outerBackground))
-                }*/
-                }
-
-                if (expandedTriggerPosition == position || expandedTriggerPosition == -1) {
-                    /*
-                holder.itemView.alpha = 1.0f
-                holder.itemView.setBackgroundColor(ContextCompat.getColor(parent.context, R.color.frontalBackground))*/
-                }*/
+        override fun onBindViewHolder(holder: ATriggerViewHolder<*>, position: Int) {
+            val viewModel = currentTriggerViewModels[position]
+            if (holder is TimeTriggerViewHolder && viewModel is TimeTriggerViewModel) {
+                holder.bind(viewModel, viewModel.triggerId.value == newlyAddedTriggerId)
+            } else if (holder is EventTriggerViewHolder && viewModel is DataTriggerViewModel) {
+                holder.bind(viewModel, viewModel.triggerId.value == newlyAddedTriggerId)
             }
         }
 
-        override fun onCreateViewHolder(parentView: ViewGroup, viewType: Int): ATriggerViewHolder<out OTTrigger> {
+        override fun onCreateViewHolder(parentView: ViewGroup, viewType: Int): ATriggerViewHolder<*> {
 
             return when (viewType) {
                 OTTrigger.TYPE_TIME ->
@@ -310,7 +308,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
         }
 
         override fun getItemCount(): Int {
-            return triggerAdapter?.triggerCount() ?: 0
+            return currentTriggerViewModels.size
         }
 
 
@@ -318,58 +316,16 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
 
         }
 
-        override fun onTriggerEditRequested(position: Int, viewHolder: ATriggerViewHolder<out OTTrigger>) {
-            this@ATriggerListFragmentCore.onTriggerEditRequested(triggerAdapter!!.getTriggerAt(position))
+        override fun onTriggerEditRequested(position: Int, viewHolder: ATriggerViewHolder<*>) {
+            this@ATriggerListFragmentCore.onTriggerEditRequested(currentTriggerViewModels.get(position).triggerId.value)
         }
 
         override fun onTriggerRemove(position: Int) {
-
-            if (triggerAdapter != null) {
-                /*
-                if (expandedTriggerPosition == position) {
-                    val lastExpandedIndex = expandedTriggerPosition
-                    expandedTriggerPosition = -1
-                    expandedViewHolder = null
-                    for (triggerEntry in triggerAdapter!!.withIndex) {
-                        if (triggerEntry.index != lastExpandedIndex) {
-                            this.notifyItemChanged(triggerEntry.index)
-                        }
-                    }
-                }*/
-
-                val trigger = triggerAdapter!!.getTriggerAt(position)
-                triggerAdapter?.onRemoveTrigger(trigger)
-                this.notifyItemRemoved(position)
-                newTriggerButton.visibility = View.VISIBLE
-
-                EventLoggingManager.logTriggerChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_TRIGGER_REMOVE, trigger.objectId, trigger.typeId, trigger.action)
-            }
-        }
-
-        /*
-        override fun onTriggerExpandRequested(position: Int, viewHolder: ATriggerViewHolder<out OTTrigger>) {
-
-            if (expandedViewHolder !== viewHolder)
-                expandedViewHolder?.setIsExpanded(false, false)
-
-            newTriggerButton.visibility = View.INVISIBLE
-
-            expandedTriggerPosition = position
-            expandedViewHolder = viewHolder
-
-            viewHolder.setIsExpanded(true, true)
-        }
-
-        override fun onTriggerCollapse(position: Int, viewHolder: ATriggerViewHolder<out OTTrigger>) {
-            expandedTriggerPosition = -1
+            val triggerViewModel = currentTriggerViewModels[position]
+            viewModel.removeTrigger(triggerViewModel)
             newTriggerButton.visibility = View.VISIBLE
 
-            if (expandedViewHolder !== viewHolder)
-                expandedViewHolder?.setIsExpanded(false, false)
-
-            viewHolder.setIsExpanded(false, true)
-            //adapter.notifyDataSetChanged()
-        }*/
+            EventLoggingManager.logTriggerChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_TRIGGER_REMOVE, triggerViewModel.triggerId.value, triggerViewModel.triggerType.value, triggerViewModel.triggerAction.value)
+        }
     }
-
 }
