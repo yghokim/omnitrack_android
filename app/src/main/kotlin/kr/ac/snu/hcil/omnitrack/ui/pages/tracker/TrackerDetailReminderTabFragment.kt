@@ -11,42 +11,17 @@ import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.ATriggerListFragmentCore
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.TriggerDetailActivity
 import rx.subscriptions.CompositeSubscription
-import java.util.*
 
 /**
  * Created by younghokim on 16. 7. 30..
  */
 class TrackerDetailReminderTabFragment : TrackerDetailActivity.ChildFragment() {
 
-    val core: ATriggerListFragmentCore
+    val core = Core()
 
     private var resumeSubscriptions = CompositeSubscription()
 
     init {
-        core = object : ATriggerListFragmentCore(this@TrackerDetailReminderTabFragment) {
-
-            override val triggerActionType = OTTrigger.ACTION_NOTIFICATION
-            override val triggerActionTypeName: Int = R.string.msg_text_reminder
-            override val emptyMessageId: Int = R.string.msg_reminder_empty
-
-            //TODO remove this to unlock data-driven trigger
-            override fun onNewTriggerButtonClicked() {
-                val newTrigger = triggerAdapter?.makeNewTriggerInstance(OTTrigger.TYPE_TIME)
-                if (newTrigger != null)
-                    super.appendNewTrigger(newTrigger)
-            }
-
-            override fun hideTrackerAssignmentInterface(): Boolean {
-                return true
-            }
-
-            override fun onTriggerEditRequested(trigger: OTTrigger) {
-                parent.startActivityForResult(
-                        TriggerDetailActivity.makeEditTriggerIntent(parent.context, trigger, hideTrackerAssignmentInterface(), resources.getString(R.string.title_activity_reminder_edit)),
-                        DETAIL_REQUEST_CODE
-                )
-            }
-        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,72 +40,14 @@ class TrackerDetailReminderTabFragment : TrackerDetailActivity.ChildFragment() {
 
     override fun onTrackerLoaded(tracker: OTTracker) {
 
+        core.trackerId = tracker.objectId
+
         startSubscriptions.add(
                 tracker.colorObservable.subscribe {
                     color ->
                     core.setFloatingButtonColor(color)
                 }
         )
-
-        core.triggerAdapter = object : ATriggerListFragmentCore.TriggerAdapter {
-            private var mTempTriggers: ArrayList<OTTrigger>? = null
-
-            init {
-                if (!isEditMode) {
-                    mTempTriggers = ArrayList<OTTrigger>()
-                }
-            }
-
-            val triggers: Array<OTTrigger> get() =
-            //if(isEditMode){
-            tracker.owner?.triggerManager?.getAttachedTriggers(tracker, OTTrigger.ACTION_NOTIFICATION)!!
-            //}
-            //else{
-            //    mTempTriggers!!.toTypedArray()
-            //}
-
-
-            override fun getTriggerAt(position: Int): OTTrigger {
-                return triggers[position]
-            }
-
-            override fun makeNewTriggerInstance(type: Int): OTTrigger {
-                val newTrigger = OTTrigger.makeInstance(type, "My Trigger", OTTrigger.ACTION_NOTIFICATION, tracker.owner!!, tracker)
-                //if(!isEditMode)
-                //{
-                //    newTrigger.switchDisconnected = true
-                //}
-
-                return newTrigger
-            }
-
-            override fun onAddTrigger(trigger: OTTrigger) {
-                //if(isEditMode) {
-                tracker.owner?.triggerManager?.putNewTrigger(trigger)
-                //}
-                //else{
-                mTempTriggers?.add(trigger)
-                //}
-            }
-
-            override fun onRemoveTrigger(trigger: OTTrigger) {
-                //if(isEditMode) {
-                tracker.owner?.triggerManager?.removeTrigger(trigger)
-                //}
-                //else{
-
-                //    mTempTriggers?.remove(trigger)
-                //}
-            }
-
-            override fun triggerCount(): Int {
-                return triggers.size
-            }
-
-            override val withIndex: Iterable<IndexedValue<OTTrigger>>
-                get() = triggers.withIndex()
-
-        }
     }
 
     override fun onResume() {
@@ -177,6 +94,51 @@ class TrackerDetailReminderTabFragment : TrackerDetailActivity.ChildFragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         core.onActivityResult(requestCode, resultCode, data)
+    }
+
+    inner class Core : ATriggerListFragmentCore(this@TrackerDetailReminderTabFragment) {
+
+        var trackerId: String? = null
+
+        override val triggerFilter: (OTTrigger) -> Boolean = { trigger ->
+            trigger.action == OTTrigger.ACTION_NOTIFICATION &&
+                    trigger.trackers.find { it.objectId == trackerId } != null
+        }
+
+        override val triggerActionType = OTTrigger.ACTION_NOTIFICATION
+        override val triggerActionTypeName: Int = R.string.msg_text_reminder
+        override val emptyMessageId: Int = R.string.msg_reminder_empty
+
+        //TODO remove this to unlock data-driven trigger
+        override fun onNewTriggerButtonClicked() {
+            /*
+            val newTrigger = OTTrigger.makeInstance(OTTrigger.TYPE_TIME, "My Trigger", OTTrigger.ACTION_NOTIFICATION,)
+            if (newTrigger != null)
+                super.appendNewTrigger(newTrigger)*/
+            this@TrackerDetailReminderTabFragment
+                    .startActivityForResult(
+                            TriggerDetailActivity.makeNewTriggerIntent(parent.context, OTTrigger.TYPE_TIME, triggerActionType, hideTrackerAssignmentInterface(), resources.getString(R.string.title_activity_reminder_new)), DETAIL_REQUEST_CODE)
+
+        }
+
+        override fun postProcessNewlyAddedTrigger(newTrigger: OTTrigger) {
+            super.postProcessNewlyAddedTrigger(newTrigger)
+            trackerId?.let {
+                newTrigger.addTracker(it)
+            }
+        }
+
+        override fun hideTrackerAssignmentInterface(): Boolean {
+            return true
+        }
+
+        override fun onTriggerEditRequested(triggerId: String) {
+
+            parent.startActivityForResult(
+                    TriggerDetailActivity.makeEditTriggerIntent(parent.context, triggerId, hideTrackerAssignmentInterface(), resources.getString(R.string.title_activity_reminder_edit)),
+                    DETAIL_REQUEST_CODE
+            )
+        }
     }
 
 }

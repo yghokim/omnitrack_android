@@ -53,7 +53,6 @@ object VectorIconHelper {
         val cacheKey = makeKey(vectorDrawableRes, sizeDp, tint)
         val memCachedBitmap = memCache.get(cacheKey)
         if (memCachedBitmap == null) {
-            Realm.init(context)
             val realm = Realm.getInstance(realmConfiguration)
             val cache = realm.where(VectorIconBitmapCache::class.java).equalTo("resourceId", vectorDrawableRes).equalTo("sizeDp", sizeDp).equalTo("tint", tint).findAll()
 

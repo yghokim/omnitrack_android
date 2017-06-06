@@ -47,9 +47,9 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_mul
             return intent
         }
 
-        fun makeEditTriggerIntent(context: Context, trigger: OTTrigger, hideAttachedTrackers: Boolean = false, overrideTitle: String? = null): Intent {
+        fun makeEditTriggerIntent(context: Context, triggerId: String, hideAttachedTrackers: Boolean = false, overrideTitle: String? = null): Intent {
             val intent = Intent(context, TriggerDetailActivity::class.java)
-                    .putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRIGGER, trigger.objectId)
+                    .putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRIGGER, triggerId)
                     .putExtra(INTENT_EXTRA_HIDE_ATTACHED_TRACKERS, hideAttachedTrackers)
 
             if (overrideTitle != null) {

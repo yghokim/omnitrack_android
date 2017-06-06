@@ -30,14 +30,10 @@ class OTTimeTriggerAlarmManager() {
 
         const val DB_ALARM_SCHEDULE_UNIT_FILENAME = "alarmSchedules.db"
 
-        val realmDbConfiguration: RealmConfiguration by lazy {
-            RealmConfiguration.Builder().name(DB_ALARM_SCHEDULE_UNIT_FILENAME).deleteRealmIfMigrationNeeded().build()
-        }
-
-        private fun makeIntent(context: Context, user: OTUser, triggerTime: Long, alarmId: Int): PendingIntent {
+        private fun makeIntent(context: Context, userId: String, triggerTime: Long, alarmId: Int): PendingIntent {
             val intent = Intent(context, TimeTriggerAlarmReceiver::class.java)
             intent.action = OTApplication.BROADCAST_ACTION_TIME_TRIGGER_ALARM
-            intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_USER, user.objectId)
+            intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_USER, userId)
             intent.putExtra(INTENT_EXTRA_ALARM_ID, alarmId)
             intent.putExtra(INTENT_EXTRA_TRIGGER_TIME, triggerTime)
             return PendingIntent.getBroadcast(context, alarmId, intent, PendingIntent.FLAG_CANCEL_CURRENT)
@@ -49,6 +45,11 @@ class OTTimeTriggerAlarmManager() {
     }
 
     private val alarmManager by lazy { OTApplication.app.getSystemService(Context.ALARM_SERVICE) as AlarmManager }
+
+
+    private val realmDbConfiguration: RealmConfiguration by lazy {
+        RealmConfiguration.Builder().name(DB_ALARM_SCHEDULE_UNIT_FILENAME).deleteRealmIfMigrationNeeded().build()
+    }
 
     init {
     }
@@ -76,7 +77,7 @@ class OTTimeTriggerAlarmManager() {
                     it.skipped = true
                 }
             } else {
-
+                registerSystemAlarm(alarm.reservedAlarmTime, alarm.userId ?: "", alarm.alarmId)
             }
         }
         realm.commitTransaction()
@@ -102,7 +103,14 @@ class OTTimeTriggerAlarmManager() {
                 return appendableAlarm.getInfo()
             } else {
                 //make new alarm
-                val newAlarmId = (realm.where(AlarmInstance::class.java).max("alarmId") ?: 0).toInt() + 1
+                /*
+                * s: false, f: false
+                *
+                * */
+                val newAlarmId = (realm.where(AlarmInstance::class.java)
+                        .equalTo(AlarmInstance.FIELD_SKIPPED, false)
+                        .equalTo(AlarmInstance.FIELD_FIRED, false)
+                        .max("alarmId") ?: 0).toInt() + 1
                 val newAlarmDbId = (realm.where(AlarmInstance::class.java).max("id") ?: 0).toLong() + 1
                 val alarmInstance = realm.createObject(AlarmInstance::class.java, newAlarmDbId)
                 alarmInstance.alarmId = newAlarmId
@@ -112,18 +120,23 @@ class OTTimeTriggerAlarmManager() {
                 alarmInstance.reservedAlarmTime = alarmTimeToReserve
                 schedule.parentAlarmId = alarmInstance.id
                 alarmInstance.triggerSchedules.add(schedule)
+                alarmInstance.userId = trigger.user.objectId
 
                 realm.insertOrUpdate(alarmInstance)
                 realm.commitTransaction()
 
-                if (android.os.Build.VERSION.SDK_INT >= 23) {
-                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, alarmTimeToReserve, makeIntent(OTApplication.app, trigger.user, alarmTime, newAlarmId))
-                } else {
-                    alarmManager.setExact(AlarmManager.RTC_WAKEUP, alarmTimeToReserve, makeIntent(OTApplication.app, trigger.user, alarmTime, newAlarmId))
-                }
+                registerSystemAlarm(alarmTimeToReserve, trigger.user.objectId, newAlarmId)
 
                 return alarmInstance.getInfo()
             }
+        }
+    }
+
+    private fun registerSystemAlarm(alarmTimeToReserve: Long, userId: String, alarmId: Int) {
+        if (android.os.Build.VERSION.SDK_INT >= 23) {
+            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, alarmTimeToReserve, makeIntent(OTApplication.app, userId, alarmTimeToReserve, alarmId))
+        } else {
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, alarmTimeToReserve, makeIntent(OTApplication.app, userId, alarmTimeToReserve, alarmId))
         }
     }
 
@@ -149,7 +162,7 @@ class OTTimeTriggerAlarmManager() {
                     if (parentAlarm.triggerSchedules.isEmpty()) {
                         //cancel system alarm.
                         println("remove system alarm")
-                        val pendingIntent = makeIntent(OTApplication.app, trigger.user, parentAlarm.reservedAlarmTime, parentAlarm.alarmId)
+                        val pendingIntent = makeIntent(OTApplication.app, trigger.user.objectId, parentAlarm.reservedAlarmTime, parentAlarm.alarmId)
                         alarmManager.cancel(pendingIntent)
                         pendingIntent.cancel()
                         parentAlarm.deleteFromRealm()
