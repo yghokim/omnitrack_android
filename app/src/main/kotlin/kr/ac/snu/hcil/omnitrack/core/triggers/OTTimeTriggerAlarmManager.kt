@@ -75,6 +75,12 @@ class OTTimeTriggerAlarmManager() {
                 alarm.triggerSchedules.load()
                 alarm.triggerSchedules.forEach {
                     it.skipped = true
+
+                    if (it.oneShot) {
+                        //one-shot trigger was failed
+                    } else {
+                        //repeated trigger was failed.
+                    }
                 }
             } else {
                 registerSystemAlarm(alarm.reservedAlarmTime, alarm.userId ?: "", alarm.alarmId)

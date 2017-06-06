@@ -148,22 +148,12 @@ class OTTriggerManager(val user: OTUser) {
         subscriptionListPerTrigger[trigger]?.clear()
         subscriptionListPerTrigger.remove(trigger)
 
-        trigger.suspendDatabaseSync = true
-        trigger.isOn = false
-
-        //TODO handler dependencies associated with the trigger
         if (trigger is OTTimeTrigger) {
             OTApplication.app.timeTriggerAlarmManager.cancelTrigger(trigger)
         }
 
-        /*
-        for (tracker in trigger.trackers) {
-            if (trackerPivotedTriggerListCache.containsKey(tracker.objectId)) {
-                trackerPivotedTriggerListCache[tracker.objectId] = trackerPivotedTriggerListCache[tracker.objectId]!!.filter { it != trigger }.toTypedArray()
-            }
-        }*/
+        trigger.detachFromSystem()
 
-        //TODO remove trigger from DB
         DatabaseManager.removeTrigger(trigger)
 
         triggerRemoved.onNext(trigger)
