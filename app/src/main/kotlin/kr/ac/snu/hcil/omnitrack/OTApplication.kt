@@ -18,6 +18,7 @@ import android.text.format.DateUtils
 import com.google.firebase.crash.FirebaseCrash
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.squareup.leakcanary.LeakCanary
+import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
@@ -300,8 +301,9 @@ class OTApplication : MultiDexApplication() {
         app = this
         println("set application instance.")
 
-        AndroidThreeTen.init(this);
-        RxActivityResult.register(this);
+        AndroidThreeTen.init(this)
+        RxActivityResult.register(this)
+        Realm.init(this)
 
         if (LeakCanary.isInAnalyzerProcess(this)) {
             // This process is dedicated to LeakCanary for heap analysis.

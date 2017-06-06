@@ -209,7 +209,6 @@ class TrackerListFragment : OTFragment() {
                             createViewSubscriptions.add(
                                     viewModel.trackerViewModels.subscribe {
                                         trackerViewModelList ->
-                                        println("tracker viewmodel list refresh")
 
                                         val diffResult = DiffUtil.calculateDiff(
                                                 TrackerListViewModel.TrackerViewModelListDiffUtilCallback(currentTrackerViewModelList, trackerViewModelList)

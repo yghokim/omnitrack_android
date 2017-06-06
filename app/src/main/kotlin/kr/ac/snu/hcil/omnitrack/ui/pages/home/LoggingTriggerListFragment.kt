@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
-import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.ATriggerListFragmentCore
 import rx.subscriptions.CompositeSubscription
@@ -22,6 +21,7 @@ class LoggingTriggerListFragment : OTFragment() {
 
     init {
         core = object : ATriggerListFragmentCore(this@LoggingTriggerListFragment) {
+            override val triggerFilter: (OTTrigger) -> Boolean = { trigger -> trigger.action == OTTrigger.ACTION_BACKGROUND_LOGGING }
 
             override val triggerActionType = OTTrigger.ACTION_BACKGROUND_LOGGING
             override val triggerActionTypeName: Int = R.string.msg_text_trigger
@@ -46,42 +46,6 @@ class LoggingTriggerListFragment : OTFragment() {
     override fun onDestroy() {
         super.onDestroy()
         core.onDestroy()
-    }
-
-    override fun onStart() {
-        super.onStart()
-        val activity = activity
-        if (activity is OTActivity) {
-            activity.signedInUserObservable.subscribe {
-                user ->
-                core.triggerAdapter = object : ATriggerListFragmentCore.TriggerAdapter {
-                    val triggers: Array<OTTrigger> get() = user.triggerManager.getTriggersOfAction((OTTrigger.ACTION_BACKGROUND_LOGGING))
-                    override fun getTriggerAt(position: Int): OTTrigger {
-                        return triggers[position]
-                    }
-
-                    override fun makeNewTriggerInstance(type: Int): OTTrigger {
-                        return OTTrigger.makeInstance(type, "My Trigger", OTTrigger.ACTION_BACKGROUND_LOGGING, user)
-                    }
-
-                    override fun onAddTrigger(trigger: OTTrigger) {
-                        user.triggerManager.putNewTrigger(trigger)
-                    }
-
-                    override fun onRemoveTrigger(trigger: OTTrigger) {
-                        user.triggerManager.removeTrigger(trigger)
-                    }
-
-                    override fun triggerCount(): Int {
-                        return triggers.size
-                    }
-
-                    override val withIndex: Iterable<IndexedValue<OTTrigger>>
-                        get() = triggers.withIndex()
-
-                }
-            }
-        }
     }
 
     override fun onStop() {

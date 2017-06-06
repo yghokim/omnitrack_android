@@ -6,11 +6,14 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
+import kr.ac.snu.hcil.omnitrack.core.triggers.database.AlarmInfo
 import kr.ac.snu.hcil.omnitrack.utils.BitwiseOperationHelper
 import kr.ac.snu.hcil.omnitrack.utils.ObservableMapDelegate
 import kr.ac.snu.hcil.omnitrack.utils.time.DesignatedTimeScheduleCalculator
 import kr.ac.snu.hcil.omnitrack.utils.time.IntervalTimeScheduleCalculator
-import rx.subjects.BehaviorSubject
+import kr.ac.snu.hcil.omnitrack.utils.time.Time
+import rx.subjects.PublishSubject
+import rx.subjects.SerializedSubject
 import java.util.*
 
 /**
@@ -166,6 +169,9 @@ class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObject
         const val HOUR_SHIFT = 27
         const val MINUTE_SHIFT = 21
 
+        fun getAlarmTimeConfig(config: Int): Time {
+            return Time(getHourOfDay(config), getMinute(config), 0)
+        }
 
         fun getHour(config: Int): Int {
             return BitwiseOperationHelper.getIntAt(config, HOUR_SHIFT, HOUR_MASK)
@@ -323,7 +329,7 @@ class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObject
         } else return true
     }*/
 
-    val nextAlarmTime: BehaviorSubject<Long?> = BehaviorSubject.create()
+    val onAlarmReserved = SerializedSubject(PublishSubject.create<Long?>())
 
     fun getNextAlarmTime(pivot: Long?): Long? {
         if (isOn) {
@@ -377,7 +383,7 @@ class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObject
         //val alarmManager = OTApplication.app.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
         OTApplication.app.timeTriggerAlarmManager.cancelTrigger(this)
-        if (!reserveNextAlarmToSystem(lastTriggeredTime)) {
+        if (reserveNextAlarmToSystem(lastTriggeredTime) == null) {
             isOn = false
         }
     }
@@ -388,7 +394,7 @@ class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObject
         OTApplication.logger.writeSystemLog("Time trigger range changed. cancel trigger", TAG)
 
         OTApplication.app.timeTriggerAlarmManager.cancelTrigger(this)
-        if (!reserveNextAlarmToSystem(lastTriggeredTime)) {
+        if (reserveNextAlarmToSystem(lastTriggeredTime) == null) {
             isOn = false
         }
     }
@@ -412,7 +418,7 @@ class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObject
         }*/
     }
 
-    fun reserveNextAlarmToSystem(currentTriggerTime: Long?): Boolean {
+    fun reserveNextAlarmToSystem(currentTriggerTime: Long?): AlarmInfo? {
 
         println("current trigger time: ${currentTriggerTime}")
 
@@ -426,12 +432,12 @@ class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObject
             OTApplication.logger.writeSystemLog("Next alarm is reserved at ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(nextAlarmTime))}", TAG)
 
             val nextAlarmInfo = OTApplication.app.timeTriggerAlarmManager.reserveAlarm(this, nextAlarmTime, !isRepeated)
-            this.nextAlarmTime.onNext(nextAlarmInfo.reservedAlarmTime)
-            return true
+            onAlarmReserved.onNext(nextAlarmInfo.reservedAlarmTime)
+            return nextAlarmInfo
         } else {
             println("Finish trigger. Do not repeat.")
-            this.nextAlarmTime.onNext(null)
-            return false
+            onAlarmReserved.onNext(null)
+            return null
         }
     }
 
@@ -441,7 +447,7 @@ class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObject
 
     override fun handleOn() {
         Log.d(TAG, "handle Time trigger on.")
-        if (!reserveNextAlarmToSystem(null)) {
+        if (reserveNextAlarmToSystem(null) == null) {
             isOn = false
         }
     }

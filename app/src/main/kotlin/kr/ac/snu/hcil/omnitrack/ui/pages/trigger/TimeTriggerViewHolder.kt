@@ -3,63 +3,43 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
-import kr.ac.snu.hcil.omnitrack.OTApplication
-import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTrigger
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.TimeTriggerViewModel
 
 /**
  * Created by younghokim on 16. 8. 24..
  *
  */
-class TimeTriggerViewHolder(parent: ViewGroup, listener: ITriggerControlListener, context: Context) : ATriggerViewHolder<OTTimeTrigger>(parent, listener, context) {
-
-    override fun getConfigSummary(trigger: OTTimeTrigger): CharSequence {
-        if (trigger.isConfigSpecified) {
-
-        }
-
-        println("trigger range specified: ${trigger.isRangeSpecified}")
-        println("trigger range repeated: ${trigger.isRepeated}")
-
-        if (trigger.isRangeSpecified && trigger.isRepeated) {
-            //display only days of weeks
-            if (OTTimeTrigger.Range.isAllDayUsed(trigger.rangeVariables)) {
-                return itemView.context.resources.getString(R.string.msg_everyday)
-            } else {
-
-                val names = itemView.context.resources.getStringArray(R.array.days_of_week_short)
-
-                val stringBuilder = StringBuilder()
-
-                for (day in 1..7) {
-                    if (OTTimeTrigger.Range.isDayOfWeekUsed(trigger.rangeVariables, day)) {
-                        stringBuilder.append(names[day - 1].toUpperCase(), "  ")
-                    }
-                }
-
-                return stringBuilder.trim()
-            }
-        } else return itemView.context.resources.getString(R.string.msg_once)
-    }
+class TimeTriggerViewHolder(parent: ViewGroup, listener: ITriggerControlListener, context: Context) : ATriggerViewHolder<TimeTriggerViewModel>(parent, listener, context) {
 
 
-    override fun getHeaderView(current: View?, trigger: OTTimeTrigger): View {
+    override fun getHeaderView(current: View?, viewModel: TimeTriggerViewModel): View {
         val view = if (current is TimeTriggerDisplayView) current else TimeTriggerDisplayView(itemView.context)
 
-        val nextTriggerTime = OTApplication.app.timeTriggerAlarmManager.getNearestAlarmTime(trigger, System.currentTimeMillis())
-        println("refresh Trigger viewholder header - ${nextTriggerTime}")
-        view.nextTriggerTime = OTApplication.app.timeTriggerAlarmManager.getNearestAlarmTime(trigger, System.currentTimeMillis()) ?: 0L
+        if (current != view) {
+            headerViewSubscriptions.clear()
 
-        when (trigger.configType) {
-            OTTimeTrigger.CONFIG_TYPE_ALARM ->
-                view.setAlarmInformation(OTTimeTrigger.AlarmConfig.getHour(trigger.configVariables),
-                        OTTimeTrigger.AlarmConfig.getMinute(trigger.configVariables),
-                        OTTimeTrigger.AlarmConfig.getAmPm(trigger.configVariables))
+            headerViewSubscriptions.add(
+                    viewModel.nextAlarmTime.subscribe { nextAlarmTime ->
+                        view.nextTriggerTime = nextAlarmTime ?: 0L
+                    }
+            )
 
-            OTTimeTrigger.CONFIG_TYPE_INTERVAL ->
-                view.setIntervalInformation(OTTimeTrigger.IntervalConfig.getIntervalSeconds(trigger.configVariables))
+            headerViewSubscriptions.add(
+                    viewModel.configuredAlarmTime.subscribe {
+                        time ->
+                        println("configured alarm time changed: ${time}")
+                        view.setAlarmInformation(time.hour, time.minute, time.amPm)
+                    }
+            )
+
+            headerViewSubscriptions.add(
+                    viewModel.configuredIntervalSeconds.subscribe {
+                        seconds ->
+                        println("configured interval changed: ${seconds}")
+                        view.setIntervalInformation(seconds)
+                    }
+            )
         }
-
         return view
     }
 /*

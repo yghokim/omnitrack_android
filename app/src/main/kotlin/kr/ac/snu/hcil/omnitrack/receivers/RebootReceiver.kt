@@ -27,6 +27,8 @@ class RebootReceiver : BroadcastReceiver() {
 
         OTVersionCheckService.setupServiceAlarm(context)
 
+        OTApplication.app.timeTriggerAlarmManager.activateOnSystem()
+
         OTApplication.app.currentUserObservable.observeOn(Schedulers.newThread()).subscribe({
             user ->
             OTShortcutPanelManager.refreshNotificationShortcutViews(user, context)
