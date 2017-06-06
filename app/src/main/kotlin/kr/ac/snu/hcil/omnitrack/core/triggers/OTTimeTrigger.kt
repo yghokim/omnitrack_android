@@ -28,8 +28,6 @@ class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObject
         const val CONFIG_TYPE_ALARM = 0
         const val CONFIG_TYPE_INTERVAL = 1
 
-        const val MILLISECOND_TOLERANCE = 1000L
-
         fun configIconId(configType: Int): Int {
             return when (configType) {
                 CONFIG_TYPE_ALARM -> R.drawable.alarm_dark
@@ -321,14 +319,6 @@ class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObject
         }
     }
 
-    /*
-
-    val isTriggeredOnce: Boolean get() {
-        if (isRangeSpecified) {
-            return BitwiseOperationHelper.getIntAt(rangeVariables, Range.DAYS_OF_WEEK_FLAGS_SHIFT, Range.DAYS_OF_WEEK_FLAGS_MASK) == 0
-        } else return true
-    }*/
-
     val onAlarmReserved = SerializedSubject(PublishSubject.create<Long?>())
 
     fun getNextAlarmTime(pivot: Long?): Long? {
@@ -404,18 +394,13 @@ class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObject
 
         if (isOn == false) {
             handleOff()
-        }
-        /*
-        println("trigger activated")
-        if (isOn) {
-            //TODO need to check current alarmmanager to avoid duplicate alarm
-            if (!reserveNextAlarmToSystem(lastTriggeredTime)) {
-                println("didn't reserve next alarm. turn off")
-                isOn = false
-            } else {
-                println("reserved next alarm.")
+        } else {
+            if (OTApplication.app.timeTriggerAlarmManager.getNearestAlarmTime(this, System.currentTimeMillis()) == null) {
+                if (reserveNextAlarmToSystem(lastTriggeredTime) == null) {
+                    isOn = false
+                }
             }
-        }*/
+        }
     }
 
     fun reserveNextAlarmToSystem(currentTriggerTime: Long?): AlarmInfo? {
