@@ -128,6 +128,7 @@ abstract class ATriggerViewHolder<T>(parent: ViewGroup, val listener: ITriggerCo
         subscriptions.clear()
         headerViewSubscriptions.clear()
         currentHeaderView = null
+        headerViewContainer.removeAllViewsInLayout()
         viewModel = null
     }
 
@@ -163,7 +164,7 @@ abstract class ATriggerViewHolder<T>(parent: ViewGroup, val listener: ITriggerCo
                     } else {
                         attachedTrackerListView?.visibility = View.GONE
                         //trackerAssignPanelContainer?.visibility = View.GONE
-                }
+                    }
                 }
         )
 
@@ -233,10 +234,7 @@ abstract class ATriggerViewHolder<T>(parent: ViewGroup, val listener: ITriggerCo
 
     protected fun refreshHeaderView(headerView: View) {
         if (currentHeaderView !== headerView) {
-            if (currentHeaderView != null) {
-                headerViewContainer.removeAllViews()
-            }
-
+            headerViewContainer.removeAllViewsInLayout()
             headerViewContainer.addView(headerView)
             currentHeaderView = headerView
         }
