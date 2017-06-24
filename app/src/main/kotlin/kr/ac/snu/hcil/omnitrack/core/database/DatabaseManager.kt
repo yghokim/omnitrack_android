@@ -145,6 +145,7 @@ object DatabaseManager {
         var dataTable: Map<String, String>? = null
         var sourceType: Int = -1
         var timestamp: Any = 0
+        var deviceId: String? = null
 
         @Exclude
         fun getTimestamp(): Long {
@@ -255,9 +256,15 @@ object DatabaseManager {
                     override fun onDataChange(snapshot: DataSnapshot) {
                         if (snapshot.exists()) {
                             val triggerWithPosition = extractTriggerWithPosition(user, snapshot)
-                            if (!subscriber.isUnsubscribed) {
-                                subscriber.onNext(triggerWithPosition.second)
-                                subscriber.onCompleted()
+                            if (triggerWithPosition != null) {
+                                if (!subscriber.isUnsubscribed) {
+                                    subscriber.onNext(triggerWithPosition.second)
+                                    subscriber.onCompleted()
+                                }
+                            } else {
+                                if (!subscriber.isUnsubscribed) {
+                                    subscriber.onError(Exception("Trigger parsing error"))
+                                }
                             }
                         } else {
                             if (!subscriber.isUnsubscribed) {
@@ -276,20 +283,24 @@ object DatabaseManager {
         }
     }
 
-    fun extractTriggerWithPosition(user: OTUser, snapshot: DataSnapshot): Pair<Int, OTTrigger> {
-        val pojo = snapshot.getValue(TriggerPOJO::class.java)
-        if (pojo.user == user.objectId) {
-            val trigger = OTTrigger.makeInstance(
-                    snapshot.key,
-                    pojo.type,
-                    user,
-                    pojo.name ?: "",
-                    pojo.trackers?.map { it.key!! }?.toTypedArray(),
-                    pojo.on, pojo.action, pojo.lastTriggeredTime, pojo.properties)
+    fun extractTriggerWithPosition(user: OTUser, snapshot: DataSnapshot): Pair<Int, OTTrigger>? {
+        try {
+            val pojo = snapshot.getValue(TriggerPOJO::class.java)!!
+            if (pojo.user == user.objectId) {
+                val trigger = OTTrigger.makeInstance(
+                        snapshot.key,
+                        pojo.type,
+                        user,
+                        pojo.name ?: "",
+                        pojo.trackers?.map { it.key!! }?.toTypedArray(),
+                        pojo.on, pojo.action, pojo.lastTriggeredTime, pojo.properties)
 
-            return Pair(pojo.position, trigger)
-        } else {
-            throw IllegalArgumentException("user is different.")
+                return Pair(pojo.position, trigger)
+            } else {
+                throw IllegalArgumentException("user is different.")
+            }
+        } catch(e: Exception) {
+            return null
         }
     }
 
@@ -349,51 +360,52 @@ object DatabaseManager {
         trackerRef(trackerId)?.child(CHILD_NAME_ATTRIBUTES)?.child(objectId)?.removeValue()
     }
 
-    fun extractTrackerWithPosition(snapshot: DataSnapshot): Pair<Int, OTTracker> {
+    fun extractTrackerWithPosition(snapshot: DataSnapshot): Pair<Int, OTTracker>? {
         val pojo = snapshot.getValue(TrackerPOJO::class.java)
         //val attributesRef = snapshot.child(CHILD_NAME_ATTRIBUTES)
+        if (pojo != null) {
+            val attributes = pojo.attributes
 
-        val attributes = pojo.attributes
-
-        val attributeList = ArrayList<OTAttribute<out Any>>()
-        if (attributes != null) {
-            val attrPojos = ArrayList<Map.Entry<String, AttributePOJO>>(pojo.attributes?.entries).filter {
-                it ->
-                it.value.type != null
-            }.toMutableList()
+            val attributeList = ArrayList<OTAttribute<out Any>>()
+            if (attributes != null) {
+                val attrPojos = ArrayList<Map.Entry<String, AttributePOJO>>(pojo.attributes?.entries).filter {
+                    it ->
+                    it.value.type != null
+                }.toMutableList()
 
 
-            attrPojos.sortBy { it -> it.value.position }
+                attrPojos.sortBy { it -> it.value.position }
 
-            attrPojos.forEach {
-                try {
-                    attributeList.add(OTAttribute.createAttribute(
-                            it.key,
-                            it.value.localKey,
-                            null,
-                            it.value.name ?: "noname",
-                            it.value.required,
-                            it.value.type!!,
-                            it.value.properties,
-                            it.value.connectionSerialized)
-                    )
-                } catch(ex: Exception) {
+                attrPojos.forEach {
+                    try {
+                        attributeList.add(OTAttribute.createAttribute(
+                                it.key,
+                                it.value.localKey,
+                                null,
+                                it.value.name ?: "noname",
+                                it.value.required,
+                                it.value.type!!,
+                                it.value.properties,
+                                it.value.connectionSerialized)
+                        )
+                    } catch(ex: Exception) {
+                    }
                 }
             }
-        }
 
-        return Pair(pojo.position, OTTracker(
-                snapshot.key,
-                pojo.name ?: "Noname",
-                pojo.color,
-                pojo.onShortcut,
-                pojo.editable,
-                pojo.attributeLocalKeySeed,
-                attributeList, pojo.creationFlags, pojo.position
-        ))
+            return Pair(pojo.position, OTTracker(
+                    snapshot.key,
+                    pojo.name ?: "Noname",
+                    pojo.color,
+                    pojo.onShortcut,
+                    pojo.editable,
+                    pojo.attributeLocalKeySeed,
+                    attributeList, pojo.creationFlags, pojo.position
+            ))
+        } else return null
     }
 
-    fun <T> findElementListOfUser(userId: String, childName: String, extractFunc: (DataSnapshot) -> Pair<Int, T>): Observable<List<T>> {
+    fun <T> findElementListOfUser(userId: String, childName: String, extractFunc: (DataSnapshot) -> Pair<Int, T>?): Observable<List<T>> {
         val query = getContainsFlagListOfUser(userId, childName)
         return if (query != null) {
             Observable.create {
@@ -441,13 +453,18 @@ object DatabaseManager {
                                         override fun onDataChange(snapshot: DataSnapshot) {
                                             println(snapshot.value)
                                             if (snapshot.value != null) {
-                                                if (!subscriber.isUnsubscribed) {
-                                                    subscriber.onNext(extractFunc(snapshot))
-                                                    subscriber.onCompleted()
+                                                val extracted = extractFunc(snapshot)
+                                                if (extracted != null) {
+                                                    if (!subscriber.isUnsubscribed) {
+                                                        subscriber.onNext(extracted)
+                                                        subscriber.onCompleted()
+                                                    }
+                                                } else {
+                                                    subscriber.onError(Exception("$childName parsing error"))
                                                 }
                                             } else {
                                                 if (!subscriber.isUnsubscribed) {
-                                                    subscriber.onError(Exception("tracker id does not exists."))
+                                                    subscriber.onError(Exception("$childName id does not exists."))
                                                 }
                                             }
                                         }
@@ -495,9 +512,15 @@ object DatabaseManager {
 
                     override fun onDataChange(snapshot: DataSnapshot) {
                         val trackerWithPosition = extractTrackerWithPosition(snapshot)
-                        if (!subscriber.isUnsubscribed) {
-                            subscriber.onNext(trackerWithPosition.second)
-                            subscriber.onCompleted()
+                        if (trackerWithPosition != null) {
+                            if (!subscriber.isUnsubscribed) {
+                                subscriber.onNext(trackerWithPosition.second)
+                                subscriber.onCompleted()
+                            }
+                        } else {
+                            if (!subscriber.isUnsubscribed) {
+                                subscriber.onError(Exception("tracker parsing failed"))
+                            }
                         }
                     }
 
@@ -625,7 +648,7 @@ object DatabaseManager {
                         if (!subscriber.isUnsubscribed) {
                             val pojo = snapshot.getValue(ItemPOJO::class.java)
                             if (pojo != null) {
-                                val item = OTItem(snapshot.key, tracker.objectId, pojo.dataTable, pojo.getTimestamp(), OTItem.LoggingSource.values()[pojo.sourceType])
+                                val item = OTItem(snapshot.key, tracker.objectId, pojo.dataTable, pojo.getTimestamp(), OTItem.LoggingSource.values()[pojo.sourceType], pojo.deviceId)
                                 subscriber.onNext(item)
                                 subscriber.onCompleted()
                             } else {
@@ -689,7 +712,7 @@ object DatabaseManager {
     fun makeItemFromSnapshot(snapshot: DataSnapshot, trackerId: String): OTItem? {
         val pojo = snapshot.getValue(ItemPOJO::class.java)
         return if (pojo != null)
-            OTItem(snapshot.key, trackerId, pojo.dataTable, pojo.getTimestamp(), OTItem.LoggingSource.values()[pojo.sourceType])
+            OTItem(snapshot.key, trackerId, pojo.dataTable, pojo.getTimestamp(), OTItem.LoggingSource.values()[pojo.sourceType], pojo.deviceId)
         else null
     }
 
@@ -722,8 +745,8 @@ object DatabaseManager {
                         if (snapshot.exists()) {
                             if (!subscriber.isUnsubscribed) {
                                 val list = snapshot.children.mapTo(ArrayList<OTItem>()) {
-                                    val pojo = it.getValue(ItemPOJO::class.java)
-                                    OTItem(it.key, tracker.objectId, pojo.dataTable, pojo.getTimestamp(), OTItem.LoggingSource.values()[pojo.sourceType])
+                                    val pojo = it.getValue(ItemPOJO::class.java)!!
+                                    OTItem(it.key, tracker.objectId, pojo.dataTable, pojo.getTimestamp(), OTItem.LoggingSource.values()[pojo.sourceType], pojo.deviceId)
                                 }
 
                                 list.sortBy {

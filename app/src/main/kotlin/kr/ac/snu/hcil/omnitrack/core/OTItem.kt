@@ -27,6 +27,9 @@ class OTItem : ADataRow, IDatabaseStorable {
     }
 
     companion object {
+
+        const val DEVICE_ID_UNSPECIFIED = "unspecified"
+
         inline fun <reified T> extractNotNullValues(items: Collection<OTItem>, attribute: OTAttribute<out Any>, out: MutableList<T>): Int {
             var count = 0
 
@@ -44,7 +47,7 @@ class OTItem : ADataRow, IDatabaseStorable {
 
         fun createItemsWithColumnArrays(tracker: OTTracker, timestamps: LongArray, source: LoggingSource, outItems: MutableList<OTItem>, vararg columnValuesArray: Array<Any?>) {
 
-            if (columnValuesArray.size > 0) {
+            if (columnValuesArray.isNotEmpty()) {
                 val numItems = columnValuesArray[0].size
 
                 for (columnValues in columnValuesArray) {
@@ -64,6 +67,7 @@ class OTItem : ADataRow, IDatabaseStorable {
                                     tracker,
                                     timestamps[i],
                                     source,
+                                    OTApplication.app.deviceId,
                                     *values
                             )
                     )
@@ -73,6 +77,8 @@ class OTItem : ADataRow, IDatabaseStorable {
     }
 
     val trackerObjectId: String
+
+    val deviceId: String
 
     override var objectId: String?
         set(value) {
@@ -91,17 +97,19 @@ class OTItem : ADataRow, IDatabaseStorable {
     var source: LoggingSource
         private set
 
-    constructor(trackerObjectId: String, source: LoggingSource) : super() {
+    constructor(trackerObjectId: String, source: LoggingSource, deviceId: String?) : super() {
         objectId = null
         this.trackerObjectId = trackerObjectId
         this.source = source
+        this.deviceId = deviceId ?: DEVICE_ID_UNSPECIFIED
     }
 
-    constructor(objectId: String, trackerObjectId: String, serializedValueTable: Map<String, String>?, timestamp: Long, source: LoggingSource) {
+    constructor(objectId: String, trackerObjectId: String, serializedValueTable: Map<String, String>?, timestamp: Long, source: LoggingSource, deviceId: String?) {
         this.objectId = objectId
         this.trackerObjectId = trackerObjectId
         this.timestamp = timestamp
         this.source = source
+        this.deviceId = deviceId ?: DEVICE_ID_UNSPECIFIED
 
         if (serializedValueTable != null) {
             for ((key, value) in serializedValueTable) {
@@ -113,7 +121,7 @@ class OTItem : ADataRow, IDatabaseStorable {
     /**
      * used to log directly in code behind
      */
-    constructor(tracker: OTTracker, timestamp: Long, source: LoggingSource, vararg values: Any?) : this(tracker.objectId, source)
+    constructor(tracker: OTTracker, timestamp: Long, source: LoggingSource, deviceId: String?, vararg values: Any?) : this(tracker.objectId, source, deviceId)
     {
         this.timestamp = timestamp
         this.source = source

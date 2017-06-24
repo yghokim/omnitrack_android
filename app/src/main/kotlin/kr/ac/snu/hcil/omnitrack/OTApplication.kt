@@ -583,6 +583,7 @@ class OTApplication : MultiDexApplication() {
                                 sleepTracker,
                                 wakeUp + (Math.random() * DateUtils.HOUR_IN_MILLIS).toLong(),
                                 OTItem.LoggingSource.Unspecified,
+                                OTApplication.app.deviceId,
                                 TimeSpan.fromPoints(from + (Math.random() * 3 * DateUtils.HOUR_IN_MILLIS - 1.5 * DateUtils.HOUR_IN_MILLIS).toLong(), wakeUp),
                                 (Math.random() * 5).toFloat(),
                                 ""
@@ -659,6 +660,7 @@ class OTApplication : MultiDexApplication() {
                             beerTracker,
                             it[1] as Long,
                             OTItem.LoggingSource.Unspecified,
+                            OTApplication.app.deviceId,
                             *it
                     )
                 }, beerTracker)
