@@ -12,7 +12,6 @@ import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.ILineChartOnTime
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.QuantizedTimeScale
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers.MultiLineChartDrawer
-import org.apache.commons.math3.stat.StatUtils
 import rx.subscriptions.CompositeSubscription
 import java.math.BigDecimal
 import java.util.*
@@ -78,7 +77,7 @@ class TimelineComparisonLineChartModel(override val attributes: List<OTNumberAtt
                                     break
                                 }
                                 timestamp = items[currentItemPointer].timestamp
-                        }
+                            }
                         }
 
 
@@ -87,11 +86,10 @@ class TimelineComparisonLineChartModel(override val attributes: List<OTNumberAtt
 
                             val numPoints = OTItem.extractNotNullValues(itemBinCache, attribute, values)
                             if (numPoints > 0) {
-                                attrPivotedPoints[attribute]?.add(Pair(from, BigDecimal(StatUtils.mean(values.map { it.toDouble() }.toDoubleArray()))))
+                                attrPivotedPoints[attribute]?.add(Pair(from, BigDecimal(values.map { it.toFloat() }.average())))
+                            }
                         }
                     }
-
-                }
 
                     synchronized(data) {
                     data.clear()

@@ -22,4 +22,9 @@ dependencies {
     compile "com.android.support:appcompat-v7:$rootProject.ext.android_support_version"
 }
 
+repositories {
+    jcenter()
+    maven { url 'https://maven.google.com' }
+}
+
 archivesBaseName = 'fancybuttons'

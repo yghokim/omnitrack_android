@@ -14,7 +14,7 @@ android {
     buildToolsVersion BUILD_TOOLS
 
     defaultConfig {
-        minSdkVersion 13
+        minSdkVersion 14
         targetSdkVersion TARGET_SDK
         versionCode 1
         versionName PUBLISH_VERSION
@@ -34,3 +34,7 @@ dependencies {
     compile "me.zhanghai.android.materialprogressbar:library:1.3.0"
 }
 
+repositories {
+    jcenter()
+    maven { url 'https://maven.google.com' }
+}

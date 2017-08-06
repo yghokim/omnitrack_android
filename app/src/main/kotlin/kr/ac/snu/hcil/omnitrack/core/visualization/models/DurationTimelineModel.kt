@@ -22,7 +22,6 @@ import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.Nu
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.QuantizedTimeScale
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers.ATimelineChartDrawer
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
-import org.apache.commons.math3.stat.StatUtils
 import rx.Observable
 import rx.functions.Func1
 import rx.subscriptions.CompositeSubscription
@@ -76,17 +75,17 @@ class DurationTimelineModel(override val attribute: OTTimeSpanAttribute) : Attri
 
                             println("timespans count: ${timeSpansCache.size}")
                             if (timeSpansCache.size > 0) {
-                                val doubleFromArray = timeSpansCache.map { timeToRatio(it.first.from, it.second).toDouble() }.toDoubleArray()
-                                val doubleToArray = timeSpansCache.map { timeToRatio(it.first.to, it.second).toDouble() }.toDoubleArray()
+                                val fromArray = timeSpansCache.map { timeToRatio(it.first.from, it.second) }
+                                val toArray = timeSpansCache.map { timeToRatio(it.first.to, it.second) }
 
                                 Observable.just(
                                         AggregatedDuration(
                                                 from,
                                                 timeSpansCache.size,
-                                                StatUtils.mean(doubleFromArray).toFloat(),
-                                                StatUtils.mean(doubleToArray).toFloat(),
-                                                StatUtils.min(doubleFromArray).toFloat(),
-                                                StatUtils.max(doubleToArray).toFloat()
+                                                fromArray.average().toFloat(),
+                                                toArray.average().toFloat(),
+                                                fromArray.min() ?: 0f,
+                                                toArray.max() ?: 0f
                                         ))
                             } else Observable.just<AggregatedDuration>(null)
                         } else Observable.just(null)
