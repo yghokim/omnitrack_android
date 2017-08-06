@@ -148,6 +148,12 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        processAuthorization()
+
+        PreferenceManager.setDefaultValues(this, R.xml.global_preferences, false)
+    }
+
+    protected open fun processAuthorization() {
         if (false/*BuildConfig.DEBUG*/) {
             performSignInProcessCompletelyFinished()
         } else {
@@ -160,8 +166,6 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
                 goSignInUnlessUserCached()
             }
         }
-
-        PreferenceManager.setDefaultValues(this, R.xml.global_preferences, false)
     }
 
     protected fun getUserOrGotoSignIn(): Single<OTUser> {

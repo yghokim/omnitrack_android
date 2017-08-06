@@ -71,7 +71,7 @@ class OAuth2Client(val config: OAuth2Config) {
     }
 
     fun authorize(activity: Activity, serviceName: String? = null): Observable<Credential> {
-        val uri = HttpUrl.parse(config.authorizationUrl).newBuilder()
+        val uri = HttpUrl.parse(config.authorizationUrl)!!.newBuilder()
                 .addQueryParameter(AuthConstants.PARAM_CLIENT_ID, config.clientId)
                 .addQueryParameter(AuthConstants.PARAM_RESPONSE_TYPE, AuthConstants.VALUE_RESPONSE_TYPE_CODE)
                 .addQueryParameter(AuthConstants.PARAM_REDIRECT_URI, config.redirectUri)
@@ -116,7 +116,7 @@ class OAuth2Client(val config: OAuth2Config) {
     }*/
 
     private fun refreshToken(credential: Credential): Credential? {
-        val uri = HttpUrl.parse(config.tokenRequestUrl)
+        val uri = HttpUrl.parse(config.tokenRequestUrl)!!
 
         println("trying to refresh token with refresh token ${credential.refreshToken}")
 
@@ -132,8 +132,7 @@ class OAuth2Client(val config: OAuth2Config) {
 
         try {
             val response = OkHttpClient().newCall(request).execute()
-            val json = JSONObject(response.body().string())
-            println(json)
+            val json = JSONObject(response.body()?.string() ?: "{\"error\": \"null response\"}")
             if (json.has(AuthConstants.PARAM_ACCESS_TOKEN)) {
                 println("token refreshing was successful")
                 return Credential(json.getString(AuthConstants.PARAM_ACCESS_TOKEN),
@@ -183,7 +182,6 @@ class OAuth2Client(val config: OAuth2Config) {
                     if (response.code() == 401) {
 
                         //token expired
-                        println(response.body().string())
                         println("token expired. try refreshing..")
 
                         val newCredential = refreshToken(credential)
@@ -197,7 +195,7 @@ class OAuth2Client(val config: OAuth2Config) {
                             continue
                         }
                     }
-                    result.add(response.body().string())
+                    result.add(response.body()!!.string())
                 }
                 return converter.process(result.toTypedArray())
             } catch(e: Exception) {
@@ -225,7 +223,7 @@ class OAuth2Client(val config: OAuth2Config) {
                     .add("token", credentials[0].accessToken)
                     .build()
 
-            val request = makeRequestBuilderWithAuthHeader(HttpUrl.parse(config.revokeUrl))
+            val request = makeRequestBuilderWithAuthHeader(HttpUrl.parse(config.revokeUrl)!!)
                     .post(requestBody)
                     .build()
 
@@ -255,7 +253,7 @@ class OAuth2Client(val config: OAuth2Config) {
 
     private fun exchangeToken(requestCode: String): rx.Observable<Credential> {
         return Observable.defer {
-            val uri = HttpUrl.parse(config.tokenRequestUrl)
+            val uri = HttpUrl.parse(config.tokenRequestUrl)!!
 
             val requestBody = FormBody.Builder()
                     .add(AuthConstants.PARAM_CODE, requestCode)
@@ -272,7 +270,7 @@ class OAuth2Client(val config: OAuth2Config) {
             if (NetworkHelper.isConnectedToInternet()) {
                 try {
                     val response = OkHttpClient().newCall(request).execute()
-                    val json = JSONObject(response.body().string())
+                    val json = JSONObject(response.body()!!.string())
                     println(json)
                     if (json.has(AuthConstants.PARAM_ACCESS_TOKEN)) {
                         println("successfully exchanged code to credential.")
@@ -300,7 +298,7 @@ class OAuth2Client(val config: OAuth2Config) {
         }
 
         override fun doInBackground(vararg p0: String): Credential? {
-            val uri = HttpUrl.parse(config.tokenRequestUrl)
+            val uri = HttpUrl.parse(config.tokenRequestUrl)!!
 
             val requestBody = FormBody.Builder()
                     .add(AuthConstants.PARAM_CODE, p0[0])
@@ -317,7 +315,7 @@ class OAuth2Client(val config: OAuth2Config) {
             if (NetworkHelper.isConnectedToInternet()) {
                 try {
                     val response = OkHttpClient().newCall(request).execute()
-                    val json = JSONObject(response.body().string())
+                    val json = JSONObject(response.body()!!.string())
                     println(json)
                     if (json.has(AuthConstants.PARAM_ACCESS_TOKEN)) {
                         println("successfully exchanged code to credential.")

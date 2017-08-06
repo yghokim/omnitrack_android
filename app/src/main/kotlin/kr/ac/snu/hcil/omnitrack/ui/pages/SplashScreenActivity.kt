@@ -3,9 +3,12 @@ package kr.ac.snu.hcil.omnitrack.ui.pages
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailability
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
+import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 
 
 /**
@@ -18,10 +21,41 @@ class SplashScreenActivity : OTActivity(checkRefreshingCredential = true, checkU
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         val pref = getSharedPreferences("app_info", Context.MODE_PRIVATE)
 
         if (pref.getBoolean("first_launch in this system", false)) {
             //first run
+        }
+    }
+
+    override fun processAuthorization() {
+
+        //check google play service availability
+
+        val googleApiAvailability = GoogleApiAvailability.getInstance()
+        val googlePlayServiceStatus = googleApiAvailability.isGooglePlayServicesAvailable(this.applicationContext)
+
+        if (googlePlayServiceStatus != ConnectionResult.SUCCESS) {
+            //google play service is not available for now.
+            if (googleApiAvailability.isUserResolvableError(googlePlayServiceStatus)) {
+                googleApiAvailability.makeGooglePlayServicesAvailable(this).addOnCompleteListener {
+                    result ->
+                    if (result.isSuccessful) {
+                        super.processAuthorization()
+                    } else {
+                        finish()
+                    }
+                }
+            } else {
+                //unsupported device.
+                DialogHelper.makeSimpleAlertBuilder(this, "This device may not to support Google Play services, which is required to run the OmniTrack app. If you are in the region such as China, where the Google Play service is unavailable, we're sorry to confirm that you can't use OmniTrack :(")
+                        .dismissListener {
+                            finish()
+                        }.show()
+            }
+        } else {
+            super.processAuthorization()
         }
     }
 
