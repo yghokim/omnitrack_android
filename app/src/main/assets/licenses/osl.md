@@ -92,10 +92,6 @@ The MIT license (MIT)
 <https://github.com/atteo/evo-inflector><br>
 Apache 2.0 license
 
-#####Apache Commons Math
-<http://commons.apache.org/proper/commons-math/><br>
-Apache 2.0 license
-
 #####Android Tooltip
 <https://github.com/sephiroth74/android-target-tooltip/><br>
 Apache 2.0 license

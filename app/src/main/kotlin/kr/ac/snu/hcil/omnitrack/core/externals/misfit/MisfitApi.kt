@@ -130,7 +130,7 @@ object MisfitApi {
             if (NetworkHelper.isConnectedToInternet()) {
                 try {
                     val response = OkHttpClient().newCall(request).execute()
-                    val responseBody = response.body().string()
+                    val responseBody = response.body()!!.string()
                     println(responseBody)
                     return@defer Observable.just(JSONObject(responseBody))
                 } catch(e: Exception) {
@@ -159,7 +159,7 @@ object MisfitApi {
 
             try {
                 val response = OkHttpClient().newCall(request).execute()
-                val result = JSONObject(response.body().string())
+                val result = JSONObject(response.body()!!.string())
                 if (result.has(AuthConstants.PARAM_ACCESS_TOKEN)) {
                     return@defer Observable.just(result.getString(AuthConstants.PARAM_ACCESS_TOKEN))
                 } else return@defer Observable.error<String>(Exception("token empty"))

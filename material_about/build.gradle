@@ -37,3 +37,8 @@ dependencies {
     compile "com.android.support:design:$rootProject.ext.android_support_version"
     testCompile 'junit:junit:4.12'
 }
+
+repositories {
+    jcenter()
+    maven { url 'https://maven.google.com' }
+}
