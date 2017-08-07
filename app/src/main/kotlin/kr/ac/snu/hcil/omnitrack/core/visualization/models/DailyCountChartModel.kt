@@ -17,62 +17,26 @@ import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.Nu
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.QuantizedTimeScale
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers.ATimelineChartDrawer
 import kr.ac.snu.hcil.omnitrack.utils.DataHelper
-import rx.subscriptions.CompositeSubscription
-import java.util.*
+import rx.Observable
 
 /**
  * Created by younghokim on 2017. 5. 8..
  */
 class DailyCountChartModel(tracker: OTTracker) : TrackerChartModel<Pair<Long, Int>>(tracker) {
-
-    private val dataPoints = ArrayList<Pair<Long, Int>>()
-    private var _isLoaded = false
-    private var subscriptions = CompositeSubscription()
-
-    override fun getDataPointAt(position: Int): Pair<Long, Int> {
-        return dataPoints[position]
-    }
-
-    override fun getDataPoints(): List<Pair<Long, Int>> {
-        return dataPoints
-    }
-
-    override val numDataPoints: Int get() = dataPoints.size
-
     override val name: String = String.format(OTApplication.app.getString(R.string.msg_vis_daily_count_title_format), tracker.name)
 
-    override val isLoaded: Boolean
-        get() = _isLoaded
 
-    override fun onReload(finished: (Boolean) -> Unit) {
-        subscriptions.clear()
+    override fun reloadData(): Observable<List<Pair<Long, Int>>> {
 
         val xScale = QuantizedTimeScale()
         xScale.setDomain(getTimeScope().from, getTimeScope().to)
         xScale.quantize(currentGranularity)
 
-        subscriptions.add(
-                DatabaseManager.loadItems(tracker, getTimeScope(), DatabaseManager.Order.ASC).subscribe({
+        return DatabaseManager.loadItems(tracker, getTimeScope(), DatabaseManager.Order.ASC).map {
                     items ->
-                    val binnedData = DataHelper.ConvertSortedListToBinWithLong((xScale.binPointsOnDomain + getTimeScope().to).toTypedArray(),
-                            items, { item -> item.timestamp })
-
-                    synchronized(dataPoints)
-                    {
-                        dataPoints.clear()
-                        dataPoints.addAll(binnedData.map { bin -> Pair(bin.x0, bin.values.size) })
-                    }
-
-                    _isLoaded = true
-                    finished.invoke(true)
-                }, { finished.invoke(false) })
-        )
-    }
-
-    override fun recycle() {
-        dataPoints.clear()
-        _isLoaded = false
-        subscriptions.clear()
+            DataHelper.ConvertSortedListToBinWithLong((xScale.binPointsOnDomain + getTimeScope().to).toTypedArray(),
+                    items, { item -> item.timestamp }).map { bin -> Pair(bin.x0, bin.values.size) }
+        }
     }
 
     override fun getChartDrawer(): AChartDrawer {
@@ -132,13 +96,13 @@ class DailyCountChartModel(tracker: OTTracker) : TrackerChartModel<Pair<Long, In
                 todayCenterX = xScale[xScale.binPointsOnDomain[todayIndex]]
             }
 
-            val minCount = this@DailyCountChartModel.dataPoints.minBy { elm -> elm.second }?.second ?: 0
-            val maxCount = this@DailyCountChartModel.dataPoints.maxBy { elm -> elm.second }?.second ?: 0
+            val minCount = this@DailyCountChartModel.cachedData.minBy { elm -> elm.second }?.second ?: 0
+            val maxCount = this@DailyCountChartModel.cachedData.maxBy { elm -> elm.second }?.second ?: 0
 
             yScale.setDomain(minCount.toFloat(), maxCount.toFloat(), true)
             yScale.nice(true)
 
-            counterBarGroups.setData(this@DailyCountChartModel.dataPoints)
+            counterBarGroups.setData(this@DailyCountChartModel.cachedData)
 
             counterBarGroups.appendEnterSelection { datum ->
                 datum.value
