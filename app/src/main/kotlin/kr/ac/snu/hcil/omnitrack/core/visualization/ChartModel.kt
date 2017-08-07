@@ -3,50 +3,88 @@ package kr.ac.snu.hcil.omnitrack.core.visualization
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.IChartInterface
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
-import kr.ac.snu.hcil.omnitrack.utils.events.Event
+import rx.Observable
+import rx.android.schedulers.AndroidSchedulers
+import rx.subjects.BehaviorSubject
+import rx.subscriptions.CompositeSubscription
 
 /**
  * Created by younghokim on 16. 9. 7..
  */
-abstract class ChartModel<T>(): IChartInterface<T> {
+abstract class ChartModel<T>() : IChartInterface<T> {
+    override fun getDataPointAt(position: Int): T {
+        return cachedData[position]
+    }
+
+    override fun getDataPoints(): List<T> {
+        return cachedData
+    }
+
+    enum class State {
+        Unloaded, Loading, Loaded
+    }
 
     abstract val name: String
 
-    abstract val numDataPoints: Int
-    abstract val isLoaded: Boolean
+    protected val cachedData = ArrayList<T>()
 
-    val onReloaded = Event<Boolean>()
+    val numDataPoints: Int get() = cachedData.size
+
+    private var _stateSubject: BehaviorSubject<State> = BehaviorSubject.create(State.Unloaded)
+    val stateObservable: Observable<State> get() = _stateSubject
+
+    private val internalSubscriptions = CompositeSubscription()
 
     private val queryRange = TimeSpan()
     protected var currentGranularity: Granularity = Granularity.WEEK
         private set
 
-    var isLoading: Boolean = false
-        private set
+    var currentState = _stateSubject.value!!
+        private set(value) {
+            _stateSubject.onNext(value)
+        }
 
-    private var invalidated: Boolean = true
+    private var invalidated = false
 
-    fun reload()
-    {
-        if (!isLoading) {
-            isLoading = true
+    protected open fun onNewDataLoaded(data: List<T>) {
+        this.cachedData.clear()
+        this.cachedData.addAll(data)
+    }
+
+    fun reload() {
+        if ((currentState == State.Unloaded) || (currentState == State.Loaded && invalidated)) {
+            val lastState = currentState
+            currentState = State.Loading
             invalidated = false
-            onReload {
-                success ->
-                isLoading = false
-                if (invalidated) {
-                    reload()
-                } else onReloaded.invoke(this, success)
-            }
+            internalSubscriptions.add(
+                    reloadData().observeOn(AndroidSchedulers.mainThread()).subscribe({
+                        data ->
+                        onNewDataLoaded(data)
+                        currentState = State.Loaded
+                        if (invalidated == true) {
+                            reload()
+                        }
+                    }, {
+                        ex ->
+                        ex.printStackTrace()
+                        invalidated = true
+                        currentState = lastState
+                    })
+            )
         } else {
             invalidate()
         }
     }
 
-    abstract fun onReload(finished: (Boolean) -> Unit)
-    abstract fun recycle()
+    open fun cancelLoading() {
+        internalSubscriptions.clear()
+    }
 
-    val isEmpty: Boolean get() = numDataPoints == 0
+    abstract fun reloadData(): Observable<List<T>>
+
+    open fun recycle() {
+        internalSubscriptions.clear()
+    }
 
     abstract fun getChartDrawer(): AChartDrawer
 
@@ -61,7 +99,7 @@ abstract class ChartModel<T>(): IChartInterface<T> {
     }
 
 
-    fun getCurrentScopeGranularity(): Granularity{
+    fun getCurrentScopeGranularity(): Granularity {
         return currentGranularity
     }
 

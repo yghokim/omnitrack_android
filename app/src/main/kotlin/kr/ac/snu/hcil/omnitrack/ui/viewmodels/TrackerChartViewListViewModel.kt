@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui.viewmodels
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.Granularity
+import rx.Observable
 import rx.subjects.BehaviorSubject
 
 /**
@@ -14,7 +15,9 @@ class TrackerChartViewListViewModel : TrackerAttachedViewModel() {
     val currentPointSubject: BehaviorSubject<Long> = BehaviorSubject.create(System.currentTimeMillis())
     val isBusySubject: BehaviorSubject<Boolean> = BehaviorSubject.create(false)
 
-    private val currentChartViewModels = ArrayList<ChartModel<out Any>>()
+    private val currentChartViewModelList = ArrayList<ChartModel<out Any>>()
+    private val chartViewModelListSubject: BehaviorSubject<List<ChartModel<out Any>>> = BehaviorSubject.create()
+    val chartViewModels: Observable<List<ChartModel<out Any>>> get() = chartViewModelListSubject
 
     var granularity: Granularity?
         get() = currentGranularitySubject.value
@@ -30,6 +33,16 @@ class TrackerChartViewListViewModel : TrackerAttachedViewModel() {
 
     override fun onTrackerAttached(newTracker: OTTracker) {
         super.onTrackerAttached(newTracker)
+
+    }
+
+    private fun clearChartViewModels() {
+        currentChartViewModelList.forEach {
+            model ->
+            model.recycle()
+        }
+        currentChartViewModelList.clear()
+
     }
 
     fun setScope(point: Long, granularity: Granularity) {
