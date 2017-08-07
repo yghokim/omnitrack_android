@@ -7,6 +7,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
 import kr.ac.snu.hcil.omnitrack.utils.events.IEventListener
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
+import rx.subscriptions.CompositeSubscription
 import kotlin.properties.Delegates
 
 /**
@@ -31,12 +32,7 @@ class ChartView : LinearLayout, IEventListener<ChartModel<*>?> {
         }
         */
 
-    val onModelReloaded = {
-        sender:Any, success:Boolean->
-
-        chartView.chartDrawer?.refresh()
-        chartView.invalidate()
-    }
+    private val internalSubscriptions = CompositeSubscription()
 
     var model: ChartModel<*>? by Delegates.observable(null as ChartModel<*>?)
     {
@@ -45,12 +41,22 @@ class ChartView : LinearLayout, IEventListener<ChartModel<*>?> {
         {
             if(old!=null)
             {
-                old.onReloaded -= onModelReloaded
+                internalSubscriptions.clear()
                 old.recycle()
             }
 
             if (new != null) {
-                new.onReloaded += onModelReloaded
+
+                internalSubscriptions.add(
+                        new.stateObservable.subscribe { state ->
+                            when (state) {
+                                ChartModel.State.Loaded -> {
+                                    chartView.chartDrawer?.refresh()
+                                    chartView.invalidate()
+                                }
+                            }
+                        }
+                )
                 chartView.chartDrawer = new.getChartDrawer()
                 chartView.chartDrawer?.model = new
                 chartView.invalidate()

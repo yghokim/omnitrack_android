@@ -12,7 +12,7 @@ import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.ILineChartOnTime
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.QuantizedTimeScale
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers.MultiLineChartDrawer
-import rx.subscriptions.CompositeSubscription
+import rx.Observable
 import java.math.BigDecimal
 import java.util.*
 
@@ -24,29 +24,15 @@ class TimelineComparisonLineChartModel(override val attributes: List<OTNumberAtt
 
     override val name: String = OTApplication.app.resourcesWrapped.getString(R.string.msg_vis_numeric_line_timeline_title)
 
-    override val numDataPoints: Int get() = data.size
-
-    override val isLoaded: Boolean
-        get() = _isLoaded
-
-    private var _isLoaded = false
-
-    private val data = ArrayList<ILineChartOnTime.TimeSeriesTrendData>()
-
-    private val values = ArrayList<BigDecimal>()
-
-    private val subscriptions = CompositeSubscription()
-
-    override fun onReload(finished: (Boolean) -> Unit) {
-        data.clear()
-        subscriptions.clear()
+    override fun reloadData(): Observable<List<ILineChartOnTime.TimeSeriesTrendData>> {
+        val data = ArrayList<ILineChartOnTime.TimeSeriesTrendData>()
+        val values = ArrayList<BigDecimal>()
 
         val xScale = QuantizedTimeScale()
         xScale.setDomain(getTimeScope().from, getTimeScope().to)
         xScale.quantize(currentGranularity)
 
-        subscriptions.add(
-                DatabaseManager.loadItems(parent, getTimeScope(), DatabaseManager.Order.ASC).subscribe {
+        return DatabaseManager.loadItems(parent, getTimeScope(), DatabaseManager.Order.ASC).map {
                     items ->
 
                     var currentItemPointer = 0
@@ -97,19 +83,8 @@ class TimelineComparisonLineChartModel(override val attributes: List<OTNumberAtt
                         ILineChartOnTime.TimeSeriesTrendData(it.value.toTypedArray(), it.key)
                     }
                 }
-
-                    values.clear()
-
-
-                    _isLoaded = true
-                    finished.invoke(true)
-            }
-        )
-    }
-
-    override fun recycle() {
-        data.clear()
-        subscriptions.clear()
+            data
+        }
     }
 
     override fun getChartDrawer(): AChartDrawer {
@@ -120,13 +95,5 @@ class TimelineComparisonLineChartModel(override val attributes: List<OTNumberAtt
         drawer.verticalAxis.labelPaint.isFakeBoldText = true
         drawer.verticalAxis.labelPaint.textSize = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_axis_label_numeric_size)
         return drawer
-    }
-
-    override fun getDataPointAt(position: Int): ILineChartOnTime.TimeSeriesTrendData {
-        return data[position]
-    }
-
-    override fun getDataPoints(): List<ILineChartOnTime.TimeSeriesTrendData> {
-        return data
     }
 }

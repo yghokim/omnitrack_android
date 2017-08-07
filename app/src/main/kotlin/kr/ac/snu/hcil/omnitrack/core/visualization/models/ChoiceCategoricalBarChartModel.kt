@@ -9,42 +9,33 @@ import kr.ac.snu.hcil.omnitrack.core.visualization.AttributeChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.ICategoricalBarChart
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers.CategoricalBarChartDrawer
-import rx.subscriptions.CompositeSubscription
+import rx.Observable
 import java.util.*
 
 /**
  * Created by younghokim on 16. 9. 7..
  */
 class ChoiceCategoricalBarChartModel(override val attribute: OTChoiceAttribute) : AttributeChartModel<ICategoricalBarChart.Point>(attribute), ICategoricalBarChart {
-    private var loaded = false
-    private val data = ArrayList<ICategoricalBarChart.Point>()
 
     private val counterDictCache = SparseIntArray() // entry id : count
     private val categoriesCache = HashSet<Int>()
-
-    override val isLoaded: Boolean get() = !loaded
-
-    override val numDataPoints: Int get() = data.size
-
-    private val subscriptions = CompositeSubscription()
 
     override val name: String
         get() = String.format(OTApplication.app.resourcesWrapped.getString(R.string.msg_vis_categorical_distribution_title_format), super.name)
 
     override fun recycle() {
-        data.clear()
-        subscriptions.clear()
+        counterDictCache.clear()
+        categoriesCache.clear()
     }
 
-    override fun onReload(finished: (Boolean) -> Unit) {
-
-        subscriptions.clear()
-
+    override fun reloadData(): Observable<List<ICategoricalBarChart.Point>> {
         val tracker = attribute.tracker
         if (tracker != null) {
-            subscriptions.add(
-                    DatabaseManager.loadItems(tracker, getTimeScope()).subscribe({
+            return DatabaseManager.loadItems(tracker, getTimeScope()).map {
                 items ->
+
+                val data = ArrayList<ICategoricalBarChart.Point>()
+
                 counterDictCache.clear()
                 categoriesCache.clear()
 
@@ -57,7 +48,7 @@ class ChoiceCategoricalBarChartModel(override val attribute: OTChoiceAttribute) 
 
                 items.map { it.getValueOf(attribute) as? IntArray }
                         .forEach {
-                            if (it != null && it.size > 0) {
+                            if (it != null && it.isNotEmpty()) {
                                 for (id in it) {
                                     if (categoriesCache.contains(id) == false) {
                                         categoriesCache.add(id)
@@ -87,24 +78,13 @@ class ChoiceCategoricalBarChartModel(override val attribute: OTChoiceAttribute) 
 
                 categoriesCache.clear()
                 counterDictCache.clear()
-                finished.invoke(true)
-            }, {
-                finished.invoke(false)
-            })
-            )
+
+                return@map data
+            }
+        } else {
+            throw IllegalArgumentException("No tracker is assigned in the field.")
         }
     }
-
-
-    override fun getDataPoints(): List<ICategoricalBarChart.Point> {
-        return data
-    }
-
-
-    override fun getDataPointAt(position: Int): ICategoricalBarChart.Point {
-        return data[position]
-    }
-
 
     override fun getChartDrawer(): AChartDrawer {
         val drawer = CategoricalBarChartDrawer()

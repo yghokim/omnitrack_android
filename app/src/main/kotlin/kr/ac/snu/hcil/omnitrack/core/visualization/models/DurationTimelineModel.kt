@@ -24,7 +24,6 @@ import kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers.ATimelineCha
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 import rx.Observable
 import rx.functions.Func1
-import rx.subscriptions.CompositeSubscription
 import java.util.*
 
 /**
@@ -34,26 +33,13 @@ class DurationTimelineModel(override val attribute: OTTimeSpanAttribute) : Attri
 
     data class AggregatedDuration(val time: Long, val count: Int, val avgFrom: Float, val avgTo: Float, val earliest: Float = avgFrom, val latest: Float = avgTo)
 
-
-    private var _isLoaded = false
-
-    override val isLoaded: Boolean
-        get() = _isLoaded
-
-    private val data = ArrayList<AggregatedDuration>()
-
-    private val subscriptions = CompositeSubscription()
-
-    override fun onReload(finished: (Boolean) -> Unit) {
-
-        subscriptions.clear()
+    override fun reloadData(): Observable<List<AggregatedDuration>> {
 
         val xScale = QuantizedTimeScale()
         xScale.setDomain(getTimeScope().from, getTimeScope().to)
         xScale.quantize(currentGranularity)
 
-        subscriptions.add(
-                Observable.zip((0..xScale.numTicks - 1).map { xIndex ->
+        return Observable.zip((0..xScale.numTicks - 1).map { xIndex ->
 
                     val from = xScale.binPointsOnDomain[xIndex]
                     val to = if (xIndex < xScale.numTicks - 1) xScale.binPointsOnDomain[xIndex + 1]
@@ -94,8 +80,7 @@ class DurationTimelineModel(override val attribute: OTTimeSpanAttribute) : Attri
                 }, { it ->
                     println(it)
                     it.filter { it is AggregatedDuration }.map { it as AggregatedDuration }.toList()
-                }).subscribe({ it -> println("duration list received"); data.clear(); data.addAll(it); println(data); finished.invoke(true) }, { finished.invoke(false) })
-        )
+        })
     }
 
     private fun timeToRatio(time: Long, pivot: Long): Float
@@ -103,25 +88,9 @@ class DurationTimelineModel(override val attribute: OTTimeSpanAttribute) : Attri
         return (time - pivot)/ DateUtils.HOUR_IN_MILLIS.toFloat()
     }
 
-    override fun recycle() {
-        data.clear()
-        subscriptions.clear()
-    }
-
     override fun getChartDrawer(): AChartDrawer {
         return DurationChartDrawer()
     }
-
-    override fun getDataPointAt(position: Int): AggregatedDuration {
-        return data[position]
-    }
-
-    override fun getDataPoints(): List<AggregatedDuration> {
-        return data
-    }
-
-    override val numDataPoints: Int
-        get() = data.size
 
     inner class DurationBar : ADataEncodedDrawer<AggregatedDuration> {
 
@@ -275,7 +244,7 @@ class DurationTimelineModel(override val attribute: OTTimeSpanAttribute) : Attri
 
             durationBarWidth = Math.min(durationBarMaxWidth, xScale.getTickInterval() - 2.5f * OTApplication.app.resourcesWrapped.displayMetrics.density)
 
-            durationBars.setData(this@DurationTimelineModel.data)
+            durationBars.setData(this@DurationTimelineModel.cachedData)
 
             durationBars.appendEnterSelection {
                 datum->
