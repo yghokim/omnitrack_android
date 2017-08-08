@@ -14,6 +14,7 @@ import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.utils.UniqueStringEntryList
+import kr.ac.snu.hcil.omnitrack.utils.dipRound
 import java.util.*
 import kotlin.properties.Delegates
 
@@ -36,7 +37,7 @@ class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
         listView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         listView.adapter = adapter
         listView.itemAnimator.changeDuration = 200
-        listView.addItemDecoration(HorizontalDividerItemDecoration(ContextCompat.getColor(context, R.color.separator_Light), (0.8f * (resources.displayMetrics.density + 0.5f)).toInt(), resources.getDimensionPixelSize(R.dimen.choice_indicator_size) + resources.getDimensionPixelSize(R.dimen.choice_indicator_spacing)))
+        listView.addItemDecoration(HorizontalDividerItemDecoration(ContextCompat.getColor(context, R.color.separator_Light), dipRound(0.8f), resources.getDimensionPixelSize(R.dimen.choice_indicator_size) + resources.getDimensionPixelSize(R.dimen.choice_indicator_spacing)))
 
     }
 

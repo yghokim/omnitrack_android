@@ -7,6 +7,7 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.util.AttributeSet
 import android.view.View
+import kr.ac.snu.hcil.omnitrack.utils.dipSize
 
 /**
  * Created by Young-Ho Kim on 8/7/2016
@@ -42,7 +43,7 @@ class ProcessArrowIndicator : View {
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
     init {
-        arrowPointRadius = context.resources.displayMetrics.density * 2.5f
+        arrowPointRadius = dipSize(2.5f)
 
         arrowHeadLineLength = arrowPointRadius * 3.5f
 

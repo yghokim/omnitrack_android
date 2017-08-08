@@ -9,6 +9,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
 import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.utils.dipSize
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 
 /**
@@ -64,7 +65,7 @@ class ColorPaletteView(context: Context, attrs: AttributeSet?, defStyle: Int) : 
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val view = ColorSelectionButton(context)
-            buttonSize = ((parent.measuredWidth - parent.paddingLeft - parent.paddingRight) / itemCount - 4 * resources.displayMetrics.density).toInt()
+            buttonSize = ((parent.measuredWidth - parent.paddingLeft - parent.paddingRight) / itemCount - dipSize(4)).toInt()
             view.layoutParams = LayoutParams(buttonSize, buttonSize)
             return ViewHolder(view)
         }

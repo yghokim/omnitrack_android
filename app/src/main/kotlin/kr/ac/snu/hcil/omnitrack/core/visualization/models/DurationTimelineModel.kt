@@ -21,6 +21,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.element.D
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.NumericScale
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.QuantizedTimeScale
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers.ATimelineChartDrawer
+import kr.ac.snu.hcil.omnitrack.utils.dipSize
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 import rx.Observable
 import rx.functions.Func1
@@ -197,7 +198,7 @@ class DurationTimelineModel(override val attribute: OTTimeSpanAttribute) : Attri
             paint.style = Paint.Style.FILL
             paint.color = ContextCompat.getColor(OTApplication.app, R.color.colorPointed_Light)
 
-            pointPaint.strokeWidth = 2f * OTApplication.app.resourcesWrapped.displayMetrics.density
+            pointPaint.strokeWidth = dipSize(2f)
             pointPaint.style = Paint.Style.STROKE
             pointPaint.color = ContextCompat.getColor(OTApplication.app, R.color.colorPointed)
 
@@ -242,7 +243,7 @@ class DurationTimelineModel(override val attribute: OTTimeSpanAttribute) : Attri
         override fun onRefresh() {
             super.onRefresh()
 
-            durationBarWidth = Math.min(durationBarMaxWidth, xScale.getTickInterval() - 2.5f * OTApplication.app.resourcesWrapped.displayMetrics.density)
+            durationBarWidth = Math.min(durationBarMaxWidth, xScale.getTickInterval() - dipSize(2.5f))
 
             durationBars.setData(this@DurationTimelineModel.cachedData)
 

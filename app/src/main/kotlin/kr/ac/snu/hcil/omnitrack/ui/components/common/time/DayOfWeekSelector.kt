@@ -15,6 +15,7 @@ import android.widget.LinearLayout
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.BitwiseOperationHelper
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
+import kr.ac.snu.hcil.omnitrack.utils.dipSize
 
 /**
  * Created by Young-Ho on 8/25/2016.
@@ -70,7 +71,7 @@ class DayOfWeekSelector : LinearLayout, View.OnClickListener {
             val lp = LayoutParams(0, resources.getDimensionPixelSize(R.dimen.button_height_normal))
             lp.weight = 1f
             lp.gravity = Gravity.CENTER_VERTICAL
-            button.inset = 3 * resources.displayMetrics.density
+            button.inset = dipSize(3)
             button.tag = index
             button.text = oneLetterDayNames[index].toUpperCase()
             button.setPadding(0, 0, 0, 0)

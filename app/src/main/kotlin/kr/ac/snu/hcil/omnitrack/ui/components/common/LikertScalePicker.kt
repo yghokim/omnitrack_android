@@ -12,6 +12,7 @@ import android.view.MotionEvent
 import android.view.View
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.utils.dipSize
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kotlin.properties.Delegates
 
@@ -243,7 +244,7 @@ class LikertScalePicker : View, GestureDetector.OnGestureListener {
         val rightLabelLayout = makeMultilineStaticLayout(rightLabel, labelTextPaint, contentWidth / 5, Layout.Alignment.ALIGN_NORMAL)
         canvas.save()
 
-        canvas.translate((paddingLeft + contentWidth).toFloat() - 2 * resources.displayMetrics.density, _labelY)
+        canvas.translate((paddingLeft + contentWidth).toFloat() - dipSize(2), _labelY)
         rightLabelLayout.draw(canvas)
         canvas.restore()
 

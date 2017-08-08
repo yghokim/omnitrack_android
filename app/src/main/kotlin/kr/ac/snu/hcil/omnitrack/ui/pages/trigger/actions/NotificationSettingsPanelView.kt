@@ -20,6 +20,7 @@ import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTNotificationTriggerAction
 import kr.ac.snu.hcil.omnitrack.ui.components.common.StringIndicatorPropertyView
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.ITriggerConfigurationCoordinator
+import kr.ac.snu.hcil.omnitrack.utils.dipRound
 
 /**
  * Created by younghokim on 2017. 4. 18..
@@ -120,7 +121,7 @@ class NotificationSettingsPanelView : StringIndicatorPropertyView, ITriggerConfi
 
         return MaterialDialog.Builder(context)
                 .customView(view, true)
-                .customViewHorizontalPadding((resources.displayMetrics.density * 8 + 0.5f).toInt())
+                .customViewHorizontalPadding(dipRound(8))
                 .positiveColorRes(R.color.colorPointed)
                 .negativeColorRes(R.color.colorRed_Light)
                 .positiveText(R.string.msg_apply)

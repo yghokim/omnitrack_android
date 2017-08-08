@@ -9,6 +9,7 @@ import android.view.View
 import android.widget.EditText
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.utils.dipSize
 import kotlin.properties.Delegates
 
 /**
@@ -50,7 +51,7 @@ class LinedTextBase(val textView: View, attrs: AttributeSet?, defStyleAttr: Int 
         linePaint.strokeWidth = 2.0f
         linePaint.color = ContextCompat.getColor(textView.context, R.color.editTextLine)
 
-        lineOffset = 5 * textView.resources.displayMetrics.density
+        lineOffset = dipSize(5)
 
         val a = textView.context.obtainStyledAttributes(attrs, R.styleable.LinedTextView, defStyleAttr, 0)
 

@@ -10,6 +10,7 @@ import android.util.AttributeSet
 import android.view.View
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.NumericScale
+import kr.ac.snu.hcil.omnitrack.utils.dipSize
 
 /**
  * Created by younghokim on 2016. 9. 28..
@@ -68,7 +69,7 @@ class AudioRecorderProgressBar : View {
         volumeLinePaint.style = Paint.Style.STROKE
         volumeLinePaint.color = Color.WHITE
         volumeLinePaint.alpha = 100
-        volumeLinePaint.strokeWidth = resources.displayMetrics.density
+        volumeLinePaint.strokeWidth = dipSize(1)
     }
 
     override fun onDraw(canvas: Canvas) {
