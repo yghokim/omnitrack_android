@@ -37,6 +37,23 @@ fun isInDozeMode(): Boolean {
     return powerManager.isDeviceIdleMode
 }
 
+fun dipRound(value: Float): Int {
+    return (dipSize(value) + 0.5f).toInt()
+}
+
+fun dipRound(value: Int): Int {
+    return (dipSize(value) + 0.5f).toInt()
+}
+
+
+fun dipSize(value: Float): Float {
+    return value * OTApplication.app.resourcesWrapped.displayMetrics.density
+}
+
+fun dipSize(value: Int): Float {
+    return value * OTApplication.app.resourcesWrapped.displayMetrics.density
+}
+
 fun Boolean.toInt(): Int{
     return if(this==true) 1 else 0
 }
