@@ -12,6 +12,8 @@ import butterknife.bindView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.calculation.SingleNumericComparison
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
+import kr.ac.snu.hcil.omnitrack.utils.dipRound
+import kr.ac.snu.hcil.omnitrack.utils.dipSize
 import kr.ac.snu.hcil.omnitrack.utils.setPaddingTop
 import java.text.DecimalFormat
 
@@ -51,8 +53,8 @@ class EventTriggerDisplayView: LinearLayout {
 
             comparedNumberView.setText(R.string.msg_trigger_event_msg_tap_to_configure)
 
-            comparedNumberView.setPaddingTop((10f * resources.displayMetrics.density + .5f).toInt())
-            comparedNumberView.setTextSize(TypedValue.COMPLEX_UNIT_PX, 20f * resources.displayMetrics.density)
+            comparedNumberView.setPaddingTop(dipRound(10f))
+            comparedNumberView.setTextSize(TypedValue.COMPLEX_UNIT_PX, dipSize(20f))
         }
         else{
             symbolView.visibility = View.VISIBLE

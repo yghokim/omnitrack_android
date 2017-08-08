@@ -9,6 +9,7 @@ import android.support.v4.graphics.ColorUtils
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.IDrawer
+import kr.ac.snu.hcil.omnitrack.utils.dipSize
 import kotlin.properties.Delegates
 
 /**
@@ -27,7 +28,7 @@ class Axis(var pivot: Pivot): IDrawer {
 
                 axis.labelPaint.textSize = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_axis_label_numeric_size)
                 axis.labelPaint.isFakeBoldText = true
-                axis.labelSpacing = 2 * OTApplication.app.resourcesWrapped.displayMetrics.density
+                axis.labelSpacing = dipSize(2)
             }
 
         },

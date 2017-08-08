@@ -20,6 +20,7 @@ import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.MeasureFactoryAdapter
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
+import kr.ac.snu.hcil.omnitrack.utils.dipRound
 import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
 import rx.subscriptions.CompositeSubscription
 import rx.subscriptions.SerialSubscription
@@ -151,7 +152,7 @@ class ServiceListFragment : OTFragment() {
                 measureFactoryListView = view.findViewById(R.id.ui_supported_measure_list) as RecyclerView
                 measureFactoryListView.adapter = measureFactoryAdapter
                 measureFactoryListView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-                measureFactoryListView.addItemDecoration(HorizontalDividerItemDecoration(ContextCompat.getColor(context, R.color.separator_Light), (0.6f * resources.displayMetrics.density + .5f).toInt()))
+                measureFactoryListView.addItemDecoration(HorizontalDividerItemDecoration(ContextCompat.getColor(context, R.color.separator_Light), dipRound(0.6f)))
 
                 activationButton = view.findViewById(R.id.ui_button_activate) as AppCompatButton
                 activationButton.supportBackgroundTintList = activateColor

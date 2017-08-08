@@ -13,6 +13,7 @@ import android.support.v4.graphics.ColorUtils
 import android.util.AttributeSet
 import android.widget.Button
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.utils.dipSize
 import kotlin.properties.Delegates
 
 /**
@@ -94,7 +95,7 @@ class AudioRecordingButton : Button, ValueAnimator.AnimatorUpdateListener {
         frameCirclePaint = Paint(Paint.ANTI_ALIAS_FLAG)
         frameCirclePaint.style = Paint.Style.STROKE
         frameCirclePaint.color = ContextCompat.getColor(context, R.color.dividerColor)
-        frameCirclePaint.strokeWidth = 1 * resources.displayMetrics.density
+        frameCirclePaint.strokeWidth = dipSize(1)
 
         buttonCirclePaint = Paint(Paint.ANTI_ALIAS_FLAG)
         buttonCirclePaint.style = Paint.Style.FILL

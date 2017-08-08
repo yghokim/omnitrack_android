@@ -15,25 +15,49 @@ class TrackerChartViewListViewModel : TrackerAttachedViewModel() {
     val currentPointSubject: BehaviorSubject<Long> = BehaviorSubject.create(System.currentTimeMillis())
     val isBusySubject: BehaviorSubject<Boolean> = BehaviorSubject.create(false)
 
-    private val currentChartViewModelList = ArrayList<ChartModel<out Any>>()
-    private val chartViewModelListSubject: BehaviorSubject<List<ChartModel<out Any>>> = BehaviorSubject.create()
-    val chartViewModels: Observable<List<ChartModel<out Any>>> get() = chartViewModelListSubject
+    private val currentChartViewModelList = ArrayList<ChartModel<*>>()
+    private val chartViewModelListSubject: BehaviorSubject<List<ChartModel<*>>> = BehaviorSubject.create()
+    val chartViewModels: Observable<List<ChartModel<*>>> get() = chartViewModelListSubject
+
+    var suspendApplyingScope = false
 
     var granularity: Granularity?
         get() = currentGranularitySubject.value
         set(value) {
             currentGranularitySubject.onNext(value)
+            applyScopeToChartViewModels()
         }
 
     var point: Long?
         get() = currentPointSubject.value
         set(value) {
             currentPointSubject.onNext(value)
+            applyScopeToChartViewModels()
         }
 
     override fun onTrackerAttached(newTracker: OTTracker) {
         super.onTrackerAttached(newTracker)
+        clearChartViewModels()
+        currentChartViewModelList.addAll(newTracker.getRecommendedChartModels())
+    }
 
+    private fun applyScopeToChartViewModels() {
+        if (!suspendApplyingScope) {
+            val point = point
+            val granularity = granularity
+            if (point != null && granularity != null) {
+                currentChartViewModelList.forEach {
+                    model ->
+                    model.setTimeScope(point, granularity)
+                    model.reload()
+                }
+            }
+        }
+    }
+
+    override fun onDispose() {
+        super.onDispose()
+        clearChartViewModels()
     }
 
     private fun clearChartViewModels() {
@@ -42,12 +66,18 @@ class TrackerChartViewListViewModel : TrackerAttachedViewModel() {
             model.recycle()
         }
         currentChartViewModelList.clear()
-
+        chartViewModelListSubject.onNext(emptyList())
     }
 
     fun setScope(point: Long, granularity: Granularity) {
+        val suspending = suspendApplyingScope
+        suspendApplyingScope = true
         this.granularity = granularity
         this.point = point
+        if (!suspending) {
+            suspendApplyingScope = false
+            applyScopeToChartViewModels()
+        }
     }
 
     fun refreshCharts() {

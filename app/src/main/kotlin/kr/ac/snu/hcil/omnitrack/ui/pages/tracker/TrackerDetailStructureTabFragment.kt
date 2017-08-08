@@ -37,6 +37,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.tutorial.TutorialManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.ConnectionIndicatorStubProxy
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeDetailActivity
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
+import kr.ac.snu.hcil.omnitrack.utils.dipRound
 import kr.ac.snu.hcil.omnitrack.utils.startActivityOnDelay
 import rx.subscriptions.CompositeSubscription
 
@@ -128,7 +129,7 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
         }
 
         attributeListView = rootView.findViewById(R.id.ui_attribute_list) as AdapterLinearLayout
-        attributeListView.setViewIntervalDistance((resources.displayMetrics.density * 8 + .5f).toInt())
+        attributeListView.setViewIntervalDistance(dipRound(8))
         attributeListView.emptyView = rootView.findViewById(R.id.ui_empty_list_message)
         val layoutManager = object : LinearLayoutManager(context, VERTICAL, false) {
             override fun canScrollVertically(): Boolean {

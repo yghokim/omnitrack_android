@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.visualization
 
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -15,6 +16,7 @@ import kr.ac.snu.hcil.omnitrack.core.visualization.Granularity
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTTrackerAttachedActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.choice.SelectionView
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
+import kr.ac.snu.hcil.omnitrack.ui.viewmodels.TrackerChartViewListViewModel
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 
 class ChartViewActivity : OTTrackerAttachedActivity(R.layout.activity_chart_view), View.OnClickListener {
@@ -41,6 +43,8 @@ class ChartViewActivity : OTTrackerAttachedActivity(R.layout.activity_chart_view
         get() = supportedGranularity[scopeSelectionView.selectedIndex]
 
     private var currentPoint: Long = System.currentTimeMillis()
+
+    private lateinit var viewModel: TrackerChartViewListViewModel
 
     private lateinit var listView: RecyclerView
 
@@ -76,6 +80,9 @@ class ChartViewActivity : OTTrackerAttachedActivity(R.layout.activity_chart_view
 
         listView.adapter = adapter
 
+
+        viewModel = ViewModelProviders.of(this).get(TrackerChartViewListViewModel::class.java)
+
     }
 
     override fun onToolbarLeftButtonClicked() {
@@ -92,6 +99,8 @@ class ChartViewActivity : OTTrackerAttachedActivity(R.layout.activity_chart_view
         adapter.tracker = tracker
 
         title = String.format(resources.getString(R.string.title_activity_chart_view, tracker.name))
+
+        viewModel.tracker = tracker
 
         currentPoint = System.currentTimeMillis()
 

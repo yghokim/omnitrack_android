@@ -17,6 +17,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.Nu
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.QuantizedTimeScale
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers.ATimelineChartDrawer
 import kr.ac.snu.hcil.omnitrack.utils.DataHelper
+import kr.ac.snu.hcil.omnitrack.utils.dipSize
 import rx.Observable
 
 /**
@@ -67,7 +68,7 @@ class DailyCountChartModel(tracker: OTTracker) : TrackerChartModel<Pair<Long, In
         private val todayPaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
         init {
-            paddingTop = 17 * OTApplication.app.resourcesWrapped.displayMetrics.density
+            paddingTop = dipSize(17)
 
             yAxis.style = Axis.TickLabelStyle.Small
             yAxis.drawBar = false
@@ -76,7 +77,7 @@ class DailyCountChartModel(tracker: OTTracker) : TrackerChartModel<Pair<Long, In
 
             horizontalAxis.drawGridLines = false
 
-            textPadding = 5 * OTApplication.app.resourcesWrapped.displayMetrics.density
+            textPadding = dipSize(5)
 
             todayPaint.color = todayBackgroundColor
 
@@ -145,9 +146,9 @@ class DailyCountChartModel(tracker: OTTracker) : TrackerChartModel<Pair<Long, In
 
             if (this@DailyCountChartModel.getCurrentScopeGranularity() <=
                     Granularity.WEEK_2_REL) {
-                bar.textPaint.textSize = 14 * OTApplication.app.resourcesWrapped.displayMetrics.density
+                bar.textPaint.textSize = dipSize(14)
             } else {
-                bar.textPaint.textSize = 10 * OTApplication.app.resourcesWrapped.displayMetrics.density
+                bar.textPaint.textSize = dipSize(10)
             }
         }
 

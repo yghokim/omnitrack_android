@@ -22,6 +22,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.dependency.DependencyContro
 import kr.ac.snu.hcil.omnitrack.ui.components.common.dependency.DependencyControlViewModel
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.utils.TextHelper
+import kr.ac.snu.hcil.omnitrack.utils.dipRound
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 import mehdi.sakout.fancybuttons.FancyButton
 import rx.android.schedulers.AndroidSchedulers
@@ -83,7 +84,7 @@ class ExternalServiceActivationActivity : OTActivity(false, false) {
         dependencyListView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         dependencyListView.adapter = dependencyAdapter
         dependencyListView.addItemDecoration(HorizontalDividerItemDecoration(ContextCompat.getColor(this, R.color.separator_Light),
-                (1 * resources.displayMetrics.density + .5f).toInt(),
+                dipRound(1),
                 resources.getDimensionPixelSize(R.dimen.activity_horizontal_margin),
                 resources.getDimensionPixelSize(R.dimen.activity_horizontal_margin)
         ))

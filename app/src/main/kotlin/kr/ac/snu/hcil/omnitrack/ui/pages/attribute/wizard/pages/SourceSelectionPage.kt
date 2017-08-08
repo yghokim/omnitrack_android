@@ -17,6 +17,7 @@ import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.AWizardPage
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.wizard.ConnectionWizardView
+import kr.ac.snu.hcil.omnitrack.utils.dipRound
 
 /**
  * Created by Young-Ho Kim on 2016-08-30.
@@ -67,7 +68,7 @@ class SourceSelectionPage(override val parent: ConnectionWizardView, val attribu
         init {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
             addItemDecoration(HorizontalDividerItemDecoration(ContextCompat.getColor(context, R.color.separator_Light),
-                    (1.5f * resources.displayMetrics.density).toInt(),
+                    dipRound(1.5f),
                     resources.getDimensionPixelSize(R.dimen.activity_horizontal_margin),
                     resources.getDimensionPixelSize(R.dimen.activity_horizontal_margin)))
 
