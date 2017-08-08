@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.viewmodels
 
+import android.support.v7.util.DiffUtil
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.Granularity
@@ -24,21 +25,26 @@ class TrackerChartViewListViewModel : TrackerAttachedViewModel() {
     var granularity: Granularity?
         get() = currentGranularitySubject.value
         set(value) {
-            currentGranularitySubject.onNext(value)
-            applyScopeToChartViewModels()
+            if (currentGranularitySubject.value != value) {
+                currentGranularitySubject.onNext(value)
+                applyScopeToChartViewModels()
+            }
         }
 
     var point: Long?
         get() = currentPointSubject.value
         set(value) {
-            currentPointSubject.onNext(value)
-            applyScopeToChartViewModels()
+            if (currentPointSubject.value != value) {
+                currentPointSubject.onNext(value)
+                applyScopeToChartViewModels()
+            }
         }
 
     override fun onTrackerAttached(newTracker: OTTracker) {
         super.onTrackerAttached(newTracker)
         clearChartViewModels()
         currentChartViewModelList.addAll(newTracker.getRecommendedChartModels())
+        chartViewModelListSubject.onNext(currentChartViewModelList)
     }
 
     private fun applyScopeToChartViewModels() {
@@ -80,9 +86,24 @@ class TrackerChartViewListViewModel : TrackerAttachedViewModel() {
         }
     }
 
-    fun refreshCharts() {
+    class ChartViewModelListDiffUtilCallback(val oldList: List<ChartModel<*>>, val newList: List<ChartModel<*>>) : DiffUtil.Callback() {
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return oldList[oldItemPosition] === newList[newItemPosition]
+        }
+
+        override fun getOldListSize(): Int {
+            return oldList.size
+        }
+
+        override fun getNewListSize(): Int {
+            return newList.size
+        }
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return areItemsTheSame(oldItemPosition, newItemPosition)
+        }
+
 
     }
-
 
 }
