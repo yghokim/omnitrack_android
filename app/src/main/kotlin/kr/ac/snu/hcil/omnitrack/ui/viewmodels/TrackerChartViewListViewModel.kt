@@ -42,13 +42,17 @@ class TrackerChartViewListViewModel : TrackerAttachedViewModel() {
 
     override fun onTrackerAttached(newTracker: OTTracker) {
         super.onTrackerAttached(newTracker)
-        clearChartViewModels()
+        clearChartViewModels(false)
         currentChartViewModelList.addAll(newTracker.getRecommendedChartModels())
         chartViewModelListSubject.onNext(currentChartViewModelList)
     }
 
-    private fun applyScopeToChartViewModels() {
-        if (!suspendApplyingScope) {
+    fun reloadChartData() {
+        applyScopeToChartViewModels(true)
+    }
+
+    private fun applyScopeToChartViewModels(force: Boolean = false) {
+        if (!suspendApplyingScope || force) {
             val point = point
             val granularity = granularity
             if (point != null && granularity != null) {
@@ -66,13 +70,15 @@ class TrackerChartViewListViewModel : TrackerAttachedViewModel() {
         clearChartViewModels()
     }
 
-    private fun clearChartViewModels() {
+    private fun clearChartViewModels(pushEmptyList: Boolean = true) {
         currentChartViewModelList.forEach {
             model ->
             model.recycle()
         }
         currentChartViewModelList.clear()
-        chartViewModelListSubject.onNext(emptyList())
+
+        if (pushEmptyList)
+            chartViewModelListSubject.onNext(emptyList())
     }
 
     fun setScope(point: Long, granularity: Granularity) {
