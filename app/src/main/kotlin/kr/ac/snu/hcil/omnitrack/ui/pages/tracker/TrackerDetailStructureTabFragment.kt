@@ -91,14 +91,14 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val rootView = inflater!!.inflate(R.layout.fragment_tracker_detail_structure, container, false)
 
-        rootScrollView = rootView.findViewById(R.id.scroll_root) as NestedScrollView
+        rootScrollView = rootView.findViewById(R.id.scroll_root)
 
-        contentContainer = rootView.findViewById(R.id.ui_content_container) as ViewGroup
+        contentContainer = rootView.findViewById(R.id.ui_content_container)
 
-        namePropertyView = rootView.findViewById(R.id.nameProperty) as ShortTextPropertyView
+        namePropertyView = rootView.findViewById(R.id.nameProperty)
         namePropertyView.addNewValidator("Name cannot be empty.", ShortTextPropertyView.NOT_EMPTY_VALIDATOR)
 
-        colorPropertyView = rootView.findViewById(R.id.colorProperty) as ColorPalettePropertyView
+        colorPropertyView = rootView.findViewById(R.id.colorProperty)
 
         colorPropertyView.valueChanged += {
             sender, colorIndex ->
@@ -110,7 +110,7 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
             }
         }
 
-        isOnShortcutPropertyView = rootView.findViewById(R.id.isOnShortcutProperty) as BooleanPropertyView
+        isOnShortcutPropertyView = rootView.findViewById(R.id.isOnShortcutProperty)
         isOnShortcutPropertyView.valueChanged += {
             sender, isOnShortcut ->
             if (tracker?.isOnShortcut != isOnShortcut) {
@@ -128,7 +128,7 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
             }
         }
 
-        attributeListView = rootView.findViewById(R.id.ui_attribute_list) as AdapterLinearLayout
+        attributeListView = rootView.findViewById(R.id.ui_attribute_list)
         attributeListView.setViewIntervalDistance(dipRound(8))
         attributeListView.emptyView = rootView.findViewById(R.id.ui_empty_list_message)
         val layoutManager = object : LinearLayoutManager(context, VERTICAL, false) {
@@ -156,7 +156,7 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
             attributeListAdapter.undoRemove()
         }
 
-        newAttributeButton = rootView.findViewById(R.id.ui_button_new_attribute) as FloatingActionButton
+        newAttributeButton = rootView.findViewById(R.id.ui_button_new_attribute)
 
         newAttributeButton.setOnClickListener {
             newAttributePanel.show(this@TrackerDetailStructureTabFragment.fragmentManager, newAttributePanel.tag)
@@ -321,8 +321,8 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
             return ViewHolder(view)
         }
 
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.bindAttribute(tracker!!.attributes[position])
+        override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
+            viewHolder.bindAttribute(tracker!!.attributes[position])
         }
 
         override fun getCount(): Int {

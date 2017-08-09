@@ -27,7 +27,7 @@ class PurposeChoiceFragment : SlideFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.slide_purposes, container, false)
 
-        purposeChoiceView = view.findViewById(R.id.ui_purpose_selection) as ChoiceFormView
+        purposeChoiceView = view.findViewById(R.id.ui_purpose_selection)
         purposeChoiceView.allowMultipleSelection = true
 
 

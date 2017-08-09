@@ -45,10 +45,10 @@ abstract class MultiButtonActionBarActivity(val layoutId: Int) : OTActivity() {
 
         setContentView(layoutId)
 
-        val toolbar = findViewById(R.id.toolbar) as Toolbar
+        val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        leftActionBarButton = findViewById(R.id.ui_appbar_button_left) as AppCompatImageButton
+        leftActionBarButton = findViewById<AppCompatImageButton>(R.id.ui_appbar_button_left)
         leftActionBarButton?.setOnClickListener {
 
             super.setResult(leftButtonResultCode)
@@ -56,7 +56,7 @@ abstract class MultiButtonActionBarActivity(val layoutId: Int) : OTActivity() {
         }
 
 
-        rightActionBarButton = findViewById(R.id.ui_appbar_button_right) as AppCompatImageButton
+        rightActionBarButton = findViewById(R.id.ui_appbar_button_right)
 
         rightActionBarButton?.setOnClickListener {
 
@@ -64,18 +64,18 @@ abstract class MultiButtonActionBarActivity(val layoutId: Int) : OTActivity() {
             onToolbarRightButtonClicked()
         }
 
-        rightActionBarTextButton = findViewById(R.id.ui_appbar_text_button_right) as AppCompatButton
+        rightActionBarTextButton = findViewById(R.id.ui_appbar_text_button_right)
         rightActionBarTextButton?.setOnClickListener {
             super.setResult(rightButtonResultCode)
             onToolbarRightButtonClicked()
         }
 
-        rightActionBarSubButton = findViewById(R.id.ui_appbar_button_right_sub) as AppCompatImageButton
+        rightActionBarSubButton = findViewById(R.id.ui_appbar_button_right_sub)
         rightActionBarSubButton?.setOnClickListener {
             onToolbarRightSubButtonClicked()
         }
 
-        titleView = findViewById(R.id.ui_appbar_title) as TextView?
+        titleView = findViewById(R.id.ui_appbar_title)
         titleView?.setText(title)
 
     }

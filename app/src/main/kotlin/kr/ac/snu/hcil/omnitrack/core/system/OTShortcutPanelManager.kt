@@ -1,6 +1,5 @@
 package kr.ac.snu.hcil.omnitrack.core.system
 
-import android.app.Notification
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
@@ -9,9 +8,9 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.preference.PreferenceManager
+import android.support.v4.app.NotificationCompat
 import android.support.v4.app.TaskStackBuilder
 import android.support.v4.graphics.ColorUtils
-import android.support.v7.app.NotificationCompat
 import android.view.View
 import android.widget.RemoteViews
 import kr.ac.snu.hcil.omnitrack.OTApplication
@@ -113,7 +112,7 @@ object OTShortcutPanelManager {
         return rv
     }
 
-    fun refreshNotificationShortcutViews(user: OTUser, context: Context = OTApplication.app) {
+    fun refreshNotificationShortcutViews(user: OTUser, context: Context = OTApplication.app.contextCompat) {
 
         if (showPanels) {
             val trackers = user.getTrackersOnShortcut()
@@ -121,16 +120,16 @@ object OTShortcutPanelManager {
                 val bigView = buildNewNotificationShortcutViews(user, context, true)
                 val normalView = buildNewNotificationShortcutViews(user, context, false)
 
-                val noti = NotificationCompat.Builder(context)
+                val noti = NotificationCompat.Builder(context, OTNotificationChannelManager.CHANNEL_ID_WIDGETS)
                         .setSmallIcon(R.drawable.icon_simple)
                         .setLargeIcon(VectorIconHelper.getConvertedBitmap(context, R.drawable.icon_simple))
                         .setContentTitle(context.resources.getString(R.string.app_name))
                         .setCustomBigContentView(bigView)
                         .setCustomContentView(normalView)
-                        .setVisibility(Notification.VISIBILITY_PUBLIC)
+                        .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                        .setPriority(NotificationCompat.PRIORITY_HIGH)
                         .setAutoCancel(false)
                         .setOngoing(true)
-                        .setPriority(Notification.PRIORITY_MAX)
                         .build()
 
                 notificationManager

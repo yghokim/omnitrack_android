@@ -47,11 +47,11 @@ class SingleNumericConditionerSettingView : LinearLayout {
         orientation = LinearLayout.HORIZONTAL
         inflateContent(R.layout.conditioner_setting_single_numeric_comparison, true)
 
-        spinner = findViewById(R.id.ui_comparison_method) as ExtendedSpinner
+        spinner = findViewById(R.id.ui_comparison_method)
         spinner.adapter = adapter
 
 
-        numberField = findViewById(R.id.ui_compared_number_input) as EditText
+        numberField = findViewById(R.id.ui_compared_number_input)
 
     }
 
@@ -83,7 +83,7 @@ class SingleNumericConditionerSettingView : LinearLayout {
 
         inner class MethodViewHolder(val view: View) {
 
-            private val iconView: AppCompatImageView = view.findViewById(R.id.textView) as AppCompatImageView
+            private val iconView: AppCompatImageView = view.findViewById(R.id.textView)
 
             fun bind(method: SingleNumericComparison.ComparisonMethod) {
                 iconView.setImageResource(method.symbolImageResourceId)

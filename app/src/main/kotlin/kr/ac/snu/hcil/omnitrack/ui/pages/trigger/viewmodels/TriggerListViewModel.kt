@@ -12,16 +12,16 @@ import rx.subjects.BehaviorSubject
  */
 class TriggerListViewModel(var triggerFilter: (OTTrigger) -> Boolean = { trigger -> true }) : UserAttachedViewModel() {
 
-    private val currentTriggerViewModels = ArrayList<TriggerViewModel<out OTTrigger>>()
+    private val currentTriggerViewModels = ArrayList<TriggerViewModel<OTTrigger>>()
 
-    val triggerViewModelListSubject: BehaviorSubject<List<TriggerViewModel<out OTTrigger>>> = BehaviorSubject.create()
+    val triggerViewModelListSubject: BehaviorSubject<List<TriggerViewModel<OTTrigger>>> = BehaviorSubject.create()
 
     override fun onDispose() {
         super.onDispose()
         clearTriggerList()
     }
 
-    private fun makeTriggerViewModel(trigger: OTTrigger): TriggerViewModel<out OTTrigger> {
+    private fun makeTriggerViewModel(trigger: OTTrigger): TriggerViewModel<OTTrigger> {
         return if (trigger is OTTimeTrigger) {
             TimeTriggerViewModel(trigger)
         } else TriggerViewModel(trigger)
@@ -72,7 +72,7 @@ class TriggerListViewModel(var triggerFilter: (OTTrigger) -> Boolean = { trigger
         user?.triggerManager?.removeTrigger(trigger)
     }
 
-    fun removeTrigger(viewModel: TriggerViewModel<out OTTrigger>) {
+    fun removeTrigger(viewModel: TriggerViewModel<OTTrigger>) {
         removeTrigger(viewModel.trigger)
     }
 
@@ -86,7 +86,7 @@ class TriggerListViewModel(var triggerFilter: (OTTrigger) -> Boolean = { trigger
         triggerViewModelListSubject.onNext(emptyList())
     }
 
-    class TriggerViewModelListDiffUtilCallback(val oldList: List<TriggerViewModel<out OTTrigger>>, val newList: List<TriggerViewModel<out OTTrigger>>) : DiffUtil.Callback() {
+    class TriggerViewModelListDiffUtilCallback(val oldList: List<TriggerViewModel<OTTrigger>>, val newList: List<TriggerViewModel<OTTrigger>>) : DiffUtil.Callback() {
         override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
             return oldList[oldItemPosition].trigger.objectId == newList[newItemPosition].trigger.objectId
         }

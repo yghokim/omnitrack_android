@@ -45,9 +45,9 @@ class ColorPreference : DialogPreference {
 
     override fun onBindDialogView(view: View) {
 
-        colorPicker = view.findViewById(R.id.ui_color_picker) as LobsterPicker
+        colorPicker = view.findViewById(R.id.ui_color_picker)
         colorPicker?.colorAdapter = BitmapColorAdapter(context, R.drawable.lights_pallete)
-        colorSlider = view.findViewById(R.id.ui_color_slider) as LobsterShadeSlider
+        colorSlider = view.findViewById(R.id.ui_color_slider)
 
         if (colorSlider != null) {
             colorPicker?.addDecorator(colorSlider!!)
@@ -78,7 +78,7 @@ class ColorPreference : DialogPreference {
     override fun onBindView(view: View) {
         super.onBindView(view)
 
-        colorButton = view.findViewById(R.id.ui_button) as FancyButton
+        colorButton = view.findViewById(R.id.ui_button)
         colorButton?.setBackgroundColor(currentColor)
         colorButton?.setOnClickListener {
             onClick()

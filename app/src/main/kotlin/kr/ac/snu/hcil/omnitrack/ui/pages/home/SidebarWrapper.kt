@@ -27,11 +27,11 @@ import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
  */
 class SidebarWrapper(val view: View, val parentActivity: AppCompatActivity) : PopupMenu.OnMenuItemClickListener {
 
-    private val photoView: CircleImageView = view.findViewById(R.id.ui_user_photo) as CircleImageView
-    private val nameView: TextView = view.findViewById(R.id.ui_user_name) as TextView
-    private val profileMenuButton: AppCompatImageButton = view.findViewById(R.id.ui_button_profile_menu) as AppCompatImageButton
+    private val photoView: CircleImageView = view.findViewById(R.id.ui_user_photo)
+    private val nameView: TextView = view.findViewById(R.id.ui_user_name)
+    private val profileMenuButton: AppCompatImageButton = view.findViewById(R.id.ui_button_profile_menu)
 
-    private val menuList: RecyclerView = view.findViewById(R.id.ui_menu_list) as RecyclerView
+    private val menuList: RecyclerView = view.findViewById(R.id.ui_menu_list)
     init {
         /*
         val signOutButton = view.findViewById(R.id.ui_button_sign_out)

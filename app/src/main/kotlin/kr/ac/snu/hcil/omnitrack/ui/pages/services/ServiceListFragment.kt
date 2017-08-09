@@ -44,7 +44,7 @@ class ServiceListFragment : OTFragment() {
                               savedInstanceState: Bundle?): View? {
         val rootView = inflater!!.inflate(R.layout.fragment_home_services, container, false)
 
-        listView = rootView.findViewById(R.id.ui_list) as RecyclerView
+        listView = rootView.findViewById(R.id.ui_list)
 
         listView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         //listView.addItemDecoration(HorizontalDividerItemDecoration(0, 20))
@@ -143,18 +143,18 @@ class ServiceListFragment : OTFragment() {
                 }
 
             init {
-                thumbView = view.findViewById(R.id.thumb) as ImageView
-                nameView = view.findViewById(R.id.name) as TextView
-                descriptionView = view.findViewById(R.id.description) as TextView
+                thumbView = view.findViewById(R.id.thumb)
+                nameView = view.findViewById(R.id.name)
+                descriptionView = view.findViewById(R.id.description)
 
-                progressBar = view.findViewById(R.id.ui_progress_bar) as ProgressBar
+                progressBar = view.findViewById(R.id.ui_progress_bar)
 
-                measureFactoryListView = view.findViewById(R.id.ui_supported_measure_list) as RecyclerView
+                measureFactoryListView = view.findViewById(R.id.ui_supported_measure_list)
                 measureFactoryListView.adapter = measureFactoryAdapter
                 measureFactoryListView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
                 measureFactoryListView.addItemDecoration(HorizontalDividerItemDecoration(ContextCompat.getColor(context, R.color.separator_Light), dipRound(0.6f)))
 
-                activationButton = view.findViewById(R.id.ui_button_activate) as AppCompatButton
+                activationButton = view.findViewById(R.id.ui_button_activate)
                 activationButton.supportBackgroundTintList = activateColor
                 activationButton.setOnClickListener {
                     val service = getService(adapterPosition)

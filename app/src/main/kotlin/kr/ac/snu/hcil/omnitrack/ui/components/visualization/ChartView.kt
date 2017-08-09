@@ -75,7 +75,7 @@ class ChartView : LinearLayout, IEventListener<ChartModel<*>?> {
         orientation = VERTICAL
         inflateContent(R.layout.component_chart_view, true)
 
-        chartView = findViewById(R.id.ui_chart) as ChartCanvasView
+        chartView = findViewById(R.id.ui_chart)
 
     }
 

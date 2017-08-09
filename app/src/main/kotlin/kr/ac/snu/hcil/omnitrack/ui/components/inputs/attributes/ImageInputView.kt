@@ -73,7 +73,7 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
             }
         }
 
-    val picker: ImagePicker = findViewById(R.id.ui_image_picker) as ImagePicker
+    val picker: ImagePicker = findViewById(R.id.ui_image_picker)
     private val subscriptions = CompositeSubscription()
 
     private val eventReceiver: BroadcastReceiver by lazy {

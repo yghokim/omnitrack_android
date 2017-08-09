@@ -531,6 +531,10 @@
     <string name="msg_pref_application_langauge">Application Language</string>
     <string name="msg_pref_reminder_light_color">Reminder Light Color</string>
 
+    <string name="msg_notification_channel_name_widgets">OmniTrack Widgets &amp; Indicators</string>
+    <string name="msg_notification_channel_name_alerts">OmniTrack Important Notifications</string>
+    <string name="msg_notification_channel_name_system_messages">OmniTrack System Messages</string>
+    <string name="msg_notification_channel_name_notice">OmniTrack Notices &amp; Promotions</string>
 
     <string-array name="supported_language_names">
         <item>English</item>

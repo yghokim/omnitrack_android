@@ -78,7 +78,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
 
     private var newlyAddedTriggerId: String? = null
 
-    private val currentTriggerViewModels = ArrayList<TriggerViewModel<out OTTrigger>>()
+    private val currentTriggerViewModels = ArrayList<TriggerViewModel<OTTrigger>>()
 
     //private var expandedTriggerPosition: Int = -1
     //private var expandedViewHolder: ATriggerViewHolder<out OTTrigger>? = null
@@ -136,8 +136,8 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
     fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, @Suppress("UNUSED_PARAMETER") savedInstanceState: Bundle?): View {
         val rootView = inflater!!.inflate(R.layout.fragment_tracker_detail_triggers, container, false)
 
-        listView = rootView.findViewById(R.id.ui_trigger_list) as FallbackRecyclerView
-        listView.emptyView = (rootView.findViewById(R.id.ui_empty_list_message) as TextView).apply {
+        listView = rootView.findViewById(R.id.ui_trigger_list)
+        listView.emptyView = rootView.findViewById<TextView>(R.id.ui_empty_list_message).apply {
             setText(emptyMessageId)
         }
 
@@ -157,7 +157,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
         //expandedTriggerPosition = savedInstanceState?.getInt(STATE_EXPANDED_POSITION, -1) ?: -1
         listView.adapter = adapter
 
-        newTriggerButton = rootView.findViewById(R.id.ui_button_new_trigger) as FloatingActionButton
+        newTriggerButton = rootView.findViewById(R.id.ui_button_new_trigger)
 
         setFloatingButtonColor(ContextCompat.getColor(rootView.context, R.color.colorPointed))
 

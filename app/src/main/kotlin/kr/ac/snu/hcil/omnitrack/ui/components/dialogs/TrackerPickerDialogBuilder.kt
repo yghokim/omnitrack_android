@@ -24,7 +24,6 @@ class TrackerPickerDialogBuilder(val trackers: List<OTTracker>, val viewHolderFa
                 val view = parent.inflateContent(R.layout.simple_colored_circle_and_text, false)
                 return TrackerViewHolder(view)
             }
-
         }
     }
 
@@ -49,7 +48,7 @@ class TrackerPickerDialogBuilder(val trackers: List<OTTracker>, val viewHolderFa
                 .setView(view)
                 .create()
 
-        val listView = view.findViewById(R.id.ui_list) as RecyclerView
+        val listView: RecyclerView = view.findViewById(R.id.ui_list)
 
         listView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
 
@@ -65,8 +64,8 @@ class TrackerPickerDialogBuilder(val trackers: List<OTTracker>, val viewHolderFa
 
     open class TrackerViewHolder(view: View) : RecyclerView.ViewHolder(view), View.OnClickListener {
 
-        val circle: AppCompatImageView
-        val textView: TextView
+        val circle: AppCompatImageView = view.findViewById(R.id.colored_circle)
+        val textView: TextView = view.findViewById(R.id.text)
 
         var onPicked: ((OTTracker?) -> Unit)? = null
 
@@ -91,9 +90,6 @@ class TrackerPickerDialogBuilder(val trackers: List<OTTracker>, val viewHolderFa
         }
 
         init {
-            circle = view.findViewById(R.id.colored_circle) as AppCompatImageView
-            textView = view.findViewById(R.id.text) as TextView
-
             view.setOnClickListener(this)
         }
 

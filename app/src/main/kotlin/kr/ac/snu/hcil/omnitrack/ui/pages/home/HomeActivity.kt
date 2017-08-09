@@ -44,13 +44,13 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), OTAut
      */
     private val mViewPager: ViewPager by bindView(R.id.container)
 
-    private lateinit var drawerLayout: DrawerLayout
+    private val drawerLayout: DrawerLayout by bindView(R.id.ui_drawer_layout)
 
     private lateinit var sidebar: SidebarWrapper
 
     private val startSubscriptions = CompositeSubscription()
 
-    private lateinit var tabLayout: TabLayout
+    private val tabLayout: TabLayout by bindView(R.id.tabs)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,13 +69,9 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), OTAut
         // Set up the ViewPager with the sections adapter.
         mViewPager.adapter = mSectionsPagerAdapter
 
-        tabLayout = findViewById(R.id.tabs) as TabLayout
         tabLayout.setupWithViewPager(mViewPager)
 
-
         //Setup sliding menu
-        drawerLayout = findViewById(R.id.ui_drawer_layout) as DrawerLayout
-
         drawerLayout.addDrawerListener(this)
 
         sidebar = SidebarWrapper(findViewById(R.id.ui_sidebar), this)

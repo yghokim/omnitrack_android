@@ -8,6 +8,7 @@ import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewCompat
 import android.support.v4.view.ViewPager
+import android.view.View
 import android.widget.ImageButton
 import com.heinrichreimersoftware.materialintro.app.IntroActivity
 import com.heinrichreimersoftware.materialintro.slide.FragmentSlide
@@ -30,7 +31,7 @@ class ExperimentSignInActivity : IntroActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        buttonNext = findViewById(R.id.mi_button_next) as ImageButton
+        buttonNext = findViewById(R.id.mi_button_next)
         buttonBackFunction = BUTTON_BACK_FUNCTION_BACK
         buttonNextFunction = BUTTON_NEXT_FUNCTION_NEXT
         isButtonBackVisible = false
@@ -73,7 +74,7 @@ class ExperimentSignInActivity : IntroActivity() {
 
         addOnNavigationBlockedListener { position, direction ->
 
-            val contentView = findViewById(android.R.id.content)
+            val contentView = findViewById<View>(android.R.id.content)
             if (contentView != null) {
                 val slide = getSlide(position)
                 if (slide === demographicSlide) {

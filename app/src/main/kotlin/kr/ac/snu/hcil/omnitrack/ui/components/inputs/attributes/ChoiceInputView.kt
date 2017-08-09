@@ -23,7 +23,7 @@ import kotlin.properties.Delegates
  */
 class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttributeInputView<IntArray>(R.layout.input_choice, context, attrs) {
 
-    private val listView: RecyclerView
+    private val listView: RecyclerView = findViewById(R.id.ui_list)
     private val adapter: Adapter
 
     private val selectedIds = ArrayList<Int>()
@@ -31,7 +31,6 @@ class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
     private val idPivotedEntryIndexTable = SparseIntArray()
 
     init {
-        listView = findViewById(R.id.ui_list) as RecyclerView
         adapter = Adapter()
 
         listView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
@@ -107,16 +106,12 @@ class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
 
         inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view), OnClickListener {
 
-            private val indicator: ImageView
-            private val textView: TextView
+            private val indicator: ImageView = view.findViewById(R.id.ui_checked)
+            private val textView: TextView = view.findViewById(R.id.ui_text)
 
             private var id: Int = -1
 
-
             init {
-                indicator = view.findViewById(R.id.ui_checked) as ImageView
-                textView = view.findViewById(R.id.ui_text) as TextView
-
                 view.setOnClickListener(this)
             }
 

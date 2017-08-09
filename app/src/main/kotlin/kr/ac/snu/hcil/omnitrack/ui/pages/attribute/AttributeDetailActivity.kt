@@ -345,7 +345,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
             @Suppress("UNCHECKED_CAST")
             val propView: APropertyView<Any> = propertyViewEntry.second as APropertyView<Any>
 
-            propView.value = attribute.getPropertyValue(propertyViewEntry.first!!)
+            propView.value = attribute.getPropertyValue(propertyViewEntry.first)
 
             propView.watchOriginalValue()
         }

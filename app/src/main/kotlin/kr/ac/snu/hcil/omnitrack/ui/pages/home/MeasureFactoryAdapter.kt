@@ -50,16 +50,12 @@ class MeasureFactoryAdapter : RecyclerView.Adapter<MeasureFactoryAdapter.Measure
 
         private lateinit var measureFactory: OTMeasureFactory
 
-        val nameView: TextView
-        val descriptionView: TextView
+        val nameView: TextView = view.findViewById(R.id.name)
+        val descriptionView: TextView = view.findViewById(R.id.description)
 
-        val connectButton: AppCompatImageButton
+        val connectButton: AppCompatImageButton = view.findViewById(R.id.ui_connect_button)
 
         init {
-            nameView = view.findViewById(R.id.name) as TextView
-            descriptionView = view.findViewById(R.id.description) as TextView
-            connectButton = view.findViewById(R.id.ui_connect_button) as AppCompatImageButton
-
             connectButton.setOnClickListener(this)
         }
 
@@ -98,11 +94,7 @@ class MeasureFactoryAdapter : RecyclerView.Adapter<MeasureFactoryAdapter.Measure
         }
 
         private inner class TrackerPickerElementViewHolder(view: View) : TrackerPickerDialogBuilder.TrackerViewHolder(view) {
-            private val messageView: TextView
-
-            init {
-                messageView = view.findViewById(R.id.message) as TextView
-            }
+            private val messageView: TextView = view.findViewById(R.id.message)
 
             override fun bind(tracker: OTTracker) {
                 super.bind(tracker)

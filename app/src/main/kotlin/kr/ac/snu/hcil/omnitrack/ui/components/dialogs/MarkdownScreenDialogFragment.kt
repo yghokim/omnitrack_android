@@ -46,9 +46,9 @@ class MarkdownScreenDialogFragment : DialogFragment() {
     }
 
     private fun initView(view: View) {
-        markdownView = view.findViewById(R.id.mdView) as MarkdownView
-        titleView = view.findViewById(R.id.title) as TextView
-        exitButton = view.findViewById(R.id.ui_button_cancel) as AppCompatImageButton
+        markdownView = view.findViewById(R.id.mdView)
+        titleView = view.findViewById(R.id.title)
+        exitButton = view.findViewById(R.id.ui_button_cancel)
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

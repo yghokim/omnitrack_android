@@ -60,13 +60,13 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
     }
 
     private fun findViews(view: View) {
-        cameraView = view.findViewById(R.id.ui_camera_view) as CameraView
+        cameraView = view.findViewById(R.id.ui_camera_view)
         cameraView.setCameraListener(listener)
 
-        shutterButton = view.findViewById(R.id.ui_camera_shutter) as Button
+        shutterButton = view.findViewById(R.id.ui_camera_shutter)
         shutterButton.setOnClickListener(this)
 
-        cameraModeToggleButton = view.findViewById(R.id.ui_button_toggle_camera) as ToggleButton
+        cameraModeToggleButton = view.findViewById(R.id.ui_button_toggle_camera)
         applyTintToCompoundDrawables(cameraModeToggleButton)
         cameraModeToggleButton.setOnCheckedChangeListener { compoundButton, checked ->
             if (checked) {
@@ -79,13 +79,13 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
             }
         }
 
-        titleView = view.findViewById(R.id.title) as TextView
+        titleView = view.findViewById(R.id.title)
         titleView.setText(R.string.msg_camera_input_header)
 
-        cancelButton = view.findViewById(R.id.ui_button_cancel) as AppCompatImageButton
+        cancelButton = view.findViewById(R.id.ui_button_cancel)
         cancelButton.setOnClickListener(this)
 
-        loadingIndicator = view.findViewById(R.id.ui_loading_indicator) as LoadingIndicatorBar
+        loadingIndicator = view.findViewById(R.id.ui_loading_indicator)
         loadingIndicator.setMessage(R.string.msg_indicator_message_processing)
     }
 

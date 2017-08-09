@@ -3,7 +3,6 @@ package kr.ac.snu.hcil.omnitrack.ui.components.tutorial
 import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
-import android.view.MotionEvent
 import android.view.View
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt
@@ -48,7 +47,7 @@ object TutorialManager {
                                     .setTarget(sequence.target)
                                     .setPrimaryText(sequence.primaryTextRes)
                                     .setSecondaryText(sequence.secondaryTextRes)
-                                    .setFocalColourAlpha(sequence.focalColorAlpha)
+                                    //.setFocalColourAlpha(sequence.focalColorAlpha)
                                     .setCaptureTouchEventOutsidePrompt(true)
                                     .setBackgroundColour(sequence.backgroundColor), sequenceFlagKey)
                 } else null
@@ -56,31 +55,28 @@ object TutorialManager {
 
             for (builder in list.withIndex()) {
 
-                builder.value.first.setOnHidePromptListener(object : MaterialTapTargetPrompt.OnHidePromptListener {
+                builder.value.first.setPromptStateChangeListener(object : MaterialTapTargetPrompt.PromptStateChangeListener {
                     private var hideByTargetTap = false
+                    override fun onPromptStateChanged(prompt: MaterialTapTargetPrompt?, state: Int) {
+                        if (state == MaterialTapTargetPrompt.STATE_DISMISSED) {
+                            setTutorialFlag(builder.value.second, true)
 
-                    override fun onHidePromptComplete() {
-                        setTutorialFlag(builder.value.second, true)
 
+                            if (builder.index < list.size - 1) {
+                                if (stopWhenTappedTarget && hideByTargetTap) {
 
-                        if (builder.index < list.size - 1) {
-                            if (stopWhenTappedTarget && hideByTargetTap) {
+                                } else list[builder.index + 1].first.show()
+                            }
 
-                            } else list[builder.index + 1].first.show()
+                            if (closeFlagAfterClose && builder.index >= list.size - 1) {
+                                setTutorialFlag(tag, true)
+                            }
                         }
-
-                        if (closeFlagAfterClose && builder.index >= list.size - 1) {
-                            setTutorialFlag(tag, true)
-                        }
-                    }
-
-                    override fun onHidePrompt(event: MotionEvent?, tappedTarget: Boolean) {
-                        hideByTargetTap = tappedTarget
                     }
                 })
             }
 
-            list.first()?.first?.show()
+            list.first().first.show()
             return true
         } else return false
     }
@@ -89,21 +85,16 @@ object TutorialManager {
         if (DEBUG_ALWAYS_SHOW_TUTORIAL || !hasShownTutorials(tag)) {
             val builder = MaterialTapTargetPrompt.Builder(activity)
                     .setTarget(target)
-                    .setFocalColourAlpha(focalColorAlpha)
+                    //.setFocalColourAlpha(focalColorAlpha)
                     .setBackgroundColour(backgroundColor)
                     .setCaptureTouchEventOutsidePrompt(true)
-                    .setOnHidePromptListener(object : MaterialTapTargetPrompt.OnHidePromptListener {
-                        override fun onHidePromptComplete() {
+                    .setPromptStateChangeListener { prompt, state ->
+                        if (state == MaterialTapTargetPrompt.STATE_DISMISSED) {
                             if (closeFlagAfterClose) {
                                 setTutorialFlag(tag, true)
                             }
                         }
-
-                        override fun onHidePrompt(event: MotionEvent?, tappedTarget: Boolean) {
-
-                        }
-
-                    })
+                    }
             if (primaryText != null) {
                 builder.setPrimaryText(primaryText)
             }

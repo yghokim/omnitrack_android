@@ -242,7 +242,7 @@ object DatabaseManager {
     }
 
     fun getTrigger(user: OTUser, key: String): Observable<OTTrigger> {
-        return Observable.create {
+        return Observable.unsafeCreate {
             subscriber ->
             val query = dbRef?.child(CHILD_NAME_TRIGGERS)?.child(key)
             if (query != null) {

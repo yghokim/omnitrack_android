@@ -103,13 +103,13 @@ class TimeRangePicker : FrameLayout, View.OnClickListener {
         addView(inflater.inflate(R.layout.component_time_range_picker, this, false))
 
 
-        fromButton = findViewById(R.id.ui_button_from) as Button
-        toButton = findViewById(R.id.ui_button_to) as Button
+        fromButton = findViewById(R.id.ui_button_from)
+        toButton = findViewById(R.id.ui_button_to)
 
         fromButton.setOnClickListener(this)
         toButton.setOnClickListener(this)
 
-        durationIndicator = findViewById(R.id.ui_interval_indicator) as TextView
+        durationIndicator = findViewById(R.id.ui_interval_indicator)
 
         InterfaceHelper.removeButtonTextDecoration(fromButton)
         InterfaceHelper.removeButtonTextDecoration(toButton)

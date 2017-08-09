@@ -10,7 +10,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.ColorPaletteView
  */
 class ColorPalettePropertyView(context: Context, attrs: AttributeSet?) : APropertyView<Int>(R.layout.component_property_color_palette, context, attrs) {
 
-    private var paletteView: ColorPaletteView
+    private var paletteView: ColorPaletteView = findViewById(R.id.value)
 
     override var value: Int
         get() = paletteView.selectedColor
@@ -23,7 +23,6 @@ class ColorPalettePropertyView(context: Context, attrs: AttributeSet?) : AProper
     }
 
     init {
-        paletteView = findViewById(R.id.value) as ColorPaletteView
         paletteView.colorChanged += {
             sender, value ->
             onValueChanged(value)

@@ -42,14 +42,7 @@ class IconNameEntryArrayAdapter : ArrayAdapter<IconNameEntryArrayAdapter.Entry> 
     }
 
     class ViewHolder(val view: View) {
-
-        val iconView: AppCompatImageView
-        val nameView: TextView
-
-        init {
-            iconView = view.findViewById(R.id.ui_icon) as AppCompatImageView
-            nameView = view.findViewById(R.id.ui_name) as TextView
-        }
-
+        val iconView: AppCompatImageView = view.findViewById(R.id.ui_icon)
+        val nameView: TextView = view.findViewById(R.id.ui_name)
     }
 }

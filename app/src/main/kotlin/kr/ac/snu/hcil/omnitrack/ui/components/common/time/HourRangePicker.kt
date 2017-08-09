@@ -38,8 +38,8 @@ class HourRangePicker : LinearLayout {
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         inflater.inflate(R.layout.component_hour_range_picker, this, true)
 
-        fromPicker = findViewById(R.id.ui_picker_from) as HourPicker
-        toPicker = findViewById(R.id.ui_picker_to) as HourPicker
+        fromPicker = findViewById(R.id.ui_picker_from)
+        toPicker = findViewById(R.id.ui_picker_to)
 
     }
 

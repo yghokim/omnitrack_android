@@ -87,9 +87,9 @@ class VersionCheckDialogFragment : DialogFragment() {
     }
 
     private fun setupViews(view: View) {
-        currentVersionTextView = view.findViewById(R.id.ui_current_version) as TextView
-        latestVersionTextView = view.findViewById(R.id.ui_latest_version) as TextView
-        storeButton = view.findViewById(R.id.ui_store_button) as Button
+        currentVersionTextView = view.findViewById(R.id.ui_current_version)
+        latestVersionTextView = view.findViewById(R.id.ui_latest_version)
+        storeButton = view.findViewById(R.id.ui_store_button)
 
         currentVersionTextView.text = BuildConfig.VERSION_NAME
         storeButton.isEnabled = false

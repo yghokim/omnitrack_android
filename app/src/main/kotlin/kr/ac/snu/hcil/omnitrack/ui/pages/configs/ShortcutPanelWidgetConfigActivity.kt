@@ -45,7 +45,7 @@ class ShortcutPanelWidgetConfigActivity : AppWidgetConfigurationActivity(R.layou
     override fun onCreateWithWidget(appWidgetId: Int) {
         super.onCreateWithWidget(appWidgetId)
 
-        (findViewById(R.id.ui_button_bottom_left) as Button)
+        (findViewById<Button>(R.id.ui_button_bottom_left))
                 .apply {
                     this.setOnClickListener {
                         finish()
@@ -53,7 +53,7 @@ class ShortcutPanelWidgetConfigActivity : AppWidgetConfigurationActivity(R.layou
                     this.setText(R.string.msg_cancel)
                 }
 
-        (findViewById(R.id.ui_button_bottom_right) as Button)
+        (findViewById<Button>(R.id.ui_button_bottom_right))
                 .apply {
                     this.setOnClickListener {
                         if (initializeWidget(appWidgetId)) {
@@ -166,8 +166,8 @@ class ShortcutPanelWidgetConfigActivity : AppWidgetConfigurationActivity(R.layou
         }
 
         inner class TrackerViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-            val checkBox = view.findViewById(R.id.ui_checkbox) as AppCompatCheckBox
-            val colorBar = view.findViewById(R.id.color_bar)
+            val checkBox: AppCompatCheckBox = view.findViewById(R.id.ui_checkbox)
+            val colorBar: View = view.findViewById(R.id.color_bar)
 
             init {
                 checkBox.setOnCheckedChangeListener { compoundButton, checked ->

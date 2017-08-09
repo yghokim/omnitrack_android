@@ -71,10 +71,10 @@ class ChoiceEntryListEditor : LinearLayout, View.OnClickListener {
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         inflater.inflate(R.layout.component_choice_entry_list_editor, this, true)
 
-        newEntryButton = findViewById(R.id.ui_button_new_entry) as Button
+        newEntryButton = findViewById(R.id.ui_button_new_entry)
         newEntryButton.setOnClickListener(this)
 
-        entryListView = findViewById(R.id.ui_list) as RecyclerView
+        entryListView = findViewById(R.id.ui_list)
 
         entryListView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
 
@@ -156,18 +156,13 @@ class ChoiceEntryListEditor : LinearLayout, View.OnClickListener {
 
         inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view), OnClickListener, TextWatcher, OnTouchListener {
 
-            val entryInputView: EditText
-            val removeEntryButton: View
-            val dragHandle: View
+            val entryInputView: EditText = view.findViewById(R.id.ui_text)
+            val removeEntryButton: View = view.findViewById(R.id.ui_button_remove)
+            val dragHandle: View = view.findViewById(R.id.ui_drag_handle)
 
             init {
-                entryInputView = view.findViewById(R.id.ui_text) as EditText
                 entryInputView.addTextChangedListener(this)
-
-                removeEntryButton = view.findViewById(R.id.ui_button_remove)
                 removeEntryButton.setOnClickListener(this)
-
-                dragHandle = view.findViewById(R.id.ui_drag_handle)
                 dragHandle.setOnTouchListener(this)
             }
 

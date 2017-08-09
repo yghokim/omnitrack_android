@@ -12,6 +12,7 @@ object OTTaskNotificationManager {
 
     const val PROGRESS_INDETERMINATE = -1
 
+    //TODO refactor to use the notification channel
     fun setTaskProgressNotification(context: Context, tag: String? = null, id: Int, title: String, content: String, progress: Int, largeIcon: Int = R.drawable.icon_cloud_download, smallIcon: Int = android.R.drawable.stat_sys_download, dismissedIntent: PendingIntent? = null) {
         val noti = PugNotification.with(context)
                 .load()

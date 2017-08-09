@@ -144,7 +144,7 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
             onTrackerAdded(args.first, args.second)
         }
 
-        trackers.elementRemoved += { sender, args ->
+        trackers.elementRemoved += { _, args ->
             onTrackerRemoved(args.first, args.second)
         }
 
@@ -156,7 +156,7 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
         }
 
         trackers.listModified += {
-            sender, args ->
+            _, args ->
             OTApplication.app.startService(OTShortcutPanelWidgetUpdateService.makeNotifyDatesetChangedIntentToAllWidgets(OTApplication.app))
         }
 
@@ -277,8 +277,8 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
         val unOccupied = OTApplication.app.colorPalette.filter {
             color ->
             trackers.unObservedList.find {
-                tracker ->
-                tracker.color == color
+                it ->
+                it.color == color
             } == null
         }
 
