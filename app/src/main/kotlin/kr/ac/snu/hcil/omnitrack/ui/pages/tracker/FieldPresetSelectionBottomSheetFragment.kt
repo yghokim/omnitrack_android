@@ -83,7 +83,7 @@ class FieldPresetSelectionBottomSheetFragment : BottomSheetDialogFragment() {
             behavior.setBottomSheetCallback(behaviorCallback)
         }
 
-        newAttributeGrid = contentView.findViewById(R.id.ui_new_attribute_grid) as RecyclerView
+        newAttributeGrid = contentView.findViewById(R.id.ui_new_attribute_grid)
         newAttributeGrid.layoutManager = GridLayoutManager(context, resources.getInteger(R.integer.new_attribute_panel_horizontal_count))
         newAttributeGrid.adapter = gridAdapter
     }
@@ -164,12 +164,10 @@ class FieldPresetSelectionBottomSheetFragment : BottomSheetDialogFragment() {
         }
 
         inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-            val name: TextView
-            val typeIcon: ImageView
+            val name: TextView = view.findViewById(R.id.name)
+            val typeIcon: ImageView = view.findViewById(R.id.type_icon)
 
             init {
-                name = view.findViewById(R.id.name) as TextView
-                typeIcon = view.findViewById(R.id.type_icon) as ImageView
 
                 view.setOnClickListener {
                     val typeInfo = presets?.get(adapterPosition)

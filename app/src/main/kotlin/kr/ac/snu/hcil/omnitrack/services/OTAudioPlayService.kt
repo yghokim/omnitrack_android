@@ -7,13 +7,16 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.media.AudioAttributes
+import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Binder
+import android.os.Build
 import android.os.IBinder
+import android.support.v4.app.NotificationCompat
 import android.support.v4.content.LocalBroadcastManager
-import android.support.v7.app.NotificationCompat
 import android.util.Log
 import android.widget.RemoteViews
 import kr.ac.snu.hcil.omnitrack.OTApplication
@@ -183,7 +186,7 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
     init {
 
         secondTicker.tick += {
-            sender, elapsed ->
+            _, _ ->
             if (isSoundPlaying && currentSessionId != null) {
                 LocalBroadcastManager.getInstance(this)
                         .sendBroadcast(makeOnProgressEventIntent(currentSessionId!!, currentPlayPositionSecond, currentProgressRatio))
@@ -262,7 +265,11 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
         currentPlayer?.setOnCompletionListener(this)
         currentPlayer?.reset()
 
-        currentPlayer?.setAudioStreamType(AudioManager.STREAM_MUSIC)
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            currentPlayer?.setAudioStreamType(AudioManager.STREAM_MUSIC)
+        } else {
+            currentPlayer?.setAudioAttributes(AudioAttributes.Builder().setLegacyStreamType(AudioManager.STREAM_MUSIC).build())
+        }
     }
 
     private fun playMedia() {
@@ -298,12 +305,20 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
     }
 
     private fun requestAudioFocus(): Boolean {
-        val focusResult = audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN)
+        val focusResult = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            audioManager.requestAudioFocus(AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE).setOnAudioFocusChangeListener(this).build())
+        } else {
+            audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN)
+        }
         return focusResult == AudioManager.AUDIOFOCUS_REQUEST_GRANTED
     }
 
     private fun removeAudioFocus(): Boolean {
-        return AudioManager.AUDIOFOCUS_REQUEST_GRANTED == audioManager.abandonAudioFocus(this)
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            AudioManager.AUDIOFOCUS_REQUEST_GRANTED == audioManager.abandonAudioFocusRequest(AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE).setOnAudioFocusChangeListener(this).build())
+        } else {
+            AudioManager.AUDIOFOCUS_REQUEST_GRANTED == audioManager.abandonAudioFocus(this)
+        }
     }
 
     override fun onAudioFocusChange(focusState: Int) {

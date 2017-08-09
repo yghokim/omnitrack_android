@@ -124,7 +124,7 @@ class ChoiceFormView : LinearLayout {
 
         inner open class ViewHolder(view: View) : RecyclerView.ViewHolder(view), OnClickListener {
 
-            protected val indicator: ImageView = view.findViewById(R.id.ui_checked) as ImageView
+            protected val indicator: ImageView = view.findViewById(R.id.ui_checked)
 
             protected var entry: Entry? = null
                 private set
@@ -182,7 +182,7 @@ class ChoiceFormView : LinearLayout {
         }
 
         inner class NormalViewHolder(view: View): ViewHolder(view){
-            private val textView: TextView = view.findViewById(R.id.ui_text) as TextView
+            private val textView: TextView = view.findViewById(R.id.ui_text)
 
             override fun bind(entry: Entry) {
                 super.bind(entry)
@@ -191,7 +191,7 @@ class ChoiceFormView : LinearLayout {
         }
 
         inner class CustomViewHolder(view: View) : ViewHolder(view), OnClickListener {
-            private val customInputView: TextView = view.findViewById(R.id.ui_input) as TextView
+            private val customInputView: TextView = view.findViewById(R.id.ui_input)
 
             init{
                 customInputView.setOnClickListener(this)

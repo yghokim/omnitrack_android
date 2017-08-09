@@ -9,9 +9,6 @@ import kr.ac.snu.hcil.omnitrack.R
  */
 class SimpleTextViewHolder(val view: View) {
 
-    val textView: TextView
+    val textView: TextView = view.findViewById(R.id.textView)
 
-    init {
-        textView = view.findViewById(R.id.textView) as TextView
-    }
 }

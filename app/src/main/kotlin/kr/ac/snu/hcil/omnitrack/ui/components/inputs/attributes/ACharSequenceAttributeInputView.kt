@@ -21,10 +21,9 @@ abstract class ACharSequenceAttributeInputView(layoutId: Int, context: Context, 
             }
         }
 
-    private val valueView: EditText
+    private val valueView: EditText = findViewById(R.id.value)
 
     init {
-        valueView = findViewById(R.id.value) as EditText
         valueView.addTextChangedListener(Watcher())
 
         EnterHideKeyboardEditorActionListener(valueView)

@@ -108,8 +108,8 @@ class NotificationSettingsPanelView : StringIndicatorPropertyView, ITriggerConfi
 
         val view = inflater.inflate(R.layout.layout_notification_level_selection_dialog, null, false)
 
-        val list = view.findViewById(R.id.ui_list) as RecyclerView
-        val syncToServerCheckBox = view.findViewById(R.id.ui_checkbox) as CheckBox
+        val list: RecyclerView = view.findViewById(R.id.ui_list)
+        val syncToServerCheckBox: CheckBox = view.findViewById(R.id.ui_checkbox)
         list.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         list.itemAnimator.changeDuration = 0L
 
@@ -152,10 +152,10 @@ class NotificationSettingsPanelView : StringIndicatorPropertyView, ITriggerConfi
         }
 
         inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-            val radioView: ImageView = view.findViewById(R.id.ui_radio) as ImageView
-            val thumbnailView: ImageView = view.findViewById(R.id.ui_thumb) as ImageView
-            val titleView: TextView = view.findViewById(R.id.ui_title) as TextView
-            val descView: TextView = view.findViewById(R.id.ui_description) as TextView
+            val radioView: ImageView = view.findViewById(R.id.ui_radio)
+            val thumbnailView: ImageView = view.findViewById(R.id.ui_thumb)
+            val titleView: TextView = view.findViewById(R.id.ui_title)
+            val descView: TextView = view.findViewById(R.id.ui_description)
 
             var isSelected: Boolean = false
                 set(value) {

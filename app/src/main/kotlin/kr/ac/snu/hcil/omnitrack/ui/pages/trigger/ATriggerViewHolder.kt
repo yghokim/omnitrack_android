@@ -33,12 +33,12 @@ import rx.subscriptions.CompositeSubscription
  */
 abstract class ATriggerViewHolder<T>(parent: ViewGroup, val listener: ITriggerControlListener, context: Context) :
         RecyclerView.ViewHolder(LayoutInflater.from(context).inflate(R.layout.trigger_list_element, parent, false))
-        , View.OnClickListener, ValidatedSwitch.IValidationListener where T : TriggerViewModel<out OTTrigger> {
+        , View.OnClickListener, ValidatedSwitch.IValidationListener where T : TriggerViewModel<OTTrigger> {
 
     interface ITriggerControlListener {
         fun onTriggerRemove(position: Int)
         fun onTriggerEdited(position: Int)
-        fun onTriggerEditRequested(position: Int, viewHolder: ATriggerViewHolder<out TriggerViewModel<out OTTrigger>>)
+        fun onTriggerEditRequested(position: Int, viewHolder: ATriggerViewHolder<out TriggerViewModel<OTTrigger>>)
         //fun onTriggerExpandRequested(position: Int, viewHolder: ATriggerViewHolder<out OTTrigger>)
         //fun onTriggerCollapse(position: Int, viewHolder: ATriggerViewHolder<out OTTrigger>)
     }
@@ -155,7 +155,7 @@ abstract class ATriggerViewHolder<T>(parent: ViewGroup, val listener: ITriggerCo
                     if (action == OTTrigger.ACTION_BACKGROUND_LOGGING) {
                         if (attachedTrackerListView == null) {
                             attachedTrackerListView = attachedTrackerListStub.inflate()
-                            attachedTrackerList = attachedTrackerListView?.findViewById(R.id.ui_attached_tracker_list) as ViewGroup
+                            attachedTrackerList = attachedTrackerListView?.findViewById(R.id.ui_attached_tracker_list)
                             attachedTrackerNoTrackerFallbackView = attachedTrackerListView?.findViewById(R.id.ui_attached_tracker_list_empty_fallback)
                         } else {
                             attachedTrackerListView?.visibility = View.VISIBLE
@@ -328,13 +328,8 @@ abstract class ATriggerViewHolder<T>(parent: ViewGroup, val listener: ITriggerCo
     }
 
     open class AttachedTrackerViewHolder(val view: View) {
-        val textView: TextView
-        val colorBar: View
-
-        init {
-            textView = view.findViewById(R.id.text) as TextView
-            colorBar = view.findViewById(R.id.color_bar)
-        }
+        val textView: TextView = view.findViewById(R.id.text)
+        val colorBar: View = view.findViewById(R.id.color_bar)
     }
 
 

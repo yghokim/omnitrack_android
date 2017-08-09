@@ -104,17 +104,17 @@ class NumericUpDown : LinearLayout, OnLongClickListener, OnClickListener, OnTouc
 
         }
 
-        upButton = findViewById(R.id.ui_button_plus) as ImageButton
+        upButton = findViewById(R.id.ui_button_plus)
         upButton.setOnClickListener(this)
         upButton.setOnLongClickListener(this)
         upButton.setOnTouchListener(this)
 
-        downButton = findViewById(R.id.ui_button_minus) as ImageButton
+        downButton = findViewById(R.id.ui_button_minus)
         downButton.setOnClickListener(this)
         downButton.setOnLongClickListener(this)
         downButton.setOnTouchListener(this)
 
-        field = findViewById(R.id.ui_value_field) as TextView
+        field = findViewById(R.id.ui_value_field)
 
         invalidateViews()
     }

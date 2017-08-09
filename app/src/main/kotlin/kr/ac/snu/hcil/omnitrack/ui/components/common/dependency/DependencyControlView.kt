@@ -57,12 +57,12 @@ class DependencyControlView : RelativeLayout {
     init {
         inflateContent(R.layout.layout_dependency_control_view, true)
 
-        descriptionView = findViewById(R.id.ui_description) as TextView
-        resolveButton = findViewById(R.id.ui_button) as FancyButton
+        descriptionView = findViewById(R.id.ui_description)
+        resolveButton = findViewById(R.id.ui_button)
         busyIndicator = findViewById(R.id.ui_loading_indicator)
         checkedView = findViewById(R.id.ui_checked)
-        resolveButtonContainer = findViewById(R.id.ui_resolve_button_container) as ViewGroup
-        resolveTypeWappen = findViewById(R.id.ui_resolve_type_wappen) as TextView
+        resolveButtonContainer = findViewById(R.id.ui_resolve_button_container)
+        resolveTypeWappen = findViewById(R.id.ui_resolve_type_wappen)
 
         resolveButton.setOnClickListener {
             val activity = getActivity()

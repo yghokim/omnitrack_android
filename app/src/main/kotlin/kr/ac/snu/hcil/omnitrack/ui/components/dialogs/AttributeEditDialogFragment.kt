@@ -238,7 +238,7 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
         */
         val view = inflater.inflate(R.layout.layout_item_field_edit_dialog, null, false)
         progressBar = view.findViewById(R.id.ui_progress_bar)
-        container = view.findViewById(R.id.container) as LockableFrameLayout
+        container = view.findViewById(R.id.container)
         return view
     }
 

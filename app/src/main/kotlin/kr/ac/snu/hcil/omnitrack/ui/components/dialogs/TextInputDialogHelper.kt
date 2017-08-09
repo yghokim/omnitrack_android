@@ -17,7 +17,7 @@ object TextInputDialogHelper {
     fun makeDialog(context: Context, title: String, hint: String, pasteClipBoardFirst: Boolean = false, onOk: (CharSequence) -> Unit, onCancel: (() -> Unit)? = null): Dialog {
         val view = View.inflate(context, R.layout.dialog_text_input, null)
 
-        val textInput = view.findViewById(R.id.editText) as TextView
+        val textInput: TextView = view.findViewById(R.id.editText)
         textInput.hint = hint
 
         if (pasteClipBoardFirst) {

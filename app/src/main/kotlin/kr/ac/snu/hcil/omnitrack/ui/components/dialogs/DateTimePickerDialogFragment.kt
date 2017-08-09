@@ -19,12 +19,12 @@ class DateTimePickerDialogFragment : DialogFragment() {
 
     companion object {
         private fun setDateLabel(tabHost: TabHost, year: Int, zeroBasedMonth: Int, day: Int) {
-            val labelView = tabHost.tabWidget.getChildAt(0).findViewById(android.R.id.title) as TextView
+            val labelView: TextView = tabHost.tabWidget.getChildAt(0).findViewById(android.R.id.title)
             labelView.text = "${year}-${zeroBasedMonth + 1}-${day}"
         }
 
         private fun setTimeLabel(tabHost: TabHost, hourOfDay: Int, minute: Int) {
-            val labelView = tabHost.tabWidget.getChildAt(1).findViewById(android.R.id.title) as TextView
+            val labelView: TextView = tabHost.tabWidget.getChildAt(1).findViewById(android.R.id.title)
             if (hourOfDay == 12 && minute == 0) {
                 //PM 12:00 : Noon
                 labelView.setText(R.string.msg_noon)
@@ -93,10 +93,10 @@ class DateTimePickerDialogFragment : DialogFragment() {
         val inflater = activity.layoutInflater
         val view = inflater.inflate(R.layout.dialog_datetime_picker, null)
 
-        tabHost = view.findViewById(R.id.tabHost) as TabHost
+        tabHost = view.findViewById(R.id.tabHost)
         tabHost.setup()
 
-        val modeButton = (view.findViewById(R.id.ui_mode_button) as AppCompatButton).apply {
+        val modeButton = view.findViewById<AppCompatButton>(R.id.ui_mode_button).apply {
             InterfaceHelper.removeButtonTextDecoration(this)
             applyModeToButton(TAB_DATE, this)
             setOnClickListener {
@@ -130,18 +130,18 @@ class DateTimePickerDialogFragment : DialogFragment() {
         setDateLabel(tabHost, year, zeroBasedMonth, day)
         setTimeLabel(tabHost, calendar.getHourOfDay(), calendar.getMinute())
 
-        val calendarView = view.findViewById(R.id.ui_calendar_view) as CalendarView
+        val calendarView: CalendarView = view.findViewById(R.id.ui_calendar_view)
 
         calendarView.setDate(calendar.timeInMillis, false, true)
 
-        calendarView.setOnDateChangeListener { calendarView, y, m, d ->
+        calendarView.setOnDateChangeListener { _, y, m, d ->
             setDateLabel(tabHost, y, m, d)
             year = y
             zeroBasedMonth = m
             day = d
         }
 
-        val timePickerView = view.findViewById(R.id.ui_time_picker_view) as TimePicker
+        val timePickerView: TimePicker = view.findViewById(R.id.ui_time_picker_view)
         timePickerView.setHourOfDayCompat(calendar.getHourOfDay())
         timePickerView.setMinuteCompat(calendar.getMinute())
 

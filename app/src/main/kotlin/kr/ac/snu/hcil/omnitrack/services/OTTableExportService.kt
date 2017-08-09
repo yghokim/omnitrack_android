@@ -63,7 +63,7 @@ class OTTableExportService : WakefulService(TAG) {
 
             val view = LayoutInflater.from(context).inflate(R.layout.dialog_export_configuration, null, false)
 
-            val includeFilesCheckbox = view.findViewById(R.id.ui_include_external_files) as AppCompatCheckBox
+            val includeFilesCheckbox = view.findViewById<AppCompatCheckBox>(R.id.ui_include_external_files)
             if (tracker.isExternalFilesInvolved) {
                 includeFilesCheckbox.isEnabled = true
                 includeFilesCheckbox.isChecked = true
@@ -72,8 +72,8 @@ class OTTableExportService : WakefulService(TAG) {
                 includeFilesCheckbox.isChecked = false
                 includeFilesCheckbox.alpha = 0.3f
             }
-            val excelRadioButton = view.findViewById(R.id.ui_radio_export_type_excel) as RadioButton
-            val csvRadioButton = view.findViewById(R.id.ui_radio_export_type_csv) as RadioButton
+            val excelRadioButton = view.findViewById<RadioButton>(R.id.ui_radio_export_type_excel)
+            val csvRadioButton = view.findViewById<RadioButton>(R.id.ui_radio_export_type_csv)
 
             val builder = MaterialDialog.Builder(context)
                     .title(context.getString(R.string.msg_configure_export))

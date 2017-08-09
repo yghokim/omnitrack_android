@@ -172,7 +172,7 @@ class TrackerListFragment : OTFragment() {
                               savedInstanceState: Bundle?): View? {
         val rootView = inflater!!.inflate(R.layout.fragment_home_trackers, container, false)
 
-        addTrackerFloatingButton = rootView.findViewById(R.id.fab) as FloatingActionButton
+        addTrackerFloatingButton = rootView.findViewById(R.id.fab)
         addTrackerFloatingButton.setOnClickListener { view ->
             if (userLoaded) {
                 newTrackerNameDialog.input(null, user.generateNewTrackerName(context), false) {
@@ -186,8 +186,8 @@ class TrackerListFragment : OTFragment() {
 
         }
 
-        listView = rootView.findViewById(R.id.ui_tracker_list_view) as FallbackRecyclerView
-        emptyMessageView = rootView.findViewById(R.id.ui_empty_list_message) as TextView
+        listView = rootView.findViewById(R.id.ui_tracker_list_view)
+        emptyMessageView = rootView.findViewById(R.id.ui_empty_list_message)
         listView.emptyView = emptyMessageView
         trackerListLayoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         listView.layoutManager = trackerListLayoutManager

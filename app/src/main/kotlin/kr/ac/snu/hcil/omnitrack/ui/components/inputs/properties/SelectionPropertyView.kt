@@ -10,7 +10,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.choice.SelectionView
  */
 class SelectionPropertyView(context: Context, attrs: AttributeSet?) : APropertyView<Int>(R.layout.component_property_selection, context, attrs) {
 
-    private var selectionView: SelectionView
+    private var selectionView: SelectionView = findViewById(R.id.value)
 
     override var value: Int
         get() = selectionView.selectedIndex
@@ -23,7 +23,6 @@ class SelectionPropertyView(context: Context, attrs: AttributeSet?) : APropertyV
     }
 
     init {
-        selectionView = findViewById(R.id.value) as SelectionView
         selectionView.onSelectedIndexChanged += {
             sender, index ->
             onValueChanged(index)

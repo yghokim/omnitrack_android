@@ -24,7 +24,7 @@ class ConnectionIndicatorStubProxy(val parent: View, stubId: Int) : OnClickListe
     private var connectionInvalidMessages: ArrayList<CharSequence>? = null
 
     init {
-        connectionIndicatorStub = parent.findViewById(stubId) as ViewStub
+        connectionIndicatorStub = parent.findViewById(stubId)
         parent.addOnAttachStateChangeListener(this)
     }
 
@@ -33,8 +33,8 @@ class ConnectionIndicatorStubProxy(val parent: View, stubId: Int) : OnClickListe
         if (connectionSource != null) {
             if (connectionIndicator == null) {
                 connectionIndicator = connectionIndicatorStub.inflate()
-                connectionIndicatorLinkIconView = connectionIndicator?.findViewById(R.id.ui_connection_link_icon) as AppCompatImageView
-                connectionIndicatorSourceNameView = connectionIndicator?.findViewById(R.id.ui_connection_source_name) as TextView
+                connectionIndicatorLinkIconView = connectionIndicator?.findViewById(R.id.ui_connection_link_icon)
+                connectionIndicatorSourceNameView = connectionIndicator?.findViewById(R.id.ui_connection_source_name)
                 connectionIndicatorErrorMark = connectionIndicator?.findViewById(R.id.ui_invalid_icon)
                 connectionIndicatorErrorMark?.setOnClickListener(this)
             } else {

@@ -44,9 +44,9 @@ abstract class WizardView : FrameLayout, AWizardViewPagerAdapter.IWizardPageList
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         inflater.inflate(R.layout.layout_wizard_view_parent, this, true)
 
-        titleView = findViewById(R.id.ui_wizard_title) as TextView
+        titleView = findViewById(R.id.ui_wizard_title)
 
-        viewPager = findViewById(R.id.ui_wizard_pager) as ViewPager
+        viewPager = findViewById(R.id.ui_wizard_pager)
         viewPager.addOnPageChangeListener(this)
 
         cancelButton = findViewById(R.id.ui_button_cancel)

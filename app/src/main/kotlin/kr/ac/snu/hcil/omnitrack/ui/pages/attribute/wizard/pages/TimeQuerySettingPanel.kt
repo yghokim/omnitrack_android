@@ -49,9 +49,9 @@ class TimeQuerySettingPanel : LinearLayout, IEventListener<Int> {
     init {
         inflateContent(R.layout.connection_time_query_panel, true)
 
-        pivotTimeComboBox = findViewById(R.id.ui_pivot_selection) as ComboBoxPropertyView
-        scopeView = findViewById(R.id.ui_bin_size) as SelectionPropertyView
-        offsetView = findViewById(R.id.ui_bin_offset) as NumericUpDownPropertyView
+        pivotTimeComboBox = findViewById(R.id.ui_pivot_selection)
+        scopeView = findViewById(R.id.ui_bin_size)
+        offsetView = findViewById(R.id.ui_bin_offset)
 
         scopeView.setEntries(
                 arrayOf(

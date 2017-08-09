@@ -27,7 +27,7 @@ object NewTriggerTypeSelectionDialogHelper {
     fun builder(context: Context, triggerActionTypeName: Int, listener: (Int) -> Unit): AlertDialog.Builder {
 
         val view = LayoutInflater.from(context).inflate(R.layout.simple_layout_with_recycler_view, null)
-        val listView = view.findViewById(R.id.ui_list) as RecyclerView
+        val listView: RecyclerView = view.findViewById(R.id.ui_list)
 
         listView.layoutManager = GridLayoutManager(context, 2)
         listView.adapter = Adapter(listener)
@@ -75,16 +75,12 @@ object NewTriggerTypeSelectionDialogHelper {
         inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view), View.OnClickListener {
             var item: TriggerTypeEntry? = null
 
-            val iconView: AppCompatImageView
-            val nameView: TextView
-            val descView: TextView
-            val disabledMessageView: TextView
+            val iconView: AppCompatImageView = view.findViewById(R.id.ui_icon)
+            val nameView: TextView = view.findViewById(R.id.ui_name)
+            val descView: TextView = view.findViewById(R.id.ui_description)
+            val disabledMessageView: TextView = view.findViewById(R.id.ui_disabled_message)
 
             init {
-                iconView = view.findViewById(R.id.ui_icon) as AppCompatImageView
-                nameView = view.findViewById(R.id.ui_name) as TextView
-                descView = view.findViewById(R.id.ui_description) as TextView
-                disabledMessageView = view.findViewById(R.id.ui_disabled_message) as TextView
                 view.setOnClickListener(this)
             }
 

@@ -114,15 +114,11 @@ class SourceSelectionPage(override val parent: ConnectionWizardView, val attribu
 
     inner class SourceViewHolder(view: View) : RecyclerView.ViewHolder(view), View.OnClickListener {
 
-        private val titleView: TextView
-        private val descriptionView: TextView
-        private val categoryView: TextView
+        private val titleView: TextView = view.findViewById(R.id.title)
+        private val descriptionView: TextView = view.findViewById(R.id.description)
+        private val categoryView: TextView = view.findViewById(R.id.category)
 
         init {
-            categoryView = view.findViewById(R.id.category) as TextView
-            titleView = view.findViewById(R.id.title) as TextView
-            descriptionView = view.findViewById(R.id.description) as TextView
-
             view.setOnClickListener(this)
         }
 

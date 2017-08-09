@@ -92,8 +92,8 @@ class ImagePicker : FrameLayout, View.OnClickListener {
         cameraButton = findViewById(R.id.ui_button_camera)
         galleryButton = findViewById(R.id.ui_button_gallery)
         removeButton = findViewById(R.id.ui_button_cancel)
-        buttonGroup = findViewById(R.id.ui_button_container) as ViewGroup
-        imageView = findViewById(R.id.ui_image_view) as ImageView
+        buttonGroup = findViewById(R.id.ui_button_container)
+        imageView = findViewById(R.id.ui_image_view)
 
         cameraButton.setOnClickListener(this)
         galleryButton.setOnClickListener(this)

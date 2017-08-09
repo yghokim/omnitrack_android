@@ -288,7 +288,7 @@ object OTAuthManager {
     }
 
     private fun firebaseAuthWithGoogle(acct: GoogleSignInAccount?): Observable<AuthResult> {
-        return Observable.create<AuthResult> {
+        return Observable.unsafeCreate<AuthResult> {
             subscriber ->
             Log.d(LOG_TAG, "firebaseAuthWithGooogle:" + acct?.getId())
             val credential = getAuthCredential()

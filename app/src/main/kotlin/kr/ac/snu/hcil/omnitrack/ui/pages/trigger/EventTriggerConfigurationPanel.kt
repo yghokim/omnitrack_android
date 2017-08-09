@@ -66,10 +66,10 @@ class EventTriggerConfigurationPanel : FrameLayout, ITriggerConfigurationCoordin
             it.isDemandingUserInput == false
         }
 
-        measureSelectionView = findViewById(R.id.ui_event_trigger_measure_selection) as ComboBoxPropertyView
+        measureSelectionView = findViewById(R.id.ui_event_trigger_measure_selection)
         measureSelectionView.adapter = MeasureSpinnerAdapter()
 
-        conditionerView = findViewById(R.id.ui_condition_setting) as SingleNumericConditionerSettingView
+        conditionerView = findViewById(R.id.ui_condition_setting)
 
     }
 
@@ -104,13 +104,8 @@ class EventTriggerConfigurationPanel : FrameLayout, ITriggerConfigurationCoordin
 
     inner class MeasureViewHolder(val view: View) {
 
-        private val titleView: TextView
-        private val categoryView: TextView
-
-        init {
-            categoryView = view.findViewById(R.id.category) as TextView
-            titleView = view.findViewById(R.id.title) as TextView
-        }
+        private val titleView: TextView = view.findViewById(R.id.category)
+        private val categoryView: TextView = view.findViewById(R.id.title)
 
         fun bind(factory: OTMeasureFactory) {
             categoryView.setText(factory.getService().nameResourceId)

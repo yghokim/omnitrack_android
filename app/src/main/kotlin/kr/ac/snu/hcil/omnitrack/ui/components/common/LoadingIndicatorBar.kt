@@ -58,8 +58,8 @@ class LoadingIndicatorBar : FrameLayout {
 
     init {
         inflateContent(R.layout.component_loading_indicator_bar, true)
-        progressBar = findViewById(R.id.ui_progress_bar) as SpinKitView
-        messageView = findViewById(R.id.ui_message) as TextView
+        progressBar = findViewById(R.id.ui_progress_bar)
+        messageView = findViewById(R.id.ui_message)
 
         animationUpdateListener = ValueAnimator.AnimatorUpdateListener {
             animator->

@@ -40,7 +40,6 @@ class DependencyControlViewModel(val dependencyResolver: OTSystemDependencyResol
                                         OTSystemDependencyResolver.DependencyState.Passed -> State.SATISFIED
                                         OTSystemDependencyResolver.DependencyState.FatalFailed -> State.FAILED_FATAL
                                         OTSystemDependencyResolver.DependencyState.NonFatalFailed -> State.FAILED_NON_FATAL
-                                        else -> State.FAILED_FATAL
                                     }
                             )
 

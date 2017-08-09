@@ -366,6 +366,10 @@
     <string name="msg_pref_reminder_light_color">리마인더 알림 LED 색</string>
     <string name="msg_language_change_applied_after_exit_this_screen">언어 설정은 본 화면을 닫은 뒤에 적용됩니다.</string>
 
+    <string name="msg_notification_channel_name_widgets">OmniTrack 위젯 및 인터페이스</string>
+    <string name="msg_notification_channel_name_alerts">OmniTrack 중요 알림</string>
+    <string name="msg_notification_channel_name_system_messages">OmniTrack 시스템 메시지</string>
+    <string name="msg_notification_channel_name_notice">OmniTrack 공지 및 기능소개</string>
 
     <string-array name="purpose_entries">
         <item>directive|건강 관련 정보를 기록하기 위해서</item>

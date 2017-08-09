@@ -5,7 +5,6 @@ import android.support.annotation.Keep
 import android.support.v7.app.AppCompatActivity
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
@@ -101,7 +100,7 @@ object ExperimentConsentManager {
                 profile.purposes = data.getStringArrayListExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_PURPOSES)
 
                 val currentExpRef = DatabaseManager.experimentProfileRef
-                currentExpRef?.setValue(profile, DatabaseReference.CompletionListener { databaseError, databaseReference ->
+                currentExpRef?.setValue(profile, { databaseError, _ ->
                     if (databaseError == null) {
                         mResultListener?.onConsentApproved()
                         finishProcess()

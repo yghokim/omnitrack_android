@@ -70,10 +70,10 @@ class DemographicInputFragment : SlideFragment(), ExtendedSpinner.OnItemSelected
 
         val view = inflater.inflate(R.layout.slide_demographic, container, false)
 
-        genderSelector = view.findViewById(R.id.ui_gender_selector) as SelectionView
+        genderSelector = view.findViewById(R.id.ui_gender_selector)
         genderSelector.setValues(R.array.gender_entries)
 
-        ageSpinner = view.findViewById(R.id.ui_age_selector) as ExtendedSpinner
+        ageSpinner = view.findViewById(R.id.ui_age_selector)
         ageSpinner.setItems(*resources.getStringArray(R.array.age_entries))
         ageSpinner.selectedItemPosition = -1
 
@@ -83,7 +83,7 @@ class DemographicInputFragment : SlideFragment(), ExtendedSpinner.OnItemSelected
         occupationSpinner.selectedItemPosition = -1
 */
 
-        countryButton = view.findViewById(R.id.ui_country_selector) as AppCompatButton
+        countryButton = view.findViewById(R.id.ui_country_selector)
 
         countryPicker = CountryPicker.newInstance(getString(R.string.msg_select_country))
         countryPicker.setListener { name, code, dialCode, flagDrawableResID ->

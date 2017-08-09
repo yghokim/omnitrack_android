@@ -23,7 +23,7 @@ class ComboBoxPropertyView(context: Context, attrs: AttributeSet?) : APropertyVi
             spinner.adapter = value
         }
 
-    private val spinner: ExtendedSpinner = findViewById(R.id.value) as ExtendedSpinner
+    private val spinner: ExtendedSpinner = findViewById(R.id.value)
 
     init {
         spinner.onItemSelectedListener = this

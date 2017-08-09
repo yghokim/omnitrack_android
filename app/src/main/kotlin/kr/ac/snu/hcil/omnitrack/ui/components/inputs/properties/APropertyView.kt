@@ -10,7 +10,7 @@ import kr.ac.snu.hcil.omnitrack.R
  */
 abstract class APropertyView<T>(layoutId: Int, context: Context, attrs: AttributeSet?) : AInputView<T>(layoutId, context, attrs) {
 
-    protected var titleView: TextView
+    protected var titleView: TextView = findViewById(R.id.title)
 
     var useIntrinsicPadding: Boolean = false
 
@@ -38,8 +38,6 @@ abstract class APropertyView<T>(layoutId: Int, context: Context, attrs: Attribut
     constructor(layoutId: Int, context: Context) : this(layoutId, context, null)
 
     init {
-
-        titleView = findViewById(R.id.title) as TextView
 
         val a = context.theme.obtainStyledAttributes(
                 attrs, intArrayOf(android.R.attr.text),

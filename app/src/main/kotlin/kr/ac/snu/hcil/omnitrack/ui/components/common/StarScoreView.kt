@@ -36,7 +36,7 @@ class StarScoreView : LinearLayout {
     init {
         orientation = HORIZONTAL
         inflateContent(R.layout.component_star_score_view, true)
-        scoreView = findViewById(R.id.ui_text) as TextView
+        scoreView = findViewById(R.id.ui_text)
     }
 
     fun setScore(score: Float, maxScore: Float) {

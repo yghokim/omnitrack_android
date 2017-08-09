@@ -72,16 +72,14 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
             }
         }
 
-    val valueView: AudioRecorderView
-    val loadingIndicator: SpinKitView
+    val valueView: AudioRecorderView = findViewById(R.id.ui_audio_recorder)
+    val loadingIndicator: SpinKitView = findViewById(R.id.ui_loading_indicator)
 
     private var audioTitleInformation: String = ""
 
     private var subscriptions = CompositeSubscription()
 
     init {
-        valueView = findViewById(R.id.ui_audio_recorder) as AudioRecorderView
-        loadingIndicator = findViewById(R.id.ui_loading_indicator) as SpinKitView
 
         valueView.audioFileUriChanged += {
             sender, uri->

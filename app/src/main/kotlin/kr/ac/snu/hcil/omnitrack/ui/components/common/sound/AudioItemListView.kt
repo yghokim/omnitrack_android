@@ -56,10 +56,10 @@ class AudioItemListView : ConstraintLayout {
 
     init {
         inflateContent(R.layout.component_audio_item_list_view, true)
-        loadingIndicatorView = findViewById(R.id.ui_loading_indicator) as SpinKitView
-        iconView = findViewById(R.id.icon) as AppCompatImageView
-        durationView = findViewById(R.id.ui_duration_view) as TextView
-        unitView = findViewById(R.id.ui_unit_text) as TextView
+        loadingIndicatorView = findViewById(R.id.ui_loading_indicator)
+        iconView = findViewById(R.id.icon)
+        durationView = findViewById(R.id.ui_duration_view)
+        unitView = findViewById(R.id.ui_unit_text)
     }
 
     private fun startDownload() {
