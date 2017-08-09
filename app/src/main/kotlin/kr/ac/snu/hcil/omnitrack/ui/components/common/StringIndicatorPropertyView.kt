@@ -60,8 +60,8 @@ open class StringIndicatorPropertyView : LinearLayout {
 
         inflateContent(R.layout.component_string_indicator_property, true)
 
-        indicatorView = findViewById(R.id.ui_indicator) as TextView
-        titleView = findViewById(R.id.ui_title) as TextView
+        indicatorView = findViewById(R.id.ui_indicator)
+        titleView = findViewById(R.id.ui_title)
     }
 
     private fun init(context: Context, attrs: AttributeSet?) {

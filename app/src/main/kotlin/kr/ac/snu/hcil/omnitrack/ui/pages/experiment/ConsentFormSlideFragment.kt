@@ -18,7 +18,7 @@ class ConsentFormSlideFragment : SlideFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val view = inflater.inflate(R.layout.slide_consent_form, container, false)
-        markdownView = view.findViewById(R.id.ui_markdown) as MarkdownView
+        markdownView = view.findViewById(R.id.ui_markdown)
 
         markdownView.loadMarkdownFile(
                 "$ANDROID_ASSET_PATH/consent/${resources.getString(R.string.informed_consent_filename)}",

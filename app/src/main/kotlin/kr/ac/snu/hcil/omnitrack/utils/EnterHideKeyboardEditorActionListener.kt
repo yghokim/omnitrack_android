@@ -17,7 +17,7 @@ class EnterHideKeyboardEditorActionListener(val view: TextView) : TextView.OnEdi
     }
 
     override fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
-        if (actionId === EditorInfo.IME_ACTION_DONE) {
+        if (actionId == EditorInfo.IME_ACTION_DONE) {
             //Toast.makeText(getActivity(), "call",45).show();
             // hide virtual keyboard
             val imm = view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager

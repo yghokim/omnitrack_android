@@ -136,7 +136,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
 
         sortOrderButton.setOnClickListener(this)
 
-        val snackBarContainer: CoordinatorLayout = findViewById(R.id.ui_snackbar_container) as CoordinatorLayout
+        val snackBarContainer: CoordinatorLayout = findViewById(R.id.ui_snackbar_container)
         removalSnackbar = Snackbar.make(snackBarContainer, resources.getText(R.string.msg_item_removed_message), Snackbar.LENGTH_INDEFINITE)
         removalSnackbar.setAction(resources.getText(R.string.msg_undo)) {
             view ->
@@ -394,7 +394,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
 
             init {
 
-                val leftBar = view.findViewById(R.id.ui_left_bar)
+                val leftBar: View = view.findViewById(R.id.ui_left_bar)
 
                 leftBar.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
                 view.minimumHeight = leftBar.measuredHeight
@@ -768,7 +768,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                 }
             })
 
-            listView = contentView.findViewById(R.id.ui_list) as RecyclerView
+            listView = contentView.findViewById(R.id.ui_list)
 
             listView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
             listView.adapter = menuAdapter

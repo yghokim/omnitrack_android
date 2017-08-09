@@ -17,14 +17,12 @@ class LikertScaleInputView(context: Context, attrs: AttributeSet? = null) : AAtt
             scalePicker.value = value
         }
 
-    val scalePicker: LikertScalePicker
+    val scalePicker: LikertScalePicker = findViewById(R.id.value)
 
     override fun focus() {
     }
 
     init {
-        scalePicker = findViewById(R.id.value) as LikertScalePicker
-
         scalePicker.valueChanged += {
             sender, new: Float ->
             valueChanged.invoke(this, new)

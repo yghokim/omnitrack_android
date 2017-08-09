@@ -125,7 +125,7 @@ dependencies {
     compile 'com.github.halysongoncalves:pugnotification:1.8.1'
     compile 'com.github.mukeshsolanki:country-picker-android:1.1.7'
     compile 'pl.charmas.android:android-reactive-location:0.10@aar'
-    compile 'uk.co.samuelwall:material-tap-target-prompt:1.12.0'
+    compile 'uk.co.samuelwall:material-tap-target-prompt:2.0.0'
     compile 'com.wdullaer:materialdatetimepicker:3.2.2'
     compile 'com.jakewharton.threetenabp:threetenabp:1.0.5'
     testCompile 'junit:junit:4.12'

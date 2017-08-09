@@ -207,14 +207,14 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
     init {
         inflateContent(R.layout.component_audio_recorder_view, true)
 
-        mainButton = findViewById(R.id.ui_main_button) as AudioRecordingButton
+        mainButton = findViewById(R.id.ui_main_button)
         mainButton.setOnClickListener(this)
 
-        playBar = findViewById(R.id.ui_play_bar) as AudioRecorderProgressBar
-        elapsedTimeView = findViewById(R.id.ui_time_elapsed) as TextView
-        remainingTimeView = findViewById(R.id.ui_time_remain) as TextView
+        playBar = findViewById(R.id.ui_play_bar)
+        elapsedTimeView = findViewById(R.id.ui_time_elapsed)
+        remainingTimeView = findViewById(R.id.ui_time_remain)
 
-        playerButton = findViewById(R.id.ui_player_button) as AppCompatImageButton
+        playerButton = findViewById(R.id.ui_player_button)
         playerButton.setOnClickListener(this)
 
         playerModeTransitionAnimator = ValueAnimator.ofFloat(0f, 1f)

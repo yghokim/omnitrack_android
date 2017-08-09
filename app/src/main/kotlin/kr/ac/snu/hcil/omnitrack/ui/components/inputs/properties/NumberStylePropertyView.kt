@@ -25,12 +25,12 @@ class NumberStylePropertyView(context: Context, attrs: AttributeSet?) : APropert
 
     private var numberStyle: NumberStyle
 
-    private val unitPositionSelectionView: SelectionPropertyView
-    private val unitTextView: ShortTextPropertyView
-    private val pluralizeCheckView: BooleanPropertyView
-    private val showCommasCheckView: BooleanPropertyView
-    private val showFractionView: BooleanPropertyView
-    private val fractionalDigitCountView: NumericUpDownPropertyView
+    private val unitPositionSelectionView: SelectionPropertyView = findViewById(R.id.ui_unit_position)
+    private val unitTextView: ShortTextPropertyView = findViewById(R.id.ui_unit_text)
+    private val pluralizeCheckView: BooleanPropertyView = findViewById(R.id.ui_pluralize)
+    private val showCommasCheckView: BooleanPropertyView = findViewById(R.id.ui_show_commas)
+    private val showFractionView: BooleanPropertyView = findViewById(R.id.ui_show_fraction)
+    private val fractionalDigitCountView: NumericUpDownPropertyView = findViewById(R.id.ui_fractional_count)
 
     private var suspendEvent: Boolean = false
 
@@ -40,19 +40,12 @@ class NumberStylePropertyView(context: Context, attrs: AttributeSet?) : APropert
     }
 
     init {
-
         layoutTransition = LayoutTransition()
 
-        unitTextView = findViewById(R.id.ui_unit_text) as ShortTextPropertyView
         unitTextView.valueChanged += {
             sender, text ->
             updateCache(!suspendEvent)
         }
-
-
-        pluralizeCheckView = findViewById(R.id.ui_pluralize) as BooleanPropertyView
-
-        unitPositionSelectionView = findViewById(R.id.ui_unit_position) as SelectionPropertyView
         unitPositionSelectionView.setEntries(NumberStyle.UnitPosition.values().map { context.getString(it.nameResId) }.toTypedArray())
         unitPositionSelectionView.valueChanged += {
             sender, index ->
@@ -67,10 +60,6 @@ class NumberStylePropertyView(context: Context, attrs: AttributeSet?) : APropert
             updateCache(!suspendEvent)
         }
 
-        showCommasCheckView = findViewById(R.id.ui_show_commas) as BooleanPropertyView
-        showFractionView = findViewById(R.id.ui_show_fraction) as BooleanPropertyView
-
-        fractionalDigitCountView = findViewById(R.id.ui_fractional_count) as NumericUpDownPropertyView
         fractionalDigitCountView.valueChanged += {
             sender, text ->
             updateCache(!suspendEvent)

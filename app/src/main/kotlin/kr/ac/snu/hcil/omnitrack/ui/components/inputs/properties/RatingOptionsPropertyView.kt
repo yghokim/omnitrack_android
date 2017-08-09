@@ -45,10 +45,10 @@ class RatingOptionsPropertyView(context: Context, attrs: AttributeSet?) : APrope
     override fun focus() {
     }
 
-    private val displayTypeSelectionView: SelectionPropertyView
-    private val starLevelSelectionView: SelectionPropertyView
+    private val displayTypeSelectionView: SelectionPropertyView = findViewById(R.id.ui_display_type)
+    private val starLevelSelectionView: SelectionPropertyView = findViewById(R.id.ui_star_levels)
 
-    private val likertOptionsGroup: ViewGroup
+    private val likertOptionsGroup: ViewGroup = findViewById(R.id.ui_group_options_likert)
 
     private val leftmostValuePicker: NumericUpDownPropertyView
     private val rightmostValuePicker: NumericUpDownPropertyView
@@ -57,38 +57,33 @@ class RatingOptionsPropertyView(context: Context, attrs: AttributeSet?) : APrope
     private val middleLabelPropertyView: ShortTextPropertyView
     private val rightLabelPropertyView: ShortTextPropertyView
 
-    private val allowIntermediatePropertyView: BooleanPropertyView
+    private val allowIntermediatePropertyView: BooleanPropertyView = findViewById(R.id.ui_allow_intermediate)
 
     init {
         layoutTransition = LayoutTransition()
 
-        displayTypeSelectionView = findViewById(R.id.ui_display_type) as SelectionPropertyView
         displayTypeSelectionView.setEntries(RatingOptions.DisplayType.values().map { resources.getString(it.nameResourceId) }.toTypedArray())
         displayTypeSelectionView.valueChanged += {
             sender, v ->
             onValueChanged(value)
         }
 
-        starLevelSelectionView = findViewById(R.id.ui_star_levels) as SelectionPropertyView
         starLevelSelectionView.setEntries(RatingOptions.StarLevel.values().map { it.maxScore.toString() }.toTypedArray())
         starLevelSelectionView.valueChanged += {
             sender, v ->
             onValueChanged(value)
         }
 
-        likertOptionsGroup = findViewById(R.id.ui_group_options_likert) as ViewGroup
-
-        allowIntermediatePropertyView = findViewById(R.id.ui_allow_intermediate) as BooleanPropertyView
         allowIntermediatePropertyView.valueChanged += {
             sender, v ->
             onValueChanged(value)
         }
 
-        leftmostValuePicker = likertOptionsGroup.findViewById(R.id.ui_leftmost_value) as NumericUpDownPropertyView
-        rightmostValuePicker = likertOptionsGroup.findViewById(R.id.ui_rightmost_value) as NumericUpDownPropertyView
-        leftLabelPropertyView = likertOptionsGroup.findViewById(R.id.ui_left_label) as ShortTextPropertyView
-        middleLabelPropertyView = likertOptionsGroup.findViewById(R.id.ui_middle_label) as ShortTextPropertyView
-        rightLabelPropertyView = likertOptionsGroup.findViewById(R.id.ui_right_label) as ShortTextPropertyView
+        leftmostValuePicker = likertOptionsGroup.findViewById(R.id.ui_leftmost_value)
+        rightmostValuePicker = likertOptionsGroup.findViewById(R.id.ui_rightmost_value)
+        leftLabelPropertyView = likertOptionsGroup.findViewById(R.id.ui_left_label)
+        middleLabelPropertyView = likertOptionsGroup.findViewById(R.id.ui_middle_label)
+        rightLabelPropertyView = likertOptionsGroup.findViewById(R.id.ui_right_label)
 
         leftmostValuePicker.valueChanged += {
             sender, v ->

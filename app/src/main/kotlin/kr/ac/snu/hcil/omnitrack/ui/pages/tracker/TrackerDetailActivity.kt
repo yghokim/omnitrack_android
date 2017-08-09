@@ -378,13 +378,13 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
 
     class TabViewHolder(val view: View) {
 
-        val iconView: ImageView = view.findViewById(R.id.icon) as ImageView
-        val textView: TextView = view.findViewById(R.id.text) as TextView
+        val iconView: ImageView = view.findViewById(R.id.icon)
+        val textView: TextView = view.findViewById(R.id.text)
 
         fun setValue(text: CharSequence, count: Int? = null) {
-            textView.setText(if (count != null) {
+            textView.text = if (count != null) {
                 "$text ($count)"
-            } else text)
+            } else text
         }
     }
 }

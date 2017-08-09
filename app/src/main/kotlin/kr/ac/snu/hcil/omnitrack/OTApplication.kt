@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Resources
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.os.Looper
 import android.os.SystemClock
@@ -13,7 +14,6 @@ import android.provider.Settings
 import android.support.multidex.MultiDex
 import android.support.multidex.MultiDexApplication
 import android.support.v7.app.AppCompatDelegate
-import android.telephony.TelephonyManager
 import android.text.format.DateUtils
 import com.google.firebase.crash.FirebaseCrash
 import com.jakewharton.threetenabp.AndroidThreeTen
@@ -35,6 +35,7 @@ import kr.ac.snu.hcil.omnitrack.core.externals.fitbit.FitbitRecentSleepTimeMeasu
 import kr.ac.snu.hcil.omnitrack.core.externals.fitbit.FitbitStepCountMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.externals.google.fit.GoogleFitStepsFactory
 import kr.ac.snu.hcil.omnitrack.core.externals.misfit.MisfitStepMeasureFactory
+import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationChannelManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTriggerAlarmManager
 import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
@@ -43,6 +44,7 @@ import kr.ac.snu.hcil.omnitrack.utils.LocaleHelper
 import kr.ac.snu.hcil.omnitrack.utils.NumberStyle
 import kr.ac.snu.hcil.omnitrack.utils.UniqueStringEntryList
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
+import org.jetbrains.anko.telephonyManager
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
@@ -150,7 +152,9 @@ class OTApplication : MultiDexApplication() {
             if (!androidUUID.isNullOrBlank()) {
                 deviceUUID = UUID.nameUUIDFromBytes(androidUUID.toByteArray(Charset.forName("utf8")))
             } else {
-                val phoneUUID = (getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager).deviceId
+                val phoneUUID = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    this.telephonyManager.imei
+                } else this.telephonyManager.deviceId
                 if (!phoneUUID.isNullOrBlank()) {
                     deviceUUID = UUID.nameUUIDFromBytes(phoneUUID.toByteArray(Charset.forName("utf8")))
                 } else {
@@ -293,7 +297,13 @@ class OTApplication : MultiDexApplication() {
     }
 
     fun refreshConfiguration(context: Context) {
-        wrappedContext = LocaleHelper.wrapContextWithLocale(context.applicationContext ?: context, LocaleHelper.getLanguageCode(context))
+        val wrapped = LocaleHelper.wrapContextWithLocale(context.applicationContext ?: context, LocaleHelper.getLanguageCode(context))
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            OTNotificationChannelManager.refreshChannels(wrapped)
+        }
+
+        wrappedContext = wrapped
     }
 
     override fun onCreate() {
@@ -328,7 +338,7 @@ class OTApplication : MultiDexApplication() {
         for (service in OTExternalService.availableServices) {
             if (service.state == OTExternalService.ServiceState.ACTIVATED) {
                 service.activateSilently().subscribe {
-                    state ->
+
 
                 }
             }

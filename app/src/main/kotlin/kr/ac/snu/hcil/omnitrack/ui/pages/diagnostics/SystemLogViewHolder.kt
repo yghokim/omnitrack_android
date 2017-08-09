@@ -13,17 +13,10 @@ import java.util.*
 class SystemLogViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
 
-    private val idView: TextView
-    private val logView: TextView
-    private val tagView: TextView
-    private val timestampView: TextView
-
-    init {
-        idView = view.findViewById(R.id.ui_id) as TextView
-        logView = view.findViewById(R.id.ui_log) as TextView
-        tagView = view.findViewById(R.id.ui_tag) as TextView
-        timestampView = view.findViewById(R.id.ui_timestamp) as TextView
-    }
+    private val idView: TextView = view.findViewById(R.id.ui_id)
+    private val logView: TextView = view.findViewById(R.id.ui_log)
+    private val tagView: TextView = view.findViewById(R.id.ui_tag)
+    private val timestampView: TextView = view.findViewById(R.id.ui_timestamp)
 
     fun bind(log: LoggingDbHelper.OTLog) {
         idView.text = log.id.toString()

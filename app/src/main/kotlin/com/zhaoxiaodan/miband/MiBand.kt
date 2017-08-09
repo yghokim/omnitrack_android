@@ -106,7 +106,6 @@ class MiBand(private val context: Context) {
             VibrationMode.VIBRATION_WITH_LED -> protocal = Protocol.VIBRATION_WITH_LED
             VibrationMode.VIBRATION_10_TIMES_WITH_LED -> protocal = Protocol.VIBRATION_10_TIMES_WITH_LED
             VibrationMode.VIBRATION_WITHOUT_LED -> protocal = Protocol.VIBRATION_WITHOUT_LED
-            else -> return
         }
         this.io.writeCharacteristic(Profile.UUID_SERVICE_VIBRATION, Profile.UUID_CHAR_VIBRATION, protocal, null)
     }
@@ -159,10 +158,8 @@ class MiBand(private val context: Context) {
             override fun onNotify(data: ByteArray?) {
                 Log.d(TAG, Arrays.toString(data))
                 if (data?.size == 4) {
-                    if (data != null) {
-                        val steps = data[3].toInt() shl 24 or (data[2].toInt() and 0xFF) shl 16 or (data[1].toInt() and 0xFF) shl 8 or (data[0].toInt() and 0xFF)
-                        listener.onNotify(steps)
-                    }
+                    val steps = data[3].toInt() shl 24 or (data[2].toInt() and 0xFF) shl 16 or (data[1].toInt() and 0xFF) shl 8 or (data[0].toInt() and 0xFF)
+                    listener.onNotify(steps)
                 }
             }
         })
@@ -192,7 +189,6 @@ class MiBand(private val context: Context) {
             LedColor.BLUE -> protocal = Protocol.SET_COLOR_BLUE
             LedColor.GREEN -> protocal = Protocol.SET_COLOR_GREEN
             LedColor.ORANGE -> protocal = Protocol.SET_COLOR_ORANGE
-            else -> return
         }
         this.io.writeCharacteristic(Profile.UUID_CHAR_CONTROL_POINT, protocal, null)
     }

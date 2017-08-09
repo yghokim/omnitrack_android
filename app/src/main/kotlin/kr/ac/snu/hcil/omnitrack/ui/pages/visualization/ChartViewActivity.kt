@@ -63,17 +63,17 @@ class ChartViewActivity : OTTrackerAttachedActivity(R.layout.activity_chart_view
         leftNavigationButton.setOnClickListener(this)
         rightNavigationButton.setOnClickListener(this)
 
-        currentScopeView = findViewById(R.id.ui_current_time) as TextView
-        currentYearView = findViewById(R.id.ui_current_year) as TextView
+        currentScopeView = findViewById(R.id.ui_current_time)
+        currentYearView = findViewById(R.id.ui_current_year)
 
-        scopeSelectionView = findViewById(R.id.ui_scope_selection) as SelectionView
+        scopeSelectionView = findViewById(R.id.ui_scope_selection)
         scopeSelectionView.setValues(supportedGranularity.map { resources.getString(it.nameId) }.toTypedArray())
         scopeSelectionView.onSelectedIndexChanged += {
             sender, index ->
             viewModel.granularity = supportedGranularity[index]
         }
 
-        listView = findViewById(R.id.ui_list) as RecyclerView
+        listView = findViewById(R.id.ui_list)
         listView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         listView.addItemDecoration(HorizontalImageDividerItemDecoration(R.drawable.horizontal_separator_pattern, this))
 
@@ -204,8 +204,8 @@ class ChartViewActivity : OTTrackerAttachedActivity(R.layout.activity_chart_view
 
         inner class ChartViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
-            private val nameView: TextView = view.findViewById(R.id.ui_chart_name) as TextView
-            private val chartView: ChartView = view.findViewById(R.id.ui_chart_view) as ChartView
+            private val nameView: TextView = view.findViewById(R.id.ui_chart_name)
+            private val chartView: ChartView = view.findViewById(R.id.ui_chart_view)
 
             fun bindChart(model: ChartModel<*>) {
                 nameView.text = model.name

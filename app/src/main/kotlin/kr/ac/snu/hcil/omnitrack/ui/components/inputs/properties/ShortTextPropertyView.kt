@@ -26,10 +26,9 @@ class ShortTextPropertyView(context: Context, attrs: AttributeSet?) : APropertyV
             }
         }
 
-    private var valueView: TextView
+    private var valueView: TextView = findViewById(R.id.value)
 
     init{
-        valueView = findViewById(R.id.value) as TextView
         valueView.addTextChangedListener(object : TextWatcher {
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {

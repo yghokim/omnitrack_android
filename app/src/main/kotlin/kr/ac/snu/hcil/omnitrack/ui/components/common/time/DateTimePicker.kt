@@ -162,11 +162,11 @@ class DateTimePicker(context: Context, attrs: AttributeSet? = null) : FrameLayou
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         addView(inflater.inflate(R.layout.component_timepoint, this, false))
 
-        leftPicker = findViewById(R.id.ui_left_picker) as NumericUpDown
-        middlePicker = findViewById(R.id.ui_middle_picker) as NumericUpDown
-        rightPicker = findViewById(R.id.ui_right_picker) as NumericUpDown
+        leftPicker = findViewById(R.id.ui_left_picker)
+        middlePicker = findViewById(R.id.ui_middle_picker)
+        rightPicker = findViewById(R.id.ui_right_picker)
 
-        dateButton = findViewById(R.id.ui_button_date) as Button
+        dateButton = findViewById(R.id.ui_button_date)
 
         dateButton.setOnClickListener {
             val activity = getActivity()

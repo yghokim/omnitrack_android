@@ -324,7 +324,6 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
                         attribute.suspendDatabaseSync = true
 
                         attribute.name = pojo.name ?: "Noname"
-                        var changedValue = false
                         val properties = pojo.properties
                         if (properties != null) {
                             attribute.readPropertiesFromDatabase(properties)

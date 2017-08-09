@@ -11,9 +11,9 @@ import kr.ac.snu.hcil.omnitrack.R
  */
 class BooleanPropertyView(context: Context, attrs: AttributeSet?) : APropertyView<Boolean>(R.layout.component_property_boolean, context, attrs), View.OnClickListener {
 
-    private val switch: SwitchCompat
+    private val switch: SwitchCompat = findViewById(R.id.value)
 
-    private val proxyButton: View
+    private val proxyButton: View = findViewById(R.id.ui_button_proxy)
 
     override var value: Boolean
         get() = switch.isChecked
@@ -22,9 +22,6 @@ class BooleanPropertyView(context: Context, attrs: AttributeSet?) : APropertyVie
         }
 
     init {
-        switch = findViewById(R.id.value) as SwitchCompat
-        proxyButton = findViewById(R.id.ui_button_proxy)
-
         proxyButton.setOnClickListener(this)
     }
 

@@ -81,9 +81,9 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
         }
 
 
-    private val mapView: MapView
+    private val mapView: MapView = findViewById(R.id.ui_map)
 
-    private val controlPanel: View
+    private val controlPanel: View = findViewById(R.id.ui_control_panel)
 
     private val searchButton: View
     private val zoomInButton: View
@@ -92,13 +92,13 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
 
     private val fitButton: View
 
-    private val addressView: TextView
+    private val addressView: TextView = findViewById(R.id.ui_address)
 
-    private val colorFrame: View
+    private val colorFrame: View = findViewById(R.id.ui_mapview_frame)
 
-    private val addressBusyIndicator: ProgressBar
+    private val addressBusyIndicator: ProgressBar = findViewById(R.id.ui_address_busy_indicator)
 
-    private val adjustPanelStub: ViewStub
+    private val adjustPanelStub: ViewStub = findViewById(R.id.ui_adjust_panel_stub)
 
     private var adjustPanel: View? = null
 
@@ -114,17 +114,7 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
 
     init {
 
-        mapView = findViewById(R.id.ui_map) as MapView
-
-        addressView = findViewById(R.id.ui_address) as TextView
-
-        addressBusyIndicator = findViewById(R.id.ui_address_busy_indicator) as ProgressBar
         addressBusyIndicator.visibility = View.INVISIBLE
-
-        colorFrame = findViewById(R.id.ui_mapview_frame)
-
-        controlPanel = findViewById(R.id.ui_control_panel)
-        adjustPanelStub = findViewById(R.id.ui_adjust_panel_stub) as ViewStub
 
         zoomInButton = findViewById(R.id.ui_button_zoom_in)
         zoomOutButton = findViewById(R.id.ui_button_zoom_out)

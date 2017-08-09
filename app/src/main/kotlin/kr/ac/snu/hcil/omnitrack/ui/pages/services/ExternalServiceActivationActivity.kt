@@ -49,18 +49,17 @@ class ExternalServiceActivationActivity : OTActivity(false, false) {
 
     private lateinit var viewModel: ServiceActivationViewModel
 
-    private lateinit var imageView: ImageView
-    private lateinit var statusView: TextView
-    private lateinit var progressBar: ProgressBar
+    private val imageView: ImageView by bindView(R.id.ui_thumb)
+    private val progressBar: ProgressBar by bindView(R.id.ui_progress_bar)
 
-    private lateinit var nameView: TextView
-    private lateinit var descriptionView: TextView
+    private val nameView: TextView by bindView(R.id.ui_name)
+    private val descriptionView: TextView by bindView(R.id.ui_description)
 
-    private lateinit var activateButton: FancyButton
+    private val activateButton: FancyButton by bindView(R.id.ui_button_activate)
 
-    private lateinit var dependencyListView: RecyclerView
+    private val dependencyListView: RecyclerView by bindView(R.id.ui_dependency_list)
 
-    private lateinit var buttonColorRevealView: RevealColorView
+    private val buttonColorRevealView: RevealColorView by bindView(R.id.ui_reveal_color_view)
 
     private var dependencyList: List<DependencyControlViewModel>? = null
     private val dependencyAdapter = DependencyAdapter()
@@ -69,17 +68,6 @@ class ExternalServiceActivationActivity : OTActivity(false, false) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_service_activation_wizard)
-
-        imageView = findViewById(R.id.ui_thumb) as ImageView
-        //statusView = findViewById(R.id.ui_total_status_text) as TextView
-        dependencyListView = findViewById(R.id.ui_dependency_list) as RecyclerView
-        progressBar = findViewById(R.id.ui_progress_bar) as ProgressBar
-        activateButton = findViewById(R.id.ui_button_activate) as FancyButton
-
-        nameView = findViewById(R.id.ui_name) as TextView
-        descriptionView = findViewById(R.id.ui_description) as TextView
-
-        buttonColorRevealView = findViewById(R.id.ui_reveal_color_view) as RevealColorView
 
         dependencyListView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         dependencyListView.adapter = dependencyAdapter

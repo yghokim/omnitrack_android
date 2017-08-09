@@ -31,7 +31,7 @@ class SourceConfigurationPanel : FrameLayout, IEventListener<Int> {
     init {
         inflateContent(R.layout.connection_source_configuration_panel, true)
 
-        queryPresetSelectionView = findViewById(R.id.ui_preset_selection) as ComboBoxPropertyView
+        queryPresetSelectionView = findViewById(R.id.ui_preset_selection)
 
         queryPresetSelectionView.adapter = queryPresetAdapter
 

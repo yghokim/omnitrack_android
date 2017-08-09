@@ -258,9 +258,9 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_mul
             println("create view")
 
             val view = inflater.inflate(R.layout.activity_trigger_detail_fragment, container, false)
-            controlPanelContainer = view.findViewById(R.id.ui_control_panel) as ViewGroup
-            trackerAssignPanelStub = view.findViewById(R.id.ui_tracker_assign_panel_stub) as ViewStub
-            actionSettingsContainer = view.findViewById(R.id.ui_action_settings_container) as ViewGroup
+            controlPanelContainer = view.findViewById(R.id.ui_control_panel)
+            trackerAssignPanelStub = view.findViewById(R.id.ui_tracker_assign_panel_stub)
+            actionSettingsContainer = view.findViewById(R.id.ui_action_settings_container)
 
             this.hideAttachedTrackers = arguments.getBoolean(INTENT_EXTRA_HIDE_ATTACHED_TRACKERS, false)
 
@@ -364,7 +364,7 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_mul
             } else {
                 if (trackerAssignPanelContainer == null) {
                     trackerAssignPanelContainer = trackerAssignPanelStub.inflate()
-                    trackerAssignPanel = trackerAssignPanelContainer?.findViewById(R.id.ui_tracker_assign_list) as TrackerAssignPanel
+                    trackerAssignPanel = trackerAssignPanelContainer?.findViewById(R.id.ui_tracker_assign_list)
                     trackerAssignPanel?.init(attachedTrigger?.trackers)
                 } else {
                     trackerAssignPanelContainer?.visibility = View.VISIBLE

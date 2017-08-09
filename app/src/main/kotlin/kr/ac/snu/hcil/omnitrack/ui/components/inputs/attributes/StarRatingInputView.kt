@@ -11,7 +11,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.StarRatingView
 class StarRatingInputView(context: Context, attrs: AttributeSet? = null) : AAttributeInputView<Float>(R.layout.input_stars, context, attrs) {
     override val typeId: Int = VIEW_TYPE_RATING_STARS
 
-    val ratingView: StarRatingView
+    val ratingView: StarRatingView = findViewById(R.id.value)
 
     override var value: Float
         get() = ratingView.score
@@ -20,8 +20,6 @@ class StarRatingInputView(context: Context, attrs: AttributeSet? = null) : AAttr
         }
 
     init {
-        ratingView = findViewById(R.id.value) as StarRatingView
-
         ratingView.scoreChanged += {
             sender, score: Float ->
             valueChanged.invoke(this, score)

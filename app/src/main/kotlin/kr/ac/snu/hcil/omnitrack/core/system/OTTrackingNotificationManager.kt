@@ -6,7 +6,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.preference.PreferenceManager
 import android.support.v4.app.NotificationCompat
 import android.support.v4.app.TaskStackBuilder
@@ -31,34 +30,9 @@ object OTTrackingNotificationManager {
     private val reminderTrackerPendingCounts = Hashtable<String, Int>()
 
     private val reminderTrackerNotificationIdTable = FillingIntegerIdReservationTable<String>()
-    private val backgroundLoggingTrackerNotificationIdTable = FillingIntegerIdReservationTable<String>()
-
-    /*
-    private val icon_ex: Icon by lazy{
-        Icon.createWithBitmap(BitmapFactory.decodeResource(OTApplication.app.resourcesWrapped, R.drawable.ex_dark))
-    }*/
 
     private fun getNewReminderNotificationId(tracker: OTTracker): Int {
         return reminderTrackerNotificationIdTable[tracker.objectId]
-    }
-
-    private fun getNewBackgroundLoggingNotificationId(tracker: OTTracker): Int {
-        return 500 + backgroundLoggingTrackerNotificationIdTable[tracker.objectId]
-    }
-
-    enum class Type(val priority: Int, val collapse: Boolean) {
-        TRACKING_REMINDER(Notification.PRIORITY_MAX, false),
-        BACKGROUND_LOGGING_NOTIFICATION(Notification.PRIORITY_DEFAULT, true),
-        BACKGROUND_LOGGING_PROGRESS(Notification.PRIORITY_DEFAULT, false);
-
-
-        fun getNewId(): Int {
-            return if (collapse) {
-                values().indexOf(this)
-            } else {
-                increment.incrementAndGet()
-            }
-        }
     }
 
     private val notificationService: NotificationManager by lazy {
@@ -77,7 +51,7 @@ object OTTrackingNotificationManager {
         val ringtone = PreferenceManager.getDefaultSharedPreferences(context).getString(SettingsActivity.PREF_REMINDER_NOTI_RINGTONE, android.provider.Settings.System.DEFAULT_NOTIFICATION_URI.toString())
         val lightColor = PreferenceManager.getDefaultSharedPreferences(context).getInt(SettingsActivity.PREF_REMINDER_LIGHT_COLOR, ContextCompat.getColor(context, R.color.colorPrimary))
 
-        val builder = makeBaseBuilder(context, Type.TRACKING_REMINDER.priority, reminderTime)
+        val builder = makeBaseBuilder(context, reminderTime, OTNotificationChannelManager.CHANNEL_ID_IMPORTANT)
                 .setContentIntent(resultPendingIntent)
                 .setContentText(String.format(context.resources.getString(R.string.msg_noti_tap_for_tracking_format), tracker.name))
                 .setDefaults(Notification.DEFAULT_VIBRATE)
@@ -129,7 +103,7 @@ object OTTrackingNotificationManager {
                 context.resources.getString(R.string.msg_notification_action_discard_item),
                 PendingIntent.getBroadcast(context, 0, itemRemoveIntent, PendingIntent.FLAG_UPDATE_CURRENT)).build()
 
-        val builder = makeBaseBuilder(context, Type.BACKGROUND_LOGGING_NOTIFICATION.priority, loggedTime)
+        val builder = makeBaseBuilder(context, loggedTime, OTNotificationChannelManager.CHANNEL_ID_SYSTEM)
                 .setSmallIcon(R.drawable.icon_simple_plus)
                 .setContentIntent(resultPendingIntent)
                 .setContentText(
@@ -159,23 +133,12 @@ object OTTrackingNotificationManager {
         // }
     }
 
-    fun pushWarningMessageNotification(context: Context, message: String) {
-
-    }
-
-    fun makeBaseBuilder(context: Context, priority: Int, time: Long): NotificationCompat.Builder {
-
-        val builder = NotificationCompat.Builder(context).setPriority(priority)
+    fun makeBaseBuilder(context: Context, time: Long, channelId: String): NotificationCompat.Builder {
+        return NotificationCompat.Builder(context, channelId)
                 .setWhen(time)
                 .setShowWhen(true)
                 .setSmallIcon(R.drawable.icon_simple)
-
-        if (Build.VERSION.SDK_INT >= 21) {
-            builder.setColor(ContextCompat.getColor(context, R.color.colorPrimary))
-        }
-
-
-        return builder
+                .setColor(ContextCompat.getColor(context, R.color.colorPrimary))
     }
 
 }

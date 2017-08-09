@@ -73,8 +73,8 @@ class HourPicker : RelativeLayout, View.OnClickListener {
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         inflater.inflate(R.layout.component_hour_picker, this, true)
 
-        amPmView = findViewById(R.id.ui_ampm) as TextView
-        hourView = findViewById(R.id.ui_hour) as TextView
+        amPmView = findViewById(R.id.ui_ampm)
+        hourView = findViewById(R.id.ui_hour)
 
         amPm = 1
         hour = 9

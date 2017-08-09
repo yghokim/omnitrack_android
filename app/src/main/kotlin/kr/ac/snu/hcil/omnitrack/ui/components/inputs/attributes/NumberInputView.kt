@@ -37,10 +37,10 @@ class NumberInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
 
     private var moveUnit: BigDecimal = BigDecimal(1)
 
-    private var increaseButton: View
-    private var decreaseButton: View
-    private lateinit var valueField: EditText
-    private lateinit var valueStatic: TextView
+    private val increaseButton: View = findViewById(R.id.ui_button_plus)
+    private val decreaseButton: View = findViewById(R.id.ui_button_minus)
+    private val valueField: EditText = findViewById(R.id.ui_value_field)
+    private val valueStatic: TextView = findViewById(R.id.ui_value_static)
 
     private val formattedInformation = NumberStyle.FormattedInformation(null, "", NumberStyle.UnitPosition.None)
 
@@ -90,11 +90,6 @@ class NumberInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
     }
 
     init {
-        increaseButton = findViewById(R.id.ui_button_plus)
-        decreaseButton = findViewById(R.id.ui_button_minus)
-
-        valueField = findViewById(R.id.ui_value_field) as EditText
-        valueStatic = findViewById(R.id.ui_value_static) as TextView
 
         valueField.visibility = GONE
 
