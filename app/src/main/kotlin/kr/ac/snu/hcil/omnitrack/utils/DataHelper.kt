@@ -9,6 +9,10 @@ object DataHelper {
     }
 
     inline fun <T> ConvertSortedListToBinWithLong(cuts: Array<Long>, list: List<T>, getKey: (T) -> Long, from: Int = 0, to: Int = list.size - 1): Array<BinWithLong<T>> {
+        if (list.isEmpty()) {
+            return emptyArray<BinWithLong<T>>()
+        }
+
         var currentItemPointer: Int = from
         var currentCutPointer: Int = 0
         var cut0 = cuts[currentCutPointer]

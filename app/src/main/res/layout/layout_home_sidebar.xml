@@ -6,8 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/frontalBackground"
     android:clickable="true"
-    android:orientation="vertical"
-    >
+    android:orientation="vertical">
 
     <LinearLayout
         android:id="@+id/ui_profile_panel"

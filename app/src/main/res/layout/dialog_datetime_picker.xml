@@ -32,8 +32,7 @@
                     android:id="@+id/ui_time_tab_content"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:paddingBottom="15dp"
-                    >
+                    android:paddingBottom="15dp">
 
                     <TimePicker
                         android:id="@+id/ui_time_picker_view"

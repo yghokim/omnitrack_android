@@ -720,7 +720,7 @@ object DatabaseManager {
         val ref = getItemListOfTrackerChild(tracker.objectId)
         if (ref != null) {
             var query = ref.orderByChild("timestamp")
-            return Observable.create { subscriber ->
+            return Observable.unsafeCreate { subscriber ->
                 if (timeRange != null) {
                     query = query.startAt(timeRange.from.toDouble(), "timestamp").endAt(timeRange.to.toDouble(), "timestamp")
                 }

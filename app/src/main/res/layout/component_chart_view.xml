@@ -2,6 +2,7 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
     <kr.ac.snu.hcil.omnitrack.ui.components.visualization.ChartCanvasView
         android:id="@+id/ui_chart"
         android:layout_width="match_parent"

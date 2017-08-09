@@ -54,16 +54,16 @@
             android:textSize="14sp" />
 
         <android.support.v7.widget.AppCompatButton
-                android:id="@+id/ui_button_activate"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/button_height_normal"
+            android:id="@+id/ui_button_activate"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/button_height_normal"
             android:layout_alignParentEnd="true"
             android:layout_alignParentTop="true"
-                android:layout_gravity="center"
+            android:layout_gravity="center"
             android:layout_marginLeft="@dimen/service_list_element_horizontal_padding"
             android:layout_marginRight="@dimen/service_list_element_horizontal_padding"
             android:backgroundTint="@color/colorPointed"
-                android:paddingEnd="@dimen/service_list_element_horizontal_padding"
+            android:paddingEnd="@dimen/service_list_element_horizontal_padding"
 
             android:paddingStart="@dimen/service_list_element_horizontal_padding"
             android:text="@string/msg_activate"

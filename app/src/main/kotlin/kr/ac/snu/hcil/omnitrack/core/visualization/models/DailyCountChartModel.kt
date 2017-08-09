@@ -28,11 +28,11 @@ class DailyCountChartModel(tracker: OTTracker) : TrackerChartModel<Pair<Long, In
 
 
     override fun reloadData(): Observable<List<Pair<Long, Int>>> {
+        println("reload chart data. Scope:  ${getTimeScope()}")
 
         val xScale = QuantizedTimeScale()
         xScale.setDomain(getTimeScope().from, getTimeScope().to)
         xScale.quantize(currentGranularity)
-
         return DatabaseManager.loadItems(tracker, getTimeScope(), DatabaseManager.Order.ASC).map {
                     items ->
             DataHelper.ConvertSortedListToBinWithLong((xScale.binPointsOnDomain + getTimeScope().to).toTypedArray(),
