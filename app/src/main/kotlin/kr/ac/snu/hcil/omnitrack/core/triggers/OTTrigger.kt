@@ -115,11 +115,11 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
             println("lasttrigger time old: ${field}, new: ${value}")
             if (field != value) {
                 field = value
-            if (!suspendDatabaseSync) {
-                databasePointRef?.child(PROPERTY_LAST_TRIGGERED_TIME)?.setValue(value)
+                if (!suspendDatabaseSync) {
+                    databasePointRef?.child(PROPERTY_LAST_TRIGGERED_TIME)?.setValue(value)
+                }
             }
         }
-    }
 
     var isOn: Boolean by Delegates.observable(isOn) {
         prop, old, new ->
@@ -297,12 +297,11 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
         }
     }
 
-    fun getSerializedProperties(): String{
+    fun getSerializedProperties(): String {
         val list = ArrayList<SerializedStringKeyEntry>()
 
         for ((key, value) in properties)
-            if (value != null)
-            {
+            if (value != null) {
                 list.add(SerializedStringKeyEntry(key, TypeStringSerializationHelper.serialize(value)))
             }
 
@@ -320,7 +319,7 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
     fun writePropertiesToDatabase(propertyRef: MutableData) {
         for ((key, value) in properties) {
             if (value != null) {
-                propertyRef.child(key).setValue(TypeStringSerializationHelper.serialize(value))
+                propertyRef.child(key).value = TypeStringSerializationHelper.serialize(value)
             }
         }
     }
@@ -355,7 +354,7 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
                         trackerIndexedIdList
                 )
             }
-            
+
             attachedTrackersChanged.onNext(ListDelta())
         }
     }

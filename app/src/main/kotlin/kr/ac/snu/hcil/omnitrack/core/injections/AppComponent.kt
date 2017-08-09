@@ -8,5 +8,4 @@ import javax.inject.Singleton
  */
 @Singleton
 @Component(modules = arrayOf(OTApplicationModule::class))
-interface AppComponent {
-}
+interface AppComponent

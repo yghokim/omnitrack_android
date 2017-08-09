@@ -13,7 +13,7 @@
         android:text="@string/msg_trigger_time_config_type" />
 
     <FrameLayout
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1">
 

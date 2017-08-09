@@ -21,7 +21,7 @@ import java.util.*
  */
 class OAuth2Client(val config: OAuth2Config) {
 
-    class OAuth2Config() {
+    class OAuth2Config {
         var authorizationUrl: String = ""
         var tokenRequestUrl: String = ""
         var revokeUrl: String = ""

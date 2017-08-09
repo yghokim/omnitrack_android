@@ -43,7 +43,7 @@ class OTTriggerManager(val user: OTUser) {
                         if (trigger.trackers.isEmpty() && trigger.isOn) {
                             trigger.isOn = false
                         }
-            }
+                    }
                 })
     }
 
@@ -82,9 +82,9 @@ class OTTriggerManager(val user: OTUser) {
         return triggers.find { it.objectId == objId }
     }
 
-    fun getFilteredTriggers(filter: (OTTrigger)->Boolean): List<OTTrigger>{
-        return triggers.filter{
-            filter(it)==true
+    fun getFilteredTriggers(filter: (OTTrigger) -> Boolean): List<OTTrigger> {
+        return triggers.filter {
+            filter(it) == true
         }
     }
 
@@ -170,7 +170,6 @@ class OTTriggerManager(val user: OTUser) {
     fun withIndex(): Iterable<IndexedValue<OTTrigger>> {
         return triggers.withIndex()
     }
-
 
 
 }

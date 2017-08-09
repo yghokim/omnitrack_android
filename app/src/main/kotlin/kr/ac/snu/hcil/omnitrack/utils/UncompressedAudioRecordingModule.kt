@@ -50,7 +50,7 @@ class UncompressedAudioRecordingModule(val listener: RecordingListener, val file
         if (audioRecord.state != AudioRecord.STATE_INITIALIZED) {
             println("audioRecorder cannot be initialized.")
             listener.onRecordingFinished(this, false)
-            return;
+            return
         }
 
         _stopReserved = false
@@ -75,7 +75,7 @@ class UncompressedAudioRecordingModule(val listener: RecordingListener, val file
         }
 
         override fun run() {
-            android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_AUDIO);
+            android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_AUDIO)
 
             val audioBuffer = ShortArray(bufferSize / 2)
             audioRecord.startRecording()

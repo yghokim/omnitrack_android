@@ -54,9 +54,9 @@ class SynchronizedUri {
 
     val isLocalUriValid: Boolean get() {
         return if (Uri.EMPTY != localUri) {
-            if (localUri.scheme=="file") {
+            if (localUri.scheme == "file") {
                 File(localUri.path).exists()
-            } else{
+            } else {
                 println("uri ${localUri.path} is not file.")
                 false
             }
@@ -71,9 +71,7 @@ class SynchronizedUri {
         } else localUri
     } else serverUri
 
-    constructor() {
-
-    }
+    constructor()
 
     constructor(localUri: Uri, serverUri: Uri = Uri.EMPTY) {
         this.localUri = localUri

@@ -91,7 +91,7 @@ object FitbitStepCountMeasureFactory : OTMeasureFactory("step") {
                 FitbitService.getRequest(
                         dailyConverter,
                         FitbitApi.makeDailyRequestUrl(FitbitApi.REQUEST_COMMAND_SUMMARY, Date(start)))
-                    as Observable<Result<out Any>>
+                        as Observable<Result<out Any>>
             } else
             //TODO: Can be optimized by querying summary data of middle days.
                 FitbitService.getRequest(intraDayConverter, *FitbitApi.makeIntraDayRequestUrls(FitbitApi.REQUEST_INTRADAY_RESOURCE_PATH_STEPS, start, end))

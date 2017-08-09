@@ -36,9 +36,7 @@ class MicrosoftBandHeartRateFactory : OTMeasureFactory("heart") {
     }
 
     override fun isAttachableTo(attribute: OTAttribute<out Any>): Boolean {
-        if (attribute is OTNumberAttribute) {
-            return true
-        } else return false
+        return attribute is OTNumberAttribute
     }
 
     override val isRangedQueryAvailable: Boolean = false

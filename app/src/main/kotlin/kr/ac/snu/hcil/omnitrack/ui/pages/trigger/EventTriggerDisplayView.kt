@@ -20,7 +20,7 @@ import java.text.DecimalFormat
 /**
  * Created by Young-Ho on 9/5/2016.
  */
-class EventTriggerDisplayView: LinearLayout {
+class EventTriggerDisplayView : LinearLayout {
 
     private val measureNameView: TextView by bindView(R.id.ui_measure_name)
     private val symbolView: AppCompatImageView by bindView(R.id.ui_comparison_symbol)
@@ -31,22 +31,19 @@ class EventTriggerDisplayView: LinearLayout {
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
 
-    init{
+    init {
         orientation = VERTICAL
 
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         inflater.inflate(R.layout.trigger_display_event, this, true)
     }
 
-    fun setMeasureFactory(factory: OTMeasureFactory?)
-    {
+    fun setMeasureFactory(factory: OTMeasureFactory?) {
         measureNameView.text = factory?.getFormattedName()
     }
 
-    fun setConditioner(conditioner: SingleNumericComparison?)
-    {
-        if(conditioner==null)
-        {
+    fun setConditioner(conditioner: SingleNumericComparison?) {
+        if (conditioner == null) {
             symbolView.visibility = GONE
             measureNameView.visibility = GONE
 
@@ -55,8 +52,7 @@ class EventTriggerDisplayView: LinearLayout {
 
             comparedNumberView.setPaddingTop(dipRound(10f))
             comparedNumberView.setTextSize(TypedValue.COMPLEX_UNIT_PX, dipSize(20f))
-        }
-        else{
+        } else {
             symbolView.visibility = View.VISIBLE
             measureNameView.visibility = VISIBLE
 

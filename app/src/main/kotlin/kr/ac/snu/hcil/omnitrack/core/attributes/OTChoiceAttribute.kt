@@ -172,7 +172,7 @@ class OTChoiceAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrac
         }
     }
 
-    private fun getChoiceTexts(value: IntArray): List<String>{
+    private fun getChoiceTexts(value: IntArray): List<String> {
         val list = ArrayList <String>()
         for (idEntry in value.withIndex()) {
 
@@ -201,11 +201,9 @@ class OTChoiceAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrac
     }
 
     override fun onAddValueToTable(value: Any?, out: MutableList<String?>, uniqKey: String?) {
-        if(value is IntArray)
-        {
+        if (value is IntArray) {
             getChoiceTexts(value).joinToString(",")
-        }
-        else out.add(null)
+        } else out.add(null)
     }
 
 

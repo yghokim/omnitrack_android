@@ -16,8 +16,8 @@ import kr.ac.snu.hcil.omnitrack.R
 class ColorSelectionButton : Button, ValueAnimator.AnimatorUpdateListener {
 
     var color: Int = Color.RED
-        set(value){
-            if(field != value) {
+        set(value) {
+            if (field != value) {
                 field = value
                 shapePaint.color = value
                 invalidate()
@@ -30,20 +30,19 @@ class ColorSelectionButton : Button, ValueAnimator.AnimatorUpdateListener {
     private var paddingTop = 0.0f
     private var paddingLeft = 0.0f
 
-    private var contentSize : Float = 0.0f
+    private var contentSize: Float = 0.0f
 
     private var cornerRadius: Float = 0.0f
     private var contentPadding: Float = 0.0f
 
 
-    val shapePaint : Paint = Paint()
+    val shapePaint: Paint = Paint()
 
     private var toSelectionRoundingAnimator: ValueAnimator? = null
     private var toUnselectionRoundingAnimator: ValueAnimator? = null
 
     private var toSelectionRadiusAnimator: ValueAnimator? = null
     private var toUnselectionRadiusAnimator: ValueAnimator? = null
-
 
 
     companion object {
@@ -82,23 +81,20 @@ class ColorSelectionButton : Button, ValueAnimator.AnimatorUpdateListener {
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
 
-        if(changed == true)
-        {
+        if (changed == true) {
 
             contentSize = Math.min(width, height).toFloat()
-            if(width >= height)
-            {
+            if (width >= height) {
                 paddingTop = 0.0f
-                paddingLeft = (width - contentSize)*.5f
-            }
-            else{
-                paddingTop = (height - contentSize)*.5f
+                paddingLeft = (width - contentSize) * .5f
+            } else {
+                paddingTop = (height - contentSize) * .5f
                 paddingLeft = 0.0f
             }
 
             frameBounds.set(paddingLeft, paddingTop, paddingLeft + contentSize, paddingTop + contentSize)
             val paddingSize = Math.round(contentSize * 0.07f)
-            val drawableSize = Math.round(paddingSize + contentSize - 2*paddingSize)
+            val drawableSize = Math.round(paddingSize + contentSize - 2 * paddingSize)
             checkedDrawable.setBounds(Math.round(paddingLeft + paddingSize), Math.round(paddingTop + paddingSize), drawableSize, drawableSize)
 
             if (isSelected) {
@@ -169,8 +165,7 @@ class ColorSelectionButton : Button, ValueAnimator.AnimatorUpdateListener {
         frameBounds.inset(contentPadding, contentPadding)
         canvas.drawRoundRect(frameBounds, cornerRadius, cornerRadius, shapePaint)
 
-        if (isSelected)
-        {
+        if (isSelected) {
             checkedDrawable.draw(canvas)
 
         }

@@ -32,9 +32,7 @@ import java.util.*
 class ImagePicker : FrameLayout, View.OnClickListener {
 
     //https://developer.android.com/training/camera/photobasics.html
-    companion object{
-
-    }
+    companion object
 
     interface ImagePickerCallback {
         fun onRequestCameraImage(view: ImagePicker)
@@ -45,7 +43,7 @@ class ImagePicker : FrameLayout, View.OnClickListener {
 
     var imageUri: Uri = Uri.EMPTY
         set(value) {
-            println("new uri _ ${value.toString()}")
+            println("new uri _ $value")
             if (field != value) {
                 field = value
 
@@ -134,7 +132,7 @@ class ImagePicker : FrameLayout, View.OnClickListener {
         val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
 
         //ensure there is a camera activity
-        if (takePictureIntent.resolveActivity(activity.getPackageManager()) != null) {
+        if (takePictureIntent.resolveActivity(activity.packageManager) != null) {
 
             val uri = createCacheImageFileUri(activity)
             takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri)

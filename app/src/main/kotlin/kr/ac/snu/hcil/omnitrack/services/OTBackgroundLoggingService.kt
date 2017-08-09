@@ -135,8 +135,7 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
             context.sendBroadcast(intent)
         }
 
-        fun makeIntent(context: Context, tracker: OTTracker, source: OTItem.LoggingSource): Intent
-        {
+        fun makeIntent(context: Context, tracker: OTTracker, source: OTItem.LoggingSource): Intent {
             return makeIntent(context, tracker.objectId, source)
         }
 
@@ -167,8 +166,6 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
             log(this, tracker, OTItem.LoggingSource.valueOf(intent.getStringExtra(INTENT_EXTRA_LOGGING_SOURCE)), true).subscribe()
         }
     }
-
-
 
 
 }

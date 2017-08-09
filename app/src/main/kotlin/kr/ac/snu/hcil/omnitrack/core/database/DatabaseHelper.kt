@@ -18,7 +18,7 @@ import java.util.*
  */
 class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db", null, 1) {
 
-    companion object{
+    companion object {
         const val SAVE_RESULT_NEW = 1
         const val SAVE_RESULT_EDIT = 2
         const val SAVE_RESULT_FAIL = 0
@@ -260,7 +260,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
     }
 
     fun deleteObjects(scheme: TableScheme, vararg ids: Long) {
-        val idStringArray = ids.map { "${scheme._ID}=${it.toString()}" }.toTypedArray()
+        val idStringArray = ids.map { "${scheme._ID}=$it" }.toTypedArray()
         if (idStringArray.size > 0) {
             val deleted = writableDatabase.delete(scheme.tableName, idStringArray.joinToString(" OR "), null)
             println("removed ${scheme.tableName}, $deleted")
@@ -444,8 +444,8 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
 
         val result = saveObject(item, values, ItemScheme)
 
-        if(result != SAVE_RESULT_FAIL) {
-            if(notifyIntent) {
+        if (result != SAVE_RESULT_FAIL) {
+            if (notifyIntent) {
                 val intent = Intent(when (result) {
                     SAVE_RESULT_NEW -> OTApplication.BROADCAST_ACTION_ITEM_ADDED
                     SAVE_RESULT_EDIT -> OTApplication.BROADCAST_ACTION_ITEM_EDITED
@@ -458,29 +458,23 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
                 OTApplication.app.sendBroadcast(intent)
             }
             return result
-        }
-        else{
+        } else {
             println("Item insert failed - $item")
             return result
         }
     }
 
-    fun save(items: Collection<OTItem>, tracker: OTTracker)
-    {
+    fun save(items: Collection<OTItem>, tracker: OTTracker) {
         var success = 0
         var fail = 0
-        for(item in items)
-        {
+        for (item in items) {
             val result = save(item, tracker, false)
-            if(result == SAVE_RESULT_FAIL)
-            {
+            if (result == SAVE_RESULT_FAIL) {
                 fail++
-            }
-            else success++
+            } else success++
         }
 
-        if(success >0 )
-        {
+        if (success > 0) {
             val intent = Intent(OTApplication.BROADCAST_ACTION_ITEM_ADDED)
             intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
             OTApplication.app.sendBroadcast(intent)
@@ -555,8 +549,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "omnitrack.db
         return OTItem(id.toString(), tracker.objectId, serializedValues, timestamp, source)
     }*/
 
-    fun getLogCountDuring(tracker: OTTracker, from: Long, to: Long): Int
-    {
+    fun getLogCountDuring(tracker: OTTracker, from: Long, to: Long): Int {
         /*
         val numRows = DatabaseUtils.queryNumEntries(readableDatabase, ItemScheme.tableName, "${ItemScheme.TRACKER_ID}=? AND ${ItemScheme.LOGGED_AT} BETWEEN ? AND ?", arrayOf(tracker.objectId.toString(), from.toString(), to.toString()))
         return numRows.toInt()*/

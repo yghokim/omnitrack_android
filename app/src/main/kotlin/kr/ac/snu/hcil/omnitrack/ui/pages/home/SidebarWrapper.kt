@@ -32,6 +32,7 @@ class SidebarWrapper(val view: View, val parentActivity: AppCompatActivity) : Po
     private val profileMenuButton: AppCompatImageButton = view.findViewById(R.id.ui_button_profile_menu)
 
     private val menuList: RecyclerView = view.findViewById(R.id.ui_menu_list)
+
     init {
         /*
         val signOutButton = view.findViewById(R.id.ui_button_sign_out)
@@ -60,7 +61,7 @@ class SidebarWrapper(val view: View, val parentActivity: AppCompatActivity) : Po
     override fun onMenuItemClick(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_unlink_with_this_device -> {
-                DialogHelper.makeNegativePhrasedYesNoDialogBuilder(parentActivity, "OmniTrack", parentActivity.getString(R.string.msg_profile_unlink_account_confirm), R.string.msg_logout, onYes= {
+                DialogHelper.makeNegativePhrasedYesNoDialogBuilder(parentActivity, "OmniTrack", parentActivity.getString(R.string.msg_profile_unlink_account_confirm), R.string.msg_logout, onYes = {
                     OTAuthManager.signOut()
                     OTApplication.app.unlinkUser()
                 }).show()

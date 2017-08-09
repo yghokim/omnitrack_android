@@ -140,7 +140,7 @@ class FieldPresetSelectionBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
 
-    inner class GridAdapter() : RecyclerView.Adapter<GridAdapter.ViewHolder>() {
+    inner class GridAdapter : RecyclerView.Adapter<GridAdapter.ViewHolder>() {
 
         var presets: Array<AttributePresetInfo>? = null
 

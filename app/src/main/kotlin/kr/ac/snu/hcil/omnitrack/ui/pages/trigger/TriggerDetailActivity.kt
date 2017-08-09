@@ -72,15 +72,15 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_mul
             hideAttachedTrackers = intent.getBooleanExtra(INTENT_EXTRA_HIDE_ATTACHED_TRACKERS, false)
         }
 
-            val triggerId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRIGGER)
-            if (!triggerId.isNullOrBlank()) {
+        val triggerId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRIGGER)
+        if (!triggerId.isNullOrBlank()) {
 
-                title = resources.getString(R.string.title_activity_trigger_edit)
-                setActionBarButtonMode(Mode.ApplyCancel)
+            title = resources.getString(R.string.title_activity_trigger_edit)
+            setActionBarButtonMode(Mode.ApplyCancel)
 
-            } else {
-                title = resources.getString(R.string.title_activity_trigger_new)
-            }
+        } else {
+            title = resources.getString(R.string.title_activity_trigger_new)
+        }
 
         val overrideTitle = intent.getStringExtra(INTENT_EXTRA_OVERRIDE_TITLE)
         if (!overrideTitle.isNullOrBlank()) {
@@ -103,7 +103,6 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_mul
             transaction.replace(R.id.ui_content_replace, contentFragment, "TriggerDetailContent")
             transaction.commit()
         }
-
 
 
     }
@@ -154,7 +153,6 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_mul
             super.onBackPressed()
         }
     }
-
 
 
     override fun onToolbarRightButtonClicked() {

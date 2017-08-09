@@ -41,7 +41,7 @@ open class TriggerSchedule : RealmObject() {
     }
 }
 
-data class AlarmInfo(val systemAlarmId: Int, val reservedAlarmTime: Long) {}
+data class AlarmInfo(val systemAlarmId: Int, val reservedAlarmTime: Long)
 
 open class AlarmInstance : RealmObject() {
     companion object {

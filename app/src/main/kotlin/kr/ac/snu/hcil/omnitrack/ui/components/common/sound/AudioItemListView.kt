@@ -4,7 +4,7 @@ import android.content.Context
 import android.support.constraint.ConstraintLayout
 import android.support.v7.widget.AppCompatImageView
 import android.util.AttributeSet
-import android.view.View;
+import android.view.View
 import android.widget.TextView
 import com.github.ybq.android.spinkit.SpinKitView
 import kr.ac.snu.hcil.omnitrack.OTApplication
@@ -67,7 +67,7 @@ class AudioItemListView : ConstraintLayout {
                 OTApplication.app.storageHelper.downloadFileTo(mountedUri.serverUri.toString(), mountedUri.localUri)
                         .subscribe({
                             uri ->
-                            println("audio file download complete: ${uri.toString()}")
+                            println("audio file download complete: $uri")
                             mode = Mode.Mounted
                         }, { mode = Mode.Error })
         )
@@ -79,40 +79,35 @@ class AudioItemListView : ConstraintLayout {
     }
 
     private fun onModeChanged(mode: Mode, oldMode: Mode) {
-        when(mode)
-        {
-            Mode.Loading->
-            {
+        when (mode) {
+            Mode.Loading -> {
                 iconView.visibility = View.INVISIBLE
                 loadingIndicatorView.visibility = View.VISIBLE
-                unitView.setText("Synchronizing...")
+                unitView.text = "Synchronizing..."
                 durationView.visibility = View.GONE
             }
-            Mode.Mounted->
-            {
+            Mode.Mounted -> {
                 iconView.visibility = View.VISIBLE
                 loadingIndicatorView.visibility = View.INVISIBLE
                 iconView.setImageResource(R.drawable.icon_waveform)
                 val metadata = AudioRecordMetadata.readMetadata(mountedUri.localUri.path)
-                if(metadata != null) {
+                if (metadata != null) {
                     durationView.visibility = View.VISIBLE
-                    durationView.text = ((metadata.durationMillis/10)/100f).toString()
+                    durationView.text = ((metadata.durationMillis / 10) / 100f).toString()
                     unitView.text = "sec"
-                }
-                else{
+                } else {
                     durationView.visibility = View.INVISIBLE
                     unitView.text = "Audio"
                 }
             }
-            Mode.Error->
-            {
+            Mode.Error -> {
                 loadingIndicatorView.visibility = View.INVISIBLE
                 iconView.visibility = View.VISIBLE
                 iconView.setImageResource(R.drawable.error_dark)
                 durationView.visibility = View.GONE
                 unitView.text = "Data Error"
             }
-            Mode.Empty->{
+            Mode.Empty -> {
                 loadingIndicatorView.visibility = View.INVISIBLE
                 iconView.visibility = View.VISIBLE
                 iconView.setImageResource(R.drawable.icon_waveform_unavailable)

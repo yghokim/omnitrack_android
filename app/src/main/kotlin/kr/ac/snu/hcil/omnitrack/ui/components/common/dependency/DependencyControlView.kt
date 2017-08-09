@@ -103,14 +103,11 @@ class DependencyControlView : RelativeLayout {
                                         }
                                     }
 
-                                    if(state == DependencyControlViewModel.State.FAILED_FATAL)
-                                    {
+                                    if (state == DependencyControlViewModel.State.FAILED_FATAL) {
                                         resolveTypeWappen.setText(R.string.msg_mandatory)
                                         resolveTypeWappen.background.setColorFilter(ContextCompat.getColor(context, R.color.colorRed_Light), PorterDuff.Mode.SRC_ATOP)
                                         //.setTextColor(ContextCompat.getColor(context, R.color.colorRed_Light))
-                                    }
-                                    else if(state == DependencyControlViewModel.State.FAILED_NON_FATAL)
-                                    {
+                                    } else if (state == DependencyControlViewModel.State.FAILED_NON_FATAL) {
                                         resolveTypeWappen.setText(R.string.msg_optional)
                                         resolveTypeWappen.background.setColorFilter(ContextCompat.getColor(context, R.color.colorNoticeable), PorterDuff.Mode.SRC_ATOP)
                                         //descriptionView.setTextColor(ContextCompat.getColor(context, R.color.colorNoticeable))
@@ -122,7 +119,7 @@ class DependencyControlView : RelativeLayout {
                         it.onDependencyCheckResult.observeOn(AndroidSchedulers.mainThread())
                                 .subscribe {
                                     (_, message, resolveText) ->
-                                    resolveButton.setText(resolveText)
+                                    resolveButton.text = resolveText
                                     descriptionView.text = message
                                 }
                 )

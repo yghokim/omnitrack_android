@@ -136,7 +136,7 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), OTAut
                                             ).show()
                                         }
                                     }
-                        )
+                    )
                 }
         )
     }

@@ -159,7 +159,7 @@ abstract class ATriggerViewHolder<T>(parent: ViewGroup, val listener: ITriggerCo
                             attachedTrackerNoTrackerFallbackView = attachedTrackerListView?.findViewById(R.id.ui_attached_tracker_list_empty_fallback)
                         } else {
                             attachedTrackerListView?.visibility = View.VISIBLE
-                    }
+                        }
 
                     } else {
                         attachedTrackerListView?.visibility = View.GONE
@@ -309,7 +309,7 @@ abstract class ATriggerViewHolder<T>(parent: ViewGroup, val listener: ITriggerCo
         println("clicked : ${view?.javaClass}")
 
         if (view === removeButton) {
-            DialogHelper.makeNegativePhrasedYesNoDialogBuilder(itemView.context, "OmniTrack", itemView.context.resources.getString(R.string.msg_trigger_remove_confirm), R.string.msg_remove, onYes= {
+            DialogHelper.makeNegativePhrasedYesNoDialogBuilder(itemView.context, "OmniTrack", itemView.context.resources.getString(R.string.msg_trigger_remove_confirm), R.string.msg_remove, onYes = {
                 listener.onTriggerRemove(adapterPosition)
             }).show()
         } else if (view === triggerSwitch) {

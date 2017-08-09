@@ -57,19 +57,19 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
         override fun onSuccess() {
 
             ExperimentConsentManager.startProcess(this@OTActivity, OTAuthManager.userId!!, object : ExperimentConsentManager.ResultListener {
-                    override fun onConsentApproved() {
-                        performSignInProcessCompletelyFinished()
-                    }
+                override fun onConsentApproved() {
+                    performSignInProcessCompletelyFinished()
+                }
 
-                    override fun onConsentFailed() {
-                        Log.d(LOG_TAG, "Consent process was failed. go Sign-in.")
-                        goSignIn()
-                    }
+                override fun onConsentFailed() {
+                    Log.d(LOG_TAG, "Consent process was failed. go Sign-in.")
+                    goSignIn()
+                }
 
-                    override fun onConsentDenied() {
-                        Log.d(LOG_TAG, "Consent was denied by user. go Sign-in.")
-                        goSignIn()
-                    }
+                override fun onConsentDenied() {
+                    Log.d(LOG_TAG, "Consent was denied by user. go Sign-in.")
+                    goSignIn()
+                }
 
             })
         }
@@ -225,11 +225,11 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
 
                     onSignInProcessCompletelyFinished()
                 },
-                {
-                    e ->
-                    Log.d(LOG_TAG, "User is not stored in device. go Sign-in. ${e.message}")
-                    goSignIn()
-                })
+                        {
+                            e ->
+                            Log.d(LOG_TAG, "User is not stored in device. go Sign-in. ${e.message}")
+                            goSignIn()
+                        })
         )
     }
 

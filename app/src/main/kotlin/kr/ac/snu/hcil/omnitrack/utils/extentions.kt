@@ -54,12 +54,12 @@ fun dipSize(value: Int): Float {
     return value * OTApplication.app.resourcesWrapped.displayMetrics.density
 }
 
-fun Boolean.toInt(): Int{
-    return if(this==true) 1 else 0
+fun Boolean.toInt(): Int {
+    return if (this == true) 1 else 0
 }
 
-fun Int.toBoolean(): Boolean{
-    return if(this==0) false else true
+fun Int.toBoolean(): Boolean {
+    return this != 0
 }
 
 fun AppCompatActivity.startActivityOnDelay(intent: Intent, delay: Long = 50) {
@@ -234,7 +234,7 @@ fun LatLng.getAddress(context: Context): Address? {
 
     val geocoder = Geocoder(context)
     try {
-        val addresses = geocoder.getFromLocation(latitude, longitude, 1);
+        val addresses = geocoder.getFromLocation(latitude, longitude, 1)
         return addresses?.firstOrNull()
     } catch(e: Exception) {
         e.printStackTrace()

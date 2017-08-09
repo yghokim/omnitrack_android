@@ -26,9 +26,8 @@ class LoadingIndicatorBar : FrameLayout {
 
 
     private var isIndicatorShown: Boolean = false
-        private set(value)
-        {
-            if(value!=field) {
+        private set(value) {
+            if (value != field) {
                 /*
                 if (value == true) {
                     this.layoutParams?.height = expandedHeight
@@ -42,12 +41,12 @@ class LoadingIndicatorBar : FrameLayout {
             }
         }
 
-    private var message: CharSequence get()=messageView.text.toString()
-        set(value){
+    private var message: CharSequence get() = messageView.text.toString()
+        set(value) {
             messageView.text = value
         }
 
-    private val expandedHeight: Int by lazy{
+    private val expandedHeight: Int by lazy {
         context.resources.getDimensionPixelSize(R.dimen.loading_indicator_bar_height)
     }
 
@@ -62,18 +61,18 @@ class LoadingIndicatorBar : FrameLayout {
         messageView = findViewById(R.id.ui_message)
 
         animationUpdateListener = ValueAnimator.AnimatorUpdateListener {
-            animator->
+            animator ->
             val heightValue = animator.animatedValue as Float
-            this@LoadingIndicatorBar.layoutParams?.height = (heightValue+.5f).toInt()
+            this@LoadingIndicatorBar.layoutParams?.height = (heightValue + .5f).toInt()
             this@LoadingIndicatorBar.requestLayout()
         }
 
-        showAnimator = ValueAnimator.ofFloat(0f, expandedHeight.toFloat()).apply{
+        showAnimator = ValueAnimator.ofFloat(0f, expandedHeight.toFloat()).apply {
             duration = 250
             interpolator = DecelerateInterpolator()
 
             addUpdateListener(animationUpdateListener)
-            addListener(object: Animator.AnimatorListener {
+            addListener(object : Animator.AnimatorListener {
                 override fun onAnimationEnd(p0: Animator?) {
                 }
 
@@ -93,12 +92,12 @@ class LoadingIndicatorBar : FrameLayout {
             })
         }
 
-        dismissAnimator = ValueAnimator.ofFloat(expandedHeight.toFloat(), 0f).apply{
+        dismissAnimator = ValueAnimator.ofFloat(expandedHeight.toFloat(), 0f).apply {
             duration = 400
             interpolator = DecelerateInterpolator()
 
             addUpdateListener(animationUpdateListener)
-            addListener(object: Animator.AnimatorListener {
+            addListener(object : Animator.AnimatorListener {
                 override fun onAnimationEnd(p0: Animator?) {
                     this@LoadingIndicatorBar.visibility = View.INVISIBLE
                     this@LoadingIndicatorBar.layoutParams?.height = 0
@@ -122,12 +121,12 @@ class LoadingIndicatorBar : FrameLayout {
         }
     }
 
-    fun setMessage(res: Int){
+    fun setMessage(res: Int) {
         this.messageView.setText(res)
     }
 
-    fun show(){
-        if(!isIndicatorShown) {
+    fun show() {
+        if (!isIndicatorShown) {
             if (dismissAnimator.isRunning) {
                 dismissAnimator.reverse()
             } else showAnimator.start()
@@ -136,8 +135,8 @@ class LoadingIndicatorBar : FrameLayout {
         }
     }
 
-    fun dismiss(){
-        if(isIndicatorShown) {
+    fun dismiss() {
+        if (isIndicatorShown) {
             if (showAnimator.isRunning) {
                 showAnimator.reverse()
             } else dismissAnimator.start()

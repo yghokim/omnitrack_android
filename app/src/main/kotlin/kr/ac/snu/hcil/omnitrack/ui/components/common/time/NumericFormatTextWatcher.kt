@@ -101,11 +101,7 @@ class NumericFormatTextWatcher(private val et: EditText) : TextWatcher {
     }
 
     override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-        if (s.toString().contains(format.decimalFormatSymbols.decimalSeparator)) {
-            hasFractionalPart = true
-        } else {
-            hasFractionalPart = false
-        }
+        hasFractionalPart = s.toString().contains(format.decimalFormatSymbols.decimalSeparator)
     }
 
     init {

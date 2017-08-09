@@ -193,19 +193,19 @@ class OTTableExportService : WakefulService(TAG) {
             }
 
             val subscription =
-            OTApplication.app.currentUserObservable
-                    .flatMap {
-                        user ->
-                        user.getTrackerObservable(trackerId)
-                    }.onErrorReturn { null }.flatMap {
-                tracker: OTTracker? ->
-                if (tracker != null) {
+                    OTApplication.app.currentUserObservable
+                            .flatMap {
+                                user ->
+                                user.getTrackerObservable(trackerId)
+                            }.onErrorReturn { null }.flatMap {
+                        tracker: OTTracker? ->
+                        if (tracker != null) {
                             loadedTracker = tracker
 
                             if (externalFilesInvolved) {
                                 cacheDirectory = this.cacheDir.resolve("export_${System.currentTimeMillis()}")
-                                cacheDirectory?.let{
-                                    if(!it.exists())
+                                cacheDirectory?.let {
+                                    if (!it.exists())
                                         cacheDirectory?.mkdirs()
                                 }
 
@@ -219,7 +219,7 @@ class OTTableExportService : WakefulService(TAG) {
                                 it.onAddColumnToTable(table.columns)
                             }
 
-                    val tableObservable = DatabaseManager.loadItems(tracker).doOnNext {
+                            val tableObservable = DatabaseManager.loadItems(tracker).doOnNext {
                                 items ->
                                 items.withIndex().forEach {
                                     itemWithIndex ->
@@ -235,11 +235,9 @@ class OTTableExportService : WakefulService(TAG) {
                                     table.rows.add(row)
                                 }
 
-                                if(externalFilesInvolved)
-                                {
+                                if (externalFilesInvolved) {
                                     val tablePath = cacheDirectory?.resolve("table.${tableType.extension}")
-                                    if(tablePath!=null)
-                                    {
+                                    if (tablePath != null) {
                                         val fileOutputStream = FileOutputStream(tablePath)
                                         when (tableType) {
                                             TableFileType.CSV -> {
@@ -302,60 +300,60 @@ class OTTableExportService : WakefulService(TAG) {
                             } else {
                                 tableObservable
                             }
-                } else {
-                    Observable.error(Exception("tracker does not exists."))
-                }
-            }.subscribe({
-                println("file making task finished")
-
-                val successful: Boolean = if (externalFilesInvolved) {
-                    involvedFileList?.let {
-                        list ->
-                        println("Involved files: ")
-                        for (path in list) {
-                            println(path)
+                        } else {
+                            Observable.error(Exception("tracker does not exists."))
                         }
+                    }.subscribe({
+                        println("file making task finished")
 
-                        try {
-                            val outputStream = contentResolver.openOutputStream(exportUri)
-                            kr.ac.snu.hcil.omnitrack.utils.io.ZipUtil.zip(cacheDirectory!!.absolutePath, outputStream)
-                        } catch(ex: Exception) {
-                            //fail
-                            ex.printStackTrace()
-                            false
-                        }
-                    } ?: false
-                } else {
-                    try {
-                        println("store table itself to output")
-                        val outputStream = contentResolver.openOutputStream(exportUri)
-                        when (tableType) {
-                            TableFileType.EXCEL -> {
-                                table.storeExcelToStream(outputStream)
+                        val successful: Boolean = if (externalFilesInvolved) {
+                            involvedFileList?.let {
+                                list ->
+                                println("Involved files: ")
+                                for (path in list) {
+                                    println(path)
+                                }
+
+                                try {
+                                    val outputStream = contentResolver.openOutputStream(exportUri)
+                                    kr.ac.snu.hcil.omnitrack.utils.io.ZipUtil.zip(cacheDirectory!!.absolutePath, outputStream)
+                                } catch(ex: Exception) {
+                                    //fail
+                                    ex.printStackTrace()
+                                    false
+                                }
+                            } ?: false
+                        } else {
+                            try {
+                                println("store table itself to output")
+                                val outputStream = contentResolver.openOutputStream(exportUri)
+                                when (tableType) {
+                                    TableFileType.EXCEL -> {
+                                        table.storeExcelToStream(outputStream)
+                                    }
+                                    TableFileType.CSV -> {
+                                        table.storeCsvToStream(outputStream)
+                                        outputStream.close()
+                                    }
+                                }
+                                true
+                            } catch(ex: Exception) {
+                                //fail
+                                ex.printStackTrace()
+                                false
                             }
-                            TableFileType.CSV -> {
-                                table.storeCsvToStream(outputStream)
-                                outputStream.close()
-                            }
                         }
-                        true
-                    } catch(ex: Exception) {
-                        //fail
-                        ex.printStackTrace()
-                        false
-                    }
-                }
 
 
-                if (successful) {
-                    println("created table successfully.")
-                    println(table)
+                        if (successful) {
+                            println("created table successfully.")
+                            println(table)
 
-                    finish(true)
-                } else {
-                    finish(false)
-                }
-            }, { ex -> ex.printStackTrace(); finish(false) })
+                            finish(true)
+                        } else {
+                            finish(false)
+                        }
+                    }, { ex -> ex.printStackTrace(); finish(false) })
 
             subscriptions.add(subscription)
             return START_NOT_STICKY

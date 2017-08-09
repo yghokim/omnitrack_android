@@ -29,7 +29,7 @@ object FileHelper {
     fun makeSaveLocationPickIntent(filename: String): Intent {
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
         intent.addCategory(Intent.CATEGORY_OPENABLE)
-        intent.setType("*/*")
+        intent.type = "*/*"
         intent.putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("text/csv", "application/zip", "text/comma-separated-values", "text/plain"))
         intent.putExtra(Intent.EXTRA_TITLE, filename)
 

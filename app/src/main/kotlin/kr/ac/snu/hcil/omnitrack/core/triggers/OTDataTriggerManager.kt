@@ -22,7 +22,7 @@ object OTDataTriggerManager {
 
     //private var batch: MeasureBatchCheckTask? = null
 
-    private val preferences: SharedPreferences by lazy{
+    private val preferences: SharedPreferences by lazy {
         OTApplication.app.getSharedPreferences(PREFERENCE_LAST_CONDITION_TABLE, Context.MODE_PRIVATE)
     }
 
@@ -50,8 +50,7 @@ object OTDataTriggerManager {
 
         val ids = preferences.getStringSet(PREFERENCE_ENROLLED_IDS, HashSet<String>())
         println(ids)
-        if (!ids.contains(trigger.objectId))
-        {
+        if (!ids.contains(trigger.objectId)) {
             ids.add(trigger.objectId)
             preferences.edit().putBoolean(prefKey(trigger), false).putStringSet(PREFERENCE_ENROLLED_IDS, ids).apply()
         }
@@ -59,19 +58,16 @@ object OTDataTriggerManager {
         //alarmManager.setsetInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), CHECK_PERIOD, makeIntent(OTApplication.app))
     }
 
-    fun onEventTriggerOff(trigger: OTDataTrigger)
-    {
+    fun onEventTriggerOff(trigger: OTDataTrigger) {
 
         println("event trigger is unregistered on system.")
 
-        if(preferences.contains(prefKey(trigger)))
-        {
+        if (preferences.contains(prefKey(trigger))) {
             val ids = preferences.getStringSet(PREFERENCE_ENROLLED_IDS, HashSet<String>())
             ids.remove(trigger.objectId)
             preferences.edit().remove(prefKey(trigger)).putStringSet(PREFERENCE_ENROLLED_IDS, ids).apply()
 
-            if(ids.size == 0)
-            {
+            if (ids.size == 0) {
                 println("No event trigger is on. Cancel alarm.")
                 //alarmManager.cancel(makeIntent(OTApplication.app))
 

@@ -61,7 +61,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
     private val connectionFrame: FrameLayout by bindView(R.id.ui_attribute_connection_frame)
 
     private val newConnectionButton: FancyButton by bindView(R.id.ui_button_new_connection)
-    private val connectionView: AttributeConnectionView by  bindView(R.id.ui_attribute_connection)
+    private val connectionView: AttributeConnectionView by bindView(R.id.ui_attribute_connection)
 
     private val connectionViewTitle: TextView by bindView(R.id.ui_property_title_value_connection)
 
@@ -99,7 +99,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
         connectionView.onRemoveButtonClicked += {
             sender, arg ->
-            DialogHelper.makeNegativePhrasedYesNoDialogBuilder(this, "OmniTrack", resources.getString(R.string.msg_confirm_remove_connection), R.string.msg_remove, onYes= {
+            DialogHelper.makeNegativePhrasedYesNoDialogBuilder(this, "OmniTrack", resources.getString(R.string.msg_confirm_remove_connection), R.string.msg_remove, onYes = {
                 connectionView.connection = null
                 refreshConnection(true)
             }).show()
@@ -180,17 +180,17 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
     private fun askChangeAndFinish(backInsteadOfFinish: Boolean = false) {
         DialogHelper.makeYesNoDialogBuilder(this, "OmniTrack", resources.getString(R.string.msg_confirm_field_apply_change), R.string.msg_apply, onYes = {
-                    saveChanges()
-                    if (backInsteadOfFinish)
-                        super.onBackPressed()
-                    else
-                        finish()
-                }, onNo = {
-                    if (backInsteadOfFinish)
-                        super.onBackPressed()
-                    else
-                        finish()
-                }
+            saveChanges()
+            if (backInsteadOfFinish)
+                super.onBackPressed()
+            else
+                finish()
+        }, onNo = {
+            if (backInsteadOfFinish)
+                super.onBackPressed()
+            else
+                finish()
+        }
         ).cancelable(true)
                 .neutralText(R.string.msg_cancel)
                 .show()
@@ -213,9 +213,9 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
         }
 
         for (entry in propertyViewList) {
-                if (entry.second is APropertyView<*>) {
-                    entry.second.showEdited = attribute?.getPropertyValue<Any>(entry.first) != entry.second.value!!
-                }
+            if (entry.second is APropertyView<*>) {
+                entry.second.showEdited = attribute?.getPropertyValue<Any>(entry.first) != entry.second.value!!
+            }
         }
     }
 
@@ -230,11 +230,11 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
         }
 
         for (entry in propertyViewList) {
-                if (entry.second is APropertyView<*>) {
-                    if (attribute?.getPropertyValue<Any>(entry.first) != entry.second.value!!) {
-                        return true
-                    }
+            if (entry.second is APropertyView<*>) {
+                if (attribute?.getPropertyValue<Any>(entry.first) != entry.second.value!!) {
+                    return true
                 }
+            }
         }
 
         return false
@@ -248,11 +248,11 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
             attribute?.valueConnection = connectionView.connection
 
             for (entry in propertyViewList) {
-                    if (entry.second is APropertyView<*>) {
-                        if (entry.second.validate()) {
-                            attribute?.setPropertyValue(entry.first, entry.second.value!!)
-                        }
+                if (entry.second is APropertyView<*>) {
+                    if (entry.second.validate()) {
+                        attribute?.setPropertyValue(entry.first, entry.second.value!!)
                     }
+                }
             }
         }
     }
@@ -290,24 +290,24 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
             for (entryWithIndex in attr.makePropertyViews(this).withIndex()) {
                 val entry = entryWithIndex.value
 
-                    propertyViewList.add(entry)
+                propertyViewList.add(entry)
 
-                    @Suppress("UNCHECKED_CAST")
-                    val propView: APropertyView<Any> = entry.second as APropertyView<Any>
-                    if (!propView.useIntrinsicPadding) {
-                        propView.setPaddingLeft(propertyViewHorizontalMargin)
-                        propView.setPaddingRight(propertyViewHorizontalMargin)
-                    }
+                @Suppress("UNCHECKED_CAST")
+                val propView: APropertyView<Any> = entry.second as APropertyView<Any>
+                if (!propView.useIntrinsicPadding) {
+                    propView.setPaddingLeft(propertyViewHorizontalMargin)
+                    propView.setPaddingRight(propertyViewHorizontalMargin)
+                }
 
-                    //propView.value = attr.getPropertyValue(entry.first)
-                    propView.valueChanged += {
-                        sender, value ->
-                        if (sender is APropertyView<*>) {
-                            if (sender.validate()) {
-                                //attr.setPropertyValue(entry.first, value)
-                            }
+                //propView.value = attr.getPropertyValue(entry.first)
+                propView.valueChanged += {
+                    sender, value ->
+                    if (sender is APropertyView<*>) {
+                        if (sender.validate()) {
+                            //attr.setPropertyValue(entry.first, value)
                         }
                     }
+                }
 
                 entry.second.id = View.generateViewId()
                 propertyViewContainer.addView(entry.second, layoutParams)

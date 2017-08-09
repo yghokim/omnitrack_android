@@ -22,8 +22,7 @@ object AuthConstants {
 
     const val HEADER_AUTHORIZATION = "Authorization"
 
-    fun makeBasicHeader(clientId: String, clientSecret: String): String
-    {
+    fun makeBasicHeader(clientId: String, clientSecret: String): String {
         return "Basic ${Base64.encodeToString("$clientId:$clientSecret".toByteArray(), Base64.NO_WRAP)}"
     }
 

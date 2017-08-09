@@ -15,7 +15,7 @@ import java.util.*
  * Created by Young-Ho Kim on 2017-04-24.
  */
 data class AudioRecordMetadata(var durationMillis: Int, var fileSizeBytes: Long, var recordedAt: String) {
-    companion object{
+    companion object {
 
         val formatterISO8601: DateTimeFormatter by lazy {
             DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss.SSSX")
@@ -29,8 +29,7 @@ data class AudioRecordMetadata(var durationMillis: Int, var fileSizeBytes: Long,
             DateTimeFormatter.ofPattern("dd MMMM yyyy")
         }
 
-        fun readMetadata(filePath: String): AudioRecordMetadata?
-        {
+        fun readMetadata(filePath: String): AudioRecordMetadata? {
             try {
                 val retriever = MediaMetadataRetriever()
                 retriever.setDataSource(filePath)
@@ -76,9 +75,7 @@ data class AudioRecordMetadata(var durationMillis: Int, var fileSizeBytes: Long,
                 val fileSize = File(filePath).length()
                 retriever.release()
                 return AudioRecordMetadata(duration.toInt(), fileSize, parsedDateString)
-            }
-            catch(ex: Exception)
-            {
+            } catch(ex: Exception) {
                 println("Metadata extraction failed:")
                 ex.printStackTrace()
                 return null

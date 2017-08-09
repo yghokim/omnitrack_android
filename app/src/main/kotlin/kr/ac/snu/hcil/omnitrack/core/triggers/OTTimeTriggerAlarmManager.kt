@@ -18,7 +18,7 @@ import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 /**
  * Created by younghokim on 16. 8. 29..
  */
-class OTTimeTriggerAlarmManager() {
+class OTTimeTriggerAlarmManager {
     companion object {
 
         const val TAG = "TimeTriggerAlarmManager"

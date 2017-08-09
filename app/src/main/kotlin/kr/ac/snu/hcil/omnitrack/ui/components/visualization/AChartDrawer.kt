@@ -10,20 +10,18 @@ import java.util.*
 /**
  * Created by Young-Ho on 9/7/2016.
  */
-abstract class AChartDrawer: IDrawer {
+abstract class AChartDrawer : IDrawer {
 
     abstract val aspectRatio: Float
 
     protected var canvasWidth = 0
-    private set
+        private set
     protected var canvasHeight = 0
-    private set
+        private set
 
     var model: ChartModel<*>? = null
-        set(value)
-        {
-            if(field != value)
-            {
+        set(value) {
+            if (field != value) {
                 field = value
                 onModelChanged()
                 refresh()
@@ -47,15 +45,13 @@ abstract class AChartDrawer: IDrawer {
     protected var paddingBottom = 0f
 
 
-
     init {
         fillPaint.style = Paint.Style.FILL
         strokePaint.style = Paint.Style.STROKE
     }
 
-    fun setCanvasSize(width: Int, height: Int)
-    {
-        if(this.canvasWidth!= width || this.canvasHeight != height) {
+    fun setCanvasSize(width: Int, height: Int) {
+        if (this.canvasWidth != width || this.canvasHeight != height) {
             this.canvasWidth = width
             this.canvasHeight = height
             this.plotAreaRect.set(
@@ -72,8 +68,8 @@ abstract class AChartDrawer: IDrawer {
 
 
     fun refresh() {
-       onRefresh()
-   }
+        onRefresh()
+    }
 
     protected abstract fun onRefresh()
 

@@ -4,9 +4,7 @@ package kr.ac.snu.hcil.omnitrack.utils
  * Created by Young-Ho on 9/10/2016.
  */
 object DataHelper {
-    data class BinWithLong<T>(val x0: Long, val x1: Long, val values: List<T>) {
-
-    }
+    data class BinWithLong<T>(val x0: Long, val x1: Long, val values: List<T>)
 
     inline fun <T> ConvertSortedListToBinWithLong(cuts: Array<Long>, list: List<T>, getKey: (T) -> Long, from: Int = 0, to: Int = list.size - 1): Array<BinWithLong<T>> {
         if (list.isEmpty()) {
@@ -38,7 +36,7 @@ object DataHelper {
                     cut1 = cuts[currentCutPointer + 1]
                 }
             }
-            continue;
+            continue
         }
 
         if (currentBucket.isNotEmpty()) {

@@ -42,7 +42,6 @@ object TypeStringSerializationHelper {
     const val TYPENAME_SYNCHRONIZED_URI = "SyncU"
 
 
-
     val classNameDictionary: Map<String, String> = mapOf(
             Int::class.java.name to TYPENAME_INT,
             "java.lang.Integer" to TYPENAME_INT,
@@ -97,8 +96,7 @@ object TypeStringSerializationHelper {
     }
 
     fun serialize(value: Any): String {
-        if(classNameDictionary.containsKey(value.javaClass.name))
-        {
+        if (classNameDictionary.containsKey(value.javaClass.name)) {
             return serialize(classNameDictionary[value.javaClass.name]!!, value)
         } else throw Exception("Serialization of this type [${value.javaClass.name}] is not implemented, value: $value")
     }

@@ -24,7 +24,7 @@ import rx.subscriptions.CompositeSubscription
  */
 class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttributeInputView<SynchronizedUri>(R.layout.input_image, context, attrs), ImagePicker.ImagePickerCallback {
 
-    companion object{
+    companion object {
         const val REQUEST_CODE_CAMERA = 2
         const val REQUEST_CODE_GALLERY = 4
 
@@ -39,8 +39,7 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
     override val typeId: Int = VIEW_TYPE_IMAGE
 
     override var value: SynchronizedUri = SynchronizedUri()
-        set(value)
-        {
+        set(value) {
             if (field != value) {
                 subscriptions.clear()
                 field = value
@@ -100,8 +99,8 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
         picker.callback = this
 
         picker.uriChanged += {
-            sender, uri->
-            println("picker uri changed to ${uri.toString()}")
+            sender, uri ->
+            println("picker uri changed to $uri")
             value = SynchronizedUri(uri)
             onValueChanged(value)
         }
@@ -117,7 +116,7 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
 
     override fun onRequestCameraImage(view: ImagePicker) {
         val activity = this.getActivity()
-        if(activity != null) {
+        if (activity != null) {
             picker.showCameraPickDialog(activity, boundAttribute?.objectId ?: "")
         }
     }
@@ -161,8 +160,7 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
         resizeImage(bitmap, dest)
     }
 
-    fun resizeImage(bitmap: Bitmap, dest: Uri)
-    {
+    fun resizeImage(bitmap: Bitmap, dest: Uri) {
         println("loaded bitmap original size: ${bitmap.width} X ${bitmap.height}")
 
 
@@ -204,8 +202,7 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
 
     override fun setValueFromActivityResult(data: Intent, requestType: Int): Boolean {
 
-        if (requestType == REQUEST_CODE_CAMERA)
-        {
+        if (requestType == REQUEST_CODE_CAMERA) {
             return handleCameraInputData(data.getByteArrayExtra(CameraPickDialogFragment.EXTRA_IMAGE_DATA))
         } else if (requestType == REQUEST_CODE_GALLERY) {
             if (data.data != null) {
@@ -216,8 +213,7 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
             }
 
             return true
-        }
-        else return false
+        } else return false
 
 
     }

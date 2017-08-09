@@ -12,7 +12,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 class LatLngToAddressTask(private val listener: OnFinishListener, private val view: View) : AsyncTask<LatLng, Void, String?>() {
 
     interface OnFinishListener {
-        fun onAddressReceived(address: String?);
+        fun onAddressReceived(address: String?)
     }
 
     override fun onPostExecute(result: String?) {

@@ -20,7 +20,7 @@ import java.util.*
  * Created by Young-Ho Kim on 2016-09-08.
  */
 class TimelineComparisonLineChartModel(override val attributes: List<OTNumberAttribute>, parent: OTTracker)
-: CompoundAttributeChartModel<ILineChartOnTime.TimeSeriesTrendData>(attributes, parent), ILineChartOnTime {
+    : CompoundAttributeChartModel<ILineChartOnTime.TimeSeriesTrendData>(attributes, parent), ILineChartOnTime {
 
     override val name: String = OTApplication.app.resourcesWrapped.getString(R.string.msg_vis_numeric_line_timeline_title)
 
@@ -33,56 +33,56 @@ class TimelineComparisonLineChartModel(override val attributes: List<OTNumberAtt
         xScale.quantize(currentGranularity)
 
         return DatabaseManager.loadItems(parent, getTimeScope(), DatabaseManager.Order.ASC).map {
-                    items ->
+            items ->
 
-                    var currentItemPointer = 0
+            var currentItemPointer = 0
 
-                    val itemBinCache = ArrayList<OTItem>()
+            val itemBinCache = ArrayList<OTItem>()
 
-                    val attrPivotedPoints = HashMap<OTAttribute<out Any>, MutableList<Pair<Long, BigDecimal>>>()
-                    attributes.forEach {
-                        attrPivotedPoints[it] = ArrayList()
-                    }
+            val attrPivotedPoints = HashMap<OTAttribute<out Any>, MutableList<Pair<Long, BigDecimal>>>()
+            attributes.forEach {
+                attrPivotedPoints[it] = ArrayList()
+            }
 
-                    for (xIndex in 0..xScale.numTicks - 1) {
-                        val from = xScale.binPointsOnDomain[xIndex]
-                        val to = if (xIndex < xScale.numTicks - 1) xScale.binPointsOnDomain[xIndex + 1]
-                        else getTimeScope().to
+            for (xIndex in 0..xScale.numTicks - 1) {
+                val from = xScale.binPointsOnDomain[xIndex]
+                val to = if (xIndex < xScale.numTicks - 1) xScale.binPointsOnDomain[xIndex + 1]
+                else getTimeScope().to
 
-                        itemBinCache.clear()
+                itemBinCache.clear()
 
-                        if (currentItemPointer < items.size) {
-                            var timestamp = items[currentItemPointer].timestamp
-                            while (timestamp < to) {
-                                if (timestamp >= from) {
-                                    itemBinCache.add(items[currentItemPointer])
-                                }
-
-                                currentItemPointer++
-                                if (currentItemPointer >= items.size) {
-                                    break
-                                }
-                                timestamp = items[currentItemPointer].timestamp
-                            }
+                if (currentItemPointer < items.size) {
+                    var timestamp = items[currentItemPointer].timestamp
+                    while (timestamp < to) {
+                        if (timestamp >= from) {
+                            itemBinCache.add(items[currentItemPointer])
                         }
 
-
-                        for (attribute in attributes) {
-                            values.clear()
-
-                            val numPoints = OTItem.extractNotNullValues(itemBinCache, attribute, values)
-                            if (numPoints > 0) {
-                                attrPivotedPoints[attribute]?.add(Pair(from, BigDecimal(values.map { it.toFloat() }.average())))
-                            }
+                        currentItemPointer++
+                        if (currentItemPointer >= items.size) {
+                            break
                         }
-                    }
-
-                    synchronized(data) {
-                    data.clear()
-                    attrPivotedPoints.mapTo(data) {
-                        ILineChartOnTime.TimeSeriesTrendData(it.value.toTypedArray(), it.key)
+                        timestamp = items[currentItemPointer].timestamp
                     }
                 }
+
+
+                for (attribute in attributes) {
+                    values.clear()
+
+                    val numPoints = OTItem.extractNotNullValues(itemBinCache, attribute, values)
+                    if (numPoints > 0) {
+                        attrPivotedPoints[attribute]?.add(Pair(from, BigDecimal(values.map { it.toFloat() }.average())))
+                    }
+                }
+            }
+
+            synchronized(data) {
+                data.clear()
+                attrPivotedPoints.mapTo(data) {
+                    ILineChartOnTime.TimeSeriesTrendData(it.value.toTypedArray(), it.key)
+                }
+            }
             data
         }
     }

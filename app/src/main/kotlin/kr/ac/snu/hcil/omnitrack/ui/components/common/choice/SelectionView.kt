@@ -44,7 +44,7 @@ class SelectionView(context: Context, attrs: AttributeSet?, defStyle: Int) : Rec
     }
 
     val selectedItem: String
-        get()= values[selectedIndex]
+        get() = values[selectedIndex]
 
     val onSelectedIndexChanged = Event<Int>()
 
@@ -81,7 +81,7 @@ class SelectionView(context: Context, attrs: AttributeSet?, defStyle: Int) : Rec
         values.addAll(arrayOf("Second", "Minute", "Hour", "Date"))
     }
 
-    inner class Adapter() : RecyclerView.Adapter<Adapter.ViewHolder>() {
+    inner class Adapter : RecyclerView.Adapter<Adapter.ViewHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val view = TextView(context)

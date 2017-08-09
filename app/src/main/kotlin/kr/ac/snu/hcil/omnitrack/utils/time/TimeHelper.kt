@@ -30,7 +30,7 @@ object TimeHelper {
     val DAY_OF_WEEK_FULL_FORMAT: SimpleDateFormat by lazy { SimpleDateFormat("EEEE") }
     val DAY_OF_WEEK_SHORT_FORMAT: SimpleDateFormat by lazy { SimpleDateFormat("EEE") }
 
-    val FORMAT_ISO_8601: SimpleDateFormat by lazy{
+    val FORMAT_ISO_8601: SimpleDateFormat by lazy {
         SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
     }
 
@@ -45,7 +45,7 @@ object TimeHelper {
         return timestamp + days * daysInMilli
     }
 
-    fun getTodayRange(): Pair<Long, Long>{
+    fun getTodayRange(): Pair<Long, Long> {
         val cal = Calendar.getInstance()
         cal.set(Calendar.MILLISECOND, 0)
         cal.set(Calendar.SECOND, 0)
@@ -136,22 +136,18 @@ object TimeHelper {
         return list
     }
 
-    fun getDateText(timestamp: Long, context: Context): String{
+    fun getDateText(timestamp: Long, context: Context): String {
         val cal = Calendar.getInstance()
 
         cal.timeInMillis = timestamp
-        if(DateUtils.isToday(timestamp))
-        {
+        if (DateUtils.isToday(timestamp)) {
             return context.resources.getString(R.string.msg_today)
-        }
-        else{
+        } else {
             val yesterdayCal = Calendar.getInstance()
             yesterdayCal.add(Calendar.DAY_OF_YEAR, -1)
-            if(yesterdayCal.getYear() == cal.getYear() && yesterdayCal.get(Calendar.DAY_OF_YEAR) == cal.get(Calendar.DAY_OF_YEAR))
-            {
+            if (yesterdayCal.getYear() == cal.getYear() && yesterdayCal.get(Calendar.DAY_OF_YEAR) == cal.get(Calendar.DAY_OF_YEAR)) {
                 return context.resources.getString(R.string.msg_yesterday)
-            }
-            else{
+            } else {
                 return SimpleDateFormat(context.resources.getString(R.string.msg_tracker_list_date_format)).format(cal.time)
             }
         }
@@ -212,8 +208,7 @@ object TimeHelper {
         return builder.trim().toString()
     }
 
-    fun getYear(time: Long): Int
-    {
+    fun getYear(time: Long): Int {
         val cal = Calendar.getInstance()
         cal.timeInMillis = time
         return cal.getYear()
@@ -230,8 +225,8 @@ object TimeHelper {
         val ms1 = c1.get(Calendar.MILLISECOND)
         val ms2 = c2.get(Calendar.MILLISECOND)
 
-        val t1 = h1*3600*1000 + m1 * 60 * 1000 + s1 * 1000 + ms1
-        val t2 =  h2*3600*1000 + m2 * 60 * 1000 + s2 * 1000 + ms2
+        val t1 = h1 * 3600 * 1000 + m1 * 60 * 1000 + s1 * 1000 + ms1
+        val t2 = h2 * 3600 * 1000 + m2 * 60 * 1000 + s2 * 1000 + ms2
 
         return t1 - t2
     }
@@ -249,18 +244,16 @@ object TimeHelper {
         }
     }
 
-    fun loopForDays(from: Long, to: Long, loopHandler:(time:Long, start:Long, end:Long, dayOfYear:Int)->Unit)
-    {
+    fun loopForDays(from: Long, to: Long, loopHandler: (time: Long, start: Long, end: Long, dayOfYear: Int) -> Unit) {
         val rangeCal = Calendar.getInstance()
         val cal = Calendar.getInstance()
         cal.timeInMillis = from
 
-        while(cal.timeInMillis <= to)
-        {
+        while (cal.timeInMillis <= to) {
             rangeCal.timeInMillis = cal.timeInMillis
             rangeCal.setHourOfDay(0, true)
 
-            loopHandler(cal.timeInMillis, rangeCal.timeInMillis, rangeCal.timeInMillis + DateUtils.DAY_IN_MILLIS,  cal.get(Calendar.DAY_OF_YEAR))
+            loopHandler(cal.timeInMillis, rangeCal.timeInMillis, rangeCal.timeInMillis + DateUtils.DAY_IN_MILLIS, cal.get(Calendar.DAY_OF_YEAR))
 
             cal.add(Calendar.DAY_OF_YEAR, 1)
         }

@@ -16,14 +16,14 @@ import java.util.*
 
 class QuantizedTimeScale : IAxisScale<Long> {
 
-    companion object{
+    companion object {
 
 
-        private val calendarCache: Calendar by lazy{
+        private val calendarCache: Calendar by lazy {
             Calendar.getInstance()
         }
 
-        val TICKFORMAT_DAY =  object: IAxisScale.ITickFormat<Long> {
+        val TICKFORMAT_DAY = object : IAxisScale.ITickFormat<Long> {
             override fun format(value: Long, index: Int): String {
                 calendarCache.timeInMillis = value
                 val hourOfDay = calendarCache.getHourOfDay()
@@ -38,42 +38,39 @@ class QuantizedTimeScale : IAxisScale<Long> {
             }
         }
 
-        val TICKFORMAT_WEEK= object: IAxisScale.ITickFormat<Long> {
+        val TICKFORMAT_WEEK = object : IAxisScale.ITickFormat<Long> {
             override fun format(value: Long, index: Int): String {
                 return TimeHelper.FORMAT_DAY_OF_WEEK_SHORT.format(Date(value))
             }
 
         }
 
-        val TICKFORMAT_WEEK_2= object: IAxisScale.ITickFormat<Long> {
+        val TICKFORMAT_WEEK_2 = object : IAxisScale.ITickFormat<Long> {
             override fun format(value: Long, index: Int): String {
                 calendarCache.timeInMillis = value
                 val dow = calendarCache.getDayOfWeek()
-                if(dow == 1 && index != 0)
-                {
+                if (dow == 1 && index != 0) {
                     return TimeHelper.FORMAT_DAY_WITHOUT_YEAR.format(Date(value))
-                }
-                else{
-                    if(dow  == 1 || dow == 3 || dow == 5 || (dow==7 && index == 13)) {
+                } else {
+                    if (dow == 1 || dow == 3 || dow == 5 || (dow == 7 && index == 13)) {
                         return TimeHelper.FORMAT_DAY_OF_WEEK_SHORT.format(Date(value))
-                    }
-                    else return ""
+                    } else return ""
                 }
             }
         }
 
-        val TICKFORMAT_MONTH = object: IAxisScale.ITickFormat<Long> {
+        val TICKFORMAT_MONTH = object : IAxisScale.ITickFormat<Long> {
             override fun format(value: Long, index: Int): String {
                 calendarCache.timeInMillis = value
                 val result = calendarCache.getDayOfMonth().toString()
 
-                if(index == 0 || result.endsWith('5') || result.endsWith('0'))
+                if (index == 0 || result.endsWith('5') || result.endsWith('0'))
                     return result
                 else return ""
             }
         }
 
-        val TICKFORMAT_YEAR = object: IAxisScale.ITickFormat<Long> {
+        val TICKFORMAT_YEAR = object : IAxisScale.ITickFormat<Long> {
             override fun format(value: Long, index: Int): String {
                 return TimeHelper.FORMAT_MONTH_SHORT.format(Date(value))
 
@@ -119,7 +116,7 @@ class QuantizedTimeScale : IAxisScale<Long> {
      */
     private var inset: Boolean = false
 
-    private val calendarCache: Calendar by lazy{
+    private val calendarCache: Calendar by lazy {
         Calendar.getInstance()
     }
 
@@ -140,9 +137,7 @@ class QuantizedTimeScale : IAxisScale<Long> {
         get() = domainBinPoints.size
 
 
-
-    fun setDomain(from: Long, to: Long): QuantizedTimeScale
-    {
+    fun setDomain(from: Long, to: Long): QuantizedTimeScale {
         domainTimeMin = from
         domainTimeMax = to
 
@@ -154,50 +149,42 @@ class QuantizedTimeScale : IAxisScale<Long> {
         return this
     }
 
-    fun quantize(level: Int, every: Int = 1)
-    {
+    fun quantize(level: Int, every: Int = 1) {
         this.calendarLevel = level
 
         domainBinPoints.clear()
         calendarCache.timeInMillis = domainTimeMin
         var current: Long = domainTimeMin
-        while(current < domainTimeMax)
-        {
+        while (current < domainTimeMax) {
             domainBinPoints.add(current)
             calendarCache.add(calendarLevel, every)
             current = calendarCache.timeInMillis
         }
     }
 
-    fun quantize(granularity: Granularity)
-    {
-        when(granularity)
-        {
-            Granularity.DAY ->
-            {
+    fun quantize(granularity: Granularity) {
+        when (granularity) {
+            Granularity.DAY -> {
                 quantize(Calendar.HOUR_OF_DAY, 1)
                 tickFormat = TICKFORMAT_DAY
             }
 
-            Granularity.WEEK ->
-            {
+            Granularity.WEEK -> {
                 quantize(Calendar.DAY_OF_YEAR, 1)
                 tickFormat = TICKFORMAT_WEEK
             }
 
-            Granularity.WEEK_2->
-            {
+            Granularity.WEEK_2 -> {
                 quantize(Calendar.DAY_OF_YEAR, 1)
                 tickFormat = TICKFORMAT_WEEK_2
             }
 
-            Granularity.MONTH ->
-            {
+            Granularity.MONTH -> {
                 quantize(Calendar.DAY_OF_YEAR, 1)
                 tickFormat = TICKFORMAT_MONTH
             }
 
-            Granularity.YEAR ->{
+            Granularity.YEAR -> {
                 quantize(Calendar.MONTH, 1)
                 tickFormat = TICKFORMAT_YEAR
             }
@@ -227,9 +214,9 @@ class QuantizedTimeScale : IAxisScale<Long> {
     override fun getTickInterval(): Float {
         val rangeWidth = rangeMax - rangeMin
 
-        if(inset)
-            return rangeWidth/(domainBinPoints.size-1 +1)
-        else return rangeWidth/(domainBinPoints.size-1)
+        if (inset)
+            return rangeWidth / (domainBinPoints.size - 1 + 1)
+        else return rangeWidth / (domainBinPoints.size - 1)
     }
 
     override fun getTickCoordAt(index: Int): Float {
@@ -242,14 +229,12 @@ class QuantizedTimeScale : IAxisScale<Long> {
 
     override fun get(domain: Long): Float {
         val index = indexOfBinPoint(domain)
-        if(index!=-1)
-        {
+        if (index != -1) {
             val coord = rangeMin + getTickInterval() * index
 
-            if(inset) return getTickInterval()/2 + coord
+            if (inset) return getTickInterval() / 2 + coord
             else return coord
-        }
-        else return 0f //TODO quantize
+        } else return 0f //TODO quantize
     }
 
     fun domainIndexContaining(time: Long): Int {

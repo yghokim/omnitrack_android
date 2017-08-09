@@ -41,12 +41,10 @@ object OTShortcutPanelManager {
         (OTApplication.app.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
     }
 
-    private fun buildNewNotificationShortcutViews(user: OTUser, context: Context, bigStyle: Boolean): RemoteViews
-    {
+    private fun buildNewNotificationShortcutViews(user: OTUser, context: Context, bigStyle: Boolean): RemoteViews {
         val rv = RemoteViews(context.packageName, if (bigStyle) R.layout.remoteview_shortcut_notification_big else R.layout.remoteview_shortcut_notification_normal)
 
-        if(bigStyle)
-        {
+        if (bigStyle) {
             //header exist.
 
             val stackBuilder = TaskStackBuilder.create(context)
@@ -70,16 +68,13 @@ object OTShortcutPanelManager {
         val paint = Paint(Paint.ANTI_ALIAS_FLAG)
         paint.style = Paint.Style.FILL
 
-        for (i in 0..MAX_NUM_SHORTCUTS - 1)
-        {
+        for (i in 0..MAX_NUM_SHORTCUTS - 1) {
             val element = RemoteViews(context.packageName, if (bigStyle) R.layout.remoteview_shortcut_notification_element else R.layout.remoteview_shortcut_notification_element_normal)
 
-            if(trackers.size-1 < i)
-            {
+            if (trackers.size - 1 < i) {
                 element.setViewVisibility(R.id.ui_button_instant, View.INVISIBLE)
                 element.setViewVisibility(R.id.ui_name, View.INVISIBLE)
-            }
-            else{
+            } else {
                 element.setViewVisibility(R.id.ui_button_instant, View.VISIBLE)
                 element.setViewVisibility(R.id.ui_name, View.VISIBLE)
 
@@ -156,8 +151,7 @@ object OTShortcutPanelManager {
             refreshNotificationShortcutViews(user)
     }
 
-    operator fun plusAssign(@Suppress("UNUSED_PARAMETER") tracker: OTTracker)
-    {/*
+    operator fun plusAssign(@Suppress("UNUSED_PARAMETER") tracker: OTTracker) {/*
         val intent = Intent(OTApplication.BROADCAST_ACTION_SHORTCUT_INCLUDE_TRACKER)
         intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
 
@@ -171,12 +165,11 @@ object OTShortcutPanelManager {
         OTApplication.app.startService(OTShortcutPanelWidgetUpdateService.makeNotifyDatesetChangedIntentToAllWidgets(OTApplication.app))
     }
 
-    operator fun minusAssign(@Suppress("UNUSED_PARAMETER") tracker: OTTracker)
-    {
-    /*    val intent = Intent(OTApplication.BROADCAST_ACTION_SHORTCUT_EXCLUDE_TRACKER)
-        intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
+    operator fun minusAssign(@Suppress("UNUSED_PARAMETER") tracker: OTTracker) {
+        /*    val intent = Intent(OTApplication.BROADCAST_ACTION_SHORTCUT_EXCLUDE_TRACKER)
+            intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
 
-        OTApplication.app.sendBroadcast(intent)*/
+            OTApplication.app.sendBroadcast(intent)*/
         val user = tracker.owner
         if (user != null)
             refreshNotificationShortcutViews(user)
