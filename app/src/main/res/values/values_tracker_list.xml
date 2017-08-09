@@ -27,7 +27,8 @@
     </style>
 
     <style name="trackerListInformationTextViewStyle">
-        <item name="android:textSize">@dimen/tracker_list_element_information_text_contentSize</item>
+        <item name="android:textSize">@dimen/tracker_list_element_information_text_contentSize
+        </item>
         <item name="android:textColor">@color/textColorLight</item>
     </style>
 

@@ -110,8 +110,7 @@ class ChartViewActivity : OTTrackerAttachedActivity(R.layout.activity_chart_view
         creationSubscriptions.add(
                 viewModel.chartViewModels.subscribe {
                     newList ->
-                    println("new model list: ${newList}")
-
+                    println("new chart data list: ${newList}")
                     val diffResult = DiffUtil.calculateDiff(
                             TrackerChartViewListViewModel.ChartViewModelListDiffUtilCallback(currentChartViewModelList, newList)
                     )
@@ -121,10 +120,6 @@ class ChartViewActivity : OTTrackerAttachedActivity(R.layout.activity_chart_view
                     diffResult.dispatchUpdatesTo(adapter)
                 }
         )
-
-        if (savedInstanceState == null) {
-            viewModel.setScope(System.currentTimeMillis(), supportedGranularity[scopeSelectionView.selectedIndex])
-        }
     }
 
     private fun updateScopeUI(point: Long, granularity: Granularity) {
@@ -161,7 +156,11 @@ class ChartViewActivity : OTTrackerAttachedActivity(R.layout.activity_chart_view
 
         title = String.format(resources.getString(R.string.title_activity_chart_view, tracker.name))
 
-        viewModel.tracker = tracker
+        if (viewModel.tracker != tracker) {
+            viewModel.tracker = tracker
+            viewModel.setScope(System.currentTimeMillis(), supportedGranularity[scopeSelectionView.selectedIndex])
+        }
+
     }
 
     override fun onStop() {

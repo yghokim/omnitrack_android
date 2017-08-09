@@ -56,9 +56,12 @@ abstract class ChartModel<T>() : IChartInterface<T> {
             val lastState = currentState
             currentState = State.Loading
             invalidated = false
+            println("start loading chart data: ${this.name}")
             internalSubscriptions.add(
                     reloadData().observeOn(AndroidSchedulers.mainThread()).subscribe({
                         data ->
+
+                        println("chart data loading finished: ${this.name}")
                         onNewDataLoaded(data)
                         currentState = State.Loaded
                         if (invalidated == true) {
@@ -72,6 +75,8 @@ abstract class ChartModel<T>() : IChartInterface<T> {
                     })
             )
         } else {
+
+            println("chart loading is already doing. invalidate current configuration instead: ${this.name}")
             invalidate()
         }
     }

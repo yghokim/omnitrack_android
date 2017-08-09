@@ -11,11 +11,10 @@
 
     <com.github.ybq.android.spinkit.SpinKitView
         android:id="@+id/ui_loading_indicator"
-        android:visibility="gone"
         android:layout_width="35dp"
         android:layout_height="35dp"
-        app:SpinKit_Color="@color/colorPointed"
-        app:SpinKit_Style="ThreeBounce"
         android:layout_gravity="center"
-        />
+        android:visibility="gone"
+        app:SpinKit_Color="@color/colorPointed"
+        app:SpinKit_Style="ThreeBounce" />
 </merge>

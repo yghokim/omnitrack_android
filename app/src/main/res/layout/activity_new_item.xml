@@ -24,10 +24,10 @@
 
     <kr.ac.snu.hcil.omnitrack.ui.components.common.LoadingIndicatorBar
         android:id="@+id/ui_loading_indicator"
-        android:layout_below="@+id/appbar"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:visibility="gone"/>
+        android:layout_below="@+id/appbar"
+        android:visibility="gone" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/ui_attribute_list"

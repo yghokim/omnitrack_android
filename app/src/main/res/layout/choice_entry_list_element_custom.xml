@@ -34,7 +34,6 @@
         android:background="@drawable/form_rounded"
         android:hint="Your own answer"
         android:minLines="1"
-        android:textColorHint="@color/textColorLight"
-        />
+        android:textColorHint="@color/textColorLight" />
 
 </LinearLayout>

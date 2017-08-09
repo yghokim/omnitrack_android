@@ -33,8 +33,7 @@
             android:paddingTop="6dp"
             android:textColor="@color/textColorMid"
             app:drawableStartCompat="@drawable/map_dark"
-            app:drawableTint="@color/textColorLight"
-            />
+            app:drawableTint="@color/textColorLight" />
 
         <ProgressBar
             android:id="@+id/ui_address_busy_indicator"
