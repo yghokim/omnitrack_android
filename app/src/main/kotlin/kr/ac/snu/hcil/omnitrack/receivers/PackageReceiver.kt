@@ -15,41 +15,41 @@ import rx.schedulers.Schedulers
 /**
  * Created by Young-Ho on 9/4/2016.
  */
-class PackageReceiver: BroadcastReceiver() {
+class PackageReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         println("package broadcast receiver")
-            when (intent.action) {
-                Intent.ACTION_INSTALL_PACKAGE -> {
+        when (intent.action) {
+            Intent.ACTION_INSTALL_PACKAGE -> {
 
-                    OTApplication.app.currentUserObservable.observeOn(Schedulers.immediate()).subscribe({
-                        user ->
-                        OTShortcutPanelManager.refreshNotificationShortcutViews(user, context)
-                        context.startService(OTShortcutPanelWidgetUpdateService.makeNotifyDatesetChangedIntentToAllWidgets(context))
-                    },{})
-                }
-
-                Intent.ACTION_MY_PACKAGE_REPLACED -> {
-                    println("app package replaced")
-                    OTApplication.app.currentUserObservable.observeOn(Schedulers.immediate()).subscribe({
-                        user ->
-                        OTShortcutPanelManager.refreshNotificationShortcutViews(user, context)
-                        context.startService(OTShortcutPanelWidgetUpdateService.makeNotifyDatesetChangedIntentToAllWidgets(context))
-                        if (OTAuthManager.currentSignedInLevel > OTAuthManager.SignedInLevel.NONE) {
-                            DatabaseManager.getDeviceInfoChild()?.child("appVersion")?.setValue(BuildConfig.VERSION_NAME)
-                        }
-                    },{})
-
-
-                    OTVersionCheckService.setupServiceAlarm(context)
-                }
-
-                Intent.ACTION_PACKAGE_ADDED -> {
-                    OTApplication.app.currentUserObservable.observeOn(Schedulers.immediate()).subscribe({
-                        user ->
-                        OTShortcutPanelManager.refreshNotificationShortcutViews(user, context)
-                        context.startService(OTShortcutPanelWidgetUpdateService.makeNotifyDatesetChangedIntentToAllWidgets(context))
-                    },{})
-                }
+                OTApplication.app.currentUserObservable.observeOn(Schedulers.immediate()).subscribe({
+                    user ->
+                    OTShortcutPanelManager.refreshNotificationShortcutViews(user, context)
+                    context.startService(OTShortcutPanelWidgetUpdateService.makeNotifyDatesetChangedIntentToAllWidgets(context))
+                }, {})
             }
+
+            Intent.ACTION_MY_PACKAGE_REPLACED -> {
+                println("app package replaced")
+                OTApplication.app.currentUserObservable.observeOn(Schedulers.immediate()).subscribe({
+                    user ->
+                    OTShortcutPanelManager.refreshNotificationShortcutViews(user, context)
+                    context.startService(OTShortcutPanelWidgetUpdateService.makeNotifyDatesetChangedIntentToAllWidgets(context))
+                    if (OTAuthManager.currentSignedInLevel > OTAuthManager.SignedInLevel.NONE) {
+                        DatabaseManager.getDeviceInfoChild()?.child("appVersion")?.setValue(BuildConfig.VERSION_NAME)
+                    }
+                }, {})
+
+
+                OTVersionCheckService.setupServiceAlarm(context)
+            }
+
+            Intent.ACTION_PACKAGE_ADDED -> {
+                OTApplication.app.currentUserObservable.observeOn(Schedulers.immediate()).subscribe({
+                    user ->
+                    OTShortcutPanelManager.refreshNotificationShortcutViews(user, context)
+                    context.startService(OTShortcutPanelWidgetUpdateService.makeNotifyDatesetChangedIntentToAllWidgets(context))
+                }, {})
+            }
+        }
     }
 }

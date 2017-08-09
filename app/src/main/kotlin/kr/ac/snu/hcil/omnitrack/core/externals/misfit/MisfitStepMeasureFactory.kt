@@ -48,7 +48,7 @@ object MisfitStepMeasureFactory : OTMeasureFactory("step") {
     override val descResourceId: Int = R.string.measure_steps_desc
 
 
-    class MisfitStepMeasure : OTRangeQueriedMeasure{
+    class MisfitStepMeasure : OTRangeQueriedMeasure {
 
         override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_INT
 

@@ -26,7 +26,7 @@ class ConsentFormSlideFragment : SlideFragment() {
         )
 
         markdownView.scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY
-        markdownView.setScrollbarFadingEnabled(false)
+        markdownView.isScrollbarFadingEnabled = false
 
         return view
     }

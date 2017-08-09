@@ -169,7 +169,7 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
                         if (this.attribute != null) {
                             val value = item.getValueOf(this.attribute!!)
                             if (value != null) {
-                                println("value : ${value.toString()}")
+                                println("value : $value")
                                 this.valueView?.setAnyValue(value)
                             }
                         }

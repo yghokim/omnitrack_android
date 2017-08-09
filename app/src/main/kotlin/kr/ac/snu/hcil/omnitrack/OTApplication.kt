@@ -233,29 +233,29 @@ class OTApplication : MultiDexApplication() {
 
             if (cachedUser == null) {
                 //if (OTAuthManager.isUserSignedIn()) {
-                    val uid = OTAuthManager.userId!!
-                    println("OMNITRACK user identityId: ${uid}, userName: ${OTAuthManager.userName}")
+                val uid = OTAuthManager.userId!!
+                println("OMNITRACK user identityId: ${uid}, userName: ${OTAuthManager.userName}")
                 //DatabaseManager.findTrackersOfUser(uid).flatMap {
                 //    trackers ->
 
                 val user = OTUser(uid, OTAuthManager.userName, OTAuthManager.userImageUrl)
-                        OTUser.storeOrOverwriteInstanceCache(user, systemSharedPreferences)
-                        for (tracker in user.getTrackersOnShortcut()) {
-                            OTShortcutPanelManager += tracker
-                        }
+                OTUser.storeOrOverwriteInstanceCache(user, systemSharedPreferences)
+                for (tracker in user.getTrackersOnShortcut()) {
+                    OTShortcutPanelManager += tracker
+                }
 
-                        //handle failed background logging
-                        for (pair in OTBackgroundLoggingService.getFlags()) {
-                            val tracker = user[pair.first]
-                            if (tracker != null) {
-                                logger.writeSystemLog("${tracker.name} background logging was failed. started at ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(pair.second))}", "OmniTrack")
-                            }
-                        }
+                //handle failed background logging
+                for (pair in OTBackgroundLoggingService.getFlags()) {
+                    val tracker = user[pair.first]
+                    if (tracker != null) {
+                        logger.writeSystemLog("${tracker.name} background logging was failed. started at ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(pair.second))}", "OmniTrack")
+                    }
+                }
 
-                        if (initialRun) {
-                            //createExampleTrackers(user)
-                            createUsabilityTestingTrackers(user)
-                        }
+                if (initialRun) {
+                    //createExampleTrackers(user)
+                    createUsabilityTestingTrackers(user)
+                }
 
                 _currentUser = user
                 sendUser(user)
@@ -290,7 +290,7 @@ class OTApplication : MultiDexApplication() {
     private lateinit var userLoadingLooper: Looper
 
     override fun attachBaseContext(base: Context) {
-        LocaleHelper.init(base);
+        LocaleHelper.init(base)
         refreshConfiguration(base)
         super.attachBaseContext(wrappedContext)
         MultiDex.install(this)

@@ -103,11 +103,11 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
         val inflater = LayoutInflater.from(this)
         for (i in 0..numPages - 1) {
             val tabView = inflater.inflate(R.layout.layout_tracker_detail_tab_view, tabLayout, false)
-            tabLayout.getTabAt(i)?.setCustomView(tabView)
+            tabLayout.getTabAt(i)?.customView = tabView
 
             val viewHolder = TabViewHolder(tabView)
             viewHolder.iconView.setImageResource(mSectionsPagerAdapter.getIconId(i))
-            viewHolder.textView.setText(mSectionsPagerAdapter.getPageTitle(i))
+            viewHolder.textView.text = mSectionsPagerAdapter.getPageTitle(i)
             tabView.tag = viewHolder
             if (tabLayout.getTabAt(i)?.isSelected == false) {
                 tabView.alpha = 0.5f
@@ -218,13 +218,13 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
         }
     }
 
-    override fun onPause(){
+    override fun onPause() {
         super.onPause()
 
         OTApplication.app.syncUserToDb()
     }
 
-    override fun onStart(){
+    override fun onStart() {
         super.onStart()
     }
 
@@ -246,7 +246,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
     }
 
     override fun onToolbarRightButtonClicked() {
-            //add
+        //add
         if (!isEditMode) {
 
             setResult(RESULT_OK, Intent().putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker?.objectId))
@@ -320,7 +320,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
             }
         }
 
-        protected abstract fun onTrackerLoaded(tracker: OTTracker);
+        protected abstract fun onTrackerLoaded(tracker: OTTracker)
 
         override fun onStop() {
             super.onStop()

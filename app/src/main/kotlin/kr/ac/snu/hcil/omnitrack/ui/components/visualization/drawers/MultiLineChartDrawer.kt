@@ -17,7 +17,7 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 2016-09-08.
  */
-class MultiLineChartDrawer() : ATimelineChartDrawer() {
+class MultiLineChartDrawer : ATimelineChartDrawer() {
 
     override val aspectRatio: Float = 1.7f
     val verticalAxis = Axis(Axis.Pivot.LEFT)
@@ -76,10 +76,9 @@ class MultiLineChartDrawer() : ATimelineChartDrawer() {
         if (model is ILineChartOnTime && model != null) {
             println("Model changed")
 
-            if(model is CompoundAttributeChartModel)
-            {
+            if (model is CompoundAttributeChartModel) {
                 legend.entries.clear()
-                for(attr in (model as CompoundAttributeChartModel).attributes.withIndex()) {
+                for (attr in (model as CompoundAttributeChartModel).attributes.withIndex()) {
                     legend.entries.add(
                             Pair(attr.value.name, OTApplication.app.colorPalette[attr.index % OTApplication.app.colorPalette.size])
                     )
@@ -149,7 +148,7 @@ class MultiLineChartDrawer() : ATimelineChartDrawer() {
     fun refreshPolyLine(datum: IndexedValue<ILineChartOnTime.TimeSeriesTrendData>, element: PolyLineElement<ILineChartOnTime.TimeSeriesTrendData>) {
 
         println("coord of line")
-        element.color = OTApplication.app.colorPalette[datum.index%OTApplication.app.colorPalette.size]
+        element.color = OTApplication.app.colorPalette[datum.index % OTApplication.app.colorPalette.size]
         element.fitNumPoints(datum.value.points.count())
         for (point in datum.value.points.withIndex()) {
             element.set(point.index, xScale[point.value.first], verticalAxisScale[point.value.second.toFloat()])

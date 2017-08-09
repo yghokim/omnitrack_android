@@ -16,7 +16,7 @@ class PolyLineElement<T> : ADataEncodedDrawer<T> {
     var linePaint: Paint
     var markerPaint: Paint
 
-    var path  = Path()
+    var path = Path()
 
     var color: Int = Color.DKGRAY
     var thickness: Float = 40f
@@ -76,7 +76,7 @@ class PolyLineElement<T> : ADataEncodedDrawer<T> {
     }
 
     fun fitNumPoints(count: Int) {
-        val countDiff = count*2 - _points.size
+        val countDiff = count * 2 - _points.size
         if (countDiff > 0) {
             for (i in 0..countDiff - 1) {
                 _points.add(0f)
@@ -89,14 +89,13 @@ class PolyLineElement<T> : ADataEncodedDrawer<T> {
         }
     }
 
-    fun refreshPath(){
-        path=  Path()
-        if(numPoints>1) {
+    fun refreshPath() {
+        path = Path()
+        if (numPoints > 1) {
             println("num points: ${numPoints}")
             path.moveTo(getX(0), getY(0))
 
-            for(i in 1..numPoints-1)
-            {
+            for (i in 1..numPoints - 1) {
                 path.lineTo(getX(i), getY(i))
             }
         }
@@ -106,24 +105,21 @@ class PolyLineElement<T> : ADataEncodedDrawer<T> {
         linePaint.color = color
         linePaint.strokeWidth = thickness
 
-        if(drawLine && numPoints > 1)
+        if (drawLine && numPoints > 1)
             canvas.drawPath(path, linePaint)
 
-        if(drawMarker)
-        {
+        if (drawMarker) {
             markerPaint.strokeWidth = markerThickness
             markerPaint.style = Paint.Style.FILL
             markerPaint.color = Color.WHITE
-            for(i in 0..numPoints-1)
-            {
+            for (i in 0..numPoints - 1) {
 
                 canvas.drawCircle(getX(i), getY(i), markerRadius, markerPaint)
             }
 
             markerPaint.style = Paint.Style.STROKE
             markerPaint.color = color
-            for(i in 0..numPoints-1)
-            {
+            for (i in 0..numPoints - 1) {
                 canvas.drawCircle(getX(i), getY(i), markerRadius, markerPaint)
             }
         }

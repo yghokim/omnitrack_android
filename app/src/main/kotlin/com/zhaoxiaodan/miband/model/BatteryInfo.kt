@@ -53,7 +53,7 @@ class BatteryInfo private constructor() {
         private set
 
     override fun toString(): String {
-        return "cycles:${this.cycles},level:${this.level}, status:${this.status},last:${SimpleDateFormat("yyyy-MM-dd HH:mm:SS", Locale.CHINA).format(this.lastChargedDate?.getTime())}"
+        return "cycles:${this.cycles},level:${this.level}, status:${this.status},last:${SimpleDateFormat("yyyy-MM-dd HH:mm:SS", Locale.CHINA).format(this.lastChargedDate?.time)}"
     }
 
     companion object {

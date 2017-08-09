@@ -29,7 +29,7 @@ class BooleanPropertyView(context: Context, attrs: AttributeSet?) : APropertyVie
     }
 
     override fun onClick(view: View?) {
-        if(validate(!value)) {
+        if (validate(!value)) {
             switch.performClick()
             onValueChanged(switch.isChecked)
         }

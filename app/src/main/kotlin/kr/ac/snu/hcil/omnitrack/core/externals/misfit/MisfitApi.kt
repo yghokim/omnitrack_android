@@ -120,7 +120,7 @@ object MisfitApi {
 
             uriBuilder.addQueryParameter(AuthConstants.PARAM_ACCESS_TOKEN, token)
 
-            println("query ${uriBuilder.build().toString()}")
+            println("query ${uriBuilder.build()}")
 
             val request = Request.Builder()
                     .url(uriBuilder.build())

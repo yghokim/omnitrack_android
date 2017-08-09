@@ -146,16 +146,14 @@ class OTTimeAttribute(objectId: String?, localKey: Int?, parentTracker: OTTracke
     }
 
     override fun onAddValueToTable(value: Any?, out: MutableList<String?>, uniqKey: String?) {
-        if(value is TimePoint)
-        {
+        if (value is TimePoint) {
             val date = Date(value.timestamp)
             TimeHelper.FORMAT_ISO_8601.timeZone = value.timeZone
 
             out.add(value.timestamp.toString())
             out.add(value.timeZone.getDisplayName(Locale.ENGLISH))
             out.add(TimeHelper.FORMAT_ISO_8601.format(date))
-        }
-        else{
+        } else {
             out.add(null)
             out.add(null)
         }

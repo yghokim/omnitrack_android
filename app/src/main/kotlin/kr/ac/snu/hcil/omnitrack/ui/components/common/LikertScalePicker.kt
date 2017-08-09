@@ -358,7 +358,7 @@ class LikertScalePicker : View, GestureDetector.OnGestureListener {
         val measuredHeight: Int
 
         if (widthMode == MeasureSpec.EXACTLY) {
-            measuredWidth = widthSize;
+            measuredWidth = widthSize
         } else if (widthMode == MeasureSpec.AT_MOST) {
             measuredWidth = widthSize
         } else {
@@ -370,7 +370,7 @@ class LikertScalePicker : View, GestureDetector.OnGestureListener {
                 Math.max(Math.max(textHeight(leftLabel, labelTextPaint, contentWidth / 5), textHeight(rightLabel, labelTextPaint, contentWidth / 5)), textHeight(middleLabel, labelTextPaint, contentWidth / 5)) + 0.5f).toInt()
 
         if (heightMode == MeasureSpec.EXACTLY) {
-            measuredHeight = heightSize;
+            measuredHeight = heightSize
         } else if (heightMode == MeasureSpec.AT_MOST) {
             measuredHeight = Math.min(intrinsicHeight + paddingTop + paddingBottom, heightSize).toInt()
         } else {

@@ -268,7 +268,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
         }
     }
 
-    inner class Adapter() : RecyclerView.Adapter<ATriggerViewHolder<*>>(), ATriggerViewHolder.ITriggerControlListener {
+    inner class Adapter : RecyclerView.Adapter<ATriggerViewHolder<*>>(), ATriggerViewHolder.ITriggerControlListener {
 
         private val viewHolders = ArrayList<ATriggerViewHolder<*>>()
 

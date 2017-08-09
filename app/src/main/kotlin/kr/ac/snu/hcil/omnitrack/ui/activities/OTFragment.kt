@@ -49,7 +49,7 @@ open class OTFragment : Fragment() {
             val now = System.currentTimeMillis()
             EventLoggingManager.logSession(this, elapsed, now, null, contentObject)
 
-            println("finished fragment ${this.javaClass.simpleName}. uptime: $elapsed, ${contentObject.toString()}")
+            println("finished fragment ${this.javaClass.simpleName}. uptime: $elapsed, $contentObject")
         }
     }
 

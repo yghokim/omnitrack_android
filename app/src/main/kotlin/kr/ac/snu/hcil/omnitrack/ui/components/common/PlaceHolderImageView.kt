@@ -111,7 +111,7 @@ open class PlaceHolderImageView : FrameLayout {
         loadingIndicator = SpinKitView(context)
         loadingIndicator.setColor(ContextCompat.getColor(context, R.color.colorPointed))
         loadingIndicator.isIndeterminate = true
-        loadingIndicator.setIndeterminateDrawable(Circle())
+        loadingIndicator.indeterminateDrawable = Circle()
 
         val lp = FrameLayout.LayoutParams(
                 context.resources.getDimensionPixelSize(R.dimen.image_placeholder_loading_indicator_size),

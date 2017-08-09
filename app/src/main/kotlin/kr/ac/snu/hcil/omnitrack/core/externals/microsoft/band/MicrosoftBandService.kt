@@ -21,7 +21,7 @@ object MicrosoftBandService : OTExternalService("MicrosoftBandService", 19) {
     override val nameResourceId: Int = R.string.service_microsoft_band_name
     override val descResourceId: Int = R.string.service_microsoft_band_desc
 
-    private var connectionTask : ConnectionTask? = null
+    private var connectionTask: ConnectionTask? = null
 
     private var connectionState: ConnectionState? = null
 
@@ -55,31 +55,25 @@ object MicrosoftBandService : OTExternalService("MicrosoftBandService", 19) {
 
     }
 
-    fun getClient() : BandClient? {
+    fun getClient(): BandClient? {
         val pairedBands = BandClientManager.getInstance().pairedBands
         println("${pairedBands.size} bands are paired.")
-        if(pairedBands.size > 0) {
+        if (pairedBands.size > 0) {
             return BandClientManager.getInstance().create(OTApplication.app, pairedBands[0])
-        }
-        else return null
+        } else return null
     }
 
-    class ConnectionTask(val client: BandClient, val handler: ((Boolean)->Unit)?): AsyncTask<Void?, Void?, ConnectionState?>()
-    {
+    class ConnectionTask(val client: BandClient, val handler: ((Boolean) -> Unit)?) : AsyncTask<Void?, Void?, ConnectionState?>() {
 
         override fun doInBackground(vararg params: Void?): ConnectionState? {
             val pendingState = client.connect()
-            try{
+            try {
                 val connectionState = pendingState.await()
                 return connectionState
-            }
-            catch(interruption: InterruptedException)
-            {
+            } catch(interruption: InterruptedException) {
                 interruption.printStackTrace()
                 return null
-            }
-            catch(bandEx : BandException)
-            {
+            } catch(bandEx: BandException) {
                 bandEx.printStackTrace()
                 return null
             }

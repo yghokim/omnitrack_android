@@ -121,21 +121,17 @@ class OTItem : ADataRow, IDatabaseStorable {
     /**
      * used to log directly in code behind
      */
-    constructor(tracker: OTTracker, timestamp: Long, source: LoggingSource, deviceId: String?, vararg values: Any?) : this(tracker.objectId, source, deviceId)
-    {
+    constructor(tracker: OTTracker, timestamp: Long, source: LoggingSource, deviceId: String?, vararg values: Any?) : this(tracker.objectId, source, deviceId) {
         this.timestamp = timestamp
         this.source = source
 
-        if(tracker.attributes.size != values.size)
-        {
+        if (tracker.attributes.size != values.size) {
             throw IllegalArgumentException("attribute count and value count is different. - attribute count is ${tracker.attributes.size}, input value count is ${values.size}")
         }
 
-        for(valueEntry in values.withIndex())
-        {
+        for (valueEntry in values.withIndex()) {
             val value = valueEntry.value
-            if (value != null)
-            {
+            if (value != null) {
                 setValueOf(tracker.attributes[valueEntry.index], value)
             }
         }

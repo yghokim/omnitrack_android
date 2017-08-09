@@ -130,6 +130,6 @@ class TimeTriggerAlarmReceiver : BroadcastReceiver() {
             }.subscribe({
 
             }, { }, { completeWakefulIntent(intent) })
-            }
         }
+    }
 }

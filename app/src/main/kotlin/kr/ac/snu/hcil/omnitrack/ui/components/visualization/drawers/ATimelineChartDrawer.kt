@@ -10,13 +10,13 @@ import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.Qu
 /**
  * Created by Young-Ho on 9/9/2016.
  */
-abstract class ATimelineChartDrawer : AChartDrawer(){
+abstract class ATimelineChartDrawer : AChartDrawer() {
 
     val xScale = QuantizedTimeScale().inset(true)
 
     val horizontalAxis = Axis(Axis.Pivot.BOTTOM)
 
-    init{
+    init {
         paddingBottom = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_axis_height).toFloat()
         paddingLeft = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_axis_width).toFloat()
         paddingTop = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_axis_label_numeric_size).toFloat()
@@ -35,18 +35,15 @@ abstract class ATimelineChartDrawer : AChartDrawer(){
 
     override fun onRefresh() {
 
-        if(model != null)
-        {
+        if (model != null) {
             val timeScope = model!!.getTimeScope()
             val granularity = model!!.getCurrentScopeGranularity()
 
             xScale.setDomain(timeScope.from, timeScope.to).quantize(granularity)
 
-            if (granularity != Granularity.WEEK && granularity != Granularity.WEEK_REL)
-            {
+            if (granularity != Granularity.WEEK && granularity != Granularity.WEEK_REL) {
                 horizontalAxis.style = Axis.TickLabelStyle.Small
-            }
-            else{
+            } else {
                 horizontalAxis.style = Axis.TickLabelStyle.Normal
             }
         }

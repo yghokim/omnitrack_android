@@ -11,7 +11,7 @@ import rx.subscriptions.CompositeSubscription
 /**
  * Created by younghokim on 16. 9. 7..
  */
-abstract class ChartModel<T>() : IChartInterface<T> {
+abstract class ChartModel<T> : IChartInterface<T> {
     override fun getDataPointAt(position: Int): T {
         return cachedData[position]
     }

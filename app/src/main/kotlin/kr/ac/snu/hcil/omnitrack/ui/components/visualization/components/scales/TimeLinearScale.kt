@@ -27,7 +27,7 @@ class TimeLinearScale : IAxisScale<Long> {
 
     private var domainInterval: Long = 0L
 
-    override var tickFormat : IAxisScale.ITickFormat<Long>? = null
+    override var tickFormat: IAxisScale.ITickFormat<Long>? = null
 
     val tsCache = TimeSpan()
 
@@ -47,14 +47,13 @@ class TimeLinearScale : IAxisScale<Long> {
 
     fun setTicksBasedOnGranularity(granularity: Granularity): TimeLinearScale {
 
-        when(granularity)
-        {
+        when (granularity) {
             Granularity.DAY ->//time
             {
                 //3 hours
                 _numIntervals = 8
                 domainInterval = 3 * DateUtils.HOUR_IN_MILLIS
-                tickFormat = object: IAxisScale.ITickFormat<Long> {
+                tickFormat = object : IAxisScale.ITickFormat<Long> {
                     override fun format(value: Long, index: Int): String {
                         calendarCache.timeInMillis = value
                         val hourOfDay = calendarCache.getHourOfDay()
@@ -70,21 +69,18 @@ class TimeLinearScale : IAxisScale<Long> {
                 }
             }
 
-            Granularity.WEEK ->
-            {
+            Granularity.WEEK -> {
                 // day of week
                 _numIntervals = 7
                 domainInterval = DateUtils.DAY_IN_MILLIS
             }
 
-            Granularity.MONTH ->
-            {
+            Granularity.MONTH -> {
                 //5 days
 
             }
 
-            Granularity.YEAR ->
-            {
+            Granularity.YEAR -> {
                 //month
                 _numIntervals = 12
                 domainInterval = DateUtils.DAY_IN_MILLIS * 30

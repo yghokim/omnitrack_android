@@ -94,9 +94,7 @@ object RescueTimeComputerUsageDurationMeasureFactory : OTMeasureFactory("cud") {
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
-            else if (other is ComputerUsageDurationMeasure) {
-                return true
-            } else return false
+            else return other is ComputerUsageDurationMeasure
         }
 
         override fun hashCode(): Int {

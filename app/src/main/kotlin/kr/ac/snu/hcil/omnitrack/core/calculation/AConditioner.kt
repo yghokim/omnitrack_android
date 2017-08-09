@@ -33,8 +33,7 @@ abstract class AConditioner : ATypedQueueSerializable {
 
     abstract val typeCode: Int
 
-    constructor() {
-    }
+    constructor()
 
     constructor(serialized: String) : super(serialized)
 

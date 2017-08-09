@@ -87,7 +87,7 @@ class SourceSelectionPage(override val parent: ConnectionWizardView, val attribu
 
     }
 
-    inner class SourceAdapter() : RecyclerView.Adapter<SourceViewHolder>() {
+    inner class SourceAdapter : RecyclerView.Adapter<SourceViewHolder>() {
 
         init {
 

@@ -26,12 +26,12 @@ import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 
 class ChartViewActivity : OTTrackerAttachedActivity(R.layout.activity_chart_view), View.OnClickListener {
 
-    companion object{
-            fun makeIntent(trackerId: String, context: Context): Intent {
-                val intent = Intent(context, ChartViewActivity::class.java)
-                intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
-                return intent
-            }
+    companion object {
+        fun makeIntent(trackerId: String, context: Context): Intent {
+            val intent = Intent(context, ChartViewActivity::class.java)
+            intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
+            return intent
+        }
     }
 
     private lateinit var timeNavigator: View
@@ -69,7 +69,7 @@ class ChartViewActivity : OTTrackerAttachedActivity(R.layout.activity_chart_view
         scopeSelectionView = findViewById(R.id.ui_scope_selection)
         scopeSelectionView.setValues(supportedGranularity.map { resources.getString(it.nameId) }.toTypedArray())
         scopeSelectionView.onSelectedIndexChanged += {
-            sender, index ->
+            _, index ->
             viewModel.granularity = supportedGranularity[index]
         }
 
@@ -80,12 +80,6 @@ class ChartViewActivity : OTTrackerAttachedActivity(R.layout.activity_chart_view
         listView.adapter = adapter
 
         viewModel = ViewModelProviders.of(this).get(TrackerChartViewListViewModel::class.java)
-
-        creationSubscriptions.add(
-                viewModel.chartViewModels.subscribe {
-                    chartViewModels ->
-                }
-        )
 
         creationSubscriptions.add(
                 viewModel.currentGranularitySubject.subscribe {

@@ -25,7 +25,7 @@ abstract class NamedObject(objectId: String?, name: String) : IDatabaseSyncedObj
     abstract val databasePointRef: DatabaseReference?
     var suspendDatabaseSync: Boolean = false
 
-    var name: String by Delegates.observable(name){
+    var name: String by Delegates.observable(name) {
         prop, old, new ->
         if (old != new) {
             if (!suspendDatabaseSync)
@@ -45,6 +45,6 @@ abstract class NamedObject(objectId: String?, name: String) : IDatabaseSyncedObj
 
     protected abstract fun makeNewObjectId(): String
 
-    protected open fun onNameChanged(newName: String){
+    protected open fun onNameChanged(newName: String) {
     }
 }

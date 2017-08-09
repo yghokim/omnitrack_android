@@ -29,7 +29,6 @@ abstract class AAttributeInputView<DataType>(layoutId: Int, context: Context, at
         const val VIEW_TYPE_AUDIO_RECORD = 11
 
 
-
         fun makeInstance(type: Int, context: Context): AAttributeInputView<out Any> {
             return when (type) {
                 VIEW_TYPE_NUMBER -> NumberInputView(context)

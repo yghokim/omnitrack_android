@@ -3,7 +3,6 @@ package kr.ac.snu.hcil.omnitrack.core.attributes
 import android.net.Uri
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import rx.Single
-import java.io.OutputStream
 
 /**
  * Created by Young-Ho Kim on 2017-03-09.

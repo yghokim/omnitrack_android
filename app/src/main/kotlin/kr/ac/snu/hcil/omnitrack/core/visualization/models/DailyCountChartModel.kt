@@ -34,7 +34,7 @@ class DailyCountChartModel(tracker: OTTracker) : TrackerChartModel<Pair<Long, In
         xScale.setDomain(getTimeScope().from, getTimeScope().to)
         xScale.quantize(currentGranularity)
         return DatabaseManager.loadItems(tracker, getTimeScope(), DatabaseManager.Order.ASC).map {
-                    items ->
+            items ->
             DataHelper.ConvertSortedListToBinWithLong((xScale.binPointsOnDomain + getTimeScope().to).toTypedArray(),
                     items, { item -> item.timestamp }).map { bin -> Pair(bin.x0, bin.values.size) }
         }
@@ -44,7 +44,7 @@ class DailyCountChartModel(tracker: OTTracker) : TrackerChartModel<Pair<Long, In
         return DailyCountChartDrawer()
     }
 
-    inner class DailyCountChartDrawer() : ATimelineChartDrawer() {
+    inner class DailyCountChartDrawer : ATimelineChartDrawer() {
         override val aspectRatio: Float = 2f
 
         private val yAxis = Axis(Axis.Pivot.LEFT)

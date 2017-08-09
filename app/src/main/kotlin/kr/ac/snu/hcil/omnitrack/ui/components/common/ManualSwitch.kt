@@ -16,6 +16,5 @@ class ManualSwitch : SwipelessSwitchCompat {
     }
 
     override fun toggle() {
-        ;
     }
 }

@@ -114,11 +114,11 @@ class SignInActivity : AppCompatActivity() {
     }
 
     private fun goHomeActivity() {
-        Log.d(LOG_TAG, "Launching Main Activity...");
+        Log.d(LOG_TAG, "Launching Main Activity...")
         startActivity(Intent(this@SignInActivity, HomeActivity::class.java)
                 .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP).putExtra(OTApplication.INTENT_EXTRA_IGNORE_SIGN_IN_CHECK, true))
         // finish should always be called on the main thread.
-        finish();
+        finish()
     }
 
     override fun onDestroy() {
@@ -142,48 +142,48 @@ class SignInActivity : AppCompatActivity() {
             Toast.makeText(this@SignInActivity, String.format(getString(R.string.msg_sign_in_google_succeeded)), Toast.LENGTH_LONG).show()
 
             ExperimentConsentManager.startProcess(this@SignInActivity, OTAuthManager.userId!!, object : ExperimentConsentManager.ResultListener {
-                    override fun onConsentApproved() {
-                        val activatedRef = DatabaseManager.currentUserRef?.child("examples_generated")
-                        activatedRef?.addListenerForSingleValueEvent(object : ValueEventListener {
-                            override fun onCancelled(error: DatabaseError?) {
+                override fun onConsentApproved() {
+                    val activatedRef = DatabaseManager.currentUserRef?.child("examples_generated")
+                    activatedRef?.addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onCancelled(error: DatabaseError?) {
+                            goHomeActivity()
+                        }
+
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            if (snapshot.exists() && snapshot.value == true) {
                                 goHomeActivity()
-                            }
-
-                            override fun onDataChange(snapshot: DataSnapshot) {
-                                if (snapshot.exists() && snapshot.value == true) {
-                                    goHomeActivity()
-                                } else {
-                                    creationSubscription.add(
-                                            OTApplication.app.currentUserObservable.subscribe {
-                                                user ->
-                                                user.addExampleTrackers()
-                                                activatedRef.setValue(true, object : DatabaseReference.CompletionListener {
-                                                    override fun onComplete(error: DatabaseError?, ref: DatabaseReference?) {
-                                                        if (error == null) {
-                                                            goHomeActivity()
-                                                        }
+                            } else {
+                                creationSubscription.add(
+                                        OTApplication.app.currentUserObservable.subscribe {
+                                            user ->
+                                            user.addExampleTrackers()
+                                            activatedRef.setValue(true, object : DatabaseReference.CompletionListener {
+                                                override fun onComplete(error: DatabaseError?, ref: DatabaseReference?) {
+                                                    if (error == null) {
+                                                        goHomeActivity()
                                                     }
+                                                }
 
-                                                })
-                                            }
-                                    )
-                                }
-
-
+                                            })
+                                        }
+                                )
                             }
 
-                        }) ?: goHomeActivity()
-                    }
 
-                    override fun onConsentFailed() {
-                        println("consent failed")
-                        toIdleMode()
-                    }
+                        }
 
-                    override fun onConsentDenied() {
-                        println("consent was denied")
-                        toIdleMode()
-                    }
+                    }) ?: goHomeActivity()
+                }
+
+                override fun onConsentFailed() {
+                    println("consent failed")
+                    toIdleMode()
+                }
+
+                override fun onConsentDenied() {
+                    println("consent was denied")
+                    toIdleMode()
+                }
 
             })
         }

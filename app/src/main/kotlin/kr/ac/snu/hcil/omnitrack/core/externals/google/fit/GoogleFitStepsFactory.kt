@@ -77,10 +77,10 @@ object GoogleFitStepsFactory : GoogleFitService.GoogleFitMeasureFactory("step") 
                 GoogleFitService.getConnectedClient().map<Result<out Any>>(object : Func1<GoogleApiClient, Result<out Any>> {
                     override fun call(client: GoogleApiClient): Result<out Any> {
                         val request = DataReadRequest.Builder()
-                            .aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
-                            .bucketByTime(1, TimeUnit.DAYS)
-                            .setTimeRange(start, end, TimeUnit.MILLISECONDS)
-                            .build()
+                                .aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
+                                .bucketByTime(1, TimeUnit.DAYS)
+                                .setTimeRange(start, end, TimeUnit.MILLISECONDS)
+                                .build()
                         val result = Fitness.HistoryApi.readData(client, request).await(10, TimeUnit.SECONDS)
                         var steps = 0
                         for (bucket in result.buckets) {
@@ -88,9 +88,9 @@ object GoogleFitStepsFactory : GoogleFitService.GoogleFitMeasureFactory("step") 
                                 for (dataPoint in dataset.dataPoints) {
                                     steps += dataPoint.getValue(Field.FIELD_STEPS).asInt()
                                     println(dataPoint.getValue(Field.FIELD_STEPS))
+                                }
                             }
-                            }
-                    }
+                        }
 
                         return Result(steps)
                     }

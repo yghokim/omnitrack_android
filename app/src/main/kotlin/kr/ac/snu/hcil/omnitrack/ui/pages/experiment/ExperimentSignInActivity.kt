@@ -118,11 +118,11 @@ class ExperimentSignInActivity : IntroActivity() {
     }
 
     fun setButtonNextBackgroundTint(color: Int) {
-        ViewCompat.setBackgroundTintList(buttonNext, ColorStateList.valueOf(color));
+        ViewCompat.setBackgroundTintList(buttonNext, ColorStateList.valueOf(color))
     }
 
     fun setButtonNextBackgroundTintRes(@ColorRes colorRes: Int) {
-        ViewCompat.setBackgroundTintList(buttonNext, ColorStateList.valueOf(ContextCompat.getColor(this, colorRes)));
+        ViewCompat.setBackgroundTintList(buttonNext, ColorStateList.valueOf(ContextCompat.getColor(this, colorRes)))
     }
 
     override fun onSendActivityResult(result: Int): Intent? {

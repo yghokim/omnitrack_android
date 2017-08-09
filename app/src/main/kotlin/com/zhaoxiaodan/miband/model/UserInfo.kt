@@ -33,9 +33,7 @@ class UserInfo {
     var type: Int = 0
         private set
 
-    private constructor() {
-
-    }
+    private constructor()
 
     constructor(uid: Int, gender: Int, age: Int, height: Int, weight: Int, alias: String, type: Int) {
         this.uid = uid

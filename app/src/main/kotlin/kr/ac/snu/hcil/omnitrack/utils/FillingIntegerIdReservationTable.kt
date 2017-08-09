@@ -16,9 +16,7 @@ class FillingIntegerIdReservationTable<T> {
     val size: Int
         get() = keyPivotedTable.size
 
-    constructor() {
-
-    }
+    constructor()
 
     constructor(entries: Collection<Pair<Int, T>>) {
         for (entry in entries) {

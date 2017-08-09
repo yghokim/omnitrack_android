@@ -93,8 +93,7 @@ class OTFirebaseUploadService : WakefulService(TAG) {
             if (!currentTasks.containsKey(taskInfo.id)) {
                 println("restart uploading ${taskInfo.localUri}")
                 var localUri = Uri.parse(taskInfo.localUri)
-                if(localUri.scheme == null)
-                {
+                if (localUri.scheme == null) {
                     localUri = Uri.Builder()
                             .scheme("file")
                             .path(localUri.path)
@@ -150,11 +149,9 @@ class OTFirebaseUploadService : WakefulService(TAG) {
 
             println("local uri info: ${outUri.localUri.scheme}, isAbsolute: ${outUri.localUri.isAbsolute}, isRelative: ${outUri.localUri.isRelative}, scheme: ${outUri.localUri.scheme}")
 
-            val task = if(outUri.localUri.scheme == null)
-            {
+            val task = if (outUri.localUri.scheme == null) {
                 storageRef.putFile(Uri.Builder().scheme("file").path(outUri.localUri.path).build())
-            }
-            else{
+            } else {
                 storageRef.putFile(outUri.localUri)
             }
 

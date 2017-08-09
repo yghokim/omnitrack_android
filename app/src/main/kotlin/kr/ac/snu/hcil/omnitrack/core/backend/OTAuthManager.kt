@@ -48,7 +48,7 @@ object OTAuthManager {
     }
 
     private const val RC_SIGN_IN = 9913
-    private val REQUEST_GOOGLE_PLAY_SERVICES = 1363;
+    private val REQUEST_GOOGLE_PLAY_SERVICES = 1363
 
 
     private val executorService = Executors.newFixedThreadPool(2)
@@ -188,18 +188,18 @@ object OTAuthManager {
             if (skipValidationIfCacheHit) {
                 Log.d(LOG_TAG, "Skip sign in. use cached Firebase User.")
                 resultsHandler.onSuccess()
-                } else {
+            } else {
                 Log.d(LOG_TAG, "Reload Firebase User to check connection.")
                 mFirebaseAuth.currentUser!!.reload().addOnCompleteListener {
                     task ->
                     if (task.isSuccessful) {
-                            resultsHandler.onSuccess()
+                        resultsHandler.onSuccess()
                     } else {
                         signInSilently(resultsHandler)
                     }
-                    }
+                }
             }
-            } else {
+        } else {
             Log.d(LOG_TAG, "Firebase user does not exist. Sign in silently")
             signInSilently(resultsHandler)
         }
@@ -290,17 +290,17 @@ object OTAuthManager {
     private fun firebaseAuthWithGoogle(acct: GoogleSignInAccount?): Observable<AuthResult> {
         return Observable.unsafeCreate<AuthResult> {
             subscriber ->
-            Log.d(LOG_TAG, "firebaseAuthWithGooogle:" + acct?.getId())
+            Log.d(LOG_TAG, "firebaseAuthWithGooogle:" + acct?.id)
             val credential = getAuthCredential()
             mFirebaseAuth.signInWithCredential(credential)
                     .addOnCompleteListener {
                         task: Task<AuthResult> ->
-                        Log.d(LOG_TAG, "signInWithCredential:onComplete:" + task.isSuccessful);
+                        Log.d(LOG_TAG, "signInWithCredential:onComplete:" + task.isSuccessful)
                         // If sign in fails, display a message to the user. If sign in succeeds
                         // the auth state listener will be notified and logic to handle the
                         // signed in user can be handled in the listener.
                         if (!task.isSuccessful) {
-                            Log.w(LOG_TAG, "signInWithCredential", task.getException());
+                            Log.w(LOG_TAG, "signInWithCredential", task.exception)
                             if (!subscriber.isUnsubscribed) {
                                 subscriber.onError(task.exception)
                             }
@@ -414,12 +414,12 @@ object OTAuthManager {
                     api.showErrorDialogFragment(activity, code, REQUEST_GOOGLE_PLAY_SERVICES)
                 } else {
                     val isDebugBuild = 0 != activity
-                            .getApplicationContext()
-                            .getApplicationInfo()
+                            .applicationContext
+                            .applicationInfo
                             .flags and ApplicationInfo.FLAG_DEBUGGABLE
 
                     if (!isDebugBuild) {
-                        buttonView.setVisibility(View.GONE)
+                        buttonView.visibility = View.GONE
                     } else {
                         Log.w(LOG_TAG, "Google Play Services are not available, but we are showing the Google Sign-in Button, anyway, because this is a debug build.")
                     }

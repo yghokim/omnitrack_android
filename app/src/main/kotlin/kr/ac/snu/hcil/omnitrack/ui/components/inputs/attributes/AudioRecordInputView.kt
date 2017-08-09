@@ -19,17 +19,14 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
     override val typeId: Int = VIEW_TYPE_AUDIO_RECORD
 
     private var inLoadingMode: Boolean = false
-        set(value){
-            if(field!=value)
-            {
+        set(value) {
+            if (field != value) {
                 field = value
-                if(value)
-                {
+                if (value) {
                     loadingIndicator.visibility = View.VISIBLE
                     valueView.visibility = View.INVISIBLE
                     locked = true
-                }
-                else{
+                } else {
                     valueView.visibility = View.VISIBLE
                     loadingIndicator.visibility = View.GONE
                     locked = false
@@ -39,33 +36,31 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
 
     override var value = SynchronizedUri()
         set(value) {
-            if(field!=value)
-            {
+            if (field != value) {
                 subscriptions.clear()
                 field = value
-                if(value.isLocalUriValid)
-                {
+                if (value.isLocalUriValid) {
                     valueView.audioFileUriChanged.suspend = true
                     valueView.audioFileUri = value.localUri
                     valueView.audioFileUriChanged.suspend = false
-                }else if(value.isSynchronized){
+                } else if (value.isSynchronized) {
                     inLoadingMode = true
                     subscriptions.add(
-                            OTApplication.app.storageHelper.downloadFileTo(value.serverUri.path, value.localUri).subscribe (
+                            OTApplication.app.storageHelper.downloadFileTo(value.serverUri.path, value.localUri).subscribe(
                                     {
-                                        uri->
+                                        uri ->
                                         valueView.audioFileUriChanged.suspend = true
                                         valueView.audioFileUri = uri
                                         valueView.audioFileUriChanged.suspend = false
                                         inLoadingMode = false
                                     }, {
-                                        error->
-                                        error?.printStackTrace()
-                                        valueView.audioFileUriChanged.suspend = true
-                                        valueView.audioFileUri = Uri.EMPTY
-                                        valueView.audioFileUriChanged.suspend = false
-                                        inLoadingMode = false
-                                    }
+                                error ->
+                                error?.printStackTrace()
+                                valueView.audioFileUriChanged.suspend = true
+                                valueView.audioFileUri = Uri.EMPTY
+                                valueView.audioFileUriChanged.suspend = false
+                                inLoadingMode = false
+                            }
                             )
                     )
                 }
@@ -82,7 +77,7 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
     init {
 
         valueView.audioFileUriChanged += {
-            sender, uri->
+            sender, uri ->
             this.value = SynchronizedUri(uri)
             this.onValueChanged(value)
         }

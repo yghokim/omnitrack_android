@@ -73,7 +73,7 @@ class EventTriggerConfigurationPanel : FrameLayout, ITriggerConfigurationCoordin
 
     }
 
-    inner class MeasureSpinnerAdapter() : ArrayAdapter<OTMeasureFactory>(context, R.layout.simple_list_element_category_name, availableMeasures) {
+    inner class MeasureSpinnerAdapter : ArrayAdapter<OTMeasureFactory>(context, R.layout.simple_list_element_category_name, availableMeasures) {
 
         init {
 

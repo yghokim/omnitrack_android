@@ -1,11 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.utils.io;
 
 /**
- *
  * Copyright (c) 2014 CoderKiss
- *
+ * <p>
  * CoderKiss[AT]gmail.com
- *
  */
 
 import android.util.Log;

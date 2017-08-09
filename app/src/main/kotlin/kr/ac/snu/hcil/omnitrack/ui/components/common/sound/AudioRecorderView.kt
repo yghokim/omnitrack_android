@@ -98,8 +98,7 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
                     if (File(value.path).exists()) {
                         state = State.FILE_MOUNTED
                         mountNewFile(value)
-                    } else
-                    {
+                    } else {
                         println("recorded file does not exists.")
                         state = State.RECORD
                     }
@@ -387,7 +386,7 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
 
     private fun mountNewFile(fileUri: Uri) {
 
-        println("fileUri: ${fileUri.toString()}")
+        println("fileUri: $fileUri")
         val mmr = MediaMetadataRetriever()
         mmr.setDataSource(context, fileUri)
         val duration = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION).toInt()

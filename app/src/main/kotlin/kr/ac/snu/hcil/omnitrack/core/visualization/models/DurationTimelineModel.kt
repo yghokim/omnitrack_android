@@ -42,51 +42,50 @@ class DurationTimelineModel(override val attribute: OTTimeSpanAttribute) : Attri
 
         return Observable.zip((0..xScale.numTicks - 1).map { xIndex ->
 
-                    val from = xScale.binPointsOnDomain[xIndex]
-                    val to = if (xIndex < xScale.numTicks - 1) xScale.binPointsOnDomain[xIndex + 1]
-                    else getTimeScope().to
+            val from = xScale.binPointsOnDomain[xIndex]
+            val to = if (xIndex < xScale.numTicks - 1) xScale.binPointsOnDomain[xIndex + 1]
+            else getTimeScope().to
 
-                    DatabaseManager.loadItems(attribute.tracker!!, TimeSpan.fromPoints(from, to)).flatMap<AggregatedDuration?>(Func1<List<OTItem>, Observable<AggregatedDuration?>> {
-                        items ->
-                        println("items during ${TimeSpan.fromPoints(from, to).toString()}; count: ${items.size}")
-                        if (items.isNotEmpty()) {
-                            val timeSpansCache = ArrayList<Pair<TimeSpan, Long>>()
+            DatabaseManager.loadItems(attribute.tracker!!, TimeSpan.fromPoints(from, to)).flatMap<AggregatedDuration?>(Func1<List<OTItem>, Observable<AggregatedDuration?>> {
+                items ->
+                println("items during ${TimeSpan.fromPoints(from, to)}; count: ${items.size}")
+                if (items.isNotEmpty()) {
+                    val timeSpansCache = ArrayList<Pair<TimeSpan, Long>>()
 
-                            items.forEach { item ->
-                                println("item for ${item.timestampString}")
-                                val v = item.getValueOf(attribute)
-                                if (v is TimeSpan) {
-                                    timeSpansCache.add(Pair(v, TimeHelper.cutTimePartFromEpoch(item.timestamp)))
-                                }
+                    items.forEach { item ->
+                        println("item for ${item.timestampString}")
+                        val v = item.getValueOf(attribute)
+                        if (v is TimeSpan) {
+                            timeSpansCache.add(Pair(v, TimeHelper.cutTimePartFromEpoch(item.timestamp)))
                         }
+                    }
 
-                            println("timespans count: ${timeSpansCache.size}")
-                            if (timeSpansCache.size > 0) {
-                                val fromArray = timeSpansCache.map { timeToRatio(it.first.from, it.second) }
-                                val toArray = timeSpansCache.map { timeToRatio(it.first.to, it.second) }
+                    println("timespans count: ${timeSpansCache.size}")
+                    if (timeSpansCache.size > 0) {
+                        val fromArray = timeSpansCache.map { timeToRatio(it.first.from, it.second) }
+                        val toArray = timeSpansCache.map { timeToRatio(it.first.to, it.second) }
 
-                                Observable.just(
-                                        AggregatedDuration(
-                                                from,
-                                                timeSpansCache.size,
-                                                fromArray.average().toFloat(),
-                                                toArray.average().toFloat(),
-                                                fromArray.min() ?: 0f,
-                                                toArray.max() ?: 0f
-                                        ))
-                            } else Observable.just<AggregatedDuration>(null)
-                        } else Observable.just(null)
-                    })
-                    //OTApplication.app.dbHelper.getItems(attribute.tracker!!, TimeSpan.fromPoints(from, to), itemsCache, true)
-                }, { it ->
-                    println(it)
-                    it.filter { it is AggregatedDuration }.map { it as AggregatedDuration }.toList()
+                        Observable.just(
+                                AggregatedDuration(
+                                        from,
+                                        timeSpansCache.size,
+                                        fromArray.average().toFloat(),
+                                        toArray.average().toFloat(),
+                                        fromArray.min() ?: 0f,
+                                        toArray.max() ?: 0f
+                                ))
+                    } else Observable.just<AggregatedDuration>(null)
+                } else Observable.just(null)
+            })
+            //OTApplication.app.dbHelper.getItems(attribute.tracker!!, TimeSpan.fromPoints(from, to), itemsCache, true)
+        }, { it ->
+            println(it)
+            it.filter { it is AggregatedDuration }.map { it as AggregatedDuration }.toList()
         })
     }
 
-    private fun timeToRatio(time: Long, pivot: Long): Float
-    {
-        return (time - pivot)/ DateUtils.HOUR_IN_MILLIS.toFloat()
+    private fun timeToRatio(time: Long, pivot: Long): Float {
+        return (time - pivot) / DateUtils.HOUR_IN_MILLIS.toFloat()
     }
 
     override fun getChartDrawer(): AChartDrawer {
@@ -107,8 +106,8 @@ class DurationTimelineModel(override val attribute: OTTimeSpanAttribute) : Attri
 
         var roundMode = false
 
-        constructor(){
-            paint= Paint()
+        constructor() {
+            paint = Paint()
             pointPaint = Paint()
         }
 
@@ -119,18 +118,16 @@ class DurationTimelineModel(override val attribute: OTTimeSpanAttribute) : Attri
         }
 
         override fun onDraw(canvas: Canvas) {
-            if(drawRange)
-            {
+            if (drawRange) {
                 val originalColor = paint.color
                 paint.color = Color.LTGRAY
                 paint.alpha = 100
 
-                if(roundMode) {
+                if (roundMode) {
                     rectBoundCache.set(backBound.left, backBound.top - backBound.width() / 2, backBound.right, backBound.bottom + backBound.width() / 2)
                     canvas.drawRoundRect(rectBoundCache, 1000f, 1000f, paint)
                     //backBound.set(backBound.left, backBound.top + backBound.width() / 2, backBound.right, backBound.bottom - backBound.width() / 2)
-                }
-                else{
+                } else {
                     canvas.drawRoundRect(backBound, 2f, 2f, paint)
                 }
 
@@ -139,7 +136,7 @@ class DurationTimelineModel(override val attribute: OTTimeSpanAttribute) : Attri
 
             paint.alpha = 200
 
-            if(roundMode) {
+            if (roundMode) {
                 rectBoundCache.set(frontalBound.left, frontalBound.top - frontalBound.width() / 2, frontalBound.right, frontalBound.bottom + frontalBound.width() / 2)
                 canvas.drawRoundRect(rectBoundCache, 1000f, 1000f, paint)
                 //frontalBound.set(frontalBound.left, frontalBound.top + frontalBound.width() / 2, frontalBound.right, frontalBound.bottom - frontalBound.width() / 2)
@@ -167,15 +164,14 @@ class DurationTimelineModel(override val attribute: OTTimeSpanAttribute) : Attri
 
                 pointPaint.color = originalColor
 */
-            }
-            else{
+            } else {
                 canvas.drawRoundRect(frontalBound, 2f, 2f, paint)
             }
         }
 
     }
 
-    inner class DurationChartDrawer(): ATimelineChartDrawer(){
+    inner class DurationChartDrawer : ATimelineChartDrawer() {
 
         override val aspectRatio: Float = 1.5f
 
@@ -193,7 +189,7 @@ class DurationTimelineModel(override val attribute: OTTimeSpanAttribute) : Attri
         val durationBarMaxWidth: Float by lazy { OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_duration_bar_max_width) }
         var durationBarWidth: Float = 0f
 
-        init{
+        init {
 
             paint.style = Paint.Style.FILL
             paint.color = ContextCompat.getColor(OTApplication.app, R.color.colorPointed_Light)
@@ -217,7 +213,7 @@ class DurationTimelineModel(override val attribute: OTTimeSpanAttribute) : Attri
 
             yScale.setDomain(-3f, 15f, false).inverse().setTicksForEvery(3f)
 
-            yScale.tickFormat = object: IAxisScale.ITickFormat<Float> {
+            yScale.tickFormat = object : IAxisScale.ITickFormat<Float> {
                 override fun format(value: Float, index: Int): String {
 
                     return when (value.toInt()) {
@@ -248,10 +244,10 @@ class DurationTimelineModel(override val attribute: OTTimeSpanAttribute) : Attri
             durationBars.setData(this@DurationTimelineModel.cachedData)
 
             durationBars.appendEnterSelection {
-                datum->
+                datum ->
                 val newBar = DurationBar(paint, pointPaint, pointUnderPaint)
-                    updateBarSize(newBar, datum.value)
-                    newBar
+                updateBarSize(newBar, datum.value)
+                newBar
             }
 
             durationBars.updateElement { datum, element ->
@@ -273,20 +269,18 @@ class DurationTimelineModel(override val attribute: OTTimeSpanAttribute) : Attri
             }
         }
 
-        private fun updateBarSize(durationBar: DurationBar, datum: AggregatedDuration)
-        {
+        private fun updateBarSize(durationBar: DurationBar, datum: AggregatedDuration) {
             println("updating bar size: ${datum}")
             val centerX = xScale[datum.time]
 
             durationBar.roundMode = true
 
-            durationBar.drawRange = datum.count>1
-            if(durationBar.drawRange)
-            {
-                durationBar.backBound.set(centerX - durationBarWidth/2, yScale[datum.earliest], centerX + durationBarWidth/2, yScale[datum.latest])
+            durationBar.drawRange = datum.count > 1
+            if (durationBar.drawRange) {
+                durationBar.backBound.set(centerX - durationBarWidth / 2, yScale[datum.earliest], centerX + durationBarWidth / 2, yScale[datum.latest])
             }
 
-            durationBar.frontalBound.set(centerX - durationBarWidth/2, yScale[datum.avgFrom], centerX + durationBarWidth/2, yScale[datum.avgTo])
+            durationBar.frontalBound.set(centerX - durationBarWidth / 2, yScale[datum.avgFrom], centerX + durationBarWidth / 2, yScale[datum.avgTo])
         }
 
 

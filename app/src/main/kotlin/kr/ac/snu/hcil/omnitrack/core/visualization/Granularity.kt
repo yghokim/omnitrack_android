@@ -127,7 +127,11 @@ enum class Granularity(val nameId: Int) {
             */
 
 
-            return if(directionToNext){ cal.timeInMillis - pivot } else { pivot - cal.timeInMillis }
+            return if (directionToNext) {
+                cal.timeInMillis - pivot
+            } else {
+                pivot - cal.timeInMillis
+            }
         }
 
         override fun getFormattedCurrentScope(time: Long, context: Context): String {

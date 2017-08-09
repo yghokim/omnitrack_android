@@ -93,9 +93,7 @@ object RescueTimeProductivityMeasureFactory : OTMeasureFactory("prd") {
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
-            else if (other is ProductivityMeasure) {
-                return true
-            } else return false
+            else return other is ProductivityMeasure
         }
 
         override fun hashCode(): Int {
