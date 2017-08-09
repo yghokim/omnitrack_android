@@ -13,7 +13,7 @@ import java.util.*
 /**
  * Created by Young-Ho on 9/10/2016.
  */
-class Legend: IDrawer {
+class Legend : IDrawer {
 
 
     val entries = ArrayList<Pair<String, Int>>()
@@ -36,33 +36,30 @@ class Legend: IDrawer {
 
 
     var attachedTo: RectF = RectF()
-        set(value)
-        {
-            if(field != value)
-            {
+        set(value) {
+            if (field != value) {
                 field = value
 
                 refresh()
             }
         }
 
-    init{
+    init {
         labelPaint.textSize = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_legend_label_size)
         labelPaint.isFakeBoldText = true
         labelPaint.color = ContextCompat.getColor(OTApplication.app, R.color.textColorMid)
     }
 
-    fun refresh(){
+    fun refresh() {
         var intrinsicWidth = 0f
 
-        for(entry in entries)
-        {
+        for (entry in entries) {
             intrinsicWidth += rectSize + rectMargin
             labelPaint.getTextBounds(entry.first, 0, entry.first.length, measureRect)
             intrinsicWidth += measureRect.width() + spacing
         }
 
-        left = attachedTo.left + (attachedTo.width()-intrinsicWidth)/2
+        left = attachedTo.left + (attachedTo.width() - intrinsicWidth) / 2
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -70,14 +67,13 @@ class Legend: IDrawer {
         val top = attachedTo.bottom + topMargin
 
         var currentLeft = left
-        for(entry in entries)
-        {
+        for (entry in entries) {
             rectPaint.color = entry.second
             rectBound.set(currentLeft, top + topMargin, currentLeft + rectSize, top + topMargin + rectSize)
             canvas.drawRoundRect(rectBound, 5f, 5f, rectPaint)
 
             currentLeft += rectSize + rectMargin
-            canvas.drawText(entry.first, currentLeft, top + topMargin + rectSize/2 + textSize/2, labelPaint)
+            canvas.drawText(entry.first, currentLeft, top + topMargin + rectSize / 2 + textSize / 2, labelPaint)
 
             labelPaint.getTextBounds(entry.first, 0, entry.first.length, measureRect)
             currentLeft += measureRect.width() + spacing

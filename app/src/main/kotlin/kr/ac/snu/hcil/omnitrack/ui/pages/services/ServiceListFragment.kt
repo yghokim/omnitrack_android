@@ -177,11 +177,11 @@ class ServiceListFragment : OTFragment() {
                                     service.grantPermissions(this@ServiceListFragment, adapterPosition)
                                 } else {
                                 */
-                                    creationSubscriptions.add(
-                                            service.startActivationActivityAsync(context).subscribe({
-                                                success ->
-                                            }, { })
-                                    )
+                                creationSubscriptions.add(
+                                        service.startActivationActivityAsync(context).subscribe({
+                                            success ->
+                                        }, { })
+                                )
                                 //}
                             }
                         }

@@ -19,6 +19,7 @@ object FitbitHeartRateMeasureFactory : OTMeasureFactory("heart") {
     override fun getService(): OTExternalService {
         return FitbitService
     }
+
     override fun isAttachableTo(attribute: OTAttribute<out Any>): Boolean {
         return attribute.typeId == OTAttribute.TYPE_NUMBER
     }

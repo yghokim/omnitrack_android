@@ -53,7 +53,7 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
             val intent = Intent(context, ItemEditingActivity::class.java)
             intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
             intent.putExtra(INTENT_EXTRA_REMINDER_TIME, reminderTime)
-            intent.setAction("item_edit:${trackerId}")
+            intent.action = "item_edit:${trackerId}"
             return intent
         }
 
@@ -88,7 +88,7 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
 
     private lateinit var builderRestoredSnackbar: Snackbar
 
-    private val loadingIndicatorBar : LoadingIndicatorBar by bindView(R.id.ui_loading_indicator)
+    private val loadingIndicatorBar: LoadingIndicatorBar by bindView(R.id.ui_loading_indicator)
 
     private var itemSaved: Boolean = false
 
@@ -204,7 +204,7 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
                                     }
                                 } else Observable.error(Exception("required permission not accepted."))
                             }.subscribe({
-                                println("Finished builder autocomplete.");
+                                println("Finished builder autocomplete.")
                                 if (builder != null) {
                                     snapshot(builder!!)
                                     snapshotInitialValue(builder!!)
@@ -358,7 +358,7 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
             itemSaved = true
             setResult(RESULT_OK, Intent().putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, item.objectId))
         }
-            finish()
+        finish()
         //}
     }
 

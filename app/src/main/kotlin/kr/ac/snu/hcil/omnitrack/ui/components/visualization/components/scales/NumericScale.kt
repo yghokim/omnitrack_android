@@ -6,7 +6,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.NiceNumbe
 /**
  * Created by Young-Ho on 9/8/2016.
  */
-class NumericScale: IAxisScale<Float> {
+class NumericScale : IAxisScale<Float> {
 
     private var rangeFrom: Float = 0f
     private var rangeTo: Float = 0f
@@ -23,18 +23,17 @@ class NumericScale: IAxisScale<Float> {
 
     private var _numTicks: Int = 0
 
-    private var inversed : Boolean = false
+    private var inversed: Boolean = false
 
 
     override var tickFormat: IAxisScale.ITickFormat<Float>? = null
 
     override fun setRealCoordRange(from: Float, to: Float): NumericScale {
 
-        if(inversed) {
+        if (inversed) {
             this.rangeFrom = to
             this.rangeTo = from
-        }
-        else{
+        } else {
             this.rangeFrom = from
             this.rangeTo = to
 
@@ -42,20 +41,19 @@ class NumericScale: IAxisScale<Float> {
         return this
     }
 
-    fun setTicksForEvery(domainSpacing: Float): NumericScale{
+    fun setTicksForEvery(domainSpacing: Float): NumericScale {
 
         tickSpacingInDomain = domainSpacing
-        _numTicks = ((domainExtendedMax - domainExtendedMin)/tickSpacingInDomain).toInt()+1
+        _numTicks = ((domainExtendedMax - domainExtendedMin) / tickSpacingInDomain).toInt() + 1
         return this
     }
 
-    fun inverse(): NumericScale{
+    fun inverse(): NumericScale {
         inversed = true
         return this
     }
 
-    fun setDomain(from: Float, to: Float, isZeroBased: Boolean): NumericScale
-    {
+    fun setDomain(from: Float, to: Float, isZeroBased: Boolean): NumericScale {
         domainDataMax = to
         domainDataMin = if (isZeroBased) {
             Math.min(0f, from)
@@ -87,7 +85,7 @@ class NumericScale: IAxisScale<Float> {
 
     override val numTicks: Int get() = _numTicks
 
-    fun getTickDomainAt(index: Int): Float{
+    fun getTickDomainAt(index: Int): Float {
         return domainExtendedMin + index * tickSpacingInDomain
     }
 
@@ -96,7 +94,9 @@ class NumericScale: IAxisScale<Float> {
     }
 
     override fun getTickLabelAt(index: Int): String {
-        return tickFormat?.format(getTickDomainAt(index), index) ?: if(tickSpacingInDomain >= 1){ getTickDomainAt(index).toInt().toString() }else getTickDomainAt(index).toString()
+        return tickFormat?.format(getTickDomainAt(index), index) ?: if (tickSpacingInDomain >= 1) {
+            getTickDomainAt(index).toInt().toString()
+        } else getTickDomainAt(index).toString()
     }
 
     override fun getTickInterval(): Float {

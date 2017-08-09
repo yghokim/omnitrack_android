@@ -30,18 +30,16 @@ class ChoiceFormView : LinearLayout {
             }
     }
 
-    var allowMultipleSelection: Boolean by Delegates.observable(false){
-        prop, old, new->
-        if(old!=new)
-        {
+    var allowMultipleSelection: Boolean by Delegates.observable(false) {
+        prop, old, new ->
+        if (old != new) {
             adapter.notifyDataSetChanged()
         }
     }
 
-    var entries: Array<Entry>? by Delegates.observable(null as Array<Entry>?){
-        prop, old, new->
-        if(old!=new)
-        {
+    var entries: Array<Entry>? by Delegates.observable(null as Array<Entry>?) {
+        prop, old, new ->
+        if (old != new) {
             selectedIndices.clear()
             adapter.notifyDataSetChanged()
         }
@@ -53,8 +51,8 @@ class ChoiceFormView : LinearLayout {
 
     val valueChanged = Event<Void?>()
 
-    val selectedEntries : Array<Entry> get(){
-        return selectedIndices.map{ entries?.get(it)!!}.toTypedArray()
+    val selectedEntries: Array<Entry> get() {
+        return selectedIndices.map { entries?.get(it)!! }.toTypedArray()
     }
 
     private val recyclerView: RecyclerView
@@ -66,7 +64,7 @@ class ChoiceFormView : LinearLayout {
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes)
 
-    init{
+    init {
         orientation = LinearLayout.VERTICAL
         recyclerView = RecyclerView(context)
         recyclerView.isNestedScrollingEnabled = false
@@ -87,27 +85,24 @@ class ChoiceFormView : LinearLayout {
     private inner class Adapter : RecyclerView.Adapter<Adapter.ViewHolder>() {
 
         override fun getItemViewType(position: Int): Int {
-            if(entries?.get(position)?.isCustom == true)
-            {
+            if (entries?.get(position)?.isCustom == true) {
                 return VIEWHOLDER_TYPE_CUSTOM
-            }
-            else{
+            } else {
                 return VIEWHOLDER_TYPE_NORMAL
             }
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Adapter.ViewHolder {
-            return when(viewType){
-                   VIEWHOLDER_TYPE_NORMAL->
-                   {
-                       val view = LayoutInflater.from(parent.context).inflate(R.layout.choice_entry_list_element, parent, false)
-                       NormalViewHolder(view)
-                   }
-                VIEWHOLDER_TYPE_CUSTOM-> {
+            return when (viewType) {
+                VIEWHOLDER_TYPE_NORMAL -> {
+                    val view = LayoutInflater.from(parent.context).inflate(R.layout.choice_entry_list_element, parent, false)
+                    NormalViewHolder(view)
+                }
+                VIEWHOLDER_TYPE_CUSTOM -> {
                     val view = LayoutInflater.from(parent.context).inflate(R.layout.choice_entry_list_element_custom, parent, false)
                     CustomViewHolder(view)
                 }
-                else->{
+                else -> {
                     val view = LayoutInflater.from(parent.context).inflate(R.layout.choice_entry_list_element, parent, false)
                     NormalViewHolder(view)
                 }
@@ -115,7 +110,7 @@ class ChoiceFormView : LinearLayout {
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            entries?.let{
+            entries?.let {
                 holder.bind(it[position])
             }
         }
@@ -181,7 +176,7 @@ class ChoiceFormView : LinearLayout {
             }
         }
 
-        inner class NormalViewHolder(view: View): ViewHolder(view){
+        inner class NormalViewHolder(view: View) : ViewHolder(view) {
             private val textView: TextView = view.findViewById(R.id.ui_text)
 
             override fun bind(entry: Entry) {
@@ -193,7 +188,7 @@ class ChoiceFormView : LinearLayout {
         inner class CustomViewHolder(view: View) : ViewHolder(view), OnClickListener {
             private val customInputView: TextView = view.findViewById(R.id.ui_input)
 
-            init{
+            init {
                 customInputView.setOnClickListener(this)
             }
 

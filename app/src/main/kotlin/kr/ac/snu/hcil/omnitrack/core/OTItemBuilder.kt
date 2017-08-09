@@ -342,11 +342,11 @@ class OTItemBuilder : IStringSerializable {
         return Observable.merge(tracker.attributes.unObservedList.mapIndexed { i, attr ->
             if (attr.valueConnection != null) {
                 attr.valueConnection!!.getRequestedValue(this).flatMap { data ->
-                        if (data.datum == null) {
-                            attr.getAutoCompleteValue()
-                        } else {
-                            Observable.just(data.datum)
-                        }
+                    if (data.datum == null) {
+                        attr.getAutoCompleteValue()
+                    } else {
+                        Observable.just(data.datum)
+                    }
                 }.onErrorResumeNext { attr.getAutoCompleteValue() }.map { value -> Pair(i, value) }.subscribeOn(Schedulers.io()).doOnSubscribe {
 
                     println("RX doOnSubscribe1: ${Thread.currentThread().name}")

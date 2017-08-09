@@ -67,10 +67,10 @@ abstract class OTTrackerAttachedActivity(layoutId: Int) : MultiButtonActionBarAc
             creationSubscriptions.add(
                     getUserOrGotoSignIn().toObservable().flatMap { user -> user.getTrackerObservable(trackerId) }.subscribe({
                         tracker ->
-                    println("restored tracker.")
-                    this._tracker = tracker
-                    onRestoredInstanceStateWithTracker(savedInstanceState, tracker)
-            }, { println("user error. to go sign in.") })
+                        println("restored tracker.")
+                        this._tracker = tracker
+                        onRestoredInstanceStateWithTracker(savedInstanceState, tracker)
+                    }, { println("user error. to go sign in.") })
             )
         }
     }

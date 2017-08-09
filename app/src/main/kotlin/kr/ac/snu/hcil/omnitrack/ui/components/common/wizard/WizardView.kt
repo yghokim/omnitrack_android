@@ -95,7 +95,7 @@ abstract class WizardView : FrameLayout, AWizardViewPagerAdapter.IWizardPageList
 
             viewPager.setCurrentItem(nextPosition, true)
         } else {
-                listener?.onComplete(this)
+            listener?.onComplete(this)
         }
     }
 
@@ -119,7 +119,6 @@ abstract class WizardView : FrameLayout, AWizardViewPagerAdapter.IWizardPageList
     abstract fun onLeavePage(page: AWizardPage, position: Int)
 
     override fun onGoBackRequested(position: Int) {
-        ;
     }
 
 }

@@ -281,7 +281,7 @@
     <string name="msg_export_to_file_tracker">Export items to file..</string>
     <string name="msg_desc_export_to_file_tracker">Store the items of the tracker to table</string>
     <string name="msg_export_success_notification_message">Exported %1$s logs successfully.</string>
-    <string name="msg_export_title_progress">Exporting tracker data...</string>
+    <string name="msg_export_title_progress">Exporting tracker data…</string>
     <string name="msg_export_warning_mobile_network">If you download tracking data vis 3G/LTE connection, it may impact your mobile data usage. Do you want to continue export?</string>
     <string name="msg_other">Other:</string>
     <string name="msg_choose_one_or_more">Choose one or more items to proceed.</string>
@@ -296,7 +296,7 @@
     <string name="msg_export_type_csv">CSV text (.csv)</string>
     <string name="msg_select_country">Select country</string>
     <string name="msg_uploading_file_to_server">Uploading file to Server</string>
-    <string name="msg_uploading">Uploading...</string>
+    <string name="msg_uploading">Uploading…</string>
 
     <string name="msg_mandatory">Mandatory</string>
     <string name="msg_optional">Optional</string>
@@ -380,7 +380,7 @@
     <string name="msg_send_report_to_omnitrack_team">Send inquiry to OmniTrack Team?</string>
     <string name="msg_send_report_error_message">Couldn\'t send inquiry because of an error. Please try it later.</string>
     <string name="msg_send_report_success_message">Sent inquiry successfully.</string>
-    <string name="msg_background_logging_started_notification_message">Processing new item...</string>
+    <string name="msg_background_logging_started_notification_message">Processing new item…</string>
     <string name="msg_sign_in_google_succeeded">Sign-in with Google succeeded.</string>
     <string name="msg_sign_in_google_canceled">Sign-in with Google canceled.</string>
     <string name="msg_under_development">This feature is under development. It will be unlocked soon!</string>

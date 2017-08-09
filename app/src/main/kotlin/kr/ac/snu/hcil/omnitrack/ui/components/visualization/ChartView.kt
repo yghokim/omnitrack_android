@@ -37,10 +37,8 @@ class ChartView : LinearLayout, IEventListener<ChartModel<*>?> {
     var model: ChartModel<*>? by Delegates.observable(null as ChartModel<*>?)
     {
         prop, old, new ->
-        if(old !== new)
-        {
-            if(old!=null)
-            {
+        if (old !== new) {
+            if (old != null) {
                 internalSubscriptions.clear()
                 old.recycle()
             }

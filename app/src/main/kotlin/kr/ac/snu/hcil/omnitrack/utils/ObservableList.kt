@@ -8,7 +8,7 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 2016-07-11.
  */
-class ObservableList<T>(){
+class ObservableList<T> {
 
     private val list = ArrayList<T>()
 
@@ -25,13 +25,12 @@ class ObservableList<T>(){
         get() = list.size
 
     fun add(element: T): Boolean {
-        if(list.add(element)) {
+        if (list.add(element)) {
             elementAdded.invoke(this, ReadOnlyPair(element, list.size - 1))
             elementAddedSubject.onNext(Pair(this, ReadOnlyPair(element, list.size - 1)))
             listModified.invoke(this, null)
             return true
-        }
-        else{
+        } else {
             return false
         }
     }
@@ -79,15 +78,13 @@ class ObservableList<T>(){
 
     fun remove(element: T): Boolean {
         val index = list.indexOf(element)
-        if(index >= 0)
-        {
+        if (index >= 0) {
             list.removeAt(index)
             elementRemoved.invoke(this, ReadOnlyPair(element, index))
             elementRemovedSubject.onNext(Pair(this, ReadOnlyPair(element, index)))
             listModified.invoke(this, null)
             return true
-        }
-        else{
+        } else {
             return false
         }
     }
@@ -104,12 +101,12 @@ class ObservableList<T>(){
         return list.toArray()
     }
 
-    fun filter( func: (T)-> Boolean): List<T>{
+    fun filter(func: (T) -> Boolean): List<T> {
         return list.filter(func)
     }
 
-    val unObservedList : ArrayList<T>
-        get(){
+    val unObservedList: ArrayList<T>
+        get() {
             return list
         }
 }

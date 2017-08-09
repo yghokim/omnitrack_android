@@ -203,7 +203,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                                 }
                             }
                         }
-                }
+                    }
                 }
         )
     }
@@ -433,7 +433,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                         return true
                     }
                     R.id.action_remove -> {
-                        DialogHelper.makeNegativePhrasedYesNoDialogBuilder(this@ItemBrowserActivity, "OmniTrack", resources.getString(R.string.msg_item_remove_confirm), R.string.msg_remove, onYes= {
+                        DialogHelper.makeNegativePhrasedYesNoDialogBuilder(this@ItemBrowserActivity, "OmniTrack", resources.getString(R.string.msg_item_remove_confirm), R.string.msg_remove, onYes = {
                             deleteItemPermanently(adapterPosition)
                         }).show()
                         return true
@@ -455,7 +455,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                         } else item.timestamp
 
 
-                monthView.text = String.format(Locale.US, "%tb", cal);
+                monthView.text = String.format(Locale.US, "%tb", cal)
                 dayView.text = cal.getDayOfMonth().toString()
 
                 sourceView.text = item.source.sourceText

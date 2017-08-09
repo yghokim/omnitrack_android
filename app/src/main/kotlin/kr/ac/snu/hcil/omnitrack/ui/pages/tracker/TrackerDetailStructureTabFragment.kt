@@ -286,7 +286,7 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
     }
 
 
-    inner class AttributeListAdapter() : AdapterLinearLayout.ViewHolderAdapter<AttributeListAdapter.ViewHolder>() {
+    inner class AttributeListAdapter : AdapterLinearLayout.ViewHolderAdapter<AttributeListAdapter.ViewHolder>() {
 
 
         override fun getViewTypeCount(): Int {

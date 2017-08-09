@@ -16,15 +16,15 @@ import kr.ac.snu.hcil.omnitrack.utils.events.Event
  * Created by Young-Ho Kim on 2016-07-19
  */
 class ColorPaletteView(context: Context, attrs: AttributeSet?, defStyle: Int) : RecyclerView(context, attrs, defStyle) {
-    private var selectedIndex : Int = 0
+    private var selectedIndex: Int = 0
 
-    private var buttonSize : Int = 0
+    private var buttonSize: Int = 0
 
     val colorChanged = Event<Int>()
 
     constructor(context: Context, attrs: AttributeSet? = null) : this(context, attrs, 0)
 
-    init{
+    init {
 
         //buttonSize = //context.resources.getDimensionPixelSize(R.dimen.color_selection_button_size)
 
@@ -57,7 +57,7 @@ class ColorPaletteView(context: Context, attrs: AttributeSet?, defStyle: Int) : 
         return OTApplication.app.colorPalette.indexOf(color)
     }
 
-    inner class Adapter() : RecyclerView.Adapter<Adapter.ViewHolder>(){
+    inner class Adapter : RecyclerView.Adapter<Adapter.ViewHolder>() {
 
         init {
             setHasStableIds(true)
@@ -83,13 +83,12 @@ class ColorPaletteView(context: Context, attrs: AttributeSet?, defStyle: Int) : 
         }
 
 
-        inner class ViewHolder(val view : View) : RecyclerView.ViewHolder(view){
+        inner class ViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
 
 
-            init{
+            init {
                 view.setOnClickListener {
-                    if(adapterPosition != selectedIndex)
-                    {
+                    if (adapterPosition != selectedIndex) {
                         selectedIndex = adapterPosition
                         colorChanged.invoke(parent, selectedIndex)
                     }
@@ -99,7 +98,7 @@ class ColorPaletteView(context: Context, attrs: AttributeSet?, defStyle: Int) : 
                 }
             }
 
-            fun bind(position: Int){
+            fun bind(position: Int) {
                 (view as ColorSelectionButton).color = OTApplication.app.colorPalette[position]
                 view.isSelected = selectedIndex == position
             }

@@ -167,7 +167,7 @@ object DatabaseManager {
     @Keep
     class DeviceInfo {
         var os: String? = "Android api-${android.os.Build.VERSION.SDK_INT}"
-        var instanceId: String? = FirebaseInstanceId.getInstance().getToken()
+        var instanceId: String? = FirebaseInstanceId.getInstance().token
         var firstLoginAt: Any? = ServerValue.TIMESTAMP
         var appVersion: String? = BuildConfig.VERSION_NAME
     }
@@ -175,8 +175,7 @@ object DatabaseManager {
     @Keep
     class IndexedKey(
             var position: Int = 0,
-            var key: String? = null) : Serializable {
-    }
+            var key: String? = null) : Serializable
 
     fun isConnected(): Single<Boolean> {
         return Single.create {

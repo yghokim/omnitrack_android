@@ -5,11 +5,7 @@ package kr.ac.snu.hcil.omnitrack.utils
  */
 class ListDelta<T> {
 
-    constructor() {
+    constructor()
 
-    }
-
-    constructor(original: List<T>, compareTo: List<T>) {
-
-    }
+    constructor(original: List<T>, compareTo: List<T>)
 }

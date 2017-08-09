@@ -193,9 +193,9 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
                     .build())
 
             if (animate) {
-                googleMap?.animateCamera(update);
+                googleMap?.animateCamera(update)
             } else {
-                googleMap?.moveCamera(update);
+                googleMap?.moveCamera(update)
             }
 
             if (valueMarker == null) {

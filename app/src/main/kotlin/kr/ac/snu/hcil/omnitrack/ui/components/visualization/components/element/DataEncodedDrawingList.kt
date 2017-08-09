@@ -6,7 +6,7 @@ import java.util.*
 /**
  * Created by Young-Ho Kim  on 16. 9. 8
  */
-class DataEncodedDrawingList<T, SelfDataType>() : ADataEncodedDrawer<SelfDataType>() {
+class DataEncodedDrawingList<T, SelfDataType> : ADataEncodedDrawer<SelfDataType>() {
 
     private var elements = ArrayList<ADataEncodedDrawer<T>>()
     private var _updateElements = ArrayList<Pair<IndexedValue<T>, ADataEncodedDrawer<T>>>()
@@ -43,7 +43,7 @@ class DataEncodedDrawingList<T, SelfDataType>() : ADataEncodedDrawer<SelfDataTyp
             for (datum in data.withIndex()) {
                 if (
                 isPairedData(datum.value, datum.index, existingElementEntry.value.datum!!, existingElementEntry.index)
-                ) {
+                        ) {
                     //update selection
                     found = true
                     _updateElements.add(Pair(datum, existingElementEntry.value))
@@ -62,7 +62,7 @@ class DataEncodedDrawingList<T, SelfDataType>() : ADataEncodedDrawer<SelfDataTyp
             for (existingElementEntry in elements.withIndex()) {
                 if (
                 isPairedData(datum.value, datum.index, existingElementEntry.value.datum!!, existingElementEntry.index)
-                ) {
+                        ) {
                     //update selection
                     found = true
                     break

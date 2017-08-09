@@ -61,7 +61,7 @@ object VectorIconHelper {
             } else {
                 var drawable = AppCompatResources.getDrawable(context, vectorDrawableRes)!!
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-                    drawable = (DrawableCompat.wrap(drawable)).mutate();
+                    drawable = (DrawableCompat.wrap(drawable)).mutate()
                 }
                 val width: Int = if (sizeDp != null) {
                     dipRound(sizeDp)

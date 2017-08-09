@@ -67,7 +67,7 @@ class AudioRecordingModule(var listener: RecordingListener?,
             e.printStackTrace()
             println("audioRecorder cannot be initialized.")
             listener?.onRecordingFinished(this, null)
-            return;
+            return
         }
 
         _isRecording = true

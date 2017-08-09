@@ -175,9 +175,7 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
 
     private val secondTicker = Ticker(1000)
 
-    class AudioServiceBinder(val service: OTAudioPlayService) : Binder() {
-
-    }
+    class AudioServiceBinder(val service: OTAudioPlayService) : Binder()
 
     override fun onBind(p0: Intent?): IBinder {
         return binder

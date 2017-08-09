@@ -32,7 +32,7 @@ abstract class AListBottomSpaceItemDecoration(var height: Int, var reversed: Boo
         }
     }
 
-    protected abstract fun onDrawBottomSpace(c: Canvas, left: Float, right: Float, top: Float, bottom: Float);
+    protected abstract fun onDrawBottomSpace(c: Canvas, left: Float, right: Float, top: Float, bottom: Float)
 
     override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State?) {
         super.getItemOffsets(outRect, view, parent, state)

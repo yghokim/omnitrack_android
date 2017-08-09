@@ -30,7 +30,7 @@ class Ticker(var unit: Int = 1000) {
     private fun onTick() {
         tick.invoke(this@Ticker, System.currentTimeMillis())
         val uptime = SystemClock.uptimeMillis()
-        val next: Long = uptime + (unit - uptime % unit);
+        val next: Long = uptime + (unit - uptime % unit)
         handler.postAtTime(ticker, next)
     }
 

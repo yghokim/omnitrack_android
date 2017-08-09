@@ -199,28 +199,28 @@ class TrackerListFragment : OTFragment() {
 
         val activity = activity as? OTActivity
         if (activity != null) {
-                createViewSubscriptions.add(
-                        activity.signedInUserObservable.subscribe {
-                            user ->
-                            this.user = user
-                            userLoaded = true
+            createViewSubscriptions.add(
+                    activity.signedInUserObservable.subscribe {
+                        user ->
+                        this.user = user
+                        userLoaded = true
 
-                            viewModel.user = user
-                            createViewSubscriptions.add(
-                                    viewModel.trackerViewModels.subscribe {
-                                        trackerViewModelList ->
+                        viewModel.user = user
+                        createViewSubscriptions.add(
+                                viewModel.trackerViewModels.subscribe {
+                                    trackerViewModelList ->
 
-                                        val diffResult = DiffUtil.calculateDiff(
-                                                TrackerListViewModel.TrackerViewModelListDiffUtilCallback(currentTrackerViewModelList, trackerViewModelList)
-                                        )
+                                    val diffResult = DiffUtil.calculateDiff(
+                                            TrackerListViewModel.TrackerViewModelListDiffUtilCallback(currentTrackerViewModelList, trackerViewModelList)
+                                    )
 
-                                        currentTrackerViewModelList.clear()
-                                        currentTrackerViewModelList.addAll(trackerViewModelList)
-                                        diffResult.dispatchUpdatesTo(trackerListAdapter)
-                                    }
-                            )
-                        }
-                )
+                                    currentTrackerViewModelList.clear()
+                                    currentTrackerViewModelList.addAll(trackerViewModelList)
+                                    diffResult.dispatchUpdatesTo(trackerListAdapter)
+                                }
+                        )
+                    }
+            )
         }
 
         return rootView
@@ -316,7 +316,7 @@ class TrackerListFragment : OTFragment() {
     }
 
 
-    inner class TrackerListAdapter() : RecyclerView.Adapter<TrackerListAdapter.ViewHolder>() {
+    inner class TrackerListAdapter : RecyclerView.Adapter<TrackerListAdapter.ViewHolder>() {
 
         val viewHolders = ArrayList<ViewHolder>()
 
@@ -347,7 +347,7 @@ class TrackerListFragment : OTFragment() {
         }
 
         override fun getItemId(position: Int): Long {
-            return position.toLong();
+            return position.toLong()
         }
 
 
@@ -480,9 +480,9 @@ class TrackerListFragment : OTFragment() {
                     startActivityOnDelay(ItemBrowserActivity.makeIntent(user.trackers[adapterPosition], this@TrackerListFragment.context))
                 } else if (view === removeButton) {
                     val tracker = user.trackers[adapterPosition]
-                    DialogHelper.makeNegativePhrasedYesNoDialogBuilder(context, tracker.name, getString(R.string.msg_confirm_remove_tracker), R.string.msg_remove, onYes= { ->
-                        user.trackers.remove(tracker);
-                        listView.invalidateItemDecorations();
+                    DialogHelper.makeNegativePhrasedYesNoDialogBuilder(context, tracker.name, getString(R.string.msg_confirm_remove_tracker), R.string.msg_remove, onYes = { ->
+                        user.trackers.remove(tracker)
+                        listView.invalidateItemDecorations()
                         EventLoggingManager.logTrackerChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_TRACKER_REMOVE, tracker)
                     }).show()
                 } else if (view === chartViewButton) {
@@ -509,7 +509,7 @@ class TrackerListFragment : OTFragment() {
                     if (validationErrorMessages.size > 0) {
                         TooltipHelper.makeTooltipBuilder(adapterPosition, errorIndicator)
                                 .text(
-                                validationErrorMessages.joinToString("\n")
+                                        validationErrorMessages.joinToString("\n")
                                 ).show()
                     }
                 }
@@ -580,7 +580,7 @@ class TrackerListFragment : OTFragment() {
                             if (count > 0) {
                                 alarmIcon.visibility = View.VISIBLE
                                 alarmText.visibility = View.VISIBLE
-                                alarmText.setText(count.toString())
+                                alarmText.text = count.toString()
                             } else {
                                 alarmIcon.visibility = View.INVISIBLE
                                 alarmText.visibility = View.INVISIBLE

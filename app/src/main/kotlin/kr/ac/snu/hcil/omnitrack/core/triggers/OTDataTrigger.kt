@@ -34,7 +34,7 @@ class OTDataTrigger(objectId: String?, user: OTUser, name: String, trackerObject
             }
         }
         set(value) {
-            if(measure != value) {
+            if (measure != value) {
                 if (value == null) {
                     measureFactoryCode = ""
                     serializedMeasure = ""
@@ -56,7 +56,7 @@ class OTDataTrigger(objectId: String?, user: OTUser, name: String, trackerObject
             }
         }
         set(value) {
-            if(conditioner != value) {
+            if (conditioner != value) {
                 if (value == null) {
                     conditionerType = -1
                     serializedConditioner = ""
@@ -106,11 +106,9 @@ class OTDataTrigger(objectId: String?, user: OTUser, name: String, trackerObject
     }
 
     override fun handleOn() {
-        if(conditioner== null || measure == null)
-        {
+        if (conditioner == null || measure == null) {
             isOn = false
-        }
-        else {
+        } else {
             OTDataTriggerManager.onEventTriggerOn(this)
         }
     }
@@ -119,12 +117,12 @@ class OTDataTrigger(objectId: String?, user: OTUser, name: String, trackerObject
         OTDataTriggerManager.onEventTriggerOff(this)
     }
 
-    private fun onMeasureChanged(){
+    private fun onMeasureChanged() {
         OTDataTriggerManager.onEventTriggerOff(this)
         OTDataTriggerManager.onEventTriggerOn(this)
     }
 
-    private fun onConditionerChanged(){
+    private fun onConditionerChanged() {
         OTDataTriggerManager.onEventTriggerOff(this)
         OTDataTriggerManager.onEventTriggerOn(this)
     }

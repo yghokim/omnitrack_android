@@ -13,7 +13,7 @@ import kr.ac.snu.hcil.omnitrack.utils.applyTint
 /**
  * Created by younghokim on 2017. 1. 13..
  */
-class CompoundDrawableTintCore() {
+class CompoundDrawableTintCore {
 
 
     private val LEFT = 0

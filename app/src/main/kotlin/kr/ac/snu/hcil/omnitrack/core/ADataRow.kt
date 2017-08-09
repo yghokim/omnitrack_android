@@ -8,7 +8,7 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 16. 7. 22
  */
-abstract class ADataRow() {
+abstract class ADataRow {
 
 
     protected val valueTable = Hashtable<String, Any>()

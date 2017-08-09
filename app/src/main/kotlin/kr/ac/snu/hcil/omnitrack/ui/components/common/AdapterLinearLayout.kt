@@ -301,7 +301,7 @@ class AdapterLinearLayout : DragLinearLayout {
         adapter?.let {
             adapter ->
             for (i in 0..adapter.count - 1) {
-                val view = makeView(i)!!
+                val view = makeView(i)
 
                 if (this.indexOfChild(view) == -1) {
                     addViewInLayout(view, i, view.layoutParams)
@@ -358,7 +358,7 @@ class AdapterLinearLayout : DragLinearLayout {
 
 
         companion object {
-            @JvmField final val CREATOR: Parcelable.Creator<SavedState> = object : Parcelable.Creator<SavedState> {
+            @JvmField val CREATOR: Parcelable.Creator<SavedState> = object : Parcelable.Creator<SavedState> {
                 override fun createFromParcel(source: Parcel): SavedState {
                     return SavedState(source)
                 }
@@ -370,9 +370,7 @@ class AdapterLinearLayout : DragLinearLayout {
         }
 
         constructor(source: Parcel?) : super(source)
-        constructor(source: Parcel?, loader: ClassLoader?) : super(source, loader) {
-
-        }
+        constructor(source: Parcel?, loader: ClassLoader?) : super(source, loader)
 
 
         constructor(superState: Parcelable?) : super(superState)

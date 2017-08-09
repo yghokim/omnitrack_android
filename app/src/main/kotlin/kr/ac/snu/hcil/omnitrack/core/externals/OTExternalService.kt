@@ -34,10 +34,10 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
             arrayOf(
                     //AndroidDeviceService,
                     GoogleFitService
-                    ,FitbitService
+                    , FitbitService
                     , JawboneUpService
-                    ,MisfitService
-                    ,RescueTimeService
+                    , MisfitService
+                    , RescueTimeService
                     //,MicrosoftBandService
                     //,MiBandService
             )

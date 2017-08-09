@@ -13,22 +13,22 @@ import kr.ac.snu.hcil.omnitrack.utils.EnterHideKeyboardEditorActionListener
  */
 class ShortTextPropertyView(context: Context, attrs: AttributeSet?) : APropertyView<String>(R.layout.component_property_shorttext, context, attrs) {
 
-    companion object{
-         val NOT_EMPTY_VALIDATOR : ((String)->Boolean) = { it != "" }
+    companion object {
+        val NOT_EMPTY_VALIDATOR: ((String) -> Boolean) = { it != "" }
 
     }
 
     override var value: String
         get() = valueView.text.toString()
         set(value) {
-            if(valueView.text != value) {
+            if (valueView.text != value) {
                 valueView.text = value
             }
         }
 
     private var valueView: TextView = findViewById(R.id.value)
 
-    init{
+    init {
         valueView.addTextChangedListener(object : TextWatcher {
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -50,14 +50,11 @@ class ShortTextPropertyView(context: Context, attrs: AttributeSet?) : APropertyV
         valueView.requestFocus()
     }
 
-    override fun onValidated(result: Boolean)
-    {
+    override fun onValidated(result: Boolean) {
         super.onValidated(result)
-        if(result == false)
-        {
+        if (result == false) {
             valueView.error = validationErrorMessageList.joinToString("\n")
-        }
-        else{
+        } else {
             valueView.error = null
         }
     }

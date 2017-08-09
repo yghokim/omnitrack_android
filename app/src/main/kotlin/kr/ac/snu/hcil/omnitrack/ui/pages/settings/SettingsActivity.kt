@@ -108,8 +108,8 @@ class SettingsActivity : MultiButtonActionBarActivity(R.layout.activity_multibut
 
         override fun onDestroy() {
             super.onDestroy()
-            findPreference(PREF_REMINDER_NOTI_RINGTONE).setOnPreferenceChangeListener(null)
-            findPreference(LocaleHelper.PREF_KEY_SELECTED_LANGUAGE).setOnPreferenceChangeListener(null)
+            findPreference(PREF_REMINDER_NOTI_RINGTONE).onPreferenceChangeListener = null
+            findPreference(LocaleHelper.PREF_KEY_SELECTED_LANGUAGE).onPreferenceChangeListener = null
         }
 
         override fun onResume() {

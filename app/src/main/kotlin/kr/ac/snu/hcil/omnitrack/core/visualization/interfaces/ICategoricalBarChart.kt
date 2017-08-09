@@ -6,7 +6,7 @@ import java.util.*
  * Created by younghokim on 16. 9. 7..
  */
 interface ICategoricalBarChart : IChartInterface<ICategoricalBarChart.Point> {
-    data class Point(val label: String, val value: Double, val category: Int){
+    data class Point(val label: String, val value: Double, val category: Int) {
         override fun toString(): String {
             return "$label : $value, in category: ${category}"
         }
@@ -22,7 +22,6 @@ interface ICategoricalBarChart : IChartInterface<ICategoricalBarChart.Point> {
             val VALUE_COMPARATOR = ValueComparator()
         }
     }
-
 
 
 }

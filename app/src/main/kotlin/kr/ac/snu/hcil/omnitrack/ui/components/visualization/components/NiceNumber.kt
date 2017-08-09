@@ -6,27 +6,27 @@ package kr.ac.snu.hcil.omnitrack.ui.components.visualization.components
 class NiceNumber
 /**
  * Instantiates a new instance of the NiceNumber class.
-    http://stackoverflow.com/questions/8506881/nice-label-algorithm-for-charts-with-minimum-ticks
-    Author: Incongruous
+http://stackoverflow.com/questions/8506881/nice-label-algorithm-for-charts-with-minimum-ticks
+Author: Incongruous
  * @param min the minimum data point on the axis
  * *
  * @param max the maximum data point on the axis
  */
-() {
+{
 
-    var minPoint: Double =0.0
+    var minPoint: Double = 0.0
     var maxPoint: Double = 0.0
 
     private var maxTicks = 5.0
     var niceTickSpacing: Double = 0.toDouble()
-    private set
+        private set
 
     private var range: Double = 0.toDouble()
     var niceMin: Double = 0.toDouble()
-    private set
+        private set
 
     var niceMax: Double = 0.toDouble()
-    private set
+        private set
 
     init {
     }

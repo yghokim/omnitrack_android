@@ -8,7 +8,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 /**
  * Created by Young-Ho Kim on 2016-08-30.
  */
-abstract class AWizardViewPagerAdapter() : PagerAdapter() {
+abstract class AWizardViewPagerAdapter : PagerAdapter() {
     interface IWizardPageListener {
         fun onGoNextRequested(currentPosition: Int, nextPosition: Int)
         fun onGoBackRequested(position: Int)

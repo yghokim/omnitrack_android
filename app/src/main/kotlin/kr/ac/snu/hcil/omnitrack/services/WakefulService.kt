@@ -30,7 +30,7 @@ open class WakefulService(val tag: String) : Service() {
     override fun onDestroy() {
         super.onDestroy()
 
-        if (wakeLock?.isHeld() ?: false) {
+        if (wakeLock?.isHeld ?: false) {
             wakeLock?.release()
         }
     }

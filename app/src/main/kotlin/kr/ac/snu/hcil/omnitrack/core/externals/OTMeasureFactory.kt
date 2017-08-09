@@ -96,7 +96,7 @@ abstract class OTMeasureFactory(val factoryTypeName: String) : INameDescriptionR
         "${getService().identifier}_${factoryTypeName}"
     }
 
-    abstract fun getService(): OTExternalService;
+    abstract fun getService(): OTExternalService
 
     open val supportedConditionerTypes: IntArray = intArrayOf()
 
@@ -159,7 +159,7 @@ abstract class OTMeasureFactory(val factoryTypeName: String) : INameDescriptionR
         abstract fun getValueRequest(builder: OTItemBuilder, query: OTTimeRangeQuery?): Observable<Result<out Any>>
     }
 
-    abstract class OTRangeQueriedMeasure: OTMeasure{
+    abstract class OTRangeQueriedMeasure : OTMeasure {
 
         constructor() : super()
         constructor(serialized: String) : super(serialized)

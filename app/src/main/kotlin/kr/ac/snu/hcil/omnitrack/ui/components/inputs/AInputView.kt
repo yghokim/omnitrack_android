@@ -23,9 +23,9 @@ abstract class AInputView<T>(layoutId: Int, context: Context, attrs: AttributeSe
 
     abstract var value: T
 
-    constructor(layoutId: Int, context: Context): this(layoutId, context, null)
+    constructor(layoutId: Int, context: Context) : this(layoutId, context, null)
 
-    init{
+    init {
         if (layoutId != 0) {
             val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
             try {
@@ -37,7 +37,7 @@ abstract class AInputView<T>(layoutId: Int, context: Context, attrs: AttributeSe
         }
     }
 
-    fun addNewValidator(failedMessage: CharSequence?, func: (T)->Boolean){
+    fun addNewValidator(failedMessage: CharSequence?, func: (T) -> Boolean) {
         validators.add(ReadOnlyPair<CharSequence?, (T) -> Boolean>(failedMessage, func))
     }
 
@@ -45,14 +45,12 @@ abstract class AInputView<T>(layoutId: Int, context: Context, attrs: AttributeSe
         return validate(value)
     }
 
-    fun validate(value: T): Boolean{
+    fun validate(value: T): Boolean {
         validationErrorMessageList.clear()
 
         var passed = true
-        for(entry in validators)
-        {
-            if(entry.second(value) == false)
-            {
+        for (entry in validators) {
+            if (entry.second(value) == false) {
                 passed = false
                 val msg = entry.first
                 if (msg != null) {
@@ -61,17 +59,14 @@ abstract class AInputView<T>(layoutId: Int, context: Context, attrs: AttributeSe
             }
         }
 
-        if(passed==false)
-        {
+        if (passed == false) {
             validationFailed.invoke(this, validationErrorMessageList.joinToString("\n"))
         }
         onValidated(passed)
         return passed
     }
 
-    open fun onValidated(result: Boolean)
-    {
-        ;
+    open fun onValidated(result: Boolean) {
     }
 
     protected open fun onValueChanged(newValue: T) {

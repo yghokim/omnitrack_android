@@ -15,13 +15,13 @@ import kotlin.properties.Delegates
 /**
  * Created by Young-Ho on 9/8/2016.
  */
-class Axis(var pivot: Pivot): IDrawer {
+class Axis(var pivot: Pivot) : IDrawer {
 
-    enum class Pivot{
+    enum class Pivot {
         LEFT, BOTTOM
     }
 
-    enum class TickLabelStyle{
+    enum class TickLabelStyle {
 
         Small {
             override fun applyStyle(axis: Axis) {
@@ -58,14 +58,12 @@ class Axis(var pivot: Pivot): IDrawer {
     var gridOnBorder: Boolean = false
 
     var attachedTo: RectF = RectF()
-        set(value)
-        {
-            if(field != value)
-            {
+        set(value) {
+            if (field != value) {
                 field = value
-                when(pivot){
-                    Pivot.BOTTOM-> scale?.setRealCoordRange(value.left, value.right)
-                    Pivot.LEFT-> scale?.setRealCoordRange(value.bottom, value.top)
+                when (pivot) {
+                    Pivot.BOTTOM -> scale?.setRealCoordRange(value.left, value.right)
+                    Pivot.LEFT -> scale?.setRealCoordRange(value.bottom, value.top)
                 }
             }
         }
@@ -74,12 +72,12 @@ class Axis(var pivot: Pivot): IDrawer {
 
     private val tickLabelSizeMeasureRect = Rect()
 
-    var style: TickLabelStyle by Delegates.observable(TickLabelStyle.Normal){
-        prop, old, new->
-            new.applyStyle(this)
+    var style: TickLabelStyle by Delegates.observable(TickLabelStyle.Normal) {
+        prop, old, new ->
+        new.applyStyle(this)
     }
 
-    init{
+    init {
         linePaint.color = ContextCompat.getColor(OTApplication.app, R.color.vis_color_axis)
         linePaint.style = Paint.Style.STROKE
         linePaint.strokeWidth = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_axis_thickness)
@@ -103,8 +101,7 @@ class Axis(var pivot: Pivot): IDrawer {
             Pivot.LEFT -> labelPaint.textAlign = Paint.Align.RIGHT
         }
 
-        if (drawBar)
-        {
+        if (drawBar) {
             when (pivot) {
                 Pivot.BOTTOM -> canvas.drawLine(attachedTo.left, attachedTo.bottom, attachedTo.right, attachedTo.bottom, linePaint)
 
@@ -129,8 +126,8 @@ class Axis(var pivot: Pivot): IDrawer {
 
             if (drawGridLines) {
 
-                val gridCoord = if (gridOnBorder && i < scale?.numTicks?:0 -1) {
-                    tickCoord + (scale?.getTickInterval() ?: 0f)/2
+                val gridCoord = if (gridOnBorder && i < scale?.numTicks ?: 0 - 1) {
+                    tickCoord + (scale?.getTickInterval() ?: 0f) / 2
                 } else {
                     tickCoord
                 }

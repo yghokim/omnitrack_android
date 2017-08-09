@@ -251,7 +251,7 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
 
     }
 
-    fun getTrackersOnShortcut(): List<OTTracker>{
+    fun getTrackersOnShortcut(): List<OTTracker> {
         return trackers.filter { it.isOnShortcut == true }
     }
 

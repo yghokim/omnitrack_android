@@ -381,7 +381,6 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
     }
 
 
-
     abstract fun getInputViewType(previewMode: Boolean = false): Int
 
     open fun makePropertyViews(context: Context): Collection<ReadOnlyPair<String, View>> {
@@ -406,7 +405,7 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
         return view
     }
 
-    abstract fun refreshInputViewUI(inputView: AAttributeInputView<out Any>);
+    abstract fun refreshInputViewUI(inputView: AAttributeInputView<out Any>)
 
     open fun getViewForItemListContainerType(): Int {
         return VIEW_FOR_ITEM_LIST_CONTAINER_TYPE_SINGLELINE
@@ -460,19 +459,18 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
         } else return true
     }
 
-    protected fun getAttributeUniqueName(): String{ return "${name}(${objectId})" }
+    protected fun getAttributeUniqueName(): String {
+        return "${name}(${objectId})"
+    }
 
-    open fun onAddColumnToTable(out: MutableList<String>)
-    {
+    open fun onAddColumnToTable(out: MutableList<String>) {
         out.add(getAttributeUniqueName())
     }
 
-    open fun onAddValueToTable(value: Any?, out: MutableList<String?>, uniqKey: String?)
-    {
+    open fun onAddValueToTable(value: Any?, out: MutableList<String?>, uniqKey: String?) {
         val str = value?.toString()
-        if(str.isNullOrBlank())
-        {
+        if (str.isNullOrBlank()) {
             out.add(null)
-        }else out.add(str)
+        } else out.add(str)
     }
 }

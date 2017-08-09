@@ -116,29 +116,29 @@ class OTNotificationTriggerAction(trigger: OTTrigger) : OTTriggerAction(trigger)
 
     override fun performAction(triggerTime: Long, context: Context): Observable<OTTrigger> {
         println("trigger fired - send notification")
-            when (notificationLevelForSystem) {
-                NotificationLevel.Noti -> {
-                    for (tracker in trigger.trackers) {
-                        OTTrackingNotificationManager.pushReminderNotification(context, tracker, triggerTime)
-                    }
-                }
-                NotificationLevel.Popup -> {
-
-                    val TAG = "ReminderPopup"
-
-                    if (popupTriggerQueueTime != triggerTime) {
-                        Log.d(TAG, "there are remaining triggers: ${popupTriggersQueue.size}. Clear.")
-                        popupTriggersQueue.clear()
-                    }
-
-                    Log.d(TAG, "add one trigger for ${triggerTime}}")
-                    popupTriggersQueue.add(WeakReference(trigger))
-                    popupTriggerQueueTime = triggerTime
-                }
-                NotificationLevel.Impose -> {
-
+        when (notificationLevelForSystem) {
+            NotificationLevel.Noti -> {
+                for (tracker in trigger.trackers) {
+                    OTTrackingNotificationManager.pushReminderNotification(context, tracker, triggerTime)
                 }
             }
+            NotificationLevel.Popup -> {
+
+                val TAG = "ReminderPopup"
+
+                if (popupTriggerQueueTime != triggerTime) {
+                    Log.d(TAG, "there are remaining triggers: ${popupTriggersQueue.size}. Clear.")
+                    popupTriggersQueue.clear()
+                }
+
+                Log.d(TAG, "add one trigger for ${triggerTime}}")
+                popupTriggersQueue.add(WeakReference(trigger))
+                popupTriggerQueueTime = triggerTime
+            }
+            NotificationLevel.Impose -> {
+
+            }
+        }
 
         return Observable.just(trigger)
     }

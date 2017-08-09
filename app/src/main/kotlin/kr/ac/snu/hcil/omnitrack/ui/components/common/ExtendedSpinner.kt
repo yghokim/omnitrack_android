@@ -434,7 +434,7 @@ class ExtendedSpinner : LinearLayout, View.OnClickListener {
         }
 
         internal fun computeContentWidth() {
-            val background = getBackground()
+            val background = background
             var hOffset = 0
             if (background != null) {
                 background.getPadding(mTempRect)
@@ -444,9 +444,9 @@ class ExtendedSpinner : LinearLayout, View.OnClickListener {
                 mTempRect.left = mTempRect.right
             }
 
-            val spinnerPaddingLeft = this@ExtendedSpinner.getPaddingLeft()
-            val spinnerPaddingRight = this@ExtendedSpinner.getPaddingRight()
-            val spinnerWidth = this@ExtendedSpinner.getWidth()
+            val spinnerPaddingLeft = this@ExtendedSpinner.paddingLeft
+            val spinnerPaddingRight = this@ExtendedSpinner.paddingRight
+            val spinnerWidth = this@ExtendedSpinner.width
 
             /*
             if (mDropDownWidth === WRAP_CONTENT) {
@@ -476,7 +476,7 @@ class ExtendedSpinner : LinearLayout, View.OnClickListener {
 
             //hOffset += spinnerPaddingLeft
 
-            setHorizontalOffset(hOffset)
+            horizontalOffset = hOffset
         }
 
         override fun show(textDirection: Int, textAlignment: Int) {

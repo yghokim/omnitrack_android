@@ -6,7 +6,7 @@ package kr.ac.snu.hcil.omnitrack.utils.events
  * Codes and design patterns from https://nvbn.github.io/2016/04/28/kotlin-events/
  *
  */
-open class Event<T> () {
+open class Event<T> {
     private var handlers = hashSetOf<(sender: Any, args: T) -> Unit>()
     private var listeners = hashSetOf<IEventListener<T>>()
 
@@ -34,7 +34,7 @@ open class Event<T> () {
 
 
     fun invoke(sender: Any, args: T) {
-        if(!suspend) {
+        if (!suspend) {
             for (subscriber in handlers) {
                 subscriber(sender, args)
             }

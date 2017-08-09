@@ -27,8 +27,8 @@ abstract class MultiButtonActionBarActivity(val layoutId: Int) : OTActivity() {
 
     protected val header: AppBarLayout by bindView(R.id.appbar)
 
-    protected var leftActionBarButton: ImageButton?=null
-    protected var rightActionBarButton: ImageButton?=null
+    protected var leftActionBarButton: ImageButton? = null
+    protected var rightActionBarButton: ImageButton? = null
     protected var rightActionBarSubButton: ImageButton? = null
 
     protected var rightActionBarTextButton: AppCompatButton? = null
@@ -76,13 +76,13 @@ abstract class MultiButtonActionBarActivity(val layoutId: Int) : OTActivity() {
         }
 
         titleView = findViewById(R.id.ui_appbar_title)
-        titleView?.setText(title)
+        titleView?.text = title
 
     }
 
     override fun onTitleChanged(title: CharSequence?, color: Int) {
         super.onTitleChanged(title, color)
-        titleView?.setText(title)
+        titleView?.text = title
     }
 
     protected open val leftButtonResultCode = Activity.RESULT_CANCELED

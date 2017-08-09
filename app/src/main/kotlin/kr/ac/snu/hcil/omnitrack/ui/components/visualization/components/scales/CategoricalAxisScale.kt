@@ -6,7 +6,7 @@ import java.util.*
 /**
  * Created by Young-Ho on 9/8/2016.
  */
-class CategoricalAxisScale: IAxisScale<Int> {
+class CategoricalAxisScale : IAxisScale<Int> {
     override var tickFormat: IAxisScale.ITickFormat<Int>? = null
 
     private var rangeFrom: Float = 0f
@@ -16,20 +16,20 @@ class CategoricalAxisScale: IAxisScale<Int> {
 
     private var tickInterval: Float = 0f
 
-    private var inversed : Boolean = false
+    private var inversed: Boolean = false
 
     override fun setRealCoordRange(from: Float, to: Float): CategoricalAxisScale {
         this.rangeFrom = from
         this.rangeTo = to
 
-        tickInterval = if(numTicks>0)
-            ((to - from)/numTicks)
-            else 0f
+        tickInterval = if (numTicks > 0)
+            ((to - from) / numTicks)
+        else 0f
 
         return this
     }
 
-    fun inverse(): CategoricalAxisScale{
+    fun inverse(): CategoricalAxisScale {
         inversed = true
         return this
     }
@@ -45,11 +45,13 @@ class CategoricalAxisScale: IAxisScale<Int> {
         return this
     }
 
-    override val numTicks: Int get()= categoryList.size
+    override val numTicks: Int get() = categoryList.size
 
     override fun getTickCoordAt(index: Int): Float {
-        val m = if(inversed){ numTicks -1 - index } else index
-        return rangeFrom + tickInterval * m + tickInterval/2
+        val m = if (inversed) {
+            numTicks - 1 - index
+        } else index
+        return rangeFrom + tickInterval * m + tickInterval / 2
     }
 
     override fun getTickInterval(): Float {
@@ -58,7 +60,7 @@ class CategoricalAxisScale: IAxisScale<Int> {
 
 
     override fun getTickLabelAt(index: Int): String {
-        return tickFormat?.format(index, index) ?: categoryList[ index ]
+        return tickFormat?.format(index, index) ?: categoryList[index]
     }
 
     override fun get(domain: Int): Float {

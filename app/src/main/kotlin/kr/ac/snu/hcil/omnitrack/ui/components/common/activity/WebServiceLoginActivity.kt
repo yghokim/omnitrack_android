@@ -45,25 +45,23 @@ open class WebServiceLoginActivity : AppCompatActivity(), View.OnClickListener {
         cancelButton.setOnClickListener(this)
 
         webView.settings.javaScriptEnabled = true
-        webView.setWebViewClient(
-                object : WebViewClient() {
-                    override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
-                        super.onPageStarted(view, url, favicon)
-                    }
+        webView.webViewClient = object : WebViewClient() {
+            override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+                super.onPageStarted(view, url, favicon)
+            }
 
-                    override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
-                        super.onReceivedError(view, request, error)
-                        loadingIndicator.visibility = View.INVISIBLE
-                    }
+            override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
+                super.onReceivedError(view, request, error)
+                loadingIndicator.visibility = View.INVISIBLE
+            }
 
-                    override fun onPageFinished(view: WebView, url: String) {
-                        super.onPageFinished(view, url)
-                        onPageFinished(url)
-                        loadingIndicator.visibility = View.INVISIBLE
-                    }
+            override fun onPageFinished(view: WebView, url: String) {
+                super.onPageFinished(view, url)
+                onPageFinished(url)
+                loadingIndicator.visibility = View.INVISIBLE
+            }
 
-                }
-        )
+        }
     }
 
     override fun onStart() {

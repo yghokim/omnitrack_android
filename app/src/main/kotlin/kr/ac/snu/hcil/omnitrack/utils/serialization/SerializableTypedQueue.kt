@@ -63,16 +63,11 @@ class SerializableTypedQueue() : IStringSerializable {
     }
 
 
-
     fun getString(): String {
         return getValue(TypeStringSerializationHelper.TYPENAME_STRING) as String
     }
 
     fun getBoolean(): Boolean {
-        return if (getValue(TypeStringSerializationHelper.TYPENAME_INT) == 1) {
-            true
-        } else {
-            false
-        }
+        return getValue(TypeStringSerializationHelper.TYPENAME_INT) == 1
     }
 }

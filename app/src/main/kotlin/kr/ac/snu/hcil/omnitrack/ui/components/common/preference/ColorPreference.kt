@@ -39,8 +39,8 @@ class ColorPreference : DialogPreference {
         widgetLayoutResource = R.layout.layout_custom_preference_color
         dialogLayoutResource = R.layout.layout_dialog_color_preference
 
-        setPositiveButtonText(android.R.string.ok);
-        setNegativeButtonText(android.R.string.cancel);
+        setPositiveButtonText(android.R.string.ok)
+        setNegativeButtonText(android.R.string.cancel)
     }
 
     override fun onBindDialogView(view: View) {

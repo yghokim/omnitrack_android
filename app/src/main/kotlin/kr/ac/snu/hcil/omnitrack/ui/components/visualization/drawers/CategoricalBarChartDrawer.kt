@@ -17,7 +17,7 @@ import java.util.*
 /**
  * Created by Young-Ho on 9/8/2016.
  */
-class CategoricalBarChartDrawer(): AChartDrawer() {
+class CategoricalBarChartDrawer : AChartDrawer() {
 
     //configuration
     var integerValues: Boolean = false
@@ -25,8 +25,10 @@ class CategoricalBarChartDrawer(): AChartDrawer() {
             if (field != value) {
                 field = value
                 if (value == true) {
-                    verticalAxisScale.tickFormat = object: IAxisScale.ITickFormat<Float>{
-                        override fun format(value: Float, index: Int): String { return value.toInt().toString() }
+                    verticalAxisScale.tickFormat = object : IAxisScale.ITickFormat<Float> {
+                        override fun format(value: Float, index: Int): String {
+                            return value.toInt().toString()
+                        }
                     }
                 } else {
                     verticalAxisScale.tickFormat = null
@@ -47,7 +49,7 @@ class CategoricalBarChartDrawer(): AChartDrawer() {
 
     private val barElements = DataEncodedDrawingList<ICategoricalBarChart.Point, Void?>()
 
-    init{
+    init {
         paddingBottom = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_axis_height).toFloat()
         paddingLeft = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_axis_width).toFloat()
         paddingTop = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_axis_label_numeric_size).toFloat()
@@ -78,8 +80,7 @@ class CategoricalBarChartDrawer(): AChartDrawer() {
         }
     }
 
-    private fun mapBarElementToSpace(datum: IndexedValue<ICategoricalBarChart.Point>, bar: RectElement<ICategoricalBarChart.Point>)
-    {
+    private fun mapBarElementToSpace(datum: IndexedValue<ICategoricalBarChart.Point>, bar: RectElement<ICategoricalBarChart.Point>) {
         val dataX = horizontalAxisScale.getTickCoordAt(datum.index)
         println("bar X : $dataX")
         val dataY = verticalAxisScale[datum.value.value.toFloat()]
@@ -97,17 +98,17 @@ class CategoricalBarChartDrawer(): AChartDrawer() {
 
     override fun onRefresh() {
 
-        if(model is ICategoricalBarChart && model != null) {
+        if (model is ICategoricalBarChart && model != null) {
             println("Model changed")
             barData.clear()
-            barData.addAll( model!!.getDataPoints().map {
+            barData.addAll(model!!.getDataPoints().map {
                 (it as ICategoricalBarChart.Point)
             })
 
             println("categorical bar data")
             println(barData)
 
-            horizontalAxisScale.setCategories(*barData.map{
+            horizontalAxisScale.setCategories(*barData.map {
                 it.label
             }.toTypedArray())
 

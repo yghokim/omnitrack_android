@@ -83,7 +83,7 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
     var isEditable: Boolean = isEditable
         private set
 
-    var owner: OTUser? by Delegates.observable(null as OTUser?){
+    var owner: OTUser? by Delegates.observable(null as OTUser?) {
         prop, old, new ->
         if (old != new) {
             if (old != null) {
@@ -163,15 +163,12 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
     private val colorSubject = BehaviorSubject.create<Int>()
     val colorObservable: rx.Observable<Int> get() = colorSubject
 
-    var isOnShortcut: Boolean by Delegates.observable(isOnShortcut){
-        prop, old, new->
-        if(old!=new)
-        {
-            if(new==true)
-            {
+    var isOnShortcut: Boolean by Delegates.observable(isOnShortcut) {
+        prop, old, new ->
+        if (old != new) {
+            if (new == true) {
                 OTShortcutPanelManager += this
-            }
-            else{
+            } else {
                 OTShortcutPanelManager -= this
             }
 
@@ -200,7 +197,7 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
 
     constructor(name: String) : this(null, name, isEditable = true)
 
-    init{
+    init {
         suspendDatabaseSync = true
         if (_attributes != null) {
             for (attribute in _attributes) {
@@ -214,12 +211,12 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
         }
 
         attributes.elementAdded += {
-            sender, args->
+            sender, args ->
             onAttributeAdded(args.first, args.second)
         }
 
         attributes.elementRemoved += {
-            sender, args->
+            sender, args ->
             onAttributeRemoved(args.first, args.second)
         }
 
@@ -501,8 +498,7 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
         }
 
 
-        for(attribute in attributes)
-        {
+        for (attribute in attributes) {
             list.addAll(attribute.getRecommendedChartModels())
         }
 

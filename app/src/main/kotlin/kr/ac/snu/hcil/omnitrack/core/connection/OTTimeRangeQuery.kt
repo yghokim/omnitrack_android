@@ -79,9 +79,7 @@ class OTTimeRangeQuery : ATypedQueueSerializable {
 
     var linkedAttribute: OTAttribute<out Any>? = null
 
-    constructor() {
-
-    }
+    constructor()
 
     constructor(mode: Int, binSize: Int, binOffset: Int = 0, anchorToNow: Boolean = false) {
         this.mode = mode

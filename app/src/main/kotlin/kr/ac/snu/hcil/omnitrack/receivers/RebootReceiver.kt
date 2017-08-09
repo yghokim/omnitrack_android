@@ -16,6 +16,7 @@ class RebootReceiver : BroadcastReceiver() {
     companion object {
         const val TAG = "RebootReceiver"
     }
+
     override fun onReceive(context: Context, intent: Intent) {
         println("OMNITRACK: reboot receiver called - ${intent.action}")
 

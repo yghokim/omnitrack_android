@@ -10,7 +10,6 @@ import rx.Single
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.io.OutputStream
 import java.util.concurrent.Callable
 
 /**

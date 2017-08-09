@@ -72,7 +72,7 @@ class TimeKeyValueSetTable<T>(var thresholdMillis: Int, data: SortedMap<Long, Mu
     }
 
     operator fun get(timestamp: Long): Set<T>? {
-        return map[timestamp] as? Set<T>
+        return map[timestamp]
     }
 
     fun removeValueAndCheckIsTimestampEmpty(timestamp: Long, value: T): Boolean {
