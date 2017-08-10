@@ -61,7 +61,6 @@ dependencies {
     compile "com.android.support:appcompat-v7:$rootProject.ext.android_support_version"
     compile "com.android.support:recyclerview-v7:$rootProject.ext.android_support_version"
     compile "com.android.support:design:$rootProject.ext.android_support_version"
-    compile "com.android.support:percent:$rootProject.ext.android_support_version"
     compile "com.android.support:support-v4:$rootProject.ext.android_support_version"
     compile "com.android.support:support-vector-drawable:$rootProject.ext.android_support_version"
     compile "com.google.android.gms:play-services-maps:$rootProject.ext.google_play_version"
