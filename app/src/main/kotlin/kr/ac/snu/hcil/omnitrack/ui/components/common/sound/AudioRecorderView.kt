@@ -15,6 +15,7 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.services.OTAudioPlayService
+import kr.ac.snu.hcil.omnitrack.services.OTAudioRecordService
 import kr.ac.snu.hcil.omnitrack.utils.Ticker
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
@@ -231,6 +232,8 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
                 State.RECORDING -> {
                     if (currentRecorderId == mediaSessionId) {
                         currentAudioSeconds = ((time - Companion.currentRecordingModule!!.startedAt) / 1000).toInt()
+                        LocalBroadcastManager.getInstance(context)
+                                .sendBroadcast(OTAudioRecordService.makeProgressIntent(context, mediaSessionId, currentAudioSeconds))
                     } else {
                         secondTicker.stop()
                     }
@@ -289,7 +292,8 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
                 }
 
                 State.RECORDING -> {
-                    stopRecording()
+                    LocalBroadcastManager.getInstance(context)
+                            .sendBroadcast(OTAudioRecordService.makeStopIntent(context, mediaSessionId))
                 }
 
                 State.FILE_MOUNTED -> {
@@ -349,6 +353,7 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
         playBar.currentProgressRatio = 0f
         playBar.amplitudeTimelineProvider = Companion.currentRecordingModule
         secondTicker.start()
+        context.startService(OTAudioRecordService.makeStartIntent(context, mediaSessionId, audioTitle))
 
         state = State.RECORDING
     }
@@ -487,6 +492,13 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
                         playBar.currentProgressRatio = ratio
                         val seconds = intent.getIntExtra(OTAudioPlayService.INTENT_EXTRA_CURRENT_POSITION_SECONDS, 0)
                         currentAudioSeconds = seconds
+                    }
+                }
+
+                OTAudioRecordService.INTENT_ACTION_EVENT_RECORD_COMPLETED -> {
+                    val sessionId = intent.getStringExtra(OTAudioRecordService.INTENT_EXTRA_SESSION_ID)
+                    if (sessionId == mediaSessionId) {
+                        stopRecording()
                     }
                 }
             }
