@@ -10,6 +10,7 @@ import android.net.Uri
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.widget.AppCompatImageButton
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
@@ -256,8 +257,9 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
         super.onAttachedToWindow()
         LocalBroadcastManager.getInstance(context)
                 .registerReceiver(playerEventReceiver, IntentFilter().apply {
-                    this.addAction(OTAudioPlayService.INTENT_ACTION_EVENT_AUDIO_COMPLETED)
-                    this.addAction(OTAudioPlayService.INTENT_ACTION_EVENT_AUDIO_PROGRESS)
+                    addAction(OTAudioPlayService.INTENT_ACTION_EVENT_AUDIO_COMPLETED)
+                    addAction(OTAudioPlayService.INTENT_ACTION_EVENT_AUDIO_PROGRESS)
+                    addAction(OTAudioRecordService.INTENT_ACTION_EVENT_RECORD_COMPLETED)
                 })
     }
 
@@ -293,7 +295,8 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
 
                 State.RECORDING -> {
                     LocalBroadcastManager.getInstance(context)
-                            .sendBroadcast(OTAudioRecordService.makeStopIntent(context, mediaSessionId))
+                            .sendBroadcast(OTAudioRecordService.makeStopIntent(mediaSessionId))
+                    Log.i("AudioRecordService", "mediaSessionId : " + mediaSessionId)
                 }
 
                 State.FILE_MOUNTED -> {
@@ -353,7 +356,7 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
         playBar.currentProgressRatio = 0f
         playBar.amplitudeTimelineProvider = Companion.currentRecordingModule
         secondTicker.start()
-        context.startService(OTAudioRecordService.makeStartIntent(context, mediaSessionId, audioTitle))
+        context.startService(OTAudioRecordService.makeStartIntent(context, mediaSessionId, "Audio service"))
 
         state = State.RECORDING
     }
