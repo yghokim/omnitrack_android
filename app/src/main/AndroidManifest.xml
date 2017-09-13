@@ -150,6 +150,7 @@
                 <action android:name="com.google.android.gms.gcm.ACTION_TASK_READY" />
             </intent-filter>
         </service>
+
         <service
             android:name=".services.OTTableExportService"
             android:exported="false" />
@@ -174,6 +175,7 @@
         </service>
 
         <service android:name=".services.OTAudioPlayService" />
+        <service android:name=".services.OTAudioRecordService"/>
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
