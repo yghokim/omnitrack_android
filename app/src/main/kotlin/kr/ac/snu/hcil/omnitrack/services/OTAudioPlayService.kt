@@ -36,7 +36,7 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
     companion object {
         const val TAG = "AudioService"
 
-        const val AUDIO_NOTIFICATION_ID = 2442
+        private const val AUDIO_NOTIFICATION_ID = 2442
 
         const val INTENT_EXTRA_SESSION_ID = "audioPlaySessionId"
         const val INTENT_EXTRA_CURRENT_POSITION_SECONDS = "audioCurrentDurationSeconds"

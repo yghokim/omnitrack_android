@@ -17,7 +17,6 @@ import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.services.OTAudioPlayService
 import kr.ac.snu.hcil.omnitrack.services.OTAudioRecordService
-import kr.ac.snu.hcil.omnitrack.utils.Ticker
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 import java.io.File
@@ -27,57 +26,16 @@ import kotlin.properties.Delegates
 /**
  * Created by Young-Ho Kim on 2016. 9. 27
  */
-class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModule.RecordingListener, ValueAnimator.AnimatorUpdateListener {
+class AudioRecorderView : FrameLayout, View.OnClickListener, ValueAnimator.AnimatorUpdateListener {
     companion object {
+
+        private val TAG = "AudioRecorderView"
+
         fun formatTime(seconds: Int): String {
             val min = seconds / 60
             val sec = seconds % 60
 
             return "$min:${String.format("%02d", sec)}"
-        }
-
-        private var currentRecorderId: String? = null
-        private var currentRecordingModule: AudioRecordingModule? = null
-
-        /*
-        private var currentPlayingId: String? = null
-        private var currentPlayer: AudioPlayerModule? = null
-
-
-        private val isSoundPlaying: Boolean get() = currentPlayer != null && currentPlayer?.isRunning() == true*/
-
-        private val isRecordingSourceFree: Boolean get() = currentRecordingModule == null
-/*
-        private fun registerNewPlayer(id: String, module: AudioPlayerModule) {
-            currentPlayingId = id
-            currentPlayer = module
-        }
-
-        private fun cancelCurrentPlayer() {
-            currentPlayer?.cancel()
-            clearPlayer()
-        }
-
-        private fun clearPlayer() {
-            currentPlayingId = null
-            currentPlayer = null
-        }*/
-
-        private fun registerNewRecordingModule(id: String, module: AudioRecordingModule) {
-            this.currentRecorderId = id
-            this.currentRecordingModule = module
-        }
-
-        private fun cancelCurrentRecording() {
-            if (!isRecordingSourceFree) {
-                currentRecordingModule?.cancel()
-                clearModule()
-            }
-        }
-
-        private fun clearModule() {
-            currentRecorderId = null
-            currentRecordingModule = null
         }
     }
 
@@ -89,6 +47,26 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
         prop, old, new ->
         if (old != new) {
             onSetState(new)
+        }
+    }
+
+    private fun onSetState(state: State) {
+        mainButton.state = state
+
+        when (state) {
+            State.RECORD -> {
+                audioLengthSeconds = 60
+                playBar.clear()
+                setBarViewState(false)
+            }
+
+            State.RECORDING -> {
+                setBarViewState(false)
+            }
+
+            State.FILE_MOUNTED -> {
+                setBarViewState(true)
+            }
         }
     }
 
@@ -116,7 +94,7 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
         set(value) {
             if (field != value) {
                 field = value
-                refreshTimeViews()
+                refreshTimeViews(0)
             }
         }
 
@@ -126,61 +104,39 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
 
     val audioFileUriChanged = Event<Uri>()
 
-    var currentAudioSeconds: Int = 0
-        set(value) {
-            if (field != value) {
-                field = value
-                refreshTimeViews()
-            }
-        }
-
     var mediaSessionId: String by Delegates.observable(UUID.randomUUID().toString()) {
         prop, old, new ->
         if (old != new) {
-            if (Companion.currentRecorderId == new) {
+            if (OTAudioRecordService.currentSessionId == new) {
                 //cancel last recording
-                //Companion.cancelCurrentRecording()
-                Companion.currentRecordingModule!!.listener = this
-                playBar.amplitudeTimelineProvider = Companion.currentRecordingModule
+                playBar.amplitudeTimelineProvider = OTAudioRecordService.currentRecordingModule
                 state = State.RECORDING
-                secondTicker.start()
                 return@observable
-            } else if (Companion.currentRecorderId == old) {
+
+            } else if (OTAudioRecordService.currentSessionId == old) {
                 if (state == State.RECORDING) {
-                    state = State.RECORD
-                    secondTicker.stop()
+                    tryStopRecording()
                 }
                 return@observable
             }
 
             if (OTAudioPlayService.currentSessionId == new) {
-                //Companion.currentPlayer!!.listener = this
                 state = State.FILE_MOUNTED
                 playBar.currentProgressRatio = OTAudioPlayService.currentProgressRatio
-                currentAudioSeconds = OTAudioPlayService.currentPlayPositionSecond
+                refreshTimeViews(OTAudioPlayService.currentPlayPositionSecond)
                 return@observable
             } else {
                 println("current audio play session is different.")
-                ///Companion.currentPlayer?.listener = null
 
                 if (state == State.FILE_MOUNTED) {
                     playBar.clear()
-                    currentAudioSeconds = 0
+                    refreshTimeViews(0)
                     setBarViewState(true)
-                    secondTicker.stop()
                 } else {
                     setBarViewState(false)
                 }
             }
         }
-    }
-
-    val isRecording: Boolean get() {
-        return Companion.currentRecorderId == mediaSessionId
-    }
-
-    val isPlaying: Boolean get() {
-        return OTAudioPlayService.currentSessionId == mediaSessionId
     }
 
     val recordingComplete = Event<Long>()
@@ -194,8 +150,6 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
     private val playerButton: AppCompatImageButton
 
     private val playerModeTransitionAnimator: ValueAnimator
-
-    private val secondTicker: Ticker = Ticker(1000)
 
     private val playerModeBarHeight: Float
     private val recorderModeBarHeight: Float
@@ -223,34 +177,7 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
 
         playerModeBarHeight = resources.getDimension(R.dimen.audio_recorder_progressbar_height_player)
         recorderModeBarHeight = resources.getDimension(R.dimen.audio_recorder_progressbar_height_recorder)
-
-        secondTicker.tick += {
-            sender, time ->
-
-            when (state) {
-                State.RECORD -> {
-                }
-                State.RECORDING -> {
-                    if (currentRecorderId == mediaSessionId) {
-                        currentAudioSeconds = ((time - Companion.currentRecordingModule!!.startedAt) / 1000).toInt()
-                        LocalBroadcastManager.getInstance(context)
-                                .sendBroadcast(OTAudioRecordService.makeProgressIntent(context, mediaSessionId, currentAudioSeconds))
-                    } else {
-                        secondTicker.stop()
-                    }
-                }
-            /*
-            State.FILE_MOUNTED -> {
-                if (currentPlayingId == mediaSessionId) {
-                    currentAudioSeconds = currentPlayer!!.getCurrentProgressDuration(time) / 1000
-                } else {
-                    secondTicker.stop()
-                }
-            }*/
-            }
-        }
-
-        refreshTimeViews()
+        refreshTimeViews(0)
     }
 
     override fun onAttachedToWindow() {
@@ -259,6 +186,8 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
                 .registerReceiver(playerEventReceiver, IntentFilter().apply {
                     addAction(OTAudioPlayService.INTENT_ACTION_EVENT_AUDIO_COMPLETED)
                     addAction(OTAudioPlayService.INTENT_ACTION_EVENT_AUDIO_PROGRESS)
+                    addAction(OTAudioRecordService.INTENT_ACTION_EVENT_RECORD_START_CALLBACK)
+                    addAction(OTAudioRecordService.INTENT_ACTION_EVENT_RECORD_PROGRESS)
                     addAction(OTAudioRecordService.INTENT_ACTION_EVENT_RECORD_COMPLETED)
                 })
     }
@@ -290,13 +219,12 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
         if (view === mainButton) {
             when (state) {
                 State.RECORD -> {
-                    startRecording()
+                    tryStartRecordService()
                 }
 
                 State.RECORDING -> {
                     LocalBroadcastManager.getInstance(context)
-                            .sendBroadcast(OTAudioRecordService.makeStopIntent(mediaSessionId))
-                    Log.i("AudioRecordService", "mediaSessionId : " + mediaSessionId)
+                            .sendBroadcast(OTAudioRecordService.makeStopIntent(context, mediaSessionId))
                 }
 
                 State.FILE_MOUNTED -> {
@@ -327,13 +255,12 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
     }
 
 
-    private fun startRecording() {
-
+    private fun tryStartRecordService() {
 
         println("start recording: ${mediaSessionId}")
 
-        if (!Companion.isRecordingSourceFree) {
-            Companion.cancelCurrentRecording()
+        if (OTAudioRecordService.isRecording) {
+            tryStopRecording()
         }
 
         if (OTAudioPlayService.isSoundPlaying) {
@@ -350,28 +277,20 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
                 .path(recordingOutputPath.path)
                 .build()
 
-        Companion.registerNewRecordingModule(mediaSessionId, AudioRecordingModule(this, uri))
-        Companion.currentRecordingModule?.startAsync()
-
-        playBar.currentProgressRatio = 0f
-        playBar.amplitudeTimelineProvider = Companion.currentRecordingModule
-        secondTicker.start()
-        context.startService(OTAudioRecordService.makeStartIntent(context, mediaSessionId, "Audio service"))
-
-        state = State.RECORDING
+        context.startService(OTAudioRecordService.makeStartIntent(context, mediaSessionId, audioTitle, uri))
     }
 
-    private fun stopRecording() {
+    private fun tryStopRecording() {
         println("stop recording: ${mediaSessionId}")
-        Companion.currentRecordingModule?.stop()
-        playerModeTransitionAnimator.start()
+        LocalBroadcastManager.getInstance(context)
+                .sendBroadcast(OTAudioRecordService.makeStopIntent(context, mediaSessionId))
     }
 
     private fun playFile() {
         if (state == State.FILE_MOUNTED) {
 
-            if (!Companion.isRecordingSourceFree) {
-                Companion.cancelCurrentRecording()
+            if (OTAudioRecordService.isRecording) {
+                tryStopRecording()
             }
 
             context.startService(OTAudioPlayService.makePlayIntent(context, audioFileUri, mediaSessionId, audioTitle))
@@ -390,7 +309,6 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
         LocalBroadcastManager.getInstance(context)
                 .sendBroadcast(OTAudioPlayService.makeStopCommandIntent(mediaSessionId))
     }
-
 
     private fun mountNewFile(fileUri: Uri) {
 
@@ -412,67 +330,19 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
         }
     }
 
-    private fun onSetState(state: State) {
-        mainButton.state = state
-
-        when (state) {
-            State.RECORD -> {
-                currentAudioSeconds = 0
-                audioLengthSeconds = 60
-                playBar.clear()
-                secondTicker.stop()
-                setBarViewState(false)
-            }
-
-            State.RECORDING -> {
-                setBarViewState(false)
-            }
-
-            State.FILE_MOUNTED -> {
-                currentAudioSeconds = 0
-                setBarViewState(true)
-            }
-        }
+    private fun saveRecordFile(uri: Uri, soundLength: Long) {
+        playerModeTransitionAnimator.start()
+        audioFileUri = uri
+        recordingComplete.invoke(this, soundLength)
     }
 
-    private fun refreshTimeViews() {
+    private fun refreshTimeViews(currentAudioSeconds: Int) {
         elapsedTimeView.text = formatTime(currentAudioSeconds)
         remainingTimeView.text = formatTime(audioLengthSeconds - currentAudioSeconds)
     }
 
-    override fun onRecordingProgress(module: AudioRecordingModule, volume: Int) {
-        if (module === currentRecordingModule && currentRecorderId == mediaSessionId) {
-            playBar.currentProgressRatio = currentRecordingModule!!.getCurrentProgressRatio(System.currentTimeMillis())
-        }
-    }
-
-    override fun onRecordingFinished(module: AudioRecordingModule, resultUri: Uri?) {
-        if (module === currentRecordingModule && currentRecorderId == mediaSessionId) {
-            playBar.clear()
-            secondTicker.stop()
-            val soundLength = System.currentTimeMillis() - currentRecordingModule!!.startedAt
-            Companion.clearModule()
-
-            if (resultUri != null) {
-                this.audioFileUri = resultUri
-                recordingComplete.invoke(this, soundLength)
-            } else {
-                state = State.RECORD
-            }
-        }
-    }
-
     fun dispose() {
-        if (isRecording) {
-            println("cancel recording.")
-            cancelCurrentRecording()
-        }
 
-        if (isPlaying) {
-            // println("cancel recording")
-            // cancelCurrentPlayer()
-            //stopFile()
-        }
     }
 
     inner class PlayerEventReceiver : BroadcastReceiver() {
@@ -483,7 +353,7 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
                     if (sessionId == mediaSessionId) {
                         println("audio stopped: ${mediaSessionId}")
                         playBar.clear()
-                        currentAudioSeconds = 0
+                        refreshTimeViews(0)
                         playerButton.setImageResource(R.drawable.play_dark)
                     }
                 }
@@ -494,18 +364,39 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, AudioRecordingModul
                         val ratio = intent.getFloatExtra(OTAudioPlayService.INTENT_EXTRA_CURRENT_PROGRESS_RATIO, 0f)
                         playBar.currentProgressRatio = ratio
                         val seconds = intent.getIntExtra(OTAudioPlayService.INTENT_EXTRA_CURRENT_POSITION_SECONDS, 0)
-                        currentAudioSeconds = seconds
+                        refreshTimeViews(seconds)
+                    }
+                }
+                OTAudioRecordService.INTENT_ACTION_EVENT_RECORD_START_CALLBACK -> {
+                    playBar.currentProgressRatio = 0f
+                    playBar.amplitudeTimelineProvider = OTAudioRecordService.currentRecordingModule
+                    state = State.RECORDING
+                }
+
+                OTAudioRecordService.INTENT_ACTION_EVENT_RECORD_PROGRESS -> {
+                    val sessionId = intent.getStringExtra(OTAudioRecordService.INTENT_EXTRA_SESSION_ID)
+                    val currentSeconds = intent.getIntExtra(OTAudioRecordService.INTENT_EXTRA_CURRENT_PROGRESS_SECONDS, 0)
+                    val currentRatio = intent.getFloatExtra(OTAudioRecordService.INTENT_EXTRA_CURRENT_PROGRESS_RATIO, 0f)
+                    if (sessionId == mediaSessionId) {
+                        refreshTimeViews(currentSeconds)
+                        playBar.currentProgressRatio = currentRatio
                     }
                 }
 
                 OTAudioRecordService.INTENT_ACTION_EVENT_RECORD_COMPLETED -> {
                     val sessionId = intent.getStringExtra(OTAudioRecordService.INTENT_EXTRA_SESSION_ID)
+                    val resultUri = Uri.parse(intent.getStringExtra(OTAudioRecordService.INTENT_EXTRA_RECORD_URI))
+                    val startedAt = intent.getLongExtra(OTAudioRecordService.INTENT_EXTRA_RECORD_START_TIME, 0)
                     if (sessionId == mediaSessionId) {
-                        stopRecording()
+                        refreshTimeViews(0)
+                        playBar.clear()
+                        val soundLength = System.currentTimeMillis() - startedAt
+                        if (resultUri != null) {
+                            saveRecordFile(resultUri, soundLength)
+                        }
                     }
                 }
             }
         }
-
     }
 }
