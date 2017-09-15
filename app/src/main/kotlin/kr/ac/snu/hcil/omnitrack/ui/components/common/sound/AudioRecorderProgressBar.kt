@@ -7,6 +7,7 @@ import android.graphics.Paint
 import android.graphics.RectF
 import android.support.v4.content.ContextCompat
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.NumericScale
