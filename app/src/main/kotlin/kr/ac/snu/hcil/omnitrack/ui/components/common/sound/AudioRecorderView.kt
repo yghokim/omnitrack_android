@@ -10,7 +10,6 @@ import android.net.Uri
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.widget.AppCompatImageButton
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
@@ -108,14 +107,13 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, ValueAnimator.Anima
         prop, old, new ->
         if (old != new) {
             if (OTAudioRecordService.currentSessionId == new) {
-                //cancel last recording
                 playBar.amplitudeTimelineProvider = OTAudioRecordService.currentRecordingModule
                 state = State.RECORDING
                 return@observable
 
             } else if (OTAudioRecordService.currentSessionId == old) {
                 if (state == State.RECORDING) {
-                    tryStopRecording()
+                    tryStopRecordService()
                 }
                 return@observable
             }
@@ -260,7 +258,7 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, ValueAnimator.Anima
         println("start recording: ${mediaSessionId}")
 
         if (OTAudioRecordService.isRecording) {
-            tryStopRecording()
+            tryStopRecordService()
         }
 
         if (OTAudioPlayService.isSoundPlaying) {
@@ -280,7 +278,7 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, ValueAnimator.Anima
         context.startService(OTAudioRecordService.makeStartIntent(context, mediaSessionId, audioTitle, uri))
     }
 
-    private fun tryStopRecording() {
+    private fun tryStopRecordService() {
         println("stop recording: ${mediaSessionId}")
         LocalBroadcastManager.getInstance(context)
                 .sendBroadcast(OTAudioRecordService.makeStopIntent(context, mediaSessionId))
@@ -290,7 +288,7 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, ValueAnimator.Anima
         if (state == State.FILE_MOUNTED) {
 
             if (OTAudioRecordService.isRecording) {
-                tryStopRecording()
+                tryStopRecordService()
             }
 
             context.startService(OTAudioPlayService.makePlayIntent(context, audioFileUri, mediaSessionId, audioTitle))
@@ -328,12 +326,6 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, ValueAnimator.Anima
             playerModeTransitionAnimator.reverse()
             fileRemoved.invoke(this, 0)
         }
-    }
-
-    private fun saveRecordFile(uri: Uri, soundLength: Long) {
-        playerModeTransitionAnimator.start()
-        audioFileUri = uri
-        recordingComplete.invoke(this, soundLength)
     }
 
     private fun refreshTimeViews(currentAudioSeconds: Int) {
@@ -386,13 +378,12 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, ValueAnimator.Anima
                 OTAudioRecordService.INTENT_ACTION_EVENT_RECORD_COMPLETED -> {
                     val sessionId = intent.getStringExtra(OTAudioRecordService.INTENT_EXTRA_SESSION_ID)
                     val resultUri = Uri.parse(intent.getStringExtra(OTAudioRecordService.INTENT_EXTRA_RECORD_URI))
-                    val startedAt = intent.getLongExtra(OTAudioRecordService.INTENT_EXTRA_RECORD_START_TIME, 0)
                     if (sessionId == mediaSessionId) {
                         refreshTimeViews(0)
                         playBar.clear()
-                        val soundLength = System.currentTimeMillis() - startedAt
                         if (resultUri != null) {
-                            saveRecordFile(resultUri, soundLength)
+                            playerModeTransitionAnimator.start()
+                            audioFileUri = resultUri
                         }
                     }
                 }
