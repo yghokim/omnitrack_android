@@ -150,7 +150,6 @@
                 <action android:name="com.google.android.gms.gcm.ACTION_TASK_READY" />
             </intent-filter>
         </service>
-
         <service
             android:name=".services.OTTableExportService"
             android:exported="false" />

@@ -33,7 +33,6 @@ class OTAudioRecordService : Service(), AudioRecordingModule.RecordingListener {
         const val INTENT_EXTRA_SESSION_ID = "audioRecordSessionId"
         const val INTENT_EXTRA_CURRENT_PROGRESS_SECONDS = "audioCurrentRecordProgressSeconds"
         const val INTENT_EXTRA_CURRENT_PROGRESS_RATIO = "audioCurrentRecordProgressRatio"
-        const val INTENT_EXTRA_RECORD_START_TIME = "recordStartedAt"
         const val INTENT_EXTRA_RECORD_URI = "recordURI"
         const val INTENT_EXTRA_RECORD_TITLE = "recordTitle"
 
@@ -80,10 +79,9 @@ class OTAudioRecordService : Service(), AudioRecordingModule.RecordingListener {
                     .putExtra(INTENT_EXTRA_SESSION_ID, sessionId)
         }
 
-        fun makeCompleteIntent(sessionId: String, startedAt: Long, uri: Uri): Intent {
+        fun makeCompleteIntent(sessionId: String, uri: Uri): Intent {
             return Intent(INTENT_ACTION_EVENT_RECORD_COMPLETED)
                     .putExtra(INTENT_EXTRA_SESSION_ID, sessionId)
-                    .putExtra(INTENT_EXTRA_RECORD_START_TIME, startedAt)
                     .putExtra(INTENT_EXTRA_RECORD_URI, uri.toString())
         }
     }
@@ -166,7 +164,7 @@ class OTAudioRecordService : Service(), AudioRecordingModule.RecordingListener {
         if (currentRecordingModule != null) {
             if (resultUri != null) {
                 LocalBroadcastManager.getInstance(this)
-                        .sendBroadcast(makeCompleteIntent(currentSessionId!!, module.startedAt, resultUri))
+                        .sendBroadcast(makeCompleteIntent(currentSessionId!!, resultUri))
                 disposeRecorder()
             }
         }
