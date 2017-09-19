@@ -447,13 +447,21 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
         val connection = valueConnection
         if (connection != null) {
             println("OMNITRACK attribute name: ${name}, tracker: ${tracker?.name}, source: ${connection.source}")
-            val service = connection.source!!.factory.getService()
-            if (service.state == OTExternalService.ServiceState.ACTIVATED) {
-                return true
+            val source = connection.source
+            if (source != null) {
+                val service = source.factory.getService()
+                if (service.state == OTExternalService.ServiceState.ACTIVATED) {
+                    return true
+                } else {
+                    invalidMessages?.add(TextHelper.fromHtml(String.format(
+                            "<font color=\"blue\">${OTApplication.app.resourcesWrapped.getString(R.string.msg_service_is_not_activated_format)}</font>",
+                            OTApplication.app.resourcesWrapped.getString(service.nameResourceId))))
+                    return false
+                }
             } else {
-                invalidMessages?.add(TextHelper.fromHtml(String.format(
-                        "<font color=\"blue\">${OTApplication.app.resourcesWrapped.getString(R.string.msg_service_is_not_activated_format)}</font>",
-                        OTApplication.app.resourcesWrapped.getString(service.nameResourceId))))
+                invalidMessages?.add(TextHelper.fromHtml(
+                        "<font color=\"blue\">Connection is not supported on current version.</font>"
+                ))
                 return false
             }
         } else return true
