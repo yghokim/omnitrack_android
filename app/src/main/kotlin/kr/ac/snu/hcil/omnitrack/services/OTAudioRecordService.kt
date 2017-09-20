@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.Color
 import android.net.Uri
 import android.os.Binder
 import android.os.Build
@@ -200,7 +201,8 @@ class OTAudioRecordService : Service(), AudioRecordingModule.RecordingListener {
             setTextViewText(R.id.ui_title, title)
             setTextViewText(R.id.ui_description, description)
             setTextViewText(R.id.ui_duration_view, AudioRecorderView.formatTime(currentProgressSeconds))
-            setImageViewBitmap(R.id.ui_player_button, VectorIconHelper.getConvertedBitmap(context, R.drawable.ex))
+            setImageViewBitmap(R.id.ui_player_button, VectorIconHelper.getConvertedBitmap(context, R.drawable.stop_dark, 24, Color.WHITE))
+            setImageViewBitmap(R.id.ui_discard_button, VectorIconHelper.getConvertedBitmap(context, R.drawable.trashcan, 24, Color.WHITE))
             setOnClickPendingIntent(R.id.ui_player_button, PendingIntent.getService(context,
                     RECORD_NOTIFICATION_ID,
                     makeStopIntent(context, sessionId),
