@@ -38,6 +38,7 @@ class OTTableExportService : WakefulService(TAG) {
     companion object {
 
         val TAG = OTTableExportService::class.java.simpleName.toString()
+        val NOTIFY_ID: Int = 110523424
 
         private val uniqueNotificationIdPointer = AtomicInteger()
 
@@ -111,7 +112,7 @@ class OTTableExportService : WakefulService(TAG) {
         val trackerId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
         if (OTApplication.app.isTrackerItemExportInProgress()) {
             println("another export task is in progress")
-            Toast.makeText(this, "Another export task is in progress.", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Another export task is in progress. Try again later", Toast.LENGTH_LONG).show()
             return START_NOT_STICKY
         }
         val exportUriString = intent.getStringExtra(EXTRA_EXPORT_URI)
@@ -121,7 +122,8 @@ class OTTableExportService : WakefulService(TAG) {
             OTApplication.app.setTrackerItemExportInProgress(true)
 
             Toast.makeText(this, R.string.msg_export_title_progress, Toast.LENGTH_SHORT).show()
-            OTTaskNotificationManager.setTaskProgressNotification(this, TAG, 100, getString(R.string.msg_export_title_progress), "downloading", OTTaskNotificationManager.PROGRESS_INDETERMINATE)
+            val notification = OTTaskNotificationManager.makeTaskProgressNotificationBuilder(this, getString(R.string.msg_export_title_progress), "downloading", OTTaskNotificationManager.PROGRESS_INDETERMINATE).build()
+            startForeground(NOTIFY_ID, notification)
 
             var loadedTracker: OTTracker? = null
 
@@ -149,7 +151,7 @@ class OTTableExportService : WakefulService(TAG) {
                     }
                 }
 
-                OTTaskNotificationManager.dismissNotification(this, 100, TAG)
+                OTTaskNotificationManager.dismissNotification(this, NOTIFY_ID, TAG)
 
                 if (successful && loadedTracker != null) {
 

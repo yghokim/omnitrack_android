@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger
  */
 object OTTrackingNotificationManager {
 
+    private val TAG = "TrackingReminder"
     private val increment = AtomicInteger(500)
 
     private val reminderTrackerPendingCounts = Hashtable<String, Int>()
@@ -77,7 +78,7 @@ object OTTrackingNotificationManager {
         }
 
 
-        notificationService.notify(getNewReminderNotificationId(tracker), builder.build())
+        notificationService.notify(TAG, getNewReminderNotificationId(tracker), builder.build())
     }
 
     fun cancelBackgroundLoggingSuccessNotification(tracker: OTTracker, idSeed: Int) {
@@ -123,7 +124,7 @@ object OTTrackingNotificationManager {
         //  {
         //remove reminder
         reminderTrackerPendingCounts.remove(trackerId)
-        notificationService.cancel(reminderTrackerNotificationIdTable[trackerId])
+        notificationService.cancel(TAG, reminderTrackerNotificationIdTable[trackerId])
         reminderTrackerNotificationIdTable.removeKey(trackerId)
         //  }
         //  else{
