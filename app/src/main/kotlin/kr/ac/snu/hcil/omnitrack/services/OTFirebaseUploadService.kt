@@ -26,7 +26,7 @@ class OTFirebaseUploadService : WakefulService(TAG) {
     companion object {
 
         const val TAG = "FilebaseUploadService"
-        const val NOTIFICATION_IDENTIFIER = 1
+        const val NOTIFICATION_IDENTIFIER: Int = 903829784
 
         const val ACTION_UPLOAD = "omnitrack_firebase_upload"
         const val ACTION_RESUME = "omnitrack_restart_firebase_uploads"
@@ -142,10 +142,10 @@ class OTFirebaseUploadService : WakefulService(TAG) {
 
             Toast.makeText(this, R.string.msg_uploading_file_to_server, Toast.LENGTH_SHORT).show()
 
-            OTTaskNotificationManager.setTaskProgressNotification(this, TAG, NOTIFICATION_IDENTIFIER,
+            val notification = OTTaskNotificationManager.makeTaskProgressNotificationBuilder(this,
                     getString(R.string.msg_uploading_file_to_server), getString(R.string.msg_uploading), OTTaskNotificationManager.PROGRESS_INDETERMINATE,
-                    R.drawable.icon_cloud_upload, R.drawable.icon_cloud_upload)
-
+                    R.drawable.icon_cloud_upload, R.drawable.icon_cloud_upload).build()
+            startForeground(NOTIFICATION_IDENTIFIER, notification)
 
             println("local uri info: ${outUri.localUri.scheme}, isAbsolute: ${outUri.localUri.isAbsolute}, isRelative: ${outUri.localUri.isRelative}, scheme: ${outUri.localUri.scheme}")
 
@@ -217,7 +217,6 @@ class OTFirebaseUploadService : WakefulService(TAG) {
 
     fun finishIfAllTasksDone() {
         if (currentTasks.isEmpty()) {
-            OTTaskNotificationManager.dismissNotification(this, NOTIFICATION_IDENTIFIER, TAG)
             stopSelf()
         }
     }
