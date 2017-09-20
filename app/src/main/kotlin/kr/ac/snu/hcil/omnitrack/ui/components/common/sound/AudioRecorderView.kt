@@ -71,22 +71,21 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, ValueAnimator.Anima
 
     var audioFileUri: Uri = Uri.EMPTY
         set(value) {
-            if (field != value) {
-                field = value
-                if (value != Uri.EMPTY) {
-                    if (File(value.path).exists()) {
-                        state = State.FILE_MOUNTED
-                        mountNewFile(value)
-                    } else {
-                        println("recorded file does not exists.")
-                        state = State.RECORD
-                    }
+            field = value
+            if (value != Uri.EMPTY) {
+                if (File(value.path).exists()) {
+                    state = State.FILE_MOUNTED
+                    playerModeTransitionAnimator.start()
+                    mountNewFile(value)
                 } else {
+                    println("recorded file does not exists.")
                     state = State.RECORD
                 }
-
-                audioFileUriChanged.invoke(this, value)
+            } else {
+                state = State.RECORD
             }
+
+            audioFileUriChanged.invoke(this, value)
         }
 
     var audioLengthSeconds: Int = 60
@@ -381,10 +380,7 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, ValueAnimator.Anima
                     if (sessionId == mediaSessionId) {
                         refreshTimeViews(0)
                         playBar.clear()
-                        if (resultUri != null) {
-                            playerModeTransitionAnimator.start()
-                            audioFileUri = resultUri
-                        }
+                        audioFileUri = resultUri
                     }
                 }
             }

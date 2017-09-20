@@ -82,7 +82,7 @@
         android:id="@+id/ui_player_button_container"
         android:layout_width="@dimen/button_height_tall"
         android:layout_height="match_parent"
-        android:layout_alignParentRight="true"
+        android:layout_toLeftOf="@+id/ui_discard_button_container"
         android:layout_centerVertical="true"
         android:background="#22ffffff">
 
@@ -92,6 +92,29 @@
             android:layout_height="match_parent"
             android:background="@drawable/transparent_button_background"
             app:srcCompat='@drawable/ex' />
+
+    </FrameLayout>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_toStartOf="@+id/ui_discard_button_container"
+        android:src="@drawable/left_separator" />
+
+    <FrameLayout
+        android:id="@+id/ui_discard_button_container"
+        android:layout_width="@dimen/button_height_tall"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:background="#22ffffff">
+
+        <ImageButton
+            android:id="@+id/ui_discard_button"
+            android:layout_width="@dimen/button_height_tall"
+            android:layout_height="match_parent"
+            android:background="@drawable/transparent_button_background"
+            app:srcCompat='@drawable/trashcan_noti' />
     </FrameLayout>
 
 </RelativeLayout>

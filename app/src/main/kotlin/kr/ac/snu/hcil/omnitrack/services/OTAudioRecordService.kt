@@ -50,6 +50,7 @@ class OTAudioRecordService : Service(), AudioRecordingModule.RecordingListener {
 
         const val INTENT_ACTION_RECORD_START = "kr.ac.snu.hcil.omnitrack.action.ACTION_RECORD_START"
         const val INTENT_ACTION_RECORD_STOP = "kr.ac.snu.hcil.omnitrack.action.ACTION_RECORD_STOP"
+        const val INTENT_ACTION_RECORD_DISCARD = "kr.ac.snu.hcil.omnitrack.action.ACTION_RECORD_DISCARD"
 
         const val INTENT_ACTION_EVENT_RECORD_START_CALLBACK = "kr.ac.snu.hcil.omnitrack.action.ACTION_RECORD_START_CALLBACK"
         const val INTENT_ACTION_EVENT_RECORD_COMPLETED = "kr.ac.snu.hcil.omnitrack.action.ACTION_RECORD_COMPLETED"
@@ -79,7 +80,12 @@ class OTAudioRecordService : Service(), AudioRecordingModule.RecordingListener {
                     .putExtra(INTENT_EXTRA_SESSION_ID, sessionId)
         }
 
-        fun makeCompleteIntent(sessionId: String, uri: Uri): Intent {
+        fun makeDiscardIntent(context: Context, sessionId: String): Intent {
+            return Intent(context, OTAudioRecordService::class.java).setAction(INTENT_ACTION_RECORD_DISCARD)
+                    .putExtra(INTENT_EXTRA_SESSION_ID, sessionId)
+        }
+
+        fun makeCompleteIntent(sessionId: String, uri: Uri?): Intent {
             return Intent(INTENT_ACTION_EVENT_RECORD_COMPLETED)
                     .putExtra(INTENT_EXTRA_SESSION_ID, sessionId)
                     .putExtra(INTENT_EXTRA_RECORD_URI, uri.toString())
@@ -138,6 +144,13 @@ class OTAudioRecordService : Service(), AudioRecordingModule.RecordingListener {
                     stopRecording()
                 }
             }
+
+            INTENT_ACTION_RECORD_DISCARD -> {
+                val sessionId = intent.getStringExtra(INTENT_EXTRA_SESSION_ID)
+                if (currentSessionId == sessionId) {
+                    discardRecording()
+                }
+            }
         }
         return START_NOT_STICKY
     }
@@ -156,17 +169,22 @@ class OTAudioRecordService : Service(), AudioRecordingModule.RecordingListener {
         }
     }
 
+    private fun discardRecording() {
+        if (currentRecordingModule != null) {
+            currentRecordingModule!!.cancel()
+            isRecording = false
+        }
+    }
+
     override fun onRecordingProgress(module: AudioRecordingModule, volume: Int) = currentSessionId?.let {
         currentAudioRatio = currentRecordingModule!!.getCurrentProgressRatio(System.currentTimeMillis())
     } ?: Unit
 
     override fun onRecordingFinished(module: AudioRecordingModule, resultUri: Uri?) {
         if (currentRecordingModule != null) {
-            if (resultUri != null) {
-                LocalBroadcastManager.getInstance(this)
-                        .sendBroadcast(makeCompleteIntent(currentSessionId!!, resultUri))
-                disposeRecorder()
-            }
+            LocalBroadcastManager.getInstance(this)
+                    .sendBroadcast(makeCompleteIntent(currentSessionId!!, resultUri))
+            disposeRecorder()
         }
     }
 
@@ -186,6 +204,10 @@ class OTAudioRecordService : Service(), AudioRecordingModule.RecordingListener {
             setOnClickPendingIntent(R.id.ui_player_button, PendingIntent.getService(context,
                     RECORD_NOTIFICATION_ID,
                     makeStopIntent(context, sessionId),
+                    PendingIntent.FLAG_ONE_SHOT))
+            setOnClickPendingIntent(R.id.ui_discard_button, PendingIntent.getService(context,
+                    RECORD_NOTIFICATION_ID,
+                    makeDiscardIntent(context, sessionId),
                     PendingIntent.FLAG_ONE_SHOT))
         }
     }
