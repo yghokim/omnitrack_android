@@ -91,7 +91,7 @@
             android:layout_width="@dimen/button_height_tall"
             android:layout_height="match_parent"
             android:background="@drawable/transparent_button_background"
-            app:srcCompat='@drawable/stop_bright' />
+            app:srcCompat='@drawable/stop_dark' />
 
     </FrameLayout>
 
@@ -114,7 +114,7 @@
             android:layout_width="@dimen/button_height_tall"
             android:layout_height="match_parent"
             android:background="@drawable/transparent_button_background"
-            app:srcCompat="@drawable/trashcan_bright" />
+            app:srcCompat="@drawable/trashcan" />
     </FrameLayout>
 
 </RelativeLayout>
