@@ -49,7 +49,7 @@ object VectorIconHelper {
     }
 
     fun getConvertedBitmap(context: Context, @DrawableRes vectorDrawableRes: Int, sizeDp: Int? = 24, tint: Int? = null): Bitmap {
-
+        //TODO: implement the part that applies the {@code tint} to the bitmap
         val cacheKey = makeKey(vectorDrawableRes, sizeDp, tint)
         val memCachedBitmap = memCache.get(cacheKey)
         if (memCachedBitmap == null) {
