@@ -4,14 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/main_gradient_mild"
+    android:background="@drawable/audio_play_background_gradient"
     tools:layout_height="64dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:layout_toStartOf="@+id/ui_duration_view"
         android:orientation="vertical">
 
@@ -21,7 +21,7 @@
             android:orientation="horizontal">
 
             <ImageView
-                android:id="@+id/ui_audio"
+                android:id="@+id/ui_audio_icon"
                 android:layout_width="14dp"
                 android:layout_height="14dp"
                 android:layout_gravity="center_vertical"
@@ -34,7 +34,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:layout_marginLeft="4dp"
+                android:layout_marginStart="4dp"
                 android:ellipsize="end"
                 android:fontFamily="sans-serif-normal"
                 android:maxLines="1"
@@ -48,7 +48,7 @@
             android:id="@+id/ui_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="3dp"
+            android:layout_marginStart="3dp"
             android:layout_marginTop="4dp"
             android:ellipsize="marquee"
             android:fontFamily="sans-serif-condensed"
@@ -65,8 +65,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:layout_marginLeft="4dp"
-        android:layout_marginRight="12dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginStart="4dp"
         android:layout_toStartOf="@+id/ui_player_button_container"
         android:fontFamily="sans-serif-light"
         android:textColor="#afffffff"
@@ -80,15 +80,15 @@
 
     <FrameLayout
         android:id="@+id/ui_player_button_container"
-        android:layout_width="@dimen/button_height_tall"
+        android:layout_width="@dimen/button_height_normal"
         android:layout_height="match_parent"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
         android:background="#22ffffff">
 
         <ImageButton
             android:id="@+id/ui_player_button"
-            android:layout_width="@dimen/button_height_tall"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@drawable/transparent_button_background"
             app:srcCompat='@drawable/ex' />
