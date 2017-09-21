@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.Color
 import android.media.AudioAttributes
 import android.media.AudioFocusRequest
 import android.media.AudioManager
@@ -97,13 +98,11 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
                     .putExtra(INTENT_EXTRA_AUDIO_TITLE, title)
         }
 
-        fun makeStopCommandIntent(sessionId: String): Intent {
-            return Intent(INTENT_ACTION_STOP).putExtra(INTENT_EXTRA_SESSION_ID, sessionId)
-        }
+        fun makeStopCommandIntent(sessionId: String): Intent =
+                Intent(INTENT_ACTION_STOP).putExtra(INTENT_EXTRA_SESSION_ID, sessionId)
 
-        private fun makeCompleteEventIntent(sessionId: String): Intent {
-            return Intent(INTENT_ACTION_EVENT_AUDIO_COMPLETED).putExtra(INTENT_EXTRA_SESSION_ID, sessionId)
-        }
+        private fun makeCompleteEventIntent(sessionId: String): Intent =
+                Intent(INTENT_ACTION_EVENT_AUDIO_COMPLETED).putExtra(INTENT_EXTRA_SESSION_ID, sessionId)
 
         private fun makeOnProgressEventIntent(sessionId: String, progressDurationSecond: Int, progressRatio: Float): Intent {
             return Intent(INTENT_ACTION_EVENT_AUDIO_PROGRESS)
@@ -114,6 +113,7 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
 
         private fun makeAudioNotificationRemoteViews(context: Context, title: String, description: String, currentProgressSeconds: Int): RemoteViews {
             val remoteViews = RemoteViews(context.packageName, R.layout.remoteview_notification_audio_player)
+            remoteViews.setImageViewBitmap(R.id.ui_audio_icon, VectorIconHelper.getConvertedBitmap(context, R.drawable.icon_small_audio, tint = Color.WHITE))
             remoteViews.setTextViewText(R.id.ui_title, title)
             remoteViews.setTextViewText(R.id.ui_description, description)
 
@@ -137,6 +137,7 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
             val builder = lastNotificationBuilder ?: NotificationCompat.Builder(context)
                     .setSmallIcon(R.drawable.icon_simple)
                     .setAutoCancel(false)
+                    .setOngoing(true)
                     .setContentTitle("OmniTrack Audio Record Player") as NotificationCompat.Builder
 
             lastNotificationBuilder = builder
@@ -159,7 +160,7 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
 
     private val binder = AudioServiceBinder(this)
 
-    var currentFile: Uri? = null
+    private var currentFile: Uri? = null
         private set
 
     private var pausedPosition: Int = -1

@@ -4,14 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/main_gradient_mild"
+    android:background="@drawable/audio_play_background_gradient"
     tools:layout_height="96dp">
 
     <ImageView
-        android:id="@+id/ui_icon"
+        android:id="@+id/ui_audio_icon"
         android:layout_width="14dp"
         android:layout_height="14dp"
-        android:layout_marginLeft="12dp"
+        android:layout_marginStart="12dp"
         android:layout_marginTop="6dp"
         android:alpha="0.7"
         android:scaleType="fitEnd"
@@ -20,12 +20,12 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/ui_icon"
+        android:layout_alignBottom="@+id/ui_audio_icon"
         android:layout_marginBottom="0dp"
-        android:layout_marginLeft="0dp"
-        android:layout_toEndOf="@+id/ui_icon"
+        android:layout_marginStart="4dp"
+        android:layout_toEndOf="@+id/ui_audio_icon"
         android:fontFamily="sans-serif-regular"
-        android:text="Audio Record"
+        android:text="@string/type_audio_record_name"
         android:textColor="#aaffffff"
         android:textSize="12sp" />
 

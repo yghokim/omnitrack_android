@@ -49,7 +49,6 @@ object VectorIconHelper {
     }
 
     fun getConvertedBitmap(context: Context, @DrawableRes vectorDrawableRes: Int, sizeDp: Int? = 24, tint: Int? = null): Bitmap {
-        //TODO: implement the part that applies the {@code tint} to the bitmap
         val cacheKey = makeKey(vectorDrawableRes, sizeDp, tint)
         val memCachedBitmap = memCache.get(cacheKey)
         if (memCachedBitmap == null) {
@@ -61,8 +60,13 @@ object VectorIconHelper {
             } else {
                 var drawable = AppCompatResources.getDrawable(context, vectorDrawableRes)!!
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-                    drawable = (DrawableCompat.wrap(drawable)).mutate()
+                    drawable = if (tint != null) {
+                        applyTint(drawable, tint)
+                    } else (DrawableCompat.wrap(drawable)).mutate()
+                } else if (tint != null) {
+                    drawable.setTint(tint)
                 }
+
                 val width: Int = if (sizeDp != null) {
                     dipRound(sizeDp)
                 } else drawable.intrinsicWidth
