@@ -370,6 +370,7 @@
     <string name="msg_notification_channel_name_alerts">OmniTrack 중요 알림</string>
     <string name="msg_notification_channel_name_system_messages">OmniTrack 시스템 메시지</string>
     <string name="msg_notification_channel_name_notice">OmniTrack 공지 및 기능소개</string>
+    <string name="msg_recording">녹음중…</string>
 
     <string-array name="purpose_entries">
         <item>directive|건강 관련 정보를 기록하기 위해서</item>

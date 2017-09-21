@@ -1,6 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.services
 
-import android.app.*
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.app.Service
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -94,7 +97,6 @@ class OTAudioRecordService : Service(), AudioRecordingModule.RecordingListener {
     }
 
     private var title = ""
-    private var description = ""
     private val commandReceiver = CommandReceiver()
     private var remoteViews: RemoteViews? = null
 
@@ -134,7 +136,7 @@ class OTAudioRecordService : Service(), AudioRecordingModule.RecordingListener {
 
                     currentSessionId = sessionId
                     currentRecordingModule = AudioRecordingModule(this, filePath)
-                    remoteViews = initRemoteViews(this, currentSessionId!!, title, description, 0)
+                    remoteViews = initRemoteViews(this, currentSessionId!!, title, 0)
                     putNotificationControl(remoteViews)
                     startRecording()
                 }
@@ -194,12 +196,12 @@ class OTAudioRecordService : Service(), AudioRecordingModule.RecordingListener {
     private fun initRemoteViews(context: Context,
                                 sessionId: String,
                                 title: String,
-                                description: String,
                                 currentProgressSeconds: Int): RemoteViews {
         return RemoteViews(context.packageName,
                 R.layout.remoteview_notification_record_player).apply {
+
+            setImageViewBitmap(R.id.ui_audio_icon, VectorIconHelper.getConvertedBitmap(context, R.drawable.icon_small_audio, tint = Color.WHITE))
             setTextViewText(R.id.ui_title, title)
-            setTextViewText(R.id.ui_description, description)
             setTextViewText(R.id.ui_duration_view, AudioRecorderView.formatTime(currentProgressSeconds))
             setImageViewBitmap(R.id.ui_player_button, VectorIconHelper.getConvertedBitmap(context, R.drawable.stop_dark, 24, Color.WHITE))
             setImageViewBitmap(R.id.ui_discard_button, VectorIconHelper.getConvertedBitmap(context, R.drawable.trashcan, 24, Color.WHITE))
@@ -228,12 +230,14 @@ class OTAudioRecordService : Service(), AudioRecordingModule.RecordingListener {
             NotificationCompat.Builder(this)
                     .setSmallIcon(R.drawable.icon_simple)
                     .setAutoCancel(false)
+                    .setOngoing(true)
                     .setChannelId(CHANNEL_ID_RECORD)
                     .setContentTitle("OmniTrack Audio Record Player") as NotificationCompat.Builder
         } else {
             NotificationCompat.Builder(this)
                     .setSmallIcon(R.drawable.icon_simple)
                     .setAutoCancel(false)
+                    .setOngoing(true)
                     .setContentTitle("OmniTrack Audio Record Player") as NotificationCompat.Builder
         }
     }
@@ -252,7 +256,6 @@ class OTAudioRecordService : Service(), AudioRecordingModule.RecordingListener {
 
     private fun disposeRecorder() {
         title = ""
-        description = ""
         currentRecordingModule = null
         currentSessionId = null
         remoteViews = null
