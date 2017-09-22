@@ -804,7 +804,7 @@ object DatabaseManager {
                         override fun onCancelled(p0: DatabaseError) {
                             p0.toException().printStackTrace()
                             if (!subscriber.isUnsubscribed) {
-                                subscriber.onError(p0.toException())
+                                subscriber.onCompleted()
                             }
                         }
 
@@ -861,7 +861,7 @@ object DatabaseManager {
                         override fun onCancelled(p0: DatabaseError) {
                             p0.toException().printStackTrace()
                             if (!subscriber.isUnsubscribed) {
-                                subscriber.onError(p0.toException())
+                                subscriber.onCompleted()
                             }
                         }
 
@@ -888,7 +888,8 @@ object DatabaseManager {
                         override fun onCancelled(p0: DatabaseError) {
                             p0.toException().printStackTrace()
                             if (!subscriber.isUnsubscribed) {
-                                subscriber.onError(p0.toException())
+                                //subscriber.onError(p0.toException())
+                                subscriber.onCompleted()
                             }
                         }
 
