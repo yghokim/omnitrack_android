@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:background="@color/frontalBackground"
     android:orientation="vertical"
-    android:paddingBottom="30dp"
+    android:paddingBottom="20dp"
     android:paddingRight="@dimen/activity_horizontal_margin">
 
     <com.google.android.flexbox.FlexboxLayout
@@ -74,9 +74,10 @@
             />
     </com.google.android.flexbox.FlexboxLayout>
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
         <FrameLayout
             android:id="@+id/sidebar"
@@ -84,6 +85,16 @@
             android:layout_height="match_parent"
             android:layout_alignBottom="@+id/ui_content_container">
 
+            <ImageButton
+                android:id="@+id/ui_button_option"
+                android:layout_width="@dimen/button_height_tiny"
+                android:layout_height="@dimen/button_height_tiny"
+                android:layout_gravity="bottom|center_horizontal"
+                android:background="@drawable/transparent_button_background"
+                android:padding="6dp"
+                android:scaleType="centerInside"
+                android:tint="@color/textColorLight"
+                app:srcCompat="@drawable/more" />
         </FrameLayout>
 
         <LinearLayout
@@ -97,7 +108,8 @@
             <kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
                 android:id="@+id/ui_input_view_container"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                tools:layout_height="200dp">
 
                 <com.github.ybq.android.spinkit.SpinKitView
                     android:id="@+id/ui_container_indicator"
@@ -120,6 +132,6 @@
         </LinearLayout>
 
 
-    </RelativeLayout>
+    </LinearLayout>
 
 </LinearLayout>

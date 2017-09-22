@@ -50,6 +50,8 @@
     <dimen name="button_height_tall">60dp</dimen>
     <dimen name="button_height_normal">50dp</dimen>
     <dimen name="button_height_small">40dp</dimen>
+    <dimen name="button_height_tiny">35dp</dimen>
+
 
     <dimen name="app_widget_instant_logging_button_height">35dp</dimen>
 
