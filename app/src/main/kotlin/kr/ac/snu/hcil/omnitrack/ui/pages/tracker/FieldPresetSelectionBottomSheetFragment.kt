@@ -14,6 +14,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.*
+import kr.ac.snu.hcil.omnitrack.ui.components.common.DismissingBottomSheetDialogFragment
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
@@ -22,25 +23,11 @@ import rx.subscriptions.CompositeSubscription
 /**
  * Created by Young-Ho Kim on 2016-12-28.
  */
-class FieldPresetSelectionBottomSheetFragment : BottomSheetDialogFragment() {
+class FieldPresetSelectionBottomSheetFragment : DismissingBottomSheetDialogFragment(R.layout.fragment_field_preset_selection) {
 
     interface Callback {
         fun onAttributePermittedToAdd(typeInfo: AttributePresetInfo)
     }
-
-    private val behaviorCallback = object : BottomSheetBehavior.BottomSheetCallback() {
-        override fun onSlide(bottomSheet: View, slideOffset: Float) {
-
-        }
-
-        override fun onStateChanged(bottomSheet: View, newState: Int) {
-            if (newState == BottomSheetBehavior.STATE_HIDDEN) {
-                dismiss()
-            }
-        }
-
-    }
-
 
     private lateinit var newAttributeGrid: RecyclerView
 
@@ -72,17 +59,7 @@ class FieldPresetSelectionBottomSheetFragment : BottomSheetDialogFragment() {
         subscriptions.clear()
     }
 
-    override fun setupDialog(dialog: Dialog, style: Int) {
-        super.setupDialog(dialog, style)
-
-        val contentView = View.inflate(context, R.layout.fragment_field_preset_selection, null)
-        dialog.setContentView(contentView)
-        val lp = ((contentView.parent as View).layoutParams as CoordinatorLayout.LayoutParams)
-        val behavior = lp.behavior
-        if (behavior is BottomSheetBehavior) {
-            behavior.setBottomSheetCallback(behaviorCallback)
-        }
-
+    override fun setupDialogAndContentView(dialog: Dialog, contentView: View) {
         newAttributeGrid = contentView.findViewById(R.id.ui_new_attribute_grid)
         newAttributeGrid.layoutManager = GridLayoutManager(context, resources.getInteger(R.integer.new_attribute_panel_horizontal_count))
         newAttributeGrid.adapter = gridAdapter

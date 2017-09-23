@@ -82,8 +82,7 @@
         <FrameLayout
             android:id="@+id/sidebar"
             android:layout_width="?attr/actionBarSize"
-            android:layout_height="match_parent"
-            android:layout_alignBottom="@+id/ui_content_container">
+            android:layout_height="match_parent">
 
             <ImageButton
                 android:id="@+id/ui_button_option"

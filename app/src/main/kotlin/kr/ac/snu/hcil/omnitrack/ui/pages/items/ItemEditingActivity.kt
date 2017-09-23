@@ -549,6 +549,8 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
 
             private val loadingIndicatorInContainer: View by bindView(R.id.ui_container_indicator)
 
+            private val optionButton: View by bindView(R.id.ui_button_option)
+
             private var attributeId: String? = null
 
 
