@@ -7,10 +7,12 @@ import android.view.View
 import android.view.ViewGroup
 import com.heinrichreimersoftware.materialintro.app.IntroActivity
 import com.heinrichreimersoftware.materialintro.app.SlideFragment
-import com.mukesh.countrypicker.fragments.CountryPicker
+import com.mukesh.countrypicker.Country
+import com.mukesh.countrypicker.CountryPicker
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.common.ExtendedSpinner
 import kr.ac.snu.hcil.omnitrack.ui.components.common.choice.SelectionView
+import java.util.*
 
 /**
  * Created by younghokim on 2017. 1. 27..
@@ -97,7 +99,8 @@ class DemographicInputFragment : SlideFragment(), ExtendedSpinner.OnItemSelected
             countryPicker.dismiss()
         }
 
-        val userCountry = countryPicker.getUserCountryInfo(context)
+        val userCountry = Country.getCountryFromSIM(context) ?: Country.getCountryByLocale(Locale.getDefault())
+
         selectedCountryCode = userCountry.code
         selectedCountryName = userCountry.name
         selectedCountryFlagId = userCountry.flag
