@@ -16,6 +16,7 @@ import android.webkit.URLUtil
 import android.widget.FrameLayout
 import android.widget.ImageView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.R
@@ -52,7 +53,9 @@ class ImagePicker : FrameLayout, View.OnClickListener {
                     Glide.with(context).load(value.toString()).into(imageView)
 
                 } else {
-                    Glide.with(context).load(value.toString()).override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL).into(imageView)
+                    Glide.with(context).load(value.toString())
+                            .apply(RequestOptions.overrideOf(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL))
+                            .into(imageView)
                 }
 
                 if (value == Uri.EMPTY) {
