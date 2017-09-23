@@ -1,11 +1,13 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes
 
 import android.content.Context
-import android.net.Uri
+import android.graphics.drawable.Drawable
 import android.view.View
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.drawable.GlideDrawable
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
@@ -20,7 +22,6 @@ import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelpe
 import rx.Observable
 import rx.Single
 import rx.schedulers.Schedulers
-import java.lang.Exception
 import java.util.*
 
 /**
@@ -79,7 +80,7 @@ class OTImageAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrack
                             view.currentMode = PlaceHolderImageView.Mode.IMAGE
                             Glide.with(view.context)
                                     .load(value.localUri.toString())
-                                    .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
+                                    .apply(RequestOptions().override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL))
                                     .into(view.imageView)
                             return Single.just(true)
                         } else {
@@ -106,17 +107,17 @@ class OTImageAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrack
                                             println("downloaded: ${uri}")
                                             Glide.with(view.context)
                                                     .load(uri)
-                                                    .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
-                                                    .listener(object : RequestListener<Uri, GlideDrawable> {
-                                                        override fun onException(e: Exception?, model: Uri?, target: Target<GlideDrawable>?, isFirstResource: Boolean): Boolean {
-                                                            view.currentMode = PlaceHolderImageView.Mode.ERROR
-                                                            return false
-                                                        }
-
-                                                        override fun onResourceReady(resource: GlideDrawable?, model: Uri?, target: Target<GlideDrawable>?, isFromMemoryCache: Boolean, isFirstResource: Boolean): Boolean {
+                                                    .apply(RequestOptions.overrideOf(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL))
+                                                    .listener(object : RequestListener<Drawable> {
+                                                        override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
                                                             if (resource != null) {
                                                                 view.currentMode = PlaceHolderImageView.Mode.IMAGE
                                                             }
+                                                            return false
+                                                        }
+
+                                                        override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable>?, isFirstResource: Boolean): Boolean {
+                                                            view.currentMode = PlaceHolderImageView.Mode.ERROR
                                                             return false
                                                         }
 
