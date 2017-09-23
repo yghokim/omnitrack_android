@@ -31,6 +31,7 @@ import kr.ac.snu.hcil.omnitrack.services.OTTableExportService
 import kr.ac.snu.hcil.omnitrack.ui.DragItemTouchHelperCallback
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTTrackerAttachedActivity
+import kr.ac.snu.hcil.omnitrack.ui.components.common.DismissingBottomSheetDialogFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.common.ExtendedSpinner
 import kr.ac.snu.hcil.omnitrack.ui.components.common.FallbackRecyclerView
 import kr.ac.snu.hcil.omnitrack.ui.components.common.viewholders.RecyclerViewMenuAdapter
@@ -593,7 +594,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
         }
     }
 
-    class SettingsDialogFragment : BottomSheetDialogFragment() {
+    class SettingsDialogFragment : DismissingBottomSheetDialogFragment(R.layout.fragment_items_settings) {
 
         companion object {
 
@@ -608,19 +609,6 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
 
                 return fragment
             }
-        }
-
-        private val behaviorCallback = object : BottomSheetBehavior.BottomSheetCallback() {
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {
-
-            }
-
-            override fun onStateChanged(bottomSheet: View, newState: Int) {
-                if (newState == BottomSheetBehavior.STATE_HIDDEN) {
-                    dismiss()
-                }
-            }
-
         }
 
         private var listView: RecyclerView by Delegates.notNull()
@@ -683,19 +671,9 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
             menuAdapter.notifyItemChanged(0)
         }
 
-        override fun setupDialog(dialog: Dialog, style: Int) {
-            super.setupDialog(dialog, style)
-            val contentView = View.inflate(context, R.layout.fragment_items_settings, null)
-            dialog.setContentView(contentView)
-            val lp = ((contentView.parent as View).layoutParams as CoordinatorLayout.LayoutParams)
-            val behavior = lp.behavior
-            if (behavior is BottomSheetBehavior) {
-                behavior.setBottomSheetCallback(behaviorCallback)
-            }
-
+        override fun setupDialogAndContentView(dialog: Dialog, contentView: View) {
 
             purgeMenuItem = RecyclerViewMenuAdapter.MenuItem(R.drawable.clear_cache, context.getString(R.string.msg_purge_cache), null, isEnabled = false, onClick = {
-                //TODO purge cache
                 val cacheDir = tracker?.getItemCacheDir(context, false)
                 if (cacheDir != null) {
                     println("purge cache dir files")

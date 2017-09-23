@@ -1,7 +1,41 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.common
 
+import android.app.Dialog
+import android.support.design.widget.BottomSheetBehavior
+import android.support.design.widget.BottomSheetDialogFragment
+import android.support.design.widget.CoordinatorLayout
+import android.view.View
+import kr.ac.snu.hcil.omnitrack.R
+
 /**
  * Created by younghokim on 2017. 9. 23..
  */
-class DismissableBottomSheetFragment {
+abstract class DismissingBottomSheetDialogFragment(private val dialogLayoutId: Int) : BottomSheetDialogFragment() {
+    private val behaviorCallback = object : BottomSheetBehavior.BottomSheetCallback() {
+        override fun onSlide(bottomSheet: View, slideOffset: Float) {
+
+        }
+
+        override fun onStateChanged(bottomSheet: View, newState: Int) {
+            if (newState == BottomSheetBehavior.STATE_HIDDEN) {
+                dismiss()
+            }
+        }
+
+    }
+
+    override fun setupDialog(dialog: Dialog, style: Int) {
+        super.setupDialog(dialog, style)
+        val contentView = View.inflate(context, dialogLayoutId, null)
+        dialog.setContentView(contentView)
+        val lp = ((contentView.parent as View).layoutParams as CoordinatorLayout.LayoutParams)
+        val behavior = lp.behavior
+        if (behavior is BottomSheetBehavior) {
+            behavior.setBottomSheetCallback(behaviorCallback)
+        }
+
+        setupDialogAndContentView(dialog, contentView)
+    }
+
+    protected abstract fun setupDialogAndContentView(dialog: Dialog, contentView: View)
 }
