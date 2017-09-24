@@ -564,6 +564,15 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
                 }
 
                 connectionIndicatorStubProxy = ConnectionIndicatorStubProxy(frame, R.id.ui_connection_indicator_stub)
+
+                optionButton.setOnClickListener {
+                    val tracker = tracker
+                    val attributeId = attributeId
+                    if (tracker != null && attributeId != null) {
+                        val historyDialog = RecentItemValuePickerBottomSheetFragment.getInstance(tracker.objectId, attributeId)
+                        historyDialog.show(supportFragmentManager, RecentItemValuePickerBottomSheetFragment.TAG)
+                    }
+                }
             }
 
             private fun onInputViewValueChanged(newVal: Any) {
