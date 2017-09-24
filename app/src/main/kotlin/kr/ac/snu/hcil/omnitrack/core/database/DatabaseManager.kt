@@ -28,9 +28,7 @@ import kotlin.NoSuchElementException
 /**
  * Created by younghokim on 2017. 2. 9..
  */
-object DatabaseManager {
-
-    enum class Order {ASC, DESC }
+object DatabaseManager : IDatabaseManager {
 
     const val CHILD_NAME_USERS = "users"
     const val CHILD_NAME_TRACKERS = "trackers"
@@ -158,14 +156,7 @@ object DatabaseManager {
     }
 
     @Keep
-    class ItemListSummary {
-        var totalCount: Long? = null
-        var todayCount: Int? = null
-        var lastLoggingTime: Long? = null
-    }
-
-    @Keep
-    class DeviceInfo {
+    class DeviceInfoPOJO {
         var os: String? = "Android api-${android.os.Build.VERSION.SDK_INT}"
         var instanceId: String? = FirebaseInstanceId.getInstance().token
         var firstLoginAt: Any? = ServerValue.TIMESTAMP
@@ -212,35 +203,20 @@ object DatabaseManager {
         return newKey
     }
 
-    fun generateAttributeKey(trackerId: String): String {
-        return trackerRef(trackerId)!!.child(CHILD_NAME_ATTRIBUTES)!!.push().key
-    }
-
-    /*
-    fun saveUser(user: OTUser) {
-        for (child in user.trackers.iterator().withIndex()) {
-            saveTracker(child.value, child.index)
-        }
-
-        for (triggerEntry in user.triggerManager.withIndex()) {
-            saveTrigger(triggerEntry.value, user.objectId, triggerEntry.index)
-        }
-    }*/
-
-    fun saveTrigger(trigger: OTTrigger, userId: String, position: Int) {
+    override fun saveTrigger(trigger: OTTrigger, userId: String, position: Int) {
         val pojo = trigger.dumpDataToPojo(null)
         triggerRef(triggerId = trigger.objectId)?.setValue(pojo)
         setContainsFlagOfUser(userId, trigger.objectId, CHILD_NAME_TRIGGERS, true)
     }
 
-    fun findTriggersOfUser(user: OTUser): Observable<List<OTTrigger>> {
+    override fun findTriggersOfUser(user: OTUser): Observable<List<OTTrigger>> {
         return findElementListOfUser(user.objectId, CHILD_NAME_TRIGGERS) {
             child ->
             extractTriggerWithPosition(user, child)
         }
     }
 
-    fun getTrigger(user: OTUser, key: String): Observable<OTTrigger> {
+    override fun getTrigger(user: OTUser, key: String): Observable<OTTrigger> {
         return Observable.unsafeCreate {
             subscriber ->
             val query = dbRef?.child(CHILD_NAME_TRIGGERS)?.child(key)
@@ -282,7 +258,7 @@ object DatabaseManager {
         }
     }
 
-    fun extractTriggerWithPosition(user: OTUser, snapshot: DataSnapshot): Pair<Int, OTTrigger>? {
+    private fun extractTriggerWithPosition(user: OTUser, snapshot: DataSnapshot): Pair<Int, OTTrigger>? {
         try {
             val pojo = snapshot.getValue(TriggerPOJO::class.java)!!
             if (pojo.user == user.objectId) {
@@ -303,7 +279,7 @@ object DatabaseManager {
         }
     }
 
-    fun getContainsFlagListOfUser(userId: String, childName: String): DatabaseReference? {
+    private fun getContainsFlagListOfUser(userId: String, childName: String): DatabaseReference? {
         return dbRef?.child(CHILD_NAME_USERS)?.child(userId)?.child(childName)
     }
 
@@ -315,7 +291,7 @@ object DatabaseManager {
         })
     }
 
-    fun removeTracker(tracker: OTTracker, formerOwner: OTUser, archive: Boolean = true) {
+    override fun removeTracker(tracker: OTTracker, formerOwner: OTUser, archive: Boolean) {
         println("Firebase remove tracker: ${tracker.name}, ${tracker.objectId}")
         if (archive) {
             deBelongReference(trackerRef(tracker.objectId), CHILD_NAME_TRACKERS, formerOwner.objectId)
@@ -329,7 +305,7 @@ object DatabaseManager {
         }
     }
 
-    fun removeTrigger(trigger: OTTrigger) {
+    override fun removeTrigger(trigger: OTTrigger) {
 
         println("Firebase remove tracker: ${trigger.name}, ${trigger.objectId}")
         deBelongReference(triggerRef(trigger.objectId), CHILD_NAME_TRIGGERS, trigger.user.objectId)
@@ -355,11 +331,11 @@ object DatabaseManager {
         }
     }
 
-    fun removeAttribute(trackerId: String, objectId: String) {
+    override fun removeAttribute(trackerId: String, objectId: String) {
         trackerRef(trackerId)?.child(CHILD_NAME_ATTRIBUTES)?.child(objectId)?.removeValue()
     }
 
-    fun extractTrackerWithPosition(snapshot: DataSnapshot): Pair<Int, OTTracker>? {
+    private fun extractTrackerWithPosition(snapshot: DataSnapshot): Pair<Int, OTTracker>? {
         val pojo = snapshot.getValue(TrackerPOJO::class.java)
         //val attributesRef = snapshot.child(CHILD_NAME_ATTRIBUTES)
         if (pojo != null) {
@@ -404,7 +380,7 @@ object DatabaseManager {
         } else return null
     }
 
-    fun <T> findElementListOfUser(userId: String, childName: String, extractFunc: (DataSnapshot) -> Pair<Int, T>?): Observable<List<T>> {
+    private fun <T> findElementListOfUser(userId: String, childName: String, extractFunc: (DataSnapshot) -> Pair<Int, T>?): Observable<List<T>> {
         val query = getContainsFlagListOfUser(userId, childName)
         return if (query != null) {
             Observable.create {
@@ -490,14 +466,14 @@ object DatabaseManager {
 
     }
 
-    fun findTrackersOfUser(userId: String): Observable<List<OTTracker>> {
+    override fun findTrackersOfUser(userId: String): Observable<List<OTTracker>> {
         return findElementListOfUser(userId, CHILD_NAME_TRACKERS) {
             snapshot ->
             extractTrackerWithPosition(snapshot)
         }
     }
 
-    fun getTracker(key: String): Observable<OTTracker> {
+    override fun getTracker(key: String): Observable<OTTracker> {
         return Observable.create {
             subscriber ->
             val query = dbRef?.child(CHILD_NAME_TRACKERS)?.child(key)
@@ -532,7 +508,7 @@ object DatabaseManager {
         }
     }
 
-    fun saveAttribute(trackerId: String, attribute: OTAttribute<out Any>, position: Int) {
+    override fun saveAttribute(trackerId: String, attribute: OTAttribute<out Any>, position: Int) {
         val attributeRef = trackerRef(trackerId)?.child("attributes")?.child(attribute.objectId)
         if (attributeRef != null) {
             val pojo = makeAttributePojo(attribute, position)
@@ -559,7 +535,7 @@ object DatabaseManager {
         return pojo
     }
 
-    fun saveTracker(tracker: OTTracker, position: Int) {
+    override fun saveTracker(tracker: OTTracker, position: Int) {
         println("save tracker: ${tracker.name}, ${tracker.objectId}")
 
         if (tracker.owner != null) {
@@ -601,11 +577,7 @@ object DatabaseManager {
         return getItemListContainerOfTrackerChild(trackerId)?.child("list")
     }
 
-    fun getItemStatisticsOfTrackerChild(trackerId: String): DatabaseReference? {
-        return getItemListContainerOfTrackerChild(trackerId)?.child("statistics")
-    }
-
-    fun removeItem(item: OTItem) {
+    override fun removeItem(item: OTItem) {
         //deleteObjects(DatabaseHelper.ItemScheme, item.objectId!!)
         val itemId = item.objectId
         if (itemId != null) {
@@ -613,7 +585,7 @@ object DatabaseManager {
         }
     }
 
-    fun removeItem(trackerId: String, itemId: String) {
+    override fun removeItem(trackerId: String, itemId: String) {
         val itemRef = getItemListOfTrackerChild(trackerId)?.child(itemId)
 
         if (itemRef != null) {
@@ -629,7 +601,7 @@ object DatabaseManager {
         }
     }
 
-    fun getItem(tracker: OTTracker, itemId: String): Observable<OTItem> {
+    override fun getItem(tracker: OTTracker, itemId: String): Observable<OTItem> {
         val ref = getItemListOfTrackerChild(tracker.objectId)?.child(itemId)
         if (ref != null) {
             return Observable.create {
@@ -663,11 +635,11 @@ object DatabaseManager {
         }
     }
 
-    fun setUsedAppWidget(widgetName: String, used: Boolean) {
+    override fun setUsedAppWidget(widgetName: String, used: Boolean) {
         currentUserRef?.child("used_widgets")?.child(widgetName)?.setValue(used)
     }
 
-    fun makeItemQueryStream(tracker: OTTracker, timeRange: TimeSpan? = null, order: Order = Order.DESC): Observable<ItemAction> {
+    fun makeItemQueryStream(tracker: OTTracker, timeRange: TimeSpan? = null, order: IDatabaseManager.Order = IDatabaseManager.Order.DESC): Observable<ItemAction> {
         val ref = getItemListOfTrackerChild(tracker.objectId)
         if (ref != null) {
             var query = ref.orderByChild("timestamp")
@@ -715,7 +687,7 @@ object DatabaseManager {
         else null
     }
 
-    fun loadItems(tracker: OTTracker, timeRange: TimeSpan? = null, order: Order = Order.DESC): Observable<List<OTItem>> {
+    override fun loadItems(tracker: OTTracker, timeRange: TimeSpan?, order: IDatabaseManager.Order): Observable<List<OTItem>> {
         val ref = getItemListOfTrackerChild(tracker.objectId)
         if (ref != null) {
             var query = ref.orderByChild("timestamp")
@@ -750,7 +722,7 @@ object DatabaseManager {
 
                                 list.sortBy {
                                     when (order) {
-                                        Order.ASC -> it.timestamp
+                                        IDatabaseManager.Order.ASC -> it.timestamp
                                         else -> -it.timestamp
                                     }
                                 }
@@ -780,23 +752,7 @@ object DatabaseManager {
                 ?.endAt(to.toDouble(), "timestamp")
     }
 
-    fun getItemListRefOfDay(tracker: OTTracker, pivot: Long): Query? {
-        val cal = Calendar.getInstance()
-        cal.timeInMillis = pivot
-        cal.set(Calendar.HOUR_OF_DAY, 0)
-        cal.set(Calendar.MINUTE, 0)
-        cal.set(Calendar.SECOND, 0)
-        cal.set(Calendar.MILLISECOND, 0)
-
-        val first = cal.timeInMillis
-
-        cal.add(Calendar.DAY_OF_YEAR, 1)
-        val second = cal.timeInMillis - 20
-
-        return getItemListRefDuring(tracker, first, second)
-    }
-
-    fun getLogCountDuring(tracker: OTTracker, from: Long, to: Long): Observable<Long> {
+    override fun getLogCountDuring(tracker: OTTracker, from: Long, to: Long): Observable<Long> {
         return Observable.create {
             subscriber ->
             getItemListRefDuring(tracker, from, to)
@@ -820,7 +776,7 @@ object DatabaseManager {
         return numRows.toInt()*/
     }
 
-    fun getLogCountOfDay(tracker: OTTracker): Observable<Long> {
+    override fun getLogCountOfDay(tracker: OTTracker): Observable<Long> {
         val cal = Calendar.getInstance()
         cal.set(Calendar.HOUR_OF_DAY, 0)
         cal.set(Calendar.MINUTE, 0)
@@ -835,27 +791,9 @@ object DatabaseManager {
         return getLogCountDuring(tracker, first, second)
     }
 
-    fun getTotalItemCount(tracker: OTTracker): Observable<Pair<Long, Long>> {
+    override fun getTotalItemCount(tracker: OTTracker): Observable<Pair<Long, Long>> {
         return Observable.create {
             subscriber ->
-            /*
-            getItemListOfTrackerChild(tracker.objectId)
-                    ?.addListenerForSingleValueEvent(object : ValueEventListener {
-                        override fun onCancelled(p0: DatabaseError) {
-                            p0.toException().printStackTrace()
-                            if (!subscriber.isUnsubscribed) {
-                                subscriber.onError(p0.toException())
-                            }
-                        }
-
-                        override fun onDataChange(snapshot: DataSnapshot) {
-                            println("item count: ${snapshot.childrenCount}")
-                            if (!subscriber.isUnsubscribed) {
-                                subscriber.onNext(snapshot.childrenCount)
-                                subscriber.onCompleted()
-                            }
-                        }
-                    })*/
             getItemListContainerOfTrackerChild(tracker.objectId)?.child("item_count")
                     ?.addValueEventListener(object : ValueEventListener {
                         override fun onCancelled(p0: DatabaseError) {
@@ -880,7 +818,7 @@ object DatabaseManager {
         }
     }
 
-    fun getLastLoggingTime(tracker: OTTracker): Observable<Long?> {
+    override fun getLastLoggingTime(tracker: OTTracker): Observable<Long?> {
         return Observable.create {
             subscriber ->
             getItemListOfTrackerChild(tracker.objectId)?.orderByChild("timestamp")?.limitToLast(1)
@@ -911,56 +849,7 @@ object DatabaseManager {
         }
     }
 
-    /*
-    fun getItemListSummary(tracker: OTTracker): Observable<ItemListSummary> {
-        return Observable.create {
-            subscriber ->
-
-            val eventListener = object : ValueEventListener {
-                override fun onCancelled(p0: DatabaseError) {
-                    p0.toException().printStackTrace()
-                    if (!subscriber.isUnsubscribed) {
-                        subscriber.onError(p0.toException())
-                    }
-                }
-
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    println("item count: ${snapshot.childrenCount}")
-                    if (!subscriber.isUnsubscribed) {
-                        val info = ItemListSummary()
-                        info.totalCount = snapshot.childrenCount
-                        if (snapshot.hasChildren()) {
-                            val lastLoggingTime = snapshot.children.last().child("timestamp").value
-                            if (lastLoggingTime is Long) info.lastLoggingTime = lastLoggingTime
-                            else if (lastLoggingTime is Int) info.lastLoggingTime = lastLoggingTime.toLong()
-
-                            val startOfToday = TimeHelper.cutTimePartFromEpoch(System.currentTimeMillis())
-                            info.todayCount = snapshot.children.filter {
-                                val timestamp = it.child("timestamp").value
-                                if (timestamp is Long) {
-                                    timestamp >= startOfToday
-                                } else if (timestamp is Int) {
-                                    timestamp >= startOfToday.toInt()
-                                } else false
-                            }.count()
-                        }
-
-                        subscriber.onNext(info)
-                    }
-                }
-            }
-
-            val query = getItemListRefOfDay(tracker, System.currentTimeMillis())
-
-            query?.addValueEventListener(eventListener)
-
-            subscriber.add(Subscriptions.create {
-                query?.removeEventListener(eventListener)
-            })
-        }
-    }*/
-
-    fun saveItem(item: OTItem, tracker: OTTracker, notifyIntent: Boolean = true, finished: ((Boolean) -> Unit)? = null) {
+    override fun saveItem(item: OTItem, tracker: OTTracker, notifyIntent: Boolean, finished: ((Boolean) -> Unit)?) {
 
         val itemRef = if (item.objectId != null) {
             getItemListOfTrackerChild(tracker.objectId)?.child(item.objectId!!)
@@ -1034,7 +923,7 @@ object DatabaseManager {
         } else finished?.invoke(false)
     }
 
-    fun checkHasDeviceId(userId: String, deviceId: String): Single<Boolean> {
+    override fun checkHasDeviceId(userId: String, deviceId: String): Single<Boolean> {
         val query = DatabaseManager.dbRef?.child(DatabaseManager.CHILD_NAME_USERS)?.child(userId)?.child("devices")?.child(deviceId)
         if (query != null) {
             return Single.create {
@@ -1065,19 +954,19 @@ object DatabaseManager {
         return DatabaseManager.currentUserRef?.child("devices")?.child(OTApplication.app.deviceId)
     }
 
-    fun addDeviceInfoToUser(userId: String, deviceId: String): Single<DeviceInfo> {
+    override fun addDeviceInfoToUser(userId: String, deviceId: String): Single<OTDeviceInfo> {
         val query = DatabaseManager.dbRef?.child(DatabaseManager.CHILD_NAME_USERS)?.child(userId)?.child("devices")
         if (query != null) {
             return Single.create {
                 subscriber ->
 
-                val info = DeviceInfo()
+                val info = DeviceInfoPOJO()
                 query.child(deviceId).setValue(info).addOnCompleteListener({
                     result ->
                     if (!subscriber.isUnsubscribed) {
                         if (result.isSuccessful) {
                             refreshInstanceIdToServerIfExists(false)
-                            subscriber.onSuccess(info)
+                            subscriber.onSuccess(OTDeviceInfo().apply { appVersion = info.appVersion; this.firstLoginAt = System.currentTimeMillis(); this.os = info.os; this.instanceId = info.instanceId })
                         } else {
                             subscriber.onError(result.exception)
                         }
@@ -1089,7 +978,7 @@ object DatabaseManager {
         }
     }
 
-    fun refreshInstanceIdToServerIfExists(ignoreIfStored: Boolean): Boolean {
+    override fun refreshInstanceIdToServerIfExists(ignoreIfStored: Boolean): Boolean {
         if (ignoreIfStored) {
             if (OTApplication.app.systemSharedPreferences.contains(OTApplication.PREFERENCE_KEY_FIREBASE_INSTANCE_ID)) {
                 return false
@@ -1108,7 +997,7 @@ object DatabaseManager {
 
     }
 
-    fun removeDeviceInfo(userId: String, deviceId: String): Single<Boolean> {
+    override fun removeDeviceInfo(userId: String, deviceId: String): Single<Boolean> {
         val query = DatabaseManager.dbRef?.child(DatabaseManager.CHILD_NAME_USERS)?.child(userId)?.child("devices")
         if (query != null) {
             return Single.create {

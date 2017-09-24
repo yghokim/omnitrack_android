@@ -8,6 +8,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.IDatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.visualization.TrackerChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.ITimeBinnedHeatMap
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
@@ -51,7 +52,7 @@ class LoggingHeatMapModel(tracker: OTTracker) : TrackerChartModel<ITimeBinnedHea
 
         val calendarCache = Calendar.getInstance()
 
-        return DatabaseManager.loadItems(tracker, getTimeScope(), DatabaseManager.Order.ASC).map {
+        return DatabaseManager.loadItems(tracker, getTimeScope(), IDatabaseManager.Order.ASC).map {
             items ->
             println("items for loging heatmap: ${items.size}")
             //println(items)
