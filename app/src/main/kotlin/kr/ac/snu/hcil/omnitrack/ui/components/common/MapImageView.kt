@@ -94,14 +94,16 @@ class MapImageView : PlaceHolderImageView /*FutureCallback<ImageView>*/ {
                         .apply(
                                 RequestOptions.overrideOf(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
                                         .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                                        .dontAnimate()
                         )
                         .listener(object : RequestListener<Drawable> {
                             override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
                                 if (resource != null) {
                                     currentMode = PlaceHolderImageView.Mode.IMAGE
+                                    imageView.setImageDrawable(resource)
                                 }
                                 onBitmapRetrieved()
-                                return false
+                                return true
                             }
 
                             override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable>?, isFirstResource: Boolean): Boolean {
@@ -110,8 +112,7 @@ class MapImageView : PlaceHolderImageView /*FutureCallback<ImageView>*/ {
                                 return false
                             }
 
-                        })
-                        .into(this.imageView)
+                        }).into(imageView)
                 /*
             Ion.with(this)
                     .load(makeGoogleMapQuery(location, zoom, width, height)).setCallback(this)*/

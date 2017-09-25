@@ -125,7 +125,7 @@ dependencies {
     compile 'com.jaredrummler:material-spinner:1.1.0'
     compile 'de.hdodenhof:circleimageview:2.1.0'
     compile 'com.github.bumptech.glide:glide:4.1.1'
-    //kapt 'com.github.bumptech.glide:compiler:3.7.0'
+    kapt 'com.github.bumptech.glide:compiler:4.1.1'
     compile 'gun0912.ted:tedbottompicker:1.0.12'
     compile 'com.tbruyelle.rxpermissions:rxpermissions:0.9.4@aar'
     compile 'com.flurgle:camerakit:0.9.17'
