@@ -59,7 +59,7 @@
 
     <string name="property_rating_options_display_type">Input Type</string>
     <string name="property_rating_display_type_likert">Likert Scale</string>
-    <string name="property_rating_display_type_stars">Start</string>
+    <string name="property_rating_display_type_stars">Stars</string>
     <string name="property_rating_options_star_levels">Number of Stars</string>
     <string name="property_rating_options_leftmost_value">Leftmost value</string>
     <string name="property_rating_options_rightmost_value">Rightmost value</string>
