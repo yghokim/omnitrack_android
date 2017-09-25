@@ -5,7 +5,10 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.*
+import android.support.design.widget.BaseTransientBottomBar
+import android.support.design.widget.BottomSheetDialogFragment
+import android.support.design.widget.CoordinatorLayout
+import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -46,6 +49,7 @@ import kr.ac.snu.hcil.omnitrack.utils.getDayOfMonth
 import kr.ac.snu.hcil.omnitrack.utils.io.FileHelper
 import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
 import rx.Subscription
+import rx.android.schedulers.AndroidSchedulers
 import rx.subscriptions.CompositeSubscription
 import java.text.SimpleDateFormat
 import java.util.*
@@ -226,8 +230,12 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                 val item = items.find { item -> item.objectId == itemId }
                 if (item != null) {
                     item.setValueOf(attribute, value)
-                    DatabaseManager.saveItem(item, tracker, false)
-                    itemListViewAdapter.notifyItemChanged(items.indexOf(item))
+                    creationSubscriptions.add(
+                            DatabaseManager.saveItem(item, tracker, false).observeOn(AndroidSchedulers.mainThread()).subscribe { success ->
+                                if (success)
+                                    itemListViewAdapter.notifyItemChanged(items.indexOf(item))
+                            }
+                    )
                 }
             }
         }
@@ -645,10 +653,6 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
             super.onSaveInstanceState(outState)
             outState.putBoolean(OTTableExportService.EXTRA_EXPORT_CONFIG_INCLUDE_FILE, exportConfigIncludeFile)
             outState.putString(OTTableExportService.EXTRA_EXPORT_CONFIG_TABLE_FILE_TYPE, exportConfigTableFileType.toString())
-        }
-
-        override fun onDestroy() {
-            super.onDestroy()
         }
 
         override fun onDismiss(dialog: DialogInterface?) {
