@@ -30,6 +30,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.pages.ConnectionIndicatorStubProxy
+import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import rx.Observable
 import rx.subscriptions.CompositeSubscription
 import java.util.*
@@ -350,15 +351,23 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
             val item = it.makeItem(OTItem.LoggingSource.Manual)
             println("Will push $item")
 
+            creationSubscriptions.add(
+                    DatabaseManager.saveItem(item, tracker!!).subscribe { success ->
+                        if (success) {
+                            it.clear()
+                            clearBuilderCache()
+                            skipViewValueCaching = true
+                            itemSaved = true
+                            setResult(RESULT_OK, Intent().putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, item.objectId))
+                            finish()
+                        } else {
+                            DialogHelper.makeSimpleAlertBuilder(this, "Item Logging Failed.")
+                        }
+                    }
+            )
 
-            DatabaseManager.saveItem(item, tracker!!)
-            it.clear()
-            clearBuilderCache()
-            skipViewValueCaching = true
-            itemSaved = true
-            setResult(RESULT_OK, Intent().putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, item.objectId))
+
         }
-        finish()
         //}
     }
 

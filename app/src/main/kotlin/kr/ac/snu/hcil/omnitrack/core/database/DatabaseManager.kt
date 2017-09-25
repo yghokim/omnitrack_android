@@ -12,8 +12,6 @@ import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.database.DatabaseHelper.Companion.SAVE_RESULT_EDIT
-import kr.ac.snu.hcil.omnitrack.core.database.DatabaseHelper.Companion.SAVE_RESULT_NEW
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.services.OTFirebaseUploadService
@@ -28,7 +26,7 @@ import kotlin.NoSuchElementException
 /**
  * Created by younghokim on 2017. 2. 9..
  */
-object DatabaseManager : IDatabaseManager {
+object DatabaseManager : ADatabaseManager() {
 
     const val CHILD_NAME_USERS = "users"
     const val CHILD_NAME_TRACKERS = "trackers"
@@ -639,7 +637,7 @@ object DatabaseManager : IDatabaseManager {
         currentUserRef?.child("used_widgets")?.child(widgetName)?.setValue(used)
     }
 
-    fun makeItemQueryStream(tracker: OTTracker, timeRange: TimeSpan? = null, order: IDatabaseManager.Order = IDatabaseManager.Order.DESC): Observable<ItemAction> {
+    fun makeItemQueryStream(tracker: OTTracker, timeRange: TimeSpan? = null, order: ADatabaseManager.Order = ADatabaseManager.Order.DESC): Observable<ItemAction> {
         val ref = getItemListOfTrackerChild(tracker.objectId)
         if (ref != null) {
             var query = ref.orderByChild("timestamp")
@@ -687,7 +685,7 @@ object DatabaseManager : IDatabaseManager {
         else null
     }
 
-    override fun loadItems(tracker: OTTracker, timeRange: TimeSpan?, order: IDatabaseManager.Order): Observable<List<OTItem>> {
+    override fun loadItems(tracker: OTTracker, timeRange: TimeSpan?, order: ADatabaseManager.Order): Observable<List<OTItem>> {
         val ref = getItemListOfTrackerChild(tracker.objectId)
         if (ref != null) {
             var query = ref.orderByChild("timestamp")
@@ -722,7 +720,7 @@ object DatabaseManager : IDatabaseManager {
 
                                 list.sortBy {
                                     when (order) {
-                                        IDatabaseManager.Order.ASC -> it.timestamp
+                                        ADatabaseManager.Order.ASC -> it.timestamp
                                         else -> -it.timestamp
                                     }
                                 }
@@ -849,78 +847,80 @@ object DatabaseManager : IDatabaseManager {
         }
     }
 
-    override fun saveItem(item: OTItem, tracker: OTTracker, notifyIntent: Boolean, finished: ((Boolean) -> Unit)?) {
+    override fun saveItemImpl(item: OTItem, tracker: OTTracker): Single<Int> {
 
-        val itemRef = if (item.objectId != null) {
-            getItemListOfTrackerChild(tracker.objectId)?.child(item.objectId!!)
-        } else getItemListOfTrackerChild(tracker.objectId)?.push()
+        return Single.create { subscriber ->
 
-        if (itemRef != null) {
-            val itemId = itemRef.key
+            val itemRef = if (item.objectId != null) {
+                getItemListOfTrackerChild(tracker.objectId)?.child(item.objectId!!)
+            } else getItemListOfTrackerChild(tracker.objectId)?.push()
 
-            tracker.attributes.unObservedList.forEach {
-                val value = item.getValueOf(it)
-                if (value is SynchronizedUri && value.localUri != Uri.EMPTY) {
-                    println("upload Synchronized Uri file to server...")
-                    val storageRef = OTFirebaseUploadService.getItemStorageReference(itemId, tracker.objectId, tracker.owner!!.objectId).child(value.localUri.lastPathSegment)
-                    value.setSynchronized(Uri.parse(storageRef.path))
+            if (itemRef != null) {
+                val itemId = itemRef.key
 
-                    OTApplication.app.startService(
-                            OTFirebaseUploadService.makeUploadTaskIntent(OTApplication.app, value, itemId, tracker.objectId, tracker.owner!!.objectId)
-                    )
+                tracker.attributes.unObservedList.forEach {
+                    val value = item.getValueOf(it)
+                    if (value is SynchronizedUri && value.localUri != Uri.EMPTY) {
+                        println("upload Synchronized Uri file to server...")
+                        val storageRef = OTFirebaseUploadService.getItemStorageReference(itemId, tracker.objectId, tracker.owner!!.objectId).child(value.localUri.lastPathSegment)
+                        value.setSynchronized(Uri.parse(storageRef.path))
+
+                        OTApplication.app.startService(
+                                OTFirebaseUploadService.makeUploadTaskIntent(OTApplication.app, value, itemId, tracker.objectId, tracker.owner!!.objectId)
+                        )
+                    }
                 }
-            }
 
-            val pojo = ItemPOJO()
-            pojo.timestamp = if (item.timestamp != -1L) {
-                item.timestamp
-            } else {
-                ServerValue.TIMESTAMP
-            }
-            pojo.sourceType = item.source.ordinal
-            val data = HashMap<String, String>()
-
-            for (attribute in tracker.attributes) {
-                val value = item.getCastedValueOf(attribute)
-                if (value != null) {
-                    data[attribute.objectId] = TypeStringSerializationHelper.serialize(attribute.typeNameForSerialization, value)
+                val pojo = ItemPOJO()
+                pojo.timestamp = if (item.timestamp != -1L) {
+                    item.timestamp
+                } else {
+                    ServerValue.TIMESTAMP
                 }
-            }
+                pojo.sourceType = item.source.ordinal
+                val data = HashMap<String, String>()
 
-            println("store data ${data}")
+                for (attribute in tracker.attributes) {
+                    val value = item.getCastedValueOf(attribute)
+                    if (value != null) {
+                        data[attribute.objectId] = TypeStringSerializationHelper.serialize(attribute.typeNameForSerialization, value)
+                    }
+                }
 
-            pojo.dataTable = data
+                println("store data ${data}")
 
-            val result = if (item.objectId != null) {
-                SAVE_RESULT_EDIT
-            } else {
-                SAVE_RESULT_NEW
-            }
+                pojo.dataTable = data
 
-            itemRef.setValue(pojo)
+                val result = if (item.objectId != null) {
+                    SAVE_RESULT_EDIT
+                } else {
+                    SAVE_RESULT_NEW
+                }
 
-            if (result == SAVE_RESULT_NEW) {
-                ItemCountTracer.setCounterCache(tracker.objectId, ItemCountTracer.getCachedCount(tracker.objectId) + 1, System.currentTimeMillis())
-            }
+                itemRef.setValue(pojo, object : DatabaseReference.CompletionListener {
+                    override fun onComplete(error: DatabaseError?, ref: DatabaseReference) {
+                        if (error != null) {
+                            if (!subscriber.isUnsubscribed) {
+                                error.toException().printStackTrace()
+                                subscriber.onSuccess(SAVE_RESULT_FAIL)
+                            }
+                        } else {
+                            if (result == SAVE_RESULT_NEW) {
+                                ItemCountTracer.setCounterCache(tracker.objectId, ItemCountTracer.getCachedCount(tracker.objectId) + 1, System.currentTimeMillis())
+                            }
 
-            if (item.objectId == null)
-                item.objectId = itemId
+                            if (item.objectId == null)
+                                item.objectId = itemId
 
-            if (notifyIntent) {
-                val intent = Intent(when (result) {
-                    SAVE_RESULT_NEW -> OTApplication.BROADCAST_ACTION_ITEM_ADDED
-                    SAVE_RESULT_EDIT -> OTApplication.BROADCAST_ACTION_ITEM_EDITED
-                    else -> throw IllegalArgumentException("")
+                            if (!subscriber.isUnsubscribed) {
+                                subscriber.onSuccess(result)
+                            }
+                        }
+
+                    }
                 })
-
-                intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
-                intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, item.objectId)
-
-                OTApplication.app.sendBroadcast(intent)
             }
-
-            finished?.invoke(true)
-        } else finished?.invoke(false)
+        }
     }
 
     override fun checkHasDeviceId(userId: String, deviceId: String): Single<Boolean> {
