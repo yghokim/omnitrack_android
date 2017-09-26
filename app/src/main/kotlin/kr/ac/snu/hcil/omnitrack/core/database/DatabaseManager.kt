@@ -1,6 +1,5 @@
 package kr.ac.snu.hcil.omnitrack.core.database
 
-import android.content.Intent
 import android.net.Uri
 import android.support.annotation.Keep
 import com.google.firebase.database.*
@@ -575,28 +574,15 @@ object DatabaseManager : ADatabaseManager() {
         return getItemListContainerOfTrackerChild(trackerId)?.child("list")
     }
 
-    override fun removeItem(item: OTItem) {
-        //deleteObjects(DatabaseHelper.ItemScheme, item.objectId!!)
-        val itemId = item.objectId
-        if (itemId != null) {
-            removeItem(item.trackerObjectId, itemId)
-        }
-    }
-
-    override fun removeItem(trackerId: String, itemId: String) {
+    override fun removeItemImpl(trackerId: String, itemId: String): Boolean {
         val itemRef = getItemListOfTrackerChild(trackerId)?.child(itemId)
 
         if (itemRef != null) {
             ItemCountTracer.setCounterCache(trackerId, ItemCountTracer.getCachedCount(trackerId) - 1, System.currentTimeMillis())
 
             itemRef.removeValue()
-
-            val intent = Intent(OTApplication.BROADCAST_ACTION_ITEM_REMOVED)
-
-            intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
-
-            OTApplication.app.sendBroadcast(intent)
-        }
+            return true
+        } else return false
     }
 
     override fun getItem(tracker: OTTracker, itemId: String): Observable<OTItem> {
@@ -772,21 +758,6 @@ object DatabaseManager : ADatabaseManager() {
         /*
         val numRows = DatabaseUtils.queryNumEntries(readableDatabase, ItemScheme.tableName, "${ItemScheme.TRACKER_ID}=? AND ${ItemScheme.LOGGED_AT} BETWEEN ? AND ?", arrayOf(tracker.objectId.toString(), from.toString(), to.toString()))
         return numRows.toInt()*/
-    }
-
-    override fun getLogCountOfDay(tracker: OTTracker): Observable<Long> {
-        val cal = Calendar.getInstance()
-        cal.set(Calendar.HOUR_OF_DAY, 0)
-        cal.set(Calendar.MINUTE, 0)
-        cal.set(Calendar.SECOND, 0)
-        cal.set(Calendar.MILLISECOND, 0)
-
-        val first = cal.timeInMillis
-
-        cal.add(Calendar.DAY_OF_YEAR, 1)
-        val second = cal.timeInMillis - 20
-
-        return getLogCountDuring(tracker, first, second)
     }
 
     override fun getTotalItemCount(tracker: OTTracker): Observable<Pair<Long, Long>> {

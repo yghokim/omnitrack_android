@@ -1,9 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.ui.viewmodels
 
 import android.support.v7.util.DiffUtil
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
-import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.ItemCountTracer
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import rx.Observable
@@ -112,14 +112,14 @@ class TrackerListViewModel : UserAttachedViewModel() {
             )
 
             subscriptions.add(
-                    DatabaseManager.getLogCountOfDay(tracker).subscribe {
+                    OTApplication.app.databaseManager.getLogCountOfDay(tracker).subscribe {
                         count ->
                         todayCount.onNext(count)
                     }
             )
 
             subscriptions.add(
-                    DatabaseManager.getLastLoggingTime(tracker).subscribe {
+                    OTApplication.app.databaseManager.getLastLoggingTime(tracker).subscribe {
                         time ->
                         lastLoggingTime.onNext(time)
                     }

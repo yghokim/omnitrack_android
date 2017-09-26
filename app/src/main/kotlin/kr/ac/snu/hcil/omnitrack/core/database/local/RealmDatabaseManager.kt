@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.database.local
 
 import io.realm.Realm
 import io.realm.RealmConfiguration
+import io.realm.RealmQuery
 import io.realm.Sort
 import io.realm.rx.RealmObservableFactory
 import io.realm.rx.RxObservableFactory
@@ -15,6 +16,7 @@ import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import rx.Observable
 import rx.Single
+import java.util.*
 
 /**
  * Created by younghokim on 2017. 9. 25..
@@ -28,6 +30,10 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) : ADatab
     private val realmInstance: Realm get() = Realm.getInstance(RealmConfiguration.Builder().name(config.fileName).build())
     private val observableFactory: RxObservableFactory by lazy {
         RealmObservableFactory()
+    }
+
+    private fun getItemQueryOfTracker(tracker: OTTracker): RealmQuery<OTItemDAO> {
+        return realmInstance.where(OTItemDAO::class.java).equalTo("trackerObjectId", tracker.objectId)
     }
 
     override fun saveTrigger(trigger: OTTrigger, userId: String, position: Int) {
@@ -81,7 +87,18 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) : ADatab
                     } else {
                         SAVE_RESULT_EDIT
                     }
-                    realm.insertOrUpdate(RealmItemHelper.convertItemToDAO(item))
+
+                    val dao = RealmItemHelper.convertItemToDAO(item)
+                    //if itemId is null, set new Id.
+                    if (item.objectId == null) {
+                        val newItemId = tracker.objectId + UUID.randomUUID().toString()
+                        item.objectId = newItemId
+                        dao.objectId = newItemId
+                    }
+
+
+                    realm.insertOrUpdate(dao)
+                    println("OTItem was pushed to Realm. item count: ${getItemQueryOfTracker(tracker).count()}, object Id: ${item.objectId}")
                 }
             } catch (ex: Exception) {
                 ex.printStackTrace()
@@ -93,23 +110,21 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) : ADatab
         }
     }
 
-    override fun removeItem(item: OTItem) {
-
-        val itemDao = realmInstance.where(OTItemDAO::class.java).equalTo("objectId", item.objectId).findFirst()
-        realmInstance.executeTransaction {
-            itemDao?.deleteFromRealm()
-        }
-    }
-
-    override fun removeItem(trackerId: String, itemId: String) {
-        val itemDao = realmInstance.where(OTItemDAO::class.java).equalTo("objectId", itemId).findFirst()
-        realmInstance.executeTransaction {
-            itemDao?.deleteFromRealm()
+    override fun removeItemImpl(trackerId: String, itemId: String): Boolean {
+        try {
+            val itemDao = realmInstance.where(OTItemDAO::class.java).equalTo("objectId", itemId).findFirst()
+            realmInstance.executeTransaction {
+                itemDao?.deleteFromRealm()
+            }
+            return true
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            return false
         }
     }
 
     override fun loadItems(tracker: OTTracker, timeRange: TimeSpan?, order: ADatabaseManager.Order): Observable<List<OTItem>> {
-        return realmInstance.where(OTItemDAO::class.java).equalTo("trackerObjectId", tracker.objectId)
+        return getItemQueryOfTracker(tracker)
                 .run {
                     if (timeRange != null)
                         return@run this.between("timestamp", timeRange.from, timeRange.to)
@@ -137,20 +152,25 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) : ADatab
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun getLogCountDuring(tracker: OTTracker, from: Long, to: Long): Observable<Long> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun getLogCountDuring(tracker: OTTracker, from: Long, to: Long): Observable<Long> =
+            Observable.just(getItemQueryOfTracker(tracker).between("timestamp", from, to).count())
 
-    override fun getLogCountOfDay(tracker: OTTracker): Observable<Long> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
 
     override fun getTotalItemCount(tracker: OTTracker): Observable<Pair<Long, Long>> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return Observable.just(
+                Pair(
+                        getItemQueryOfTracker(tracker).count(),
+                        System.currentTimeMillis()))
     }
 
     override fun getLastLoggingTime(tracker: OTTracker): Observable<Long?> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return getItemQueryOfTracker(tracker).findAllSortedAsync("timestamp", Sort.DESCENDING).asObservable()
+                .map { results ->
+                    val latestRow = results.first()
+                    if (latestRow != null) {
+                        latestRow.timestamp
+                    } else null
+                }.onErrorReturn { null }
     }
 
     override fun checkHasDeviceId(userId: String, deviceId: String): Single<Boolean> {

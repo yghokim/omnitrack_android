@@ -91,9 +91,9 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
                     currentBuilderSubscriptionDict[tracker.objectId]?.unsubscribe()
                     currentBuilderSubscriptionDict.remove(tracker.objectId)
                 } else {
-                    currentBuilderSubscriptionDict[tracker.objectId] = builder.autoComplete().doOnCompleted { currentBuilderSubscriptionDict.remove(tracker.objectId) }.flatMap<Pair<Boolean, OTItem>> {
+                    currentBuilderSubscriptionDict[tracker.objectId] = builder.autoComplete().last().toSingle().map { pair -> true }.doOnSuccess { currentBuilderSubscriptionDict.remove(tracker.objectId) }.flatMap<Pair<Boolean, OTItem>> {
                         val item = builder.makeItem(source)
-                        OTApplication.app.databaseManager.saveItem(item, tracker).toObservable().map { success -> Pair(success, item) }
+                        OTApplication.app.databaseManager.saveItem(item, tracker).map { success -> Pair(success, item) }
                     }.subscribe { successItemPair ->
                         if (successItemPair.first == true) {
                             sendBroadcast(context, OTApplication.BROADCAST_ACTION_BACKGROUND_LOGGING_SUCCEEDED, tracker, successItemPair.second.objectId!!, notify, notificationId)
