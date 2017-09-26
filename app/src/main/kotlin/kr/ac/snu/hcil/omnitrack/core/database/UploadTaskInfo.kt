@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.database
 
+import android.net.Uri
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
 
@@ -18,4 +19,16 @@ open class UploadTaskInfo : RealmObject() {
     var trackerId: String = ""
     var itemId: String = ""
     var userId: String = ""
+
+    fun localUriCompat(): Uri {
+
+        var uri = Uri.parse(localUri)
+        if (uri.scheme == null) {
+            uri = Uri.Builder()
+                    .scheme("file")
+                    .path(uri.path)
+                    .build()
+        }
+        return uri
+    }
 }
