@@ -10,7 +10,6 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeSpanAttribute
-import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.visualization.AttributeChartModel
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
@@ -46,7 +45,7 @@ class DurationTimelineModel(override val attribute: OTTimeSpanAttribute) : Attri
             val to = if (xIndex < xScale.numTicks - 1) xScale.binPointsOnDomain[xIndex + 1]
             else getTimeScope().to
 
-            DatabaseManager.loadItems(attribute.tracker!!, TimeSpan.fromPoints(from, to)).flatMap<AggregatedDuration?>(Func1<List<OTItem>, Observable<AggregatedDuration?>> {
+            OTApplication.app.databaseManager.loadItems(attribute.tracker!!, TimeSpan.fromPoints(from, to)).flatMap<AggregatedDuration?>(Func1<List<OTItem>, Observable<AggregatedDuration?>> {
                 items ->
                 println("items during ${TimeSpan.fromPoints(from, to)}; count: ${items.size}")
                 if (items.isNotEmpty()) {
@@ -283,10 +282,6 @@ class DurationTimelineModel(override val attribute: OTTimeSpanAttribute) : Attri
             durationBar.frontalBound.set(centerX - durationBarWidth / 2, yScale[datum.avgFrom], centerX + durationBarWidth / 2, yScale[datum.avgTo])
         }
 
-
-        override fun onDraw(canvas: Canvas) {
-            super.onDraw(canvas)
-        }
 
     }
 

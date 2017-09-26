@@ -72,7 +72,6 @@ abstract class ADatabaseManager {
     abstract fun removeItem(trackerId: String, itemId: String)
     abstract fun getItem(tracker: OTTracker, itemId: String): Observable<OTItem>
 
-
     abstract fun checkHasDeviceId(userId: String, deviceId: String): Single<Boolean>
     abstract fun addDeviceInfoToUser(userId: String, deviceId: String): Single<OTDeviceInfo>
     abstract fun refreshInstanceIdToServerIfExists(ignoreIfStored: Boolean): Boolean

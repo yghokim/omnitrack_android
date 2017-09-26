@@ -16,7 +16,6 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTExternalFileInvolvedAttribute
-import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.EventLoggingManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTTaskNotificationManager
 import kr.ac.snu.hcil.omnitrack.utils.io.StringTableSheet
@@ -221,7 +220,7 @@ class OTTableExportService : WakefulService(TAG) {
                                 it.onAddColumnToTable(table.columns)
                             }
 
-                            val tableObservable = DatabaseManager.loadItems(tracker).doOnNext {
+                            val tableObservable = OTApplication.app.databaseManager.loadItems(tracker).doOnNext {
                                 items ->
                                 items.withIndex().forEach {
                                     itemWithIndex ->

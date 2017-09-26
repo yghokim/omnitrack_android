@@ -21,7 +21,6 @@ import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilder
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
-import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTTrackingNotificationManager
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTTrackerAttachedActivity
@@ -223,7 +222,7 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
         if (intent.hasExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM)) {
             //contains item. Edit mode
             creationSubscriptions.add(
-                    DatabaseManager.getItem(tracker, intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM)).subscribe {
+                    OTApplication.app.databaseManager.getItem(tracker, intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM)).subscribe {
                         item ->
                         if (item != null) {
                             mode = Mode.Edit
@@ -352,7 +351,7 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
             println("Will push $item")
 
             creationSubscriptions.add(
-                    DatabaseManager.saveItem(item, tracker!!).subscribe { success ->
+                    OTApplication.app.databaseManager.saveItem(item, tracker!!).subscribe { success ->
                         if (success) {
                             it.clear()
                             clearBuilderCache()

@@ -213,15 +213,6 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
         )
     }
 
-    private fun loadWholeItems(tracker: OTTracker): Subscription {
-        return DatabaseManager.loadItems(tracker).subscribe {
-            loadedItems ->
-            items.clear()
-            items.addAll(loadedItems)
-            onItemListChanged()
-        }
-    }
-
     override fun onOkAttributeEditDialog(changed: Boolean, value: Any, tracker: OTTracker, attribute: OTAttribute<out Any>, itemId: String?) {
         println("dismiss handler")
         Log.d(AttributeEditDialogFragment.TAG, "changed: ${changed}, value: ${value}")
@@ -231,7 +222,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                 if (item != null) {
                     item.setValueOf(attribute, value)
                     creationSubscriptions.add(
-                            DatabaseManager.saveItem(item, tracker, false).observeOn(AndroidSchedulers.mainThread()).subscribe { success ->
+                            OTApplication.app.databaseManager.saveItem(item, tracker, false).observeOn(AndroidSchedulers.mainThread()).subscribe { success ->
                                 if (success)
                                     itemListViewAdapter.notifyItemChanged(items.indexOf(item))
                             }
@@ -313,7 +304,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
 
     fun deleteItemPermanently(position: Int): OTItem {
         val removedItem = items[position]
-        DatabaseManager.removeItem(removedItem)
+        OTApplication.app.databaseManager.removeItem(removedItem)
         items.removeAt(position)
         onItemRemoved(position)
 
@@ -341,7 +332,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
 
         fun clearTrashcan() {
             for (item in removedItems) {
-                DatabaseManager.removeItem(item)
+                OTApplication.app.databaseManager.removeItem(item)
             }
         }
 
