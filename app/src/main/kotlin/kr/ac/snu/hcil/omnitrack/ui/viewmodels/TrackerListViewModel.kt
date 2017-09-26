@@ -4,7 +4,6 @@ import android.support.v7.util.DiffUtil
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
-import kr.ac.snu.hcil.omnitrack.core.database.ItemCountTracer
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import rx.Observable
 import rx.Subscription
@@ -84,7 +83,7 @@ class TrackerListViewModel : UserAttachedViewModel() {
 
         val trackerEditable: BehaviorSubject<Boolean> = BehaviorSubject.create()
 
-        private val countTracer: ItemCountTracer = ItemCountTracer(tracker)
+        //private val countTracer: ItemCountTracer = ItemCountTracer(tracker)
 
         private val subscriptions = CompositeSubscription()
 
@@ -103,27 +102,34 @@ class TrackerListViewModel : UserAttachedViewModel() {
             reminderSubscriptionDict[trigger.objectId]?.add(subscription)
         }
 
-        fun register() {
-            subscriptions.add(
-                    countTracer.itemCountObservable.subscribe {
-                        count ->
-                        totalItemCount.onNext(count)
-                    }
-            )
+        private fun refreshSummaryStatistics() {
+            subscriptions.add(OTApplication.app.databaseManager.getTotalItemCount(tracker).subscribe { countPair ->
+                totalItemCount.onNext(countPair.first)
+            })
 
             subscriptions.add(
-                    OTApplication.app.databaseManager.getLogCountOfDay(tracker).subscribe {
-                        count ->
+                    OTApplication.app.databaseManager.getLogCountOfDay(tracker).subscribe { count ->
                         todayCount.onNext(count)
                     }
             )
 
             subscriptions.add(
-                    OTApplication.app.databaseManager.getLastLoggingTime(tracker).subscribe {
-                        time ->
+                    OTApplication.app.databaseManager.getLastLoggingTime(tracker).subscribe { time ->
                         lastLoggingTime.onNext(time)
                     }
             )
+        }
+
+
+        fun register() {
+            subscriptions.add(
+                    OTApplication.app.databaseManager.OnItemListUpdated.filter { trackerId -> trackerId == tracker.objectId }.subscribe { pair ->
+                        println("Tracker Item List Updated: ${tracker.name}")
+                        refreshSummaryStatistics()
+                    }
+            )
+
+            refreshSummaryStatistics()
 
             subscriptions.add(
                     tracker.colorChanged.subscribe {
@@ -179,15 +185,16 @@ class TrackerListViewModel : UserAttachedViewModel() {
                 )
             }
 
-            countTracer.register()
-            countTracer.notifyConnected()
+            //countTracer.register()
+            //countTracer.notifyConnected()
 
             isActive = true
         }
 
         fun unregister() {
+            /*
             if (countTracer.isRegistered)
-                countTracer.unregister()
+                countTracer.unregister()*/
 
             subscriptions.clear()
             reminderSubscriptionDict.forEach { entry -> entry.value?.clear() }

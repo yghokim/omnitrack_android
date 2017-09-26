@@ -10,6 +10,7 @@ import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import rx.Observable
 import rx.Single
+import rx.subjects.BehaviorSubject
 import java.util.*
 
 /**
@@ -24,6 +25,8 @@ abstract class ADatabaseManager {
         const val SAVE_RESULT_EDIT = 2
         const val SAVE_RESULT_FAIL = 0
     }
+
+    val OnItemListUpdated = BehaviorSubject.create<String>() // trackerId
 
     abstract fun saveTrigger(trigger: OTTrigger, userId: String, position: Int)
     abstract fun findTriggersOfUser(user: OTUser): Observable<List<OTTrigger>>
@@ -57,13 +60,14 @@ abstract class ADatabaseManager {
         return getLogCountDuring(tracker, first, second)
     }
 
-    abstract fun getTotalItemCount(tracker: OTTracker): Observable<Pair<Long, Long>>
+    abstract fun getTotalItemCount(tracker: OTTracker): Observable<Pair<Long/*count*/, Long/*timestamp*/>>
     abstract fun getLastLoggingTime(tracker: OTTracker): Observable<Long?>
 
     //Items
     fun saveItem(item: OTItem, tracker: OTTracker, notifyIntent: Boolean = true): Single<Boolean> {
         return saveItemImpl(item, tracker).map { resultCode ->
             if (notifyIntent && resultCode != SAVE_RESULT_FAIL) {
+
                 val intent = Intent(when (resultCode) {
                     SAVE_RESULT_NEW -> OTApplication.BROADCAST_ACTION_ITEM_ADDED
                     SAVE_RESULT_EDIT -> OTApplication.BROADCAST_ACTION_ITEM_EDITED
@@ -74,6 +78,10 @@ abstract class ADatabaseManager {
                 intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, item.objectId)
 
                 OTApplication.app.sendBroadcast(intent)
+
+                if (resultCode == SAVE_RESULT_NEW) {
+                    OnItemListUpdated.onNext(tracker.objectId)
+                }
             }
 
             return@map resultCode == SAVE_RESULT_EDIT || resultCode == SAVE_RESULT_NEW
@@ -98,6 +106,8 @@ abstract class ADatabaseManager {
             intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
 
             OTApplication.app.sendBroadcast(intent)
+
+            OnItemListUpdated.onNext(trackerId)
         }
     }
 
