@@ -28,7 +28,6 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AttributeSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
-import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
 import kr.ac.snu.hcil.omnitrack.services.OTTableExportService
 import kr.ac.snu.hcil.omnitrack.ui.DragItemTouchHelperCallback
@@ -173,6 +172,14 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
         }
 
         creationSubscriptions.add(
+                OTApplication.app.databaseManager.loadItems(tracker).subscribe { items ->
+                    this.items.clear()
+                    this.items.addAll(items)
+                    reSort()
+                }
+        )
+        /*
+        creationSubscriptions.add(
                 //loadWholeItems(tracker)
                 DatabaseManager.makeItemQueryStream(tracker).subscribe {
                     action ->
@@ -210,7 +217,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                         }
                     }
                 }
-        )
+        )*/
     }
 
     override fun onOkAttributeEditDialog(changed: Boolean, value: Any, tracker: OTTracker, attribute: OTAttribute<out Any>, itemId: String?) {
@@ -305,7 +312,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
     fun deleteItemPermanently(position: Int): OTItem {
         val removedItem = items[position]
         OTApplication.app.databaseManager.removeItem(removedItem)
-        items.removeAt(position)
+        //items.removeAt(position)
         onItemRemoved(position)
 
         return removedItem
@@ -759,7 +766,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
 
                                 if (tracker != null) {
                                     dialogSubscriptions.add(
-                                            DatabaseManager.getTotalItemCount(tracker!!).subscribe {
+                                            OTApplication.app.databaseManager.getTotalItemCount(tracker!!).subscribe {
                                                 count ->
                                                 if (count.first > 0) {
                                                     deletionMenuItem.description = "Item count: ${count}"

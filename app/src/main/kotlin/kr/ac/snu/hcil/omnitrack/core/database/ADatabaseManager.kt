@@ -10,6 +10,7 @@ import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import rx.Observable
 import rx.Single
+import java.util.*
 
 /**
  * Created by Young-Ho on 9/24/2017.
@@ -41,7 +42,21 @@ abstract class ADatabaseManager {
     //Item Summaries
     abstract fun getLogCountDuring(tracker: OTTracker, from: Long, to: Long): Observable<Long>
 
-    abstract fun getLogCountOfDay(tracker: OTTracker): Observable<Long>
+    fun getLogCountOfDay(tracker: OTTracker): Observable<Long> {
+        val cal = Calendar.getInstance()
+        cal.set(Calendar.HOUR_OF_DAY, 0)
+        cal.set(Calendar.MINUTE, 0)
+        cal.set(Calendar.SECOND, 0)
+        cal.set(Calendar.MILLISECOND, 0)
+
+        val first = cal.timeInMillis
+
+        cal.add(Calendar.DAY_OF_YEAR, 1)
+        val second = cal.timeInMillis - 20
+
+        return getLogCountDuring(tracker, first, second)
+    }
+
     abstract fun getTotalItemCount(tracker: OTTracker): Observable<Pair<Long, Long>>
     abstract fun getLastLoggingTime(tracker: OTTracker): Observable<Long?>
 
@@ -68,8 +83,27 @@ abstract class ADatabaseManager {
     protected abstract fun saveItemImpl(item: OTItem, tracker: OTTracker): Single<Int>
 
     abstract fun loadItems(tracker: OTTracker, timeRange: TimeSpan? = null, order: ADatabaseManager.Order = Order.DESC): Observable<List<OTItem>>
-    abstract fun removeItem(item: OTItem)
-    abstract fun removeItem(trackerId: String, itemId: String)
+
+    fun removeItem(item: OTItem) {
+        item.objectId?.let { itemId ->
+            removeItem(item.trackerObjectId, itemId)
+        }
+    }
+
+    fun removeItem(trackerId: String, itemId: String) {
+        if (removeItemImpl(trackerId, itemId)) {
+
+            val intent = Intent(OTApplication.BROADCAST_ACTION_ITEM_REMOVED)
+
+            intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
+
+            OTApplication.app.sendBroadcast(intent)
+        }
+    }
+
+
+    abstract fun removeItemImpl(trackerId: String, itemId: String): Boolean
+
     abstract fun getItem(tracker: OTTracker, itemId: String): Observable<OTItem>
 
     abstract fun checkHasDeviceId(userId: String, deviceId: String): Single<Boolean>
