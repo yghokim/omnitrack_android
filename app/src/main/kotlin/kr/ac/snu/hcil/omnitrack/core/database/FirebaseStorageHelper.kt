@@ -6,7 +6,6 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
 import com.google.firebase.storage.FileDownloadTask
 import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.StreamDownloadTask
 import rx.Single
 import rx.subscriptions.Subscriptions
@@ -22,10 +21,6 @@ class FirebaseStorageHelper(context: Context) {
     fun restartUploadTask() {
 
 
-    }
-
-    fun getItemStorageReference(itemId: String, trackerId: String, userId: String): StorageReference {
-        return FirebaseStorage.getInstance().reference.child("entry_data").child(userId).child(trackerId).child(itemId)
     }
 
     fun getDownloadUrl(pathString: String): Single<Uri> {

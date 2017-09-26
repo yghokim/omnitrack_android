@@ -1,11 +1,14 @@
-package kr.ac.snu.hcil.omnitrack.core.database
+package kr.ac.snu.hcil.omnitrack.core.database.abstraction
 
 import android.content.Intent
+import android.net.Uri
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
+import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
+import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import rx.Observable
@@ -63,6 +66,20 @@ abstract class ADatabaseManager {
     abstract fun getTotalItemCount(tracker: OTTracker): Observable<Pair<Long/*count*/, Long/*timestamp*/>>
     abstract fun getLastLoggingTime(tracker: OTTracker): Observable<Long?>
 
+    protected fun handleBinaryUpload(itemId: String, item: OTItem, tracker: OTTracker) {
+        tracker.attributes.unObservedList.forEach {
+            val value = item.getValueOf(it)
+            if (value is SynchronizedUri && value.localUri != Uri.EMPTY) {
+                println("upload Synchronized Uri file to server...")
+                value.setSynchronized(OTApplication.app.binaryUploadServiceController.makeFilePath(itemId, tracker.objectId, tracker.owner!!.objectId, value.localUri.lastPathSegment))
+
+                OTApplication.app.startService(
+                        OTApplication.app.binaryUploadServiceController.makeUploadServiceIntent(value, itemId, tracker.objectId, tracker.owner!!.objectId)
+                )
+            }
+        }
+    }
+
     //Items
     fun saveItem(item: OTItem, tracker: OTTracker, notifyIntent: Boolean = true): Single<Boolean> {
         return saveItemImpl(item, tracker).map { resultCode ->
@@ -82,7 +99,7 @@ abstract class ADatabaseManager {
                 if (resultCode == SAVE_RESULT_NEW) {
                     OnItemListUpdated.onNext(tracker.objectId)
                 }
-            }
+                }
 
             return@map resultCode == SAVE_RESULT_EDIT || resultCode == SAVE_RESULT_NEW
         }
@@ -90,7 +107,7 @@ abstract class ADatabaseManager {
 
     protected abstract fun saveItemImpl(item: OTItem, tracker: OTTracker): Single<Int>
 
-    abstract fun loadItems(tracker: OTTracker, timeRange: TimeSpan? = null, order: ADatabaseManager.Order = Order.DESC): Observable<List<OTItem>>
+    abstract fun loadItems(tracker: OTTracker, timeRange: TimeSpan? = null, order: Order = Order.DESC): Observable<List<OTItem>>
 
     fun removeItem(item: OTItem) {
         item.objectId?.let { itemId ->

@@ -1,6 +1,5 @@
 package kr.ac.snu.hcil.omnitrack.core.database
 
-import android.net.Uri
 import android.support.annotation.Keep
 import com.google.firebase.database.*
 import com.google.firebase.iid.FirebaseInstanceId
@@ -11,9 +10,9 @@ import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
+import kr.ac.snu.hcil.omnitrack.core.database.abstraction.ADatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
-import kr.ac.snu.hcil.omnitrack.services.OTFirebaseUploadService
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Observable
 import rx.Single
@@ -829,18 +828,7 @@ object DatabaseManager : ADatabaseManager() {
             if (itemRef != null) {
                 val itemId = itemRef.key
 
-                tracker.attributes.unObservedList.forEach {
-                    val value = item.getValueOf(it)
-                    if (value is SynchronizedUri && value.localUri != Uri.EMPTY) {
-                        println("upload Synchronized Uri file to server...")
-                        val storageRef = OTFirebaseUploadService.getItemStorageReference(itemId, tracker.objectId, tracker.owner!!.objectId).child(value.localUri.lastPathSegment)
-                        value.setSynchronized(Uri.parse(storageRef.path))
-
-                        OTApplication.app.startService(
-                                OTFirebaseUploadService.makeUploadTaskIntent(OTApplication.app, value, itemId, tracker.objectId, tracker.owner!!.objectId)
-                        )
-                    }
-                }
+                handleBinaryUpload(itemId, item, tracker)
 
                 val pojo = ItemPOJO()
                 pojo.timestamp = if (item.timestamp != -1L) {

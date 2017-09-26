@@ -26,10 +26,11 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.*
 import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
-import kr.ac.snu.hcil.omnitrack.core.database.ADatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.DatabaseHelper
 import kr.ac.snu.hcil.omnitrack.core.database.FirebaseStorageHelper
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
+import kr.ac.snu.hcil.omnitrack.core.database.abstraction.ABinaryUploadService
+import kr.ac.snu.hcil.omnitrack.core.database.abstraction.ADatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
@@ -194,6 +195,9 @@ class OTApplication : MultiDexApplication() {
     lateinit var storageHelper: FirebaseStorageHelper
         private set
 
+    lateinit var binaryUploadServiceController: ABinaryUploadService.ABinaryUploadServiceController
+        private set
+
     //Modules end===================================================
 
 /*
@@ -337,6 +341,8 @@ class OTApplication : MultiDexApplication() {
         //initialize modules===============================================
         this.databaseManager = RealmDatabaseManager()
 
+        this.binaryUploadServiceController = OTFirebaseUploadService.ServiceController(this)
+
         logger = LoggingDbHelper(this)
         logger.writeSystemLog("Application creates.", "OTApplication")
 
@@ -389,7 +395,7 @@ class OTApplication : MultiDexApplication() {
             }
         })
 
-        startService(OTFirebaseUploadService.makeResumeUploadIntent(this))
+        startService(this.binaryUploadServiceController.makeResumeUploadIntent())
 
 
         //OTVersionCheckService.setupServiceAlarm(this)
