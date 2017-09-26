@@ -8,13 +8,11 @@ import kotlin.properties.Delegates
 /**
  * Created by Young-Ho on 7/11/2016.
  */
-abstract class NamedObject(objectId: String?, name: String) : IDatabaseSyncedObject {
+abstract class NamedObject(objectId: String?, name: String) {
 
     companion object {
         const val PROPERTY_NAME = "name"
     }
-
-    override var isDirtySinceLastSync: Boolean = true
 
     open val objectId: String by lazy {
         objectId ?: makeNewObjectId()
@@ -37,7 +35,6 @@ abstract class NamedObject(objectId: String?, name: String) : IDatabaseSyncedObj
     }
 
     init {
-        isDirtySinceLastSync == null // if it is directly loaded from db
     }
 
     constructor() : this(null, "Noname")

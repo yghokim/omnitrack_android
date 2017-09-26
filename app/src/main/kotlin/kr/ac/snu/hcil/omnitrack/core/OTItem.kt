@@ -4,7 +4,6 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
-import kr.ac.snu.hcil.omnitrack.core.database.IDatabaseStorable
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import kr.ac.snu.hcil.omnitrack.utils.serialization.stringKeyEntryParser
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
@@ -13,7 +12,7 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 16. 7. 22
  */
-class OTItem : ADataRow, IDatabaseStorable {
+class OTItem : ADataRow {
 
     enum class LoggingSource(val nameResId: Int) {
         Unspecified(R.string.msg_tracking_source_unspecified),
@@ -80,7 +79,7 @@ class OTItem : ADataRow, IDatabaseStorable {
 
     val deviceId: String
 
-    override var objectId: String?
+    var objectId: String?
         set(value) {
             if (field != null) {
                 throw Exception("objectId already assigned.")
