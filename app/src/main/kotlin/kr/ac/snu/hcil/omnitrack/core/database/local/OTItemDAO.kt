@@ -32,6 +32,7 @@ open class OTItemDAO : RealmObject() {
 
     var updatedAt: Long = System.currentTimeMillis()
 
+    var removed: Boolean = false
 
     var loggingSource: OTItem.LoggingSource
         get() = if (source != null) {

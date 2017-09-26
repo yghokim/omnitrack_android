@@ -24,6 +24,14 @@ import java.util.*
  */
 class RealmDatabaseManager(val config: Configuration = Configuration()) : ADatabaseManager() {
 
+    companion object {
+        const val FIELD_OBJECT_ID = "objectId"
+        const val FIELD_UPDATED_AT_LONG = "updatedAt"
+        const val FIELD_REMOVED_BOOLEAN = "removed"
+        const val FIELD_TIMESTAMP_LONG = "timestamp"
+        const val FIELD_TRACKER_ID = "trackerObjectId"
+    }
+
     data class Configuration(
             val fileName: String = "localDatabase"
     )
@@ -34,7 +42,7 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) : ADatab
     }
 
     private fun getItemQueryOfTracker(tracker: OTTracker): RealmQuery<OTItemDAO> {
-        return realmInstance.where(OTItemDAO::class.java).equalTo("trackerObjectId", tracker.objectId)
+        return realmInstance.where(OTItemDAO::class.java).equalTo(FIELD_TRACKER_ID, tracker.objectId).equalTo(FIELD_REMOVED_BOOLEAN, false)
     }
 
     override fun saveTrigger(trigger: OTTrigger, userId: String, position: Int) {
@@ -112,11 +120,15 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) : ADatab
 
     override fun removeItemImpl(trackerId: String, itemId: String): Boolean {
         try {
-            val itemDao = realmInstance.where(OTItemDAO::class.java).equalTo("objectId", itemId).findFirst()
-            realmInstance.executeTransaction {
-                itemDao?.deleteFromRealm()
-            }
-            return true
+            val itemDao = realmInstance.where(OTItemDAO::class.java).equalTo(FIELD_OBJECT_ID, itemId).findFirst()
+            itemDao?.let {
+                realmInstance.executeTransaction { realm ->
+                    itemDao.removed = true
+                    itemDao.synchronized = false
+                    itemDao.updatedAt = System.currentTimeMillis()
+                }
+                return true
+            } ?: return false
         } catch (ex: Exception) {
             ex.printStackTrace()
             return false
@@ -127,9 +139,9 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) : ADatab
         return getItemQueryOfTracker(tracker)
                 .run {
                     if (timeRange != null)
-                        return@run this.between("timestamp", timeRange.from, timeRange.to)
+                        return@run this.between(FIELD_TIMESTAMP_LONG, timeRange.from, timeRange.to)
                     else this
-                }.findAllSorted("timestamp", when (order) { Order.ASC -> Sort.ASCENDING; Order.DESC -> Sort.DESCENDING
+                }.findAllSorted(FIELD_TIMESTAMP_LONG, when (order) { Order.ASC -> Sort.ASCENDING; Order.DESC -> Sort.DESCENDING
         })
                 .asObservable().map { result ->
             result.map { dao ->
@@ -141,7 +153,7 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) : ADatab
 
     override fun getItem(tracker: OTTracker, itemId: String): Observable<OTItem> {
         return Observable.defer {
-            val dao = realmInstance.where(OTItemDAO::class.java).equalTo("objectId", itemId).findFirst()
+            val dao = realmInstance.where(OTItemDAO::class.java).equalTo(FIELD_OBJECT_ID, itemId).findFirst()
             if (dao != null) {
                 return@defer Observable.just(RealmItemHelper.convertDAOToItem(dao))
             } else return@defer Observable.empty<OTItem>()
@@ -153,7 +165,7 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) : ADatab
     }
 
     override fun getLogCountDuring(tracker: OTTracker, from: Long, to: Long): Observable<Long> =
-            Observable.just(getItemQueryOfTracker(tracker).between("timestamp", from, to).count()).subscribeOn(Schedulers.io())
+            Observable.just(getItemQueryOfTracker(tracker).between(FIELD_TIMESTAMP_LONG, from, to).count()).subscribeOn(Schedulers.io())
 
 
     override fun getTotalItemCount(tracker: OTTracker): Observable<Pair<Long, Long>> {
@@ -165,7 +177,7 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) : ADatab
 
     override fun getLastLoggingTime(tracker: OTTracker): Observable<Long?> {
         return Observable.just(
-                getItemQueryOfTracker(tracker).max("timestamp")?.toLong()
+                getItemQueryOfTracker(tracker).max(FIELD_TIMESTAMP_LONG)?.toLong()
         ).subscribeOn(Schedulers.io())
     }
 
