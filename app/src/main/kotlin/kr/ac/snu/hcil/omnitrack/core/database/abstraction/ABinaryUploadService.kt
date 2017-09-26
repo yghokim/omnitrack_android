@@ -69,9 +69,7 @@ abstract class ABinaryUploadService(tag: String) : WakefulService(tag) {
 
     }
 
-    protected open fun isTaskOngoing(taskInfo: UploadTaskInfo): Boolean {
-        return true
-    }
+    protected open fun isTaskOngoing(taskInfo: UploadTaskInfo): Boolean = true
 
     private fun resumeCachedUploads() {
         val realm = Realm.getInstance(realmConfiguration)
