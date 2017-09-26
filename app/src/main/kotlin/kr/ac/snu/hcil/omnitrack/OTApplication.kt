@@ -14,39 +14,24 @@ import android.provider.Settings
 import android.support.multidex.MultiDex
 import android.support.multidex.MultiDexApplication
 import android.support.v7.app.AppCompatDelegate
-import android.text.format.DateUtils
 import com.google.firebase.crash.FirebaseCrash
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.squareup.leakcanary.LeakCanary
 import io.realm.Realm
-import kr.ac.snu.hcil.omnitrack.core.OTItem
-import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
-import kr.ac.snu.hcil.omnitrack.core.attributes.*
 import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
-import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
-import kr.ac.snu.hcil.omnitrack.core.database.DatabaseHelper
 import kr.ac.snu.hcil.omnitrack.core.database.FirebaseStorageHelper
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.ABinaryUploadService
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.ADatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
-import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
-import kr.ac.snu.hcil.omnitrack.core.externals.fitbit.FitbitRecentSleepTimeMeasureFactory
-import kr.ac.snu.hcil.omnitrack.core.externals.fitbit.FitbitStepCountMeasureFactory
-import kr.ac.snu.hcil.omnitrack.core.externals.google.fit.GoogleFitStepsFactory
-import kr.ac.snu.hcil.omnitrack.core.externals.misfit.MisfitStepMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationChannelManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTriggerAlarmManager
 import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
 import kr.ac.snu.hcil.omnitrack.services.OTFirebaseUploadService
 import kr.ac.snu.hcil.omnitrack.utils.LocaleHelper
-import kr.ac.snu.hcil.omnitrack.utils.NumberStyle
-import kr.ac.snu.hcil.omnitrack.utils.UniqueStringEntryList
-import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 import org.jetbrains.anko.telephonyManager
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
@@ -173,10 +158,6 @@ class OTApplication : MultiDexApplication() {
 
     private var _currentUser: OTUser? = null
 
-    lateinit var dbHelper: DatabaseHelper
-        private set
-
-
     val isAppInForeground: Boolean get() {
         return numActivitiesActive.get() > 0
     }
@@ -268,7 +249,7 @@ class OTApplication : MultiDexApplication() {
 
                 if (initialRun) {
                     //createExampleTrackers(user)
-                    createUsabilityTestingTrackers(user)
+                    //createUsabilityTestingTrackers(user)
                 }
 
                 _currentUser = user
@@ -351,8 +332,6 @@ class OTApplication : MultiDexApplication() {
         //=================================================================
 
 
-        dbHelper = DatabaseHelper(this)
-
         timeTriggerAlarmManager = OTTimeTriggerAlarmManager()
 
         OTExternalService.init()
@@ -424,11 +403,9 @@ class OTApplication : MultiDexApplication() {
         logger.writeSystemLog("App terminates.", "Application")
 
         syncUserToDb()
-
-        dbHelper.close()
     }
 
-    private fun createUsabilityTestingTrackers(user: OTUser) {
+/*    private fun createUsabilityTestingTrackers(user: OTUser) {
 
         val bookTracker = user.newTracker("독서록", true)
         bookTracker.attributes += OTAttribute.createAttribute(bookTracker, "제목", OTAttribute.TYPE_SHORT_TEXT)
@@ -592,59 +569,6 @@ class OTApplication : MultiDexApplication() {
         //dbHelper.save(user)
 
         return // skip example data
-
-        java.lang.Runnable {
-
-            //batch input
-            val end = System.currentTimeMillis()
-            val start = end - 200 * DateUtils.DAY_IN_MILLIS
-
-
-            val sleepItems = ArrayList<OTItem>()
-            val coffeeItems = ArrayList<OTItem>()
-
-
-            TimeHelper.loopForDays(start, end)
-            {
-                time, from, to, dayOfYear ->
-
-                val wakeUp = from + 8 * DateUtils.HOUR_IN_MILLIS + (Math.random() * DateUtils.HOUR_IN_MILLIS * 1.5).toLong()
-                sleepItems.add(
-                        OTItem(
-                                sleepTracker,
-                                wakeUp + (Math.random() * DateUtils.HOUR_IN_MILLIS).toLong(),
-                                OTItem.LoggingSource.Unspecified,
-                                OTApplication.app.deviceId,
-                                TimeSpan.fromPoints(from + (Math.random() * 3 * DateUtils.HOUR_IN_MILLIS - 1.5 * DateUtils.HOUR_IN_MILLIS).toLong(), wakeUp),
-                                (Math.random() * 5).toFloat(),
-                                ""
-                        )
-                )
-
-                val numCoffeeADay = ((Math.random() * 4) + .5f).toInt()
-                for (i in 0..numCoffeeADay - 1) {
-                    val coffeeTime = from + ((to - from) * Math.random()).toLong()
-                    coffeeItems.add(
-                            OTItem(
-                                    coffeeTracker,
-                                    coffeeTime,
-                                    OTItem.LoggingSource.Unspecified,
-                                    "Americano",
-                                    coffeeTime
-                            )
-                    )
-                }
-            }
-
-            addStepsExampleItems(stepComparisonTracker)
-
-            addExampleBeerReviews(beerTracker)
-
-            dbHelper.save(sleepItems, sleepTracker)
-            dbHelper.save(coffeeItems, coffeeTracker)
-
-
-        }.run()
     }
 
     private fun addStepsExampleItems(stepTracker: OTTracker) {
@@ -668,7 +592,6 @@ class OTApplication : MultiDexApplication() {
         val stepItems = ArrayList<OTItem>()
         OTItem.createItemsWithColumnArrays(stepTracker, timestamps, OTItem.LoggingSource.Unspecified, stepItems, fitbitSteps, misfitSteps, googleSteps)
 
-        dbHelper.save(stepItems, stepTracker)
     }
 
     private fun addExampleBeerReviews(beerTracker: OTTracker) {
@@ -697,7 +620,7 @@ class OTApplication : MultiDexApplication() {
                 }, beerTracker)
 
 
-    }
+    }*/
 
     fun isTrackerItemExportInProgress(): Boolean {
         return systemSharedPreferences.getBoolean(PREFERENCE_KEY_TRACKER_ITEMS_EXPORTING_PREFIX, false)
