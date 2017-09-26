@@ -6,7 +6,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
-import kr.ac.snu.hcil.omnitrack.core.database.ADatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.abstraction.ADatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.visualization.CompoundAttributeChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.ILineChartOnTime
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer

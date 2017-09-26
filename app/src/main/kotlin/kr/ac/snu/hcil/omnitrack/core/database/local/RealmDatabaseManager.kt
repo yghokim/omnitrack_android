@@ -10,8 +10,8 @@ import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
-import kr.ac.snu.hcil.omnitrack.core.database.ADatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
+import kr.ac.snu.hcil.omnitrack.core.database.abstraction.ADatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import rx.Observable
@@ -82,22 +82,22 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) : ADatab
         return Single.create { subscriber ->
             var result: Int = SAVE_RESULT_FAIL
             try {
+                result = if (item.objectId == null) {
+                    SAVE_RESULT_NEW
+                } else {
+                    SAVE_RESULT_EDIT
+                }
+
+                //if itemId is null, set new Id.
+                if (item.objectId == null) {
+                    val newItemId = tracker.objectId + UUID.randomUUID().toString()
+                    item.objectId = newItemId
+                }
+
+                handleBinaryUpload(item.objectId!!, item, tracker)
+
                 realmInstance.executeTransaction { realm ->
-                    result = if (item.objectId == null) {
-                        SAVE_RESULT_NEW
-                    } else {
-                        SAVE_RESULT_EDIT
-                    }
-
-                    val dao = RealmItemHelper.convertItemToDAO(item)
-                    //if itemId is null, set new Id.
-                    if (item.objectId == null) {
-                        val newItemId = tracker.objectId + UUID.randomUUID().toString()
-                        item.objectId = newItemId
-                        dao.objectId = newItemId
-                    }
-
-                    realm.insertOrUpdate(dao)
+                    realm.insertOrUpdate(RealmItemHelper.convertItemToDAO(item))
                     println("OTItem was pushed to Realm. item count: ${getItemQueryOfTracker(tracker).count()}, object Id: ${item.objectId}")
                 }
             } catch (ex: Exception) {
