@@ -125,6 +125,8 @@ abstract class ADatabaseManager {
             OTApplication.app.sendBroadcast(intent)
 
             OnItemListUpdated.onNext(trackerId)
+        } else {
+            println("item remove failed.")
         }
     }
 
