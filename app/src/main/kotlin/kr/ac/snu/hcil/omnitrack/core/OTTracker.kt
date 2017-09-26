@@ -231,7 +231,6 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
 
         colorSubject.onNext(color)
 
-        isDirtySinceLastSync = true
         suspendDatabaseSync = false
 
 
@@ -338,7 +337,7 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
                     val attrId = snapshot.key
                     if (attributes.unObservedList.find { it.objectId == attrId } == null) {
                         val pojo = snapshot.getValue(DatabaseManager.AttributePOJO::class.java)
-                        if (pojo != null && pojo.type != null) {
+                        if (pojo?.type != null) {
                             attributes.addAt(OTAttribute.Companion.createAttribute(snapshot.key, pojo), pojo.position)
                         }
                     }
