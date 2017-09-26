@@ -4,7 +4,6 @@ import android.util.SparseIntArray
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTChoiceAttribute
-import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.visualization.AttributeChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.ICategoricalBarChart
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
@@ -31,7 +30,7 @@ class ChoiceCategoricalBarChartModel(override val attribute: OTChoiceAttribute) 
     override fun reloadData(): Observable<List<ICategoricalBarChart.Point>> {
         val tracker = attribute.tracker
         if (tracker != null) {
-            return DatabaseManager.loadItems(tracker, getTimeScope()).map {
+            return OTApplication.app.databaseManager.loadItems(tracker, getTimeScope()).map {
                 items ->
 
                 val data = ArrayList<ICategoricalBarChart.Point>()
