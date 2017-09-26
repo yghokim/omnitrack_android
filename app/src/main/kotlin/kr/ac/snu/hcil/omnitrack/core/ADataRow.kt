@@ -61,7 +61,7 @@ abstract class ADataRow {
         return s.toTypedArray()
     }
 
-    override fun toString(): String {
-        return valueTable.map { "${it.key}: ${it.value}" }.joinToString(", ")
-    }
+    override fun toString(): String = valueTable.map { "${it.key}: ${it.value}" }.joinToString(", ")
+
+    fun getEntryIterator(): Iterable<Map.Entry<String, Any>> = valueTable.asIterable()
 }

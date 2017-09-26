@@ -12,7 +12,6 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
-import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.common.RxBoundDialogFragment
@@ -155,7 +154,7 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
                     user ->
                     val tracker = this.tracker
                     if (tracker != null && itemId != null) {
-                        DatabaseManager.getItem(tracker, itemId)
+                        OTApplication.app.databaseManager.getItem(tracker, itemId)
                     } else Observable.just(null)
                 }.subscribe {
                     item ->

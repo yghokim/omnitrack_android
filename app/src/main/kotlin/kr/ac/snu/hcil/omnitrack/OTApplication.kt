@@ -26,9 +26,11 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.*
 import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
+import kr.ac.snu.hcil.omnitrack.core.database.ADatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.DatabaseHelper
 import kr.ac.snu.hcil.omnitrack.core.database.FirebaseStorageHelper
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
+import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.fitbit.FitbitRecentSleepTimeMeasureFactory
@@ -173,8 +175,6 @@ class OTApplication : MultiDexApplication() {
     lateinit var dbHelper: DatabaseHelper
         private set
 
-    lateinit var storageHelper: FirebaseStorageHelper
-        private set
 
     val isAppInForeground: Boolean get() {
         return numActivitiesActive.get() > 0
@@ -185,6 +185,16 @@ class OTApplication : MultiDexApplication() {
     private val numActivitiesActive = AtomicInteger(0)
 
     private var wrappedContext: Context? = null
+
+
+    //Modules=======================================================
+    lateinit var databaseManager: ADatabaseManager
+        private set
+
+    lateinit var storageHelper: FirebaseStorageHelper
+        private set
+
+    //Modules end===================================================
 
 /*
     private val currentUser: OTUser
@@ -324,13 +334,18 @@ class OTApplication : MultiDexApplication() {
 
         val startedAt = SystemClock.elapsedRealtime()
 
+        //initialize modules===============================================
+        this.databaseManager = RealmDatabaseManager()
+
         logger = LoggingDbHelper(this)
         logger.writeSystemLog("Application creates.", "OTApplication")
 
-        dbHelper = DatabaseHelper(this)
-
         storageHelper = FirebaseStorageHelper(this)
         storageHelper.restartUploadTask()
+        //=================================================================
+
+
+        dbHelper = DatabaseHelper(this)
 
         timeTriggerAlarmManager = OTTimeTriggerAlarmManager()
 
