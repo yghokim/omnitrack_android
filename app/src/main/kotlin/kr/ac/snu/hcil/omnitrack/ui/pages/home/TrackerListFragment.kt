@@ -53,6 +53,7 @@ import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.startActivityOnDelay
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
+import rx.android.schedulers.AndroidSchedulers
 import rx.subscriptions.CompositeSubscription
 import java.text.SimpleDateFormat
 import java.util.*
@@ -516,6 +517,7 @@ class TrackerListFragment : OTFragment() {
             }
 
             private fun setLastLoggingTime(timestamp: Long?) {
+                println("Last logging time: ${timestamp}")
                 if (timestamp != null) {
                     InterfaceHelper.setTextAppearance(lastLoggingTimeView, R.style.trackerListInformationTextViewStyle)
                     val dateText = TimeHelper.getDateText(timestamp, context).toUpperCase()
@@ -589,9 +591,9 @@ class TrackerListFragment : OTFragment() {
                         }
                 )
 
-                subscriptions.add(viewModel.lastLoggingTime.subscribe { time -> setLastLoggingTime(time) })
-                subscriptions.add(viewModel.todayCount.subscribe { count -> setTodayLoggingCount(count) })
-                subscriptions.add(viewModel.totalItemCount.subscribe { count -> setTotalItemCount(count) })
+                subscriptions.add(viewModel.lastLoggingTime.observeOn(AndroidSchedulers.mainThread()).subscribe { time -> setLastLoggingTime(time) })
+                subscriptions.add(viewModel.todayCount.observeOn(AndroidSchedulers.mainThread()).subscribe { count -> setTodayLoggingCount(count) })
+                subscriptions.add(viewModel.totalItemCount.observeOn(AndroidSchedulers.mainThread()).subscribe { count -> setTotalItemCount(count) })
 
                 validationErrorMessages.clear()
                 errorIndicator.visibility = if (viewModel.tracker.isValid(validationErrorMessages)) {

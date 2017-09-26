@@ -16,6 +16,7 @@ import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import rx.Observable
 import rx.Single
+import rx.schedulers.Schedulers
 import java.util.*
 
 /**
@@ -96,7 +97,6 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) : ADatab
                         dao.objectId = newItemId
                     }
 
-
                     realm.insertOrUpdate(dao)
                     println("OTItem was pushed to Realm. item count: ${getItemQueryOfTracker(tracker).count()}, object Id: ${item.objectId}")
                 }
@@ -153,24 +153,20 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) : ADatab
     }
 
     override fun getLogCountDuring(tracker: OTTracker, from: Long, to: Long): Observable<Long> =
-            Observable.just(getItemQueryOfTracker(tracker).between("timestamp", from, to).count())
+            Observable.just(getItemQueryOfTracker(tracker).between("timestamp", from, to).count()).subscribeOn(Schedulers.io())
 
 
     override fun getTotalItemCount(tracker: OTTracker): Observable<Pair<Long, Long>> {
         return Observable.just(
                 Pair(
                         getItemQueryOfTracker(tracker).count(),
-                        System.currentTimeMillis()))
+                        System.currentTimeMillis())).subscribeOn(Schedulers.io())
     }
 
     override fun getLastLoggingTime(tracker: OTTracker): Observable<Long?> {
-        return getItemQueryOfTracker(tracker).findAllSortedAsync("timestamp", Sort.DESCENDING).asObservable()
-                .map { results ->
-                    val latestRow = results.first()
-                    if (latestRow != null) {
-                        latestRow.timestamp
-                    } else null
-                }.onErrorReturn { null }
+        return Observable.just(
+                getItemQueryOfTracker(tracker).max("timestamp")?.toLong()
+        ).subscribeOn(Schedulers.io())
     }
 
     override fun checkHasDeviceId(userId: String, deviceId: String): Single<Boolean> {
