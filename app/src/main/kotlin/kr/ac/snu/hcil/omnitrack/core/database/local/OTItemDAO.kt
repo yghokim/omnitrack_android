@@ -58,10 +58,16 @@ open class OTItemAttributeEntryDAO : RealmObject() {
 object RealmItemHelper {
     fun convertItemToDAO(item: OTItem): OTItemDAO {
         val dao = OTItemDAO()
+        dao.trackerObjectId = item.trackerObjectId
         dao.objectId = item.objectId
         dao.deviceId = item.deviceId
         dao.source = item.source.name
-        dao.timestamp = item.timestamp
+
+        dao.timestamp = if (item.timestamp != -1L) {
+            item.timestamp
+        } else {
+            System.currentTimeMillis()
+        }
 
         for (entry in item.getEntryIterator()) {
             dao.fieldValueEntries.add(
@@ -76,5 +82,5 @@ object RealmItemHelper {
     }
 
     fun convertDAOToItem(dao: OTItemDAO): OTItem =//objectId notNull is guaranteed.
-            OTItem(dao.objectId!!, dao.trackerObjectId, dao.serializedValueTable(), dao.timestamp, dao.loggingSource, dao.deviceId)
+            OTItem(dao.objectId ?: dao.trackerObjectId + UUID.randomUUID().toString(), dao.trackerObjectId, dao.serializedValueTable(), dao.timestamp, dao.loggingSource, dao.deviceId)
 }
