@@ -25,6 +25,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.ABinaryUploadService
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.ADatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.synchronization.IServerSideAPI
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationChannelManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
@@ -177,6 +178,9 @@ class OTApplication : MultiDexApplication() {
         private set
 
     lateinit var binaryUploadServiceController: ABinaryUploadService.ABinaryUploadServiceController
+        private set
+
+    lateinit var serverController: IServerSideAPI
         private set
 
     //Modules end===================================================

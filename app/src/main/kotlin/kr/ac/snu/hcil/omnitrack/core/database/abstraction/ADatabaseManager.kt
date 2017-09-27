@@ -9,6 +9,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
+import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTItemPOJO
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import rx.Observable
@@ -44,6 +45,14 @@ abstract class ADatabaseManager {
     abstract fun saveTracker(tracker: OTTracker, position: Int)
 
     abstract fun setUsedAppWidget(widgetName: String, used: Boolean)
+
+    //Synchronization==============================================================================================
+    abstract fun getItemLatestSynchronizedServerTime(): Single<Long>
+
+    abstract fun getDirtyItemsToSync(): Single<List<OTItemPOJO>>
+    abstract fun setItemSynchronizationFlags(idTimestampPair: List<Pair<String, Long>>): Single<Boolean>
+    abstract fun applyServerItemsToSync(itemList: List<OTItemPOJO>): Single<List<Boolean>>
+    //=============================================================================================================
 
     //Item Summaries
     abstract fun getLogCountDuring(tracker: OTTracker, from: Long, to: Long): Observable<Long>

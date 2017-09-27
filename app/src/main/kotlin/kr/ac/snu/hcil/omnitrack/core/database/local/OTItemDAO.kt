@@ -28,7 +28,7 @@ open class OTItemDAO : RealmObject() {
 
     var fieldValueEntries = RealmList<OTItemAttributeEntryDAO>()
 
-    var dirty: Boolean = true
+    var synchronizedAt: Long? = null // store server time of when synchronized perfectly.
 
     var updatedAt: Long = System.currentTimeMillis()
 
@@ -57,6 +57,9 @@ open class OTItemAttributeEntryDAO : RealmObject() {
 }
 
 object RealmItemHelper {
+
+    const val TIMESTAMP_NULL = -1
+
     fun convertItemToDAO(item: OTItem): OTItemDAO {
         val dao = OTItemDAO()
         dao.trackerObjectId = item.trackerObjectId
