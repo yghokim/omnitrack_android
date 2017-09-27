@@ -124,7 +124,7 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) : ADatab
             itemDao?.let {
                 realmInstance.executeTransaction { realm ->
                     itemDao.removed = true
-                    itemDao.synchronized = false
+                    itemDao.dirty = true
                     itemDao.updatedAt = System.currentTimeMillis()
                 }
                 return true
