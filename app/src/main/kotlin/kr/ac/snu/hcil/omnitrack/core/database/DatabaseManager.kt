@@ -11,6 +11,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.ADatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTItemPOJO
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
@@ -25,6 +26,21 @@ import kotlin.NoSuchElementException
  * Created by younghokim on 2017. 2. 9..
  */
 object DatabaseManager : ADatabaseManager() {
+    override fun getDirtyItemsToSync(): Single<List<OTItemPOJO>> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun setItemSynchronizationFlags(idTimestampPair: List<Pair<String, Long>>): Single<Boolean> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun applyServerItemsToSync(itemList: List<OTItemPOJO>): Single<List<Boolean>> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun getItemLatestSynchronizedServerTime(): Single<Long> {
+        return Single.just(0)
+    }
 
     const val CHILD_NAME_USERS = "users"
     const val CHILD_NAME_TRACKERS = "trackers"
