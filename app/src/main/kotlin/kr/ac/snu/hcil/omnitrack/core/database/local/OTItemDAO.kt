@@ -28,7 +28,7 @@ open class OTItemDAO : RealmObject() {
 
     var fieldValueEntries = RealmList<OTItemAttributeEntryDAO>()
 
-    var synchronized: Boolean = false
+    var dirty: Boolean = true
 
     var updatedAt: Long = System.currentTimeMillis()
 
