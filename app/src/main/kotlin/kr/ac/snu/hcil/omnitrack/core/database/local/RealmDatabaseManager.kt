@@ -1,9 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.database.local
 
-import io.realm.Realm
-import io.realm.RealmConfiguration
-import io.realm.RealmQuery
-import io.realm.Sort
+import io.realm.*
 import io.realm.rx.RealmObservableFactory
 import io.realm.rx.RxObservableFactory
 import kr.ac.snu.hcil.omnitrack.core.OTItem
@@ -12,6 +9,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.ADatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTItemPOJO
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import rx.Observable
@@ -27,6 +25,7 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) : ADatab
     companion object {
         const val FIELD_OBJECT_ID = "objectId"
         const val FIELD_UPDATED_AT_LONG = "updatedAt"
+        const val FIELD_SYNCHRONIZED_AT = "synchronizedAt"
         const val FIELD_REMOVED_BOOLEAN = "removed"
         const val FIELD_TIMESTAMP_LONG = "timestamp"
         const val FIELD_TRACKER_ID = "trackerObjectId"
@@ -43,6 +42,45 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) : ADatab
 
     private fun getItemQueryOfTracker(tracker: OTTracker): RealmQuery<OTItemDAO> {
         return realmInstance.where(OTItemDAO::class.java).equalTo(FIELD_TRACKER_ID, tracker.objectId).equalTo(FIELD_REMOVED_BOOLEAN, false)
+    }
+
+    override fun getDirtyItemsToSync(): Single<List<OTItemPOJO>> {
+        return realmInstance.where(OTItemDAO::class.java).equalTo(FIELD_SYNCHRONIZED_AT, null as Long).findAll().asObservable().toSingle().map { result ->
+            result.map { itemDao ->
+                val itemPojo = OTItemPOJO()
+                if (itemDao.objectId != null)
+                    itemPojo.objectId = itemDao.objectId!!
+                itemPojo.deviceId = itemDao.deviceId
+                itemPojo.trackerObjectId = itemDao.trackerObjectId
+                itemPojo.loggingSource = itemDao.source
+                itemPojo.updatedAt = itemDao.updatedAt
+                itemPojo.serializedValueTable = itemDao.serializedValueTable()
+                itemPojo
+            }
+        }
+    }
+
+    override fun setItemSynchronizationFlags(idTimestampPair: List<Pair<String, Long>>): Single<Boolean> {
+        return Single.defer {
+            try {
+                realmInstance.executeTransaction { realm ->
+                    for (pair in idTimestampPair) {
+                        val row = realm.where(OTItemDAO::class.java).equalTo(FIELD_OBJECT_ID, pair.first).findFirst()
+                        if (row != null) {
+                            row.synchronizedAt = pair.second
+                        }
+                    }
+                }
+                return@defer Single.just(true)
+            } catch (ex: Exception) {
+                ex.printStackTrace()
+                return@defer Single.just(false)
+            }
+        }
+    }
+
+    override fun applyServerItemsToSync(itemList: List<OTItemPOJO>): Single<List<Boolean>> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun saveTrigger(trigger: OTTrigger, userId: String, position: Int) {
@@ -86,6 +124,14 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) : ADatab
     }
 
 
+    override fun getItemLatestSynchronizedServerTime(): Single<Long> {
+        return getLatestSynchronizedServerTimeImpl(OTItemDAO::class.java)
+    }
+
+    private fun getLatestSynchronizedServerTimeImpl(daoClass: Class<out RealmObject>): Single<Long> {
+        return Single.just(realmInstance.where(daoClass).max(FIELD_SYNCHRONIZED_AT)?.toLong() ?: 0)
+    }
+
     override fun saveItemImpl(item: OTItem, tracker: OTTracker): Single<Int> {
         return Single.create { subscriber ->
             var result: Int = SAVE_RESULT_FAIL
@@ -124,7 +170,7 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) : ADatab
             itemDao?.let {
                 realmInstance.executeTransaction { realm ->
                     itemDao.removed = true
-                    itemDao.dirty = true
+                    itemDao.synchronizedAt = null
                     itemDao.updatedAt = System.currentTimeMillis()
                 }
                 return true
