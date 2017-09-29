@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.database.synchronization
 
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTItemPOJO
+import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTUserRolePOJO
 import rx.Single
 
 /**
@@ -13,4 +14,7 @@ interface ISynchronizationServerSideAPI {
     //server receives
     fun postItemsDirty(items: List<OTItemPOJO>): Single<List<SyncResultEntry>>
 
+    fun getUserRoles(): Single<List<OTUserRolePOJO>>
+
+    fun postUserRoleConsentResult(result: OTUserRolePOJO): Single<Boolean>
 }

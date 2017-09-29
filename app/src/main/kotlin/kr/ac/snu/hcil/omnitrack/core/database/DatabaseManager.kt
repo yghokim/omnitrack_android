@@ -979,7 +979,6 @@ object DatabaseManager : ADatabaseManager() {
         } else {
             return false
         }
-
     }
 
     override fun removeDeviceInfo(userId: String, deviceId: String): Single<Boolean> {
