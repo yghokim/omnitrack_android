@@ -1,14 +1,10 @@
 package kr.ac.snu.hcil.omnitrack.core
 
 import android.content.Intent
-import android.support.annotation.Keep
 import android.support.v7.app.AppCompatActivity
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTUserRolePOJO
 import kr.ac.snu.hcil.omnitrack.ui.pages.experiment.ExperimentSignInActivity
 
 /**
@@ -17,19 +13,6 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.experiment.ExperimentSignInActivity
 object ExperimentConsentManager {
 
     const val REQUEST_CODE_EXPERIMENT_SIGN_IN = 6550
-
-    @Keep
-    data class ExperimentProfile(
-            var isConsentApproved: Boolean = false,
-            var age: String? = null,
-            var gender: String? = null,
-            var purposes: List<String>? = null,
-            var country: String? = null) {
-
-        override fun toString(): String {
-            return "isConsentApproved: ${isConsentApproved}, age: ${age}, gender: ${gender}, country: ${country}, purposes: ${purposes?.joinToString(",")}"
-        }
-    }
 
     interface ResultListener {
         fun onConsentApproved()
@@ -44,6 +27,30 @@ object ExperimentConsentManager {
     fun startProcess(activity: AppCompatActivity, userId: String, resultListener: ResultListener? = null) {
         mActivity = activity
         mResultListener = resultListener
+
+        if (OTApplication.app.systemSharedPreferences.getBoolean(OTUser.PREFERENCES_KEY_CONSENT_APPROVED, false) == true) {
+            mResultListener?.onConsentApproved()
+            finishProcess()
+        } else {
+
+            OTApplication.app.synchronizationServerController.getUserRoles().subscribe({ result ->
+                val userRole = result.find { it.role == "ServiceUser" }
+                if (userRole == null || userRole.isConsentApproved == false) {
+                    println("consent form was not approved or is first-time login.")
+                    activity.startActivityForResult(Intent(activity, ExperimentSignInActivity::class.java), REQUEST_CODE_EXPERIMENT_SIGN_IN)
+                } else {
+                    println("consent form has been approved.")
+                    onApproved()
+                    finishProcess()
+                }
+            }, { error ->
+                error.printStackTrace()
+                mResultListener?.onConsentFailed()
+                finishProcess()
+            })
+        }
+
+        /*
 
         DatabaseManager.experimentProfileRef?.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError?) {
@@ -65,7 +72,12 @@ object ExperimentConsentManager {
                 }
             }
 
-        })
+        })*/
+    }
+
+    private fun onApproved() {
+        OTApplication.app.systemSharedPreferences.getBoolean(OTUser.PREFERENCES_KEY_CONSENT_APPROVED, true)
+        mResultListener?.onConsentApproved()
     }
 
     fun handleActivityResult(deleteAccountIfDenied: Boolean, requestCode: Int, resultCode: Int, data: Intent?) {
@@ -92,13 +104,32 @@ object ExperimentConsentManager {
                 mResultListener?.onConsentFailed()
                 finishProcess()
             } else {
-                val profile = ExperimentProfile()
+                val profile = OTUserRolePOJO()
+                profile.role = "ServiceUser"
                 profile.isConsentApproved = true
-                profile.age = data.getStringExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_AGE_GROUP)
-                profile.country = data.getStringExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_COUNTRY)
-                profile.gender = data.getStringExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_GENDER)
-                profile.purposes = data.getStringArrayListExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_PURPOSES)
+                val information = HashMap<String, Any>()
+                information["age"] = data.getStringExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_AGE_GROUP)
+                information["country"] = data.getStringExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_COUNTRY)
+                information["gender"] = data.getStringExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_GENDER)
+                information["purposes"] = data.getStringArrayListExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_PURPOSES)
+                profile.information = information
 
+                OTApplication.app.synchronizationServerController.postUserRoleConsentResult(profile)
+                        .subscribe({ success ->
+                            if (success == true) {
+                                onApproved()
+                                finishProcess()
+                            } else {
+                                mResultListener?.onConsentFailed()
+                                finishProcess()
+                            }
+                        }, { error ->
+                            error.printStackTrace()
+                            mResultListener?.onConsentFailed()
+                            finishProcess()
+                        })
+
+                /*
                 val currentExpRef = DatabaseManager.experimentProfileRef
                 currentExpRef?.setValue(profile, { databaseError, _ ->
                     if (databaseError == null) {
@@ -108,7 +139,7 @@ object ExperimentConsentManager {
                         mResultListener?.onConsentFailed()
                         finishProcess()
                     }
-                })
+                })*/
             }
         }
     }

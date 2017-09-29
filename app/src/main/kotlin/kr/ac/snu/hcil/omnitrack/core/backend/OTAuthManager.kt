@@ -11,6 +11,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.common.api.GoogleApiClient
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.*
 import kr.ac.snu.hcil.omnitrack.OTApplication
@@ -70,7 +71,6 @@ object OTAuthManager {
 
     private val mSignInChangedListeners = HashSet<SignInChangedListener>()
 
-
     @Volatile var authToken: String? = null
         private set
 
@@ -85,6 +85,14 @@ object OTAuthManager {
 
     init {
         clearUserInfo()
+
+        mFirebaseAuth.addIdTokenListener { auth ->
+            auth.currentUser?.getIdToken(false)?.addOnCompleteListener(object : OnCompleteListener<GetTokenResult> {
+                override fun onComplete(task: Task<GetTokenResult>) {
+                    authToken = task.result.token
+                }
+            })
+        }
 
         Log.d(LOG_TAG, "Initializing Google SDK...")
 
