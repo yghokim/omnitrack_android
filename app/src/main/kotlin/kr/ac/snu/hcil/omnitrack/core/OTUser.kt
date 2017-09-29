@@ -38,6 +38,7 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
         const val PREFERENCES_KEY_OBJECT_ID = "ot_user_object_id"
         const val PREFERENCES_KEY_NAME = "ot_user_name"
         const val PREFERENCES_KEY_PHOTO_URL = "ot_user_photo_url"
+        const val PREFERENCES_KEY_CONSENT_APPROVED = "ot_user_consent_approved"
 
 
         //const val PREFERENCES_KEY_EMAIL = "user_email"
@@ -88,6 +89,7 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
                     .remove(PREFERENCES_KEY_OBJECT_ID)
                     .remove(PREFERENCES_KEY_NAME)
                     .remove(PREFERENCES_KEY_PHOTO_URL)
+                    .remove(PREFERENCES_KEY_CONSENT_APPROVED)
                     .apply()
 
             return removed

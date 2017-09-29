@@ -1,11 +1,10 @@
 package kr.ac.snu.hcil.omnitrack.core.database.synchronization.official
 
+import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTItemPOJO
+import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTUserRolePOJO
 import kr.ac.snu.hcil.omnitrack.core.database.synchronization.SyncResultEntry
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Query
+import retrofit2.http.*
 import rx.Single
 
 /**
@@ -15,8 +14,18 @@ import rx.Single
 interface OTOfficialServerService {
 
     @GET("api/items/changes")
-    fun getItemServerChanges(@Query("user") userId: String, @Query("timestamp") timestamp: String): Single<List<OTItemPOJO>>
+    fun getItemServerChanges(@Query("timestamp") timestamp: String): Single<List<OTItemPOJO>>
 
     @POST("api/items/changes")
-    fun postItemLocalChanges(@Query("user") userId: String, @Body list: List<OTItemPOJO>): Single<List<SyncResultEntry>>
+    fun postItemLocalChanges(@Body list: List<OTItemPOJO>): Single<List<SyncResultEntry>>
+
+    @GET("api/user/roles")
+    fun getUserRoles(): Single<List<OTUserRolePOJO>>
+
+    @POST("api/user/role")
+    fun postUserRoleConsentResult(@Body data: OTUserRolePOJO): Single<Boolean>
+
+    @PUT("api/user/device")
+    fun putDeviceInfo(@Body info: OTDeviceInfo): Single<Boolean>
+
 }
