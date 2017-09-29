@@ -20,8 +20,9 @@ class OTItemPOJO {
     var synchronizedAt: Long? = null
 
     var serializedValueTable: Map<String, String>? = null
+    var removed: Boolean = false
 
-    var updatedAt: Long = System.currentTimeMillis()
-
-    var loggingSource: String? = null
+    override fun toString(): String {
+        return "objectId: ${objectId}\ntrackerId: ${trackerObjectId}\ndeviceId: ${deviceId}\ntimestamp: ${timestamp}\nsource: ${source}\nsynchronizedAt: ${synchronizedAt}\nremoved: ${removed}\nvalues: ${serializedValueTable?.size ?: "null"}"
+    }
 }

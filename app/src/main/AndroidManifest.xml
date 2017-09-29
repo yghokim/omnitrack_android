@@ -176,6 +176,10 @@
         <service android:name=".services.OTAudioPlayService" />
         <service android:name=".services.OTAudioRecordService"/>
 
+        <service
+            android:name=".core.database.synchronization.OTSynchronizationService"
+            android:exported="false" />
+
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/icon_simple" />
