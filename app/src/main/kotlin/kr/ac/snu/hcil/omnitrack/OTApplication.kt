@@ -25,7 +25,9 @@ import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.ABinaryUploadService
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.ADatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
-import kr.ac.snu.hcil.omnitrack.core.database.synchronization.IServerSideAPI
+import kr.ac.snu.hcil.omnitrack.core.database.synchronization.ISynchronizationServerSideAPI
+import kr.ac.snu.hcil.omnitrack.core.database.synchronization.OTSyncManager
+import kr.ac.snu.hcil.omnitrack.core.database.synchronization.official.OTOfficialServerApiController
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationChannelManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
@@ -170,6 +172,9 @@ class OTApplication : MultiDexApplication() {
     private var wrappedContext: Context? = null
 
 
+    lateinit var syncManager: OTSyncManager
+        private set
+
     //Modules=======================================================
     lateinit var databaseManager: ADatabaseManager
         private set
@@ -180,8 +185,9 @@ class OTApplication : MultiDexApplication() {
     lateinit var binaryUploadServiceController: ABinaryUploadService.ABinaryUploadServiceController
         private set
 
-    lateinit var serverController: IServerSideAPI
+    lateinit var synchronizationServerController: ISynchronizationServerSideAPI
         private set
+
 
     //Modules end===================================================
 
@@ -327,6 +333,9 @@ class OTApplication : MultiDexApplication() {
         this.databaseManager = RealmDatabaseManager()
 
         this.binaryUploadServiceController = OTFirebaseUploadService.ServiceController(this)
+        this.synchronizationServerController = OTOfficialServerApiController()
+
+
 
         logger = LoggingDbHelper(this)
         logger.writeSystemLog("Application creates.", "OTApplication")
@@ -334,7 +343,7 @@ class OTApplication : MultiDexApplication() {
         storageHelper = FirebaseStorageHelper(this)
         storageHelper.restartUploadTask()
         //=================================================================
-
+        syncManager = OTSyncManager(this, synchronizationServerController)
 
         timeTriggerAlarmManager = OTTimeTriggerAlarmManager()
 

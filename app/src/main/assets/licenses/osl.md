@@ -47,6 +47,11 @@ The AWS SDK for Android is generally licensed under the Apache 2.0 License, with
 Copyright 2016 Square, Inc.<br>
 Apache 2.0 license
 
+#####Retrofit
+<http://square.github.io/retrofit><br>
+Copyright 2013 Square, Inc.<br>
+Apache 2.0 license
+
 #####RecyclerView Animators
 <https://github.com/wasabeef/recyclerview-animators><br>
 Copyright 2015 Wasabeef<br>

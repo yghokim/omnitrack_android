@@ -10,6 +10,8 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTItemPOJO
+import kr.ac.snu.hcil.omnitrack.core.database.synchronization.ESyncDataType
+import kr.ac.snu.hcil.omnitrack.core.database.synchronization.SyncResultEntry
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import rx.Observable
@@ -47,11 +49,19 @@ abstract class ADatabaseManager {
     abstract fun setUsedAppWidget(widgetName: String, used: Boolean)
 
     //Synchronization==============================================================================================
-    abstract fun getItemLatestSynchronizedServerTime(): Single<Long>
+    fun getLatestSynchronizedServerTimeOf(type: ESyncDataType): Single<Long>
+            = when (type) {
+        ESyncDataType.ITEM -> getItemLatestSynchronizedServerTime()
+        else -> Single.just(0L)
+    //TODO implement other syncdatatypes
+    }
+
+    abstract protected fun getItemLatestSynchronizedServerTime(): Single<Long>
+
 
     abstract fun getDirtyItemsToSync(): Single<List<OTItemPOJO>>
-    abstract fun setItemSynchronizationFlags(idTimestampPair: List<Pair<String, Long>>): Single<Boolean>
-    abstract fun applyServerItemsToSync(itemList: List<OTItemPOJO>): Single<List<Boolean>>
+    abstract fun setItemSynchronizationFlags(idTimestampPair: List<SyncResultEntry>): Single<Boolean>
+    abstract fun applyServerItemsToSync(itemList: List<OTItemPOJO>): Single<Boolean>
     //=============================================================================================================
 
     //Item Summaries
