@@ -10,6 +10,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.ADatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTItemPOJO
+import kr.ac.snu.hcil.omnitrack.core.database.synchronization.SyncResultEntry
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import rx.Observable
@@ -35,52 +36,80 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) : ADatab
             val fileName: String = "localDatabase"
     )
 
-    private val realmInstance: Realm get() = Realm.getInstance(RealmConfiguration.Builder().name(config.fileName).build())
+    private fun getRealmInstance(): Realm = Realm.getInstance(RealmConfiguration.Builder().name(config.fileName).build())
     private val observableFactory: RxObservableFactory by lazy {
         RealmObservableFactory()
     }
 
     private fun getItemQueryOfTracker(tracker: OTTracker): RealmQuery<OTItemDAO> {
-        return realmInstance.where(OTItemDAO::class.java).equalTo(FIELD_TRACKER_ID, tracker.objectId).equalTo(FIELD_REMOVED_BOOLEAN, false)
+        return getRealmInstance().where(OTItemDAO::class.java).equalTo(FIELD_TRACKER_ID, tracker.objectId).equalTo(FIELD_REMOVED_BOOLEAN, false)
     }
 
     override fun getDirtyItemsToSync(): Single<List<OTItemPOJO>> {
-        return realmInstance.where(OTItemDAO::class.java).equalTo(FIELD_SYNCHRONIZED_AT, null as Long).findAll().asObservable().toSingle().map { result ->
-            result.map { itemDao ->
-                val itemPojo = OTItemPOJO()
-                if (itemDao.objectId != null)
-                    itemPojo.objectId = itemDao.objectId!!
-                itemPojo.deviceId = itemDao.deviceId
-                itemPojo.trackerObjectId = itemDao.trackerObjectId
-                itemPojo.loggingSource = itemDao.source
-                itemPojo.updatedAt = itemDao.updatedAt
-                itemPojo.serializedValueTable = itemDao.serializedValueTable()
-                itemPojo
-            }
-        }
+        println("get items of Realm local.")
+        return Single.just(
+                getRealmInstance().where(OTItemDAO::class.java).equalTo(FIELD_SYNCHRONIZED_AT, null as Long?).findAll().map { itemDao ->
+                    val itemPojo = OTItemPOJO()
+                    RealmItemHelper.applyDaoToPojo(itemDao, itemPojo)
+                    itemPojo
+                })
     }
 
-    override fun setItemSynchronizationFlags(idTimestampPair: List<Pair<String, Long>>): Single<Boolean> {
+    override fun setItemSynchronizationFlags(idTimestampPair: List<SyncResultEntry>): Single<Boolean> {
+        return setSynchronizationFlagsImpl(OTItemDAO::class.java, idTimestampPair)
+    }
+
+    override fun applyServerItemsToSync(itemList: List<OTItemPOJO>): Single<Boolean> {
         return Single.defer {
+            val realm = getRealmInstance()
             try {
-                realmInstance.executeTransaction { realm ->
-                    for (pair in idTimestampPair) {
-                        val row = realm.where(OTItemDAO::class.java).equalTo(FIELD_OBJECT_ID, pair.first).findFirst()
-                        if (row != null) {
-                            row.synchronizedAt = pair.second
+                for (serverPojo in itemList) {
+                    val match = realm.where(OTItemDAO::class.java).equalTo(FIELD_OBJECT_ID, serverPojo.objectId).findFirst()
+                    if (match == null) {
+                        if (!serverPojo.removed) {
+                            //insert
+                            println("synchronization: server row not matched and is not a removed row. append new in local db.")
+
+                            realm.executeTransaction { realm ->
+                                val dao = realm.createObject(OTItemDAO::class.java, serverPojo.objectId)
+                                RealmItemHelper.applyPojoToDao(serverPojo, dao, realm)
+                            }
+                        }
+                    } else if (match.synchronizedAt == null) {
+                        //found matched row, but it is dirty. Conflict!
+                        //late timestamp win policy
+                        println("conflict")
+                        if (match.timestamp > serverPojo.timestamp) {
+                            //client win
+                            println("client win")
+                        } else {
+                            //server win
+                            println("server win")
+                            realm.executeTransaction {
+                                RealmItemHelper.applyPojoToDao(serverPojo, match, realm)
+                            }
+                        }
+                    } else {
+                        //update
+                        realm.executeTransaction {
+                            if (serverPojo.removed) {
+                                match.deleteFromRealm()
+                            } else {
+                                RealmItemHelper.applyPojoToDao(serverPojo, match, realm)
+                            }
                         }
                     }
                 }
+
+                realm.close()
                 return@defer Single.just(true)
             } catch (ex: Exception) {
                 ex.printStackTrace()
                 return@defer Single.just(false)
+            } finally {
+                realm.close()
             }
         }
-    }
-
-    override fun applyServerItemsToSync(itemList: List<OTItemPOJO>): Single<List<Boolean>> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun saveTrigger(trigger: OTTrigger, userId: String, position: Int) {
@@ -128,8 +157,34 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) : ADatab
         return getLatestSynchronizedServerTimeImpl(OTItemDAO::class.java)
     }
 
+    private fun setSynchronizationFlagsImpl(daoClass: Class<out RealmObject>, idTimestampPair: List<SyncResultEntry>): Single<Boolean> {
+        return Single.defer {
+            try {
+                getRealmInstance().let {
+
+                    it.executeTransaction { realm ->
+                        for (pair in idTimestampPair) {
+                            val row = realm.where(daoClass).equalTo(FIELD_OBJECT_ID, pair.id).findFirst()
+                            if (row != null) {
+                                if (row is OTItemDAO) {
+                                    row.synchronizedAt = pair.synchronizedAt
+                                }
+                                println("set synchronization timestamp to ${pair.synchronizedAt}")
+                            }
+                        }
+                    }
+                    it.close()
+                }
+                return@defer Single.just(true)
+            } catch (ex: Exception) {
+                ex.printStackTrace()
+                return@defer Single.just(false)
+            }
+        }
+    }
+
     private fun getLatestSynchronizedServerTimeImpl(daoClass: Class<out RealmObject>): Single<Long> {
-        return Single.just(realmInstance.where(daoClass).max(FIELD_SYNCHRONIZED_AT)?.toLong() ?: 0)
+        return Single.just(getRealmInstance().where(daoClass).max(FIELD_SYNCHRONIZED_AT)?.toLong() ?: 0)
     }
 
     override fun saveItemImpl(item: OTItem, tracker: OTTracker): Single<Int> {
@@ -150,8 +205,12 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) : ADatab
 
                 handleBinaryUpload(item.objectId!!, item, tracker)
 
-                realmInstance.executeTransaction { realm ->
-                    realm.insertOrUpdate(RealmItemHelper.convertItemToDAO(item))
+                getRealmInstance().executeTransaction { realm ->
+                    realm.insertOrUpdate(RealmItemHelper.convertItemToDAO(item).apply {
+                        this.synchronizedAt = null
+                        this.updatedAt = System.currentTimeMillis()
+                    })
+
                     println("OTItem was pushed to Realm. item count: ${getItemQueryOfTracker(tracker).count()}, object Id: ${item.objectId}")
                 }
             } catch (ex: Exception) {
@@ -165,10 +224,11 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) : ADatab
     }
 
     override fun removeItemImpl(trackerId: String, itemId: String): Boolean {
+        val realm = getRealmInstance()
         try {
-            val itemDao = realmInstance.where(OTItemDAO::class.java).equalTo(FIELD_OBJECT_ID, itemId).findFirst()
+            val itemDao = realm.where(OTItemDAO::class.java).equalTo(FIELD_OBJECT_ID, itemId).findFirst()
             itemDao?.let {
-                realmInstance.executeTransaction { realm ->
+                realm.executeTransaction { realm ->
                     itemDao.removed = true
                     itemDao.synchronizedAt = null
                     itemDao.updatedAt = System.currentTimeMillis()
@@ -178,6 +238,8 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) : ADatab
         } catch (ex: Exception) {
             ex.printStackTrace()
             return false
+        } finally {
+            realm.close()
         }
     }
 
@@ -199,7 +261,7 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) : ADatab
 
     override fun getItem(tracker: OTTracker, itemId: String): Observable<OTItem> {
         return Observable.defer {
-            val dao = realmInstance.where(OTItemDAO::class.java).equalTo(FIELD_OBJECT_ID, itemId).findFirst()
+            val dao = getRealmInstance().where(OTItemDAO::class.java).equalTo(FIELD_OBJECT_ID, itemId).findFirst()
             if (dao != null) {
                 return@defer Observable.just(RealmItemHelper.convertDAOToItem(dao))
             } else return@defer Observable.empty<OTItem>()

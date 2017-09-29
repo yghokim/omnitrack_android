@@ -12,6 +12,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.ADatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTItemPOJO
+import kr.ac.snu.hcil.omnitrack.core.database.synchronization.SyncResultEntry
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
@@ -30,11 +31,11 @@ object DatabaseManager : ADatabaseManager() {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun setItemSynchronizationFlags(idTimestampPair: List<Pair<String, Long>>): Single<Boolean> {
+    override fun setItemSynchronizationFlags(idTimestampPair: List<SyncResultEntry>): Single<Boolean> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun applyServerItemsToSync(itemList: List<OTItemPOJO>): Single<List<Boolean>> {
+    override fun applyServerItemsToSync(itemList: List<OTItemPOJO>): Single<Boolean> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
@@ -50,7 +51,7 @@ object DatabaseManager : ADatabaseManager() {
     const val CHILD_NAME_ATTRIBUTE_PROPERTIES = "properties"
 
     enum class ElementActionType {Added, Removed, Modified }
-    data class ItemAction(val itemId: String, val action: ElementActionType, val element: OTItem? = null, val pojo: ItemPOJO? = null)
+    data class ItemAction(val itemId: String, val action: ElementActionType, val element: OTItem? = null, val pojo: FirebaseItemPOJO? = null)
 
     const val CHILD_NAME_EXPERIMENT_PROFILE = "experiment_profile"
 
@@ -151,11 +152,13 @@ object DatabaseManager : ADatabaseManager() {
     }
 
     @Keep
-    class ItemPOJO {
+    class FirebaseItemPOJO {
         var dataTable: Map<String, String>? = null
         var sourceType: Int = -1
         var timestamp: Any = 0
         var deviceId: String? = null
+
+        var updatedAt: Any = ServerValue.TIMESTAMP
 
         @Exclude
         fun getTimestamp(): Long {
@@ -165,6 +168,13 @@ object DatabaseManager : ADatabaseManager() {
                 return (timestamp as Long)
             } else throw Exception("Timestamp is not an integer of long.")
         }
+
+        @Exclude
+        fun getUpdatedAtTimestamp(): Long {
+            return (updatedAt as? Number)?.toLong() ?: throw Exception("Timestamp is not an integer of long.")
+        }
+
+
     }
 
     @Keep
@@ -616,7 +626,7 @@ object DatabaseManager : ADatabaseManager() {
 
                     override fun onDataChange(snapshot: DataSnapshot) {
                         if (!subscriber.isUnsubscribed) {
-                            val pojo = snapshot.getValue(ItemPOJO::class.java)
+                            val pojo = snapshot.getValue(FirebaseItemPOJO::class.java)
                             if (pojo != null) {
                                 val item = OTItem(snapshot.key, tracker.objectId, pojo.dataTable, pojo.getTimestamp(), OTItem.LoggingSource.values()[pojo.sourceType], pojo.deviceId)
                                 subscriber.onNext(item)
@@ -657,7 +667,7 @@ object DatabaseManager : ADatabaseManager() {
                     }
 
                     override fun onChildChanged(snapshot: DataSnapshot, p1: String?) {
-                        subscriber.onNext(ItemAction(snapshot.key, ElementActionType.Modified, null, snapshot.getValue(ItemPOJO::class.java)))
+                        subscriber.onNext(ItemAction(snapshot.key, ElementActionType.Modified, null, snapshot.getValue(FirebaseItemPOJO::class.java)))
                     }
 
                     override fun onChildAdded(snapshot: DataSnapshot, p1: String?) {
@@ -680,7 +690,7 @@ object DatabaseManager : ADatabaseManager() {
 
 
     fun makeItemFromSnapshot(snapshot: DataSnapshot, trackerId: String): OTItem? {
-        val pojo = snapshot.getValue(ItemPOJO::class.java)
+        val pojo = snapshot.getValue(FirebaseItemPOJO::class.java)
         return if (pojo != null)
             OTItem(snapshot.key, trackerId, pojo.dataTable, pojo.getTimestamp(), OTItem.LoggingSource.values()[pojo.sourceType], pojo.deviceId)
         else null
@@ -715,7 +725,7 @@ object DatabaseManager : ADatabaseManager() {
                         if (snapshot.exists()) {
                             if (!subscriber.isUnsubscribed) {
                                 val list = snapshot.children.mapTo(ArrayList<OTItem>()) {
-                                    val pojo = it.getValue(ItemPOJO::class.java)!!
+                                    val pojo = it.getValue(FirebaseItemPOJO::class.java)!!
                                     OTItem(it.key, tracker.objectId, pojo.dataTable, pojo.getTimestamp(), OTItem.LoggingSource.values()[pojo.sourceType], pojo.deviceId)
                                 }
 
@@ -846,7 +856,7 @@ object DatabaseManager : ADatabaseManager() {
 
                 handleBinaryUpload(itemId, item, tracker)
 
-                val pojo = ItemPOJO()
+                val pojo = FirebaseItemPOJO()
                 pojo.timestamp = if (item.timestamp != -1L) {
                     item.timestamp
                 } else {

@@ -136,7 +136,7 @@ class OTItem : ADataRow {
         }
     }
 
-    fun overwriteWithPojo(pojo: DatabaseManager.ItemPOJO) {
+    fun overwriteWithPojo(pojo: DatabaseManager.FirebaseItemPOJO) {
         this.timestamp = pojo.getTimestamp()
         this.source = OTItem.LoggingSource.values()[pojo.sourceType]
         valueTable.clear()
