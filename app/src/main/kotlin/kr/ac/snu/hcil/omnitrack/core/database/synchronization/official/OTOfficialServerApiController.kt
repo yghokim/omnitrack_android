@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.database.synchronization.official
 
 import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
+import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTItemPOJO
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTUserRolePOJO
 import kr.ac.snu.hcil.omnitrack.core.database.synchronization.ISynchronizationServerSideAPI
@@ -20,6 +21,10 @@ import java.io.IOException
  */
 class OTOfficialServerApiController : ISynchronizationServerSideAPI {
 
+    override fun removeDeviceInfo(userId: String, deviceId: String): Single<Boolean> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     private val retrofit: Retrofit by lazy {
 
         val client = OkHttpClient.Builder().addInterceptor(object : Interceptor {
@@ -34,7 +39,7 @@ class OTOfficialServerApiController : ISynchronizationServerSideAPI {
 
         Retrofit.Builder()
                 .client(client)
-                .baseUrl("http://192.168.35.176:3000")
+                .baseUrl("http://192.168.0.5:3000")
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
@@ -60,5 +65,9 @@ class OTOfficialServerApiController : ISynchronizationServerSideAPI {
 
     override fun postUserRoleConsentResult(result: OTUserRolePOJO): Single<Boolean> {
         return service.postUserRoleConsentResult(result).subscribeOn(Schedulers.io())
+    }
+
+    override fun putDeviceInfo(info: OTDeviceInfo): Single<Boolean> {
+        return service.putDeviceInfo(info).subscribeOn(Schedulers.io())
     }
 }
