@@ -7,7 +7,6 @@ import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
-import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.ADatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTItemPOJO
 import kr.ac.snu.hcil.omnitrack.core.database.synchronization.SyncResultEntry
@@ -287,21 +286,5 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) : ADatab
         return Observable.just(
                 getItemQueryOfTracker(tracker).max(FIELD_TIMESTAMP_LONG)?.toLong()
         ).subscribeOn(Schedulers.io())
-    }
-
-    override fun checkHasDeviceId(userId: String, deviceId: String): Single<Boolean> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun addDeviceInfoToUser(userId: String, deviceId: String): Single<OTDeviceInfo> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun refreshInstanceIdToServerIfExists(ignoreIfStored: Boolean): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun removeDeviceInfo(userId: String, deviceId: String): Single<Boolean> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }
