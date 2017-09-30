@@ -908,7 +908,7 @@ object DatabaseManager : ADatabaseManager() {
         }
     }
 
-    override fun checkHasDeviceId(userId: String, deviceId: String): Single<Boolean> {
+    fun checkHasDeviceId(userId: String, deviceId: String): Single<Boolean> {
         val query = DatabaseManager.dbRef?.child(DatabaseManager.CHILD_NAME_USERS)?.child(userId)?.child("devices")?.child(deviceId)
         if (query != null) {
             return Single.create {
@@ -939,7 +939,7 @@ object DatabaseManager : ADatabaseManager() {
         return DatabaseManager.currentUserRef?.child("devices")?.child(OTApplication.app.deviceId)
     }
 
-    override fun addDeviceInfoToUser(userId: String, deviceId: String): Single<OTDeviceInfo> {
+    fun addDeviceInfoToUser(userId: String, deviceId: String): Single<OTDeviceInfo> {
         val query = DatabaseManager.dbRef?.child(DatabaseManager.CHILD_NAME_USERS)?.child(userId)?.child("devices")
         if (query != null) {
             return Single.create {
@@ -963,7 +963,7 @@ object DatabaseManager : ADatabaseManager() {
         }
     }
 
-    override fun refreshInstanceIdToServerIfExists(ignoreIfStored: Boolean): Boolean {
+    fun refreshInstanceIdToServerIfExists(ignoreIfStored: Boolean): Boolean {
         if (ignoreIfStored) {
             if (OTApplication.app.systemSharedPreferences.contains(OTApplication.PREFERENCE_KEY_FIREBASE_INSTANCE_ID)) {
                 return false
@@ -981,7 +981,7 @@ object DatabaseManager : ADatabaseManager() {
         }
     }
 
-    override fun removeDeviceInfo(userId: String, deviceId: String): Single<Boolean> {
+    fun removeDeviceInfo(userId: String, deviceId: String): Single<Boolean> {
         val query = DatabaseManager.dbRef?.child(DatabaseManager.CHILD_NAME_USERS)?.child(userId)?.child("devices")
         if (query != null) {
             return Single.create {

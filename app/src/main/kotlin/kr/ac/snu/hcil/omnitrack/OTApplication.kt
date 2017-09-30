@@ -15,6 +15,7 @@ import android.support.multidex.MultiDex
 import android.support.multidex.MultiDexApplication
 import android.support.v7.app.AppCompatDelegate
 import com.google.firebase.crash.FirebaseCrash
+import com.google.firebase.iid.FirebaseInstanceId
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.squareup.leakcanary.LeakCanary
 import io.realm.Realm
@@ -22,6 +23,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.FirebaseStorageHelper
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
+import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.ABinaryUploadService
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.ADatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
@@ -37,6 +39,7 @@ import kr.ac.snu.hcil.omnitrack.services.OTFirebaseUploadService
 import kr.ac.snu.hcil.omnitrack.utils.LocaleHelper
 import org.jetbrains.anko.telephonyManager
 import rx.Observable
+import rx.Single
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 import rx_activity_result2.RxActivityResult
@@ -416,6 +419,23 @@ class OTApplication : MultiDexApplication() {
         logger.writeSystemLog("App terminates.", "Application")
 
         syncUserToDb()
+    }
+
+    fun refreshInstanceIdToServerIfExists(ignoreIfStored: Boolean): Single<Boolean> {
+        if (ignoreIfStored) {
+            if (OTApplication.app.systemSharedPreferences.contains(OTApplication.PREFERENCE_KEY_FIREBASE_INSTANCE_ID)) {
+                return Single.just(false)
+            }
+        }
+
+        val token = FirebaseInstanceId.getInstance().token
+        if (token != null && OTAuthManager.currentSignedInLevel > OTAuthManager.SignedInLevel.NONE) {
+            OTApplication.app.systemSharedPreferences.edit().putString(OTApplication.PREFERENCE_KEY_FIREBASE_INSTANCE_ID, token)
+                    .apply()
+            return synchronizationServerController.putDeviceInfo(OTDeviceInfo())
+        } else {
+            return Single.just(false)
+        }
     }
 
 /*    private fun createUsabilityTestingTrackers(user: OTUser) {

@@ -18,10 +18,11 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.utils.getActivity
+import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
 import rx.Observable
-import rx.Single
-import rx.schedulers.Schedulers
+import rx.android.schedulers.AndroidSchedulers
 import java.util.*
 import java.util.concurrent.Executors
 
@@ -259,31 +260,21 @@ object OTAuthManager {
                 googleSignInAccount = result.signInAccount
                 println("signed in google account: ${result.signInAccount}")
                 refreshToken()
-                firebaseAuthWithGoogle(googleSignInAccount).subscribe({
-                    authResult ->
+                firebaseAuthWithGoogle(googleSignInAccount).observeOn(AndroidSchedulers.mainThread()).subscribe({ authResult ->
                     reloadUserInfo()
-
-                    DatabaseManager.checkHasDeviceId(authResult.user.uid, OTApplication.app.deviceId).flatMap {
-                        hasDevice: Boolean ->
-                        if (hasDevice) {
-                            Single.just(null)
-                        } else {
-                            DatabaseManager.addDeviceInfoToUser(authResult.user.uid, OTApplication.app.deviceId)
-                        }
-                    }.subscribeOn(Schedulers.io()).subscribe({
-                        info ->
-                        if (info != null) {
-                            println("added new device info.")
-                        }
-                    }, {
-                        //TODO cache failed deviceInfo and retry later.
-                    })
-
-
                     notifySignedIn(authResult.user)
                     resultHandler?.onSuccess()
+
+                    if (NetworkHelper.isConnectedToInternet()) {
+                        OTApplication.app.synchronizationServerController.putDeviceInfo(OTDeviceInfo()).toObservable()
+                                .map { success ->
+                                    println("refreshed device info.")
+                                }
+                        }
                 }, {
                     ex ->
+                    mFirebaseAuth.signOut()
+                    Auth.GoogleSignInApi.signOut(mGoogleApiClient)
                     resultHandler?.onError(ex)
                 })
 

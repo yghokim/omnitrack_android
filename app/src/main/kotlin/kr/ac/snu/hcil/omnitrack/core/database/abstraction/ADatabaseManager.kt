@@ -7,7 +7,6 @@ import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
-import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTItemPOJO
 import kr.ac.snu.hcil.omnitrack.core.database.synchronization.ESyncDataType
@@ -153,9 +152,4 @@ abstract class ADatabaseManager {
     abstract fun removeItemImpl(trackerId: String, itemId: String): Boolean
 
     abstract fun getItem(tracker: OTTracker, itemId: String): Observable<OTItem>
-
-    abstract fun checkHasDeviceId(userId: String, deviceId: String): Single<Boolean>
-    abstract fun addDeviceInfoToUser(userId: String, deviceId: String): Single<OTDeviceInfo>
-    abstract fun refreshInstanceIdToServerIfExists(ignoreIfStored: Boolean): Boolean
-    abstract fun removeDeviceInfo(userId: String, deviceId: String): Single<Boolean>
 }
