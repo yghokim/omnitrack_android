@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.core.backend
+package kr.ac.snu.hcil.omnitrack.core.auth
 
 import android.content.Intent
 import android.content.pm.ApplicationInfo
@@ -23,7 +23,7 @@ import kr.ac.snu.hcil.omnitrack.utils.getActivity
 import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
-import java.util.*
+import rx.subscriptions.Subscriptions
 import java.util.concurrent.Executors
 
 /**
@@ -41,12 +41,6 @@ object OTAuthManager {
         fun onSuccess()
         fun onError(e: Throwable)
         fun onCancel()
-    }
-
-    interface SignInChangedListener {
-        fun onSignedIn(firebaseUser: FirebaseUser)
-
-        fun onSignedOut()
     }
 
     private const val RC_SIGN_IN = 9913
@@ -69,8 +63,6 @@ object OTAuthManager {
     //is signIn process in progress
     private var mIntentInProgress = false
     private var mResultsHandler: SignInResultsHandler? = null
-
-    private val mSignInChangedListeners = HashSet<SignInChangedListener>()
 
     @Volatile var authToken: String? = null
         private set
@@ -233,6 +225,20 @@ object OTAuthManager {
         })
     }
 
+    fun getAuthStateRefreshObservable(): Observable<SignedInLevel> {
+        return Observable.unsafeCreate { subscriber ->
+            val listener = FirebaseAuth.AuthStateListener { auth ->
+                val signedInLevel = currentSignedInLevel
+                if (!subscriber.isUnsubscribed) {
+                    subscriber.onNext(signedInLevel)
+                }
+            }
+            mFirebaseAuth.addAuthStateListener(listener)
+
+            subscriber.add(Subscriptions.create { mFirebaseAuth.removeAuthStateListener(listener) })
+        }
+    }
+
     fun startSignInProcess(activity: AppCompatActivity, resultsHandler: SignInResultsHandler) {
         println("OMNITRACK start sign in activity")
         mResultsHandler = resultsHandler
@@ -343,25 +349,11 @@ object OTAuthManager {
         }
     }
 
-    fun addSignInChangedListener(signInChangedListener: SignInChangedListener) {
-        mSignInChangedListeners.add(signInChangedListener)
-    }
-
-    fun removeSignInChangedListener(signInChangedListener: SignInChangedListener) {
-        mSignInChangedListeners.remove(signInChangedListener)
-    }
-
     private fun notifySignedIn(user: FirebaseUser) {
-        mSignInChangedListeners.forEach {
-            it.onSignedIn(user)
-        }
         OTApplication.app.sendBroadcast(Intent(OTApplication.BROADCAST_ACTION_USER_SIGNED_IN).putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_USER, userId))
     }
 
     private fun notifySignedOut() {
-        mSignInChangedListeners.forEach {
-            it.onSignedOut()
-        }
         OTApplication.app.sendBroadcast(Intent(OTApplication.BROADCAST_ACTION_USER_SIGNED_OUT).putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_USER, userId))
     }
 
