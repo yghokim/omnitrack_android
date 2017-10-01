@@ -3,7 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import kr.ac.snu.hcil.omnitrack.OTApplication
-import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
+import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTUserRolePOJO
 import kr.ac.snu.hcil.omnitrack.ui.pages.experiment.ExperimentSignInActivity
 
@@ -28,14 +28,14 @@ object ExperimentConsentManager {
         mActivity = activity
         mResultListener = resultListener
 
-        if (OTApplication.app.systemSharedPreferences.getBoolean(OTUser.PREFERENCES_KEY_CONSENT_APPROVED, false) == true) {
+        if (OTApplication.app.systemSharedPreferences.getBoolean(OTUser.PREFERENCES_KEY_CONSENT_APPROVED, false)) {
             mResultListener?.onConsentApproved()
             finishProcess()
         } else {
 
             OTApplication.app.synchronizationServerController.getUserRoles().subscribe({ result ->
                 val userRole = result.find { it.role == "ServiceUser" }
-                if (userRole == null || userRole.isConsentApproved == false) {
+                if (userRole == null || !userRole.isConsentApproved) {
                     println("consent form was not approved or is first-time login.")
                     activity.startActivityForResult(Intent(activity, ExperimentSignInActivity::class.java), REQUEST_CODE_EXPERIMENT_SIGN_IN)
                 } else {
@@ -76,7 +76,7 @@ object ExperimentConsentManager {
     }
 
     private fun onApproved() {
-        OTApplication.app.systemSharedPreferences.getBoolean(OTUser.PREFERENCES_KEY_CONSENT_APPROVED, true)
+        OTApplication.app.systemSharedPreferences.edit().putBoolean(OTUser.PREFERENCES_KEY_CONSENT_APPROVED, true).apply()
         mResultListener?.onConsentApproved()
     }
 

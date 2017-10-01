@@ -10,7 +10,7 @@ import android.widget.Toast
 import butterknife.bindView
 import com.jaredrummler.materialspinner.MaterialSpinner
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
+import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper

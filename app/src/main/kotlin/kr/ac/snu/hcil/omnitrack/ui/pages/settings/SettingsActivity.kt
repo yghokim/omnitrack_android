@@ -12,7 +12,7 @@ import android.preference.PreferenceFragment
 import android.widget.Toast
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
+import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckService
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity

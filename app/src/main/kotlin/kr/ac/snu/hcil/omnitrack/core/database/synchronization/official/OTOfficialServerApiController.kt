@@ -1,6 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.database.synchronization.official
 
-import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
+import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTItemPOJO
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTUserRolePOJO
@@ -33,13 +33,16 @@ class OTOfficialServerApiController : ISynchronizationServerSideAPI {
                 val newRequest = chain.request().newBuilder()
                         .addHeader("Authorization", "Bearer " + OTAuthManager.authToken)
                         .build()
+
+                println("chaining for official server: ${chain.request().url()}")
+
                 return chain.proceed(newRequest)
             }
         }).build()
 
         Retrofit.Builder()
                 .client(client)
-                .baseUrl("http://192.168.0.5:3000")
+                .baseUrl("http://192.168.0.2:3000")
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()

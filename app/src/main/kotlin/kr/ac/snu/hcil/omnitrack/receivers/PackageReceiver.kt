@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApplication
-import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
+import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckService

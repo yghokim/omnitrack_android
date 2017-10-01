@@ -9,7 +9,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
-import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
+import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.ADatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTItemPOJO
 import kr.ac.snu.hcil.omnitrack.core.database.synchronization.SyncResultEntry

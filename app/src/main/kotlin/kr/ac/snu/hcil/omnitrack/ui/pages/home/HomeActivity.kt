@@ -15,11 +15,10 @@ import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import butterknife.bindView
-import com.google.firebase.auth.FirebaseUser
 import com.tbruyelle.rxpermissions.RxPermissions
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
+import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.tutorial.TutorialManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
@@ -28,7 +27,7 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.services.ServiceListFragment
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import rx.subscriptions.CompositeSubscription
 
-class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), OTAuthManager.SignInChangedListener, DrawerLayout.DrawerListener {
+class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), DrawerLayout.DrawerListener {
 
     companion object {
         const val TAB_INDEX_TRACKERS = 0
@@ -143,7 +142,6 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), OTAut
 
     override fun onResume() {
         super.onResume()
-        OTAuthManager.addSignInChangedListener(this)
     }
 
     override fun onToolbarLeftButtonClicked() {
@@ -203,6 +201,14 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), OTAut
                     }
                 }
         )
+
+        startSubscriptions.add(
+                OTAuthManager.getAuthStateRefreshObservable().subscribe { signInLevel ->
+                    if (signInLevel == OTAuthManager.SignedInLevel.NONE) {
+                        goSignInPage()
+                    }
+                }
+        )
     }
 
     override fun onStop() {
@@ -212,7 +218,6 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), OTAut
 
     override fun onPause() {
         super.onPause()
-        OTAuthManager.removeSignInChangedListener(this)
         (application as OTApplication).syncUserToDb()
     }
 
@@ -256,14 +261,6 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), OTAut
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-    }
-
-    override fun onSignedIn(firebaseUser: FirebaseUser) {
-
-    }
-
-    override fun onSignedOut() {
-        goSignInPage()
     }
 
     private fun goSignInPage() {
