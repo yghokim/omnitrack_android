@@ -17,7 +17,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.ExperimentConsentManager
 import kr.ac.snu.hcil.omnitrack.core.OTUser
-import kr.ac.snu.hcil.omnitrack.core.backend.OTAuthManager
+import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.EventLoggingManager
 import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckService
 import kr.ac.snu.hcil.omnitrack.ui.components.common.time.DurationPicker
@@ -136,7 +136,6 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
         if (OTAuthManager.isUserSignedIn() && NetworkHelper.isConnectedToInternet()) {
             //println("${LOG_TAG} OMNITRACK Google is signed in.")
             if (NetworkHelper.isConnectedToInternet()) {
-                OTApplication.app.refreshInstanceIdToServerIfExists(true)
                 OTAuthManager.refreshCredentialWithFallbackSignIn(this, OmniTrackSignInResultsHandler())
             }
         } else {
@@ -153,17 +152,13 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
     }
 
     protected open fun processAuthorization() {
-        if (false/*BuildConfig.DEBUG*/) {
-            performSignInProcessCompletelyFinished()
+        if (checkRefreshingCredential) {
+            val thread = Thread(Runnable {
+                refreshCredentialsWithFallbackSignIn()
+            })
+            thread.start()
         } else {
-            if (checkRefreshingCredential) {
-                val thread = Thread(Runnable {
-                    refreshCredentialsWithFallbackSignIn()
-                })
-                thread.start()
-            } else {
-                goSignInUnlessUserCached()
-            }
+            goSignInUnlessUserCached()
         }
     }
 
