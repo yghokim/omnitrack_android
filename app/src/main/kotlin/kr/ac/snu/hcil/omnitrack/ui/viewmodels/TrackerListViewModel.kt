@@ -1,9 +1,11 @@
 package kr.ac.snu.hcil.omnitrack.ui.viewmodels
 
 import android.support.v7.util.DiffUtil
+import io.realm.*
 import kr.ac.snu.hcil.omnitrack.OTApplication
-import kr.ac.snu.hcil.omnitrack.core.OTTracker
-import kr.ac.snu.hcil.omnitrack.core.OTUser
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import rx.Observable
 import rx.Subscription
@@ -14,8 +16,10 @@ import rx.subscriptions.CompositeSubscription
  * Created by younghokim on 2017-05-30.
  */
 
-typealias TrackerWithIndex = Pair<OTTracker, Int>
-class TrackerListViewModel : UserAttachedViewModel() {
+class TrackerListViewModel : UserAttachedViewModel(), OrderedRealmCollectionChangeListener<RealmResults<OTTrackerDAO>> {
+
+    private val realm = OTApplication.app.databaseManager.getRealmInstance()
+    private var trackersRealmResults: RealmResults<OTTrackerDAO>? = null
 
     private var trackerViewModelListSubject: BehaviorSubject<List<TrackerInformationViewModel>> = BehaviorSubject.create()
 
@@ -24,41 +28,53 @@ class TrackerListViewModel : UserAttachedViewModel() {
     val trackerViewModels: Observable<List<TrackerInformationViewModel>>
         get() = trackerViewModelListSubject
 
-    override fun onUserAttached(newUser: OTUser) {
-        super.onUserAttached(newUser)
+    override fun onChange(snapshot: RealmResults<OTTrackerDAO>, changeSet: OrderedCollectionChangeSet?) {
+        if (snapshot.isLoaded && snapshot.isValid) {
+            if (changeSet == null) {
+                println("Viewmodel first time limit")
+                //first time emit
+                clearTrackerViewModelList()
+                val viewModels = snapshot.map { TrackerInformationViewModel(it, realm) }
+                currentTrackerViewModelList.addAll(viewModels)
 
+                trackerViewModelListSubject.onNext(
+                        currentTrackerViewModelList
+                )
+            } else {
+
+                //deal with deletions
+                val removes = changeSet.deletions.map { i -> currentTrackerViewModelList[i] }
+                removes.forEach { it.unregister() }
+                currentTrackerViewModelList.removeAll(removes)
+
+                //deal with additions
+                val newDaos = changeSet.insertions.map { i -> snapshot[i] }
+                currentTrackerViewModelList.addAll(
+                        newDaos.map { TrackerInformationViewModel(it, realm) }
+                )
+
+                trackerViewModelListSubject.onNext(
+                        currentTrackerViewModelList
+                )
+            }
+        }
+    }
+
+    override fun onUserAttached(newUserId: String) {
+        super.onUserAttached(newUserId)
+        trackersRealmResults?.removeAllChangeListeners()
         clearTrackerViewModelList()
-        val viewModels = newUser.trackers.map { TrackerInformationViewModel(it).apply { this.register() } }
-        currentTrackerViewModelList.addAll(viewModels)
-        trackerViewModelListSubject.onNext(
-                currentTrackerViewModelList
-        )
+        val trackerQueryResults = OTApplication.app.databaseManager.findTrackersOfUser(newUserId, realm)
+        trackersRealmResults = trackerQueryResults
 
-        internalSubscriptions.add(
-                newUser.trackerAdded.subscribe {
-                    trackerIndexPair ->
-                    currentTrackerViewModelList.add(TrackerInformationViewModel(trackerIndexPair.first).apply { this.register() })
-                    trackerViewModelListSubject.onNext(currentTrackerViewModelList)
-                }
-        )
-
-        internalSubscriptions.add(
-                newUser.trackerRemoved.subscribe {
-                    trackerIndexPair ->
-
-                    currentTrackerViewModelList.find { it.tracker == trackerIndexPair.first }
-                            ?.let {
-                                it.unregister()
-                                currentTrackerViewModelList.remove(it)
-                                trackerViewModelListSubject.onNext(currentTrackerViewModelList)
-                            }
-                }
-        )
+        trackerQueryResults.addChangeListener(this)
     }
 
     override fun onDispose() {
         super.onDispose()
+        trackersRealmResults?.removeAllChangeListeners()
         clearTrackerViewModelList()
+        realm.close()
     }
 
     private fun clearTrackerViewModelList() {
@@ -69,7 +85,8 @@ class TrackerListViewModel : UserAttachedViewModel() {
         trackerViewModelListSubject.onNext(emptyList())
     }
 
-    class TrackerInformationViewModel(val tracker: OTTracker) {
+    class TrackerInformationViewModel(val trackerDao: OTTrackerDAO, val realm: Realm) : RealmChangeListener<OTTrackerDAO> {
+
         val totalItemCount: BehaviorSubject<Long> = BehaviorSubject.create()
 
         val todayCount: BehaviorSubject<Long> = BehaviorSubject.create()
@@ -83,16 +100,45 @@ class TrackerListViewModel : UserAttachedViewModel() {
 
         val trackerEditable: BehaviorSubject<Boolean> = BehaviorSubject.create()
 
+        val trackerItemsResult: RealmResults<OTItemDAO> = OTApplication.app.databaseManager.makeItemsQuery(trackerDao.objectId, null, null, realm).findAllAsync()
+        val todayItemsResult: RealmResults<OTItemDAO> = OTApplication.app.databaseManager.makeItemsQueryOfToday(trackerDao.objectId, realm).findAllAsync()
+
         //private val countTracer: ItemCountTracer = ItemCountTracer(tracker)
 
         private val subscriptions = CompositeSubscription()
 
         private val reminderSubscriptionDict = android.support.v4.util.ArrayMap<String, CompositeSubscription>()
 
-        var isActive: Boolean = false
-            private set
-
         init {
+
+            trackerItemsResult.addChangeListener { snapshot, changeSet ->
+                if (changeSet == null) {
+                    //first
+                }
+
+                snapshot.count().toLong().let {
+                    if (totalItemCount.value != it) {
+                        totalItemCount.onNext(it)
+                    }
+                }
+
+                snapshot.max(RealmDatabaseManager.FIELD_TIMESTAMP_LONG)?.toLong()?.let {
+                    if (lastLoggingTime.value != it) {
+                        lastLoggingTime.onNext(it)
+                    }
+                } ?: lastLoggingTime.onNext(null)
+            }
+
+            todayItemsResult.addChangeListener { snapshot, changeSet ->
+                val count = snapshot.count().toLong()
+                if (todayCount.value != count) {
+                    todayCount.onNext(count)
+                }
+            }
+
+
+            trackerDao.addChangeListener(this)
+            updateValues(trackerDao)
         }
 
         private fun addSubscriptionToTrigger(trigger: OTTrigger, subscription: Subscription) {
@@ -102,111 +148,46 @@ class TrackerListViewModel : UserAttachedViewModel() {
             reminderSubscriptionDict[trigger.objectId]?.add(subscription)
         }
 
-        private fun refreshSummaryStatistics() {
-            subscriptions.add(OTApplication.app.databaseManager.getTotalItemCount(tracker).subscribe { countPair ->
-                totalItemCount.onNext(countPair.first)
-            })
-
-            subscriptions.add(
-                    OTApplication.app.databaseManager.getLogCountOfDay(tracker).subscribe { count ->
-                        todayCount.onNext(count)
-                    }
-            )
-
-            subscriptions.add(
-                    OTApplication.app.databaseManager.getLastLoggingTime(tracker).subscribe { time ->
-                        lastLoggingTime.onNext(time)
-                    }
-            )
-        }
-
-
-        fun register() {
-            subscriptions.add(
-                    OTApplication.app.databaseManager.OnItemListUpdated.filter { trackerId -> trackerId == tracker.objectId }.subscribe { pair ->
-                        println("Tracker Item List Updated: ${tracker.name}")
-                        refreshSummaryStatistics()
-                    }
-            )
-
-            refreshSummaryStatistics()
-
-            subscriptions.add(
-                    tracker.colorChanged.subscribe {
-                        color ->
-                        trackerColor.onNext(color.second)
-                    }
-            )
-            trackerColor.onNext(tracker.color)
-
-            subscriptions.add(
-                    tracker.nameChanged.subscribe {
-                        name ->
-                        trackerName.onNext(name.second)
-                    }
-            )
-            trackerName.onNext(tracker.name)
-
-            trackerEditable.onNext(tracker.isEditable)
-
-
-            tracker.owner?.let {
-                user ->
-                fun updateReminderCount() {
-                    activeNotificationCount.onNext(user.triggerManager.getAttachedTriggers(tracker, OTTrigger.ACTION_NOTIFICATION).filter { it.isOn == true }.size)
-                }
-                updateReminderCount()
-
-                val attachedTriggers = user.triggerManager.getAttachedTriggers(tracker, OTTrigger.ACTION_NOTIFICATION)
-                attachedTriggers.forEach {
-                    trigger ->
-                    addSubscriptionToTrigger(trigger,
-                            trigger.switchTurned.subscribe {
-                                updateReminderCount()
-                            })
-                }
-
-                subscriptions.add(
-                        tracker.reminderAdded.subscribe { reminder ->
-                            addSubscriptionToTrigger(reminder.second,
-                                    reminder.second.switchTurned.subscribe {
-                                        updateReminderCount()
-                                    })
-                            updateReminderCount()
-                        }
-                )
-
-                subscriptions.add(
-                        tracker.reminderRemoved.subscribe { reminder ->
-                            reminderSubscriptionDict[reminder.second.objectId]?.clear()
-                            reminderSubscriptionDict.remove(reminder.second.objectId)
-                            updateReminderCount()
-                        }
-                )
+        private fun updateValues(snapshot: OTTrackerDAO) {
+            if (trackerColor.value != snapshot.color) {
+                trackerColor.onNext(snapshot.color)
             }
 
-            //countTracer.register()
-            //countTracer.notifyConnected()
+            if (trackerName.value != snapshot.name) {
+                trackerName.onNext(snapshot.name)
+            }
 
-            isActive = true
+            if (trackerEditable.value != snapshot.isEditable) {
+                trackerEditable.onNext(snapshot.isEditable)
+            }
+
+        }
+
+        override fun onChange(snapshot: OTTrackerDAO) {
+            println("tracker information viewmodel onChange")
+            println(snapshot.name)
+            println(snapshot.color)
+            if (snapshot.isValid && snapshot.isLoaded) {
+                updateValues(snapshot)
+            }
         }
 
         fun unregister() {
-            /*
-            if (countTracer.isRegistered)
-                countTracer.unregister()*/
+            trackerDao.removeChangeListener(this)
+
+            this.trackerItemsResult.removeAllChangeListeners()
+            this.todayItemsResult.removeAllChangeListeners()
 
             subscriptions.clear()
             reminderSubscriptionDict.forEach { entry -> entry.value?.clear() }
             reminderSubscriptionDict.clear()
 
-            isActive = false
         }
     }
 
     class TrackerViewModelListDiffUtilCallback(val oldList: List<TrackerInformationViewModel>, val newList: List<TrackerInformationViewModel>) : DiffUtil.Callback() {
         override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return oldList[oldItemPosition].tracker.objectId == newList[newItemPosition].tracker.objectId
+            return oldList[oldItemPosition].trackerDao.objectId == newList[newItemPosition].trackerDao.objectId
         }
 
         override fun getOldListSize(): Int {

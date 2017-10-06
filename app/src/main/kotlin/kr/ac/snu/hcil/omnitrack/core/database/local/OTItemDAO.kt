@@ -9,6 +9,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTItemPOJO
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import java.util.*
+import kotlin.collections.HashMap
 
 /**
  * Created by younghokim on 2017. 9. 25..
@@ -19,7 +20,7 @@ open class OTItemDAO : RealmObject() {
     var objectId: String? = null
 
     @Index
-    var trackerObjectId: String = ""
+    var trackerId: String = ""
 
     var deviceId: String? = null
 
@@ -28,7 +29,7 @@ open class OTItemDAO : RealmObject() {
 
     var source: String? = null
 
-    var fieldValueEntries = RealmList<OTItemAttributeEntryDAO>()
+    var fieldValueEntries = RealmList<OTKeyStringValueEntryDAO>()
 
     var synchronizedAt: Long? = null // store server time of when synchronized perfectly.
 
@@ -45,27 +46,21 @@ open class OTItemDAO : RealmObject() {
         }
 
     fun serializedValueTable(): Map<String, String> {
-        val table = Hashtable<String, String>()
-        for (entryDAO in fieldValueEntries) {
-            table[entryDAO.attributeId] = entryDAO.serializedValue
-        }
-        return table
+        return RealmDatabaseManager.convertRealmEntryListToDictionary(fieldValueEntries)
     }
 }
 
-open class OTItemAttributeEntryDAO : RealmObject() {
-    var attributeId: String = ""
-    var serializedValue: String? = null
+open class OTKeyStringValueEntryDAO : RealmObject() {
+    @PrimaryKey
+    var id: String = ""
+    var key: String = ""
+    var value: String? = null
 }
 
 object RealmItemHelper {
 
-    const val TIMESTAMP_NULL = -1
-
-    fun convertItemToDAO(item: OTItem): OTItemDAO {
-        val dao = OTItemDAO()
-        dao.trackerObjectId = item.trackerObjectId
-        dao.objectId = item.objectId
+    fun applyItemToDAO(item: OTItem, dao: OTItemDAO, realm: Realm) {
+        dao.trackerId = item.trackerId
         dao.deviceId = item.deviceId
         dao.source = item.source.name
 
@@ -75,20 +70,15 @@ object RealmItemHelper {
             System.currentTimeMillis()
         }
 
+        val serializedTable = HashMap<String, String>()
         for (entry in item.getEntryIterator()) {
-            dao.fieldValueEntries.add(
-                    OTItemAttributeEntryDAO().apply {
-                        attributeId = entry.key
-                        serializedValue = TypeStringSerializationHelper.serialize(entry.value)
-                    }
-            )
+            serializedTable[entry.key] = TypeStringSerializationHelper.serialize(entry.value)
         }
-
-        return dao
+        RealmDatabaseManager.convertDictionaryToRealmList(realm, serializedTable, dao.fieldValueEntries, null)
     }
 
     fun convertDAOToItem(dao: OTItemDAO): OTItem =//objectId notNull is guaranteed.
-            OTItem(dao.objectId ?: dao.trackerObjectId + UUID.randomUUID().toString(), dao.trackerObjectId, dao.serializedValueTable(), dao.timestamp, dao.loggingSource, dao.deviceId)
+            OTItem(dao.objectId ?: dao.trackerId + UUID.randomUUID().toString(), dao.trackerId, dao.serializedValueTable(), dao.timestamp, dao.loggingSource, dao.deviceId)
 
 
     fun applyDaoToPojo(dao: OTItemDAO, pojo: OTItemPOJO) {
@@ -97,7 +87,7 @@ object RealmItemHelper {
         pojo.source = dao.source
         pojo.synchronizedAt = dao.synchronizedAt
         pojo.timestamp = dao.timestamp
-        pojo.trackerObjectId = dao.trackerObjectId
+        pojo.trackerObjectId = dao.trackerId
         pojo.removed = dao.removed
 
         pojo.serializedValueTable = dao.serializedValueTable()
@@ -108,19 +98,18 @@ object RealmItemHelper {
         dao.source = pojo.source
         dao.synchronizedAt = pojo.synchronizedAt
         dao.timestamp = pojo.timestamp
-        dao.trackerObjectId = pojo.trackerObjectId
+        dao.trackerId = pojo.trackerObjectId
         dao.removed = pojo.removed
 
-        dao.fieldValueEntries.clear()
         if (pojo.serializedValueTable != null) {
-            dao.fieldValueEntries.addAll(
-                    pojo.serializedValueTable!!.map { entry ->
-                        realm.createObject(OTItemAttributeEntryDAO::class.java).apply {
-                            this.attributeId = entry.key
-                            this.serializedValue = entry.value
-                        }
-                    }.toTypedArray()
-            )
+            RealmDatabaseManager.convertDictionaryToRealmList(
+                    realm, pojo.serializedValueTable!!,
+                    dao.fieldValueEntries, null)
+        } else {
+            dao.fieldValueEntries.forEach {
+                it.deleteFromRealm()
+            }
+            dao.fieldValueEntries.clear()
         }
     }
 }

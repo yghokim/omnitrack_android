@@ -164,11 +164,6 @@ class TrackerListFragment : OTFragment() {
         trackerListAdapter.currentlyExpandedIndex = savedInstanceState?.getInt(STATE_EXPANDED_TRACKER_INDEX, -1) ?: -1
     }
 
-    override fun onResume() {
-        super.onResume()
-        //context.registerReceiver(itemEventReceiver, itemEventIntentFilter)
-    }
-
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val rootView = inflater!!.inflate(R.layout.fragment_home_trackers, container, false)
@@ -178,8 +173,7 @@ class TrackerListFragment : OTFragment() {
             if (userLoaded) {
                 newTrackerNameDialog.input(null, user.generateNewTrackerName(context), false) {
                     dialog, text ->
-                    val newTracker = user.newTracker(text.toString(), true, isEditable = true)
-                    startActivityForResult(TrackerDetailActivity.makeIntent(newTracker.objectId, context, true), REQUEST_CODE_NEW_TRACKER)
+                    startActivityForResult(TrackerDetailActivity.makeNewTrackerIntent(text.toString(), context), REQUEST_CODE_NEW_TRACKER)
 
                 }.show()
                 //Toast.makeText(context,String.format(resources.getString(R.string.sentence_new_tracker_added), newTracker.name), Toast.LENGTH_LONG).show()
@@ -206,7 +200,7 @@ class TrackerListFragment : OTFragment() {
                         this.user = user
                         userLoaded = true
 
-                        viewModel.user = user
+                        viewModel.userId = user.objectId
                         createViewSubscriptions.add(
                                 viewModel.trackerViewModels.subscribe {
                                     trackerViewModelList ->
@@ -245,10 +239,6 @@ class TrackerListFragment : OTFragment() {
         trackerListAdapter.viewHolders.clear()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE_NEW_TRACKER) {
@@ -256,20 +246,10 @@ class TrackerListFragment : OTFragment() {
                 if (data != null) {
                     if (data.hasExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)) {
                         val newTrackerId = data.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
-                        val activity = activity
-                        if (activity != null) {
-                            if (activity is OTActivity) {
-                                resumeSubscriptions.add(
-                                        activity.signedInUserObservable.subscribe {
-                                            user ->
-                                            val newTracker = user[newTrackerId]
-                                            if (newTracker != null) {
-                                                EventLoggingManager.logTrackerChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_TRACKER_ADD, newTracker)
-                                            }
-                                        }
-                                )
-                            }
-                        }
+
+                        /* TODO logging
+                        EventLoggingManager.logTrackerChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_TRACKER_ADD, newTracker)
+                        */
                     }
                 }
             }
@@ -340,6 +320,7 @@ class TrackerListFragment : OTFragment() {
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            println("Bind tracker viewmodel: ${currentTrackerViewModelList[position]}")
             holder.bindViewModel(currentTrackerViewModelList[position])
         }
 
@@ -376,6 +357,8 @@ class TrackerListFragment : OTFragment() {
             val errorIndicator: AppCompatImageButton by bindView(R.id.ui_invalid_icon)
 
             private val validationErrorMessages = ArrayList<CharSequence>()
+
+            private var trackerId: String? = null
 
             var collapsed = true
 
@@ -476,7 +459,7 @@ class TrackerListFragment : OTFragment() {
                 if (view === itemView) {
                     handleTrackerClick(user.trackers[adapterPosition])
                 } else if (view === editButton) {
-                    startActivityOnDelay(TrackerDetailActivity.makeIntent(user.trackers[adapterPosition].objectId, this@TrackerListFragment.context))
+                    startActivityOnDelay(TrackerDetailActivity.makeIntent(trackerId, this@TrackerListFragment.context))
                 } else if (view === listButton) {
                     startActivityOnDelay(ItemBrowserActivity.makeIntent(user.trackers[adapterPosition], this@TrackerListFragment.context))
                 } else if (view === removeButton) {
@@ -545,7 +528,9 @@ class TrackerListFragment : OTFragment() {
             }
 
             fun bindViewModel(viewModel: TrackerListViewModel.TrackerInformationViewModel) {
-                println("bind viewmodel to viewholder, ${viewModel.tracker.name}, ${viewModel.isActive}, ${viewModel.trackerName.hasValue()}")
+
+                trackerId = viewModel.trackerDao.objectId
+
                 subscriptions.clear()
                 subscriptions.add(
                         viewModel.trackerName.subscribe {
@@ -596,11 +581,14 @@ class TrackerListFragment : OTFragment() {
                 subscriptions.add(viewModel.totalItemCount.observeOn(AndroidSchedulers.mainThread()).subscribe { count -> setTotalItemCount(count) })
 
                 validationErrorMessages.clear()
+
+                //TODO validate
+                /*
                 errorIndicator.visibility = if (viewModel.tracker.isValid(validationErrorMessages)) {
                     View.INVISIBLE
                 } else {
                     View.VISIBLE
-                }
+                }*/
 
                 if (currentlyExpandedIndex == adapterPosition) {
                     lastExpandedViewHolder = this

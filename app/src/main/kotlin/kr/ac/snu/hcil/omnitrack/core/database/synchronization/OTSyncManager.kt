@@ -13,6 +13,6 @@ class OTSyncManager(val context: Context, val synchronizationServerController: I
     }
 
     fun performSynchronizationOf(dataType: ESyncDataType) {
-        context.startService(OTSynchronizationService.makePerformSynchronizationSessionIntent(context, dataType))
+        context.startService(OTSynchronizationService.makePerformSynchronizationSessionIntent(context, dataType, SyncDirection.BIDIRECTIONAL))
     }
 }

@@ -7,7 +7,7 @@ import rx.schedulers.Schedulers
 /**
  * Created by younghokim on 2017. 9. 27..
  */
-class SyncSession(val startTimestamp: Long, val syncDataType: ESyncDataType, val serviceStartId: Int) {
+class SyncSession(val startTimestamp: Long, val syncDataType: ESyncDataType, val direction: SyncDirection, val serviceStartId: Int) {
     fun performSync(): Single<Pair<SyncSession, Boolean>> {
         val single = when (syncDataType) {
             ESyncDataType.ITEM -> {

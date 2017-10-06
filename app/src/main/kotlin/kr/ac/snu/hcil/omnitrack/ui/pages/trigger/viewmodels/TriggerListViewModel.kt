@@ -1,7 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels
 
 import android.support.v7.util.DiffUtil
-import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTrigger
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.UserAttachedViewModel
@@ -27,10 +26,10 @@ class TriggerListViewModel(var triggerFilter: (OTTrigger) -> Boolean = { trigger
         } else TriggerViewModel(trigger)
     }
 
-    override fun onUserAttached(newUser: OTUser) {
-        super.onUserAttached(newUser)
+    override fun onUserAttached(userId: String) {
+        super.onUserAttached(userId)
         clearTriggerList()
-
+        /*
         currentTriggerViewModels.addAll(newUser.triggerManager.getFilteredTriggers(triggerFilter).map {
             makeTriggerViewModel(it).apply {
                 this.register()
@@ -61,15 +60,15 @@ class TriggerListViewModel(var triggerFilter: (OTTrigger) -> Boolean = { trigger
                     }
                 }
         )
-
+        */
     }
 
     fun addTrigger(trigger: OTTrigger) {
-        user?.triggerManager?.putNewTrigger(trigger)
+        //user?.triggerManager?.putNewTrigger(trigger)
     }
 
     fun removeTrigger(trigger: OTTrigger) {
-        user?.triggerManager?.removeTrigger(trigger)
+        //user?.triggerManager?.removeTrigger(trigger)
     }
 
     fun removeTrigger(viewModel: TriggerViewModel<OTTrigger>) {

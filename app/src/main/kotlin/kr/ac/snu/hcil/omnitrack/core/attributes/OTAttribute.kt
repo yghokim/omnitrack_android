@@ -9,14 +9,12 @@ import android.util.SparseArray
 import android.view.View
 import android.widget.TextView
 import com.afollestad.materialdialogs.MaterialDialog
-import com.google.firebase.database.DatabaseReference
 import com.tbruyelle.rxpermissions.RxPermissions
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTProperty
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
-import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.NamedObject
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
@@ -40,6 +38,7 @@ import kotlin.properties.Delegates
  */
 abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTracker: OTTracker?, columnName: String, isRequired: Boolean, val typeId: Int, propertyData: Map<String, Any?>?, connectionData: String?) : NamedObject(objectId, columnName) {
 
+    /*
     override val databasePointRef: DatabaseReference?
         get() {
             if (tracker != null) {
@@ -52,13 +51,14 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
                 return null
             }
         }
+        */
 
     override fun makeNewObjectId(): String {
         /*
         if (tracker != null) {
             return DatabaseManager.generateAttributeKey(tracker!!.objectId)
         } else return UUID.randomUUID().toString()*/
-        return "attr_$localKey"
+        return UUID.randomUUID().toString()
     }
 
     companion object {
@@ -144,20 +144,6 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
             return createAttribute(null, tracker.nextAttributeLocalKey(), tracker, columnName, false, typeId, null, null)
         }
 
-        fun createAttribute(attributeId: String, pojo: DatabaseManager.AttributePOJO): OTAttribute<out Any> {
-            return OTAttribute.createAttribute(
-                    attributeId,
-                    pojo.localKey,
-                    null,
-                    pojo.name ?: "noname",
-                    pojo.required,
-                    pojo.type!!,
-                    pojo.properties,
-                    pojo.connectionSerialized).apply {
-                this.createdAt = pojo.createdAt
-            }
-        }
-
         fun showPermissionCheckDialog(activity: Activity, typeId: Int, typeName: String, onGranted: (Boolean) -> Unit, onDenied: (() -> Unit)? = null): MaterialDialog? {
             val requiredPermissions = OTAttribute.getPermissionsForAttribute(typeId)
             if (requiredPermissions != null) {
@@ -198,9 +184,6 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
         return getPermissionsForAttribute(typeId)
     }
 
-    var createdAt: Any? = null
-        private set
-
     var tracker: OTTracker? by Delegates.observable(parentTracker) {
         prop, old, new ->
         if (old != new) {
@@ -212,6 +195,8 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
                 //this.localKey = new.nextAttributeLocalKey()
                 addedToTracker.invoke(this, new)
             }
+
+            if (!suspendDatabaseSync) save()
         }
     }
 
@@ -220,8 +205,7 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
             if (field != value) {
                 field = value
 
-                if (!suspendDatabaseSync)
-                    databasePointRef?.child("localKey")?.setValue(value)
+                if (!suspendDatabaseSync) save()
             }
         }
 
@@ -229,7 +213,16 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
         set(value) {
             if (field != value) {
                 field = value
-                databasePointRef?.child("required")?.setValue(value)
+                if (!suspendDatabaseSync) save()
+            }
+        }
+
+    var intrinsicPosition: Int = 0
+        set(value) {
+            if (field != value) {
+                field = value
+
+                if (!suspendDatabaseSync) save()
             }
         }
 
@@ -259,7 +252,7 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
     var valueConnection: OTConnection? by Delegates.observable(null as OTConnection?) {
         prop, old, new ->
         if (old != new) {
-            databasePointRef?.child("connectionSerialized")?.setValue(new?.getSerializedString())
+            if (!suspendDatabaseSync) save()
         }
     }
 
@@ -331,7 +324,7 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
         propertyValueChanged.invoke(this, args)
         propertyValueChangedSubject.onNext(Pair(this, args))
         if (!suspendDatabaseSync) {
-            databasePointRef?.child(DatabaseManager.CHILD_NAME_ATTRIBUTE_PROPERTIES)?.child(args.key.toString())?.setValue(getProperty<String>(args.key).getSerializedValue())
+            save()
         }
     }
 
@@ -480,5 +473,9 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
         if (str.isNullOrBlank()) {
             out.add(null)
         } else out.add(str)
+    }
+
+    override fun save() {
+        OTApplication.app.databaseManager.saveAttribute(tracker?.objectId, this as OTAttribute<out Any>, intrinsicPosition)
     }
 }
