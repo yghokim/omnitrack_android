@@ -261,7 +261,7 @@ class OTItemBuilder : IStringSerializable {
         val pack = gson.fromJson(serialized, SerializationPackage::class.java)
 
 
-        reloadTracker(pack.trackerObjectId)
+        reloadTracker(pack.trackerId)
 
         this.mode = pack.mode
         this.connectedItemDbId = pack.connectedItemDbId

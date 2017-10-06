@@ -3,10 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core
 //import kr.ac.snu.hcil.omnitrack.core.database.TrackerEntity
 import android.content.Context
 import android.graphics.Color
-import com.google.firebase.database.ChildEventListener
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AttributeSorter
@@ -61,18 +58,15 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
 
     }
 
-    override val databasePointRef: DatabaseReference?
-        get() = DatabaseManager.dbRef?.child(DatabaseManager.CHILD_NAME_TRACKERS)?.child(objectId)
-
     override fun makeNewObjectId(): String {
         return DatabaseManager.generateNewKey(DatabaseManager.CHILD_NAME_TRACKERS)
     }
-
+/*
     private var currentDbReference: DatabaseReference? = null
     private val dbChangedListener: ChildEventListener
 
     private var currentAttributesDbReference: DatabaseReference? = null
-    private val attributesDbChangedListener: ChildEventListener
+    private val attributesDbChangedListener: ChildEventListener*/
 
     private var onReminderAddedSubscription = SerialSubscription()
     private var onReminderRemovedSubscription = SerialSubscription()
@@ -87,16 +81,11 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
         prop, old, new ->
         if (old != new) {
             if (old != null) {
-                if (!suspendDatabaseSync) {
-                    DatabaseManager.setContainsFlagOfUser(old.objectId, this.objectId, DatabaseManager.CHILD_NAME_TRACKERS, false)
-                }
-
                 removedFromUser.invoke(this, old)
             }
             if (new != null) {
                 if (!suspendDatabaseSync) {
-                    databasePointRef?.child("user")?.setValue(new.objectId)
-                    DatabaseManager.setContainsFlagOfUser(new.objectId, this.objectId, DatabaseManager.CHILD_NAME_TRACKERS, true)
+                    if (!suspendDatabaseSync) save()
                 }
 
                 onReminderAddedSubscription.set(
@@ -132,8 +121,7 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
         private set(value) {
             if (field != value) {
                 field = value
-                if (!suspendDatabaseSync)
-                    databasePointRef?.child("attributeLocalKeySeed")?.setValue(value)
+                if (!suspendDatabaseSync) save()
             }
         }
 
@@ -141,9 +129,7 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
     {
         prop, old, new ->
         if (old != new) {
-            if (!suspendDatabaseSync) {
-                databasePointRef?.child(PROPERTY_POSITION)?.setValue(new)
-            }
+            if (!suspendDatabaseSync) save()
         }
     }
 
@@ -155,8 +141,7 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
             OTShortcutPanelManager.notifyAppearanceChanged(this)
             colorSubject.onNext(new)
 
-            if (!suspendDatabaseSync)
-                databasePointRef?.child(PROPERTY_COLOR)?.setValue(new)
+            if (!suspendDatabaseSync) save()
         }
     }
 
@@ -172,8 +157,7 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
                 OTShortcutPanelManager -= this
             }
 
-            if (!suspendDatabaseSync)
-                databasePointRef?.child(PROPERTY_IS_ON_SHORTCUT)?.setValue(new)
+            if (!suspendDatabaseSync) save()
 
             isOnShortcutChanged.onNext(ReadOnlyPair(this, new))
         }
@@ -224,8 +208,9 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
             sender, range ->
             if (!suspendDatabaseSync) {
                 for (i in range) {
-                    attributes[i].databasePointRef?.child("position")?.setValue(i)
+                    OTApplication.app.databaseManager.saveAttribute(this.objectId, attributes[i], i)
                 }
+                OTApplication.app.databaseManager.saveTracker(this, intrinsicPosition)
             }
         }
 
@@ -233,7 +218,7 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
 
         suspendDatabaseSync = false
 
-
+/*
         currentDbReference = databasePointRef
         dbChangedListener = object : ChildEventListener {
 
@@ -363,12 +348,16 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
         }
 
         currentDbReference?.addChildEventListener(dbChangedListener)
-        currentAttributesDbReference?.addChildEventListener(attributesDbChangedListener)
+        currentAttributesDbReference?.addChildEventListener(attributesDbChangedListener)*/
+    }
+
+    override fun save() {
+        OTApplication.app.databaseManager.saveTracker(this, intrinsicPosition)
     }
 
     fun dispose() {
-        currentDbReference?.removeEventListener(dbChangedListener)
-        currentAttributesDbReference?.removeEventListener(attributesDbChangedListener)
+        //currentDbReference?.removeEventListener(dbChangedListener)
+        //currentAttributesDbReference?.removeEventListener(attributesDbChangedListener)
         onReminderRemovedSubscription.set(Subscriptions.empty())
         onReminderAddedSubscription.set(Subscriptions.empty())
 
@@ -432,8 +421,10 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
         if (new.objectId != null)
             _removedAttributeIds.removeAll { it == new.objectId }*/
 
-        if (!suspendDatabaseSync)
-            DatabaseManager.saveAttribute(this.objectId, new, index)
+        if (!suspendDatabaseSync) {
+            OTApplication.app.databaseManager.saveTracker(this, intrinsicPosition)
+            OTApplication.app.databaseManager.saveAttribute(this.objectId, new, index)
+        }
 
         attributeAdded.invoke(this, ReadOnlyPair(new, index))
     }
@@ -447,7 +438,8 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
 
         attributeRemoved.invoke(this, ReadOnlyPair(attribute, index))
         if (!suspendDatabaseSync) {
-            DatabaseManager.removeAttribute(objectId, attribute.objectId)
+            OTApplication.app.databaseManager.saveTracker(this, intrinsicPosition)
+            OTApplication.app.databaseManager.removeAttribute(objectId, attribute.objectId)
         }
     }
 

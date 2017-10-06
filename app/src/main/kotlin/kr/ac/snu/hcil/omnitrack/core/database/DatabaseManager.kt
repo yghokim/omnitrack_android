@@ -530,8 +530,8 @@ object DatabaseManager : ADatabaseManager() {
         }
     }
 
-    override fun saveAttribute(trackerId: String, attribute: OTAttribute<out Any>, position: Int) {
-        val attributeRef = trackerRef(trackerId)?.child("attributes")?.child(attribute.objectId)
+    override fun saveAttribute(trackerId: String?, attribute: OTAttribute<out Any>, position: Int) {
+        val attributeRef = trackerRef(trackerId!!)?.child("attributes")?.child(attribute.objectId)
         if (attributeRef != null) {
             val pojo = makeAttributePojo(attribute, position)
             println(pojo)
@@ -550,9 +550,7 @@ object DatabaseManager : ADatabaseManager() {
         val properties = HashMap<String, String>()
         attribute.writePropertiesToDatabase(properties)
         pojo.properties = properties
-        if (attribute.createdAt != null) {
-            pojo.createdAt = attribute.createdAt
-        }
+        pojo.createdAt = System.currentTimeMillis()
 
         return pojo
     }

@@ -25,7 +25,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.FirebaseStorageHelper
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.ABinaryUploadService
-import kr.ac.snu.hcil.omnitrack.core.database.abstraction.ADatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.synchronization.ISynchronizationServerSideAPI
 import kr.ac.snu.hcil.omnitrack.core.database.synchronization.OTSyncManager
@@ -71,7 +70,7 @@ class OTApplication : MultiDexApplication() {
         const val ACCOUNT_DATASET_EXPERIMENT_KEY_COUNTRY = "country"
         const val ACCOUNT_DATASET_EXPERIMENT_KEY_PURPOSES = "purpose"
 
-        const val INTENT_EXTRA_OBJECT_ID_TRACKER = "trackerObjectId"
+        const val INTENT_EXTRA_OBJECT_ID_TRACKER = "trackerId"
         const val INTENT_EXTRA_OBJECT_ID_ATTRIBUTE = "attributeObjectId"
         const val INTENT_EXTRA_OBJECT_ID_USER = "userObjectId"
         const val INTENT_EXTRA_OBJECT_ID_TRIGGER = "triggerObjectId"
@@ -178,9 +177,10 @@ class OTApplication : MultiDexApplication() {
     lateinit var syncManager: OTSyncManager
         private set
 
+
+    val databaseManager: RealmDatabaseManager = RealmDatabaseManager()
+
     //Modules=======================================================
-    lateinit var databaseManager: ADatabaseManager
-        private set
 
     lateinit var storageHelper: FirebaseStorageHelper
         private set
@@ -333,7 +333,6 @@ class OTApplication : MultiDexApplication() {
         val startedAt = SystemClock.elapsedRealtime()
 
         //initialize modules===============================================
-        this.databaseManager = RealmDatabaseManager()
 
         this.binaryUploadServiceController = OTFirebaseUploadService.ServiceController(this)
         this.synchronizationServerController = OTOfficialServerApiController()

@@ -1,13 +1,14 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.tracker
 
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
+import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.ATriggerListFragmentCore
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.TriggerDetailActivity
 import rx.subscriptions.CompositeSubscription
@@ -15,13 +16,30 @@ import rx.subscriptions.CompositeSubscription
 /**
  * Created by younghokim on 16. 7. 30..
  */
-class TrackerDetailReminderTabFragment : TrackerDetailActivity.ChildFragment() {
+class TrackerDetailReminderTabFragment : OTFragment() {
 
     val core = Core()
+
+    private lateinit var viewModel: TrackerDetailViewModel
+
+    private var creationSubscriptions = CompositeSubscription()
 
     private var resumeSubscriptions = CompositeSubscription()
 
     init {
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+
+        this.viewModel = ViewModelProviders.of(activity).get(TrackerDetailViewModel::class.java)
+
+        creationSubscriptions.add(
+                this.viewModel.colorObservable.subscribe { color ->
+                    core.setFloatingButtonColor(color)
+                }
+        )
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,37 +52,6 @@ class TrackerDetailReminderTabFragment : TrackerDetailActivity.ChildFragment() {
         core.onDestroy()
     }
 
-    override fun onStart() {
-        super.onStart()
-    }
-
-    override fun onTrackerLoaded(tracker: OTTracker) {
-
-        core.trackerId = tracker.objectId
-
-        startSubscriptions.add(
-                tracker.colorObservable.subscribe {
-                    color ->
-                    core.setFloatingButtonColor(color)
-                }
-        )
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        val activity = activity
-        if (activity is TrackerDetailActivity) {
-
-            resumeSubscriptions.add(
-                    activity.trackerColorOnUI.subscribe {
-                        color ->
-                        core.setFloatingButtonColor(color)
-                    }
-            )
-        }
-
-    }
 
     override fun onPause() {
         super.onPause()
@@ -84,6 +71,7 @@ class TrackerDetailReminderTabFragment : TrackerDetailActivity.ChildFragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         core.onDestroyView()
+        creationSubscriptions.clear()
     }
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {

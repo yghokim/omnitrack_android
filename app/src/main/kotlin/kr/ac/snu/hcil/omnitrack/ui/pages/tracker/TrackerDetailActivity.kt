@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.tracker
 
 import android.animation.Animator
 import android.app.Activity
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -24,34 +25,32 @@ import butterknife.bindView
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
-import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
-import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
-import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 import kr.ac.snu.hcil.omnitrack.utils.applyTint
-import rx.subjects.BehaviorSubject
-import rx.subscriptions.CompositeSubscription
-import java.util.concurrent.TimeUnit
 
 class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tracker_detail) {
 
     companion object {
-        const val IS_EDIT_MODE = "isEditMode"
-
-        const val NEW_TRACKER_NAME = "newTrackerName"
 
         const val INTENT_KEY_FOCUS_ATTRIBUTE_ID = "focusAttributeId"
+        const val INTENT_KEY_NEW_TRACKER_PRESET_NAME = "newTrackerName"
 
         const val TAB_INDEX_STRUCTURE = 0
         const val TAB_INDEX_REMINDERS = 1
 
-        fun makeIntent(trackerId: String, context: Context, new_mode: Boolean = false): Intent {
+        fun makeIntent(trackerId: String?, context: Context): Intent {
             val intent = Intent(context, TrackerDetailActivity::class.java)
             intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
-            intent.putExtra(IS_EDIT_MODE, !new_mode)
             return intent
+        }
+
+        fun makeNewTrackerIntent(presetName: String?, context: Context): Intent {
+            return Intent(context, TrackerDetailActivity::class.java)
+                    .apply {
+                        this.putExtra(INTENT_KEY_NEW_TRACKER_PRESET_NAME, presetName)
+                    }
         }
 
         fun makeIntent(trackerId: String, focusAttribute: OTAttribute<out Any>, context: Context): Intent {
@@ -74,12 +73,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
 
     private val tabLayout: TabLayout by bindView(R.id.tabs)
 
-    private var user: OTUser? = null
-    private var tracker: OTTracker? = null
-
-    val trackerSubject = BehaviorSubject.create<OTTracker>()
-
-    val trackerColorOnUI = BehaviorSubject.create<Int>()
+    private lateinit var viewModel: TrackerDetailViewModel
 
     override fun onSessionLogContent(contentObject: Bundle) {
         super.onSessionLogContent(contentObject)
@@ -90,8 +84,6 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
         super.onCreate(savedInstanceState)
 
         mSectionsPagerAdapter = SectionsPagerAdapter(supportFragmentManager)
-
-
 
         mViewPager.pageMargin = resources.getDimensionPixelSize(R.dimen.viewpager_page_margin)
         mViewPager.setPageMarginDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.darkerBackground)))
@@ -129,27 +121,29 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
 
         })
 
+        this.viewModel = ViewModelProviders.of(this).get(TrackerDetailViewModel::class.java)
 
-        if (savedInstanceState != null) {
-            if (savedInstanceState.containsKey(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)) {
-                this.intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, savedInstanceState.getString(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER))
-            }
+        isEditMode = intent.hasExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
 
-            this.intent.putExtra(IS_EDIT_MODE, savedInstanceState.getBoolean(IS_EDIT_MODE, true))
-        }
-
-        isEditMode = intent.getBooleanExtra(IS_EDIT_MODE, true)
-
+        setActionBarButtonMode(Mode.SaveCancel)
         if (isEditMode) {
-            setActionBarButtonMode(Mode.Back)
+            val trackerId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
+            this.viewModel.init(trackerId)
+            //setActionBarButtonMode(Mode.Back)
             title = resources.getString(R.string.title_activity_tracker_edit)
         } else {
-            setActionBarButtonMode(Mode.SaveCancel)
+            this.viewModel.init(null)
+            if (intent.hasExtra(INTENT_KEY_NEW_TRACKER_PRESET_NAME)) {
+                this.viewModel.name = intent.getStringExtra(INTENT_KEY_NEW_TRACKER_PRESET_NAME)
+            }
+
             title = resources.getString(R.string.title_activity_tracker_new)
         }
 
-
         val trackerObjectId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
+
+
+        /*
         creationSubscriptions.add(
                 signedInUserObservable.doOnNext { user -> this.user = user }
                         .flatMap {
@@ -174,7 +168,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
             //val attributeId = intent.getStringExtra(INTENT_KEY_FOCUS_ATTRIBUTE_ID)
             mViewPager.setCurrentItem(0, true)
 
-        }
+        }*/
 
     }
 
@@ -196,11 +190,13 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
     }
 
     private fun refreshReminderCount() {
+        //TODO reminder count
+        /*
         tracker?.let {
             tracker ->
             val reminders = tracker.owner?.triggerManager?.getAttachedTriggers(tracker, OTTrigger.ACTION_NOTIFICATION)
             (tabLayout.getTabAt(TAB_INDEX_REMINDERS)?.customView?.tag as? TabViewHolder)?.setValue(mSectionsPagerAdapter.getPageTitle(TAB_INDEX_REMINDERS) ?: "Reminders", reminders?.size ?: 0)
-        }
+        }*/
     }
 
     private fun tossToHome() {
@@ -210,13 +206,6 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
         startActivity(homeActivityIntent)
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putBoolean(IS_EDIT_MODE, isEditMode)
-        if (isEditMode) {
-            outState.putString(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker?.objectId)
-        }
-    }
 
     override fun onPause() {
         super.onPause()
@@ -224,19 +213,9 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
         OTApplication.app.syncUserToDb()
     }
 
-    override fun onStart() {
-        super.onStart()
-    }
 
     override fun onToolbarLeftButtonClicked() {
-        if (!isEditMode) {
-            if (tracker != null) {
-                user?.trackers?.remove(tracker!!)
-            }
-        }
-
         setResult(Activity.RESULT_CANCELED)
-
         finish()
     }
 
@@ -247,17 +226,9 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
 
     override fun onToolbarRightButtonClicked() {
         //add
-        if (!isEditMode) {
-
-            setResult(RESULT_OK, Intent().putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker?.objectId))
-            finish()
-            /*
-            signedInUserObservable.subscribe(){
-                user->
-                user.trackers.add(tracker!!)
-                finish()
-            }*/
-        }
+        val newTrackerId = viewModel.applyChanges()
+        setResult(RESULT_OK, Intent().putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, newTrackerId))
+        finish()
         /*
             if(namePropertyView.validate()) {
                 //modify
@@ -298,53 +269,15 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
         }
     }
 
-
-    abstract class ChildFragment : OTFragment() {
-        protected var isEditMode = false
-            private set
-
-        protected val startSubscriptions = CompositeSubscription()
-
-        override fun onStart() {
-            super.onStart()
-            val args = arguments
-
-            isEditMode = args.getBoolean(IS_EDIT_MODE, true)
-            val activity = activity
-            if (activity is TrackerDetailActivity) {
-                startSubscriptions.add(
-                        activity.trackerSubject.subscribe {
-                            tracker ->
-                            onTrackerLoaded(tracker)
-                        })
-            }
-        }
-
-        protected abstract fun onTrackerLoaded(tracker: OTTracker)
-
-        override fun onStop() {
-            super.onStop()
-            startSubscriptions.clear()
-        }
-    }
-
     inner class SectionsPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
 
         override fun getItem(position: Int): Fragment {
 
-            val bundle = Bundle()
-            bundle.putBoolean(IS_EDIT_MODE, isEditMode)
-
-            val fragment =
-                    (when (position) {
-                        0 -> TrackerDetailStructureTabFragment()
-                        1 -> TrackerDetailReminderTabFragment()
-                        else -> TrackerDetailReminderTabFragment()
-                    })
-
-            fragment.arguments = bundle
-
-            return fragment
+            return (when (position) {
+                0 -> TrackerDetailStructureTabFragment()
+                1 -> TrackerDetailReminderTabFragment()
+                else -> TrackerDetailReminderTabFragment()
+            })
         }
 
         override fun getCount(): Int {

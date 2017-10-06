@@ -1,5 +1,8 @@
 package kr.ac.snu.hcil.omnitrack.utils.events
 
+import rx.Observable
+import rx.subjects.BehaviorSubject
+
 /**
  * Created by younghokim on 16. 7. 11..
  *
@@ -10,6 +13,9 @@ open class Event<T> {
     private var handlers = hashSetOf<(sender: Any, args: T) -> Unit>()
     private var listeners = hashSetOf<IEventListener<T>>()
 
+    private val _observable = BehaviorSubject.create<Pair<Any, T>>()
+
+    val observable: Observable<Pair<Any, T>> get() = _observable
 
     var suspend: Boolean = false
 
@@ -43,6 +49,7 @@ open class Event<T> {
                 subscriber.onEvent(sender, args)
             }
 
+            _observable.onNext(Pair(sender, args))
         }
     }
 

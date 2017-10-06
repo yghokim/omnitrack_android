@@ -75,7 +75,7 @@ class OTItem : ADataRow {
         }
     }
 
-    val trackerObjectId: String
+    val trackerId: String
 
     val deviceId: String
 
@@ -98,14 +98,14 @@ class OTItem : ADataRow {
 
     constructor(trackerObjectId: String, source: LoggingSource, deviceId: String?) : super() {
         objectId = null
-        this.trackerObjectId = trackerObjectId
+        this.trackerId = trackerObjectId
         this.source = source
         this.deviceId = deviceId ?: DEVICE_ID_UNSPECIFIED
     }
 
     constructor(objectId: String, trackerObjectId: String, serializedValueTable: Map<String, String>?, timestamp: Long, source: LoggingSource, deviceId: String?) {
         this.objectId = objectId
-        this.trackerObjectId = trackerObjectId
+        this.trackerId = trackerObjectId
         this.timestamp = timestamp
         this.source = source
         this.deviceId = deviceId ?: DEVICE_ID_UNSPECIFIED

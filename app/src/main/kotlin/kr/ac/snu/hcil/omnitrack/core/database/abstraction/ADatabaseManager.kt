@@ -42,7 +42,7 @@ abstract class ADatabaseManager {
 
     abstract fun findTrackersOfUser(userId: String): Observable<List<OTTracker>>
     abstract fun getTracker(key: String): Observable<OTTracker>
-    abstract fun saveAttribute(trackerId: String, attribute: OTAttribute<out Any>, position: Int)
+    abstract fun saveAttribute(trackerId: String?, attribute: OTAttribute<out Any>, position: Int)
     abstract fun saveTracker(tracker: OTTracker, position: Int)
 
     abstract fun setUsedAppWidget(widgetName: String, used: Boolean)
@@ -129,7 +129,7 @@ abstract class ADatabaseManager {
 
     fun removeItem(item: OTItem) {
         item.objectId?.let { itemId ->
-            removeItem(item.trackerObjectId, itemId)
+            removeItem(item.trackerId, itemId)
         }
     }
 

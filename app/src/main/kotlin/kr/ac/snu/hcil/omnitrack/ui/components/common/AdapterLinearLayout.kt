@@ -10,6 +10,7 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Parcel
 import android.os.Parcelable
 import android.support.transition.TransitionManager
+import android.support.v7.util.ListUpdateCallback
 import android.util.AttributeSet
 import android.util.SparseArray
 import android.view.View
@@ -38,7 +39,7 @@ class AdapterLinearLayout : DragLinearLayout {
         }
     }
 
-    abstract class ViewHolderAdapter<T : AViewHolder> : android.widget.Adapter {
+    abstract class ViewHolderAdapter<T : AViewHolder> : android.widget.Adapter, ListUpdateCallback {
 
         interface Listener {
             fun onItemAdded(position: Int)
@@ -62,6 +63,30 @@ class AdapterLinearLayout : DragLinearLayout {
             viewHolder.adapterPosition = position
             onBindViewHolder(viewHolder, position)
         }
+
+        //=====================================================================
+        override fun onChanged(position: Int, count: Int, payload: Any?) {
+            for (i in position until position + count) {
+                notifyItemChanged(i)
+            }
+        }
+
+        override fun onMoved(fromPosition: Int, toPosition: Int) {
+            notifyItemMoved(fromPosition, toPosition)
+        }
+
+        override fun onInserted(position: Int, count: Int) {
+            for (i in position until position + count) {
+                notifyItemInserted(i)
+            }
+        }
+
+        override fun onRemoved(position: Int, count: Int) {
+            for (i in position until position + count) {
+                notifyItemRemoved(i)
+            }
+        }
+        //=====================================================================
 
         abstract fun onCreateViewHolder(parent: ViewGroup, viewType: Int): T
 
@@ -375,10 +400,6 @@ class AdapterLinearLayout : DragLinearLayout {
 
         constructor(superState: Parcelable?) : super(superState)
 
-        override fun writeToParcel(out: Parcel?, flags: Int) {
-            super.writeToParcel(out, flags)
-
-        }
     }
 
     override fun onDetachedFromWindow() {

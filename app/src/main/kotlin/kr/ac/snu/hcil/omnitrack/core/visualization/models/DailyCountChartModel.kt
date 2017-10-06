@@ -6,7 +6,7 @@ import android.support.v4.content.ContextCompat
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
-import kr.ac.snu.hcil.omnitrack.core.database.abstraction.ADatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.visualization.Granularity
 import kr.ac.snu.hcil.omnitrack.core.visualization.TrackerChartModel
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
@@ -33,7 +33,7 @@ class DailyCountChartModel(tracker: OTTracker) : TrackerChartModel<Pair<Long, In
         val xScale = QuantizedTimeScale()
         xScale.setDomain(getTimeScope().from, getTimeScope().to)
         xScale.quantize(currentGranularity)
-        return OTApplication.app.databaseManager.loadItems(tracker, getTimeScope(), ADatabaseManager.Order.ASC).map {
+        return OTApplication.app.databaseManager.loadItems(tracker, getTimeScope(), RealmDatabaseManager.Order.ASC).map {
             items ->
             DataHelper.ConvertSortedListToBinWithLong((xScale.binPointsOnDomain + getTimeScope().to).toTypedArray(),
                     items, { item -> item.timestamp }).map { bin -> Pair(bin.x0, bin.values.size) }

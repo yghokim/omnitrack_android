@@ -521,7 +521,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                     override fun onClick(v: View?) {
                         try {
                             val item = getParentItem()
-                            AttributeEditDialogFragment.makeInstance(item.objectId!!, attributeId!!, item.trackerObjectId, this@ItemBrowserActivity)
+                            AttributeEditDialogFragment.makeInstance(item.objectId!!, attributeId!!, item.trackerId, this@ItemBrowserActivity)
                                     .show(this@ItemBrowserActivity.supportFragmentManager, "ValueModifyDialog")
 
                         } catch(e: Exception) {
