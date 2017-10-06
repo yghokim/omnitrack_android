@@ -2,7 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.google.firebase.database.*
+import com.google.firebase.database.DatabaseReference
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.*
@@ -21,10 +21,7 @@ import rx.Single
 import rx.subjects.PublishSubject
 import rx.subjects.SerializedSubject
 import rx.subscriptions.CompositeSubscription
-import rx.subscriptions.Subscriptions
-import java.net.ConnectException
 import java.util.*
-import kotlin.NoSuchElementException
 
 /**
  * Created by Young-Ho Kim on 2016-07-11.
@@ -119,11 +116,13 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
     val trackerRemoved = SerializedSubject(PublishSubject.create<ReadOnlyPair<OTTracker, Int>>())
     val trackerIndexChanged = SerializedSubject(PublishSubject.create<ReadOnlyPair<OTTracker, Int>>())
 
+    /*
     private var trackerListDbReference: DatabaseReference? = null
     private val trackerListChangeEventListener: ChildEventListener
 
     private var triggerListDbReference: DatabaseReference? = null
     private val triggerListChangeEventListener: ChildEventListener
+    */
 
     var suspendDatabaseSync: Boolean = false
 
@@ -153,7 +152,8 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
         trackers.elementReordered += {
             sender, range ->
             for (i in range) {
-                trackers[i].databasePointRef?.child("position")?.setValue(i)
+                trackers[i].intrinsicPosition = i
+                //trackers[i].databasePointRef?.child("position")?.setValue(i)
             }
         }
 
@@ -162,10 +162,15 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
             OTApplication.app.startService(OTShortcutPanelWidgetUpdateService.makeNotifyDatesetChangedIntentToAllWidgets(OTApplication.app))
         }
 
-        trackerListDbReference = databaseRef?.child(DatabaseManager.CHILD_NAME_TRACKERS)
-        triggerListDbReference = databaseRef?.child(DatabaseManager.CHILD_NAME_TRIGGERS)
+        subscriptions.add(
+                crawlAllTrackersAndTriggerAtOnce().subscribe { success -> println("crawled trackers and triggers.") }
+        )
 
 
+        //trackerListDbReference = databaseRef?.child(DatabaseManager.CHILD_NAME_TRACKERS)
+        //triggerListDbReference = databaseRef?.child(DatabaseManager.CHILD_NAME_TRIGGERS)
+
+        /*
         trackerListChangeEventListener = object : ChildEventListener {
             override fun onCancelled(error: DatabaseError) {
                 println("trackers error: ${error.toException().printStackTrace()}")
@@ -249,7 +254,7 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
 
         trackerListDbReference?.addChildEventListener(trackerListChangeEventListener)
         triggerListDbReference?.addChildEventListener(triggerListChangeEventListener)
-
+        */
 
     }
 
@@ -265,8 +270,8 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
 
     fun detachFromSystem() {
         triggerManager.detachFromSystem()
-        trackerListDbReference?.removeEventListener(trackerListChangeEventListener)
-        triggerListDbReference?.removeEventListener(triggerListChangeEventListener)
+        //trackerListDbReference?.removeEventListener(trackerListChangeEventListener)
+        //triggerListDbReference?.removeEventListener(triggerListChangeEventListener)
         subscriptions.clear()
     }
 
@@ -321,7 +326,7 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
 
         println("tracker was added")
         if (!suspendDatabaseSync)
-            DatabaseManager.saveTracker(new, index)
+            OTApplication.app.databaseManager.saveTracker(new, index)
     }
 
     private fun onTrackerRemoved(tracker: OTTracker, index: Int) {
@@ -345,7 +350,7 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
         tracker.suspendDatabaseSync = false
 
         if (!suspendDatabaseSync)
-            DatabaseManager.removeTracker(tracker, this, true)
+            OTApplication.app.databaseManager.removeTracker(tracker, this, true)
     }
 
     fun findAttributeByObjectId(trackerId: String, attributeId: String): OTAttribute<out Any>? {
@@ -386,35 +391,7 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
                 Observable.just(trigger)
             } else {
                 //check if the user has a trigger with the id
-                Observable.unsafeCreate<OTTrigger> {
-                    subscriber ->
-                    val dbRef = triggerListDbReference?.child(triggerId)
-                    if (dbRef != null) {
-                        val listener = object : ValueEventListener {
-                            override fun onCancelled(error: DatabaseError) {
-                                subscriber.onError(error.toException())
-                            }
-
-                            override fun onDataChange(snapshot: DataSnapshot) {
-                                if (snapshot.exists()) {
-                                    DatabaseManager.getTrigger(this@OTUser, triggerId).subscribe(subscriber)
-                                } else {
-                                    subscriber.onError(NoSuchElementException("No such trigger in db"))
-                                }
-                            }
-
-                        }
-
-                        dbRef.addListenerForSingleValueEvent(listener)
-
-                        subscriber.add(Subscriptions.create {
-                            //unsubscribe
-                            triggerListDbReference?.removeEventListener(listener)
-                        })
-                    } else {
-                        subscriber.onError(ConnectException("no database reference"))
-                    }
-                }
+                DatabaseManager.getTrigger(this, triggerId)
             }
         }.doOnError { error ->
             OTApplication.logger.writeSystemLog("trigger observable error: ${error.message}", TAG)
@@ -422,7 +399,9 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
     }
 
     fun crawlAllTrackersAndTriggerAtOnce(): Single<OTUser> {
-        return DatabaseManager.findTrackersOfUser(objectId).doOnNext {
+        return Single.just(this)
+
+        /*OTApplication.app.databaseManager.findTrackersOfUser(objectId, realm).doOnNext {
             trackers ->
             println("crawled trackers")
             for (tracker in trackers) {
@@ -438,7 +417,7 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
                     this.triggerManager.putNewTrigger(trigger)
                 }
             }.map { this }
-        }.first().toSingle()
+        }.first().toSingle()*/
     }
 
 

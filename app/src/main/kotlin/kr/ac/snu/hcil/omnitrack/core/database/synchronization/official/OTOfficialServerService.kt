@@ -28,4 +28,5 @@ interface OTOfficialServerService {
     @PUT("api/user/device")
     fun putDeviceInfo(@Body info: OTDeviceInfo): Single<Boolean>
 
+
 }

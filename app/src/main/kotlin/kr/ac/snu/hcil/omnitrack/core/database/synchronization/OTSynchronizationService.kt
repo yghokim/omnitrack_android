@@ -15,11 +15,13 @@ class OTSynchronizationService : Service() {
 
         const val ACTION_PERFORM_SYNCHRONIZATION = "kr.ac.snu.hcil.omnitrack.PERFORM_SYNCHRONIZATION"
         const val INTENT_EXTRA_SYNC_DATA_TYPE = "syncDataType"
+        const val INTENT_EXTRA_SYNC_DIRECTION = "syncDirection"
 
-        fun makePerformSynchronizationSessionIntent(context: Context, syncDataType: ESyncDataType): Intent {
+        fun makePerformSynchronizationSessionIntent(context: Context, syncDataType: ESyncDataType, syncDirection: SyncDirection): Intent {
             return Intent(context, OTSynchronizationService::class.java)
                     .setAction(ACTION_PERFORM_SYNCHRONIZATION)
                     .putExtra(INTENT_EXTRA_SYNC_DATA_TYPE, syncDataType.name)
+                    .putExtra(INTENT_EXTRA_SYNC_DIRECTION, syncDirection.name)
         }
     }
 
@@ -31,7 +33,14 @@ class OTSynchronizationService : Service() {
         when (intent.action) {
             ACTION_PERFORM_SYNCHRONIZATION -> {
                 if (intent.hasExtra(INTENT_EXTRA_SYNC_DATA_TYPE)) {
-                    startSynchronization(ESyncDataType.valueOf(intent.getStringExtra(INTENT_EXTRA_SYNC_DATA_TYPE)), startId)
+                    startSynchronization(
+                            ESyncDataType.valueOf(intent.getStringExtra(INTENT_EXTRA_SYNC_DATA_TYPE)),
+                            try {
+                                SyncDirection.valueOf(intent.getStringExtra(INTENT_EXTRA_SYNC_DIRECTION))
+                            } catch (ex: Exception) {
+                                ex.printStackTrace(); SyncDirection.BIDIRECTIONAL
+                            },
+                            startId)
                 }
                 return START_NOT_STICKY
             }
@@ -40,11 +49,11 @@ class OTSynchronizationService : Service() {
         return super.onStartCommand(intent, flags, startId)
     }
 
-    private fun startSynchronization(syncDataType: ESyncDataType, startId: Int) {
+    private fun startSynchronization(syncDataType: ESyncDataType, direction: SyncDirection, startId: Int) {
         OTApplication.app.databaseManager.getLatestSynchronizedServerTimeOf(syncDataType).observeOn(Schedulers.io())
                 .subscribe { serverTime ->
                     println("last synchronized server time was ${serverTime}.")
-                    val newSession = SyncSession(serverTime, syncDataType, startId)
+                    val newSession = SyncSession(serverTime, syncDataType, direction, startId)
                     newSession.performSync().subscribe { result ->
                         println(result.second)
                         stopSelf(startId)

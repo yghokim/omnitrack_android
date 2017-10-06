@@ -113,7 +113,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
             creationSubscriptions.add(
                     activity.signedInUserObservable.subscribe {
                         user ->
-                        viewModel.user = user
+                        viewModel.userId = user.objectId
 
                         creationSubscriptions.add(
                                 viewModel.triggerViewModelListSubject.subscribe {

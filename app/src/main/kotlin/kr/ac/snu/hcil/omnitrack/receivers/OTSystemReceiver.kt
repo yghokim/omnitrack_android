@@ -53,7 +53,8 @@ class OTSystemReceiver : BroadcastReceiver() {
                         val notificationId = intent.getIntExtra(OTApplication.INTENT_EXTRA_NOTIFICATION_ID_SEED, 1)
                         val itemId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM)
                         if (itemId != null) {
-                            OTApplication.app.databaseManager.removeItem(tracker.objectId, itemId)
+                            //TODO item remove
+                            //OTApplication.app.databaseManager.removeItem(tracker.objectId, itemId)
                         }
 
                         OTTrackingNotificationManager.cancelBackgroundLoggingSuccessNotification(tracker, notificationId)

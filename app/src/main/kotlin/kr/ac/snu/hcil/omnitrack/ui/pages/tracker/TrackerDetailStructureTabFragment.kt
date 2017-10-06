@@ -1,12 +1,13 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.tracker
 
+import android.arch.lifecycle.ViewModelProviders
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
-import android.support.v4.content.ContextCompat
 import android.support.v4.widget.NestedScrollView
+import android.support.v7.util.DiffUtil
 import android.support.v7.widget.AppCompatImageView
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -22,11 +23,9 @@ import butterknife.bindView
 import com.afollestad.materialdialogs.MaterialDialog
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.OTTracker
-import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.AttributePresetInfo
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
-import kr.ac.snu.hcil.omnitrack.core.database.EventLoggingManager
+import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.common.AdapterLinearLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
@@ -35,16 +34,14 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ColorPaletteProp
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ShortTextPropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.tutorial.TutorialManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.ConnectionIndicatorStubProxy
-import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeDetailActivity
-import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
+import kr.ac.snu.hcil.omnitrack.utils.DefaultNameGenerator
 import kr.ac.snu.hcil.omnitrack.utils.dipRound
-import kr.ac.snu.hcil.omnitrack.utils.startActivityOnDelay
 import rx.subscriptions.CompositeSubscription
 
 /**
  * Created by Young-Ho Kim on 16. 7. 29
  */
-class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() {
+class TrackerDetailStructureTabFragment : OTFragment() {
 
     companion object {
         val toastForAdded by lazy { Toast.makeText(OTApplication.app, R.string.msg_shortcut_added, Toast.LENGTH_SHORT) }
@@ -54,7 +51,7 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
     lateinit private var rootScrollView: NestedScrollView
 
     lateinit private var attributeListView: AdapterLinearLayout
-    lateinit private var attributeListAdapter: AttributeListAdapter
+    //lateinit private var attributeListAdapter: AttributeListAdapter
 
     lateinit private var attributeListItemTouchHelper: ItemTouchHelper
 
@@ -71,8 +68,13 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
 
     private var scrollToBottomReserved = false
 
-    private var user: OTUser? = null
-    private var tracker: OTTracker? = null
+    private lateinit var viewModel: TrackerDetailViewModel
+
+    private val currentAttributeViewModelList = ArrayList<TrackerDetailViewModel.AttributeInformationViewModel>()
+
+    private val attributeListAdapter = AttributeListAdapter()
+
+    private val creationSubscriptions = CompositeSubscription()
 
     private val viewHolderSubscriptions = CompositeSubscription()
 
@@ -88,6 +90,60 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
         newAttributePanel
     }
 
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        this.viewModel = ViewModelProviders.of(activity).get(TrackerDetailViewModel::class.java)
+
+        //set UI
+        namePropertyView.value = this.viewModel.name
+        isOnShortcutPropertyView.value = this.viewModel.isBookmarked
+        applyColorTheme(this.viewModel.color, false)
+        colorPropertyView.value = this.viewModel.color
+
+        currentAttributeViewModelList.clear()
+
+        creationSubscriptions.add(
+                this.viewModel.attributeViewModelListObservable.subscribe { newList ->
+
+                    println("new attribute viewmodel list: ${newList}, old: ${currentAttributeViewModelList}")
+
+                    val diffResult = DiffUtil.calculateDiff(
+                            TrackerDetailViewModel.AttributeViewModelListDiffUtilCallback(currentAttributeViewModelList, newList)
+                    )
+
+                    currentAttributeViewModelList.clear()
+                    currentAttributeViewModelList.addAll(newList)
+
+                    diffResult.dispatchUpdatesTo(attributeListAdapter)
+                }
+        )
+
+        creationSubscriptions.add(
+                namePropertyView.valueChanged.observable.subscribe { result ->
+                    this.viewModel.name = result.second
+                }
+        )
+
+        creationSubscriptions.add(
+                colorPropertyView.valueChanged.observable.subscribe { result ->
+                    println("viewModel color set to ${colorPropertyView.value}")
+                    this.viewModel.color = colorPropertyView.value
+                    applyColorTheme(colorPropertyView.value, true)
+                }
+        )
+
+        creationSubscriptions.add(
+                isOnShortcutPropertyView.valueChanged.observable.subscribe { result ->
+                    this.viewModel.isBookmarked = result.second
+                }
+        )
+
+
+        if (savedInstanceState == null) {
+            TutorialManager.checkAndShowTargetPrompt("TrackerDetail_add_attribute", true, this.activity, newAttributeButton, R.string.msg_tutorial_add_attribute_primary, R.string.msg_tutorial_add_attribute_secondary, this.viewModel.color)
+        }
+    }
+
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val rootView = inflater!!.inflate(R.layout.fragment_tracker_detail_structure, container, false)
 
@@ -100,17 +156,8 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
 
         colorPropertyView = rootView.findViewById(R.id.colorProperty)
 
-        colorPropertyView.valueChanged += {
-            sender, colorIndex ->
-            val activity = activity
-            if (activity is TrackerDetailActivity) {
-                activity.trackerColorOnUI.onNext(colorPropertyView.value)
-                applyColorTheme(colorPropertyView.value, true)
-
-            }
-        }
-
         isOnShortcutPropertyView = rootView.findViewById(R.id.isOnShortcutProperty)
+        /*
         isOnShortcutPropertyView.valueChanged += {
             sender, isOnShortcut ->
             if (tracker?.isOnShortcut != isOnShortcut) {
@@ -126,7 +173,7 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
                     toastForRemoved.show()
                 }
             }
-        }
+        }*/
 
         attributeListView = rootView.findViewById(R.id.ui_attribute_list)
         attributeListView.setViewIntervalDistance(dipRound(8))
@@ -153,53 +200,34 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
         removalSnackbar = Snackbar.make(rootView, resources.getText(R.string.msg_attribute_removed_message), 5000)
         removalSnackbar.setAction(resources.getText(R.string.msg_undo)) {
             view ->
-            attributeListAdapter.undoRemove()
+            //attributeListAdapter.undoRemove()
         }
 
         newAttributeButton = rootView.findViewById(R.id.ui_button_new_attribute)
 
         newAttributeButton.setOnClickListener {
-            newAttributePanel.show(this@TrackerDetailStructureTabFragment.fragmentManager, newAttributePanel.tag)
+            newAttributePanel.show(this.fragmentManager, newAttributePanel.tag)
         }
 
         return rootView
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-
-    }
-
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        attributeListAdapter = AttributeListAdapter()
 
         attributeListView.setOnViewSwapListener { firstView, firstPosition, secondView, secondPosition ->
             attributeListAdapter.onMoveItem(firstPosition, secondPosition)
         }
 
         attributeListView.adapter = attributeListAdapter as AdapterLinearLayout.ViewHolderAdapter<AdapterLinearLayout.AViewHolder>
-        //attributeListItemTouchHelper = ItemTouchHelper(DragItemTouchHelperCallback(attributeListAdapter, context, true, false))
-        //attributeListItemTouchHelper.attachToRecyclerView(attributeListView)
+
     }
 
-    fun refresh() {
-        if (isEditMode) {
-            //edit
-        } else {
-            //new mode
-            //namePropertyView.focus()
-        }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        creationSubscriptions.clear()
 
-        namePropertyView.value = tracker?.name ?: ""
-        colorPropertyView.value = tracker?.color ?: ContextCompat.getColor(context, R.color.colorPrimary)
-        isOnShortcutPropertyView.value = tracker?.isOnShortcut ?: false
-
-        attributeListAdapter.notifyDataSetChanged()
-
-        applyColorTheme(tracker?.color ?: ContextCompat.getColor(context, R.color.colorPrimary), false)
     }
 
     private fun applyColorTheme(color: Int, animate: Boolean) {
@@ -211,62 +239,9 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
         newAttributeButton.rippleColor = Color.HSVToColor(hsv)
     }
 
-
-    override fun onTrackerLoaded(tracker: OTTracker) {
-        this.tracker = tracker
-        tracker.let {
-
-            if (activity.intent.hasExtra(TrackerDetailActivity.INTENT_KEY_FOCUS_ATTRIBUTE_ID)) {
-                val focusedAttributeId = activity.intent.getStringExtra(TrackerDetailActivity.INTENT_KEY_FOCUS_ATTRIBUTE_ID)
-
-                for (attr in tracker.attributes.unObservedList) {
-                    if (attr.objectId == focusedAttributeId) {
-                        scrollToBottomReserved = true
-                        break
-                    }
-                }
-            }
-        }
-
-        startSubscriptions.add(
-                tracker.attributes.elementAddedSubject.subscribe {
-                    pair ->
-                    attributeListAdapter.notifyItemInserted(pair.second.second)
-                }
-        )
-
-        startSubscriptions.add(
-                tracker.attributes.elementRemovedSubject.subscribe {
-                    pair ->
-                    attributeListAdapter.notifyItemRemoved(pair.second.second)
-                }
-        )
-
-        refresh()
-
-        TutorialManager.checkAndShowTargetPrompt("TrackerDetail_add_attribute", true, this.activity, newAttributeButton, R.string.msg_tutorial_add_attribute_primary, R.string.msg_tutorial_add_attribute_secondary, tracker.color)
-    }
-
     override fun onStop() {
         super.onStop()
-
         viewHolderSubscriptions.clear()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        refresh()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        if (namePropertyView.validate()) {
-            tracker?.name = namePropertyView.value
-        }
-
-        if (colorPropertyView.validate()) {
-            tracker?.color = colorPropertyView.value
-        }
     }
 
 
@@ -278,7 +253,8 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
 
 
     fun openAttributeDetailActivity(position: Int) {
-        startActivityOnDelay(AttributeDetailActivity.makeIntent(activity, tracker!!, tracker!!.attributes.get(position)))
+        //TODO Open Attribute Detail Activity
+        //startActivityOnDelay(AttributeDetailActivity.makeIntent(activity, tracker!!, tracker!!.attributes.get(position)))
     }
 
     fun scrollToBottom() {
@@ -294,11 +270,11 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
         }
 
         override fun isEmpty(): Boolean {
-            return tracker?.attributes?.size ?: 0 > 0
+            return currentAttributeViewModelList.isEmpty()
         }
 
         override fun getItem(position: Int): Any {
-            return tracker?.attributes?.get(position) as Any
+            return currentAttributeViewModelList[position]
         }
 
         override fun getItemViewType(position: Int): Int {
@@ -322,20 +298,20 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
         }
 
         override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
-            viewHolder.bindAttribute(tracker!!.attributes[position])
+            viewHolder.bindAttribute(currentAttributeViewModelList[position])
         }
 
         override fun getCount(): Int {
-            return tracker?.attributes?.size ?: 0
+            return currentAttributeViewModelList.size
         }
 
         override fun getItemId(position: Int): Long {
-            return tracker?.attributes?.get(position)?.objectId?.toLong() ?: -1
+            return position.toLong()
         }
 
         fun undoRemove() {
             if (removed != null) {
-                tracker?.attributes?.addAt(removed!!, removedPosition)
+                //tracker?.attributes?.addAt(removed!!, removedPosition)
                 //notifyItemInserted(removedPosition)
             }
         }
@@ -345,24 +321,9 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
         }
 
         fun onMoveItem(fromPosition: Int, toPosition: Int) {
-            tracker?.attributes?.moveItem(fromPosition, toPosition)
+            viewModel.moveAttribute(fromPosition, toPosition)
             //notifyItemMoved(fromPosition, toPosition)
         }
-
-        /*
-        override fun onCheckCanDrop(draggingPosition: Int, dropPosition: Int): Boolean {
-            println("check can drop $draggingPosition $dropPosition")
-            return true
-        }
-
-        override fun onCheckCanStartDrag(holder: AttributeListAdapter.ViewHolder?, position: Int, x: Int, y: Int): Boolean {
-            println("check can start drag $position $x, $y")
-            return true
-        }
-
-        override fun onGetItemDraggableRange(holder: AttributeListAdapter.ViewHolder?, position: Int): ItemDraggableRange? {
-            return null
-        }*/
 
         inner class ViewHolder(val view: View) : AdapterLinearLayout.AViewHolder(view), View.OnClickListener {
 
@@ -421,6 +382,7 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
                 if (view === editButton || view === previewContainer) {
                     openAttributeDetailActivity(adapterPosition)
                 } else if (view === removeButton) {
+                    /*
                     val tracker = tracker
                     tracker?.let {
                         DialogHelper.makeNegativePhrasedYesNoDialogBuilder(this@TrackerDetailStructureTabFragment.context,
@@ -437,25 +399,24 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
                                 EventLoggingManager.logAttributeChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_ATTRIBUTE_REMOVE, removed!!.typeId, removed!!.objectId, tracker.objectId)
                             }
                         }, onNo = null).show()
-                    }
+                    }*/
                 } else if (view === columnNameButton) {
-                    val tracker = tracker
-                    tracker?.let {
+
                         columnNameChangeDialog
-                                .input(null, tracker.attributes[adapterPosition].name, false) {
+                                .input(null, currentAttributeViewModelList[adapterPosition].name, false) {
                                     dialog, input ->
-                                    if (tracker.attributes[adapterPosition].name.compareTo(input.toString()) != 0) {
-                                        tracker.attributes[adapterPosition].name = input.toString()
+                                    if (currentAttributeViewModelList[adapterPosition].name.compareTo(input.toString()) != 0) {
+                                        currentAttributeViewModelList[adapterPosition].name = input.toString()
                                         attributeListAdapter.notifyItemChanged(adapterPosition)
                                     }
                                 }.show()
-                    }
                 }
             }
 
-            fun bindAttribute(attribute: OTAttribute<out Any>) {
-                typeIconView.setImageResource(attribute.typeSmallIconResourceId)
-                columnNameView.text = attribute.name
+            fun bindAttribute(attributeViewModel: TrackerDetailViewModel.AttributeInformationViewModel) {
+                //typeIconView.setImageResource(attribute.typeSmallIconResourceId)
+                columnNameView.text = attributeViewModel.name
+                /*
                 requiredMarker.visibility = if (attribute.isRequired) {
                     View.VISIBLE
                 } else {
@@ -470,15 +431,15 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
                 val propertySub =
                         attribute.propertyValueChangedSubject.subscribe {
                             preview = attribute.getInputView(context, true, preview)
-                        }
+                        }*/
 
                 val nameSub =
-                        attribute.nameChanged.subscribe {
+                        attributeViewModel.nameObservable.subscribe {
                             args ->
-                            columnNameView.text = args.second
+                            columnNameView.text = args
                         }
 
-                viewHolderSubscriptions.add(propertySub)
+                //viewHolderSubscriptions.add(propertySub)
                 viewHolderSubscriptions.add(nameSub)
             }
         }
@@ -486,14 +447,12 @@ class TrackerDetailStructureTabFragment : TrackerDetailActivity.ChildFragment() 
     }
 
     protected fun addNewAttribute(typeInfo: AttributePresetInfo) {
-        val tracker = tracker
-        tracker?.let {
-            val newAttribute = typeInfo.creater(tracker, tracker.generateNewAttributeName(typeInfo.name, context))
-            tracker.attributes.add(newAttribute)
-            EventLoggingManager.logAttributeChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_ATTRIBUTE_ADD, newAttribute.typeId, newAttribute.objectId, tracker.objectId)
 
-            //attributeListAdapter.notifyItemInserted(tracker.attributes.size - 1)
-            scrollToBottomReserved = true
-        }
+        val newAttributeName = DefaultNameGenerator.generateName(typeInfo.name, currentAttributeViewModelList.map { it.nameObservable.value }, true)
+        this.viewModel.addNewAttribute(newAttributeName, typeInfo.typeId)
+        scrollToBottomReserved = true
+
+        //EventLoggingManager.logAttributeChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_ATTRIBUTE_ADD, newAttribute.typeId, newAttribute.objectId, tracker.objectId)
     }
+
 }

@@ -9,6 +9,7 @@ import rx.Single
  * Created by younghokim on 2017. 9. 27..
  */
 interface ISynchronizationServerSideAPI {
+
     //server returns server-side changes after designated timestamp.
     fun getItemsAfter(timestamp: Long): Single<List<OTItemPOJO>>
 

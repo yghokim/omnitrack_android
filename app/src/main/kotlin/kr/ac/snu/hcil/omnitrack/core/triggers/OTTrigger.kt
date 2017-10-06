@@ -78,7 +78,7 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
 
     val triggerAction: OTTriggerAction
 
-    override val databasePointRef: DatabaseReference?
+    val databasePointRef: DatabaseReference?
         get() = DatabaseManager.dbRef?.child(DatabaseManager.CHILD_NAME_TRIGGERS)?.child(objectId)
 
     private var currentDbRef: DatabaseReference?
@@ -392,4 +392,8 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
 
     abstract fun onDetachFromSystem()
 
+
+    override fun save() {
+
+    }
 }
