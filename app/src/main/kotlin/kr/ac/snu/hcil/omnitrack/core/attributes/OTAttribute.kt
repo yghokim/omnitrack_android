@@ -180,10 +180,6 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
         }
     }
 
-    fun requiredPermissions(): Array<String>? {
-        return getPermissionsForAttribute(typeId)
-    }
-
     var tracker: OTTracker? by Delegates.observable(parentTracker) {
         prop, old, new ->
         if (old != new) {
@@ -229,19 +225,25 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
     /**
      * whether default value is stable or dynamic to time
      * */
-    open val isAutoCompleteValueStatic: Boolean = true
-
-    open val isExternalFile: Boolean = false
 
     val removedFromTracker = Event<OTTracker>()
     val addedToTracker = Event<OTTracker>()
 
     abstract val valueNumericCharacteristics: NumericCharacteristics
 
-
     abstract val typeNameResourceId: Int
 
     abstract val typeSmallIconResourceId: Int
+
+    open val isAutoCompleteValueStatic: Boolean = true
+
+    open val isExternalFile: Boolean = false
+
+    abstract val typeNameForSerialization: String
+
+    fun requiredPermissions(): Array<String>? {
+        return getPermissionsForAttribute(typeId)
+    }
 
     abstract val propertyKeys: Array<String>
     val propertyValueChanged = Event<OTProperty.PropertyChangedEventArgs<out Any>>()
@@ -309,7 +311,6 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
         }
     }
 
-    abstract val typeNameForSerialization: String
 
     protected fun assignProperty(property: OTProperty<out Any>) {
         property.onValueChanged += {
