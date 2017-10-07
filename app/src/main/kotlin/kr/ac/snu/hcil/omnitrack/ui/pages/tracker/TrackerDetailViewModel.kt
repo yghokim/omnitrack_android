@@ -14,6 +14,7 @@ import org.jetbrains.anko.collections.forEachWithIndex
 import rx.subjects.BehaviorSubject
 import rx.subscriptions.CompositeSubscription
 import java.util.*
+import kotlin.collections.HashSet
 
 /**
  * Created by younghokim on 2017. 10. 3..
@@ -62,6 +63,8 @@ class TrackerDetailViewModel : ViewModel() {
     fun getAttributeViewModelList(): List<AttributeInformationViewModel> {
         return currentAttributeViewModelList
     }
+
+    private val removedAttributes = HashSet<AttributeInformationViewModel>()
 
     /*
         private var attributeRealmResults: RealmResults<OTAttributeDAO>? = null
@@ -142,6 +145,12 @@ class TrackerDetailViewModel : ViewModel() {
         currentAttributeViewModelList.move(from, to)
     }
 
+    fun removeAttribute(attrViewModel: AttributeInformationViewModel) {
+        removedAttributes.add(attrViewModel)
+        currentAttributeViewModelList.remove(attrViewModel)
+        attributeViewModelListObservable.onNext(currentAttributeViewModelList)
+    }
+
     private fun saveAttributes(trackerDao: OTTrackerDAO) {
         trackerDao.attributes.clear()
         currentAttributeViewModelList.forEachWithIndex { index, attrViewModel ->
@@ -159,6 +168,12 @@ class TrackerDetailViewModel : ViewModel() {
             attrViewModel.applyChanges()
             trackerDao.attributes.add(attrViewModel.attributeDAO)
         }
+        removedAttributes.forEach { viewModel ->
+            if (viewModel.isInDatabase) {
+                viewModel.attributeDAO.deleteFromRealm()
+            }
+        }
+        removedAttributes.clear()
     }
 
     fun applyChanges(): String {
@@ -212,7 +227,7 @@ class TrackerDetailViewModel : ViewModel() {
     override fun onCleared() {
         super.onCleared()
         clearCurrentAttributeList()
-        trackerDao?.removeAllChangeListeners()
+        removedAttributes.clear()
         realm.close()
     }
 
@@ -247,11 +262,13 @@ class TrackerDetailViewModel : ViewModel() {
         }
 
         override fun onChange(snapshot: OTAttributeDAO) {
-            if (nameObservable.value != snapshot.name)
-                nameObservable.onNext(snapshot.name)
+            if (snapshot.isValid) {
+                if (nameObservable.value != snapshot.name)
+                    nameObservable.onNext(snapshot.name)
 
-            if (typeObservable.value != snapshot.type)
-                typeObservable.onNext(snapshot.type)
+                if (typeObservable.value != snapshot.type)
+                    typeObservable.onNext(snapshot.type)
+            }
         }
 
         fun applyChanges() {
