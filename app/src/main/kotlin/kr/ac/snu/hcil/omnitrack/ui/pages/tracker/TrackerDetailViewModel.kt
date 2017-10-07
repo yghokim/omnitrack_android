@@ -1,10 +1,13 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.tracker
 
 import android.arch.lifecycle.ViewModel
+import android.support.annotation.DrawableRes
 import android.support.v7.util.DiffUtil
 import io.realm.Realm
 import io.realm.RealmChangeListener
 import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
@@ -239,6 +242,7 @@ class TrackerDetailViewModel : ViewModel() {
 
         val nameObservable = BehaviorSubject.create<String>("")
         val typeObservable = BehaviorSubject.create<Int>(-1)
+        val iconObservable = BehaviorSubject.create<Int>(R.drawable.icon_small_longtext)
         val connectionObservable = BehaviorSubject.create<OTConnection>()
 
         var name: String
@@ -246,6 +250,14 @@ class TrackerDetailViewModel : ViewModel() {
             set(value) {
                 if (nameObservable.value != value) {
                     nameObservable.onNext(value)
+                }
+            }
+
+        var icon: Int
+            get() = iconObservable.value
+            set(@DrawableRes value) {
+                if (iconObservable.value != value) {
+                    iconObservable.onNext(value)
                 }
             }
 
@@ -263,17 +275,19 @@ class TrackerDetailViewModel : ViewModel() {
 
         override fun onChange(snapshot: OTAttributeDAO) {
             if (snapshot.isValid) {
-                if (nameObservable.value != snapshot.name)
-                    nameObservable.onNext(snapshot.name)
+                this.name = snapshot.name
 
                 if (typeObservable.value != snapshot.type)
                     typeObservable.onNext(snapshot.type)
+
+                val helper = OTAttributeManager.getAttributeHelper(snapshot.type)
+                val icon = helper.getTypeSmallIconResourceId(snapshot)
+                this.icon = icon
             }
         }
 
         fun applyChanges() {
             attributeDAO.name = nameObservable.value
-            attributeDAO.type = typeObservable.value
             attributeDAO.updatedAt = System.currentTimeMillis()
         }
 
