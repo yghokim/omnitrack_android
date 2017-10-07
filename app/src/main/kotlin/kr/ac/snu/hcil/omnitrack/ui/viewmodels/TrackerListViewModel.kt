@@ -70,11 +70,15 @@ class TrackerListViewModel : UserAttachedViewModel(), OrderedRealmCollectionChan
         trackerQueryResults.addChangeListener(this)
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        trackersRealmResults?.removeAllChangeListeners()
+        realm.close()
+    }
+
     override fun onDispose() {
         super.onDispose()
-        trackersRealmResults?.removeAllChangeListeners()
         clearTrackerViewModelList()
-        realm.close()
     }
 
     private fun clearTrackerViewModelList() {
@@ -83,6 +87,14 @@ class TrackerListViewModel : UserAttachedViewModel(), OrderedRealmCollectionChan
         }
         currentTrackerViewModelList.clear()
         trackerViewModelListSubject.onNext(emptyList())
+    }
+
+    fun removeTracker(model: TrackerInformationViewModel) {
+        if (!realm.isInTransaction) {
+            realm.executeTransaction {
+                OTApplication.app.databaseManager.removeTracker(model.trackerDao)
+            }
+        }
     }
 
     class TrackerInformationViewModel(val trackerDao: OTTrackerDAO, val realm: Realm) : RealmChangeListener<OTTrackerDAO> {

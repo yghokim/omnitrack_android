@@ -218,6 +218,38 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
                 .findAllAsync()
     }
 
+    fun removeTracker(dao: OTTrackerDAO) {
+        if (!dao.removed) {
+
+            (dao.attributes + dao.removedAttributes).forEach { attrDao ->
+                if (attrDao.isManaged) {
+                    attrDao.deleteFromRealm()
+                }
+            }
+
+            dao.removed = true
+            dao.synchronizedAt = null
+            dao.updatedAt = System.currentTimeMillis()
+        }
+    }
+
+    fun removeTracker(objectId: String, realm: Realm) {
+        val dao = getTrackerQueryWithId(objectId, realm).findFirst()
+        if (dao != null) {
+            removeTracker(dao)
+        }
+    }
+
+    fun removeAttribute(dao: OTAttributeDAO, tracker: OTTrackerDAO, realm: Realm) {
+        if (!realm.isInTransaction) {
+            realm.executeTransaction {
+                tracker.removedAttributes.add(dao)
+            }
+        } else {
+            tracker.removedAttributes.add(dao)
+        }
+    }
+
 
     fun removeTracker(tracker: OTTracker, formerOwner: OTUser, archive: Boolean) {
         val realm = getRealmInstance()
@@ -246,6 +278,7 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
         val realm = getRealmInstance()
         val dao = realm.where(OTAttributeDAO::class.java).equalTo("trackerId", trackerId).equalTo("objectId", objectId).findFirst()
         if (dao != null) {
+
             /*
             realm.executeTransaction {
                 if(dao.removed != true)
