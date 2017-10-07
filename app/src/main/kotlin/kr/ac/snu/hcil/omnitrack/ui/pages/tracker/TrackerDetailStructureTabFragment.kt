@@ -413,7 +413,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
             }
 
             fun bindAttribute(attributeViewModel: TrackerDetailViewModel.AttributeInformationViewModel) {
-                //typeIconView.setImageResource(attribute.typeSmallIconResourceId)
+                typeIconView.setImageResource(attributeViewModel.icon)
                 columnNameView.text = attributeViewModel.name
                 /*
                 requiredMarker.visibility = if (attribute.isRequired) {
@@ -432,14 +432,20 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                             preview = attribute.getInputView(context, true, preview)
                         }*/
 
-                val nameSub =
+                viewHolderSubscriptions.add(
                         attributeViewModel.nameObservable.subscribe {
                             args ->
                             columnNameView.text = args
                         }
+                )
+
+                viewHolderSubscriptions.add(
+                        attributeViewModel.iconObservable.subscribe { args ->
+                            typeIconView.setImageResource(args)
+                        }
+                )
 
                 //viewHolderSubscriptions.add(propertySub)
-                viewHolderSubscriptions.add(nameSub)
             }
         }
 
