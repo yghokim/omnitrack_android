@@ -25,6 +25,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.AttributePresetInfo
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
+import kr.ac.snu.hcil.omnitrack.core.database.EventLoggingManager
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.common.AdapterLinearLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
@@ -35,6 +36,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ShortTextPropert
 import kr.ac.snu.hcil.omnitrack.ui.components.tutorial.TutorialManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.ConnectionIndicatorStubProxy
 import kr.ac.snu.hcil.omnitrack.utils.DefaultNameGenerator
+import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.dipRound
 import rx.subscriptions.CompositeSubscription
 
@@ -382,24 +384,21 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                 if (view === editButton || view === previewContainer) {
                     openAttributeDetailActivity(adapterPosition)
                 } else if (view === removeButton) {
-                    /*
-                    val tracker = tracker
-                    tracker?.let {
-                        DialogHelper.makeNegativePhrasedYesNoDialogBuilder(this@TrackerDetailStructureTabFragment.context,
-                                getString(R.string.msg_remove_field),
-                                String.format(getString(R.string.msg_format_confirm_remove_field),
-                                        tracker.attributes[adapterPosition].name
-                                ),
-                                R.string.msg_remove, R.string.msg_cancel, {
-                            removed = tracker.attributes[adapterPosition]
-                            removedPosition = adapterPosition
-                            tracker.attributes.remove(tracker.attributes[adapterPosition])
-                            showRemovalSnackbar()
-                            if (removed != null) {
-                                EventLoggingManager.logAttributeChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_ATTRIBUTE_REMOVE, removed!!.typeId, removed!!.objectId, tracker.objectId)
-                            }
-                        }, onNo = null).show()
-                    }*/
+                    DialogHelper.makeNegativePhrasedYesNoDialogBuilder(this@TrackerDetailStructureTabFragment.context,
+                            getString(R.string.msg_remove_field),
+                            String.format(getString(R.string.msg_format_confirm_remove_field),
+                                    currentAttributeViewModelList[adapterPosition].name
+                            ),
+                            R.string.msg_remove, R.string.msg_cancel, {
+                        //removed = tracker.attributes[adapterPosition]
+                        //removedPosition = adapterPosition
+                        //tracker.attributes.remove(tracker.attributes[adapterPosition])
+                        viewModel.removeAttribute(currentAttributeViewModelList[adapterPosition])
+                        showRemovalSnackbar()
+                        if (removed != null) {
+                            EventLoggingManager.logAttributeChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_ATTRIBUTE_REMOVE, removed!!.typeId, removed!!.objectId, viewModel.trackerId ?: "null")
+                        }
+                    }, onNo = null).show()
                 } else if (view === columnNameButton) {
 
                         columnNameChangeDialog

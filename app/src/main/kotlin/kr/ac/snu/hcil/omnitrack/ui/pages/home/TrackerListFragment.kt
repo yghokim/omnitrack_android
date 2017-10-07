@@ -35,7 +35,6 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
-import kr.ac.snu.hcil.omnitrack.core.database.EventLoggingManager
 import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
@@ -463,11 +462,12 @@ class TrackerListFragment : OTFragment() {
                 } else if (view === listButton) {
                     startActivityOnDelay(ItemBrowserActivity.makeIntent(user.trackers[adapterPosition], this@TrackerListFragment.context))
                 } else if (view === removeButton) {
-                    val tracker = user.trackers[adapterPosition]
-                    DialogHelper.makeNegativePhrasedYesNoDialogBuilder(context, tracker.name, getString(R.string.msg_confirm_remove_tracker), R.string.msg_remove, onYes = { ->
-                        user.trackers.remove(tracker)
+                    val trackerViewModel = currentTrackerViewModelList[adapterPosition]
+                    DialogHelper.makeNegativePhrasedYesNoDialogBuilder(context, trackerViewModel.trackerName.value, getString(R.string.msg_confirm_remove_tracker), R.string.msg_remove, onYes = { ->
+                        viewModel.removeTracker(trackerViewModel)
                         listView.invalidateItemDecorations()
-                        EventLoggingManager.logTrackerChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_TRACKER_REMOVE, tracker)
+                        //TODO logging tracker removal
+                        //EventLoggingManager.logTrackerChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_TRACKER_REMOVE, tracker)
                     }).show()
                 } else if (view === chartViewButton) {
                     val tracker = user.trackers[adapterPosition]
