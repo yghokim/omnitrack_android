@@ -1,6 +1,8 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.tracker
 
+import android.app.Activity.RESULT_OK
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
@@ -27,6 +29,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.AttributePresetInfo
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.database.EventLoggingManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.common.AdapterLinearLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
@@ -36,6 +39,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ColorPaletteProp
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ShortTextPropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.tutorial.TutorialManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.ConnectionIndicatorStubProxy
+import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeDetailActivity
 import kr.ac.snu.hcil.omnitrack.utils.DefaultNameGenerator
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.dipRound
@@ -47,6 +51,7 @@ import rx.subscriptions.CompositeSubscription
 class TrackerDetailStructureTabFragment : OTFragment() {
 
     companion object {
+        const val REQUEST_CODE_ATTRIBUTE_DETAIL = 52423
         val toastForAdded by lazy { Toast.makeText(OTApplication.app, R.string.msg_shortcut_added, Toast.LENGTH_SHORT) }
         val toastForRemoved by lazy { Toast.makeText(OTApplication.app, R.string.msg_shortcut_removed, Toast.LENGTH_SHORT) }
     }
@@ -256,12 +261,27 @@ class TrackerDetailStructureTabFragment : OTFragment() {
 
 
     fun openAttributeDetailActivity(position: Int) {
-        //TODO Open Attribute Detail Activity
-        //startActivityOnDelay(AttributeDetailActivity.makeIntent(activity, tracker!!, tracker!!.attributes.get(position)))
+        val attrViewModel = currentAttributeViewModelList[position]
+        startActivityForResult(AttributeDetailActivity.makeIntent(activity, attrViewModel.makeFrontalChangesToDao(), false), REQUEST_CODE_ATTRIBUTE_DETAIL)
     }
 
     fun scrollToBottom() {
         rootScrollView.smoothScrollTo(0, contentContainer.measuredHeight)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_CODE_ATTRIBUTE_DETAIL && resultCode == RESULT_OK && data != null) {
+            println("JSON: ${data.getStringExtra(AttributeDetailActivity.INTENT_EXTRA_SERIALIZED_ATTRIBUTE_DAO)}")
+            val editedDao = OTAttributeDAO.parser.fromJson(data.getStringExtra(AttributeDetailActivity.INTENT_EXTRA_SERIALIZED_ATTRIBUTE_DAO), OTAttributeDAO::class.java)
+            println(editedDao)
+            val correspondingViewModel = currentAttributeViewModelList.find { it.attributeDAO.objectId == editedDao.objectId }
+            if (correspondingViewModel != null) {
+                correspondingViewModel.applyDaoChangesToFront(editedDao)
+
+                attributeListAdapter.notifyItemChanged(currentAttributeViewModelList.indexOf(correspondingViewModel))
+            }
+        }
     }
 
 
@@ -391,9 +411,6 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                                     currentAttributeViewModelList[adapterPosition].name
                             ),
                             R.string.msg_remove, R.string.msg_cancel, {
-                        //removed = tracker.attributes[adapterPosition]
-                        //removedPosition = adapterPosition
-                        //tracker.attributes.remove(tracker.attributes[adapterPosition])
                         viewModel.removeAttribute(currentAttributeViewModelList[adapterPosition])
                         showRemovalSnackbar()
                         if (removed != null) {
@@ -439,6 +456,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                 viewHolderSubscriptions.add(
                         attributeViewModel.nameObservable.subscribe {
                             args ->
+                            println("name changed: ${args}")
                             columnNameView.text = args
                         }
                 )
@@ -452,7 +470,13 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                 viewHolderSubscriptions.add(
                         attributeViewModel.typeObservable.subscribe { args ->
 
-                            preview = OTAttributeManager.getAttributeHelper(args).getInputView(context, true, attributeViewModel.attributeDAO, preview)
+                            preview = OTAttributeManager.getAttributeHelper(args).getInputView(context, true, attributeViewModel.makeFrontalChangesToDao(), preview)
+                        }
+                )
+
+                viewHolderSubscriptions.add(
+                        attributeViewModel.onPropertyChanged.subscribe {
+                            preview = OTAttributeManager.getAttributeHelper(attributeViewModel.typeObservable.value).getInputView(context, true, attributeViewModel.makeFrontalChangesToDao(), preview)
                         }
                 )
 
@@ -465,7 +489,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
     protected fun addNewAttribute(typeInfo: AttributePresetInfo) {
 
         val newAttributeName = DefaultNameGenerator.generateName(typeInfo.name, currentAttributeViewModelList.map { it.nameObservable.value }, true)
-        this.viewModel.addNewAttribute(newAttributeName, typeInfo.typeId)
+        this.viewModel.addNewAttribute(newAttributeName, typeInfo.typeId, typeInfo.processor)
         scrollToBottomReserved = true
 
         //EventLoggingManager.logAttributeChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_ATTRIBUTE_ADD, newAttribute.typeId, newAttribute.objectId, tracker.objectId)

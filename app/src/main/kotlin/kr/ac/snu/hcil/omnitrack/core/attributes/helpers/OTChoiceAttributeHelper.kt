@@ -1,8 +1,10 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 
 import android.content.Context
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTChoiceEntryListPropertyHelper
+import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
@@ -39,12 +41,28 @@ class OTChoiceAttributeHelper : OTAttributeHelper() {
 
     override val propertyKeys: Array<String> = arrayOf(PROPERTY_MULTISELECTION, PROPERTY_ENTRIES)
 
-    override fun <T> parsePropertyValue(propertyKey: String, serializedValue: String): T? {
+    override fun <T> getPropertyHelper(propertyKey: String): OTPropertyHelper<T> {
         return when (propertyKey) {
-            PROPERTY_MULTISELECTION -> OTPropertyManager.getHelper(OTPropertyManager.EPropertyType.Boolean).parseValue(serializedValue)
-            PROPERTY_ENTRIES -> OTPropertyManager.getHelper(OTPropertyManager.EPropertyType.ChoiceEntryList).parseValue(serializedValue)
+            PROPERTY_MULTISELECTION -> OTPropertyManager.getHelper(OTPropertyManager.EPropertyType.Boolean)
+            PROPERTY_ENTRIES -> OTPropertyManager.getHelper(OTPropertyManager.EPropertyType.ChoiceEntryList)
             else -> throw IllegalArgumentException("Unsupported property key ${propertyKey}")
-        } as T
+        } as OTPropertyHelper<T>
+    }
+
+    override fun getPropertyInitialValue(propertyKey: String): Any? {
+        return when (propertyKey) {
+            PROPERTY_MULTISELECTION -> false
+            PROPERTY_ENTRIES -> UniqueStringEntryList()
+            else -> null
+        }
+    }
+
+    override fun getPropertyTitle(propertyKey: String): String {
+        return when (propertyKey) {
+            PROPERTY_MULTISELECTION -> OTApplication.getString(R.string.property_choice_allow_multiple_selections)
+            PROPERTY_ENTRIES -> OTApplication.getString(R.string.property_choice_entries)
+            else -> ""
+        }
     }
 
     private fun getAllowedMultiSelection(attribute: OTAttributeDAO): Boolean? {
@@ -54,7 +72,6 @@ class OTChoiceAttributeHelper : OTAttributeHelper() {
     private fun getEntries(attribute: OTAttributeDAO): UniqueStringEntryList? {
         return getDeserializedPropertyValue<UniqueStringEntryList>(PROPERTY_ENTRIES, attribute)
     }
-
 
     override fun getInputViewType(previewMode: Boolean, attribute: OTAttributeDAO): Int = AAttributeInputView.VIEW_TYPE_CHOICE
 

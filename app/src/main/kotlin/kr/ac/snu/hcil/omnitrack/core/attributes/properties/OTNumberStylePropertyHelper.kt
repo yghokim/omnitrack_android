@@ -18,7 +18,7 @@ class OTNumberStylePropertyHelper : OTPropertyHelper<NumberStyle>() {
         return Gson().fromJson(serialized, NumberStyle::class.java)
     }
 
-    override fun onBuildView(context: Context): APropertyView<NumberStyle> {
+    override fun makeView(context: Context): APropertyView<NumberStyle> {
         return NumberStylePropertyView(context, null)
     }
 }

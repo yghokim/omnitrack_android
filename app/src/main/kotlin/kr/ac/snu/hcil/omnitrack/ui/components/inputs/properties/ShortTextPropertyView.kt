@@ -21,7 +21,7 @@ class ShortTextPropertyView(context: Context, attrs: AttributeSet?) : APropertyV
     override var value: String
         get() = valueView.text.toString()
         set(value) {
-            if (valueView.text != value) {
+            if (valueView.text.toString() != value) {
                 valueView.text = value
             }
         }

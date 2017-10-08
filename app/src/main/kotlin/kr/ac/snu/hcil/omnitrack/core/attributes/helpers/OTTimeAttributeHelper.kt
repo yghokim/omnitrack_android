@@ -1,6 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 
+import android.content.Context
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
@@ -8,6 +11,8 @@ import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.common.time.DateTimePicker
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.TimePointInputView
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.SelectionPropertyView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 
 /**
@@ -39,11 +44,38 @@ class OTTimeAttributeHelper : OTAttributeHelper() {
 
     override fun getInputViewType(previewMode: Boolean, attribute: OTAttributeDAO): Int = AAttributeInputView.VIEW_TYPE_TIME_POINT
 
-    override fun <T> parsePropertyValue(propertyKey: String, serializedValue: String): T? {
+    override fun <T> getPropertyHelper(propertyKey: String): OTPropertyHelper<T> {
         return when (propertyKey) {
-            GRANULARITY -> OTPropertyManager.getHelper(OTPropertyManager.EPropertyType.Selection).parseValue(serializedValue)
+            GRANULARITY -> OTPropertyManager.getHelper(OTPropertyManager.EPropertyType.Selection)
             else -> throw IllegalArgumentException("Unsupported property type ${propertyKey}")
-        } as T
+        } as OTPropertyHelper<T>
+    }
+
+    override fun getPropertyInitialValue(propertyKey: String): Any? {
+        return when (propertyKey) {
+            GRANULARITY -> GRANULARITY_DAY
+            else -> null
+        }
+    }
+
+    override fun getPropertyTitle(propertyKey: String): String {
+        return when (propertyKey) {
+            GRANULARITY -> OTApplication.getString(R.string.property_time_granularity)
+            else -> ""
+        }
+    }
+
+    override fun makePropertyView(propertyKey: String, context: Context): APropertyView<out Any> {
+        val superView = super.makePropertyView(propertyKey, context)
+        if (propertyKey == GRANULARITY && superView is SelectionPropertyView) {
+            superView.setEntries(arrayOf(OTApplication.app.resourcesWrapped.getString(R.string.property_time_granularity_day),
+                    OTApplication.app.resourcesWrapped.getString(R.string.property_time_granularity_minute),
+                    OTApplication.app.resourcesWrapped.getString(R.string.property_time_granularity_second)
+
+            ))
+        }
+
+        return superView
     }
 
     fun getGranularity(attribute: OTAttributeDAO): Int {

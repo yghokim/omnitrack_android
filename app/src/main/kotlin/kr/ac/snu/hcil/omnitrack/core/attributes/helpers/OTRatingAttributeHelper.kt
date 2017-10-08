@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
@@ -33,15 +34,22 @@ class OTRatingAttributeHelper : OTAttributeHelper() {
 
     override val propertyKeys: Array<String> = arrayOf(PROPERTY_OPTIONS)
 
-    override fun <T> parsePropertyValue(propertyKey: String, serializedValue: String): T? {
+    override fun <T> getPropertyHelper(propertyKey: String): OTPropertyHelper<T> {
         return when (propertyKey) {
-            PROPERTY_OPTIONS -> OTPropertyManager.getHelper(OTPropertyManager.EPropertyType.RatingOptions).parseValue(serializedValue)
+            PROPERTY_OPTIONS -> OTPropertyManager.getHelper(OTPropertyManager.EPropertyType.RatingOptions)
             else -> throw IllegalArgumentException("Unsupported property type: ${propertyKey}")
-        } as T
+        } as OTPropertyHelper<T>
     }
 
     fun getRatingOptions(attribute: OTAttributeDAO): RatingOptions {
         return getDeserializedPropertyValue<RatingOptions>(PROPERTY_OPTIONS, attribute) ?: RatingOptions()
+    }
+
+    override fun getPropertyInitialValue(propertyKey: String): Any? {
+        return when (propertyKey) {
+            PROPERTY_OPTIONS -> RatingOptions()
+            else -> null
+        }
     }
 
 

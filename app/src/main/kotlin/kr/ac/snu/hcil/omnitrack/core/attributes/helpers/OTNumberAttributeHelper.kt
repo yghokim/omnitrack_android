@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
@@ -33,17 +34,24 @@ class OTNumberAttributeHelper : OTAttributeHelper() {
     override val propertyKeys: Array<String>
         get() = arrayOf(NUMBERSTYLE)
 
-    override fun <T> parsePropertyValue(propertyKey: String, serializedValue: String): T? {
+    override fun <T> getPropertyHelper(propertyKey: String): OTPropertyHelper<T> {
         return when (propertyKey) {
-            NUMBERSTYLE -> {
-                OTPropertyManager.getHelper(OTPropertyManager.EPropertyType.NumberStyle).parseValue(serializedValue)
-            }
+            NUMBERSTYLE ->
+                OTPropertyManager.getHelper(OTPropertyManager.EPropertyType.NumberStyle)
+
             else -> throw IllegalArgumentException("Unsupported property key.")
-        } as T
+        } as OTPropertyHelper<T>
     }
 
     private fun getNumberStyle(attribute: OTAttributeDAO): NumberStyle? {
         return getDeserializedPropertyValue(NUMBERSTYLE, attribute)
+    }
+
+    override fun getPropertyInitialValue(propertyKey: String): Any? {
+        return when (propertyKey) {
+            NUMBERSTYLE -> NumberStyle()
+            else -> null
+        }
     }
 
 

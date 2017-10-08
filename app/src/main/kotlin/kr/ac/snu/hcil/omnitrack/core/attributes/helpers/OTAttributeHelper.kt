@@ -1,11 +1,22 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 
 import android.content.Context
+import android.view.View
+import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
+import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyHelper
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
+import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
+import java.util.ArrayList
+import kotlin.collections.Collection
+import kotlin.collections.HashMap
+import kotlin.collections.Map
+import kotlin.collections.forEach
+import kotlin.collections.set
 
 /**
  * Created by Young-Ho on 10/7/2017.
@@ -21,10 +32,15 @@ abstract class OTAttributeHelper() {
     open fun isExternalFile(attribute: OTAttributeDAO): Boolean = false
     open fun getRequiredPermissions(attribute: OTAttributeDAO): Array<String>? = null
     abstract val typeNameForSerialization: String
+
     open val propertyKeys: Array<String> = emptyArray()
 
-    open fun <T> parsePropertyValue(propertyKey: String, serializedValue: String): T? {
-        return null
+    open fun <T> parsePropertyValue(propertyKey: String, serializedValue: String): T {
+        return getPropertyHelper<T>(propertyKey).parseValue(serializedValue)
+    }
+
+    fun <T> setPropertyValue(propertyKey: String, value: T, attribute: OTAttributeDAO, realm: Realm) {
+        attribute.setPropertySerializedValue(propertyKey, getPropertyHelper<T>(propertyKey).getSerializedValue(value), realm)
     }
 
     fun <T> getDeserializedPropertyValue(propertyKey: String, attribute: OTAttributeDAO): T? {
@@ -32,6 +48,10 @@ abstract class OTAttributeHelper() {
         return if (s != null)
             parsePropertyValue<T>(propertyKey, s)
         else null
+    }
+
+    open fun <T> getPropertyHelper(propertyKey: String): OTPropertyHelper<T> {
+        throw UnsupportedOperationException("Not supported operation.")
     }
 
     fun getDeserializedPropertyTable(attribute: OTAttributeDAO): Map<String, Any?> {
@@ -44,6 +64,33 @@ abstract class OTAttributeHelper() {
         }
 
         return table
+    }
+
+    open fun getPropertyTitle(propertyKey: String): String {
+        return ""
+    }
+
+    open fun getPropertyInitialValue(propertyKey: String): Any? {
+        throw IllegalAccessException("Must not reach here.")
+    }
+
+    open fun makePropertyView(propertyKey: String, context: Context): APropertyView<out Any> {
+        val view = getPropertyHelper<Any>(propertyKey).makeView(context)
+        view.title = getPropertyTitle(propertyKey)
+        val initialValue = getPropertyInitialValue(propertyKey)
+        if (initialValue != null)
+            view.value = initialValue
+        return view
+
+        return view
+    }
+
+    open fun makePropertyViews(context: Context): Collection<ReadOnlyPair<String, View>> {
+        val result = ArrayList<ReadOnlyPair<String, View>>()
+        for (key in propertyKeys) {
+            result.add(ReadOnlyPair(key, makePropertyView(key, context)))
+        }
+        return result
     }
 
     //Input View=========================================================================================================
