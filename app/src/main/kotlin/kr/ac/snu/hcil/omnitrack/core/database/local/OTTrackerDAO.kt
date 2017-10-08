@@ -1,5 +1,10 @@
 package kr.ac.snu.hcil.omnitrack.core.database.local
 
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.TypeAdapter
+import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonWriter
 import io.realm.Realm
 import io.realm.RealmList
 import io.realm.RealmObject
@@ -7,6 +12,7 @@ import io.realm.annotations.Index
 import io.realm.annotations.PrimaryKey
 import io.realm.exceptions.RealmException
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import java.util.*
 
 /**
@@ -43,6 +49,75 @@ open class OTTrackerDAO : RealmObject() {
 
 
 open class OTAttributeDAO : RealmObject() {
+    class AttrDaoJsonTypeAdapter : TypeAdapter<OTAttributeDAO>() {
+        override fun read(reader: JsonReader): OTAttributeDAO {
+            val dao = OTAttributeDAO()
+            reader.beginObject()
+            while (reader.hasNext()) {
+                when (reader.nextName()) {
+                    "id" -> dao.objectId = reader.nextString()
+                    "localId" -> dao.localId = reader.nextInt()
+                    "trackerId" -> dao.trackerId = reader.nextString()
+                    "name" -> dao.name = reader.nextString()
+                    "pos" -> dao.position = reader.nextInt()
+                    "type" -> dao.type = reader.nextInt()
+                    "userCreatedAt" -> dao.userCreatedAt = reader.nextLong()
+                    "updatedAt" -> dao.updatedAt = reader.nextLong()
+                    "req" -> dao.isRequired = reader.nextBoolean()
+                    "conn" -> dao.serializedConnection = reader.nextString()
+                    "props" -> {
+                        val list = ArrayList<OTStringStringEntryDAO>()
+                        reader.beginArray()
+                        while (reader.hasNext()) {
+                            val entry = OTStringStringEntryDAO()
+                            reader.beginObject()
+                            while (reader.hasNext()) {
+                                when (reader.nextName()) {
+                                    "id" -> entry.id = reader.nextString()
+                                    "k" -> entry.key = reader.nextString()
+                                    "v" -> entry.value = reader.nextString()
+                                }
+                            }
+                            reader.endObject()
+                            list.add(entry)
+                        }
+                        reader.endArray()
+                        dao.properties.addAll(list)
+                    }
+                }
+            }
+            reader.endObject()
+
+            return dao
+        }
+
+        override fun write(out: JsonWriter, value: OTAttributeDAO) {
+            out.beginObject()
+
+            out.name("id").value(value.objectId)
+            out.name("localId").value(value.localId)
+            out.name("trackerId").value(value.trackerId)
+            out.name("name").value(value.name)
+            out.name("pos").value(value.position)
+            out.name("type").value(value.type)
+            out.name("userCreatedAt").value(value.userCreatedAt)
+            out.name("req").value(value.isRequired)
+            out.name("conn").value(value.serializedConnection)
+            out.name("props").beginArray()
+
+            value.properties.forEach { prop ->
+                out.beginObject()
+                out.name("id").value(prop.id)
+                out.name("k").value(prop.key)
+                out.name("v").value(prop.value)
+                out.endObject()
+            }
+
+            out.endArray()
+
+            out.endObject()
+        }
+    }
 
     @PrimaryKey
     var objectId: String? = null
@@ -63,16 +138,32 @@ open class OTAttributeDAO : RealmObject() {
     var userCreatedAt: Long = System.currentTimeMillis()
     var updatedAt: Long = System.currentTimeMillis()
 
-    fun setPropertySerializedValue(key: String, serializedValue: String, realm: Realm) {
+    fun initializePropertiesWithDefaults(realm: Realm) {
+        val attributeHelper = OTAttributeManager.getAttributeHelper(type)
+        attributeHelper.propertyKeys.forEach { key ->
+            setPropertySerializedValue(key, attributeHelper.getPropertyHelper<Any>(key).getSerializedValue(attributeHelper.getPropertyInitialValue(key)!!), realm)
+        }
+    }
+
+    fun setPropertySerializedValue(key: String, serializedValue: String, realm: Realm): Boolean {
+        var changed = false
         val match = properties.find { it.key == key }
         if (match != null) {
+            if (match.value != serializedValue)
+                changed = true
+
             match.value = serializedValue
         } else {
-            val newProperty = realm.createObject(OTStringStringEntryDAO::class.java, UUID.randomUUID().toString())
+            val newProperty = if (this.isManaged)
+                realm.createObject(OTStringStringEntryDAO::class.java, UUID.randomUUID().toString())
+            else OTStringStringEntryDAO().apply { this.id = UUID.randomUUID().toString() }
             newProperty.key = key
             newProperty.value = serializedValue
             properties.add(newProperty)
+            changed = true
         }
+
+        return changed
     }
 
     fun getPropertySerializedValue(key: String): String? {
@@ -80,6 +171,11 @@ open class OTAttributeDAO : RealmObject() {
     }
 
     companion object {
+
+        val parser: Gson by lazy {
+            GsonBuilder().registerTypeAdapter(OTAttributeDAO::class.java, AttrDaoJsonTypeAdapter()).create()
+        }
+
         fun convertAttributeToDAO(attribute: OTAttribute<*>, position: Int, realm: Realm, dao: OTAttributeDAO?): OTAttributeDAO {
             if (!realm.isInTransaction) {
                 throw RealmException("This operation should be called in transaction.")

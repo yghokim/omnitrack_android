@@ -16,7 +16,7 @@ class OTBooleanPropertyHelper : OTPropertyHelper<Boolean>() {
         return serialized.toBoolean()
     }
 
-    override fun onBuildView(context: Context): APropertyView<Boolean> {
+    override fun makeView(context: Context): APropertyView<Boolean> {
         return BooleanPropertyView(context, null)
     }
 

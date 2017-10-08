@@ -12,13 +12,5 @@ abstract class OTPropertyHelper<T>() {
 
     abstract fun parseValue(serialized: String): T
 
-    fun buildView(title: String, initialValue: T, context: Context): APropertyView<T> {
-        val view = onBuildView(context)
-        if (title != null)
-            view.title = title
-        view.value = initialValue
-        return view
-    }
-
-    abstract protected fun onBuildView(context: Context): APropertyView<T>
+    abstract fun makeView(context: Context): APropertyView<T>
 }

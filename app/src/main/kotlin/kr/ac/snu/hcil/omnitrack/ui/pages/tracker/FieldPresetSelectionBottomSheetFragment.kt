@@ -2,9 +2,6 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.tracker
 
 import android.app.Dialog
 import android.os.Bundle
-import android.support.design.widget.BottomSheetBehavior
-import android.support.design.widget.BottomSheetDialogFragment
-import android.support.design.widget.CoordinatorLayout
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -13,7 +10,13 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.attributes.*
+import kr.ac.snu.hcil.omnitrack.core.attributes.AttributePresetInfo
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
+import kr.ac.snu.hcil.omnitrack.core.attributes.SimpleAttributePresetInfo
+import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTChoiceAttributeHelper
+import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTTimeAttributeHelper
+import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTTimeSpanAttributeHelper
 import kr.ac.snu.hcil.omnitrack.ui.components.common.DismissingBottomSheetDialogFragment
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
@@ -75,42 +78,47 @@ class FieldPresetSelectionBottomSheetFragment : DismissingBottomSheetDialogFragm
                 //                SimpleAttributePresetInfo(OTAttribute.TYPE_TIME, R.drawable.field_icon_time, this.getString(R.string.type_timepoint_name), this.getString(R.string.type_timepoint_desc)),
 
                 AttributePresetInfo(OTAttribute.TYPE_TIME, R.drawable.field_icon_time_hour, this.getString(R.string.type_timepoint_time_name), this.getString(R.string.type_timepoint_time_desc),
-                        { tracker, columnName ->
-                            val attr = OTAttribute.createAttribute(tracker, columnName, OTAttribute.TYPE_TIME) as OTTimeAttribute
-                            attr.granularity = OTTimeAttribute.GRANULARITY_MINUTE
-                            attr
+                        { dao, realm ->
+                            OTAttributeManager.getAttributeHelper(OTAttributeManager.TYPE_TIME)
+                                    .setPropertyValue(OTTimeAttributeHelper.GRANULARITY, OTTimeAttributeHelper.GRANULARITY_MINUTE, dao, realm)
+                            dao
                         }),
 
                 AttributePresetInfo(OTAttribute.TYPE_TIME, R.drawable.field_icon_time_date, this.getString(R.string.type_timepoint_date_name), this.getString(R.string.type_timepoint_date_desc),
-                        { tracker, columnName ->
-                            val attr = OTAttribute.createAttribute(tracker, columnName, OTAttribute.TYPE_TIME) as OTTimeAttribute
-                            attr.granularity = OTTimeAttribute.GRANULARITY_DAY
-                            attr
+                        { dao, realm ->
+                            OTAttributeManager.getAttributeHelper(OTAttributeManager.TYPE_TIME)
+                                    .setPropertyValue(OTTimeAttributeHelper.GRANULARITY, OTTimeAttributeHelper.GRANULARITY_DAY, dao, realm)
+                            dao
                         }),
 
                 AttributePresetInfo(OTAttribute.TYPE_TIMESPAN, R.drawable.field_icon_timer, this.getString(R.string.type_timespan_name), this.getString(R.string.type_timespan_desc),
-                        { tracker, columnName ->
-                            (OTAttribute.createAttribute(tracker, columnName, OTAttribute.TYPE_TIMESPAN) as OTTimeSpanAttribute).apply {
-                                setPropertyValue(OTTimeSpanAttribute.PROPERTY_GRANULARITY, OTTimeSpanAttribute.GRANULARITY_MINUTE)
-                            }
+                        { dao, realm ->
+                            OTAttributeManager.getAttributeHelper(OTAttributeManager.TYPE_TIMESPAN)
+                                    .setPropertyValue(OTTimeSpanAttributeHelper.PROPERTY_GRANULARITY, OTTimeSpanAttributeHelper.GRANULARITY_MINUTE, dao, realm)
+                            dao
                         }),
-                SimpleAttributePresetInfo(OTAttribute.TYPE_TIMESPAN, R.drawable.field_icon_time_range_date, this.getString(R.string.type_timespan_date_name), this.getString(R.string.type_timespan_date_desc)),
+                AttributePresetInfo(OTAttribute.TYPE_TIMESPAN, R.drawable.field_icon_time_range_date, this.getString(R.string.type_timespan_date_name), this.getString(R.string.type_timespan_date_desc),
+                        { dao, realm ->
+                            OTAttributeManager.getAttributeHelper(OTAttributeManager.TYPE_TIMESPAN)
+                                    .setPropertyValue(OTTimeSpanAttributeHelper.PROPERTY_GRANULARITY, OTTimeSpanAttributeHelper.GRANULARITY_DAY, dao, realm)
+                            dao
+                        }),
                 SimpleAttributePresetInfo(OTAttribute.TYPE_LOCATION, R.drawable.field_icon_location, this.getString(R.string.type_location_name), this.getString(R.string.type_location_desc)),
                 SimpleAttributePresetInfo(OTAttribute.TYPE_IMAGE, R.drawable.field_icon_image, this.getString(R.string.type_image_name), this.getString(R.string.type_image_desc)),
                 SimpleAttributePresetInfo(OTAttribute.TYPE_AUDIO, R.drawable.field_icon_audio, this.getString(R.string.type_audio_record_name), this.getString(R.string.type_audio_record_desc)),
 
                 AttributePresetInfo(OTAttribute.TYPE_CHOICE, R.drawable.field_icon_singlechoice, this.getString(R.string.type_single_choice_name), this.getString(R.string.type_single_choice_desc),
-                        { tracker, columnName ->
-                            val attr = OTAttribute.createAttribute(tracker, columnName, OTAttribute.TYPE_CHOICE) as OTChoiceAttribute
-                            attr.allowedMultiSelection = false
-                            attr
+                        { dao, realm ->
+                            OTAttributeManager.getAttributeHelper(OTAttributeManager.TYPE_CHOICE)
+                                    .setPropertyValue(OTChoiceAttributeHelper.PROPERTY_MULTISELECTION, false, dao, realm)
+                            dao
                         }),
 
                 AttributePresetInfo(OTAttribute.TYPE_CHOICE, R.drawable.field_icon_multiplechoice, this.getString(R.string.type_multiple_choices_name), this.getString(R.string.type_multiple_choices_desc),
-                        { tracker, columnName ->
-                            val attr = OTAttribute.createAttribute(tracker, columnName, OTAttribute.TYPE_CHOICE) as OTChoiceAttribute
-                            attr.allowedMultiSelection = true
-                            attr
+                        { dao, realm ->
+                            OTAttributeManager.getAttributeHelper(OTAttributeManager.TYPE_CHOICE)
+                                    .setPropertyValue(OTChoiceAttributeHelper.PROPERTY_MULTISELECTION, true, dao, realm)
+                            dao
                         })
 
         )
