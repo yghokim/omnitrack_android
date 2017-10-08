@@ -44,7 +44,7 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
         const val SAVE_RESULT_EDIT = 2
         const val SAVE_RESULT_FAIL = 0
 
-        fun convertRealmEntryListToDictionary(realmList: RealmList<OTKeyStringValueEntryDAO>): Map<String, String> {
+        fun convertRealmEntryListToDictionary(realmList: RealmList<OTStringStringEntryDAO>): Map<String, String> {
             val table = Hashtable<String, String>()
             for (entryDAO in realmList) {
                 table[entryDAO.key] = entryDAO.value
@@ -54,11 +54,11 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
 
         fun convertDictionaryToRealmList(realm: Realm,
                                          dictionary: Map<String, String>,
-                                         realmList: RealmList<OTKeyStringValueEntryDAO>,
+                                         realmList: RealmList<OTStringStringEntryDAO>,
                                          valueConverter: ((String) -> String)? = null) {
             for (entry in dictionary) {
                 val entryDao = realmList.find { it.key == entry.key }
-                        ?: realm.createObject(OTKeyStringValueEntryDAO::class.java, UUID.randomUUID().toString()).apply { realmList.add(this) }
+                        ?: realm.createObject(OTStringStringEntryDAO::class.java, UUID.randomUUID().toString()).apply { realmList.add(this) }
                 entryDao.key = entry.key
                 entryDao.value = valueConverter?.invoke(entry.value) ?: entry.value
             }

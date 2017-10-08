@@ -29,7 +29,7 @@ open class OTItemDAO : RealmObject() {
 
     var source: String? = null
 
-    var fieldValueEntries = RealmList<OTKeyStringValueEntryDAO>()
+    var fieldValueEntries = RealmList<OTStringStringEntryDAO>()
 
     var synchronizedAt: Long? = null // store server time of when synchronized perfectly.
 
@@ -48,13 +48,6 @@ open class OTItemDAO : RealmObject() {
     fun serializedValueTable(): Map<String, String> {
         return RealmDatabaseManager.convertRealmEntryListToDictionary(fieldValueEntries)
     }
-}
-
-open class OTKeyStringValueEntryDAO : RealmObject() {
-    @PrimaryKey
-    var id: String = ""
-    var key: String = ""
-    var value: String? = null
 }
 
 object RealmItemHelper {
