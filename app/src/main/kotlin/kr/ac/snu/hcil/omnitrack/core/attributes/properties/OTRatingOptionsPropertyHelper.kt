@@ -18,7 +18,7 @@ class OTRatingOptionsPropertyHelper : OTPropertyHelper<RatingOptions>() {
         return Gson().fromJson(serialized, RatingOptions::class.java)
     }
 
-    override fun onBuildView(context: Context): APropertyView<RatingOptions> {
+    override fun makeView(context: Context): APropertyView<RatingOptions> {
         return RatingOptionsPropertyView(context, null)
     }
 }

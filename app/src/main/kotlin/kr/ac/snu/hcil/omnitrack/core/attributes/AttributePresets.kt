@@ -1,16 +1,16 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes
 
-import kr.ac.snu.hcil.omnitrack.core.OTTracker
+import io.realm.Realm
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 
 /**
  * Created by younghokim on 16. 8. 13..
  */
 
 
-open class AttributePresetInfo(val typeId: Int, val iconId: Int, val name: String, val description: String?, internal val creater: ((tracker: OTTracker, columnName: String) -> OTAttribute<out Any>))
+open class AttributePresetInfo(val typeId: Int, val iconId: Int, val name: String, val description: String?, internal val processor: ((OTAttributeDAO, Realm) -> OTAttributeDAO))
 
 class SimpleAttributePresetInfo(typeId: Int, iconId: Int, name: String, description: String?) : AttributePresetInfo(typeId, iconId, name, description,
-        {
-            tracker, columnName ->
-            OTAttribute.createAttribute(tracker, columnName, typeId)
+        { dao, realm ->
+            dao
         })

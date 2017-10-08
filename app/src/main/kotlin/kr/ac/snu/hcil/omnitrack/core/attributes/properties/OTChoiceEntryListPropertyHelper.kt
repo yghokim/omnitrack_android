@@ -39,7 +39,7 @@ class OTChoiceEntryListPropertyHelper : OTPropertyHelper<UniqueStringEntryList>(
         }
     }
 
-    override fun onBuildView(context: Context): APropertyView<UniqueStringEntryList> {
+    override fun makeView(context: Context): APropertyView<UniqueStringEntryList> {
         return ChoiceEntryListPropertyView(context, null)
     }
 

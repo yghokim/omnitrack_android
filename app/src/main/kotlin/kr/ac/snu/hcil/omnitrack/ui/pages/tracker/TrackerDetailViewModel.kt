@@ -15,6 +15,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.utils.move
 import org.jetbrains.anko.collections.forEachWithIndex
 import rx.subjects.BehaviorSubject
+import rx.subjects.PublishSubject
 import rx.subscriptions.CompositeSubscription
 import java.util.*
 import kotlin.collections.HashSet
@@ -69,38 +70,6 @@ class TrackerDetailViewModel : ViewModel() {
 
     private val removedAttributes = HashSet<AttributeInformationViewModel>()
 
-    /*
-        private var attributeRealmResults: RealmResults<OTAttributeDAO>? = null
-
-        private val attributeListChangedListener = object: OrderedRealmCollectionChangeListener<RealmResults<OTAttributeDAO>>{
-            override fun onChange(snapshot: RealmResults<OTAttributeDAO>, changeSet: OrderedCollectionChangeSet?) {
-                println("Attribute list: ${snapshot.size}")
-
-                if(changeSet == null)
-                {
-                    //first time emission
-                    clearCurrentAttributeList()
-                    currentAttributeViewModelList.addAll(
-                            snapshot.map { AttributeInformationViewModel(it, realm) }
-                    )
-                }
-                else{
-                    //deal with deletions
-                    val removes = changeSet.deletions.map { i -> currentAttributeViewModelList[i] }
-                    removes.forEach { it.unregister() }
-                    currentAttributeViewModelList.removeAll(removes)
-
-                    //deal with additions
-                    val newDaos = changeSet.insertions.map { i -> snapshot[i] }
-                    currentAttributeViewModelList.addAll(
-                            newDaos.map { AttributeInformationViewModel(it, realm) }
-                    )
-                }
-
-                attributeViewModelListObservable.onNext(currentAttributeViewModelList)
-            }
-        }
-    */
     private val currentAttributeViewModelList = ArrayList<AttributeInformationViewModel>()
 
     fun init(trackerId: String?) {
@@ -133,12 +102,14 @@ class TrackerDetailViewModel : ViewModel() {
         }
     }
 
-    fun addNewAttribute(name: String, type: Int) {
+    fun addNewAttribute(name: String, type: Int, processor: ((OTAttributeDAO, Realm) -> OTAttributeDAO)? = null) {
         val newDao = OTAttributeDAO()
         newDao.objectId = UUID.randomUUID().toString()
         newDao.name = name
         newDao.type = type
         newDao.trackerId = trackerId
+        newDao.initializePropertiesWithDefaults(realm)
+        processor?.invoke(newDao, realm)
 
         currentAttributeViewModelList.add(AttributeInformationViewModel(newDao, realm))
         attributeViewModelListObservable.onNext(currentAttributeViewModelList)
@@ -245,6 +216,13 @@ class TrackerDetailViewModel : ViewModel() {
         val iconObservable = BehaviorSubject.create<Int>(R.drawable.icon_small_longtext)
         val connectionObservable = BehaviorSubject.create<OTConnection>()
 
+        val onPropertyChanged = PublishSubject.create<Long>()
+
+        val internalSubscription = CompositeSubscription()
+
+        //key, dbId/serializedValue
+        private val propertyTable = Hashtable<String, Pair<String, String>>()
+
         var name: String
             get() = nameObservable.value
             set(value) {
@@ -266,11 +244,14 @@ class TrackerDetailViewModel : ViewModel() {
                 attributeDAO.addChangeListener(this)
 
             onChange(attributeDAO)
+
         }
 
         fun unregister() {
             if (isInDatabase)
                 attributeDAO.removeChangeListener(this)
+
+            internalSubscription.clear()
         }
 
         override fun onChange(snapshot: OTAttributeDAO) {
@@ -286,9 +267,49 @@ class TrackerDetailViewModel : ViewModel() {
             }
         }
 
+        fun makeFrontalChangesToDao(): OTAttributeDAO {
+            val dao = OTAttributeDAO()
+            dao.objectId = attributeDAO.objectId
+            dao.type = attributeDAO.type
+            dao.localId = attributeDAO.localId
+            dao.position = attributeDAO.position
+            dao.trackerId = attributeDAO.trackerId
+            dao.updatedAt = attributeDAO.updatedAt
+            dao.isRequired = attributeDAO.isRequired
+            dao.name = name
+            for (entry in propertyTable) {
+                dao.setPropertySerializedValue(entry.key, entry.value.second, realm)
+            }
+
+            dao.serializedConnection = connectionObservable.value?.getSerializedString()
+
+            return dao
+        }
+
+        fun applyDaoChangesToFront(editedDao: OTAttributeDAO) {
+            name = editedDao.name
+            propertyTable.clear()
+            var changed = false
+            editedDao.properties.forEach { entry ->
+                if (propertyTable[entry.key] != Pair(entry.id, entry.value!!)) {
+                    propertyTable[entry.key] = Pair(entry.id, entry.value!!)
+                    changed = true
+                }
+            }
+
+            val helper = OTAttributeManager.getAttributeHelper(editedDao.type)
+            icon = helper.getTypeSmallIconResourceId(editedDao)
+            if (changed) {
+                onPropertyChanged.onNext(System.currentTimeMillis())
+            }
+        }
+
         fun applyChanges() {
             attributeDAO.name = nameObservable.value
             attributeDAO.updatedAt = System.currentTimeMillis()
+            for (entry in propertyTable) {
+                attributeDAO.setPropertySerializedValue(entry.key, entry.value.second, realm)
+            }
         }
 
         fun saveToRealm() {
