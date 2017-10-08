@@ -154,12 +154,10 @@ class OTRatingAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrac
     override fun applyValueToViewForItemList(value: Any?, view: View): Single<Boolean> {
         return Single.defer {
             if (view is StarRatingView && value is Float) {
-                if (value is Float) {
-                    view.score = value
-                    view.allowIntermediate = allowIntermediate
-                    view.levels = level.maxScore
-                    Single.just(true)
-                } else Single.just(false)
+                view.score = value
+                view.allowIntermediate = allowIntermediate
+                view.levels = level.maxScore
+                Single.just(true)
             } else if (view is StarScoreView && value is Float) {
                 view.setScore(value, ratingOptions.starLevels.maxScore.toFloat())
                 Single.just(true)

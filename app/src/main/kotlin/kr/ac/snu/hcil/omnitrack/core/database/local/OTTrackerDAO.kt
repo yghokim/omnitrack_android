@@ -6,7 +6,6 @@ import io.realm.RealmObject
 import io.realm.annotations.Index
 import io.realm.annotations.PrimaryKey
 import io.realm.exceptions.RealmException
-import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import java.util.*
 
@@ -31,7 +30,7 @@ open class OTTrackerDAO : RealmObject() {
     var attributes = RealmList<OTAttributeDAO>()
     var removedAttributes = RealmList<OTAttributeDAO>()
 
-    var creationFlags = RealmList<OTKeyStringValueEntryDAO>()
+    var creationFlags = RealmList<OTStringStringEntryDAO>()
     var isEditable: Boolean = true
 
     var userCreatedAt: Long = System.currentTimeMillis()
@@ -40,28 +39,6 @@ open class OTTrackerDAO : RealmObject() {
     var removed: Boolean = false
 
     val creationFlagsMap: Map<String, String> get() = RealmDatabaseManager.convertRealmEntryListToDictionary(creationFlags)
-
-
-    companion object {
-        fun convertDaoToTracker(dao: OTTrackerDAO): OTTracker {
-            return OTTracker(dao.objectId, dao.name, dao.color, dao.isBookmarked,
-                    dao.isEditable, dao.attributeLocalKeySeed,
-                    dao.attributes.map { attrDao ->
-                        OTAttribute.Companion.createAttribute(
-                                attrDao.objectId,
-                                attrDao.localId,
-                                null,
-                                attrDao.name,
-                                attrDao.isRequired,
-                                attrDao.type,
-                                attrDao.serializedProperties,
-                                attrDao.serializedConnection
-                        )
-                    },
-                    dao.creationFlagsMap,
-                    dao.position)
-        }
-    }
 }
 
 
@@ -81,15 +58,26 @@ open class OTAttributeDAO : RealmObject() {
     var serializedConnection: String? = null
     var type: Int = -1
     var isRequired: Boolean = false
-    var properties = RealmList<OTKeyStringValueEntryDAO>()
+    var properties = RealmList<OTStringStringEntryDAO>()
 
     var userCreatedAt: Long = System.currentTimeMillis()
     var updatedAt: Long = System.currentTimeMillis()
 
-    val serializedProperties: Map<String, String>?
-        get() = if (properties.isNotEmpty()) {
-            RealmDatabaseManager.convertRealmEntryListToDictionary(properties)
-        } else null
+    fun setPropertySerializedValue(key: String, serializedValue: String, realm: Realm) {
+        val match = properties.find { it.key == key }
+        if (match != null) {
+            match.value = serializedValue
+        } else {
+            val newProperty = realm.createObject(OTStringStringEntryDAO::class.java, UUID.randomUUID().toString())
+            newProperty.key = key
+            newProperty.value = serializedValue
+            properties.add(newProperty)
+        }
+    }
+
+    fun getPropertySerializedValue(key: String): String? {
+        return properties.find { it.key == key }?.value
+    }
 
     companion object {
         fun convertAttributeToDAO(attribute: OTAttribute<*>, position: Int, realm: Realm, dao: OTAttributeDAO?): OTAttributeDAO {

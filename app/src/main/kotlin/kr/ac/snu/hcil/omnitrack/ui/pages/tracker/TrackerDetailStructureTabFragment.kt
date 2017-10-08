@@ -25,6 +25,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.AttributePresetInfo
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.database.EventLoggingManager
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.common.AdapterLinearLayout
@@ -412,19 +413,22 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                 }
             }
 
+
             fun bindAttribute(attributeViewModel: TrackerDetailViewModel.AttributeInformationViewModel) {
                 typeIconView.setImageResource(attributeViewModel.icon)
                 columnNameView.text = attributeViewModel.name
+
+                requiredMarker.visibility = View.INVISIBLE
                 /*
                 requiredMarker.visibility = if (attribute.isRequired) {
                     View.VISIBLE
                 } else {
                     View.INVISIBLE
-                }
+                }*/
 
                 previewContainer.alpha = 0.5f
-                preview = attribute.getInputView(context, true, preview)
 
+                /*
                 connectionIndicatorStubProxy.onBind(attribute)
 
                 val propertySub =
@@ -442,6 +446,13 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                 viewHolderSubscriptions.add(
                         attributeViewModel.iconObservable.subscribe { args ->
                             typeIconView.setImageResource(args)
+                        }
+                )
+
+                viewHolderSubscriptions.add(
+                        attributeViewModel.typeObservable.subscribe { args ->
+
+                            preview = OTAttributeManager.getAttributeHelper(args).getInputView(context, true, attributeViewModel.attributeDAO, preview)
                         }
                 )
 

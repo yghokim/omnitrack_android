@@ -7,6 +7,10 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.*
  * Created by Young-Ho on 10/7/2017.
  */
 object OTAttributeManager {
+
+    const val VIEW_FOR_ITEM_LIST_CONTAINER_TYPE_MULTILINE = 0
+    const val VIEW_FOR_ITEM_LIST_CONTAINER_TYPE_SINGLELINE = 1
+
     const val TYPE_NUMBER = 0
     const val TYPE_TIME = 1
     const val TYPE_TIMESPAN = 2
