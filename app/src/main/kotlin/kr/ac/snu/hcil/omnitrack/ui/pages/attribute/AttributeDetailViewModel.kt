@@ -69,7 +69,7 @@ class AttributeDetailViewModel : ViewModel() {
             this.attributeDao = attributeDao
             if (attributeDao != null) {
                 name = attributeDao.name
-                connection = attributeDao.serializedConnection?.let { OTConnection(it) }
+                connection = attributeDao.serializedConnection?.let { OTConnection.fromJson(it) }
 
                 if (typeObservable.value != attributeDao.type)
                     typeObservable.onNext(attributeDao.type)
