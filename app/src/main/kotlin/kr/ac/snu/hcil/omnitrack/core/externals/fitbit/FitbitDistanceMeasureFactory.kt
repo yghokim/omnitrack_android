@@ -1,7 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.fitbit
 
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
@@ -27,7 +26,7 @@ object FitbitDistanceMeasureFactory : OTMeasureFactory("dist") {
 
     override val supportedConditionerTypes: IntArray = CONDITIONERS_FOR_SINGLE_NUMERIC_VALUE
 
-    override val exampleAttributeType: Int = OTAttribute.TYPE_NUMBER
+    override val exampleAttributeType: Int = OTAttributeManager.TYPE_NUMBER
 
     override fun isAttachableTo(attribute: OTAttributeDAO): Boolean {
         return attribute.type == OTAttributeManager.TYPE_NUMBER

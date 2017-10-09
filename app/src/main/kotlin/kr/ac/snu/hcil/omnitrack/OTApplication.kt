@@ -440,12 +440,12 @@ class OTApplication : MultiDexApplication() {
 /*    private fun createUsabilityTestingTrackers(user: OTUser) {
 
         val bookTracker = user.newTracker("독서록", true)
-        bookTracker.attributes += OTAttribute.createAttribute(bookTracker, "제목", OTAttribute.TYPE_SHORT_TEXT)
-        bookTracker.attributes += OTAttribute.createAttribute(bookTracker, "날짜", OTAttribute.TYPE_TIME).apply {
+        bookTracker.attributes += OTAttribute.createAttribute(bookTracker, "제목", OTAttributeManager.TYPE_SHORT_TEXT)
+        bookTracker.attributes += OTAttribute.createAttribute(bookTracker, "날짜", OTAttributeManager.TYPE_TIME).apply {
             this.setPropertyValue(OTTimeAttribute.GRANULARITY, OTTimeAttribute.GRANULARITY_DAY)
         }
-        bookTracker.attributes += OTAttribute.createAttribute(bookTracker, "감상평", OTAttribute.TYPE_LONG_TEXT)
-        bookTracker.attributes += OTAttribute.createAttribute(bookTracker, "별점", OTAttribute.TYPE_RATING)
+        bookTracker.attributes += OTAttribute.createAttribute(bookTracker, "감상평", OTAttributeManager.TYPE_LONG_TEXT)
+        bookTracker.attributes += OTAttribute.createAttribute(bookTracker, "별점", OTAttributeManager.TYPE_RATING)
 
         //===================================================================================================================================
         val stepComparisonTracker = user.newTracker("걸음 수 비교", true)
@@ -456,10 +456,10 @@ class OTApplication : MultiDexApplication() {
             this.fractionPart = 0
         }
 
-        val fitbitAttribute = OTAttribute.createAttribute(stepComparisonTracker, "Fitbit", OTAttribute.TYPE_NUMBER) as OTNumberAttribute
+        val fitbitAttribute = OTAttribute.createAttribute(stepComparisonTracker, "Fitbit", OTAttributeManager.TYPE_NUMBER) as OTNumberAttribute
         fitbitAttribute.numberStyle = stepNumberStyle
 
-        val googleFitAttribute = OTAttribute.createAttribute(stepComparisonTracker, "Google Fit", OTAttribute.TYPE_NUMBER) as OTNumberAttribute
+        val googleFitAttribute = OTAttribute.createAttribute(stepComparisonTracker, "Google Fit", OTAttributeManager.TYPE_NUMBER) as OTNumberAttribute
         googleFitAttribute.numberStyle = stepNumberStyle
 
         stepComparisonTracker.attributes.add(fitbitAttribute)
@@ -469,11 +469,11 @@ class OTApplication : MultiDexApplication() {
         //===================================================================================================================================
         val diaryTracker = user.newTracker("일기", true)
 
-        diaryTracker.attributes += OTAttribute.createAttribute(diaryTracker, "날짜", OTAttribute.TYPE_TIME).apply {
+        diaryTracker.attributes += OTAttribute.createAttribute(diaryTracker, "날짜", OTAttributeManager.TYPE_TIME).apply {
             this.setPropertyValue(OTTimeAttribute.GRANULARITY, OTTimeAttribute.GRANULARITY_DAY)
         }
 
-        diaryTracker.attributes += OTAttribute.createAttribute(diaryTracker, "기분", OTAttribute.TYPE_RATING).apply {
+        diaryTracker.attributes += OTAttribute.createAttribute(diaryTracker, "기분", OTAttributeManager.TYPE_RATING).apply {
             this.setPropertyValue(OTRatingAttribute.PROPERTY_OPTIONS, kr.ac.snu.hcil.omnitrack.utils.RatingOptions().apply {
                 this.allowIntermediate = true
                 this.leftLabel = "매우 나쁨"
@@ -483,21 +483,21 @@ class OTApplication : MultiDexApplication() {
             })
         }
 
-        diaryTracker.attributes += OTAttribute.createAttribute(diaryTracker, "날씨", OTAttribute.TYPE_CHOICE).apply {
+        diaryTracker.attributes += OTAttribute.createAttribute(diaryTracker, "날씨", OTAttributeManager.TYPE_CHOICE).apply {
             this.setPropertyValue(OTChoiceAttribute.PROPERTY_ENTRIES, UniqueStringEntryList("맑음", "흐림", "비", "눈"))
             this.setPropertyValue(OTChoiceAttribute.PROPERTY_MULTISELECTION, false)
         }
-        diaryTracker.attributes += OTAttribute.Companion.createAttribute(diaryTracker, "제목", OTAttribute.TYPE_SHORT_TEXT)
-        diaryTracker.attributes += OTAttribute.createAttribute(diaryTracker, "내용", OTAttribute.TYPE_LONG_TEXT)
+        diaryTracker.attributes += OTAttribute.Companion.createAttribute(diaryTracker, "제목", OTAttributeManager.TYPE_SHORT_TEXT)
+        diaryTracker.attributes += OTAttribute.createAttribute(diaryTracker, "내용", OTAttributeManager.TYPE_LONG_TEXT)
 
 
         //=====================================================================================================================================
         val stressTracker = user.newTracker("스트레스", true)
-        stressTracker.attributes += OTAttribute.createAttribute(stressTracker, "시간", OTAttribute.TYPE_TIME).apply {
+        stressTracker.attributes += OTAttribute.createAttribute(stressTracker, "시간", OTAttributeManager.TYPE_TIME).apply {
             this.setPropertyValue(OTTimeAttribute.GRANULARITY, OTTimeAttribute.GRANULARITY_MINUTE)
         }
 
-        stressTracker.attributes += OTAttribute.createAttribute(stressTracker, "기분", OTAttribute.TYPE_RATING).apply {
+        stressTracker.attributes += OTAttribute.createAttribute(stressTracker, "기분", OTAttributeManager.TYPE_RATING).apply {
             this.setPropertyValue(OTRatingAttribute.PROPERTY_OPTIONS, kr.ac.snu.hcil.omnitrack.utils.RatingOptions().apply {
                 this.allowIntermediate = true
                 this.leftLabel = "매우 나쁨"
@@ -507,17 +507,17 @@ class OTApplication : MultiDexApplication() {
             })
         }
 
-        stressTracker.attributes += OTAttribute.createAttribute(stressTracker, "이유", OTAttribute.TYPE_LONG_TEXT)
+        stressTracker.attributes += OTAttribute.createAttribute(stressTracker, "이유", OTAttributeManager.TYPE_LONG_TEXT)
 
         //=====================================================================================================================================
         val foodTracker = user.newTracker("맛집", true)
-        foodTracker.attributes += OTAttribute.createAttribute(foodTracker, "식당명", OTAttribute.TYPE_SHORT_TEXT)
-        foodTracker.attributes += OTAttribute.createAttribute(foodTracker, "먹은 날", OTAttribute.TYPE_TIME).apply {
+        foodTracker.attributes += OTAttribute.createAttribute(foodTracker, "식당명", OTAttributeManager.TYPE_SHORT_TEXT)
+        foodTracker.attributes += OTAttribute.createAttribute(foodTracker, "먹은 날", OTAttributeManager.TYPE_TIME).apply {
             this.setPropertyValue(OTTimeAttribute.GRANULARITY, OTTimeAttribute.GRANULARITY_DAY)
         }
-        foodTracker.attributes += OTAttribute.createAttribute(foodTracker, "위치", OTAttribute.TYPE_LOCATION)
-        foodTracker.attributes += OTAttribute.createAttribute(foodTracker, "사진", OTAttribute.TYPE_IMAGE)
-        foodTracker.attributes += OTAttribute.createAttribute(foodTracker, "평점", OTAttribute.TYPE_RATING)
+        foodTracker.attributes += OTAttribute.createAttribute(foodTracker, "위치", OTAttributeManager.TYPE_LOCATION)
+        foodTracker.attributes += OTAttribute.createAttribute(foodTracker, "사진", OTAttributeManager.TYPE_IMAGE)
+        foodTracker.attributes += OTAttribute.createAttribute(foodTracker, "평점", OTAttributeManager.TYPE_RATING)
 
 
         //dbHelper.save(user)
@@ -528,18 +528,18 @@ class OTApplication : MultiDexApplication() {
         //====================================================================================================================================================
         val coffeeTracker = user.newTracker("Coffee", true)
         coffeeTracker.isOnShortcut = true
-        coffeeTracker.attributes.add(OTAttribute.Companion.createAttribute(coffeeTracker, "Name", OTAttribute.TYPE_SHORT_TEXT))
-        coffeeTracker.attributes.add(OTAttribute.Companion.createAttribute(coffeeTracker, "Drank At", OTAttribute.TYPE_TIME))
+        coffeeTracker.attributes.add(OTAttribute.Companion.createAttribute(coffeeTracker, "Name", OTAttributeManager.TYPE_SHORT_TEXT))
+        coffeeTracker.attributes.add(OTAttribute.Companion.createAttribute(coffeeTracker, "Drank At", OTAttributeManager.TYPE_TIME))
 
         val waterTracker = user.newTracker("Water", true)
-        waterTracker.attributes.add(OTAttribute.Companion.createAttribute(waterTracker, "Drank At", OTAttribute.TYPE_TIME))
+        waterTracker.attributes.add(OTAttribute.Companion.createAttribute(waterTracker, "Drank At", OTAttributeManager.TYPE_TIME))
 
 
         //====================================================================================================================================================
         val sleepTracker = user.newTracker("Sleep", true)
         sleepTracker.isOnShortcut = true
 
-        val sleepTimeAttribute = OTAttribute.Companion.createAttribute(sleepTracker, "Sleep Duration", OTAttribute.TYPE_TIMESPAN)
+        val sleepTimeAttribute = OTAttribute.Companion.createAttribute(sleepTracker, "Sleep Duration", OTAttributeManager.TYPE_TIMESPAN)
         sleepTimeAttribute.setPropertyValue(OTTimeSpanAttribute.PROPERTY_GRANULARITY, OTTimeAttribute.GRANULARITY_MINUTE)
 
         val sleepTimeConnection = OTConnection()
@@ -548,38 +548,38 @@ class OTApplication : MultiDexApplication() {
         sleepTimeAttribute.valueConnection = sleepTimeConnection
 
         sleepTracker.attributes.add(sleepTimeAttribute)
-        sleepTracker.attributes.add(OTAttribute.Companion.createAttribute(sleepTracker, "Quality", OTAttribute.TYPE_RATING))
-        sleepTracker.attributes.add(OTAttribute.Companion.createAttribute(sleepTracker, "Memo", OTAttribute.TYPE_LONG_TEXT))
+        sleepTracker.attributes.add(OTAttribute.Companion.createAttribute(sleepTracker, "Quality", OTAttributeManager.TYPE_RATING))
+        sleepTracker.attributes.add(OTAttribute.Companion.createAttribute(sleepTracker, "Memo", OTAttributeManager.TYPE_LONG_TEXT))
 
         //====================================================================================================================================================
         val beerTracker = user.newTracker("Beer", true)
 
-        beerTracker.attributes.add(OTAttribute.Companion.createAttribute(beerTracker, "Photo", OTAttribute.TYPE_IMAGE))
-        val dateAttribute = OTAttribute.createAttribute(beerTracker, "Date", OTAttribute.TYPE_TIME)
+        beerTracker.attributes.add(OTAttribute.Companion.createAttribute(beerTracker, "Photo", OTAttributeManager.TYPE_IMAGE))
+        val dateAttribute = OTAttribute.createAttribute(beerTracker, "Date", OTAttributeManager.TYPE_TIME)
         dateAttribute.setPropertyValue(OTTimeAttribute.GRANULARITY, OTTimeAttribute.GRANULARITY_DAY)
         beerTracker.attributes.add(dateAttribute)
 
-        beerTracker.attributes.add(OTAttribute.Companion.createAttribute(beerTracker, "Name", OTAttribute.TYPE_SHORT_TEXT))
+        beerTracker.attributes.add(OTAttribute.Companion.createAttribute(beerTracker, "Name", OTAttributeManager.TYPE_SHORT_TEXT))
 
-        val typeAttribute = OTAttribute.createAttribute(beerTracker, "Type", OTAttribute.TYPE_CHOICE)
+        val typeAttribute = OTAttribute.createAttribute(beerTracker, "Type", OTAttributeManager.TYPE_CHOICE)
         typeAttribute.setPropertyValue(OTChoiceAttribute.PROPERTY_ENTRIES, UniqueStringEntryList("Lager", "Stout", "Ale", "Hybrid"))
         typeAttribute.setPropertyValue(OTChoiceAttribute.PROPERTY_MULTISELECTION, false)
         beerTracker.attributes.add(typeAttribute)
 
-        beerTracker.attributes.add(OTAttribute.Companion.createAttribute(beerTracker, "Score", OTAttribute.TYPE_RATING))
-        beerTracker.attributes.add(OTAttribute.Companion.createAttribute(beerTracker, "Review", OTAttribute.TYPE_LONG_TEXT))
+        beerTracker.attributes.add(OTAttribute.Companion.createAttribute(beerTracker, "Score", OTAttributeManager.TYPE_RATING))
+        beerTracker.attributes.add(OTAttribute.Companion.createAttribute(beerTracker, "Review", OTAttributeManager.TYPE_LONG_TEXT))
 
 
         //====================================================================================================================================================
         val stepComparisonTracker = user.newTracker("Step Devices", true)
-        val fitbitAttribute = OTAttribute.createAttribute(stepComparisonTracker, "Fitbit", OTAttribute.TYPE_NUMBER) as OTNumberAttribute
+        val fitbitAttribute = OTAttribute.createAttribute(stepComparisonTracker, "Fitbit", OTAttributeManager.TYPE_NUMBER) as OTNumberAttribute
         fitbitAttribute.numberStyle.fractionPart = 0
         val fitbitStepConnection = OTConnection()
         fitbitStepConnection.source = FitbitStepCountMeasureFactory.makeMeasure()
         fitbitStepConnection.rangedQuery = OTTimeRangeQuery(OTTimeRangeQuery.TYPE_PIVOT_TIMESTAMP, OTTimeRangeQuery.BIN_SIZE_DAY, -1)
         fitbitAttribute.valueConnection = fitbitStepConnection
 
-        val misfitAttribute = OTAttribute.createAttribute(stepComparisonTracker, "MisFit", OTAttribute.TYPE_NUMBER) as OTNumberAttribute
+        val misfitAttribute = OTAttribute.createAttribute(stepComparisonTracker, "MisFit", OTAttributeManager.TYPE_NUMBER) as OTNumberAttribute
         misfitAttribute.numberStyle.fractionPart = 0
         val misfitStepConnection = OTConnection()
 
@@ -587,7 +587,7 @@ class OTApplication : MultiDexApplication() {
         misfitStepConnection.rangedQuery = OTTimeRangeQuery(OTTimeRangeQuery.TYPE_PIVOT_TIMESTAMP, OTTimeRangeQuery.BIN_SIZE_DAY, -1)
         misfitAttribute.valueConnection = misfitStepConnection
 
-        val googleFitAttribute = OTAttribute.createAttribute(stepComparisonTracker, "Google Fit", OTAttribute.TYPE_NUMBER) as OTNumberAttribute
+        val googleFitAttribute = OTAttribute.createAttribute(stepComparisonTracker, "Google Fit", OTAttributeManager.TYPE_NUMBER) as OTNumberAttribute
         googleFitAttribute.numberStyle.fractionPart = 0
         val googleFitConnection = OTConnection()
         googleFitConnection.source = GoogleFitStepsFactory.makeMeasure()

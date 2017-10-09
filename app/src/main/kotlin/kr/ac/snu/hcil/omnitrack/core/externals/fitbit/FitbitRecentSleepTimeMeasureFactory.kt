@@ -1,7 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.fitbit
 
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
@@ -35,7 +34,7 @@ object FitbitRecentSleepTimeMeasureFactory : OTMeasureFactory("slp") {
     override val isDemandingUserInput: Boolean = false
 
 
-    override val exampleAttributeType: Int = OTAttribute.TYPE_TIMESPAN
+    override val exampleAttributeType: Int = OTAttributeManager.TYPE_TIMESPAN
 
     override fun makeMeasure(): OTMeasure {
         return FitbitRecentSleepTimeMeasure()

@@ -3,7 +3,6 @@ package kr.ac.snu.hcil.omnitrack.core.externals.microsoft.band
 import com.microsoft.band.sensors.BandHeartRateEvent
 import com.microsoft.band.sensors.BandHeartRateEventListener
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
@@ -20,7 +19,7 @@ class MicrosoftBandHeartRateFactory : OTMeasureFactory("heart") {
     }
 
 
-    override val exampleAttributeType: Int = OTAttribute.TYPE_NUMBER
+    override val exampleAttributeType: Int = OTAttributeManager.TYPE_NUMBER
 
     override val supportedConditionerTypes: IntArray = CONDITIONERS_FOR_SINGLE_NUMERIC_VALUE
 

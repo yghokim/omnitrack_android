@@ -66,11 +66,6 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
         }
     }
 
-
-    private enum class Mode {
-        Edit, New
-    }
-
     private val attributeListAdapter = AttributeListAdapter()
 
     private var builder: OTItemBuilder? = null
@@ -82,7 +77,7 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
 
     private var skipViewValueCaching = false
 
-    private var mode: Mode = Mode.New
+    private var mode: ItemEditionViewModel.ItemMode = ItemEditionViewModel.ItemMode.New
 
     private var activityResultAppliedAttributePosition = -1
 
@@ -170,15 +165,15 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
         fun onModeSet() {
 
             when (mode) {
-                Mode.Edit -> {
+                ItemEditionViewModel.ItemMode.Edit -> {
                     title = String.format(getString(R.string.title_activity_edit_item), tracker.name)
                 }
-                Mode.New -> {
+                ItemEditionViewModel.ItemMode.New -> {
                     title = String.format(resources.getString(R.string.title_activity_new_item), tracker.name)
                 }
             }
 
-            if (mode == Mode.New && activityResultAppliedAttributePosition == -1) {
+            if (mode == ItemEditionViewModel.ItemMode.New && activityResultAppliedAttributePosition == -1) {
                 if (tryRestoreItemBuilderCache(tracker)) {
 
                     clearBuilderCache()
@@ -225,18 +220,18 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
                     OTApplication.app.databaseManager.getItem(tracker, intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM)).subscribe {
                         item ->
                         if (item != null) {
-                            mode = Mode.Edit
+                            mode = ItemEditionViewModel.ItemMode.Edit
                             println("started activity with edit mode")
                             builder = OTItemBuilder(item, tracker)
                             onModeSet()
                         } else {
-                            mode = Mode.New
+                            mode = ItemEditionViewModel.ItemMode.New
                             onModeSet()
                         }
                     }
             )
         } else {
-            mode = Mode.New
+            mode = ItemEditionViewModel.ItemMode.New
             onModeSet()
         }
 
@@ -260,7 +255,7 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
         }
 
 
-        if (mode == Mode.New) {
+        if (mode == ItemEditionViewModel.ItemMode.New) {
             if (!skipViewValueCaching) {
                 if (needsToCacheBuilder())
                     storeItemBuilderCache()
@@ -288,12 +283,12 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
     override fun onRestoredInstanceStateWithTracker(savedInstanceState: Bundle, tracker: OTTracker) {
         super.onRestoredInstanceStateWithTracker(savedInstanceState, tracker)
         println("restore item editing activity instance state")
-        mode = Mode.valueOf(savedInstanceState.getString("mode"))
+        mode = ItemEditionViewModel.ItemMode.valueOf(savedInstanceState.getString("mode"))
         when (mode) {
-            Mode.Edit -> {
+            ItemEditionViewModel.ItemMode.Edit -> {
                 title = String.format(getString(R.string.title_activity_edit_item), tracker.name)
             }
-            Mode.New -> {
+            ItemEditionViewModel.ItemMode.New -> {
                 title = String.format(resources.getString(R.string.title_activity_new_item), tracker.name)
             }
         }

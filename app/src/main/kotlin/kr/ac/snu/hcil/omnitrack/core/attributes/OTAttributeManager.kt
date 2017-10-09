@@ -1,7 +1,14 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes
 
+import android.app.Activity
+import android.content.pm.PackageManager
+import android.support.v4.content.ContextCompat
 import android.util.SparseArray
+import com.afollestad.materialdialogs.MaterialDialog
+import com.tbruyelle.rxpermissions.RxPermissions
+import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.*
+import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 
 /**
  * Created by Young-Ho on 10/7/2017.
@@ -43,5 +50,39 @@ object OTAttributeManager {
             this.attributeCharacteristicsTable.setValueAt(type, fallback)
             return fallback
         } else return characteristics
+    }
+
+    fun showPermissionCheckDialog(activity: Activity, typeId: Int, typeName: String, onGranted: (Boolean) -> Unit, onDenied: (() -> Unit)? = null): MaterialDialog? {
+        val requiredPermissions = OTAttribute.getPermissionsForAttribute(typeId)
+        if (requiredPermissions != null) {
+            val notGrantedPermissions = requiredPermissions.filter { ContextCompat.checkSelfPermission(activity, it) != PackageManager.PERMISSION_GRANTED }
+            if (notGrantedPermissions.isNotEmpty()) {
+                val dialog = DialogHelper.makeYesNoDialogBuilder(activity, activity.resources.getString(R.string.msg_permission_required),
+                        String.format(activity.resources.getString(R.string.msg_format_permission_request_of_field), typeName),
+                        cancelable = false,
+                        onYes = {
+                            val rxPermissions = RxPermissions(activity)
+                            rxPermissions.request(*requiredPermissions)
+                                    .subscribe { granted ->
+                                        if (granted) {
+                                            onGranted.invoke(true)
+                                        } else {
+                                            onDenied?.invoke()
+                                        }
+                                    }
+                        },
+                        onCancel = null,
+                        yesLabel = R.string.msg_allow_permission,
+                        noLabel = R.string.msg_cancel
+                )
+                return dialog.show()
+            } else {
+                onGranted.invoke(false)
+                return null
+            }
+        } else {
+            onGranted.invoke(false)
+            return null
+        }
     }
 }
