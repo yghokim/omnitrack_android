@@ -274,7 +274,7 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
             readPropertiesFromDatabase(propertyData)
 
         if (connectionData != null) {
-            valueConnection = OTConnection(connectionData)
+            valueConnection = OTConnection.fromJson(connectionData)
         }
 
         if (localKey == null && parentTracker != null) {

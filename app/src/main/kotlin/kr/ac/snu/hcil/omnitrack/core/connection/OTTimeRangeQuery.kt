@@ -2,16 +2,57 @@ package kr.ac.snu.hcil.omnitrack.core.connection
 
 import android.content.Context
 import android.text.format.DateUtils
+import com.google.gson.TypeAdapter
+import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonWriter
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilder
-import kr.ac.snu.hcil.omnitrack.utils.serialization.ATypedQueueSerializable
-import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableTypedQueue
 import java.util.*
 
 /**
  * Created by Young-Ho Kim on 2016-08-11
  */
-class OTTimeRangeQuery : ATypedQueueSerializable {
+class OTTimeRangeQuery {
+
+    class TimeRangeQueryTypeAdapter : TypeAdapter<OTTimeRangeQuery>() {
+        override fun write(out: JsonWriter, value: OTTimeRangeQuery) {
+            out.beginObject()
+
+            out.name("mode").value(value.mode)
+            out.name("anchored").value(value.anchorToNow)
+            if (value.isBinAndOffsetAvailable) {
+                out.name("bin_size").value(value.binSize)
+                out.name("bin_offset").value(value.binOffset)
+            }
+
+            if (value.needsLinkedAttribute) {
+                out.name("linked_attr").value(value.linkedAttributeId)
+            }
+
+            out.endObject()
+        }
+
+        override fun read(reader: JsonReader): OTTimeRangeQuery {
+            val out = OTTimeRangeQuery()
+
+            reader.beginObject()
+
+            while (reader.hasNext()) {
+                when (reader.nextName()) {
+                    "mode" -> out.mode = reader.nextInt()
+                    "anchored" -> out.anchorToNow = reader.nextBoolean()
+                    "bin_size" -> out.binSize = reader.nextInt()
+                    "bin_offset" -> out.binOffset = reader.nextInt()
+                    "linked_attr" -> out.linkedAttributeId = reader.nextString()
+                }
+            }
+
+            reader.endObject()
+
+            return out
+        }
+
+    }
 
     companion object {
         const val TYPE_PIVOT_TIMESTAMP = 0
@@ -94,35 +135,6 @@ class OTTimeRangeQuery : ATypedQueueSerializable {
                     other.linkedAttributeId == this.linkedAttributeId
         } else return false
     }
-
-    override fun onSerialize(typedQueue: SerializableTypedQueue) {
-        typedQueue.putInt(mode)
-        typedQueue.putBoolean(anchorToNow)
-        if (isBinAndOffsetAvailable) {
-            typedQueue.putInt(binSize)
-            typedQueue.putInt(binOffset)
-        }
-
-        if (needsLinkedAttribute) {
-            if (linkedAttributeId != null) {
-                typedQueue.putString(linkedAttributeId!!)
-            }
-        }
-    }
-
-    override fun onDeserialize(typedQueue: SerializableTypedQueue) {
-        mode = typedQueue.getInt()
-        anchorToNow = typedQueue.getBoolean()
-        if (isBinAndOffsetAvailable) {
-            binSize = typedQueue.getInt()
-            binOffset = typedQueue.getInt()
-        }
-
-        if (needsLinkedAttribute) {
-            linkedAttributeId = typedQueue.getString()
-        }
-    }
-
 
     fun getRange(@Suppress("UNUSED_PARAMETER") builder: OTItemBuilder): Pair<Long, Long> {
         val start: Long

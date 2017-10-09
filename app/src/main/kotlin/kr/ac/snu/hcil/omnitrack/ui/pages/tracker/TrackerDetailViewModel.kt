@@ -288,7 +288,7 @@ class TrackerDetailViewModel : ViewModel() {
 
             println("serialized connection of dao: ${editedDao.serializedConnection}")
             editedDao.serializedConnection?.let {
-                val connection = OTConnection(it)
+                val connection = OTConnection.fromJson(it)
                 if (connectionObservable.value?.datum != connection) {
                     connectionObservable.onNext(Nullable(connection))
                 }
