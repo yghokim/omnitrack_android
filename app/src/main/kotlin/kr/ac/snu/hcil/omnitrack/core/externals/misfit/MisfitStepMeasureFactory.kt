@@ -2,10 +2,12 @@ package kr.ac.snu.hcil.omnitrack.core.externals.misfit
 
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
-import kr.ac.snu.hcil.omnitrack.utils.Result
+import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableTypedQueue
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Observable
@@ -28,8 +30,8 @@ object MisfitStepMeasureFactory : OTMeasureFactory("step") {
 
     override val exampleAttributeType: Int = OTAttribute.TYPE_NUMBER
 
-    override fun isAttachableTo(attribute: OTAttribute<out Any>): Boolean {
-        return attribute.typeId == OTAttribute.TYPE_NUMBER
+    override fun isAttachableTo(attribute: OTAttributeDAO): Boolean {
+        return attribute.type == OTAttributeManager.TYPE_NUMBER
     }
 
     override val isRangedQueryAvailable: Boolean = true
@@ -57,13 +59,13 @@ object MisfitStepMeasureFactory : OTMeasureFactory("step") {
         constructor() : super()
         constructor(serialized: String) : super(serialized)
 
-        override fun getValueRequest(start: Long, end: Long): Observable<Result<out Any>> {
+        override fun getValueRequest(start: Long, end: Long): Observable<Nullable<out Any>> {
             return Observable.defer {
                 val token = MisfitService.getStoredAccessToken()
                 if (token != null) {
-                    return@defer MisfitApi.getStepsOnDayRequest(token, Date(start), Date(end - 1)) as Observable<Result<out Any>>
+                    return@defer MisfitApi.getStepsOnDayRequest(token, Date(start), Date(end - 1)) as Observable<Nullable<out Any>>
                 } else {
-                    return@defer Observable.error<Result<out Any>>(Exception("no token"))
+                    return@defer Observable.error<Nullable<out Any>>(Exception("no token"))
                 }
             }
         }

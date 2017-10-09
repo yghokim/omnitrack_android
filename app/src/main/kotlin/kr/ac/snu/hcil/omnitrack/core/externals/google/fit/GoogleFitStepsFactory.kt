@@ -9,11 +9,12 @@ import com.google.android.gms.fitness.data.Field
 import com.google.android.gms.fitness.request.DataReadRequest
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
-import kr.ac.snu.hcil.omnitrack.utils.Result
+import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableTypedQueue
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Observable
@@ -50,8 +51,8 @@ object GoogleFitStepsFactory : GoogleFitService.GoogleFitMeasureFactory("step") 
     override val usedAPI: Api<out Api.ApiOptions.NotRequiredOptions> = Fitness.HISTORY_API
     override val usedScope: Scope = Fitness.SCOPE_ACTIVITY_READ
 
-    override fun isAttachableTo(attribute: OTAttribute<out Any>): Boolean {
-        return attribute is OTNumberAttribute
+    override fun isAttachableTo(attribute: OTAttributeDAO): Boolean {
+        return attribute.type == OTAttributeManager.TYPE_NUMBER
     }
 
     override fun makeMeasure(): OTMeasure {
@@ -71,11 +72,11 @@ object GoogleFitStepsFactory : GoogleFitService.GoogleFitMeasureFactory("step") 
         constructor() : super()
         constructor(serialized: String) : super(serialized)
 
-        override fun getValueRequest(start: Long, end: Long): Observable<Result<out Any>> {
+        override fun getValueRequest(start: Long, end: Long): Observable<Nullable<out Any>> {
             println("Requested Google Fit Step Measure")
             return if (factory.getService().state == OTExternalService.ServiceState.ACTIVATED) {
-                GoogleFitService.getConnectedClient().map<Result<out Any>>(object : Func1<GoogleApiClient, Result<out Any>> {
-                    override fun call(client: GoogleApiClient): Result<out Any> {
+                GoogleFitService.getConnectedClient().map<Nullable<out Any>>(object : Func1<GoogleApiClient, Nullable<out Any>> {
+                    override fun call(client: GoogleApiClient): Nullable<out Any> {
                         val request = DataReadRequest.Builder()
                                 .aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
                                 .bucketByTime(1, TimeUnit.DAYS)
@@ -92,11 +93,11 @@ object GoogleFitStepsFactory : GoogleFitService.GoogleFitMeasureFactory("step") 
                             }
                         }
 
-                        return Result(steps)
+                        return Nullable(steps)
                     }
                 }).subscribeOn(Schedulers.io())
             } else {
-                Observable.error<Result<out Any>>(Exception("Service is not activated."))
+                Observable.error<Nullable<out Any>>(Exception("Service is not activated."))
             }
         }
 

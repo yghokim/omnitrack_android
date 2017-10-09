@@ -2,11 +2,13 @@ package kr.ac.snu.hcil.omnitrack.core.externals.fitbit
 
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
-import kr.ac.snu.hcil.omnitrack.utils.Result
+import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.auth.AuthConstants
 import kr.ac.snu.hcil.omnitrack.utils.auth.OAuth2Client
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableTypedQueue
@@ -24,8 +26,8 @@ object FitbitRecentSleepTimeMeasureFactory : OTMeasureFactory("slp") {
         return CONFIGURATOR_FOR_TIMESPAN_ATTRIBUTE
     }
 
-    override fun isAttachableTo(attribute: OTAttribute<out Any>): Boolean {
-        return attribute.typeId == OTAttribute.TYPE_TIMESPAN
+    override fun isAttachableTo(attribute: OTAttributeDAO): Boolean {
+        return attribute.type == OTAttributeManager.TYPE_TIMESPAN
     }
 
     override val isRangedQueryAvailable: Boolean = true
@@ -81,13 +83,13 @@ object FitbitRecentSleepTimeMeasureFactory : OTMeasureFactory("slp") {
         constructor() : super()
         constructor(serialized: String) : super(serialized)
 
-        override fun getValueRequest(start: Long, end: Long): Observable<Result<out Any>> {
+        override fun getValueRequest(start: Long, end: Long): Observable<Nullable<out Any>> {
             val uri = HttpUrl.parse(FitbitApi.makeDailyRequestUrl(FitbitApi.REQUEST_COMMAND_SLEEP, Date(start)))!!.newBuilder()
                     .addQueryParameter("isMainSleep", "true")
                     .build()
             return FitbitService.getRequest(
                     converter,
-                    uri.toString()) as Observable<Result<out Any>>
+                    uri.toString()) as Observable<Nullable<out Any>>
         }
 
         override fun onDeserialize(typedQueue: SerializableTypedQueue) {

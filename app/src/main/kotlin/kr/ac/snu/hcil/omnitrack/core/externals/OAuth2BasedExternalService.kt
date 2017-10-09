@@ -3,7 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.externals
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.dependency.OAuth2LoginDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.dependency.OTSystemDependencyResolver
-import kr.ac.snu.hcil.omnitrack.utils.Result
+import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.auth.OAuth2Client
 import rx.Observable
 
@@ -55,7 +55,7 @@ abstract class OAuth2BasedExternalService(identifier: String, minimumSDK: Int) :
         credential = newCredential
     }
 
-    fun <T> getRequest(converter: OAuth2Client.OAuth2RequestConverter<T>, vararg requestUrls: String): Observable<Result<T>> {
+    fun <T> getRequest(converter: OAuth2Client.OAuth2RequestConverter<T>, vararg requestUrls: String): Observable<Nullable<T>> {
         val credential = credential
         return if (credential != null) {
             authClient.getRequest(credential, converter, this, *requestUrls)

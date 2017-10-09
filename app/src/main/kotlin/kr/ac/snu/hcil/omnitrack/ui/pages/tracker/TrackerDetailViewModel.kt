@@ -12,6 +12,7 @@ import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.move
 import org.jetbrains.anko.collections.forEachWithIndex
 import rx.subjects.BehaviorSubject
@@ -214,7 +215,7 @@ class TrackerDetailViewModel : ViewModel() {
         val nameObservable = BehaviorSubject.create<String>("")
         val typeObservable = BehaviorSubject.create<Int>(-1)
         val iconObservable = BehaviorSubject.create<Int>(R.drawable.icon_small_longtext)
-        val connectionObservable = BehaviorSubject.create<OTConnection>()
+        val connectionObservable = BehaviorSubject.create<Nullable<OTConnection>>()
 
         val onPropertyChanged = PublishSubject.create<Long>()
 
@@ -274,7 +275,7 @@ class TrackerDetailViewModel : ViewModel() {
                 dao.setPropertySerializedValue(entry.key, entry.value.second)
             }
 
-            dao.serializedConnection = connectionObservable.value?.getSerializedString()
+            dao.serializedConnection = connectionObservable.value?.datum?.getSerializedString()
 
             return dao
         }
@@ -283,6 +284,16 @@ class TrackerDetailViewModel : ViewModel() {
             name = editedDao.name
             if (typeObservable.value != editedDao.type) {
                 typeObservable.onNext(editedDao.type)
+            }
+
+            println("serialized connection of dao: ${editedDao.serializedConnection}")
+            editedDao.serializedConnection?.let {
+                val connection = OTConnection(it)
+                if (connectionObservable.value?.datum != connection) {
+                    connectionObservable.onNext(Nullable(connection))
+                }
+            } ?: if (connectionObservable.value?.datum != null) {
+                connectionObservable.onNext(Nullable(null))
             }
 
             propertyTable.clear()
@@ -308,9 +319,8 @@ class TrackerDetailViewModel : ViewModel() {
                 println("set new serialized value: $entry")
                 attributeDAO.setPropertySerializedValue(entry.key, entry.value.second)
                 println("get serialized value: ${attributeDAO.getPropertySerializedValue(entry.key)}")
-
-
             }
+            attributeDAO.serializedConnection = connectionObservable.value?.datum?.getSerializedString()
         }
 
         fun saveToRealm() {

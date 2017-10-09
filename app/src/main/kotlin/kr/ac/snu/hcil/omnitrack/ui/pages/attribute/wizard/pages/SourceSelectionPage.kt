@@ -11,7 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.AWizardPage
@@ -22,7 +22,7 @@ import kr.ac.snu.hcil.omnitrack.utils.dipRound
 /**
  * Created by Young-Ho Kim on 2016-08-30.
  */
-class SourceSelectionPage(override val parent: ConnectionWizardView, val attribute: OTAttribute<out Any>) : AWizardPage(parent) {
+class SourceSelectionPage(override val parent: ConnectionWizardView, val attribute: OTAttributeDAO) : AWizardPage(parent) {
 
     override val getTitleResourceId: Int = R.string.msg_connection_wizard_title_source_selection
 

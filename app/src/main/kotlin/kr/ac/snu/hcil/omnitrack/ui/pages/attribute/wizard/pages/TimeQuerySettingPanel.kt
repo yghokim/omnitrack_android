@@ -7,7 +7,6 @@ import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.LinearLayout
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ComboBoxPropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.NumericUpDownPropertyView
@@ -27,8 +26,6 @@ class TimeQuerySettingPanel : LinearLayout, IEventListener<Int> {
     private var suspendEvent: Boolean = false
 
     private val pivotEntryAdapter = ArrayAdapter<PivotEntry>(context, R.layout.simple_text_element, R.id.textView)
-
-    private var attribute: OTAttribute<out Any>? = null
 
     var timeQuery: OTTimeRangeQuery = OTTimeRangeQuery()
         set(value) {
@@ -68,8 +65,7 @@ class TimeQuerySettingPanel : LinearLayout, IEventListener<Int> {
         offsetView.valueChanged += this
     }
 
-    fun init(attribute: OTAttribute<out Any>) {
-        this.attribute = attribute
+    fun init() {
         buildPivotEntries()
     }
 
@@ -77,7 +73,7 @@ class TimeQuerySettingPanel : LinearLayout, IEventListener<Int> {
         pivotEntryAdapter.clear()
         pivotEntryAdapter.add(PivotEntry(R.string.msg_connection_wizard_time_query_pivot_present, OTTimeRangeQuery.TYPE_PIVOT_TIMESTAMP))
 
-
+        /*
         val siblingAttributes = this.attribute?.tracker?.attributes
         if (siblingAttributes != null) {
 
@@ -99,7 +95,7 @@ class TimeQuerySettingPanel : LinearLayout, IEventListener<Int> {
                     }
                 }
             }
-        }
+        }*/
     }
 
     override fun onEvent(sender: Any, args: Int) {
@@ -146,10 +142,10 @@ class TimeQuerySettingPanel : LinearLayout, IEventListener<Int> {
         }
     }
 
-    inner class AttributePivotEntry(name: String, mode: Int, val attribute: OTAttribute<out Any>) : PivotEntry(name, mode) {
+    inner class AttributePivotEntry(name: String, mode: Int, val attributeId: String) : PivotEntry(name, mode) {
         override fun applyToQuery(timeQuery: OTTimeRangeQuery) {
             super.applyToQuery(timeQuery)
-            timeQuery.linkedAttribute = attribute
+            timeQuery.linkedAttributeId = attributeId
         }
     }
 }
