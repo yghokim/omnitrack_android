@@ -1,6 +1,5 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.tracker
 
-import android.arch.lifecycle.ViewModel
 import android.support.annotation.DrawableRes
 import android.support.v7.util.DiffUtil
 import io.realm.Realm
@@ -13,6 +12,7 @@ import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
+import kr.ac.snu.hcil.omnitrack.utils.RealmViewModel
 import kr.ac.snu.hcil.omnitrack.utils.move
 import org.jetbrains.anko.collections.forEachWithIndex
 import rx.subjects.BehaviorSubject
@@ -24,13 +24,11 @@ import kotlin.collections.HashSet
 /**
  * Created by younghokim on 2017. 10. 3..
  */
-class TrackerDetailViewModel : ViewModel() {
+class TrackerDetailViewModel : RealmViewModel() {
 
     private var trackerDao: OTTrackerDAO? = null
 
     val trackerId: String? get() = this.trackerDao?.objectId
-
-    private val realm: Realm = OTApplication.app.databaseManager.getRealmInstance()
 
     //Observables========================================
     val nameObservable = BehaviorSubject.create<String>("")
@@ -62,8 +60,6 @@ class TrackerDetailViewModel : ViewModel() {
                 colorObservable.onNext(value)
             }
         }
-
-    private val subscriptions = CompositeSubscription()
 
     fun getAttributeViewModelList(): List<AttributeInformationViewModel> {
         return currentAttributeViewModelList
@@ -203,7 +199,6 @@ class TrackerDetailViewModel : ViewModel() {
         super.onCleared()
         clearCurrentAttributeList()
         removedAttributes.clear()
-        realm.close()
     }
 
     class AttributeInformationViewModel(_attributeDAO: OTAttributeDAO, val realm: Realm) : RealmChangeListener<OTAttributeDAO> {

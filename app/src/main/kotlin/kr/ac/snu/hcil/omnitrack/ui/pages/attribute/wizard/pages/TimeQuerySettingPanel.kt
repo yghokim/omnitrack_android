@@ -82,12 +82,12 @@ class TimeQuerySettingPanel : LinearLayout, IEventListener<Int> {
             for (attribute in siblingAttributes) {
                 if (attribute !== this.attribute) {
                     when (attribute.typeId) {
-                        OTAttribute.TYPE_TIME -> {
+                        OTAttributeManager.TYPE_TIME -> {
                             pivotEntryAdapter.add(
                                     AttributePivotEntry(String.format(fieldNameFormat, attribute.name), OTTimeRangeQuery.TYPE_PIVOT_TIMEPOINT, attribute)
                             )
                         }
-                        OTAttribute.TYPE_TIMESPAN -> {
+                        OTAttributeManager.TYPE_TIMESPAN -> {
                             pivotEntryAdapter.add(
                                     AttributePivotEntry(String.format(fieldNameFormat, attribute.name), OTTimeRangeQuery.TYPE_LINK_TIMESPAN, attribute)
                             )
