@@ -30,7 +30,6 @@ import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 import kr.ac.snu.hcil.omnitrack.utils.setPaddingLeft
 import kr.ac.snu.hcil.omnitrack.utils.setPaddingRight
 import mehdi.sakout.fancybuttons.FancyButton
-import rx.android.schedulers.AndroidSchedulers
 import rx.subscriptions.CompositeSubscription
 import java.util.*
 
@@ -75,13 +74,6 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
     private val propertyViewList = ArrayList<ReadOnlyPair<String, View>>()
 
     private val startSubscriptions = CompositeSubscription()
-
-    override fun onSessionLogContent(contentObject: Bundle) {
-        super.onSessionLogContent(contentObject)
-        //TODO log session
-        //contentObject.putString("attribute_id", attribute?.objectId)
-        //contentObject.putString("attribute_name", attribute?.name)
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -157,9 +149,12 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
                     refreshConnection(true)
                 }
         )
+        /*
 
         creationSubscriptions.add(
                 viewModel.onPropertyValueChanged.observeOn(AndroidSchedulers.mainThread()).subscribe { (key, value) ->
+                    println("on property value changed: ${key}, ${value}")
+
                     @Suppress("UNCHECKED_CAST")
                     val propView = propertyViewList.find { it.first == key }?.second as? APropertyView<Any>
 
@@ -167,7 +162,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
                         propView.value = value
                     }
                 }
-        )
+        )*/
 
         creationSubscriptions.add(
                 viewModel.typeObservable.subscribe { type ->
@@ -215,7 +210,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
                         }
                         //end: refresh properties==================================================================================
 
-                        if (viewModel.isValid || viewModel.attributeHelper?.propertyKeys?.isEmpty() ?: true) {
+                        if (viewModel.isValid || viewModel.attributeHelper?.propertyKeys?.isEmpty() != false) {
                             //no property
                             propertyViewContainer.setBackgroundResource(R.drawable.bottom_separator_light)
                         } else if (viewModel.attributeHelper?.propertyKeys?.size == 1) {

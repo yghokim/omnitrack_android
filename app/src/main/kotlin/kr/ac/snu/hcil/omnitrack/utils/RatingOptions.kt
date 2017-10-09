@@ -102,4 +102,8 @@ class RatingOptions {
                     other.starLevels == this.starLevels
         } else return false
     }
+
+    override fun toString(): String {
+        return "{RationOptions | allowIntermediate: $allowIntermediate , type: $type, starLevels: $starLevels, leftMost: $leftMost, rightMost: $rightMost, leftLabel: $leftLabel, rightLabel: $rightLabel, middleLable: $middleLabel"
+    }
 }

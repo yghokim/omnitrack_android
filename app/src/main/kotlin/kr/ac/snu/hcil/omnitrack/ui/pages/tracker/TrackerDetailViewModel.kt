@@ -256,14 +256,7 @@ class TrackerDetailViewModel : ViewModel() {
 
         override fun onChange(snapshot: OTAttributeDAO) {
             if (snapshot.isValid) {
-                this.name = snapshot.name
-
-                if (typeObservable.value != snapshot.type)
-                    typeObservable.onNext(snapshot.type)
-
-                val helper = OTAttributeManager.getAttributeHelper(snapshot.type)
-                val icon = helper.getTypeSmallIconResourceId(snapshot)
-                this.icon = icon
+                applyDaoChangesToFront(snapshot)
             }
         }
 
@@ -278,7 +271,7 @@ class TrackerDetailViewModel : ViewModel() {
             dao.isRequired = attributeDAO.isRequired
             dao.name = name
             for (entry in propertyTable) {
-                dao.setPropertySerializedValue(entry.key, entry.value.second, realm)
+                dao.setPropertySerializedValue(entry.key, entry.value.second)
             }
 
             dao.serializedConnection = connectionObservable.value?.getSerializedString()
@@ -288,6 +281,10 @@ class TrackerDetailViewModel : ViewModel() {
 
         fun applyDaoChangesToFront(editedDao: OTAttributeDAO) {
             name = editedDao.name
+            if (typeObservable.value != editedDao.type) {
+                typeObservable.onNext(editedDao.type)
+            }
+
             propertyTable.clear()
             var changed = false
             editedDao.properties.forEach { entry ->
@@ -308,7 +305,11 @@ class TrackerDetailViewModel : ViewModel() {
             attributeDAO.name = nameObservable.value
             attributeDAO.updatedAt = System.currentTimeMillis()
             for (entry in propertyTable) {
-                attributeDAO.setPropertySerializedValue(entry.key, entry.value.second, realm)
+                println("set new serialized value: $entry")
+                attributeDAO.setPropertySerializedValue(entry.key, entry.value.second)
+                println("get serialized value: ${attributeDAO.getPropertySerializedValue(entry.key)}")
+
+
             }
         }
 
