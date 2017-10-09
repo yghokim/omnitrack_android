@@ -114,7 +114,7 @@ class AttributeDetailViewModel : ViewModel() {
             val value = entry.value
             val propertyHelper = attributeHelper?.getPropertyHelper<Any>(entry.key)
             if (propertyHelper != null && value != null) {
-                attributeDao?.setPropertySerializedValue(entry.key, propertyHelper.getSerializedValue(value), realm)
+                attributeDao?.setPropertySerializedValue(entry.key, propertyHelper.getSerializedValue(value))
             }
         }
 
