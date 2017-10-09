@@ -7,7 +7,7 @@ import android.view.View.OnClickListener
 import android.view.ViewStub
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
+import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.ui.components.common.TooltipHelper
 import java.util.*
 
@@ -28,8 +28,8 @@ class ConnectionIndicatorStubProxy(val parent: View, stubId: Int) : OnClickListe
         parent.addOnAttachStateChangeListener(this)
     }
 
-    fun onBind(attribute: OTAttribute<out Any>) {
-        val connectionSource = attribute.valueConnection?.source
+    fun onBind(connection: OTConnection?) {
+        val connectionSource = connection?.source
         if (connectionSource != null) {
             if (connectionIndicator == null) {
                 connectionIndicator = connectionIndicatorStub.inflate()
@@ -46,7 +46,7 @@ class ConnectionIndicatorStubProxy(val parent: View, stubId: Int) : OnClickListe
                 connectionInvalidMessages = ArrayList<CharSequence>()
             }
             connectionInvalidMessages?.clear()
-            if (attribute.isConnectionValid(connectionInvalidMessages)) {
+            if (connection.isValid(connectionInvalidMessages)) {
                 connectionIndicatorSourceNameView?.setTextColor(ResourcesCompat.getColor(parent.resources, R.color.colorPointed, null))
                 connectionIndicatorErrorMark?.visibility = View.GONE
                 connectionIndicatorLinkIconView?.setImageResource(R.drawable.link)

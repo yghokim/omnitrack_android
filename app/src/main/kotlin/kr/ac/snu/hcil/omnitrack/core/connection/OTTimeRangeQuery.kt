@@ -2,14 +2,10 @@ package kr.ac.snu.hcil.omnitrack.core.connection
 
 import android.content.Context
 import android.text.format.DateUtils
-import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilder
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeSpanAttribute
 import kr.ac.snu.hcil.omnitrack.utils.serialization.ATypedQueueSerializable
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableTypedQueue
-import rx.schedulers.Schedulers
 import java.util.*
 
 /**
@@ -77,7 +73,7 @@ class OTTimeRangeQuery : ATypedQueueSerializable {
      */
     var binOffset: Int = 0
 
-    var linkedAttribute: OTAttribute<out Any>? = null
+    var linkedAttributeId: String? = null
 
     constructor()
 
@@ -95,7 +91,7 @@ class OTTimeRangeQuery : ATypedQueueSerializable {
                     other.anchorToNow == this.anchorToNow &&
                     other.binOffset == this.binOffset &&
                     other.binSize == this.binSize &&
-                    other.linkedAttribute == this.linkedAttribute
+                    other.linkedAttributeId == this.linkedAttributeId
         } else return false
     }
 
@@ -108,9 +104,8 @@ class OTTimeRangeQuery : ATypedQueueSerializable {
         }
 
         if (needsLinkedAttribute) {
-            if (linkedAttribute != null) {
-                typedQueue.putString(linkedAttribute!!.objectId)
-                typedQueue.putString(linkedAttribute!!.tracker!!.objectId)
+            if (linkedAttributeId != null) {
+                typedQueue.putString(linkedAttributeId!!)
             }
         }
     }
@@ -124,13 +119,7 @@ class OTTimeRangeQuery : ATypedQueueSerializable {
         }
 
         if (needsLinkedAttribute) {
-            val attrId = typedQueue.getString()
-            val trackerId = typedQueue.getString()
-            OTApplication.app.currentUserObservable.observeOn(Schedulers.immediate())
-                    .subscribe {
-                        user ->
-                        linkedAttribute = user.findAttributeByObjectId(trackerId, attrId) as OTTimeSpanAttribute
-                    }
+            linkedAttributeId = typedQueue.getString()
         }
     }
 
@@ -185,7 +174,7 @@ class OTTimeRangeQuery : ATypedQueueSerializable {
             return context.resources.getString(R.string.msg_connection_wizard_time_query_pivot_present)
         } else if (mode == TYPE_PIVOT_TIMEPOINT || mode == TYPE_LINK_TIMESPAN) {
             val fieldNameFormat = context.resources.getString(R.string.msg_connection_wizard_time_query_pivot_field_format)
-            return String.format(fieldNameFormat, linkedAttribute?.name ?: "")
+            return String.format(fieldNameFormat, "Other")
         } else return "None"
     }
 

@@ -445,13 +445,11 @@ class TrackerDetailStructureTabFragment : OTFragment() {
 
                 previewContainer.alpha = 0.5f
 
-                /*
-                connectionIndicatorStubProxy.onBind(attribute)
-
-                val propertySub =
-                        attribute.propertyValueChangedSubject.subscribe {
-                            preview = attribute.getInputView(context, true, preview)
-                        }*/
+                viewHolderSubscriptions.add(
+                        attributeViewModel.connectionObservable.subscribe { connection ->
+                            connectionIndicatorStubProxy.onBind(connection.datum)
+                        }
+                )
 
                 viewHolderSubscriptions.add(
                         attributeViewModel.nameObservable.subscribe {

@@ -4,7 +4,9 @@ import android.arch.lifecycle.ViewModel
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTAttributeHelper
+import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import rx.subjects.BehaviorSubject
 import rx.subjects.PublishSubject
 import java.util.*
@@ -29,7 +31,7 @@ class AttributeDetailViewModel : ViewModel() {
     val isInDatabase: Boolean get() = attributeDao?.isManaged ?: false
 
     val nameObservable = BehaviorSubject.create<String>("")
-    val serializedConnectionObservable = BehaviorSubject.create<String>("")
+    val connectionObservable = BehaviorSubject.create<Nullable<OTConnection>>()
 
     val typeObservable = BehaviorSubject.create<Int>()
 
@@ -52,13 +54,13 @@ class AttributeDetailViewModel : ViewModel() {
     val isNameChanged: Boolean
         get() = name != attributeDao?.name
 
-    var serializedConnection: String?
+    var connection: OTConnection?
         get() {
-            return serializedConnectionObservable.value
+            return connectionObservable.value?.datum
         }
         set(value) {
-            if (serializedConnectionObservable.value != value) {
-                serializedConnectionObservable.onNext(value)
+            if (connectionObservable.value?.datum != value) {
+                connectionObservable.onNext(Nullable(value))
             }
         }
 
@@ -67,7 +69,7 @@ class AttributeDetailViewModel : ViewModel() {
             this.attributeDao = attributeDao
             if (attributeDao != null) {
                 name = attributeDao.name
-                serializedConnection = attributeDao.serializedConnection ?: CONNECTION_NULL
+                connection = attributeDao.serializedConnection?.let { OTConnection(it) }
 
                 if (typeObservable.value != attributeDao.type)
                     typeObservable.onNext(attributeDao.type)
@@ -118,7 +120,7 @@ class AttributeDetailViewModel : ViewModel() {
             }
         }
 
-        attributeDao?.serializedConnection = if (serializedConnection == CONNECTION_NULL) null else serializedConnection
+        attributeDao?.serializedConnection = connection?.getSerializedString()
     }
 
     override fun onCleared() {

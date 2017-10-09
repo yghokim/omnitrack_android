@@ -1,9 +1,12 @@
 package kr.ac.snu.hcil.omnitrack.core.connection
 
+import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilder
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
-import kr.ac.snu.hcil.omnitrack.utils.Result
+import kr.ac.snu.hcil.omnitrack.utils.Nullable
+import kr.ac.snu.hcil.omnitrack.utils.TextHelper
 import kr.ac.snu.hcil.omnitrack.utils.serialization.ATypedQueueSerializable
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableTypedQueue
 import rx.Observable
@@ -45,13 +48,32 @@ class OTConnection : ATypedQueueSerializable {
     constructor() : super()
     constructor(serialized: String) : super(serialized)
 
+    fun isValid(invalidMessages: MutableList<CharSequence>?): Boolean {
+        val source = source
+        if (source != null) {
+            val service = source.factory.getService()
+            if (service.state == OTExternalService.ServiceState.ACTIVATED) {
+                return true
+            } else {
+                invalidMessages?.add(TextHelper.fromHtml(String.format(
+                        "<font color=\"blue\">${OTApplication.app.resourcesWrapped.getString(R.string.msg_service_is_not_activated_format)}</font>",
+                        OTApplication.app.resourcesWrapped.getString(service.nameResourceId))))
+                return false
+            }
+        } else {
+            invalidMessages?.add(TextHelper.fromHtml(
+                    "<font color=\"blue\">Connection is not supported on current version.</font>"
+            ))
+            return false
+        }
+    }
 
-    fun getRequestedValue(builder: OTItemBuilder): Observable<Result<out Any>> {
+    fun getRequestedValue(builder: OTItemBuilder): Observable<Nullable<out Any>> {
         return Observable.defer {
             if (source != null) {
                 return@defer source!!.getValueRequest(builder, rangedQuery)
             } else {
-                return@defer Observable.error<Result<out Any>>(Exception("Connection source is not designated."))
+                return@defer Observable.error<Nullable<out Any>>(Exception("Connection source is not designated."))
             }
         }
     }

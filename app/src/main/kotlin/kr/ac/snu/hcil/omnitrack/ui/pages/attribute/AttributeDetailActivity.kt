@@ -15,10 +15,9 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import butterknife.bindView
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
-import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.WizardView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
@@ -115,23 +114,14 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
         connectionView.onRemoveButtonClicked += {
             sender, arg ->
             DialogHelper.makeNegativePhrasedYesNoDialogBuilder(this, "OmniTrack", resources.getString(R.string.msg_confirm_remove_connection), R.string.msg_remove, onYes = {
-                viewModel.serializedConnection = AttributeDetailViewModel.CONNECTION_NULL
+                viewModel.connection = null
             }).show()
         }
 
+
         newConnectionButton.setOnClickListener(this)
 
-        /*
-        if (OTExternalService.getFilteredMeasureFactories {
-            it.isAttachableTo()
-        }.isEmpty()) {
-            connectionGroup.visibility = View.GONE
-            connectionView.connection = null
-        } else {
-            connectionGroup.visibility = View.VISIBLE
-            connectionView.connection = attr.valueConnection
-            refreshConnection(false)
-        }*/
+
 
         creationSubscriptions.add(
                 viewModel.nameObservable.subscribe { name ->
@@ -140,15 +130,19 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
         )
 
         creationSubscriptions.add(
-                viewModel.serializedConnectionObservable.subscribe { conn ->
-                    if (conn == AttributeDetailViewModel.CONNECTION_NULL) {
-                        connectionView.connection = null
-                    } else {
-                        connectionView.connection = OTConnection(conn)
-                    }
+                viewModel.connectionObservable.subscribe { conn ->
+                    connectionView.connection = conn.datum
                     refreshConnection(true)
                 }
         )
+
+        creationSubscriptions.add(
+                connectionView.onConnectionChanged.subscribe { newConnection ->
+                    viewModel.connection = newConnection.datum
+                    refreshConnection(false)
+                }
+        )
+
         /*
 
         creationSubscriptions.add(
@@ -210,6 +204,17 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
                         }
                         //end: refresh properties==================================================================================
 
+                        val dao = viewModel.attributeDao
+                        if (dao != null) {
+                            if (OTExternalService.getFilteredMeasureFactories {
+                                it.isAttachableTo(dao)
+                            }.isEmpty()) {
+                                connectionGroup.visibility = View.GONE
+                            } else {
+                                connectionGroup.visibility = View.VISIBLE
+                            }
+                        }
+
                         if (viewModel.isValid || viewModel.attributeHelper?.propertyKeys?.isEmpty() != false) {
                             //no property
                             propertyViewContainer.setBackgroundResource(R.drawable.bottom_separator_light)
@@ -233,34 +238,6 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
         //do not call super method to prevent view hierarchy checking.
     }
 
-    /*
-        override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
-            println("restore state")
-
-            if (savedInstanceState != null) {
-                savedInstanceState.getString(STATE_COLUMN_NAME)?.let {
-                    columnNameView.value = it
-                }
-
-                connectionView.connection = null
-                savedInstanceState.getString(STATE_CONNECTION)?.let {
-                    try {
-                        connectionView.connection = OTConnection(it)
-                    } catch(e: Exception) {
-                        connectionView.connection = null
-                    }
-                }
-
-
-
-                savedInstanceState.getStringArray(STATE_PROPERTIES)?.let {
-                    for (entry in it.withIndex()) {
-                        (propertyViewList[entry.index].second as? APropertyView<*>)?.setSerializedValue(entry.value)
-                    }
-                }
-            }
-        }
-    */
     override fun onStop() {
         super.onStop()
         startSubscriptions.clear()
@@ -350,21 +327,6 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
     private fun saveChanges() {
         viewModel.applyChanges()
         setResult(Activity.RESULT_OK, Intent().putExtra(INTENT_EXTRA_SERIALIZED_ATTRIBUTE_DAO, OTAttributeDAO.parser.toJson(viewModel.attributeDao, OTAttributeDAO::class.java)))
-        /*
-        if (isChanged()) {
-            if (columnNameView.validate())
-                attribute?.name = columnNameView.value
-
-            attribute?.valueConnection = connectionView.connection
-
-            for (entry in propertyViewList) {
-                if (entry.second is APropertyView<*>) {
-                    if (entry.second.validate()) {
-                        attribute?.setPropertyValue(entry.first, entry.second.value!!)
-                    }
-                }
-            }
-        }*/
     }
 
     /*
@@ -451,17 +413,6 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
         connectionViewTitle.text = "${resources.getString(R.string.msg_value_autocompletion)}"
     }
 
-    private fun applyAttributeToPropertyView(attribute: OTAttribute<out Any>) {
-        for (propertyViewEntry in propertyViewList) {
-            @Suppress("UNCHECKED_CAST")
-            val propView: APropertyView<Any> = propertyViewEntry.second as APropertyView<Any>
-
-            propView.value = attribute.getPropertyValue(propertyViewEntry.first)
-
-            propView.watchOriginalValue()
-        }
-    }
-
     override fun onClick(view: View?) {
         println(view === newConnectionButton)
         if (view === newConnectionButton) {
@@ -481,8 +432,9 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
                     .setView(wizardView)
                     .create()
 
-            //TODO
-            //wizardView.init(attribute!!)
+            viewModel.attributeDao?.let {
+                wizardView.init(it)
+            }
 
             wizardView.setWizardListener(object : WizardView.IWizardListener {
                 override fun onComplete(wizard: WizardView) {
@@ -499,15 +451,6 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
             })
 
             wizardDialog.show()
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == 0) {
-            if (resultCode == RESULT_OK) {
-                println("result: Ok")
-            }
         }
     }
 }

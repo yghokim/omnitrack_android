@@ -10,9 +10,10 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeSpanAttribute
 import kr.ac.snu.hcil.omnitrack.core.calculation.AConditioner
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.utils.INameDescriptionResourceProvider
+import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.NumberStyle
-import kr.ac.snu.hcil.omnitrack.utils.Result
 import kr.ac.snu.hcil.omnitrack.utils.serialization.ATypedQueueSerializable
 import rx.Observable
 
@@ -102,7 +103,7 @@ abstract class OTMeasureFactory(val factoryTypeName: String) : INameDescriptionR
 
     open val requiredPermissions: Array<String> = arrayOf()
 
-    abstract fun isAttachableTo(attribute: OTAttribute<out Any>): Boolean
+    abstract fun isAttachableTo(attribute: OTAttributeDAO): Boolean
 
     abstract val isRangedQueryAvailable: Boolean
     abstract val isDemandingUserInput: Boolean
@@ -156,7 +157,7 @@ abstract class OTMeasureFactory(val factoryTypeName: String) : INameDescriptionR
         constructor() : super()
         constructor(serialized: String) : super(serialized)
 
-        abstract fun getValueRequest(builder: OTItemBuilder, query: OTTimeRangeQuery?): Observable<Result<out Any>>
+        abstract fun getValueRequest(builder: OTItemBuilder, query: OTTimeRangeQuery?): Observable<Nullable<out Any>>
     }
 
     abstract class OTRangeQueriedMeasure : OTMeasure {
@@ -164,9 +165,9 @@ abstract class OTMeasureFactory(val factoryTypeName: String) : INameDescriptionR
         constructor() : super()
         constructor(serialized: String) : super(serialized)
 
-        abstract fun getValueRequest(start: Long, end: Long): Observable<Result<out Any>>
+        abstract fun getValueRequest(start: Long, end: Long): Observable<Nullable<out Any>>
 
-        override fun getValueRequest(builder: OTItemBuilder, query: OTTimeRangeQuery?): Observable<Result<out Any>> {
+        override fun getValueRequest(builder: OTItemBuilder, query: OTTimeRangeQuery?): Observable<Nullable<out Any>> {
             val range = query!!.getRange(builder)
             return getValueRequest(range.first, range.second)
         }

@@ -10,9 +10,11 @@ import butterknife.bindView
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
+import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.TextHelper
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
+import rx.subjects.PublishSubject
 
 /**
  * Created by Young-Ho Kim on 16. 8. 11
@@ -21,10 +23,13 @@ class AttributeConnectionView : LinearLayout, View.OnClickListener {
 
     val onRemoveButtonClicked = Event<Any>()
 
+    val onConnectionChanged = PublishSubject.create<Nullable<OTConnection>>()
+
     var connection: OTConnection? = null
         set(value) {
             if (field != value) {
                 field = value
+                onConnectionChanged.onNext(Nullable(value))
                 refresh()
             }
         }
@@ -60,7 +65,7 @@ class AttributeConnectionView : LinearLayout, View.OnClickListener {
             sourceView.text = source.factory.getFormattedName()
         }
 
-        if (connection?.isRangedQueryAvailable ?: false) {
+        if (connection?.isRangedQueryAvailable == true) {
             queryViewGroup.visibility = View.VISIBLE
             val query = connection?.rangedQuery
             if (query != null) {
