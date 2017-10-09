@@ -141,11 +141,11 @@ open class OTAttributeDAO : RealmObject() {
     fun initializePropertiesWithDefaults(realm: Realm) {
         val attributeHelper = OTAttributeManager.getAttributeHelper(type)
         attributeHelper.propertyKeys.forEach { key ->
-            setPropertySerializedValue(key, attributeHelper.getPropertyHelper<Any>(key).getSerializedValue(attributeHelper.getPropertyInitialValue(key)!!), realm)
+            setPropertySerializedValue(key, attributeHelper.getPropertyHelper<Any>(key).getSerializedValue(attributeHelper.getPropertyInitialValue(key)!!))
         }
     }
 
-    fun setPropertySerializedValue(key: String, serializedValue: String, realm: Realm): Boolean {
+    fun setPropertySerializedValue(key: String, serializedValue: String): Boolean {
         var changed = false
         val match = properties.find { it.key == key }
         if (match != null) {
@@ -154,12 +154,11 @@ open class OTAttributeDAO : RealmObject() {
 
             match.value = serializedValue
         } else {
-            val newProperty = if (this.isManaged)
-                realm.createObject(OTStringStringEntryDAO::class.java, UUID.randomUUID().toString())
-            else OTStringStringEntryDAO().apply { this.id = UUID.randomUUID().toString() }
-            newProperty.key = key
-            newProperty.value = serializedValue
-            properties.add(newProperty)
+            properties.add(OTStringStringEntryDAO().apply {
+                this.id = UUID.randomUUID().toString()
+                this.key = key
+                this.value = serializedValue
+            })
             changed = true
         }
 

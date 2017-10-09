@@ -12,16 +12,13 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputV
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 import java.util.ArrayList
-import kotlin.collections.Collection
 import kotlin.collections.HashMap
-import kotlin.collections.Map
-import kotlin.collections.forEach
 import kotlin.collections.set
 
 /**
  * Created by Young-Ho on 10/7/2017.
  */
-abstract class OTAttributeHelper() {
+abstract class OTAttributeHelper {
 
     open fun getValueNumericCharacteristics(attribute: OTAttributeDAO): NumericCharacteristics = NumericCharacteristics(false, false)
 
@@ -40,7 +37,7 @@ abstract class OTAttributeHelper() {
     }
 
     fun <T> setPropertyValue(propertyKey: String, value: T, attribute: OTAttributeDAO, realm: Realm) {
-        attribute.setPropertySerializedValue(propertyKey, getPropertyHelper<T>(propertyKey).getSerializedValue(value), realm)
+        attribute.setPropertySerializedValue(propertyKey, getPropertyHelper<T>(propertyKey).getSerializedValue(value))
     }
 
     fun <T> getDeserializedPropertyValue(propertyKey: String, attribute: OTAttributeDAO): T? {

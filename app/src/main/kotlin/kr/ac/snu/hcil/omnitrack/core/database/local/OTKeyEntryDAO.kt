@@ -12,6 +12,10 @@ open class OTStringStringEntryDAO : RealmObject() {
     var id: String = ""
     var key: String = ""
     var value: String? = null
+
+    override fun toString(): String {
+        return "{StringStringEntry | id : $id, key : $key, value : $value}"
+    }
 }
 
 open class OTIntegerStringEntryDAO : RealmObject() {
