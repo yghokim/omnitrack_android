@@ -1,7 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.misfit
 
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
@@ -26,7 +25,7 @@ object MisfitSleepMeasureFactory : OTMeasureFactory("slp") {
         return MisfitService
     }
 
-    override val exampleAttributeType: Int = OTAttribute.TYPE_TIMESPAN
+    override val exampleAttributeType: Int = OTAttributeManager.TYPE_TIMESPAN
 
     override fun isAttachableTo(attribute: OTAttributeDAO): Boolean {
         return attribute.type == OTAttributeManager.TYPE_TIMESPAN

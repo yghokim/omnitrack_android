@@ -37,7 +37,7 @@ object RescueTimeProductivityMeasureFactory : OTMeasureFactory("prd") {
         return configurator
     }
 
-    override val exampleAttributeType: Int = OTAttribute.TYPE_NUMBER
+    override val exampleAttributeType: Int = OTAttributeManager.TYPE_NUMBER
 
     override fun getService(): OTExternalService {
         return RescueTimeService

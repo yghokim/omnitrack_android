@@ -40,7 +40,7 @@ object RescueTimeComputerUsageDurationMeasureFactory : OTMeasureFactory("cud") {
     }
 
 
-    override val exampleAttributeType: Int = OTAttribute.TYPE_NUMBER
+    override val exampleAttributeType: Int = OTAttributeManager.TYPE_NUMBER
 
     override val supportedConditionerTypes: IntArray = CONDITIONERS_FOR_SINGLE_NUMERIC_VALUE
 
