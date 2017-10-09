@@ -1,5 +1,10 @@
 package kr.ac.snu.hcil.omnitrack.core.connection
 
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.TypeAdapter
+import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonWriter
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilder
@@ -7,17 +12,99 @@ import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.TextHelper
-import kr.ac.snu.hcil.omnitrack.utils.serialization.ATypedQueueSerializable
-import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableTypedQueue
 import rx.Observable
 
 /**
  * Created by Young-Ho Kim on 2016-08-11.
  */
-class OTConnection : ATypedQueueSerializable {
+class OTConnection {
+
+    class ConnectionTypeAdapter : TypeAdapter<OTConnection>() {
+        override fun read(reader: JsonReader): OTConnection {
+            /*
+            if (typedQueue.getBoolean()) {
+                val factoryCode = typedQueue.getString()
+                val factory = OTExternalService.getMeasureFactoryByCode(typeCode = factoryCode)
+                if (factory == null) {
+                    println("$factoryCode is deprecated in System.")
+
+                } else {
+                    source = factory.makeMeasure(typedQueue.getString())
+                }
+            }
+
+            if (typedQueue.getBoolean()) {
+                rangedQuery = OTTimeRangeQuery()
+                rangedQuery?.onDeserialize(typedQueue)
+            }*/
+
+            val connection = OTConnection()
+            reader.beginObject()
+
+            while (reader.hasNext()) {
+                when (reader.nextName()) {
+                    "factory" -> {
+                        var factoryCode: String = ""
+                        var serialized: String = ""
+                        reader.beginObject()
+                        while (reader.hasNext()) {
+                            when (reader.nextName()) {
+                                "code" -> factoryCode = reader.nextString()
+                                "serialized" -> serialized = reader.nextString()
+                            }
+                        }
+                        reader.endObject()
+
+                        val factory = OTExternalService.getMeasureFactoryByCode(typeCode = factoryCode)
+                        if (factory == null) {
+                            println("$factoryCode is deprecated in System.")
+
+                        } else {
+                            connection.source = factory.makeMeasure(serialized)
+                        }
+                    }
+
+                    "query" -> {
+                        val adapter = OTTimeRangeQuery.TimeRangeQueryTypeAdapter()
+                        connection.rangedQuery = adapter.read(reader)
+                    }
+                }
+            }
+
+            reader.endObject()
+
+            return connection
+        }
+
+        override fun write(out: JsonWriter, value: OTConnection) {
+            out.beginObject()
+
+            value.source?.let {
+                out.name("factory").beginObject()
+                out.name("code").value(it.factoryCode)
+                out.name("serialized").value(it.getSerializedString())
+                out.endObject()
+            }
+
+            value.rangedQuery?.let {
+                out.name("query")
+                val adapter = OTTimeRangeQuery.TimeRangeQueryTypeAdapter()
+                adapter.write(out, it)
+            }
+
+            out.endObject()
+        }
+
+    }
 
     companion object {
-        val NULL = Any()
+        val parser: Gson by lazy {
+            GsonBuilder().registerTypeAdapter(OTConnection::class.java, ConnectionTypeAdapter()).create()
+        }
+
+        fun fromJson(serialized: String): OTConnection {
+            return parser.fromJson(serialized, OTConnection::class.java)
+        }
     }
 
     var source: OTMeasureFactory.OTMeasure? = null
@@ -46,7 +133,6 @@ class OTConnection : ATypedQueueSerializable {
 
 
     constructor() : super()
-    constructor(serialized: String) : super(serialized)
 
     fun isValid(invalidMessages: MutableList<CharSequence>?): Boolean {
         val source = source
@@ -85,35 +171,8 @@ class OTConnection : ATypedQueueSerializable {
         } else return false
     }
 
-    override fun onSerialize(typedQueue: SerializableTypedQueue) {
-        typedQueue.putBoolean(source != null)
-        if (source != null) {
-            typedQueue.putString(source!!.factoryCode)
-            typedQueue.putString(source!!.getSerializedString())
-        }
-
-        typedQueue.putBoolean(rangedQuery != null)
-        if (rangedQuery != null) {
-            rangedQuery?.onSerialize(typedQueue)
-        }
-    }
-
-    override fun onDeserialize(typedQueue: SerializableTypedQueue) {
-        if (typedQueue.getBoolean()) {
-            val factoryCode = typedQueue.getString()
-            val factory = OTExternalService.getMeasureFactoryByCode(typeCode = factoryCode)
-            if (factory == null) {
-                println("$factoryCode is deprecated in System.")
-
-            } else {
-                source = factory.makeMeasure(typedQueue.getString())
-            }
-        }
-
-        if (typedQueue.getBoolean()) {
-            rangedQuery = OTTimeRangeQuery()
-            rangedQuery?.onDeserialize(typedQueue)
-        }
+    fun getSerializedString(): String {
+        return parser.toJson(this)
     }
 
 }
