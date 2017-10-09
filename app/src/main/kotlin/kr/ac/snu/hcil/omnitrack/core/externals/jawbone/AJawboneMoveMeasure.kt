@@ -5,7 +5,7 @@ import com.google.gson.JsonObject
 import com.jawbone.upplatformsdk.api.ApiManager
 import com.jawbone.upplatformsdk.utils.UpPlatformSdkConstants
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
-import kr.ac.snu.hcil.omnitrack.utils.Result
+import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 import retrofit.Callback
 import retrofit.RetrofitError
@@ -21,9 +21,9 @@ abstract class AJawboneMoveMeasure : OTMeasureFactory.OTRangeQueriedMeasure {
     constructor() : super()
     constructor(serialized: String) : super(serialized)
 
-    override fun getValueRequest(start: Long, end: Long): Observable<Result<out Any>> {
+    override fun getValueRequest(start: Long, end: Long): Observable<Nullable<out Any>> {
         if (TimeHelper.isSameDay(start, end - 10)) {
-            return Observable.create<Result<out Any>> {
+            return Observable.create<Nullable<out Any>> {
                 subscriber ->
                 ApiManager.getRestApiInterface().getMoveEventsList(UpPlatformSdkConstants.API_VERSION_STRING, HashMap<String, Long>().apply { this["date"] = JawboneUpService.makeFormattedDateInteger(start).toLong() }, object : Callback<Any> {
                     override fun failure(error: RetrofitError) {
@@ -35,14 +35,14 @@ abstract class AJawboneMoveMeasure : OTMeasureFactory.OTRangeQueriedMeasure {
                     override fun success(result: Any, response: Response) {
 
                         if (!subscriber.isUnsubscribed) {
-                            subscriber.onNext(Result(extractValueFromResult(result)))
+                            subscriber.onNext(Nullable(extractValueFromResult(result)))
                             subscriber.onCompleted()
                         }
                     }
                 })
             }
         } else {
-            return Observable.create<Result<out Any>> {
+            return Observable.create<Nullable<out Any>> {
                 subscriber ->
 
                 Observable.zip(TimeHelper.sliceToDate(start, end).map {
@@ -74,7 +74,7 @@ abstract class AJawboneMoveMeasure : OTMeasureFactory.OTRangeQueriedMeasure {
                 }).subscribe({
                     result ->
                     if (!subscriber.isUnsubscribed) {
-                        subscriber.onNext(Result(result))
+                        subscriber.onNext(Nullable(result))
                         subscriber.onCompleted()
                     }
                 }, {

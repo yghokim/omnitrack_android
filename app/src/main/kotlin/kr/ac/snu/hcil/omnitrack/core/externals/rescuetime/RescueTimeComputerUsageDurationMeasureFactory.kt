@@ -2,12 +2,14 @@ package kr.ac.snu.hcil.omnitrack.core.externals.rescuetime
 
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
+import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.NumberStyle
-import kr.ac.snu.hcil.omnitrack.utils.Result
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableTypedQueue
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import org.json.JSONObject
@@ -46,8 +48,8 @@ object RescueTimeComputerUsageDurationMeasureFactory : OTMeasureFactory("cud") {
         return RescueTimeService
     }
 
-    override fun isAttachableTo(attribute: OTAttribute<out Any>): Boolean {
-        return attribute.typeId == OTAttribute.TYPE_NUMBER
+    override fun isAttachableTo(attribute: OTAttributeDAO): Boolean {
+        return attribute.type == OTAttributeManager.TYPE_NUMBER
     }
 
     override val minimumGranularity: OTTimeRangeQuery.Granularity = OTTimeRangeQuery.Granularity.Hour
@@ -79,8 +81,8 @@ object RescueTimeComputerUsageDurationMeasureFactory : OTMeasureFactory("cud") {
         override val factory: OTMeasureFactory = RescueTimeComputerUsageDurationMeasureFactory
 
 
-        override fun getValueRequest(start: Long, end: Long): Observable<Result<out Any>> {
-            return RescueTimeService.getSummaryRequest(Date(start), Date(end - 1), usageDurationCalculator) as Observable<Result<out Any>>
+        override fun getValueRequest(start: Long, end: Long): Observable<Nullable<out Any>> {
+            return RescueTimeService.getSummaryRequest(Date(start), Date(end - 1), usageDurationCalculator) as Observable<Nullable<out Any>>
         }
 
         override fun onSerialize(typedQueue: SerializableTypedQueue) {

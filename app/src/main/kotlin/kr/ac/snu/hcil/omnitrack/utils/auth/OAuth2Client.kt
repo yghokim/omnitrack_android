@@ -5,7 +5,7 @@ import android.app.Activity
 import android.content.SharedPreferences
 import android.os.AsyncTask
 import kr.ac.snu.hcil.omnitrack.ui.components.common.activity.WebServiceLoginActivity
-import kr.ac.snu.hcil.omnitrack.utils.Result
+import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.convertToRx1Observable
 import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
 import okhttp3.*
@@ -162,10 +162,10 @@ class OAuth2Client(val config: OAuth2Config) {
                 .addHeader(AuthConstants.HEADER_AUTHORIZATION, "Bearer ${credential.accessToken}")
     }
 
-    fun <T> getRequest(credential: Credential, converter: OAuth2RequestConverter<T>, credentialRefreshedListener: OAuth2CredentialRefreshedListener?, vararg requestUrls: String): Observable<Result<T>> {
+    fun <T> getRequest(credential: Credential, converter: OAuth2RequestConverter<T>, credentialRefreshedListener: OAuth2CredentialRefreshedListener?, vararg requestUrls: String): Observable<Nullable<T>> {
         return Observable.defer {
             val result = requestAwait(credential, converter, credentialRefreshedListener, *requestUrls)
-            return@defer Observable.just(Result(result))
+            return@defer Observable.just(Nullable(result))
         }.subscribeOn(Schedulers.io())
     }
 

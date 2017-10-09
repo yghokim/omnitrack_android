@@ -2,8 +2,8 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.attribute.wizard
 
 import android.content.Context
 import android.util.AttributeSet
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.AWizardPage
 import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.AWizardViewPagerAdapter
 import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.WizardView
@@ -36,14 +36,14 @@ class ConnectionWizardView : WizardView {
     init {
     }
 
-    fun init(attribute: OTAttribute<out Any>) {
+    fun init(attribute: OTAttributeDAO) {
         init(attribute, OTConnection())
     }
 
     /**
      * used to modify existing connection
      */
-    fun init(attribute: OTAttribute<out Any>, connection: OTConnection) {
+    fun init(attribute: OTAttributeDAO, connection: OTConnection) {
         setAdapter(Adapter(attribute))
         pendingConnection = connection
     }
@@ -82,13 +82,13 @@ class ConnectionWizardView : WizardView {
     }
 
 
-    inner class Adapter(attribute: OTAttribute<out Any>) : AWizardViewPagerAdapter() {
+    inner class Adapter(attribute: OTAttributeDAO) : AWizardViewPagerAdapter() {
         val pages = Array<AWizardPage>(3) {
             index ->
             when (index) {
                 PAGE_INDEX_SOURCE_SELECTION -> SourceSelectionPage(this@ConnectionWizardView, attribute)
-                PAGE_INDEX_TIME_QUERY -> TimeQueryPage(this@ConnectionWizardView, attribute)
-                PAGE_INDEX_CONFIGURATION -> SourceConfigurationPage(this@ConnectionWizardView, attribute)
+                PAGE_INDEX_TIME_QUERY -> TimeQueryPage(this@ConnectionWizardView)
+                PAGE_INDEX_CONFIGURATION -> SourceConfigurationPage(this@ConnectionWizardView)
                 else -> throw Exception("wrong index")
             }
         }

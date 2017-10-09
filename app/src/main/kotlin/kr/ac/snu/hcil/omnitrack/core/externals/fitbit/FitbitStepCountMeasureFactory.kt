@@ -2,10 +2,12 @@ package kr.ac.snu.hcil.omnitrack.core.externals.fitbit
 
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
-import kr.ac.snu.hcil.omnitrack.utils.Result
+import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.auth.OAuth2Client
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableTypedQueue
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
@@ -27,8 +29,8 @@ object FitbitStepCountMeasureFactory : OTMeasureFactory("step") {
 
     override val exampleAttributeType: Int = OTAttribute.TYPE_NUMBER
 
-    override fun isAttachableTo(attribute: OTAttribute<out Any>): Boolean {
-        return attribute.typeId == OTAttribute.TYPE_NUMBER
+    override fun isAttachableTo(attribute: OTAttributeDAO): Boolean {
+        return attribute.type == OTAttributeManager.TYPE_NUMBER
     }
 
     override val isRangedQueryAvailable: Boolean = true
@@ -85,17 +87,17 @@ object FitbitStepCountMeasureFactory : OTMeasureFactory("step") {
         constructor(serialized: String) : super(serialized)
 
 
-        override fun getValueRequest(start: Long, end: Long): Observable<Result<out Any>> {
+        override fun getValueRequest(start: Long, end: Long): Observable<Nullable<out Any>> {
 
             return if (TimeHelper.isSameDay(start, end - 10)) {
                 FitbitService.getRequest(
                         dailyConverter,
                         FitbitApi.makeDailyRequestUrl(FitbitApi.REQUEST_COMMAND_SUMMARY, Date(start)))
-                        as Observable<Result<out Any>>
+                        as Observable<Nullable<out Any>>
             } else
             //TODO: Can be optimized by querying summary data of middle days.
                 FitbitService.getRequest(intraDayConverter, *FitbitApi.makeIntraDayRequestUrls(FitbitApi.REQUEST_INTRADAY_RESOURCE_PATH_STEPS, start, end))
-                        as Observable<Result<out Any>>
+                        as Observable<Nullable<out Any>>
         }
 
         override fun onDeserialize(typedQueue: SerializableTypedQueue) {

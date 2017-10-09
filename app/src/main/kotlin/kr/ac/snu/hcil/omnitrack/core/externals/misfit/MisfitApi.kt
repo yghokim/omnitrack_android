@@ -6,7 +6,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.ui.components.common.activity.WebServiceLoginActivity
-import kr.ac.snu.hcil.omnitrack.utils.Result
+import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.auth.AuthConstants
 import kr.ac.snu.hcil.omnitrack.utils.convertToRx1Observable
 import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
@@ -75,7 +75,7 @@ object MisfitApi {
                 }
     }
 
-    fun getLatestSleepOnDayRequest(token: String, start: Date, end: Date): Observable<Result<TimeSpan>> {
+    fun getLatestSleepOnDayRequest(token: String, start: Date, end: Date): Observable<Nullable<TimeSpan>> {
         return getApiRequest(token, mapOf(
                 QUERY_START_DATE to AuthConstants.DATE_TIME_FORMAT.format(start),
                 QUERY_END_DATE to AuthConstants.DATE_TIME_FORMAT.format(end)
@@ -88,20 +88,20 @@ object MisfitApi {
                     val startTimeString = last.getString("startTime")
                     val duration = last.getInt("duration")
                     val startTime = AuthConstants.DATE_TIME_FORMAT.parse(startTimeString)
-                    Result((TimeSpan.fromPoints(startTime.time, startTime.time + duration * 1000)))
-                } else Result<TimeSpan>(null)
+                    Nullable((TimeSpan.fromPoints(startTime.time, startTime.time + duration * 1000)))
+                } else Nullable<TimeSpan>(null)
             } else throw Exception("Result JSON doe not have 'sleeps' element.")
         }
     }
 
-    fun getStepsOnDayRequest(token: String, start: Date, end: Date): Observable<Result<Int>> {
+    fun getStepsOnDayRequest(token: String, start: Date, end: Date): Observable<Nullable<Int>> {
         return getApiRequest(token, mapOf(
                 QUERY_START_DATE to AuthConstants.DATE_TIME_FORMAT.format(start),
                 QUERY_END_DATE to AuthConstants.DATE_TIME_FORMAT.format(end)
         ), SUBURL_ACTIVITY_SUMMARY).map {
             resultObject ->
             if (resultObject.has("steps")) {
-                Result(resultObject.getInt("steps"))
+                Nullable(resultObject.getInt("steps"))
             } else {
                 println("misfit step count failed")
                 throw Exception("Result JSON doe not have 'steps' element.")

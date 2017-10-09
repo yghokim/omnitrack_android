@@ -611,7 +611,7 @@ class ItemEditingActivity : OTTrackerAttachedActivity(R.layout.activity_new_item
                 }
                 //attributeTypeView.text = resources.getString(attribute.typeNameResourceId)
 
-                connectionIndicatorStubProxy.onBind(attribute)
+                connectionIndicatorStubProxy.onBind(attribute.valueConnection)
 
                 builder?.let {
                     if (it.hasValueOf(attribute)) {

@@ -4,8 +4,9 @@ import com.microsoft.band.sensors.BandHeartRateEvent
 import com.microsoft.band.sensors.BandHeartRateEventListener
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 
@@ -35,8 +36,8 @@ class MicrosoftBandHeartRateFactory : OTMeasureFactory("heart") {
         throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun isAttachableTo(attribute: OTAttribute<out Any>): Boolean {
-        return attribute is OTNumberAttribute
+    override fun isAttachableTo(attribute: OTAttributeDAO): Boolean {
+        return attribute.type == OTAttributeManager.TYPE_NUMBER
     }
 
     override val isRangedQueryAvailable: Boolean = false
