@@ -114,6 +114,9 @@ class OTApplication : MultiDexApplication() {
 
         const val PREFERENCE_KEY_FIREBASE_INSTANCE_ID = "firebase_instance_id"
 
+        const val PREFERENCE_KEY_DEVICE_LOCAL_KEY = "device_local_key"
+
+
         fun getString(resId: Int): String {
             return app.resourcesWrapped.getString(resId)
         }
@@ -431,7 +434,13 @@ class OTApplication : MultiDexApplication() {
         if (token != null && OTAuthManager.currentSignedInLevel > OTAuthManager.SignedInLevel.NONE) {
             OTApplication.app.systemSharedPreferences.edit().putString(OTApplication.PREFERENCE_KEY_FIREBASE_INSTANCE_ID, token)
                     .apply()
-            return synchronizationServerController.putDeviceInfo(OTDeviceInfo())
+            return synchronizationServerController.putDeviceInfo(OTDeviceInfo()).map { deviceInfoResult ->
+                val localKey = deviceInfoResult.deviceLocalKey
+                if (localKey != null) {
+                    OTAuthManager.userDeviceLocalKey = localKey
+                    return@map true
+                } else return@map false
+            }
         } else {
             return Single.just(false)
         }

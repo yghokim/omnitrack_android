@@ -70,7 +70,7 @@ class OTOfficialServerApiController : ISynchronizationServerSideAPI {
         return service.postUserRoleConsentResult(result).subscribeOn(Schedulers.io())
     }
 
-    override fun putDeviceInfo(info: OTDeviceInfo): Single<Boolean> {
+    override fun putDeviceInfo(info: OTDeviceInfo): Single<ISynchronizationServerSideAPI.DeviceInfoResult> {
         return service.putDeviceInfo(info).subscribeOn(Schedulers.io())
     }
 }
