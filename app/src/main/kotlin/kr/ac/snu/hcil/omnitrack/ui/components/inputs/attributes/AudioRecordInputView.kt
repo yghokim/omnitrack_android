@@ -7,8 +7,8 @@ import android.view.View
 import com.github.ybq.android.spinkit.SpinKitView
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioRecorderView
 import rx.subscriptions.CompositeSubscription
 
@@ -102,12 +102,19 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
         subscriptions.clear()
     }
 
-    override fun onAttributeBound(attribute: OTAttribute<out Any>) {
-        valueView.mediaSessionId = attribute.objectId
+    override fun onAttributeBound(attributeObjectId: String) {
+        valueView.mediaSessionId = attributeObjectId
 
-        val trackerName = attribute.tracker?.name ?: "No Tracker"
+        val realm = OTApplication.app.databaseManager.getRealmInstance()
+        val attributeInfo = realm.where(OTAttributeDAO::class.java).equalTo("objectId", attributeObjectId).findFirst()
+        if (attributeInfo != null) {
+            val trackerName = attributeInfo.trackerId?.let {
+                val trackerInfo = OTApplication.app.databaseManager.getTrackerQueryWithId(it, realm).findFirst()
+                trackerInfo?.name ?: "No Tracker"
+            } ?: "No Tracker"
 
-        valueView.audioTitle = "${attribute.name} | ${trackerName}"
+            valueView.audioTitle = "${attributeInfo.name} | ${trackerName}"
+        }
     }
 
     override fun onPause() {

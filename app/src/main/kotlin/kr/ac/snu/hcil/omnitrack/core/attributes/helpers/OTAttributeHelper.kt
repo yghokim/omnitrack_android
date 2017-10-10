@@ -10,7 +10,9 @@ import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
+import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
+import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Observable
 import java.util.ArrayList
 import kotlin.collections.HashMap
@@ -102,6 +104,33 @@ abstract class OTAttributeHelper {
 
     open fun makeIntrinsicDefaultValueMessage(attribute: OTAttributeDAO): CharSequence {
         return ""
+    }
+
+    open fun getFallbackValue(attribute: OTAttributeDAO): Observable<Nullable<out Any>> {
+        return Observable.defer {
+            when (attribute.fallbackValuePolicy) {
+                OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE -> {
+                    return@defer if (isIntrinsicDefaultValueSupported(attribute)) {
+                        makeIntrinsicDefaultValue(attribute).map { value -> Nullable(value) as Nullable<out Any> }
+                    } else Observable.just<Nullable<out Any>>(Nullable(null))
+                }
+                OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_LAST_ITEM -> {
+                    return@defer Observable.just<Nullable<out Any>>(Nullable(null))
+
+                }
+                OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_PRESET -> {
+                    return@defer attribute.fallbackPresetSerializedValue?.let {
+                        Observable.just(Nullable(TypeStringSerializationHelper.deserialize(it)) as Nullable<out Any>)
+                    } ?: Observable.just<Nullable<out Any>>(Nullable(null))
+                }
+                OTAttributeDAO.DEFAULT_VALUE_POLICY_NULL -> {
+                    return@defer Observable.just<Nullable<out Any>>(Nullable(null))
+                }
+                else -> {
+                    return@defer Observable.just<Nullable<out Any>>(Nullable(null))
+                }
+            }
+        }
     }
 
     //Input View=========================================================================================================
