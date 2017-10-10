@@ -11,6 +11,7 @@ import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
+import rx.Observable
 import java.util.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.set
@@ -88,6 +89,19 @@ abstract class OTAttributeHelper {
             result.add(ReadOnlyPair(key, makePropertyView(key, context)))
         }
         return result
+    }
+
+    //Input Values=======================================================================================================
+    open fun isIntrinsicDefaultValueSupported(attribute: OTAttributeDAO): Boolean {
+        return false
+    }
+
+    open fun makeIntrinsicDefaultValue(attribute: OTAttributeDAO): Observable<out Any> {
+        return Observable.empty()
+    }
+
+    open fun makeIntrinsicDefaultValueMessage(attribute: OTAttributeDAO): CharSequence {
+        return ""
     }
 
     //Input View=========================================================================================================

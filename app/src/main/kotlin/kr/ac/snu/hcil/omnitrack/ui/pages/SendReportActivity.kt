@@ -4,11 +4,8 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import android.widget.CheckBox
-import android.widget.EditText
 import android.widget.Toast
-import butterknife.bindView
-import com.jaredrummler.materialspinner.MaterialSpinner
+import kotlinx.android.synthetic.main.activity_send_report.*
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
@@ -26,13 +23,9 @@ class SendReportActivity : MultiButtonActionBarActivity(R.layout.activity_send_r
         const val KEY_CONTENT = "content"
     }
 
-    private val reportTypeSpinner: MaterialSpinner by bindView(R.id.ui_spinner_report_type)
-    private val isAnonymousCheckBox: CheckBox by bindView(R.id.ui_checkbox_anonymous)
-    private val contentEditText: EditText by bindView(R.id.ui_text_content)
-
-    private val selectedReportType: String get() = reportTypes[reportTypeSpinner.selectedIndex]
-    private val reportContent: String get() = contentEditText.text.toString()
-    private val isAnonymous: Boolean get() = isAnonymousCheckBox.isChecked
+    private val selectedReportType: String get() = reportTypes[ui_spinner_report_type.selectedIndex]
+    private val reportContent: String get() = ui_text_content.text.toString()
+    private val isAnonymous: Boolean get() = ui_checkbox_anonymous.isChecked
 
     private lateinit var reportTypes: List<String>
     private lateinit var reportTypeTexts: List<String>
@@ -49,9 +42,9 @@ class SendReportActivity : MultiButtonActionBarActivity(R.layout.activity_send_r
         reportTypes = reportTypeSources.map { it.first() }
         reportTypeTexts = reportTypeSources.map { it.last() }
 
-        reportTypeSpinner.setItems(reportTypeTexts)
+        ui_spinner_report_type.setItems(reportTypeTexts)
 
-        contentEditText.addTextChangedListener(object : TextWatcher {
+        ui_text_content.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
 
             }
@@ -91,9 +84,9 @@ class SendReportActivity : MultiButtonActionBarActivity(R.layout.activity_send_r
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
         super.onRestoreInstanceState(savedInstanceState)
-        isAnonymousCheckBox.isChecked = savedInstanceState?.getBoolean(KEY_IS_ANONYMOUS, false)!!
-        reportTypeSpinner.selectedIndex = reportTypes.indexOf(savedInstanceState.getString(KEY_TYPE))
-        contentEditText.setText(savedInstanceState.getString(KEY_CONTENT))
+        ui_checkbox_anonymous.isChecked = savedInstanceState?.getBoolean(KEY_IS_ANONYMOUS, false)!!
+        ui_spinner_report_type.selectedIndex = reportTypes.indexOf(savedInstanceState.getString(KEY_TYPE))
+        ui_text_content.setText(savedInstanceState.getString(KEY_CONTENT))
     }
 
     private fun disableRightButton() {

@@ -97,4 +97,9 @@
     <string name="property_choice_add_new_entry">항목 추가</string>
     <string name="property_choice_type_in_entry_text">항목 입력</string>
 
+    <string name="msg_intrinsic_location">현재 위치로 자동입력</string>
+    <string name="msg_intrinsic_number">0으로 채우기</string>
+    <string name="msg_intrinsic_rating">중간점수로 자동입력</string>
+    <string name="msg_intrinsic_time">현재 시점으로 입력</string>
+
 </resources>

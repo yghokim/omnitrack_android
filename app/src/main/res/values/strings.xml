@@ -113,6 +113,11 @@
     <string name="msg_attribute">Field</string>
     <string name="msg_new_tracker_prefix">My Tracker</string>
 
+    <string name="msg_attribute_fallback_policy">Fallback Value Rule</string>
+    <string name="msg_attribute_fallback_policy_null">Set empty</string>
+    <string name="msg_attribute_fallback_policy_last">Fill with the previous logging value</string>
+    <string name="msg_attribute_fallback_policy_preset">Fill with the preset value</string>
+
     <string name="msg_value_autocompletion">Value Autocompletion</string>
 
     <string name="msg_column_name">Field Name</string>

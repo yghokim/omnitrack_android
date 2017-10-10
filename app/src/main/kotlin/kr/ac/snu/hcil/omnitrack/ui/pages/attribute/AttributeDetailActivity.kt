@@ -10,25 +10,24 @@ import android.transition.TransitionManager
 import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import android.widget.LinearLayout
-import android.widget.TextView
-import butterknife.bindView
+import com.jaredrummler.materialspinner.MaterialSpinner
+import kotlinx.android.synthetic.main.activity_attribute_detail.*
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
+import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.WizardView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.BooleanPropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ShortTextPropertyView
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.wizard.ConnectionWizardView
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 import kr.ac.snu.hcil.omnitrack.utils.setPaddingLeft
 import kr.ac.snu.hcil.omnitrack.utils.setPaddingRight
-import mehdi.sakout.fancybuttons.FancyButton
 import rx.subscriptions.CompositeSubscription
 import java.util.*
 
@@ -37,10 +36,6 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
     companion object {
         const val INTENT_EXTRA_SERIALIZED_ATTRIBUTE_DAO = "serializedAttributeDao"
         const val INTENT_EXTRA_APPLY_TO_DB = "applyToDb"
-
-        const val STATE_COLUMN_NAME = "columnName"
-        const val STATE_CONNECTION = "connection"
-        const val STATE_PROPERTIES = "properties"
 
         fun makeIntent(context: Context, dao: OTAttributeDAO, applyToDb: Boolean): Intent {
 
@@ -53,22 +48,13 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
     private lateinit var viewModel: AttributeDetailViewModel
 
-    private val propertyViewContainer: LinearLayout by bindView(R.id.ui_list)
-
-    private val columnNameView: ShortTextPropertyView by bindView(R.id.nameProperty)
-
-    private val requiredView: BooleanPropertyView by bindView(R.id.requiredProperty)
-
-    private val connectionGroup: ViewGroup by bindView(R.id.ui_connection_group)
-
-    private val connectionFrame: FrameLayout by bindView(R.id.ui_attribute_connection_frame)
-
-    private val newConnectionButton: FancyButton by bindView(R.id.ui_button_new_connection)
-    private val connectionView: AttributeConnectionView by bindView(R.id.ui_attribute_connection)
-
-    private val connectionViewTitle: TextView by bindView(R.id.ui_property_title_value_connection)
-
     private var propertyViewHorizontalMargin: Int = 0
+
+    private val currentSpinnerEntries = arrayListOf(
+            FallbackSpinnerEntry(OTAttributeDAO.DEFAULT_VALUE_POLICY_NULL, OTApplication.getString(R.string.msg_attribute_fallback_policy_null)),
+            FallbackSpinnerEntry(OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_LAST_ITEM, OTApplication.getString(R.string.msg_attribute_fallback_policy_last)),
+            FallbackSpinnerEntry(OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_PRESET, OTApplication.getString(R.string.msg_attribute_fallback_policy_preset))
+    )
 
     private val propertyViewList = ArrayList<ReadOnlyPair<String, View>>()
 
@@ -94,16 +80,16 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
         propertyViewHorizontalMargin = resources.getDimensionPixelSize(R.dimen.activity_horizontal_margin)
 
-        columnNameView.addNewValidator(String.format(resources.getString(R.string.msg_format_cannot_be_blank), resources.getString(R.string.msg_column_name)), ShortTextPropertyView.NOT_EMPTY_VALIDATOR)
+        nameProperty.addNewValidator(String.format(resources.getString(R.string.msg_format_cannot_be_blank), resources.getString(R.string.msg_column_name)), ShortTextPropertyView.NOT_EMPTY_VALIDATOR)
 
 
-        columnNameView.valueChanged += {
+        nameProperty.valueChanged += {
             sender, value ->
-            if (columnNameView.validate()) {
+            if (nameProperty.validate()) {
                 viewModel.name = value
             }
 
-            columnNameView.showEdited = viewModel.isNameDirty
+            nameProperty.showEdited = viewModel.isNameDirty
         }
 
         /*requiredView.valueChanged += {
@@ -111,7 +97,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
             attribute?.isRequired = value
         }*/
 
-        connectionView.onRemoveButtonClicked += {
+        ui_attribute_connection.onRemoveButtonClicked += {
             sender, arg ->
             DialogHelper.makeNegativePhrasedYesNoDialogBuilder(this, "OmniTrack", resources.getString(R.string.msg_confirm_remove_connection), R.string.msg_remove, onYes = {
                 viewModel.connection = null
@@ -119,27 +105,51 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
         }
 
 
-        newConnectionButton.setOnClickListener(this)
+        ui_button_new_connection.setOnClickListener(this)
 
+        ui_fallback_policy_spinner.setOnItemSelectedListener(object : MaterialSpinner.OnItemSelectedListener<FallbackSpinnerEntry> {
+            override fun onItemSelected(view: MaterialSpinner?, position: Int, id: Long, item: FallbackSpinnerEntry?) {
+                if (item != null) {
+                    viewModel.defaultValuePolicy = item.id
+                }
+            }
+
+        })
 
 
         creationSubscriptions.add(
                 viewModel.nameObservable.subscribe { name ->
-                    columnNameView.value = name
+                    nameProperty.value = name
                 }
         )
 
         creationSubscriptions.add(
                 viewModel.connectionObservable.subscribe { conn ->
-                    connectionView.connection = conn.datum
+                    ui_attribute_connection.connection = conn.datum
                     refreshConnection(true)
+
+                    if (viewModel.isConnectionDirty) {
+                        ui_property_title_value_connection.text = "${OTApplication.getString(R.string.msg_value_autocompletion)}*"
+                    } else {
+                        ui_property_title_value_connection.setText(R.string.msg_value_autocompletion)
+                    }
                 }
         )
 
         creationSubscriptions.add(
-                connectionView.onConnectionChanged.subscribe { newConnection ->
+                ui_attribute_connection.onConnectionChanged.subscribe { newConnection ->
                     viewModel.connection = newConnection.datum
                     refreshConnection(false)
+                }
+        )
+
+        creationSubscriptions.add(
+                viewModel.defaultValuePolicyObservable.subscribe { policy ->
+                    ui_fallback_policy_spinner.selectedIndex = currentSpinnerEntries.indexOf(currentSpinnerEntries.find { it.id == policy })
+
+                    if (viewModel.isDefaultValuePolicyDirty) {
+                        ui_title_fallback.text = "${OTApplication.getString(R.string.msg_attribute_fallback_policy)}*"
+                    } else ui_title_fallback.setText(R.string.msg_attribute_fallback_policy)
                 }
         )
 
@@ -163,7 +173,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
                     println("type changed: ${type}")
                     try {
                         val attrHelper = OTAttributeManager.getAttributeHelper(type)
-                        propertyViewContainer.removeAllViewsInLayout()
+                        ui_list.removeAllViewsInLayout()
 
                         val layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
 
@@ -200,30 +210,33 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
                             println("original view id: ${entry.second.id}, type: ${entry.second.javaClass}")
                             entry.second.id = View.generateViewId()
                             println("assigned view id: ${entry.second.id}, type: ${entry.second.javaClass}")
-                            propertyViewContainer.addView(entry.second, layoutParams)
+                            ui_list.addView(entry.second, layoutParams)
                         }
                         //end: refresh properties==================================================================================
 
-                        val dao = viewModel.attributeDao
+                        val dao = viewModel.makeFrontalChangesToDao()
                         if (dao != null) {
                             if (OTExternalService.getFilteredMeasureFactories {
                                 it.isAttachableTo(dao)
                             }.isEmpty()) {
-                                connectionGroup.visibility = View.GONE
+                                ui_connection_group.visibility = View.GONE
                             } else {
-                                connectionGroup.visibility = View.VISIBLE
+                                ui_connection_group.visibility = View.VISIBLE
                             }
+
+                            //refresh Fallback spinners============================================================================
+                            refreshFallbackSpinner(dao, attrHelper)
                         }
 
                         if (viewModel.isValid || viewModel.attributeHelper?.propertyKeys?.isEmpty() != false) {
                             //no property
-                            propertyViewContainer.setBackgroundResource(R.drawable.bottom_separator_light)
+                            ui_list.setBackgroundResource(R.drawable.bottom_separator_light)
                         } else if (viewModel.attributeHelper?.propertyKeys?.size == 1) {
                             //single property
-                            propertyViewContainer.setBackgroundResource(R.drawable.top_bottom_separator_light)
+                            ui_list.setBackgroundResource(R.drawable.top_bottom_separator_light)
                         } else {
                             //multiple properties
-                            propertyViewContainer.setBackgroundResource(R.drawable.expanded_view_inner_shadow)
+                            ui_list.setBackgroundResource(R.drawable.expanded_view_inner_shadow)
                         }
                     } catch (ex: Exception) {
 
@@ -232,6 +245,23 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
         )
 
         setResult(Activity.RESULT_CANCELED)
+    }
+
+    private fun refreshFallbackSpinner(dao: OTAttributeDAO, attrHelper: OTAttributeHelper) {
+        val match = currentSpinnerEntries.find { it.id == OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE }
+        if (attrHelper.isIntrinsicDefaultValueSupported(dao)) {
+            if (match != null) {
+                if (match.text != attrHelper.makeIntrinsicDefaultValueMessage(dao).toString()) {
+                    currentSpinnerEntries.remove(match)
+                    currentSpinnerEntries.add(1, FallbackSpinnerEntry(OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE, attrHelper.makeIntrinsicDefaultValueMessage(dao).toString()))
+                }
+            } else currentSpinnerEntries.add(1, FallbackSpinnerEntry(OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE, attrHelper.makeIntrinsicDefaultValueMessage(dao).toString()))
+        } else currentSpinnerEntries.remove(match)
+
+        ui_fallback_policy_spinner.setItems(currentSpinnerEntries)
+        ui_fallback_policy_spinner.selectedIndex = currentSpinnerEntries.indexOf(currentSpinnerEntries.find { it.id == dao.fallbackValuePolicy })
+
+        println("refreshed fallback spinner. policy: ${dao.fallbackValuePolicy}, index: ${currentSpinnerEntries.indexOf(currentSpinnerEntries.find { it.id == dao.fallbackValuePolicy })}")
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
@@ -257,10 +287,6 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
                 return super.onKeyDown(keyCode, event)
             }
         } else return super.onKeyDown(keyCode, event)
-    }
-
-    fun setCurrentStateToResult() {
-        setResult(Activity.RESULT_OK, Intent().putExtra(INTENT_EXTRA_SERIALIZED_ATTRIBUTE_DAO, OTAttributeDAO.parser.toJson(viewModel.attributeDao, OTAttributeDAO::class.java)))
     }
 
     private fun askChangeAndFinish(backInsteadOfFinish: Boolean = false) {
@@ -326,7 +352,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
     private fun saveChanges() {
         viewModel.applyChanges()
-        setResult(Activity.RESULT_OK, Intent().putExtra(INTENT_EXTRA_SERIALIZED_ATTRIBUTE_DAO, OTAttributeDAO.parser.toJson(viewModel.attributeDao, OTAttributeDAO::class.java)))
+        setResult(Activity.RESULT_OK, Intent().putExtra(INTENT_EXTRA_SERIALIZED_ATTRIBUTE_DAO, OTAttributeDAO.parser.toJson(viewModel.attributeDAO, OTAttributeDAO::class.java)))
     }
 
     /*
@@ -338,7 +364,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
             columnNameView.value = attr.name
             columnNameView.watchOriginalValue()
 
-            propertyViewContainer.removeAllViewsInLayout()
+            ui_list.removeAllViewsInLayout()
 
             val layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
 
@@ -367,7 +393,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
                 }
 
                 entry.second.id = View.generateViewId()
-                propertyViewContainer.addView(entry.second, layoutParams)
+                ui_list.addView(entry.second, layoutParams)
             }
             //end: refresh properties==================================================================================
 
@@ -387,35 +413,33 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
         if (attr == null || attr.propertyKeys.isEmpty()) {
             //no property
-            propertyViewContainer.setBackgroundResource(R.drawable.bottom_separator_light)
+            ui_list.setBackgroundResource(R.drawable.bottom_separator_light)
         } else if (attr.propertyKeys.size == 1) {
             //single property
-            propertyViewContainer.setBackgroundResource(R.drawable.top_bottom_separator_light)
+            ui_list.setBackgroundResource(R.drawable.top_bottom_separator_light)
         } else {
             //multiple properties
-            propertyViewContainer.setBackgroundResource(R.drawable.expanded_view_inner_shadow)
+            ui_list.setBackgroundResource(R.drawable.expanded_view_inner_shadow)
         }
     }*/
 
     private fun refreshConnection(animated: Boolean) {
         if (animated) {
-            TransitionManager.beginDelayedTransition(connectionFrame)
+            TransitionManager.beginDelayedTransition(ui_attribute_connection_frame)
         }
 
-        if (connectionView.connection != null) {
-            newConnectionButton.visibility = View.GONE
-            connectionView.visibility = View.VISIBLE
+        if (ui_attribute_connection.connection != null) {
+            ui_button_new_connection.visibility = View.GONE
+            ui_attribute_connection.visibility = View.VISIBLE
         } else {
-            connectionView.visibility = View.GONE
-            newConnectionButton.visibility = View.VISIBLE
+            ui_attribute_connection.visibility = View.GONE
+            ui_button_new_connection.visibility = View.VISIBLE
         }
-
-        connectionViewTitle.text = "${resources.getString(R.string.msg_value_autocompletion)}"
     }
 
     override fun onClick(view: View?) {
-        println(view === newConnectionButton)
-        if (view === newConnectionButton) {
+        println(view === ui_button_new_connection)
+        if (view === ui_button_new_connection) {
             /*
             val intent = Intent(this, ConnectionWizardActivity::class.java)
             startActivityForResult(intent, 0)*/
@@ -432,13 +456,13 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
                     .setView(wizardView)
                     .create()
 
-            viewModel.attributeDao?.let {
+            viewModel.attributeDAO?.let {
                 wizardView.init(it)
             }
 
             wizardView.setWizardListener(object : WizardView.IWizardListener {
                 override fun onComplete(wizard: WizardView) {
-                    connectionView.connection = wizardView.connection
+                    ui_attribute_connection.connection = wizardView.connection
                     refreshConnection(true)
                     println("new connection refreshed.")
                     wizardDialog.dismiss()
@@ -451,6 +475,12 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
             })
 
             wizardDialog.show()
+        }
+    }
+
+    data class FallbackSpinnerEntry(val id: Int, val text: String) {
+        override fun toString(): String {
+            return text
         }
     }
 }

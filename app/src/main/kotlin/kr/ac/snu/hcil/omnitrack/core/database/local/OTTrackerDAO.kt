@@ -13,6 +13,7 @@ import io.realm.annotations.PrimaryKey
 import io.realm.exceptions.RealmException
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
+import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import java.util.*
 
 /**
@@ -61,6 +62,8 @@ open class OTAttributeDAO : RealmObject() {
                     "name" -> dao.name = reader.nextString()
                     "pos" -> dao.position = reader.nextInt()
                     "type" -> dao.type = reader.nextInt()
+                    "fallbackPolicy" -> dao.fallbackValuePolicy = reader.nextInt()
+                    "fallbackPreset" -> dao.fallbackPresetSerializedValue = reader.nextString()
                     "userCreatedAt" -> dao.userCreatedAt = reader.nextLong()
                     "updatedAt" -> dao.updatedAt = reader.nextLong()
                     "req" -> dao.isRequired = reader.nextBoolean()
@@ -99,6 +102,8 @@ open class OTAttributeDAO : RealmObject() {
             out.name("trackerId").value(value.trackerId)
             out.name("name").value(value.name)
             out.name("pos").value(value.position)
+            out.name("fallbackPolicy").value(value.fallbackValuePolicy)
+            out.name("fallbackPreset").value(value.fallbackPresetSerializedValue)
             out.name("type").value(value.type)
             out.name("userCreatedAt").value(value.userCreatedAt)
             out.name("req").value(value.isRequired)
@@ -136,10 +141,15 @@ open class OTAttributeDAO : RealmObject() {
     var properties = RealmList<OTStringStringEntryDAO>()
 
     //If connection is specified, this policy is overriden.
-    var defaultValuePolicy: Int = DEFAULT_VALUE_POLICY_NULL
+    var fallbackValuePolicy: Int = DEFAULT_VALUE_POLICY_NULL
+    var fallbackPresetSerializedValue: String? = null
 
     var userCreatedAt: Long = System.currentTimeMillis()
     var updatedAt: Long = System.currentTimeMillis()
+
+    fun getParsedConnection(): OTConnection? {
+        return serializedConnection?.let { OTConnection.fromJson(it) }
+    }
 
     fun initializePropertiesWithDefaults(realm: Realm) {
         val attributeHelper = OTAttributeManager.getAttributeHelper(type)
@@ -176,7 +186,8 @@ open class OTAttributeDAO : RealmObject() {
 
         const val DEFAULT_VALUE_POLICY_NULL = 0
         const val DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE = 1
-        const val DEFAULT_VALUE_POLICY_FILL_WITH_LAST_ITEM = 2
+        const val DEFAULT_VALUE_POLICY_FILL_WITH_PRESET = 2
+        const val DEFAULT_VALUE_POLICY_FILL_WITH_LAST_ITEM = 3
 
         val parser: Gson by lazy {
             GsonBuilder().registerTypeAdapter(OTAttributeDAO::class.java, AttrDaoJsonTypeAdapter()).create()
