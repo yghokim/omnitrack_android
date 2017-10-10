@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.database.synchronization.official
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTItemPOJO
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTUserRolePOJO
+import kr.ac.snu.hcil.omnitrack.core.database.synchronization.ISynchronizationServerSideAPI
 import kr.ac.snu.hcil.omnitrack.core.database.synchronization.SyncResultEntry
 import retrofit2.http.*
 import rx.Single
@@ -26,7 +27,7 @@ interface OTOfficialServerService {
     fun postUserRoleConsentResult(@Body data: OTUserRolePOJO): Single<Boolean>
 
     @PUT("api/user/device")
-    fun putDeviceInfo(@Body info: OTDeviceInfo): Single<Boolean>
+    fun putDeviceInfo(@Body info: OTDeviceInfo): Single<ISynchronizationServerSideAPI.DeviceInfoResult>
 
 
 }

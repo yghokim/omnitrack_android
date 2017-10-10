@@ -20,7 +20,6 @@ import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.utils.getActivity
-import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
 import rx.subscriptions.Subscriptions
@@ -127,6 +126,17 @@ object OTAuthManager {
     }.share().observeOn(Schedulers.io())
     */
     val userId: String? get() = mFirebaseAuth.currentUser?.uid
+
+    var userDeviceLocalKey: String?
+        get() = OTApplication.app.systemSharedPreferences.getString(OTApplication.PREFERENCE_KEY_DEVICE_LOCAL_KEY, null)
+        set(value) {
+            println("set device local key: ${value}")
+            if (value != null) {
+                OTApplication.app.systemSharedPreferences.edit().putString(OTApplication.PREFERENCE_KEY_DEVICE_LOCAL_KEY, value).apply()
+            } else {
+                OTApplication.app.systemSharedPreferences.edit().remove(OTApplication.PREFERENCE_KEY_DEVICE_LOCAL_KEY).apply()
+            }
+        }
 
     fun isUserSignedIn(): Boolean {
         return mFirebaseAuth.currentUser != null
@@ -266,17 +276,27 @@ object OTAuthManager {
                 googleSignInAccount = result.signInAccount
                 println("signed in google account: ${result.signInAccount}")
                 refreshToken()
-                firebaseAuthWithGoogle(googleSignInAccount).observeOn(AndroidSchedulers.mainThread()).subscribe({ authResult ->
+                firebaseAuthWithGoogle(googleSignInAccount).flatMap { authResult ->
+                    OTApplication.app.synchronizationServerController.putDeviceInfo(OTDeviceInfo()).
+                            map { result ->
+                                val localKey = result.deviceLocalKey
+                                if (localKey != null) {
+                                    userDeviceLocalKey = localKey
+                                    return@map true
+                                } else return@map false
+                            }
+                            .toObservable()
+                            .map { success ->
+                                println("refreshed device info.")
+                                if (success) {
+                                    authResult
+                                } else throw Exception("Failed to push device info to server.")
+                            }
+                }.observeOn(AndroidSchedulers.mainThread()).subscribe({ authResult ->
+                    println("sign in succeeded.")
                     reloadUserInfo()
                     notifySignedIn(authResult.user)
                     resultHandler?.onSuccess()
-
-                    if (NetworkHelper.isConnectedToInternet()) {
-                        OTApplication.app.synchronizationServerController.putDeviceInfo(OTDeviceInfo()).toObservable()
-                                .map { success ->
-                                    println("refreshed device info.")
-                                }
-                        }
                 }, {
                     ex ->
                     mFirebaseAuth.signOut()
@@ -339,12 +359,14 @@ object OTAuthManager {
                 clearUserInfo()
                 mFirebaseAuth.signOut()
                 Auth.GoogleSignInApi.signOut(mGoogleApiClient)
+                userDeviceLocalKey = null
                 notifySignedOut()
             }
         } else {
             clearUserInfo()
             mFirebaseAuth.signOut()
             Auth.GoogleSignInApi.signOut(mGoogleApiClient)
+            userDeviceLocalKey = null
             notifySignedOut()
         }
     }
@@ -357,10 +379,11 @@ object OTAuthManager {
         OTApplication.app.sendBroadcast(Intent(OTApplication.BROADCAST_ACTION_USER_SIGNED_OUT).putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_USER, userId))
     }
 
-    private fun clearUserInfo() {
+    fun clearUserInfo() {
         userName = null
         userImageUrl = null
         email = null
+
     }
 
     fun refreshToken(): String? {

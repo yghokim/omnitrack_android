@@ -203,46 +203,6 @@ class OTItemBuilder : IStringSerializable {
         syncFromTrackerScheme()
     }
 
-
-    /**
-     * used when deserializing
-     */
-    /*
-    constructor(parcel: Parcel) {
-
-        reloadTracker(parcel.readString())
-
-        this.mode = parcel.readInt()
-        this.connectedItemDbId = parcel.readLong()
-
-        val parcelArray = parcelParser.fromJson(parcel.readString(), Array<ValueParcel>::class.java)
-
-        for (entry in parcelArray) {
-            valueTable[entry.key] = ValueInfo(
-                    TypeStringSerializationHelper.deserialize(entry.serializedValue),
-                    entry.timeStamp
-            )
-
-        }
-
-        syncFromTrackerScheme()
-    }*/
-
-    /*
-    override fun writeToParcel(parcel: Parcel, content: Int) {
-        parcel.writeString(tracker.objectId)
-        parcel.writeInt(mode)
-        parcel.writeLong(connectedItemDbId)
-
-
-        parcel.writeString(
-                parcelParser.toJson(valueTable.map {
-                    ValueParcel(it.key,
-                            TypeStringSerializationHelper.serialize(it.value), it.value.timestamp)
-                }.toTypedArray()
-                ))
-    }*/
-
     private constructor(trackerObjectId: String, mode: Int, connectedItemDbId: String?, connectedItemTimestamp: Long?) {
         if (!OTApplication.app.isUserLoaded) {
             throw Exception("Do not deserialize ItemBuilder until user is loaded.")
@@ -253,31 +213,6 @@ class OTItemBuilder : IStringSerializable {
         this.connectedItemTimestamp = connectedItemTimestamp
         syncFromTrackerScheme()
     }
-/*
-    constructor(serialized: String) {
-
-        val gson = Gson()
-
-        val pack = gson.fromJson(serialized, SerializationPackage::class.java)
-
-
-        reloadTracker(pack.trackerId)
-
-        this.mode = pack.mode
-        this.connectedItemDbId = pack.connectedItemDbId
-
-        val parcelArray = parcelParser.fromJson(pack.valueParcelArray, Array<ValueParcel>::class.java)
-
-        for (entry in parcelArray) {
-            valueTable[entry.key] = ValueInfo(
-                    TypeStringSerializationHelper.deserialize(entry.serializedValue),
-                    entry.timeStamp
-            )
-
-        }
-
-        syncFromTrackerScheme()
-    }*/
 
     override fun getSerializedString(): String {
         return parser.toJson(this)

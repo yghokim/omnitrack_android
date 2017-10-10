@@ -10,6 +10,8 @@ import rx.Single
  */
 interface ISynchronizationServerSideAPI {
 
+    data class DeviceInfoResult(var result: String, var deviceLocalKey: String?)
+
     //server returns server-side changes after designated timestamp.
     fun getItemsAfter(timestamp: Long): Single<List<OTItemPOJO>>
 
@@ -20,6 +22,6 @@ interface ISynchronizationServerSideAPI {
 
     fun postUserRoleConsentResult(result: OTUserRolePOJO): Single<Boolean>
 
-    fun putDeviceInfo(info: OTDeviceInfo): Single<Boolean>
+    fun putDeviceInfo(info: OTDeviceInfo): Single<DeviceInfoResult>
     fun removeDeviceInfo(userId: String, deviceId: String): Single<Boolean>
 }

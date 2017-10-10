@@ -8,6 +8,7 @@ import com.google.gson.stream.JsonWriter
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilder
+import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
@@ -155,6 +156,16 @@ class OTConnection {
     }
 
     fun getRequestedValue(builder: OTItemBuilder): Observable<Nullable<out Any>> {
+        return Observable.defer {
+            //if (source != null) {
+            //    return@defer source!!.getValueRequest(builder, rangedQuery)
+            // } else {
+            return@defer Observable.error<Nullable<out Any>>(Exception("Connection source is not designated."))
+            // }
+        }
+    }
+
+    fun getRequestedValue(builder: OTItemBuilderWrapperBase): Observable<Nullable<out Any>> {
         return Observable.defer {
             if (source != null) {
                 return@defer source!!.getValueRequest(builder, rangedQuery)
