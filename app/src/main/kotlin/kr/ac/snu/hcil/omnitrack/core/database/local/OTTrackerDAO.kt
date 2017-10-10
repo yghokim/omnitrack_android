@@ -10,8 +10,6 @@ import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.annotations.Index
 import io.realm.annotations.PrimaryKey
-import io.realm.exceptions.RealmException
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import java.util.*
@@ -31,7 +29,6 @@ open class OTTrackerDAO : RealmObject() {
 
     var position: Int = 0
     var color: Int = 0
-    var attributeLocalKeySeed: Int = 0
     var isBookmarked: Boolean = false
 
     var attributes = RealmList<OTAttributeDAO>()
@@ -57,7 +54,7 @@ open class OTAttributeDAO : RealmObject() {
             while (reader.hasNext()) {
                 when (reader.nextName()) {
                     "id" -> dao.objectId = reader.nextString()
-                    "localId" -> dao.localId = reader.nextInt()
+                    "localId" -> dao.localId = reader.nextString()
                     "trackerId" -> dao.trackerId = reader.nextString()
                     "name" -> dao.name = reader.nextString()
                     "pos" -> dao.position = reader.nextInt()
@@ -127,7 +124,7 @@ open class OTAttributeDAO : RealmObject() {
     @PrimaryKey
     var objectId: String? = null
 
-    var localId: Int = -1
+    var localId: String = ""
 
     @Index
     var trackerId: String? = null
@@ -191,29 +188,6 @@ open class OTAttributeDAO : RealmObject() {
 
         val parser: Gson by lazy {
             GsonBuilder().registerTypeAdapter(OTAttributeDAO::class.java, AttrDaoJsonTypeAdapter()).create()
-        }
-
-        fun convertAttributeToDAO(attribute: OTAttribute<*>, position: Int, realm: Realm, dao: OTAttributeDAO?): OTAttributeDAO {
-            if (!realm.isInTransaction) {
-                throw RealmException("This operation should be called in transaction.")
-            }
-
-            val baseDao = dao ?: realm.createObject(OTAttributeDAO::class.java, attribute.objectId)
-            baseDao.localId = attribute.localKey
-            baseDao.name = attribute.name
-            baseDao.position = position
-            baseDao.isRequired = attribute.isRequired
-            baseDao.serializedConnection = attribute.valueConnection?.getSerializedString()
-
-            val properties = HashMap<String, String>()
-            attribute.writePropertiesToDatabase(properties)
-
-            RealmDatabaseManager.convertDictionaryToRealmList(realm,
-                    properties,
-                    baseDao.properties,
-                    null)
-
-            return baseDao
         }
     }
 }
