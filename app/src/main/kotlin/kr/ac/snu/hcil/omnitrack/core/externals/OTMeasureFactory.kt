@@ -2,7 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.externals
 
 import android.text.Html
 import kr.ac.snu.hcil.omnitrack.OTApplication
-import kr.ac.snu.hcil.omnitrack.core.OTItemBuilder
+import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
@@ -157,7 +157,7 @@ abstract class OTMeasureFactory(val factoryTypeName: String) : INameDescriptionR
         constructor() : super()
         constructor(serialized: String) : super(serialized)
 
-        abstract fun getValueRequest(builder: OTItemBuilder, query: OTTimeRangeQuery?): Observable<Nullable<out Any>>
+        abstract fun getValueRequest(builder: OTItemBuilderWrapperBase, query: OTTimeRangeQuery?): Observable<Nullable<out Any>>
     }
 
     abstract class OTRangeQueriedMeasure : OTMeasure {
@@ -167,7 +167,7 @@ abstract class OTMeasureFactory(val factoryTypeName: String) : INameDescriptionR
 
         abstract fun getValueRequest(start: Long, end: Long): Observable<Nullable<out Any>>
 
-        override fun getValueRequest(builder: OTItemBuilder, query: OTTimeRangeQuery?): Observable<Nullable<out Any>> {
+        override fun getValueRequest(builder: OTItemBuilderWrapperBase, query: OTTimeRangeQuery?): Observable<Nullable<out Any>> {
             val range = query!!.getRange(builder)
             return getValueRequest(range.first, range.second)
         }

@@ -6,7 +6,7 @@ import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.OTItemBuilder
+import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import java.util.*
 
 /**
@@ -136,7 +136,7 @@ class OTTimeRangeQuery {
         } else return false
     }
 
-    fun getRange(@Suppress("UNUSED_PARAMETER") builder: OTItemBuilder): Pair<Long, Long> {
+    fun getRange(@Suppress("UNUSED_PARAMETER") builder: OTItemBuilderWrapperBase): Pair<Long, Long> {
         val start: Long
         val end: Long
         if (mode == TYPE_PIVOT_TIMESTAMP) {
