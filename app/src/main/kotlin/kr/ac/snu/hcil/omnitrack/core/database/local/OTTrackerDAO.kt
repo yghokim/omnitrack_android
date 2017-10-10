@@ -135,6 +135,9 @@ open class OTAttributeDAO : RealmObject() {
     var isRequired: Boolean = false
     var properties = RealmList<OTStringStringEntryDAO>()
 
+    //If connection is specified, this policy is overriden.
+    var defaultValuePolicy: Int = DEFAULT_VALUE_POLICY_NULL
+
     var userCreatedAt: Long = System.currentTimeMillis()
     var updatedAt: Long = System.currentTimeMillis()
 
@@ -170,6 +173,10 @@ open class OTAttributeDAO : RealmObject() {
     }
 
     companion object {
+
+        const val DEFAULT_VALUE_POLICY_NULL = 0
+        const val DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE = 1
+        const val DEFAULT_VALUE_POLICY_FILL_WITH_LAST_ITEM = 2
 
         val parser: Gson by lazy {
             GsonBuilder().registerTypeAdapter(OTAttributeDAO::class.java, AttrDaoJsonTypeAdapter()).create()

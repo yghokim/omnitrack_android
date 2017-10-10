@@ -23,7 +23,7 @@ class ItemEditionViewModel : RealmViewModel() {
     private var itemBuilderDao: OTPendingItemBuilderDAO? = null
 
     val modeObservable = BehaviorSubject.create<ItemMode>(ItemMode.New)
-    val builderObservable = BehaviorSubject.create<Pair<OTPendingItemBuilderDAO, BuilderCreationMode>>()
+    val builderCreationModeObservable = BehaviorSubject.create<BuilderCreationMode>()
 
     var mode: ItemMode
         get() {
@@ -46,8 +46,18 @@ class ItemEditionViewModel : RealmViewModel() {
                     OTApplication.app.databaseManager.getItemBuilderOfTracker(trackerId, OTPendingItemBuilderDAO.HOLDER_TYPE_INPUT_FORM, realm).subscribe { result ->
                         if (result.datum != null) {
                             //there is a pending itemBuilder.
+                            this.itemBuilderDao = result.datum
+                            builderCreationModeObservable.onNext(BuilderCreationMode.Restored)
+
                         } else {
                             //no pending itemBuilder.
+                            realm.executeTransaction {
+                                val newBuilderDao = realm.createObject(OTPendingItemBuilderDAO::class.java, (realm.where(OTPendingItemBuilderDAO::class.java).max("id")?.toLong() ?: 0) + 1)
+                                newBuilderDao.tracker = trackerDao
+                                newBuilderDao.holderType = OTPendingItemBuilderDAO.HOLDER_TYPE_INPUT_FORM
+                                this.itemBuilderDao = newBuilderDao
+                            }
+                            builderCreationModeObservable.onNext(BuilderCreationMode.NewBuilder)
                         }
 
                         mode = ItemMode.New

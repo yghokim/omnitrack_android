@@ -35,6 +35,8 @@ class AttributeDetailViewModel : ViewModel() {
 
     val typeObservable = BehaviorSubject.create<Int>()
 
+    val defaultValuePolicyObservable = BehaviorSubject.create<Int>(OTAttributeDAO.DEFAULT_VALUE_POLICY_NULL)
+
     val onPropertyValueChanged = PublishSubject.create<Pair<String, Any?>>()
 
     private val propertyTable = Hashtable<String, Any?>()
@@ -51,7 +53,18 @@ class AttributeDetailViewModel : ViewModel() {
             }
         }
 
-    val isNameChanged: Boolean
+    var defaultValuePolicy: Int
+        get() = defaultValuePolicyObservable.value
+        set(value) {
+            if (value != defaultValuePolicyObservable.value) {
+                defaultValuePolicyObservable.onNext(value)
+            }
+        }
+
+    val isDefaultValuePolicyDirty: Boolean
+        get() = defaultValuePolicy != attributeDao?.defaultValuePolicy
+
+    val isNameDirty: Boolean
         get() = name != attributeDao?.name
 
     var connection: OTConnection?
@@ -67,26 +80,23 @@ class AttributeDetailViewModel : ViewModel() {
     fun init(attributeDao: OTAttributeDAO) {
         if (this.attributeDao != attributeDao) {
             this.attributeDao = attributeDao
-            if (attributeDao != null) {
                 name = attributeDao.name
                 connection = attributeDao.serializedConnection?.let { OTConnection.fromJson(it) }
 
                 if (typeObservable.value != attributeDao.type)
                     typeObservable.onNext(attributeDao.type)
 
+            defaultValuePolicy = attributeDao.defaultValuePolicy
 
                 propertyTable.clear()
                 val helper = attributeHelper
                 if (helper != null) {
                     val table = helper.getDeserializedPropertyTable(attributeDao)
-                    if (table != null) {
                         for (entry in table) {
                             propertyTable.set(entry.key, entry.value)
                             onPropertyValueChanged.onNext(Pair(entry.key, entry.value))
                         }
-                    }
                 }
-            }
         }
     }
 
@@ -106,11 +116,12 @@ class AttributeDetailViewModel : ViewModel() {
     }
 
     fun isChanged(): Boolean {
-        return isNameChanged || hasAnyPropertyChanged()
+        return isNameDirty || hasAnyPropertyChanged()
     }
 
     fun applyChanges() {
         attributeDao?.name = name
+        attributeDao?.defaultValuePolicy = defaultValuePolicy
 
         for (entry in propertyTable) {
             val value = entry.value

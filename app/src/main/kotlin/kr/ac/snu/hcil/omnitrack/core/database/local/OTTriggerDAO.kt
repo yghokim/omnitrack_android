@@ -8,7 +8,7 @@ import io.realm.annotations.PrimaryKey
 /**
  * Created by Young-Ho on 10/9/2017.
  */
-class OTTriggerDAO : RealmObject() {
+open class OTTriggerDAO : RealmObject() {
 
     @PrimaryKey
     var objectId: String? = null
