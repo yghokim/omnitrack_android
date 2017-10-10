@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyManager
@@ -10,6 +11,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.LikertScaleInput
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.StarRatingInputView
 import kr.ac.snu.hcil.omnitrack.utils.RatingOptions
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
+import rx.Observable
 
 /**
  * Created by Young-Ho on 10/7/2017.
@@ -75,5 +77,36 @@ class OTRatingAttributeHelper : OTAttributeHelper() {
             inputView.scalePicker.middleLabel = options.middleLabel
             inputView.scalePicker.value = ((options.rightMost + options.leftMost) shr 1).toFloat()
         }
+    }
+
+    override fun isIntrinsicDefaultValueSupported(attribute: OTAttributeDAO): Boolean {
+        return true
+    }
+
+    override fun makeIntrinsicDefaultValue(attribute: OTAttributeDAO): Observable<out Any> {
+        return Observable.defer {
+            val ratingOptions = getRatingOptions(attribute)
+            when (ratingOptions.type) {
+                RatingOptions.DisplayType.Likert -> {
+                    if (ratingOptions.allowIntermediate) {
+                        return@defer Observable.just((ratingOptions.rightMost + ratingOptions.leftMost) / 2.0f)
+                    } else {
+
+                        return@defer Observable.just(((ratingOptions.rightMost + ratingOptions.leftMost) / 2).toFloat())
+                    }
+                }
+                RatingOptions.DisplayType.Star -> {
+                    if (ratingOptions.allowIntermediate) {
+                        return@defer Observable.just(ratingOptions.starLevels.maxScore / 2.0f)
+                    } else {
+                        return@defer Observable.just((ratingOptions.starLevels.maxScore / 2).toFloat())
+                    }
+                }
+            }
+        }
+    }
+
+    override fun makeIntrinsicDefaultValueMessage(attribute: OTAttributeDAO): CharSequence {
+        return OTApplication.getString(R.string.msg_intrinsic_rating)
     }
 }

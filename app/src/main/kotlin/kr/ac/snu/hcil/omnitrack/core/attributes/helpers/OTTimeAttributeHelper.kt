@@ -14,6 +14,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.TimePointInputVi
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.SelectionPropertyView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
+import rx.Observable
 
 /**
  * Created by Young-Ho on 10/7/2017.
@@ -95,4 +96,15 @@ class OTTimeAttributeHelper : OTAttributeHelper() {
         }
     }
 
+    override fun isIntrinsicDefaultValueSupported(attribute: OTAttributeDAO): Boolean {
+        return true
+    }
+
+    override fun makeIntrinsicDefaultValue(attribute: OTAttributeDAO): Observable<out Any> {
+        return Observable.defer { Observable.just(TimePoint()) }
+    }
+
+    override fun makeIntrinsicDefaultValueMessage(attribute: OTAttributeDAO): CharSequence {
+        return OTApplication.getString(R.string.msg_intrinsic_time)
+    }
 }

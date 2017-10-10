@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyManager
@@ -9,6 +10,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputV
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.NumberInputView
 import kr.ac.snu.hcil.omnitrack.utils.NumberStyle
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
+import rx.Observable
 
 /**
  * Created by Young-Ho on 10/7/2017.
@@ -61,5 +63,17 @@ class OTNumberAttributeHelper : OTAttributeHelper() {
         if (inputView is NumberInputView) {
             inputView.numberStyle = getNumberStyle(attribute) ?: NumberStyle()
         }
+    }
+
+    override fun isIntrinsicDefaultValueSupported(attribute: OTAttributeDAO): Boolean {
+        return true
+    }
+
+    override fun makeIntrinsicDefaultValue(attribute: OTAttributeDAO): Observable<out Any> {
+        return Observable.just(0)
+    }
+
+    override fun makeIntrinsicDefaultValueMessage(attribute: OTAttributeDAO): CharSequence {
+        return OTApplication.getString(R.string.msg_intrinsic_number)
     }
 }

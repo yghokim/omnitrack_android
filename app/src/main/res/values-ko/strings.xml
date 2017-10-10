@@ -93,6 +93,11 @@
 
     <string name="msg_value_autocompletion">값 자동완성</string>
 
+    <string name="msg_attribute_fallback_policy">미입력 처리</string>
+    <string name="msg_attribute_fallback_policy_null">빈 값으로 두기</string>
+    <string name="msg_attribute_fallback_policy_last">이전 데이터 값으로 자동입력</string>
+    <string name="msg_attribute_fallback_policy_preset">미리 지정한 값으로 자동입력</string>
+
     <string name="msg_column_name">필드 이름</string>
 
     <string name='msg_format_cannot_be_blank'>%1$s 항목은 비어있을 수 없습니다.</string>

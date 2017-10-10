@@ -19,23 +19,24 @@ class AttributeDetailViewModel : ViewModel() {
         const val CONNECTION_NULL = "null"
     }
 
-    var attributeDao: OTAttributeDAO? = null
+    var attributeDAO: OTAttributeDAO? = null
         private set
 
     private val realm = OTApplication.app.databaseManager.getRealmInstance()
 
-    val isValid: Boolean get() = attributeDao?.isValid ?: false
+    val isValid: Boolean get() = attributeDAO?.isValid ?: false
 
-    val attributeHelper: OTAttributeHelper? get() = attributeDao?.let { OTAttributeManager.getAttributeHelper(it.type) }
+    val attributeHelper: OTAttributeHelper? get() = attributeDAO?.let { OTAttributeManager.getAttributeHelper(it.type) }
 
-    val isInDatabase: Boolean get() = attributeDao?.isManaged ?: false
+    val isInDatabase: Boolean get() = attributeDAO?.isManaged ?: false
 
     val nameObservable = BehaviorSubject.create<String>("")
     val connectionObservable = BehaviorSubject.create<Nullable<OTConnection>>()
 
     val typeObservable = BehaviorSubject.create<Int>()
 
-    val defaultValuePolicyObservable = BehaviorSubject.create<Int>(OTAttributeDAO.DEFAULT_VALUE_POLICY_NULL)
+    val defaultValuePolicyObservable = BehaviorSubject.create<Int>(-1)
+    val defaultValuePresetObservable = BehaviorSubject.create<Nullable<String>>(Nullable<String>(null))
 
     val onPropertyValueChanged = PublishSubject.create<Pair<String, Any?>>()
 
@@ -61,11 +62,25 @@ class AttributeDetailViewModel : ViewModel() {
             }
         }
 
+    var defaultValuePreset: String?
+        get() = defaultValuePresetObservable.value.datum
+        set(value) {
+            if (value != defaultValuePresetObservable.value.datum) {
+                defaultValuePresetObservable.onNext(Nullable(value))
+            }
+        }
+
+    val isConnectionDirty: Boolean
+        get() = connectionObservable.value?.datum != attributeDAO?.getParsedConnection()
+
     val isDefaultValuePolicyDirty: Boolean
-        get() = defaultValuePolicy != attributeDao?.defaultValuePolicy
+        get() = defaultValuePolicy != attributeDAO?.fallbackValuePolicy
+
+    val isDefaultValuePresetDirty: Boolean
+        get() = defaultValuePreset != attributeDAO?.fallbackPresetSerializedValue
 
     val isNameDirty: Boolean
-        get() = name != attributeDao?.name
+        get() = name != attributeDAO?.name
 
     var connection: OTConnection?
         get() {
@@ -78,25 +93,28 @@ class AttributeDetailViewModel : ViewModel() {
         }
 
     fun init(attributeDao: OTAttributeDAO) {
-        if (this.attributeDao != attributeDao) {
-            this.attributeDao = attributeDao
-                name = attributeDao.name
-                connection = attributeDao.serializedConnection?.let { OTConnection.fromJson(it) }
+        if (this.attributeDAO != attributeDao) {
+            this.attributeDAO = attributeDao
+            name = attributeDao.name
+            connection = attributeDao.serializedConnection?.let { OTConnection.fromJson(it) }
 
-                if (typeObservable.value != attributeDao.type)
-                    typeObservable.onNext(attributeDao.type)
+            println("initial policy: ${attributeDao.fallbackValuePolicy}")
 
-            defaultValuePolicy = attributeDao.defaultValuePolicy
+            defaultValuePolicy = attributeDao.fallbackValuePolicy
+            defaultValuePreset = attributeDao.fallbackPresetSerializedValue
 
-                propertyTable.clear()
-                val helper = attributeHelper
-                if (helper != null) {
-                    val table = helper.getDeserializedPropertyTable(attributeDao)
-                        for (entry in table) {
-                            propertyTable.set(entry.key, entry.value)
-                            onPropertyValueChanged.onNext(Pair(entry.key, entry.value))
-                        }
+            propertyTable.clear()
+            val helper = attributeHelper
+            if (helper != null) {
+                val table = helper.getDeserializedPropertyTable(attributeDao)
+                for (entry in table) {
+                    propertyTable.set(entry.key, entry.value)
+                    onPropertyValueChanged.onNext(Pair(entry.key, entry.value))
                 }
+            }
+
+            if (typeObservable.value != attributeDao.type)
+                typeObservable.onNext(attributeDao.type)
         }
     }
 
@@ -108,7 +126,7 @@ class AttributeDetailViewModel : ViewModel() {
     }
 
     fun isPropertyChanged(propertyKey: String): Boolean {
-        return attributeDao?.let { propertyTable[propertyKey] != attributeHelper?.getDeserializedPropertyValue(propertyKey, it) } ?: false
+        return attributeDAO?.let { propertyTable[propertyKey] != attributeHelper?.getDeserializedPropertyValue<Any>(propertyKey, it) } ?: false
     }
 
     fun hasAnyPropertyChanged(): Boolean {
@@ -116,27 +134,54 @@ class AttributeDetailViewModel : ViewModel() {
     }
 
     fun isChanged(): Boolean {
-        return isNameDirty || hasAnyPropertyChanged()
+        return isNameDirty || isDefaultValuePolicyDirty || isDefaultValuePresetDirty || hasAnyPropertyChanged() || isConnectionDirty
     }
 
     fun applyChanges() {
-        attributeDao?.name = name
-        attributeDao?.defaultValuePolicy = defaultValuePolicy
+        attributeDAO?.name = name
+        attributeDAO?.fallbackValuePolicy = defaultValuePolicy
+        attributeDAO?.fallbackPresetSerializedValue = defaultValuePreset
 
         for (entry in propertyTable) {
             val value = entry.value
             val propertyHelper = attributeHelper?.getPropertyHelper<Any>(entry.key)
             if (propertyHelper != null && value != null) {
-                attributeDao?.setPropertySerializedValue(entry.key, propertyHelper.getSerializedValue(value))
+                attributeDAO?.setPropertySerializedValue(entry.key, propertyHelper.getSerializedValue(value))
             }
         }
 
-        attributeDao?.serializedConnection = connection?.getSerializedString()
+        attributeDAO?.serializedConnection = connection?.getSerializedString()
+    }
+
+    fun makeFrontalChangesToDao(): OTAttributeDAO? {
+        return attributeDAO?.let {
+            val dao = OTAttributeDAO()
+            dao.objectId = it.objectId
+            dao.type = it.type
+            dao.localId = it.localId
+            dao.position = it.position
+            dao.trackerId = it.trackerId
+            dao.updatedAt = it.updatedAt
+            dao.isRequired = it.isRequired
+            dao.fallbackValuePolicy = defaultValuePolicy
+            dao.fallbackPresetSerializedValue = defaultValuePreset
+            dao.name = name
+            for (entry in propertyTable) {
+                val value = entry.value
+                val propertyHelper = attributeHelper?.getPropertyHelper<Any>(entry.key)
+                if (propertyHelper != null && value != null) {
+                    dao.setPropertySerializedValue(entry.key, propertyHelper.getSerializedValue(value))
+                }
+            }
+
+            dao.serializedConnection = connectionObservable.value?.datum?.getSerializedString()
+            dao
+        }
     }
 
     override fun onCleared() {
         super.onCleared()
         realm.close()
-        attributeDao = null
+        attributeDAO = null
     }
 }
