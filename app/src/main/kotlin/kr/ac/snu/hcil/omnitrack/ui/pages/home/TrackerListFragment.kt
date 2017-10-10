@@ -32,10 +32,9 @@ import butterknife.bindView
 import com.afollestad.materialdialogs.MaterialDialog
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
-import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.common.FallbackRecyclerView
@@ -261,18 +260,19 @@ class TrackerListFragment : OTFragment() {
         resumeSubscriptions.clear()
     }
 
-    private fun handleTrackerClick(tracker: OTTracker) {
+    private fun handleTrackerClick(tracker: OTTrackerDAO) {
         if (tracker.attributes.size == 0) {
             emptyTrackerDialog
                     .onPositive { materialDialog, dialogAction ->
-                        OTBackgroundLoggingService.log(context, tracker, OTItem.LoggingSource.Manual, notify = false).subscribe()
+                        //TODO background logging
+                        //OTBackgroundLoggingService.log(context, tracker, OTItem.LoggingSource.Manual, notify = false).subscribe()
                     }
                     .onNeutral { materialDialog, dialogAction ->
                         startActivity(TrackerDetailActivity.makeIntent(tracker.objectId, context))
                     }
                     .show()
         } else {
-            startActivityOnDelay(ItemEditingActivity.makeIntent(tracker.objectId, context))
+            startActivityOnDelay(ItemEditingActivity.makeIntent(tracker.objectId!!, context))
         }
     }
 
@@ -455,14 +455,14 @@ class TrackerListFragment : OTFragment() {
             }
 
             override fun onClick(view: View) {
+                val trackerViewModel = currentTrackerViewModelList[adapterPosition]
                 if (view === itemView) {
-                    handleTrackerClick(user.trackers[adapterPosition])
+                    handleTrackerClick(trackerViewModel.trackerDao)
                 } else if (view === editButton) {
                     startActivityOnDelay(TrackerDetailActivity.makeIntent(trackerId, this@TrackerListFragment.context))
                 } else if (view === listButton) {
                     startActivityOnDelay(ItemBrowserActivity.makeIntent(user.trackers[adapterPosition], this@TrackerListFragment.context))
                 } else if (view === removeButton) {
-                    val trackerViewModel = currentTrackerViewModelList[adapterPosition]
                     DialogHelper.makeNegativePhrasedYesNoDialogBuilder(context, trackerViewModel.trackerName.value, getString(R.string.msg_confirm_remove_tracker), R.string.msg_remove, onYes = { ->
                         viewModel.removeTracker(trackerViewModel)
                         listView.invalidateItemDecorations()

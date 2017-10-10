@@ -1,6 +1,11 @@
 package kr.ac.snu.hcil.omnitrack.core
 
+import io.realm.Realm
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTPendingItemBuilderDAO
+import rx.Observable
+import rx.android.schedulers.AndroidSchedulers
+import rx.schedulers.Schedulers
 import java.util.*
 
 /**
@@ -19,14 +24,18 @@ class OTItemBuilderWrapperBase {
     }
 
     interface AttributeStateChangedListener {
-        fun onAttributeStateChanged(attributeId: String, position: Int, state: EAttributeValueState)
+        fun onAttributeStateChanged(attributeId: String, state: EAttributeValueState)
     }
 
-    data class ValueInfo(var value: Any?, var timestamp: Long)
+    data class ValueWithTimestamp(var value: Any?, var timestamp: Long) {
+        override fun toString(): String {
+            return "TimestampValueInfo{ timestamp: ${timestamp}, value: ${value}, valueType: ${value?.javaClass}}"
+        }
+    }
 
-    private val attributeStateList = ArrayList<EAttributeValueState>()
+    private val attributeStateTable = Hashtable<String, EAttributeValueState>()
 
-    protected val valueTable = Hashtable<String, ValueInfo>()
+    protected val valueTable = Hashtable<String, ValueWithTimestamp>()
 
     val isEmpty: Boolean get() = valueTable.isEmpty
 
@@ -38,14 +47,21 @@ class OTItemBuilderWrapperBase {
      * Used when editing item.
      * @param item: item should be already stored in DB. (Every item is immediately stored in DB when created.)
      */
-    constructor(dao: OTPendingItemBuilderDAO) {
-        this.dao = dao
-        dao.data.forEach { it ->
-            valueTable[it.attributeLocalId] = ValueInfo(it.serializedValue, it.timestamp)
+    constructor(dao: OTPendingItemBuilderDAO, realm: Realm) {
+        if (dao.isManaged) {
+            this.dao = realm.copyFromRealm(dao)
+        } else this.dao = dao
+
+        this.dao.data.forEach { it ->
+            valueTable[it.attributeLocalId] = ValueWithTimestamp(it.serializedValue, it.timestamp)
         }
     }
 
-    fun getValueInformationOf(attributeLocalId: String): ValueInfo? {
+    fun saveCurrentBuilder() {
+
+    }
+
+    fun getValueInformationOf(attributeLocalId: String): ValueWithTimestamp? {
         return valueTable[attributeLocalId]
     }
 
@@ -60,7 +76,7 @@ class OTItemBuilderWrapperBase {
                 info.value = value
                 info.timestamp = timestamp
             } else {
-                valueTable[attributeLocalId] = ValueInfo(value, timestamp)
+                valueTable[attributeLocalId] = ValueWithTimestamp(value, timestamp)
             }
         }
     }
@@ -81,39 +97,40 @@ class OTItemBuilderWrapperBase {
         valueTable.clear()
     }
 
-    fun getAttributeValueState(position: Int): EAttributeValueState {
-        return attributeStateList[position]
+    fun getAttributeValueState(attributeLocalId: String): EAttributeValueState? {
+        return attributeStateTable[attributeLocalId]
     }
-/*
-    fun autoComplete(onAttributeStateChangedListener: AttributeStateChangedListener? = null): Observable<Pair<Int, Any?>> {
+
+    fun autoComplete(onAttributeStateChangedListener: AttributeStateChangedListener? = null): Observable<Pair<String, Any?>> {
 
         return Observable.defer {
             val attributes = dao.tracker?.attributes
             if (attributes == null) {
-                return@defer Observable.empty<Pair<Int, Any?>>()
+                return@defer Observable.empty<Pair<String, Any?>>()
             } else {
-                Observable.merge(attributes.mapIndexed { i, attr ->
+                Observable.merge(attributes.mapIndexed { i, attr: OTAttributeDAO ->
+                    val attrLocalId = attr.localId
                     val connection = attr.getParsedConnection()
                     if (connection != null) {
                         connection.getRequestedValue(this).flatMap { data ->
                             if (data.datum == null) {
-                                attr.getAutoCompleteValue()
+                                attr.getFallbackValue()
                             } else {
                                 Observable.just(data.datum)
                             }
-                        }.onErrorResumeNext { attr.getAutoCompleteValue() }.map { value -> Pair(i, value) }.subscribeOn(Schedulers.io()).doOnSubscribe {
+                        }.onErrorResumeNext { attr.getFallbackValue() }.map { value -> Pair(attrLocalId, value) }.subscribeOn(Schedulers.io()).doOnSubscribe {
 
                             println("RX doOnSubscribe1: ${Thread.currentThread().name}")
-                            attributeStateList[i] = EAttributeValueState.GettingExternalValue
-                            onAttributeStateChangedListener?.onAttributeStateChanged(attr.localId.toString(), i, EAttributeValueState.GettingExternalValue)
+                            attributeStateTable[attrLocalId] = EAttributeValueState.GettingExternalValue
+                            onAttributeStateChangedListener?.onAttributeStateChanged(attrLocalId, EAttributeValueState.GettingExternalValue)
                         }
                     } else {
-                        attr.getAutoCompleteValue().map { data ->
-                            Pair(i, data as Any)
+                        attr.getFallbackValue().map { nullable ->
+                            Pair(attrLocalId, nullable.datum)
                         }.doOnSubscribe {
                             println("RX doOnSubscribe2: ${Thread.currentThread().name}")
-                            attributeStateList[i] = EAttributeValueState.Processing
-                            onAttributeStateChangedListener?.onAttributeStateChanged(attr.localId.toString(), i, EAttributeValueState.Processing)
+                            attributeStateTable[attrLocalId] = EAttributeValueState.Processing
+                            onAttributeStateChangedListener?.onAttributeStateChanged(attrLocalId, EAttributeValueState.Processing)
                         }
                     }
                 }).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io()).doOnSubscribe {
@@ -121,20 +138,22 @@ class OTItemBuilderWrapperBase {
                 }.doOnNext { result ->
 
                     println("RX doOnNext: ${Thread.currentThread().name}")
-                    val index = result.first
+                    val attrLocalId = result.first
                     val value = result.second
 
-                    val attribute = tracker.attributes[index]
-                    attributeStateList[index] = EAttributeValueState.Idle
+                    attributeStateTable[attrLocalId] = EAttributeValueState.Idle
 
-                    println("attribute ${index} (${attribute.name}) was complete: ${value}")
-
-                    onAttributeStateChangedListener?.onAttributeStateChanged(attribute, index, EAttributeValueState.Idle)
-                    setValueOf(attribute, value)
+                    onAttributeStateChangedListener?.onAttributeStateChanged(attrLocalId, EAttributeValueState.Idle)
+                    setValueOf(attrLocalId, value)
                 }.doOnCompleted {
                     println("RX finished autocompleting builder=======================")
+                    println("Value Table=======================")
+                    for (entry in valueTable) {
+                        println("attrLocalId: ${entry.key}   /    valueInfo: ${entry.value}")
+                    }
+                    println("===================================")
                 }
             }
         }
-    }*/
+    }
 }

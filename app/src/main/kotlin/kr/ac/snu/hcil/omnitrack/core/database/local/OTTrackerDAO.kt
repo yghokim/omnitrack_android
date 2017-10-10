@@ -11,7 +11,10 @@ import io.realm.RealmObject
 import io.realm.annotations.Index
 import io.realm.annotations.PrimaryKey
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
+import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
+import kr.ac.snu.hcil.omnitrack.utils.Nullable
+import rx.Observable
 import java.util.*
 
 /**
@@ -148,11 +151,23 @@ open class OTAttributeDAO : RealmObject() {
         return serializedConnection?.let { OTConnection.fromJson(it) }
     }
 
+    fun getHelper(): OTAttributeHelper {
+        return OTAttributeManager.getAttributeHelper(type)
+    }
+
+    fun getInputViewType(previewMode: Boolean): Int {
+        return getHelper().getInputViewType(previewMode, this)
+    }
+
     fun initializePropertiesWithDefaults(realm: Realm) {
         val attributeHelper = OTAttributeManager.getAttributeHelper(type)
         attributeHelper.propertyKeys.forEach { key ->
             setPropertySerializedValue(key, attributeHelper.getPropertyHelper<Any>(key).getSerializedValue(attributeHelper.getPropertyInitialValue(key)!!))
         }
+    }
+
+    fun getFallbackValue(): Observable<Nullable<out Any>> {
+        return OTAttributeManager.getAttributeHelper(type).getFallbackValue(this)
     }
 
     fun setPropertySerializedValue(key: String, serializedValue: String): Boolean {

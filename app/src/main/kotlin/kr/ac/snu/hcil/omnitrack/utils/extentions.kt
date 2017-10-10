@@ -136,7 +136,7 @@ fun ViewGroup.inflateContent(layout: Int, attach: Boolean): View {
     return inflater.inflate(layout, this, attach)
 }
 
-fun isNumericPrimitive(value: Any): Boolean {
+fun isNumericPrimitive(value: Any?): Boolean {
     return value is Int || value is Float || value is Double || value is Long
 }
 

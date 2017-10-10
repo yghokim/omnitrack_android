@@ -75,8 +75,10 @@ abstract class AInputView<T>(layoutId: Int, context: Context, attrs: AttributeSe
     }
 
     @Suppress("UNCHECKED_CAST")
-    open fun setAnyValue(value: Any) {
-        this.value = value as T
+    open fun setAnyValue(value: Any?) {
+        if (value != null) {
+            this.value = value as T
+        }
     }
 
     abstract fun focus(): Unit
