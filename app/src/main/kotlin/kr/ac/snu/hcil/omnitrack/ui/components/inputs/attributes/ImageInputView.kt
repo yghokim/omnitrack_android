@@ -83,7 +83,7 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
                     CameraPickDialogFragment.EXTRA_ACTION_PHOTO_TAKEN -> {
                         val requestKey = intent.getStringExtra(CameraPickDialogFragment.EXTRA_REQUEST_KEY)
                         if (requestKey != null) {
-                            if (requestKey == this@ImageInputView.boundAttribute?.objectId) {
+                            if (requestKey == this@ImageInputView.boundAttributeObjectId) {
                                 val imageData = intent.getByteArrayExtra(CameraPickDialogFragment.EXTRA_IMAGE_DATA)
                                 this@ImageInputView.handleCameraInputData(imageData)
                             }
@@ -117,7 +117,7 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
     override fun onRequestCameraImage(view: ImagePicker) {
         val activity = this.getActivity()
         if (activity != null) {
-            picker.showCameraPickDialog(activity, boundAttribute?.objectId ?: "")
+            picker.showCameraPickDialog(activity, boundAttributeObjectId ?: "")
         }
     }
 

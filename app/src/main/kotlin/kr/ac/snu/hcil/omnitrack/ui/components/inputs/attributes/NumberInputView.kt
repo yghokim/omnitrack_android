@@ -164,10 +164,14 @@ class NumberInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
 
     }
 
-    override fun setAnyValue(value: Any) {
+    override fun setAnyValue(value: Any?) {
         println(value)
         if (isNumericPrimitive(value)) {
-            this.value = toBigDecimal(value)
+            if (value != null) {
+                this.value = toBigDecimal(value)
+            } else {
+                //TODO null value
+            }
         } else {
             super.setAnyValue(value)
         }
