@@ -114,6 +114,7 @@ class TrackerDetailViewModel : RealmViewModel() {
 
     fun moveAttribute(from: Int, to: Int) {
         currentAttributeViewModelList.move(from, to)
+        attributeViewModelListObservable.onNext(currentAttributeViewModelList)
     }
 
     fun removeAttribute(attrViewModel: AttributeInformationViewModel) {
@@ -212,7 +213,7 @@ class TrackerDetailViewModel : RealmViewModel() {
         val iconObservable = BehaviorSubject.create<Int>(R.drawable.icon_small_longtext)
         val connectionObservable = BehaviorSubject.create<Nullable<OTConnection>>()
         val defaultValuePolicyObservable = BehaviorSubject.create<Int>(OTAttributeDAO.DEFAULT_VALUE_POLICY_NULL)
-
+        val defaultValuePresetObservable = BehaviorSubject.create<Nullable<String>>(Nullable<String>(null))
 
         val onPropertyChanged = PublishSubject.create<Long>()
 
@@ -242,6 +243,14 @@ class TrackerDetailViewModel : RealmViewModel() {
             set(value) {
                 if (value != defaultValuePolicyObservable.value) {
                     defaultValuePolicyObservable.onNext(value)
+                }
+            }
+
+        var defaultValuePreset: String?
+            get() = defaultValuePresetObservable.value.datum
+            set(value) {
+                if (value != defaultValuePresetObservable.value.datum) {
+                    defaultValuePresetObservable.onNext(Nullable(value))
                 }
             }
 
@@ -275,7 +284,9 @@ class TrackerDetailViewModel : RealmViewModel() {
             dao.trackerId = attributeDAO.trackerId
             dao.updatedAt = attributeDAO.updatedAt
             dao.isRequired = attributeDAO.isRequired
-            dao.defaultValuePolicy = attributeDAO.defaultValuePolicy
+
+            dao.fallbackValuePolicy = this.defaultValuePolicy
+            dao.fallbackPresetSerializedValue = this.defaultValuePreset
             dao.name = name
             for (entry in propertyTable) {
                 dao.setPropertySerializedValue(entry.key, entry.value.second)
@@ -288,11 +299,9 @@ class TrackerDetailViewModel : RealmViewModel() {
 
         fun applyDaoChangesToFront(editedDao: OTAttributeDAO) {
             name = editedDao.name
-            if (typeObservable.value != editedDao.type) {
-                typeObservable.onNext(editedDao.type)
-            }
 
-            defaultValuePolicy = editedDao.defaultValuePolicy
+            defaultValuePolicy = editedDao.fallbackValuePolicy
+            defaultValuePreset = editedDao.fallbackPresetSerializedValue
 
             println("serialized connection of dao: ${editedDao.serializedConnection}")
             editedDao.serializedConnection?.let {
@@ -318,12 +327,16 @@ class TrackerDetailViewModel : RealmViewModel() {
             if (changed) {
                 onPropertyChanged.onNext(System.currentTimeMillis())
             }
+
+            if (typeObservable.value != editedDao.type) {
+                typeObservable.onNext(editedDao.type)
+            }
         }
 
         fun applyChanges() {
             attributeDAO.name = nameObservable.value
             attributeDAO.updatedAt = System.currentTimeMillis()
-            attributeDAO.defaultValuePolicy = defaultValuePolicy
+            attributeDAO.fallbackValuePolicy = defaultValuePolicy
             for (entry in propertyTable) {
                 println("set new serialized value: $entry")
                 attributeDAO.setPropertySerializedValue(entry.key, entry.value.second)

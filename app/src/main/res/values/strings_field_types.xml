@@ -96,4 +96,10 @@
     <string name="property_time_format_granularity_second">MMM dd, yyyy hh:mm:ss a</string>
 
 
+    <string name="msg_intrinsic_location">Current location</string>
+    <string name="msg_intrinsic_number">Insert zero</string>
+    <string name="msg_intrinsic_rating">The midpoint score</string>
+    <string name="msg_intrinsic_time">Present</string>
+
+
 </resources>
