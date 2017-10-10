@@ -323,16 +323,8 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
     fun saveAttribute(trackerId: String?, attribute: OTAttribute<out Any>, position: Int) {
         val realm = getRealmInstance()
         realm.executeTransaction {
-            saveAttribute(attribute, trackerId, position, realm)
+            //saveAttribute(attribute, trackerId, position, realm)
         }
-    }
-
-    private fun saveAttribute(attribute: OTAttribute<out Any>, trackerId: String?, position: Int, realm: Realm) {
-        val attributeDao = OTAttributeDAO.convertAttributeToDAO(attribute, position, realm, realm.where(OTAttributeDAO::class.java)
-                .equalTo(FIELD_OBJECT_ID, attribute.objectId).findFirst())
-
-        attributeDao.trackerId = trackerId
-        attributeDao.updatedAt = System.currentTimeMillis()
     }
 
     fun saveTracker(tracker: OTTracker, position: Int) {
@@ -341,7 +333,7 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
             val baseDao = getTrackerQueryWithId(tracker.objectId, realm).findFirst() ?:
                     realm.createObject(OTTrackerDAO::class.java, UUID.randomUUID().toString())
 
-            baseDao.attributeLocalKeySeed = tracker.attributeLocalKeySeed
+            //baseDao.attributeLocalKeySeed = tracker.attributeLocalKeySeed
             baseDao.name = tracker.name
             baseDao.color = tracker.color
             baseDao.isBookmarked = tracker.isOnShortcut
@@ -361,7 +353,7 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
             //Update attributes dao updates================================
             baseDao.attributes.clear()
             tracker.attributes.unObservedList.forEachIndexed { index, attr ->
-                saveAttribute(attr, tracker.objectId, index, realm)
+                //saveAttribute(attr, tracker.objectId, index, realm)
             }
 
             baseDao.synchronizedAt = null
