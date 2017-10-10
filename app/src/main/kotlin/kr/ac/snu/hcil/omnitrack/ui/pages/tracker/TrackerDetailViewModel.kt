@@ -125,12 +125,19 @@ class TrackerDetailViewModel : RealmViewModel() {
 
     private fun saveAttributes(trackerDao: OTTrackerDAO) {
         trackerDao.attributes.clear()
+        val deviceLocalKey = OTAuthManager.userDeviceLocalKey
+        var maxAttributeKeyFromThisDevice = currentAttributeViewModelList
+                .mapNotNull { it.attributeDAO.localId }.map { it.split("_") }.filter { it[0] == deviceLocalKey }
+                .map { it[1].toInt() }
+                .max() ?: 0
+
         currentAttributeViewModelList.forEachWithIndex { index, attrViewModel ->
             if (!attrViewModel.isInDatabase) {
                 println("viewmodel ${attrViewModel.name} is not in database.")
-                println("viewmodel attribute local id: ${trackerDao.attributeLocalKeySeed}")
-                attrViewModel.attributeDAO.localId = trackerDao.attributeLocalKeySeed
-                trackerDao.attributeLocalKeySeed++
+
+                attrViewModel.attributeDAO.localId = deviceLocalKey + "_" + (++maxAttributeKeyFromThisDevice)
+
+                println("new localId: ${attrViewModel.attributeDAO.localId}")
                 attrViewModel.attributeDAO.trackerId = trackerDao.objectId
 
                 println("viewmodel attribute tracker id: ${trackerDao.objectId}")
