@@ -211,6 +211,8 @@ class TrackerDetailViewModel : RealmViewModel() {
         val typeObservable = BehaviorSubject.create<Int>(-1)
         val iconObservable = BehaviorSubject.create<Int>(R.drawable.icon_small_longtext)
         val connectionObservable = BehaviorSubject.create<Nullable<OTConnection>>()
+        val defaultValuePolicyObservable = BehaviorSubject.create<Int>(OTAttributeDAO.DEFAULT_VALUE_POLICY_NULL)
+
 
         val onPropertyChanged = PublishSubject.create<Long>()
 
@@ -232,6 +234,14 @@ class TrackerDetailViewModel : RealmViewModel() {
             set(@DrawableRes value) {
                 if (iconObservable.value != value) {
                     iconObservable.onNext(value)
+                }
+            }
+
+        var defaultValuePolicy: Int
+            get() = defaultValuePolicyObservable.value
+            set(value) {
+                if (value != defaultValuePolicyObservable.value) {
+                    defaultValuePolicyObservable.onNext(value)
                 }
             }
 
@@ -265,6 +275,7 @@ class TrackerDetailViewModel : RealmViewModel() {
             dao.trackerId = attributeDAO.trackerId
             dao.updatedAt = attributeDAO.updatedAt
             dao.isRequired = attributeDAO.isRequired
+            dao.defaultValuePolicy = attributeDAO.defaultValuePolicy
             dao.name = name
             for (entry in propertyTable) {
                 dao.setPropertySerializedValue(entry.key, entry.value.second)
@@ -280,6 +291,8 @@ class TrackerDetailViewModel : RealmViewModel() {
             if (typeObservable.value != editedDao.type) {
                 typeObservable.onNext(editedDao.type)
             }
+
+            defaultValuePolicy = editedDao.defaultValuePolicy
 
             println("serialized connection of dao: ${editedDao.serializedConnection}")
             editedDao.serializedConnection?.let {
@@ -310,6 +323,7 @@ class TrackerDetailViewModel : RealmViewModel() {
         fun applyChanges() {
             attributeDAO.name = nameObservable.value
             attributeDAO.updatedAt = System.currentTimeMillis()
+            attributeDAO.defaultValuePolicy = defaultValuePolicy
             for (entry in propertyTable) {
                 println("set new serialized value: $entry")
                 attributeDAO.setPropertySerializedValue(entry.key, entry.value.second)

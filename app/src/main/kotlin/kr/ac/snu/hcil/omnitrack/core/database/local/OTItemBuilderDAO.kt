@@ -7,7 +7,7 @@ import io.realm.annotations.Index
 /**
  * Created by Young-Ho on 10/9/2017.
  */
-class OTPendingItemBuilderDAO : RealmObject() {
+open class OTPendingItemBuilderDAO : RealmObject() {
 
     companion object {
         const val HOLDER_TYPE_INPUT_FORM = 0
@@ -24,7 +24,7 @@ class OTPendingItemBuilderDAO : RealmObject() {
     var data = RealmList<OTItemBuilderFieldValueEntry>()
 }
 
-class OTItemBuilderFieldValueEntry : RealmObject() {
+open class OTItemBuilderFieldValueEntry : RealmObject() {
     var id: Long = 0
     var attributeLocalId: String? = null
     var serializedValue: String? = null

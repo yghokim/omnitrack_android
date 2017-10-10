@@ -103,11 +103,6 @@ dependencies {
     compile project(':fancybuttons')
     // https://mvnrepository.com/artifact/org.apache.commons/commons-math3
 
-
-    kapt "com.google.dagger:dagger-compiler:$rootProject.ext.dagger_version"
-    compile "com.google.dagger:dagger:$rootProject.ext.dagger_version"
-    compile "com.google.dagger:dagger-android:$rootProject.ext.dagger_version"
-
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile files('libs/opencsv-3.9.jar')
     compile files('libs/jxl.jar')
