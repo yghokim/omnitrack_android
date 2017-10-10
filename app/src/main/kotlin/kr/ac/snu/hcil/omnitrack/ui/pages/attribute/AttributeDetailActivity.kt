@@ -103,7 +103,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
                 viewModel.name = value
             }
 
-            columnNameView.showEdited = viewModel.isNameChanged
+            columnNameView.showEdited = viewModel.isNameDirty
         }
 
         /*requiredView.valueChanged += {
