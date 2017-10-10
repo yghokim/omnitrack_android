@@ -14,8 +14,8 @@ import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.ToggleButton
-import com.flurgle.camerakit.CameraKit
-import com.flurgle.camerakit.CameraView
+import com.wonderkiln.camerakit.CameraKit
+import com.wonderkiln.camerakit.CameraView
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LoadingIndicatorBar
@@ -52,7 +52,7 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
     private val listener = CameraListener()
 
     private val cameraFrontDrawable by lazy {
-        applyTint(DrawableCompat.wrap(OTApplication.app.getDrawable(R.drawable.camera_front)), Color.WHITE)
+        applyTint(DrawableCompat.wrap(ContextCompat.getDrawable(OTApplication.app, R.drawable.camera_front)), Color.WHITE)
     }
 
     private val cameraRearDrawable by lazy {
@@ -72,10 +72,10 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
             if (checked) {
                 //true: SelfieMode on
                 compoundButton.setCompoundDrawablesRelativeWithIntrinsicBounds(cameraRearDrawable, null, null, null)
-                cameraView.setFacing(CameraKit.Constants.FACING_FRONT)
+                cameraView.facing = CameraKit.Constants.FACING_FRONT
             } else {
                 compoundButton.setCompoundDrawablesRelativeWithIntrinsicBounds(cameraFrontDrawable, null, null, null)
-                cameraView.setFacing(CameraKit.Constants.FACING_BACK)
+                cameraView.facing = CameraKit.Constants.FACING_BACK
             }
         }
 
@@ -135,7 +135,7 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
                 .create()
     }
 
-    inner class CameraListener : com.flurgle.camerakit.CameraListener() {
+    inner class CameraListener : com.wonderkiln.camerakit.CameraListener() {
         override fun onPictureTaken(jpeg: ByteArray?) {
             super.onPictureTaken(jpeg)
             if (jpeg != null) {
