@@ -1,17 +1,21 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.items
 
+import android.support.v7.util.DiffUtil
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTPendingItemBuilderDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.RealmViewModel
+import rx.Observable
 import rx.subjects.BehaviorSubject
+import rx.subscriptions.CompositeSubscription
 
 /**
  * Created by Young-Ho on 10/9/2017.
  */
-class ItemEditionViewModel : RealmViewModel() {
+class ItemEditionViewModel : RealmViewModel(), OTItemBuilderWrapperBase.AttributeStateChangedListener {
 
     enum class ItemMode {
         Edit, New
@@ -25,25 +29,26 @@ class ItemEditionViewModel : RealmViewModel() {
         private set
 
     private lateinit var itemBuilderDao: OTPendingItemBuilderDAO
+    private lateinit var builderWrapper: OTItemBuilderWrapperBase
 
     val modeObservable = BehaviorSubject.create<ItemMode>(ItemMode.New)
     val builderCreationModeObservable = BehaviorSubject.create<BuilderCreationMode>()
 
-    val builderWrapperObservable = BehaviorSubject.create<OTItemBuilderWrapperBase>()
+    val attributeViewModelListObservable = BehaviorSubject.create<List<AttributeInputViewModel>>()
 
-    val unManagedAttributeListObservable = BehaviorSubject.create<List<OTAttributeDAO>>()
+    val isBusyObservable = BehaviorSubject.create<Boolean>(false)
 
-    var builderWrapper: OTItemBuilderWrapperBase
+    var isBusy: Boolean
         get() {
-            return builderWrapperObservable.value
+            return isBusyObservable.value
         }
         private set(value) {
-            if (builderWrapperObservable.value != value) {
-                builderWrapperObservable.onNext(value)
+            if (isBusyObservable.value != value) {
+                isBusyObservable.onNext(value)
             }
         }
 
-    private val currentUnmanagedAttributeList = ArrayList<OTAttributeDAO>()
+    private val currentAttributeViewModelList = ArrayList<AttributeInputViewModel>()
 
     var mode: ItemMode
         get() {
@@ -81,18 +86,135 @@ class ItemEditionViewModel : RealmViewModel() {
                         }
 
                         val unManagedTrackerDao = realm.copyFromRealm(trackerDao)!!
-                        currentUnmanagedAttributeList.clear()
-                        currentUnmanagedAttributeList.addAll(unManagedTrackerDao.attributes)
-                        unManagedAttributeListObservable.onNext(currentUnmanagedAttributeList)
+
+                        currentAttributeViewModelList.forEach { it.unregister() }
+                        currentAttributeViewModelList.clear()
+
+                        currentAttributeViewModelList.addAll(unManagedTrackerDao.attributes.map { AttributeInputViewModel(it) })
+                        attributeViewModelListObservable.onNext(currentAttributeViewModelList)
 
                         this.builderWrapper = OTItemBuilderWrapperBase(realm.copyFromRealm(this.itemBuilderDao), realm)
 
-                        this.builderWrapper.autoComplete().subscribe { result ->
-                            println(result)
+                        for (key in this.builderWrapper.keys) {
+                            val value = this.builderWrapper.getValueInformationOf(key)
+                            if (value != null) {
+                                setValueOfAttribute(key, value)
+                            }
                         }
+
                         mode = ItemMode.New
                     }
             )
         }
+    }
+
+    fun startAutoComplete() {
+        subscriptions.add(
+                this.builderWrapper.makeAutoCompleteObservable(this).subscribe({ (attrLocalId, valueWithTimestamp) ->
+                    setValueOfAttribute(attrLocalId, valueWithTimestamp)
+                }, {
+
+                }, {
+                    isBusy = false
+                })
+        )
+    }
+
+    fun setValueOfAttribute(attributeLocalId: String, valueWithTimestamp: OTItemBuilderWrapperBase.ValueWithTimestamp) {
+        val match = currentAttributeViewModelList.find { it.attributeLocalId == attributeLocalId }
+        if (match != null) {
+            match.value = valueWithTimestamp
+        }
+    }
+
+    override fun onAttributeStateChanged(attributeLocalId: String, state: OTItemBuilderWrapperBase.EAttributeValueState) {
+        val match = currentAttributeViewModelList.find { it.attributeLocalId == attributeLocalId }
+        if (match != null) {
+            match.state = state
+        }
+    }
+
+    private fun refreshDaoValues() {
+        currentAttributeViewModelList.forEach { attrViewModel ->
+            val value = attrViewModel.value
+
+        }
+    }
+
+    fun saveItemBuilderAsync() {
+        subscriptions.add(
+                isBusyObservable.filter { it == false }.subscribe {
+                    realm.executeTransactionAsync {
+                        realm.copyToRealmOrUpdate(itemBuilderDao)
+                    }
+                }
+        )
+
+    }
+
+    fun removeItemBuilderAsync() {
+        subscriptions.add(
+                isBusyObservable.filter { it == false }.subscribe {
+                    realm.executeTransactionAsync {
+                        itemBuilderDao.deleteFromRealm()
+                    }
+                }
+        )
+    }
+
+    class AttributeInputViewModel(val attributeDAO: OTAttributeDAO) {
+        val attributeLocalId: String get() = attributeDAO.localId
+        val columnNameObservable: Observable<String> = BehaviorSubject.create<String>("")
+        val stateObservable: Observable<OTItemBuilderWrapperBase.EAttributeValueState> = BehaviorSubject.create<OTItemBuilderWrapperBase.EAttributeValueState>()
+
+        val valueObservable = BehaviorSubject.create<Nullable<OTItemBuilderWrapperBase.ValueWithTimestamp>>(Nullable(null) as Nullable<OTItemBuilderWrapperBase.ValueWithTimestamp>)
+
+        var value: OTItemBuilderWrapperBase.ValueWithTimestamp?
+            get() = valueObservable.value?.datum
+            set(value) {
+                if (valueObservable.value?.datum != value) {
+                    valueObservable.onNext(Nullable(value))
+                }
+            }
+
+        var state: OTItemBuilderWrapperBase.EAttributeValueState
+            get() = (stateObservable as BehaviorSubject).value
+            internal set(value) {
+                if ((stateObservable as BehaviorSubject).value != value) {
+                    stateObservable.onNext(value)
+                }
+            }
+
+        private val subscriptions = CompositeSubscription()
+
+        init {
+            (columnNameObservable as BehaviorSubject).onNext(attributeDAO.name)
+        }
+
+        fun unregister() {
+            subscriptions.clear()
+        }
+
+    }
+
+    class AttributeInputViewModelListDiffUtilCallback(val oldList: List<AttributeInputViewModel>, val newList: List<AttributeInputViewModel>) : DiffUtil.Callback() {
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return oldList[oldItemPosition] === newList[newItemPosition] ||
+                    oldList[oldItemPosition].attributeDAO.objectId == newList[newItemPosition].attributeDAO.objectId
+        }
+
+        override fun getOldListSize(): Int {
+            return oldList.size
+        }
+
+        override fun getNewListSize(): Int {
+            return newList.size
+        }
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return areItemsTheSame(oldItemPosition, newItemPosition)
+        }
+
+
     }
 }

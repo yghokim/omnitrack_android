@@ -56,15 +56,21 @@ class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
             }
         }
 
-    override var value: IntArray
-        get() = selectedIds.toIntArray()
+    override var value: IntArray? = null
         set(value) {
-            selectedIds.clear()
-            selectedIds.addAll(value.toTypedArray())
-            adapter.notifyDataSetChanged()
+            if (field != value) {
+                field = value
+                if ((field == null && value?.size == 0) || (field?.size == 0 && value == null)) {
 
-            println("Choice input value changed")
-            onValueChanged(value)
+                } else {
+                    selectedIds.clear()
+                    selectedIds.addAll(value?.toTypedArray() ?: emptyArray())
+                    adapter.notifyDataSetChanged()
+
+                    println("Choice input value changed")
+                    onValueChanged(value)
+                }
+            }
         }
 
 
@@ -162,8 +168,6 @@ class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
                         sortSelectedIdsByEntryPosition()
                     }
 
-                    notifyItemChanged(adapterPosition)
-                    onValueChanged(selectedIds.toIntArray())
                 } else {
 
                     if (!selectedIds.contains(id)) {
@@ -183,12 +187,13 @@ class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
 
                         selectedIds.add(id)
                         sortSelectedIdsByEntryPosition()
-                        notifyItemChanged(adapterPosition)
-                        onValueChanged(selectedIds.toIntArray())
                     }
                 }
 
 
+                notifyItemChanged(adapterPosition)
+
+                value = selectedIds.toIntArray()
             }
 
         }

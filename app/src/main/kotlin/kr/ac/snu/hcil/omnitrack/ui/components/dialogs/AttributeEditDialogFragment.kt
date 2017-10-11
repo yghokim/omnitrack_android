@@ -209,7 +209,7 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
         valueView?.let {
-            outState?.putString(EXTRA_SERIALIZED_VALUE, TypeStringSerializationHelper.serialize(it.value))
+            outState?.putString(EXTRA_SERIALIZED_VALUE, it.value?.let { TypeStringSerializationHelper.serialize(it) })
         }
 
         tracker?.let {

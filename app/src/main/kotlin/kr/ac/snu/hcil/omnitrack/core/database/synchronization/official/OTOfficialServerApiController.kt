@@ -42,7 +42,7 @@ class OTOfficialServerApiController : ISynchronizationServerSideAPI {
 
         Retrofit.Builder()
                 .client(client)
-                .baseUrl("http://192.168.0.2:3000") // test server
+                .baseUrl("http://147.46.242.28:3000") // test server
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()

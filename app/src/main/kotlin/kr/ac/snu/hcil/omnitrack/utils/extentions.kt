@@ -137,7 +137,7 @@ fun ViewGroup.inflateContent(layout: Int, attach: Boolean): View {
 }
 
 fun isNumericPrimitive(value: Any?): Boolean {
-    return value is Int || value is Float || value is Double || value is Long
+    return value is Number || value is BigDecimal
 }
 
 fun convertNumericToDouble(value: Any): Double {

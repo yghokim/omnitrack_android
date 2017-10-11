@@ -13,16 +13,21 @@ class StarRatingInputView(context: Context, attrs: AttributeSet? = null) : AAttr
 
     val ratingView: StarRatingView = findViewById(R.id.value)
 
-    override var value: Float
-        get() = ratingView.score
+    override var value: Float? = 0f
         set(value) {
-            ratingView.score = value
+            if (field != value) {
+                field = value
+                ratingView.scoreChanged.suspend = true
+                ratingView.score = value ?: 0f
+                ratingView.scoreChanged.suspend = false
+            }
         }
 
     init {
         ratingView.scoreChanged += {
             sender, score: Float ->
-            valueChanged.invoke(this, score)
+            this.value = score
+            onValueChanged(score)
         }
     }
 

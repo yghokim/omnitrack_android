@@ -11,7 +11,7 @@ import kotlin.properties.Delegates
 /**
  * Created by Young-Ho Kim on 2016-07-22.
  */
-abstract class AAttributeInputView<DataType>(layoutId: Int, context: Context, attrs: AttributeSet? = null) : AInputView<DataType>(layoutId, context, attrs), IActivityLifeCycle {
+abstract class AAttributeInputView<DataType>(layoutId: Int, context: Context, attrs: AttributeSet? = null) : AInputView<DataType?>(layoutId, context, attrs), IActivityLifeCycle {
 
 
     companion object {
