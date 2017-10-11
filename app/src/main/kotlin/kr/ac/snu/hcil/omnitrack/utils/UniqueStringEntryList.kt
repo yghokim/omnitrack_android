@@ -26,23 +26,31 @@ class UniqueStringEntryList : IStringSerializable {
             val result = UniqueStringEntryList()
 
             input.beginObject()
-
-            input.nextName()
-            result.increment = input.nextInt()
-
-            input.nextName()
-            input.beginArray()
             while (input.hasNext()) {
-                input.beginObject()
-                input.nextName()
-                val id = input.nextInt()
-                input.nextName()
-                val value = input.nextString()
-                input.endObject()
+                when (input.nextName()) {
+                    "seed", "i" -> result.increment = input.nextInt()
+                    "entries", "e" -> {
+                        input.beginArray()
+                        while (input.hasNext()) {
+                            input.beginObject()
+                            while (input.hasNext()) {
+                                var id: Int? = null
+                                var value: String? = null
+                                when (input.nextName()) {
+                                    "id", "i" -> id = input.nextInt()
+                                    "val", "v" -> value = input.nextString()
+                                }
 
-                result.list.add(Entry(id, value))
+                                if (id != null && value != null)
+                                    result.list.add(Entry(id, value))
+                            }
+                            input.endObject()
+                        }
+                        input.endArray()
+                    }
+                }
             }
-            input.endArray()
+
             input.endObject()
 
 
@@ -52,13 +60,13 @@ class UniqueStringEntryList : IStringSerializable {
 
         override fun write(out: JsonWriter, value: UniqueStringEntryList) {
             out.beginObject()
-            out.name("i").value(value.increment)
-            out.name("e").beginArray()
+            out.name("seed").value(value.increment)
+            out.name("entries").beginArray()
 
             value.list.forEach {
                 out.beginObject()
-                out.name("i").value(it.id)
-                out.name("v").value(it.text)
+                out.name("id").value(it.id)
+                out.name("val").value(it.text)
                 out.endObject()
             }
 
