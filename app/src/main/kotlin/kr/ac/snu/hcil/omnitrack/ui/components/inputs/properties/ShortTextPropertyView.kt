@@ -43,7 +43,7 @@ class ShortTextPropertyView(context: Context, attrs: AttributeSet?) : APropertyV
             }
         })
 
-        EnterHideKeyboardEditorActionListener(valueView)
+        valueView.setOnEditorActionListener(EnterHideKeyboardEditorActionListener())
     }
 
     override fun focus() {

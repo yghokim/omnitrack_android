@@ -34,16 +34,16 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
             }
         }
 
-    override var value = SynchronizedUri()
+    override var value: SynchronizedUri? = SynchronizedUri()
         set(value) {
             if (field != value) {
                 subscriptions.clear()
                 field = value
-                if (value.isLocalUriValid) {
+                if (value?.isLocalUriValid == true) {
                     valueView.audioFileUriChanged.suspend = true
                     valueView.audioFileUri = value.localUri
                     valueView.audioFileUriChanged.suspend = false
-                } else if (value.isSynchronized) {
+                } else if (value?.isSynchronized == true) {
                     inLoadingMode = true
                     subscriptions.add(
                             OTApplication.app.storageHelper.downloadFileTo(value.serverUri.path, value.localUri).subscribe(
@@ -63,6 +63,12 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
                             }
                             )
                     )
+                } else {
+                    //null
+                    valueView.audioFileUriChanged.suspend = true
+                    valueView.audioFileUri = Uri.EMPTY
+                    valueView.audioFileUriChanged.suspend = false
+                    inLoadingMode = false
                 }
             }
         }

@@ -11,10 +11,15 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.LikertScalePicker
 class LikertScaleInputView(context: Context, attrs: AttributeSet? = null) : AAttributeInputView<Float>(R.layout.input_likert, context, attrs) {
     override val typeId: Int = AAttributeInputView.VIEW_TYPE_RATING_LIKERT
 
-    override var value: Float
-        get() = scalePicker.value
+    override var value: Float? = 0.0f
         set(value) {
-            scalePicker.value = value
+            if (field != value) {
+                field = value
+
+                scalePicker.valueChanged.suspend = true
+                scalePicker.value = value ?: 0f
+                scalePicker.valueChanged.suspend = false
+            }
         }
 
     val scalePicker: LikertScalePicker = findViewById(R.id.value)
@@ -25,7 +30,8 @@ class LikertScaleInputView(context: Context, attrs: AttributeSet? = null) : AAtt
     init {
         scalePicker.valueChanged += {
             sender, new: Float ->
-            valueChanged.invoke(this, new)
+            this.value = new
+            onValueChanged(new)
         }
     }
 

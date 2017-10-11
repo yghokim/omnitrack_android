@@ -21,20 +21,21 @@ import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilder
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LoadingIndicatorBar
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.pages.ConnectionIndicatorStubProxy
+import rx.Observable
+import rx.android.schedulers.AndroidSchedulers
 import rx.subscriptions.CompositeSubscription
 import java.util.*
 
 /**
  * Created by Young-Ho Kim on 16. 7. 24
  */
-class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_item), OTItemBuilderWrapperBase.AttributeStateChangedListener {
+class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_item) {
 
     companion object {
 
@@ -84,7 +85,7 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
 
     private val loadingIndicatorBar: LoadingIndicatorBar by bindView(R.id.ui_loading_indicator)
 
-    private val currentAttributeList = ArrayList<OTAttributeDAO>()
+    private val currentAttributeViewModelList = ArrayList<ItemEditionViewModel.AttributeInputViewModel>()
 
     private var itemSaved: Boolean = false
 
@@ -125,50 +126,33 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
         builderRestoredSnackbar = Snackbar.make(findViewById(R.id.ui_snackbar_container), resources.getText(R.string.msg_builder_restored), Snackbar.LENGTH_INDEFINITE)
         builderRestoredSnackbar.setAction(resources.getText(R.string.msg_clear_form)) {
             view ->
-            creationSubscriptions.add(
-                    viewModel.builderWrapper.autoComplete(this).doOnSubscribe {
-                        loadingIndicatorBar.show()
-                    }.doOnCompleted { loadingIndicatorBar.dismiss() }
-                            .subscribe {
 
-                            }
-            )
-            /*
-            builder = OTItemBuilder(tracker!!, OTItemBuilder.MODE_FOREGROUND)
-
-            val requiredPermissions = tracker!!.getRequiredPermissions()
-            val rxPermissionObservable = if (requiredPermissions.isNotEmpty()) {
-                RxPermissions(this).request(*requiredPermissions)
-            } else {
-                Observable.just(true)
-            }
             creationSubscriptions.add(
-                    rxPermissionObservable
-                            .flatMap {
-                                approved ->
+                    (viewModel.trackerDao?.makePermissionAssertObservable(this) ?: Observable.just(true))
+                            .subscribe({ approved ->
                                 if (approved) {
-                                    if (builder != null) {
-                                        builder!!.autoComplete(this).doOnSubscribe {
-                                            loadingIndicatorBar.show()
-                                        }.doOnCompleted { loadingIndicatorBar.dismiss() }
-                                    } else {
-                                        Observable.just(false)
-                                    }
-                                } else Observable.error(Exception("required permission not accepted."))
-                            }.subscribe({
-                        println("Finished builder autocomplete.")
-                        if (builder != null) {
-                            snapshot(builder!!)
-                            snapshotInitialValue(builder!!)
-                        }
-                    }, {
-                        //TODO handle permission not granted
-                    })
+                                    viewModel.startAutoComplete()
+                                } else {
+
+                                }
+                            }, {
+                                //TODO handle permission not granted
+                            }, {
+                                println("Finished builder autocomplete.")
+
+                            })
             )
 
             builderRestoredSnackbar.dismiss()
-            */
         }
+
+        creationSubscriptions.add(
+                viewModel.isBusyObservable.subscribe { isBusy ->
+                    if (isBusy)
+                        loadingIndicatorBar.show()
+                    else loadingIndicatorBar.dismiss()
+                }
+        )
 
         creationSubscriptions.add(
                 viewModel.builderCreationModeObservable.subscribe { builderCreationMode ->
@@ -195,9 +179,9 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
         )
 
         creationSubscriptions.add(
-                viewModel.unManagedAttributeListObservable.subscribe { list ->
-                    currentAttributeList.clear()
-                    currentAttributeList.addAll(list)
+                viewModel.attributeViewModelListObservable.subscribe { list ->
+                    currentAttributeViewModelList.clear()
+                    currentAttributeViewModelList.addAll(list)
                     attributeListAdapter.notifyDataSetChanged()
                 }
         )
@@ -307,31 +291,9 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
             inputView.onPause()
         }
 
-
-        if (mode == ItemEditionViewModel.ItemMode.New) {
-            if (!skipViewValueCaching) {
-                if (needsToCacheBuilder())
-                    storeItemBuilderCache()
-                //Toast.makeText(this, "Filled form content was stored.", Toast.LENGTH_SHORT).show()
-
-            } else {
-                skipViewValueCaching = false
-            }
-        }
-
         this.activityResultAppliedAttributePosition = -1
     }
 
-    override fun onSaveInstanceState(outState: Bundle?) {
-        super.onSaveInstanceState(outState)
-        for (inputView in attributeListAdapter.inputViews) {
-            inputView.onSaveInstanceState(outState)
-        }
-
-        outState?.putString("mode", mode.toString())
-        outState?.putString("builder", builder?.getSerializedString())
-
-    }
 /*
     override fun onRestoredInstanceStateWithTracker(savedInstanceState: Bundle, tracker: OTTracker) {
         super.onRestoredInstanceStateWithTracker(savedInstanceState, tracker)
@@ -473,24 +435,6 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
         //TODO store builder
     }
 
-    override fun onAttributeStateChanged(attributeLocalId: String, state: OTItemBuilderWrapperBase.EAttributeValueState) {
-        println("attribute ${attributeLocalId} state was changed to $state, thread: ${Thread.currentThread().name}")
-        runOnUiThread { attributeListAdapter.notifyItemChanged(currentAttributeList.indexOfFirst { it.localId == attributeLocalId }) }
-    }
-
-
-    private fun onAttributeValueChangedHandler(attributeId: String, newVal: Any) {
-        println("Attribute $attributeId was changed to $newVal")
-        /*
-        val attribute = tracker?.attributes?.unObservedList?.find { it.objectId == attributeId }
-        if (attribute != null) {
-            println("set item builder ${attribute.typeId}, ${attributeId}")
-            builder?.setValueOf(attribute, newVal)
-
-            builderRestoredSnackbar.dismiss()
-        }*/
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         println("activityResult")
         super.onActivityResult(requestCode, resultCode, data)
@@ -506,12 +450,12 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
 
         val inputViews = HashSet<AAttributeInputView<*>>()
 
-        fun getItem(position: Int): OTAttributeDAO {
-            return currentAttributeList[position]
+        fun getItem(position: Int): ItemEditionViewModel.AttributeInputViewModel {
+            return currentAttributeViewModelList[position]
         }
 
         override fun getItemViewType(position: Int): Int {
-            return getItem(position).getInputViewType(false)
+            return getItem(position).attributeDAO.getInputViewType(false)
         }
 
         override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
@@ -532,7 +476,7 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
         }
 
         override fun getItemCount(): Int {
-            return currentAttributeList.size
+            return currentAttributeViewModelList.size
         }
 
         inner class ViewHolder(val inputView: AAttributeInputView<out Any>, frame: View) : RecyclerView.ViewHolder(frame) {
@@ -551,35 +495,23 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
 
             private val optionButton: View by bindView(R.id.ui_button_option)
 
-            private var attributeId: String? = null
+            private val internalSubscriptions = CompositeSubscription()
 
 
             init {
 
                 container.addView(inputView, 0)
 
-                inputView.valueChanged += {
-                    sender, args ->
-                    onInputViewValueChanged(args)
-                }
-
                 connectionIndicatorStubProxy = ConnectionIndicatorStubProxy(frame, R.id.ui_connection_indicator_stub)
 
                 optionButton.setOnClickListener {
                     /*
                     val tracker = tracker
-                    val attributeId = attributeId
-                    if (tracker != null && attributeId != null) {
-                        val historyDialog = RecentItemValuePickerBottomSheetFragment.getInstance(tracker.objectId, attributeId)
+                    val attributeLocalId = attributeLocalId
+                    if (tracker != null && attributeLocalId != null) {
+                        val historyDialog = RecentItemValuePickerBottomSheetFragment.getInstance(tracker.objectId, attributeLocalId)
                         historyDialog.show(supportFragmentManager, RecentItemValuePickerBottomSheetFragment.TAG)
                     }*/
-                }
-            }
-
-            private fun onInputViewValueChanged(newVal: Any) {
-                setTimestampIndicatorText(System.currentTimeMillis())
-                if (attributeId != null) {
-                    onAttributeValueChangedHandler(attributeId!!, newVal)
                 }
             }
 
@@ -592,61 +524,75 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
                 }
             }
 
-            fun bind(attribute: OTAttributeDAO) {
-                attribute.getHelper().refreshInputViewUI(inputView, attribute)
+            fun bind(attributeViewModel: ItemEditionViewModel.AttributeInputViewModel) {
+                println("bind attributeViewModel: ${attributeViewModel.attributeLocalId}")
 
-                attributeId = attribute.objectId
-                columnNameView.text = attribute.name
-                requiredMarker.visibility = if (attribute.isRequired) {
+                internalSubscriptions.clear()
+
+                attributeViewModel.attributeDAO.getHelper().refreshInputViewUI(inputView, attributeViewModel.attributeDAO)
+                internalSubscriptions.add(
+                        attributeViewModel.columnNameObservable.subscribe { name ->
+                            columnNameView.text = name
+                        }
+                )
+                requiredMarker.visibility = View.INVISIBLE
+                /*
+                requiredMarker.visibility = if (attributeViewModel.isRequired) {
                     View.VISIBLE
                 } else {
                     View.INVISIBLE
-                }
+                }*/
                 //attributeTypeView.text = resources.getString(attribute.typeNameResourceId)
 
-                connectionIndicatorStubProxy.onBind(attribute.getParsedConnection())
 
-                viewModel.builderWrapper.let {
-                    if (it.hasValueOf(attribute.localId)) {
-                        val valueInfo = it.getValueInformationOf(attribute.localId)!!
-
-                        inputView.valueChanged.suspend = true
-                        inputView.setAnyValue(valueInfo.value)
-                        inputView.valueChanged.suspend = false
-
-                        setTimestampIndicatorText(valueInfo.timestamp)
+                internalSubscriptions.add(
+                        inputView.valueChanged.observable.subscribe { (sender, args) ->
+                            println("input view value changed - ${args}")
+                            val now = System.currentTimeMillis()
+                            attributeViewModel.value = OTItemBuilderWrapperBase.ValueWithTimestamp(args, now)
                     }
+                )
 
-                    val state = it.getAttributeValueState(attribute.localId)
 
-                    if (state == OTItemBuilderWrapperBase.EAttributeValueState.Idle) {
-                        container.locked = false
-                        inputView.alpha = 1.0f
-                    } else {
-                        container.locked = true
-                        inputView.alpha = 0.12f
-                    }
+                connectionIndicatorStubProxy.onBind(attributeViewModel.attributeDAO.getParsedConnection())
 
-                    println("current builder attribute state: ${it.getAttributeValueState(attribute.localId)}, localId: ${attribute.localId}")
-
-                    when (it.getAttributeValueState(attribute.localId)) {
-                        OTItemBuilderWrapperBase.EAttributeValueState.Idle -> {
-                            loadingIndicatorInContainer.visibility = View.GONE
+                internalSubscriptions.add(
+                        attributeViewModel.stateObservable.observeOn(AndroidSchedulers.mainThread()).subscribe { state ->
+                            if (state == OTItemBuilderWrapperBase.EAttributeValueState.Idle) {
+                                container.locked = false
+                                inputView.alpha = 1.0f
+                            } else {
+                                container.locked = true
+                                inputView.alpha = 0.12f
+                            }
+                            when (state) {
+                                OTItemBuilderWrapperBase.EAttributeValueState.Idle -> {
+                                    loadingIndicatorInContainer.visibility = View.GONE
+                                }
+                                OTItemBuilderWrapperBase.EAttributeValueState.Processing -> {
+                                    loadingIndicatorInContainer.visibility = View.VISIBLE
+                                }
+                                OTItemBuilderWrapperBase.EAttributeValueState.GettingExternalValue -> {
+                                    loadingIndicatorInContainer.visibility = View.VISIBLE
+                                }
+                            }
                         }
-                        OTItemBuilderWrapperBase.EAttributeValueState.Processing -> {
-                            loadingIndicatorInContainer.visibility = View.VISIBLE
-                        }
-                        OTItemBuilderWrapperBase.EAttributeValueState.GettingExternalValue -> {
-                            loadingIndicatorInContainer.visibility = View.VISIBLE
-                        }
-                    }
-                }
+                )
 
-                attributeValueExtractors[attribute.localId] = {
-                    inputView.value
-                }
+                internalSubscriptions.add(
+                        attributeViewModel.valueObservable.observeOn(AndroidSchedulers.mainThread()).subscribe { valueNullable ->
+                            println("viewModel value changed - ${valueNullable.datum}")
+                            if (inputView.value != valueNullable.datum?.value) {
+                                inputView.valueChanged.suspend = true
+                                inputView.setAnyValue(valueNullable.datum?.value)
+                                inputView.valueChanged.suspend = false
 
-                inputView.boundAttributeObjectId = attribute.objectId
+                                setTimestampIndicatorText(valueNullable.datum?.timestamp ?: 0)
+                            }
+                        }
+                )
+
+                inputView.boundAttributeObjectId = attributeViewModel.attributeDAO.objectId
 
 
                 inputView.onResume()
