@@ -14,10 +14,15 @@ class TimePointInputView(context: Context, attrs: AttributeSet? = null) : AAttri
 
     private var valueView: DateTimePicker = findViewById(R.id.value)
 
-    override var value: TimePoint
-        get() = valueView.time
+    override var value: TimePoint? = TimePoint()
         set(value) {
-            valueView.time = value
+            if (field != value) {
+                field = value
+                //TODO null UI
+                valueView.timeChanged.suspend = true
+                valueView.time = value ?: TimePoint()
+                valueView.timeChanged.suspend = false
+            }
         }
 
     init {

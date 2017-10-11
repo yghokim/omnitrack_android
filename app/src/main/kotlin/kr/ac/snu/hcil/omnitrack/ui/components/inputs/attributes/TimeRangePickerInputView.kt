@@ -14,13 +14,13 @@ class TimeRangePickerInputView(context: Context, attrs: AttributeSet? = null) : 
 
     private var valueView: TimeRangePicker = findViewById(R.id.value)
 
-    override var value: TimeSpan
-        get() {
-            val timeSpan = valueView.getTimeSpan()
-            return timeSpan
-        }
+    override var value: TimeSpan? = TimeSpan()
         set(value) {
-            valueView.setTimeSpan(value)
+            //TODO Null UI
+            if (field != value) {
+                field = value
+                valueView.setTimeSpan(value ?: TimeSpan())
+            }
         }
 
     init {

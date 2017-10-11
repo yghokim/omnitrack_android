@@ -37,7 +37,7 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
 
     override val typeId: Int = VIEW_TYPE_LOCATION
 
-    override var value: LatLng = LatLng(0.0, 0.0)
+    override var value: LatLng? = LatLng(0.0, 0.0)
         set(value) {
             if (field != value) {
                 field = value
@@ -199,7 +199,7 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
             }
 
             if (valueMarker == null) {
-                valueMarker = googleMap?.addMarker(MarkerOptions().position(value).draggable(false))
+                valueMarker = googleMap?.addMarker(MarkerOptions().position(value!!).draggable(false))
             } else {
                 valueMarker?.position = value
             }
@@ -221,7 +221,7 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
     }
 
 
-    private fun reserveAddressChange(location: LatLng) {
+    private fun reserveAddressChange(location: LatLng?) {
         if (isLocationConversionTaskRunning) {
             queuedLocationToConvert = location
         } else {

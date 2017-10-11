@@ -38,16 +38,16 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
 
     override val typeId: Int = VIEW_TYPE_IMAGE
 
-    override var value: SynchronizedUri = SynchronizedUri()
+    override var value: SynchronizedUri? = SynchronizedUri()
         set(value) {
             if (field != value) {
                 subscriptions.clear()
                 field = value
-                if (value.isLocalUriValid) {
+                if (value?.isLocalUriValid == true) {
                     picker.uriChanged.suspend = true
                     picker.imageUri = value.localUri
                     picker.uriChanged.suspend = false
-                } else if (value.isSynchronized) {
+                } else if (value?.isSynchronized == true) {
                     picker.isEnabled = false
                     subscriptions.add(
                             OTApplication.app.storageHelper.downloadFileTo(value.serverUri.path, value.localUri).subscribe({
@@ -108,10 +108,6 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
 
     override fun focus() {
 
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
     }
 
     override fun onRequestCameraImage(view: ImagePicker) {

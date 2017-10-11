@@ -1,10 +1,12 @@
 package kr.ac.snu.hcil.omnitrack.core.database.local
 
+import android.app.Activity
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
+import com.tbruyelle.rxpermissions.RxPermissions
 import io.realm.Realm
 import io.realm.RealmList
 import io.realm.RealmObject
@@ -46,6 +48,31 @@ open class OTTrackerDAO : RealmObject() {
     var removed: Boolean = false
 
     val creationFlagsMap: Map<String, String> get() = RealmDatabaseManager.convertRealmEntryListToDictionary(creationFlags)
+
+    fun getRequiredPermissions(): Array<String> {
+        val list = ArrayList<String>()
+        attributes.forEach {
+            try {
+                val perms = it.getHelper().getRequiredPermissions(it)
+                if (perms != null) {
+                    list.addAll(perms)
+                }
+            } catch (ex: Exception) {
+
+            }
+        }
+
+        return list.toTypedArray()
+    }
+
+    fun makePermissionAssertObservable(activity: Activity): Observable<Boolean> {
+        val requiredPermissions = this.getRequiredPermissions()
+        return if (requiredPermissions.isNotEmpty()) {
+            RxPermissions(activity).request(*requiredPermissions)
+        } else {
+            Observable.just(true)
+        }
+    }
 }
 
 

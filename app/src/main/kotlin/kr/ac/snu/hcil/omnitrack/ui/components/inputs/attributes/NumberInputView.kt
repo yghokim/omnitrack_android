@@ -26,7 +26,7 @@ import kotlin.properties.Delegates
 class NumberInputView(context: Context, attrs: AttributeSet? = null) : AAttributeInputView<BigDecimal>(R.layout.input_number, context, attrs) {
 
     override val typeId: Int = VIEW_TYPE_NUMBER
-    override var value: BigDecimal = BigDecimal("0")
+    override var value: BigDecimal? = BigDecimal("0")
         set(value) {
             if (field != value) {
                 field = value
@@ -82,10 +82,11 @@ class NumberInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
             typingMode = false
         }
         when (view.id) {
-            R.id.ui_button_plus ->
-                value += moveUnit
+            R.id.ui_button_plus -> {
+                value = (value ?: BigDecimal(0)) + moveUnit
+            }
             R.id.ui_button_minus ->
-                value -= moveUnit
+                value = (value ?: BigDecimal(0)) - moveUnit
         }
     }
 
@@ -120,41 +121,35 @@ class NumberInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
     }
 
     fun applyValueToView() {
-/*
-        valueStatic.text = format.format(value)
-        var bigDecimalString = value.toPlainString()
-        val decimalPointIndex = bigDecimalString.indexOfFirst { it == '.' }
-        if (decimalPointIndex != -1) {
-            bigDecimalString = bigDecimalString.substring(0, Math.min(decimalPointIndex + numDigitsUnderPoint + 1, bigDecimalString.length))
+
+        val value = this.value
+        if (value == null) {
+            valueStatic.text = null
+            valueField.setText(null, TextView.BufferType.NORMAL)
+            valueField.setSelection(valueField.text.length)
+        } else {
+            val formattedText = numberStyle.formatNumber(value, formattedInformation)
+
+            val spanned = SpannableString(formattedText)
+            if (numberStyle.unitPosition != NumberStyle.UnitPosition.None) {
+                spanned.setSpan(TextAppearanceSpan(context, R.style.numberInputViewUnitStyle), formattedInformation.unitPartStart, formattedInformation.unitPartEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+
+            spanned.setSpan(StyleSpan(Typeface.ITALIC), formattedInformation.numberPartStart, formattedInformation.numberPartEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+            valueStatic.text = spanned
+            valueField.setText(value.toPlainString(), TextView.BufferType.NORMAL)
+            valueField.setSelection(valueField.text.length)
         }
-
-        if (bigDecimalString.last() == '.') {
-            bigDecimalString.substring(0, bigDecimalString.length)
-        }
-
-        valueField.setText(bigDecimalString)*/
-        val formattedText = numberStyle.formatNumber(value, formattedInformation)
-
-        val spanned = SpannableString(formattedText)
-        if (numberStyle.unitPosition != NumberStyle.UnitPosition.None) {
-            spanned.setSpan(TextAppearanceSpan(context, R.style.numberInputViewUnitStyle), formattedInformation.unitPartStart, formattedInformation.unitPartEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-        }
-
-        spanned.setSpan(StyleSpan(Typeface.ITALIC), formattedInformation.numberPartStart, formattedInformation.numberPartEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-
-
-        valueStatic.text = spanned
-        valueField.setText(value.toPlainString(), TextView.BufferType.NORMAL)
-        valueField.setSelection(valueField.text.length)
     }
 
-    fun applyFieldValue() {
+    private fun applyFieldValue() {
         try {
-            value = BigDecimal(if (valueField.text.isNotBlank()) {
-                valueField.text.toString()
+            value = if (valueField.text.isNotBlank()) {
+                BigDecimal(valueField.text.toString())
             } else {
-                "0"
-            })
+                null
+            }
         } catch(e: Exception) {
             e.printStackTrace()
         }
@@ -166,12 +161,10 @@ class NumberInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
 
     override fun setAnyValue(value: Any?) {
         println(value)
-        if (isNumericPrimitive(value)) {
-            if (value != null) {
+        if (value == null) {
+            this.value = null
+        } else if (isNumericPrimitive(value)) {
                 this.value = toBigDecimal(value)
-            } else {
-                //TODO null value
-            }
         } else {
             super.setAnyValue(value)
         }

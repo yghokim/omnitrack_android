@@ -4,6 +4,7 @@ import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.annotations.Index
 import io.realm.annotations.PrimaryKey
+import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 
 /**
  * Created by Young-Ho on 10/9/2017.
@@ -24,6 +25,14 @@ open class OTPendingItemBuilderDAO : RealmObject() {
     var holderType: Int = 0
 
     var data = RealmList<OTItemBuilderFieldValueEntry>()
+
+    fun setValue(attributeLocalId: String, value: OTItemBuilderWrapperBase.ValueWithTimestamp?) {
+        val match = data.find { it.attributeLocalId == attributeLocalId }
+        if (match != null) {
+        } else {
+
+        }
+    }
 }
 
 open class OTItemBuilderFieldValueEntry : RealmObject() {
