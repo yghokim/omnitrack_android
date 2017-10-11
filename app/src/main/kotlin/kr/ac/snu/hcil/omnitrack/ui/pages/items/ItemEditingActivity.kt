@@ -89,9 +89,6 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
 
     private var itemSaved: Boolean = false
 
-    private val startSubscriptions = CompositeSubscription()
-    private val resumeSubscriptions = CompositeSubscription()
-
     private val initialValueSnapshot = Hashtable<String, Any>()
     private val snapshot = Hashtable<String, Any>()
 
@@ -285,8 +282,6 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
     override fun onPause() {
         super.onPause()
 
-        resumeSubscriptions.clear()
-
         for (inputView in attributeListAdapter.inputViews) {
             inputView.onPause()
         }
@@ -322,15 +317,20 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
 
     override fun onDestroy() {
         super.onDestroy()
+        println("onDestroy ItemEditingActivity")
+
         for (inputView in attributeListAdapter.inputViews) {
             inputView.onDestroy()
         }
-    }
 
-    override fun onStop() {
-        super.onStop()
-        println("startSubscriptions has subscriptoin: ${startSubscriptions.hasSubscriptions()}")
-        startSubscriptions.clear()
+        if (viewModel.isValid && viewModel.isViewModelsDirty() && viewModel.mode == ItemEditionViewModel.ItemMode.New) {
+            //cache Builder
+            println("store Builder.")
+            viewModel.saveItemBuilderAsync()
+        } else {
+            println("remove builder")
+            viewModel.removeItemBuilderAsync()
+        }
     }
 
     override fun onLowMemory() {
@@ -400,39 +400,6 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
         for (key in builder.keys) {
             initialValueSnapshot[key] = builder.getValueWithKey(key)
         }
-    }
-
-    private fun needsToCacheBuilder(): Boolean {
-        /*
-        if (tracker?.attributes?.unObservedList?.find { (it.valueConnection != null && it.isConnectionValid(null)) || !it.isAutoCompleteValueStatic } != null) {
-            return true
-        } else {
-            //there is no connection, and every field is static
-            return tracker?.attributes?.unObservedList?.find {
-                it.valueConnection == null && it.isAutoCompleteValueStatic &&
-                        (builder?.getValueWithKey(it.objectId) != initialValueSnapshot[it.objectId])
-            } != null
-        }*/ return false
-    }
-
-    private fun clearBuilderCache() {
-        //TODO clearBuilder
-    }
-
-    private fun storeItemBuilderCache() {
-        /*
-        if (tracker != null) {
-//            syncViewStateToBuilderAsync {
-            if (builder?.isEmpty == false) {
-                val preferences = getSharedPreferences(OTApplication.PREFERENCE_KEY_FOREGROUND_ITEM_BUILDER_STORAGE, Context.MODE_PRIVATE)
-                val editor = preferences.edit()
-                editor.putString(makeTrackerPreferenceKey(tracker!!), builder?.getSerializedString())
-                editor.apply()
-            }
-            //          }
-        }
-        */
-        //TODO store builder
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

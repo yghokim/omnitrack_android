@@ -8,6 +8,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.local.OTPendingItemBuilderDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.RealmViewModel
+import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Observable
 import rx.subjects.BehaviorSubject
 import rx.subscriptions.CompositeSubscription
@@ -38,6 +39,9 @@ class ItemEditionViewModel : RealmViewModel(), OTItemBuilderWrapperBase.Attribut
 
     val isBusyObservable = BehaviorSubject.create<Boolean>(false)
 
+    var isValid: Boolean = true
+        private set
+
     var isBusy: Boolean
         get() {
             return isBusyObservable.value
@@ -61,6 +65,7 @@ class ItemEditionViewModel : RealmViewModel(), OTItemBuilderWrapperBase.Attribut
         }
 
     fun init(trackerId: String, itemId: String?) {
+        isValid = true
         trackerDao = OTApplication.app.databaseManager.getTrackerQueryWithId(trackerId, realm).findFirst()
         subscriptions.clear()
 
@@ -71,7 +76,7 @@ class ItemEditionViewModel : RealmViewModel(), OTItemBuilderWrapperBase.Attribut
                     OTApplication.app.databaseManager.getItemBuilderOfTracker(trackerId, OTPendingItemBuilderDAO.HOLDER_TYPE_INPUT_FORM, realm).subscribe { result ->
                         if (result.datum != null) {
                             //there is a pending itemBuilder.
-                            this.itemBuilderDao = result.datum
+                            this.itemBuilderDao = realm.copyFromRealm(result.datum)
                             builderCreationModeObservable.onNext(BuilderCreationMode.Restored)
 
                         } else {
@@ -93,7 +98,7 @@ class ItemEditionViewModel : RealmViewModel(), OTItemBuilderWrapperBase.Attribut
                         currentAttributeViewModelList.addAll(unManagedTrackerDao.attributes.map { AttributeInputViewModel(it) })
                         attributeViewModelListObservable.onNext(currentAttributeViewModelList)
 
-                        this.builderWrapper = OTItemBuilderWrapperBase(realm.copyFromRealm(this.itemBuilderDao), realm)
+                        this.builderWrapper = OTItemBuilderWrapperBase(this.itemBuilderDao, realm)
 
                         for (key in this.builderWrapper.keys) {
                             val value = this.builderWrapper.getValueInformationOf(key)
@@ -120,7 +125,26 @@ class ItemEditionViewModel : RealmViewModel(), OTItemBuilderWrapperBase.Attribut
         )
     }
 
-    fun setValueOfAttribute(attributeLocalId: String, valueWithTimestamp: OTItemBuilderWrapperBase.ValueWithTimestamp) {
+    fun isViewModelsDirty(): Boolean {
+        for (viewModel in currentAttributeViewModelList) {
+            val match = itemBuilderDao.data.find { it.attributeLocalId == viewModel.attributeLocalId }
+            if (match != null) {
+                val vmValue = viewModel.value
+                if (vmValue == null) {
+                    return true
+                } else {
+                    if ((vmValue.timestamp != match.timestamp) || (vmValue.value != match.serializedValue?.let { TypeStringSerializationHelper.deserialize(it) })) {
+                        return true
+                    }
+                }
+            } else return viewModel.value != null
+        }
+
+        return false
+    }
+
+    private fun setValueOfAttribute(attributeLocalId: String, valueWithTimestamp: OTItemBuilderWrapperBase.ValueWithTimestamp) {
+        itemBuilderDao.setValue(attributeLocalId, valueWithTimestamp, realm)
         val match = currentAttributeViewModelList.find { it.attributeLocalId == attributeLocalId }
         if (match != null) {
             match.value = valueWithTimestamp
@@ -135,29 +159,36 @@ class ItemEditionViewModel : RealmViewModel(), OTItemBuilderWrapperBase.Attribut
     }
 
     private fun refreshDaoValues() {
-        currentAttributeViewModelList.forEach { attrViewModel ->
-            val value = attrViewModel.value
-
+        realm.executeTransaction {
+            currentAttributeViewModelList.forEach { attrViewModel ->
+                val value = attrViewModel.value
+                itemBuilderDao.setValue(attrViewModel.attributeLocalId, value, realm)
+            }
         }
     }
 
     fun saveItemBuilderAsync() {
-        subscriptions.add(
-                isBusyObservable.filter { it == false }.subscribe {
-                    realm.executeTransactionAsync {
-                        realm.copyToRealmOrUpdate(itemBuilderDao)
+        if (isValid) {
+            println("save builder")
+            refreshDaoValues()
+            subscriptions.add(
+                    isBusyObservable.filter { it == false }.subscribe {
+                        realm.executeTransaction {
+                            realm.copyToRealmOrUpdate(itemBuilderDao)
+                        }
                     }
-                }
-        )
-
+            )
+        }
     }
 
     fun removeItemBuilderAsync() {
         subscriptions.add(
                 isBusyObservable.filter { it == false }.subscribe {
-                    realm.executeTransactionAsync {
-                        itemBuilderDao.deleteFromRealm()
+                    realm.executeTransaction {
+                        realm.where(OTPendingItemBuilderDAO::class.java).equalTo("id", itemBuilderDao.id).findAll().deleteAllFromRealm()
                     }
+                    println("removed item builder.")
+                    isValid = false
                 }
         )
     }
