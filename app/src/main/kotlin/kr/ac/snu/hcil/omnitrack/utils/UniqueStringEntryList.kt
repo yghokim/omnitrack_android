@@ -33,17 +33,16 @@ class UniqueStringEntryList : IStringSerializable {
                         input.beginArray()
                         while (input.hasNext()) {
                             input.beginObject()
+                            var id: Int? = null
+                            var value: String? = null
                             while (input.hasNext()) {
-                                var id: Int? = null
-                                var value: String? = null
                                 when (input.nextName()) {
                                     "id", "i" -> id = input.nextInt()
                                     "val", "v" -> value = input.nextString()
                                 }
-
-                                if (id != null && value != null)
-                                    result.list.add(Entry(id, value))
                             }
+                            if (id != null && value != null)
+                                result.list.add(Entry(id, value))
                             input.endObject()
                         }
                         input.endArray()
