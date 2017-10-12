@@ -28,6 +28,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AttributeSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
+import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
 import kr.ac.snu.hcil.omnitrack.services.OTTableExportService
 import kr.ac.snu.hcil.omnitrack.ui.DragItemTouchHelperCallback
@@ -229,7 +230,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                 if (item != null) {
                     item.setValueOf(attribute, value)
                     creationSubscriptions.add(
-                            OTApplication.app.databaseManager.saveItem(item, tracker, false).observeOn(AndroidSchedulers.mainThread()).subscribe { success ->
+                            DatabaseManager.saveItem(item, tracker, false).observeOn(AndroidSchedulers.mainThread()).subscribe { success ->
                                 if (success)
                                     itemListViewAdapter.notifyItemChanged(items.indexOf(item))
                             }
