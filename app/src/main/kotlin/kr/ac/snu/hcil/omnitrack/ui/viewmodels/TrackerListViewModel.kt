@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui.viewmodels
 import android.support.v7.util.DiffUtil
 import io.realm.*
 import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
@@ -99,6 +100,8 @@ class TrackerListViewModel : UserAttachedViewModel(), OrderedRealmCollectionChan
 
     class TrackerInformationViewModel(val trackerDao: OTTrackerDAO, val realm: Realm) : RealmChangeListener<OTTrackerDAO> {
 
+        val validationResult = BehaviorSubject.create<Pair<Boolean, List<CharSequence>>>()
+
         val totalItemCount: BehaviorSubject<Long> = BehaviorSubject.create()
 
         val todayCount: BehaviorSubject<Long> = BehaviorSubject.create()
@@ -112,6 +115,7 @@ class TrackerListViewModel : UserAttachedViewModel(), OrderedRealmCollectionChan
 
         val trackerEditable: BehaviorSubject<Boolean> = BehaviorSubject.create()
 
+        val attributesResult: RealmResults<OTAttributeDAO> = OTApplication.app.databaseManager.getAttributeListQuery(trackerDao.objectId!!, realm).findAllAsync()
         val trackerItemsResult: RealmResults<OTItemDAO> = OTApplication.app.databaseManager.makeItemsQuery(trackerDao.objectId, null, null, realm).findAllAsync()
         val todayItemsResult: RealmResults<OTItemDAO> = OTApplication.app.databaseManager.makeItemsQueryOfToday(trackerDao.objectId, realm).findAllAsync()
 
@@ -122,6 +126,23 @@ class TrackerListViewModel : UserAttachedViewModel(), OrderedRealmCollectionChan
         private val reminderSubscriptionDict = android.support.v4.util.ArrayMap<String, CompositeSubscription>()
 
         init {
+
+            attributesResult.addChangeListener { snapshot, changeSet ->
+                if (changeSet == null) {
+                    //first
+                }
+
+                var valid = true
+                val validationMessages = ArrayList<CharSequence>()
+
+                snapshot.forEach {
+                    if (it.getParsedConnection()?.isAvailableToRequestValue(validationMessages) == false) {
+                        valid = false
+                    }
+                }
+
+                validationResult.onNext(Pair(valid, validationMessages))
+            }
 
             trackerItemsResult.addChangeListener { snapshot, changeSet ->
                 if (changeSet == null) {
@@ -187,6 +208,7 @@ class TrackerListViewModel : UserAttachedViewModel(), OrderedRealmCollectionChan
         fun unregister() {
             trackerDao.removeChangeListener(this)
 
+            this.attributesResult.removeAllChangeListeners()
             this.trackerItemsResult.removeAllChangeListeners()
             this.todayItemsResult.removeAllChangeListeners()
 
