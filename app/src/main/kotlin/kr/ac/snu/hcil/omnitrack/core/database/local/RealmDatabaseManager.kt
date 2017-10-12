@@ -437,10 +437,12 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
                     item.objectId = newItemId
                 }
 
-                handleBinaryUpload(item.objectId!!, item)
 
                 val realm = getRealmInstance()
-                realm.executeTransaction { realm -> realm.copyToRealmOrUpdate(item) }
+                realm.executeTransaction { realm ->
+                    handleBinaryUpload(item.objectId!!, item)
+                    realm.copyToRealmOrUpdate(item)
+                }
                 realm.close()
 
             } catch (ex: Exception) {
@@ -461,7 +463,7 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
                 if (value is SynchronizedUri && value.localUri != Uri.EMPTY) {
                     println("upload Synchronized Uri file to server...")
                     value.setSynchronized(OTApplication.app.binaryUploadServiceController.makeFilePath(itemId, item.trackerId!!, OTAuthManager.userId!!, value.localUri.lastPathSegment))
-
+                    entry.value = TypeStringSerializationHelper.serialize(value)
                     OTApplication.app.startService(
                             OTApplication.app.binaryUploadServiceController.makeUploadServiceIntent(value, itemId, item.trackerId!!, OTAuthManager.userId!!)
                     )
