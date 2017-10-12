@@ -26,7 +26,7 @@ class OTLocationAttributeHelper : OTAttributeHelper() {
 
     override fun getTypeSmallIconResourceId(attribute: OTAttributeDAO): Int = R.drawable.icon_small_location
 
-    override fun isAutoCompleteValueStatic(attribute: OTAttributeDAO): Boolean = false
+    override fun isIntrinsicDefaultValueVolatile(attribute: OTAttributeDAO): Boolean = true
 
     override fun getRequiredPermissions(attribute: OTAttributeDAO): Array<String>? = permissions
 
