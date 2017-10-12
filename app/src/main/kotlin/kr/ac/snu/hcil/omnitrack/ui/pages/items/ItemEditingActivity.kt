@@ -154,13 +154,13 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
         )
 
         creationSubscriptions.add(
-                viewModel.modeObservable.subscribe { mode ->
+                viewModel.modeObservable.flatMap { mode -> viewModel.trackerNameObservable.map { name -> Pair(mode, name) } }.subscribe { (mode, name) ->
                     when (mode) {
                         ItemEditionViewModel.ItemMode.Edit -> {
-                            title = String.format(getString(R.string.title_activity_edit_item), viewModel.trackerDao?.name)
+                            title = String.format(getString(R.string.title_activity_edit_item), name)
                         }
                         ItemEditionViewModel.ItemMode.New -> {
-                            title = String.format(resources.getString(R.string.title_activity_new_item), viewModel.trackerDao?.name)
+                            title = String.format(resources.getString(R.string.title_activity_new_item), name)
                         }
                     }
                 }
@@ -189,6 +189,10 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
 
         for (inputView in attributeListAdapter.inputViews) {
             inputView.onPause()
+        }
+
+        for (inputView in attributeListAdapter.inputViews) {
+            inputView.clearFocus()
         }
 
         this.activityResultAppliedAttributePosition = -1
@@ -385,12 +389,17 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
                 }
             }
 
-            private fun setTimestampIndicatorText(timestamp: Long) {
-                val now = System.currentTimeMillis()
-                timestampIndicator.text = if (now - timestamp < DateUtils.SECOND_IN_MILLIS) {
-                    resources.getString(R.string.time_just_now)
+            private fun setTimestampIndicatorText(timestamp: Long?) {
+                println("timestamp: ${timestamp}")
+                if (timestamp == null) {
+                    timestampIndicator.text = ""
                 } else {
-                    DateUtils.getRelativeTimeSpanString(timestamp, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_ABBREV_ALL)
+                    val now = System.currentTimeMillis()
+                    timestampIndicator.text = if (now - timestamp < 2 * DateUtils.SECOND_IN_MILLIS) {
+                        resources.getString(R.string.time_just_now)
+                    } else {
+                        DateUtils.getRelativeTimeSpanString(timestamp, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_ABBREV_ALL)
+                    }
                 }
             }
 
@@ -417,9 +426,9 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
 
                 internalSubscriptions.add(
                         inputView.valueChanged.observable.subscribe { (sender, args) ->
-                            println("input view value changed - ${args}")
                             val now = System.currentTimeMillis()
                             attributeViewModel.value = OTItemBuilderWrapperBase.ValueWithTimestamp(args, now)
+                            builderRestoredSnackbar.dismiss()
                     }
                 )
 
@@ -456,9 +465,8 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
                                 inputView.valueChanged.suspend = true
                                 inputView.setAnyValue(valueNullable.datum?.value)
                                 inputView.valueChanged.suspend = false
-
-                                setTimestampIndicatorText(valueNullable.datum?.timestamp ?: 0)
                             }
+                            setTimestampIndicatorText(valueNullable.datum?.timestamp)
                         }
                 )
 
