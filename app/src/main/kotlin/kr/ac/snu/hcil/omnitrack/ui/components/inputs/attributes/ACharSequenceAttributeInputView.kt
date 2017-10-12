@@ -42,6 +42,10 @@ abstract class ACharSequenceAttributeInputView(layoutId: Int, context: Context, 
         valueView.requestFocus()
     }
 
+    override fun clearFocus() {
+        valueView.clearFocus()
+    }
+
     inner class EditorActionListener : EnterHideKeyboardEditorActionListener() {
         override fun onEditorAction(v: TextView, actionId: Int, event: KeyEvent?): Boolean {
             val superResult = super.onEditorAction(v, actionId, event)

@@ -33,6 +33,8 @@ class ItemEditionViewModel : RealmViewModel(), OTItemBuilderWrapperBase.Attribut
     private lateinit var itemBuilderDao: OTPendingItemBuilderDAO
     private lateinit var builderWrapper: OTItemBuilderWrapperBase
 
+    val trackerNameObservable = BehaviorSubject.create<String>()
+
     val modeObservable = BehaviorSubject.create<ItemMode>(ItemMode.New)
     val builderCreationModeObservable = BehaviorSubject.create<BuilderCreationMode>()
 
@@ -70,6 +72,7 @@ class ItemEditionViewModel : RealmViewModel(), OTItemBuilderWrapperBase.Attribut
     fun init(trackerId: String, itemId: String?) {
         isValid = true
         trackerDao = OTApplication.app.databaseManager.getTrackerQueryWithId(trackerId, realm).findFirst()
+        trackerNameObservable.onNext(trackerDao?.name)
         subscriptions.clear()
 
         if (itemId != null) {
