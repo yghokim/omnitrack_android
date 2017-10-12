@@ -26,7 +26,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeAttribute
-import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AttributeSorter
+import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
 import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
@@ -179,46 +179,6 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                     reSort()
                 }
         )
-        /*
-        creationSubscriptions.add(
-                //loadWholeItems(tracker)
-                DatabaseManager.makeItemQueryStream(tracker).subscribe {
-                    action ->
-                    when (action.action) {
-                        DatabaseManager.ElementActionType.Added -> {
-                            action.element?.let {
-                                synchronized(items) {
-                                    items.add(it)
-                                    reSort()
-                                }
-                            }
-                        }
-                        DatabaseManager.ElementActionType.Removed -> {
-                            synchronized(items) {
-                                val toRemoveIndex = items.indexOfFirst { it.objectId == action.itemId }
-                                if (toRemoveIndex != -1) {
-                                    items.removeAt(toRemoveIndex)
-                                    itemListViewAdapter.notifyItemRemoved(toRemoveIndex)
-                                }
-                            }
-                        }
-                        DatabaseManager.ElementActionType.Modified -> {
-                            println("Item was modified.")
-                            val changed = items.find { it.objectId == action.itemId }
-                            if (changed != null) {
-                                synchronized(items)
-                                {
-                                    action.pojo?.let {
-                                        pojo ->
-                                        changed.overwriteWithPojo(pojo)
-                                        reSort()
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-        )*/
     }
 
     override fun onOkAttributeEditDialog(changed: Boolean, value: Any, tracker: OTTracker, attribute: OTAttribute<out Any>, itemId: String?) {
@@ -456,7 +416,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                 val currentSorter = getCurrentSort()
 
                 cal.timeInMillis =
-                        if (currentSorter is AttributeSorter && currentSorter.attribute is OTTimeAttribute) {
+                        if (currentSorter is AFieldValueSorter && currentSorter.attribute is OTTimeAttribute) {
                             if (item.hasValueOf(currentSorter.attribute)) {
                                 (item.getValueOf(currentSorter.attribute) as TimePoint).timestamp
                             } else item.timestamp
@@ -550,7 +510,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                         attributeId = attribute.objectId
                         val sort = getCurrentSort()
                         attributeNameView.setTextColor(
-                                if (sort is AttributeSorter && sort.attribute === attribute) {
+                                if (sort is AFieldValueSorter && sort.attribute === attribute) {
                                     ContextCompat.getColor(this@ItemBrowserActivity, R.color.colorAccent)
                                 } else ContextCompat.getColor(this@ItemBrowserActivity, R.color.textColorLight)
                         )

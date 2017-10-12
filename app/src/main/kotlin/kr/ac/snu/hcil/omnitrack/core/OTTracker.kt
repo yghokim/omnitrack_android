@@ -6,7 +6,6 @@ import android.graphics.Color
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
-import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AttributeSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
 import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.NamedObject
@@ -461,7 +460,7 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
 
         for (attribute in attributes) {
             if (attribute.valueNumericCharacteristics.sortable) {
-                list.add(AttributeSorter(attribute))
+                //list.add(AFieldValueSorter(attribute))
             }
         }
 

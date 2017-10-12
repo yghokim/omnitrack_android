@@ -48,6 +48,10 @@ open class OTItemDAO : RealmObject() {
     fun serializedValueTable(): Map<String, String> {
         return RealmDatabaseManager.convertRealmEntryListToDictionary(fieldValueEntries)
     }
+
+    fun getValueOf(attributeLocalId: String): Any? {
+        return fieldValueEntries.find { it.key == attributeLocalId }?.value?.let { TypeStringSerializationHelper.deserialize(attributeLocalId) }
+    }
 }
 
 object RealmItemHelper {

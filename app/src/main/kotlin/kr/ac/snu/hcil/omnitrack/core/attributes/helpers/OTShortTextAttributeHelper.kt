@@ -9,7 +9,7 @@ import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelpe
 /**
  * Created by Young-Ho on 10/7/2017.
  */
-class OTShortTextAttributeHelper : OTAttributeHelper() {
+class OTShortTextAttributeHelper : ATextTypeAttributeHelper() {
 
     override fun getValueNumericCharacteristics(attribute: OTAttributeDAO): NumericCharacteristics {
         return NumericCharacteristics(false, false)
