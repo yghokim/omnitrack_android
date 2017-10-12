@@ -94,4 +94,8 @@ class OTTimeSpanAttributeHelper : OTAttributeHelper() {
             inputView.setGranularity(granularity)
         }
     }
+
+    override fun initialize(attribute: OTAttributeDAO) {
+        attribute.fallbackValuePolicy = OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE
+    }
 }

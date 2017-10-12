@@ -163,4 +163,9 @@ abstract class OTAttributeHelper {
     open fun getViewForItemListContainerType(): Int {
         return OTAttributeManager.VIEW_FOR_ITEM_LIST_CONTAINER_TYPE_SINGLELINE
     }
+
+    //Configuration=======================================================================================
+    open fun initialize(attribute: OTAttributeDAO) {
+        //noop
+    }
 }
