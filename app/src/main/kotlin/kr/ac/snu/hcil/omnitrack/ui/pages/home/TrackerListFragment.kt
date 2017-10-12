@@ -582,13 +582,18 @@ class TrackerListFragment : OTFragment() {
 
                 validationErrorMessages.clear()
 
-                //TODO validate
-                /*
-                errorIndicator.visibility = if (viewModel.tracker.isValid(validationErrorMessages)) {
-                    View.INVISIBLE
-                } else {
-                    View.VISIBLE
-                }*/
+                subscriptions.add(
+                        viewModel.validationResult.subscribe { (isValid, invalidateMessages) ->
+                            this.validationErrorMessages.clear()
+                            this.validationErrorMessages.addAll(invalidateMessages)
+
+                            errorIndicator.visibility = if (isValid) {
+                                View.INVISIBLE
+                            } else {
+                                View.VISIBLE
+                            }
+                        }
+                )
 
                 if (currentlyExpandedIndex == adapterPosition) {
                     lastExpandedViewHolder = this

@@ -115,7 +115,7 @@ abstract class OTAttributeHelper {
 
     open fun getFallbackValue(attribute: OTAttributeDAO): Observable<Nullable<out Any>> {
         return Observable.defer {
-            println("getFallbackValue. Current thread: ${Thread.currentThread().name}")
+            println("getFallbackValue. policy: ${attribute.fallbackValuePolicy}. Current thread: ${Thread.currentThread().name}")
             when (attribute.fallbackValuePolicy) {
                 OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE -> {
                     return@defer if (isIntrinsicDefaultValueSupported(attribute)) {
