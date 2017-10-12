@@ -3,6 +3,8 @@ package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 import android.content.Context
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
+import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ChoiceSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTChoiceEntryListProperty
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTChoiceEntryListPropertyHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyHelper
@@ -39,6 +41,12 @@ class OTChoiceAttributeHelper : OTAttributeHelper() {
     }
 
     override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_INT_ARRAY
+
+    override fun getSupportedSorters(attribute: OTAttributeDAO): Array<AFieldValueSorter> {
+        return arrayOf(
+                ChoiceSorter(attribute.name, getEntries(attribute) ?: UniqueStringEntryList(), attribute.localId)
+        )
+    }
 
     override val propertyKeys: Array<String> = arrayOf(PROPERTY_MULTISELECTION, PROPERTY_ENTRIES)
 

@@ -3,6 +3,9 @@ package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 import android.content.Context
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
+import kr.ac.snu.hcil.omnitrack.core.attributes.logics.TimeSpanIntervalSorter
+import kr.ac.snu.hcil.omnitrack.core.attributes.logics.TimeSpanPivotalSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
@@ -35,6 +38,14 @@ class OTTimeSpanAttributeHelper : OTAttributeHelper() {
 
     override fun getTypeSmallIconResourceId(attribute: OTAttributeDAO): Int {
         return R.drawable.icon_small_timer
+    }
+
+    override fun getSupportedSorters(attribute: OTAttributeDAO): Array<AFieldValueSorter> {
+        return arrayOf(
+                TimeSpanPivotalSorter("${attribute.name} start", true, attribute.localId),
+                TimeSpanPivotalSorter("${attribute.name} end", false, attribute.localId),
+                TimeSpanIntervalSorter("${attribute.name} interval", attribute.localId)
+        )
     }
 
     override fun isIntrinsicDefaultValueVolatile(attribute: OTAttributeDAO): Boolean = true
