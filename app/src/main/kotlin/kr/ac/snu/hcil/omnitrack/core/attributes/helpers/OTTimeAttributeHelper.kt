@@ -109,4 +109,8 @@ class OTTimeAttributeHelper : OTAttributeHelper() {
     override fun makeIntrinsicDefaultValueMessage(attribute: OTAttributeDAO): CharSequence {
         return OTApplication.getString(R.string.msg_intrinsic_time)
     }
+
+    override fun initialize(attribute: OTAttributeDAO) {
+        attribute.fallbackValuePolicy = OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE
+    }
 }

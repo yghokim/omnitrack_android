@@ -7,7 +7,6 @@ import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import com.tbruyelle.rxpermissions.RxPermissions
-import io.realm.Realm
 import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.annotations.Index
@@ -186,7 +185,12 @@ open class OTAttributeDAO : RealmObject() {
         return getHelper().getInputViewType(previewMode, this)
     }
 
-    fun initializePropertiesWithDefaults(realm: Realm) {
+    fun initialize() {
+        initializePropertiesWithDefaults()
+        getHelper().initialize(this)
+    }
+
+    fun initializePropertiesWithDefaults() {
         val attributeHelper = OTAttributeManager.getAttributeHelper(type)
         attributeHelper.propertyKeys.forEach { key ->
             setPropertySerializedValue(key, attributeHelper.getPropertyHelper<Any>(key).getSerializedValue(attributeHelper.getPropertyInitialValue(key)!!))
