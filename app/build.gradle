@@ -105,6 +105,7 @@ dependencies {
     compile project(':UpPlatformSdk')
     compile project(':material_about')
     compile project(':fancybuttons')
+    compile project(':TedBottomPicker:tedbottompicker')
     // https://mvnrepository.com/artifact/org.apache.commons/commons-math3
 
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
@@ -134,7 +135,6 @@ dependencies {
     compile 'de.hdodenhof:circleimageview:2.1.0'
     compile 'com.github.bumptech.glide:glide:4.2.0'
     kapt 'com.github.bumptech.glide:compiler:4.2.0'
-    compile 'gun0912.ted:tedbottompicker:1.0.12'
     compile 'com.tbruyelle.rxpermissions:rxpermissions:0.9.4@aar'
     compile 'com.wonderkiln:camerakit:0.11.0'
     compile 'com.github.halysongoncalves:pugnotification:1.8.1'

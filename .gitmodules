@@ -1,0 +1,3 @@
+[submodule "TedBottomPicker"]
+	path = TedBottomPicker
+	url = https://github.com/muclipse/TedBottomPicker.git
