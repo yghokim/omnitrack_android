@@ -37,9 +37,8 @@ class OTItemBuilderWrapperBase {
     private val dao: OTPendingItemBuilderDAO
 
     constructor(dao: OTPendingItemBuilderDAO, realm: Realm) {
-        if (dao.isManaged) {
-            this.dao = realm.copyFromRealm(dao)
-        } else this.dao = dao
+        println("builderDao managed: ${dao.isManaged}, tracker managed: ${dao.tracker?.isManaged}, attribute managed: ${dao.tracker?.attributes?.first()?.isManaged}")
+        this.dao = dao
     }
 
     fun getValueInformationOf(attributeLocalId: String): ValueWithTimestamp? {
@@ -62,35 +61,38 @@ class OTItemBuilderWrapperBase {
                     val attrLocalId = attr.localId
                     val connection = attr.getParsedConnection()
                     if (connection != null) {
+                        //Connection
                         connection.getRequestedValue(this).flatMap { data ->
                             if (data.datum == null) {
-                                attr.getFallbackValue()
+                                println("ValueConnection result was null. send fallback value")
+                                return@flatMap attr.getFallbackValue()
                             } else {
-                                Observable.just(data.datum)
+                                println("Received valueConnection result - ${data.datum}")
+                                return@flatMap Observable.just(data.datum)
                             }
-                        }.onErrorResumeNext { attr.getFallbackValue() }.map { value -> Pair(attrLocalId, ValueWithTimestamp(value, System.currentTimeMillis())) }.subscribeOn(Schedulers.io()).doOnSubscribe {
+                        }.onErrorResumeNext { err -> err.printStackTrace(); attr.getFallbackValue() }.map { value -> Pair(attrLocalId, ValueWithTimestamp(value, System.currentTimeMillis())) }.subscribeOn(Schedulers.io()).doOnSubscribe {
 
-                            println("RX doOnSubscribe1: ${Thread.currentThread().name}")
                             onAttributeStateChangedListener?.onAttributeStateChanged(attrLocalId, EAttributeValueState.GettingExternalValue)
                         }
                     } else {
-                        attr.getFallbackValue().map { nullable ->
+
+                        println("No connection. use fallback value: ${attrLocalId}")
+                        return@mapIndexed attr.getFallbackValue().map { nullable ->
+                            println("No connection. received fallback value: ${attrLocalId}, ${nullable.datum}")
                             Pair(attrLocalId, ValueWithTimestamp(nullable.datum, System.currentTimeMillis()))
                         }.doOnSubscribe {
-                            println("RX doOnSubscribe2: ${Thread.currentThread().name}")
                             onAttributeStateChangedListener?.onAttributeStateChanged(attrLocalId, EAttributeValueState.Processing)
                         }
                     }
-                }).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io()).doOnSubscribe {
-                    println("RX Subscribe to ITemBuilder Autocomplete: ${Thread.currentThread().name} ==========================================")
-                }.doOnNext { result ->
+                }).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io())
+                        .doOnNext { result ->
 
-                    println("RX doOnNext: ${Thread.currentThread().name}")
-                    val attrLocalId = result.first
-                    val value = result.second
+                            println("RX doOnNext: ${Thread.currentThread().name}")
+                            val attrLocalId = result.first
+                            val value = result.second
 
-                    onAttributeStateChangedListener?.onAttributeStateChanged(attrLocalId, EAttributeValueState.Idle)
-                }.doOnCompleted {
+                            onAttributeStateChangedListener?.onAttributeStateChanged(attrLocalId, EAttributeValueState.Idle)
+                        }.doOnCompleted {
                     println("RX finished autocompleting builder=======================")
                 }
             }

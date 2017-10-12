@@ -17,7 +17,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.database.synchronization.SyncResultEntry
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
-import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import rx.Observable
 import rx.Single
 import rx.schedulers.Schedulers
@@ -213,13 +212,8 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    fun getItemBuilderOfTracker(trackerId: String, holderType: Int, realm: Realm): Single<Nullable<OTPendingItemBuilderDAO>> {
-        return realm.where(OTPendingItemBuilderDAO::class.java).equalTo("tracker.objectId", trackerId).equalTo("holderType", holderType).findFirstAsync().asObservable<OTPendingItemBuilderDAO>()
-                .skipWhile { it -> it.isLoaded == false }.map {
-            if (it.isValid) {
-                Nullable(it)
-            } else Nullable<OTPendingItemBuilderDAO>(null)
-        }.first().toSingle()
+    fun getItemBuilderQuery(trackerId: String, holderType: Int, realm: Realm): RealmQuery<OTPendingItemBuilderDAO> {
+        return realm.where(OTPendingItemBuilderDAO::class.java).equalTo("tracker.objectId", trackerId).equalTo("holderType", holderType)
     }
 
 

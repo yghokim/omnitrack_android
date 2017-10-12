@@ -6,6 +6,7 @@ import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyHelper
+import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
@@ -28,7 +29,7 @@ abstract class OTAttributeHelper {
     open fun getTypeNameResourceId(attribute: OTAttributeDAO): Int = R.drawable.field_icon_shorttext
 
     open fun getTypeSmallIconResourceId(attribute: OTAttributeDAO): Int = R.drawable.icon_small_shorttext
-    open fun isAutoCompleteValueStatic(attribute: OTAttributeDAO): Boolean = true
+    open fun isIntrinsicDefaultValueVolatile(attribute: OTAttributeDAO): Boolean = false
     open fun isExternalFile(attribute: OTAttributeDAO): Boolean = false
     open fun getRequiredPermissions(attribute: OTAttributeDAO): Array<String>? = null
     abstract val typeNameForSerialization: String
@@ -106,8 +107,15 @@ abstract class OTAttributeHelper {
         return ""
     }
 
+    open fun isAttributeValueVolatile(attribute: OTAttributeDAO): Boolean {
+        return attribute.serializedConnection?.let { OTConnection.fromJson(it) }?.source != null
+                || (attribute.fallbackValuePolicy == OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_LAST_ITEM)
+                || (attribute.fallbackValuePolicy == OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE && isIntrinsicDefaultValueSupported(attribute) && isIntrinsicDefaultValueVolatile(attribute))
+    }
+
     open fun getFallbackValue(attribute: OTAttributeDAO): Observable<Nullable<out Any>> {
         return Observable.defer {
+            println("getFallbackValue. Current thread: ${Thread.currentThread().name}")
             when (attribute.fallbackValuePolicy) {
                 OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE -> {
                     return@defer if (isIntrinsicDefaultValueSupported(attribute)) {
