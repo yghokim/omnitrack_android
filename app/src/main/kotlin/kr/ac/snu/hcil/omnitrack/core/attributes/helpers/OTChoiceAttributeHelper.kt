@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 import android.content.Context
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTChoiceEntryListProperty
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTChoiceEntryListPropertyHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyManager
@@ -52,7 +53,7 @@ class OTChoiceAttributeHelper : OTAttributeHelper() {
     override fun getPropertyInitialValue(propertyKey: String): Any? {
         return when (propertyKey) {
             PROPERTY_MULTISELECTION -> false
-            PROPERTY_ENTRIES -> UniqueStringEntryList()
+            PROPERTY_ENTRIES -> UniqueStringEntryList(OTChoiceEntryListProperty.PREVIEW_ENTRIES)
             else -> null
         }
     }
