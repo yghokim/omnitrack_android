@@ -20,12 +20,12 @@ open class OTItemDAO : RealmObject() {
     var objectId: String? = null
 
     @Index
-    var trackerId: String = ""
+    var trackerId: String? = null
 
     var deviceId: String? = null
 
     @Index
-    var timestamp: Long = 0
+    var timestamp: Long = System.currentTimeMillis()
 
     var source: String? = null
 
@@ -71,7 +71,7 @@ object RealmItemHelper {
     }
 
     fun convertDAOToItem(dao: OTItemDAO): OTItem =//objectId notNull is guaranteed.
-            OTItem(dao.objectId ?: dao.trackerId + UUID.randomUUID().toString(), dao.trackerId, dao.serializedValueTable(), dao.timestamp, dao.loggingSource, dao.deviceId)
+            OTItem(dao.objectId ?: dao.trackerId + UUID.randomUUID().toString(), dao.trackerId!!, dao.serializedValueTable(), dao.timestamp, dao.loggingSource, dao.deviceId)
 
 
     fun applyDaoToPojo(dao: OTItemDAO, pojo: OTItemPOJO) {
@@ -80,7 +80,7 @@ object RealmItemHelper {
         pojo.source = dao.source
         pojo.synchronizedAt = dao.synchronizedAt
         pojo.timestamp = dao.timestamp
-        pojo.trackerObjectId = dao.trackerId
+        pojo.trackerObjectId = dao.trackerId!!
         pojo.removed = dao.removed
 
         pojo.serializedValueTable = dao.serializedValueTable()

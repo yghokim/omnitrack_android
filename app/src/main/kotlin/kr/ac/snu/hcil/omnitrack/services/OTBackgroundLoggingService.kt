@@ -10,6 +10,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTItemBuilder
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.utils.isInDozeMode
 import rx.Observable
+import rx.Single
 import rx.Subscription
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
@@ -93,7 +94,10 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
                 } else {
                     currentBuilderSubscriptionDict[tracker.objectId] = builder.autoComplete().last().toSingle().map { pair -> true }.doOnSuccess { currentBuilderSubscriptionDict.remove(tracker.objectId) }.flatMap<Pair<Boolean, OTItem>> {
                         val item = builder.makeItem(source)
-                        OTApplication.app.databaseManager.saveItem(item, tracker).map { success -> Pair(success, item) }
+                        //OTApplication.app.databaseManager.saveItem(item, tracker).map { success -> Pair(success, item) }
+                        //TODO fix item save logic in background logging
+                        Single.just(Pair(false, item))
+
                     }.subscribe { successItemPair ->
                         if (successItemPair.first == true) {
                             sendBroadcast(context, OTApplication.BROADCAST_ACTION_BACKGROUND_LOGGING_SUCCEEDED, tracker, successItemPair.second.objectId!!, notify, notificationId)

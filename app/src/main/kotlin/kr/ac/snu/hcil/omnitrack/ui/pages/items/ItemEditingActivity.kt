@@ -258,35 +258,15 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
 
     override fun onToolbarRightButtonClicked() {
         //push item to db
-        //syncViewStateToBuilderAsync {
-        viewModel.removeItemBuilder()
-
-        builder?.let {
-            val item = it.makeItem(OTItem.LoggingSource.Manual)
-            println("Will push $item")
-
-            viewModel.removeItemBuilder()
-
-            /*
-            creationSubscriptions.add(
-
-                    OTApplication.app.databaseManager.saveItem(item, tracker!!).subscribe { success ->
-                        if (success) {
-                            it.clear()
-                            clearBuilderCache()
-                            skipViewValueCaching = true
-                            itemSaved = true
-                            setResult(RESULT_OK, Intent().putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, item.objectId))
-                            finish()
-                        } else {
-                            DialogHelper.makeSimpleAlertBuilder(this, "Item Logging Failed.")
-                        }
-                    }
-            )*/
-
-
+        //syncViewStateToBuilderAsync {viewModel.applyBuilderToItem()
+        viewModel.applyBuilderToItem().subscribe { result ->
+            if (result.datum != null) {
+                viewModel.removeItemBuilder()
+                setResult(RESULT_OK, Intent().putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, result.datum))
+                finish()
+            }
         }
-        //}
+
     }
 
     private fun makeTrackerPreferenceKey(tracker: OTTracker): String {

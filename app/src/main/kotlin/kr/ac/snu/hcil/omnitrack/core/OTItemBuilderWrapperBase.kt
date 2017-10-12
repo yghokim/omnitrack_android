@@ -1,12 +1,15 @@
 package kr.ac.snu.hcil.omnitrack.core
 
-import io.realm.Realm
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTPendingItemBuilderDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTStringStringEntryDAO
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
+import java.util.*
 
 /**
  * Created by Young-Ho Kim on 16. 7. 25
@@ -36,8 +39,7 @@ class OTItemBuilderWrapperBase {
     val keys: Set<String> by lazy { dao.data.mapNotNull { it.attributeLocalId }.toSet() }
     private val dao: OTPendingItemBuilderDAO
 
-    constructor(dao: OTPendingItemBuilderDAO, realm: Realm) {
-        println("builderDao managed: ${dao.isManaged}, tracker managed: ${dao.tracker?.isManaged}, attribute managed: ${dao.tracker?.attributes?.first()?.isManaged}")
+    constructor(dao: OTPendingItemBuilderDAO) {
         this.dao = dao
     }
 
@@ -48,6 +50,35 @@ class OTItemBuilderWrapperBase {
                     it.timestamp
             )
         }
+    }
+
+    fun saveToItem(itemDao: OTItemDAO?, loggingSource: OTItem.LoggingSource?): OTItemDAO {
+        val itemDaoToSave = itemDao ?: OTItemDAO()
+        if (itemDao == null) {
+            itemDaoToSave.deviceId = OTApplication.app.deviceId
+            itemDaoToSave.loggingSource = loggingSource ?: OTItem.LoggingSource.Unspecified
+            itemDaoToSave.trackerId = dao.tracker?.objectId
+        } else {
+            itemDaoToSave.updatedAt = System.currentTimeMillis()
+        }
+        itemDaoToSave.synchronizedAt = null
+
+        dao.data.forEach { builderFieldEntry ->
+            val match = itemDaoToSave.fieldValueEntries.find { it.key == builderFieldEntry.attributeLocalId }
+            if (match != null) {
+                match.value = builderFieldEntry.serializedValue
+            } else {
+                itemDaoToSave.fieldValueEntries.add(
+                        OTStringStringEntryDAO().apply {
+                            id = UUID.randomUUID().toString()
+                            key = builderFieldEntry.attributeLocalId!!
+                            value = builderFieldEntry.serializedValue
+                        }
+                )
+            }
+        }
+
+        return itemDaoToSave
     }
 
     fun makeAutoCompleteObservable(onAttributeStateChangedListener: AttributeStateChangedListener? = null): Observable<Pair<String, ValueWithTimestamp>> {

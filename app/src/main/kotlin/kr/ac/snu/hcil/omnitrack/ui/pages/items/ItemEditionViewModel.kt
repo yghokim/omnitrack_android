@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.items
 
 import android.support.v7.util.DiffUtil
 import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTPendingItemBuilderDAO
@@ -10,6 +11,7 @@ import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.RealmViewModel
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Observable
+import rx.Single
 import rx.subjects.BehaviorSubject
 import rx.subjects.PublishSubject
 import rx.subscriptions.CompositeSubscription
@@ -106,7 +108,7 @@ class ItemEditionViewModel : RealmViewModel(), OTItemBuilderWrapperBase.Attribut
             currentAttributeViewModelList.addAll(unManagedTrackerDao.attributes.map { AttributeInputViewModel(it) })
             attributeViewModelListObservable.onNext(currentAttributeViewModelList)
 
-            this.builderWrapper = OTItemBuilderWrapperBase(this.itemBuilderDao, realm)
+            this.builderWrapper = OTItemBuilderWrapperBase(this.itemBuilderDao)
 
             for (key in this.builderWrapper.keys) {
                 val value = this.builderWrapper.getValueInformationOf(key)
@@ -187,6 +189,23 @@ class ItemEditionViewModel : RealmViewModel(), OTItemBuilderWrapperBase.Attribut
                     }
             )
         }
+    }
+
+    fun applyBuilderToItem(): Single<Nullable<String>> {
+        if (isValid) {
+            return isBusyObservable.filter { it == false }.first().toSingle().flatMap {
+                refreshDaoValues()
+                var itemId: String? = null
+
+                if (mode == ItemMode.New) {
+                    val item = builderWrapper.saveToItem(null, OTItem.LoggingSource.Manual)
+                    return@flatMap OTApplication.app.databaseManager.saveItemImpl(item).map { Nullable(it.second) }
+                } else {
+                    //TODO edit mode
+                    throw NotImplementedError("")
+                }
+            }
+        } else return Single.just(Nullable<String>(null))
     }
 
     fun removeItemBuilder() {
