@@ -5,6 +5,7 @@ import android.view.View
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
+import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyHelper
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
@@ -33,6 +34,10 @@ abstract class OTAttributeHelper {
     open fun isExternalFile(attribute: OTAttributeDAO): Boolean = false
     open fun getRequiredPermissions(attribute: OTAttributeDAO): Array<String>? = null
     abstract val typeNameForSerialization: String
+
+    open fun getSupportedSorters(attribute: OTAttributeDAO): Array<AFieldValueSorter> {
+        return emptyArray()
+    }
 
     open val propertyKeys: Array<String> = emptyArray()
 

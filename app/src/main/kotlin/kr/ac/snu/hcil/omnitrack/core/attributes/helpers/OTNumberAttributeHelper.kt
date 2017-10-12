@@ -2,6 +2,8 @@ package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
+import kr.ac.snu.hcil.omnitrack.core.attributes.logics.NumericSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
@@ -29,6 +31,10 @@ class OTNumberAttributeHelper : OTAttributeHelper() {
 
     override fun getTypeSmallIconResourceId(attribute: OTAttributeDAO): Int {
         return R.drawable.icon_small_number
+    }
+
+    override fun getSupportedSorters(attribute: OTAttributeDAO): Array<AFieldValueSorter> {
+        return arrayOf(NumericSorter(attribute.name, attribute.localId))
     }
 
     override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_BIGDECIMAL
