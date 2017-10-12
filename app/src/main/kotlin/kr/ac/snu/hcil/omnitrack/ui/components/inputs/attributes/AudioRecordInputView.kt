@@ -70,6 +70,8 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
                     valueView.audioFileUriChanged.suspend = false
                     inLoadingMode = false
                 }
+
+                this.onValueChanged(value)
             }
         }
 
@@ -85,7 +87,6 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
         valueView.audioFileUriChanged += {
             sender, uri ->
             this.value = SynchronizedUri(uri)
-            this.onValueChanged(value)
         }
         /*
         valueView.fileRemoved += {
