@@ -41,7 +41,9 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
         set(value) {
             if (field != value) {
                 field = value
-                fitToValueLocation(false)
+                if (value != null) {
+                    fitToValueLocation(false)
+                }
                 onValueChanged(value)
                 //addressView.text = value.getAddress(context)?.getAddressLine(0)
                 reserveAddressChange(value)
@@ -224,7 +226,7 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
     private fun reserveAddressChange(location: LatLng?) {
         if (isLocationConversionTaskRunning) {
             queuedLocationToConvert = location
-        } else {
+        } else if (location != null) {
             isLocationConversionTaskRunning = true
             LatLngToAddressTask(this, this).execute(location)
             addressBusyIndicator.visibility = View.VISIBLE

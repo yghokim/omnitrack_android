@@ -69,6 +69,8 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
                 } else {
                     picker.imageUri = Uri.EMPTY
                 }
+
+                onValueChanged(value)
             }
         }
 
@@ -102,7 +104,6 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
             sender, uri ->
             println("picker uri changed to $uri")
             value = SynchronizedUri(uri)
-            onValueChanged(value)
         }
     }
 

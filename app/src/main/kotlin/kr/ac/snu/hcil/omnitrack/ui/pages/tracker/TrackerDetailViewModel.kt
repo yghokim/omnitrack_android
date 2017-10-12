@@ -105,7 +105,7 @@ class TrackerDetailViewModel : RealmViewModel() {
         newDao.name = name
         newDao.type = type
         newDao.trackerId = trackerId
-        newDao.initializePropertiesWithDefaults(realm)
+        newDao.initialize()
         processor?.invoke(newDao, realm)
 
         currentAttributeViewModelList.add(AttributeInformationViewModel(newDao, realm))
