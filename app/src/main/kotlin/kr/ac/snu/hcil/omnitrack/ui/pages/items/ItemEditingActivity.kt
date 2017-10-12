@@ -73,10 +73,6 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
     private val attributeListView: RecyclerView by bindView(R.id.ui_attribute_list)
     private val layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
 
-    private val attributeValueExtractors = Hashtable<String, () -> Any>()
-
-    private var skipViewValueCaching = false
-
     private var mode: ItemEditionViewModel.ItemMode = ItemEditionViewModel.ItemMode.New
 
     private var activityResultAppliedAttributePosition = -1
@@ -105,13 +101,6 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
         setActionBarButtonMode(MultiButtonActionBarActivity.Mode.SaveCancel)
 
         viewModel = ViewModelProviders.of(this).get(ItemEditionViewModel::class.java)
-
-        if (savedInstanceState == null) {
-            val trackerId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
-            if (trackerId != null) {
-                viewModel.init(trackerId, intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM))
-            }
-        }
 
         attributeListView.layoutManager = layoutManager
         attributeListView.addItemDecoration(HorizontalImageDividerItemDecoration(R.drawable.horizontal_separator_pattern, this))
@@ -152,11 +141,13 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
         )
 
         creationSubscriptions.add(
-                viewModel.builderCreationModeObservable.subscribe { builderCreationMode ->
-                    if (builderCreationMode == ItemEditionViewModel.BuilderCreationMode.Restored) {
-                        builderRestoredSnackbar.show()
-                        if (builder != null) {
-                            snapshot(builder!!)
+                viewModel.onInitialized.observeOn(AndroidSchedulers.mainThread()).subscribe { (itemMode, builderCreationMode) ->
+                    println("ItemEditingViewModel initialized: itemMode - ${itemMode}, builderMode - ${builderCreationMode}")
+                    if (itemMode == ItemEditionViewModel.ItemMode.New) {
+                        if (builderCreationMode == ItemEditionViewModel.BuilderCreationMode.Restored) {
+                            builderRestoredSnackbar.show()
+                        } else if (builderCreationMode == ItemEditionViewModel.BuilderCreationMode.NewBuilder) {
+                            viewModel.startAutoComplete()
                         }
                     }
                 }
@@ -182,102 +173,16 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
                     attributeListAdapter.notifyDataSetChanged()
                 }
         )
+
+
+        if (savedInstanceState == null) {
+            val trackerId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
+            if (trackerId != null) {
+                viewModel.init(trackerId, intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM))
+            }
+        }
     }
-/*
-    override fun onTrackerLoaded(tracker: OTTracker) {
-        super.onTrackerLoaded(tracker)
 
-        println("tracker attribute count: ${tracker.attributes.size}")
-
-        val requiredPermissions = tracker.getRequiredPermissions()
-        val rxPermissionObservable = if (requiredPermissions.isNotEmpty()) {
-            RxPermissions(this).request(*requiredPermissions)
-        } else Observable.just(true)
-
-        title = String.format(resources.getString(R.string.title_activity_new_item), tracker.name)
-
-        fun onModeSet() {
-
-            when (mode) {
-                ItemEditionViewModel.ItemMode.Edit -> {
-                    title = String.format(getString(R.string.title_activity_edit_item), tracker.name)
-                }
-                ItemEditionViewModel.ItemMode.New -> {
-                    title = String.format(resources.getString(R.string.title_activity_new_item), tracker.name)
-                }
-            }
-
-            if (mode == ItemEditionViewModel.ItemMode.New && activityResultAppliedAttributePosition == -1) {
-                if (tryRestoreItemBuilderCache(tracker)) {
-
-                    clearBuilderCache()
-
-                    //Toast.makeText(this, "Past inputs were restored.", Toast.LENGTH_SHORT).show()
-                    builderRestoredSnackbar.show()
-                    if (builder != null) {
-                        snapshot(builder!!)
-                    }
-                } else {
-                    //new builder was created
-                    println("Start builder autocomplete")
-                    creationSubscriptions.add(
-                            rxPermissionObservable.flatMap {
-                                approved: Boolean ->
-                                if (approved) {
-                                    if (builder != null) {
-                                        builder!!.autoComplete(this).doOnSubscribe {
-                                            loadingIndicatorBar.show()
-                                        }.doOnCompleted { loadingIndicatorBar.dismiss() }
-                                    } else {
-                                        Observable.just(false)
-                                    }
-                                } else Observable.error(Exception("required permission not accepted."))
-                            }.subscribe({
-                                println("Finished builder autocomplete.")
-                                if (builder != null) {
-                                    snapshot(builder!!)
-                                    snapshotInitialValue(builder!!)
-                                }
-                            }, {
-                                //TODO handle when permission not accepted.
-                            })
-                    )
-                }
-            }
-
-            attributeListView.adapter = attributeListAdapter
-        }
-
-        if (intent.hasExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM)) {
-            //contains item. Edit mode
-            creationSubscriptions.add(
-                    OTApplication.app.databaseManager.getItem(tracker, intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM)).subscribe {
-                        item ->
-                        if (item != null) {
-                            mode = ItemEditionViewModel.ItemMode.Edit
-                            println("started activity with edit mode")
-                            builder = OTItemBuilder(item, tracker)
-                            onModeSet()
-                        } else {
-                            mode = ItemEditionViewModel.ItemMode.New
-                            onModeSet()
-                        }
-                    }
-            )
-        } else {
-            mode = ItemEditionViewModel.ItemMode.New
-            onModeSet()
-        }
-
-        //if(intent.hasExtra(INTENT_EXTRA_REMINDER_TIME))
-        //{
-        //TODO need more rich design for Notifications. Currently, dismiss all notifications for the tracker when opening the activity.
-        //this is from the reminder.
-        OTTrackingNotificationManager.notifyReminderChecked(tracker.objectId, intent.getLongExtra(INTENT_EXTRA_REMINDER_TIME, 0))
-        //}
-
-        //when the activity is NOT started by startActivityWithResult()
-    }*/
 
     override fun onPause() {
         super.onPause()
@@ -289,32 +194,6 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
         this.activityResultAppliedAttributePosition = -1
     }
 
-/*
-    override fun onRestoredInstanceStateWithTracker(savedInstanceState: Bundle, tracker: OTTracker) {
-        super.onRestoredInstanceStateWithTracker(savedInstanceState, tracker)
-        println("restore item editing activity instance state")
-        mode = ItemEditionViewModel.ItemMode.valueOf(savedInstanceState.getString("mode"))
-        when (mode) {
-            ItemEditionViewModel.ItemMode.Edit -> {
-                title = String.format(getString(R.string.title_activity_edit_item), tracker.name)
-            }
-            ItemEditionViewModel.ItemMode.New -> {
-                title = String.format(resources.getString(R.string.title_activity_new_item), tracker.name)
-            }
-        }
-        println("tracker exists. get builder cache.")
-        if (savedInstanceState.containsKey("builder")) {
-            val builder = OTItemBuilder.getDeserializedInstanceWithTracker(savedInstanceState.getString("builder"), tracker)
-            if (builder != null) {
-                this.builder = builder
-                attributeListAdapter.notifyDataSetChanged()
-            } else {
-                tryRestoreItemBuilderCache(tracker)
-                attributeListAdapter.notifyDataSetChanged()
-            }
-        }
-    }*/
-
     override fun onDestroy() {
         super.onDestroy()
         println("onDestroy ItemEditingActivity")
@@ -323,13 +202,33 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
             inputView.onDestroy()
         }
 
-        if (viewModel.isValid && viewModel.isViewModelsDirty() && viewModel.mode == ItemEditionViewModel.ItemMode.New) {
-            //cache Builder
+        /*
+        ItemBuilder Caching Policy:
+        1. if user edited the result: save
+        2. if user did not edited the result:
+            - if field values are volatile: cache result
+            - if field values are not volatile:
+                - creationMode was new: discard builder (it will yield the same result on later visit)
+                - creationMode was restored: store builder (it is naturally dirty after autoComplete.)
+         */
+
+        val needToStoreBuilder = if (viewModel.isValid && viewModel.mode == ItemEditionViewModel.ItemMode.New) {
+
+            if (viewModel.isViewModelsDirty()) {
+                true
+            } else if (currentAttributeViewModelList.filter { it.attributeDAO.getHelper().isAttributeValueVolatile(it.attributeDAO) }.isNotEmpty()) {
+                true
+            } else viewModel.builderCreationModeObservable.value == ItemEditionViewModel.BuilderCreationMode.Restored
+        } else {
+            false
+        }
+
+        if (needToStoreBuilder) {
             println("store Builder.")
-            viewModel.saveItemBuilderAsync()
+            viewModel.saveItemBuilder()
         } else {
             println("remove builder")
-            viewModel.removeItemBuilderAsync()
+            viewModel.removeItemBuilder()
         }
     }
 
@@ -356,9 +255,13 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
     override fun onToolbarRightButtonClicked() {
         //push item to db
         //syncViewStateToBuilderAsync {
+        viewModel.removeItemBuilder()
+
         builder?.let {
             val item = it.makeItem(OTItem.LoggingSource.Manual)
             println("Will push $item")
+
+            viewModel.removeItemBuilder()
 
             /*
             creationSubscriptions.add(

@@ -39,6 +39,8 @@ class OTTimeAttributeHelper : OTAttributeHelper() {
         return R.drawable.icon_small_time
     }
 
+    override fun isIntrinsicDefaultValueVolatile(attribute: OTAttributeDAO): Boolean = true
+
     override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_TIMEPOINT
 
     override val propertyKeys: Array<String> = arrayOf(GRANULARITY)
