@@ -186,4 +186,24 @@ class OTConnection {
         return parser.toJson(this)
     }
 
+    fun isAvailableToRequestValue(invalidMessages: MutableList<CharSequence>? = null): Boolean {
+        val source = source
+        if (source != null) {
+            val service = source.factory.getService()
+            if (service.state == OTExternalService.ServiceState.ACTIVATED) {
+                return true
+            } else {
+                invalidMessages?.add(TextHelper.fromHtml(String.format(
+                        "<font color=\"blue\">${OTApplication.app.resourcesWrapped.getString(R.string.msg_service_is_not_activated_format)}</font>",
+                        OTApplication.app.resourcesWrapped.getString(service.nameResourceId))))
+                return false
+            }
+        } else {
+            invalidMessages?.add(TextHelper.fromHtml(
+                    "<font color=\"blue\">Connection is not supported on current version.</font>"
+            ))
+            return false
+        }
+    }
+
 }

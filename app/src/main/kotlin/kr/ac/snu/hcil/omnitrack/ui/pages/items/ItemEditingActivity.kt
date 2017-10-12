@@ -68,8 +68,6 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
 
     private lateinit var viewModel: ItemEditionViewModel
 
-    private var builder: OTItemBuilder? = null
-
     private val attributeListView: RecyclerView by bindView(R.id.ui_attribute_list)
     private val layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
 
