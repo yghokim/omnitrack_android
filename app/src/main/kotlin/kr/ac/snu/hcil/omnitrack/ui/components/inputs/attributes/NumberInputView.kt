@@ -170,4 +170,8 @@ class NumberInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
         }
     }
 
+    override fun clearFocus() {
+        valueField.clearFocus()
+    }
+
 }
