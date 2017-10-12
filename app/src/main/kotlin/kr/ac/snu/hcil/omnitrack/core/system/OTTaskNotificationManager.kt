@@ -25,13 +25,17 @@ object OTTaskNotificationManager {
         }
     }
 
-    fun makeTaskProgressNotificationBuilder(context: Context, title: String, content: String, progress: Int, largeIcon: Int = R.drawable.icon_cloud_download, smallIcon: Int = android.R.drawable.stat_sys_download, dismissedIntent: PendingIntent? = null): NotificationCompat.Builder {
+    fun makeTaskProgressNotificationBuilder(context: Context, title: String, content: String, progress: Int, largeIcon: Int? = R.drawable.icon_cloud_download, smallIcon: Int = android.R.drawable.stat_sys_download, dismissedIntent: PendingIntent? = null): NotificationCompat.Builder {
         return NotificationCompat.Builder(context, OTNotificationChannelManager.CHANNEL_ID_IMPORTANT)
                 .setContentTitle(title)
                 .setContentText(content)
                 .setSmallIcon(smallIcon)
                 .setColor(R.color.colorPrimary)
-                .setLargeIcon(VectorIconHelper.getConvertedBitmap(context, largeIcon))
+                .apply {
+                    if (largeIcon != null) {
+                        setLargeIcon(VectorIconHelper.getConvertedBitmap(context, largeIcon))
+                    }
+                }
                 .setDeleteIntent(dismissedIntent)
                 .setProgress(100, progress, progress == PROGRESS_INDETERMINATE)
     }

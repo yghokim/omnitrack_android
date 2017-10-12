@@ -115,7 +115,7 @@ abstract class ABinaryUploadService(tag: String) : WakefulService(tag) {
 
             val notification = OTTaskNotificationManager.makeTaskProgressNotificationBuilder(this,
                     getString(R.string.msg_uploading_file_to_server), getString(R.string.msg_uploading), OTTaskNotificationManager.PROGRESS_INDETERMINATE,
-                    R.drawable.icon_cloud_upload, R.drawable.icon_cloud_upload).build()
+                    null, R.drawable.icon_cloud_upload).build()
             startForeground(NOTIFICATION_IDENTIFIER, notification)
 
             println("local uri info: ${outUri.localUri.scheme}, isAbsolute: ${outUri.localUri.isAbsolute}, isRelative: ${outUri.localUri.isRelative}, scheme: ${outUri.localUri.scheme}")
