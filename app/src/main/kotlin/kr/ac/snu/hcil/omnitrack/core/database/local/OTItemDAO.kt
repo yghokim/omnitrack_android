@@ -50,7 +50,7 @@ open class OTItemDAO : RealmObject() {
     }
 
     fun getValueOf(attributeLocalId: String): Any? {
-        return fieldValueEntries.find { it.key == attributeLocalId }?.value?.let { TypeStringSerializationHelper.deserialize(attributeLocalId) }
+        return fieldValueEntries.find { it.key == attributeLocalId }?.value?.let { TypeStringSerializationHelper.deserialize(it) }
     }
 }
 

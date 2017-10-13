@@ -5,6 +5,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemBuilderFieldValueEntry
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTPendingItemBuilderDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
@@ -71,55 +72,65 @@ class ItemEditionViewModel : RealmViewModel(), OTItemBuilderWrapperBase.Attribut
             }
         }
 
+    fun reset() {
+        val trackerId = trackerDao?.objectId
+        if (trackerId != null) {
+            trackerDao = null
+            init(trackerId, null)
+        }
+    }
+
     fun init(trackerId: String, itemId: String?) {
         isValid = true
-        trackerDao = OTApplication.app.databaseManager.getTrackerQueryWithId(trackerId, realm).findFirst()
-        trackerNameObservable.onNext(trackerDao?.name)
-        subscriptions.clear()
+        if (trackerDao?.objectId != trackerId) {
+            trackerDao = OTApplication.app.databaseManager.getTrackerQueryWithId(trackerId, realm).findFirst()
+            trackerNameObservable.onNext(trackerDao?.name)
+            subscriptions.clear()
 
-        if (itemId != null) {
-            mode = ItemMode.Edit
-            onInitialized.onNext(Pair(mode, BuilderCreationMode.NewBuilder))
-        } else {
-
-            val builderDaoResult = OTApplication.app.databaseManager.getItemBuilderQuery(trackerId, OTPendingItemBuilderDAO.HOLDER_TYPE_INPUT_FORM, realm).findFirst()
-
-            if (builderDaoResult != null) {
-                //there is a pending itemBuilder.
-                this.itemBuilderDao = realm.copyFromRealm(builderDaoResult)
-                builderCreationModeObservable.onNext(BuilderCreationMode.Restored)
-
+            if (itemId != null) {
+                mode = ItemMode.Edit
+                onInitialized.onNext(Pair(mode, BuilderCreationMode.NewBuilder))
             } else {
-                //no pending itemBuilder.
-                realm.executeTransaction {
-                    val newBuilderDao = realm.createObject(OTPendingItemBuilderDAO::class.java, (realm.where(OTPendingItemBuilderDAO::class.java).max("id")?.toLong() ?: 0) + 1)
-                    newBuilderDao.tracker = trackerDao
-                    newBuilderDao.holderType = OTPendingItemBuilderDAO.HOLDER_TYPE_INPUT_FORM
-                    this.itemBuilderDao = realm.copyFromRealm(newBuilderDao)
+
+                val builderDaoResult = OTApplication.app.databaseManager.getItemBuilderQuery(trackerId, OTPendingItemBuilderDAO.HOLDER_TYPE_INPUT_FORM, realm).findFirst()
+
+                if (builderDaoResult != null) {
+                    //there is a pending itemBuilder.
+                    this.itemBuilderDao = realm.copyFromRealm(builderDaoResult)
+                    builderCreationModeObservable.onNext(BuilderCreationMode.Restored)
+
+                } else {
+                    //no pending itemBuilder.
+                    realm.executeTransaction {
+                        val newBuilderDao = realm.createObject(OTPendingItemBuilderDAO::class.java, (realm.where(OTPendingItemBuilderDAO::class.java).max("id")?.toLong() ?: 0) + 1)
+                        newBuilderDao.tracker = trackerDao
+                        newBuilderDao.holderType = OTPendingItemBuilderDAO.HOLDER_TYPE_INPUT_FORM
+                        this.itemBuilderDao = realm.copyFromRealm(newBuilderDao)
+                    }
+                    builderCreationModeObservable.onNext(BuilderCreationMode.NewBuilder)
                 }
-                builderCreationModeObservable.onNext(BuilderCreationMode.NewBuilder)
-            }
 
-            val unManagedTrackerDao = realm.copyFromRealm(trackerDao)!!
+                val unManagedTrackerDao = realm.copyFromRealm(trackerDao)!!
 
-            currentAttributeViewModelList.forEach { it.unregister() }
-            currentAttributeViewModelList.clear()
+                currentAttributeViewModelList.forEach { it.unregister() }
+                currentAttributeViewModelList.clear()
 
-            currentAttributeViewModelList.addAll(unManagedTrackerDao.attributes.map { AttributeInputViewModel(it) })
-            attributeViewModelListObservable.onNext(currentAttributeViewModelList)
+                currentAttributeViewModelList.addAll(unManagedTrackerDao.attributes.map { AttributeInputViewModel(it) })
+                attributeViewModelListObservable.onNext(currentAttributeViewModelList)
 
-            this.builderWrapper = OTItemBuilderWrapperBase(this.itemBuilderDao)
+                this.builderWrapper = OTItemBuilderWrapperBase(this.itemBuilderDao)
 
-            for (key in this.builderWrapper.keys) {
-                val value = this.builderWrapper.getValueInformationOf(key)
-                if (value != null) {
-                    setValueOfAttribute(key, value)
+                for (key in this.builderWrapper.keys) {
+                    val value = this.builderWrapper.getValueInformationOf(key)
+                    if (value != null) {
+                        setValueOfAttribute(key, value)
+                    }
                 }
+
+                mode = ItemMode.New
+
+                onInitialized.onNext(Pair(mode, builderCreationModeObservable.value))
             }
-
-            mode = ItemMode.New
-
-            onInitialized.onNext(Pair(mode, builderCreationModeObservable.value))
         }
     }
 
@@ -183,6 +194,12 @@ class ItemEditionViewModel : RealmViewModel(), OTItemBuilderWrapperBase.Attribut
             refreshDaoValues()
             subscriptions.add(
                     isBusyObservable.filter { it == false }.subscribe {
+                        var highestBuilderEntryId = realm.where(OTItemBuilderFieldValueEntry::class.java).max("id")?.toLong() ?: 0L
+                        itemBuilderDao.data.forEach {
+                            if (!it.isManaged && it.id == -1L) {
+                                it.id = ++highestBuilderEntryId
+                            }
+                        }
                         realm.executeTransaction {
                             realm.copyToRealmOrUpdate(itemBuilderDao)
                         }
@@ -212,7 +229,11 @@ class ItemEditionViewModel : RealmViewModel(), OTItemBuilderWrapperBase.Attribut
         subscriptions.add(
                 isBusyObservable.filter { it == false }.subscribe {
                     realm.executeTransaction {
-                        realm.where(OTPendingItemBuilderDAO::class.java).equalTo("id", itemBuilderDao.id).findAll().deleteAllFromRealm()
+                        val daos = realm.where(OTPendingItemBuilderDAO::class.java).equalTo("id", itemBuilderDao.id).findAll()
+                        daos.forEach {
+                            it.data.deleteAllFromRealm()
+                        }
+                        daos.deleteAllFromRealm()
                     }
                     println("removed item builder.")
                     isValid = false

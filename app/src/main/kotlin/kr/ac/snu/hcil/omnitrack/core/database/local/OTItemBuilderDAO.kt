@@ -40,9 +40,7 @@ open class OTPendingItemBuilderDAO : RealmObject() {
             }
         } else {
             if (value != null) {
-                val highestId = realm.where(OTItemBuilderFieldValueEntry::class.java).max("id")?.toLong() ?: 0L
                 val newEntryDao = OTItemBuilderFieldValueEntry()
-                newEntryDao.id = highestId + 1
                 newEntryDao.attributeLocalId = attributeLocalId
                 newEntryDao.serializedValue = value.value?.let { TypeStringSerializationHelper.serialize(it) }
                 newEntryDao.timestamp = value.timestamp
@@ -54,7 +52,7 @@ open class OTPendingItemBuilderDAO : RealmObject() {
 
 open class OTItemBuilderFieldValueEntry : RealmObject() {
     @PrimaryKey
-    var id: Long = 0
+    var id: Long = -1
 
     var attributeLocalId: String? = null
     var serializedValue: String? = null

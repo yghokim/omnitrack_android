@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 
 import android.content.Context
+import android.view.View
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
@@ -11,10 +12,13 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
+import kr.ac.snu.hcil.omnitrack.ui.components.common.choice.WordListView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.ChoiceInputView
 import kr.ac.snu.hcil.omnitrack.utils.UniqueStringEntryList
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
+import rx.Single
+import java.util.*
 
 /**
  * Created by Young-Ho on 10/7/2017.
@@ -102,4 +106,38 @@ class OTChoiceAttributeHelper : OTAttributeHelper() {
         return inputView
     }
 
+    override fun getViewForItemList(attribute: OTAttributeDAO, context: Context, recycledView: View?): View {
+        val target: WordListView = recycledView as? WordListView ?: WordListView(context)
+
+        target.useColors = true
+
+        return target
+    }
+
+    override fun applyValueToViewForItemList(attribute: OTAttributeDAO, value: Any?, view: View): Single<Boolean> {
+        return Single.defer {
+            if (view is WordListView) {
+                view.colorIndexList.clear()
+
+                if (value is IntArray && value.size > 0) {
+                    val entries = getEntries(attribute)
+                    if (entries != null) {
+                        val list = ArrayList<String>()
+                        for (idEntry in value.withIndex()) {
+                            val indexInEntries = entries.indexOf(idEntry.value)
+                            if (indexInEntries >= 0) {
+                                list.add(entries[indexInEntries].text)
+                                view.colorIndexList.add(indexInEntries)
+                            }
+                        }
+
+                        view.words = list.toTypedArray()
+                    }
+                } else {
+                    view.words = arrayOf()
+                }
+                Single.just(true)
+            } else super.applyValueToViewForItemList(attribute, value, view)
+        }
+    }
 }

@@ -99,6 +99,7 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
         setActionBarButtonMode(MultiButtonActionBarActivity.Mode.SaveCancel)
 
         viewModel = ViewModelProviders.of(this).get(ItemEditionViewModel::class.java)
+        val trackerId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
 
         attributeListView.layoutManager = layoutManager
         attributeListView.addItemDecoration(HorizontalImageDividerItemDecoration(R.drawable.horizontal_separator_pattern, this))
@@ -115,7 +116,8 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
                     (viewModel.trackerDao?.makePermissionAssertObservable(this) ?: Observable.just(true))
                             .subscribe({ approved ->
                                 if (approved) {
-                                    viewModel.startAutoComplete()
+                                    viewModel.removeItemBuilder()
+                                    viewModel.reset()
                                 } else {
 
                                 }
@@ -172,12 +174,8 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
                 }
         )
 
-
-        if (savedInstanceState == null) {
-            val trackerId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
-            if (trackerId != null) {
-                viewModel.init(trackerId, intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM))
-            }
+        if (trackerId != null) {
+            viewModel.init(trackerId, intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM))
         }
     }
 
