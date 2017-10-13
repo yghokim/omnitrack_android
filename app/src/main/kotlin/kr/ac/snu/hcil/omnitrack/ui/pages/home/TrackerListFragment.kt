@@ -46,7 +46,6 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemBrowserActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemEditingActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.tracker.TrackerDetailActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.visualization.ChartViewActivity
-import kr.ac.snu.hcil.omnitrack.ui.viewmodels.TrackerListViewModel
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.startActivityOnDelay
@@ -461,7 +460,7 @@ class TrackerListFragment : OTFragment() {
                 } else if (view === editButton) {
                     startActivityOnDelay(TrackerDetailActivity.makeIntent(trackerId, this@TrackerListFragment.context))
                 } else if (view === listButton) {
-                    startActivityOnDelay(ItemBrowserActivity.makeIntent(user.trackers[adapterPosition], this@TrackerListFragment.context))
+                    startActivityOnDelay(ItemBrowserActivity.makeIntent(trackerId!!, this@TrackerListFragment.context))
                 } else if (view === removeButton) {
                     DialogHelper.makeNegativePhrasedYesNoDialogBuilder(context, trackerViewModel.trackerName.value, getString(R.string.msg_confirm_remove_tracker), R.string.msg_remove, onYes = { ->
                         viewModel.removeTracker(trackerViewModel)

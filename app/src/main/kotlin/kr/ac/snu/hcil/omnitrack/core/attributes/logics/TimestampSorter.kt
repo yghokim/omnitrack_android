@@ -10,7 +10,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemDAO
 class TimestampSorter : ItemComparator() {
     override val name: String = OTApplication.app.resourcesWrapped.getString(R.string.msg_sort_method_timestamp)
 
-    override fun increasingCompare(a: OTItemDAO, b: OTItemDAO): Int {
-        return a.timestamp.compareTo(b.timestamp)
+    override fun increasingCompare(a: OTItemDAO?, b: OTItemDAO?): Int {
+        return (a?.timestamp ?: 0).compareTo(b?.timestamp ?: 0)
     }
 }

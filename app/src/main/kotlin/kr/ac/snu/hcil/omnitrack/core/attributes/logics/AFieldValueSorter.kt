@@ -9,9 +9,9 @@ abstract class AFieldValueSorter(val attributeLocalId: String) : ItemComparator(
 
     abstract fun compareValues(valueA: Any, valueB: Any): Int
 
-    override fun increasingCompare(a: OTItemDAO, b: OTItemDAO): Int {
-        val valueA = a.getValueOf(attributeLocalId)
-        val valueB = b.getValueOf(attributeLocalId)
+    override fun increasingCompare(a: OTItemDAO?, b: OTItemDAO?): Int {
+        val valueA = a?.getValueOf(attributeLocalId)
+        val valueB = b?.getValueOf(attributeLocalId)
 
         return if (valueA != null && valueB != null) {
             return compareValues(valueA, valueB)
