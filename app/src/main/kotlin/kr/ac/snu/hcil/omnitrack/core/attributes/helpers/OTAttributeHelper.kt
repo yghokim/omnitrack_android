@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 
 import android.content.Context
 import android.view.View
+import android.widget.TextView
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
@@ -12,10 +13,13 @@ import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
+import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
+import kr.ac.snu.hcil.omnitrack.utils.TextHelper
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Observable
+import rx.Single
 import java.util.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.set
@@ -165,8 +169,36 @@ abstract class OTAttributeHelper {
     }
 
     //Item list view==========================================================================================================================
+    open fun formatAttributeValue(attribute: OTAttributeDAO, value: Any): CharSequence {
+        return value.toString()
+    }
+
     open fun getViewForItemListContainerType(): Int {
         return OTAttributeManager.VIEW_FOR_ITEM_LIST_CONTAINER_TYPE_SINGLELINE
+    }
+
+    open fun getViewForItemList(attribute: OTAttributeDAO, context: Context, recycledView: View?): View {
+
+        val target: TextView = recycledView as? TextView ?: TextView(context)
+
+        InterfaceHelper.setTextAppearance(target, R.style.viewForItemListTextAppearance)
+
+        target.background = null
+
+        return target
+    }
+
+    open fun applyValueToViewForItemList(attribute: OTAttributeDAO, value: Any?, view: View): Single<Boolean> {
+        return Single.defer<Boolean> {
+            if (view is TextView) {
+                if (value != null) {
+                    view.text = TextHelper.stringWithFallback(formatAttributeValue(attribute, value), "-")
+                } else {
+                    view.text = view.context.getString(R.string.msg_empty_value)
+                }
+                Single.just(true)
+            } else Single.just(false)
+        }
     }
 
     //Configuration=======================================================================================

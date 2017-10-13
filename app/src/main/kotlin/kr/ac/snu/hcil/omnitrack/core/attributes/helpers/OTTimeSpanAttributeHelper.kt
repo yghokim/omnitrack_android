@@ -9,6 +9,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.logics.TimeSpanPivotalSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.common.time.TimeRangePicker
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
@@ -16,6 +17,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.TimeRangePickerI
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.SelectionPropertyView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
+import java.util.*
 
 /**
  * Created by Young-Ho on 10/7/2017.
@@ -108,5 +110,31 @@ class OTTimeSpanAttributeHelper : OTAttributeHelper() {
 
     override fun initialize(attribute: OTAttributeDAO) {
         attribute.fallbackValuePolicy = OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE
+    }
+
+    override fun formatAttributeValue(attribute: OTAttributeDAO, value: Any): CharSequence {
+        return (value as? TimeSpan)?.let {
+            val granularity = getGranularity(attribute)
+            val format = when (granularity) {
+                GRANULARITY_DAY -> OTTimeAttributeHelper.formats[GRANULARITY_DAY]!!
+                GRANULARITY_MINUTE -> OTTimeAttributeHelper.formats[GRANULARITY_MINUTE]!!
+                else -> OTTimeAttributeHelper.formats[GRANULARITY_MINUTE]!!
+            }
+
+            val from = format.format(Date(it.from))
+            val to = format.format(Date(it.to))
+
+            val overlapUntil = 0
+            /*
+            while( from[overlapUntil] == to[overlapUntil] )
+            {
+                overlapUntil++
+                if(overlapUntil>=from.length || overlapUntil >= to.length){break;}
+            }*/
+
+            val builder = StringBuilder(from)
+            builder.append(" ~ ").append(to.subSequence(overlapUntil, to.length)).toString()
+
+        } ?: ""
     }
 }

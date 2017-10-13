@@ -1,5 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 
+import android.content.Context
+import android.view.View
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
@@ -8,12 +10,15 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
+import kr.ac.snu.hcil.omnitrack.ui.components.common.StarRatingView
+import kr.ac.snu.hcil.omnitrack.ui.components.common.StarScoreView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.LikertScaleInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.StarRatingInputView
 import kr.ac.snu.hcil.omnitrack.utils.RatingOptions
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Observable
+import rx.Single
 
 /**
  * Created by Young-Ho on 10/7/2017.
@@ -114,5 +119,55 @@ class OTRatingAttributeHelper : OTAttributeHelper() {
 
     override fun makeIntrinsicDefaultValueMessage(attribute: OTAttributeDAO): CharSequence {
         return OTApplication.getString(R.string.msg_intrinsic_rating)
+    }
+
+    override fun formatAttributeValue(attribute: OTAttributeDAO, value: Any): CharSequence {
+        val ratingOptions = getRatingOptions(attribute)
+        return when (ratingOptions.type) {
+            RatingOptions.DisplayType.Star -> value.toString() + " / ${ratingOptions.starLevels.maxScore}"
+            RatingOptions.DisplayType.Likert -> value.toString()
+        }
+    }
+
+    //item list=========================
+
+    override fun getViewForItemList(attribute: OTAttributeDAO, context: Context, recycledView: View?): View {
+        val ratingOptions = getRatingOptions(attribute)
+
+        when (ratingOptions.type) {
+            RatingOptions.DisplayType.Star -> {
+
+                if (ratingOptions.starLevels <= RatingOptions.StarLevel.Level5) {
+                    val target = recycledView as? StarRatingView ?: StarRatingView(context)
+
+                    target.isLightMode = true
+                    target.overridenIntrinsicWidth = context.resources.getDimensionPixelSize(R.dimen.star_rating_item_list_view_unit_size)
+                    target.overridenIntrinsicHeight = target.overridenIntrinsicWidth
+                    return target
+                } else {
+                    val target = recycledView as? StarScoreView ?: StarScoreView(context)
+                    return target
+                }
+            }
+
+            RatingOptions.DisplayType.Likert -> {
+                return super.getViewForItemList(attribute, context, recycledView)
+            }
+        }
+    }
+
+    override fun applyValueToViewForItemList(attribute: OTAttributeDAO, value: Any?, view: View): Single<Boolean> {
+        return Single.defer {
+            val ratingOptions = getRatingOptions(attribute)
+            if (view is StarRatingView && value is Float) {
+                view.score = value
+                view.allowIntermediate = ratingOptions.allowIntermediate
+                view.levels = ratingOptions.starLevels.maxScore
+                Single.just(true)
+            } else if (view is StarScoreView && value is Float) {
+                view.setScore(value, ratingOptions.starLevels.maxScore.toFloat())
+                Single.just(true)
+            } else super.applyValueToViewForItemList(attribute, value, view)
+        }
     }
 }

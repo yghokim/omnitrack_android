@@ -1,17 +1,22 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 
 import android.Manifest
+import android.content.Context
+import android.view.View
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.maps.model.LatLng
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTLocationAttribute
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
+import kr.ac.snu.hcil.omnitrack.ui.components.common.MapImageView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import pl.charmas.android.reactivelocation.ReactiveLocationProvider
 import rx.Observable
+import rx.Single
 import java.util.concurrent.TimeUnit
 
 /**
@@ -61,5 +66,25 @@ class OTLocationAttributeHelper : OTAttributeHelper() {
 
     override fun initialize(attribute: OTAttributeDAO) {
         attribute.fallbackValuePolicy = OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE
+    }
+
+    //item list===========================================================================
+    override fun getViewForItemListContainerType(): Int {
+        return OTAttributeManager.VIEW_FOR_ITEM_LIST_CONTAINER_TYPE_MULTILINE
+    }
+
+    override fun getViewForItemList(attribute: OTAttributeDAO, context: Context, recycledView: View?): View {
+        return recycledView as? MapImageView ?: MapImageView(context)
+    }
+
+    override fun applyValueToViewForItemList(attribute: OTAttributeDAO, value: Any?, view: View): Single<Boolean> {
+        return Single.defer {
+            if (view is MapImageView && value != null) {
+                if (value is LatLng) {
+                    view.location = value
+                    Single.just(true)
+                } else Single.just(false)
+            } else super.applyValueToViewForItemList(attribute, value, view)
+        }
     }
 }

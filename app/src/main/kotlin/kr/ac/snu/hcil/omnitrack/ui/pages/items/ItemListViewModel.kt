@@ -134,6 +134,10 @@ class ItemListViewModel : RealmViewModel(), OrderedRealmCollectionChangeListener
         val itemId: String? get() = itemDao.objectId
         val isSynchronized: Boolean get() = itemDao.synchronizedAt != null
 
+        fun getItemValueOf(attributeLocalId: String): Any? {
+            return itemDao.getValueOf(attributeLocalId)
+        }
+
         val timestampObservable = BehaviorSubject.create<Long>()
         var timestamp: Long
             get() = timestampObservable.value
