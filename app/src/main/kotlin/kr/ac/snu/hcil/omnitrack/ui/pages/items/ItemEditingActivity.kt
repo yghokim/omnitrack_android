@@ -438,7 +438,7 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
 
                 internalSubscriptions.add(
                         attributeViewModel.valueObservable.observeOn(AndroidSchedulers.mainThread()).subscribe { valueNullable ->
-                            println("viewModel value changed - ${valueNullable.datum}")
+                            println("viewModel value changed - ${valueNullable.datum}, ${attributeViewModel.attributeLocalId}")
                             if (inputView.value != valueNullable.datum?.value) {
                                 inputView.valueChanged.suspend = true
                                 inputView.setAnyValue(valueNullable.datum?.value)

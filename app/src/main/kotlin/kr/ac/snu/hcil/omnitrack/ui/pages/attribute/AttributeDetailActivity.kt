@@ -64,15 +64,12 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
         super.onCreate(savedInstanceState)
 
         viewModel = ViewModelProviders.of(this).get(AttributeDetailViewModel::class.java)
-        if (savedInstanceState == null) {
+        val serializedAttributeDao = intent.getStringExtra(INTENT_EXTRA_SERIALIZED_ATTRIBUTE_DAO)
+        val applyToDb = intent.getBooleanExtra(INTENT_EXTRA_APPLY_TO_DB, false)
 
-            val serializedAttributeDao = intent.getStringExtra(INTENT_EXTRA_SERIALIZED_ATTRIBUTE_DAO)
-            val applyToDb = intent.getBooleanExtra(INTENT_EXTRA_APPLY_TO_DB, false)
-
-            if (!serializedAttributeDao.isNullOrBlank()) {
-                val attributeDao = OTAttributeDAO.parser.fromJson(serializedAttributeDao, OTAttributeDAO::class.java)
-                viewModel.init(attributeDao)
-            }
+        if (!serializedAttributeDao.isNullOrBlank()) {
+            val attributeDao = OTAttributeDAO.parser.fromJson(serializedAttributeDao, OTAttributeDAO::class.java)
+            viewModel.init(attributeDao)
         }
 
         setActionBarButtonMode(Mode.SaveCancel)
