@@ -1,12 +1,17 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 
 import android.Manifest
+import android.content.Context
+import android.view.View
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
+import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioItemListView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AudioRecordInputView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
+import rx.Single
 
 /**
  * Created by Young-Ho on 10/7/2017.
@@ -39,5 +44,22 @@ class OTAudioRecordAttributeHelper : OTAttributeHelper() {
         if (inputView is AudioRecordInputView) {   //TODO cacheDir
             //inputView.valueView.recordingOutputDirectoryPathOverride = tracker?.getItemCacheDir(inputView.context, true)
         }
+    }
+
+    override fun formatAttributeValue(attribute: OTAttributeDAO, value: Any): CharSequence {
+        return "Audio $value"
+    }
+
+    override fun getViewForItemList(attribute: OTAttributeDAO, context: Context, recycledView: View?): View {
+        val view = recycledView as? AudioItemListView ?: AudioItemListView(context)
+
+        return view
+    }
+
+    override fun applyValueToViewForItemList(attribute: OTAttributeDAO, value: Any?, view: View): Single<Boolean> {
+        if (view is AudioItemListView && value is SynchronizedUri) {
+            view.mountedUri = value
+        }
+        return super.applyValueToViewForItemList(attribute, value, view)
     }
 }

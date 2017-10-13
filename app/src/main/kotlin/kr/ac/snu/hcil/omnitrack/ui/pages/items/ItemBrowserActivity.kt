@@ -26,6 +26,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
@@ -462,10 +463,9 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                 }
 
                 override fun getItemViewType(position: Int): Int {
-                    /*
-                    if (this@ItemElementViewHolder.adapterPosition != -1 && getParent().hasValueOf(tracker!!.attributes[position]))
-                        return tracker?.attributes?.get(position)?.getViewForItemListContainerType() ?: 0
-                    else return 5*/ return 0
+                    if (this@ItemElementViewHolder.adapterPosition != -1 && getParent().getItemValueOf(viewModel.attributes[position].localId) != null)
+                        return viewModel.attributes[position].getHelper().getViewForItemListContainerType()
+                    else return 5
                 }
 
                 override fun onBindViewHolder(holder: TableRowViewHolder, position: Int) {
@@ -479,8 +479,8 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                 override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TableRowViewHolder {
 
                     val view = LayoutInflater.from(parent.context).inflate(when (viewType) {
-                        OTAttribute.VIEW_FOR_ITEM_LIST_CONTAINER_TYPE_SINGLELINE -> R.layout.item_attribute_row_singleline
-                        OTAttribute.VIEW_FOR_ITEM_LIST_CONTAINER_TYPE_MULTILINE -> R.layout.item_attribute_row_multiline
+                        OTAttributeManager.VIEW_FOR_ITEM_LIST_CONTAINER_TYPE_SINGLELINE -> R.layout.item_attribute_row_singleline
+                        OTAttributeManager.VIEW_FOR_ITEM_LIST_CONTAINER_TYPE_MULTILINE -> R.layout.item_attribute_row_multiline
                         else -> R.layout.item_attribute_row_singleline
                     }, parent, false)
 
@@ -544,20 +544,29 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                                 }
                         )
 
-                        /*
+                        val itemValue = getParent().getItemValueOf(attribute.localId)
+                        if (itemValue != null) {
+                            val newValueView = attribute.getHelper().getViewForItemList(attribute, this@ItemBrowserActivity, valueView)
+                            changeNewValueView(newValueView)
 
-                        val newValueView = attribute.getViewForItemList(this@ItemBrowserActivity, valueView)
-                        changeNewValueView(newValueView)
-
-                        valueApplySubscription?.unsubscribe()
-                        if (getParentItem().hasValueOf(attribute)) {
-                            valueApplySubscription = attribute.applyValueToViewForItemList(getParentItem().getValueOf(attribute), valueView).subscribe({
+                            valueApplySubscription?.unsubscribe()
+                            valueApplySubscription = attribute.getHelper().applyValueToViewForItemList(attribute, itemValue, valueView).subscribe({
                                 valueApplySubscription = null
                             }, {
                                 valueApplySubscription = null
                             })
                             startSubscriptions.add(valueApplySubscription)
-                        }*/
+                        } else {
+                            //empty value
+                            val emptyValueView = if (valueView is TextView) {
+                                valueView as TextView
+                            } else {
+                                TextView(this@ItemBrowserActivity)
+                            }
+                            emptyValueView.setTextColor(ContextCompat.getColor(this@ItemBrowserActivity, R.color.colorRed_Light))
+                            emptyValueView.text = getString(R.string.msg_empty_value)
+                            changeNewValueView(emptyValueView)
+                        }
                     }
 
                     private fun changeNewValueView(newValueView: View) {

@@ -1,8 +1,16 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 
 import android.content.Context
+import android.graphics.Typeface
+import android.support.v4.content.ContextCompat
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.AbsoluteSizeSpan
+import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.TimePointSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyHelper
@@ -17,6 +25,8 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.SelectionPropertyView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Observable
+import java.text.SimpleDateFormat
+import java.util.*
 
 /**
  * Created by Young-Ho on 10/7/2017.
@@ -29,6 +39,16 @@ class OTTimeAttributeHelper : OTAttributeHelper() {
         const val GRANULARITY_DAY = 0
         const val GRANULARITY_MINUTE = 1
         const val GRANULARITY_SECOND = 2
+
+        val formats = mapOf<Int, SimpleDateFormat>(
+                Pair(OTTimeAttribute.GRANULARITY_DAY, SimpleDateFormat(OTApplication.getString(R.string.property_time_format_granularity_day))),
+                Pair(OTTimeAttribute.GRANULARITY_MINUTE, SimpleDateFormat(OTApplication.getString(R.string.property_time_format_granularity_minute))),
+                Pair(OTTimeAttribute.GRANULARITY_SECOND, SimpleDateFormat(OTApplication.getString(R.string.property_time_format_granularity_second)))
+        )
+
+        private val timezoneSizeSpan = AbsoluteSizeSpan(OTApplication.app.resourcesWrapped.getDimensionPixelSize(R.dimen.tracker_list_element_information_text_headerSize))
+        private val timezoneStyleSpan = StyleSpan(Typeface.BOLD)
+        private val timezoneColorSpan = ForegroundColorSpan(ContextCompat.getColor(OTApplication.app.contextCompat, R.color.textColorLight))
     }
 
     override fun getValueNumericCharacteristics(attribute: OTAttributeDAO): NumericCharacteristics = NumericCharacteristics(true, true)
@@ -118,5 +138,33 @@ class OTTimeAttributeHelper : OTAttributeHelper() {
 
     override fun initialize(attribute: OTAttributeDAO) {
         attribute.fallbackValuePolicy = OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE
+    }
+
+    override fun formatAttributeValue(attribute: OTAttributeDAO, value: Any): CharSequence {
+        return if (value is TimePoint) {
+            val granularity = getGranularity(attribute)
+            val calendar = Calendar.getInstance()
+            calendar.timeInMillis = value.timestamp
+            calendar.timeZone = value.timeZone
+
+            calendar.set(Calendar.MILLISECOND, 0)
+
+            if (granularity == OTTimeAttribute.GRANULARITY_DAY) {
+                calendar.set(Calendar.SECOND, 0)
+                calendar.set(Calendar.MINUTE, 0)
+                calendar.set(Calendar.HOUR_OF_DAY, 0)
+            }
+
+            val timeString = OTTimeAttribute.formats[granularity]!!.format(calendar.time)
+            val timeZoneName = value.timeZone.displayName
+            val start = timeString.length + 1
+            val end = timeString.length + 1 + timeZoneName.length
+
+            return SpannableString("$timeString\n$timeZoneName").apply {
+                setSpan(timezoneSizeSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                setSpan(timezoneStyleSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                setSpan(timezoneColorSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+        } else return ""
     }
 }
