@@ -24,7 +24,6 @@ import butterknife.bindView
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
-import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeAttribute
@@ -34,7 +33,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.services.OTTableExportService
 import kr.ac.snu.hcil.omnitrack.ui.DragItemTouchHelperCallback
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
-import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.DismissingBottomSheetDialogFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.common.ExtendedSpinner
 import kr.ac.snu.hcil.omnitrack.ui.components.common.FallbackRecyclerView
@@ -188,7 +186,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
         creationSubscriptions.add(
                 viewModel.currentSorterObservable.subscribe { newSorter ->
-
+                    itemListViewAdapter.notifyDataSetChanged()
                 }
         )
 
@@ -444,6 +442,17 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                 sourceView.text = itemVM.loggingSource.sourceText
                 loggingTimeView.text = OTTimeAttribute.formats[OTTimeAttribute.GRANULARITY_MINUTE]!!.format(Date(itemVM.timestamp))
 
+                itemLevelSubscriptions.add(
+                        viewModel.currentSorterObservable.subscribe { sort ->
+                            if (sort is AFieldValueSorter) {
+                                val rowIndex = viewModel.attributes.indexOfFirst { it.localId == sort.attributeLocalId }
+                                if (rowIndex != -1) {
+                                    valueListAdapter.notifyItemChanged(rowIndex)
+                                }
+                            }
+                        }
+                )
+
                 valueListAdapter.notifyDataSetChanged()
 
                 /*
@@ -534,14 +543,11 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                         attributeNameView.text = attribute.name
                         attributeId = attribute.objectId
 
-                        itemLevelSubscriptions.add(
-                                viewModel.currentSorterObservable.subscribe { sort ->
-                                    attributeNameView.setTextColor(
-                                            if (sort is AFieldValueSorter && sort.attributeLocalId === attribute.localId) {
-                                                ContextCompat.getColor(this@ItemBrowserActivity, R.color.colorAccent)
-                                            } else ContextCompat.getColor(this@ItemBrowserActivity, R.color.textColorLight)
-                                    )
-                                }
+                        val sort = viewModel.currentSorter
+                        attributeNameView.setTextColor(
+                                if (sort is AFieldValueSorter && sort.attributeLocalId === attribute.localId) {
+                                    ContextCompat.getColor(this@ItemBrowserActivity, R.color.colorAccent)
+                                } else ContextCompat.getColor(this@ItemBrowserActivity, R.color.textColorLight)
                         )
 
                         val itemValue = getParent().getItemValueOf(attribute.localId)
@@ -595,6 +601,13 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                     override fun bind(attributeDao: OTAttributeDAO) {
                         attributeId = attributeDao.objectId
                         attributeNameView.text = attributeDao.name
+
+                        val sort = viewModel.currentSorter
+                        attributeNameView.setTextColor(
+                                if (sort is AFieldValueSorter && sort.attributeLocalId === attributeDao.localId) {
+                                    ContextCompat.getColor(this@ItemBrowserActivity, R.color.colorAccent)
+                                } else ContextCompat.getColor(this@ItemBrowserActivity, R.color.textColorLight)
+                        )
                     }
                 }
             }
@@ -613,10 +626,9 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
             }
         }
 
-        private var listView: RecyclerView by Delegates.notNull()
+        private lateinit var viewModel: ItemListViewModel
 
-        private var user: OTUser? = null
-        private var tracker: OTTracker? = null
+        private var listView: RecyclerView by Delegates.notNull()
 
         private var dialogSubscriptions = CompositeSubscription()
 
@@ -630,6 +642,33 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
         private var exportConfigIncludeFile: Boolean = false
         private var exportConfigTableFileType: OTTableExportService.TableFileType = OTTableExportService.TableFileType.CSV
+
+        override fun onActivityCreated(savedInstanceState: Bundle?) {
+            super.onActivityCreated(savedInstanceState)
+            viewModel = ViewModelProviders.of(activity).get(ItemListViewModel::class.java)
+
+            dialogSubscriptions.add(
+                    viewModel.sortedItemsObservable.subscribe { items ->
+                        val count = items.count()
+                        println("item count: ${count}")
+                        if (count > 0) {
+                            deletionMenuItem.description = "Item count: ${count}"
+                            deletionMenuItem.isEnabled = true
+
+                            exportMenuItem.isEnabled = true
+                        } else {
+                            deletionMenuItem.description = "No items"
+                            deletionMenuItem.isEnabled = false
+
+                            exportMenuItem.isEnabled = false
+                        }
+                        menuAdapter.notifyItemChanged(1)
+                        menuAdapter.notifyItemChanged(2)
+                    }
+            )
+
+            refreshPurgeButton()
+        }
 
         override fun onViewStateRestored(savedInstanceState: Bundle?) {
             super.onViewStateRestored(savedInstanceState)
@@ -653,12 +692,10 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
             super.onDismiss(dialog)
 
             dialogSubscriptions.clear()
-            user = null
-            tracker = null
         }
 
         private fun refreshPurgeButton() {
-            val cacheSize = this.tracker?.getTotalCacheFileSize(context) ?: 0L
+            val cacheSize = this.viewModel.trackerDao.getTotalCacheFileSize(context)
             if (cacheSize > 0L) {
                 purgeMenuItem.isEnabled = true
                 purgeMenuItem.description = "${(cacheSize / (1024 * 102.4f) + .5f).toInt() / 10f} Mb"
@@ -672,7 +709,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
         override fun setupDialogAndContentView(dialog: Dialog, contentView: View) {
 
             purgeMenuItem = RecyclerViewMenuAdapter.MenuItem(R.drawable.clear_cache, context.getString(R.string.msg_purge_cache), null, isEnabled = false, onClick = {
-                val cacheDir = tracker?.getItemCacheDir(context, false)
+                val cacheDir = viewModel.trackerDao.getItemCacheDir(context, false)
                 if (cacheDir != null) {
                     println("purge cache dir files")
                     /*
@@ -693,7 +730,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                 println("export item clicked.")
 
 
-                tracker?.let {
+                viewModel.trackerDao.let {
 
                     val configDialog = OTTableExportService.makeConfigurationDialog(context, it) {
                         includeFile, tableFileType ->
@@ -748,42 +785,6 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
             listView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
             listView.adapter = menuAdapter
-
-            if (arguments != null) {
-                val activity = activity
-                if (activity is OTActivity) {
-                    dialogSubscriptions.add(
-                            activity.signedInUserObservable.subscribe {
-                                user ->
-                                this.user = user
-                                this.tracker = user[arguments.getString(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)]
-
-                                refreshPurgeButton()
-
-                                if (tracker != null) {
-                                    dialogSubscriptions.add(
-                                            OTApplication.app.databaseManager.getTotalItemCount(tracker!!).subscribe {
-                                                count ->
-                                                if (count.first > 0) {
-                                                    deletionMenuItem.description = "Item count: ${count}"
-                                                    deletionMenuItem.isEnabled = true
-
-                                                    exportMenuItem.isEnabled = true
-                                                } else {
-                                                    deletionMenuItem.description = "No items"
-                                                    deletionMenuItem.isEnabled = false
-
-                                                    exportMenuItem.isEnabled = false
-                                                }
-                                                menuAdapter.notifyItemChanged(1)
-                                                menuAdapter.notifyItemChanged(2)
-
-                                            }
-                                    )
-                                }
-                            })
-                }
-            }
         }
 
         override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -793,7 +794,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                     val exportUri = data.data
                     if (exportUri != null) {
                         println(exportUri.toString())
-                        tracker?.let {
+                        viewModel.trackerDao.objectId?.let {
                             val serviceIntent = OTTableExportService.makeIntent(this@SettingsDialogFragment.context, it, exportUri.toString(), exportConfigIncludeFile, exportConfigTableFileType)
                             this@SettingsDialogFragment.dismiss()
                             activity?.startService(serviceIntent)

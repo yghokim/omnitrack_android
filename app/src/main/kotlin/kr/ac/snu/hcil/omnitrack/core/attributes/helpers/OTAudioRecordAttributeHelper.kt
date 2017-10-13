@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 import android.Manifest
 import android.content.Context
 import android.view.View
+import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
@@ -12,11 +13,12 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputV
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AudioRecordInputView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Single
+import java.util.*
 
 /**
  * Created by Young-Ho on 10/7/2017.
  */
-class OTAudioRecordAttributeHelper : OTAttributeHelper() {
+class OTAudioRecordAttributeHelper : OTFileInvolvedAttributeHelper() {
 
     private val permissions = arrayOf(Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
@@ -42,7 +44,9 @@ class OTAudioRecordAttributeHelper : OTAttributeHelper() {
 
     override fun refreshInputViewUI(inputView: AAttributeInputView<out Any>, attribute: OTAttributeDAO) {
         if (inputView is AudioRecordInputView) {   //TODO cacheDir
-            //inputView.valueView.recordingOutputDirectoryPathOverride = tracker?.getItemCacheDir(inputView.context, true)
+            OTApplication.app.databaseManager.getUnManagedTrackerDao(attribute.trackerId, null)?.let {
+                inputView.valueView.recordingOutputDirectoryPathOverride = it.getItemCacheDir(inputView.context, true)
+            }
         }
     }
 
@@ -61,5 +65,9 @@ class OTAudioRecordAttributeHelper : OTAttributeHelper() {
             view.mountedUri = value
         }
         return super.applyValueToViewForItemList(attribute, value, view)
+    }
+
+    override fun makeRelativeFilePathFromValue(attribute: OTAttributeDAO, value: Any?, uniqKey: String?): String {
+        return "audios/audio_${attribute.load()}_${uniqKey ?: UUID.randomUUID().toString()}.3gp"
     }
 }

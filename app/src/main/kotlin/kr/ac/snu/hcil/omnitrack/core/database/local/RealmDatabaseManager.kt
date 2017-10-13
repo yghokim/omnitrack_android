@@ -97,6 +97,32 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
         return realm.where(OTAttributeDAO::class.java).equalTo(FIELD_TRACKER_ID, trackerId)
     }
 
+    fun getUnManagedTrackerDao(trackerId: String?, realm: Realm?): OTTrackerDAO? {
+        if (trackerId == null) {
+            return null
+        }
+
+        val realmInstance = if (realm != null) {
+            realm
+        } else getRealmInstance()
+
+        val trackerDao = getTrackerQueryWithId(trackerId, realmInstance).findFirst()
+        if (trackerDao != null) {
+            val unmanaged = realmInstance.copyFromRealm(trackerDao)
+
+            if (realm == null) {
+                realmInstance.close()
+            }
+
+            return unmanaged
+        } else {
+            if (realm == null) {
+                realmInstance.close()
+            }
+            return null
+        }
+    }
+
     fun makeItemsQuery(trackerId: String?, from: Long?, to: Long?, realm: Realm): RealmQuery<OTItemDAO> {
         return realm.where(OTItemDAO::class.java)
                 .run {
