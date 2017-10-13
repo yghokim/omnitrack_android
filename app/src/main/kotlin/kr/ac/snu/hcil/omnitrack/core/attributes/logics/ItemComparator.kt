@@ -19,7 +19,7 @@ abstract class ItemComparator : Comparator<OTItemDAO> {
         return name
     }
 
-    override final fun compare(p0: OTItemDAO, p1: OTItemDAO): Int {
+    override final fun compare(p0: OTItemDAO?, p1: OTItemDAO?): Int {
         if (isDecreasing) {
             return -1 * increasingCompare(p0, p1)
         } else {
@@ -27,7 +27,7 @@ abstract class ItemComparator : Comparator<OTItemDAO> {
         }
     }
 
-    abstract fun increasingCompare(a: OTItemDAO, b: OTItemDAO): Int
+    abstract fun increasingCompare(a: OTItemDAO?, b: OTItemDAO?): Int
 
 
 }

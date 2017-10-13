@@ -90,7 +90,7 @@ object OTTrackingNotificationManager {
         // Adds the back stack for the Intent (but not the Intent itself)
         stackBuilder.addParentStack(ItemBrowserActivity::class.java)
         // Adds the Intent that starts the Activity to the top of the stack
-        stackBuilder.addNextIntent(ItemBrowserActivity.makeIntent(tracker, context))
+        stackBuilder.addNextIntent(ItemBrowserActivity.makeIntent(tracker.objectId, context))
 
         val resultPendingIntent = stackBuilder.getPendingIntent(0,
                 PendingIntent.FLAG_UPDATE_CURRENT)

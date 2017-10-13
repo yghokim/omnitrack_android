@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.viewmodels
+package kr.ac.snu.hcil.omnitrack.ui.pages.home
 
 import android.support.v7.util.DiffUtil
 import io.realm.*
@@ -8,6 +8,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
+import kr.ac.snu.hcil.omnitrack.ui.viewmodels.UserAttachedViewModel
 import rx.Observable
 import rx.Subscription
 import rx.subjects.BehaviorSubject

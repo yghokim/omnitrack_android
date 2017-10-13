@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.items
 
 import android.app.Dialog
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -10,6 +11,7 @@ import android.support.design.widget.BottomSheetDialogFragment
 import android.support.design.widget.CoordinatorLayout
 import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
+import android.support.v7.util.DiffUtil
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
@@ -21,19 +23,17 @@ import android.widget.ToggleButton
 import butterknife.bindView
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
-import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
-import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.services.OTTableExportService
 import kr.ac.snu.hcil.omnitrack.ui.DragItemTouchHelperCallback
+import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
-import kr.ac.snu.hcil.omnitrack.ui.activities.OTTrackerAttachedActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.DismissingBottomSheetDialogFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.common.ExtendedSpinner
 import kr.ac.snu.hcil.omnitrack.ui.components.common.FallbackRecyclerView
@@ -49,27 +49,28 @@ import kr.ac.snu.hcil.omnitrack.utils.getDayOfMonth
 import kr.ac.snu.hcil.omnitrack.utils.io.FileHelper
 import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
 import rx.Subscription
-import rx.android.schedulers.AndroidSchedulers
 import rx.subscriptions.CompositeSubscription
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.properties.Delegates
 
-class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_browser), ExtendedSpinner.OnItemSelectedListener, View.OnClickListener, AttributeEditDialogFragment.Listener {
+class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_browser), ExtendedSpinner.OnItemSelectedListener, View.OnClickListener, AttributeEditDialogFragment.Listener {
 
     companion object {
 
         const val REQUEST_CODE_NEW_ITEM = 151
         const val REQUEST_CODE_EDIT_ITEM = 150
 
-        fun makeIntent(tracker: OTTracker, context: Context): Intent {
+        fun makeIntent(trackerId: String, context: Context): Intent {
             val intent = Intent(context, ItemBrowserActivity::class.java)
-            intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
+            intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
             return intent
         }
     }
 
-    private val items = ArrayList<OTItem>()
+    private lateinit var viewModel: ItemListViewModel
+
+    private val items = ArrayList<ItemListViewModel.ItemViewModel>()
 
     private val itemListView: FallbackRecyclerView by bindView(R.id.ui_item_list)
 
@@ -83,12 +84,8 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
 
     private lateinit var removalSnackbar: Snackbar
 
-    private var supportedItemComparators: List<ItemComparator>? = null
-
     private val settingsFragment: BottomSheetDialogFragment? get() {
-        if (tracker != null)
-            return SettingsDialogFragment.getInstance(tracker!!)
-        else return null
+        return SettingsDialogFragment.getInstance()
     }
 
     private val startSubscriptions = CompositeSubscription()
@@ -153,37 +150,58 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
             }
 
         })
-    }
 
-    override fun onTrackerLoaded(tracker: OTTracker) {
-        super.onTrackerLoaded(tracker)
-
-        println("Cache size: ${tracker.getTotalCacheFileSize(this)}")
-
-        items.clear()
-        title = String.format(resources.getString(R.string.title_activity_item_browser, tracker.name))
-
-        supportedItemComparators = tracker.getSupportedComparators()
-
-        if (supportedItemComparators != null) {
-            val adapter = ArrayAdapter<ItemComparator>(this, R.layout.simple_list_element_text_light, R.id.textView, supportedItemComparators)
-            adapter.setDropDownViewResource(R.layout.simple_list_element_text_dropdown)
-
-            sortSpinner.adapter = adapter
-        }
+        viewModel = ViewModelProviders.of(this).get(ItemListViewModel::class.java)
 
         creationSubscriptions.add(
-                OTApplication.app.databaseManager.loadItems(tracker).subscribe { items ->
-                    this.items.clear()
-                    this.items.addAll(items)
-                    reSort()
+                viewModel.trackerNameObservable.subscribe { name ->
+                    title = String.format(resources.getString(R.string.title_activity_item_browser, name))
                 }
         )
+
+        creationSubscriptions.add(
+                viewModel.sorterSetObservable.subscribe { set ->
+                    val adapter = ArrayAdapter<ItemComparator>(this, R.layout.simple_list_element_text_light, R.id.textView, set)
+                    adapter.setDropDownViewResource(R.layout.simple_list_element_text_dropdown)
+
+                    sortSpinner.adapter = adapter
+                }
+        )
+
+        creationSubscriptions.add(
+                viewModel.sortedItemsObservable.subscribe {
+                    val diffResult = DiffUtil.calculateDiff(
+                            ItemListViewModel.ItemViewModelListDiffUtilCallback(items, it)
+                    )
+                    items.clear()
+                    items.addAll(it)
+                    diffResult.dispatchUpdatesTo(itemListViewAdapter)
+                }
+        )
+
+        creationSubscriptions.add(
+                viewModel.onSchemaChanged.subscribe {
+                    itemListViewAdapter.notifyDataSetChanged()
+                }
+        )
+
+        creationSubscriptions.add(
+                viewModel.currentSorterObservable.subscribe { newSorter ->
+
+                }
+        )
+
+        val trackerId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
+        if (trackerId != null) {
+            viewModel.init(trackerId)
+        }
+
     }
 
     override fun onOkAttributeEditDialog(changed: Boolean, value: Any, tracker: OTTracker, attribute: OTAttribute<out Any>, itemId: String?) {
         println("dismiss handler")
         Log.d(AttributeEditDialogFragment.TAG, "changed: ${changed}, value: ${value}")
+        /*
         if (this.tracker?.objectId == tracker.objectId) {
             if (itemId != null) {
                 val item = items.find { item -> item.objectId == itemId }
@@ -197,7 +215,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                     )
                 }
             }
-        }
+        }*/
     }
 
 
@@ -221,37 +239,9 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
         reSort()
     }
 
-    private fun reSort(refresh: Boolean = true) {
-        val comparator = supportedItemComparators?.get(sortSpinner.selectedItemPosition)
-        if (comparator != null) {
-            println("sort items by ${comparator}")
-            comparator.isDecreasing = !sortOrderButton.isChecked
-            items.sortWith(comparator)
-            if (refresh)
-                onItemListChanged()
-        }
-    }
-
-    private fun getCurrentSort(): ItemComparator? {
-        return supportedItemComparators?.get(sortSpinner.selectedItemPosition)
-    }
-
-    private fun onItemListChanged() {
-        itemListViewAdapter.notifyDataSetChanged()
-        onListChanged()
-    }
-
-    private fun onItemChanged(position: Int) {
-        itemListViewAdapter.notifyItemChanged(position)
-        onListChanged()
-    }
-
     private fun onItemRemoved(position: Int) {
         itemListViewAdapter.notifyItemRemoved(position)
-        onListChanged()
-    }
-
-    private fun onListChanged() {
+        //onListChanged()
     }
 
     override fun onToolbarLeftButtonClicked() {
@@ -259,24 +249,40 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
     }
 
     override fun onToolbarRightButtonClicked() {
-        if (tracker != null) {
-            val intent = ItemEditingActivity.makeIntent(tracker!!.objectId, this)
+        val intent = ItemEditingActivity.makeIntent(viewModel.trackerId, this)
             intent.putExtra(OTApplication.INTENT_EXTRA_FROM, this@ItemBrowserActivity.javaClass.simpleName)
             startActivityForResult(intent, REQUEST_CODE_NEW_ITEM)
-        }
     }
 
     override fun onToolbarRightSubButtonClicked() {
         settingsFragment?.show(supportFragmentManager, "TRACKER_ITEMS_SETTINGS")
     }
 
-    fun deleteItemPermanently(position: Int): OTItem {
-        val removedItem = items[position]
-        OTApplication.app.databaseManager.removeItem(removedItem)
-        //items.removeAt(position)
-        onItemRemoved(position)
+    override fun onDestroy() {
+        super.onDestroy()
 
-        return removedItem
+        itemListViewAdapter.dispose()
+    }
+
+    private fun reSort() {
+        val comparator = getCurrentSort()
+        if (comparator != null) {
+            println("sort items by ${comparator}")
+            viewModel.setSorter(comparator)
+        }
+    }
+
+    private fun getCurrentSort(): ItemComparator? {
+        val sorter = viewModel.sorterSetObservable.value?.get(sortSpinner.selectedItemPosition)
+        sorter?.isDecreasing = !sortOrderButton.isChecked
+        return sorter
+    }
+
+    fun deleteItemPermanently(position: Int): String? {
+        val removedItem = items[position]
+        //TODO remove
+
+        return removedItem.itemId
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -296,11 +302,20 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
 
     inner class ItemListViewAdapter : RecyclerView.Adapter<ItemListViewAdapter.ItemElementViewHolder>(), DragItemTouchHelperCallback.ItemDragHelperAdapter {
 
-        private val removedItems = ArrayList<OTItem>()
+        private val removedItems = HashSet<String>()
+
+        private val viewHolders = ArrayList<ItemElementViewHolder>()
 
         fun clearTrashcan() {
             for (item in removedItems) {
-                OTApplication.app.databaseManager.removeItem(item)
+                //TODO remove
+                //OTApplication.app.databaseManager.removeItem(item)
+            }
+        }
+
+        fun dispose() {
+            viewHolders.forEach {
+                it.itemLevelSubscriptions.clear()
             }
         }
 
@@ -309,12 +324,12 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
         }
 
         override fun onRemoveItem(position: Int) {
-            removedItems += items.removeAt(position)
-            notifyItemRemoved(position)
+            items.removeAt(position).itemId?.let { removedItems += it }
             removalSnackbar.show()
         }
 
         fun undoRemoval() {
+            /*
             if (!removedItems.isEmpty()) {
                 val restored = removedItems.removeAt(removedItems.size - 1)
                 items.add(restored)
@@ -325,7 +340,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                 } else {
                     itemListViewAdapter.notifyDataSetChanged()
                 }
-            }
+            }*/
         }
 
         override fun getItemCount(): Int {
@@ -338,11 +353,14 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemElementViewHolder {
             val view = LayoutInflater.from(parent.context).inflate(R.layout.item_list_element, parent, false)
-            return ItemElementViewHolder(view)
+            val viewHolder = ItemElementViewHolder(view)
+            viewHolders.add(viewHolder)
+            return viewHolder
         }
 
         inner class ItemElementViewHolder(view: View) : RecyclerView.ViewHolder(view), View.OnClickListener, PopupMenu.OnMenuItemClickListener {
 
+            val itemLevelSubscriptions = CompositeSubscription()
             val colorBar: View by bindView(R.id.color_bar)
 
             val monthView: TextView by bindView(R.id.ui_text_month)
@@ -373,7 +391,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
 */
                 moreButton.setOnClickListener(this)
 
-                itemMenu = PopupMenu(this@ItemBrowserActivity, moreButton, Gravity.TOP or Gravity.LEFT)
+                itemMenu = PopupMenu(this@ItemBrowserActivity, moreButton, Gravity.TOP or Gravity.START)
                 itemMenu.inflate(R.menu.menu_item_list_element)
                 itemMenu.setOnMenuItemClickListener(this)
 
@@ -395,9 +413,11 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
             override fun onMenuItemClick(p0: MenuItem): Boolean {
                 when (p0.itemId) {
                     R.id.action_edit -> {
-                        val intent = ItemEditingActivity.makeIntent(items[adapterPosition], tracker!!, this@ItemBrowserActivity)
+                        /*
+                        TODO edit
+                        val intent = ItemEditingActivity.makeIntent(items[adapterPosition].itemDao, viewModel.trackerId, this@ItemBrowserActivity)
                         intent.putExtra(OTApplication.INTENT_EXTRA_FROM, this@ItemBrowserActivity.javaClass.simpleName)
-                        startActivityForResult(intent, REQUEST_CODE_EDIT_ITEM)
+                        startActivityForResult(intent, REQUEST_CODE_EDIT_ITEM)*/
                         return true
                     }
                     R.id.action_remove -> {
@@ -411,45 +431,49 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
             }
 
 
-            fun bindItem(item: OTItem) {
-                val cal = Calendar.getInstance()
-                val currentSorter = getCurrentSort()
+            fun bindItem(itemVM: ItemListViewModel.ItemViewModel) {
+                itemLevelSubscriptions.clear()
 
+                val cal = Calendar.getInstance()
+                //val currentSorter = getCurrentSort()
+                cal.timeInMillis = itemVM.timestamp
+                monthView.text = String.format(Locale.US, "%tb", cal)
+                dayView.text = cal.getDayOfMonth().toString()
+
+                sourceView.text = itemVM.loggingSource.sourceText
+                loggingTimeView.text = OTTimeAttribute.formats[OTTimeAttribute.GRANULARITY_MINUTE]!!.format(Date(itemVM.timestamp))
+
+                valueListAdapter.notifyDataSetChanged()
+
+                /*
                 cal.timeInMillis =
                         if (currentSorter is AFieldValueSorter && currentSorter.attribute is OTTimeAttribute) {
                             if (item.hasValueOf(currentSorter.attribute)) {
                                 (item.getValueOf(currentSorter.attribute) as TimePoint).timestamp
                             } else item.timestamp
                         } else item.timestamp
-
-
-                monthView.text = String.format(Locale.US, "%tb", cal)
-                dayView.text = cal.getDayOfMonth().toString()
-
-                sourceView.text = item.source.sourceText
-                loggingTimeView.text = OTTimeAttribute.formats[OTTimeAttribute.GRANULARITY_MINUTE]!!.format(Date(item.timestamp))
-
-                valueListAdapter.notifyDataSetChanged()
+*/
             }
 
             inner class TableRowAdapter : RecyclerView.Adapter<TableRowAdapter.TableRowViewHolder>() {
 
-                fun getParentItem(): OTItem {
+                fun getParent(): ItemListViewModel.ItemViewModel {
                     return items[this@ItemElementViewHolder.adapterPosition]
                 }
 
                 override fun getItemViewType(position: Int): Int {
-                    if (this@ItemElementViewHolder.adapterPosition != -1 && getParentItem().hasValueOf(tracker!!.attributes[position]))
+                    /*
+                    if (this@ItemElementViewHolder.adapterPosition != -1 && getParent().hasValueOf(tracker!!.attributes[position]))
                         return tracker?.attributes?.get(position)?.getViewForItemListContainerType() ?: 0
-                    else return 5
+                    else return 5*/ return 0
                 }
 
                 override fun onBindViewHolder(holder: TableRowViewHolder, position: Int) {
-                    holder.bindAttribute(tracker!!.attributes[position])
+                    holder.bind(viewModel.attributes[position])
                 }
 
                 override fun getItemCount(): Int {
-                    return tracker?.attributes?.size ?: 0
+                    return viewModel.attributes.size
                 }
 
                 override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TableRowViewHolder {
@@ -481,10 +505,11 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
 
                     override fun onClick(v: View?) {
                         try {
-                            val item = getParentItem()
+                            /*
+                            val item = getParent()
                             AttributeEditDialogFragment.makeInstance(item.objectId!!, attributeId!!, item.trackerId, this@ItemBrowserActivity)
                                     .show(this@ItemBrowserActivity.supportFragmentManager, "ValueModifyDialog")
-
+*/
                         } catch(e: Exception) {
                             e.printStackTrace()
                         }
@@ -505,15 +530,21 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                         newValueView.text = value
                     }
 
-                    open fun bindAttribute(attribute: OTAttribute<out Any>) {
+                    open fun bind(attribute: OTAttributeDAO) {
                         attributeNameView.text = attribute.name
                         attributeId = attribute.objectId
-                        val sort = getCurrentSort()
-                        attributeNameView.setTextColor(
-                                if (sort is AFieldValueSorter && sort.attribute === attribute) {
-                                    ContextCompat.getColor(this@ItemBrowserActivity, R.color.colorAccent)
-                                } else ContextCompat.getColor(this@ItemBrowserActivity, R.color.textColorLight)
+
+                        itemLevelSubscriptions.add(
+                                viewModel.currentSorterObservable.subscribe { sort ->
+                                    attributeNameView.setTextColor(
+                                            if (sort is AFieldValueSorter && sort.attributeLocalId === attribute.localId) {
+                                                ContextCompat.getColor(this@ItemBrowserActivity, R.color.colorAccent)
+                                            } else ContextCompat.getColor(this@ItemBrowserActivity, R.color.textColorLight)
+                                    )
+                                }
                         )
+
+                        /*
 
                         val newValueView = attribute.getViewForItemList(this@ItemBrowserActivity, valueView)
                         changeNewValueView(newValueView)
@@ -526,7 +557,7 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                                 valueApplySubscription = null
                             })
                             startSubscriptions.add(valueApplySubscription)
-                        }
+                        }*/
                     }
 
                     private fun changeNewValueView(newValueView: View) {
@@ -552,9 +583,9 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
                         }
                     }
 
-                    override fun bindAttribute(attribute: OTAttribute<out Any>) {
-                        attributeId = attribute.objectId
-                        attributeNameView.text = attribute.name
+                    override fun bind(attributeDao: OTAttributeDAO) {
+                        attributeId = attributeDao.objectId
+                        attributeNameView.text = attributeDao.name
                     }
                 }
             }
@@ -567,13 +598,8 @@ class ItemBrowserActivity : OTTrackerAttachedActivity(R.layout.activity_item_bro
 
             const val REQUEST_CODE_FILE_LOCATION_PICK = 300
 
-            fun getInstance(tracker: OTTracker): BottomSheetDialogFragment {
-                val arguments = Bundle()
-                arguments.putString(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
-
+            fun getInstance(): BottomSheetDialogFragment {
                 val fragment = SettingsDialogFragment()
-                fragment.arguments = arguments
-
                 return fragment
             }
         }
