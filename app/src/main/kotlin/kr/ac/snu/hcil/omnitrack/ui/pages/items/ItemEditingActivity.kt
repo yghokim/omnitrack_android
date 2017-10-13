@@ -446,6 +446,8 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
                         }
                 )
 
+                creationSubscriptions.addAll(internalSubscriptions)
+
                 inputView.boundAttributeObjectId = attributeViewModel.attributeDAO.objectId
 
 

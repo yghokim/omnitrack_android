@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.database.local
 
 import android.app.Activity
+import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.TypeAdapter
@@ -16,6 +17,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import rx.Observable
+import java.io.File
 import java.util.*
 
 /**
@@ -48,6 +50,11 @@ open class OTTrackerDAO : RealmObject() {
 
     val creationFlagsMap: Map<String, String> get() = RealmDatabaseManager.convertRealmEntryListToDictionary(creationFlags)
 
+    val isExternalFilesInvolved: Boolean
+        get() {
+            return attributes.find { it.getHelper().isExternalFile(it) } != null
+        }
+
     fun getRequiredPermissions(): Array<String> {
         val list = ArrayList<String>()
         attributes.forEach {
@@ -70,6 +77,47 @@ open class OTTrackerDAO : RealmObject() {
             RxPermissions(activity).request(*requiredPermissions)
         } else {
             Observable.just(true)
+        }
+    }
+
+    fun getItemCacheDir(context: Context, createIfNotExist: Boolean = true): File {
+        val file = context.externalCacheDir.resolve("${userId ?: "anonymous"}/${objectId ?: System.currentTimeMillis()}")
+        if (createIfNotExist && !file.exists()) {
+            file.mkdirs()
+        }
+        return file
+    }
+
+    fun getTotalCacheFileSize(context: Context): Long {
+        val cacheDirectory = getItemCacheDir(context, false)
+        try {
+            if (cacheDirectory.isDirectory && cacheDirectory.exists()) {
+
+                fun getSizeRecur(dir: File): Long {
+                    var size = 0L
+
+                    if (dir.isDirectory) {
+                        for (file in dir.listFiles()) {
+                            if (file.isFile) {
+                                size += file.length()
+                            } else {
+                                size += getSizeRecur(file)
+                            }
+                        }
+                    } else if (dir.isFile) {
+                        size += dir.length()
+                    }
+
+                    return size
+                }
+
+                return getSizeRecur(cacheDirectory)
+            } else {
+                return 0
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return 0
         }
     }
 }
@@ -224,6 +272,7 @@ open class OTAttributeDAO : RealmObject() {
     fun getPropertySerializedValue(key: String): String? {
         return properties.find { it.key == key }?.value
     }
+
 
     companion object {
 

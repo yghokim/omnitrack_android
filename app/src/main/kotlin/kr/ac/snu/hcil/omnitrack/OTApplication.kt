@@ -106,12 +106,6 @@ class OTApplication : MultiDexApplication() {
 
         const val BROADCAST_ACTION_BACKGROUND_LOGGING_STARTED = "kr.ac.snu.hcil.omnitrack.action.BACKGROUND_LOGGING_STARTED"
         const val BROADCAST_ACTION_BACKGROUND_LOGGING_SUCCEEDED = "kr.ac.snu.hcil.omnitrack.action.BACKGROUND_LOGGING_SUCCEEDED"
-        const val PREFERENCE_KEY_FOREGROUND_ITEM_BUILDER_STORAGE = "item_builder_storage_foreground"
-
-        const val PREFERENCE_KEY_BACKGROUND_ITEM_BUILDER_STORAGE = "item_builder_storage_background"
-
-        const val PREFERENCE_KEY_TRACKER_ITEMS_EXPORTING_PREFIX = "exporting_tracker"
-
         const val PREFERENCE_KEY_FIREBASE_INSTANCE_ID = "firebase_instance_id"
 
         const val PREFERENCE_KEY_DEVICE_LOCAL_KEY = "device_local_key"
@@ -662,12 +656,4 @@ class OTApplication : MultiDexApplication() {
 
 
     }*/
-
-    fun isTrackerItemExportInProgress(): Boolean {
-        return systemSharedPreferences.getBoolean(PREFERENCE_KEY_TRACKER_ITEMS_EXPORTING_PREFIX, false)
-    }
-
-    fun setTrackerItemExportInProgress(inProgress: Boolean) {
-        systemSharedPreferences.edit().putBoolean(PREFERENCE_KEY_TRACKER_ITEMS_EXPORTING_PREFIX, inProgress).apply()
-    }
 }

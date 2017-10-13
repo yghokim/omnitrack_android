@@ -21,7 +21,9 @@ import rx.subjects.PublishSubject
 class ItemListViewModel : RealmViewModel(), OrderedRealmCollectionChangeListener<RealmResults<OTItemDAO>> {
 
     private var currentItemQueryResults: RealmResults<OTItemDAO>? = null
-    private lateinit var trackerDao: OTTrackerDAO
+    lateinit var trackerDao: OTTrackerDAO
+        private set
+
     private lateinit var managedTrackerDao: OTTrackerDAO
     private lateinit var managedAttributeList: RealmResults<OTAttributeDAO>
 
@@ -50,9 +52,7 @@ class ItemListViewModel : RealmViewModel(), OrderedRealmCollectionChangeListener
             return currentSorterObservable.value
         }
         set(value) {
-            if (currentSorterObservable.value != value) {
-                currentSorterObservable.onNext(value)
-            }
+            currentSorterObservable.onNext(value)
         }
 
     private val itemsInTimestampDescendingOrder = ArrayList<ItemViewModel>()
@@ -123,11 +123,9 @@ class ItemListViewModel : RealmViewModel(), OrderedRealmCollectionChangeListener
     }
 
     fun setSorter(itemComparator: ItemComparator) {
-        if (currentSorter != itemComparator) {
             currentSorter = itemComparator
             itemsSortedList.sortWith(itemComparerMethod)
             sortedItemsObservable.onNext(itemsSortedList)
-        }
     }
 
     class ItemViewModel(val itemDao: OTItemDAO) {

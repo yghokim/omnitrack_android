@@ -14,12 +14,11 @@ import br.com.goncalves.pugnotification.notification.PugNotification
 import com.afollestad.materialdialogs.MaterialDialog
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.OTTracker
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTExternalFileInvolvedAttribute
+import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTFileInvolvedAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.database.EventLoggingManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.system.OTTaskNotificationManager
 import kr.ac.snu.hcil.omnitrack.utils.io.StringTableSheet
-import rx.Observable
 import rx.Single
 import rx.subscriptions.CompositeSubscription
 import java.io.File
@@ -50,16 +49,16 @@ class OTTableExportService : WakefulService(TAG) {
         const val EXTRA_EXPORT_CONFIG_TABLE_FILE_TYPE = "export_config_table_file_type"
 
 
-        fun makeIntent(context: Context, tracker: OTTracker, exportUri: String, includeFiles: Boolean, tableFileType: TableFileType): Intent {
+        fun makeIntent(context: Context, trackerId: String, exportUri: String, includeFiles: Boolean, tableFileType: TableFileType): Intent {
             val intent = Intent(context, OTTableExportService::class.java)
-                    .putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
+                    .putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
                     .putExtra(EXTRA_EXPORT_URI, exportUri)
                     .putExtra(EXTRA_EXPORT_CONFIG_INCLUDE_FILE, includeFiles)
                     .putExtra(EXTRA_EXPORT_CONFIG_TABLE_FILE_TYPE, tableFileType.toString())
             return intent
         }
 
-        fun makeConfigurationDialog(context: Context, tracker: OTTracker, onConfigured: (includeFiles: Boolean, tableFileType: TableFileType) -> Unit): MaterialDialog.Builder {
+        fun makeConfigurationDialog(context: Context, tracker: OTTrackerDAO, onConfigured: (includeFiles: Boolean, tableFileType: TableFileType) -> Unit): MaterialDialog.Builder {
 
             val view = LayoutInflater.from(context).inflate(R.layout.dialog_export_configuration, null, false)
 
@@ -100,31 +99,21 @@ class OTTableExportService : WakefulService(TAG) {
 
     override fun onDestroy() {
         super.onDestroy()
-
-        OTApplication.app.setTrackerItemExportInProgress(false)
-
         subscriptions.clear()
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         println("table export service started.")
         val trackerId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
-        if (OTApplication.app.isTrackerItemExportInProgress()) {
-            println("another export task is in progress")
-            Toast.makeText(this, "Another export task is in progress. Try again later", Toast.LENGTH_LONG).show()
-            return START_NOT_STICKY
-        }
         val exportUriString = intent.getStringExtra(EXTRA_EXPORT_URI)
         if (trackerId != null && exportUriString != null) {
             val exportUri = Uri.parse(exportUriString)
-
-            OTApplication.app.setTrackerItemExportInProgress(true)
 
             Toast.makeText(this, R.string.msg_export_title_progress, Toast.LENGTH_SHORT).show()
             val notification = OTTaskNotificationManager.makeTaskProgressNotificationBuilder(this, getString(R.string.msg_export_title_progress), "downloading", OTTaskNotificationManager.PROGRESS_INDETERMINATE).build()
             startForeground(NOTIFY_ID, notification)
 
-            var loadedTracker: OTTracker? = null
+            var loadedTracker: OTTrackerDAO? = null
 
             val externalFilesInvolved: Boolean = intent.getBooleanExtra(EXTRA_EXPORT_CONFIG_INCLUDE_FILE, false)
             val tableType = TableFileType.valueOf(intent.getStringExtra(EXTRA_EXPORT_CONFIG_TABLE_FILE_TYPE))
@@ -188,21 +177,18 @@ class OTTableExportService : WakefulService(TAG) {
                             .simple()
                             .build()
                 }
-
-                OTApplication.app.setTrackerItemExportInProgress(false)
                 stopSelf(startId)
             }
 
-            val subscription =
-                    OTApplication.app.currentUserObservable
-                            .flatMap {
-                                user ->
-                                user.getTrackerObservable(trackerId)
-                            }.onErrorReturn { null }.flatMap {
-                        tracker: OTTracker? ->
-                        if (tracker != null) {
-                            loadedTracker = tracker
-
+            subscriptions.add(
+                    Single.defer<Boolean> {
+                        val realm = OTApplication.app.databaseManager.getRealmInstance()
+                        val tracker = OTApplication.app.databaseManager.getUnManagedTrackerDao(trackerId, realm)
+                        realm.close()
+                        loadedTracker = tracker
+                        if (tracker == null) {
+                            return@defer Single.just(true)
+                        } else {
                             if (externalFilesInvolved) {
                                 cacheDirectory = this.cacheDir.resolve("export_${System.currentTimeMillis()}")
                                 cacheDirectory?.let {
@@ -216,94 +202,82 @@ class OTTableExportService : WakefulService(TAG) {
                             table.columns.add("index")
                             table.columns.add("logged_at")
                             table.columns.add("source")
-                            tracker.attributes.unObservedList.forEach {
-                                it.onAddColumnToTable(table.columns)
+
+                            tracker.attributes.forEach {
+                                it.getHelper().onAddColumnToTable(it, table.columns)
                             }
 
-                            val tableObservable = OTApplication.app.databaseManager.loadItems(tracker).doOnNext {
-                                items ->
-                                items.withIndex().forEach {
-                                    itemWithIndex ->
-                                    val item = itemWithIndex.value
-                                    val row = ArrayList<String?>()
-                                    row.add(itemWithIndex.index.toString())
-                                    row.add(item.timestamp.toString())
-                                    row.add(item.source.name)
-                                    tracker.attributes.unObservedList.forEach {
-                                        attribute ->
-                                        attribute.onAddValueToTable(item.getValueOf(attribute), row, itemWithIndex.index.toString())
-                                    }
-                                    table.rows.add(row)
+                            val items = OTApplication.app.databaseManager.makeItemsQuery(trackerId, null, null, realm).findAll()
+                            items.withIndex().forEach { itemWithIndex ->
+                                val item = itemWithIndex.value
+                                val row = ArrayList<String?>()
+                                row.add(itemWithIndex.index.toString())
+                                row.add(item.timestamp.toString())
+                                row.add(item.loggingSource.name)
+                                tracker.attributes.forEach { attribute ->
+                                    attribute.getHelper().onAddValueToTable(attribute, item.getValueOf(attribute.localId), row, itemWithIndex.index.toString())
+                                    //TODO add value
+                                    //attribute.onAddValueToTable(item.getValueOf(attribute), row, itemWithIndex.index.toString())
                                 }
-
-                                if (externalFilesInvolved) {
-                                    val tablePath = cacheDirectory?.resolve("table.${tableType.extension}")
-                                    if (tablePath != null) {
-                                        val fileOutputStream = FileOutputStream(tablePath)
-                                        when (tableType) {
-                                            TableFileType.CSV -> {
-                                                table.storeCsvToStream(fileOutputStream)
-                                                fileOutputStream.close()
-                                            }
-                                            TableFileType.EXCEL -> {
-                                                table.storeExcelToStream(fileOutputStream)
-                                            }
-                                        }
-
-                                        involvedFileList?.add(tablePath.path)
-                                    }
-                                }
-
+                                table.rows.add(row)
                             }
 
-                            if (externalFilesInvolved) {
-                                tableObservable.flatMap {
-                                    items ->
-                                    val storeObservables = ArrayList<Single<Uri>>()
-                                    tracker.attributes.unObservedList.filter { it is OTExternalFileInvolvedAttribute }.forEach {
-                                        attr ->
-                                        if (attr is OTExternalFileInvolvedAttribute) {
-                                            items.withIndex().forEach {
-                                                itemWithIndex ->
-                                                val itemValue = itemWithIndex.value.getValueOf(attr)
-                                                if (itemValue != null && attr.isValueContainingFileInfo(itemValue)) {
-                                                    val cacheFilePath = cacheDirectory?.resolve(attr.makeRelativeFilePathFromValue(itemValue, itemWithIndex.index.toString()))
-                                                    if (cacheFilePath != null) {
-                                                        val cacheFileLocation = cacheFilePath.parentFile
-                                                        if (!cacheFileLocation.exists()) {
-                                                            cacheFileLocation.mkdirs()
-                                                        }
-
-                                                        if (!cacheFilePath.exists()) {
-                                                            cacheFilePath.createNewFile()
-                                                        }
-                                                        storeObservables.add(attr.storeValueFile(itemValue, Uri.parse(cacheFilePath.path)).onErrorReturn { ex -> Uri.EMPTY })
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    if (storeObservables.isNotEmpty()) {
-                                        Single.zip(storeObservables) {
-                                            uris ->
-                                            println("uris")
-                                            uris.filter { it != Uri.EMPTY }.map { it.toString() }
-                                        }.toObservable().doOnNext {
-                                            uris ->
-                                            involvedFileList?.addAll(uris)
-                                        }
-                                    } else {
-                                        tableObservable
-                                    }
-
-                                }
+                            if (!externalFilesInvolved) {
+                                return@defer Single.just(true)
                             } else {
-                                tableObservable
+                                val tablePath = cacheDirectory?.resolve("table.${tableType.extension}")
+                                if (tablePath != null) {
+                                    val fileOutputStream = FileOutputStream(tablePath)
+                                    when (tableType) {
+                                        TableFileType.CSV -> {
+                                            table.storeCsvToStream(fileOutputStream)
+                                            fileOutputStream.close()
+                                }
+                                        TableFileType.EXCEL -> {
+                                            table.storeExcelToStream(fileOutputStream)
+                                        }
                             }
-                        } else {
-                            Observable.error(Exception("tracker does not exists."))
+
+                                    involvedFileList?.add(tablePath.path)
+                                }
+
+                                val storeObservables = ArrayList<Single<Uri>>()
+                                tracker.attributes.filter { it.getHelper().isExternalFile(it) && it.getHelper() is OTFileInvolvedAttributeHelper }.forEach { attr ->
+                                    val helper = attr.getHelper() as OTFileInvolvedAttributeHelper
+                                    items.withIndex().forEach { itemWithIndex ->
+                                        val itemValue = itemWithIndex.value.getValueOf(attr.localId)
+                                        if (itemValue != null && helper.isValueContainingFileInfo(attr, itemValue)) {
+                                            val cacheFilePath = cacheDirectory?.resolve(helper.makeRelativeFilePathFromValue(attr, itemValue, itemWithIndex.index.toString()))
+                                            if (cacheFilePath != null) {
+                                                val cacheFileLocation = cacheFilePath.parentFile
+                                                if (!cacheFileLocation.exists()) {
+                                                    cacheFileLocation.mkdirs()
+                                        }
+
+                                                if (!cacheFilePath.exists()) {
+                                                    cacheFilePath.createNewFile()
+                                        }
+                                                storeObservables.add(helper.storeValueFile(attr, itemValue, Uri.parse(cacheFilePath.path)).onErrorReturn { ex -> Uri.EMPTY })
+                                    }
+                                }
+                            }
                         }
+
+                                if (storeObservables.isNotEmpty()) {
+                                    return@defer Single.zip(storeObservables) { uris ->
+                                        println("uris")
+                                        uris.filter { it != Uri.EMPTY }.map { it.toString() }
+                                    }.doOnSuccess { uris ->
+                                        involvedFileList?.addAll(uris)
+                                    }.map { true }
+                                } else {
+                                    return@defer Single.just(true)
+                                }
+                            }
+                        }
+                    }.onErrorReturn { err ->
+                        err.printStackTrace()
+                        false
                     }.subscribe({
                         println("file making task finished")
 
@@ -355,8 +329,10 @@ class OTTableExportService : WakefulService(TAG) {
                             finish(false)
                         }
                     }, { ex -> ex.printStackTrace(); finish(false) })
+            )
 
-            subscriptions.add(subscription)
+
+
             return START_NOT_STICKY
         } else {
             stopSelf(startId)

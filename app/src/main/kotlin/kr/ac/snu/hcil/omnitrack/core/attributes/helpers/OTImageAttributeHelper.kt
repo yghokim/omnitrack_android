@@ -23,11 +23,13 @@ import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Single
 import rx.schedulers.Schedulers
+import java.util.*
 
 /**
  * Created by Young-Ho on 10/7/2017.
  */
-class OTImageAttributeHelper : OTAttributeHelper() {
+class OTImageAttributeHelper : OTFileInvolvedAttributeHelper() {
+
     override fun getInputViewType(previewMode: Boolean, attribute: OTAttributeDAO): Int = AAttributeInputView.VIEW_TYPE_IMAGE
 
     private val permissions = arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -52,8 +54,9 @@ class OTImageAttributeHelper : OTAttributeHelper() {
 
     override fun refreshInputViewUI(inputView: AAttributeInputView<out Any>, attribute: OTAttributeDAO) {
         if (inputView is ImageInputView) {
-            //TODO cacheDir
-            //inputView.picker.overrideLocalUriFolderPath = tracker?.getItemCacheDir(inputView.context)
+            OTApplication.app.databaseManager.getUnManagedTrackerDao(attribute.trackerId, null)?.let {
+                inputView.picker.overrideLocalUriFolderPath = it.getItemCacheDir(inputView.context, true)
+            }
         }
     }
 
@@ -148,4 +151,9 @@ class OTImageAttributeHelper : OTAttributeHelper() {
             } else super.applyValueToViewForItemList(attribute, null, view)
         }
     }
+
+    override fun makeRelativeFilePathFromValue(attribute: OTAttributeDAO, value: Any?, uniqKey: String?): String {
+        return "images/image_${attribute.localId}_${uniqKey ?: UUID.randomUUID().toString()}.jpg"
+    }
+
 }
