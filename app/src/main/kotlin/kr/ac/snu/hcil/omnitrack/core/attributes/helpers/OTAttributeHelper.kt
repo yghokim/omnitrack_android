@@ -205,4 +205,19 @@ abstract class OTAttributeHelper {
     open fun initialize(attribute: OTAttributeDAO) {
         //noop
     }
+
+    //Export====================
+    open fun getAttributeUniqueName(attribute: OTAttributeDAO): String {
+        return "${attribute.name}(${attribute.localId})"
+    }
+
+    open fun onAddColumnToTable(attribute: OTAttributeDAO, out: MutableList<String>) {
+        out.add(getAttributeUniqueName(attribute))
+    }
+
+    open fun onAddValueToTable(attribute: OTAttributeDAO, value: Any?, out: MutableList<String?>, uniqKey: String?) {
+        if (value != null) {
+            out.add(formatAttributeValue(attribute, value).toString())
+        } else out.add(null)
+    }
 }

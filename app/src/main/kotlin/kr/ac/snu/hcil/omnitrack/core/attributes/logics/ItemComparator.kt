@@ -29,6 +29,5 @@ abstract class ItemComparator : Comparator<OTItemDAO> {
 
     abstract fun increasingCompare(a: OTItemDAO?, b: OTItemDAO?): Int
 
-
 }
 
