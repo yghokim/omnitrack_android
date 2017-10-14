@@ -124,7 +124,7 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
     }
 
     fun makeItemsQuery(trackerId: String?, from: Long?, to: Long?, realm: Realm): RealmQuery<OTItemDAO> {
-        return realm.where(OTItemDAO::class.java)
+        return realm.where(OTItemDAO::class.java).equalTo("removed", false)
                 .run {
                     if (trackerId != null) {
                         return@run this.equalTo(FIELD_TRACKER_ID, trackerId)
@@ -500,14 +500,9 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
         }
     }
 
-    fun removeItem(item: OTItem) {
-        item.objectId?.let { itemId ->
-            removeItem(item.trackerId, itemId)
-        }
-    }
-
-    fun removeItem(trackerId: String, itemId: String) {
-        if (removeItemImpl(trackerId, itemId)) {
+    fun removeItem(itemDao: OTItemDAO, realm: Realm) {
+        val trackerId = itemDao.trackerId
+        if (removeItemImpl(itemDao, realm)) {
 
             val intent = Intent(OTApplication.BROADCAST_ACTION_ITEM_REMOVED)
 
@@ -521,28 +516,29 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
         }
     }
 
-    fun removeItemImpl(trackerId: String, itemId: String): Boolean {
-        val realm = getRealmInstance()
+    private fun removeItemImpl(itemDao: OTItemDAO, realm: Realm): Boolean {
         try {
-            val itemDao = realm.where(OTItemDAO::class.java).equalTo(FIELD_OBJECT_ID, itemId).equalTo(FIELD_REMOVED_BOOLEAN, false).findFirst()
-            itemDao?.let {
-                realm.executeTransaction { realm ->
-
-                    itemDao.fieldValueEntries.forEach {
-                        it.deleteFromRealm()
-                    }
-
-                    itemDao.removed = true
-                    itemDao.synchronizedAt = null
-                    itemDao.updatedAt = System.currentTimeMillis()
+            fun command() {
+                itemDao.fieldValueEntries.forEach {
+                    it.deleteFromRealm()
                 }
-                return true
-            } ?: return false
+
+                itemDao.removed = true
+                itemDao.synchronizedAt = null
+                itemDao.updatedAt = System.currentTimeMillis()
+
+            }
+
+            if (!realm.isInTransaction) {
+                realm.executeTransaction { command() }
+            } else {
+                command()
+            }
+
+            return true
         } catch (ex: Exception) {
             ex.printStackTrace()
             return false
-        } finally {
-            realm.close()
         }
     }
 
