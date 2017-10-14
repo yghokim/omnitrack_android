@@ -283,8 +283,9 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
     fun deleteItemPermanently(position: Int): String? {
         val removedItem = items[position]
-        //TODO remove
-
+        removedItem.itemId?.let {
+            viewModel.removeItem(it)
+        }
         return removedItem.itemId
     }
 
