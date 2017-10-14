@@ -72,6 +72,8 @@ class OTApplication : MultiDexApplication() {
 
         const val INTENT_EXTRA_OBJECT_ID_TRACKER = "trackerId"
         const val INTENT_EXTRA_OBJECT_ID_ATTRIBUTE = "attributeObjectId"
+        const val INTENT_EXTRA_LOCAL_ID_ATTRIBUTE = "attributeLocalId"
+
         const val INTENT_EXTRA_OBJECT_ID_USER = "userObjectId"
         const val INTENT_EXTRA_OBJECT_ID_TRIGGER = "triggerObjectId"
         const val INTENT_EXTRA_OBJECT_ID_ITEM = "itemDbId"

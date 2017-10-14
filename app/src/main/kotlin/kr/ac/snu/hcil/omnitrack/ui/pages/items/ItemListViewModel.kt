@@ -128,7 +128,7 @@ class ItemListViewModel : RealmViewModel(), OrderedRealmCollectionChangeListener
             sortedItemsObservable.onNext(itemsSortedList)
     }
 
-    class ItemViewModel(val itemDao: OTItemDAO) {
+    inner class ItemViewModel(val itemDao: OTItemDAO) {
         val itemId: String? get() = itemDao.objectId
         val isSynchronized: Boolean get() = itemDao.synchronizedAt != null
 
@@ -157,6 +157,18 @@ class ItemListViewModel : RealmViewModel(), OrderedRealmCollectionChangeListener
         init {
             timestamp = itemDao.timestamp
             loggingSource = itemDao.loggingSource
+        }
+
+        fun setValueOf(attributeLocalId: String, serializedValue: String?) {
+            realm.executeTransaction {
+                itemDao.setValueOf(attributeLocalId, serializedValue)
+            }
+        }
+
+        fun save() {
+            realm.executeTransaction {
+                OTApplication.app.databaseManager.saveItem(itemDao, false)
+            }
         }
     }
 
