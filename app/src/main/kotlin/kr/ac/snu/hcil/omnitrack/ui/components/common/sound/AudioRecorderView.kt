@@ -409,9 +409,11 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, ValueAnimator.Anima
                 }
 
                 OTAudioRecordService.INTENT_ACTION_EVENT_RECORD_COMPLETED -> {
+                    println("delivered record completed event.")
                     val sessionId = intent.getStringExtra(OTAudioRecordService.INTENT_EXTRA_SESSION_ID)
                     val resultUri = Uri.parse(intent.getStringExtra(OTAudioRecordService.INTENT_EXTRA_RECORD_URI))
                     if (sessionId == mediaSessionId) {
+                        println("this recorder view was completed - ${sessionId}")
                         refreshTimeViews(0)
                         playBar.clear()
                         audioFileUri = resultUri
