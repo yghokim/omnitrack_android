@@ -22,13 +22,15 @@ class TimePointInputView(context: Context, attrs: AttributeSet? = null) : AAttri
                 valueView.timeChanged.suspend = true
                 valueView.time = value ?: TimePoint()
                 valueView.timeChanged.suspend = false
+
+                onValueChanged(value)
             }
         }
 
     init {
         valueView.timeChanged += {
             sender, arg ->
-            onValueChanged(arg)
+            value = arg
         }
     }
 

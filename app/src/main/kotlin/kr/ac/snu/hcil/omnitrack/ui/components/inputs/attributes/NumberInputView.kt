@@ -23,10 +23,10 @@ import kotlin.properties.Delegates
 /**
  * Created by Young-Ho Kim on 2016-07-22.
  */
-class NumberInputView(context: Context, attrs: AttributeSet? = null) : AAttributeInputView<BigDecimal>(R.layout.input_number, context, attrs) {
+class NumberInputView(context: Context, attrs: AttributeSet? = null, initialValue: BigDecimal? = null) : AAttributeInputView<BigDecimal>(R.layout.input_number, context, attrs) {
 
     override val typeId: Int = VIEW_TYPE_NUMBER
-    override var value: BigDecimal? = BigDecimal("0")
+    override var value: BigDecimal? = initialValue
         set(value) {
             if (field != value) {
                 field = value

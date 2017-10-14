@@ -6,7 +6,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTRatingOptionsProperty
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
-import kr.ac.snu.hcil.omnitrack.ui.components.common.StarRatingView
+import kr.ac.snu.hcil.omnitrack.ui.components.common.StarRatingSlider
 import kr.ac.snu.hcil.omnitrack.ui.components.common.StarScoreView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.LikertScaleInputView
@@ -133,7 +133,7 @@ class OTRatingAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrac
             RatingOptions.DisplayType.Star -> {
 
                 if (ratingOptions.starLevels <= RatingOptions.StarLevel.Level5) {
-                    val target = recycledView as? StarRatingView ?: StarRatingView(context)
+                    val target = recycledView as? StarRatingSlider ?: StarRatingSlider(context)
 
                     target.isLightMode = true
                     target.overridenIntrinsicWidth = context.resources.getDimensionPixelSize(R.dimen.star_rating_item_list_view_unit_size)
@@ -153,7 +153,7 @@ class OTRatingAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrac
 
     override fun applyValueToViewForItemList(value: Any?, view: View): Single<Boolean> {
         return Single.defer {
-            if (view is StarRatingView && value is Float) {
+            if (view is StarRatingSlider && value is Float) {
                 view.score = value
                 view.allowIntermediate = allowIntermediate
                 view.levels = level.maxScore

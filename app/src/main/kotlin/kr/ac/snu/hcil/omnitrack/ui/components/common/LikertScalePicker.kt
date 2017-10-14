@@ -66,7 +66,7 @@ class LikertScalePicker : View, GestureDetector.OnGestureListener {
         }
     }
 
-    var value: Float by Delegates.observable(((rightMost + leftMost) shr 1).toFloat()) {
+    var value: Float? by Delegates.observable(((rightMost + leftMost) shr 1).toFloat() as Float?) {
         prop, old, new ->
         if (old != new) {
             invalidate()
@@ -74,7 +74,7 @@ class LikertScalePicker : View, GestureDetector.OnGestureListener {
         }
     }
 
-    val valueChanged = Event<Float>()
+    val valueChanged = Event<Float?>()
 
     val numPoints: Int get() = Math.abs(rightMost - leftMost) + 1
 
@@ -250,17 +250,20 @@ class LikertScalePicker : View, GestureDetector.OnGestureListener {
 
 
         //draw value
-        val valuePosition = convertValueToCoordinate(value)
+        val value = value
+        if (value != null) {
+            val valuePosition = convertValueToCoordinate(value)
 
-        canvas.drawCircle(valuePosition, _lineY, valueIndicatorRadius, valueIndicatorPaint)
+            canvas.drawCircle(valuePosition, _lineY, valueIndicatorRadius, valueIndicatorPaint)
 
-        val valueText = value.toString()
-        valueTextPaint.getTextBounds(valueText, 0, valueText.length, boundRect)
-        val valueCenter = getWrappedCenterPoint(valuePosition, boundRect.width() / 2 + valueBoxHorizontalPadding)
-        boxRect.set(valueCenter - boundRect.width() / 2 - valueBoxHorizontalPadding, 0f, valueCenter + boundRect.width() / 2 + valueBoxHorizontalPadding, valueTextSize + 2 * valueBoxVerticalPadding)
-        canvas.drawRoundRect(boxRect, 15f, 15f, valueBoxPaint)
+            val valueText = value.toString()
+            valueTextPaint.getTextBounds(valueText, 0, valueText.length, boundRect)
+            val valueCenter = getWrappedCenterPoint(valuePosition, boundRect.width() / 2 + valueBoxHorizontalPadding)
+            boxRect.set(valueCenter - boundRect.width() / 2 - valueBoxHorizontalPadding, 0f, valueCenter + boundRect.width() / 2 + valueBoxHorizontalPadding, valueTextSize + 2 * valueBoxVerticalPadding)
+            canvas.drawRoundRect(boxRect, 15f, 15f, valueBoxPaint)
 
-        canvas.drawText(valueText, valueCenter, (boxRect.top + boxRect.bottom) / 2 + boundRect.height() / 2, valueTextPaint)
+            canvas.drawText(valueText, valueCenter, (boxRect.top + boxRect.bottom) / 2 + boundRect.height() / 2, valueTextPaint)
+        }
     }
 
     fun getWrappedCenterPoint(desired: Float, contentHalfWidth: Float): Float {
