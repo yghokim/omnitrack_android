@@ -18,6 +18,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputV
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Observable
 import rx.Subscription
+import rx.subscriptions.CompositeSubscription
 import rx.subscriptions.Subscriptions
 
 /**
@@ -44,7 +45,7 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
     }
 
     interface Listener {
-        fun onOkAttributeEditDialog(changed: Boolean, value: Any, trackerId: String, attributeLocalId: String, itemId: String?)
+        fun onOkAttributeEditDialog(changed: Boolean, value: Any?, trackerId: String, attributeLocalId: String, itemId: String?)
     }
 
     private var trackerId: String? = null
@@ -62,6 +63,8 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
     private val listeners = HashSet<Listener>()
 
     private lateinit var realm: Realm
+
+    private val subscriptions = CompositeSubscription()
 
     fun addListener(listener: Listener) {
         this.listeners.add(listener)
@@ -82,25 +85,27 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
                 .cancelable(false)
                 .title(getString(R.string.msg_attribute_edit_dialog_title))
                 .onPositive { dialog, which ->
-                    this.valueView?.clearFocus()
-                        val value = this.valueView?.value
-                        val changed: Boolean
-                        if (this.item == null) {
-                            changed = true
-                        } else {
-                            val itemValue = attribute?.localId?.let { this.item?.getValueOf(it) }
-                            changed = value != itemValue
-                        }
+                    this.valueView?.let { valueView ->
+                        subscriptions.add(
+                                valueView.forceApplyValueAsync().subscribe { (value) ->
+                                    val changed: Boolean
+                                    if (this.item == null) {
+                                        changed = true
+                                    } else {
+                                        val itemValue = attribute?.localId?.let { this.item?.getValueOf(it) }
+                                        changed = value != itemValue
+                                    }
 
-                        if (value != null) {
-                            val attribute = attribute
-                            val trackerId = trackerId
-                            if (trackerId != null && attribute != null) {
-                                for (listener in listeners) {
-                                    listener.onOkAttributeEditDialog(changed, value, trackerId, attribute.localId, item?.objectId)
+                                    val attribute = attribute
+                                    val trackerId = trackerId
+                                    if (trackerId != null && attribute != null) {
+                                        for (listener in listeners) {
+                                            listener.onOkAttributeEditDialog(changed, value, trackerId, attribute.localId, item?.objectId)
+                                        }
+                                    }
                                 }
-                            }
-                        }
+                        )
+                    }
                 }
                 .build()
 

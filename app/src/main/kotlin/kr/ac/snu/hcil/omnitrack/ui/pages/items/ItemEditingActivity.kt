@@ -27,6 +27,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDivider
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.pages.ConnectionIndicatorStubProxy
 import rx.Observable
+import rx.Single
 import rx.android.schedulers.AndroidSchedulers
 import rx.subscriptions.CompositeSubscription
 import java.util.*
@@ -254,14 +255,19 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
     override fun onToolbarRightButtonClicked() {
         //push item to db
         //syncViewStateToBuilderAsync {viewModel.applyBuilderToItem()
-        viewModel.applyBuilderToItem().subscribe { result ->
-            if (result.datum != null) {
-                viewModel.removeItemBuilder()
-                setResult(RESULT_OK, Intent().putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, result.datum))
-                finish()
-            }
-        }
-
+        creationSubscriptions.add(
+                Single.zip(
+                        attributeListAdapter.inputViews.map { it.forceApplyValueAsync() }
+                ) { zipped -> zipped }.flatMap {
+                    viewModel.applyBuilderToItem()
+                }.subscribe { result ->
+                    if (result.datum != null) {
+                        viewModel.removeItemBuilder()
+                        setResult(RESULT_OK, Intent().putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, result.datum))
+                        finish()
+                    }
+                }
+        )
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

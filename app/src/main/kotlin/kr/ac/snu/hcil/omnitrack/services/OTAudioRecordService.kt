@@ -67,8 +67,9 @@ class OTAudioRecordService : Service(), AudioRecordingModule.RecordingListener {
                     .putExtra(INTENT_EXTRA_RECORD_TITLE, title)
         }
 
-        fun makeStartCallbackIntent(sessionId: String): Intent {
+        fun makeStartCallbackIntent(sessionId: String, recordedFileUri: Uri): Intent {
             return Intent(INTENT_ACTION_EVENT_RECORD_START_CALLBACK)
+                    .putExtra(INTENT_EXTRA_RECORD_URI, recordedFileUri.toString())
                     .putExtra(INTENT_EXTRA_SESSION_ID, sessionId)
         }
 
@@ -129,7 +130,7 @@ class OTAudioRecordService : Service(), AudioRecordingModule.RecordingListener {
                 val filePath = intent.data
 
                 if (filePath != null && sessionId != null) {
-                    Log.d(TAG, "Play record view: $filePath $sessionId")
+                    Log.d(TAG, "Start recording of record view: $filePath $sessionId")
                     if (currentSessionId != sessionId && currentRecordingModule?.isRunning() == true) {
                         stopRecording()
                     }
@@ -161,8 +162,9 @@ class OTAudioRecordService : Service(), AudioRecordingModule.RecordingListener {
     private fun startRecording() {
         currentRecordingModule!!.startAsync()
         isRecording = true
+        println("send recording start callback intent")
         LocalBroadcastManager.getInstance(this)
-                .sendBroadcast(makeStartCallbackIntent(currentSessionId!!))
+                .sendBroadcast(makeStartCallbackIntent(currentSessionId!!, currentRecordingModule!!.fileUri))
     }
 
     private fun stopRecording() {

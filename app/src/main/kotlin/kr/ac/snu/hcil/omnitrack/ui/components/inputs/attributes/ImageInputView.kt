@@ -38,8 +38,10 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
 
     override val typeId: Int = VIEW_TYPE_IMAGE
 
-    override var value: SynchronizedUri? = SynchronizedUri()
-        set(value) {
+    override var value: SynchronizedUri? = null
+        set(rawValue) {
+            println("image rawvalue: ${rawValue}")
+            val value = if (rawValue?.isEmpty == true) null else rawValue
             if (field != value) {
                 subscriptions.clear()
                 field = value

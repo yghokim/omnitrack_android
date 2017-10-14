@@ -216,7 +216,7 @@ class ItemEditionViewModel : RealmViewModel(), OTItemBuilderWrapperBase.Attribut
 
                 if (mode == ItemMode.New) {
                     val item = builderWrapper.saveToItem(null, OTItem.LoggingSource.Manual)
-                    return@flatMap OTApplication.app.databaseManager.saveItemImpl(item).map { Nullable(it.second) }
+                    return@flatMap OTApplication.app.databaseManager.saveItemObservable(item, false, null, realm).map { Nullable(it.second) }
                 } else {
                     //TODO edit mode
                     throw NotImplementedError("")

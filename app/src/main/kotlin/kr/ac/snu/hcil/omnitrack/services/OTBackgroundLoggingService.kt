@@ -94,7 +94,7 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
                 } else {
                     currentBuilderSubscriptionDict[tracker.objectId] = builder.autoComplete().last().toSingle().map { pair -> true }.doOnSuccess { currentBuilderSubscriptionDict.remove(tracker.objectId) }.flatMap<Pair<Boolean, OTItem>> {
                         val item = builder.makeItem(source)
-                        //OTApplication.app.databaseManager.saveItem(item, tracker).map { success -> Pair(success, item) }
+                        //OTApplication.app.databaseManager.saveItemObservable(item, tracker).map { success -> Pair(success, item) }
                         //TODO fix item save logic in background logging
                         Single.just(Pair(false, item))
 
