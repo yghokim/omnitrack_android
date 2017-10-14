@@ -49,9 +49,7 @@ class ItemListViewModel : RealmViewModel(), OrderedRealmCollectionChangeListener
 
     val currentSorterObservable = BehaviorSubject.create<ItemComparator>(ItemComparator.TIMESTAMP_SORTER)
     var currentSorter: ItemComparator
-        get() {
-            return currentSorterObservable.value
-        }
+        get() = currentSorterObservable.value
         set(value) {
             currentSorterObservable.onNext(value)
         }
@@ -63,11 +61,7 @@ class ItemListViewModel : RealmViewModel(), OrderedRealmCollectionChangeListener
 
     val sortedItemsObservable = BehaviorSubject.create<List<ItemViewModel>>()
 
-    private val itemComparerMethod = object : Comparator<ItemViewModel> {
-        override fun compare(p0: ItemViewModel?, p1: ItemViewModel?): Int {
-            return currentSorter.compare(p0?.itemDao, p1?.itemDao)
-        }
-    }
+    private val itemComparerMethod = Comparator<ItemViewModel> { p0, p1 -> currentSorter.compare(p0?.itemDao, p1?.itemDao) }
 
     fun init(trackerId: String) {
         val dao = OTApplication.app.databaseManager.getTrackerQueryWithId(trackerId, realm).findFirst()
@@ -117,10 +111,30 @@ class ItemListViewModel : RealmViewModel(), OrderedRealmCollectionChangeListener
             itemsSortedList.sortWith(itemComparerMethod)
 
         } else {
-            //TODO
+            //delete removed//deal with deletions
+            val removes = changeSet.deletions.map { i -> itemsInTimestampDescendingOrder[i] }
+            itemsInTimestampDescendingOrder.removeAll(removes)
+
+            //deal with additions
+            changeSet.insertions.forEach { i ->
+                itemsInTimestampDescendingOrder.add(i, ItemViewModel(snapshot[i]))
+            }
+
+            itemsSortedList.clear()
+            itemsSortedList.addAll(itemsInTimestampDescendingOrder)
+            itemsSortedList.sortWith(itemComparerMethod)
         }
 
         sortedItemsObservable.onNext(itemsSortedList)
+    }
+
+    fun removeItem(itemId: String) {
+        val viewModel = itemsInTimestampDescendingOrder.find { it.itemId == itemId }
+        if (viewModel != null) {
+            realm.executeTransaction {
+                OTApplication.app.databaseManager.removeItem(viewModel.itemDao, realm)
+            }
+        }
     }
 
     fun setSorter(itemComparator: ItemComparator) {
@@ -133,9 +147,7 @@ class ItemListViewModel : RealmViewModel(), OrderedRealmCollectionChangeListener
         val itemId: String? get() = itemDao.objectId
         val isSynchronized: Boolean get() = itemDao.synchronizedAt != null
 
-        fun getItemValueOf(attributeLocalId: String): Any? {
-            return itemDao.getValueOf(attributeLocalId)
-        }
+        fun getItemValueOf(attributeLocalId: String): Any? = itemDao.getValueOf(attributeLocalId)
 
         val timestampObservable = BehaviorSubject.create<Long>()
         var timestamp: Long
@@ -166,27 +178,20 @@ class ItemListViewModel : RealmViewModel(), OrderedRealmCollectionChangeListener
             }
         }
 
-        fun save(vararg changedLocalIds: String): Single<Pair<Int, String?>> {
-            return OTApplication.app.databaseManager.saveItemObservable(itemDao, false, changedLocalIds.toList().toTypedArray(), realm)
-        }
+        fun save(vararg changedLocalIds: String): Single<Pair<Int, String?>> =
+                OTApplication.app.databaseManager.saveItemObservable(itemDao, false, changedLocalIds.toList().toTypedArray(), realm)
     }
 
     class ItemViewModelListDiffUtilCallback(val oldList: List<ItemViewModel>, val newList: List<ItemViewModel>) : DiffUtil.Callback() {
-        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return oldList[oldItemPosition].itemId == newList[newItemPosition].itemId
-        }
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
+                oldList[oldItemPosition].itemId == newList[newItemPosition].itemId
 
-        override fun getOldListSize(): Int {
-            return oldList.size
-        }
+        override fun getOldListSize(): Int = oldList.size
 
-        override fun getNewListSize(): Int {
-            return newList.size
-        }
+        override fun getNewListSize(): Int = newList.size
 
-        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return areItemsTheSame(oldItemPosition, newItemPosition)
-        }
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
+                areItemsTheSame(oldItemPosition, newItemPosition)
 
 
     }
