@@ -10,6 +10,8 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioRecorderView
+import kr.ac.snu.hcil.omnitrack.utils.Nullable
+import rx.Single
 import rx.subscriptions.CompositeSubscription
 
 /**
@@ -34,8 +36,9 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
             }
         }
 
-    override var value: SynchronizedUri? = SynchronizedUri()
-        set(value) {
+    override var value: SynchronizedUri? = null
+        set(rawValue) {
+            val value = if (rawValue?.isEmpty == true) null else rawValue
             if (field != value) {
                 subscriptions.clear()
                 field = value
@@ -102,6 +105,10 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
 
     override fun focus() {
 
+    }
+
+    override fun forceApplyValueAsync(): Single<Nullable<out Any>> {
+        return valueView.stopRecordingAndApplyUri().map { it -> Nullable(value) }
     }
 
     override fun onDetachedFromWindow() {

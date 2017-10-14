@@ -12,6 +12,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.utils.RealmViewModel
+import rx.Single
 import rx.subjects.BehaviorSubject
 import rx.subjects.PublishSubject
 
@@ -165,10 +166,8 @@ class ItemListViewModel : RealmViewModel(), OrderedRealmCollectionChangeListener
             }
         }
 
-        fun save() {
-            realm.executeTransaction {
-                OTApplication.app.databaseManager.saveItem(itemDao, false)
-            }
+        fun save(vararg changedLocalIds: String): Single<Pair<Int, String?>> {
+            return OTApplication.app.databaseManager.saveItemObservable(itemDao, false, changedLocalIds.toList().toTypedArray(), realm)
         }
     }
 

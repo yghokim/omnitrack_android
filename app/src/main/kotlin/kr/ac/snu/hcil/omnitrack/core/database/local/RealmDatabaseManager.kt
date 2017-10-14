@@ -425,8 +425,8 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
     }
 
     //Items
-    fun saveItem(item: OTItemDAO, notifyIntent: Boolean = true): Single<Pair<Int, String?>> {
-        return saveItemImpl(item).doOnSuccess { resultPair ->
+    fun saveItemObservable(item: OTItemDAO, notifyIntent: Boolean = true, localIdsToIgnore: Array<String>? = null, realm: Realm): Single<Pair<Int, String?>> {
+        return saveItemImpl(item, localIdsToIgnore, realm).doOnSuccess { resultPair ->
             if (notifyIntent && resultPair.first != SAVE_RESULT_FAIL) {
 
                 val intent = Intent(when (resultPair.first) {
@@ -447,7 +447,7 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
         }
     }
 
-    fun saveItemImpl(item: OTItemDAO): Single<Pair<Int, String?>> {
+    fun saveItemImpl(item: OTItemDAO, localIdsToIgnore: Array<String>? = null, realm: Realm): Single<Pair<Int, String?>> {
         return Single.create { subscriber ->
             var result: Int = SAVE_RESULT_FAIL
             try {
@@ -463,13 +463,15 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
                     item.objectId = newItemId
                 }
 
-
-                val realm = getRealmInstance()
-                realm.executeTransaction { realm ->
-                    handleBinaryUpload(item.objectId!!, item)
+                if (realm.isInTransaction) {
+                    handleBinaryUpload(item.objectId!!, item, localIdsToIgnore)
                     realm.copyToRealmOrUpdate(item)
+                } else {
+                    realm.executeTransaction { realm ->
+                        handleBinaryUpload(item.objectId!!, item, localIdsToIgnore)
+                        realm.copyToRealmOrUpdate(item)
+                    }
                 }
-                realm.close()
 
             } catch (ex: Exception) {
                 ex.printStackTrace()
@@ -481,9 +483,9 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
         }
     }
 
-    protected fun handleBinaryUpload(itemId: String, item: OTItemDAO) {
+    protected fun handleBinaryUpload(itemId: String, item: OTItemDAO, localIdsToIgnore: Array<String>?) {
 
-        item.fieldValueEntries.forEach { entry ->
+        item.fieldValueEntries.filter { !(localIdsToIgnore?.contains(it.key) ?: false) }.forEach { entry ->
             val value = entry.value?.let { TypeStringSerializationHelper.deserialize(it) }
             if (value != null) {
                 if (value is SynchronizedUri && value.localUri != Uri.EMPTY) {

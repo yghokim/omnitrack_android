@@ -110,7 +110,6 @@ abstract class ABinaryUploadService(tag: String) : WakefulService(tag) {
             val userId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_USER)
             val outUri = SynchronizedUri.parser.fromJson(intent.getStringExtra(EXTRA_OUT_URI), SynchronizedUri::class.java)
 
-
             Toast.makeText(this, R.string.msg_uploading_file_to_server, Toast.LENGTH_SHORT).show()
 
             val notification = OTTaskNotificationManager.makeTaskProgressNotificationBuilder(this,
@@ -118,6 +117,7 @@ abstract class ABinaryUploadService(tag: String) : WakefulService(tag) {
                     null, R.drawable.icon_cloud_upload).build()
             startForeground(NOTIFICATION_IDENTIFIER, notification)
 
+            println("SynchronizedUri: ${outUri}")
             println("local uri info: ${outUri.localUri.scheme}, isAbsolute: ${outUri.localUri.isAbsolute}, isRelative: ${outUri.localUri.isRelative}, scheme: ${outUri.localUri.scheme}")
 
             val realm = Realm.getDefaultInstance()
