@@ -84,10 +84,15 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
                 .negativeText(R.string.msg_cancel)
                 .cancelable(false)
                 .title(getString(R.string.msg_attribute_edit_dialog_title))
+                .autoDismiss(false)
+                .onNegative { dialog, which ->
+                    dialog.dismiss()
+                }
                 .onPositive { dialog, which ->
                     this.valueView?.let { valueView ->
                         subscriptions.add(
                                 valueView.forceApplyValueAsync().subscribe { (value) ->
+                                    println("force apply value async: ${value}")
                                     val changed: Boolean
                                     if (this.item == null) {
                                         changed = true
@@ -103,6 +108,8 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
                                             listener.onOkAttributeEditDialog(changed, value, trackerId, attribute.localId, item?.objectId)
                                         }
                                     }
+
+                                    dialog.dismiss()
                                 }
                         )
                     }
