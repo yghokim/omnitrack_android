@@ -92,7 +92,6 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
                     this.valueView?.let { valueView ->
                         subscriptions.add(
                                 valueView.forceApplyValueAsync().subscribe { (value) ->
-                                    println("force apply value async: ${value}")
                                     val changed: Boolean
                                     if (this.item == null) {
                                         changed = true
