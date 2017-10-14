@@ -4,12 +4,10 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTPendingItemBuilderDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTStringStringEntryDAO
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
-import java.util.*
 
 /**
  * Created by Young-Ho Kim on 16. 7. 25
@@ -64,17 +62,8 @@ class OTItemBuilderWrapperBase {
         itemDaoToSave.synchronizedAt = null
 
         dao.data.forEach { builderFieldEntry ->
-            val match = itemDaoToSave.fieldValueEntries.find { it.key == builderFieldEntry.attributeLocalId }
-            if (match != null) {
-                match.value = builderFieldEntry.serializedValue
-            } else {
-                itemDaoToSave.fieldValueEntries.add(
-                        OTStringStringEntryDAO().apply {
-                            id = UUID.randomUUID().toString()
-                            key = builderFieldEntry.attributeLocalId!!
-                            value = builderFieldEntry.serializedValue
-                        }
-                )
+            builderFieldEntry.attributeLocalId?.let {
+                itemDaoToSave.setValueOf(it, builderFieldEntry.serializedValue)
             }
         }
 

@@ -18,7 +18,6 @@ import butterknife.bindView
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItem
-import kr.ac.snu.hcil.omnitrack.core.OTItemBuilder
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
@@ -263,26 +262,6 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
             }
         }
 
-    }
-
-    private fun makeTrackerPreferenceKey(tracker: OTTracker): String {
-        return "tracker_${tracker.objectId}"
-    }
-
-    private fun snapshot(builder: OTItemBuilder) {
-        println("snapshot now")
-        snapshot.clear()
-        for (key in builder.keys) {
-            snapshot[key] = builder.getValueWithKey(key)
-        }
-    }
-
-    private fun snapshotInitialValue(builder: OTItemBuilder) {
-        println("snapshot now")
-        initialValueSnapshot.clear()
-        for (key in builder.keys) {
-            initialValueSnapshot[key] = builder.getValueWithKey(key)
-        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

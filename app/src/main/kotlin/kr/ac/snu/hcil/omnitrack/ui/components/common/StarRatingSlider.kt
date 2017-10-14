@@ -14,7 +14,7 @@ import kotlin.properties.Delegates
 /**
  * Created by Young-Ho Kim on 2016-09-06.
  */
-class StarRatingView : HorizontalLinearDrawableView, GestureDetector.OnGestureListener {
+class StarRatingSlider : HorizontalLinearDrawableView, GestureDetector.OnGestureListener {
 
     private val touchSlop = 30
 
@@ -46,7 +46,7 @@ class StarRatingView : HorizontalLinearDrawableView, GestureDetector.OnGestureLi
         }
     }
 
-    var score: Float by Delegates.observable(2.5f) {
+    var score: Float? by Delegates.observable(null as Float?) {
         prop, old, new ->
         if (old != new) {
             refresh()
@@ -56,7 +56,7 @@ class StarRatingView : HorizontalLinearDrawableView, GestureDetector.OnGestureLi
 
     private val starAdapter: ADrawableAdapter = StarAdapter()
 
-    val scoreChanged = Event<Float>()
+    val scoreChanged = Event<Float?>()
 
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
@@ -120,7 +120,9 @@ class StarRatingView : HorizontalLinearDrawableView, GestureDetector.OnGestureLi
     private fun handleTouchEvent(event: MotionEvent) {
         val adapter = adapter!!
         if (event.x < paddingLeft) {
-            score = 0f
+            score = if (allowIntermediate) {
+                0.5f
+            } else 1f
         } else if (event.x > paddingLeft + currentCellWidth * adapter.numDrawables) {
             score = levels.toFloat()
         } else {
@@ -129,8 +131,10 @@ class StarRatingView : HorizontalLinearDrawableView, GestureDetector.OnGestureLi
                 val right = left + currentCellWidth
 
                 if (left <= event.x && right >= event.x) {
-                    val fraction = (event.x - left).toFloat() / currentCellWidth
-                    score = i + discreteFraction(fraction)
+                    val fraction = (event.x - left) / currentCellWidth
+                    score = Math.max(if (allowIntermediate) {
+                        0.5f
+                    } else 1f, i + discreteFraction(fraction))
                     break
                 }
             }
@@ -205,6 +209,7 @@ class StarRatingView : HorizontalLinearDrawableView, GestureDetector.OnGestureLi
         }
 
         override fun getDrawable(position: Int): Drawable {
+            val score = score ?: 0f
             if (score.toInt() > position) {
                 return if (!isLightMode) {
                     fullDrawable

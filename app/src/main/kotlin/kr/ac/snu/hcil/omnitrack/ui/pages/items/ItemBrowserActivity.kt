@@ -23,8 +23,6 @@ import android.widget.ToggleButton
 import butterknife.bindView
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.OTTracker
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
@@ -47,6 +45,7 @@ import kr.ac.snu.hcil.omnitrack.utils.dipRound
 import kr.ac.snu.hcil.omnitrack.utils.getDayOfMonth
 import kr.ac.snu.hcil.omnitrack.utils.io.FileHelper
 import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
+import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Subscription
 import rx.subscriptions.CompositeSubscription
 import java.text.SimpleDateFormat
@@ -197,24 +196,21 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
     }
 
-    override fun onOkAttributeEditDialog(changed: Boolean, value: Any, tracker: OTTracker, attribute: OTAttribute<out Any>, itemId: String?) {
+    override fun onOkAttributeEditDialog(changed: Boolean, value: Any, trackerId: String, attributeLocalId: String, itemId: String?) {
         println("dismiss handler")
         Log.d(AttributeEditDialogFragment.TAG, "changed: ${changed}, value: ${value}")
-        /*
-        if (this.tracker?.objectId == tracker.objectId) {
+
+
+        if (this.viewModel.trackerId == trackerId) {
             if (itemId != null) {
-                val item = items.find { item -> item.objectId == itemId }
+                val item = items.find { item -> item.itemId == itemId }
                 if (item != null) {
-                    item.setValueOf(attribute, value)
-                    creationSubscriptions.add(
-                            DatabaseManager.saveItem(item, tracker, false).observeOn(AndroidSchedulers.mainThread()).subscribe { success ->
-                                if (success)
-                                    itemListViewAdapter.notifyItemChanged(items.indexOf(item))
-                            }
-                    )
+                    item.setValueOf(attributeLocalId, TypeStringSerializationHelper.serialize(value))
+                    item.save()
+                    itemListViewAdapter.notifyItemChanged(items.indexOf(item))
                 }
             }
-        }*/
+        }
     }
 
 
@@ -505,7 +501,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
                     var valueApplySubscription: Subscription? = null
 
-                    var attributeId: String? = null
+                    var attributeLocalId: String? = null
 
                     init {
                         valueView = view.findViewById(R.id.ui_value_view_replace)
@@ -514,11 +510,10 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
                     override fun onClick(v: View?) {
                         try {
-                            /*
+
                             val item = getParent()
-                            AttributeEditDialogFragment.makeInstance(item.objectId!!, attributeId!!, item.trackerId, this@ItemBrowserActivity)
+                            AttributeEditDialogFragment.makeInstance(item.itemId!!, attributeLocalId!!, viewModel.trackerId, this@ItemBrowserActivity)
                                     .show(this@ItemBrowserActivity.supportFragmentManager, "ValueModifyDialog")
-*/
                         } catch(e: Exception) {
                             e.printStackTrace()
                         }
@@ -541,7 +536,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
                     open fun bind(attribute: OTAttributeDAO) {
                         attributeNameView.text = attribute.name
-                        attributeId = attribute.objectId
+                        attributeLocalId = attribute.localId
 
                         val sort = viewModel.currentSorter
                         attributeNameView.setTextColor(
@@ -599,7 +594,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                     }
 
                     override fun bind(attributeDao: OTAttributeDAO) {
-                        attributeId = attributeDao.objectId
+                        attributeLocalId = attributeDao.localId
                         attributeNameView.text = attributeDao.name
 
                         val sort = viewModel.currentSorter
