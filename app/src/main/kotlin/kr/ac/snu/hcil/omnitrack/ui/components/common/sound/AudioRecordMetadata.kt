@@ -49,7 +49,6 @@ data class AudioRecordMetadata(var durationMillis: Int, var fileSizeBytes: Long,
                     val timestamp = date.toEpochSecond() * 1000
                     TimeHelper.FORMAT_DATETIME.format(Date(timestamp))
                 } catch(ex: DateTimeParseException) {
-                    ex.printStackTrace()
                     try {
                         val parsed = formatterDate.parse(dateString)
                         val date = ZonedDateTime.of(

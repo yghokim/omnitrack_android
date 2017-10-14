@@ -28,6 +28,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
 import kr.ac.snu.hcil.omnitrack.services.OTTableExportService
 import kr.ac.snu.hcil.omnitrack.ui.DragItemTouchHelperCallback
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
@@ -82,9 +83,10 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
     private lateinit var removalSnackbar: Snackbar
 
-    private val settingsFragment: BottomSheetDialogFragment? get() {
-        return SettingsDialogFragment.getInstance()
-    }
+    private val settingsFragment: BottomSheetDialogFragment?
+        get() {
+            return SettingsDialogFragment.getInstance()
+        }
 
     private val startSubscriptions = CompositeSubscription()
 
@@ -138,8 +140,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
         val snackBarContainer: CoordinatorLayout = findViewById(R.id.ui_snackbar_container)
         removalSnackbar = Snackbar.make(snackBarContainer, resources.getText(R.string.msg_item_removed_message), Snackbar.LENGTH_INDEFINITE)
-        removalSnackbar.setAction(resources.getText(R.string.msg_undo)) {
-            view ->
+        removalSnackbar.setAction(resources.getText(R.string.msg_undo)) { view ->
             itemListViewAdapter.undoRemoval()
         }.addCallback(object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
             override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
@@ -196,7 +197,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
     }
 
-    override fun onOkAttributeEditDialog(changed: Boolean, value: Any, trackerId: String, attributeLocalId: String, itemId: String?) {
+    override fun onOkAttributeEditDialog(changed: Boolean, value: Any?, trackerId: String, attributeLocalId: String, itemId: String?) {
         println("dismiss handler")
         Log.d(AttributeEditDialogFragment.TAG, "changed: ${changed}, value: ${value}")
 
@@ -205,8 +206,15 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
             if (itemId != null) {
                 val item = items.find { item -> item.itemId == itemId }
                 if (item != null) {
-                    item.setValueOf(attributeLocalId, TypeStringSerializationHelper.serialize(value))
-                    item.save()
+                    item.setValueOf(attributeLocalId, value?.let { TypeStringSerializationHelper.serialize(it) })
+
+                    creationSubscriptions.add(
+                            item.save(*(item.itemDao.fieldValueEntries.map { it.key } - attributeLocalId).toTypedArray()).subscribe { (resultCode, itemId) ->
+                                if (resultCode != RealmDatabaseManager.SAVE_RESULT_FAIL) {
+                                    println("item was modified successfully.")
+                                }
+                            }
+                    )
                     itemListViewAdapter.notifyItemChanged(items.indexOf(item))
                 }
             }
@@ -245,8 +253,8 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
     override fun onToolbarRightButtonClicked() {
         val intent = ItemEditingActivity.makeIntent(viewModel.trackerId, this)
-            intent.putExtra(OTApplication.INTENT_EXTRA_FROM, this@ItemBrowserActivity.javaClass.simpleName)
-            startActivityForResult(intent, REQUEST_CODE_NEW_ITEM)
+        intent.putExtra(OTApplication.INTENT_EXTRA_FROM, this@ItemBrowserActivity.javaClass.simpleName)
+        startActivityForResult(intent, REQUEST_CODE_NEW_ITEM)
     }
 
     override fun onToolbarRightSubButtonClicked() {
@@ -514,7 +522,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                             val item = getParent()
                             AttributeEditDialogFragment.makeInstance(item.itemId!!, attributeLocalId!!, viewModel.trackerId, this@ItemBrowserActivity)
                                     .show(this@ItemBrowserActivity.supportFragmentManager, "ValueModifyDialog")
-                        } catch(e: Exception) {
+                        } catch (e: Exception) {
                             e.printStackTrace()
                         }
                     }
@@ -671,7 +679,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                 try {
                     exportConfigIncludeFile = savedInstanceState.getBoolean(OTTableExportService.EXTRA_EXPORT_CONFIG_INCLUDE_FILE, false)
                     exportConfigTableFileType = OTTableExportService.TableFileType.valueOf(savedInstanceState.getString(OTTableExportService.EXTRA_EXPORT_CONFIG_TABLE_FILE_TYPE))
-                } catch(ex: Exception) {
+                } catch (ex: Exception) {
                     ex.printStackTrace()
                 }
             }
@@ -727,8 +735,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
                 viewModel.trackerDao.let {
 
-                    val configDialog = OTTableExportService.makeConfigurationDialog(context, it) {
-                        includeFile, tableFileType ->
+                    val configDialog = OTTableExportService.makeConfigurationDialog(context, it) { includeFile, tableFileType ->
                         exportConfigIncludeFile = includeFile
                         exportConfigTableFileType = tableFileType
 

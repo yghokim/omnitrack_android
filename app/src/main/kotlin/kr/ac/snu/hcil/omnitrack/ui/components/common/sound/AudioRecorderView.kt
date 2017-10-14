@@ -18,8 +18,13 @@ import kr.ac.snu.hcil.omnitrack.services.OTAudioPlayService
 import kr.ac.snu.hcil.omnitrack.services.OTAudioRecordService
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
+import rx.Single
+import rx.android.schedulers.AndroidSchedulers
+import rx.schedulers.Schedulers
+import rx.subjects.BehaviorSubject
 import java.io.File
 import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlin.properties.Delegates
 
 /**
@@ -42,12 +47,18 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, ValueAnimator.Anima
         RECORD, RECORDING, FILE_MOUNTED
     }
 
-    var state: State by Delegates.observable(State.RECORD) {
-        prop, old, new ->
-        if (old != new) {
-            onSetState(new)
+    val stateObservable = BehaviorSubject.create<State>(State.RECORD)
+
+    var state: State
+        get() {
+            return stateObservable.value
         }
-    }
+        set(value) {
+            if (stateObservable.value != value) {
+                stateObservable.onNext(value)
+                onSetState(value)
+            }
+        }
 
     private fun onSetState(state: State) {
         mainButton.state = state
@@ -87,6 +98,8 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, ValueAnimator.Anima
 
             audioFileUriChanged.invoke(this, value)
         }
+
+    private var currentRecordingUri: Uri? = null
 
     var audioLengthSeconds: Int = 60
         set(value) {
@@ -179,6 +192,7 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, ValueAnimator.Anima
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
+        println("attach broadcastreceiver for recorder view")
         LocalBroadcastManager.getInstance(context)
                 .registerReceiver(playerEventReceiver, IntentFilter().apply {
                     addAction(OTAudioPlayService.INTENT_ACTION_EVENT_AUDIO_COMPLETED)
@@ -332,6 +346,18 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, ValueAnimator.Anima
         remainingTimeView.text = formatTime(audioLengthSeconds - currentAudioSeconds)
     }
 
+    fun stopRecordingAndApplyUri(): Single<Uri> {
+        if (state == State.RECORDING) {
+            tryStopRecordService()
+            return stateObservable.filter {
+                println("state: ${it}")
+                it == State.FILE_MOUNTED
+            }.first().toSingle().subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).timeout(2, TimeUnit.SECONDS).onErrorReturn { State.FILE_MOUNTED }.map { state -> audioFileUri }
+        } else {
+            return Single.just(audioFileUri)
+        }
+    }
+
     fun dispose() {
 
     }
@@ -359,9 +385,17 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, ValueAnimator.Anima
                     }
                 }
                 OTAudioRecordService.INTENT_ACTION_EVENT_RECORD_START_CALLBACK -> {
-                    playBar.currentProgressRatio = 0f
-                    playBar.amplitudeTimelineProvider = OTAudioRecordService.currentRecordingModule
-                    state = State.RECORDING
+                    println("received recording callback.")
+                    val sessionId = intent.getStringExtra(OTAudioRecordService.INTENT_EXTRA_SESSION_ID)
+                    println("this sessionId: ${mediaSessionId} / intent session id: ${sessionId}")
+                    if (sessionId == mediaSessionId) {
+                        playBar.currentProgressRatio = 0f
+                        playBar.amplitudeTimelineProvider = OTAudioRecordService.currentRecordingModule
+                        state = State.RECORDING
+                        currentRecordingUri = intent.getStringExtra(OTAudioRecordService.INTENT_EXTRA_RECORD_URI)?.let { Uri.parse(it) }
+                    } else {
+
+                    }
                 }
 
                 OTAudioRecordService.INTENT_ACTION_EVENT_RECORD_PROGRESS -> {

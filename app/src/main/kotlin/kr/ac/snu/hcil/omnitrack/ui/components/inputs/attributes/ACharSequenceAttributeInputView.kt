@@ -13,7 +13,8 @@ import kr.ac.snu.hcil.omnitrack.utils.EnterHideKeyboardEditorActionListener
  */
 abstract class ACharSequenceAttributeInputView(layoutId: Int, context: Context, attrs: AttributeSet? = null) : AAttributeInputView<CharSequence>(layoutId, context, attrs) {
     override var value: CharSequence? = null
-        set(value) {
+        set(rawValue) {
+            val value: String? = if (rawValue?.isNotBlank() == true) rawValue.toString().trimEnd() else null
             println("TextView comparison. original: ${field} | new: ${value} | isDifferent: ${field != value}")
             if (field != value) {
                 field = value
@@ -33,7 +34,7 @@ abstract class ACharSequenceAttributeInputView(layoutId: Int, context: Context, 
         valueView.setOnEditorActionListener(EditorActionListener())
         valueView.setOnFocusChangeListener { view, hasFocus ->
             if (!hasFocus) {
-                value = valueView.text.toString()
+                value = valueView.text.toString().trimEnd()
             }
         }
     }
