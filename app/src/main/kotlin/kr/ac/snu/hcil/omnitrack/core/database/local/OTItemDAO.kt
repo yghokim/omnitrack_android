@@ -49,10 +49,14 @@ open class OTItemDAO : RealmObject() {
         return RealmDatabaseManager.convertRealmEntryListToDictionary(fieldValueEntries)
     }
 
-    fun setValueOf(attributeLocalId: String, serializedValue: String?) {
+    fun setValueOf(attributeLocalId: String, serializedValue: String?): Boolean {
+
         val match = fieldValueEntries.find { it.key == attributeLocalId }
-        if (match != null) {
-            match.value = serializedValue
+        return if (match != null) {
+            if (match.value != serializedValue) {
+                match.value = serializedValue
+                true
+            } else false
         } else {
             fieldValueEntries.add(
                     OTStringStringEntryDAO().apply {
@@ -66,6 +70,18 @@ open class OTItemDAO : RealmObject() {
 
     fun getValueOf(attributeLocalId: String): Any? {
         return fieldValueEntries.find { it.key == attributeLocalId }?.value?.let { TypeStringSerializationHelper.deserialize(it) }
+    }
+
+    fun compareData(other: OTItemDAO): Array<String> {
+        val result = ArrayList<String>()
+
+        fieldValueEntries.forEach { entry ->
+            if (other.fieldValueEntries.find { it.key == entry.key && it.value == entry.value } == null) {
+                result.add(entry.key)
+            }
+        }
+
+        return result.toTypedArray()
     }
 }
 

@@ -24,6 +24,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.pages.ConnectionIndicatorStubProxy
+import kr.ac.snu.hcil.omnitrack.utils.ValueWithTimestamp
 import rx.Observable
 import rx.Single
 import rx.android.schedulers.AndroidSchedulers
@@ -33,7 +34,7 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 16. 7. 24
  */
-class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_item) {
+class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_item) {
 
     companion object {
 
@@ -43,14 +44,14 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
         const val INTENT_ACTION_EDIT = "edit_item"
 
         fun makeNewItemPageIntent(trackerId: String, context: Context): Intent {
-            val intent = Intent(context, ItemEditingActivity::class.java)
+            val intent = Intent(context, ItemDetailActivity::class.java)
             intent.action = INTENT_ACTION_NEW
             intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
             return intent
         }
 
         fun makeIntent(trackerId: String, reminderTime: Long, context: Context): Intent {
-            val intent = Intent(context, ItemEditingActivity::class.java)
+            val intent = Intent(context, ItemDetailActivity::class.java)
             intent.action = INTENT_ACTION_NEW
             intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
             intent.putExtra(INTENT_EXTRA_REMINDER_TIME, reminderTime)
@@ -59,8 +60,8 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
         }
 
         fun makeItemEditPageIntent(itemId: String, trackerId: String, context: Context): Intent {
-            val intent = Intent(context, ItemEditingActivity::class.java)
-            intent.action = INTENT_ACTION_NEW
+            val intent = Intent(context, ItemDetailActivity::class.java)
+            intent.action = INTENT_ACTION_EDIT
             intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, itemId)
             intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
             return intent
@@ -69,12 +70,12 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
 
     private val attributeListAdapter = AttributeListAdapter()
 
-    private lateinit var viewModel: ItemEditionViewModel
+    private lateinit var viewModel: ItemEditionViewModelBase
 
     private val attributeListView: RecyclerView by bindView(R.id.ui_attribute_list)
     private val layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
 
-    private var mode: ItemEditionViewModel.ItemMode = ItemEditionViewModel.ItemMode.New
+    private var mode: ItemEditionViewModelBase.ItemMode = ItemEditionViewModelBase.ItemMode.New
 
     private var activityResultAppliedAttributePosition = -1
 
@@ -82,7 +83,7 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
 
     private val loadingIndicatorBar: LoadingIndicatorBar by bindView(R.id.ui_loading_indicator)
 
-    private val currentAttributeViewModelList = ArrayList<ItemEditionViewModel.AttributeInputViewModel>()
+    private val currentAttributeViewModelList = ArrayList<ItemEditionViewModelBase.AttributeInputViewModel>()
 
     private var itemSaved: Boolean = false
 
@@ -98,7 +99,13 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
         super.onCreate(savedInstanceState)
         setActionBarButtonMode(MultiButtonActionBarActivity.Mode.SaveCancel)
 
-        viewModel = ViewModelProviders.of(this).get(ItemEditionViewModel::class.java)
+        val action = intent.action
+        viewModel = when (action) {
+            INTENT_ACTION_NEW -> ViewModelProviders.of(this).get(NewItemCreationViewModel::class.java)
+            INTENT_ACTION_EDIT -> ViewModelProviders.of(this).get(ItemEditingViewModel::class.java)
+            else -> ViewModelProviders.of(this).get(NewItemCreationViewModel::class.java)
+        }
+
 
         attributeListView.layoutManager = layoutManager
         attributeListView.addItemDecoration(HorizontalImageDividerItemDecoration(R.drawable.horizontal_separator_pattern, this))
@@ -108,14 +115,13 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
         loadingIndicatorBar.setMessage(R.string.msg_indicator_message_item_autocomplete)
 
         builderRestoredSnackbar = Snackbar.make(findViewById(R.id.ui_snackbar_container), resources.getText(R.string.msg_builder_restored), Snackbar.LENGTH_INDEFINITE)
-        builderRestoredSnackbar.setAction(resources.getText(R.string.msg_clear_form)) {
-            view ->
+        builderRestoredSnackbar.setAction(resources.getText(R.string.msg_clear_form)) { view ->
 
             creationSubscriptions.add(
                     (viewModel.trackerDao?.makePermissionAssertObservable(this) ?: Observable.just(true))
                             .subscribe({ approved ->
                                 if (approved) {
-                                    viewModel.removeItemBuilder()
+                                    viewModel.clearHistory()
                                     viewModel.reset()
                                 } else {
 
@@ -144,17 +150,15 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
 
                     println("ItemEditingViewModel initialized: itemMode - ${itemMode}, builderMode - ${builderCreationMode}")
                     this.mode = itemMode
-                    when (this.mode) {
-                        ItemEditionViewModel.ItemMode.New -> {
-                            if (builderCreationMode == ItemEditionViewModel.BuilderCreationMode.Restored) {
-                                builderRestoredSnackbar.show()
-                            } else if (builderCreationMode == ItemEditionViewModel.BuilderCreationMode.NewBuilder) {
-                                viewModel.startAutoComplete()
-                            }
-                        }
-                        ItemEditionViewModel.ItemMode.Edit -> {
 
+                    if (builderCreationMode != null) {
+                        if (builderCreationMode == ItemEditionViewModelBase.BuilderCreationMode.Restored) {
+                            builderRestoredSnackbar.show()
+                        } else if (builderCreationMode == ItemEditionViewModelBase.BuilderCreationMode.NewBuilder) {
+                            viewModel.startAutoComplete()
                         }
+                    } else {
+                        viewModel.startAutoComplete()
                     }
                 }
         )
@@ -162,10 +166,10 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
         creationSubscriptions.add(
                 viewModel.modeObservable.flatMap { mode -> viewModel.trackerNameObservable.map { name -> Pair(mode, name) } }.subscribe { (mode, name) ->
                     when (mode) {
-                        ItemEditionViewModel.ItemMode.Edit -> {
+                        ItemEditionViewModelBase.ItemMode.Edit -> {
                             title = String.format(getString(R.string.title_activity_edit_item), name)
                         }
-                        ItemEditionViewModel.ItemMode.New -> {
+                        ItemEditionViewModelBase.ItemMode.New -> {
                             title = String.format(resources.getString(R.string.title_activity_new_item), name)
                         }
                     }
@@ -203,7 +207,7 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
 
     override fun onDestroy() {
         super.onDestroy()
-        println("onDestroy ItemEditingActivity")
+        println("onDestroy ItemDetailActivity")
 
         for (inputView in attributeListAdapter.inputViews) {
             inputView.onDestroy()
@@ -219,29 +223,24 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
                 - creationMode was restored: store builder (it is naturally dirty after autoComplete.)
          */
 
-        when (mode) {
-            ItemEditionViewModel.ItemMode.New -> {
-                val needToStoreBuilder = if (viewModel.isValid && viewModel.mode == ItemEditionViewModel.ItemMode.New) {
+        if (mode == ItemEditionViewModelBase.ItemMode.New) {
+            val needToStoreBuilder = if (viewModel.isValid && viewModel.mode == ItemEditionViewModelBase.ItemMode.New) {
 
-                    if (viewModel.isViewModelsDirty()) {
-                        true
-                    } else if (currentAttributeViewModelList.filter { it.attributeDAO.getHelper().isAttributeValueVolatile(it.attributeDAO) }.isNotEmpty()) {
-                        true
-                    } else viewModel.builderCreationModeObservable.value == ItemEditionViewModel.BuilderCreationMode.Restored
-                } else {
-                    false
-                }
-
-                if (needToStoreBuilder) {
-                    println("store Builder.")
-                    viewModel.saveItemBuilder()
-                } else {
-                    println("remove builder")
-                    viewModel.removeItemBuilder()
-                }
+                if (viewModel.isViewModelsDirty()) {
+                    true
+                } else if (currentAttributeViewModelList.filter { it.attributeDAO.getHelper().isAttributeValueVolatile(it.attributeDAO) }.isNotEmpty()) {
+                    true
+                } else viewModel.builderCreationModeObservable.value == ItemEditionViewModelBase.BuilderCreationMode.Restored
+            } else {
+                false
             }
-            ItemEditionViewModel.ItemMode.Edit -> {
 
+            if (needToStoreBuilder) {
+                println("store Builder.")
+                viewModel.cacheEditingInfo()
+            } else {
+                println("remove builder")
+                viewModel.clearHistory()
             }
         }
 
@@ -269,15 +268,15 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
 
     override fun onToolbarRightButtonClicked() {
         //push item to db
-        //syncViewStateToBuilderAsync {viewModel.applyBuilderToItem()
+        //syncViewStateToBuilderAsync {viewModel.applyEditingToDatabase()
         creationSubscriptions.add(
                 Single.zip(
                         attributeListAdapter.inputViews.map { it.forceApplyValueAsync() }
                 ) { zipped -> zipped }.flatMap {
-                    viewModel.applyBuilderToItem()
+                    viewModel.applyEditingToDatabase()
                 }.subscribe { result ->
                     if (result.datum != null) {
-                        viewModel.removeItemBuilder()
+                        viewModel.clearHistory()
                         setResult(RESULT_OK, Intent().putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, result.datum))
                         finish()
                     }
@@ -300,7 +299,7 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
 
         val inputViews = HashSet<AAttributeInputView<*>>()
 
-        fun getItem(position: Int): ItemEditionViewModel.AttributeInputViewModel {
+        fun getItem(position: Int): ItemEditionViewModelBase.AttributeInputViewModel {
             return currentAttributeViewModelList[position]
         }
 
@@ -310,9 +309,9 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
 
         override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
 
-            val frame = LayoutInflater.from(this@ItemEditingActivity).inflate(R.layout.attribute_input_frame, parent, false)
+            val frame = LayoutInflater.from(this@ItemDetailActivity).inflate(R.layout.attribute_input_frame, parent, false)
 
-            val inputView = AAttributeInputView.makeInstance(viewType, this@ItemEditingActivity)
+            val inputView = AAttributeInputView.makeInstance(viewType, this@ItemDetailActivity)
             inputViews.add(inputView)
 
             inputView.onCreate(null)
@@ -379,7 +378,7 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
                 }
             }
 
-            fun bind(attributeViewModel: ItemEditionViewModel.AttributeInputViewModel) {
+            fun bind(attributeViewModel: ItemEditionViewModelBase.AttributeInputViewModel) {
                 println("bind attributeViewModel: ${attributeViewModel.attributeLocalId}")
 
                 internalSubscriptions.clear()
@@ -403,9 +402,9 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
                 internalSubscriptions.add(
                         inputView.valueChanged.observable.subscribe { (sender, args) ->
                             val now = System.currentTimeMillis()
-                            attributeViewModel.value = OTItemBuilderWrapperBase.ValueWithTimestamp(args, now)
+                            attributeViewModel.value = ValueWithTimestamp(args, now)
                             builderRestoredSnackbar.dismiss()
-                    }
+                        }
                 )
 
 

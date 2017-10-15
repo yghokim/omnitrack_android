@@ -63,6 +63,8 @@ class ItemListViewModel : RealmViewModel(), OrderedRealmCollectionChangeListener
 
     private val itemComparerMethod = Comparator<ItemViewModel> { p0, p1 -> currentSorter.compare(p0?.itemDao, p1?.itemDao) }
 
+    val onItemContentChanged = PublishSubject.create<Array<OrderedCollectionChangeSet.Range>>()
+
     fun init(trackerId: String) {
         val dao = OTApplication.app.databaseManager.getTrackerQueryWithId(trackerId, realm).findFirst()
 
@@ -100,15 +102,21 @@ class ItemListViewModel : RealmViewModel(), OrderedRealmCollectionChangeListener
         currentItemQueryResults?.addChangeListener(this)
     }
 
+    private fun refreshSortedItems() {
+        itemsSortedList.clear()
+        itemsSortedList.addAll(itemsInTimestampDescendingOrder)
+        itemsSortedList.sortWith(itemComparerMethod)
+
+        sortedItemsObservable.onNext(itemsSortedList)
+    }
+
     override fun onChange(snapshot: RealmResults<OTItemDAO>, changeSet: OrderedCollectionChangeSet?) {
         if (changeSet == null) {
             //initial fetch
             itemsInTimestampDescendingOrder.clear()
             itemsInTimestampDescendingOrder.addAll(snapshot.map { ItemViewModel(it) })
 
-            itemsSortedList.clear()
-            itemsSortedList.addAll(itemsInTimestampDescendingOrder)
-            itemsSortedList.sortWith(itemComparerMethod)
+            refreshSortedItems()
 
         } else {
             //delete removed//deal with deletions
@@ -120,12 +128,10 @@ class ItemListViewModel : RealmViewModel(), OrderedRealmCollectionChangeListener
                 itemsInTimestampDescendingOrder.add(i, ItemViewModel(snapshot[i]))
             }
 
-            itemsSortedList.clear()
-            itemsSortedList.addAll(itemsInTimestampDescendingOrder)
-            itemsSortedList.sortWith(itemComparerMethod)
-        }
+            refreshSortedItems()
 
-        sortedItemsObservable.onNext(itemsSortedList)
+            onItemContentChanged.onNext(changeSet.changeRanges)
+        }
     }
 
     fun removeItem(itemId: String) {

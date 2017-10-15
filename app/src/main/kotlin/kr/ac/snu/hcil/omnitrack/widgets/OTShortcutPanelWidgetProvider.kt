@@ -10,7 +10,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
-import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemEditingActivity
+import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemDetailActivity
 
 /**
  * Created by younghokim on 2017. 3. 30..
@@ -72,7 +72,7 @@ class OTShortcutPanelWidgetProvider : AppWidgetProvider() {
                 CLICK_COMMAND_ROW -> {
                     val trackerId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
                     if (trackerId != null) {
-                        context.startActivity(ItemEditingActivity.makeNewItemPageIntent(trackerId, context).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK))
+                        context.startActivity(ItemDetailActivity.makeNewItemPageIntent(trackerId, context).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK))
                     }
                 }
 

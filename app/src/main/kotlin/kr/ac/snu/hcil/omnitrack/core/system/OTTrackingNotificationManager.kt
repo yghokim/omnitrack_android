@@ -14,7 +14,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemBrowserActivity
-import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemEditingActivity
+import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemDetailActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.settings.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.utils.FillingIntegerIdReservationTable
 import java.util.*
@@ -43,9 +43,9 @@ object OTTrackingNotificationManager {
     fun pushReminderNotification(context: Context, tracker: OTTracker, reminderTime: Long) {
         val stackBuilder = TaskStackBuilder.create(context)
         // Adds the back stack for the Intent (but not the Intent itself)
-        stackBuilder.addParentStack(ItemEditingActivity::class.java)
+        stackBuilder.addParentStack(ItemDetailActivity::class.java)
         // Adds the Intent that starts the Activity to the top of the stack
-        stackBuilder.addNextIntent(ItemEditingActivity.makeIntent(tracker.objectId, reminderTime, context))
+        stackBuilder.addNextIntent(ItemDetailActivity.makeIntent(tracker.objectId, reminderTime, context))
         val resultPendingIntent = stackBuilder.getPendingIntent(0,
                 PendingIntent.FLAG_UPDATE_CURRENT)
 

@@ -5,7 +5,7 @@ import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.annotations.Index
 import io.realm.annotations.PrimaryKey
-import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
+import kr.ac.snu.hcil.omnitrack.utils.ValueWithTimestamp
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 
 /**
@@ -28,7 +28,7 @@ open class OTPendingItemBuilderDAO : RealmObject() {
 
     var data = RealmList<OTItemBuilderFieldValueEntry>()
 
-    fun setValue(attributeLocalId: String, value: OTItemBuilderWrapperBase.ValueWithTimestamp?, realm: Realm) {
+    fun setValue(attributeLocalId: String, value: ValueWithTimestamp?, realm: Realm) {
         val match = data.find { it.attributeLocalId == attributeLocalId }
         if (match != null) {
             if (value == null) {
@@ -36,14 +36,14 @@ open class OTPendingItemBuilderDAO : RealmObject() {
                 data.remove(match)
             } else {
                 match.serializedValue = value.value?.let { TypeStringSerializationHelper.serialize(it) }
-                match.timestamp = value.timestamp
+                match.timestamp = value.timestamp ?: 0
             }
         } else {
             if (value != null) {
                 val newEntryDao = OTItemBuilderFieldValueEntry()
                 newEntryDao.attributeLocalId = attributeLocalId
                 newEntryDao.serializedValue = value.value?.let { TypeStringSerializationHelper.serialize(it) }
-                newEntryDao.timestamp = value.timestamp
+                newEntryDao.timestamp = value.timestamp ?: 0
                 data.add(newEntryDao)
             }
         }

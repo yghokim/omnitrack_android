@@ -4,6 +4,7 @@ import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTPendingItemBuilderDAO
+import kr.ac.snu.hcil.omnitrack.utils.ValueWithTimestamp
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
@@ -20,18 +21,6 @@ class OTItemBuilderWrapperBase {
 
     interface AttributeStateChangedListener {
         fun onAttributeStateChanged(attributeLocalId: String, state: EAttributeValueState)
-    }
-
-    data class ValueWithTimestamp(var value: Any?, var timestamp: Long) {
-        override fun toString(): String {
-            return "TimestampValueInfo{ timestamp: ${timestamp}, value: ${value}, valueType: ${value?.javaClass}}"
-        }
-
-        override fun equals(other: Any?): Boolean {
-            return if (other === this) true else if (other is ValueWithTimestamp) {
-                other.timestamp == timestamp && other.value == value
-            } else false
-        }
     }
 
     val keys: Set<String> by lazy { dao.data.mapNotNull { it.attributeLocalId }.toSet() }
