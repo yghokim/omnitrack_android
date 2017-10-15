@@ -98,7 +98,7 @@ class MapImageView : PlaceHolderImageView /*FutureCallback<ImageView>*/ {
                         )
                         .listener(object : RequestListener<Drawable> {
                             override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
-                                handler.post {
+                                handler?.post {
                                     if (resource != null) {
                                         currentMode = PlaceHolderImageView.Mode.IMAGE
                                         imageView.setImageDrawable(resource)
@@ -109,7 +109,7 @@ class MapImageView : PlaceHolderImageView /*FutureCallback<ImageView>*/ {
                             }
 
                             override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable>?, isFirstResource: Boolean): Boolean {
-                                handler.post {
+                                handler?.post {
                                     currentMode = PlaceHolderImageView.Mode.ERROR
                                     onBitmapRetrieved()
                                 }

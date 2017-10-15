@@ -17,9 +17,7 @@ import android.widget.TextView
 import butterknife.bindView
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
-import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LoadingIndicatorBar
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
@@ -41,25 +39,30 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
 
         const val INTENT_EXTRA_REMINDER_TIME = "reminderTime"
 
-        fun makeIntent(trackerId: String, context: Context): Intent {
+        const val INTENT_ACTION_NEW = "new_item"
+        const val INTENT_ACTION_EDIT = "edit_item"
+
+        fun makeNewItemPageIntent(trackerId: String, context: Context): Intent {
             val intent = Intent(context, ItemEditingActivity::class.java)
+            intent.action = INTENT_ACTION_NEW
             intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
             return intent
         }
 
         fun makeIntent(trackerId: String, reminderTime: Long, context: Context): Intent {
             val intent = Intent(context, ItemEditingActivity::class.java)
+            intent.action = INTENT_ACTION_NEW
             intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
             intent.putExtra(INTENT_EXTRA_REMINDER_TIME, reminderTime)
             intent.action = "item_edit:${trackerId}"
             return intent
         }
 
-        fun makeIntent(item: OTItem, tracker: OTTracker, context: Context): Intent {
-
+        fun makeItemEditPageIntent(itemId: String, trackerId: String, context: Context): Intent {
             val intent = Intent(context, ItemEditingActivity::class.java)
-            intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
-            intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, item.objectId)
+            intent.action = INTENT_ACTION_NEW
+            intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, itemId)
+            intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
             return intent
         }
     }
@@ -83,9 +86,6 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
 
     private var itemSaved: Boolean = false
 
-    private val initialValueSnapshot = Hashtable<String, Any>()
-    private val snapshot = Hashtable<String, Any>()
-
     override fun onSessionLogContent(contentObject: Bundle) {
         super.onSessionLogContent(contentObject)
         contentObject.putString("mode", mode.name)
@@ -99,7 +99,6 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
         setActionBarButtonMode(MultiButtonActionBarActivity.Mode.SaveCancel)
 
         viewModel = ViewModelProviders.of(this).get(ItemEditionViewModel::class.java)
-        val trackerId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
 
         attributeListView.layoutManager = layoutManager
         attributeListView.addItemDecoration(HorizontalImageDividerItemDecoration(R.drawable.horizontal_separator_pattern, this))
@@ -142,12 +141,19 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
 
         creationSubscriptions.add(
                 viewModel.onInitialized.observeOn(AndroidSchedulers.mainThread()).subscribe { (itemMode, builderCreationMode) ->
+
                     println("ItemEditingViewModel initialized: itemMode - ${itemMode}, builderMode - ${builderCreationMode}")
-                    if (itemMode == ItemEditionViewModel.ItemMode.New) {
-                        if (builderCreationMode == ItemEditionViewModel.BuilderCreationMode.Restored) {
-                            builderRestoredSnackbar.show()
-                        } else if (builderCreationMode == ItemEditionViewModel.BuilderCreationMode.NewBuilder) {
-                            viewModel.startAutoComplete()
+                    this.mode = itemMode
+                    when (this.mode) {
+                        ItemEditionViewModel.ItemMode.New -> {
+                            if (builderCreationMode == ItemEditionViewModel.BuilderCreationMode.Restored) {
+                                builderRestoredSnackbar.show()
+                            } else if (builderCreationMode == ItemEditionViewModel.BuilderCreationMode.NewBuilder) {
+                                viewModel.startAutoComplete()
+                            }
+                        }
+                        ItemEditionViewModel.ItemMode.Edit -> {
+
                         }
                     }
                 }
@@ -174,9 +180,10 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
                 }
         )
 
-        if (trackerId != null) {
-            viewModel.init(trackerId, intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM))
-        }
+
+        val trackerId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
+        viewModel.init(trackerId, intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM))
+
     }
 
 
@@ -212,24 +219,32 @@ class ItemEditingActivity : MultiButtonActionBarActivity(R.layout.activity_new_i
                 - creationMode was restored: store builder (it is naturally dirty after autoComplete.)
          */
 
-        val needToStoreBuilder = if (viewModel.isValid && viewModel.mode == ItemEditionViewModel.ItemMode.New) {
+        when (mode) {
+            ItemEditionViewModel.ItemMode.New -> {
+                val needToStoreBuilder = if (viewModel.isValid && viewModel.mode == ItemEditionViewModel.ItemMode.New) {
 
-            if (viewModel.isViewModelsDirty()) {
-                true
-            } else if (currentAttributeViewModelList.filter { it.attributeDAO.getHelper().isAttributeValueVolatile(it.attributeDAO) }.isNotEmpty()) {
-                true
-            } else viewModel.builderCreationModeObservable.value == ItemEditionViewModel.BuilderCreationMode.Restored
-        } else {
-            false
+                    if (viewModel.isViewModelsDirty()) {
+                        true
+                    } else if (currentAttributeViewModelList.filter { it.attributeDAO.getHelper().isAttributeValueVolatile(it.attributeDAO) }.isNotEmpty()) {
+                        true
+                    } else viewModel.builderCreationModeObservable.value == ItemEditionViewModel.BuilderCreationMode.Restored
+                } else {
+                    false
+                }
+
+                if (needToStoreBuilder) {
+                    println("store Builder.")
+                    viewModel.saveItemBuilder()
+                } else {
+                    println("remove builder")
+                    viewModel.removeItemBuilder()
+                }
+            }
+            ItemEditionViewModel.ItemMode.Edit -> {
+
+            }
         }
 
-        if (needToStoreBuilder) {
-            println("store Builder.")
-            viewModel.saveItemBuilder()
-        } else {
-            println("remove builder")
-            viewModel.removeItemBuilder()
-        }
     }
 
     override fun onLowMemory() {

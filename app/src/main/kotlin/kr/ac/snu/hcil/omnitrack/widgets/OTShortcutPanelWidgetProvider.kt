@@ -72,7 +72,7 @@ class OTShortcutPanelWidgetProvider : AppWidgetProvider() {
                 CLICK_COMMAND_ROW -> {
                     val trackerId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
                     if (trackerId != null) {
-                        context.startActivity(ItemEditingActivity.makeIntent(trackerId, context).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK))
+                        context.startActivity(ItemEditingActivity.makeNewItemPageIntent(trackerId, context).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK))
                     }
                 }
 
