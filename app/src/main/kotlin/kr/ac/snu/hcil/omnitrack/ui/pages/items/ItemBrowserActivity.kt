@@ -190,6 +190,15 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                 }
         )
 
+        creationSubscriptions.add(
+                viewModel.onItemContentChanged.subscribe { changeRanges ->
+                    println("changeRanges: ${changeRanges}")
+                    changeRanges.forEach {
+                        itemListViewAdapter.notifyItemRangeChanged(it.startIndex, it.length)
+                    }
+                }
+        )
+
         val trackerId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
         if (trackerId != null) {
             viewModel.init(trackerId)
@@ -252,7 +261,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
     }
 
     override fun onToolbarRightButtonClicked() {
-        val intent = ItemEditingActivity.makeNewItemPageIntent(viewModel.trackerId, this)
+        val intent = ItemDetailActivity.makeNewItemPageIntent(viewModel.trackerId, this)
         intent.putExtra(OTApplication.INTENT_EXTRA_FROM, this@ItemBrowserActivity.javaClass.simpleName)
         startActivityForResult(intent, REQUEST_CODE_NEW_ITEM)
     }
@@ -417,7 +426,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
             override fun onMenuItemClick(p0: MenuItem): Boolean {
                 when (p0.itemId) {
                     R.id.action_edit -> {
-                        val intent = ItemEditingActivity.makeItemEditPageIntent(items[adapterPosition].itemId!!, viewModel.trackerId, this@ItemBrowserActivity)
+                        val intent = ItemDetailActivity.makeItemEditPageIntent(items[adapterPosition].itemId!!, viewModel.trackerId, this@ItemBrowserActivity)
                         intent.putExtra(OTApplication.INTENT_EXTRA_FROM, this@ItemBrowserActivity.javaClass.simpleName)
                         startActivityForResult(intent, REQUEST_CODE_EDIT_ITEM)
                         return true

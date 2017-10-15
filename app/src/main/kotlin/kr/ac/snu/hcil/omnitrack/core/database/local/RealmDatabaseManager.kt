@@ -158,7 +158,7 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
     }
 
     fun makeSingleItemQuery(itemId: String, realm: Realm): RealmQuery<OTItemDAO> {
-        return realm.where(OTItemDAO::class.java).equalTo("itemId", itemId)
+        return realm.where(OTItemDAO::class.java).equalTo("objectId", itemId)
     }
 
     fun getDirtyItemsToSync(): Single<List<OTItemPOJO>> {

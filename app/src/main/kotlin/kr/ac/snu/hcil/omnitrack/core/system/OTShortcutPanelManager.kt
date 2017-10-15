@@ -20,7 +20,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
-import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemEditingActivity
+import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemDetailActivity
 import kr.ac.snu.hcil.omnitrack.utils.VectorIconHelper
 import kr.ac.snu.hcil.omnitrack.widgets.OTShortcutPanelWidgetUpdateService
 
@@ -95,7 +95,7 @@ object OTShortcutPanelManager {
                 }
 
                 val instantLoggingIntent = PendingIntent.getService(context, i, OTBackgroundLoggingService.makeIntent(context, trackers[i], OTItem.LoggingSource.Shortcut), PendingIntent.FLAG_UPDATE_CURRENT)
-                val openItemActivityIntent = PendingIntent.getActivity(context, i, ItemEditingActivity.makeNewItemPageIntent(trackers[i].objectId, context), PendingIntent.FLAG_UPDATE_CURRENT)
+                val openItemActivityIntent = PendingIntent.getActivity(context, i, ItemDetailActivity.makeNewItemPageIntent(trackers[i].objectId, context), PendingIntent.FLAG_UPDATE_CURRENT)
 
                 element.setOnClickPendingIntent(R.id.ui_button_instant, instantLoggingIntent)
                 element.setOnClickPendingIntent(R.id.group, openItemActivityIntent)
