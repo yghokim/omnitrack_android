@@ -4,10 +4,7 @@ import android.support.v7.util.DiffUtil
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemBuilderFieldValueEntry
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTPendingItemBuilderDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.*
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.RealmViewModel
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
@@ -35,6 +32,7 @@ class ItemEditionViewModel : RealmViewModel(), OTItemBuilderWrapperBase.Attribut
 
     private lateinit var itemBuilderDao: OTPendingItemBuilderDAO
     private lateinit var builderWrapper: OTItemBuilderWrapperBase
+    private lateinit var editedUnmanagedItemDao: OTItemDAO
 
     val trackerNameObservable = BehaviorSubject.create<String>()
 
@@ -58,7 +56,7 @@ class ItemEditionViewModel : RealmViewModel(), OTItemBuilderWrapperBase.Attribut
             }
         }
 
-    var onInitialized = PublishSubject.create<Pair<ItemMode, BuilderCreationMode>>()
+    var onInitialized = PublishSubject.create<Pair<ItemMode, BuilderCreationMode?>>()
 
     private val currentAttributeViewModelList = ArrayList<AttributeInputViewModel>()
 
@@ -87,9 +85,23 @@ class ItemEditionViewModel : RealmViewModel(), OTItemBuilderWrapperBase.Attribut
             trackerNameObservable.onNext(trackerDao?.name)
             subscriptions.clear()
 
+
+            val unManagedTrackerDao = realm.copyFromRealm(trackerDao)!!
+
+            currentAttributeViewModelList.forEach { it.unregister() }
+            currentAttributeViewModelList.clear()
+
+            currentAttributeViewModelList.addAll(unManagedTrackerDao.attributes.map { AttributeInputViewModel(it) })
+            attributeViewModelListObservable.onNext(currentAttributeViewModelList)
+
+
             if (itemId != null) {
                 mode = ItemMode.Edit
-                onInitialized.onNext(Pair(mode, BuilderCreationMode.NewBuilder))
+                val itemDao = OTApplication.app.databaseManager.makeSingleItemQuery(itemId, realm).findFirst()
+                if (itemDao != null) {
+                    editedUnmanagedItemDao = itemDao
+                    onInitialized.onNext(Pair(mode, null))
+                }
             } else {
 
                 val builderDaoResult = OTApplication.app.databaseManager.getItemBuilderQuery(trackerId, OTPendingItemBuilderDAO.HOLDER_TYPE_INPUT_FORM, realm).findFirst()
@@ -109,14 +121,6 @@ class ItemEditionViewModel : RealmViewModel(), OTItemBuilderWrapperBase.Attribut
                     }
                     builderCreationModeObservable.onNext(BuilderCreationMode.NewBuilder)
                 }
-
-                val unManagedTrackerDao = realm.copyFromRealm(trackerDao)!!
-
-                currentAttributeViewModelList.forEach { it.unregister() }
-                currentAttributeViewModelList.clear()
-
-                currentAttributeViewModelList.addAll(unManagedTrackerDao.attributes.map { AttributeInputViewModel(it) })
-                attributeViewModelListObservable.onNext(currentAttributeViewModelList)
 
                 this.builderWrapper = OTItemBuilderWrapperBase(this.itemBuilderDao)
 

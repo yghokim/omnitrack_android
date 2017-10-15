@@ -271,7 +271,7 @@ class TrackerListFragment : OTFragment() {
                     }
                     .show()
         } else {
-            startActivityOnDelay(ItemEditingActivity.makeIntent(tracker.objectId!!, context))
+            startActivityOnDelay(ItemEditingActivity.makeNewItemPageIntent(tracker.objectId!!, context))
         }
     }
 
