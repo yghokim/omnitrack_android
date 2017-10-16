@@ -5,6 +5,7 @@ import com.google.firebase.database.*
 import com.google.firebase.iid.FirebaseInstanceId
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
@@ -626,7 +627,7 @@ object DatabaseManager : ADatabaseManager() {
                         if (!subscriber.isUnsubscribed) {
                             val pojo = snapshot.getValue(FirebaseItemPOJO::class.java)
                             if (pojo != null) {
-                                val item = OTItem(snapshot.key, tracker.objectId, pojo.dataTable, pojo.getTimestamp(), OTItem.LoggingSource.values()[pojo.sourceType], pojo.deviceId)
+                                val item = OTItem(snapshot.key, tracker.objectId, pojo.dataTable, pojo.getTimestamp(), ItemLoggingSource.values()[pojo.sourceType], pojo.deviceId)
                                 subscriber.onNext(item)
                                 subscriber.onCompleted()
                             } else {
@@ -690,7 +691,7 @@ object DatabaseManager : ADatabaseManager() {
     fun makeItemFromSnapshot(snapshot: DataSnapshot, trackerId: String): OTItem? {
         val pojo = snapshot.getValue(FirebaseItemPOJO::class.java)
         return if (pojo != null)
-            OTItem(snapshot.key, trackerId, pojo.dataTable, pojo.getTimestamp(), OTItem.LoggingSource.values()[pojo.sourceType], pojo.deviceId)
+            OTItem(snapshot.key, trackerId, pojo.dataTable, pojo.getTimestamp(), ItemLoggingSource.values()[pojo.sourceType], pojo.deviceId)
         else null
     }
 
@@ -724,7 +725,7 @@ object DatabaseManager : ADatabaseManager() {
                             if (!subscriber.isUnsubscribed) {
                                 val list = snapshot.children.mapTo(ArrayList<OTItem>()) {
                                     val pojo = it.getValue(FirebaseItemPOJO::class.java)!!
-                                    OTItem(it.key, tracker.objectId, pojo.dataTable, pojo.getTimestamp(), OTItem.LoggingSource.values()[pojo.sourceType], pojo.deviceId)
+                                    OTItem(it.key, tracker.objectId, pojo.dataTable, pojo.getTimestamp(), ItemLoggingSource.values()[pojo.sourceType], pojo.deviceId)
                                 }
 
                                 list.sortBy {

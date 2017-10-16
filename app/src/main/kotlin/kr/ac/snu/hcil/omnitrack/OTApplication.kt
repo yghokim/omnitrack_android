@@ -627,7 +627,7 @@ class OTApplication : MultiDexApplication() {
         }
 
         val stepItems = ArrayList<OTItem>()
-        OTItem.createItemsWithColumnArrays(stepTracker, timestamps, OTItem.LoggingSource.Unspecified, stepItems, fitbitSteps, misfitSteps, googleSteps)
+        OTItem.createItemsWithColumnArrays(stepTracker, timestamps, OTItem.ItemLoggingSource.Unspecified, stepItems, fitbitSteps, misfitSteps, googleSteps)
 
     }
 
@@ -650,7 +650,7 @@ class OTApplication : MultiDexApplication() {
                     OTItem(
                             beerTracker,
                             it[1] as Long,
-                            OTItem.LoggingSource.Unspecified,
+                            OTItem.ItemLoggingSource.Unspecified,
                             OTApplication.app.deviceId,
                             *it
                     )

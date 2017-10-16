@@ -7,7 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import kr.ac.snu.hcil.omnitrack.OTApplication
-import kr.ac.snu.hcil.omnitrack.core.OTItem
+import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemDetailActivity
@@ -79,7 +79,7 @@ class OTShortcutPanelWidgetProvider : AppWidgetProvider() {
                 CLICK_COMMAND_INSTANT_LOGGING -> {
                     val trackerId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
                     if (trackerId != null) {
-                        context.startService(OTBackgroundLoggingService.makeIntent(context, trackerId, OTItem.LoggingSource.Shortcut))
+                        context.startService(OTBackgroundLoggingService.makeIntent(context, trackerId, ItemLoggingSource.Shortcut))
                     }
                 }
             }

@@ -6,7 +6,7 @@ import io.realm.OrderedRealmCollectionChangeListener
 import io.realm.RealmResults
 import io.realm.Sort
 import kr.ac.snu.hcil.omnitrack.OTApplication
-import kr.ac.snu.hcil.omnitrack.core.OTItem
+import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemDAO
@@ -164,8 +164,8 @@ class ItemListViewModel : RealmViewModel(), OrderedRealmCollectionChangeListener
                 }
             }
 
-        val loggingSourceObservable = BehaviorSubject.create<OTItem.LoggingSource>()
-        var loggingSource: OTItem.LoggingSource
+        val loggingSourceObservable = BehaviorSubject.create<ItemLoggingSource>()
+        var loggingSource: ItemLoggingSource
             get() = loggingSourceObservable.value
             set(value) {
                 if (loggingSourceObservable.value != value) {

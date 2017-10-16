@@ -2,7 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.triggers.actions
 
 import android.content.Context
 import kr.ac.snu.hcil.omnitrack.OTApplication
-import kr.ac.snu.hcil.omnitrack.core.OTItem
+import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
 import rx.Observable
@@ -18,7 +18,7 @@ class OTBackgroundLoggingTriggerAction(trigger: OTTrigger) : OTTriggerAction(tri
         //Toast.makeText(OTApplication.app, "Logged!", Toast.LENGTH_SHORT).show()
         return Observable.create {
             subscriber ->
-            Observable.merge(trigger.trackers./*filter { it.isValid(null) }.*/map { OTBackgroundLoggingService.log(OTApplication.app, it, OTItem.LoggingSource.Trigger).subscribeOn(Schedulers.newThread()) })
+            Observable.merge(trigger.trackers./*filter { it.isValid(null) }.*/map { OTBackgroundLoggingService.log(OTApplication.app, it, ItemLoggingSource.Trigger).subscribeOn(Schedulers.newThread()) })
                     .subscribe({}, {}, {
                         if (!subscriber.isUnsubscribed) {
                             subscriber.onNext(trigger)

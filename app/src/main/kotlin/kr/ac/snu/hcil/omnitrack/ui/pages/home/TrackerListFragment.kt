@@ -33,9 +33,8 @@ import com.afollestad.materialdialogs.MaterialDialog
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
-import kr.ac.snu.hcil.omnitrack.core.OTUser
+import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.common.FallbackRecyclerView
 import kr.ac.snu.hcil.omnitrack.ui.components.common.TooltipHelper
@@ -59,9 +58,6 @@ import java.util.*
  * Created by Young-Ho Kim on 2016-07-18.
  */
 class TrackerListFragment : OTFragment() {
-
-    private lateinit var user: OTUser
-    private var userLoaded: Boolean = false
 
     lateinit private var listView: FallbackRecyclerView
 
@@ -154,11 +150,28 @@ class TrackerListFragment : OTFragment() {
         //  user.trackerRemoved += onTrackerRemovedHandler
 
 
-        viewModel = ViewModelProviders.of(this).get(TrackerListViewModel::class.java)
-
-
         trackerListAdapter = TrackerListAdapter()
         trackerListAdapter.currentlyExpandedIndex = savedInstanceState?.getInt(STATE_EXPANDED_TRACKER_INDEX, -1) ?: -1
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+
+        viewModel = ViewModelProviders.of(this).get(TrackerListViewModel::class.java)
+        viewModel.userId = OTAuthManager.userId
+
+        createViewSubscriptions.add(
+                viewModel.trackerViewModels.subscribe { trackerViewModelList ->
+
+                    val diffResult = DiffUtil.calculateDiff(
+                            TrackerListViewModel.TrackerViewModelListDiffUtilCallback(currentTrackerViewModelList, trackerViewModelList)
+                    )
+
+                    currentTrackerViewModelList.clear()
+                    currentTrackerViewModelList.addAll(trackerViewModelList)
+                    diffResult.dispatchUpdatesTo(trackerListAdapter)
+                }
+        )
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
@@ -167,15 +180,12 @@ class TrackerListFragment : OTFragment() {
 
         addTrackerFloatingButton = rootView.findViewById(R.id.fab)
         addTrackerFloatingButton.setOnClickListener { view ->
-            if (userLoaded) {
-                newTrackerNameDialog.input(null, user.generateNewTrackerName(context), false) {
+            newTrackerNameDialog.input(null, viewModel.generateNewTrackerName(), false) {
                     dialog, text ->
                     startActivityForResult(TrackerDetailActivity.makeNewTrackerIntent(text.toString(), context), REQUEST_CODE_NEW_TRACKER)
 
                 }.show()
                 //Toast.makeText(context,String.format(resources.getString(R.string.sentence_new_tracker_added), newTracker.name), Toast.LENGTH_LONG).show()
-            }
-
         }
 
         listView = rootView.findViewById(R.id.ui_tracker_list_view)
@@ -188,32 +198,6 @@ class TrackerListFragment : OTFragment() {
         listView.addItemDecoration(DrawableListBottomSpaceItemDecoration(R.drawable.expanded_view_inner_shadow_top, 0))
 
         listView.adapter = trackerListAdapter
-
-        val activity = activity as? OTActivity
-        if (activity != null) {
-            createViewSubscriptions.add(
-                    activity.signedInUserObservable.subscribe {
-                        user ->
-                        this.user = user
-                        userLoaded = true
-
-                        viewModel.userId = user.objectId
-                        createViewSubscriptions.add(
-                                viewModel.trackerViewModels.subscribe {
-                                    trackerViewModelList ->
-
-                                    val diffResult = DiffUtil.calculateDiff(
-                                            TrackerListViewModel.TrackerViewModelListDiffUtilCallback(currentTrackerViewModelList, trackerViewModelList)
-                                    )
-
-                                    currentTrackerViewModelList.clear()
-                                    currentTrackerViewModelList.addAll(trackerViewModelList)
-                                    diffResult.dispatchUpdatesTo(trackerListAdapter)
-                                }
-                        )
-                    }
-            )
-        }
 
         return rootView
     }
@@ -228,12 +212,16 @@ class TrackerListFragment : OTFragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        createViewSubscriptions.clear()
         for (viewHolder in trackerListAdapter.viewHolders) {
             println("viewHolder viewmodel subscriptions clear: ${viewHolder.subscriptions.hasSubscriptions()}, ${viewHolder.subscriptions.isUnsubscribed}")
             viewHolder.subscriptions.clear()
         }
         trackerListAdapter.viewHolders.clear()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        createViewSubscriptions.clear()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -264,7 +252,7 @@ class TrackerListFragment : OTFragment() {
             emptyTrackerDialog
                     .onPositive { materialDialog, dialogAction ->
                         //TODO background logging
-                        //OTBackgroundLoggingService.log(context, tracker, OTItem.LoggingSource.Manual, notify = false).subscribe()
+                        //OTBackgroundLoggingService.log(context, tracker, OTItem.ItemLoggingSource.Manual, notify = false).subscribe()
                     }
                     .onNeutral { materialDialog, dialogAction ->
                         startActivity(TrackerDetailActivity.makeIntent(tracker.objectId, context))
