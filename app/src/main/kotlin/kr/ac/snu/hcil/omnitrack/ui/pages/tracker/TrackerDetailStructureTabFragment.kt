@@ -147,6 +147,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                 }
         )
 
+        checkRequiredInformationVisibility()
 
         if (savedInstanceState == null) {
             TutorialManager.checkAndShowTargetPrompt("TrackerDetail_add_attribute", true, this.activity, newAttributeButton, R.string.msg_tutorial_add_attribute_primary, R.string.msg_tutorial_add_attribute_secondary, this.viewModel.color)
