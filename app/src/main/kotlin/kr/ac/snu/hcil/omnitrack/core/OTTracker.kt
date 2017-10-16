@@ -5,7 +5,6 @@ import android.content.Context
 import android.graphics.Color
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
 import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.NamedObject
@@ -13,9 +12,6 @@ import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
-import kr.ac.snu.hcil.omnitrack.core.visualization.models.DailyCountChartModel
-import kr.ac.snu.hcil.omnitrack.core.visualization.models.LoggingHeatMapModel
-import kr.ac.snu.hcil.omnitrack.core.visualization.models.TimelineComparisonLineChartModel
 import kr.ac.snu.hcil.omnitrack.utils.DefaultNameGenerator
 import kr.ac.snu.hcil.omnitrack.utils.ObservableList
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
@@ -474,23 +470,6 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
     fun getRecommendedChartModels(): Array<ChartModel<*>> {
 
         val list = ArrayList<ChartModel<*>>()
-
-
-        //generate tracker-level charts
-
-        list += DailyCountChartModel(this)
-        list += LoggingHeatMapModel(this)
-
-        //add line timeline if numeric variables exist
-        val numberAttrs = attributes.filter { it is OTNumberAttribute }.map { it as OTNumberAttribute }
-        if (numberAttrs.isNotEmpty()) {
-            list.add(TimelineComparisonLineChartModel(numberAttrs, this))
-        }
-
-
-        for (attribute in attributes) {
-            list.addAll(attribute.getRecommendedChartModels())
-        }
 
         return list.toTypedArray()
     }

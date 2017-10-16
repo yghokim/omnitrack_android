@@ -12,19 +12,17 @@ import android.view.ViewGroup
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.Granularity
-import kr.ac.snu.hcil.omnitrack.ui.activities.OTTrackerAttachedActivity
+import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.choice.SelectionView
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.ChartView
-import kr.ac.snu.hcil.omnitrack.ui.viewmodels.TrackerChartViewListViewModel
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 
-class ChartViewActivity : OTTrackerAttachedActivity(R.layout.activity_chart_view), View.OnClickListener {
+class ChartViewActivity : MultiButtonActionBarActivity(R.layout.activity_chart_view), View.OnClickListener {
 
     companion object {
         fun makeIntent(trackerId: String, context: Context): Intent {
@@ -114,6 +112,19 @@ class ChartViewActivity : OTTrackerAttachedActivity(R.layout.activity_chart_view
                     diffResult.dispatchUpdatesTo(adapter)
                 }
         )
+
+        creationSubscriptions.add(
+                viewModel.trackerNameSubject.subscribe {
+                    title = String.format(resources.getString(R.string.title_activity_chart_view, it))
+                }
+        )
+
+
+        val trackerId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
+        if (trackerId != null) {
+            viewModel.init(trackerId)
+            viewModel.setScope(System.currentTimeMillis(), supportedGranularity[scopeSelectionView.selectedIndex])
+        }
     }
 
     private fun updateScopeUI(point: Long, granularity: Granularity) {
@@ -143,22 +154,6 @@ class ChartViewActivity : OTTrackerAttachedActivity(R.layout.activity_chart_view
 
     override fun onToolbarRightButtonClicked() {
 
-    }
-
-    override fun onTrackerLoaded(tracker: OTTracker) {
-        super.onTrackerLoaded(tracker)
-
-        title = String.format(resources.getString(R.string.title_activity_chart_view, tracker.name))
-
-        if (viewModel.tracker != tracker) {
-            viewModel.tracker = tracker
-            viewModel.setScope(System.currentTimeMillis(), supportedGranularity[scopeSelectionView.selectedIndex])
-        }
-
-    }
-
-    override fun onStop() {
-        super.onStop()
     }
 
     override fun onClick(view: View) {

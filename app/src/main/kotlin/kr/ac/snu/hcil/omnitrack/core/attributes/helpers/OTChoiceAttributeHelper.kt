@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 
 import android.content.Context
 import android.view.View
+import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
@@ -11,6 +12,8 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTChoiceEntryListProp
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
+import kr.ac.snu.hcil.omnitrack.core.visualization.models.ChoiceCategoricalBarChartModel
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.common.choice.WordListView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
@@ -68,6 +71,10 @@ class OTChoiceAttributeHelper : OTAttributeHelper() {
             PROPERTY_ENTRIES -> UniqueStringEntryList(OTChoiceEntryListProperty.PREVIEW_ENTRIES)
             else -> null
         }
+    }
+
+    fun getChoiceEntries(attribute: OTAttributeDAO): UniqueStringEntryList? {
+        return getDeserializedPropertyValue(PROPERTY_ENTRIES, attribute)
     }
 
     override fun getPropertyTitle(propertyKey: String): String {
@@ -139,5 +146,9 @@ class OTChoiceAttributeHelper : OTAttributeHelper() {
                 Single.just(true)
             } else super.applyValueToViewForItemList(attribute, value, view)
         }
+    }
+
+    override fun makeRecommendedChartModels(attribute: OTAttributeDAO, realm: Realm): Array<ChartModel<*>> {
+        return arrayOf(ChoiceCategoricalBarChartModel(attribute, realm))
     }
 }

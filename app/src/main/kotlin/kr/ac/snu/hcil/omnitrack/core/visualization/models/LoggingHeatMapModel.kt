@@ -4,10 +4,11 @@ import android.graphics.Canvas
 import android.support.v4.content.ContextCompat
 import android.support.v4.graphics.ColorUtils
 import android.text.format.DateUtils
+import io.realm.Realm
+import io.realm.Sort
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.OTTracker
-import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.visualization.TrackerChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.ITimeBinnedHeatMap
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
@@ -28,7 +29,7 @@ import java.util.*
  */
 
 
-class LoggingHeatMapModel(tracker: OTTracker) : TrackerChartModel<ITimeBinnedHeatMap.CounterVector>(tracker), ITimeBinnedHeatMap {
+class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm) : TrackerChartModel<ITimeBinnedHeatMap.CounterVector>(tracker, realm), ITimeBinnedHeatMap {
 
     val hoursInYBin = 2
 
@@ -51,7 +52,13 @@ class LoggingHeatMapModel(tracker: OTTracker) : TrackerChartModel<ITimeBinnedHea
 
         val calendarCache = Calendar.getInstance()
 
-        return OTApplication.app.databaseManager.loadItems(tracker, getTimeScope(), RealmDatabaseManager.Order.ASC).map {
+
+
+        return OTApplication.app.databaseManager
+                .makeItemsQuery(tracker.objectId, getTimeScope(), realm)
+                .findAllSortedAsync("timestamp", Sort.ASCENDING)
+                .asObservable()
+                .filter { it.isLoaded == true }.map {
             items ->
             println("items for loging heatmap: ${items.size}")
             //println(items)

@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.visualization
 
+import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.IChartInterface
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
@@ -11,7 +12,7 @@ import rx.subscriptions.CompositeSubscription
 /**
  * Created by younghokim on 16. 9. 7..
  */
-abstract class ChartModel<T> : IChartInterface<T> {
+abstract class ChartModel<T>(val realm: Realm) : IChartInterface<T> {
     override fun getDataPointAt(position: Int): T {
         return cachedData[position]
     }

@@ -8,7 +8,6 @@ import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTBooleanProperty
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTChoiceEntryListProperty
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
-import kr.ac.snu.hcil.omnitrack.core.visualization.models.ChoiceCategoricalBarChartModel
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.common.choice.WordListView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
@@ -197,7 +196,7 @@ class OTChoiceAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrac
     }
 
     override fun getRecommendedChartModels(): Array<ChartModel<*>> {
-        return arrayOf(ChoiceCategoricalBarChartModel(this))
+        return /*arrayOf(ChoiceCategoricalBarChartModel(this))*/emptyArray()
     }
 
     override fun onAddValueToTable(value: Any?, out: MutableList<String?>, uniqKey: String?) {

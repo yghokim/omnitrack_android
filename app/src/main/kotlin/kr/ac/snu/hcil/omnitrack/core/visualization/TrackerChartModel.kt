@@ -1,11 +1,12 @@
 package kr.ac.snu.hcil.omnitrack.core.visualization
 
-import kr.ac.snu.hcil.omnitrack.core.OTTracker
+import io.realm.Realm
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 
 /**
  * Created by younghokim on 16. 9. 7..
  */
-abstract class TrackerChartModel<T>(val tracker: OTTracker) : ChartModel<T>() {
+abstract class TrackerChartModel<T>(val tracker: OTTrackerDAO, realm: Realm) : ChartModel<T>(realm) {
     override val name: String
         get() = tracker.name
 }

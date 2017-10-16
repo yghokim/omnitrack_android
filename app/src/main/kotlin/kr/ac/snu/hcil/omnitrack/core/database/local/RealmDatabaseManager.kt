@@ -123,6 +123,10 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
         }
     }
 
+    fun makeItemsQuery(trackerId: String?, scope: TimeSpan, realm: Realm): RealmQuery<OTItemDAO> {
+        return makeItemsQuery(trackerId, scope.from, scope.to, realm)
+    }
+
     fun makeItemsQuery(trackerId: String?, from: Long?, to: Long?, realm: Realm): RealmQuery<OTItemDAO> {
         return realm.where(OTItemDAO::class.java).equalTo("removed", false)
                 .run {
