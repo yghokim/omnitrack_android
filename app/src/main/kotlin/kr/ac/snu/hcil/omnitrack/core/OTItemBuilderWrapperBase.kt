@@ -35,11 +35,11 @@ class OTItemBuilderWrapperBase(val dao: OTPendingItemBuilderDAO, val realm: Real
         }
     }
 
-    fun saveToItem(itemDao: OTItemDAO?, loggingSource: OTItem.LoggingSource?): OTItemDAO {
+    fun saveToItem(itemDao: OTItemDAO?, loggingSource: ItemLoggingSource?): OTItemDAO {
         val itemDaoToSave = itemDao ?: OTItemDAO()
         if (itemDao == null) {
             itemDaoToSave.deviceId = OTApplication.app.deviceId
-            itemDaoToSave.loggingSource = loggingSource ?: OTItem.LoggingSource.Unspecified
+            itemDaoToSave.loggingSource = loggingSource ?: ItemLoggingSource.Unspecified
             itemDaoToSave.trackerId = dao.tracker?.objectId
         } else {
             itemDaoToSave.updatedAt = System.currentTimeMillis()
