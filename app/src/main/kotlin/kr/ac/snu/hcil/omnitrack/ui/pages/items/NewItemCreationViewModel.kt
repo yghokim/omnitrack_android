@@ -38,7 +38,7 @@ class NewItemCreationViewModel : ItemEditionViewModelBase() {
             builderCreationModeObservable.onNext(BuilderCreationMode.NewBuilder)
         }
 
-        this.builderWrapper = OTItemBuilderWrapperBase(this.itemBuilderDao)
+        this.builderWrapper = OTItemBuilderWrapperBase(this.itemBuilderDao, realm)
 
         for (key in this.builderWrapper.keys) {
             val value = this.builderWrapper.getValueInformationOf(key)

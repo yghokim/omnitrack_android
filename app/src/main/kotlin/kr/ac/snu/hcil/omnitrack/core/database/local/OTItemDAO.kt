@@ -9,7 +9,6 @@ import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTItemPOJO
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import java.util.*
-import kotlin.collections.HashMap
 
 /**
  * Created by younghokim on 2017. 9. 25..
@@ -29,7 +28,7 @@ open class OTItemDAO : RealmObject() {
 
     var source: String? = null
 
-    var fieldValueEntries = RealmList<OTStringStringEntryDAO>()
+    var fieldValueEntries = RealmList<OTItemValueEntryDAO>()
 
     var synchronizedAt: Long? = null // store server time of when synchronized perfectly.
 
@@ -46,7 +45,11 @@ open class OTItemDAO : RealmObject() {
         }
 
     fun serializedValueTable(): Map<String, String> {
-        return RealmDatabaseManager.convertRealmEntryListToDictionary(fieldValueEntries)
+        val table = Hashtable<String, String>()
+        for (entryDAO in fieldValueEntries) {
+            table[entryDAO.key] = entryDAO.value
+        }
+        return table
     }
 
     fun setValueOf(attributeLocalId: String, serializedValue: String?): Boolean {
@@ -59,10 +62,11 @@ open class OTItemDAO : RealmObject() {
             } else false
         } else {
             fieldValueEntries.add(
-                    OTStringStringEntryDAO().apply {
+                    OTItemValueEntryDAO().apply {
                         id = UUID.randomUUID().toString()
                         key = attributeLocalId
                         value = serializedValue
+                        item = this@OTItemDAO
                     }
             )
         }
@@ -71,39 +75,9 @@ open class OTItemDAO : RealmObject() {
     fun getValueOf(attributeLocalId: String): Any? {
         return fieldValueEntries.find { it.key == attributeLocalId }?.value?.let { TypeStringSerializationHelper.deserialize(it) }
     }
-
-    fun compareData(other: OTItemDAO): Array<String> {
-        val result = ArrayList<String>()
-
-        fieldValueEntries.forEach { entry ->
-            if (other.fieldValueEntries.find { it.key == entry.key && it.value == entry.value } == null) {
-                result.add(entry.key)
-            }
-        }
-
-        return result.toTypedArray()
-    }
 }
 
 object RealmItemHelper {
-
-    fun applyItemToDAO(item: OTItem, dao: OTItemDAO, realm: Realm) {
-        dao.trackerId = item.trackerId
-        dao.deviceId = item.deviceId
-        dao.source = item.source.name
-
-        dao.timestamp = if (item.timestamp != -1L) {
-            item.timestamp
-        } else {
-            System.currentTimeMillis()
-        }
-
-        val serializedTable = HashMap<String, String>()
-        for (entry in item.getEntryIterator()) {
-            serializedTable[entry.key] = TypeStringSerializationHelper.serialize(entry.value)
-        }
-        RealmDatabaseManager.convertDictionaryToRealmList(realm, serializedTable, dao.fieldValueEntries, null)
-    }
 
     fun convertDAOToItem(dao: OTItemDAO): OTItem =//objectId notNull is guaranteed.
             OTItem(dao.objectId ?: dao.trackerId + UUID.randomUUID().toString(), dao.trackerId!!, dao.serializedValueTable(), dao.timestamp, dao.loggingSource, dao.deviceId)
@@ -130,14 +104,30 @@ object RealmItemHelper {
         dao.removed = pojo.removed
 
         if (pojo.serializedValueTable != null) {
-            RealmDatabaseManager.convertDictionaryToRealmList(
-                    realm, pojo.serializedValueTable!!,
-                    dao.fieldValueEntries, null)
+            pojo.serializedValueTable!!.entries.forEach { (key, serializedValue) ->
+                dao.setValueOf(key, serializedValue)
+            }
         } else {
             dao.fieldValueEntries.forEach {
                 it.deleteFromRealm()
             }
             dao.fieldValueEntries.clear()
         }
+    }
+}
+
+open class OTItemValueEntryDAO : RealmObject() {
+
+    @PrimaryKey
+    var id: String = ""
+
+    @Index
+    var key: String = ""
+
+    var value: String? = null
+    var item: OTItemDAO? = null
+
+    override fun toString(): String {
+        return "{Item Value Entry | id : $id, key : $key, value : $value, item: ${item?.objectId}}"
     }
 }

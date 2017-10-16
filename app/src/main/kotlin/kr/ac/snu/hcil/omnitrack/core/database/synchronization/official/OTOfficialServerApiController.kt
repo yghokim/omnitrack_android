@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.database.synchronization.official
 
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTItemPOJO
@@ -42,7 +43,7 @@ class OTOfficialServerApiController : ISynchronizationServerSideAPI {
 
         Retrofit.Builder()
                 .client(client)
-                .baseUrl("http://147.46.242.28:3000") // test server
+                .baseUrl(BuildConfig.OMNITRACK_SYNCHRONIZATION_SERVER_URL)
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
