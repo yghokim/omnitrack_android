@@ -38,6 +38,8 @@ class AttributeDetailViewModel : ViewModel() {
     val defaultValuePolicyObservable = BehaviorSubject.create<Int>(-1)
     val defaultValuePresetObservable = BehaviorSubject.create<Nullable<String>>(Nullable<String>(null))
 
+    val isRequiredObservable = BehaviorSubject.create<Boolean>(false)
+
     val onPropertyValueChanged = PublishSubject.create<Pair<String, Any?>>()
 
     private val propertyTable = Hashtable<String, Any?>()
@@ -51,6 +53,16 @@ class AttributeDetailViewModel : ViewModel() {
         set(value) {
             if (nameObservable.value != value) {
                 nameObservable.onNext(value)
+            }
+        }
+
+    var isRequired: Boolean
+        get() {
+            return isRequiredObservable.value
+        }
+        set(value) {
+            if (isRequiredObservable.value != value) {
+                isRequiredObservable.onNext(value)
             }
         }
 
@@ -82,6 +94,9 @@ class AttributeDetailViewModel : ViewModel() {
     val isNameDirty: Boolean
         get() = name != attributeDAO?.name
 
+    val isRequiredDirty: Boolean
+        get() = isRequired != attributeDAO?.isRequired
+
     var connection: OTConnection?
         get() {
             return connectionObservable.value?.datum
@@ -97,6 +112,8 @@ class AttributeDetailViewModel : ViewModel() {
             this.attributeDAO = attributeDao
             name = attributeDao.name
             connection = attributeDao.serializedConnection?.let { OTConnection.fromJson(it) }
+
+            isRequired = attributeDao.isRequired
 
             println("initial policy: ${attributeDao.fallbackValuePolicy}")
 
@@ -134,13 +151,14 @@ class AttributeDetailViewModel : ViewModel() {
     }
 
     fun isChanged(): Boolean {
-        return isNameDirty || isDefaultValuePolicyDirty || isDefaultValuePresetDirty || hasAnyPropertyChanged() || isConnectionDirty
+        return isNameDirty || isRequiredDirty || isDefaultValuePolicyDirty || isDefaultValuePresetDirty || hasAnyPropertyChanged() || isConnectionDirty
     }
 
     fun applyChanges() {
         attributeDAO?.name = name
         attributeDAO?.fallbackValuePolicy = defaultValuePolicy
         attributeDAO?.fallbackPresetSerializedValue = defaultValuePreset
+        attributeDAO?.isRequired = isRequired
 
         for (entry in propertyTable) {
             val value = entry.value

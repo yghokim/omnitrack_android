@@ -23,6 +23,7 @@ import android.widget.TextView
 import android.widget.Toast
 import butterknife.bindView
 import com.afollestad.materialdialogs.MaterialDialog
+import kotlinx.android.synthetic.main.fragment_tracker_detail_structure.*
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.AttributePresetInfo
@@ -150,6 +151,12 @@ class TrackerDetailStructureTabFragment : OTFragment() {
         if (savedInstanceState == null) {
             TutorialManager.checkAndShowTargetPrompt("TrackerDetail_add_attribute", true, this.activity, newAttributeButton, R.string.msg_tutorial_add_attribute_primary, R.string.msg_tutorial_add_attribute_secondary, this.viewModel.color)
         }
+    }
+
+    fun checkRequiredInformationVisibility() {
+        ui_required_information_text.visibility = if (currentAttributeViewModelList.find { it.isRequired == true } != null) {
+            View.VISIBLE
+        } else View.INVISIBLE
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -435,15 +442,19 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                 typeIconView.setImageResource(attributeViewModel.icon)
                 columnNameView.text = attributeViewModel.name
 
-                requiredMarker.visibility = View.INVISIBLE
-                /*
-                requiredMarker.visibility = if (attribute.isRequired) {
-                    View.VISIBLE
-                } else {
-                    View.INVISIBLE
-                }*/
-
                 previewContainer.alpha = 0.5f
+
+                viewHolderSubscriptions.add(
+                        attributeViewModel.isRequiredObservable.subscribe {
+                            requiredMarker.visibility = if (it) {
+                                View.VISIBLE
+                            } else {
+                                View.INVISIBLE
+                            }
+
+                            checkRequiredInformationVisibility()
+                        }
+                )
 
                 viewHolderSubscriptions.add(
                         attributeViewModel.connectionObservable.subscribe { connection ->

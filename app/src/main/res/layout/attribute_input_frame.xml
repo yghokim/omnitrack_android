@@ -19,6 +19,7 @@
         android:paddingTop="12dp"
         app:flexWrap="nowrap">
 
+        <!--
         <View
             android:id="@+id/ui_state_indicator"
             android:layout_width="15dp"
@@ -28,7 +29,21 @@
             android:layout_marginRight="17dp"
             android:background="@drawable/green_circle"
             app:layout_alignSelf="center"
-            app:layout_flexShrink="0" />
+            app:layout_flexShrink="0" />-->
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/ui_state_indicator"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="12dp"
+            app:layout_alignSelf="center"
+            app:layout_flexShrink="0"
+            app:lottie_autoPlay="false"
+            app:lottie_cacheStrategy="strong"
+            app:lottie_fileName="lottie/lottie_circle_color_transition_cycle.json"
+            app:lottie_loop="false"
+            app:lottie_progress="0.5" />
 
         <TextView
             android:id="@+id/ui_column_name"

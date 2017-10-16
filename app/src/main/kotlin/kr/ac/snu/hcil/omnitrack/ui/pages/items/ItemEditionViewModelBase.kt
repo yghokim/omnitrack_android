@@ -100,6 +100,7 @@ abstract class ItemEditionViewModelBase : RealmViewModel(), OTItemBuilderWrapper
     class AttributeInputViewModel(val attributeDAO: OTAttributeDAO) {
         val attributeLocalId: String get() = attributeDAO.localId
         val columnNameObservable: Observable<String> = BehaviorSubject.create<String>("")
+        val isRequiredObservable: Observable<Boolean> = BehaviorSubject.create<Boolean>()
         val stateObservable: Observable<OTItemBuilderWrapperBase.EAttributeValueState> = BehaviorSubject.create<OTItemBuilderWrapperBase.EAttributeValueState>()
 
         val valueObservable = BehaviorSubject.create<Nullable<ValueWithTimestamp>>(Nullable(null) as Nullable<ValueWithTimestamp>)
@@ -109,6 +110,14 @@ abstract class ItemEditionViewModelBase : RealmViewModel(), OTItemBuilderWrapper
             set(value) {
                 if (valueObservable.value?.datum != value) {
                     valueObservable.onNext(Nullable(value))
+                }
+            }
+
+        var isRequired: Boolean
+            get() = (isRequiredObservable as BehaviorSubject<Boolean>).value
+            set(value) {
+                if (isRequired != value) {
+                    (isRequiredObservable as BehaviorSubject<Boolean>).onNext(value)
                 }
             }
 
@@ -124,6 +133,7 @@ abstract class ItemEditionViewModelBase : RealmViewModel(), OTItemBuilderWrapper
 
         init {
             (columnNameObservable as BehaviorSubject<String>).onNext(attributeDAO.name)
+            (isRequiredObservable as BehaviorSubject<Boolean>).onNext(attributeDAO.isRequired)
         }
 
         fun unregister() {

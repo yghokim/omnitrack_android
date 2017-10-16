@@ -14,6 +14,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import butterknife.bindView
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
@@ -35,6 +36,8 @@ import java.util.*
  * Created by Young-Ho Kim on 16. 7. 24
  */
 class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_item) {
+
+    class RequiredFieldsNotCompleteException : Exception("Required fields are not completed.")
 
     companion object {
 
@@ -269,18 +272,30 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
     override fun onToolbarRightButtonClicked() {
         //push item to db
         //syncViewStateToBuilderAsync {viewModel.applyEditingToDatabase()
+
         creationSubscriptions.add(
                 Single.zip(
                         attributeListAdapter.inputViews.map { it.forceApplyValueAsync() }
                 ) { zipped -> zipped }.flatMap {
-                    viewModel.applyEditingToDatabase()
-                }.subscribe { result ->
+
+                    if (currentAttributeViewModelList.find {
+                        it.isRequired && it.value?.value == null
+                    } != null) {
+                        throw RequiredFieldsNotCompleteException()
+                    } else {
+                        viewModel.applyEditingToDatabase()
+                    }
+                }.subscribe({ result ->
                     if (result.datum != null) {
                         viewModel.clearHistory()
                         setResult(RESULT_OK, Intent().putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, result.datum))
                         finish()
                     }
-                }
+                }, { ex ->
+                    if (ex is RequiredFieldsNotCompleteException) {
+                        Toast.makeText(this@ItemDetailActivity, "Required fields are not completed.", Toast.LENGTH_LONG).show()
+                    }
+                })
         )
     }
 
@@ -389,15 +404,16 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
                             columnNameView.text = name
                         }
                 )
-                requiredMarker.visibility = View.INVISIBLE
-                /*
-                requiredMarker.visibility = if (attributeViewModel.isRequired) {
-                    View.VISIBLE
-                } else {
-                    View.INVISIBLE
-                }*/
-                //attributeTypeView.text = resources.getString(attribute.typeNameResourceId)
 
+                internalSubscriptions.add(
+                        attributeViewModel.isRequiredObservable.subscribe {
+                            requiredMarker.visibility = if (it == true) {
+                                View.VISIBLE
+                            } else {
+                                View.INVISIBLE
+                            }
+                        }
+                )
 
                 internalSubscriptions.add(
                         inputView.valueChanged.observable.subscribe { (sender, args) ->

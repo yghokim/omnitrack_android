@@ -216,6 +216,7 @@ class TrackerDetailViewModel : RealmViewModel() {
         val isInDatabase: Boolean get() = attributeDAO.isManaged
 
         val nameObservable = BehaviorSubject.create<String>("")
+        val isRequiredObservable = BehaviorSubject.create<Boolean>(false)
         val typeObservable = BehaviorSubject.create<Int>(-1)
         val iconObservable = BehaviorSubject.create<Int>(R.drawable.icon_small_longtext)
         val connectionObservable = BehaviorSubject.create<Nullable<OTConnection>>()
@@ -242,6 +243,14 @@ class TrackerDetailViewModel : RealmViewModel() {
             set(@DrawableRes value) {
                 if (iconObservable.value != value) {
                     iconObservable.onNext(value)
+                }
+            }
+
+        var isRequired: Boolean
+            get() = isRequiredObservable.value
+            set(value) {
+                if (isRequiredObservable.value != value) {
+                    isRequiredObservable.onNext(value)
                 }
             }
 
@@ -290,8 +299,8 @@ class TrackerDetailViewModel : RealmViewModel() {
             dao.position = attributeDAO.position
             dao.trackerId = attributeDAO.trackerId
             dao.updatedAt = attributeDAO.updatedAt
-            dao.isRequired = attributeDAO.isRequired
 
+            dao.isRequired = this.isRequired
             dao.fallbackValuePolicy = this.defaultValuePolicy
             dao.fallbackPresetSerializedValue = this.defaultValuePreset
             dao.name = name
@@ -306,6 +315,8 @@ class TrackerDetailViewModel : RealmViewModel() {
 
         fun applyDaoChangesToFront(editedDao: OTAttributeDAO) {
             name = editedDao.name
+
+            isRequired = editedDao.isRequired
 
             defaultValuePolicy = editedDao.fallbackValuePolicy
             defaultValuePreset = editedDao.fallbackPresetSerializedValue
@@ -341,7 +352,8 @@ class TrackerDetailViewModel : RealmViewModel() {
         }
 
         fun applyChanges() {
-            attributeDAO.name = nameObservable.value
+            attributeDAO.name = name
+            attributeDAO.isRequired = isRequired
             attributeDAO.updatedAt = System.currentTimeMillis()
             attributeDAO.fallbackValuePolicy = defaultValuePolicy
             for (entry in propertyTable) {
