@@ -73,14 +73,31 @@
 
                 android:orientation="vertical">
 
-                <TextView
-                    style="@style/SubTitleWithoutSeparatorAbove"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:paddingRight="@dimen/activity_horizontal_margin">
 
-                    android:paddingRight="@dimen/activity_horizontal_margin"
-                    android:text="@string/msg_attributes" />
+                    <TextView
+                        android:id="@+id/textView2"
+                        style="@style/SubTitleWithoutSeparatorAbove"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:layout_gravity="start"
+                        android:text="@string/msg_attributes" />
+
+                    <TextView
+                        android:id="@+id/ui_required_information_text"
+                        style="@style/SubTitleWithoutSeparatorAbove"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:text="@string/msg_required_information_text"
+                        android:textAllCaps="false"
+                        android:textColor="@color/colorAccent" />
+                </FrameLayout>
 
                 <kr.ac.snu.hcil.omnitrack.ui.components.common.AdapterLinearLayout
                     android:id="@+id/ui_attribute_list"

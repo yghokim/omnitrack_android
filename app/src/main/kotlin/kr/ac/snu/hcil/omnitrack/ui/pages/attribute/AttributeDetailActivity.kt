@@ -89,10 +89,12 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
             nameProperty.showEdited = viewModel.isNameDirty
         }
 
-        /*requiredView.valueChanged += {
+        requiredProperty.valueChanged += {
             sender, value ->
-            attribute?.isRequired = value
-        }*/
+            viewModel.isRequired = value
+
+            requiredProperty.showEdited = viewModel.isRequiredDirty
+        }
 
         ui_attribute_connection.onRemoveButtonClicked += {
             sender, arg ->
@@ -117,6 +119,12 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
         creationSubscriptions.add(
                 viewModel.nameObservable.subscribe { name ->
                     nameProperty.value = name
+                }
+        )
+
+        creationSubscriptions.add(
+                viewModel.isRequiredObservable.subscribe { isRequired ->
+                    requiredProperty.value = isRequired
                 }
         )
 
