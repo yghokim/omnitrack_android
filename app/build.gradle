@@ -127,6 +127,8 @@ dependencies {
     compile 'com.squareup.retrofit2:converter-gson:2.3.0'
     compile 'com.squareup.retrofit2:adapter-rxjava:2.3.0'
 
+    compile 'com.airbnb.android:lottie:2.2.5'
+
     compile 'org.atteo:evo-inflector:1.2.2'
     compile 'com.github.Epsiloni:android-target-tooltip:1.7'
     compile 'us.feras.mdv:markdownview:1.1.0'
