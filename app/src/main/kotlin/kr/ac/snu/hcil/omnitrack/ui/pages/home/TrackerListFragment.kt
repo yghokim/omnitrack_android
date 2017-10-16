@@ -469,8 +469,7 @@ class TrackerListFragment : OTFragment() {
                         //EventLoggingManager.logTrackerChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_TRACKER_REMOVE, tracker)
                     }).show()
                 } else if (view === chartViewButton) {
-                    val tracker = user.trackers[adapterPosition]
-                    startActivityOnDelay(ChartViewActivity.makeIntent(tracker.objectId, this@TrackerListFragment.context))
+                    startActivityOnDelay(ChartViewActivity.makeIntent(trackerId!!, this@TrackerListFragment.context))
 
 
                 } else if (view === expandButton) {

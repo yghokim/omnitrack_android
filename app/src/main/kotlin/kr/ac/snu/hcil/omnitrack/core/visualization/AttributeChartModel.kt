@@ -1,11 +1,12 @@
 package kr.ac.snu.hcil.omnitrack.core.visualization
 
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
+import io.realm.Realm
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 
 /**
  * Created by younghokim on 16. 9. 7..
  */
-abstract class AttributeChartModel<T>(open val attribute: OTAttribute<out Any>) : ChartModel<T>() {
+abstract class AttributeChartModel<T>(open val attribute: OTAttributeDAO, realm: Realm) : ChartModel<T>(realm) {
     override val name: String
         get() = attribute.name
 }
