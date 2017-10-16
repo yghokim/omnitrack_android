@@ -5,7 +5,6 @@ import android.support.v7.util.DiffUtil
 import io.realm.Realm
 import io.realm.RealmChangeListener
 import kr.ac.snu.hcil.omnitrack.OTApplication
-import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
@@ -126,16 +125,21 @@ class TrackerDetailViewModel : RealmViewModel() {
     private fun saveAttributes(trackerDao: OTTrackerDAO) {
         trackerDao.attributes.clear()
         val deviceLocalKey = OTAuthManager.userDeviceLocalKey
-        var maxAttributeKeyFromThisDevice = currentAttributeViewModelList
-                .mapNotNull { it.attributeDAO.localId }.map { it.split("_") }.filter { it[0] == deviceLocalKey }
-                .map { it[1].toInt() }
-                .max() ?: 0
+        var currentTimeStamp = System.currentTimeMillis()
+        val parsedFormerLocalIds = currentAttributeViewModelList
+                .mapNotNull { it.attributeDAO.localId }.map { it.split("_") }
+        while (true) {
+            val match = parsedFormerLocalIds.find { it[0] == deviceLocalKey && it[1].trim().equals(currentTimeStamp.toString(36)) }
+            if (match != null) {
+                currentTimeStamp += 1
+            } else break
+        }
 
         currentAttributeViewModelList.forEachWithIndex { index, attrViewModel ->
             if (!attrViewModel.isInDatabase) {
                 println("viewmodel ${attrViewModel.name} is not in database.")
 
-                attrViewModel.attributeDAO.localId = deviceLocalKey + "_" + (++maxAttributeKeyFromThisDevice)
+                attrViewModel.attributeDAO.localId = deviceLocalKey + "_" + currentTimeStamp.toString(36)
 
                 println("new localId: ${attrViewModel.attributeDAO.localId}")
                 attrViewModel.attributeDAO.trackerId = trackerDao.objectId
