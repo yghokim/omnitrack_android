@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.LinearSmoothScroller
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SimpleItemAnimator
 import android.text.format.DateUtils
@@ -26,6 +27,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.pages.ConnectionIndicatorStubProxy
+import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.ValueWithTimestamp
 import rx.Observable
 import rx.Single
@@ -39,7 +41,7 @@ import kotlin.properties.Delegates
  */
 class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_item) {
 
-    class RequiredFieldsNotCompleteException : Exception("Required fields are not completed.")
+    class RequiredFieldsNotCompleteException(val inCompleteFieldLocalIds: Array<String>) : Exception("Required fields are not completed.")
 
     companion object {
 
@@ -280,10 +282,12 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
                         attributeListAdapter.inputViews.map { it.forceApplyValueAsync() }
                 ) { zipped -> zipped }.flatMap {
 
-                    if (currentAttributeViewModelList.find {
+                    val incompleteFieldLocalIds = currentAttributeViewModelList.filter {
                         it.isRequired && it.value?.value == null
-                    } != null) {
-                        throw RequiredFieldsNotCompleteException()
+                    }.map { it.attributeLocalId }
+
+                    if (incompleteFieldLocalIds.isNotEmpty()) {
+                        throw RequiredFieldsNotCompleteException(incompleteFieldLocalIds.toTypedArray())
                     } else {
                         viewModel.applyEditingToDatabase()
                     }
@@ -295,7 +299,21 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
                     }
                 }, { ex ->
                     if (ex is RequiredFieldsNotCompleteException) {
-                        Toast.makeText(this@ItemDetailActivity, "Required fields are not completed.", Toast.LENGTH_LONG).show()
+                        val incompleteFields = currentAttributeViewModelList.mapIndexed { index, attributeInputViewModel -> Pair(index, attributeInputViewModel) }.filter { ex.inCompleteFieldLocalIds.contains(it.second.attributeLocalId) }
+
+                        val minPosition = incompleteFields.minBy { it.first }?.first
+                        if (minPosition != null) {
+                            val topFitScroller = object : LinearSmoothScroller(this@ItemDetailActivity) {
+                                override fun getVerticalSnapPreference(): Int {
+                                    return LinearSmoothScroller.SNAP_TO_START
+                                }
+                            }
+
+                            topFitScroller.targetPosition = minPosition
+                            attributeListView.layoutManager.startSmoothScroll(topFitScroller)
+                        }
+
+                        Toast.makeText(this@ItemDetailActivity, "${ex.inCompleteFieldLocalIds.size} required fields are not completed.", Toast.LENGTH_LONG).show()
                     }
                 })
         )
@@ -366,20 +384,17 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
             private val internalSubscriptions = CompositeSubscription()
 
             private var currentValidationState: Boolean by Delegates.observable(true) { property, old, new ->
-                println("validation old: ${old}, new; ${new}")
                 if (old != new) {
                     if (new == true) {
 
                         //validation
                         if (validationIndicator.progress != 1f || validationIndicator.progress != 0f) {
                             validationIndicator.playAnimation(0.5f, 1f)
-                            println("play valid animation")
                         }
                     } else {
                         //invalidated
                         if (validationIndicator.progress != 0.5f) {
                             validationIndicator.playAnimation(0.0f, 0.5f)
-                            println("play invalid animation")
                         }
                     }
                 }
@@ -419,8 +434,9 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
             }
 
             fun bind(attributeViewModel: ItemEditionViewModelBase.AttributeInputViewModel) {
-                println("bind attributeViewModel: ${attributeViewModel.attributeLocalId}")
                 validationIndicator.pauseAnimation()
+
+                InterfaceHelper.alertBackground(this.itemView)
 
                 if (attributeViewModel.isValidated) {
                     validationIndicator.progress = 0.0f
