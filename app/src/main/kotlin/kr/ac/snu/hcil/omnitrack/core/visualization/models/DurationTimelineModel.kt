@@ -6,10 +6,12 @@ import android.graphics.Paint
 import android.graphics.RectF
 import android.support.v4.content.ContextCompat
 import android.text.format.DateUtils
+import io.realm.Realm
+import io.realm.Sort
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.OTItem
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeSpanAttribute
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.visualization.AttributeChartModel
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
@@ -29,7 +31,7 @@ import java.util.*
 /**
  * Created by Young-Ho on 9/9/2016.
  */
-class DurationTimelineModel(override val attribute: OTTimeSpanAttribute) : AttributeChartModel<DurationTimelineModel.AggregatedDuration>(attribute) {
+class DurationTimelineModel(attribute: OTAttributeDAO, realm: Realm) : AttributeChartModel<DurationTimelineModel.AggregatedDuration>(attribute, realm) {
 
     data class AggregatedDuration(val time: Long, val count: Int, val avgFrom: Float, val avgTo: Float, val earliest: Float = avgFrom, val latest: Float = avgTo)
 
@@ -45,15 +47,19 @@ class DurationTimelineModel(override val attribute: OTTimeSpanAttribute) : Attri
             val to = if (xIndex < xScale.numTicks - 1) xScale.binPointsOnDomain[xIndex + 1]
             else getTimeScope().to
 
-            OTApplication.app.databaseManager.loadItems(attribute.tracker!!, TimeSpan.fromPoints(from, to)).flatMap<AggregatedDuration?>(Func1<List<OTItem>, Observable<AggregatedDuration?>> {
+
+            OTApplication.app.databaseManager
+                    .makeItemsQuery(attribute.trackerId, TimeSpan.fromPoints(from, to), realm)
+                    .findAllSortedAsync("timestamp", Sort.ASCENDING)
+                    .asObservable()
+                    .filter { it.isLoaded == true }.flatMap<AggregatedDuration?>(Func1<List<OTItemDAO>, Observable<AggregatedDuration?>> {
                 items ->
                 println("items during ${TimeSpan.fromPoints(from, to)}; count: ${items.size}")
                 if (items.isNotEmpty()) {
                     val timeSpansCache = ArrayList<Pair<TimeSpan, Long>>()
 
                     items.forEach { item ->
-                        println("item for ${item.timestampString}")
-                        val v = item.getValueOf(attribute)
+                        val v = item.getValueOf(attribute.localId)
                         if (v is TimeSpan) {
                             timeSpansCache.add(Pair(v, TimeHelper.cutTimePartFromEpoch(item.timestamp)))
                         }

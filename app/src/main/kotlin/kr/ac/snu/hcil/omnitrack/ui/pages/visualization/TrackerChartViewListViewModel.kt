@@ -1,16 +1,18 @@
-package kr.ac.snu.hcil.omnitrack.ui.viewmodels
+package kr.ac.snu.hcil.omnitrack.ui.pages.visualization
 
 import android.support.v7.util.DiffUtil
-import kr.ac.snu.hcil.omnitrack.core.OTTracker
+import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.core.TrackerHelper
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.Granularity
+import kr.ac.snu.hcil.omnitrack.utils.RealmViewModel
 import rx.Observable
 import rx.subjects.BehaviorSubject
 
 /**
  * Created by younghokim on 2017. 8. 6..
  */
-class TrackerChartViewListViewModel : TrackerAttachedViewModel() {
+class TrackerChartViewListViewModel : RealmViewModel() {
 
     val currentGranularitySubject: BehaviorSubject<Granularity> = BehaviorSubject.create()
     val currentPointSubject: BehaviorSubject<Long> = BehaviorSubject.create(System.currentTimeMillis())
@@ -21,6 +23,18 @@ class TrackerChartViewListViewModel : TrackerAttachedViewModel() {
     val chartViewModels: Observable<List<ChartModel<*>>> get() = chartViewModelListSubject
 
     var suspendApplyingScope = false
+
+    private var currentTrackerId: String? = null
+
+    val trackerNameSubject = BehaviorSubject.create<String>("")
+
+    var trackerName: String
+        get() = trackerNameSubject.value
+        private set(value) {
+            if (trackerNameSubject.value != value) {
+                trackerNameSubject.onNext(value)
+            }
+        }
 
     var granularity: Granularity?
         get() = currentGranularitySubject.value
@@ -40,11 +54,20 @@ class TrackerChartViewListViewModel : TrackerAttachedViewModel() {
             }
         }
 
-    override fun onTrackerAttached(newTracker: OTTracker) {
-        super.onTrackerAttached(newTracker)
-        clearChartViewModels(false)
-        currentChartViewModelList.addAll(newTracker.getRecommendedChartModels())
-        chartViewModelListSubject.onNext(currentChartViewModelList)
+
+    fun init(trackerId: String) {
+
+        if (trackerId != currentTrackerId) {
+            currentTrackerId = trackerId
+
+            clearChartViewModels(false)
+            val trackerDao = OTApplication.app.databaseManager.getTrackerQueryWithId(trackerId, realm).findFirst()
+            if (trackerDao != null) {
+                currentChartViewModelList.addAll(TrackerHelper.makeRecommendedChartModels(trackerDao, realm))
+                chartViewModelListSubject.onNext(currentChartViewModelList)
+            }
+
+        }
     }
 
     fun reloadChartData() {
@@ -65,9 +88,9 @@ class TrackerChartViewListViewModel : TrackerAttachedViewModel() {
         }
     }
 
-    override fun onDispose() {
-        super.onDispose()
-        clearChartViewModels()
+    override fun onCleared() {
+        super.onCleared()
+        clearChartViewModels(false)
     }
 
     private fun clearChartViewModels(pushEmptyList: Boolean = true) {

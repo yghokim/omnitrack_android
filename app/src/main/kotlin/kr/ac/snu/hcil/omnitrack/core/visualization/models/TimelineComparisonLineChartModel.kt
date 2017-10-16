@@ -1,17 +1,19 @@
 package kr.ac.snu.hcil.omnitrack.core.visualization.models
 
+import io.realm.Realm
+import io.realm.Sort
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.OTItem
-import kr.ac.snu.hcil.omnitrack.core.OTTracker
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
-import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.visualization.CompoundAttributeChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.ILineChartOnTime
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.QuantizedTimeScale
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers.MultiLineChartDrawer
+import kr.ac.snu.hcil.omnitrack.utils.isNumericPrimitive
+import kr.ac.snu.hcil.omnitrack.utils.toBigDecimal
 import rx.Observable
 import java.math.BigDecimal
 import java.util.*
@@ -19,8 +21,8 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 2016-09-08.
  */
-class TimelineComparisonLineChartModel(override val attributes: List<OTNumberAttribute>, parent: OTTracker)
-    : CompoundAttributeChartModel<ILineChartOnTime.TimeSeriesTrendData>(attributes, parent), ILineChartOnTime {
+class TimelineComparisonLineChartModel(attributes: List<OTAttributeDAO>, parent: OTTrackerDAO, realm: Realm)
+    : CompoundAttributeChartModel<ILineChartOnTime.TimeSeriesTrendData>(attributes, parent, realm), ILineChartOnTime {
 
     override val name: String = OTApplication.app.resourcesWrapped.getString(R.string.msg_vis_numeric_line_timeline_title)
 
@@ -32,16 +34,19 @@ class TimelineComparisonLineChartModel(override val attributes: List<OTNumberAtt
         xScale.setDomain(getTimeScope().from, getTimeScope().to)
         xScale.quantize(currentGranularity)
 
-        return OTApplication.app.databaseManager.loadItems(parent, getTimeScope(), RealmDatabaseManager.Order.ASC).map {
-            items ->
+        return OTApplication.app.databaseManager
+                .makeItemsQuery(parent.objectId, getTimeScope(), realm)
+                .findAllSortedAsync("timestamp", Sort.ASCENDING)
+                .asObservable()
+                .filter { it.isLoaded == true && it.isValid }.map { items ->
 
             var currentItemPointer = 0
 
-            val itemBinCache = ArrayList<OTItem>()
+            val itemBinCache = ArrayList<OTItemDAO>()
 
-            val attrPivotedPoints = HashMap<OTAttribute<out Any>, MutableList<Pair<Long, BigDecimal>>>()
+            val attrPivotedPoints = HashMap<String, MutableList<Pair<Long, BigDecimal>>>()
             attributes.forEach {
-                attrPivotedPoints[it] = ArrayList()
+                attrPivotedPoints[it.localId] = ArrayList()
             }
 
             for (xIndex in 0..xScale.numTicks - 1) {
@@ -70,9 +75,19 @@ class TimelineComparisonLineChartModel(override val attributes: List<OTNumberAtt
                 for (attribute in attributes) {
                     values.clear()
 
-                    val numPoints = OTItem.extractNotNullValues(itemBinCache, attribute, values)
-                    if (numPoints > 0) {
-                        attrPivotedPoints[attribute]?.add(Pair(from, BigDecimal(values.map { it.toFloat() }.average())))
+                    var count = 0
+
+                    for (item in itemBinCache) {
+                        val value = item.getValueOf(attribute.localId)
+                        if (value != null) {
+                            if (isNumericPrimitive(value)) {
+                                values.add(toBigDecimal(value))
+                                count++
+                            }
+                        }
+                    }
+                    if (count > 0) {
+                        attrPivotedPoints[attribute.localId]?.add(Pair(from, BigDecimal(values.map { it.toFloat() }.average())))
                     }
                 }
             }
@@ -80,7 +95,7 @@ class TimelineComparisonLineChartModel(override val attributes: List<OTNumberAtt
             synchronized(data) {
                 data.clear()
                 attrPivotedPoints.mapTo(data) {
-                    ILineChartOnTime.TimeSeriesTrendData(it.value.toTypedArray(), it.key)
+                    ILineChartOnTime.TimeSeriesTrendData(it.value.toTypedArray())
                 }
             }
             data

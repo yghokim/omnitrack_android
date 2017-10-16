@@ -1,6 +1,5 @@
 package kr.ac.snu.hcil.omnitrack.core.visualization.interfaces
 
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import java.math.BigDecimal
 import java.util.*
 
@@ -8,7 +7,7 @@ import java.util.*
  * Created by Young-Ho Kim on 2016-09-08.
  */
 interface ILineChartOnTime : IChartInterface<ILineChartOnTime.TimeSeriesTrendData> {
-    data class TimeSeriesTrendData(val points: Array<Pair<Long, BigDecimal>>, val attribute: OTAttribute<out Any>) {
+    data class TimeSeriesTrendData(val points: Array<Pair<Long, BigDecimal>>) {
         fun maxValue(): BigDecimal {
             return points.maxWith(ValueComparator)?.second ?: BigDecimal.valueOf(0)
         }

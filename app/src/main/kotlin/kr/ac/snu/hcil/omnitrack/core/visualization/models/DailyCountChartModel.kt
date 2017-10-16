@@ -3,10 +3,11 @@ package kr.ac.snu.hcil.omnitrack.core.visualization.models
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.support.v4.content.ContextCompat
+import io.realm.Realm
+import io.realm.Sort
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.OTTracker
-import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.visualization.Granularity
 import kr.ac.snu.hcil.omnitrack.core.visualization.TrackerChartModel
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
@@ -23,9 +24,9 @@ import rx.Observable
 /**
  * Created by younghokim on 2017. 5. 8..
  */
-class DailyCountChartModel(tracker: OTTracker) : TrackerChartModel<Pair<Long, Int>>(tracker) {
-    override val name: String = String.format(OTApplication.app.getString(R.string.msg_vis_daily_count_title_format), tracker.name)
+class DailyCountChartModel(tracker: OTTrackerDAO, realm: Realm) : TrackerChartModel<Pair<Long, Int>>(tracker, realm) {
 
+    override val name: String = String.format(OTApplication.app.getString(R.string.msg_vis_daily_count_title_format), tracker.name)
 
     override fun reloadData(): Observable<List<Pair<Long, Int>>> {
         println("reload chart data. Scope:  ${getTimeScope()}")
@@ -33,11 +34,16 @@ class DailyCountChartModel(tracker: OTTracker) : TrackerChartModel<Pair<Long, In
         val xScale = QuantizedTimeScale()
         xScale.setDomain(getTimeScope().from, getTimeScope().to)
         xScale.quantize(currentGranularity)
-        return OTApplication.app.databaseManager.loadItems(tracker, getTimeScope(), RealmDatabaseManager.Order.ASC).map {
-            items ->
-            DataHelper.ConvertSortedListToBinWithLong((xScale.binPointsOnDomain + getTimeScope().to).toTypedArray(),
-                    items, { item -> item.timestamp }).map { bin -> Pair(bin.x0, bin.values.size) }
-        }
+
+        return OTApplication.app.databaseManager
+                .makeItemsQuery(tracker.objectId, getTimeScope(), realm)
+                .findAllSortedAsync("timestamp", Sort.ASCENDING)
+                .asObservable()
+                .filter { it.isLoaded == true }
+                .map { items ->
+                    DataHelper.ConvertSortedListToBinWithLong((xScale.binPointsOnDomain + getTimeScope().to).toTypedArray(),
+                            items, { item -> item.timestamp }).map { bin -> Pair(bin.x0, bin.values.size) }
+                }
     }
 
     override fun getChartDrawer(): AChartDrawer {
