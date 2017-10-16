@@ -8,7 +8,9 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.tbruyelle.rxpermissions.RxPermissions
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.*
+import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * Created by Young-Ho on 10/7/2017.
@@ -30,6 +32,17 @@ object OTAttributeManager {
     const val TYPE_AUDIO = 9
 
     private val attributeCharacteristicsTable = SparseArray<OTAttributeHelper>()
+
+    private val attributeLocalIdSeed = AtomicInteger()
+
+    fun makeNewAttributeLocalId(createdAt: Long = System.currentTimeMillis()): String {
+        val nanoStamp = createdAt * 1000 + attributeLocalIdSeed.getAndIncrement()
+        attributeLocalIdSeed.compareAndSet(1000, 0)
+
+        val id = OTAuthManager.userDeviceLocalKey + "_" + nanoStamp.toString(36)
+        println("new attribute local id: ${id}")
+        return id
+    }
 
     fun getAttributeHelper(type: Int): OTAttributeHelper {
         val characteristics = attributeCharacteristicsTable[type]

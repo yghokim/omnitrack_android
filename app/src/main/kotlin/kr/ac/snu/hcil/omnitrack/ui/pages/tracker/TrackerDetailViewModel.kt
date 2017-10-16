@@ -121,27 +121,11 @@ class TrackerDetailViewModel : RealmViewModel() {
 
     private fun saveAttributes(trackerDao: OTTrackerDAO) {
         trackerDao.attributes.clear()
-        val deviceLocalKey = OTAuthManager.userDeviceLocalKey
-        var currentTimeStamp = System.currentTimeMillis()
-        val parsedFormerLocalIds = currentAttributeViewModelList
-                .mapNotNull { it.attributeDAO.localId }.map { it.split("_") }
-        while (true) {
-            val match = parsedFormerLocalIds.find { it[0] == deviceLocalKey && it[1].trim().equals(currentTimeStamp.toString(36)) }
-            if (match != null) {
-                currentTimeStamp += 1
-            } else break
-        }
 
         currentAttributeViewModelList.forEachWithIndex { index, attrViewModel ->
             if (!attrViewModel.isInDatabase) {
-                println("viewmodel ${attrViewModel.name} is not in database.")
-
-                attrViewModel.attributeDAO.localId = deviceLocalKey + "_" + currentTimeStamp.toString(36)
-
-                println("new localId: ${attrViewModel.attributeDAO.localId}")
+                attrViewModel.attributeDAO.localId = OTAttributeManager.makeNewAttributeLocalId(attrViewModel.attributeDAO.userCreatedAt)
                 attrViewModel.attributeDAO.trackerId = trackerDao.objectId
-
-                println("viewmodel attribute tracker id: ${trackerDao.objectId}")
                 attrViewModel.saveToRealm()
             }
             attrViewModel.attributeDAO.position = index
