@@ -32,7 +32,8 @@ open class OTPendingItemBuilderDAO : RealmObject() {
         val match = data.find { it.attributeLocalId == attributeLocalId }
         if (match != null) {
             if (value == null) {
-                match.deleteFromRealm()
+                if (match.isManaged)
+                    match.deleteFromRealm()
                 data.remove(match)
             } else {
                 match.serializedValue = value.value?.let { TypeStringSerializationHelper.serialize(it) }

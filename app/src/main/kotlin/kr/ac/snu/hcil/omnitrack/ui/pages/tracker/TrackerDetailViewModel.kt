@@ -5,6 +5,7 @@ import android.support.v7.util.DiffUtil
 import io.realm.Realm
 import io.realm.RealmChangeListener
 import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
@@ -59,10 +60,6 @@ class TrackerDetailViewModel : RealmViewModel() {
                 colorObservable.onNext(value)
             }
         }
-
-    fun getAttributeViewModelList(): List<AttributeInformationViewModel> {
-        return currentAttributeViewModelList
-    }
 
     private val removedAttributes = HashSet<AttributeInformationViewModel>()
 
