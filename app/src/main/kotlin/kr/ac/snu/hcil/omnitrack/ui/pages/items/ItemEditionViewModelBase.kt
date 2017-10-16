@@ -105,17 +105,29 @@ abstract class ItemEditionViewModelBase : RealmViewModel(), OTItemBuilderWrapper
 
         val valueObservable = BehaviorSubject.create<Nullable<ValueWithTimestamp>>(Nullable(null) as Nullable<ValueWithTimestamp>)
 
+        val validationObservable: Observable<Boolean> = BehaviorSubject.create<Boolean>(true)
+
         var value: ValueWithTimestamp?
             get() = valueObservable.value?.datum
             set(value) {
                 if (valueObservable.value?.datum != value) {
                     valueObservable.onNext(Nullable(value))
+                    validateValue()
+                }
+            }
+
+        var isValidated: Boolean
+            get() = (validationObservable as BehaviorSubject).value
+            internal set(value) {
+                if ((validationObservable as BehaviorSubject).value != value) {
+                    println("validation changed: ${attributeLocalId}, ${value}")
+                    validationObservable.onNext(value)
                 }
             }
 
         var isRequired: Boolean
             get() = (isRequiredObservable as BehaviorSubject<Boolean>).value
-            set(value) {
+            internal set(value) {
                 if (isRequired != value) {
                     (isRequiredObservable as BehaviorSubject<Boolean>).onNext(value)
                 }
@@ -134,10 +146,15 @@ abstract class ItemEditionViewModelBase : RealmViewModel(), OTItemBuilderWrapper
         init {
             (columnNameObservable as BehaviorSubject<String>).onNext(attributeDAO.name)
             (isRequiredObservable as BehaviorSubject<Boolean>).onNext(attributeDAO.isRequired)
+            validateValue()
         }
 
         fun unregister() {
             subscriptions.clear()
+        }
+
+        private fun validateValue() {
+            isValidated = !(isRequired == true && value?.value == null)
         }
 
     }

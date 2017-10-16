@@ -16,6 +16,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import butterknife.bindView
+import com.airbnb.lottie.LottieAnimationView
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
@@ -31,6 +32,7 @@ import rx.Single
 import rx.android.schedulers.AndroidSchedulers
 import rx.subscriptions.CompositeSubscription
 import java.util.*
+import kotlin.properties.Delegates
 
 /**
  * Created by Young-Ho Kim on 16. 7. 24
@@ -357,12 +359,35 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
 
             private val loadingIndicatorInContainer: View by bindView(R.id.ui_container_indicator)
 
+            private val validationIndicator: LottieAnimationView by bindView(R.id.ui_validation_indicator)
+
             private val optionButton: View by bindView(R.id.ui_button_option)
 
             private val internalSubscriptions = CompositeSubscription()
 
+            private var currentValidationState: Boolean by Delegates.observable(true) { property, old, new ->
+                println("validation old: ${old}, new; ${new}")
+                if (old != new) {
+                    if (new == true) {
+
+                        //validation
+                        if (validationIndicator.progress != 1f || validationIndicator.progress != 0f) {
+                            validationIndicator.playAnimation(0.5f, 1f)
+                            println("play valid animation")
+                        }
+                    } else {
+                        //invalidated
+                        if (validationIndicator.progress != 0.5f) {
+                            validationIndicator.playAnimation(0.0f, 0.5f)
+                            println("play invalid animation")
+                        }
+                    }
+                }
+            }
+
 
             init {
+                validationIndicator.progress = 0.0f
 
                 container.addView(inputView, 0)
 
@@ -381,7 +406,7 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
 
             private fun setTimestampIndicatorText(timestamp: Long?) {
                 println("timestamp: ${timestamp}")
-                if (timestamp == null) {
+                if (timestamp == null || timestamp == 0L) {
                     timestampIndicator.text = ""
                 } else {
                     val now = System.currentTimeMillis()
@@ -395,6 +420,13 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
 
             fun bind(attributeViewModel: ItemEditionViewModelBase.AttributeInputViewModel) {
                 println("bind attributeViewModel: ${attributeViewModel.attributeLocalId}")
+                validationIndicator.pauseAnimation()
+
+                if (attributeViewModel.isValidated) {
+                    validationIndicator.progress = 0.0f
+                } else {
+                    validationIndicator.progress = 0.5f
+                }
 
                 internalSubscriptions.clear()
 
@@ -420,6 +452,12 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
                             val now = System.currentTimeMillis()
                             attributeViewModel.value = ValueWithTimestamp(args, now)
                             builderRestoredSnackbar.dismiss()
+                        }
+                )
+
+                internalSubscriptions.add(
+                        attributeViewModel.validationObservable.subscribe { isValid ->
+                            currentValidationState = isValid
                         }
                 )
 
