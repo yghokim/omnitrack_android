@@ -58,6 +58,11 @@ android {
             versionNameSuffix '-Debug'
         }
     }
+    buildTypes.each {
+        it.buildConfigField 'String', 'OMNITRACK_SYNCHRONIZATION_SERVER_URL', OMNITRACK_SYNCHRONIZATION_SERVER_URL
+        it.buildConfigField 'String', 'OMNITRACK_MEDIA_STORAGE_SERVER_URL', OMNITRACK_MEDIA_STORAGE_SERVER_URL
+    }
+
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }

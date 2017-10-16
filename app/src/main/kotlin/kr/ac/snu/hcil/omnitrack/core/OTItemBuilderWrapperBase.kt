@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core
 
+import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemDAO
@@ -13,7 +14,7 @@ import rx.schedulers.Schedulers
 /**
  * Created by Young-Ho Kim on 16. 7. 25
  */
-class OTItemBuilderWrapperBase {
+class OTItemBuilderWrapperBase(val dao: OTPendingItemBuilderDAO, val realm: Realm) {
 
     enum class EAttributeValueState {
         Processing, GettingExternalValue, Idle
@@ -24,11 +25,6 @@ class OTItemBuilderWrapperBase {
     }
 
     val keys: Set<String> by lazy { dao.data.mapNotNull { it.attributeLocalId }.toSet() }
-    private val dao: OTPendingItemBuilderDAO
-
-    constructor(dao: OTPendingItemBuilderDAO) {
-        this.dao = dao
-    }
 
     fun getValueInformationOf(attributeLocalId: String): ValueWithTimestamp? {
         return this.dao.data.find { it.attributeLocalId == attributeLocalId }?.let {
@@ -66,6 +62,7 @@ class OTItemBuilderWrapperBase {
             if (attributes == null) {
                 return@defer Observable.empty<Pair<String, ValueWithTimestamp>>()
             } else {
+                val realm = OTApplication.app.databaseManager.getRealmInstance()
                 Observable.merge(attributes.mapIndexed { i, attr: OTAttributeDAO ->
                     val attrLocalId = attr.localId
                     val connection = attr.getParsedConnection()
@@ -74,19 +71,19 @@ class OTItemBuilderWrapperBase {
                         connection.getRequestedValue(this).flatMap { data ->
                             if (data.datum == null) {
                                 println("ValueConnection result was null. send fallback value")
-                                return@flatMap attr.getFallbackValue()
+                                return@flatMap attr.getFallbackValue(realm)
                             } else {
                                 println("Received valueConnection result - ${data.datum}")
                                 return@flatMap Observable.just(data.datum)
                             }
-                        }.onErrorResumeNext { err -> err.printStackTrace(); attr.getFallbackValue() }.map { value -> Pair(attrLocalId, ValueWithTimestamp(value, System.currentTimeMillis())) }.subscribeOn(Schedulers.io()).doOnSubscribe {
+                        }.onErrorResumeNext { err -> err.printStackTrace(); attr.getFallbackValue(realm) }.map { value -> Pair(attrLocalId, ValueWithTimestamp(value, System.currentTimeMillis())) }.subscribeOn(Schedulers.io()).doOnSubscribe {
 
                             onAttributeStateChangedListener?.onAttributeStateChanged(attrLocalId, EAttributeValueState.GettingExternalValue)
                         }
                     } else {
 
                         println("No connection. use fallback value: ${attrLocalId}")
-                        return@mapIndexed attr.getFallbackValue().map { nullable ->
+                        return@mapIndexed attr.getFallbackValue(realm).map { nullable ->
                             println("No connection. received fallback value: ${attrLocalId}, ${nullable.datum}")
                             Pair(attrLocalId, ValueWithTimestamp(nullable.datum, System.currentTimeMillis()))
                         }.doOnSubscribe {
@@ -101,7 +98,8 @@ class OTItemBuilderWrapperBase {
                             val value = result.second
 
                             onAttributeStateChangedListener?.onAttributeStateChanged(attrLocalId, EAttributeValueState.Idle)
-                        }.doOnCompleted {
+                        }.doOnError { err -> err.printStackTrace(); realm.close() }.doOnCompleted {
+                    realm.close()
                     println("RX finished autocompleting builder=======================")
                 }
             }

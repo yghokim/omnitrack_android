@@ -4,12 +4,14 @@ import android.content.Context
 import android.view.View
 import android.widget.TextView
 import io.realm.Realm
+import io.realm.Sort
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyHelper
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemValueEntryDAO
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
@@ -21,6 +23,7 @@ import kr.ac.snu.hcil.omnitrack.utils.TextHelper
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Observable
 import rx.Single
+import rx.android.schedulers.AndroidSchedulers
 import java.util.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.set
@@ -123,7 +126,7 @@ abstract class OTAttributeHelper {
                 || (attribute.fallbackValuePolicy == OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE && isIntrinsicDefaultValueSupported(attribute) && isIntrinsicDefaultValueVolatile(attribute))
     }
 
-    open fun getFallbackValue(attribute: OTAttributeDAO): Observable<Nullable<out Any>> {
+    open fun getFallbackValue(attribute: OTAttributeDAO, realm: Realm): Observable<Nullable<out Any>> {
         return Observable.defer {
             println("getFallbackValue. policy: ${attribute.fallbackValuePolicy}. Current thread: ${Thread.currentThread().name}")
             when (attribute.fallbackValuePolicy) {
@@ -133,7 +136,20 @@ abstract class OTAttributeHelper {
                     } else Observable.just<Nullable<out Any>>(Nullable(null))
                 }
                 OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_LAST_ITEM -> {
-                    return@defer Observable.just<Nullable<out Any>>(Nullable(null))
+                    Observable.defer {
+                        val previousNotNullEntry = realm.where(OTItemValueEntryDAO::class.java)
+                                .equalTo("key", attribute.localId)
+                                .equalTo("item.trackerId", attribute.trackerId)
+                                .equalTo("item.removed", false)
+                                .findAllSorted("item.timestamp", Sort.DESCENDING).filter { it.value != null }.first()
+
+                        println("previous not null entry: ${previousNotNullEntry}")
+
+                        return@defer if (previousNotNullEntry != null) {
+                            Observable.just<Nullable<out Any>>(
+                                    Nullable(previousNotNullEntry.value?.let { TypeStringSerializationHelper.deserialize(it) }))
+                        } else Observable.just<Nullable<out Any>>(Nullable(null))
+                    }.subscribeOn(AndroidSchedulers.mainThread())
 
                 }
                 OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_PRESET -> {

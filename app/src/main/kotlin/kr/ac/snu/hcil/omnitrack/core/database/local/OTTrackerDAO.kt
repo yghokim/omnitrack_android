@@ -8,6 +8,7 @@ import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import com.tbruyelle.rxpermissions.RxPermissions
+import io.realm.Realm
 import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.annotations.Index
@@ -247,8 +248,8 @@ open class OTAttributeDAO : RealmObject() {
         }
     }
 
-    fun getFallbackValue(): Observable<Nullable<out Any>> {
-        return OTAttributeManager.getAttributeHelper(type).getFallbackValue(this)
+    fun getFallbackValue(realm: Realm): Observable<Nullable<out Any>> {
+        return OTAttributeManager.getAttributeHelper(type).getFallbackValue(this, realm)
     }
 
     fun setPropertySerializedValue(key: String, serializedValue: String): Boolean {
