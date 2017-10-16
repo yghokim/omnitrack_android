@@ -5,6 +5,7 @@ import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.annotations.Index
 import io.realm.annotations.PrimaryKey
+import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTItemPOJO
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
@@ -36,10 +37,10 @@ open class OTItemDAO : RealmObject() {
 
     var removed: Boolean = false
 
-    var loggingSource: OTItem.LoggingSource
+    var loggingSource: ItemLoggingSource
         get() = if (source != null) {
-            OTItem.LoggingSource.valueOf(source!!)
-        } else OTItem.LoggingSource.Unspecified
+            ItemLoggingSource.valueOf(source!!)
+        } else ItemLoggingSource.Unspecified
         set(value) {
             source = value.name
         }

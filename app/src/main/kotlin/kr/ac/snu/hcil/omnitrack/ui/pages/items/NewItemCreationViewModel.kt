@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.items
 
 import kr.ac.snu.hcil.omnitrack.OTApplication
-import kr.ac.snu.hcil.omnitrack.core.OTItem
+import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemBuilderFieldValueEntry
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTPendingItemBuilderDAO
@@ -119,7 +119,7 @@ class NewItemCreationViewModel : ItemEditionViewModelBase() {
         if (isValid) {
             return isBusyObservable.filter { it == false }.first().toSingle().flatMap {
                 refreshDaoValues()
-                val item = builderWrapper.saveToItem(null, OTItem.LoggingSource.Manual)
+                val item = builderWrapper.saveToItem(null, ItemLoggingSource.Manual)
                 return@flatMap OTApplication.app.databaseManager.saveItemObservable(item, false, null, realm).map { Nullable(it.second) }
             }
         } else return Single.just(Nullable<String>(null))

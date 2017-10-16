@@ -15,7 +15,7 @@ import android.view.View
 import android.widget.RemoteViews
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.OTItem
+import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
@@ -94,7 +94,7 @@ object OTShortcutPanelManager {
                     element.setViewVisibility(R.id.ui_background_image, View.INVISIBLE)
                 }
 
-                val instantLoggingIntent = PendingIntent.getService(context, i, OTBackgroundLoggingService.makeIntent(context, trackers[i], OTItem.LoggingSource.Shortcut), PendingIntent.FLAG_UPDATE_CURRENT)
+                val instantLoggingIntent = PendingIntent.getService(context, i, OTBackgroundLoggingService.makeIntent(context, trackers[i], ItemLoggingSource.Shortcut), PendingIntent.FLAG_UPDATE_CURRENT)
                 val openItemActivityIntent = PendingIntent.getActivity(context, i, ItemDetailActivity.makeNewItemPageIntent(trackers[i].objectId, context), PendingIntent.FLAG_UPDATE_CURRENT)
 
                 element.setOnClickPendingIntent(R.id.ui_button_instant, instantLoggingIntent)

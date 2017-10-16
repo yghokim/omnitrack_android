@@ -3,12 +3,14 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.home
 import android.support.v7.util.DiffUtil
 import io.realm.*
 import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.UserAttachedViewModel
+import kr.ac.snu.hcil.omnitrack.utils.DefaultNameGenerator
 import rx.Observable
 import rx.Subscription
 import rx.subjects.BehaviorSubject
@@ -60,6 +62,10 @@ class TrackerListViewModel : UserAttachedViewModel(), OrderedRealmCollectionChan
                 )
             }
         }
+    }
+
+    fun generateNewTrackerName(): String {
+        return DefaultNameGenerator.generateName(OTApplication.getString(R.string.msg_new_tracker_prefix), currentTrackerViewModelList.map { it.trackerName.value }, false)
     }
 
     override fun onUserAttached(newUserId: String) {

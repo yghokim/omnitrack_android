@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilder
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
@@ -68,12 +69,12 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
             return currentBuilderSubscriptionDict.remove(trackerId) != null
         }
 
-        fun startLoggingInService(context: Context, tracker: OTTracker, source: OTItem.LoggingSource) {
+        fun startLoggingInService(context: Context, tracker: OTTracker, source: ItemLoggingSource) {
 
             context.startService(makeIntent(context, tracker, source))
         }
 
-        fun log(context: Context, tracker: OTTracker, source: OTItem.LoggingSource, notify: Boolean = true): Observable<Int> {
+        fun log(context: Context, tracker: OTTracker, source: ItemLoggingSource, notify: Boolean = true): Observable<Int> {
 
             return Observable.create<Int> { subscriber ->
                 val builder = OTItemBuilder(tracker, OTItemBuilder.MODE_BACKGROUND)
@@ -136,11 +137,11 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
             context.sendBroadcast(intent)
         }
 
-        fun makeIntent(context: Context, tracker: OTTracker, source: OTItem.LoggingSource): Intent {
+        fun makeIntent(context: Context, tracker: OTTracker, source: ItemLoggingSource): Intent {
             return makeIntent(context, tracker.objectId, source)
         }
 
-        fun makeIntent(context: Context, trackerId: String, source: OTItem.LoggingSource): Intent {
+        fun makeIntent(context: Context, trackerId: String, source: ItemLoggingSource): Intent {
             val intent = Intent(context, OTBackgroundLoggingService::class.java)
             intent.action = "${ACTION_LOG}${trackerId}"
             intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
@@ -163,7 +164,7 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
 
     private fun handleLogging(trackerId: String, intent: Intent) {
         OTApplication.app.currentUserObservable.flatMap { user -> user.getTrackerObservable(trackerId) }.subscribe { tracker ->
-            log(this, tracker, OTItem.LoggingSource.valueOf(intent.getStringExtra(INTENT_EXTRA_LOGGING_SOURCE)), true).subscribe()
+            log(this, tracker, ItemLoggingSource.valueOf(intent.getStringExtra(INTENT_EXTRA_LOGGING_SOURCE)), true).subscribe()
         }
     }
 

@@ -1,7 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core
 
 import kr.ac.snu.hcil.omnitrack.OTApplication
-import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
@@ -14,16 +13,6 @@ import java.util.*
  */
 class OTItem : ADataRow {
 
-    enum class LoggingSource(val nameResId: Int) {
-        Unspecified(R.string.msg_tracking_source_unspecified),
-        Trigger(R.string.msg_tracking_source_trigger),
-        Shortcut(R.string.msg_tracking_source_shortcut),
-        Manual(R.string.msg_tracking_source_manual);
-
-        val sourceText: String by lazy {
-            OTApplication.app.resourcesWrapped.getString(nameResId)
-        }
-    }
 
     companion object {
 
@@ -44,7 +33,7 @@ class OTItem : ADataRow {
             return count
         }
 
-        fun createItemsWithColumnArrays(tracker: OTTracker, timestamps: LongArray, source: LoggingSource, outItems: MutableList<OTItem>, vararg columnValuesArray: Array<Any?>) {
+        fun createItemsWithColumnArrays(tracker: OTTracker, timestamps: LongArray, source: ItemLoggingSource, outItems: MutableList<OTItem>, vararg columnValuesArray: Array<Any?>) {
 
             if (columnValuesArray.isNotEmpty()) {
                 val numItems = columnValuesArray[0].size
@@ -93,17 +82,17 @@ class OTItem : ADataRow {
 
     val timestampString: String get() = "${TimeHelper.FORMAT_DATETIME.format(Date(timestamp))} | $timestamp"
 
-    var source: LoggingSource
+    var source: ItemLoggingSource
         private set
 
-    constructor(trackerObjectId: String, source: LoggingSource, deviceId: String?) : super() {
+    constructor(trackerObjectId: String, source: ItemLoggingSource, deviceId: String?) : super() {
         objectId = null
         this.trackerId = trackerObjectId
         this.source = source
         this.deviceId = deviceId ?: DEVICE_ID_UNSPECIFIED
     }
 
-    constructor(objectId: String, trackerObjectId: String, serializedValueTable: Map<String, String>?, timestamp: Long, source: LoggingSource, deviceId: String?) {
+    constructor(objectId: String, trackerObjectId: String, serializedValueTable: Map<String, String>?, timestamp: Long, source: ItemLoggingSource, deviceId: String?) {
         this.objectId = objectId
         this.trackerId = trackerObjectId
         this.timestamp = timestamp
@@ -120,7 +109,7 @@ class OTItem : ADataRow {
     /**
      * used to log directly in code behind
      */
-    constructor(tracker: OTTracker, timestamp: Long, source: LoggingSource, deviceId: String?, vararg values: Any?) : this(tracker.objectId, source, deviceId) {
+    constructor(tracker: OTTracker, timestamp: Long, source: ItemLoggingSource, deviceId: String?, vararg values: Any?) : this(tracker.objectId, source, deviceId) {
         this.timestamp = timestamp
         this.source = source
 
@@ -138,7 +127,7 @@ class OTItem : ADataRow {
 
     fun overwriteWithPojo(pojo: DatabaseManager.FirebaseItemPOJO) {
         this.timestamp = pojo.getTimestamp()
-        this.source = OTItem.LoggingSource.values()[pojo.sourceType]
+        this.source = ItemLoggingSource.values()[pojo.sourceType]
         valueTable.clear()
         pojo.dataTable?.let {
             table ->

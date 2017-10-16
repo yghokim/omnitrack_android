@@ -341,7 +341,7 @@ class OTItemBuilder : IStringSerializable {
         }
     }
 
-    fun makeItem(source: OTItem.LoggingSource): OTItem {
+    fun makeItem(source: ItemLoggingSource): OTItem {
         val item = OTItem(tracker, connectedItemTimestamp ?: -1L, source, OTApplication.app.deviceId, *(tracker.attributes.map { getValueInformationOf(it)?.value }.toTypedArray()))
 
         if (connectedItemDbId != null) {
