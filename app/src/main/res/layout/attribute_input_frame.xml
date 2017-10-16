@@ -31,7 +31,7 @@
             app:layout_alignSelf="center"
             app:layout_flexShrink="0" />-->
         <com.airbnb.lottie.LottieAnimationView
-            android:id="@+id/ui_state_indicator"
+            android:id="@+id/ui_validation_indicator"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_gravity="center"
@@ -40,7 +40,7 @@
             app:layout_alignSelf="center"
             app:layout_flexShrink="0"
             app:lottie_autoPlay="false"
-            app:lottie_cacheStrategy="strong"
+            app:lottie_cacheStrategy="weak"
             app:lottie_fileName="lottie/lottie_circle_color_transition_cycle.json"
             app:lottie_loop="false"
             app:lottie_progress="0.5" />
