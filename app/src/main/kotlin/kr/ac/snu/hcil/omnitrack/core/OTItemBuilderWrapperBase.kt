@@ -3,8 +3,8 @@ package kr.ac.snu.hcil.omnitrack.core
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemBuilderDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTPendingItemBuilderDAO
 import kr.ac.snu.hcil.omnitrack.utils.ValueWithTimestamp
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import rx.Observable
@@ -14,7 +14,7 @@ import rx.schedulers.Schedulers
 /**
  * Created by Young-Ho Kim on 16. 7. 25
  */
-class OTItemBuilderWrapperBase(val dao: OTPendingItemBuilderDAO, val realm: Realm) {
+class OTItemBuilderWrapperBase(val dao: OTItemBuilderDAO, val realm: Realm) {
 
     enum class EAttributeValueState {
         Processing, GettingExternalValue, Idle

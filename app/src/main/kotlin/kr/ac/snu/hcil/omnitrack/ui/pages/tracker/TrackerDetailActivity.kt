@@ -28,6 +28,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
+import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.applyTint
 
 class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tracker_detail) {
@@ -215,12 +216,23 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
 
 
     override fun onToolbarLeftButtonClicked() {
-        setResult(Activity.RESULT_CANCELED)
-        finish()
+        if (viewModel.isDirty) {
+            DialogHelper.makeYesNoDialogBuilder(this, "OmniTrack", resources.getString(R.string.msg_confirm_tracker_apply_change), R.string.msg_apply, onYes = {
+                onToolbarRightButtonClicked()
+            }, onNo = {
+                setResult(Activity.RESULT_CANCELED)
+                finish()
+            }
+            ).cancelable(true)
+                    .neutralText(R.string.msg_cancel)
+                    .show()
+        } else {
+            setResult(Activity.RESULT_CANCELED)
+            finish()
+        }
     }
 
     override fun onBackPressed() {
-        super.onBackPressed()
         onToolbarLeftButtonClicked()
     }
 
