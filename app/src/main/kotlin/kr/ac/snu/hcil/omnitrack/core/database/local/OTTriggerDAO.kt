@@ -16,12 +16,25 @@ open class OTTriggerDAO : RealmObject() {
     var position: Int = 0
 
     @Index
-    var action: Int = 0
+    var conditionType: Int = 0
 
     @Index
-    var type: Int = 0
+    var actionType: Int = 0
+
+    var serializedAction: String? = null
+
+
+    //Device-only properties===========
+    //When synchronizing them, convey them with corresponding device local ids.
+    var lastTriggeredTime: Long? = null
+    var isOn: Boolean = false
+    //=================================
 
     var properties = RealmList<OTStringStringEntryDAO>()
-    var lastTriggeredTime: Long? = null
     var trackers = RealmList<OTTrackerDAO>()
+
+    var synchronizedAt: Long? = null
+    var removed: Boolean = false
+    var updatedAt: Long = System.currentTimeMillis()
+    var userCreatedAt: Long = System.currentTimeMillis()
 }

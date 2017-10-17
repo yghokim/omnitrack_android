@@ -11,8 +11,6 @@ import android.support.design.widget.Snackbar
 import android.support.v4.widget.NestedScrollView
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.AppCompatImageView
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.text.InputType
 import android.view.LayoutInflater
@@ -130,6 +128,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
         creationSubscriptions.add(
                 namePropertyView.valueChanged.observable.subscribe { result ->
                     this.viewModel.name = result.second
+                    namePropertyView.showEdited = viewModel.isNameDirty
                 }
         )
 
@@ -138,12 +137,14 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                     println("viewModel color set to ${colorPropertyView.value}")
                     this.viewModel.color = colorPropertyView.value
                     applyColorTheme(colorPropertyView.value, true)
+                    colorPropertyView.showEdited = viewModel.isColorDirty
                 }
         )
 
         creationSubscriptions.add(
                 isOnShortcutPropertyView.valueChanged.observable.subscribe { result ->
                     this.viewModel.isBookmarked = result.second
+                    isOnShortcutPropertyView.showEdited = viewModel.isBookmarkedDirty
                 }
         )
 
@@ -194,16 +195,6 @@ class TrackerDetailStructureTabFragment : OTFragment() {
         attributeListView = rootView.findViewById(R.id.ui_attribute_list)
         attributeListView.setViewIntervalDistance(dipRound(8))
         attributeListView.emptyView = rootView.findViewById(R.id.ui_empty_list_message)
-        val layoutManager = object : LinearLayoutManager(context, VERTICAL, false) {
-            override fun canScrollVertically(): Boolean {
-                return false
-            }
-
-            override fun onItemsAdded(recyclerView: RecyclerView?, positionStart: Int, itemCount: Int) {
-                super.onItemsAdded(recyclerView, positionStart, itemCount)
-                scrollToBottom()
-            }
-        }
 
         attributeListView.addOnLayoutChangeListener { view, a, b, c, d, e, f, g, h ->
             if (scrollToBottomReserved) {

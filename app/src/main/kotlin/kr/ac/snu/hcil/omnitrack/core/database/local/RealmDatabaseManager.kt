@@ -248,8 +248,8 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    fun getItemBuilderQuery(trackerId: String, holderType: Int, realm: Realm): RealmQuery<OTPendingItemBuilderDAO> {
-        return realm.where(OTPendingItemBuilderDAO::class.java).equalTo("tracker.objectId", trackerId).equalTo("holderType", holderType)
+    fun getItemBuilderQuery(trackerId: String, holderType: Int, realm: Realm): RealmQuery<OTItemBuilderDAO> {
+        return realm.where(OTItemBuilderDAO::class.java).equalTo("tracker.objectId", trackerId).equalTo("holderType", holderType)
     }
 
 

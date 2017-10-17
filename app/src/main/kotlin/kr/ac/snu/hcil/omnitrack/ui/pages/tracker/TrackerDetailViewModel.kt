@@ -140,6 +140,16 @@ class TrackerDetailViewModel : RealmViewModel() {
         removedAttributes.clear()
     }
 
+    val isNameDirty: Boolean get() = trackerDao?.name != nameObservable.value
+    val isBookmarkedDirty: Boolean get() = trackerDao?.isBookmarked != isBookmarkedObservable.value
+    val isColorDirty: Boolean get() = trackerDao?.color != colorObservable.value
+
+    val isDirty: Boolean
+        get() {
+            return isNameDirty || isBookmarkedDirty || isColorDirty ||
+                    currentAttributeViewModelList.find { it.isDirty == true } != null
+        }
+
     fun applyChanges(): String {
         if (trackerDao != null) {
             trackerDao?.let { dao ->
@@ -276,6 +286,25 @@ class TrackerDetailViewModel : RealmViewModel() {
             }
         }
 
+        private fun arePropertiesDirty(): Boolean {
+            for (entry in propertyTable) {
+                if (attributeDAO.getPropertySerializedValue(entry.key) != entry.value.second)
+                    return true
+            }
+            return false
+        }
+
+        val isDirty: Boolean
+            get() {
+                return attributeDAO.localId.isBlank()
+                        || attributeDAO.name != name
+                        || attributeDAO.isRequired != isRequired
+                        || attributeDAO.fallbackValuePolicy != defaultValuePolicy
+                        || attributeDAO.fallbackPresetSerializedValue != defaultValuePreset
+                        || attributeDAO.serializedConnection != connectionObservable.value?.datum?.getSerializedString()
+                        || arePropertiesDirty()
+        }
+
         fun makeFrontalChangesToDao(): OTAttributeDAO {
             val dao = OTAttributeDAO()
             dao.objectId = attributeDAO.objectId
@@ -341,6 +370,7 @@ class TrackerDetailViewModel : RealmViewModel() {
             attributeDAO.isRequired = isRequired
             attributeDAO.updatedAt = System.currentTimeMillis()
             attributeDAO.fallbackValuePolicy = defaultValuePolicy
+            attributeDAO.fallbackPresetSerializedValue = defaultValuePreset
             for (entry in propertyTable) {
                 println("set new serialized value: $entry")
                 attributeDAO.setPropertySerializedValue(entry.key, entry.value.second)
