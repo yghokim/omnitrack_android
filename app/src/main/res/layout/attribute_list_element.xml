@@ -72,7 +72,7 @@
 
                 <android.support.v7.widget.AppCompatImageView
                     android:id="@+id/ui_required_marker"
-                    android:layout_width="12dp"
+                    android:layout_width="9dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginLeft="2.5dp"
@@ -138,6 +138,5 @@
             app:layout_constraintLeft_toRightOf="@+id/ui_drag_handle"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/ui_preview_container" />
-
     </android.support.constraint.ConstraintLayout>
 </FrameLayout>
