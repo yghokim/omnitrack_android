@@ -3,8 +3,8 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.items
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemBuilderDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemBuilderFieldValueEntry
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTPendingItemBuilderDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.ValueWithTimestamp
@@ -16,11 +16,11 @@ import rx.Single
  */
 class NewItemCreationViewModel : ItemEditionViewModelBase() {
 
-    private lateinit var itemBuilderDao: OTPendingItemBuilderDAO
+    private lateinit var itemBuilderDao: OTItemBuilderDAO
     private lateinit var builderWrapper: OTItemBuilderWrapperBase
 
     override fun onInit(trackerDao: OTTrackerDAO, itemId: String?): Pair<ItemMode, BuilderCreationMode?>? {
-        val builderDaoResult = OTApplication.app.databaseManager.getItemBuilderQuery(trackerDao.objectId!!, OTPendingItemBuilderDAO.HOLDER_TYPE_INPUT_FORM, realm).findFirst()
+        val builderDaoResult = OTApplication.app.databaseManager.getItemBuilderQuery(trackerDao.objectId!!, OTItemBuilderDAO.HOLDER_TYPE_INPUT_FORM, realm).findFirst()
 
         if (builderDaoResult != null) {
             //there is a pending itemBuilder.
@@ -30,9 +30,9 @@ class NewItemCreationViewModel : ItemEditionViewModelBase() {
         } else {
             //no pending itemBuilder.
             realm.executeTransaction {
-                val newBuilderDao = realm.createObject(OTPendingItemBuilderDAO::class.java, (realm.where(OTPendingItemBuilderDAO::class.java).max("id")?.toLong() ?: 0) + 1)
+                val newBuilderDao = realm.createObject(OTItemBuilderDAO::class.java, (realm.where(OTItemBuilderDAO::class.java).max("id")?.toLong() ?: 0) + 1)
                 newBuilderDao.tracker = trackerDao
-                newBuilderDao.holderType = OTPendingItemBuilderDAO.HOLDER_TYPE_INPUT_FORM
+                newBuilderDao.holderType = OTItemBuilderDAO.HOLDER_TYPE_INPUT_FORM
                 this.itemBuilderDao = realm.copyFromRealm(newBuilderDao)
             }
             builderCreationModeObservable.onNext(BuilderCreationMode.NewBuilder)
@@ -130,7 +130,7 @@ class NewItemCreationViewModel : ItemEditionViewModelBase() {
         subscriptions.add(
                 isBusyObservable.filter { it == false }.subscribe {
                     realm.executeTransaction {
-                        val daos = realm.where(OTPendingItemBuilderDAO::class.java).equalTo("id", itemBuilderDao.id).findAll()
+                        val daos = realm.where(OTItemBuilderDAO::class.java).equalTo("id", itemBuilderDao.id).findAll()
                         daos.forEach {
                             it.data.deleteAllFromRealm()
                         }

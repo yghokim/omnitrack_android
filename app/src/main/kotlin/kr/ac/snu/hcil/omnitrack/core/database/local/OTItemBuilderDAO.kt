@@ -11,11 +11,12 @@ import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelpe
 /**
  * Created by Young-Ho on 10/9/2017.
  */
-open class OTPendingItemBuilderDAO : RealmObject() {
+open class OTItemBuilderDAO : RealmObject() {
 
     companion object {
         const val HOLDER_TYPE_INPUT_FORM = 0
         const val HOLDER_TYPE_TRIGGER = 1
+        const val HOLDER_TYPE_SERVICE = 2
     }
 
     @PrimaryKey

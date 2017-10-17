@@ -26,21 +26,20 @@ open class OTIntegerStringEntryDAO : RealmObject() {
     var value: String? = null
 }
 
-class StringStringEntryListDiffCallback(a: List<OTStringStringEntryDAO>, b: List<OTStringStringEntryDAO>) : DiffUtil.Callback() {
-    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        TODO("not implemented")
-    }
+class StringStringEntryListDiffCallback(val a: List<OTStringStringEntryDAO>, val b: List<OTStringStringEntryDAO>) : DiffUtil.Callback() {
+    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
+            a[oldItemPosition].id == b[newItemPosition].id
 
-    override fun getOldListSize(): Int {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun getOldListSize(): Int = a.size
 
-    override fun getNewListSize(): Int {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun getNewListSize(): Int = b.size
 
     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val aItem = a[oldItemPosition]
+        val bItem = b[newItemPosition]
+
+        return aItem.key == bItem.key && aItem.value == bItem.value
     }
 
 }
+
