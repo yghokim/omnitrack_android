@@ -137,11 +137,15 @@ abstract class OTAttributeHelper {
                 }
                 OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_LAST_ITEM -> {
                     Observable.defer {
-                        val previousNotNullEntry = realm.where(OTItemValueEntryDAO::class.java)
-                                .equalTo("key", attribute.localId)
-                                .equalTo("item.trackerId", attribute.trackerId)
-                                .equalTo("item.removed", false)
-                                .findAllSorted("item.timestamp", Sort.DESCENDING).filter { it.value != null }.first()
+                        val previousNotNullEntry = try {
+                            realm.where(OTItemValueEntryDAO::class.java)
+                                    .equalTo("key", attribute.localId)
+                                    .equalTo("item.trackerId", attribute.trackerId)
+                                    .equalTo("item.removed", false)
+                                    .findAllSorted("item.timestamp", Sort.DESCENDING).filter { it.value != null }.first()
+                        } catch (ex: NoSuchElementException) {
+                            null
+                        }
 
                         println("previous not null entry: ${previousNotNullEntry}")
 

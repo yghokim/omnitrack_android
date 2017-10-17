@@ -362,9 +362,6 @@ class TrackerDetailStructureTabFragment : OTFragment() {
 
             private val connectionIndicatorStubProxy: ConnectionIndicatorStubProxy
 
-            private var connectionIndicator: View? = null
-            private var connectionSourceNameView: TextView? = null
-
             private val columnNameChangeDialog: MaterialDialog.Builder
 
             var preview: AAttributeInputView<out Any>? = null
@@ -457,7 +454,6 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                 viewHolderSubscriptions.add(
                         attributeViewModel.nameObservable.subscribe {
                             args ->
-                            println("name changed: ${args}")
                             columnNameView.text = args
                         }
                 )

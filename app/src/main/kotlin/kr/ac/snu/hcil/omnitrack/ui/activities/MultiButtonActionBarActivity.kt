@@ -36,10 +36,6 @@ abstract class MultiButtonActionBarActivity(val layoutId: Int) : OTActivity() {
 
     private var isCanceled = false
 
-    override fun onSessionLogContent(contentObject: Bundle) {
-        super.onSessionLogContent(contentObject)
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -54,7 +50,6 @@ abstract class MultiButtonActionBarActivity(val layoutId: Int) : OTActivity() {
             super.setResult(leftButtonResultCode)
             onToolbarLeftButtonClicked()
         }
-
 
         rightActionBarButton = findViewById(R.id.ui_appbar_button_right)
 
@@ -78,6 +73,24 @@ abstract class MultiButtonActionBarActivity(val layoutId: Int) : OTActivity() {
         titleView = findViewById(R.id.ui_appbar_title)
         titleView?.text = title
 
+    }
+
+    protected fun setActionBarButtonEnabled(button: View, enabled: Boolean) {
+        if (enabled) {
+            button.isEnabled = true
+            button.alpha = 1f
+        } else {
+            button.isEnabled = false
+            button.alpha = 0.2f
+        }
+    }
+
+    fun setLeftActionBarButtonEnabled(enabled: Boolean) {
+        leftActionBarButton?.let { setActionBarButtonEnabled(it, enabled) }
+    }
+
+    fun setRightActionBarTextButtonEnabled(enabled: Boolean) {
+        rightActionBarTextButton?.let { setActionBarButtonEnabled(it, enabled) }
     }
 
     override fun onTitleChanged(title: CharSequence?, color: Int) {
