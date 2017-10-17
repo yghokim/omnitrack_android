@@ -238,8 +238,10 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
 
     override fun onToolbarRightButtonClicked() {
         //add
-        val newTrackerId = viewModel.applyChanges()
-        setResult(RESULT_OK, Intent().putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, newTrackerId))
+        if (viewModel.isDirty) {
+            val newTrackerId = viewModel.applyChanges()
+            setResult(RESULT_OK, Intent().putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, newTrackerId))
+        }
         finish()
         /*
             if(namePropertyView.validate()) {

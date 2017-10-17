@@ -144,10 +144,15 @@ class TrackerDetailViewModel : RealmViewModel() {
     val isBookmarkedDirty: Boolean get() = trackerDao?.isBookmarked != isBookmarkedObservable.value
     val isColorDirty: Boolean get() = trackerDao?.color != colorObservable.value
 
+    val areAttributesDirty: Boolean
+        get() {
+            return (currentAttributeViewModelList.find { it.isDirty == true } != null) ||
+                    !Arrays.equals(trackerDao?.attributes?.map { attr -> attr.objectId }?.toTypedArray(), currentAttributeViewModelList.map { it.attributeDAO.objectId }.toTypedArray())
+        }
+
     val isDirty: Boolean
         get() {
-            return isNameDirty || isBookmarkedDirty || isColorDirty ||
-                    currentAttributeViewModelList.find { it.isDirty == true } != null
+            return isNameDirty || isBookmarkedDirty || isColorDirty || areAttributesDirty
         }
 
     fun applyChanges(): String {
