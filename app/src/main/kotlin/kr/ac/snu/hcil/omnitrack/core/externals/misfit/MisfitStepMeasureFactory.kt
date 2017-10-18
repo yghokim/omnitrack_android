@@ -10,7 +10,6 @@ import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableTypedQueue
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
-import rx.Observable
 import java.util.*
 
 /**
@@ -60,12 +59,12 @@ object MisfitStepMeasureFactory : OTMeasureFactory("step") {
         constructor(serialized: String) : super(serialized)
 
         override fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>> {
-            return Observable.defer {
+            return Flowable.defer {
                 val token = MisfitService.getStoredAccessToken()
                 if (token != null) {
-                    return@defer MisfitApi.getStepsOnDayRequest(token, Date(start), Date(end - 1)) as Observable<Nullable<out Any>>
+                    return@defer MisfitApi.getStepsOnDayRequest(token, Date(start), Date(end - 1)).toFlowable() as Flowable<Nullable<out Any>>
                 } else {
-                    return@defer Observable.error<Nullable<out Any>>(Exception("no token"))
+                    return@defer Flowable.error<Nullable<out Any>>(Exception("no token"))
                 }
             }
         }

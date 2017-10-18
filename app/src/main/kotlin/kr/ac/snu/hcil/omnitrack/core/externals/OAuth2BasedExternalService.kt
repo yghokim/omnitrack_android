@@ -1,7 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.externals
 
-import io.reactivex.BackpressureStrategy
-import io.reactivex.Flowable
+import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.dependency.OAuth2LoginDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.dependency.OTSystemDependencyResolver
@@ -56,11 +55,11 @@ abstract class OAuth2BasedExternalService(identifier: String, minimumSDK: Int) :
         credential = newCredential
     }
 
-    fun <T> getRequest(converter: OAuth2Client.OAuth2RequestConverter<T>, vararg requestUrls: String): Flowable<Nullable<T>> {
+    fun <T> getRequest(converter: OAuth2Client.OAuth2RequestConverter<T>, vararg requestUrls: String): Single<Nullable<T>> {
         val credential = credential
         return if (credential != null) {
-            authClient.getRequest(credential, converter, this, *requestUrls).toFlowable(BackpressureStrategy.LATEST)
-        } else Flowable.error(Exception("Auth Credential is not stored."))
+            authClient.getRequest(credential, converter, this, *requestUrls)
+        } else Single.error(Exception("Auth Credential is not stored."))
     }
 
 }

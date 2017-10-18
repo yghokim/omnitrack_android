@@ -61,7 +61,7 @@ object FitbitHeartRateMeasureFactory : OTMeasureFactory("heart") {
         override fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>> {
             val urls = FitbitApi.makeIntraDayRequestUrls(FitbitApi.REQUEST_INTRADAY_RESOURCE_PATH_HEART_RATE, start, end)
             println(urls)
-            return FitbitService.getRequest(converter, *urls) as Flowable<Nullable<out Any>>
+            return FitbitService.getRequest(converter, *urls).toFlowable() as Flowable<Nullable<out Any>>
         }
 
         override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_INT

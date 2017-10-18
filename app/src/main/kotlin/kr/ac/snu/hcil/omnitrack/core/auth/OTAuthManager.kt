@@ -33,7 +33,7 @@ object OTAuthManager {
     const val LOG_TAG = "OMNITRACK Auth Manager"
 
     enum class SignedInLevel {
-        NONE, AUTHORIZED, CACHED
+        NONE, CACHED, AUTHORIZED
     }
 
     interface SignInResultsHandler {

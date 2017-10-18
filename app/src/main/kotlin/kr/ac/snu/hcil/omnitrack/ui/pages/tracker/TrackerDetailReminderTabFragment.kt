@@ -6,12 +6,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import io.reactivex.disposables.CompositeDisposable
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.ATriggerListFragmentCore
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.TriggerDetailActivity
-import rx.subscriptions.CompositeSubscription
 
 /**
  * Created by younghokim on 16. 7. 30..
@@ -22,9 +22,9 @@ class TrackerDetailReminderTabFragment : OTFragment() {
 
     private lateinit var viewModel: TrackerDetailViewModel
 
-    private var creationSubscriptions = CompositeSubscription()
+    private var creationSubscriptions = CompositeDisposable()
 
-    private var resumeSubscriptions = CompositeSubscription()
+    private var resumeSubscriptions = CompositeDisposable()
 
     init {
     }

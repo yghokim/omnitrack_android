@@ -14,7 +14,7 @@ import kr.ac.snu.hcil.omnitrack.utils.RealmViewModel
  */
 class TrackerChartViewListViewModel : RealmViewModel() {
 
-    val currentGranularitySubject: BehaviorSubject<Granularity> = BehaviorSubject.create()
+    val currentGranularitySubject: BehaviorSubject<Granularity> = BehaviorSubject.createDefault(Granularity.WEEK_REL)
     val currentPointSubject: BehaviorSubject<Long> = BehaviorSubject.createDefault(System.currentTimeMillis())
     val isBusySubject: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(false)
 
@@ -36,7 +36,7 @@ class TrackerChartViewListViewModel : RealmViewModel() {
             }
         }
 
-    var granularity: Granularity?
+    var granularity: Granularity
         get() = currentGranularitySubject.value
         set(value) {
             if (currentGranularitySubject.value != value) {
@@ -45,7 +45,7 @@ class TrackerChartViewListViewModel : RealmViewModel() {
             }
         }
 
-    var point: Long?
+    var point: Long
         get() = currentPointSubject.value
         set(value) {
             if (currentPointSubject.value != value) {
@@ -78,12 +78,9 @@ class TrackerChartViewListViewModel : RealmViewModel() {
         if (!suspendApplyingScope || force) {
             val point = point
             val granularity = granularity
-            if (point != null && granularity != null) {
-                currentChartViewModelList.forEach {
-                    model ->
-                    model.setTimeScope(point, granularity)
-                    model.reload()
-                }
+            currentChartViewModelList.forEach { model ->
+                model.setTimeScope(point, granularity)
+                model.reload()
             }
         }
     }
@@ -94,8 +91,7 @@ class TrackerChartViewListViewModel : RealmViewModel() {
     }
 
     private fun clearChartViewModels(pushEmptyList: Boolean = true) {
-        currentChartViewModelList.forEach {
-            model ->
+        currentChartViewModelList.forEach { model ->
             model.recycle()
         }
         currentChartViewModelList.clear()

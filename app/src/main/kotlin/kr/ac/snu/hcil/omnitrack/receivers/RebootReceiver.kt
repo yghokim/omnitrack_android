@@ -5,9 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.PowerManager
 import kr.ac.snu.hcil.omnitrack.OTApplication
-import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckService
-import rx.schedulers.Schedulers
 
 /**
  * Created by Young-Ho on 9/4/2016.
@@ -30,6 +28,7 @@ class RebootReceiver : BroadcastReceiver() {
 
         OTApplication.app.timeTriggerAlarmManager.activateOnSystem()
 
+        /*
         OTApplication.app.currentUserObservable.observeOn(Schedulers.newThread()).subscribe({
             user ->
             OTShortcutPanelManager.refreshNotificationShortcutViews(user, context)
@@ -38,7 +37,7 @@ class RebootReceiver : BroadcastReceiver() {
             result.finish()
             wl.release()
             println("OMNITRACK: reboot receiver finished.")
-        })
+        })*/
 
     }
 

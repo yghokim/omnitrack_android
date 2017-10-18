@@ -18,8 +18,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import android.widget.TextView
+import io.reactivex.disposables.CompositeDisposable
 import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator
-import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.EventLoggingManager
@@ -32,7 +32,6 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.DataTriggerViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.TimeTriggerViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.TriggerListViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.TriggerViewModel
-import rx.subscriptions.CompositeSubscription
 import java.util.*
 
 /**
@@ -83,8 +82,8 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
     //private var expandedTriggerPosition: Int = -1
     //private var expandedViewHolder: ATriggerViewHolder<out OTTrigger>? = null
 
-    private val createViewSubscriptions = CompositeSubscription()
-    private val creationSubscriptions = CompositeSubscription()
+    private val createViewSubscriptions = CompositeDisposable()
+    private val creationSubscriptions = CompositeDisposable()
 
     private val triggerTypeDialog: AlertDialog by lazy {
         NewTriggerTypeSelectionDialogHelper.builder(parent.context, triggerActionTypeName) {
@@ -113,7 +112,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
             creationSubscriptions.add(
                     activity.signedInUserObservable.subscribe {
                         user ->
-                        viewModel.userId = user.objectId
+                        viewModel.userId = user
 
                         creationSubscriptions.add(
                                 viewModel.triggerViewModelListSubject.subscribe {
@@ -181,29 +180,6 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
             )
         }*/
 
-        val activity = parent.activity
-        if (activity is OTActivity) {
-            createViewSubscriptions.add(
-                    activity.signedInUserObservable.subscribe {
-                        user ->
-                        createViewSubscriptions.add(
-                                user.triggerManager.triggerAdded.subscribe {
-                                    trigger ->
-                                    println("trigger added")
-                                    refresh()
-                                }
-                        )
-
-                        createViewSubscriptions.add(
-                                user.triggerManager.triggerRemoved.subscribe {
-                                    trigger ->
-                                    println("trigger removed")
-                                    refresh()
-                                }
-                        )
-                    }
-            )
-        }
     }
 
     fun refresh() {
@@ -254,6 +230,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
                 if (data != null && data.hasExtra(TriggerDetailActivity.INTENT_EXTRA_TRIGGER_DATA)) {
                     val triggerPojo = data.getSerializableExtra(TriggerDetailActivity.INTENT_EXTRA_TRIGGER_DATA)
                     if (triggerPojo is DatabaseManager.TriggerPOJO) {
+                        /* TODO
                         OTApplication.app.currentUserObservable.subscribe {
                             user ->
                             val newTrigger = OTTrigger.makeInstance(DatabaseManager.generateNewKey(DatabaseManager.CHILD_NAME_TRIGGERS), user, triggerPojo)
@@ -261,7 +238,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
                             postProcessNewlyAddedTrigger(newTrigger)
                             appendNewTrigger(newTrigger)
                             EventLoggingManager.logTriggerChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_TRIGGER_ADD, newTrigger.objectId, newTrigger.typeId, newTrigger.action)
-                        }
+                        }*/
                     }
                 }
             }

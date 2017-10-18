@@ -2,10 +2,10 @@ package kr.ac.snu.hcil.omnitrack.core.dependency
 
 import android.app.Activity
 import android.content.Context
+import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.utils.TextHelper
-import rx.Single
 
 /**
  * Created by Young-Ho on 5/27/2017.
@@ -22,6 +22,6 @@ class ServiceActivationDependencyResolver(val service: OTExternalService) : OTSy
     }
 
     override fun tryResolve(activity: Activity): Single<Boolean> {
-        return service.startActivationActivityAsync(activity).first().toSingle()
+        return service.startActivationActivityAsync(activity).firstOrError()
     }
 }

@@ -4,11 +4,9 @@ import android.animation.LayoutTransition
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
-import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
-import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.TrackerPickerDialogBuilder
 import kr.ac.snu.hcil.omnitrack.utils.getActivity
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 import org.apmem.tools.layouts.FlowLayout
@@ -62,6 +60,7 @@ class TrackerAssignPanel : FlowLayout, View.OnClickListener {
 
         val activity = getActivity()
         if (activity is OTActivity) {
+            /*
             subscriptions.add(
                     activity.signedInUserObservable.subscribe {
                         user ->
@@ -71,13 +70,14 @@ class TrackerAssignPanel : FlowLayout, View.OnClickListener {
                             vh.colorBar.setBackgroundColor(tracker.value.color)
                         }
                     }
-            )
+            )*/
         }
     }
 
     override fun onClick(view: View) {
         val fm = this.getActivity()?.supportFragmentManager
         if (fm != null) {
+            /*
             subscriptions.add(
 
                     OTApplication.app.currentUserObservable.subscribe {
@@ -91,7 +91,7 @@ class TrackerAssignPanel : FlowLayout, View.OnClickListener {
                         })
                         dialog.show()
                     }
-            )
+            )*/
         }
     }
 

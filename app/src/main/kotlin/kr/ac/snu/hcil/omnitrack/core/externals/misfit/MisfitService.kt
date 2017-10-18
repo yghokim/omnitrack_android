@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.externals.misfit
 
 import android.app.Activity
 import android.content.Context
+import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.dependency.OTSystemDependencyResolver
@@ -9,7 +10,6 @@ import kr.ac.snu.hcil.omnitrack.core.dependency.ThirdPartyAppDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.TextHelper
-import rx.Single
 
 /**
  * Created by Young-Ho on 9/1/2016.
@@ -60,11 +60,10 @@ object MisfitService : OTExternalService("MisfitService", 0) {
         }
 
         override fun tryResolve(activity: Activity): Single<Boolean> {
-            return MisfitApi.authorize(activity).first().toSingle().doOnSuccess {
+            return MisfitApi.authorize(activity).doOnSuccess {
                 token ->
                 OTExternalService.preferences.edit().putString(MisfitService.PREFERENCE_ACCESS_TOKEN, token).apply()
-            }.onErrorReturn { err -> null }
-                    .map { token -> !token.isNullOrBlank() }
+            }.map { token -> !token.isBlank() }.onErrorReturn { err -> false }
         }
 
     }

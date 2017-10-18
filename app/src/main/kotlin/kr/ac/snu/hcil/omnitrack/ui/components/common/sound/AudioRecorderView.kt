@@ -13,13 +13,14 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
-import io.reactivex.Maybe
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.services.OTAudioPlayService
 import kr.ac.snu.hcil.omnitrack.services.OTAudioRecordService
+import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 import java.io.File
@@ -346,16 +347,15 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, ValueAnimator.Anima
         remainingTimeView.text = formatTime(audioLengthSeconds - currentAudioSeconds)
     }
 
-    fun stopRecordingAndApplyUri(): Maybe<Uri> {
+    fun stopRecordingAndApplyUri(): Single<Nullable<Uri>> {
         if (state == State.RECORDING) {
             tryStopRecordService()
-            return Maybe.fromSingle(
-                    stateObservable.filter {
+            return stateObservable.filter {
                 println("state: ${it}")
                 it == State.FILE_MOUNTED
-                    }.firstOrError().subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).timeout(2, TimeUnit.SECONDS).onErrorReturn { State.FILE_MOUNTED }.map { state -> audioFileUri })
+            }.firstOrError().subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).timeout(2, TimeUnit.SECONDS).onErrorReturn { State.FILE_MOUNTED }.map { state -> Nullable(audioFileUri) }
         } else {
-            return Maybe.just(audioFileUri)
+            return Single.just(Nullable(audioFileUri))
         }
     }
 

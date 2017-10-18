@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.TextView
 import com.afollestad.materialdialogs.MaterialDialog
 import io.reactivex.Single
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.disposables.Disposables
 import io.realm.Realm
@@ -19,7 +20,6 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.common.RxBoundDialogFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
-import rx.subscriptions.CompositeSubscription
 
 /**
  * Created by younghokim on 2017. 4. 14..
@@ -64,7 +64,7 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
 
     private lateinit var realm: Realm
 
-    private val subscriptions = CompositeSubscription()
+    private val subscriptions = CompositeDisposable()
 
     fun addListener(listener: Listener) {
         this.listeners.add(listener)

@@ -2,22 +2,21 @@ package kr.ac.snu.hcil.omnitrack.core.externals.misfit
 
 import android.accounts.NetworkErrorException
 import android.app.Activity
+import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.ui.components.common.activity.WebServiceLoginActivity
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.auth.AuthConstants
-import kr.ac.snu.hcil.omnitrack.utils.convertToRx1Observable
 import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
 import okhttp3.FormBody
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject
-import rx.Observable
-import rx.android.schedulers.AndroidSchedulers
-import rx.schedulers.Schedulers
 import rx_activity_result2.RxActivityResult
 import java.util.*
 
@@ -49,7 +48,7 @@ object MisfitApi {
     /***
      * authrize and observe access token
      */
-    fun authorize(activity: Activity): Observable<String> {
+    fun authorize(activity: Activity): Single<String> {
 
         val uri = makeUriBuilderRoot().addPathSegments(SUBURL_LOGIN)
                 .addQueryParameter(AuthConstants.PARAM_CLIENT_ID, activity.resources.getString(R.string.misfit_app_key))
@@ -58,7 +57,7 @@ object MisfitApi {
                 .addQueryParameter(AuthConstants.PARAM_SCOPE, "tracking,sleeps")
                 .build()
         return RxActivityResult.on(activity).startIntent(WebServiceLoginActivity.makeIntent(uri.toString(), OTApplication.getString(R.string.service_misfit_name), activity))
-                .convertToRx1Observable()
+                .firstOrError()
                 .flatMap {
                     result ->
                     if (result.resultCode() == Activity.RESULT_OK) {
@@ -67,22 +66,22 @@ object MisfitApi {
                             MisfitApi.getTokenExchangeRequest(code).subscribeOn(Schedulers.io())
                                     .observeOn(AndroidSchedulers.mainThread())
                         } else {
-                            Observable.error<String>(Exception("access token was not received."))
+                            Single.error<String>(Exception("access token was not received."))
                         }
                     } else {
-                        Observable.error<String>(Exception("login activity was canceled."))
+                        Single.error<String>(Exception("login activity was canceled."))
                     }
                 }
     }
 
-    fun getLatestSleepOnDayRequest(token: String, start: Date, end: Date): Observable<Nullable<TimeSpan>> {
+    fun getLatestSleepOnDayRequest(token: String, start: Date, end: Date): Single<Nullable<TimeSpan>> {
         return getApiRequest(token, mapOf(
                 QUERY_START_DATE to AuthConstants.DATE_TIME_FORMAT.format(start),
                 QUERY_END_DATE to AuthConstants.DATE_TIME_FORMAT.format(end)
         ), SUBURL_ACTIVITY_SLEEP).map {
             resultObject ->
             if (resultObject.has("sleeps")) {
-                val sleeps = resultObject!!.getJSONArray("sleeps")
+                val sleeps = resultObject.getJSONArray("sleeps")
                 if (sleeps.length() > 0) {
                     val last = sleeps.getJSONObject(sleeps.length() - 1)
                     val startTimeString = last.getString("startTime")
@@ -94,7 +93,7 @@ object MisfitApi {
         }
     }
 
-    fun getStepsOnDayRequest(token: String, start: Date, end: Date): Observable<Nullable<Int>> {
+    fun getStepsOnDayRequest(token: String, start: Date, end: Date): Single<Nullable<Int>> {
         return getApiRequest(token, mapOf(
                 QUERY_START_DATE to AuthConstants.DATE_TIME_FORMAT.format(start),
                 QUERY_END_DATE to AuthConstants.DATE_TIME_FORMAT.format(end)
@@ -109,9 +108,9 @@ object MisfitApi {
         }
     }
 
-    fun getApiRequest(token: String, parameters: Map<String, String>, activity: String): Observable<JSONObject> {
+    fun getApiRequest(token: String, parameters: Map<String, String>, activity: String): Single<JSONObject> {
 
-        return Observable.defer {
+        return Single.defer {
             val uriBuilder = makeUriBuilderRoot().addPathSegments(SUBURL_ACTIVITY).addPathSegment(activity)
 
             for (paramEntry in parameters) {
@@ -132,17 +131,17 @@ object MisfitApi {
                     val response = OkHttpClient().newCall(request).execute()
                     val responseBody = response.body()!!.string()
                     println(responseBody)
-                    return@defer Observable.just(JSONObject(responseBody))
+                    return@defer Single.just(JSONObject(responseBody))
                 } catch(e: Exception) {
                     OTApplication.logger.writeSystemLog("Misfit API Exception: ${e.message}", "MisfitAPI")
-                    return@defer Observable.error<JSONObject>(e)
+                    return@defer Single.error<JSONObject>(e)
                 }
-            } else return@defer Observable.error<JSONObject>(NetworkErrorException("Network is not on."))
+            } else return@defer Single.error<JSONObject>(NetworkErrorException("Network is not on."))
         }
     }
 
-    fun getTokenExchangeRequest(requestCode: String): Observable<String> {
-        return Observable.defer {
+    fun getTokenExchangeRequest(requestCode: String): Single<String> {
+        return Single.defer {
             val uri = makeUriBuilderRoot().addPathSegments(SUBURL_EXCHANGE).build()
             val requestBody = FormBody.Builder()
                     .add(AuthConstants.PARAM_CODE, requestCode)
@@ -161,11 +160,11 @@ object MisfitApi {
                 val response = OkHttpClient().newCall(request).execute()
                 val result = JSONObject(response.body()!!.string())
                 if (result.has(AuthConstants.PARAM_ACCESS_TOKEN)) {
-                    return@defer Observable.just(result.getString(AuthConstants.PARAM_ACCESS_TOKEN))
-                } else return@defer Observable.error<String>(Exception("token empty"))
+                    return@defer Single.just(result.getString(AuthConstants.PARAM_ACCESS_TOKEN))
+                } else return@defer Single.error<String>(Exception("token empty"))
             } catch(e: Exception) {
                 OTApplication.logger.writeSystemLog("Misfit Token Exchange Exception: ${e.message}", "MisfitAPI")
-                return@defer Observable.error<String>(e)
+                return@defer Single.error<String>(e)
             }
         }
     }
