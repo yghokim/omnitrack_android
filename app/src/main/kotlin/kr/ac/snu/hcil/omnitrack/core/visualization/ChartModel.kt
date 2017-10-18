@@ -53,6 +53,7 @@ abstract class ChartModel<T>(val realm: Realm) : IChartInterface<T> {
         println(data)
         this.cachedData.clear()
         this.cachedData.addAll(data)
+        currentState = State.Loaded
     }
 
     fun reload() {
