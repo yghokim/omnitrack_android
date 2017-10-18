@@ -2,12 +2,12 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.services
 
 import android.arch.lifecycle.ViewModel
 import android.content.Context
+import io.reactivex.Observable
+import io.reactivex.Single
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.subjects.BehaviorSubject
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.ui.components.common.dependency.DependencyControlViewModel
-import rx.Observable
-import rx.Single
-import rx.subjects.BehaviorSubject
-import rx.subscriptions.CompositeSubscription
 
 /**
  * Created by younghokim on 2017. 5. 25..
@@ -16,7 +16,7 @@ class ServiceActivationViewModel : ViewModel() {
 
     enum class State { Checking, IdleNotSatistified, Satisfied }
 
-    private val subscriptions = CompositeSubscription()
+    private val subscriptions = CompositeDisposable()
 
     var attachedService: OTExternalService? = null
         set(value) {
@@ -63,8 +63,7 @@ class ServiceActivationViewModel : ViewModel() {
                                     }
                     )
                 }
-
-                serviceDependencyViewModels.onNext(value)
+                serviceDependencyViewModels.onNext(value ?: emptyList())
             }
         }
 

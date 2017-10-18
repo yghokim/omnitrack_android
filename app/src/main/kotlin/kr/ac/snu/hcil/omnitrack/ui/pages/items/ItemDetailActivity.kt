@@ -18,8 +18,8 @@ import android.widget.TextView
 import android.widget.Toast
 import butterknife.bindView
 import com.airbnb.lottie.LottieAnimationView
-import io.reactivex.Maybe
 import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import kr.ac.snu.hcil.omnitrack.OTApplication
@@ -278,9 +278,9 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
         //syncViewStateToBuilderAsync {viewModel.applyEditingToDatabase()
 
         creationSubscriptions.add(
-                Maybe.zip(
+                Single.zip(
                         attributeListAdapter.inputViews.map { it.forceApplyValueAsync() }
-                ) { zipped -> zipped }.flatMap {
+                ) { zipped -> zipped }.flatMapMaybe {
                     val incompleteFieldLocalIds = currentAttributeViewModelList.filter {
                         it.isRequired && it.value?.value == null
                     }.map { it.attributeLocalId }

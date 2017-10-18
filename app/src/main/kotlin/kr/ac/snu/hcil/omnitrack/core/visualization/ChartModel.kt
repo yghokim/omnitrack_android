@@ -49,6 +49,8 @@ abstract class ChartModel<T>(val realm: Realm) : IChartInterface<T> {
     private var invalidated = false
 
     protected open fun onNewDataLoaded(data: List<T>) {
+        println("new chart data loaded and cache : ${data.size}")
+        println(data)
         this.cachedData.clear()
         this.cachedData.addAll(data)
     }

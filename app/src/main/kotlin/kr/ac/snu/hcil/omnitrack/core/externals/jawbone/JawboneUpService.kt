@@ -10,17 +10,20 @@ import com.jawbone.upplatformsdk.oauth.OauthWebViewActivity
 import com.jawbone.upplatformsdk.utils.UpPlatformSdkConstants
 import com.jawbone.upplatformsdk.utils.UpPlatformSdkConstants.UP_PLATFORM_ACCESS_TOKEN
 import com.jawbone.upplatformsdk.utils.UpPlatformSdkConstants.UP_PLATFORM_REFRESH_TOKEN
+import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.dependency.OTSystemDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.dependency.ThirdPartyAppDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
-import kr.ac.snu.hcil.omnitrack.utils.*
+import kr.ac.snu.hcil.omnitrack.utils.TextHelper
+import kr.ac.snu.hcil.omnitrack.utils.getDayOfMonth
+import kr.ac.snu.hcil.omnitrack.utils.getYear
+import kr.ac.snu.hcil.omnitrack.utils.getZeroBasedMonth
 import retrofit.Callback
 import retrofit.RetrofitError
 import retrofit.client.Response
-import rx.Single
 import rx_activity_result2.RxActivityResult
 import java.util.*
 
@@ -119,7 +122,7 @@ object JawboneUpService : OTExternalService("JawboneUpService", 9) {
                 val intent = Intent(activity, OauthWebViewActivity::class.java)
                 intent.putExtra(UpPlatformSdkConstants.AUTH_URI, builder.build())
                 return@defer RxActivityResult.on(activity).startIntent(intent)
-                        .convertToRx1Observable().first().toSingle()
+                        .firstOrError()
                         .flatMap { result ->
                             if (result.resultCode() == Activity.RESULT_OK) {
                                 Single.create<Boolean> {
@@ -136,7 +139,7 @@ object JawboneUpService : OTExternalService("JawboneUpService", 9) {
                                                 object : Callback<OauthAccessTokenResponse> {
                                                     override fun failure(error: RetrofitError) {
                                                         println("Jawbone Request failed. ${error.message}")
-                                                        if (!subscriber.isUnsubscribed) {
+                                                        if (!subscriber.isDisposed) {
                                                             subscriber.onSuccess(false)
                                                         }
                                                     }
@@ -152,12 +155,12 @@ object JawboneUpService : OTExternalService("JawboneUpService", 9) {
                                                             println("accessToken:" + result.access_token)
                                                             accessToken = result.access_token
                                                             ApiManager.getRequestInterceptor().setAccessToken(accessToken)
-                                                            if (!subscriber.isUnsubscribed) {
+                                                            if (!subscriber.isDisposed) {
                                                                 subscriber.onSuccess(true)
                                                             }
                                                         } else {
                                                             println("accessToken not returned by Oauth call, exiting...")
-                                                            if (!subscriber.isUnsubscribed) {
+                                                            if (!subscriber.isDisposed) {
                                                                 subscriber.onSuccess(false)
                                                             }
                                                         }
@@ -168,7 +171,7 @@ object JawboneUpService : OTExternalService("JawboneUpService", 9) {
                             } else {
                                 Single.just(false)
                             }
-                        }
+                        }.onErrorReturn { false }
             }
         }
 

@@ -21,7 +21,8 @@ import android.widget.PopupMenu
 import android.widget.TextView
 import android.widget.ToggleButton
 import butterknife.bindView
-import io.reactivex.disposables.Disposable
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.SerialDisposable
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
@@ -48,7 +49,6 @@ import kr.ac.snu.hcil.omnitrack.utils.getDayOfMonth
 import kr.ac.snu.hcil.omnitrack.utils.io.FileHelper
 import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
-import rx.subscriptions.CompositeSubscription
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.properties.Delegates
@@ -88,7 +88,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
             return SettingsDialogFragment.getInstance()
         }
 
-    private val startSubscriptions = CompositeSubscription()
+    private val startSubscriptions = CompositeDisposable()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -373,7 +373,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
         inner class ItemElementViewHolder(view: View) : RecyclerView.ViewHolder(view), View.OnClickListener, PopupMenu.OnMenuItemClickListener {
 
-            val itemLevelSubscriptions = CompositeSubscription()
+            val itemLevelSubscriptions = CompositeDisposable()
             val colorBar: View by bindView(R.id.color_bar)
 
             val monthView: TextView by bindView(R.id.ui_text_month)
@@ -515,7 +515,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                     val attributeNameView: TextView by bindView(R.id.ui_attribute_name)
                     var valueView: View
 
-                    var valueApplySubscription: Disposable? = null
+                    var valueApplySubscription = SerialDisposable()
 
                     var attributeLocalId: String? = null
 
@@ -566,12 +566,11 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                             val newValueView = attribute.getHelper().getViewForItemList(attribute, this@ItemBrowserActivity, valueView)
                             changeNewValueView(newValueView)
 
-                            valueApplySubscription?.dispose()
-                            valueApplySubscription = attribute.getHelper().applyValueToViewForItemList(attribute, itemValue, valueView).subscribe({
-                                valueApplySubscription = null
+                            valueApplySubscription.set(attribute.getHelper().applyValueToViewForItemList(attribute, itemValue, valueView).subscribe({
+
                             }, {
-                                valueApplySubscription = null
-                            })
+                            }))
+
                             startSubscriptions.add(valueApplySubscription)
                         } else {
                             //empty value
@@ -641,7 +640,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
         private var listView: RecyclerView by Delegates.notNull()
 
-        private var dialogSubscriptions = CompositeSubscription()
+        private var dialogSubscriptions = CompositeDisposable()
 
         private val menuAdapter = Adapter()
 

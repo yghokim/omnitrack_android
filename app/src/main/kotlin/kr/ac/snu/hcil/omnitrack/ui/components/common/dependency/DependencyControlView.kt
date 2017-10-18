@@ -8,19 +8,19 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
 import android.widget.TextView
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.getActivity
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 import mehdi.sakout.fancybuttons.FancyButton
-import rx.android.schedulers.AndroidSchedulers
-import rx.subscriptions.CompositeSubscription
 
 /**
  * Created by younghokim on 2017. 5. 24..
  */
 class DependencyControlView : RelativeLayout {
 
-    private val subscriptions = CompositeSubscription()
+    private val subscriptions = CompositeDisposable()
 
     var viewModel: DependencyControlViewModel? = null
         set(value) {

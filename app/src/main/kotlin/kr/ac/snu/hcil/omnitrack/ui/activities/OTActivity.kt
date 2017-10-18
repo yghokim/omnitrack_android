@@ -165,7 +165,7 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
         println("OMNITRACK Check whether user is cached. Otherwise, go to sign in")
         creationSubscriptions.add(
                 OTAuthManager.getAuthStateRefreshObservable().firstOrError().subscribe { signInResult ->
-                    if (signInResult >= OTAuthManager.SignedInLevel.CACHED) {
+                    if (signInResult > OTAuthManager.SignedInLevel.NONE) {
                         signedInUserSubject.onNext(OTAuthManager.userId!!)
                         onSignInProcessCompletelyFinished()
                     } else {
@@ -253,14 +253,8 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
 
     private fun performSignInProcessCompletelyFinished() {
         println("OMNITRACK loading user from the application global instance")
-        /*
-        creationSubscriptions.add(
-                OTApplication.app.currentUserObservable.subscribe {
-                    user ->
-                    println("OMNITRACK received user from global instance")
-                    this.signedInUserSubject.onNext(user)
-                }
-        )*/
+
+        this.signedInUserSubject.onNext(OTAuthManager.userId!!)
 
         onSignInProcessCompletelyFinished()
     }

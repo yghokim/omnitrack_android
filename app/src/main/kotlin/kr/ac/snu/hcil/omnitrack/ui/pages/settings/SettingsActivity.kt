@@ -12,11 +12,8 @@ import android.preference.PreferenceFragment
 import android.widget.Toast
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckService
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
-import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.utils.LocaleHelper
 
 
@@ -157,6 +154,7 @@ class SettingsActivity : MultiButtonActionBarActivity(R.layout.activity_multibut
         override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
             when (key) {
                 "pref_show_shortcut_panel" -> {
+                    /*TODO fix shortcut panel options
                     if (sharedPreferences.getBoolean(key, true)) {
                         //show if logged in
                         if (OTAuthManager.currentSignedInLevel > OTAuthManager.SignedInLevel.NONE) {
@@ -174,7 +172,7 @@ class SettingsActivity : MultiButtonActionBarActivity(R.layout.activity_multibut
                         }
                     } else {
                         OTShortcutPanelManager.disposeShortcutPanel()
-                    }
+                    }*/
                 }
 
                 "pref_check_updates" -> {

@@ -252,9 +252,10 @@ class OTApplication : MultiDexApplication() {
         OTExternalService.init()
         for (service in OTExternalService.availableServices) {
             if (service.state == OTExternalService.ServiceState.ACTIVATED) {
-                service.activateSilently().subscribe {
-
-
+                service.activateSilently().subscribe { success ->
+                    if (success != true) {
+                        println("failed to activite ${service.identifier} service silently.")
+                    }
                 }
             }
         }

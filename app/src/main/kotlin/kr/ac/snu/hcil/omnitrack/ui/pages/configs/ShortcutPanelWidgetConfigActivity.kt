@@ -2,7 +2,6 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.configs
 
 import android.appwidget.AppWidgetManager
 import android.content.Intent
-import android.os.Bundle
 import android.support.v7.widget.AppCompatCheckBox
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -37,10 +36,6 @@ class ShortcutPanelWidgetConfigActivity : AppWidgetConfigurationActivity(R.layou
 
     private var trackerList: List<WritablePair<OTTracker, Boolean>>? = null
     private var trackerSelectionAdapter: TrackerSelectionAdapter = TrackerSelectionAdapter()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
 
     override fun onCreateWithWidget(appWidgetId: Int) {
         super.onCreateWithWidget(appWidgetId)
@@ -92,11 +87,13 @@ class ShortcutPanelWidgetConfigActivity : AppWidgetConfigurationActivity(R.layou
         creationSubscriptions.add(
                 signedInUserObservable.subscribe({
                     user ->
+                    /*TODO shortcut panel refresh
                     val selectedTrackerIds = OTShortcutPanelWidgetUpdateService.getSelectedTrackerIds(appWidgetId, OTShortcutPanelWidgetUpdateService.getPreferences(this))
                     trackerList = user.trackers.map {
                         WritablePair(it, selectedTrackerIds?.contains(it.objectId) == true)
                     }
-                    trackerSelectionAdapter.notifyDataSetChanged()
+                    trackerSelectionAdapter.notifyDataSetChanged()*/
+
 
                 }, {
 

@@ -11,11 +11,9 @@ import android.view.ViewStub
 import android.widget.FrameLayout
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
-import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.actions.NotificationSettingsPanelView
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
@@ -265,6 +263,7 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_mul
             val triggerId = arguments.getString(OTApplication.INTENT_EXTRA_OBJECT_ID_TRIGGER)
             if (!triggerId.isNullOrBlank()) {
                 val activity = activity
+                /*
                 if (activity is OTActivity) {
                     createViewSubscriptions.add(
                             activity.signedInUserObservable.doOnNext { user -> this.user = user }.flatMap {
@@ -282,8 +281,9 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_mul
 
                                 onUserLoaded(savedInstanceState)
                             })
-                }
+                }*/
             } else {
+                /*
                 triggerType = arguments.getInt(INTENT_EXTRA_TRIGGER_TYPE, -1)
                 triggerAction = arguments.getInt(INTENT_EXTRA_TRIGGER_ACTION, -1)
                 val activity = activity
@@ -293,7 +293,7 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_mul
                                 onUserLoaded(savedInstanceState)
                             }
                     )
-                }
+                }*/
             }
 
             return view
@@ -389,6 +389,7 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_mul
 
             if (savedInstanceState != null) {
                 if (!hideAttachedTrackers) {
+                    /*
                     val trackers = savedInstanceState.getStringArrayList("assignedTrackers")
                     if (trackers != null) {
                         val activity = activity
@@ -402,7 +403,7 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_mul
                                     }
                             )
                         }
-                    }
+                    }*/
                 }
 
                 configurationCoordinatorView?.readConfigurationFromBundle(savedInstanceState)

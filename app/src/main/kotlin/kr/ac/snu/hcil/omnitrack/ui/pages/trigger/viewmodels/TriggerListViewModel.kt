@@ -1,10 +1,10 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels
 
 import android.support.v7.util.DiffUtil
+import io.reactivex.subjects.BehaviorSubject
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTrigger
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.UserAttachedViewModel
-import rx.subjects.BehaviorSubject
 
 /**
  * Created by Young-Ho on 6/4/2017.

@@ -88,7 +88,7 @@ object FitbitRecentSleepTimeMeasureFactory : OTMeasureFactory("slp") {
                     .build()
             return FitbitService.getRequest(
                     converter,
-                    uri.toString()) as Flowable<Nullable<out Any>>
+                    uri.toString()).toFlowable() as Flowable<Nullable<out Any>>
         }
 
         override fun onDeserialize(typedQueue: SerializableTypedQueue) {

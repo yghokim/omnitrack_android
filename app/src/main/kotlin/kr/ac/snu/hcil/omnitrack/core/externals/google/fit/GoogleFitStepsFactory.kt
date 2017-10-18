@@ -1,13 +1,14 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.google.fit
 
 import com.google.android.gms.common.api.Api
-import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.common.api.Scope
 import com.google.android.gms.fitness.Fitness
 import com.google.android.gms.fitness.data.DataType
 import com.google.android.gms.fitness.data.Field
 import com.google.android.gms.fitness.request.DataReadRequest
+import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
+import io.reactivex.schedulers.Schedulers
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
@@ -17,9 +18,6 @@ import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableTypedQueue
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
-import rx.Observable
-import rx.functions.Func1
-import rx.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 
 /**
@@ -75,8 +73,7 @@ object GoogleFitStepsFactory : GoogleFitService.GoogleFitMeasureFactory("step") 
         override fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>> {
             println("Requested Google Fit Step Measure")
             return if (factory.getService().state == OTExternalService.ServiceState.ACTIVATED) {
-                GoogleFitService.getConnectedClient().map<Nullable<out Any>>(object : Func1<GoogleApiClient, Nullable<out Any>> {
-                    override fun call(client: GoogleApiClient): Nullable<out Any> {
+                GoogleFitService.getConnectedClient().toFlowable(BackpressureStrategy.LATEST).map<Nullable<out Any>> { client ->
                         val request = DataReadRequest.Builder()
                                 .aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
                                 .bucketByTime(1, TimeUnit.DAYS)
@@ -93,11 +90,10 @@ object GoogleFitStepsFactory : GoogleFitService.GoogleFitMeasureFactory("step") 
                             }
                         }
 
-                        return Nullable(steps)
-                    }
-                }).subscribeOn(Schedulers.io())
+                    return@map Nullable(steps)
+                }.subscribeOn(Schedulers.io())
             } else {
-                Observable.error<Nullable<out Any>>(Exception("Service is not activated."))
+                Flowable.error<Nullable<out Any>>(Exception("Service is not activated."))
             }
         }
 

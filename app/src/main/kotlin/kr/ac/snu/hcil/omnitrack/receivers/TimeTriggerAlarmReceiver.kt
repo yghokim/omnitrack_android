@@ -9,12 +9,7 @@ import android.os.PowerManager
 import android.util.SparseArray
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
-import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTrigger
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTriggerAlarmManager
-import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
-import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTNotificationTriggerAction
-import rx.Observable
-import rx.schedulers.Schedulers
 import java.util.*
 
 /**
@@ -91,6 +86,7 @@ class TimeTriggerAlarmReceiver : BroadcastReceiver() {
 
             println("Wakeful Service handleIntent, trigger time: ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(triggerTime))}")
 
+            /*TODO trigger alarm service handling
             OTApplication.app.currentUserObservable.first().flatMap {
                 user ->
                 println("Returned user")
@@ -129,7 +125,7 @@ class TimeTriggerAlarmReceiver : BroadcastReceiver() {
                 }
             }.subscribe({
 
-            }, { }, { completeWakefulIntent(intent) })
+            }, { }, { completeWakefulIntent(intent) })*/
         }
     }
 }

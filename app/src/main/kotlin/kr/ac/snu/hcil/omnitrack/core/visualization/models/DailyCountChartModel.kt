@@ -39,7 +39,7 @@ class DailyCountChartModel(tracker: OTTrackerDAO, realm: Realm) : TrackerChartMo
                 .makeItemsQuery(tracker.objectId, getTimeScope(), realm)
                 .findAllSortedAsync("timestamp", Sort.ASCENDING)
                 .asFlowable()
-                .filter { it.isLoaded == true }
+                .filter { it.isLoaded == true && it.isValid }
                 .firstOrError()
                 .map { items ->
                     DataHelper.ConvertSortedListToBinWithLong((xScale.binPointsOnDomain + getTimeScope().to).toTypedArray(),
@@ -104,11 +104,17 @@ class DailyCountChartModel(tracker: OTTrackerDAO, realm: Realm) : TrackerChartMo
                 todayCenterX = xScale[xScale.binPointsOnDomain[todayIndex]]
             }
 
-            val minCount = this@DailyCountChartModel.cachedData.minBy { elm -> elm.second }?.second ?: 0
-            val maxCount = this@DailyCountChartModel.cachedData.maxBy { elm -> elm.second }?.second ?: 0
+            println("current cached data: ${this@DailyCountChartModel.cachedData}")
 
-            yScale.setDomain(minCount.toFloat(), maxCount.toFloat(), true)
-            yScale.nice(true)
+            try {
+                val minCount = this@DailyCountChartModel.cachedData.minBy { elm -> elm.second }?.second ?: 0
+                val maxCount = this@DailyCountChartModel.cachedData.maxBy { elm -> elm.second }?.second ?: 0
+
+                yScale.setDomain(minCount.toFloat(), maxCount.toFloat(), true)
+                yScale.nice(true)
+            } catch (ex: Exception) {
+                ex.printStackTrace()
+            }
 
             counterBarGroups.setData(this@DailyCountChartModel.cachedData)
 

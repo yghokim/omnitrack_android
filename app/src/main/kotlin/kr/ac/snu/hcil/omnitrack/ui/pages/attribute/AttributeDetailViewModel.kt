@@ -1,14 +1,14 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.attribute
 
 import android.arch.lifecycle.ViewModel
+import io.reactivex.subjects.BehaviorSubject
+import io.reactivex.subjects.PublishSubject
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
-import rx.subjects.BehaviorSubject
-import rx.subjects.PublishSubject
 import java.util.*
 
 /**
@@ -30,15 +30,15 @@ class AttributeDetailViewModel : ViewModel() {
 
     val isInDatabase: Boolean get() = attributeDAO?.isManaged ?: false
 
-    val nameObservable = BehaviorSubject.create<String>("")
+    val nameObservable = BehaviorSubject.createDefault<String>("")
     val connectionObservable = BehaviorSubject.create<Nullable<OTConnection>>()
 
     val typeObservable = BehaviorSubject.create<Int>()
 
-    val defaultValuePolicyObservable = BehaviorSubject.create<Int>(-1)
-    val defaultValuePresetObservable = BehaviorSubject.create<Nullable<String>>(Nullable<String>(null))
+    val defaultValuePolicyObservable = BehaviorSubject.createDefault<Int>(-1)
+    val defaultValuePresetObservable = BehaviorSubject.createDefault<Nullable<String>>(Nullable<String>(null))
 
-    val isRequiredObservable = BehaviorSubject.create<Boolean>(false)
+    val isRequiredObservable = BehaviorSubject.createDefault<Boolean>(false)
 
     val onPropertyValueChanged = PublishSubject.create<Pair<String, Any?>>()
 

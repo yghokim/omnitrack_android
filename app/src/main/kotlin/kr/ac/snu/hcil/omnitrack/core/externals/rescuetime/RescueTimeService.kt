@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.rescuetime
 
+import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OAuth2BasedExternalService
@@ -10,7 +11,6 @@ import kr.ac.snu.hcil.omnitrack.utils.auth.OAuth2Client
 import okhttp3.HttpUrl
 import org.json.JSONArray
 import org.json.JSONObject
-import rx.Observable
 import java.util.*
 
 /**
@@ -77,8 +77,8 @@ object RescueTimeService : OAuth2BasedExternalService("RescueTimeService", 0) {
         return uriBuilder.toString()
     }
 
-    fun <T> getSummaryRequest(startDate: Date, endDate: Date, calculator: ISummaryCalculator<T>): Observable<Nullable<T>> {
-        return getRequest(Converter(startDate, endDate, calculator), makeSummaryRequestUrl(SUBURL_SUMMARY)) as Observable<Nullable<T>>
+    fun <T> getSummaryRequest(startDate: Date, endDate: Date, calculator: ISummaryCalculator<T>): Single<Nullable<T>> {
+        return getRequest(Converter(startDate, endDate, calculator), makeSummaryRequestUrl(SUBURL_SUMMARY)) as Single<Nullable<T>>
     }
 
     internal class Converter<T>(val startDate: Date, val endDate: Date, val calculator: ISummaryCalculator<T>) : OAuth2Client.OAuth2RequestConverter<T?> {

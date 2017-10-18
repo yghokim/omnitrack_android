@@ -21,6 +21,7 @@ import android.widget.TextView
 import android.widget.Toast
 import butterknife.bindView
 import com.afollestad.materialdialogs.MaterialDialog
+import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_tracker_detail_structure.*
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
@@ -42,7 +43,6 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeDetailActivity
 import kr.ac.snu.hcil.omnitrack.utils.DefaultNameGenerator
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.dipRound
-import rx.subscriptions.CompositeSubscription
 
 /**
  * Created by Young-Ho Kim on 16. 7. 29
@@ -81,9 +81,9 @@ class TrackerDetailStructureTabFragment : OTFragment() {
 
     private val attributeListAdapter = AttributeListAdapter()
 
-    private val creationSubscriptions = CompositeSubscription()
+    private val creationSubscriptions = CompositeDisposable()
 
-    private val viewHolderSubscriptions = CompositeSubscription()
+    private val viewHolderSubscriptions = CompositeDisposable()
 
     private val newAttributePanel: FieldPresetSelectionBottomSheetFragment by lazy {
 

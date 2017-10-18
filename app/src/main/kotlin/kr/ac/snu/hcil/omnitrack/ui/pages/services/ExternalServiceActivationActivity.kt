@@ -15,6 +15,8 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import at.markushi.ui.RevealColorView
 import butterknife.bindView
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.SerialDisposable
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
@@ -25,8 +27,6 @@ import kr.ac.snu.hcil.omnitrack.utils.TextHelper
 import kr.ac.snu.hcil.omnitrack.utils.dipRound
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 import mehdi.sakout.fancybuttons.FancyButton
-import rx.android.schedulers.AndroidSchedulers
-import rx.subscriptions.SerialSubscription
 
 /**
  * Created by younghokim on 2017. 5. 25..
@@ -162,8 +162,7 @@ class ExternalServiceActivationActivity : OTActivity(false, false) {
         activateButton.setOnClickListener {
             println("activate")
             creationSubscriptions.add(
-                    viewModel.activateService().subscribe {
-                        activated ->
+                    viewModel.activateService().subscribe { activated: Boolean ->
                         if (activated) {
                             setResult(RESULT_OK)
                             finish()
@@ -202,12 +201,12 @@ class ExternalServiceActivationActivity : OTActivity(false, false) {
             val viewModel = dependencyList?.get(position)
             holder.dependencyView.viewModel = viewModel
 
-            holder.subscription.unsubscribe()
+            holder.subscription.dispose()
         }
 
 
         inner class DependencyAdapterViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
-            val subscription = SerialSubscription()
+            val subscription = SerialDisposable()
             val dependencyView: DependencyControlView by bindView(R.id.ui_dependency_view)
         }
     }
