@@ -83,9 +83,7 @@ class ChartViewActivity : MultiButtonActionBarActivity(R.layout.activity_chart_v
                 viewModel.currentGranularitySubject.subscribe {
                     granularity ->
                     val point = viewModel.point
-                    if (point != null) {
-                        updateScopeUI(point, granularity)
-                    }
+                    updateScopeUI(point, granularity)
                 }
         )
 
@@ -93,9 +91,7 @@ class ChartViewActivity : MultiButtonActionBarActivity(R.layout.activity_chart_v
                 viewModel.currentPointSubject.subscribe {
                     point ->
                     val granularity = viewModel.granularity
-                    if (granularity != null) {
-                        updateScopeUI(point, granularity)
-                    }
+                    updateScopeUI(point, granularity)
                 }
         )
 
@@ -160,17 +156,13 @@ class ChartViewActivity : MultiButtonActionBarActivity(R.layout.activity_chart_v
         if (view === leftNavigationButton) {
             var point = viewModel.point
             val granularity = viewModel.granularity
-            if (point != null && granularity != null) {
-                point -= granularity.getIntervalMillis(false, point)
-                viewModel.point = point
-            }
+            point -= granularity.getIntervalMillis(false, point)
+            viewModel.point = point
         } else if (view === rightNavigationButton) {
             var point = viewModel.point
             val granularity = viewModel.granularity
-            if (point != null && granularity != null) {
-                point += granularity.getIntervalMillis(true, point)
-                viewModel.point = point
-            }
+            point += granularity.getIntervalMillis(true, point)
+            viewModel.point = point
         }
     }
 
