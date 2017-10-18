@@ -6,11 +6,8 @@ import android.content.Intent
 import android.content.SharedPreferences
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
-import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
-import kr.ac.snu.hcil.omnitrack.utils.isInDozeMode
 import rx.Observable
-import rx.Single
 import rx.Subscription
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
@@ -76,6 +73,7 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
         fun log(context: Context, tracker: OTTracker, source: ItemLoggingSource, notify: Boolean = true): Observable<Int> {
 
             return Observable.create<Int> { subscriber ->
+                /*
                 val builder = OTItemBuilder(tracker, OTItemBuilder.MODE_BACKGROUND)
 
                 OTApplication.logger.writeSystemLog("start background logging of ${tracker.name}", TAG)
@@ -117,6 +115,7 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
                         }
                     }
                 }
+                */
             }
         }
 
@@ -162,9 +161,10 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
     }
 
     private fun handleLogging(trackerId: String, intent: Intent) {
+        /*
         OTApplication.app.currentUserObservable.flatMap { user -> user.getTrackerObservable(trackerId) }.subscribe { tracker ->
             log(this, tracker, ItemLoggingSource.valueOf(intent.getStringExtra(INTENT_EXTRA_LOGGING_SOURCE)), true).subscribe()
-        }
+        }*/
     }
 
 

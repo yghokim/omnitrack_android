@@ -14,6 +14,8 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import com.afollestad.materialdialogs.MaterialDialog
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.SerialDisposable
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
@@ -22,8 +24,6 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.home.MeasureFactoryAdapter
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.dipRound
 import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
-import rx.subscriptions.CompositeSubscription
-import rx.subscriptions.SerialSubscription
 
 /**
  * Created by Young-Ho on 7/29/2016.
@@ -34,7 +34,7 @@ class ServiceListFragment : OTFragment() {
 
     private lateinit var adapter: Adapter
 
-    private val creationSubscriptions = CompositeSubscription()
+    private val creationSubscriptions = CompositeDisposable()
 
     private val internetRequiredAlertBuilder: MaterialDialog.Builder by lazy {
         DialogHelper.makeSimpleAlertBuilder(context, context.getString(R.string.msg_external_service_activation_requires_internet))
@@ -119,7 +119,7 @@ class ServiceListFragment : OTFragment() {
 
             val measureFactoryAdapter = MeasureFactoryAdapter()
 
-            val serviceStateSubscription = SerialSubscription()
+            val serviceStateSubscription = SerialDisposable()
 
             private val activateColor: ColorStateList by lazy {
                 ColorStateList.valueOf(ContextCompat.getColor(context, R.color.colorPointed))

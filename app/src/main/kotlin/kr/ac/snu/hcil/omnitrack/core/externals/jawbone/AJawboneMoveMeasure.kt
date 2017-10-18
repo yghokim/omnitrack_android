@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.jawbone.upplatformsdk.api.ApiManager
 import com.jawbone.upplatformsdk.utils.UpPlatformSdkConstants
+import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
@@ -24,26 +25,26 @@ abstract class AJawboneMoveMeasure : OTMeasureFactory.OTRangeQueriedMeasure {
 
     override fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>> {
         if (TimeHelper.isSameDay(start, end - 10)) {
-            return Observable.create<Nullable<out Any>> {
+            return Flowable.create<Nullable<out Any>>({
                 subscriber ->
                 ApiManager.getRestApiInterface().getMoveEventsList(UpPlatformSdkConstants.API_VERSION_STRING, HashMap<String, Long>().apply { this["date"] = JawboneUpService.makeFormattedDateInteger(start).toLong() }, object : Callback<Any> {
                     override fun failure(error: RetrofitError) {
-                        if (!subscriber.isUnsubscribed) {
+                        if (!subscriber.isCancelled) {
                             subscriber.onError(error)
                         }
                     }
 
                     override fun success(result: Any, response: Response) {
 
-                        if (!subscriber.isUnsubscribed) {
+                        if (!subscriber.isCancelled) {
                             subscriber.onNext(Nullable(extractValueFromResult(result)))
-                            subscriber.onCompleted()
+                            subscriber.onComplete()
                         }
                     }
                 })
-            }
+            }, BackpressureStrategy.LATEST)
         } else {
-            return Observable.create<Nullable<out Any>> {
+            return Flowable.create<Nullable<out Any>>({
                 subscriber ->
 
                 Observable.zip(TimeHelper.sliceToDate(start, end).map {
@@ -74,15 +75,15 @@ abstract class AJawboneMoveMeasure : OTMeasureFactory.OTRangeQueriedMeasure {
                     sum
                 }).subscribe({
                     result ->
-                    if (!subscriber.isUnsubscribed) {
+                    if (!subscriber.isCancelled) {
                         subscriber.onNext(Nullable(result))
-                        subscriber.onCompleted()
+                        subscriber.onComplete()
                     }
                 }, {
                     error ->
                     subscriber.onError(error)
                 })
-            }
+            }, BackpressureStrategy.LATEST)
         }
     }
 

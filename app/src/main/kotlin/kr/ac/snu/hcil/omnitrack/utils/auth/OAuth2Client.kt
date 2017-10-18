@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.SharedPreferences
 import android.os.AsyncTask
 import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kr.ac.snu.hcil.omnitrack.ui.components.common.activity.WebServiceLoginActivity
@@ -160,10 +161,10 @@ class OAuth2Client(val config: OAuth2Config) {
                 .addHeader(AuthConstants.HEADER_AUTHORIZATION, "Bearer ${credential.accessToken}")
     }
 
-    fun <T> getRequest(credential: Credential, converter: OAuth2RequestConverter<T>, credentialRefreshedListener: OAuth2CredentialRefreshedListener?, vararg requestUrls: String): Observable<Nullable<T>> {
-        return Observable.defer {
+    fun <T> getRequest(credential: Credential, converter: OAuth2RequestConverter<T>, credentialRefreshedListener: OAuth2CredentialRefreshedListener?, vararg requestUrls: String): Single<Nullable<T>> {
+        return Single.defer {
             val result = requestAwait(credential, converter, credentialRefreshedListener, *requestUrls)
-            return@defer Observable.just(Nullable(result))
+            return@defer Single.just(Nullable(result))
         }.subscribeOn(Schedulers.io())
     }
 

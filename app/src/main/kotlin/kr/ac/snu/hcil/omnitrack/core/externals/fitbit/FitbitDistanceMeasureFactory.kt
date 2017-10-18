@@ -91,11 +91,11 @@ object FitbitDistanceMeasureFactory : OTMeasureFactory("dist") {
             return if (TimeHelper.isSameDay(start, end - 10)) {
                 FitbitService.getRequest(
                         dailyConverter,
-                        FitbitApi.makeDailyRequestUrl(FitbitApi.REQUEST_COMMAND_SUMMARY, Date(start)))
+                        FitbitApi.makeDailyRequestUrl(FitbitApi.REQUEST_COMMAND_SUMMARY, Date(start))).toFlowable()
                         as Flowable<Nullable<out Any>>
             } else
             //TODO: Can be optimized by querying summary data of middle days.
-                FitbitService.getRequest(intraDayConverter, *FitbitApi.makeIntraDayRequestUrls(FitbitApi.REQUEST_INTRADAY_RESOURCE_PATH_DISTANCE, start, end))
+                FitbitService.getRequest(intraDayConverter, *FitbitApi.makeIntraDayRequestUrls(FitbitApi.REQUEST_INTRADAY_RESOURCE_PATH_DISTANCE, start, end)).toFlowable()
                         as Flowable<Nullable<out Any>>
         }
 

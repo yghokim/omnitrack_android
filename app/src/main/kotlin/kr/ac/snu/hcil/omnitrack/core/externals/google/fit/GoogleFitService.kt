@@ -7,6 +7,8 @@ import android.os.Bundle
 import com.google.android.gms.common.api.Api
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.common.api.Scope
+import io.reactivex.Observable
+import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.dependency.OTSystemDependencyResolver
@@ -14,8 +16,6 @@ import kr.ac.snu.hcil.omnitrack.core.dependency.ThirdPartyAppDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.TextHelper
-import rx.Observable
-import rx.Single
 import rx_activity_result2.RxActivityResult
 import java.util.*
 
@@ -88,17 +88,17 @@ object GoogleFitService : OTExternalService("GoogleFitService", 19) {
         return Observable.create {
             subscriber ->
             if (client?.isConnected == true) {
-                if (!subscriber.isUnsubscribed) {
+                if (!subscriber.isDisposed) {
                     subscriber.onNext(client!!)
-                    subscriber.onCompleted()
+                    subscriber.onComplete()
                 }
             } else {
                 client = buildClientBuilderBase()
                         .addConnectionCallbacks(object : GoogleApiClient.ConnectionCallbacks {
                             override fun onConnected(p0: Bundle?) {
-                                if (!subscriber.isUnsubscribed) {
+                                if (!subscriber.isDisposed) {
                                     subscriber.onNext(client!!)
-                                    subscriber.onCompleted()
+                                    subscriber.onComplete()
                                 }
                             }
 
@@ -107,9 +107,9 @@ object GoogleFitService : OTExternalService("GoogleFitService", 19) {
 
                         })
                         .addOnConnectionFailedListener {
-                            if (!subscriber.isUnsubscribed) {
+                            if (!subscriber.isDisposed) {
                                 subscriber.onNext(client!!)
-                                subscriber.onCompleted()
+                                subscriber.onComplete()
                             }
                         }
                         .build().apply { connect() }
@@ -137,7 +137,7 @@ object GoogleFitService : OTExternalService("GoogleFitService", 19) {
 
     class GoogleFitAuthDependencyResolver : OTSystemDependencyResolver() {
         override fun checkDependencySatisfied(context: Context, selfResolve: Boolean): Single<DependencyCheckResult> {
-            return getConnectedClient().first().toSingle().map {
+            return getConnectedClient().firstOrError().map {
                 client ->
                 DependencyCheckResult(DependencyState.Passed, TextHelper.formatWithResources(context, R.string.msg_format_dependency_sign_in_passed, nameResourceId), "")
             }.onErrorReturn { err -> DependencyCheckResult(DependencyState.FatalFailed, TextHelper.formatWithResources(context, R.string.msg_format_dependency_sign_in_failed, nameResourceId), context.getString(R.string.msg_sign_in)) }
@@ -154,8 +154,8 @@ object GoogleFitService : OTExternalService("GoogleFitService", 19) {
 
                             override fun onConnected(reason: Bundle?) {
                                 println("activation success.")
-                                if (!subscriber.isUnsubscribed) {
-                                    subscriber.onSuccess(client)
+                                if (!subscriber.isDisposed) {
+                                    subscriber.onSuccess(client!!)
                                 }
                             }
                         })
@@ -172,7 +172,7 @@ object GoogleFitService : OTExternalService("GoogleFitService", 19) {
                                             if (result.resultCode() == Activity.RESULT_OK) {
                                                 client?.connect()
                                             } else {
-                                                if (!subscriber.isUnsubscribed) {
+                                                if (!subscriber.isDisposed) {
                                                     subscriber.onError(Exception("resolution was canceled by user."))
                                                 }
                                             }

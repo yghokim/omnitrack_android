@@ -11,16 +11,11 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.badoo.mobile.util.WeakHandler
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.ValueEventListener
-import com.tbruyelle.rxpermissions.RxPermissions
+import com.tbruyelle.rxpermissions2.RxPermissions
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.ExperimentConsentManager
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import rx.subscriptions.CompositeSubscription
@@ -143,36 +138,7 @@ class SignInActivity : AppCompatActivity() {
 
             ExperimentConsentManager.startProcess(this@SignInActivity, OTAuthManager.userId!!, object : ExperimentConsentManager.ResultListener {
                 override fun onConsentApproved() {
-                    val activatedRef = DatabaseManager.currentUserRef?.child("examples_generated")
-                    activatedRef?.addListenerForSingleValueEvent(object : ValueEventListener {
-                        override fun onCancelled(error: DatabaseError?) {
-                            goHomeActivity()
-                        }
-
-                        override fun onDataChange(snapshot: DataSnapshot) {
-                            if (snapshot.exists() && snapshot.value == true) {
-                                goHomeActivity()
-                            } else {
-                                creationSubscription.add(
-                                        OTApplication.app.currentUserObservable.subscribe {
-                                            user ->
-                                            user.addExampleTrackers()
-                                            activatedRef.setValue(true, object : DatabaseReference.CompletionListener {
-                                                override fun onComplete(error: DatabaseError?, ref: DatabaseReference?) {
-                                                    if (error == null) {
-                                                        goHomeActivity()
-                                                    }
-                                                }
-
-                                            })
-                                        }
-                                )
-                            }
-
-
-                        }
-
-                    }) ?: goHomeActivity()
+                    goHomeActivity()
                 }
 
                 override fun onConsentFailed() {

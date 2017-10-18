@@ -3,12 +3,12 @@ package kr.ac.snu.hcil.omnitrack.core.dependency
 import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
+import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.utils.TextHelper
 import kr.ac.snu.hcil.omnitrack.utils.auth.OAuth2Client
-import rx.Single
 
 /**
  * Created by younghokim on 2017. 5. 25..
@@ -30,10 +30,9 @@ class OAuth2LoginDependencyResolver(val authClient: OAuth2Client, val identifier
                 .doOnNext { credential ->
                     credential.store(OTExternalService.preferences, identifier)
                 }
-                .onErrorReturn { error -> null }
-                .map {
-                    credential ->
-                    credential != null
-                }.first().toSingle()
+                .map { credential ->
+                    true
+                }.onErrorReturn { false }
+                .firstOrError()
     }
 }

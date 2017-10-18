@@ -14,7 +14,6 @@ import kr.ac.snu.hcil.omnitrack.utils.NumberStyle
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableTypedQueue
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import org.json.JSONObject
-import rx.Observable
 import java.util.*
 
 /**
@@ -83,7 +82,7 @@ object RescueTimeProductivityMeasureFactory : OTMeasureFactory("prd") {
         constructor(serialized: String) : super(serialized)
 
         override fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>> {
-            return RescueTimeService.getSummaryRequest(Date(start), Date(end - 1), productivityCalculator) as Observable<Nullable<out Any>>
+            return RescueTimeService.getSummaryRequest(Date(start), Date(end - 1), productivityCalculator).toFlowable() as Flowable<Nullable<out Any>>
         }
 
         override fun onSerialize(typedQueue: SerializableTypedQueue) {

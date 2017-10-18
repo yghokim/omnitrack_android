@@ -7,9 +7,9 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.support.annotation.StringRes
+import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.TextHelper
-import rx.Single
 
 /**
  * Created by younghokim on 2017. 5. 17..

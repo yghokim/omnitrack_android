@@ -5,6 +5,9 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.support.v4.app.Fragment
+import io.reactivex.Observable
+import io.reactivex.Single
+import io.reactivex.subjects.BehaviorSubject
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.dependency.OTSystemDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.dependency.PermissionDependencyResolver
@@ -15,10 +18,6 @@ import kr.ac.snu.hcil.omnitrack.core.externals.misfit.MisfitService
 import kr.ac.snu.hcil.omnitrack.core.externals.rescuetime.RescueTimeService
 import kr.ac.snu.hcil.omnitrack.ui.pages.services.ExternalServiceActivationActivity
 import kr.ac.snu.hcil.omnitrack.utils.INameDescriptionResourceProvider
-import kr.ac.snu.hcil.omnitrack.utils.convertToRx1Observable
-import rx.Observable
-import rx.Single
-import rx.subjects.BehaviorSubject
 import rx_activity_result2.RxActivityResult
 import java.util.*
 
@@ -181,7 +180,6 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
 
         return RxActivityResult.on(context as Activity)
                 .startIntent(ExternalServiceActivationActivity.makeIntent(context, this))
-                .convertToRx1Observable()
                 .map {
                     result ->
                     result.resultCode() == Activity.RESULT_OK

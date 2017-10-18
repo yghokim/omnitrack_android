@@ -6,15 +6,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.TrackerPickerDialogBuilder
-import kr.ac.snu.hcil.omnitrack.ui.pages.tracker.TrackerDetailActivity
-import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
-import kr.ac.snu.hcil.omnitrack.utils.getActivity
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 
 /**
@@ -62,6 +58,7 @@ class MeasureFactoryAdapter : RecyclerView.Adapter<MeasureFactoryAdapter.Measure
         override fun onClick(view: View) {
             if (view === connectButton) {
 
+                /* TODO measurefactory tracker picker
                 OTApplication.app.currentUserObservable.subscribe {
                     user ->
                     val dialog = TrackerPickerDialogBuilder(user.trackers.unObservedList, this).createDialog(itemView.getActivity()!!, R.string.msg_pick_track_to_attach_field_with_measure, null, {
@@ -77,7 +74,7 @@ class MeasureFactoryAdapter : RecyclerView.Adapter<MeasureFactoryAdapter.Measure
                         }
                     })
                     dialog.show()
-                }
+                }*/
 
             }
         }

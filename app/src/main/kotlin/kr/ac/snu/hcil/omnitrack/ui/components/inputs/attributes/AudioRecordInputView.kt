@@ -5,13 +5,14 @@ import android.net.Uri
 import android.util.AttributeSet
 import android.view.View
 import com.github.ybq.android.spinkit.SpinKitView
-import io.reactivex.Maybe
+import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioRecorderView
+import kr.ac.snu.hcil.omnitrack.utils.Nullable
 
 /**
  * Created by Young-Ho Kim on 2016-07-22.
@@ -106,8 +107,8 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
 
     }
 
-    override fun forceApplyValueAsync(): Maybe<out Any> {
-        return valueView.stopRecordingAndApplyUri()
+    override fun forceApplyValueAsync(): Single<Nullable<out Any>> {
+        return valueView.stopRecordingAndApplyUri() as Single<Nullable<out Any>>
     }
 
     override fun onDetachedFromWindow() {

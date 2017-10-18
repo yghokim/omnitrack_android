@@ -2,9 +2,9 @@ package kr.ac.snu.hcil.omnitrack.ui.components.common.dependency
 
 import android.app.Activity
 import android.content.Context
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.subjects.BehaviorSubject
 import kr.ac.snu.hcil.omnitrack.core.dependency.OTSystemDependencyResolver
-import rx.subjects.BehaviorSubject
-import rx.subscriptions.CompositeSubscription
 
 /**
  * Created by younghokim on 2017. 5. 24..
@@ -18,7 +18,7 @@ class DependencyControlViewModel(val dependencyResolver: OTSystemDependencyResol
     val onStatusChanged: BehaviorSubject<State> = BehaviorSubject.create()
     val onDependencyCheckResult: BehaviorSubject<OTSystemDependencyResolver.DependencyCheckResult> = BehaviorSubject.create()
 
-    private val subscriptions = CompositeSubscription()
+    private val subscriptions = CompositeDisposable()
 
 
     init {
