@@ -7,7 +7,9 @@ import com.google.gson.GsonBuilder
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
-import com.tbruyelle.rxpermissions.RxPermissions
+import com.tbruyelle.rxpermissions2.RxPermissions
+import io.reactivex.Observable
+import io.reactivex.Single
 import io.realm.Realm
 import io.realm.RealmList
 import io.realm.RealmObject
@@ -17,7 +19,6 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
-import rx.Observable
 import java.io.File
 import java.util.*
 
@@ -248,7 +249,7 @@ open class OTAttributeDAO : RealmObject() {
         }
     }
 
-    fun getFallbackValue(realm: Realm): Observable<Nullable<out Any>> {
+    fun getFallbackValue(realm: Realm): Single<Nullable<out Any>> {
         return OTAttributeManager.getAttributeHelper(type).getFallbackValue(this, realm)
     }
 

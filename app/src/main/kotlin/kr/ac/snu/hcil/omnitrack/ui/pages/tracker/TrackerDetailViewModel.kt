@@ -2,6 +2,9 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.tracker
 
 import android.support.annotation.DrawableRes
 import android.support.v7.util.DiffUtil
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.subjects.BehaviorSubject
+import io.reactivex.subjects.PublishSubject
 import io.realm.Realm
 import io.realm.RealmChangeListener
 import kr.ac.snu.hcil.omnitrack.OTApplication
@@ -15,9 +18,6 @@ import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.RealmViewModel
 import kr.ac.snu.hcil.omnitrack.utils.move
 import org.jetbrains.anko.collections.forEachWithIndex
-import rx.subjects.BehaviorSubject
-import rx.subjects.PublishSubject
-import rx.subscriptions.CompositeSubscription
 import java.util.*
 import kotlin.collections.HashSet
 
@@ -31,9 +31,9 @@ class TrackerDetailViewModel : RealmViewModel() {
     val trackerId: String? get() = this.trackerDao?.objectId
 
     //Observables========================================
-    val nameObservable = BehaviorSubject.create<String>("")
-    val isBookmarkedObservable = BehaviorSubject.create<Boolean>(false)
-    val colorObservable = BehaviorSubject.create<Int>(OTApplication.app.colorPalette[0])
+    val nameObservable = BehaviorSubject.createDefault<String>("")
+    val isBookmarkedObservable = BehaviorSubject.createDefault<Boolean>(false)
+    val colorObservable = BehaviorSubject.createDefault<Int>(OTApplication.app.colorPalette[0])
     val attributeViewModelListObservable = BehaviorSubject.create<List<AttributeInformationViewModel>>()
     //===================================================
 
@@ -72,7 +72,7 @@ class TrackerDetailViewModel : RealmViewModel() {
                 val dao = OTApplication.app.databaseManager.getTrackerQueryWithId(trackerId, realm).findFirstAsync()
 
                 subscriptions.add(
-                        dao.asObservable<OTTrackerDAO>().filter { it.isValid }.first().subscribe { snapshot ->
+                        dao.asFlowable<OTTrackerDAO>().filter { it.isValid }.firstOrError().subscribe { snapshot ->
 
                             name = snapshot.name
                             isBookmarked = snapshot.isBookmarked
@@ -215,17 +215,17 @@ class TrackerDetailViewModel : RealmViewModel() {
 
         val isInDatabase: Boolean get() = attributeDAO.isManaged
 
-        val nameObservable = BehaviorSubject.create<String>("")
-        val isRequiredObservable = BehaviorSubject.create<Boolean>(false)
-        val typeObservable = BehaviorSubject.create<Int>(-1)
-        val iconObservable = BehaviorSubject.create<Int>(R.drawable.icon_small_longtext)
+        val nameObservable = BehaviorSubject.createDefault<String>("")
+        val isRequiredObservable = BehaviorSubject.createDefault<Boolean>(false)
+        val typeObservable = BehaviorSubject.createDefault<Int>(-1)
+        val iconObservable = BehaviorSubject.createDefault<Int>(R.drawable.icon_small_longtext)
         val connectionObservable = BehaviorSubject.create<Nullable<OTConnection>>()
-        val defaultValuePolicyObservable = BehaviorSubject.create<Int>(OTAttributeDAO.DEFAULT_VALUE_POLICY_NULL)
-        val defaultValuePresetObservable = BehaviorSubject.create<Nullable<String>>(Nullable<String>(null))
+        val defaultValuePolicyObservable = BehaviorSubject.createDefault<Int>(OTAttributeDAO.DEFAULT_VALUE_POLICY_NULL)
+        val defaultValuePresetObservable = BehaviorSubject.createDefault<Nullable<String>>(Nullable<String>(null))
 
         val onPropertyChanged = PublishSubject.create<Long>()
 
-        val internalSubscription = CompositeSubscription()
+        val internalSubscription = CompositeDisposable()
 
         //key, dbId/serializedValue
         private val propertyTable = Hashtable<String, Pair<String, String>>()

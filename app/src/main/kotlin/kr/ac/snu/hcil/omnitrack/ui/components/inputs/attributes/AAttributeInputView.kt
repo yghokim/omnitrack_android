@@ -4,10 +4,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.AttributeSet
+import io.reactivex.Maybe
 import kr.ac.snu.hcil.omnitrack.ui.IActivityLifeCycle
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.AInputView
-import kr.ac.snu.hcil.omnitrack.utils.Nullable
-import rx.Single
 import kotlin.properties.Delegates
 
 /**
@@ -76,10 +75,10 @@ abstract class AAttributeInputView<DataType>(layoutId: Int, context: Context, at
     init {
     }
 
-    open fun forceApplyValueAsync(): Single<Nullable<out Any>> {
-        return Single.defer {
+    open fun forceApplyValueAsync(): Maybe<out Any> {
+        return Maybe.defer {
             clearFocus()
-            return@defer Single.just(Nullable(value) as Nullable<out Any>)
+            return@defer Maybe.just(value as Any)
         }
     }
 

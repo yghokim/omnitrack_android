@@ -1,12 +1,11 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.items
 
+import io.reactivex.Maybe
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.ValueWithTimestamp
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
-import rx.Single
 
 /**
  * Created by Young-Ho on 10/15/2017.
@@ -53,11 +52,11 @@ class ItemEditingViewModel : ItemEditionViewModelBase() {
     override fun cacheEditingInfo() {
     }
 
-    override fun applyEditingToDatabase(): Single<Nullable<String>> {
+    override fun applyEditingToDatabase(): Maybe<String> {
         return if (isValid) {
-            return isBusyObservable.filter { it == false }.first().toSingle().flatMap {
+            return isBusyObservable.filter { it == false }.firstOrError().flatMapMaybe {
                 if (isViewModelsDirty()) {
-                    return@flatMap Single.defer {
+                    return@flatMapMaybe Maybe.defer {
                         val originalItemFieldKeys = originalUnmanagedItemDao.fieldValueEntries.map { it.key }.toMutableList()
                         for (viewModel in currentAttributeViewModelList) {
                             if (originalUnmanagedItemDao.setValueOf(viewModel.attributeLocalId, viewModel.value?.value?.let { TypeStringSerializationHelper.serialize(it) })) {
@@ -65,11 +64,11 @@ class ItemEditingViewModel : ItemEditionViewModelBase() {
                                 originalItemFieldKeys -= viewModel.attributeLocalId
                             }
                         }
-                        OTApplication.app.databaseManager.saveItemObservable(originalUnmanagedItemDao, false, originalItemFieldKeys.toTypedArray(), realm).map { Nullable(it.second) }
+                        Maybe.fromSingle(OTApplication.app.databaseManager.saveItemObservable(originalUnmanagedItemDao, false, originalItemFieldKeys.toTypedArray(), realm).map { it.second })
                     }
-                } else Single.just(Nullable<String>(originalUnmanagedItemDao.objectId))
+                } else Maybe.just(originalUnmanagedItemDao.objectId)
             }
-        } else return Single.just(Nullable<String>(null))
+        } else return Maybe.just(null)
     }
 
     override fun clearHistory() {

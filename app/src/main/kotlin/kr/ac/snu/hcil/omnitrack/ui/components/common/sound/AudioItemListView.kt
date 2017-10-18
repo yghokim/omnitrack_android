@@ -7,11 +7,11 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.TextView
 import com.github.ybq.android.spinkit.SpinKitView
+import io.reactivex.disposables.CompositeDisposable
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
-import rx.subscriptions.CompositeSubscription
 
 /**
  * Created by Young-Ho on 4/23/2017.
@@ -30,7 +30,7 @@ class AudioItemListView : ConstraintLayout {
             }
         }
 
-    private val subscriptions = CompositeSubscription()
+    private val subscriptions = CompositeDisposable()
 
     var mountedUri: SynchronizedUri = SynchronizedUri()
         set(value) {

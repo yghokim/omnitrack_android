@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.fitbit
 
+import io.reactivex.Flowable
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
@@ -14,7 +15,6 @@ import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableTypedQueue
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import okhttp3.HttpUrl
 import org.json.JSONObject
-import rx.Observable
 import java.util.*
 
 /**
@@ -82,13 +82,13 @@ object FitbitRecentSleepTimeMeasureFactory : OTMeasureFactory("slp") {
         constructor() : super()
         constructor(serialized: String) : super(serialized)
 
-        override fun getValueRequest(start: Long, end: Long): Observable<Nullable<out Any>> {
+        override fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>> {
             val uri = HttpUrl.parse(FitbitApi.makeDailyRequestUrl(FitbitApi.REQUEST_COMMAND_SLEEP, Date(start)))!!.newBuilder()
                     .addQueryParameter("isMainSleep", "true")
                     .build()
             return FitbitService.getRequest(
                     converter,
-                    uri.toString()) as Observable<Nullable<out Any>>
+                    uri.toString()) as Flowable<Nullable<out Any>>
         }
 
         override fun onDeserialize(typedQueue: SerializableTypedQueue) {

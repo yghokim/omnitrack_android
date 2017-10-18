@@ -4,8 +4,8 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
+import io.reactivex.schedulers.Schedulers
 import kr.ac.snu.hcil.omnitrack.OTApplication
-import rx.schedulers.Schedulers
 
 /**
  * Created by younghokim on 2017. 9. 26..

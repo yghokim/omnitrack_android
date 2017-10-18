@@ -5,7 +5,7 @@ import android.content.pm.PackageManager
 import android.support.v4.content.ContextCompat
 import android.util.SparseArray
 import com.afollestad.materialdialogs.MaterialDialog
-import com.tbruyelle.rxpermissions.RxPermissions
+import com.tbruyelle.rxpermissions2.RxPermissions
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.*
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager

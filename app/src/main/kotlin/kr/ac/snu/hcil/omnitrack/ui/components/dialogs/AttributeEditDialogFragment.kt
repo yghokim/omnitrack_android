@@ -7,6 +7,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
 import com.afollestad.materialdialogs.MaterialDialog
+import io.reactivex.Single
+import io.reactivex.disposables.Disposable
+import io.reactivex.disposables.Disposables
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
@@ -16,10 +19,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.common.RxBoundDialogFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
-import rx.Observable
-import rx.Subscription
 import rx.subscriptions.CompositeSubscription
-import rx.subscriptions.Subscriptions
 
 /**
  * Created by younghokim on 2017. 4. 14..
@@ -133,7 +133,7 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
         }
     }
 
-    override fun onBind(savedInstanceState: Bundle?): Subscription {
+    override fun onBind(savedInstanceState: Bundle?): Disposable {
         val bundle = savedInstanceState ?: arguments
 
         container.locked = true
@@ -149,18 +149,17 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
             val itemObservable = OTApplication.app.databaseManager
                     .makeItemsQuery(trackerId, null, null, realm)
                     .equalTo("objectId", itemId).findFirstAsync()
-                    .asObservable<OTItemDAO>().filter { it.isValid == true && it.isLoaded == true }
-                    .first()
-                    .doOnNext { this.item = it }
+                    .asFlowable<OTItemDAO>().filter { it.isValid == true && it.isLoaded == true }
+                    .firstOrError()
+                    .doOnSuccess { this.item = it }
 
             val attributeObservable = realm.where(OTAttributeDAO::class.java).equalTo("trackerId", trackerId).equalTo("localId", attributeLocalId)
                     .findFirstAsync()
-                    .asObservable<OTAttributeDAO>().filter { it.isValid == true && it.isLoaded == true }
-                    .first()
-                    .doOnNext { this.attribute = it }
+                    .asFlowable<OTAttributeDAO>().filter { it.isValid == true && it.isLoaded == true }
+                    .firstOrError()
+                    .doOnSuccess { this.attribute = it }
 
-            return Observable.zip(arrayOf(attributeObservable, itemObservable)) { array ->
-
+            return Single.zip(listOf(attributeObservable, itemObservable)) { array ->
                 println("item edit dialog: loaded attribute and item (zip)")
                 val attribute = array[0] as OTAttributeDAO
                 val item = array[1] as OTItemDAO
@@ -199,7 +198,7 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
                 container.locked = false
                 isContentLoaded = true
             }
-        } else return Subscriptions.empty()
+        } else return Disposables.empty()
     }
 
     override fun onLowMemory() {

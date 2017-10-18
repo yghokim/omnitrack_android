@@ -54,7 +54,7 @@ class TrackerListViewModel : UserAttachedViewModel(), OrderedRealmCollectionChan
                 //deal with additions
                 val newDaos = changeSet.insertions.map { i -> snapshot[i] }
                 currentTrackerViewModelList.addAll(
-                        newDaos.map { TrackerInformationViewModel(it, realm) }
+                        newDaos.mapNotNull { it?.let { TrackerInformationViewModel(it, realm) } }
                 )
 
                 trackerViewModelListSubject.onNext(

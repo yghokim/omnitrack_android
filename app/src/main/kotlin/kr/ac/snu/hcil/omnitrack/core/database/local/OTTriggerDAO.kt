@@ -17,10 +17,10 @@ open class OTTriggerDAO : RealmObject() {
 
     @Index
     var conditionType: Int = 0
+    var conditionId: String? = null
 
     @Index
     var actionType: Int = 0
-
     var serializedAction: String? = null
 
 

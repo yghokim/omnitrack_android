@@ -2,6 +2,11 @@ package kr.ac.snu.hcil.omnitrack.core.database.local
 
 import android.content.Intent
 import android.net.Uri
+import io.reactivex.Flowable
+import io.reactivex.Observable
+import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.PublishSubject
 import io.realm.*
 import io.realm.rx.RealmObservableFactory
 import io.realm.rx.RxObservableFactory
@@ -19,10 +24,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.synchronization.SyncResultEntry
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
-import rx.Observable
-import rx.Single
-import rx.schedulers.Schedulers
-import rx.subjects.PublishSubject
 import java.util.*
 
 /**
@@ -449,7 +450,7 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
                 OTApplication.app.sendBroadcast(intent)
 
                 if (resultPair.first == ADatabaseManager.SAVE_RESULT_NEW) {
-                    OnItemListUpdated.onNext(item.trackerId)
+                    OnItemListUpdated.onNext(item.trackerId!!)
                 }
             }
         }
@@ -484,7 +485,7 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
             } catch (ex: Exception) {
                 ex.printStackTrace()
             } finally {
-                if (!subscriber.isUnsubscribed) {
+                if (!subscriber.isDisposed) {
                     subscriber.onSuccess(Pair(result, item.objectId))
                 }
             }
@@ -518,7 +519,7 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
 
             OTApplication.app.sendBroadcast(intent)
 
-            OnItemListUpdated.onNext(trackerId)
+            OnItemListUpdated.onNext(trackerId!!)
         } else {
             println("item remove failed.")
         }
@@ -550,7 +551,7 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
         }
     }
 
-    fun loadItems(tracker: OTTracker, timeRange: TimeSpan? = null, order: Order = Order.DESC): Observable<List<OTItem>> {
+    fun loadItems(tracker: OTTracker, timeRange: TimeSpan? = null, order: Order = Order.DESC): Flowable<List<OTItem>> {
         return usingRealm { realm ->
             getItemQueryOfTracker(tracker, realm)
                     .run {
@@ -559,7 +560,7 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
                         else this
                     }.findAllSorted(FIELD_TIMESTAMP_LONG, when (order) { Order.ASC -> Sort.ASCENDING; Order.DESC -> Sort.DESCENDING; else -> Sort.ASCENDING
             })
-                    .asObservable().map { result ->
+                    .asFlowable().map { result ->
                 result.map { dao ->
                     RealmItemHelper.convertDAOToItem(dao)
                 }

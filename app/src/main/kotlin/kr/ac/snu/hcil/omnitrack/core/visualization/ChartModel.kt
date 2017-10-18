@@ -1,13 +1,14 @@
 package kr.ac.snu.hcil.omnitrack.core.visualization
 
+import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.IChartInterface
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
 import rx.Observable
-import rx.android.schedulers.AndroidSchedulers
 import rx.subjects.BehaviorSubject
-import rx.subscriptions.CompositeSubscription
 
 /**
  * Created by younghokim on 16. 9. 7..
@@ -34,7 +35,7 @@ abstract class ChartModel<T>(val realm: Realm) : IChartInterface<T> {
     private var _stateSubject: BehaviorSubject<State> = BehaviorSubject.create(State.Unloaded)
     val stateObservable: Observable<State> get() = _stateSubject
 
-    private val internalSubscriptions = CompositeSubscription()
+    private val internalSubscriptions = CompositeDisposable()
 
     private val queryRange = TimeSpan()
     protected var currentGranularity: Granularity = Granularity.WEEK
@@ -64,7 +65,6 @@ abstract class ChartModel<T>(val realm: Realm) : IChartInterface<T> {
 
                         println("chart data loading finished: ${this.name}")
                         onNewDataLoaded(data)
-                        currentState = State.Loaded
                         if (invalidated == true) {
                             reload()
                         }
@@ -86,7 +86,7 @@ abstract class ChartModel<T>(val realm: Realm) : IChartInterface<T> {
         internalSubscriptions.clear()
     }
 
-    abstract fun reloadData(): Observable<List<T>>
+    abstract fun reloadData(): Single<List<T>>
 
     open fun recycle() {
         internalSubscriptions.clear()

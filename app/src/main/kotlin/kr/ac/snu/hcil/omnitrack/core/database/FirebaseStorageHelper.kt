@@ -7,8 +7,8 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.storage.FileDownloadTask
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StreamDownloadTask
-import rx.Single
-import rx.subscriptions.Subscriptions
+import io.reactivex.Single
+import io.reactivex.disposables.Disposables
 import java.io.File
 import java.io.InputStream
 
@@ -31,12 +31,12 @@ class FirebaseStorageHelper(context: Context) {
             urlTask.addOnCompleteListener(object : OnCompleteListener<Uri> {
                 override fun onComplete(task: Task<Uri>) {
                     if (task.isSuccessful) {
-                        if (!subscriber.isUnsubscribed) {
+                        if (!subscriber.isDisposed) {
                             subscriber.onSuccess(task.result)
                         }
                     } else {
-                        if (!subscriber.isUnsubscribed) {
-                            subscriber.onError(task.exception)
+                        if (!subscriber.isDisposed) {
+                            subscriber.onError(task.exception ?: Exception("getDownloadUrl task was failed."))
                         }
                     }
                 }
@@ -60,13 +60,13 @@ class FirebaseStorageHelper(context: Context) {
             val listener = object : OnCompleteListener<StreamDownloadTask.TaskSnapshot> {
                 override fun onComplete(task: Task<StreamDownloadTask.TaskSnapshot>) {
                     if (task.isSuccessful) {
-                        if (!subscriber.isUnsubscribed) {
+                        if (!subscriber.isDisposed) {
                             val inputStream = task.result.stream
                             subscriber.onSuccess(inputStream)
                         }
                     } else {
-                        if (!subscriber.isUnsubscribed) {
-                            subscriber.onError(task.exception)
+                        if (!subscriber.isDisposed) {
+                            subscriber.onError(task.exception ?: Error("DownloadFileToStream task was failed."))
                         }
                     }
                 }
@@ -76,7 +76,7 @@ class FirebaseStorageHelper(context: Context) {
             downloadTask.addOnCompleteListener(listener)
 
 
-            subscriber.add(Subscriptions.create {
+            subscriber.setDisposable(Disposables.fromAction {
                 if (downloadTask.isInProgress) {
                     downloadTask.cancel()
                 }
@@ -99,13 +99,13 @@ class FirebaseStorageHelper(context: Context) {
             val downloadTask = FirebaseStorage.getInstance().reference.child(pathString).getFile(localUri)
             val listener = object : OnCompleteListener<FileDownloadTask.TaskSnapshot> {
                 override fun onComplete(task: Task<FileDownloadTask.TaskSnapshot>) {
-                    if (!subscriber.isUnsubscribed) {
+                    if (!subscriber.isDisposed) {
                         if (task.isSuccessful) {
                             println("firebase storage image successfully downloaded at ${localUri}")
                             subscriber.onSuccess(localUri)
                         } else {
                             task.exception?.printStackTrace()
-                            subscriber.onError(task.exception)
+                            subscriber.onError(task.exception ?: Exception("downloadfile to file task was failed."))
                         }
                     }
                 }
@@ -114,12 +114,11 @@ class FirebaseStorageHelper(context: Context) {
 
             downloadTask.addOnCompleteListener(listener)
 
-            subscriber.add(
-                    Subscriptions.create {
+            subscriber.setDisposable(
+                    Disposables.fromAction {
                         println("download task was unsubscribed.")
                         if (downloadTask.isInProgress)
                             downloadTask.cancel()
-
                         downloadTask.removeOnCompleteListener(listener)
                     }
             )

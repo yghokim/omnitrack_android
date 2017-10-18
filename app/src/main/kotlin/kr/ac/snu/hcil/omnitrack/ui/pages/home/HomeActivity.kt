@@ -1,7 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.home
 
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.support.design.widget.TabLayout
@@ -15,16 +14,12 @@ import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import butterknife.bindView
-import com.tbruyelle.rxpermissions.RxPermissions
-import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.tutorial.TutorialManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.diagnostics.SystemLogActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.services.ServiceListFragment
-import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import rx.subscriptions.CompositeSubscription
 
 class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), DrawerLayout.DrawerListener {
@@ -88,11 +83,32 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
                     user ->
                     println("OMNITRACK: signed in user instance received.")
                     //Ask permission if needed
+                    if (TutorialManager.hasShownTutorials(TutorialManager.FLAG_TRACKER_LIST_ADD_TRACKER)) {
+                        val tabs = tabLayout.getChildAt(0) as ViewGroup
+                        TutorialManager.checkAndShowSequence("home_main_tabs", true, this, false,
+                                listOf(
+                                        TutorialManager.TapTargetInfo(R.string.msg_tutorial_home_tab_trackers_primary,
+                                                R.string.msg_tutorial_home_tab_trackers_secondary,
+                                                ContextCompat.getColor(this, R.color.colorPointed),
+                                                tabs.getChildAt(TAB_INDEX_TRACKERS), 50
+                                        ),
+                                        TutorialManager.TapTargetInfo(R.string.msg_tutorial_home_tab_triggers_primary,
+                                                R.string.msg_tutorial_home_tab_triggers_secondary,
+                                                ContextCompat.getColor(this, R.color.colorPointed),
+                                                tabs.getChildAt(TAB_INDEX_TRIGGERS), 50
+                                        ),
+                                        TutorialManager.TapTargetInfo(R.string.msg_tutorial_home_tab_services_primary,
+                                                R.string.msg_tutorial_home_tab_services_secondary,
+                                                ContextCompat.getColor(this, R.color.colorPointed),
+                                                tabs.getChildAt(TAB_INDEX_SERVICES), 50
+                                        )
+                                ))
+                    }
 
-
+                    /* TODO permission check in trackerlist fragment
                     val rxPermissions = RxPermissions(this)
 
-                    val permissions = user.getPermissionsRequiredForFields().filter { ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED }
+                    val permissions = viewModel.getPermissionsRequiredForFields().filter { ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED }
 
                     if (permissions.isNotEmpty()) {
                         DialogHelper.makeYesNoDialogBuilder(this, resources.getString(R.string.msg_permission_required),
@@ -110,38 +126,9 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
                                 yesLabel = R.string.msg_allow_permission,
                                 noLabel = R.string.msg_cancel
                         ).show()
-                    }
-
-                    creationSubscriptions.add(
-                            user.trackerAdded
-                                    .subscribe {
-                                        trackerPair ->
-                                        val permissionsForTracker = trackerPair.first.getRequiredPermissions().filter { ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED }
-                                        if (!permissionsForTracker.isEmpty()) {
-                                            DialogHelper.makeYesNoDialogBuilder(this, resources.getString(R.string.msg_permission_required),
-                                                    String.format(resources.getString(R.string.msg_format_permission_request_of_tracker_single), trackerPair.first.name),
-                                                    cancelable = false,
-                                                    onYes = {
-                                                        rxPermissions.request(*permissionsForTracker.toTypedArray()).subscribe {
-                                                            granted ->
-                                                            if (granted)
-                                                                println("permissions granted.")
-                                                            else println("permissions not granted.")
-                                                        }
-                                                    },
-                                                    onCancel = null,
-                                                    yesLabel = R.string.msg_allow_permission,
-                                                    noLabel = R.string.msg_cancel
-                                            ).show()
-                                        }
-                                    }
-                    )
+                    }*/
                 }
         )
-    }
-
-    override fun onResume() {
-        super.onResume()
     }
 
     override fun onToolbarLeftButtonClicked() {
@@ -171,54 +158,9 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
     override fun onDrawerOpened(drawerView: View?) {
     }
 
-    override fun onStart() {
-        super.onStart()
-        startSubscriptions.add(
-                super.signedInUserObservable.subscribe {
-                    user ->
-                    sidebar.refresh(user)
-
-                    if (TutorialManager.hasShownTutorials(TutorialManager.FLAG_TRACKER_LIST_ADD_TRACKER)) {
-                        val tabs = tabLayout.getChildAt(0) as ViewGroup
-                        TutorialManager.checkAndShowSequence("home_main_tabs", true, this, false,
-                                listOf(
-                                        TutorialManager.TapTargetInfo(R.string.msg_tutorial_home_tab_trackers_primary,
-                                                R.string.msg_tutorial_home_tab_trackers_secondary,
-                                                ContextCompat.getColor(this, R.color.colorPointed),
-                                                tabs.getChildAt(TAB_INDEX_TRACKERS), 50
-                                        ),
-                                        TutorialManager.TapTargetInfo(R.string.msg_tutorial_home_tab_triggers_primary,
-                                                R.string.msg_tutorial_home_tab_triggers_secondary,
-                                                ContextCompat.getColor(this, R.color.colorPointed),
-                                                tabs.getChildAt(TAB_INDEX_TRIGGERS), 50
-                                        ),
-                                        TutorialManager.TapTargetInfo(R.string.msg_tutorial_home_tab_services_primary,
-                                                R.string.msg_tutorial_home_tab_services_secondary,
-                                                ContextCompat.getColor(this, R.color.colorPointed),
-                                                tabs.getChildAt(TAB_INDEX_SERVICES), 50
-                                        )
-                                ))
-                    }
-                }
-        )
-
-        startSubscriptions.add(
-                OTAuthManager.getAuthStateRefreshObservable().subscribe { signInLevel ->
-                    if (signInLevel == OTAuthManager.SignedInLevel.NONE) {
-                        goSignInPage()
-                    }
-                }
-        )
-    }
-
     override fun onStop() {
         super.onStop()
         startSubscriptions.clear()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        (application as OTApplication).syncUserToDb()
     }
 
     override fun onBackPressed() {
@@ -257,10 +199,6 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
             }
             return null
         }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
     }
 
     private fun goSignInPage() {

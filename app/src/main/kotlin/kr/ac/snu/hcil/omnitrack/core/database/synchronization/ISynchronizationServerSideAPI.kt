@@ -1,9 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.core.database.synchronization
 
+import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTItemPOJO
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTUserRolePOJO
-import rx.Single
 
 /**
  * Created by younghokim on 2017. 9. 27..

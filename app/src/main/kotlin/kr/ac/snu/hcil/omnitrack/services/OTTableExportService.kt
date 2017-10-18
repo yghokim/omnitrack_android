@@ -12,6 +12,8 @@ import android.widget.RadioButton
 import android.widget.Toast
 import br.com.goncalves.pugnotification.notification.PugNotification
 import com.afollestad.materialdialogs.MaterialDialog
+import io.reactivex.Single
+import io.reactivex.disposables.CompositeDisposable
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTFileInvolvedAttributeHelper
@@ -19,8 +21,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.EventLoggingManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.system.OTTaskNotificationManager
 import kr.ac.snu.hcil.omnitrack.utils.io.StringTableSheet
-import rx.Single
-import rx.subscriptions.CompositeSubscription
 import java.io.File
 import java.io.FileOutputStream
 import java.util.concurrent.atomic.AtomicInteger
@@ -95,7 +95,7 @@ class OTTableExportService : WakefulService(TAG) {
 
     }
 
-    private val subscriptions = CompositeSubscription()
+    private val subscriptions = CompositeDisposable()
 
     override fun onDestroy() {
         super.onDestroy()

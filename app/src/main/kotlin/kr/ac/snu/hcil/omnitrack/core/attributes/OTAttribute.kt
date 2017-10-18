@@ -119,16 +119,6 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
 
         fun createAttribute(objectId: String?, localKey: Int?, parent: OTTracker?, columnName: String, isRequired: Boolean, typeId: Int, propertyData: Map<String, Any?>?, connectionData: String?): OTAttribute<out Any> {
             val attr = when (typeId) {
-                TYPE_NUMBER -> OTNumberAttribute(objectId, localKey, parent, columnName, isRequired, propertyData, connectionData)
-                TYPE_TIME -> OTTimeAttribute(objectId, localKey, parent, columnName, isRequired, propertyData, connectionData)
-                TYPE_TIMESPAN -> OTTimeSpanAttribute(objectId, localKey, parent, columnName, isRequired, propertyData, connectionData)
-                TYPE_SHORT_TEXT -> OTShortTextAttribute(objectId, localKey, parent, columnName, isRequired, propertyData, connectionData)
-                TYPE_LONG_TEXT -> OTLongTextAttribute(objectId, localKey, parent, columnName, isRequired, propertyData, connectionData)
-                TYPE_LOCATION -> OTLocationAttribute(objectId, localKey, parent, columnName, isRequired, propertyData, connectionData)
-                TYPE_CHOICE -> OTChoiceAttribute(objectId, localKey, parent, columnName, isRequired, propertyData, connectionData)
-                TYPE_RATING -> OTRatingAttribute(objectId, localKey, parent, columnName, isRequired, propertyData, connectionData)
-                TYPE_IMAGE -> OTImageAttribute(objectId, localKey, parent, columnName, isRequired, propertyData, connectionData)
-                TYPE_AUDIO -> OTAudioRecordAttribute(objectId, localKey, parent, columnName, isRequired, propertyData, connectionData)
                 else -> OTNumberAttribute(objectId, localKey, parent, columnName, isRequired, propertyData, connectionData)
             }
             return attr

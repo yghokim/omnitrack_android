@@ -24,7 +24,6 @@ import at.markushi.ui.RevealColorView
 import butterknife.bindView
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
@@ -172,7 +171,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
         }*/
 
     }
-
+/*
     private fun onTrackerLoaded(tracker: OTTracker) {
         transitionToColor(tracker.color, false)
         refreshReminderCount()
@@ -188,7 +187,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
                     refreshReminderCount()
                 }
         )
-    }
+    }*/
 
     private fun refreshReminderCount() {
         //TODO reminder count
@@ -206,14 +205,6 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
         homeActivityIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(homeActivityIntent)
     }
-
-
-    override fun onPause() {
-        super.onPause()
-
-        OTApplication.app.syncUserToDb()
-    }
-
 
     override fun onToolbarLeftButtonClicked() {
         if (viewModel.isDirty) {
