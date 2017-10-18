@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.jawbone.upplatformsdk.api.ApiManager
 import com.jawbone.upplatformsdk.utils.UpPlatformSdkConstants
+import io.reactivex.Flowable
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
@@ -21,7 +22,7 @@ abstract class AJawboneMoveMeasure : OTMeasureFactory.OTRangeQueriedMeasure {
     constructor() : super()
     constructor(serialized: String) : super(serialized)
 
-    override fun getValueRequest(start: Long, end: Long): Observable<Nullable<out Any>> {
+    override fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>> {
         if (TimeHelper.isSameDay(start, end - 10)) {
             return Observable.create<Nullable<out Any>> {
                 subscriber ->

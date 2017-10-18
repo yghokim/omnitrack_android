@@ -8,6 +8,7 @@ import android.text.SpannableString
 import android.text.style.AbsoluteSizeSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
+import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeAttribute
@@ -24,7 +25,6 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.TimePointInputVi
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.SelectionPropertyView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
-import rx.Observable
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -128,8 +128,8 @@ class OTTimeAttributeHelper : OTAttributeHelper() {
         return true
     }
 
-    override fun makeIntrinsicDefaultValue(attribute: OTAttributeDAO): Observable<out Any> {
-        return Observable.defer { Observable.just(TimePoint()) }
+    override fun makeIntrinsicDefaultValue(attribute: OTAttributeDAO): Single<out Any> {
+        return Single.defer { Single.just(TimePoint()) }
     }
 
     override fun makeIntrinsicDefaultValueMessage(attribute: OTAttributeDAO): CharSequence {

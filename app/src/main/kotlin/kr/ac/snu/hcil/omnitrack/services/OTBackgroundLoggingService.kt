@@ -7,7 +7,6 @@ import android.content.SharedPreferences
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.OTItem
-import kr.ac.snu.hcil.omnitrack.core.OTItemBuilder
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.utils.isInDozeMode
 import rx.Observable

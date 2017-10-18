@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 import android.Manifest
 import android.content.Context
 import android.view.View
+import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
@@ -12,7 +13,6 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioItemListView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AudioRecordInputView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
-import rx.Single
 import java.util.*
 
 /**

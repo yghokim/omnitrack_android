@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 
 import android.content.Context
 import android.view.View
+import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
@@ -17,8 +18,6 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.LikertScaleInput
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.StarRatingInputView
 import kr.ac.snu.hcil.omnitrack.utils.RatingOptions
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
-import rx.Observable
-import rx.Single
 
 /**
  * Created by Young-Ho on 10/7/2017.
@@ -94,23 +93,23 @@ class OTRatingAttributeHelper : OTAttributeHelper() {
         return true
     }
 
-    override fun makeIntrinsicDefaultValue(attribute: OTAttributeDAO): Observable<out Any> {
-        return Observable.defer {
+    override fun makeIntrinsicDefaultValue(attribute: OTAttributeDAO): Single<out Any> {
+        return Single.defer {
             val ratingOptions = getRatingOptions(attribute)
             when (ratingOptions.type) {
                 RatingOptions.DisplayType.Likert -> {
                     if (ratingOptions.allowIntermediate) {
-                        return@defer Observable.just((ratingOptions.rightMost + ratingOptions.leftMost) / 2.0f)
+                        return@defer Single.just((ratingOptions.rightMost + ratingOptions.leftMost) / 2.0f)
                     } else {
 
-                        return@defer Observable.just(((ratingOptions.rightMost + ratingOptions.leftMost) / 2).toFloat())
+                        return@defer Single.just(((ratingOptions.rightMost + ratingOptions.leftMost) / 2).toFloat())
                     }
                 }
                 RatingOptions.DisplayType.Star -> {
                     if (ratingOptions.allowIntermediate) {
-                        return@defer Observable.just(ratingOptions.starLevels.maxScore / 2.0f)
+                        return@defer Single.just(ratingOptions.starLevels.maxScore / 2.0f)
                     } else {
-                        return@defer Observable.just((ratingOptions.starLevels.maxScore / 2).toFloat())
+                        return@defer Single.just((ratingOptions.starLevels.maxScore / 2).toFloat())
                     }
                 }
             }

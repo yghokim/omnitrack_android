@@ -4,15 +4,14 @@ import android.accounts.NetworkErrorException
 import android.app.Activity
 import android.content.SharedPreferences
 import android.os.AsyncTask
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kr.ac.snu.hcil.omnitrack.ui.components.common.activity.WebServiceLoginActivity
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
-import kr.ac.snu.hcil.omnitrack.utils.convertToRx1Observable
 import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
 import okhttp3.*
 import org.json.JSONObject
-import rx.Observable
-import rx.android.schedulers.AndroidSchedulers
-import rx.schedulers.Schedulers
 import rx_activity_result2.RxActivityResult
 import java.util.*
 
@@ -80,7 +79,6 @@ class OAuth2Client(val config: OAuth2Config) {
 
         return RxActivityResult.on(activity)
                 .startIntent(WebServiceLoginActivity.makeIntent(uri.toString(), serviceName ?: "Service", activity))
-                .convertToRx1Observable()
                 .flatMap {
                     result ->
                     println("RxActivityResult : activity result")
@@ -251,7 +249,7 @@ class OAuth2Client(val config: OAuth2Config) {
 
     }
 
-    private fun exchangeToken(requestCode: String): rx.Observable<Credential> {
+    private fun exchangeToken(requestCode: String): Observable<Credential> {
         return Observable.defer {
             val uri = HttpUrl.parse(config.tokenRequestUrl)!!
 

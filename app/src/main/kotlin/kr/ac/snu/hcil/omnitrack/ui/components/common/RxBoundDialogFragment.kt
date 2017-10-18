@@ -2,9 +2,9 @@ package kr.ac.snu.hcil.omnitrack.ui.components.common
 
 import android.os.Bundle
 import android.support.v4.app.DialogFragment
-import rx.Subscription
-import rx.subscriptions.SerialSubscription
-import rx.subscriptions.Subscriptions
+import io.reactivex.disposables.Disposable
+import io.reactivex.disposables.Disposables
+import io.reactivex.disposables.SerialDisposable
 
 /**
  * Created by younghokim on 2017. 4. 14..
@@ -12,7 +12,7 @@ import rx.subscriptions.Subscriptions
  */
 abstract class RxBoundDialogFragment : DialogFragment() {
 
-    private val subscription = SerialSubscription()
+    private val subscription = SerialDisposable()
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -25,9 +25,9 @@ abstract class RxBoundDialogFragment : DialogFragment() {
         onUnbind()
     }
 
-    protected abstract fun onBind(savedInstanceState: Bundle?): Subscription
+    protected abstract fun onBind(savedInstanceState: Bundle?): Disposable
 
     protected open fun onUnbind() {
-        subscription.set(Subscriptions.empty())
+        subscription.set(Disposables.empty())
     }
 }

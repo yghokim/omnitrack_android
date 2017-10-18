@@ -5,15 +5,14 @@ import com.google.gson.GsonBuilder
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
+import io.reactivex.Flowable
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.OTItemBuilder
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.TextHelper
-import rx.Observable
 
 /**
  * Created by Young-Ho Kim on 2016-08-11.
@@ -155,22 +154,12 @@ class OTConnection {
         }
     }
 
-    fun getRequestedValue(builder: OTItemBuilder): Observable<Nullable<out Any>> {
-        return Observable.defer {
-            //if (source != null) {
-            //    return@defer source!!.getValueRequest(builder, rangedQuery)
-            // } else {
-            return@defer Observable.error<Nullable<out Any>>(Exception("Connection source is not designated."))
-            // }
-        }
-    }
-
-    fun getRequestedValue(builder: OTItemBuilderWrapperBase): Observable<Nullable<out Any>> {
-        return Observable.defer {
+    fun getRequestedValue(builder: OTItemBuilderWrapperBase): Flowable<Nullable<out Any>> {
+        return Flowable.defer {
             if (source != null) {
                 return@defer source!!.getValueRequest(builder, rangedQuery)
             } else {
-                return@defer Observable.error<Nullable<out Any>>(Exception("Connection source is not designated."))
+                return@defer Flowable.error<Nullable<out Any>>(Exception("Connection source is not designated."))
             }
         }
     }

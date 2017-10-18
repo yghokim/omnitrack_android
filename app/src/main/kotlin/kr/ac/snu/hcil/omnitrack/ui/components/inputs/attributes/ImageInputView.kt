@@ -11,13 +11,13 @@ import android.provider.MediaStore
 import android.support.v4.content.LocalBroadcastManager
 import android.util.AttributeSet
 import gun0912.tedbottompicker.TedBottomPicker
+import io.reactivex.disposables.CompositeDisposable
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.ui.components.common.ImagePicker
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.CameraPickDialogFragment
 import kr.ac.snu.hcil.omnitrack.utils.getActivity
-import rx.subscriptions.CompositeSubscription
 
 /**
  * Created by Young-Ho Kim on 2016-07-22.
@@ -77,7 +77,7 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
         }
 
     val picker: ImagePicker = findViewById(R.id.ui_image_picker)
-    private val subscriptions = CompositeSubscription()
+    private val subscriptions = CompositeDisposable()
 
     private val eventReceiver: BroadcastReceiver by lazy {
         object : BroadcastReceiver() {

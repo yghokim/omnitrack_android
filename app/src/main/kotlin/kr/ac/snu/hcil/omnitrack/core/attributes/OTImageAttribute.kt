@@ -1,32 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes
 
-import android.content.Context
-import android.graphics.drawable.Drawable
-import android.view.View
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.RequestOptions
-import com.bumptech.glide.request.target.Target
-import kr.ac.snu.hcil.omnitrack.OTApplication
-import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.OTTracker
-import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
-import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
-import kr.ac.snu.hcil.omnitrack.ui.components.common.PlaceHolderImageView
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.ImageInputView
-import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
-import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
-import rx.Observable
-import rx.Single
-import rx.schedulers.Schedulers
-import java.util.*
-
 /**
  * Created by younghokim on 16. 9. 6..
  */
+/*
 class OTImageAttribute(objectId: String?, localKey: Int?, parentTracker: OTTracker?, columnName: String, isRequired: Boolean, settingData: Map<String, Any?>?, connectionData: String?)
     : OTSynchronizedUriAttribute(objectId, localKey, parentTracker, columnName, isRequired, TYPE_IMAGE, settingData, connectionData) {
 
@@ -156,4 +133,4 @@ class OTImageAttribute(objectId: String?, localKey: Int?, parentTracker: OTTrack
 
     override val typeSmallIconResourceId: Int = R.drawable.icon_small_image
 
-}
+}*/

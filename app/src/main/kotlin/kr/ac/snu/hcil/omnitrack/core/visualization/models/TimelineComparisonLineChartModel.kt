@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.visualization.models
 
+import io.reactivex.Single
 import io.realm.Realm
 import io.realm.Sort
 import kr.ac.snu.hcil.omnitrack.OTApplication
@@ -14,7 +15,6 @@ import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.Qu
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers.MultiLineChartDrawer
 import kr.ac.snu.hcil.omnitrack.utils.isNumericPrimitive
 import kr.ac.snu.hcil.omnitrack.utils.toBigDecimal
-import rx.Observable
 import java.math.BigDecimal
 import java.util.*
 
@@ -26,7 +26,7 @@ class TimelineComparisonLineChartModel(attributes: List<OTAttributeDAO>, parent:
 
     override val name: String = OTApplication.app.resourcesWrapped.getString(R.string.msg_vis_numeric_line_timeline_title)
 
-    override fun reloadData(): Observable<List<ILineChartOnTime.TimeSeriesTrendData>> {
+    override fun reloadData(): Single<List<ILineChartOnTime.TimeSeriesTrendData>> {
         val data = ArrayList<ILineChartOnTime.TimeSeriesTrendData>()
         val values = ArrayList<BigDecimal>()
 
@@ -37,8 +37,8 @@ class TimelineComparisonLineChartModel(attributes: List<OTAttributeDAO>, parent:
         return OTApplication.app.databaseManager
                 .makeItemsQuery(parent.objectId, getTimeScope(), realm)
                 .findAllSortedAsync("timestamp", Sort.ASCENDING)
-                .asObservable()
-                .filter { it.isLoaded == true && it.isValid }.map { items ->
+                .asFlowable()
+                .filter { it.isLoaded == true && it.isValid }.firstOrError().map { items ->
 
             var currentItemPointer = 0
 
@@ -57,17 +57,17 @@ class TimelineComparisonLineChartModel(attributes: List<OTAttributeDAO>, parent:
                 itemBinCache.clear()
 
                 if (currentItemPointer < items.size) {
-                    var timestamp = items[currentItemPointer].timestamp
+                    var timestamp = items[currentItemPointer]!!.timestamp
                     while (timestamp < to) {
                         if (timestamp >= from) {
-                            itemBinCache.add(items[currentItemPointer])
+                            itemBinCache.add(items[currentItemPointer]!!)
                         }
 
                         currentItemPointer++
                         if (currentItemPointer >= items.size) {
                             break
                         }
-                        timestamp = items[currentItemPointer].timestamp
+                        timestamp = items[currentItemPointer]!!.timestamp
                     }
                 }
 

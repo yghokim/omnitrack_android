@@ -1,5 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.database.synchronization.official
 
+import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
@@ -11,10 +13,8 @@ import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Response
 import retrofit2.Retrofit
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
-import rx.Single
-import rx.schedulers.Schedulers
 import java.io.IOException
 
 /**
@@ -44,7 +44,7 @@ class OTOfficialServerApiController : ISynchronizationServerSideAPI {
         Retrofit.Builder()
                 .client(client)
                 .baseUrl(BuildConfig.OMNITRACK_SYNCHRONIZATION_SERVER_URL)
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
     }

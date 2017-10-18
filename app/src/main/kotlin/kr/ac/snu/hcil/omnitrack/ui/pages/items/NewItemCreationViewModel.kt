@@ -1,15 +1,14 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.items
 
+import io.reactivex.Maybe
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemBuilderDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemBuilderFieldValueEntry
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.ValueWithTimestamp
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
-import rx.Single
 
 /**
  * Created by Young-Ho on 10/9/2017.
@@ -115,14 +114,15 @@ class NewItemCreationViewModel : ItemEditionViewModelBase() {
         }
     }
 
-    override fun applyEditingToDatabase(): Single<Nullable<String>> {
+    override fun applyEditingToDatabase(): Maybe<String> {
         if (isValid) {
-            return isBusyObservable.filter { it == false }.first().toSingle().flatMap {
+            return isBusyObservable.filter { it == false }.firstOrError().flatMapMaybe {
                 refreshDaoValues()
                 val item = builderWrapper.saveToItem(null, ItemLoggingSource.Manual)
-                return@flatMap OTApplication.app.databaseManager.saveItemObservable(item, false, null, realm).map { Nullable(it.second) }
+
+                return@flatMapMaybe Maybe.fromSingle<String>(OTApplication.app.databaseManager.saveItemObservable(item, false, null, realm).map { it.second })
             }
-        } else return Single.just(Nullable<String>(null))
+        } else return Maybe.just(null)
     }
 
 

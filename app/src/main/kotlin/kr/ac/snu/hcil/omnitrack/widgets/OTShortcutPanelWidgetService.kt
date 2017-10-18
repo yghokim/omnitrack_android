@@ -52,11 +52,12 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
         }
 
         private fun loadUser() {
+            /*
             user = OTApplication.app.currentUserObservable
                     .flatMap { user -> user.crawlAllTrackersAndTriggerAtOnce().toObservable() }.onErrorReturn { ex -> null }
                     .first()
                     .toBlocking().first()
-
+            */
         }
 
         override fun getLoadingView(): RemoteViews? {
