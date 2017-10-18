@@ -1,13 +1,13 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.visualization
 
 import android.support.v7.util.DiffUtil
+import io.reactivex.Observable
+import io.reactivex.subjects.BehaviorSubject
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.TrackerHelper
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.Granularity
 import kr.ac.snu.hcil.omnitrack.utils.RealmViewModel
-import rx.Observable
-import rx.subjects.BehaviorSubject
 
 /**
  * Created by younghokim on 2017. 8. 6..
@@ -15,8 +15,8 @@ import rx.subjects.BehaviorSubject
 class TrackerChartViewListViewModel : RealmViewModel() {
 
     val currentGranularitySubject: BehaviorSubject<Granularity> = BehaviorSubject.create()
-    val currentPointSubject: BehaviorSubject<Long> = BehaviorSubject.create(System.currentTimeMillis())
-    val isBusySubject: BehaviorSubject<Boolean> = BehaviorSubject.create(false)
+    val currentPointSubject: BehaviorSubject<Long> = BehaviorSubject.createDefault(System.currentTimeMillis())
+    val isBusySubject: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(false)
 
     private val currentChartViewModelList = ArrayList<ChartModel<*>>()
     private val chartViewModelListSubject: BehaviorSubject<List<ChartModel<*>>> = BehaviorSubject.create()
@@ -26,7 +26,7 @@ class TrackerChartViewListViewModel : RealmViewModel() {
 
     private var currentTrackerId: String? = null
 
-    val trackerNameSubject = BehaviorSubject.create<String>("")
+    val trackerNameSubject = BehaviorSubject.createDefault<String>("")
 
     var trackerName: String
         get() = trackerNameSubject.value

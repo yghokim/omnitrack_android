@@ -3,7 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.dependency
 import android.app.Activity
 import android.content.Context
 import android.support.v4.app.Fragment
-import rx.Single
+import io.reactivex.Single
 
 /**
  * Created by younghokim on 2017. 5. 17..

@@ -21,6 +21,7 @@ import android.widget.PopupMenu
 import android.widget.TextView
 import android.widget.ToggleButton
 import butterknife.bindView
+import io.reactivex.disposables.Disposable
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
@@ -47,7 +48,6 @@ import kr.ac.snu.hcil.omnitrack.utils.getDayOfMonth
 import kr.ac.snu.hcil.omnitrack.utils.io.FileHelper
 import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
-import rx.Subscription
 import rx.subscriptions.CompositeSubscription
 import java.text.SimpleDateFormat
 import java.util.*
@@ -515,7 +515,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                     val attributeNameView: TextView by bindView(R.id.ui_attribute_name)
                     var valueView: View
 
-                    var valueApplySubscription: Subscription? = null
+                    var valueApplySubscription: Disposable? = null
 
                     var attributeLocalId: String? = null
 
@@ -566,7 +566,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                             val newValueView = attribute.getHelper().getViewForItemList(attribute, this@ItemBrowserActivity, valueView)
                             changeNewValueView(newValueView)
 
-                            valueApplySubscription?.unsubscribe()
+                            valueApplySubscription?.dispose()
                             valueApplySubscription = attribute.getHelper().applyValueToViewForItemList(attribute, itemValue, valueView).subscribe({
                                 valueApplySubscription = null
                             }, {

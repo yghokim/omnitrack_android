@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.rescuetime
 
+import io.reactivex.Flowable
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
@@ -81,7 +82,7 @@ object RescueTimeComputerUsageDurationMeasureFactory : OTMeasureFactory("cud") {
         override val factory: OTMeasureFactory = RescueTimeComputerUsageDurationMeasureFactory
 
 
-        override fun getValueRequest(start: Long, end: Long): Observable<Nullable<out Any>> {
+        override fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>> {
             return RescueTimeService.getSummaryRequest(Date(start), Date(end - 1), usageDurationCalculator) as Observable<Nullable<out Any>>
         }
 

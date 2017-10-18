@@ -1,11 +1,11 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 
 import android.net.Uri
+import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.utils.io.FileHelper
-import rx.Single
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream

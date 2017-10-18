@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 
+import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
@@ -12,7 +13,6 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputV
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.NumberInputView
 import kr.ac.snu.hcil.omnitrack.utils.NumberStyle
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
-import rx.Observable
 
 /**
  * Created by Young-Ho on 10/7/2017.
@@ -75,8 +75,8 @@ class OTNumberAttributeHelper : OTAttributeHelper() {
         return true
     }
 
-    override fun makeIntrinsicDefaultValue(attribute: OTAttributeDAO): Observable<out Any> {
-        return Observable.just(0)
+    override fun makeIntrinsicDefaultValue(attribute: OTAttributeDAO): Single<out Any> {
+        return Single.just(0)
     }
 
     override fun makeIntrinsicDefaultValueMessage(attribute: OTAttributeDAO): CharSequence {

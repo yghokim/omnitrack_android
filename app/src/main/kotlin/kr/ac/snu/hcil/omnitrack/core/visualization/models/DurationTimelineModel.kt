@@ -6,12 +6,13 @@ import android.graphics.Paint
 import android.graphics.RectF
 import android.support.v4.content.ContextCompat
 import android.text.format.DateUtils
+import io.reactivex.Maybe
+import io.reactivex.Single
 import io.realm.Realm
 import io.realm.Sort
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.visualization.AttributeChartModel
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
@@ -24,8 +25,6 @@ import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.Qu
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers.ATimelineChartDrawer
 import kr.ac.snu.hcil.omnitrack.utils.dipSize
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
-import rx.Observable
-import rx.functions.Func1
 import java.util.*
 
 /**
@@ -35,13 +34,13 @@ class DurationTimelineModel(attribute: OTAttributeDAO, realm: Realm) : Attribute
 
     data class AggregatedDuration(val time: Long, val count: Int, val avgFrom: Float, val avgTo: Float, val earliest: Float = avgFrom, val latest: Float = avgTo)
 
-    override fun reloadData(): Observable<List<AggregatedDuration>> {
+    override fun reloadData(): Single<List<AggregatedDuration>> {
 
         val xScale = QuantizedTimeScale()
         xScale.setDomain(getTimeScope().from, getTimeScope().to)
         xScale.quantize(currentGranularity)
 
-        return Observable.zip((0..xScale.numTicks - 1).map { xIndex ->
+        return Maybe.zip((0..xScale.numTicks - 1).map { xIndex ->
 
             val from = xScale.binPointsOnDomain[xIndex]
             val to = if (xIndex < xScale.numTicks - 1) xScale.binPointsOnDomain[xIndex + 1]
@@ -51,8 +50,8 @@ class DurationTimelineModel(attribute: OTAttributeDAO, realm: Realm) : Attribute
             OTApplication.app.databaseManager
                     .makeItemsQuery(attribute.trackerId, TimeSpan.fromPoints(from, to), realm)
                     .findAllSortedAsync("timestamp", Sort.ASCENDING)
-                    .asObservable()
-                    .filter { it.isLoaded == true }.flatMap<AggregatedDuration?>(Func1<List<OTItemDAO>, Observable<AggregatedDuration?>> {
+                    .asFlowable()
+                    .filter { it.isLoaded == true }.firstElement().flatMap<AggregatedDuration?> {
                 items ->
                 println("items during ${TimeSpan.fromPoints(from, to)}; count: ${items.size}")
                 if (items.isNotEmpty()) {
@@ -70,7 +69,7 @@ class DurationTimelineModel(attribute: OTAttributeDAO, realm: Realm) : Attribute
                         val fromArray = timeSpansCache.map { timeToRatio(it.first.from, it.second) }
                         val toArray = timeSpansCache.map { timeToRatio(it.first.to, it.second) }
 
-                        Observable.just(
+                        Maybe.just(
                                 AggregatedDuration(
                                         from,
                                         timeSpansCache.size,
@@ -79,14 +78,14 @@ class DurationTimelineModel(attribute: OTAttributeDAO, realm: Realm) : Attribute
                                         fromArray.min() ?: 0f,
                                         toArray.max() ?: 0f
                                 ))
-                    } else Observable.just<AggregatedDuration>(null)
-                } else Observable.just(null)
-            })
+                    } else Maybe.just<AggregatedDuration>(null)
+                } else Maybe.just(null)
+            }
             //OTApplication.app.dbHelper.getItems(attribute.tracker!!, TimeSpan.fromPoints(from, to), itemsCache, true)
         }, { it ->
             println(it)
             it.filter { it is AggregatedDuration }.map { it as AggregatedDuration }.toList()
-        })
+        }).toSingle(emptyList())
     }
 
     private fun timeToRatio(time: Long, pivot: Long): Float {

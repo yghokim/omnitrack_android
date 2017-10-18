@@ -1,12 +1,12 @@
 package kr.ac.snu.hcil.omnitrack.core.database.synchronization.official
 
+import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTItemPOJO
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTUserRolePOJO
 import kr.ac.snu.hcil.omnitrack.core.database.synchronization.ISynchronizationServerSideAPI
 import kr.ac.snu.hcil.omnitrack.core.database.synchronization.SyncResultEntry
 import retrofit2.http.*
-import rx.Single
 
 /**
  * Created by younghokim on 2017. 9. 28..

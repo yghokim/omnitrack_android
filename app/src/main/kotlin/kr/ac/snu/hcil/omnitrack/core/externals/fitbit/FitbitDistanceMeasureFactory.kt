@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.fitbit
 
+import io.reactivex.Flowable
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
@@ -12,7 +13,6 @@ import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableTypedQueue
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 import org.json.JSONObject
-import rx.Observable
 import java.util.*
 
 /**
@@ -86,17 +86,17 @@ object FitbitDistanceMeasureFactory : OTMeasureFactory("dist") {
         constructor(serialized: String) : super(serialized)
 
 
-        override fun getValueRequest(start: Long, end: Long): Observable<Nullable<out Any>> {
+        override fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>> {
 
             return if (TimeHelper.isSameDay(start, end - 10)) {
                 FitbitService.getRequest(
                         dailyConverter,
                         FitbitApi.makeDailyRequestUrl(FitbitApi.REQUEST_COMMAND_SUMMARY, Date(start)))
-                        as Observable<Nullable<out Any>>
+                        as Flowable<Nullable<out Any>>
             } else
             //TODO: Can be optimized by querying summary data of middle days.
                 FitbitService.getRequest(intraDayConverter, *FitbitApi.makeIntraDayRequestUrls(FitbitApi.REQUEST_INTRADAY_RESOURCE_PATH_DISTANCE, start, end))
-                        as Observable<Nullable<out Any>>
+                        as Flowable<Nullable<out Any>>
         }
 
         override fun onDeserialize(typedQueue: SerializableTypedQueue) {

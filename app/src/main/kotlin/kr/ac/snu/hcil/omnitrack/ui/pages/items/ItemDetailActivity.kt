@@ -18,6 +18,10 @@ import android.widget.TextView
 import android.widget.Toast
 import butterknife.bindView
 import com.airbnb.lottie.LottieAnimationView
+import io.reactivex.Maybe
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
@@ -29,10 +33,6 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputV
 import kr.ac.snu.hcil.omnitrack.ui.pages.ConnectionIndicatorStubProxy
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.ValueWithTimestamp
-import rx.Observable
-import rx.Single
-import rx.android.schedulers.AndroidSchedulers
-import rx.subscriptions.CompositeSubscription
 import java.util.*
 import kotlin.properties.Delegates
 
@@ -278,10 +278,9 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
         //syncViewStateToBuilderAsync {viewModel.applyEditingToDatabase()
 
         creationSubscriptions.add(
-                Single.zip(
+                Maybe.zip(
                         attributeListAdapter.inputViews.map { it.forceApplyValueAsync() }
                 ) { zipped -> zipped }.flatMap {
-
                     val incompleteFieldLocalIds = currentAttributeViewModelList.filter {
                         it.isRequired && it.value?.value == null
                     }.map { it.attributeLocalId }
@@ -292,11 +291,9 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
                         viewModel.applyEditingToDatabase()
                     }
                 }.subscribe({ result ->
-                    if (result.datum != null) {
                         viewModel.clearHistory()
-                        setResult(RESULT_OK, Intent().putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, result.datum))
+                    setResult(RESULT_OK, Intent().putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, result))
                         finish()
-                    }
                 }, { ex ->
                     if (ex is RequiredFieldsNotCompleteException) {
                         val incompleteFields = currentAttributeViewModelList.mapIndexed { index, attributeInputViewModel -> Pair(index, attributeInputViewModel) }.filter { ex.inCompleteFieldLocalIds.contains(it.second.attributeLocalId) }
@@ -315,6 +312,8 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
 
                         Toast.makeText(this@ItemDetailActivity, "${ex.inCompleteFieldLocalIds.size} required fields are not completed.", Toast.LENGTH_LONG).show()
                     }
+                }, {
+                    println("storing item was failed. Null item id returned")
                 })
         )
     }
@@ -381,7 +380,7 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
 
             private val optionButton: View by bindView(R.id.ui_button_option)
 
-            private val internalSubscriptions = CompositeSubscription()
+            private val internalSubscriptions = CompositeDisposable()
 
             private var currentValidationState: Boolean by Delegates.observable(true) { property, old, new ->
                 if (old != new) {

@@ -14,12 +14,11 @@ import android.provider.Settings
 import android.support.multidex.MultiDex
 import android.support.multidex.MultiDexApplication
 import android.support.v7.app.AppCompatDelegate
-import com.google.firebase.crash.FirebaseCrash
 import com.google.firebase.iid.FirebaseInstanceId
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.squareup.leakcanary.LeakCanary
+import io.reactivex.Single
 import io.realm.Realm
-import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.FirebaseStorageHelper
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
@@ -33,14 +32,9 @@ import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationChannelManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTriggerAlarmManager
-import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
 import kr.ac.snu.hcil.omnitrack.services.OTFirebaseUploadService
 import kr.ac.snu.hcil.omnitrack.utils.LocaleHelper
 import org.jetbrains.anko.telephonyManager
-import rx.Observable
-import rx.Single
-import rx.android.schedulers.AndroidSchedulers
-import rx.schedulers.Schedulers
 import rx_activity_result2.RxActivityResult
 import java.nio.charset.Charset
 import java.util.*
@@ -159,9 +153,6 @@ class OTApplication : MultiDexApplication() {
         deviceUUID.toString()
     }
 
-
-    private var _currentUser: OTUser? = null
-
     val isAppInForeground: Boolean get() {
         return numActivitiesActive.get() > 0
     }
@@ -192,96 +183,6 @@ class OTApplication : MultiDexApplication() {
 
 
     //Modules end===================================================
-
-/*
-    private val currentUser: OTUser
-        get() {
-            return if (_currentUser != null) {
-                println("return cached user instance")
-                _currentUser!!
-            }
-            else {
-                println("load user from db")
-                val cachedUserId = AWSMobileClient.defaultMobileClient().identityManager.cachedUserID
-                val user = OTUser.loadCachedInstance(systemSharedPreferences, dbHelper)
-                if (user == null) {
-                    initialRun = true
-                    val defaultUser = OTUser("Young-Ho Kim", "yhkim@hcil.snu.ac.kr")
-                    _currentUser = defaultUser
-                } else {
-                    _currentUser = user
-                }
-                userLoaded = true
-                _currentUser!!
-            }
-        }
-        */
-
-    //val currentUserObservable = PublishSubject.create<OTUser>()
-
-    val isUserLoaded: Boolean get() = _currentUser != null
-
-    val currentUserObservable: Observable<OTUser> = Observable.unsafeCreate<OTUser> {
-        subscriber ->
-        fun sendUser(user: OTUser) {
-            if (!subscriber.isUnsubscribed) {
-                subscriber.onNext(user)
-                subscriber.onCompleted()
-            }
-        }
-
-        if (_currentUser != null) {
-            println("return cached user instance")
-            sendUser(_currentUser!!)
-        } else {
-            //need login
-            println("load user from db")
-            val cachedUser = OTUser.loadCachedInstance(systemSharedPreferences)
-
-            if (cachedUser == null) {
-                //if (OTAuthManager.isUserSignedIn()) {
-                val uid = OTAuthManager.userId!!
-                println("OMNITRACK user identityId: ${uid}, userName: ${OTAuthManager.userName}")
-                //DatabaseManager.findTrackersOfUser(uid).flatMap {
-                //    trackers ->
-
-                val user = OTUser(uid, OTAuthManager.userName, OTAuthManager.userImageUrl)
-                OTUser.storeOrOverwriteInstanceCache(user, systemSharedPreferences)
-                for (tracker in user.getTrackersOnShortcut()) {
-                    OTShortcutPanelManager += tracker
-                }
-
-                //handle failed background logging
-                for (pair in OTBackgroundLoggingService.getFlags()) {
-                    val tracker = user[pair.first]
-                    if (tracker != null) {
-                        logger.writeSystemLog("${tracker.name} background logging was failed. started at ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(pair.second))}", "OmniTrack")
-                    }
-                }
-
-                if (initialRun) {
-                    //createExampleTrackers(user)
-                    //createUsabilityTestingTrackers(user)
-                }
-
-                _currentUser = user
-                sendUser(user)
-                //}
-                //} else {
-                //    println("OMNITRACK retreiving user instance error: User didn't signed in with google.")
-                //    Observable.error<OTUser>(Exception("retreiving user instance error: User didn't signed in with google."))
-                //}
-            } else {
-                _currentUser = cachedUser
-                sendUser(cachedUser)
-            }
-        }
-    }.doOnError {
-        error ->
-        error.printStackTrace()
-        FirebaseCrash.report(Throwable("getting user observable failed", error))
-    }.subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
 
     val colorPalette: IntArray by lazy {
         this.resources.getStringArray(R.array.colorPaletteArray).map { Color.parseColor(it) }.toIntArray()
@@ -398,17 +299,7 @@ class OTApplication : MultiDexApplication() {
 
     fun unlinkUser() {
         OTShortcutPanelManager.disposeShortcutPanel()
-        _currentUser?.detachFromSystem()
-        OTUser.clearInstanceCache(systemSharedPreferences)
-        _currentUser = null
-    }
-
-    fun syncUserToDb() {
-        if (_currentUser != null) {
-            OTUser.storeOrOverwriteInstanceCache(_currentUser!!, systemSharedPreferences)
-            //dbHelper.save(_currentUser!!)
-            //DatabaseManager.saveUser(_currentUser!!)
-        }
+        systemSharedPreferences.edit().remove(INTENT_EXTRA_OBJECT_ID_USER).apply()
     }
 
     override fun onTerminate() {
@@ -416,7 +307,6 @@ class OTApplication : MultiDexApplication() {
 
         logger.writeSystemLog("App terminates.", "Application")
 
-        syncUserToDb()
     }
 
     fun refreshInstanceIdToServerIfExists(ignoreIfStored: Boolean): Single<Boolean> {

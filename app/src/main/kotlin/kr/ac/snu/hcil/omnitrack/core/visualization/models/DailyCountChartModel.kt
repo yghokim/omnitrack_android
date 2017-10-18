@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.visualization.models
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.support.v4.content.ContextCompat
+import io.reactivex.Single
 import io.realm.Realm
 import io.realm.Sort
 import kr.ac.snu.hcil.omnitrack.OTApplication
@@ -19,7 +20,6 @@ import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.Qu
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers.ATimelineChartDrawer
 import kr.ac.snu.hcil.omnitrack.utils.DataHelper
 import kr.ac.snu.hcil.omnitrack.utils.dipSize
-import rx.Observable
 
 /**
  * Created by younghokim on 2017. 5. 8..
@@ -28,7 +28,7 @@ class DailyCountChartModel(tracker: OTTrackerDAO, realm: Realm) : TrackerChartMo
 
     override val name: String = String.format(OTApplication.app.getString(R.string.msg_vis_daily_count_title_format), tracker.name)
 
-    override fun reloadData(): Observable<List<Pair<Long, Int>>> {
+    override fun reloadData(): Single<List<Pair<Long, Int>>> {
         println("reload chart data. Scope:  ${getTimeScope()}")
 
         val xScale = QuantizedTimeScale()
@@ -38,8 +38,9 @@ class DailyCountChartModel(tracker: OTTrackerDAO, realm: Realm) : TrackerChartMo
         return OTApplication.app.databaseManager
                 .makeItemsQuery(tracker.objectId, getTimeScope(), realm)
                 .findAllSortedAsync("timestamp", Sort.ASCENDING)
-                .asObservable()
+                .asFlowable()
                 .filter { it.isLoaded == true }
+                .firstOrError()
                 .map { items ->
                     DataHelper.ConvertSortedListToBinWithLong((xScale.binPointsOnDomain + getTimeScope().to).toTypedArray(),
                             items, { item -> item.timestamp }).map { bin -> Pair(bin.x0, bin.values.size) }

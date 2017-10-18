@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.visualization.models
 
 import android.util.SparseIntArray
+import io.reactivex.Single
 import io.realm.Realm
 import io.realm.Sort
 import kr.ac.snu.hcil.omnitrack.OTApplication
@@ -12,7 +13,6 @@ import kr.ac.snu.hcil.omnitrack.core.visualization.AttributeChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.ICategoricalBarChart
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers.CategoricalBarChartDrawer
-import rx.Observable
 import java.util.*
 
 /**
@@ -31,14 +31,15 @@ class ChoiceCategoricalBarChartModel(attribute: OTAttributeDAO, realm: Realm) : 
         categoriesCache.clear()
     }
 
-    override fun reloadData(): Observable<List<ICategoricalBarChart.Point>> {
+    override fun reloadData(): Single<List<ICategoricalBarChart.Point>> {
         val trackerId = attribute.trackerId
         if (trackerId != null) {
             return OTApplication.app.databaseManager
                     .makeItemsQuery(trackerId, getTimeScope(), realm)
                     .findAllSortedAsync("timestamp", Sort.ASCENDING)
-                    .asObservable()
-                    .filter { it.isLoaded == true }.map {
+                    .asFlowable()
+                    .filter { it.isLoaded == true }
+                    .firstOrError().map {
                 items ->
 
                 val data = ArrayList<ICategoricalBarChart.Point>()
@@ -81,7 +82,7 @@ class ChoiceCategoricalBarChartModel(attribute: OTAttributeDAO, realm: Realm) : 
                 categoriesCache.clear()
                 counterDictCache.clear()
 
-                return@map data
+                return@map data.toList()
             }
         } else {
             throw IllegalArgumentException("No tracker is assigned in the field.")

@@ -5,14 +5,13 @@ import android.net.Uri
 import android.util.AttributeSet
 import android.view.View
 import com.github.ybq.android.spinkit.SpinKitView
+import io.reactivex.Maybe
+import io.reactivex.disposables.CompositeDisposable
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioRecorderView
-import kr.ac.snu.hcil.omnitrack.utils.Nullable
-import rx.Single
-import rx.subscriptions.CompositeSubscription
 
 /**
  * Created by Young-Ho Kim on 2016-07-22.
@@ -83,7 +82,7 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
 
     private var audioTitleInformation: String = ""
 
-    private var subscriptions = CompositeSubscription()
+    private var subscriptions = CompositeDisposable()
 
     init {
 
@@ -107,8 +106,8 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
 
     }
 
-    override fun forceApplyValueAsync(): Single<Nullable<out Any>> {
-        return valueView.stopRecordingAndApplyUri().map { it -> Nullable(value) }
+    override fun forceApplyValueAsync(): Maybe<out Any> {
+        return valueView.stopRecordingAndApplyUri()
     }
 
     override fun onDetachedFromWindow() {

@@ -14,15 +14,15 @@ import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.*
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposables
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.utils.getActivity
-import rx.Observable
-import rx.android.schedulers.AndroidSchedulers
-import rx.subscriptions.Subscriptions
 import java.util.concurrent.Executors
 
 /**
@@ -236,16 +236,16 @@ object OTAuthManager {
     }
 
     fun getAuthStateRefreshObservable(): Observable<SignedInLevel> {
-        return Observable.unsafeCreate { subscriber ->
+        return Observable.create { subscriber ->
             val listener = FirebaseAuth.AuthStateListener { auth ->
                 val signedInLevel = currentSignedInLevel
-                if (!subscriber.isUnsubscribed) {
+                if (!subscriber.isDisposed) {
                     subscriber.onNext(signedInLevel)
                 }
             }
             mFirebaseAuth.addAuthStateListener(listener)
 
-            subscriber.add(Subscriptions.create { mFirebaseAuth.removeAuthStateListener(listener) })
+            subscriber.setDisposable(Disposables.fromAction { mFirebaseAuth.removeAuthStateListener(listener) })
         }
     }
 
@@ -313,7 +313,7 @@ object OTAuthManager {
     }
 
     private fun firebaseAuthWithGoogle(acct: GoogleSignInAccount?): Observable<AuthResult> {
-        return Observable.unsafeCreate<AuthResult> {
+        return Observable.create<AuthResult> {
             subscriber ->
             Log.d(LOG_TAG, "firebaseAuthWithGooogle:" + acct?.id)
             val credential = getAuthCredential()
@@ -326,13 +326,13 @@ object OTAuthManager {
                         // signed in user can be handled in the listener.
                         if (!task.isSuccessful) {
                             Log.w(LOG_TAG, "signInWithCredential", task.exception)
-                            if (!subscriber.isUnsubscribed) {
-                                subscriber.onError(task.exception)
+                            if (!subscriber.isDisposed) {
+                                subscriber.onError(task.exception!!)
                             }
                         } else {
-                            if (!subscriber.isUnsubscribed) {
+                            if (!subscriber.isDisposed) {
                                 subscriber.onNext(task.result)
-                                subscriber.onCompleted()
+                                subscriber.onComplete()
                             }
                         }
                     }

@@ -13,10 +13,14 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.BehaviorSubject
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.ExperimentConsentManager
-import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.EventLoggingManager
 import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckService
@@ -26,11 +30,6 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.settings.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.utils.LocaleHelper
 import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
-import rx.Single
-import rx.android.schedulers.AndroidSchedulers
-import rx.schedulers.Schedulers
-import rx.subjects.BehaviorSubject
-import rx.subscriptions.CompositeSubscription
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper
 import java.util.*
 
@@ -104,9 +103,9 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
 
     private var touchMoveAmount: PointF = PointF()
 
-    protected val creationSubscriptions = CompositeSubscription()
+    protected val creationSubscriptions = CompositeDisposable()
 
-    private val signedInUserSubject: BehaviorSubject<OTUser> = BehaviorSubject.create<OTUser>()
+    private val signedInUserSubject = BehaviorSubject.create<String>()
 
     private var backgroundSignInCheckThread: Thread? = null
 
@@ -127,7 +126,7 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
         }
     }
 
-    val signedInUserObservable: rx.Observable<OTUser>
+    val signedInUserObservable: Observable<String>
         get() = signedInUserSubject
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -162,68 +161,17 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
         }
     }
 
-    protected fun getUserOrGotoSignIn(): Single<OTUser> {
-        return OTApplication.app.currentUserObservable.toSingle().doOnError {
-            goSignIn()
-        }
-    }
-
     private fun goSignInUnlessUserCached() {
         println("OMNITRACK Check whether user is cached. Otherwise, go to sign in")
         creationSubscriptions.add(
-                OTApplication.app.currentUserObservable.subscribe({
-                    user ->
-                    signedInUserSubject.onNext(user)
-
-                    if (!checkRefreshingCredential) {
-                        //background sign in
-                        val ignoreFlag = intent.getBooleanExtra(OTApplication.INTENT_EXTRA_IGNORE_SIGN_IN_CHECK, false)
-                        /*
-                        if (!ignoreFlag) {
-                            if (backgroundSignInCheckThread?.isAlive ?: false == false) {
-                                backgroundSignInCheckThread = Thread(Runnable {
-                                    OTAuthManager.refreshCredentialSilently(false, object : OTAuthManager.SignInResultsHandler {
-                                        override fun onCancel() {
-                                            backgroundSignInCheckThread = null
-                                        }
-
-                                        override fun onError(e: Throwable) {
-                                            Log.e("OMNITRACK", "RefreshCredential error")
-                                            //Toast.makeText(this@OTActivity, "Background sign in check failed.", Toast.LENGTH_SHORT).show()
-                                            e.printStackTrace()
-
-                                            backgroundSignInCheckThread = null
-                                        }
-
-                                        override fun onSuccess() {
-                                            if (user.objectId == OTAuthManager.userId) {
-                                                //Toast.makeText(this@OTActivity, "Background sign in check was successful.", Toast.LENGTH_SHORT).show()
-                                            } else {
-                                                Log.e("OMNITRACK", "Something wrong with your identity id.")
-                                                //Toast.makeText(this@OTActivity, "Signed-in user account id is different from what is stored. Please re-sign in.", Toast.LENGTH_SHORT).show()
-                                                goSignIn()
-                                            }
-
-                                            backgroundSignInCheckThread = null
-                                        }
-                                    }
-                                    )
-                                })
-                                backgroundSignInCheckThread?.start()
-                            } else {
-                                println("OMNITRACK background sign in of former activity is already in progress. skip current activitiy's.")
-                            }
-                        }
-                        */
+                OTAuthManager.getAuthStateRefreshObservable().firstOrError().subscribe { signInResult ->
+                    if (signInResult >= OTAuthManager.SignedInLevel.CACHED) {
+                        signedInUserSubject.onNext(OTAuthManager.userId!!)
+                        onSignInProcessCompletelyFinished()
+                    } else {
+                        goSignIn()
                     }
-
-                    onSignInProcessCompletelyFinished()
-                },
-                        {
-                            e ->
-                            Log.d(LOG_TAG, "User is not stored in device. go Sign-in. ${e.message}")
-                            goSignIn()
-                        })
+                }
         )
     }
 
@@ -305,13 +253,14 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
 
     private fun performSignInProcessCompletelyFinished() {
         println("OMNITRACK loading user from the application global instance")
+        /*
         creationSubscriptions.add(
                 OTApplication.app.currentUserObservable.subscribe {
                     user ->
                     println("OMNITRACK received user from global instance")
                     this.signedInUserSubject.onNext(user)
                 }
-        )
+        )*/
 
         onSignInProcessCompletelyFinished()
     }

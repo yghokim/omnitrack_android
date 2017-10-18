@@ -1,14 +1,13 @@
 package kr.ac.snu.hcil.omnitrack.core.database.synchronization
 
-import kr.ac.snu.hcil.omnitrack.OTApplication
 import rx.Single
-import rx.schedulers.Schedulers
 
 /**
  * Created by younghokim on 2017. 9. 27..
  */
 class SyncSession(val startTimestamp: Long, val syncDataType: ESyncDataType, val direction: SyncDirection, val serviceStartId: Int) {
     fun performSync(): Single<Pair<SyncSession, Boolean>> {
+        /*
         val single = when (syncDataType) {
             ESyncDataType.ITEM -> {
                 OTApplication.app.synchronizationServerController.getItemsAfter(startTimestamp)
@@ -37,6 +36,7 @@ class SyncSession(val startTimestamp: Long, val syncDataType: ESyncDataType, val
             println("start synchronization for ${syncDataType}")
         }.doOnSuccess {
             println("synchronization succeeded.")
-        }
+        }*/
+        return Single.error(Exception())
     }
 }

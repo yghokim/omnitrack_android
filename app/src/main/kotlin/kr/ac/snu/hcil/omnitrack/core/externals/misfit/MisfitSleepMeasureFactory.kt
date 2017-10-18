@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.misfit
 
+import io.reactivex.Flowable
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
@@ -55,7 +56,7 @@ object MisfitSleepMeasureFactory : OTMeasureFactory("slp") {
 
         override val factory: OTMeasureFactory = MisfitSleepMeasureFactory
 
-        override fun getValueRequest(start: Long, end: Long): Observable<Nullable<out Any>> {
+        override fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>> {
             return Observable.defer {
                 val token = MisfitService.getStoredAccessToken()
                 if (token != null) {

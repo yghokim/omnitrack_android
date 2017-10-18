@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.externals
 
 import android.text.Html
+import io.reactivex.Flowable
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
@@ -15,7 +16,6 @@ import kr.ac.snu.hcil.omnitrack.utils.INameDescriptionResourceProvider
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.NumberStyle
 import kr.ac.snu.hcil.omnitrack.utils.serialization.ATypedQueueSerializable
-import rx.Observable
 
 /**
  * Created by Young-Ho Kim on 16. 7. 28
@@ -157,7 +157,7 @@ abstract class OTMeasureFactory(val factoryTypeName: String) : INameDescriptionR
         constructor() : super()
         constructor(serialized: String) : super(serialized)
 
-        abstract fun getValueRequest(builder: OTItemBuilderWrapperBase, query: OTTimeRangeQuery?): Observable<Nullable<out Any>>
+        abstract fun getValueRequest(builder: OTItemBuilderWrapperBase, query: OTTimeRangeQuery?): Flowable<Nullable<out Any>>
     }
 
     abstract class OTRangeQueriedMeasure : OTMeasure {
@@ -165,9 +165,9 @@ abstract class OTMeasureFactory(val factoryTypeName: String) : INameDescriptionR
         constructor() : super()
         constructor(serialized: String) : super(serialized)
 
-        abstract fun getValueRequest(start: Long, end: Long): Observable<Nullable<out Any>>
+        abstract fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>>
 
-        override fun getValueRequest(builder: OTItemBuilderWrapperBase, query: OTTimeRangeQuery?): Observable<Nullable<out Any>> {
+        override fun getValueRequest(builder: OTItemBuilderWrapperBase, query: OTTimeRangeQuery?): Flowable<Nullable<out Any>> {
             val range = query!!.getRange(builder)
             return getValueRequest(range.first, range.second)
         }

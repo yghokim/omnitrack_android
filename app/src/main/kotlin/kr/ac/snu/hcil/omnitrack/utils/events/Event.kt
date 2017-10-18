@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.utils.events
 
-import rx.Observable
-import rx.subjects.PublishSubject
+import io.reactivex.Observable
+import io.reactivex.subjects.PublishSubject
 
 /**
  * Created by younghokim on 16. 7. 11..

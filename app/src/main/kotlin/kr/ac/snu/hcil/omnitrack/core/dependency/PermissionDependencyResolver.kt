@@ -4,8 +4,8 @@ import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.support.v4.content.ContextCompat
-import com.tbruyelle.rxpermissions.RxPermissions
-import rx.Single
+import com.tbruyelle.rxpermissions2.RxPermissions
+import io.reactivex.Single
 
 /**
  * Created by younghokim on 2017. 5. 18..
@@ -35,7 +35,7 @@ class PermissionDependencyResolver(vararg permissions: String) : OTSystemDepende
         return RxPermissions(activity)
                 .request(*(this.permissionNames.toTypedArray()))
                 .toList()
-                .map { list -> list.filter { it == false }.isEmpty() }.first().toSingle()
+                .map { list -> list.filter { it == false }.isEmpty() }
     }
 
 

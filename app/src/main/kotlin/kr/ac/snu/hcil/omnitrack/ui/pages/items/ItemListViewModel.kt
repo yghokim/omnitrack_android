@@ -1,6 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.items
 
 import android.support.v7.util.DiffUtil
+import io.reactivex.Single
+import io.reactivex.subjects.BehaviorSubject
+import io.reactivex.subjects.PublishSubject
 import io.realm.OrderedCollectionChangeSet
 import io.realm.OrderedRealmCollectionChangeListener
 import io.realm.RealmResults
@@ -12,9 +15,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.utils.RealmViewModel
-import rx.Single
-import rx.subjects.BehaviorSubject
-import rx.subjects.PublishSubject
 
 /**
  * Created by Young-Ho on 10/12/2017.
@@ -30,7 +30,7 @@ class ItemListViewModel : RealmViewModel(), OrderedRealmCollectionChangeListener
 
     val trackerId: String get() = trackerDao.objectId!!
 
-    val trackerNameObservable = BehaviorSubject.create<String>("")
+    val trackerNameObservable = BehaviorSubject.createDefault<String>("")
     var trackerName: String
         get() = trackerNameObservable.value
         private set(value) {
@@ -47,7 +47,7 @@ class ItemListViewModel : RealmViewModel(), OrderedRealmCollectionChangeListener
     val sorterSetObservable = BehaviorSubject.create<List<ItemComparator>>()
     private val currentSorterSet = ArrayList<ItemComparator>()
 
-    val currentSorterObservable = BehaviorSubject.create<ItemComparator>(ItemComparator.TIMESTAMP_SORTER)
+    val currentSorterObservable = BehaviorSubject.createDefault<ItemComparator>(ItemComparator.TIMESTAMP_SORTER)
     var currentSorter: ItemComparator
         get() = currentSorterObservable.value
         set(value) {
@@ -125,7 +125,7 @@ class ItemListViewModel : RealmViewModel(), OrderedRealmCollectionChangeListener
 
             //deal with additions
             changeSet.insertions.forEach { i ->
-                itemsInTimestampDescendingOrder.add(i, ItemViewModel(snapshot[i]))
+                itemsInTimestampDescendingOrder.add(i, ItemViewModel(snapshot[i]!!))
             }
 
             refreshSortedItems()

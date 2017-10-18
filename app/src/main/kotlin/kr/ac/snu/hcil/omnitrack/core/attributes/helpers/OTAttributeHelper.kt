@@ -3,6 +3,8 @@ package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 import android.content.Context
 import android.view.View
 import android.widget.TextView
+import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.realm.Realm
 import io.realm.Sort
 import kr.ac.snu.hcil.omnitrack.R
@@ -21,9 +23,6 @@ import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 import kr.ac.snu.hcil.omnitrack.utils.TextHelper
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
-import rx.Observable
-import rx.Single
-import rx.android.schedulers.AndroidSchedulers
 import java.util.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.set
@@ -112,8 +111,8 @@ abstract class OTAttributeHelper {
         return false
     }
 
-    open fun makeIntrinsicDefaultValue(attribute: OTAttributeDAO): Observable<out Any> {
-        return Observable.empty()
+    open fun makeIntrinsicDefaultValue(attribute: OTAttributeDAO): Single<out Any> {
+        return Single.error { NotImplementedError() }
     }
 
     open fun makeIntrinsicDefaultValueMessage(attribute: OTAttributeDAO): CharSequence {
@@ -126,17 +125,17 @@ abstract class OTAttributeHelper {
                 || (attribute.fallbackValuePolicy == OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE && isIntrinsicDefaultValueSupported(attribute) && isIntrinsicDefaultValueVolatile(attribute))
     }
 
-    open fun getFallbackValue(attribute: OTAttributeDAO, realm: Realm): Observable<Nullable<out Any>> {
-        return Observable.defer {
+    open fun getFallbackValue(attribute: OTAttributeDAO, realm: Realm): Single<Nullable<out Any>> {
+        return Single.defer {
             println("getFallbackValue. policy: ${attribute.fallbackValuePolicy}. Current thread: ${Thread.currentThread().name}")
             when (attribute.fallbackValuePolicy) {
                 OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE -> {
                     return@defer if (isIntrinsicDefaultValueSupported(attribute)) {
                         makeIntrinsicDefaultValue(attribute).map { value -> Nullable(value) as Nullable<out Any> }
-                    } else Observable.just<Nullable<out Any>>(Nullable(null))
+                    } else Single.just<Nullable<out Any>>(Nullable(null))
                 }
                 OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_LAST_ITEM -> {
-                    Observable.defer {
+                    Single.defer {
                         val previousNotNullEntry = try {
                             realm.where(OTItemValueEntryDAO::class.java)
                                     .equalTo("key", attribute.localId)
@@ -150,22 +149,22 @@ abstract class OTAttributeHelper {
                         println("previous not null entry: ${previousNotNullEntry}")
 
                         return@defer if (previousNotNullEntry != null) {
-                            Observable.just<Nullable<out Any>>(
+                            Single.just<Nullable<out Any>>(
                                     Nullable(previousNotNullEntry.value?.let { TypeStringSerializationHelper.deserialize(it) }))
-                        } else Observable.just<Nullable<out Any>>(Nullable(null))
+                        } else Single.just<Nullable<out Any>>(Nullable(null))
                     }.subscribeOn(AndroidSchedulers.mainThread())
 
                 }
                 OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_PRESET -> {
                     return@defer attribute.fallbackPresetSerializedValue?.let {
-                        Observable.just(Nullable(TypeStringSerializationHelper.deserialize(it)) as Nullable<out Any>)
-                    } ?: Observable.just<Nullable<out Any>>(Nullable(null))
+                        Single.just(Nullable(TypeStringSerializationHelper.deserialize(it)) as Nullable<out Any>)
+                    } ?: Single.just<Nullable<out Any>>(Nullable(null))
                 }
                 OTAttributeDAO.DEFAULT_VALUE_POLICY_NULL -> {
-                    return@defer Observable.just<Nullable<out Any>>(Nullable(null))
+                    return@defer Single.just<Nullable<out Any>>(Nullable(null))
                 }
                 else -> {
-                    return@defer Observable.just<Nullable<out Any>>(Nullable(null))
+                    return@defer Single.just<Nullable<out Any>>(Nullable(null))
                 }
             }
         }

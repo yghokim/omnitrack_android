@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 
 import android.content.Context
+import io.reactivex.Single
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
@@ -143,5 +144,13 @@ class OTTimeSpanAttributeHelper : OTAttributeHelper() {
 
     override fun makeRecommendedChartModels(attribute: OTAttributeDAO, realm: Realm): Array<ChartModel<*>> {
         return arrayOf(DurationTimelineModel(attribute, realm))
+    }
+
+    override fun makeIntrinsicDefaultValue(attribute: OTAttributeDAO): Single<out Any> {
+        return Single.defer { Single.just(TimeSpan()) }
+    }
+
+    override fun makeIntrinsicDefaultValueMessage(attribute: OTAttributeDAO): CharSequence {
+        return OTApplication.getString(R.string.msg_intrinsic_time)
     }
 }

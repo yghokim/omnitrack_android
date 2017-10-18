@@ -1,6 +1,11 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.items
 
 import android.support.v7.util.DiffUtil
+import io.reactivex.Maybe
+import io.reactivex.Observable
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.subjects.BehaviorSubject
+import io.reactivex.subjects.PublishSubject
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
@@ -8,11 +13,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.RealmViewModel
 import kr.ac.snu.hcil.omnitrack.utils.ValueWithTimestamp
-import rx.Observable
-import rx.Single
-import rx.subjects.BehaviorSubject
-import rx.subjects.PublishSubject
-import rx.subscriptions.CompositeSubscription
 
 /**
  * Created by Young-Ho on 10/15/2017.
@@ -30,11 +30,11 @@ abstract class ItemEditionViewModelBase : RealmViewModel(), OTItemBuilderWrapper
         protected set
 
     val trackerNameObservable = BehaviorSubject.create<String>()
-    val modeObservable = BehaviorSubject.create<ItemMode>(ItemMode.New)
+    val modeObservable = BehaviorSubject.createDefault<ItemMode>(ItemMode.New)
     val builderCreationModeObservable = BehaviorSubject.create<BuilderCreationMode>()
     val attributeViewModelListObservable = BehaviorSubject.create<List<AttributeInputViewModel>>()
 
-    val isBusyObservable = BehaviorSubject.create<Boolean>(false)
+    val isBusyObservable = BehaviorSubject.createDefault<Boolean>(false)
 
     var isValid: Boolean = true
         protected set
@@ -65,7 +65,7 @@ abstract class ItemEditionViewModelBase : RealmViewModel(), OTItemBuilderWrapper
         isValid = true
         if (trackerDao?.objectId != trackerId) {
             trackerDao = OTApplication.app.databaseManager.getTrackerQueryWithId(trackerId, realm).findFirst()
-            trackerNameObservable.onNext(trackerDao?.name)
+            trackerNameObservable.onNext(trackerDao?.name ?: "")
             subscriptions.clear()
 
 
@@ -99,13 +99,13 @@ abstract class ItemEditionViewModelBase : RealmViewModel(), OTItemBuilderWrapper
 
     class AttributeInputViewModel(val attributeDAO: OTAttributeDAO) {
         val attributeLocalId: String get() = attributeDAO.localId
-        val columnNameObservable: Observable<String> = BehaviorSubject.create<String>("")
+        val columnNameObservable: Observable<String> = BehaviorSubject.createDefault<String>("")
         val isRequiredObservable: Observable<Boolean> = BehaviorSubject.create<Boolean>()
         val stateObservable: Observable<OTItemBuilderWrapperBase.EAttributeValueState> = BehaviorSubject.create<OTItemBuilderWrapperBase.EAttributeValueState>()
 
-        val valueObservable = BehaviorSubject.create<Nullable<ValueWithTimestamp>>(Nullable(null) as Nullable<ValueWithTimestamp>)
+        val valueObservable = BehaviorSubject.createDefault<Nullable<ValueWithTimestamp>>(Nullable(null) as Nullable<ValueWithTimestamp>)
 
-        val validationObservable: Observable<Boolean> = BehaviorSubject.create<Boolean>(true)
+        val validationObservable: Observable<Boolean> = BehaviorSubject.createDefault<Boolean>(true)
 
         var value: ValueWithTimestamp?
             get() = valueObservable.value?.datum
@@ -141,7 +141,7 @@ abstract class ItemEditionViewModelBase : RealmViewModel(), OTItemBuilderWrapper
                 }
             }
 
-        private val subscriptions = CompositeSubscription()
+        private val subscriptions = CompositeDisposable()
 
         init {
             (columnNameObservable as BehaviorSubject<String>).onNext(attributeDAO.name)
@@ -179,7 +179,7 @@ abstract class ItemEditionViewModelBase : RealmViewModel(), OTItemBuilderWrapper
 
     abstract fun cacheEditingInfo()
 
-    abstract fun applyEditingToDatabase(): Single<Nullable<String>>
+    abstract fun applyEditingToDatabase(): Maybe<String>
 
     abstract fun clearHistory()
 

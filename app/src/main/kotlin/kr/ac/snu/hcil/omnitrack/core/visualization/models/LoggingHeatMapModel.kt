@@ -4,6 +4,7 @@ import android.graphics.Canvas
 import android.support.v4.content.ContextCompat
 import android.support.v4.graphics.ColorUtils
 import android.text.format.DateUtils
+import io.reactivex.Single
 import io.realm.Realm
 import io.realm.Sort
 import kr.ac.snu.hcil.omnitrack.OTApplication
@@ -21,7 +22,6 @@ import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.Qu
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers.ATimelineChartDrawer
 import kr.ac.snu.hcil.omnitrack.utils.getHourOfDay
 import kr.ac.snu.hcil.omnitrack.utils.setHourOfDay
-import rx.Observable
 import java.util.*
 
 /**
@@ -34,7 +34,7 @@ class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm) : TrackerChartMod
     val hoursInYBin = 2
 
 
-    override fun reloadData(): Observable<List<ITimeBinnedHeatMap.CounterVector>> {
+    override fun reloadData(): Single<List<ITimeBinnedHeatMap.CounterVector>> {
         val data = ArrayList<ITimeBinnedHeatMap.CounterVector>()
         val xScale = QuantizedTimeScale()
         xScale.setDomain(getTimeScope().from, getTimeScope().to)
@@ -57,8 +57,10 @@ class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm) : TrackerChartMod
         return OTApplication.app.databaseManager
                 .makeItemsQuery(tracker.objectId, getTimeScope(), realm)
                 .findAllSortedAsync("timestamp", Sort.ASCENDING)
-                .asObservable()
-                .filter { it.isLoaded == true }.map {
+                .asFlowable()
+                .filter { it.isLoaded == true }
+                .firstOrError()
+                .map {
             items ->
             println("items for loging heatmap: ${items.size}")
             //println(items)
@@ -87,7 +89,7 @@ class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm) : TrackerChartMod
                         //counter = items.filter{ it.timestamp >= queryFrom && it.timestamp < queryTo }.size
 
                         if (currentItemPointer < items.size) {
-                            var timestamp = items[currentItemPointer].timestamp
+                            var timestamp = items[currentItemPointer]!!.timestamp
 
                             while (timestamp < queryTo) {
                                 if (timestamp >= queryFrom) {
@@ -96,7 +98,7 @@ class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm) : TrackerChartMod
 
                                 currentItemPointer++
                                 if (currentItemPointer >= items.size) break
-                                timestamp = items[currentItemPointer].timestamp
+                                timestamp = items[currentItemPointer]!!.timestamp
                             }
                         }
 
@@ -126,7 +128,7 @@ class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm) : TrackerChartMod
                 countMatrix.withIndex().mapTo(data) { xEntry -> ITimeBinnedHeatMap.CounterVector(xScale.binPointsOnDomain[xEntry.index], xEntry.value.map { it / maxValue.toFloat() }.toFloatArray()) }
             }
 
-            data
+                    data.toList()
         }
     }
 

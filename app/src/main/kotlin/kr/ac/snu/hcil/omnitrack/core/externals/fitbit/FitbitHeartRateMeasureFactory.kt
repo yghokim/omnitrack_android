@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.fitbit
 
+import io.reactivex.Flowable
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
@@ -10,7 +11,6 @@ import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableTypedQueue
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import org.json.JSONObject
-import rx.Observable
 
 /**
  * Created by Young-Ho Kim on 2016-10-06.
@@ -58,10 +58,10 @@ object FitbitHeartRateMeasureFactory : OTMeasureFactory("heart") {
             }
         }
 
-        override fun getValueRequest(start: Long, end: Long): Observable<Nullable<out Any>> {
+        override fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>> {
             val urls = FitbitApi.makeIntraDayRequestUrls(FitbitApi.REQUEST_INTRADAY_RESOURCE_PATH_HEART_RATE, start, end)
             println(urls)
-            return FitbitService.getRequest(converter, *urls) as Observable<Nullable<out Any>>
+            return FitbitService.getRequest(converter, *urls) as Flowable<Nullable<out Any>>
         }
 
         override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_INT

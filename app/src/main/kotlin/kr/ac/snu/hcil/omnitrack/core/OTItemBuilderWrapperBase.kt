@@ -1,5 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.core
 
+import io.reactivex.Flowable
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
@@ -7,9 +11,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemBuilderDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.utils.ValueWithTimestamp
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
-import rx.Observable
-import rx.android.schedulers.AndroidSchedulers
-import rx.schedulers.Schedulers
 
 /**
  * Created by Young-Ho Kim on 16. 7. 25
@@ -71,15 +72,15 @@ class OTItemBuilderWrapperBase(val dao: OTItemBuilderDAO, val realm: Realm) {
                         connection.getRequestedValue(this).flatMap { data ->
                             if (data.datum == null) {
                                 println("ValueConnection result was null. send fallback value")
-                                return@flatMap attr.getFallbackValue(realm)
+                                return@flatMap attr.getFallbackValue(realm).toFlowable()
                             } else {
                                 println("Received valueConnection result - ${data.datum}")
-                                return@flatMap Observable.just(data.datum)
+                                return@flatMap Flowable.just(data.datum)
                             }
-                        }.onErrorResumeNext { err -> err.printStackTrace(); attr.getFallbackValue(realm) }.map { value -> Pair(attrLocalId, ValueWithTimestamp(value, System.currentTimeMillis())) }.subscribeOn(Schedulers.io()).doOnSubscribe {
+                        }.onErrorResumeNext { err: Throwable -> err.printStackTrace(); attr.getFallbackValue(realm).toFlowable() }.map { value -> Pair(attrLocalId, ValueWithTimestamp(value, System.currentTimeMillis())) }.subscribeOn(Schedulers.io()).doOnSubscribe {
 
                             onAttributeStateChangedListener?.onAttributeStateChanged(attrLocalId, EAttributeValueState.GettingExternalValue)
-                        }
+                        }.toObservable()
                     } else {
 
                         println("No connection. use fallback value: ${attrLocalId}")
@@ -88,7 +89,7 @@ class OTItemBuilderWrapperBase(val dao: OTItemBuilderDAO, val realm: Realm) {
                             Pair(attrLocalId, ValueWithTimestamp(nullable.datum, System.currentTimeMillis()))
                         }.doOnSubscribe {
                             onAttributeStateChangedListener?.onAttributeStateChanged(attrLocalId, EAttributeValueState.Processing)
-                        }
+                        }.toObservable()
                     }
                 }).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io())
                         .doOnNext { result ->
@@ -98,7 +99,7 @@ class OTItemBuilderWrapperBase(val dao: OTItemBuilderDAO, val realm: Realm) {
                             val value = result.second
 
                             onAttributeStateChangedListener?.onAttributeStateChanged(attrLocalId, EAttributeValueState.Idle)
-                        }.doOnError { err -> err.printStackTrace(); realm.close() }.doOnCompleted {
+                        }.doOnError { err -> err.printStackTrace(); realm.close() }.doOnComplete {
                     realm.close()
                     println("RX finished autocompleting builder=======================")
                 }

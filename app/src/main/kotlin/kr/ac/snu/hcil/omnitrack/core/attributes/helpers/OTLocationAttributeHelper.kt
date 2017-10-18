@@ -3,21 +3,16 @@ package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 import android.Manifest
 import android.content.Context
 import android.view.View
-import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.maps.model.LatLng
+import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTLocationAttribute
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.common.MapImageView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
-import pl.charmas.android.reactivelocation.ReactiveLocationProvider
-import rx.Observable
-import rx.Single
-import java.util.concurrent.TimeUnit
 
 /**
  * Created by Young-Ho on 10/7/2017.
@@ -43,8 +38,9 @@ class OTLocationAttributeHelper : OTAttributeHelper() {
         return true
     }
 
-    override fun makeIntrinsicDefaultValue(attribute: OTAttributeDAO): Observable<out Any> {
-        return Observable.defer {
+    /* TODO switch to Location library usign RxJava2
+    override fun makeIntrinsicDefaultValue(attribute: OTAttributeDAO): Single<out Any> {
+        return Single.defer {
             val locationProvider = ReactiveLocationProvider(OTApplication.app)
 
             val request = LocationRequest.create() //standard GMS LocationRequest
@@ -58,7 +54,7 @@ class OTLocationAttributeHelper : OTAttributeHelper() {
                 LatLng(location?.latitude ?: 0.0, location?.longitude ?: 0.0)
             }.timeout(2L, TimeUnit.SECONDS, locationProvider.lastKnownLocation.map { location -> LatLng(location?.latitude ?: 0.0, location?.longitude ?: 0.0) }).first()
         }
-    }
+    }*/
 
     override fun makeIntrinsicDefaultValueMessage(attribute: OTAttributeDAO): CharSequence {
         return OTApplication.getString(R.string.msg_intrinsic_location)

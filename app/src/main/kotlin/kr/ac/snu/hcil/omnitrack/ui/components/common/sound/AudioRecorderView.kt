@@ -13,15 +13,15 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
+import io.reactivex.Maybe
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.BehaviorSubject
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.services.OTAudioPlayService
 import kr.ac.snu.hcil.omnitrack.services.OTAudioRecordService
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
-import rx.Single
-import rx.android.schedulers.AndroidSchedulers
-import rx.schedulers.Schedulers
-import rx.subjects.BehaviorSubject
 import java.io.File
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -47,7 +47,7 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, ValueAnimator.Anima
         RECORD, RECORDING, FILE_MOUNTED
     }
 
-    val stateObservable = BehaviorSubject.create<State>(State.RECORD)
+    val stateObservable = BehaviorSubject.createDefault<State>(State.RECORD)
 
     var state: State
         get() {
@@ -346,15 +346,16 @@ class AudioRecorderView : FrameLayout, View.OnClickListener, ValueAnimator.Anima
         remainingTimeView.text = formatTime(audioLengthSeconds - currentAudioSeconds)
     }
 
-    fun stopRecordingAndApplyUri(): Single<Uri> {
+    fun stopRecordingAndApplyUri(): Maybe<Uri> {
         if (state == State.RECORDING) {
             tryStopRecordService()
-            return stateObservable.filter {
+            return Maybe.fromSingle(
+                    stateObservable.filter {
                 println("state: ${it}")
                 it == State.FILE_MOUNTED
-            }.first().toSingle().subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).timeout(2, TimeUnit.SECONDS).onErrorReturn { State.FILE_MOUNTED }.map { state -> audioFileUri }
+                    }.firstOrError().subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).timeout(2, TimeUnit.SECONDS).onErrorReturn { State.FILE_MOUNTED }.map { state -> audioFileUri })
         } else {
-            return Single.just(audioFileUri)
+            return Maybe.just(audioFileUri)
         }
     }
 
