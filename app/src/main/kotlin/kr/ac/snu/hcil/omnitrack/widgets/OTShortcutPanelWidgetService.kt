@@ -106,7 +106,7 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
             rv.setTextViewText(R.id.ui_tracker_name, tracker.name)
 
             /*
-            if (lastLoggingTime == null) {
+            if (lastLoggingTimeObservable == null) {
                     rv.setTextViewText(R.id.ui_text_statistics, context.getString(R.string.msg_never_logged))
                 } else {
                     val text = StringBuilder()
@@ -116,7 +116,7 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
                                 .append("\n")
                     }
 
-                lastLoggingTime.let {
+                lastLoggingTimeObservable.let {
                         val dateText = TimeHelper.getDateText(it, context)
                         val timeText = lastLoggedTimeFormat.format(Date(it))
 

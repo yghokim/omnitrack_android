@@ -12,6 +12,8 @@ import android.view.ViewGroup
 import android.view.ViewStub
 import android.widget.TextView
 import butterknife.bindView
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.database.EventLoggingManager
@@ -25,8 +27,6 @@ import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.getActivity
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
-import rx.android.schedulers.AndroidSchedulers
-import rx.subscriptions.CompositeSubscription
 
 /**
  * Created by Young-Ho Kim on 16. 8. 24
@@ -66,7 +66,7 @@ abstract class ATriggerViewHolder<T>(parent: ViewGroup, val listener: ITriggerCo
 
     private var currentHeaderView: View? = null
 
-    protected val headerViewSubscriptions = CompositeSubscription()
+    protected val headerViewSubscriptions = CompositeDisposable()
 
     //private val applyButtonGroup: ViewGroup by bindView(R.id.ui_apply_button_group)
     //private val applyButton: View by bindView(R.id.ui_button_apply)
@@ -87,7 +87,7 @@ abstract class ATriggerViewHolder<T>(parent: ViewGroup, val listener: ITriggerCo
 
     private val bottomBar: LockableFrameLayout by bindView(R.id.ui_bottom_bar)
 
-    private val subscriptions = CompositeSubscription()
+    private val subscriptions = CompositeDisposable()
 
     //private var collapsedHeight: Int = 0
     //private var expandedHeight: Int = 0

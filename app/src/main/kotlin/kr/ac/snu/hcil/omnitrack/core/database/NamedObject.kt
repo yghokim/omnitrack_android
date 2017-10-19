@@ -1,7 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.database
 
-import rx.subjects.PublishSubject
-import rx.subjects.SerializedSubject
+import io.reactivex.subjects.PublishSubject
 import kotlin.properties.Delegates
 
 /**
@@ -17,7 +16,7 @@ abstract class NamedObject(objectId: String?, name: String) {
         objectId ?: makeNewObjectId()
     }
 
-    val nameChanged = SerializedSubject(PublishSubject.create<Pair<NamedObject, String>>())
+    val nameChanged = (PublishSubject.create<Pair<NamedObject, String>>())
     var suspendDatabaseSync: Boolean = false
 
     var name: String by Delegates.observable(name) {

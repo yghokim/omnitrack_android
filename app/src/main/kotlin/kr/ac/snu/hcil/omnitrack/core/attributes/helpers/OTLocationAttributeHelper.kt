@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 
 import android.Manifest
 import android.content.Context
+import android.location.Location
 import android.view.View
 import com.google.android.gms.maps.model.LatLng
 import io.reactivex.Single
@@ -36,6 +37,12 @@ class OTLocationAttributeHelper : OTAttributeHelper() {
 
     override fun isIntrinsicDefaultValueSupported(attribute: OTAttributeDAO): Boolean {
         return true
+    }
+
+    override fun formatAttributeValue(attribute: OTAttributeDAO, value: Any): CharSequence {
+        return if (value is LatLng) {
+            "${Location.convert(value.latitude, Location.FORMAT_DEGREES)},${Location.convert(value.longitude, Location.FORMAT_DEGREES)}"
+        } else super.formatAttributeValue(attribute, value)
     }
 
     /* TODO switch to Location library usign RxJava2

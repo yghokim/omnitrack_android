@@ -2,7 +2,6 @@ package kr.ac.snu.hcil.omnitrack.core
 
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
-import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import kr.ac.snu.hcil.omnitrack.utils.serialization.stringKeyEntryParser
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
@@ -121,18 +120,6 @@ class OTItem : ADataRow {
             val value = valueEntry.value
             if (value != null) {
                 setValueOf(tracker.attributes[valueEntry.index], value)
-            }
-        }
-    }
-
-    fun overwriteWithPojo(pojo: DatabaseManager.FirebaseItemPOJO) {
-        this.timestamp = pojo.getTimestamp()
-        this.source = ItemLoggingSource.values()[pojo.sourceType]
-        valueTable.clear()
-        pojo.dataTable?.let {
-            table ->
-            for ((key, value) in table) {
-                valueTable[key] = TypeStringSerializationHelper.deserialize(value)
             }
         }
     }

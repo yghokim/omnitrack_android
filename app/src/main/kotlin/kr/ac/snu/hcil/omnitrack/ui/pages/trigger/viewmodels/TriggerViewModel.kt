@@ -1,16 +1,16 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels
 
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.subjects.BehaviorSubject
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
-import rx.subjects.BehaviorSubject
-import rx.subscriptions.CompositeSubscription
 
 /**
  * Created by Young-Ho on 6/4/2017.
  */
 open class TriggerViewModel<out T>(internal val trigger: T) where T : OTTrigger {
 
-    protected val subscriptions = CompositeSubscription()
+    protected val subscriptions = CompositeDisposable()
 
     val triggerAction: BehaviorSubject<Int> = BehaviorSubject.create()
     val triggerType: BehaviorSubject<Int> = BehaviorSubject.create()

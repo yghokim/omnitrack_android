@@ -6,21 +6,14 @@ import android.graphics.Color
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
-import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.NamedObject
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
-import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
 import kr.ac.snu.hcil.omnitrack.utils.DefaultNameGenerator
 import kr.ac.snu.hcil.omnitrack.utils.ObservableList
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
-import rx.subjects.BehaviorSubject
-import rx.subjects.PublishSubject
-import rx.subjects.SerializedSubject
-import rx.subscriptions.SerialSubscription
-import rx.subscriptions.Subscriptions
 import java.io.File
 import java.util.*
 import kotlin.collections.HashMap
@@ -54,7 +47,7 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
     }
 
     override fun makeNewObjectId(): String {
-        return DatabaseManager.generateNewKey(DatabaseManager.CHILD_NAME_TRACKERS)
+        return "" //DatabaseManager.generateNewKey(DatabaseManager.CHILD_NAME_TRACKERS)
     }
 /*
     private var currentDbReference: DatabaseReference? = null
@@ -62,10 +55,6 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
 
     private var currentAttributesDbReference: DatabaseReference? = null
     private val attributesDbChangedListener: ChildEventListener*/
-
-    private var onReminderAddedSubscription = SerialSubscription()
-    private var onReminderRemovedSubscription = SerialSubscription()
-
 
     val attributes = ObservableList<OTAttribute<out Any>>()
 
@@ -83,6 +72,7 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
                     if (!suspendDatabaseSync) save()
                 }
 
+                /*
                 onReminderAddedSubscription.set(
                         new.triggerManager.triggerAdded.filter {
                             trigger ->
@@ -101,12 +91,14 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
                             trigger ->
                             reminderRemoved.onNext(ReadOnlyPair(this, trigger))
                         }
-                )
+                )*/
 
                 addedToUser.invoke(this, new)
             } else {
+                /*
                 onReminderAddedSubscription.set(Subscriptions.empty())
                 onReminderRemovedSubscription.set(Subscriptions.empty())
+                */
             }
         }
     }
@@ -132,16 +124,11 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
     {
         prop, old, new ->
         if (old != new) {
-            colorChanged.onNext(ReadOnlyPair(this, new))
             OTShortcutPanelManager.notifyAppearanceChanged(this)
-            colorSubject.onNext(new)
 
             if (!suspendDatabaseSync) save()
         }
     }
-
-    private val colorSubject = BehaviorSubject.create<Int>()
-    val colorObservable: rx.Observable<Int> get() = colorSubject
 
     var isOnShortcut: Boolean by Delegates.observable(isOnShortcut) {
         prop, old, new ->
@@ -153,8 +140,6 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
             }
 
             if (!suspendDatabaseSync) save()
-
-            isOnShortcutChanged.onNext(ReadOnlyPair(this, new))
         }
     }
 
@@ -163,12 +148,6 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
 
     val attributeAdded = Event<ReadOnlyPair<OTAttribute<out Any>, Int>>()
     val attributeRemoved = Event<ReadOnlyPair<OTAttribute<out Any>, Int>>()
-
-    val colorChanged = SerializedSubject(PublishSubject.create<ReadOnlyPair<OTTracker, Int>>())
-    val isOnShortcutChanged = SerializedSubject(PublishSubject.create<ReadOnlyPair<OTTracker, Boolean>>())
-
-    val reminderAdded = SerializedSubject(PublishSubject.create<ReadOnlyPair<OTTracker, OTTrigger>>())
-    val reminderRemoved = SerializedSubject(PublishSubject.create<ReadOnlyPair<OTTracker, OTTrigger>>())
 
     val isExternalFilesInvolved: Boolean get() = attributes.unObservedList.find { it.isExternalFile } != null
 
@@ -208,8 +187,6 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
                 OTApplication.app.databaseManager.saveTracker(this, intrinsicPosition)
             }
         }
-
-        colorSubject.onNext(color)
 
         suspendDatabaseSync = false
 
@@ -353,8 +330,6 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
     fun dispose() {
         //currentDbReference?.removeEventListener(dbChangedListener)
         //currentAttributesDbReference?.removeEventListener(attributesDbChangedListener)
-        onReminderRemovedSubscription.set(Subscriptions.empty())
-        onReminderAddedSubscription.set(Subscriptions.empty())
 
     }
 

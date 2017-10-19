@@ -27,6 +27,20 @@ import java.util.*
  */
 open class OTTrackerDAO : RealmObject() {
 
+    companion object {
+        val CREATION_FLAG_TUTORIAL: Map<String, String> by lazy {
+            val result = HashMap<String, String>()
+            result["source"] = "generated_example"
+            result
+        }
+
+        val CREATION_FLAG_OPEN_OMNITRACK: Map<String, String> by lazy {
+            val result = HashMap<String, String>()
+            result["source"] = "generated_omnitrack_open_format"
+            result
+        }
+    }
+
     @PrimaryKey
     var objectId: String? = null
 

@@ -11,12 +11,12 @@ import android.support.v4.app.DialogFragment
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.RemoteConfigManager
-import rx.Subscription
-import rx.subscriptions.CompositeSubscription
 
 /**
  * Created by Young-Ho Kim on 2017-04-10.
@@ -45,7 +45,7 @@ class VersionCheckDialogFragment : DialogFragment() {
 
     private var latestVersion: String? = null
 
-    private val dialogSubscriptions = CompositeSubscription()
+    private val dialogSubscriptions = CompositeDisposable()
 
     /*
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -121,7 +121,7 @@ class VersionCheckDialogFragment : DialogFragment() {
         }
     }
 
-    private fun startLoadingVersion(): Subscription {
+    private fun startLoadingVersion(): Disposable {
         return RemoteConfigManager.getServerLatestVersionName().subscribe({
             versionName ->
             this.latestVersion = versionName

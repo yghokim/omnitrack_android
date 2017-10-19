@@ -26,7 +26,7 @@ import io.reactivex.disposables.SerialDisposable
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeAttribute
+import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTTimeAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
@@ -452,7 +452,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                 dayView.text = cal.getDayOfMonth().toString()
 
                 sourceView.text = itemVM.loggingSource.sourceText
-                loggingTimeView.text = OTTimeAttribute.formats[OTTimeAttribute.GRANULARITY_MINUTE]!!.format(Date(itemVM.timestamp))
+                loggingTimeView.text = OTTimeAttributeHelper.formats[OTTimeAttributeHelper.GRANULARITY_MINUTE]!!.format(Date(itemVM.timestamp))
 
                 itemLevelSubscriptions.add(
                         viewModel.currentSorterObservable.subscribe { sort ->

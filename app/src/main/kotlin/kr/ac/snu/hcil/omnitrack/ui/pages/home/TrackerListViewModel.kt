@@ -1,6 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.home
 
 import android.support.v7.util.DiffUtil
+import io.reactivex.Observable
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.subjects.BehaviorSubject
 import io.realm.*
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
@@ -8,13 +11,9 @@ import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
-import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.UserAttachedViewModel
 import kr.ac.snu.hcil.omnitrack.utils.DefaultNameGenerator
-import rx.Observable
-import rx.Subscription
-import rx.subjects.BehaviorSubject
-import rx.subscriptions.CompositeSubscription
+import kr.ac.snu.hcil.omnitrack.utils.Nullable
 
 /**
  * Created by younghokim on 2017-05-30.
@@ -113,7 +112,14 @@ class TrackerListViewModel : UserAttachedViewModel(), OrderedRealmCollectionChan
 
         val todayCount: BehaviorSubject<Long> = BehaviorSubject.create()
 
-        val lastLoggingTime: BehaviorSubject<Long> = BehaviorSubject.create()
+        val lastLoggingTimeObservable: BehaviorSubject<Nullable<Long>> = BehaviorSubject.createDefault(Nullable())
+        var lastLoggingTime: Long?
+            get() = lastLoggingTimeObservable.value.datum
+            private set(value) {
+                if (lastLoggingTimeObservable.value.datum != value) {
+                    lastLoggingTimeObservable.onNext(Nullable(value))
+                }
+            }
 
         val trackerName: BehaviorSubject<String> = BehaviorSubject.create()
         val trackerColor: BehaviorSubject<Int> = BehaviorSubject.create()
@@ -128,9 +134,7 @@ class TrackerListViewModel : UserAttachedViewModel(), OrderedRealmCollectionChan
 
         //private val countTracer: ItemCountTracer = ItemCountTracer(tracker)
 
-        private val subscriptions = CompositeSubscription()
-
-        private val reminderSubscriptionDict = android.support.v4.util.ArrayMap<String, CompositeSubscription>()
+        private val subscriptions = CompositeDisposable()
 
         init {
 
@@ -162,11 +166,7 @@ class TrackerListViewModel : UserAttachedViewModel(), OrderedRealmCollectionChan
                     }
                 }
 
-                snapshot.max(RealmDatabaseManager.FIELD_TIMESTAMP_LONG)?.toLong()?.let {
-                    if (lastLoggingTime.value != it) {
-                        lastLoggingTime.onNext(it)
-                    }
-                } ?: lastLoggingTime.onNext(null)
+                lastLoggingTime = snapshot.max(RealmDatabaseManager.FIELD_TIMESTAMP_LONG)?.toLong()
             }
 
             todayItemsResult.addChangeListener { snapshot, changeSet ->
@@ -179,13 +179,6 @@ class TrackerListViewModel : UserAttachedViewModel(), OrderedRealmCollectionChan
 
             trackerDao.addChangeListener(this)
             updateValues(trackerDao)
-        }
-
-        private fun addSubscriptionToTrigger(trigger: OTTrigger, subscription: Subscription) {
-            if (!reminderSubscriptionDict.contains(trigger.objectId)) {
-                reminderSubscriptionDict[trigger.objectId] = CompositeSubscription()
-            }
-            reminderSubscriptionDict[trigger.objectId]?.add(subscription)
         }
 
         private fun updateValues(snapshot: OTTrackerDAO) {
@@ -220,9 +213,6 @@ class TrackerListViewModel : UserAttachedViewModel(), OrderedRealmCollectionChan
             this.todayItemsResult.removeAllChangeListeners()
 
             subscriptions.clear()
-            reminderSubscriptionDict.forEach { entry -> entry.value?.clear() }
-            reminderSubscriptionDict.clear()
-
         }
     }
 
