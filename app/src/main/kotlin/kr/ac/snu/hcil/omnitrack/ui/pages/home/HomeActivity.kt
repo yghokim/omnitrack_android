@@ -66,6 +66,7 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
         drawerLayout.addDrawerListener(this)
 
         sidebar = SidebarWrapper(findViewById(R.id.ui_sidebar), this)
+        sidebar.onCreate()
 
         /*
         slidingMenu = SlidingMenu(this, SlidingMenu.SLIDING_WINDOW)
@@ -140,6 +141,11 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
     override fun onToolbarRightButtonClicked() {
         val intent = Intent(this, SystemLogActivity::class.java)
         startActivity(intent)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        sidebar.onDestroy()
     }
 
 
