@@ -54,8 +54,8 @@ class OTSynchronizationService : Service() {
                 .subscribe { serverTime ->
                     println("last synchronized server time was ${serverTime}.")
                     val newSession = SyncSession(serverTime, syncDataType, direction, startId)
-                    newSession.performSync().subscribe { result ->
-                        println(result.second)
+                    newSession.performSync().subscribe { (session, success) ->
+                        println(success)
                         stopSelf(startId)
                     }
                 }

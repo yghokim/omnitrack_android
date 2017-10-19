@@ -1,6 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.database.synchronization
 
-import rx.Single
+import io.reactivex.Single
 
 /**
  * Created by younghokim on 2017. 9. 27..

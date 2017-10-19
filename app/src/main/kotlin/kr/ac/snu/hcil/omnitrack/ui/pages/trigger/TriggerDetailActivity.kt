@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewStub
 import android.widget.FrameLayout
+import io.reactivex.disposables.CompositeDisposable
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTUser
@@ -17,7 +18,6 @@ import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.actions.NotificationSettingsPanelView
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
-import rx.subscriptions.CompositeSubscription
 import java.util.*
 
 /**
@@ -172,10 +172,11 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_mul
                     newTrigger.suspendDatabaseSync = true
 
                     contentFragment.applyViewToTrigger(newTrigger)
+                    /*
                     val pojo = newTrigger.dumpDataToPojo(null)
                     println(pojo.properties)
 
-                    resultData.putExtra(INTENT_EXTRA_TRIGGER_DATA, pojo)
+                    resultData.putExtra(INTENT_EXTRA_TRIGGER_DATA, pojo)*/
                     setResult(RESULT_OK, resultData)
                     finish()
                 } ?: finish()
@@ -246,8 +247,8 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_mul
 
         val errorMessages = ArrayList<String>()
 
-        private var startSubscriptions = CompositeSubscription()
-        private var createViewSubscriptions = CompositeSubscription()
+        private var startSubscriptions = CompositeDisposable()
+        private var createViewSubscriptions = CompositeDisposable()
 
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 

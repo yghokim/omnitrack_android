@@ -1,10 +1,10 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels
 
+import io.reactivex.subjects.BehaviorSubject
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTrigger
 import kr.ac.snu.hcil.omnitrack.utils.time.Time
-import rx.subjects.BehaviorSubject
 
 /**
  * Created by younghokim on 2017. 6. 5..
@@ -25,13 +25,13 @@ class TimeTriggerViewModel(trigger: OTTimeTrigger) : TriggerViewModel<OTTimeTrig
     override fun register() {
         super.register()
 
-        nextAlarmTime.onNext(OTApplication.app.timeTriggerAlarmManager.getNearestAlarmTime(trigger, System.currentTimeMillis()))
+        nextAlarmTime.onNext(OTApplication.app.timeTriggerAlarmManager.getNearestAlarmTime(trigger, System.currentTimeMillis())!!)
 
         subscriptions.add(
                 trigger.switchTurned.subscribe {
                     isOn ->
                     if (isOn == false) {
-                        nextAlarmTime.onNext(null)
+                        nextAlarmTime.onNext(/*null*/ 0)
                     }
                 }
         )
@@ -39,7 +39,7 @@ class TimeTriggerViewModel(trigger: OTTimeTrigger) : TriggerViewModel<OTTimeTrig
         subscriptions.add(
                 trigger.onAlarmReserved.subscribe {
                     alarmTime ->
-                    nextAlarmTime.onNext(alarmTime)
+                    nextAlarmTime.onNext(alarmTime!!)
                 }
         )
 
@@ -52,11 +52,11 @@ class TimeTriggerViewModel(trigger: OTTimeTrigger) : TriggerViewModel<OTTimeTrig
                 trigger.propertyChanged.subscribe { changedProperty ->
                     when (changedProperty.first) {
                         "configType" -> {
-                            configType.onNext(changedProperty.second as? Int)
+                            configType.onNext(changedProperty.second as Int)
                         }
 
                         "configVariables" -> {
-                            val newValue = changedProperty.second as? Int
+                            val newValue = changedProperty.second as Int
                             configVariable.onNext(newValue)
                             refreshConfigSummary()
                             if (newValue != null) {
@@ -65,7 +65,7 @@ class TimeTriggerViewModel(trigger: OTTimeTrigger) : TriggerViewModel<OTTimeTrig
                         }
 
                         "rangeVariables" -> {
-                            rangeVariable.onNext(changedProperty.second as? Int)
+                            rangeVariable.onNext(changedProperty.second as Int)
                             refreshConfigSummary()
                         }
                     }

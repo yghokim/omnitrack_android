@@ -4,11 +4,9 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_send_report.*
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 
@@ -121,6 +119,8 @@ class SendReportActivity : MultiButtonActionBarActivity(R.layout.activity_send_r
 
                 println(inquiry)
 
+            //TODO send report
+            /*
                 DatabaseManager.dbRef?.child("inquiries")?.push()?.setValue(inquiry)?.addOnCompleteListener {
                     task ->
                     if (task.isSuccessful) {
@@ -129,7 +129,7 @@ class SendReportActivity : MultiButtonActionBarActivity(R.layout.activity_send_r
                     } else {
                         errorDialog.show()
                     }
-                } ?: errorDialog.show()
+                } ?: errorDialog.show()*/
         }).show()
     }
 }

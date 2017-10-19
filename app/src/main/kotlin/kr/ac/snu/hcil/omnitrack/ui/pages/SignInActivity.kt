@@ -12,13 +12,13 @@ import android.view.View
 import android.widget.Toast
 import com.badoo.mobile.util.WeakHandler
 import com.tbruyelle.rxpermissions2.RxPermissions
+import io.reactivex.disposables.CompositeDisposable
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.ExperimentConsentManager
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
-import rx.subscriptions.CompositeSubscription
 
 class SignInActivity : AppCompatActivity() {
 
@@ -28,7 +28,7 @@ class SignInActivity : AppCompatActivity() {
     private lateinit var googleLoginButton: View
     private lateinit var loginInProgressIndicator: View
 
-    private val creationSubscription = CompositeSubscription()
+    private val creationSubscription = CompositeDisposable()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

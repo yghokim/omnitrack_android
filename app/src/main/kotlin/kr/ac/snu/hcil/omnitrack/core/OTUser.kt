@@ -4,22 +4,11 @@ import android.content.Context
 import android.content.SharedPreferences
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.attributes.*
-import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
-import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
-import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
-import kr.ac.snu.hcil.omnitrack.core.externals.fitbit.FitbitRecentSleepTimeMeasureFactory
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
-import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTrigger
-import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
-import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerManager
-import kr.ac.snu.hcil.omnitrack.utils.*
+import kr.ac.snu.hcil.omnitrack.utils.DefaultNameGenerator
+import kr.ac.snu.hcil.omnitrack.utils.ObservableList
 import kr.ac.snu.hcil.omnitrack.widgets.OTShortcutPanelWidgetUpdateService
-import rx.Observable
-import rx.Single
-import rx.subjects.PublishSubject
-import rx.subjects.SerializedSubject
-import rx.subscriptions.CompositeSubscription
 import java.util.*
 
 /**
@@ -102,15 +91,7 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
 
     val trackers = ObservableList<OTTracker>()
 
-    val triggerManager: OTTriggerManager
-
     //val trackerAdded = Event<ReadOnlyPair<OTTracker, Int>>()
-
-    private val subscriptions = CompositeSubscription()
-
-    val trackerAdded = SerializedSubject(PublishSubject.create<ReadOnlyPair<OTTracker, Int>>())
-    val trackerRemoved = SerializedSubject(PublishSubject.create<ReadOnlyPair<OTTracker, Int>>())
-    val trackerIndexChanged = SerializedSubject(PublishSubject.create<ReadOnlyPair<OTTracker, Int>>())
 
     /*
     private var trackerListDbReference: DatabaseReference? = null
@@ -134,8 +115,6 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
 
             }
         }
-
-        triggerManager = OTTriggerManager(this)
 
         trackers.elementAdded += { sender, args ->
             onTrackerAdded(args.first, args.second)
@@ -260,10 +239,9 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
     }*/
 
     fun detachFromSystem() {
-        triggerManager.detachFromSystem()
         //trackerListDbReference?.removeEventListener(trackerListChangeEventListener)
         //triggerListDbReference?.removeEventListener(triggerListChangeEventListener)
-        subscriptions.clear()
+
     }
 
     fun newTrackerWithDefaultName(context: Context, add: Boolean): OTTracker {
@@ -313,7 +291,7 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
             OTShortcutPanelManager += new
         }
 
-        trackerAdded.onNext(ReadOnlyPair(new, index))
+        //trackerAdded.onNext(ReadOnlyPair(new, index))
 
         println("tracker was added")
         if (!suspendDatabaseSync)
@@ -323,18 +301,11 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
     private fun onTrackerRemoved(tracker: OTTracker, index: Int) {
         tracker.owner = null
 
-        trackerRemoved.onNext(ReadOnlyPair(tracker, index))
+        //trackerRemoved.onNext(ReadOnlyPair(tracker, index))
 
         tracker.suspendDatabaseSync = true
         if (tracker.isOnShortcut) {
             tracker.isOnShortcut = false
-        }
-
-        //TODO currently, reminders are assigned to tracker so should be removed.
-        val reminders = triggerManager.getAttachedTriggers(tracker, OTTrigger.ACTION_NOTIFICATION)
-        for (reminder in reminders) {
-            reminder.isOn = false
-            triggerManager.removeTrigger(reminder)
         }
 
         println("tracker was removed.")
@@ -356,62 +327,7 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
         return DefaultNameGenerator.generateName(context.resources.getString(R.string.msg_new_tracker_prefix), trackers.unObservedList.map { it.name }, false)
     }
 
-    fun getTrackerObservable(trackerId: String): Observable<OTTracker> {
-        return Observable.defer {
-            val tracker = get(trackerId)
-            if (tracker != null) {
-                println("user already contains the tracker")
-                Observable.just(tracker)
-            } else {
-
-                println("user is not containing the tracker. wait")
-                trackerAdded.filter {
-                    pair ->
-                    pair.first.objectId == trackerId
-                }.map { it.first }
-            }
-        }
-    }
-
-
-    fun getTriggerObservable(triggerId: String): Observable<OTTrigger> {
-        return Observable.defer {
-            val trigger = triggerManager.getTriggerWithId(triggerId)
-            if (trigger != null) {
-                OTApplication.logger.writeSystemLog("return trigger from triggerManager", TAG)
-                Observable.just(trigger)
-            } else {
-                //check if the user has a trigger with the id
-                DatabaseManager.getTrigger(this, triggerId)
-            }
-        }.doOnError { error ->
-            OTApplication.logger.writeSystemLog("trigger observable error: ${error.message}", TAG)
-        }
-    }
-
-    fun crawlAllTrackersAndTriggerAtOnce(): Single<OTUser> {
-        return Single.just(this)
-
-        /*OTApplication.app.databaseManager.findTrackersOfUser(objectId, realm).doOnNext {
-            trackers ->
-            println("crawled trackers")
-            for (tracker in trackers) {
-                if (trackers.find { it.objectId == tracker.objectId } == null)
-                    this.trackers.add(tracker)
-            }
-        }.concatMap {
-            trackers ->
-            println("crawled triggers")
-            DatabaseManager.findTriggersOfUser(this).doOnNext {
-                triggers ->
-                for (trigger in triggers) {
-                    this.triggerManager.putNewTrigger(trigger)
-                }
-            }.map { this }
-        }.first().toSingle()*/
-    }
-
-
+    /*
     fun addExampleTrackers() {
         val context = OTApplication.app
         val diaryTracker = newTracker(context.getString(R.string.msg_example_tracker_diary), true, OTTracker.CREATION_FLAG_TUTORIAL, true)
@@ -491,6 +407,6 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
         foodTracker.attributes += OTAttribute.createAttribute(foodTracker, context.getString(R.string.msg_example_trackers_restaurant_photo), OTAttributeManager.TYPE_IMAGE)
         foodTracker.attributes += OTAttribute.createAttribute(foodTracker, context.getString(R.string.msg_example_trackers_restaurant_rating), OTAttributeManager.TYPE_RATING)
         foodTracker.attributes += OTAttribute.createAttribute(foodTracker, context.getString(R.string.msg_example_trackers_restaurant_review), OTAttributeManager.TYPE_LONG_TEXT)
-    }
+    }*/
 
 }

@@ -1,14 +1,14 @@
 package kr.ac.snu.hcil.omnitrack.core.visualization
 
+import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.subjects.BehaviorSubject
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.IChartInterface
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
-import rx.Observable
-import rx.subjects.BehaviorSubject
 
 /**
  * Created by younghokim on 16. 9. 7..
@@ -32,7 +32,7 @@ abstract class ChartModel<T>(val realm: Realm) : IChartInterface<T> {
 
     val numDataPoints: Int get() = cachedData.size
 
-    private var _stateSubject: BehaviorSubject<State> = BehaviorSubject.create(State.Unloaded)
+    private var _stateSubject: BehaviorSubject<State> = BehaviorSubject.createDefault(State.Unloaded)
     val stateObservable: Observable<State> get() = _stateSubject
 
     private val internalSubscriptions = CompositeDisposable()

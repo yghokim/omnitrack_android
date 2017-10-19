@@ -1,8 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.utils
 
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
-import rx.subjects.PublishSubject
-import rx.subjects.SerializedSubject
 import java.util.*
 
 /**
@@ -18,16 +16,12 @@ class ObservableList<T> {
 
     val listModified = Event<Void?>()
 
-    val elementAddedSubject = SerializedSubject(PublishSubject.create<Pair<ObservableList<T>, ReadOnlyPair<T, Int>>>())
-    val elementRemovedSubject = SerializedSubject(PublishSubject.create<Pair<ObservableList<T>, ReadOnlyPair<T, Int>>>())
-
     val size: Int
         get() = list.size
 
     fun add(element: T): Boolean {
         if (list.add(element)) {
             elementAdded.invoke(this, ReadOnlyPair(element, list.size - 1))
-            elementAddedSubject.onNext(Pair(this, ReadOnlyPair(element, list.size - 1)))
             listModified.invoke(this, null)
             return true
         } else {
@@ -39,7 +33,6 @@ class ObservableList<T> {
         try {
             list.add(position, element)
             elementAdded.invoke(this, ReadOnlyPair(element, position))
-            elementAddedSubject.onNext(Pair(this, ReadOnlyPair(element, position)))
             listModified.invoke(this, null)
             return true
         } catch(e: Exception) {
@@ -81,7 +74,6 @@ class ObservableList<T> {
         if (index >= 0) {
             list.removeAt(index)
             elementRemoved.invoke(this, ReadOnlyPair(element, index))
-            elementRemovedSubject.onNext(Pair(this, ReadOnlyPair(element, index)))
             listModified.invoke(this, null)
             return true
         } else {

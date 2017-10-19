@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.triggers
 
 import android.content.Context
 import android.util.Log
+import io.reactivex.subjects.PublishSubject
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTUser
@@ -12,8 +13,6 @@ import kr.ac.snu.hcil.omnitrack.utils.ObservableMapDelegate
 import kr.ac.snu.hcil.omnitrack.utils.time.DesignatedTimeScheduleCalculator
 import kr.ac.snu.hcil.omnitrack.utils.time.IntervalTimeScheduleCalculator
 import kr.ac.snu.hcil.omnitrack.utils.time.Time
-import rx.subjects.PublishSubject
-import rx.subjects.SerializedSubject
 import java.util.*
 
 /**
@@ -319,7 +318,7 @@ class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObject
         }
     }
 
-    val onAlarmReserved = SerializedSubject(PublishSubject.create<Long?>())
+    val onAlarmReserved = PublishSubject.create<Long?>()
 
     fun getNextAlarmTime(pivot: Long?): Long? {
         if (isOn) {
@@ -421,7 +420,7 @@ class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObject
             return nextAlarmInfo
         } else {
             println("Finish trigger. Do not repeat.")
-            onAlarmReserved.onNext(null)
+            onAlarmReserved.onNext(/*null*/0)
             return null
         }
     }

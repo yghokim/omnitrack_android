@@ -20,10 +20,6 @@ import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 import kr.ac.snu.hcil.omnitrack.utils.TextHelper
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
-import rx.Observable
-import rx.Single
-import rx.subjects.PublishSubject
-import rx.subjects.SerializedSubject
 import java.util.*
 import kotlin.properties.Delegates
 
@@ -115,18 +111,6 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
         fun getPermissionsForAttribute(typeId: Int): Array<String>? {
             return permissionDict[typeId]
         }
-
-
-        fun createAttribute(objectId: String?, localKey: Int?, parent: OTTracker?, columnName: String, isRequired: Boolean, typeId: Int, propertyData: Map<String, Any?>?, connectionData: String?): OTAttribute<out Any> {
-            val attr = when (typeId) {
-                else -> OTNumberAttribute(objectId, localKey, parent, columnName, isRequired, propertyData, connectionData)
-            }
-            return attr
-        }
-
-        fun createAttribute(tracker: OTTracker, columnName: String, typeId: Int): OTAttribute<out Any> {
-            return createAttribute(null, tracker.nextAttributeLocalKey(), tracker, columnName, false, typeId, null, null)
-        }
     }
 
     var tracker: OTTracker? by Delegates.observable(parentTracker) {
@@ -197,8 +181,6 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
     abstract val propertyKeys: Array<String>
     val propertyValueChanged = Event<OTProperty.PropertyChangedEventArgs<out Any>>()
     private val settingsProperties = HashMap<String, OTProperty<out Any>>()
-
-    val propertyValueChangedSubject = SerializedSubject(PublishSubject.create<Pair<OTAttribute<DataType>, OTProperty.PropertyChangedEventArgs<out Any>>>())
 
     var valueConnection: OTConnection? by Delegates.observable(null as OTConnection?) {
         prop, old, new ->
@@ -272,7 +254,6 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
 
     protected open fun onPropertyValueChanged(args: OTProperty.PropertyChangedEventArgs<out Any>) {
         propertyValueChanged.invoke(this, args)
-        propertyValueChangedSubject.onNext(Pair(this, args))
         if (!suspendDatabaseSync) {
             save()
         }
@@ -314,15 +295,6 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
      * Autocompleted values based on attribute-specific settings.
      * [return] whether the method finished synchronously.
      */
-    abstract fun getAutoCompleteValue(): Observable<DataType>
-
-    fun makeAutoCompleteValueWithId(id: Int): Observable<Pair<Int, Any>> {
-        return getAutoCompleteValue().map {
-            data ->
-            Pair(id, data as Any)
-        }
-    }
-
 
     abstract fun getInputViewType(previewMode: Boolean = false): Int
 
@@ -363,19 +335,6 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
         target.background = null
 
         return target
-    }
-
-    open fun applyValueToViewForItemList(value: Any?, view: View): Single<Boolean> {
-        return Single.defer<Boolean> {
-            if (view is TextView) {
-                if (value != null) {
-                    view.text = TextHelper.stringWithFallback(formatAttributeValue(value), "-")
-                } else {
-                    view.text = view.context.getString(R.string.msg_empty_value)
-                }
-                Single.just(true)
-            } else Single.just(false)
-        }
     }
 
     open fun getRecommendedChartModels(): Array<ChartModel<*>> {

@@ -20,7 +20,6 @@ import kr.ac.snu.hcil.omnitrack.ui.components.tutorial.TutorialManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.diagnostics.SystemLogActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.services.ServiceListFragment
-import rx.subscriptions.CompositeSubscription
 
 class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), DrawerLayout.DrawerListener {
 
@@ -41,8 +40,6 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
     private val drawerLayout: DrawerLayout by bindView(R.id.ui_drawer_layout)
 
     private lateinit var sidebar: SidebarWrapper
-
-    private val startSubscriptions = CompositeSubscription()
 
     private val tabLayout: TabLayout by bindView(R.id.tabs)
 
@@ -158,10 +155,6 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
     override fun onDrawerOpened(drawerView: View?) {
     }
 
-    override fun onStop() {
-        super.onStop()
-        startSubscriptions.clear()
-    }
 
     override fun onBackPressed() {
         if (mViewPager.currentItem == 0) {

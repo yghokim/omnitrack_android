@@ -5,7 +5,6 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.database.FirebaseDatabase
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
-import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import java.util.*
 
 /**
@@ -56,7 +55,8 @@ object EventLoggingManager {
         table["app_id"] = FirebaseDatabase.getInstance().app.options.applicationId
         table["device_id"] = OTApplication.app.deviceId
 
-        DatabaseManager.dbRef?.child(CHILD_NAME_EVENTS)?.child(OTAuthManager.userId ?: CHILD_NAME_ANONYMOUS)?.push()?.setValue(table)
+        //TODO log
+        //DatabaseManager.dbRef?.child(CHILD_NAME_EVENTS)?.child(OTAuthManager.userId ?: CHILD_NAME_ANONYMOUS)?.push()?.setValue(table)
     }
 
     fun logAttributeChangeEvent(name: String, attributeType: Int, attributeId: String, trackerId: String) {

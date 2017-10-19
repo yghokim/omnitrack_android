@@ -1,7 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.viewmodels
 
 import android.arch.lifecycle.ViewModel
-import rx.subscriptions.CompositeSubscription
 
 /**
  * Created by Young-Ho on 6/4/2017.
@@ -18,14 +17,11 @@ open class UserAttachedViewModel : ViewModel() {
                 }
             }
         }
-    protected val internalSubscriptions = CompositeSubscription()
-
     protected open fun onUserAttached(newUserId: String) {
 
     }
 
     protected open fun onDispose() {
-        internalSubscriptions.clear()
     }
 
     override fun onCleared() {

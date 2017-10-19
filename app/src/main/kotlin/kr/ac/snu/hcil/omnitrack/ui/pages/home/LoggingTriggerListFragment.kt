@@ -5,11 +5,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import io.reactivex.disposables.CompositeDisposable
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.ATriggerListFragmentCore
-import rx.subscriptions.CompositeSubscription
 
 /**
  * Created by Young-Ho on 9/1/2016.
@@ -17,7 +17,7 @@ import rx.subscriptions.CompositeSubscription
 class LoggingTriggerListFragment : OTFragment() {
     val core: ATriggerListFragmentCore
 
-    private val startSubscriptions = CompositeSubscription()
+    private val startSubscriptions = CompositeDisposable()
 
     init {
         core = object : ATriggerListFragmentCore(this@LoggingTriggerListFragment) {

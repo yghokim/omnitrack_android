@@ -11,7 +11,6 @@ import android.text.style.StyleSpan
 import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTTimeAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.TimePointSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyHelper
@@ -41,9 +40,9 @@ class OTTimeAttributeHelper : OTAttributeHelper() {
         const val GRANULARITY_SECOND = 2
 
         val formats = mapOf<Int, SimpleDateFormat>(
-                Pair(OTTimeAttribute.GRANULARITY_DAY, SimpleDateFormat(OTApplication.getString(R.string.property_time_format_granularity_day))),
-                Pair(OTTimeAttribute.GRANULARITY_MINUTE, SimpleDateFormat(OTApplication.getString(R.string.property_time_format_granularity_minute))),
-                Pair(OTTimeAttribute.GRANULARITY_SECOND, SimpleDateFormat(OTApplication.getString(R.string.property_time_format_granularity_second)))
+                Pair(GRANULARITY_DAY, SimpleDateFormat(OTApplication.getString(R.string.property_time_format_granularity_day))),
+                Pair(GRANULARITY_MINUTE, SimpleDateFormat(OTApplication.getString(R.string.property_time_format_granularity_minute))),
+                Pair(GRANULARITY_SECOND, SimpleDateFormat(OTApplication.getString(R.string.property_time_format_granularity_second)))
         )
 
         private val timezoneSizeSpan = AbsoluteSizeSpan(OTApplication.app.resourcesWrapped.getDimensionPixelSize(R.dimen.tracker_list_element_information_text_headerSize))
@@ -149,13 +148,13 @@ class OTTimeAttributeHelper : OTAttributeHelper() {
 
             calendar.set(Calendar.MILLISECOND, 0)
 
-            if (granularity == OTTimeAttribute.GRANULARITY_DAY) {
+            if (granularity == GRANULARITY_DAY) {
                 calendar.set(Calendar.SECOND, 0)
                 calendar.set(Calendar.MINUTE, 0)
                 calendar.set(Calendar.HOUR_OF_DAY, 0)
             }
 
-            val timeString = OTTimeAttribute.formats[granularity]!!.format(calendar.time)
+            val timeString = formats[granularity]!!.format(calendar.time)
             val timeZoneName = value.timeZone.displayName
             val start = timeString.length + 1
             val end = timeString.length + 1 + timeZoneName.length
