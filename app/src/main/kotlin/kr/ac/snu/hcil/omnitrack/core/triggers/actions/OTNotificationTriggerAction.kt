@@ -7,9 +7,14 @@ import android.os.Vibrator
 import android.support.annotation.DrawableRes
 import android.support.annotation.StringRes
 import android.util.Log
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.TypeAdapter
+import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonWriter
 import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.system.OTTrackingNotificationManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.ui.activities.ReminderPopupActivity
 import kr.ac.snu.hcil.omnitrack.utils.isDeviceLockedCompat
@@ -19,7 +24,36 @@ import java.lang.ref.WeakReference
 /**
  * Created by younghokim on 2017. 4. 17..
  */
-class OTNotificationTriggerAction(trigger: OTTrigger) : OTTriggerAction(trigger) {
+class OTNotificationTriggerAction : OTTriggerAction() {
+
+    class NotificationTriggerActionTypeAdapter : TypeAdapter<OTNotificationTriggerAction>() {
+        override fun write(out: JsonWriter, value: OTNotificationTriggerAction) {
+            out.beginObject()
+            out.name("level").value(value.intrinsicNotificationLevel.ordinal)
+            out.endObject()
+        }
+
+        override fun read(reader: JsonReader): OTNotificationTriggerAction {
+            val action = OTNotificationTriggerAction()
+            reader.beginObject()
+            while (reader.hasNext()) {
+                when (reader.nextName()) {
+                    "level" -> try {
+                        action.intrinsicNotificationLevel = NotificationLevel.values()[reader.nextInt()]
+                    } catch (ex: Exception) {
+                        NotificationLevel.Noti
+                    }
+                }
+            }
+            reader.endObject()
+            return action
+        }
+
+    }
+
+    override fun getSerializedString(): String? {
+        return parser.toJson(this, OTNotificationTriggerAction::class.java)
+    }
 
 
     enum class NotificationLevel(@StringRes val nameRes: Int, @StringRes val descRes: Int, @DrawableRes val thumbnailRes: Int) {
@@ -42,6 +76,10 @@ class OTNotificationTriggerAction(trigger: OTTrigger) : OTTriggerAction(trigger)
 
     companion object {
         const val KEY_NOTIFICATION_LEVEL = "notificationLevel"
+
+        val parser: Gson by lazy {
+            GsonBuilder().registerTypeAdapter(OTNotificationTriggerAction::class.java, NotificationTriggerActionTypeAdapter()).create()
+        }
 
         val popupTriggersQueue = ArrayList<WeakReference<OTTrigger>>()
         var popupTriggerQueueTime: Long? = null
@@ -78,15 +116,7 @@ class OTNotificationTriggerAction(trigger: OTTrigger) : OTTriggerAction(trigger)
         }
     }
 
-    var intrinsicNotificationLevel: NotificationLevel
-        get() {
-            return NotificationLevel.valueOf((trigger.properties.get(KEY_NOTIFICATION_LEVEL) as? String ?: NotificationLevel.Noti.name))
-        }
-        set(value) {
-            trigger.properties.set(KEY_NOTIFICATION_LEVEL, value.name)
-            trigger.syncPropertyToDatabase(KEY_NOTIFICATION_LEVEL, value.name)
-            trigger.notifyPropertyChanged(KEY_NOTIFICATION_LEVEL, value.name)
-        }
+    var intrinsicNotificationLevel: NotificationLevel = NotificationLevel.Noti
 
     val notificationLevelForSystem: NotificationLevel
         get() {
@@ -114,12 +144,13 @@ class OTNotificationTriggerAction(trigger: OTTrigger) : OTTriggerAction(trigger)
         }
 
 
-    override fun performAction(triggerTime: Long, context: Context): Single<OTTrigger> {
+    override fun performAction(triggerTime: Long, context: Context): Single<OTTriggerDAO> {
         println("trigger fired - send notification")
         when (notificationLevelForSystem) {
             NotificationLevel.Noti -> {
                 for (tracker in trigger.trackers) {
-                    OTTrackingNotificationManager.pushReminderNotification(context, tracker, triggerTime)
+                    TODO("Implement")
+                    //OTTrackingNotificationManager.pushReminderNotification(context, tracker, triggerTime)
                 }
             }
             NotificationLevel.Popup -> {
@@ -132,7 +163,8 @@ class OTNotificationTriggerAction(trigger: OTTrigger) : OTTriggerAction(trigger)
                 }
 
                 Log.d(TAG, "add one trigger for ${triggerTime}}")
-                popupTriggersQueue.add(WeakReference(trigger))
+                //TODO
+                // popupTriggersQueue.add(WeakReference(trigger))
                 popupTriggerQueueTime = triggerTime
             }
             NotificationLevel.Impose -> {
