@@ -2,8 +2,12 @@ package kr.ac.snu.hcil.omnitrack.core.database.local
 
 import io.realm.RealmList
 import io.realm.RealmObject
+import io.realm.annotations.Ignore
 import io.realm.annotations.Index
 import io.realm.annotations.PrimaryKey
+import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTBackgroundLoggingTriggerAction
+import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTNotificationTriggerAction
+import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTTriggerAction
 
 /**
  * Created by Young-Ho on 10/9/2017.
@@ -32,9 +36,37 @@ open class OTTriggerDAO : RealmObject() {
     var conditionType: Byte = CONDITION_TYPE_TIME
     var serializedCondition: String? = null
 
+
     @Index
     var actionType: Byte = ACTION_TYPE_REMIND
+        set(value) {
+            if (field != value) {
+                field = value
+                _action = null
+            }
+        }
     var serializedAction: String? = null
+
+    @Ignore
+    private var _action: OTTriggerAction? = null
+    val action: OTTriggerAction
+        get() {
+            if (_action == null) {
+                when (actionType) {
+                    ACTION_TYPE_LOG -> OTBackgroundLoggingTriggerAction(this)
+                    ACTION_TYPE_REMIND -> OTNotificationTriggerAction.parser.fromJson(serializedAction, OTNotificationTriggerAction::class.java).apply { trigger = this@OTTriggerDAO }
+                }
+            }
+
+            return _action!!
+        }
+
+    fun saveAction(): Boolean =
+            _action?.getSerializedString()?.let {
+                if (serializedAction != it) {
+                    serializedAction = it; true
+                } else false
+            } ?: false
 
 
     //Device-only properties===========
