@@ -23,7 +23,7 @@ import android.widget.ToggleButton
 import butterknife.bindView
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.SerialDisposable
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTTimeAttributeHelper
@@ -62,7 +62,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
         fun makeIntent(trackerId: String, context: Context): Intent {
             val intent = Intent(context, ItemBrowserActivity::class.java)
-            intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
+            intent.putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
             return intent
         }
     }
@@ -199,7 +199,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                 }
         )
 
-        val trackerId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
+        val trackerId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
         if (trackerId != null) {
             viewModel.init(trackerId)
         }
@@ -262,7 +262,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
     override fun onToolbarRightButtonClicked() {
         val intent = ItemDetailActivity.makeNewItemPageIntent(viewModel.trackerId, this)
-        intent.putExtra(OTApplication.INTENT_EXTRA_FROM, this@ItemBrowserActivity.javaClass.simpleName)
+        intent.putExtra(OTApp.INTENT_EXTRA_FROM, this@ItemBrowserActivity.javaClass.simpleName)
         startActivityForResult(intent, REQUEST_CODE_NEW_ITEM)
     }
 
@@ -322,7 +322,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
         fun clearTrashcan() {
             for (item in removedItems) {
                 //TODO remove
-                //OTApplication.app.databaseManager.removeItem(item)
+                //OTApp.instance.databaseManager.removeItem(item)
             }
         }
 
@@ -427,7 +427,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                 when (p0.itemId) {
                     R.id.action_edit -> {
                         val intent = ItemDetailActivity.makeItemEditPageIntent(items[adapterPosition].itemId!!, viewModel.trackerId, this@ItemBrowserActivity)
-                        intent.putExtra(OTApplication.INTENT_EXTRA_FROM, this@ItemBrowserActivity.javaClass.simpleName)
+                        intent.putExtra(OTApp.INTENT_EXTRA_FROM, this@ItemBrowserActivity.javaClass.simpleName)
                         startActivityForResult(intent, REQUEST_CODE_EDIT_ITEM)
                         return true
                     }

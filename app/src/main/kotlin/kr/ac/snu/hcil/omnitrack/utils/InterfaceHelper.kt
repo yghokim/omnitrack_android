@@ -7,7 +7,7 @@ import android.support.v4.graphics.ColorUtils
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 
 /**
@@ -41,7 +41,7 @@ object InterfaceHelper {
     }
 
     fun alertBackground(views: Array<View>, alertColorRes: Int = R.color.colorRed_Light, startAlpha: Float = 0.5f, duration: Long = 1200): ValueAnimator {
-        val color = ContextCompat.getColor(OTApplication.app, alertColorRes)
+        val color = ContextCompat.getColor(OTApp.instance, alertColorRes)
 
         val colorAnimator = ValueAnimator.ofFloat(startAlpha, 0f)
         colorAnimator.duration = duration
@@ -77,7 +77,7 @@ object InterfaceHelper {
     }
 
     fun alertBackground(view: View, alertColorRes: Int = R.color.colorRed_Light, startAlpha: Float = 0.5f, duration: Long = 1200): ValueAnimator {
-        val color = ContextCompat.getColor(OTApplication.app, alertColorRes)
+        val color = ContextCompat.getColor(OTApp.instance, alertColorRes)
 
         val colorAnimator = ValueAnimator.ofFloat(startAlpha, 0f)
         colorAnimator.duration = duration

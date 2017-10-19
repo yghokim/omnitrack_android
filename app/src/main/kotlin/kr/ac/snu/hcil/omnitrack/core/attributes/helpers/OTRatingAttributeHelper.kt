@@ -3,7 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 import android.content.Context
 import android.view.View
 import io.reactivex.Single
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.NumericSorter
@@ -117,7 +117,7 @@ class OTRatingAttributeHelper : OTAttributeHelper() {
     }
 
     override fun makeIntrinsicDefaultValueMessage(attribute: OTAttributeDAO): CharSequence {
-        return OTApplication.getString(R.string.msg_intrinsic_rating)
+        return OTApp.getString(R.string.msg_intrinsic_rating)
     }
 
     override fun formatAttributeValue(attribute: OTAttributeDAO, value: Any): CharSequence {

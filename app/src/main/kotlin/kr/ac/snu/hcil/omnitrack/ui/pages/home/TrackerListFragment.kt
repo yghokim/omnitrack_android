@@ -32,7 +32,7 @@ import butterknife.bindView
 import com.afollestad.materialdialogs.MaterialDialog
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
@@ -99,8 +99,8 @@ class TrackerListFragment : OTFragment() {
                 .negativeText(R.string.msg_cancel)
     }
 
-    private val collapsedHeight = OTApplication.app.resourcesWrapped.getDimensionPixelSize(R.dimen.tracker_list_element_collapsed_height)
-    private val expandedHeight = OTApplication.app.resourcesWrapped.getDimensionPixelSize(R.dimen.tracker_list_element_expanded_height)
+    private val collapsedHeight = OTApp.instance.resourcesWrapped.getDimensionPixelSize(R.dimen.tracker_list_element_collapsed_height)
+    private val expandedHeight = OTApp.instance.resourcesWrapped.getDimensionPixelSize(R.dimen.tracker_list_element_expanded_height)
 
     private val createViewSubscriptions: CompositeDisposable = CompositeDisposable()
     private val resumeSubscriptions: CompositeDisposable = CompositeDisposable()
@@ -229,8 +229,8 @@ class TrackerListFragment : OTFragment() {
         if (requestCode == REQUEST_CODE_NEW_TRACKER) {
             if (resultCode == RESULT_OK) {
                 if (data != null) {
-                    if (data.hasExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)) {
-                        val newTrackerId = data.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
+                    if (data.hasExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)) {
+                        val newTrackerId = data.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
 
                         /* TODO logging
                         EventLoggingManager.logTrackerChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_TRACKER_ADD, newTracker)
@@ -272,7 +272,7 @@ class TrackerListFragment : OTFragment() {
             when(which) {
                 CHANGE_TRACKER_SETTINGS -> {
                     val intent = Intent(context, TrackerDetailActivity::class.java)
-                    intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
+                    intent.putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
                     startActivityOnDelay(intent)
 
                 }
@@ -450,7 +450,8 @@ class TrackerListFragment : OTFragment() {
                 } else if (view === listButton) {
                     startActivityOnDelay(ItemBrowserActivity.makeIntent(trackerId!!, this@TrackerListFragment.context))
                 } else if (view === removeButton) {
-                    DialogHelper.makeNegativePhrasedYesNoDialogBuilder(context, trackerViewModel.trackerName.value, getString(R.string.msg_confirm_remove_tracker), R.string.msg_remove, onYes = { ->
+                    DialogHelper.makeNegativePhrasedYesNoDialogBuilder(context, trackerViewModel.trackerName.value, getString(R.string.msg_confirm_remove_tracker), R.string.msg_remove,
+                            onYes = { dialog ->
                         viewModel.removeTracker(trackerViewModel)
                         listView.invalidateItemDecorations()
                         //TODO logging tracker removal
@@ -509,7 +510,7 @@ class TrackerListFragment : OTFragment() {
             }
 
             private fun setTotalItemCount(count: Long) {
-                val header = OTApplication.app.resourcesWrapped.getString(R.string.msg_tracker_list_stat_total).toUpperCase()
+                val header = OTApp.instance.resourcesWrapped.getString(R.string.msg_tracker_list_stat_total).toUpperCase()
                 putStatistics(totalItemCountView, header, count.toString())
             }
 

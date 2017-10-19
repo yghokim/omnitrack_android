@@ -9,7 +9,7 @@ import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.common.api.Scope
 import io.reactivex.Observable
 import io.reactivex.Single
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.dependency.OTSystemDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.dependency.ThirdPartyAppDependencyResolver
@@ -61,7 +61,7 @@ object GoogleFitService : OTExternalService("GoogleFitService", 19) {
     override fun onRegisterDependencies(): Array<OTSystemDependencyResolver> {
         return arrayOf(
                 GoogleFitAuthDependencyResolver(),
-                ThirdPartyAppDependencyResolver.Builder(OTApplication.app)
+                ThirdPartyAppDependencyResolver.Builder(OTApp.instance)
                         .setPackageName("com.google.android.apps.fitness")
                         .isMandatory(false)
                         .setAppName(R.string.service_googlefit_app_name)
@@ -117,7 +117,7 @@ object GoogleFitService : OTExternalService("GoogleFitService", 19) {
         }
     }
 
-    private fun buildClientBuilderBase(context: Context = OTApplication.app): GoogleApiClient.Builder {
+    private fun buildClientBuilderBase(context: Context = OTApp.instance): GoogleApiClient.Builder {
         val builder = GoogleApiClient.Builder(context)
 
         for (api in usedApis) {

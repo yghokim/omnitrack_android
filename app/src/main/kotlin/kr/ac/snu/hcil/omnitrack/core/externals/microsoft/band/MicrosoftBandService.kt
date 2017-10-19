@@ -5,7 +5,7 @@ import com.microsoft.band.BandClient
 import com.microsoft.band.BandClientManager
 import com.microsoft.band.BandException
 import com.microsoft.band.ConnectionState
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
@@ -43,7 +43,7 @@ object MicrosoftBandService : OTExternalService("MicrosoftBandService", 19) {
             val client = getClient()
             if(client!=null)
             {
-                //val permission = PermissionChecker.checkSelfPermission(OTApplication.app, "com.microsoft.band.service.access.BIND_BAND_SERVICE")
+                //val permission = PermissionChecker.checkSelfPermission(OTApp.instance, "com.microsoft.band.service.access.BIND_BAND_SERVICE")
 
                 connectionTask = ConnectionTask(client, connectedHandler)
                 connectionTask?.execute(null);
@@ -59,7 +59,7 @@ object MicrosoftBandService : OTExternalService("MicrosoftBandService", 19) {
         val pairedBands = BandClientManager.getInstance().pairedBands
         println("${pairedBands.size} bands are paired.")
         if (pairedBands.size > 0) {
-            return BandClientManager.getInstance().create(OTApplication.app, pairedBands[0])
+            return BandClientManager.getInstance().create(OTApp.instance, pairedBands[0])
         } else return null
     }
 

@@ -14,7 +14,7 @@ import br.com.goncalves.pugnotification.notification.PugNotification
 import com.afollestad.materialdialogs.MaterialDialog
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTFileInvolvedAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.database.EventLoggingManager
@@ -51,7 +51,7 @@ class OTTableExportService : WakefulService(TAG) {
 
         fun makeIntent(context: Context, trackerId: String, exportUri: String, includeFiles: Boolean, tableFileType: TableFileType): Intent {
             val intent = Intent(context, OTTableExportService::class.java)
-                    .putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
+                    .putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
                     .putExtra(EXTRA_EXPORT_URI, exportUri)
                     .putExtra(EXTRA_EXPORT_CONFIG_INCLUDE_FILE, includeFiles)
                     .putExtra(EXTRA_EXPORT_CONFIG_TABLE_FILE_TYPE, tableFileType.toString())
@@ -104,7 +104,7 @@ class OTTableExportService : WakefulService(TAG) {
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         println("table export service started.")
-        val trackerId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
+        val trackerId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
         val exportUriString = intent.getStringExtra(EXTRA_EXPORT_URI)
         if (trackerId != null && exportUriString != null) {
             val exportUri = Uri.parse(exportUriString)
@@ -182,8 +182,8 @@ class OTTableExportService : WakefulService(TAG) {
 
             subscriptions.add(
                     Single.defer<Boolean> {
-                        val realm = OTApplication.app.databaseManager.getRealmInstance()
-                        val tracker = OTApplication.app.databaseManager.getUnManagedTrackerDao(trackerId, realm)
+                        val realm = OTApp.instance.databaseManager.getRealmInstance()
+                        val tracker = OTApp.instance.databaseManager.getUnManagedTrackerDao(trackerId, realm)
                         realm.close()
                         loadedTracker = tracker
                         if (tracker == null) {
@@ -207,7 +207,7 @@ class OTTableExportService : WakefulService(TAG) {
                                 it.getHelper().onAddColumnToTable(it, table.columns)
                             }
 
-                            val items = OTApplication.app.databaseManager.makeItemsQuery(trackerId, null, null, realm).findAll()
+                            val items = OTApp.instance.databaseManager.makeItemsQuery(trackerId, null, null, realm).findAll()
                             items.withIndex().forEach { itemWithIndex ->
                                 val item = itemWithIndex.value
                                 val row = ArrayList<String?>()

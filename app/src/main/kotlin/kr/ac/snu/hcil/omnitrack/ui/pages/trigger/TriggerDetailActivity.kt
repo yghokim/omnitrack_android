@@ -10,7 +10,7 @@ import android.view.ViewGroup
 import android.view.ViewStub
 import android.widget.FrameLayout
 import io.reactivex.disposables.CompositeDisposable
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
@@ -47,7 +47,7 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_mul
 
         fun makeEditTriggerIntent(context: Context, triggerId: String, hideAttachedTrackers: Boolean = false, overrideTitle: String? = null): Intent {
             val intent = Intent(context, TriggerDetailActivity::class.java)
-                    .putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRIGGER, triggerId)
+                    .putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRIGGER, triggerId)
                     .putExtra(INTENT_EXTRA_HIDE_ATTACHED_TRACKERS, hideAttachedTrackers)
 
             if (overrideTitle != null) {
@@ -70,7 +70,7 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_mul
             hideAttachedTrackers = intent.getBooleanExtra(INTENT_EXTRA_HIDE_ATTACHED_TRACKERS, false)
         }
 
-        val triggerId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRIGGER)
+        val triggerId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRIGGER)
         if (!triggerId.isNullOrBlank()) {
 
             title = resources.getString(R.string.title_activity_trigger_edit)
@@ -193,7 +193,7 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_mul
         companion object {
             fun getInstance(triggerId: String, hideAttachedTrackers: Boolean): TriggerDetailFragment {
                 val args = Bundle()
-                args.putString(OTApplication.INTENT_EXTRA_OBJECT_ID_TRIGGER, triggerId)
+                args.putString(OTApp.INTENT_EXTRA_OBJECT_ID_TRIGGER, triggerId)
                 args.putBoolean(INTENT_EXTRA_HIDE_ATTACHED_TRACKERS, hideAttachedTrackers)
 
                 val fragment = TriggerDetailFragment()
@@ -261,7 +261,7 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_mul
 
             this.hideAttachedTrackers = arguments.getBoolean(INTENT_EXTRA_HIDE_ATTACHED_TRACKERS, false)
 
-            val triggerId = arguments.getString(OTApplication.INTENT_EXTRA_OBJECT_ID_TRIGGER)
+            val triggerId = arguments.getString(OTApp.INTENT_EXTRA_OBJECT_ID_TRIGGER)
             if (!triggerId.isNullOrBlank()) {
                 val activity = activity
                 /*

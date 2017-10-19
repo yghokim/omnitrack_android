@@ -7,7 +7,7 @@ import com.google.firebase.storage.StorageMetadata
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import kr.ac.snu.hcil.omnitrack.core.database.UploadTaskInfo
-import kr.ac.snu.hcil.omnitrack.core.database.abstraction.ABinaryUploadService
+import kr.ac.snu.hcil.omnitrack.core.net.ABinaryUploadService
 import java.util.concurrent.ConcurrentHashMap
 
 /**

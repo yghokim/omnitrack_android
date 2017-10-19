@@ -4,7 +4,7 @@ import android.util.SparseIntArray
 import io.reactivex.Single
 import io.realm.Realm
 import io.realm.Sort
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTChoiceAttributeHelper
@@ -24,7 +24,7 @@ class ChoiceCategoricalBarChartModel(attribute: OTAttributeDAO, realm: Realm) : 
     private val categoriesCache = HashSet<Int>()
 
     override val name: String
-        get() = String.format(OTApplication.app.resourcesWrapped.getString(R.string.msg_vis_categorical_distribution_title_format), super.name)
+        get() = String.format(OTApp.instance.resourcesWrapped.getString(R.string.msg_vis_categorical_distribution_title_format), super.name)
 
     override fun recycle() {
         counterDictCache.clear()
@@ -34,7 +34,7 @@ class ChoiceCategoricalBarChartModel(attribute: OTAttributeDAO, realm: Realm) : 
     override fun reloadData(): Single<List<ICategoricalBarChart.Point>> {
         val trackerId = attribute.trackerId
         if (trackerId != null) {
-            return OTApplication.app.databaseManager
+            return OTApp.instance.databaseManager
                     .makeItemsQuery(trackerId, getTimeScope(), realm)
                     .findAllSortedAsync("timestamp", Sort.ASCENDING)
                     .asFlowable()

@@ -3,7 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.database
 import android.os.Bundle
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.database.FirebaseDatabase
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import java.util.*
 
@@ -35,7 +35,7 @@ object EventLoggingManager {
     const val EVENT_NAME_SESSION = "session"
 
     private val analytics: FirebaseAnalytics by lazy {
-        FirebaseAnalytics.getInstance(OTApplication.app)
+        FirebaseAnalytics.getInstance(OTApp.instance)
     }
 
     fun logEvent(name: String, params: Bundle) {
@@ -53,7 +53,7 @@ object EventLoggingManager {
 
         table["timestamp"] = System.currentTimeMillis()
         table["app_id"] = FirebaseDatabase.getInstance().app.options.applicationId
-        table["device_id"] = OTApplication.app.deviceId
+        table["device_id"] = OTApp.instance.deviceId
 
         //TODO log
         //DatabaseManager.dbRef?.child(CHILD_NAME_EVENTS)?.child(OTAuthManager.userId ?: CHILD_NAME_ANONYMOUS)?.push()?.setValue(table)
@@ -109,7 +109,7 @@ object EventLoggingManager {
 
     fun logExport(trackerId: String) {
         val bundle = Bundle()
-        bundle.putString(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
+        bundle.putString(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
         logEvent(EVENT_NAME_TRACKER_DATA_EXPORT, bundle)
     }
 }

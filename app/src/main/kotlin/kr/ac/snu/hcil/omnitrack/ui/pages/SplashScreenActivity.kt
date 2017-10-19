@@ -5,7 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
@@ -49,7 +49,7 @@ class SplashScreenActivity : OTActivity(checkRefreshingCredential = true, checkU
                 }
             } else {
                 //unsupported device.
-                DialogHelper.makeSimpleAlertBuilder(this, "This device may not to support Google Play services, which is required to run the OmniTrack app. If you are in the region such as China, where the Google Play service is unavailable, we're sorry to confirm that you can't use OmniTrack :(")
+                DialogHelper.makeSimpleAlertBuilder(this, "This device may not to support Google Play services, which is required to run the OmniTrack instance. If you are in the region such as China, where the Google Play service is unavailable, we're sorry to confirm that you can't use OmniTrack :(")
                         .dismissListener {
                             finish()
                         }.show()
@@ -66,7 +66,7 @@ class SplashScreenActivity : OTActivity(checkRefreshingCredential = true, checkU
                 signedInUserObservable.subscribe {
                     user ->
                     val intent = Intent(this, HomeActivity::class.java)
-                    intent.putExtra(OTApplication.INTENT_EXTRA_IGNORE_SIGN_IN_CHECK, true)
+                    intent.putExtra(OTApp.INTENT_EXTRA_IGNORE_SIGN_IN_CHECK, true)
                     startActivity(intent)
                     finish()
                 }

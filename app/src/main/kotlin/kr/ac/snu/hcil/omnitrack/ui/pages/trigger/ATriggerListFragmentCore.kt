@@ -231,7 +231,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
                     val triggerPojo = data.getSerializableExtra(TriggerDetailActivity.INTENT_EXTRA_TRIGGER_DATA)
                     if (triggerPojo is DatabaseManager.TriggerPOJO) {
 
-                        OTApplication.app.currentUserObservable.subscribe {
+                        OTApp.instance.currentUserObservable.subscribe {
                             user ->
                             val newTrigger = OTTrigger.makeInstance(DatabaseManager.generateNewKey(DatabaseManager.CHILD_NAME_TRIGGERS), user, triggerPojo)
                             newlyAddedTriggerId = newTrigger.objectId

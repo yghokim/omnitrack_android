@@ -10,7 +10,7 @@ import io.reactivex.subjects.PublishSubject
 import io.realm.*
 import io.realm.rx.RealmObservableFactory
 import io.realm.rx.RxObservableFactory
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
@@ -438,15 +438,15 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
             if (notifyIntent && resultPair.first != SAVE_RESULT_FAIL) {
 
                 val intent = Intent(when (resultPair.first) {
-                    SAVE_RESULT_NEW -> OTApplication.BROADCAST_ACTION_ITEM_ADDED
-                    SAVE_RESULT_EDIT -> OTApplication.BROADCAST_ACTION_ITEM_EDITED
+                    SAVE_RESULT_NEW -> OTApp.BROADCAST_ACTION_ITEM_ADDED
+                    SAVE_RESULT_EDIT -> OTApp.BROADCAST_ACTION_ITEM_EDITED
                     else -> throw IllegalArgumentException("")
                 })
 
-                intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, item.trackerId)
-                intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, item.objectId)
+                intent.putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, item.trackerId)
+                intent.putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM, item.objectId)
 
-                OTApplication.app.sendBroadcast(intent)
+                OTApp.instance.sendBroadcast(intent)
 
                 if (resultPair.first == SAVE_RESULT_NEW) {
                     OnItemListUpdated.onNext(item.trackerId!!)
@@ -498,10 +498,10 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
             if (value != null) {
                 if (value is SynchronizedUri && value.localUri != Uri.EMPTY) {
                     println("upload Synchronized Uri file to server...")
-                    value.setSynchronized(OTApplication.app.binaryUploadServiceController.makeFilePath(itemId, item.trackerId!!, OTAuthManager.userId!!, value.localUri.lastPathSegment))
+                    value.setSynchronized(OTApp.instance.binaryUploadServiceController.makeFilePath(itemId, item.trackerId!!, OTAuthManager.userId!!, value.localUri.lastPathSegment))
                     entry.value = TypeStringSerializationHelper.serialize(value)
-                    OTApplication.app.startService(
-                            OTApplication.app.binaryUploadServiceController.makeUploadServiceIntent(value, itemId, item.trackerId!!, OTAuthManager.userId!!)
+                    OTApp.instance.startService(
+                            OTApp.instance.binaryUploadServiceController.makeUploadServiceIntent(value, itemId, item.trackerId!!, OTAuthManager.userId!!)
                     )
                 }
             }
@@ -512,11 +512,11 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
         val trackerId = itemDao.trackerId
         if (removeItemImpl(itemDao, realm)) {
 
-            val intent = Intent(OTApplication.BROADCAST_ACTION_ITEM_REMOVED)
+            val intent = Intent(OTApp.BROADCAST_ACTION_ITEM_REMOVED)
 
-            intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
+            intent.putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
 
-            OTApplication.app.sendBroadcast(intent)
+            OTApp.instance.sendBroadcast(intent)
 
             OnItemListUpdated.onNext(trackerId!!)
         } else {

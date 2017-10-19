@@ -8,7 +8,7 @@ import android.view.View
 import android.widget.TextView
 import com.github.ybq.android.spinkit.SpinKitView
 import io.reactivex.disposables.CompositeDisposable
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
@@ -64,7 +64,7 @@ class AudioItemListView : ConstraintLayout {
 
     private fun startDownload() {
         subscriptions.add(
-                OTApplication.app.storageHelper.downloadFileTo(mountedUri.serverUri.toString(), mountedUri.localUri)
+                OTApp.instance.storageHelper.downloadFileTo(mountedUri.serverUri.toString(), mountedUri.localUri)
                         .subscribe({
                             uri ->
                             println("audio file download complete: $uri")

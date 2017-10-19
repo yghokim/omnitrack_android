@@ -12,7 +12,7 @@ import android.support.v4.content.LocalBroadcastManager
 import android.util.AttributeSet
 import gun0912.tedbottompicker.TedBottomPicker
 import io.reactivex.disposables.CompositeDisposable
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.ui.components.common.ImagePicker
@@ -52,7 +52,7 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
                 } else if (value?.isSynchronized == true) {
                     picker.isEnabled = false
                     subscriptions.add(
-                            OTApplication.app.storageHelper.downloadFileTo(value.serverUri.path, value.localUri).subscribe({
+                            OTApp.instance.storageHelper.downloadFileTo(value.serverUri.path, value.localUri).subscribe({
                                 uri ->
                                 picker.uriChanged.suspend = true
                                 picker.imageUri = uri

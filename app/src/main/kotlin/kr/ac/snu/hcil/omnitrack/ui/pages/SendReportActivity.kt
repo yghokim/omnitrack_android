@@ -4,9 +4,14 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.widget.Toast
+import com.google.gson.Gson
+import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.activity_send_report.*
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
+import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 
@@ -105,31 +110,49 @@ class SendReportActivity : MultiButtonActionBarActivity(R.layout.activity_send_r
 
         val errorDialog = DialogHelper.makeSimpleAlertBuilder(this, getString(R.string.msg_send_report_error_message))
 
-        DialogHelper.makeYesNoDialogBuilder(this, title.toString(), getString(R.string.msg_send_report_to_omnitrack_team), R.string.msg_send, R.string.msg_no, onYes = {
-                val inquiry = HashMap<String, Any?>()
-                inquiry["anonymous"] = isAnonymous
-                if (!isAnonymous) {
-                    OTAuthManager.reloadUserInfo()
-                    inquiry["email"] = OTAuthManager.email
-                    inquiry["sender"] = OTAuthManager.userId
+        DialogHelper.makeYesNoDialogBuilder(this, title.toString(), getString(R.string.msg_send_report_to_omnitrack_team), R.string.msg_send, R.string.msg_no, onYes = { dialog ->
+            val inquiry = HashMap<String, Any>()
+            inquiry["anonymous"] = isAnonymous
+            if (!isAnonymous) {
+                OTAuthManager.reloadUserInfo()
+
+                OTAuthManager.email?.let {
+                    inquiry["email"] = it
                 }
 
-                inquiry["type"] = selectedReportType
-                inquiry["content"] = reportContent
+                OTAuthManager.userId?.let {
+                    inquiry["sender"] = it
+                }
+            }
 
-                println(inquiry)
+            inquiry["type"] = selectedReportType
+            inquiry["content"] = reportContent
 
-            //TODO send report
-            /*
-                DatabaseManager.dbRef?.child("inquiries")?.push()?.setValue(inquiry)?.addOnCompleteListener {
-                    task ->
-                    if (task.isSuccessful) {
-                        Toast.makeText(this, getString(R.string.msg_send_report_success_message), Toast.LENGTH_SHORT).show()
-                        finish()
-                    } else {
+            val deviceInfo = OTDeviceInfo()
+
+            inquiry["os"] = deviceInfo.os ?: "unknown"
+            inquiry["appVersion"] = deviceInfo.appVersion ?: "unknown"
+
+            val inquiryJson = Gson().toJsonTree(inquiry).asJsonObject
+            println("inquiry json: ${inquiryJson}")
+
+            creationSubscriptions.add(
+                    OTApp.instance.userReportServerController.sendUserReport(inquiryJson).observeOn(AndroidSchedulers.mainThread()).subscribe({ success ->
+                        if (success) {
+                            Toast.makeText(this, getString(R.string.msg_send_report_success_message), Toast.LENGTH_SHORT).show()
+                            dialog.dismiss()
+                            finish()
+                        } else {
+                            dialog.dismiss()
+                            errorDialog.show()
+                        }
+                    }, {
+                        dialog.dismiss()
                         errorDialog.show()
-                    }
-                } ?: errorDialog.show()*/
-        }).show()
+                    })
+            )
+        }, onNo = { dialog ->
+            dialog.dismiss()
+        }).autoDismiss(false).show()
     }
 }

@@ -5,7 +5,7 @@ import android.content.Context
 import android.util.SparseArray
 import android.view.View
 import android.widget.TextView
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTProperty
@@ -356,8 +356,8 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
                     return true
                 } else {
                     invalidMessages?.add(TextHelper.fromHtml(String.format(
-                            "<font color=\"blue\">${OTApplication.app.resourcesWrapped.getString(R.string.msg_service_is_not_activated_format)}</font>",
-                            OTApplication.app.resourcesWrapped.getString(service.nameResourceId))))
+                            "<font color=\"blue\">${OTApp.instance.resourcesWrapped.getString(R.string.msg_service_is_not_activated_format)}</font>",
+                            OTApp.instance.resourcesWrapped.getString(service.nameResourceId))))
                     return false
                 }
             } else {
@@ -385,6 +385,6 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
     }
 
     override fun save() {
-        OTApplication.app.databaseManager.saveAttribute(tracker?.objectId, this as OTAttribute<out Any>, intrinsicPosition)
+        OTApp.instance.databaseManager.saveAttribute(tracker?.objectId, this as OTAttribute<out Any>, intrinsicPosition)
     }
 }

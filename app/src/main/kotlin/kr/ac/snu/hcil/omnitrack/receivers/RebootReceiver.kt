@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.PowerManager
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckService
 
 /**
@@ -26,10 +26,10 @@ class RebootReceiver : BroadcastReceiver() {
 
         OTVersionCheckService.setupServiceAlarm(context)
 
-        OTApplication.app.timeTriggerAlarmManager.activateOnSystem()
+        OTApp.instance.timeTriggerAlarmManager.activateOnSystem()
 
         /*
-        OTApplication.app.currentUserObservable.observeOn(Schedulers.newThread()).subscribe({
+        OTApp.instance.currentUserObservable.observeOn(Schedulers.newThread()).subscribe({
             user ->
             OTShortcutPanelManager.refreshNotificationShortcutViews(user, context)
 

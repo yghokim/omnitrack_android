@@ -13,7 +13,7 @@ import android.widget.Toast
 import com.badoo.mobile.util.WeakHandler
 import com.tbruyelle.rxpermissions2.RxPermissions
 import io.reactivex.disposables.CompositeDisposable
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.ExperimentConsentManager
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
@@ -111,7 +111,7 @@ class SignInActivity : AppCompatActivity() {
     private fun goHomeActivity() {
         Log.d(LOG_TAG, "Launching Main Activity...")
         startActivity(Intent(this@SignInActivity, HomeActivity::class.java)
-                .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP).putExtra(OTApplication.INTENT_EXTRA_IGNORE_SIGN_IN_CHECK, true))
+                .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP).putExtra(OTApp.INTENT_EXTRA_IGNORE_SIGN_IN_CHECK, true))
         // finish should always be called on the main thread.
         finish()
     }

@@ -7,7 +7,7 @@ import android.view.View
 import com.github.ybq.android.spinkit.SpinKitView
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
@@ -49,7 +49,7 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
                 } else if (value?.isSynchronized == true) {
                     inLoadingMode = true
                     subscriptions.add(
-                            OTApplication.app.storageHelper.downloadFileTo(value.serverUri.path, value.localUri).subscribe(
+                            OTApp.instance.storageHelper.downloadFileTo(value.serverUri.path, value.localUri).subscribe(
                                     {
                                         uri ->
                                         valueView.audioFileUriChanged.suspend = true
@@ -119,11 +119,11 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
     override fun onAttributeBound(attributeObjectId: String) {
         valueView.mediaSessionId = attributeObjectId
 
-        val realm = OTApplication.app.databaseManager.getRealmInstance()
+        val realm = OTApp.instance.databaseManager.getRealmInstance()
         val attributeInfo = realm.where(OTAttributeDAO::class.java).equalTo("objectId", attributeObjectId).findFirst()
         if (attributeInfo != null) {
             val trackerName = attributeInfo.trackerId?.let {
-                val trackerInfo = OTApplication.app.databaseManager.getTrackerQueryWithId(it, realm).findFirst()
+                val trackerInfo = OTApp.instance.databaseManager.getTrackerQueryWithId(it, realm).findFirst()
                 trackerInfo?.name ?: "No Tracker"
             } ?: "No Tracker"
 

@@ -10,7 +10,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
@@ -27,7 +27,7 @@ class ChartViewActivity : MultiButtonActionBarActivity(R.layout.activity_chart_v
     companion object {
         fun makeIntent(trackerId: String, context: Context): Intent {
             val intent = Intent(context, ChartViewActivity::class.java)
-            intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
+            intent.putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
             return intent
         }
     }
@@ -116,7 +116,7 @@ class ChartViewActivity : MultiButtonActionBarActivity(R.layout.activity_chart_v
         )
 
 
-        val trackerId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
+        val trackerId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
         if (trackerId != null) {
             viewModel.init(trackerId)
             viewModel.setScope(System.currentTimeMillis(), supportedGranularity[scopeSelectionView.selectedIndex])

@@ -2,7 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core
 
 import android.content.Context
 import android.content.SharedPreferences
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
@@ -134,7 +134,7 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
 
         trackers.listModified += {
             _, args ->
-            OTApplication.app.startService(OTShortcutPanelWidgetUpdateService.makeNotifyDatesetChangedIntentToAllWidgets(OTApplication.app))
+            OTApp.instance.startService(OTShortcutPanelWidgetUpdateService.makeNotifyDatesetChangedIntentToAllWidgets(OTApp.instance))
         }
 
         //trackerListDbReference = databaseRef?.child(DatabaseManager.CHILD_NAME_TRACKERS)
@@ -235,7 +235,7 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
     /*
     fun getRecentTrackers(): List<OTTracker>{
         val list = trackers.unObservedList.toMutableList()
-        list.map { OTApplication.app.dbHelper.getLastLoggingTimeAsync(it,) }
+        list.map { OTApp.instance.dbHelper.getLastLoggingTimeAsync(it,) }
     }*/
 
     fun detachFromSystem() {
@@ -250,7 +250,7 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
 
     fun newTracker(name: String, add: Boolean, creationFlags: Map<String, String>? = null, isEditable: Boolean = true): OTTracker {
         val tracker = OTTracker(null, name, isOnShortcut = false, isEditable = isEditable, creationFlags = creationFlags)
-        val unOccupied = OTApplication.app.colorPalette.filter {
+        val unOccupied = OTApp.instance.colorPalette.filter {
             color ->
             trackers.unObservedList.find {
                 it ->
@@ -261,7 +261,7 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
         tracker.color = if (unOccupied.isNotEmpty()) {
             unOccupied.first()
         } else {
-            OTApplication.app.colorPalette.first()
+            OTApp.instance.colorPalette.first()
         }
 
         if (add) {
@@ -295,7 +295,7 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
 
         println("tracker was added")
         if (!suspendDatabaseSync)
-            OTApplication.app.databaseManager.saveTracker(new, index)
+            OTApp.instance.databaseManager.saveTracker(new, index)
     }
 
     private fun onTrackerRemoved(tracker: OTTracker, index: Int) {
@@ -312,7 +312,7 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
         tracker.suspendDatabaseSync = false
 
         if (!suspendDatabaseSync)
-            OTApplication.app.databaseManager.removeTracker(tracker, this, true)
+            OTApp.instance.databaseManager.removeTracker(tracker, this, true)
     }
 
     fun findAttributeByObjectId(trackerId: String, attributeId: String): OTAttribute<out Any>? {
@@ -329,7 +329,7 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
 
     /*
     fun addExampleTrackers() {
-        val context = OTApplication.app
+        val context = OTApp.instance
         val diaryTracker = newTracker(context.getString(R.string.msg_example_tracker_diary), true, OTTracker.CREATION_FLAG_TUTORIAL, true)
         diaryTracker.isOnShortcut = true
 

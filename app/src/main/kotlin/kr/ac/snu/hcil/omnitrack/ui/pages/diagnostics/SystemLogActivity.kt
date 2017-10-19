@@ -6,7 +6,7 @@ import android.os.Looper
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
@@ -45,7 +45,7 @@ class SystemLogActivity : MultiButtonActionBarActivity(R.layout.activity_system_
         systemLogListView.isEnabled = false
         systemLogListView.alpha = 0.2f
         Thread {
-            OTApplication.logger.readSystemLogs(systemLogs, false)
+            OTApp.logger.readSystemLogs(systemLogs, false)
             Handler(Looper.getMainLooper()).post {
                 adapter.notifyDataSetChanged()
                 systemLogListView.isEnabled = true

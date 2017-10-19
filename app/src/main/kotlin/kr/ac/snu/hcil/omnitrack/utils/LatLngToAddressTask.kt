@@ -4,7 +4,7 @@ import android.location.Address
 import android.os.AsyncTask
 import android.view.View
 import com.google.android.gms.maps.model.LatLng
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 
 /**
  * Created by Young-Ho on 8/15/2016.
@@ -22,7 +22,7 @@ class LatLngToAddressTask(private val listener: OnFinishListener, private val vi
     override fun doInBackground(vararg args: LatLng): String? {
         var googleAddress: Address? = null
         while (googleAddress == null) {
-            googleAddress = args.first().getAddress(OTApplication.app)
+            googleAddress = args.first().getAddress(OTApp.instance)
         }
 
         return googleAddress.getAddressLine(googleAddress.maxAddressLineIndex)

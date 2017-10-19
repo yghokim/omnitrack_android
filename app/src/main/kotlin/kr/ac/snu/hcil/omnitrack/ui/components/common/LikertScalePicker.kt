@@ -10,7 +10,7 @@ import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.dipSize
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
@@ -38,7 +38,7 @@ class LikertScalePicker : View, GestureDetector.OnGestureListener {
     }
 
 
-    var leftLabel: String by Delegates.observable(OTApplication.app.resourcesWrapped.getString(R.string.property_rating_options_leftmost_label_example)) {
+    var leftLabel: String by Delegates.observable(OTApp.instance.resourcesWrapped.getString(R.string.property_rating_options_leftmost_label_example)) {
         prop, old, new ->
         if (old != new) {
             requestLayout()
@@ -52,7 +52,7 @@ class LikertScalePicker : View, GestureDetector.OnGestureListener {
         }
     }
 
-    var rightLabel: String by Delegates.observable(OTApplication.app.resourcesWrapped.getString(R.string.property_rating_options_rightmost_label_example)) {
+    var rightLabel: String by Delegates.observable(OTApp.instance.resourcesWrapped.getString(R.string.property_rating_options_rightmost_label_example)) {
         prop, old, new ->
         if (old != new) {
             requestLayout()

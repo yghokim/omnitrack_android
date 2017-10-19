@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.core.database.abstraction
+package kr.ac.snu.hcil.omnitrack.core.net
 
 import android.content.Context
 import android.content.Intent
@@ -6,7 +6,7 @@ import android.net.Uri
 import android.widget.Toast
 import io.realm.Realm
 import io.realm.RealmConfiguration
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.core.database.UploadTaskInfo
@@ -24,9 +24,9 @@ abstract class ABinaryUploadService(tag: String) : WakefulService(tag) {
             return Intent(context, serviceClass)
                     .setAction(ACTION_UPLOAD)
                     .putExtra(EXTRA_OUT_URI, SynchronizedUri.parser.toJson(outUri))
-                    .putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, itemId)
-                    .putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
-                    .putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_USER, userId)
+                    .putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM, itemId)
+                    .putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
+                    .putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_USER, userId)
         }
 
 
@@ -100,14 +100,14 @@ abstract class ABinaryUploadService(tag: String) : WakefulService(tag) {
     protected abstract fun startNewUploadTaskImpl(taskInfo: UploadTaskInfo, onProgress: (session: String) -> Unit, finished: () -> Unit)
 
     private fun startNewUploadTask(intent: Intent, startId: Int): Int {
-        if (intent.hasExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM)
-                && intent.hasExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
-                && intent.hasExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_USER)
+        if (intent.hasExtra(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM)
+                && intent.hasExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
+                && intent.hasExtra(OTApp.INTENT_EXTRA_OBJECT_ID_USER)
                 && intent.hasExtra(EXTRA_OUT_URI)) {
 
-            val itemId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM)
-            val trackerId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
-            val userId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_USER)
+            val itemId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM)
+            val trackerId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
+            val userId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_USER)
             val outUri = SynchronizedUri.parser.fromJson(intent.getStringExtra(EXTRA_OUT_URI), SynchronizedUri::class.java)
 
             Toast.makeText(this, R.string.msg_uploading_file_to_server, Toast.LENGTH_SHORT).show()

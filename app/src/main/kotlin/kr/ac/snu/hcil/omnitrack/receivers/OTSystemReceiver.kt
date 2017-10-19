@@ -3,7 +3,7 @@ package kr.ac.snu.hcil.omnitrack.receivers
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTDataTriggerManager
 import kr.ac.snu.hcil.omnitrack.widgets.OTShortcutPanelWidgetUpdateService
 
@@ -16,17 +16,17 @@ class OTSystemReceiver : BroadcastReceiver() {
         println("OmniTrack system receiver received Intent: - ${intent.action}")
         when (intent.action) {
 
-            OTApplication.BROADCAST_ACTION_SHORTCUT_REFRESH -> {
+            OTApp.BROADCAST_ACTION_SHORTCUT_REFRESH -> {
                 //OTShortcutPanelManager.refreshNotificationShortcutViews(user, context)
             }
 
-            OTApplication.BROADCAST_ACTION_ITEM_ADDED -> {
+            OTApp.BROADCAST_ACTION_ITEM_ADDED -> {
                 /*
-                OTApplication.app.currentUserObservable.subscribe {
+                OTApp.instance.currentUserObservable.subscribe {
                     user ->
-                    val tracker = user[intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)]
+                    val tracker = user[intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)]
                     if (tracker != null) {
-                        Toast.makeText(OTApplication.app, "${tracker.name} item was logged", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(OTApp.instance, "${tracker.name} item was logged", Toast.LENGTH_SHORT).show()
                     }
                 }
 
@@ -34,21 +34,21 @@ class OTSystemReceiver : BroadcastReceiver() {
                 */
             }
 
-            OTApplication.BROADCAST_ACTION_ITEM_REMOVED -> {
+            OTApp.BROADCAST_ACTION_ITEM_REMOVED -> {
                 context.startService(OTShortcutPanelWidgetUpdateService.makeNotifyDatesetChangedIntentToAllWidgets(context))
             }
 
-            OTApplication.BROADCAST_ACTION_COMMAND_REMOVE_ITEM -> {
+            OTApp.BROADCAST_ACTION_COMMAND_REMOVE_ITEM -> {
                 /*
-                OTApplication.app.currentUserObservable.subscribe {
+                OTApp.instance.currentUserObservable.subscribe {
                     user ->
-                    val tracker = user[intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)]
+                    val tracker = user[intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)]
                     if (tracker != null) {
-                        val notificationId = intent.getIntExtra(OTApplication.INTENT_EXTRA_NOTIFICATION_ID_SEED, 1)
-                        val itemId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM)
+                        val notificationId = intent.getIntExtra(OTApp.INTENT_EXTRA_NOTIFICATION_ID_SEED, 1)
+                        val itemId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM)
                         if (itemId != null) {
                             //TODO item remove
-                            //OTApplication.app.databaseManager.removeItem(tracker.objectId, itemId)
+                            //OTApp.instance.databaseManager.removeItem(tracker.objectId, itemId)
                         }
 
                         OTTrackingNotificationManager.cancelBackgroundLoggingSuccessNotification(tracker, notificationId)
@@ -59,30 +59,30 @@ class OTSystemReceiver : BroadcastReceiver() {
                 */
             }
 
-            OTApplication.BROADCAST_ACTION_BACKGROUND_LOGGING_STARTED -> {
+            OTApp.BROADCAST_ACTION_BACKGROUND_LOGGING_STARTED -> {
                 /*
-                OTApplication.app.currentUserObservable.subscribe {
+                OTApp.instance.currentUserObservable.subscribe {
                     user ->
-                    val tracker = user[intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)]
+                    val tracker = user[intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)]
                     if (tracker != null) {
-                        val notificationId = intent.getIntExtra(OTApplication.INTENT_EXTRA_NOTIFICATION_ID_SEED, 1)
+                        val notificationId = intent.getIntExtra(OTApp.INTENT_EXTRA_NOTIFICATION_ID_SEED, 1)
                         OTTaskNotificationManager.setTaskProgressNotification(context, tracker.objectId, notificationId, String.format(context.getString(R.string.msg_background_logging_notification_title_format), tracker.name), context.getString(R.string.msg_background_logging_started_notification_message), OTTaskNotificationManager.PROGRESS_INDETERMINATE,
                                 R.drawable.icon_cloud_upload, R.drawable.icon_cloud_upload)
                     }
                 }*/
             }
 
-            OTApplication.BROADCAST_ACTION_BACKGROUND_LOGGING_SUCCEEDED -> {
+            OTApp.BROADCAST_ACTION_BACKGROUND_LOGGING_SUCCEEDED -> {
                 /*
                 println("background logging successful")
-                OTApplication.app.currentUserObservable.subscribe {
+                OTApp.instance.currentUserObservable.subscribe {
                     user ->
-                    val tracker = user[intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)]
+                    val tracker = user[intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)]
                     if (tracker != null) {
-                        val itemId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM)
+                        val itemId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM)
                         val notify = intent.getBooleanExtra(OTBackgroundLoggingService.INTENT_EXTRA_NOTIFY, true)
                         if (itemId != null && notify) {
-                            val notificationId = intent.getIntExtra(OTApplication.INTENT_EXTRA_NOTIFICATION_ID_SEED, 1)
+                            val notificationId = intent.getIntExtra(OTApp.INTENT_EXTRA_NOTIFICATION_ID_SEED, 1)
                             OTTaskNotificationManager.dismissNotification(context, notificationId, tracker.objectId)
                             OTTrackingNotificationManager.pushBackgroundLoggingSuccessNotification(context, tracker, itemId, System.currentTimeMillis(), notificationId)
                         }
@@ -90,7 +90,7 @@ class OTSystemReceiver : BroadcastReceiver() {
                 }*/
             }
 
-            OTApplication.BROADCAST_ACTION_EVENT_TRIGGER_CHECK_ALARM -> {
+            OTApp.BROADCAST_ACTION_EVENT_TRIGGER_CHECK_ALARM -> {
                 OTDataTriggerManager.checkMeasures(context)
             }
         }

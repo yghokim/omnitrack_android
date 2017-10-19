@@ -23,12 +23,13 @@ import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.FirebaseStorageHelper
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
-import kr.ac.snu.hcil.omnitrack.core.database.abstraction.ABinaryUploadService
 import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
-import kr.ac.snu.hcil.omnitrack.core.database.synchronization.ISynchronizationServerSideAPI
 import kr.ac.snu.hcil.omnitrack.core.database.synchronization.OTSyncManager
-import kr.ac.snu.hcil.omnitrack.core.database.synchronization.official.OTOfficialServerApiController
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
+import kr.ac.snu.hcil.omnitrack.core.net.ABinaryUploadService
+import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationServerSideAPI
+import kr.ac.snu.hcil.omnitrack.core.net.IUserReportServerAPI
+import kr.ac.snu.hcil.omnitrack.core.net.OTOfficialServerApiController
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationChannelManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTriggerAlarmManager
@@ -44,10 +45,10 @@ import java.util.concurrent.atomic.AtomicInteger
  * Created by Young-Ho Kim on 2016-07-11.
  */
 
-class OTApplication : MultiDexApplication() {
+class OTApp : MultiDexApplication() {
 
     companion object {
-        lateinit var app: OTApplication
+        lateinit var instance: OTApp
             private set
 
         lateinit var logger: LoggingDbHelper
@@ -108,7 +109,7 @@ class OTApplication : MultiDexApplication() {
 
 
         fun getString(resId: Int): String {
-            return app.resourcesWrapped.getString(resId)
+            return instance.resourcesWrapped.getString(resId)
         }
 
         init {
@@ -182,6 +183,9 @@ class OTApplication : MultiDexApplication() {
         private set
 
 
+    lateinit var userReportServerController: IUserReportServerAPI
+        private set
+
     //Modules end===================================================
 
     val colorPalette: IntArray by lazy {
@@ -216,7 +220,7 @@ class OTApplication : MultiDexApplication() {
 
     override fun onCreate() {
         super.onCreate()
-        app = this
+        instance = this
         println("set application instance.")
 
         AndroidThreeTen.init(this)
@@ -225,7 +229,7 @@ class OTApplication : MultiDexApplication() {
 
         if (LeakCanary.isInAnalyzerProcess(this)) {
             // This process is dedicated to LeakCanary for heap analysis.
-            // You should not init your app in this process.
+            // You should not init your instance in this process.
         } else {
             LeakCanary.install(this)
         }
@@ -235,12 +239,12 @@ class OTApplication : MultiDexApplication() {
         //initialize modules===============================================
 
         this.binaryUploadServiceController = OTFirebaseUploadService.ServiceController(this)
-        this.synchronizationServerController = OTOfficialServerApiController()
-
-
+        val backend = OTOfficialServerApiController()
+        this.synchronizationServerController = backend
+        this.userReportServerController = backend
 
         logger = LoggingDbHelper(this)
-        logger.writeSystemLog("Application creates.", "OTApplication")
+        logger.writeSystemLog("Application creates.", "OTApp")
 
         storageHelper = FirebaseStorageHelper(this)
         storageHelper.restartUploadTask()
@@ -312,14 +316,14 @@ class OTApplication : MultiDexApplication() {
 
     fun refreshInstanceIdToServerIfExists(ignoreIfStored: Boolean): Single<Boolean> {
         if (ignoreIfStored) {
-            if (OTApplication.app.systemSharedPreferences.contains(OTApplication.PREFERENCE_KEY_FIREBASE_INSTANCE_ID)) {
+            if (OTApp.instance.systemSharedPreferences.contains(OTApp.PREFERENCE_KEY_FIREBASE_INSTANCE_ID)) {
                 return Single.just(false)
             }
         }
 
         val token = FirebaseInstanceId.getInstance().token
         if (token != null && OTAuthManager.currentSignedInLevel > OTAuthManager.SignedInLevel.NONE) {
-            OTApplication.app.systemSharedPreferences.edit().putString(OTApplication.PREFERENCE_KEY_FIREBASE_INSTANCE_ID, token)
+            OTApp.instance.systemSharedPreferences.edit().putString(OTApp.PREFERENCE_KEY_FIREBASE_INSTANCE_ID, token)
                     .apply()
             return synchronizationServerController.putDeviceInfo(OTDeviceInfo()).map { deviceInfoResult ->
                 val localKey = deviceInfoResult.deviceLocalKey
@@ -542,7 +546,7 @@ class OTApplication : MultiDexApplication() {
                             beerTracker,
                             it[1] as Long,
                             OTItem.ItemLoggingSource.Unspecified,
-                            OTApplication.app.deviceId,
+                            OTApp.instance.deviceId,
                             *it
                     )
                 }, beerTracker)

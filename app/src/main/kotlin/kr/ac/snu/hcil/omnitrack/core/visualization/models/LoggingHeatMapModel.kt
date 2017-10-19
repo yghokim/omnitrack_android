@@ -7,7 +7,7 @@ import android.text.format.DateUtils
 import io.reactivex.Single
 import io.realm.Realm
 import io.realm.Sort
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.visualization.TrackerChartModel
@@ -54,7 +54,7 @@ class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm) : TrackerChartMod
 
 
 
-        return OTApplication.app.databaseManager
+        return OTApp.instance.databaseManager
                 .makeItemsQuery(tracker.objectId, getTimeScope(), realm)
                 .findAllSortedAsync("timestamp", Sort.ASCENDING)
                 .asFlowable()
@@ -133,7 +133,7 @@ class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm) : TrackerChartMod
     }
 
     override val name: String
-        get() = String.format(OTApplication.app.resourcesWrapped.getString(R.string.msg_vis_logging_heatmap_title_format), tracker.name)
+        get() = String.format(OTApp.instance.resourcesWrapped.getString(R.string.msg_vis_logging_heatmap_title_format), tracker.name)
 
     override fun getChartDrawer(): AChartDrawer {
         return HeatMapDrawer()
@@ -150,8 +150,8 @@ class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm) : TrackerChartMod
 
         init {
 
-            horizontalAxis.gridLinePaint.color = ContextCompat.getColor(OTApplication.app, R.color.frontalBackground)
-            verticalAxis.gridLinePaint.color = ContextCompat.getColor(OTApplication.app, R.color.frontalBackground)
+            horizontalAxis.gridLinePaint.color = ContextCompat.getColor(OTApp.instance, R.color.frontalBackground)
+            verticalAxis.gridLinePaint.color = ContextCompat.getColor(OTApp.instance, R.color.frontalBackground)
 
             verticalAxis.style = Axis.TickLabelStyle.Small
 
@@ -237,7 +237,7 @@ class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm) : TrackerChartMod
                     cellGroup.appendEnterSelection {
                         count ->
                         val newCell = RectElement<Float>()
-                        newCell.color = ColorUtils.setAlphaComponent(ContextCompat.getColor(OTApplication.app, R.color.colorPointed), (255 * count.value + 0.5f).toInt())
+                        newCell.color = ColorUtils.setAlphaComponent(ContextCompat.getColor(OTApp.instance, R.color.colorPointed), (255 * count.value + 0.5f).toInt())
                         mapCellRectToSpace(newCell, datum.value.time, count.index)
                         newCell
                     }
@@ -251,14 +251,14 @@ class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm) : TrackerChartMod
                     rectList.appendEnterSelection {
                         count ->
                         val newCell = RectElement<Float>()
-                        newCell.color = ColorUtils.setAlphaComponent(ContextCompat.getColor(OTApplication.app, R.color.colorPointed), (255 * count.value + 0.5f).toInt())
+                        newCell.color = ColorUtils.setAlphaComponent(ContextCompat.getColor(OTApp.instance, R.color.colorPointed), (255 * count.value + 0.5f).toInt())
                         mapCellRectToSpace(newCell, datum.value.time, count.index)
                         newCell
                     }
 
                     rectList.updateElement { count, cell ->
                         mapCellRectToSpace(cell as RectElement<Float>, datum.value.time, count.index)
-                        cell.color = ColorUtils.setAlphaComponent(ContextCompat.getColor(OTApplication.app, R.color.colorPointed), (255 * count.value + 0.5f).toInt())
+                        cell.color = ColorUtils.setAlphaComponent(ContextCompat.getColor(OTApp.instance, R.color.colorPointed), (255 * count.value + 0.5f).toInt())
                     }
 
                     rectList.removeElements(rectList.getExitElements())
@@ -270,7 +270,7 @@ class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm) : TrackerChartMod
         }
 
         override fun onDraw(canvas: Canvas) {
-            fillRect(plotAreaRect, ContextCompat.getColor(OTApplication.app, R.color.editTextFormBackground), canvas)
+            fillRect(plotAreaRect, ContextCompat.getColor(OTApp.instance, R.color.editTextFormBackground), canvas)
 
             super.onDraw(canvas)
         }

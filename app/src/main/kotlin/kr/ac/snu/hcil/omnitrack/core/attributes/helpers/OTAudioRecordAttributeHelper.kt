@@ -4,7 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.view.View
 import io.reactivex.Single
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
@@ -44,7 +44,7 @@ class OTAudioRecordAttributeHelper : OTFileInvolvedAttributeHelper() {
 
     override fun refreshInputViewUI(inputView: AAttributeInputView<out Any>, attribute: OTAttributeDAO) {
         if (inputView is AudioRecordInputView) {   //TODO cacheDir
-            OTApplication.app.databaseManager.getUnManagedTrackerDao(attribute.trackerId, null)?.let {
+            OTApp.instance.databaseManager.getUnManagedTrackerDao(attribute.trackerId, null)?.let {
                 inputView.valueView.recordingOutputDirectoryPathOverride = it.getItemCacheDir(inputView.context, true)
             }
         }

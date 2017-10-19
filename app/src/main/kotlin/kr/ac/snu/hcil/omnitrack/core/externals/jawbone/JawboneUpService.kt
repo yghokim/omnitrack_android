@@ -11,7 +11,7 @@ import com.jawbone.upplatformsdk.utils.UpPlatformSdkConstants
 import com.jawbone.upplatformsdk.utils.UpPlatformSdkConstants.UP_PLATFORM_ACCESS_TOKEN
 import com.jawbone.upplatformsdk.utils.UpPlatformSdkConstants.UP_PLATFORM_REFRESH_TOKEN
 import io.reactivex.Single
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.dependency.OTSystemDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.dependency.ThirdPartyAppDependencyResolver
@@ -69,7 +69,7 @@ object JawboneUpService : OTExternalService("JawboneUpService", 9) {
     override fun onRegisterDependencies(): Array<OTSystemDependencyResolver> {
         return super.onRegisterDependencies() + arrayOf(
                 JawboneAuthDependencyResolver(),
-                ThirdPartyAppDependencyResolver.Builder(OTApplication.app)
+                ThirdPartyAppDependencyResolver.Builder(OTApp.instance)
                         .setAppName("UP®")
                         .setPackageName("com.jawbone.upopen")
                         .isMandatory(false)

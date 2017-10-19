@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes.properties
 
 import android.content.Context
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ChoiceEntryListPropertyView
@@ -19,7 +19,7 @@ class OTChoiceEntryListPropertyHelper : OTPropertyHelper<UniqueStringEntryList>(
         val PREVIEW_ENTRIES: Array<UniqueStringEntryList.Entry>
 
         init {
-            PREVIEW_ENTRIES = OTApplication.app.resourcesWrapped.getStringArray(R.array.choice_preview_entries).mapIndexed { i, s ->
+            PREVIEW_ENTRIES = OTApp.instance.resourcesWrapped.getStringArray(R.array.choice_preview_entries).mapIndexed { i, s ->
                 UniqueStringEntryList.Entry(i, s)
             }.toTypedArray()
         }
