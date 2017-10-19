@@ -1,6 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.fitbit
 
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.dependency.OTSystemDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.dependency.ThirdPartyAppDependencyResolver
@@ -39,7 +39,7 @@ object FitbitService : OAuth2BasedExternalService("FitbitService", 0) {
 
     override fun onRegisterDependencies(): Array<OTSystemDependencyResolver> {
         return super.onRegisterDependencies() + arrayOf(
-                ThirdPartyAppDependencyResolver.Builder(OTApplication.app)
+                ThirdPartyAppDependencyResolver.Builder(OTApp.instance)
                         .setAppName("Fitbit")
                         .setPackageName("com.fitbit.FitbitMobile")
                         .isMandatory(false)
@@ -49,8 +49,8 @@ object FitbitService : OAuth2BasedExternalService("FitbitService", 0) {
 
     override fun makeNewAuth2Client(): OAuth2Client {
         val config = OAuth2Client.OAuth2Config()
-        config.clientId = OTApplication.app.resourcesWrapped.getString(R.string.fitbit_client_id)
-        config.clientSecret = OTApplication.app.resourcesWrapped.getString(R.string.fitbit_client_secret)
+        config.clientId = OTApp.instance.resourcesWrapped.getString(R.string.fitbit_client_id)
+        config.clientSecret = OTApp.instance.resourcesWrapped.getString(R.string.fitbit_client_secret)
         config.scope = DEFAULT_SCOPES
         config.authorizationUrl = AUTHORIZATION_URL
         config.tokenRequestUrl = TOKEN_REQUEST_URL

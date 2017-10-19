@@ -11,11 +11,11 @@ class OTBackgroundLoggingTriggerAction(trigger: OTTrigger) : OTTriggerAction(tri
     override fun performAction(triggerTime: Long, context: Context): Single<OTTrigger> {
         println("trigger fired - logging in background")
 
-        //Toast.makeText(OTApplication.app, "Logged!", Toast.LENGTH_SHORT).show()
+        //Toast.makeText(OTApp.instance, "Logged!", Toast.LENGTH_SHORT).show()
         /*
         return Observable.create {
             subscriber ->
-            Observable.merge(trigger.trackers./*filter { it.isValid(null) }.*/map { OTBackgroundLoggingService.log(OTApplication.app, it, ItemLoggingSource.Trigger).subscribeOn(Schedulers.newThread()) })
+            Observable.merge(trigger.trackers./*filter { it.isValid(null) }.*/map { OTBackgroundLoggingService.log(OTApp.instance, it, ItemLoggingSource.Trigger).subscribeOn(Schedulers.newThread()) })
                     .subscribe({}, {}, {
                         if (!subscriber.isUnsubscribed) {
                             subscriber.onNext(trigger)

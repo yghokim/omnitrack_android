@@ -8,7 +8,7 @@ import android.support.v4.app.Fragment
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.subjects.BehaviorSubject
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.dependency.OTSystemDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.dependency.PermissionDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.externals.fitbit.FitbitService
@@ -64,7 +64,7 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
             return factoryCodeDict[typeCode]
         }
 
-        val preferences: SharedPreferences by lazy { OTApplication.app.getSharedPreferences("ExternalServices", Context.MODE_PRIVATE) }
+        val preferences: SharedPreferences by lazy { OTApp.instance.getSharedPreferences("ExternalServices", Context.MODE_PRIVATE) }
 
         fun init() {
             for (service in availableServices) {
@@ -106,7 +106,7 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
     open val permissionGranted: Boolean
         get() {
             for (permission in getRequiredPermissionsRecursive()) {
-                if (OTApplication.app.checkCallingOrSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
+                if (OTApp.instance.checkCallingOrSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
                     return false
                 }
             }
@@ -203,7 +203,7 @@ abstract class OTExternalService(val identifier: String, val minimumSDK: Int) : 
 
     open fun prepareServiceAsync(): Single<OTSystemDependencyResolver.DependencyState> {
 
-        return Single.zip(dependencyList.map { it.checkDependencySatisfied(OTApplication.app, false) },
+        return Single.zip(dependencyList.map { it.checkDependencySatisfied(OTApp.instance, false) },
                 { results ->
                     OTSystemDependencyResolver.combineDependencyState(*(results.map {
                         (it as OTSystemDependencyResolver.DependencyCheckResult).state

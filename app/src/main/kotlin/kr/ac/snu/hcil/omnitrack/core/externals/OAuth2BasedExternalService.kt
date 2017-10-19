@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.externals
 
 import io.reactivex.Single
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.dependency.OAuth2LoginDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.dependency.OTSystemDependencyResolver
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
@@ -28,7 +28,7 @@ abstract class OAuth2BasedExternalService(identifier: String, minimumSDK: Int) :
 
     override fun onRegisterDependencies(): Array<OTSystemDependencyResolver> {
         return super.onRegisterDependencies() + arrayOf(
-                OAuth2LoginDependencyResolver(authClient, identifier, preferences, OTApplication.getString(nameResourceId))
+                OAuth2LoginDependencyResolver(authClient, identifier, preferences, OTApp.getString(nameResourceId))
 
         )
     }

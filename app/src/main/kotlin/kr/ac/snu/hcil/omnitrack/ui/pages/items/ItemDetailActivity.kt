@@ -22,7 +22,7 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
@@ -53,14 +53,14 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
         fun makeNewItemPageIntent(trackerId: String, context: Context): Intent {
             val intent = Intent(context, ItemDetailActivity::class.java)
             intent.action = INTENT_ACTION_NEW
-            intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
+            intent.putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
             return intent
         }
 
         fun makeIntent(trackerId: String, reminderTime: Long, context: Context): Intent {
             val intent = Intent(context, ItemDetailActivity::class.java)
             intent.action = INTENT_ACTION_NEW
-            intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
+            intent.putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
             intent.putExtra(INTENT_EXTRA_REMINDER_TIME, reminderTime)
             intent.action = "item_edit:${trackerId}"
             return intent
@@ -69,8 +69,8 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
         fun makeItemEditPageIntent(itemId: String, trackerId: String, context: Context): Intent {
             val intent = Intent(context, ItemDetailActivity::class.java)
             intent.action = INTENT_ACTION_EDIT
-            intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, itemId)
-            intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
+            intent.putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM, itemId)
+            intent.putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
             return intent
         }
     }
@@ -192,8 +192,8 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
         )
 
 
-        val trackerId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
-        viewModel.init(trackerId, intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM))
+        val trackerId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
+        viewModel.init(trackerId, intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM))
 
     }
 
@@ -292,7 +292,7 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
                     }
                 }.subscribe({ result ->
                         viewModel.clearHistory()
-                    setResult(RESULT_OK, Intent().putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, result))
+                    setResult(RESULT_OK, Intent().putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM, result))
                         finish()
                 }, { ex ->
                     if (ex is RequiredFieldsNotCompleteException) {

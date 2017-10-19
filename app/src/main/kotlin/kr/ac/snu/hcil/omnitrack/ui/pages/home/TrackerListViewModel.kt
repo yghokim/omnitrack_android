@@ -5,7 +5,7 @@ import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.BehaviorSubject
 import io.realm.*
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemDAO
@@ -21,7 +21,7 @@ import kr.ac.snu.hcil.omnitrack.utils.Nullable
 
 class TrackerListViewModel : UserAttachedViewModel(), OrderedRealmCollectionChangeListener<RealmResults<OTTrackerDAO>> {
 
-    private val realm = OTApplication.app.databaseManager.getRealmInstance()
+    private val realm = OTApp.instance.databaseManager.getRealmInstance()
     private var trackersRealmResults: RealmResults<OTTrackerDAO>? = null
 
     private var trackerViewModelListSubject: BehaviorSubject<List<TrackerInformationViewModel>> = BehaviorSubject.create()
@@ -64,14 +64,14 @@ class TrackerListViewModel : UserAttachedViewModel(), OrderedRealmCollectionChan
     }
 
     fun generateNewTrackerName(): String {
-        return DefaultNameGenerator.generateName(OTApplication.getString(R.string.msg_new_tracker_prefix), currentTrackerViewModelList.map { it.trackerName.value }, false)
+        return DefaultNameGenerator.generateName(OTApp.getString(R.string.msg_new_tracker_prefix), currentTrackerViewModelList.map { it.trackerName.value }, false)
     }
 
     override fun onUserAttached(newUserId: String) {
         super.onUserAttached(newUserId)
         trackersRealmResults?.removeAllChangeListeners()
         clearTrackerViewModelList()
-        val trackerQueryResults = OTApplication.app.databaseManager.findTrackersOfUser(newUserId, realm)
+        val trackerQueryResults = OTApp.instance.databaseManager.findTrackersOfUser(newUserId, realm)
         trackersRealmResults = trackerQueryResults
 
         trackerQueryResults.addChangeListener(this)
@@ -99,7 +99,7 @@ class TrackerListViewModel : UserAttachedViewModel(), OrderedRealmCollectionChan
     fun removeTracker(model: TrackerInformationViewModel) {
         if (!realm.isInTransaction) {
             realm.executeTransaction {
-                OTApplication.app.databaseManager.removeTracker(model.trackerDao)
+                OTApp.instance.databaseManager.removeTracker(model.trackerDao)
             }
         }
     }
@@ -128,9 +128,9 @@ class TrackerListViewModel : UserAttachedViewModel(), OrderedRealmCollectionChan
 
         val trackerEditable: BehaviorSubject<Boolean> = BehaviorSubject.create()
 
-        val attributesResult: RealmResults<OTAttributeDAO> = OTApplication.app.databaseManager.getAttributeListQuery(trackerDao.objectId!!, realm).findAllAsync()
-        val trackerItemsResult: RealmResults<OTItemDAO> = OTApplication.app.databaseManager.makeItemsQuery(trackerDao.objectId, null, null, realm).findAllAsync()
-        val todayItemsResult: RealmResults<OTItemDAO> = OTApplication.app.databaseManager.makeItemsQueryOfToday(trackerDao.objectId, realm).findAllAsync()
+        val attributesResult: RealmResults<OTAttributeDAO> = OTApp.instance.databaseManager.getAttributeListQuery(trackerDao.objectId!!, realm).findAllAsync()
+        val trackerItemsResult: RealmResults<OTItemDAO> = OTApp.instance.databaseManager.makeItemsQuery(trackerDao.objectId, null, null, realm).findAllAsync()
+        val todayItemsResult: RealmResults<OTItemDAO> = OTApp.instance.databaseManager.makeItemsQueryOfToday(trackerDao.objectId, realm).findAllAsync()
 
         //private val countTracer: ItemCountTracer = ItemCountTracer(tracker)
 

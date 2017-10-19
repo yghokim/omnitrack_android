@@ -1,5 +1,6 @@
-package kr.ac.snu.hcil.omnitrack.core.database.synchronization.official
+package kr.ac.snu.hcil.omnitrack.core.net
 
+import com.google.gson.JsonObject
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import kr.ac.snu.hcil.omnitrack.BuildConfig
@@ -7,7 +8,6 @@ import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTItemPOJO
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTUserRolePOJO
-import kr.ac.snu.hcil.omnitrack.core.database.synchronization.ISynchronizationServerSideAPI
 import kr.ac.snu.hcil.omnitrack.core.database.synchronization.SyncResultEntry
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -20,11 +20,7 @@ import java.io.IOException
 /**
  * Created by younghokim on 2017. 9. 28..
  */
-class OTOfficialServerApiController : ISynchronizationServerSideAPI {
-
-    override fun removeDeviceInfo(userId: String, deviceId: String): Single<Boolean> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+class OTOfficialServerApiController : ISynchronizationServerSideAPI, IUserReportServerAPI {
 
     private val retrofit: Retrofit by lazy {
 
@@ -74,4 +70,13 @@ class OTOfficialServerApiController : ISynchronizationServerSideAPI {
     override fun putDeviceInfo(info: OTDeviceInfo): Single<ISynchronizationServerSideAPI.DeviceInfoResult> {
         return service.putDeviceInfo(info).subscribeOn(Schedulers.io())
     }
+
+    override fun sendUserReport(inquiryData: JsonObject): Single<Boolean> {
+        return service.postUserReport(inquiryData).subscribeOn(Schedulers.io())
+    }
+
+    override fun removeDeviceInfo(userId: String, deviceId: String): Single<Boolean> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
 }

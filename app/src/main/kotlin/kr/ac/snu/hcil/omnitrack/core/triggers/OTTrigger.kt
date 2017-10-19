@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.google.firebase.database.*
 import io.reactivex.subjects.PublishSubject
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.database.NamedObject
@@ -54,7 +54,7 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
         }
 
         val localSettingsPreferences: SharedPreferences by lazy {
-            OTApplication.app.getSharedPreferences("Trigger_local_settings", Context.MODE_PRIVATE)
+            OTApp.instance.getSharedPreferences("Trigger_local_settings", Context.MODE_PRIVATE)
         }
     }
 

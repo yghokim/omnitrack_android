@@ -5,7 +5,7 @@ import android.app.Activity
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.ui.components.common.activity.WebServiceLoginActivity
@@ -56,7 +56,7 @@ object MisfitApi {
                 .addQueryParameter(AuthConstants.PARAM_REDIRECT_URI, AuthConstants.VALUE_REDIRECT_URI)
                 .addQueryParameter(AuthConstants.PARAM_SCOPE, "tracking,sleeps")
                 .build()
-        return RxActivityResult.on(activity).startIntent(WebServiceLoginActivity.makeIntent(uri.toString(), OTApplication.getString(R.string.service_misfit_name), activity))
+        return RxActivityResult.on(activity).startIntent(WebServiceLoginActivity.makeIntent(uri.toString(), OTApp.getString(R.string.service_misfit_name), activity))
                 .firstOrError()
                 .flatMap {
                     result ->
@@ -133,7 +133,7 @@ object MisfitApi {
                     println(responseBody)
                     return@defer Single.just(JSONObject(responseBody))
                 } catch(e: Exception) {
-                    OTApplication.logger.writeSystemLog("Misfit API Exception: ${e.message}", "MisfitAPI")
+                    OTApp.logger.writeSystemLog("Misfit API Exception: ${e.message}", "MisfitAPI")
                     return@defer Single.error<JSONObject>(e)
                 }
             } else return@defer Single.error<JSONObject>(NetworkErrorException("Network is not on."))
@@ -145,8 +145,8 @@ object MisfitApi {
             val uri = makeUriBuilderRoot().addPathSegments(SUBURL_EXCHANGE).build()
             val requestBody = FormBody.Builder()
                     .add(AuthConstants.PARAM_CODE, requestCode)
-                    .add(AuthConstants.PARAM_CLIENT_ID, OTApplication.app.resourcesWrapped.getString(R.string.misfit_app_key))
-                    .add(AuthConstants.PARAM_CLIENT_SECRET, OTApplication.app.resourcesWrapped.getString(R.string.misfit_app_secret))
+                    .add(AuthConstants.PARAM_CLIENT_ID, OTApp.instance.resourcesWrapped.getString(R.string.misfit_app_key))
+                    .add(AuthConstants.PARAM_CLIENT_SECRET, OTApp.instance.resourcesWrapped.getString(R.string.misfit_app_secret))
                     .add(AuthConstants.PARAM_GRANT_TYPE, "authorization_code")
                     .add(AuthConstants.PARAM_REDIRECT_URI, AuthConstants.VALUE_REDIRECT_URI)
                     .build()
@@ -163,7 +163,7 @@ object MisfitApi {
                     return@defer Single.just(result.getString(AuthConstants.PARAM_ACCESS_TOKEN))
                 } else return@defer Single.error<String>(Exception("token empty"))
             } catch(e: Exception) {
-                OTApplication.logger.writeSystemLog("Misfit Token Exchange Exception: ${e.message}", "MisfitAPI")
+                OTApp.logger.writeSystemLog("Misfit Token Exchange Exception: ${e.message}", "MisfitAPI")
                 return@defer Single.error<String>(e)
             }
         }

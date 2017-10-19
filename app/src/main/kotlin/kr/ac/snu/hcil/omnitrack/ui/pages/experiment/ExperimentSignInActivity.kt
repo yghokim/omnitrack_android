@@ -13,7 +13,7 @@ import android.widget.ImageButton
 import com.heinrichreimersoftware.materialintro.app.IntroActivity
 import com.heinrichreimersoftware.materialintro.slide.FragmentSlide
 import com.heinrichreimersoftware.materialintro.slide.SimpleSlide
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 
 /**
@@ -130,10 +130,10 @@ class ExperimentSignInActivity : IntroActivity() {
             if (isComponentsCreated) {
                 val demographicFragment = demographicSlide.fragment as? DemographicInputFragment
                 if (demographicFragment != null) {
-                    putExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_AGE_GROUP, demographicFragment.selectedAgeKey)
-                    putExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_GENDER, demographicFragment.selectedGenderKey)
-                    //putExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_OCCUPATION, fragment.selectedOccupationKey)
-                    putExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_COUNTRY, demographicFragment.selectedCountryCode)
+                    putExtra(OTApp.ACCOUNT_DATASET_EXPERIMENT_KEY_AGE_GROUP, demographicFragment.selectedAgeKey)
+                    putExtra(OTApp.ACCOUNT_DATASET_EXPERIMENT_KEY_GENDER, demographicFragment.selectedGenderKey)
+                    //putExtra(OTApp.ACCOUNT_DATASET_EXPERIMENT_KEY_OCCUPATION, fragment.selectedOccupationKey)
+                    putExtra(OTApp.ACCOUNT_DATASET_EXPERIMENT_KEY_COUNTRY, demographicFragment.selectedCountryCode)
                 }
 
                 val purposeFragment = purposeSlide.fragment as? PurposeChoiceFragment
@@ -141,7 +141,7 @@ class ExperimentSignInActivity : IntroActivity() {
                     for (purpose in purposeFragment.selectedPurposes) {
                         println(purpose)
                     }
-                    putExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_PURPOSES, ArrayList<String>(purposeFragment.selectedPurposes.toList()))
+                    putExtra(OTApp.ACCOUNT_DATASET_EXPERIMENT_KEY_PURPOSES, ArrayList<String>(purposeFragment.selectedPurposes.toList()))
                 }
             }
         }

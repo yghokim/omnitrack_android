@@ -5,7 +5,7 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemBuilderDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemDAO
@@ -39,7 +39,7 @@ class OTItemBuilderWrapperBase(val dao: OTItemBuilderDAO, val realm: Realm) {
     fun saveToItem(itemDao: OTItemDAO?, loggingSource: ItemLoggingSource?): OTItemDAO {
         val itemDaoToSave = itemDao ?: OTItemDAO()
         if (itemDao == null) {
-            itemDaoToSave.deviceId = OTApplication.app.deviceId
+            itemDaoToSave.deviceId = OTApp.instance.deviceId
             itemDaoToSave.loggingSource = loggingSource ?: ItemLoggingSource.Unspecified
             itemDaoToSave.trackerId = dao.tracker?.objectId
         } else {
@@ -63,7 +63,7 @@ class OTItemBuilderWrapperBase(val dao: OTItemBuilderDAO, val realm: Realm) {
             if (attributes == null) {
                 return@defer Observable.empty<Pair<String, ValueWithTimestamp>>()
             } else {
-                val realm = OTApplication.app.databaseManager.getRealmInstance()
+                val realm = OTApp.instance.databaseManager.getRealmInstance()
                 Observable.merge(attributes.mapIndexed { i, attr: OTAttributeDAO ->
                     val attrLocalId = attr.localId
                     val connection = attr.getParsedConnection()

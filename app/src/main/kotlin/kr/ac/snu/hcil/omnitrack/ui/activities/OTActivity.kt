@@ -18,7 +18,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.ExperimentConsentManager
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
@@ -41,7 +41,7 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
     private val LOG_TAG = "OmniTrackActivity"
 
     companion object {
-        val intentFilter: IntentFilter by lazy { IntentFilter(OTApplication.BROADCAST_ACTION_NEW_VERSION_DETECTED) }
+        val intentFilter: IntentFilter by lazy { IntentFilter(OTApp.BROADCAST_ACTION_NEW_VERSION_DETECTED) }
 
         const val INTENT_KEY_LANGUAGE_AT_CREATION = "language_at_creation"
     }
@@ -112,12 +112,12 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
     private val broadcastReceiver: BroadcastReceiver by lazy {
         object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
-                if (intent?.action == OTApplication.BROADCAST_ACTION_NEW_VERSION_DETECTED) {
-                    val versionName = intent.getStringExtra(OTApplication.INTENT_EXTRA_LATEST_VERSION_NAME)
+                if (intent?.action == OTApp.BROADCAST_ACTION_NEW_VERSION_DETECTED) {
+                    val versionName = intent.getStringExtra(OTApp.INTENT_EXTRA_LATEST_VERSION_NAME)
                     VersionCheckDialogFragment.makeInstance(versionName)
                             .show(supportFragmentManager, "VersionCheck")
 
-                    OTApplication.app.systemSharedPreferences.edit()
+                    OTApp.instance.systemSharedPreferences.edit()
                             .putString(OTVersionCheckService.PREF_LAST_NOTIFIED_VERSION, versionName)
                             .apply()
                 }
@@ -229,8 +229,8 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
         super.onPause()
 
         if (isSessionLoggingEnabled) {
-            val from = if (intent.hasExtra(OTApplication.INTENT_EXTRA_FROM)) {
-                intent.getStringExtra(OTApplication.INTENT_EXTRA_FROM)
+            val from = if (intent.hasExtra(OTApp.INTENT_EXTRA_FROM)) {
+                intent.getStringExtra(OTApp.INTENT_EXTRA_FROM)
             } else null
 
             val contentObject = Bundle()

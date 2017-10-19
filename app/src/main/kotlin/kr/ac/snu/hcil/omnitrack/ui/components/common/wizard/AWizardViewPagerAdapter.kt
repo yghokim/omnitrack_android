@@ -3,7 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui.components.common.wizard
 import android.support.v4.view.PagerAdapter
 import android.view.View
 import android.view.ViewGroup
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 
 /**
  * Created by Young-Ho Kim on 2016-08-30.
@@ -51,6 +51,6 @@ abstract class AWizardViewPagerAdapter : PagerAdapter() {
     }
 
     override fun getPageTitle(position: Int): CharSequence {
-        return OTApplication.app.getString(this.getPageAt(position).getTitleResourceId)
+        return OTApp.instance.getString(this.getPageAt(position).getTitleResourceId)
     }
 }

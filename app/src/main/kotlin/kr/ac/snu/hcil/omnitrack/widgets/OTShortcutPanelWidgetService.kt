@@ -9,7 +9,7 @@ import android.graphics.Paint
 import android.support.v4.graphics.ColorUtils
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
@@ -25,7 +25,7 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
     companion object {
 
         val lastLoggedTimeFormat by lazy {
-            SimpleDateFormat(OTApplication.app.resourcesWrapped.getString(R.string.msg_tracker_list_time_format))
+            SimpleDateFormat(OTApp.instance.resourcesWrapped.getString(R.string.msg_tracker_list_time_format))
         }
     }
 
@@ -53,7 +53,7 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
 
         private fun loadUser() {
             /*
-            user = OTApplication.app.currentUserObservable
+            user = OTApp.instance.currentUserObservable
                     .flatMap { user -> user.crawlAllTrackersAndTriggerAtOnce().toObservable() }.onErrorReturn { ex -> null }
                     .first()
                     .toBlocking().first()
@@ -126,7 +126,7 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
                     rv.setTextViewText(R.id.ui_text_statistics, text)
                 }*/
 
-            val buttonSize = OTApplication.app.resourcesWrapped.getDimensionPixelSize(R.dimen.app_widget_instant_logging_button_height)
+            val buttonSize = OTApp.instance.resourcesWrapped.getDimensionPixelSize(R.dimen.app_widget_instant_logging_button_height)
             val buttonRadius = buttonSize * .5f
             val paint = Paint(Paint.ANTI_ALIAS_FLAG)
             paint.style = Paint.Style.FILL
@@ -137,7 +137,7 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
             buttonCanvas.drawCircle(buttonRadius, buttonRadius, buttonRadius, paint)
             rv.setImageViewBitmap(R.id.ui_background_image, buttonBitmap)
 
-            val baseTrackerIntent = Intent().putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
+            val baseTrackerIntent = Intent().putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
             rv.setOnClickFillInIntent(R.id.ui_clickable_area, Intent(baseTrackerIntent).putExtra(OTShortcutPanelWidgetProvider.EXTRA_CLICK_COMMAND, OTShortcutPanelWidgetProvider.CLICK_COMMAND_ROW))
             rv.setOnClickFillInIntent(R.id.ui_button_instant, Intent(baseTrackerIntent).putExtra(OTShortcutPanelWidgetProvider.EXTRA_CLICK_COMMAND, OTShortcutPanelWidgetProvider.CLICK_COMMAND_INSTANT_LOGGING))
 

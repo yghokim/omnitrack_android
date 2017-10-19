@@ -1,10 +1,10 @@
-package kr.ac.snu.hcil.omnitrack.core.database.synchronization.official
+package kr.ac.snu.hcil.omnitrack.core.net
 
+import com.google.gson.JsonObject
 import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTItemPOJO
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTUserRolePOJO
-import kr.ac.snu.hcil.omnitrack.core.database.synchronization.ISynchronizationServerSideAPI
 import kr.ac.snu.hcil.omnitrack.core.database.synchronization.SyncResultEntry
 import retrofit2.http.*
 
@@ -29,5 +29,7 @@ interface OTOfficialServerService {
     @PUT("api/user/device")
     fun putDeviceInfo(@Body info: OTDeviceInfo): Single<ISynchronizationServerSideAPI.DeviceInfoResult>
 
+    @POST("api/user/report")
+    fun postUserReport(@Body data: JsonObject): Single<Boolean>
 
 }

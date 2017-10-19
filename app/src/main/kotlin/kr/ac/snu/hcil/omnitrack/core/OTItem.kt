@@ -1,6 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core
 
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import kr.ac.snu.hcil.omnitrack.utils.serialization.stringKeyEntryParser
@@ -54,7 +54,7 @@ class OTItem : ADataRow {
                                     tracker,
                                     timestamps[i],
                                     source,
-                                    OTApplication.app.deviceId,
+                                    OTApp.instance.deviceId,
                                     *values
                             )
                     )

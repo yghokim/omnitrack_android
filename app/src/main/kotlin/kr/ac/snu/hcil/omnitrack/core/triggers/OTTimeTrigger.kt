@@ -3,7 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.triggers
 import android.content.Context
 import android.util.Log
 import io.reactivex.subjects.PublishSubject
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
@@ -368,21 +368,21 @@ class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObject
 
 
     private fun onConfigChanged() {
-        OTApplication.logger.writeSystemLog("Time trigger config changed. cancel trigger", TAG)
-        //val alarmManager = OTApplication.app.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        OTApp.logger.writeSystemLog("Time trigger config changed. cancel trigger", TAG)
+        //val alarmManager = OTApp.instance.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-        OTApplication.app.timeTriggerAlarmManager.cancelTrigger(this)
+        OTApp.instance.timeTriggerAlarmManager.cancelTrigger(this)
         if (reserveNextAlarmToSystem(lastTriggeredTime) == null) {
             isOn = false
         }
     }
 
     private fun onRangeChanged() {
-        //val alarmManager = OTApplication.app.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        //val alarmManager = OTApp.instance.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-        OTApplication.logger.writeSystemLog("Time trigger range changed. cancel trigger", TAG)
+        OTApp.logger.writeSystemLog("Time trigger range changed. cancel trigger", TAG)
 
-        OTApplication.app.timeTriggerAlarmManager.cancelTrigger(this)
+        OTApp.instance.timeTriggerAlarmManager.cancelTrigger(this)
         if (reserveNextAlarmToSystem(lastTriggeredTime) == null) {
             isOn = false
         }
@@ -394,7 +394,7 @@ class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObject
         if (isOn == false) {
             handleOff()
         } else {
-            if (OTApplication.app.timeTriggerAlarmManager.getNearestAlarmTime(this, System.currentTimeMillis()) == null) {
+            if (OTApp.instance.timeTriggerAlarmManager.getNearestAlarmTime(this, System.currentTimeMillis()) == null) {
                 if (reserveNextAlarmToSystem(lastTriggeredTime) == null) {
                     isOn = false
                 }
@@ -413,9 +413,9 @@ class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObject
             cacheCalendar.timeInMillis = nextAlarmTime
             println("next alarm will be fired at $cacheCalendar")
 
-            OTApplication.logger.writeSystemLog("Next alarm is reserved at ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(nextAlarmTime))}", TAG)
+            OTApp.logger.writeSystemLog("Next alarm is reserved at ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(nextAlarmTime))}", TAG)
 
-            val nextAlarmInfo = OTApplication.app.timeTriggerAlarmManager.reserveAlarm(this, nextAlarmTime, !isRepeated)
+            val nextAlarmInfo = OTApp.instance.timeTriggerAlarmManager.reserveAlarm(this, nextAlarmTime, !isRepeated)
             onAlarmReserved.onNext(nextAlarmInfo.reservedAlarmTime)
             return nextAlarmInfo
         } else {
@@ -439,11 +439,11 @@ class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObject
     override fun handleOff() {
         Log.d(TAG, "handle Time trigger off.")
         lastTriggeredTime = null
-        OTApplication.logger.writeSystemLog("Time trigger turned off. cancel trigger", TAG)
-        OTApplication.app.timeTriggerAlarmManager.cancelTrigger(this)
+        OTApp.logger.writeSystemLog("Time trigger turned off. cancel trigger", TAG)
+        OTApp.instance.timeTriggerAlarmManager.cancelTrigger(this)
     }
 
     override fun onDetachFromSystem() {
-        OTApplication.app.timeTriggerAlarmManager.cancelTrigger(this)
+        OTApp.instance.timeTriggerAlarmManager.cancelTrigger(this)
     }
 }

@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.IBinder
 import io.reactivex.schedulers.Schedulers
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 
 /**
  * Created by younghokim on 2017. 9. 26..
@@ -50,7 +50,7 @@ class OTSynchronizationService : Service() {
     }
 
     private fun startSynchronization(syncDataType: ESyncDataType, direction: SyncDirection, startId: Int) {
-        OTApplication.app.databaseManager.getLatestSynchronizedServerTimeOf(syncDataType).observeOn(Schedulers.io())
+        OTApp.instance.databaseManager.getLatestSynchronizedServerTimeOf(syncDataType).observeOn(Schedulers.io())
                 .subscribe { serverTime ->
                     println("last synchronized server time was ${serverTime}.")
                     val newSession = SyncSession(serverTime, syncDataType, direction, startId)

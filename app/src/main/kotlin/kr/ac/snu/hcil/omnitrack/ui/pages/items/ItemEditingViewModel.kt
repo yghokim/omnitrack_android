@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.items
 
 import io.reactivex.Maybe
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.utils.ValueWithTimestamp
@@ -16,7 +16,7 @@ class ItemEditingViewModel : ItemEditionViewModelBase() {
 
     override fun onInit(trackerDao: OTTrackerDAO, itemId: String?): Pair<ItemMode, BuilderCreationMode?>? {
         if (itemId != null) {
-            val itemDao = OTApplication.app.databaseManager.makeSingleItemQuery(itemId, realm).findFirst()
+            val itemDao = OTApp.instance.databaseManager.makeSingleItemQuery(itemId, realm).findFirst()
             if (itemDao != null) {
                 originalUnmanagedItemDao = realm.copyFromRealm(itemDao)
 
@@ -64,7 +64,7 @@ class ItemEditingViewModel : ItemEditionViewModelBase() {
                                 originalItemFieldKeys -= viewModel.attributeLocalId
                             }
                         }
-                        Maybe.fromSingle(OTApplication.app.databaseManager.saveItemObservable(originalUnmanagedItemDao, false, originalItemFieldKeys.toTypedArray(), realm).map { it.second })
+                        Maybe.fromSingle(OTApp.instance.databaseManager.saveItemObservable(originalUnmanagedItemDao, false, originalItemFieldKeys.toTypedArray(), realm).map { it.second })
                     }
                 } else Maybe.just(originalUnmanagedItemDao.objectId)
             }

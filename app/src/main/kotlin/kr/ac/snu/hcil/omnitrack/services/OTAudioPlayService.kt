@@ -20,7 +20,7 @@ import android.support.v4.app.NotificationCompat
 import android.support.v4.content.LocalBroadcastManager
 import android.util.Log
 import android.widget.RemoteViews
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioRecordMetadata
 import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioRecorderView
@@ -29,7 +29,7 @@ import kr.ac.snu.hcil.omnitrack.utils.VectorIconHelper
 
 /**
  * Created by Young-Ho on 4/22/2017.
- * Followed code from https://www.sitepoint.com/a-step-by-step-guide-to-building-an-android-audio-player-app/
+ * Followed code from https://www.sitepoint.com/a-step-by-step-guide-to-building-an-android-audio-player-instance/
  */
 class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioManager.OnAudioFocusChangeListener {
 
@@ -55,15 +55,15 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
             private set
         /*
             get(){
-                return OTApplication.app.systemSharedPreferences.getString(INTENT_EXTRA_SESSION_ID, null)
+                return OTApp.instance.systemSharedPreferences.getString(INTENT_EXTRA_SESSION_ID, null)
             }
             private set(value){
                 if(value!=null)
                 {
-                    OTApplication.app.systemSharedPreferences.edit().putString(INTENT_EXTRA_SESSION_ID, value).apply()
+                    OTApp.instance.systemSharedPreferences.edit().putString(INTENT_EXTRA_SESSION_ID, value).apply()
                 }
                 else{
-                    OTApplication.app.systemSharedPreferences.edit().remove(INTENT_EXTRA_SESSION_ID).apply()
+                    OTApp.instance.systemSharedPreferences.edit().remove(INTENT_EXTRA_SESSION_ID).apply()
                 }
             }
             */
@@ -154,7 +154,7 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
 
 
         private val notificationManager: NotificationManager by lazy {
-            (OTApplication.app.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
+            (OTApp.instance.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
         }
     }
 

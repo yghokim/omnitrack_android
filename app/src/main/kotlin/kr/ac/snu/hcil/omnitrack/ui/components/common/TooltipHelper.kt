@@ -2,7 +2,7 @@ package kr.ac.snu.hcil.omnitrack.ui.components.common
 
 import android.view.View
 import it.sephiroth.android.library.tooltip.TooltipManager
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 
 /**
@@ -16,7 +16,7 @@ object TooltipHelper {
                 .fitToScreen(true).fadeDuration(250)
                 .activateDelay(200)
                 .background("#af000000")
-                .maxWidth(OTApplication.app.resourcesWrapped.getDimensionPixelSize(R.dimen.tooltip_max_width))
+                .maxWidth(OTApp.instance.resourcesWrapped.getDimensionPixelSize(R.dimen.tooltip_max_width))
                 .withStyleId(R.style.tooltipStyle)
                 .anchor(anchorView, TooltipManager.Gravity.TOP)
     }

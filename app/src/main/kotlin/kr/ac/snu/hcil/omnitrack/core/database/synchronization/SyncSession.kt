@@ -10,19 +10,19 @@ class SyncSession(val startTimestamp: Long, val syncDataType: ESyncDataType, val
         /*
         val single = when (syncDataType) {
             ESyncDataType.ITEM -> {
-                OTApplication.app.synchronizationServerController.getItemsAfter(startTimestamp)
+                OTApp.instance.synchronizationServerController.getItemsAfter(startTimestamp)
                         .flatMap { serverItems ->
                             println("server changes: ${serverItems}")
-                            OTApplication.app.databaseManager.applyServerItemsToSync(serverItems)
+                            OTApp.instance.databaseManager.applyServerItemsToSync(serverItems)
                         }.flatMap { success ->
                     println("applied server changes to local. now get local changes")
-                    return@flatMap OTApplication.app.databaseManager.getDirtyItemsToSync()
+                    return@flatMap OTApp.instance.databaseManager.getDirtyItemsToSync()
                 }.flatMap { localChanges ->
                     println("push local changes: ${localChanges}")
-                    OTApplication.app.synchronizationServerController.postItemsDirty(localChanges)
+                    OTApp.instance.synchronizationServerController.postItemsDirty(localChanges)
                 }.flatMap { result ->
                     println("received synchronization timestamps of local changes. : ${result}")
-                    OTApplication.app.databaseManager.setItemSynchronizationFlags(result)
+                    OTApp.instance.databaseManager.setItemSynchronizationFlags(result)
                 }.map { success ->
                     Pair(this, success)
                 }

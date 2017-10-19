@@ -6,7 +6,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemDetailActivity
@@ -43,12 +43,12 @@ class OTShortcutPanelWidgetProvider : AppWidgetProvider() {
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
 
-        if (intent.action == OTApplication.BROADCAST_ACTION_USER_SIGNED_IN || intent.action == OTApplication.BROADCAST_ACTION_USER_SIGNED_OUT) {
+        if (intent.action == OTApp.BROADCAST_ACTION_USER_SIGNED_IN || intent.action == OTApp.BROADCAST_ACTION_USER_SIGNED_OUT) {
             val updateIntent = Intent(context, OTShortcutPanelWidgetUpdateService::class.java)
 
             updateIntent.action = when (intent.action) {
-                OTApplication.BROADCAST_ACTION_USER_SIGNED_IN -> OTShortcutPanelWidgetUpdateService.ACTION_TO_MAIN_MODE
-                OTApplication.BROADCAST_ACTION_USER_SIGNED_OUT -> OTShortcutPanelWidgetUpdateService.ACTION_TO_SIGN_IN_MODE
+                OTApp.BROADCAST_ACTION_USER_SIGNED_IN -> OTShortcutPanelWidgetUpdateService.ACTION_TO_MAIN_MODE
+                OTApp.BROADCAST_ACTION_USER_SIGNED_OUT -> OTShortcutPanelWidgetUpdateService.ACTION_TO_SIGN_IN_MODE
                 else -> OTShortcutPanelWidgetUpdateService.ACTION_TO_SIGN_IN_MODE
             }
             val appWidgetManager = AppWidgetManager.getInstance(context)
@@ -59,14 +59,14 @@ class OTShortcutPanelWidgetProvider : AppWidgetProvider() {
         } else if (intent.action == ACTION_TRACKER_CLICK_EVENT) {
             when (intent.getStringExtra(EXTRA_CLICK_COMMAND)) {
                 CLICK_COMMAND_ROW -> {
-                    val trackerId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
+                    val trackerId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
                     if (trackerId != null) {
                         context.startActivity(ItemDetailActivity.makeNewItemPageIntent(trackerId, context).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK))
                     }
                 }
 
                 CLICK_COMMAND_INSTANT_LOGGING -> {
-                    val trackerId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
+                    val trackerId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
                     if (trackerId != null) {
                         context.startService(OTBackgroundLoggingService.makeIntent(context, trackerId, ItemLoggingSource.Shortcut))
                     }

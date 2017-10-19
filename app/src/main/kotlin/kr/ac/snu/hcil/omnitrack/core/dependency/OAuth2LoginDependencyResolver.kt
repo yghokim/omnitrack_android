@@ -4,7 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import io.reactivex.Single
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.utils.TextHelper
@@ -20,7 +20,7 @@ class OAuth2LoginDependencyResolver(val authClient: OAuth2Client, val identifier
             if (credential != null) {
                 return@defer Single.just(DependencyCheckResult(DependencyState.Passed, TextHelper.fromHtml(TextHelper.formatWithResources(context, R.string.msg_format_dependency_sign_in_passed, serviceName)), ""))
             } else {
-                return@defer Single.just(DependencyCheckResult(DependencyState.FatalFailed, TextHelper.fromHtml(TextHelper.formatWithResources(context, R.string.msg_format_dependency_sign_in_failed, serviceName)), OTApplication.getString(R.string.msg_sign_in)))
+                return@defer Single.just(DependencyCheckResult(DependencyState.FatalFailed, TextHelper.fromHtml(TextHelper.formatWithResources(context, R.string.msg_format_dependency_sign_in_failed, serviceName)), OTApp.getString(R.string.msg_sign_in)))
             }
         }
     }

@@ -2,7 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 
 import android.net.Uri
 import io.reactivex.Single
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.utils.io.FileHelper
@@ -29,7 +29,7 @@ abstract class OTFileInvolvedAttributeHelper : OTAttributeHelper() {
             return Single.defer<Uri>(Callable<Single<Uri>> {
 
                 fun tryServerDownload(): Single<Uri> {
-                    return OTApplication.app.storageHelper.downloadFileTo(value.serverUri.path, outputUri).flatMap { uri ->
+                    return OTApp.instance.storageHelper.downloadFileTo(value.serverUri.path, outputUri).flatMap { uri ->
                         Single.just<Uri>(uri)
                     }
                 }

@@ -14,7 +14,7 @@ import br.com.goncalves.pugnotification.notification.PugNotification
 import io.reactivex.disposables.Disposables
 import io.reactivex.disposables.SerialDisposable
 import kr.ac.snu.hcil.omnitrack.BuildConfig
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.RemoteConfigManager
 
@@ -60,11 +60,11 @@ class OTVersionCheckService : Service() {
                 versionName ->
                 Log.d(TAG, "received version name.: ${versionName}")
                 if (BuildConfig.DEBUG || RemoteConfigManager.isNewVersionGreater(BuildConfig.VERSION_NAME, versionName)) {
-                    val lastNotifiedVersion = OTApplication.app.systemSharedPreferences.getString(PREF_LAST_NOTIFIED_VERSION, "")
+                    val lastNotifiedVersion = OTApp.instance.systemSharedPreferences.getString(PREF_LAST_NOTIFIED_VERSION, "")
                     if (lastNotifiedVersion != versionName) {
 
-                        if (!OTApplication.app.isAppInForeground) {
-                            Log.d(TAG, "app is in background. send notification.")
+                        if (!OTApp.instance.isAppInForeground) {
+                            Log.d(TAG, "instance is in background. send notification.")
                             PugNotification.with(this).load()
                                     .color(R.color.colorPointed)
                                     .identifier(REQUEST_CODE)
@@ -84,15 +84,15 @@ class OTVersionCheckService : Service() {
                                     .build()
 
 
-                            OTApplication.app.systemSharedPreferences.edit()
+                            OTApp.instance.systemSharedPreferences.edit()
                                     .putString(PREF_LAST_NOTIFIED_VERSION, versionName)
                                     .apply()
                         } else {
 
-                            Log.d(TAG, "app is in foreground. send broadcast.")
+                            Log.d(TAG, "instance is in foreground. send broadcast.")
                             PugNotification.with(this).cancel(TAG, REQUEST_CODE)
-                            val intent = Intent(OTApplication.BROADCAST_ACTION_NEW_VERSION_DETECTED)
-                            intent.putExtra(OTApplication.INTENT_EXTRA_LATEST_VERSION_NAME, versionName)
+                            val intent = Intent(OTApp.BROADCAST_ACTION_NEW_VERSION_DETECTED)
+                            intent.putExtra(OTApp.INTENT_EXTRA_LATEST_VERSION_NAME, versionName)
 
                             sendBroadcast(intent)
                         }

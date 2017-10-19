@@ -16,7 +16,7 @@ import android.widget.TextView
 import android.widget.ToggleButton
 import com.wonderkiln.camerakit.CameraKit
 import com.wonderkiln.camerakit.CameraView
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LoadingIndicatorBar
 import kr.ac.snu.hcil.omnitrack.utils.applyTint
@@ -52,11 +52,11 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
     private val listener = CameraListener()
 
     private val cameraFrontDrawable by lazy {
-        applyTint(DrawableCompat.wrap(ContextCompat.getDrawable(OTApplication.app, R.drawable.camera_front)), Color.WHITE)
+        applyTint(DrawableCompat.wrap(ContextCompat.getDrawable(OTApp.instance, R.drawable.camera_front)), Color.WHITE)
     }
 
     private val cameraRearDrawable by lazy {
-        applyTint(DrawableCompat.wrap(ContextCompat.getDrawable(OTApplication.app, R.drawable.camera_rear)), Color.WHITE)
+        applyTint(DrawableCompat.wrap(ContextCompat.getDrawable(OTApp.instance, R.drawable.camera_rear)), Color.WHITE)
     }
 
     private fun findViews(view: View) {
@@ -155,14 +155,6 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
                 }
                 dismiss()
             }
-        }
-
-        override fun onCameraOpened() {
-            super.onCameraOpened()
-        }
-
-        override fun onCameraClosed() {
-            super.onCameraClosed()
         }
 
     }

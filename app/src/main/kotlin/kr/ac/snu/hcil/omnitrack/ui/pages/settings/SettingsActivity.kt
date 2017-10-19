@@ -10,7 +10,7 @@ import android.preference.ListPreference
 import android.preference.Preference
 import android.preference.PreferenceFragment
 import android.widget.Toast
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckService
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
@@ -185,7 +185,7 @@ class SettingsActivity : MultiButtonActionBarActivity(R.layout.activity_multibut
                 }
 
                 LocaleHelper.PREF_USE_DEVICE_DEFAULT, LocaleHelper.PREF_KEY_SELECTED_LANGUAGE -> {
-                    OTApplication.app.refreshConfiguration(activity)
+                    OTApp.instance.refreshConfiguration(activity)
                     Toast.makeText(activity, R.string.msg_language_change_applied_after_exit_this_screen, Toast.LENGTH_LONG).show()
                     setResult(Activity.RESULT_OK, Intent().apply { putExtra(FLAG_CONFIGURATION_CHANGED, true) })
                     println("activity: ${activity}")

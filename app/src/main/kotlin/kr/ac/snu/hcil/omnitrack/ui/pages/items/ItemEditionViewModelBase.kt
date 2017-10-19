@@ -6,7 +6,7 @@ import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
@@ -64,7 +64,7 @@ abstract class ItemEditionViewModelBase : RealmViewModel(), OTItemBuilderWrapper
     fun init(trackerId: String, itemId: String?) {
         isValid = true
         if (trackerDao?.objectId != trackerId) {
-            trackerDao = OTApplication.app.databaseManager.getTrackerQueryWithId(trackerId, realm).findFirst()
+            trackerDao = OTApp.instance.databaseManager.getTrackerQueryWithId(trackerId, realm).findFirst()
             trackerNameObservable.onNext(trackerDao?.name ?: "")
             subscriptions.clear()
 

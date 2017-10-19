@@ -14,7 +14,7 @@ import android.widget.TextView
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import kr.ac.snu.hcil.omnitrack.BuildConfig
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.RemoteConfigManager
 
@@ -32,7 +32,7 @@ class VersionCheckDialogFragment : DialogFragment() {
         fun makeInstance(alreadyCheckedLatestVersion: String?): VersionCheckDialogFragment {
             val instance = VersionCheckDialogFragment()
             val bundle = Bundle()
-            bundle.putString(OTApplication.INTENT_EXTRA_LATEST_VERSION_NAME, alreadyCheckedLatestVersion)
+            bundle.putString(OTApp.INTENT_EXTRA_LATEST_VERSION_NAME, alreadyCheckedLatestVersion)
             instance.arguments = bundle
             return instance
         }
@@ -66,7 +66,7 @@ class VersionCheckDialogFragment : DialogFragment() {
         val view = inflater.inflate(R.layout.layout_version_compare, null)
         setupViews(view)
 
-        latestVersion = arguments?.getString(OTApplication.INTENT_EXTRA_LATEST_VERSION_NAME)
+        latestVersion = arguments?.getString(OTApp.INTENT_EXTRA_LATEST_VERSION_NAME)
         if (latestVersion != null) {
             compareVersions(latestVersion!!)
         } else {

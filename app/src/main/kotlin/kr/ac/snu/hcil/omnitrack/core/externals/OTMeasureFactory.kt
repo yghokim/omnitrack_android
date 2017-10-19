@@ -2,7 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.externals
 
 import android.text.Html
 import io.reactivex.Flowable
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
@@ -109,7 +109,7 @@ abstract class OTMeasureFactory(val factoryTypeName: String) : INameDescriptionR
     abstract fun makeMeasure(serialized: String): OTMeasure
 
     open fun getFormattedName(): CharSequence {
-        val html = "<b>${OTApplication.app.resourcesWrapped.getString(nameResourceId)}</b> | ${OTApplication.app.getString(getService().nameResourceId)}"
+        val html = "<b>${OTApp.instance.resourcesWrapped.getString(nameResourceId)}</b> | ${OTApp.instance.getString(getService().nameResourceId)}"
         return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY)
         } else {
@@ -126,7 +126,7 @@ abstract class OTMeasureFactory(val factoryTypeName: String) : INameDescriptionR
 
         /*
         val attr = OTAttribute.Companion.createAttribute(tracker,
-                "${OTApplication.app.getString(getService().nameResourceId)} ${OTApplication.app.resourcesWrapped.getString(nameResourceId)}",
+                "${OTApp.instance.getString(getService().nameResourceId)} ${OTApp.instance.resourcesWrapped.getString(nameResourceId)}",
                 exampleAttributeType)
 
         getExampleAttributeConfigurator().configureExampleAttribute(attr)

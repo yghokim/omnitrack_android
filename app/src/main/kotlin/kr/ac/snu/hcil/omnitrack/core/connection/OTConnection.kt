@@ -6,7 +6,7 @@ import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import io.reactivex.Flowable
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
@@ -142,8 +142,8 @@ class OTConnection {
                 return true
             } else {
                 invalidMessages?.add(TextHelper.fromHtml(String.format(
-                        "<font color=\"blue\">${OTApplication.app.resourcesWrapped.getString(R.string.msg_service_is_not_activated_format)}</font>",
-                        OTApplication.app.resourcesWrapped.getString(service.nameResourceId))))
+                        "<font color=\"blue\">${OTApp.instance.resourcesWrapped.getString(R.string.msg_service_is_not_activated_format)}</font>",
+                        OTApp.instance.resourcesWrapped.getString(service.nameResourceId))))
                 return false
             }
         } else {
@@ -183,8 +183,8 @@ class OTConnection {
                 return true
             } else {
                 invalidMessages?.add(TextHelper.fromHtml(String.format(
-                        "<font color=\"blue\">${OTApplication.app.resourcesWrapped.getString(R.string.msg_service_is_not_activated_format)}</font>",
-                        OTApplication.app.resourcesWrapped.getString(service.nameResourceId))))
+                        "<font color=\"blue\">${OTApp.instance.resourcesWrapped.getString(R.string.msg_service_is_not_activated_format)}</font>",
+                        OTApp.instance.resourcesWrapped.getString(service.nameResourceId))))
                 return false
             }
         } else {

@@ -17,7 +17,7 @@ import android.support.v4.app.NotificationCompat
 import android.support.v4.content.LocalBroadcastManager
 import android.util.Log
 import android.widget.RemoteViews
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioRecorderView
 import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioRecordingModule
@@ -245,7 +245,7 @@ class OTAudioRecordService : Service(), AudioRecordingModule.RecordingListener {
     }
 
     private val notificationManager: NotificationManager by lazy {
-        (OTApplication.app.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
+        (OTApp.instance.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
     }
 
     private fun putNotificationControl(rv: RemoteViews?) {
