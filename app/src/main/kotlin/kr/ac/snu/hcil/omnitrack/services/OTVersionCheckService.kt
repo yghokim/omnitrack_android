@@ -11,12 +11,12 @@ import android.os.IBinder
 import android.preference.PreferenceManager
 import android.util.Log
 import br.com.goncalves.pugnotification.notification.PugNotification
+import io.reactivex.disposables.Disposables
+import io.reactivex.disposables.SerialDisposable
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.RemoteConfigManager
-import rx.subscriptions.SerialSubscription
-import rx.subscriptions.Subscriptions
 
 /**
  * Created by younghokim on 2017. 4. 15..
@@ -30,7 +30,7 @@ class OTVersionCheckService : Service() {
 
         const val PREF_LAST_NOTIFIED_VERSION = "last_notified_version"
 
-        private val checkSubscription = SerialSubscription()
+        private val checkSubscription = SerialDisposable()
 
         fun setupServiceAlarm(context: Context) {
             val serviceIntent = Intent(context, OTVersionCheckService::class.java)
@@ -108,6 +108,6 @@ class OTVersionCheckService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        checkSubscription.set(Subscriptions.empty())
+        checkSubscription.set(Disposables.empty())
     }
 }

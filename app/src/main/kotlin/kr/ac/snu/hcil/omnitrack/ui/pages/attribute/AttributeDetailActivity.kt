@@ -28,7 +28,6 @@ import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 import kr.ac.snu.hcil.omnitrack.utils.setPaddingLeft
 import kr.ac.snu.hcil.omnitrack.utils.setPaddingRight
-import rx.subscriptions.CompositeSubscription
 import java.util.*
 
 class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_attribute_detail), View.OnClickListener {
@@ -57,8 +56,6 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
     )
 
     private val propertyViewList = ArrayList<ReadOnlyPair<String, View>>()
-
-    private val startSubscriptions = CompositeSubscription()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -271,11 +268,6 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
         //do not call super method to prevent view hierarchy checking.
-    }
-
-    override fun onStop() {
-        super.onStop()
-        startSubscriptions.clear()
     }
 
     override fun onToolbarLeftButtonClicked() {

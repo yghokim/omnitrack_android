@@ -7,13 +7,13 @@ import android.os.Vibrator
 import android.support.annotation.DrawableRes
 import android.support.annotation.StringRes
 import android.util.Log
+import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.system.OTTrackingNotificationManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.ui.activities.ReminderPopupActivity
 import kr.ac.snu.hcil.omnitrack.utils.isDeviceLockedCompat
 import kr.ac.snu.hcil.omnitrack.utils.isInteractiveCompat
-import rx.Observable
 import java.lang.ref.WeakReference
 
 /**
@@ -114,7 +114,7 @@ class OTNotificationTriggerAction(trigger: OTTrigger) : OTTriggerAction(trigger)
         }
 
 
-    override fun performAction(triggerTime: Long, context: Context): Observable<OTTrigger> {
+    override fun performAction(triggerTime: Long, context: Context): Single<OTTrigger> {
         println("trigger fired - send notification")
         when (notificationLevelForSystem) {
             NotificationLevel.Noti -> {
@@ -140,7 +140,7 @@ class OTNotificationTriggerAction(trigger: OTTrigger) : OTTriggerAction(trigger)
             }
         }
 
-        return Observable.just(trigger)
+        return Single.just(trigger)
     }
 
 }

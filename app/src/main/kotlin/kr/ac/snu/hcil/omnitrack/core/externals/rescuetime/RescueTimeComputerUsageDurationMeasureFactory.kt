@@ -4,13 +4,11 @@ import io.reactivex.Flowable
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTNumberAttribute
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
-import kr.ac.snu.hcil.omnitrack.utils.NumberStyle
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableTypedQueue
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import org.json.JSONObject
@@ -23,7 +21,7 @@ object RescueTimeComputerUsageDurationMeasureFactory : OTMeasureFactory("cud") {
 
     val configurator = object : IExampleAttributeConfigurator {
         override fun configureExampleAttribute(attr: OTAttribute<out Any>): Boolean {
-            if (attr is OTNumberAttribute) {
+            /*if (attr is OTNumberAttribute) {
                 val ns = NumberStyle()
                 ns.unit = "Hour"
                 ns.fractionPart = 2
@@ -31,7 +29,7 @@ object RescueTimeComputerUsageDurationMeasureFactory : OTMeasureFactory("cud") {
                 ns.pluralizeUnit = true
                 ns.unitPosition = NumberStyle.UnitPosition.Rear
                 return true
-            } else return false
+            } else*/ return false
         }
     }
 

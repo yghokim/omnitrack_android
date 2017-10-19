@@ -3,10 +3,10 @@ package kr.ac.snu.hcil.omnitrack.core.triggers
 import android.content.Context
 import android.content.SharedPreferences
 import com.google.firebase.database.*
+import io.reactivex.subjects.PublishSubject
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
-import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.NamedObject
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTTriggerAction
 import kr.ac.snu.hcil.omnitrack.utils.ListDelta
@@ -14,9 +14,6 @@ import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializedStringKeyEntry
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import kr.ac.snu.hcil.omnitrack.utils.serialization.stringKeyEntryParser
-import rx.Observable
-import rx.subjects.PublishSubject
-import rx.subjects.SerializedSubject
 import java.util.*
 import kotlin.properties.Delegates
 
@@ -56,30 +53,19 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
             return makeInstance(null, typeId, user, name, trackers.map { it.objectId }.toTypedArray(), false, action, TRIGGER_TIME_NEVER_TRIGGERED, null)
         }
 
-        fun makeInstance(objectId: String?, user: OTUser, pojo: DatabaseManager.TriggerPOJO): OTTrigger {
-            return OTTrigger.makeInstance(
-                    objectId,
-                    pojo.type,
-                    user,
-                    pojo.name ?: "",
-                    pojo.trackers?.map { it.key!! }?.toTypedArray(),
-                    pojo.on, pojo.action, pojo.lastTriggeredTime, pojo.properties)
-        }
-
-
         val localSettingsPreferences: SharedPreferences by lazy {
             OTApplication.app.getSharedPreferences("Trigger_local_settings", Context.MODE_PRIVATE)
         }
     }
 
     override fun makeNewObjectId(): String {
-        return DatabaseManager.generateNewKey(DatabaseManager.CHILD_NAME_TRIGGERS)
+        return ""
     }
 
     val triggerAction: OTTriggerAction
 
     val databasePointRef: DatabaseReference?
-        get() = DatabaseManager.dbRef?.child(DatabaseManager.CHILD_NAME_TRIGGERS)?.child(objectId)
+        get() = null
 
     private var currentDbRef: DatabaseReference?
     private val databaseEventListener: ChildEventListener
@@ -91,17 +77,14 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
     val trackers: List<OTTracker>
         get() = _trackerList
 
-    val trackerIndexedIdList: List<DatabaseManager.IndexedKey>
-        get() = _trackerList.mapIndexed { i, tracker -> DatabaseManager.IndexedKey(i, tracker.objectId) }
-
     private val _trackerList = ArrayList<OTTracker>()
 
-    val fired = SerializedSubject(PublishSubject.create<ReadOnlyPair<OTTrigger, Long>>())
+    val fired = (PublishSubject.create<ReadOnlyPair<OTTrigger, Long>>())
 
-    val switchTurned = SerializedSubject(PublishSubject.create<Boolean>())
-    val propertyChanged = SerializedSubject(PublishSubject.create<ReadOnlyPair<String, Any?>>())
+    val switchTurned = (PublishSubject.create<Boolean>())
+    val propertyChanged = (PublishSubject.create<ReadOnlyPair<String, Any?>>())
 
-    val attachedTrackersChanged = SerializedSubject(PublishSubject.create<ListDelta<OTTracker>>())
+    val attachedTrackersChanged = (PublishSubject.create<ListDelta<OTTracker>>())
 
     var isActivatedOnSystem: Boolean = false
         private set
@@ -262,23 +245,6 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
         suspendDatabaseSync = false
     }
 
-    fun dumpDataToPojo(out: DatabaseManager.TriggerPOJO?): DatabaseManager.TriggerPOJO {
-        val pojo = out ?: DatabaseManager.TriggerPOJO()
-
-        pojo.action = this.action
-        pojo.name = this.name
-        pojo.on = this.isOn
-        pojo.lastTriggeredTime = this.lastTriggeredTime
-        pojo.type = this.typeId
-        pojo.user = user.objectId
-        val properties = HashMap<String, String>()
-        this.writePropertiesToDatabase(properties)
-        pojo.properties = properties
-        pojo.trackers = trackerIndexedIdList
-
-        return pojo
-    }
-
     fun notifyPropertyChanged(propertyName: String, value: Any?) {
         propertyChanged.onNext(ReadOnlyPair(propertyName, value))
     }
@@ -329,9 +295,6 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
             _trackerList.add(tracker)
             if (!suspendDatabaseSync) {
                 if (!suspendDatabaseSync) {
-                    databasePointRef?.child("trackers")?.setValue(
-                            trackerIndexedIdList
-                    )
                 }
             }
 
@@ -350,15 +313,13 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
         if (_trackerList.remove(tracker)) {
 
             if (!suspendDatabaseSync) {
-                databasePointRef?.child("trackers")?.setValue(
-                        trackerIndexedIdList
-                )
             }
 
             attachedTrackersChanged.onNext(ListDelta())
         }
     }
 
+    /*
     fun fire(triggerTime: Long, context: Context): Observable<OTTrigger> {
         return Observable.defer<OTTrigger> {
             handleFire(triggerTime)
@@ -367,7 +328,7 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
             fired.onNext(ReadOnlyPair(this, triggerTime))
             this.lastTriggeredTime = triggerTime
         }
-    }
+    }*/
 
     fun activateOnSystem(context: Context) {
         if (!isActivatedOnSystem) {

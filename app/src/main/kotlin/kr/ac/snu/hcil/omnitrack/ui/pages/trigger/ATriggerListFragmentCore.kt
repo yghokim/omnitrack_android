@@ -21,7 +21,6 @@ import android.widget.TextView
 import io.reactivex.disposables.CompositeDisposable
 import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.EventLoggingManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
@@ -228,9 +227,10 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
             println("Received Trigger detail activity result")
             if (resultCode == AppCompatActivity.RESULT_OK) {
                 if (data != null && data.hasExtra(TriggerDetailActivity.INTENT_EXTRA_TRIGGER_DATA)) {
+                    /*TODO
                     val triggerPojo = data.getSerializableExtra(TriggerDetailActivity.INTENT_EXTRA_TRIGGER_DATA)
                     if (triggerPojo is DatabaseManager.TriggerPOJO) {
-                        /* TODO
+
                         OTApplication.app.currentUserObservable.subscribe {
                             user ->
                             val newTrigger = OTTrigger.makeInstance(DatabaseManager.generateNewKey(DatabaseManager.CHILD_NAME_TRIGGERS), user, triggerPojo)
@@ -238,8 +238,8 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
                             postProcessNewlyAddedTrigger(newTrigger)
                             appendNewTrigger(newTrigger)
                             EventLoggingManager.logTriggerChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_TRIGGER_ADD, newTrigger.objectId, newTrigger.typeId, newTrigger.action)
-                        }*/
-                    }
+                        }
+                    }*/
                 }
             }
         }

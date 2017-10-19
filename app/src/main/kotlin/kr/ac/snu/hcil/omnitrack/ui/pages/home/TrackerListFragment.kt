@@ -30,6 +30,8 @@ import android.widget.ImageButton
 import android.widget.TextView
 import butterknife.bindView
 import com.afollestad.materialdialogs.MaterialDialog
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
@@ -49,8 +51,6 @@ import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.startActivityOnDelay
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
-import rx.android.schedulers.AndroidSchedulers
-import rx.subscriptions.CompositeSubscription
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -102,8 +102,8 @@ class TrackerListFragment : OTFragment() {
     private val collapsedHeight = OTApplication.app.resourcesWrapped.getDimensionPixelSize(R.dimen.tracker_list_element_collapsed_height)
     private val expandedHeight = OTApplication.app.resourcesWrapped.getDimensionPixelSize(R.dimen.tracker_list_element_expanded_height)
 
-    private val createViewSubscriptions: CompositeSubscription = CompositeSubscription()
-    private val resumeSubscriptions: CompositeSubscription = CompositeSubscription()
+    private val createViewSubscriptions: CompositeDisposable = CompositeDisposable()
+    private val resumeSubscriptions: CompositeDisposable = CompositeDisposable()
 
     private val currentTrackerViewModelList = ArrayList<TrackerListViewModel.TrackerInformationViewModel>()
 
@@ -213,7 +213,7 @@ class TrackerListFragment : OTFragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         for (viewHolder in trackerListAdapter.viewHolders) {
-            println("viewHolder viewmodel subscriptions clear: ${viewHolder.subscriptions.hasSubscriptions()}, ${viewHolder.subscriptions.isUnsubscribed}")
+            println("viewHolder viewmodel subscriptions clear: ${viewHolder.subscriptions.size() > 0}, ${viewHolder.subscriptions.isDisposed}")
             viewHolder.subscriptions.clear()
         }
         trackerListAdapter.viewHolders.clear()
@@ -350,7 +350,7 @@ class TrackerListFragment : OTFragment() {
 
             val expandedViewHeight: Int
 
-            var subscriptions = CompositeSubscription()
+            var subscriptions = CompositeDisposable()
 
             init {
 
@@ -562,7 +562,7 @@ class TrackerListFragment : OTFragment() {
                         }
                 )
 
-                subscriptions.add(viewModel.lastLoggingTime.observeOn(AndroidSchedulers.mainThread()).subscribe { time -> setLastLoggingTime(time) })
+                subscriptions.add(viewModel.lastLoggingTimeObservable.observeOn(AndroidSchedulers.mainThread()).subscribe { (time) -> setLastLoggingTime(time) })
                 subscriptions.add(viewModel.todayCount.observeOn(AndroidSchedulers.mainThread()).subscribe { count -> setTodayLoggingCount(count) })
                 subscriptions.add(viewModel.totalItemCount.observeOn(AndroidSchedulers.mainThread()).subscribe { count -> setTotalItemCount(count) })
 

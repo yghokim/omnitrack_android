@@ -17,7 +17,6 @@ import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
-import kr.ac.snu.hcil.omnitrack.core.database.abstraction.ADatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTItemPOJO
 import kr.ac.snu.hcil.omnitrack.core.database.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.database.synchronization.SyncResultEntry
@@ -449,7 +448,7 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
 
                 OTApplication.app.sendBroadcast(intent)
 
-                if (resultPair.first == ADatabaseManager.SAVE_RESULT_NEW) {
+                if (resultPair.first == SAVE_RESULT_NEW) {
                     OnItemListUpdated.onNext(item.trackerId!!)
                 }
             }

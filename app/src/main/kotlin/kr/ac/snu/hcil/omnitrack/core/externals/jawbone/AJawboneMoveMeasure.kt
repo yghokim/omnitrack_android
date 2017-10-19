@@ -6,13 +6,13 @@ import com.jawbone.upplatformsdk.api.ApiManager
 import com.jawbone.upplatformsdk.utils.UpPlatformSdkConstants
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
+import io.reactivex.Observable
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 import retrofit.Callback
 import retrofit.RetrofitError
 import retrofit.client.Response
-import rx.Observable
 import java.util.*
 
 /**
@@ -52,15 +52,15 @@ abstract class AJawboneMoveMeasure : OTMeasureFactory.OTRangeQueriedMeasure {
                         subscriber ->
                         ApiManager.getRestApiInterface().getMoveEventsList(UpPlatformSdkConstants.API_VERSION_STRING, JawboneUpService.makeIntraDayRequestQueryParams(it.first, it.second, null), object : Callback<Any> {
                             override fun failure(error: RetrofitError) {
-                                if (!subscriber.isUnsubscribed) {
+                                if (!subscriber.isDisposed) {
                                     subscriber.onError(error)
                                 }
                             }
 
                             override fun success(result: Any, response: Response) {
-                                if (!subscriber.isUnsubscribed) {
+                                if (!subscriber.isDisposed) {
                                     subscriber.onNext(extractValueFromResult(result))
-                                    subscriber.onCompleted()
+                                    subscriber.onComplete()
                                 }
                             }
                         })

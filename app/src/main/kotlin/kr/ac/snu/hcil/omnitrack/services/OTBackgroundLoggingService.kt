@@ -4,11 +4,11 @@ import android.app.IntentService
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import io.reactivex.Observable
+import io.reactivex.disposables.Disposable
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
-import rx.Observable
-import rx.Subscription
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -59,7 +59,7 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
             flagPreferences.edit().remove(tracker.objectId).apply()
         }
 
-        private val currentBuilderSubscriptionDict = ConcurrentHashMap<String, Subscription>()
+        private val currentBuilderSubscriptionDict = ConcurrentHashMap<String, Disposable>()
 
         fun cancelBuilderTask(trackerId: String): Boolean {
             return currentBuilderSubscriptionDict.remove(trackerId) != null

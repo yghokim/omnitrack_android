@@ -2,8 +2,8 @@ package kr.ac.snu.hcil.omnitrack.core.database
 
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
+import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.BuildConfig
-import rx.Single
 
 /**
  * Created by Young-Ho Kim on 2017-04-10.
@@ -38,7 +38,7 @@ object RemoteConfigManager {
                         subscriber.onError(Exception("no value returned."))
                     }
                 } else {
-                    subscriber.onError(task.exception)
+                    subscriber.onError(task.exception!!)
                 }
             }
         }

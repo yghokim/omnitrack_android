@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.auth
 
 import android.content.Intent
 import android.content.pm.ApplicationInfo
+import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
@@ -17,11 +18,12 @@ import com.google.firebase.auth.*
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposables
+import io.reactivex.subjects.BehaviorSubject
 import kr.ac.snu.hcil.omnitrack.OTApplication
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTUser
-import kr.ac.snu.hcil.omnitrack.core.database.DatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
+import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.getActivity
 import java.util.concurrent.Executors
 
@@ -66,14 +68,35 @@ object OTAuthManager {
     @Volatile var authToken: String? = null
         private set
 
-    var email: String? = null
-        private set
+    private val _emailSubject = BehaviorSubject.createDefault<Nullable<String>>(Nullable())
+    val emailObservable: Observable<Nullable<String>> get() = _emailSubject
+    var email: String?
+        get() = _emailSubject.value.datum
+        private set(value) {
+            if (_emailSubject.value.datum != value) {
+                _emailSubject.onNext(Nullable(value))
+            }
+        }
 
-    var userName: String? = null
-        private set
+    private val _userNameSubject = BehaviorSubject.createDefault<Nullable<String>>(Nullable())
+    val userNameObservable: Observable<Nullable<String>> get() = _userNameSubject
+    var userName: String?
+        get() = _userNameSubject.value.datum
+        private set(value) {
+            if (_userNameSubject.value.datum != value) {
+                _userNameSubject.onNext(Nullable(value))
+            }
+        }
 
-    var userImageUrl: String? = null
-        private set
+    private val _userImageUrlSubject = BehaviorSubject.createDefault(Uri.EMPTY)
+    val userImageUrlObservable: Observable<Uri> get() = _userImageUrlSubject
+    var userImageUrl: Uri
+        get() = _userImageUrlSubject.value
+        private set(value) {
+            if (_userImageUrlSubject.value != value) {
+                _userImageUrlSubject.onNext(value)
+            }
+        }
 
     init {
         clearUserInfo()
@@ -93,12 +116,6 @@ object OTAuthManager {
                 .addApi(Auth.GOOGLE_SIGN_IN_API, mGoogleSignInOptions)
                 .build()
         mGoogleApiClient.connect()
-    }
-
-    fun makeUserInstance(): OTUser? {
-        if (userId != null) {
-            return OTUser(userId!!, userName, userImageUrl)
-        } else return null
     }
 
     /*
@@ -354,21 +371,11 @@ object OTAuthManager {
 
     fun signOut() {
         val uid = userId
-        if (uid != null) {
-            DatabaseManager.removeDeviceInfo(uid, OTApplication.app.deviceId).subscribe {
-                clearUserInfo()
-                mFirebaseAuth.signOut()
-                Auth.GoogleSignInApi.signOut(mGoogleApiClient)
-                userDeviceLocalKey = null
-                notifySignedOut()
-            }
-        } else {
-            clearUserInfo()
-            mFirebaseAuth.signOut()
-            Auth.GoogleSignInApi.signOut(mGoogleApiClient)
-            userDeviceLocalKey = null
-            notifySignedOut()
-        }
+        clearUserInfo()
+        mFirebaseAuth.signOut()
+        Auth.GoogleSignInApi.signOut(mGoogleApiClient)
+        userDeviceLocalKey = null
+        notifySignedOut()
     }
 
     private fun notifySignedIn(user: FirebaseUser) {
@@ -381,7 +388,7 @@ object OTAuthManager {
 
     fun clearUserInfo() {
         userName = null
-        userImageUrl = null
+        userImageUrl = Uri.EMPTY
         email = null
 
     }
@@ -405,14 +412,12 @@ object OTAuthManager {
     }
 
     fun reloadUserInfo() {
-        userName = googleSignInAccount?.displayName
-        email = googleSignInAccount?.email
+        userName = mFirebaseAuth.currentUser?.displayName
+        email = mFirebaseAuth.currentUser?.email
         Log.v("OMNITRACK", "email: " + email)
-        val photoUrl = googleSignInAccount?.photoUrl
+        val photoUrl = mFirebaseAuth.currentUser?.photoUrl
         if (photoUrl != null) {
-
-            Log.w(LOG_TAG, "Google photo uri:" + photoUrl.toString())
-            userImageUrl = photoUrl.toString()
+            userImageUrl = photoUrl
         }
     }
 

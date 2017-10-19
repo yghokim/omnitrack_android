@@ -3,11 +3,11 @@ package kr.ac.snu.hcil.omnitrack.ui.components.visualization
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.LinearLayout
+import io.reactivex.disposables.CompositeDisposable
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
 import kr.ac.snu.hcil.omnitrack.utils.events.IEventListener
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
-import rx.subscriptions.CompositeSubscription
 import kotlin.properties.Delegates
 
 /**
@@ -32,7 +32,7 @@ class ChartView : LinearLayout, IEventListener<ChartModel<*>?> {
         }
         */
 
-    private val internalSubscriptions = CompositeSubscription()
+    private val internalSubscriptions = CompositeDisposable()
 
     var model: ChartModel<*>? by Delegates.observable(null as ChartModel<*>?)
     {

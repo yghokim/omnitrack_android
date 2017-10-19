@@ -4,13 +4,13 @@ import android.animation.LayoutTransition
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
+import io.reactivex.disposables.CompositeDisposable
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.utils.getActivity
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 import org.apmem.tools.layouts.FlowLayout
-import rx.subscriptions.CompositeSubscription
 import java.util.*
 
 /**
@@ -27,7 +27,7 @@ class TrackerAssignPanel : FlowLayout, View.OnClickListener {
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attributeSet: AttributeSet?) : super(context, attributeSet)
 
-    private val subscriptions = CompositeSubscription()
+    private val subscriptions = CompositeDisposable()
 
     init {
         addButton = inflateContent(R.layout.layout_attached_tracker_list_add, true).findViewById(R.id.ui_button_add)
