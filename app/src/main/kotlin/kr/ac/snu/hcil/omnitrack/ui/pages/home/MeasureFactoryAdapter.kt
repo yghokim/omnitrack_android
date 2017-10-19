@@ -59,7 +59,7 @@ class MeasureFactoryAdapter : RecyclerView.Adapter<MeasureFactoryAdapter.Measure
             if (view === connectButton) {
 
                 /* TODO measurefactory tracker picker
-                OTApplication.app.currentUserObservable.subscribe {
+                OTApplication.instance.currentUserObservable.subscribe {
                     user ->
                     val dialog = TrackerPickerDialogBuilder(user.trackers.unObservedList, this).createDialog(itemView.getActivity()!!, R.string.msg_pick_track_to_attach_field_with_measure, null, {
                         tracker ->

@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.rescuetime
 
 import io.reactivex.Single
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OAuth2BasedExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
@@ -53,13 +53,13 @@ object RescueTimeService : OAuth2BasedExternalService("RescueTimeService", 0) {
 
     override fun makeNewAuth2Client(): OAuth2Client {
         val config = OAuth2Client.OAuth2Config()
-        config.clientId = OTApplication.app.resourcesWrapped.getString(R.string.rescuetime_client_id)
-        config.clientSecret = OTApplication.app.resourcesWrapped.getString(R.string.rescuetime_client_secret)
+        config.clientId = OTApp.instance.resourcesWrapped.getString(R.string.rescuetime_client_id)
+        config.clientSecret = OTApp.instance.resourcesWrapped.getString(R.string.rescuetime_client_secret)
         config.authorizationUrl = AUTHORIZATION_URL
         config.tokenRequestUrl = TOKEN_REQUEST_URL
         config.revokeUrl = REVOKE_URL
         config.scope = DEFAULT_SCOPES
-        config.redirectUri = OTApplication.app.resourcesWrapped.getString(R.string.rescuetime_redirect_uri)
+        config.redirectUri = OTApp.instance.resourcesWrapped.getString(R.string.rescuetime_redirect_uri)
 
         return OAuth2Client(config)
     }

@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels
 
 import io.reactivex.subjects.BehaviorSubject
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTrigger
 import kr.ac.snu.hcil.omnitrack.utils.time.Time
@@ -25,7 +25,7 @@ class TimeTriggerViewModel(trigger: OTTimeTrigger) : TriggerViewModel<OTTimeTrig
     override fun register() {
         super.register()
 
-        nextAlarmTime.onNext(OTApplication.app.timeTriggerAlarmManager.getNearestAlarmTime(trigger, System.currentTimeMillis())!!)
+        nextAlarmTime.onNext(OTApp.instance.timeTriggerAlarmManager.getNearestAlarmTime(trigger, System.currentTimeMillis())!!)
 
         subscriptions.add(
                 trigger.switchTurned.subscribe {
@@ -91,10 +91,10 @@ class TimeTriggerViewModel(trigger: OTTimeTrigger) : TriggerViewModel<OTTimeTrig
         val summary = if (trigger.isRangeSpecified && trigger.isRepeated) {
             //display only days of weeks
             if (OTTimeTrigger.Range.isAllDayUsed(trigger.rangeVariables)) {
-                OTApplication.app.resourcesWrapped.getString(R.string.msg_everyday)
+                OTApp.instance.resourcesWrapped.getString(R.string.msg_everyday)
             } else {
 
-                val names = OTApplication.app.resourcesWrapped.getStringArray(R.array.days_of_week_short)
+                val names = OTApp.instance.resourcesWrapped.getStringArray(R.array.days_of_week_short)
 
                 val stringBuilder = StringBuilder()
 
@@ -106,7 +106,7 @@ class TimeTriggerViewModel(trigger: OTTimeTrigger) : TriggerViewModel<OTTimeTrig
 
                 stringBuilder.trim()
             }
-        } else OTApplication.app.resourcesWrapped.getString(R.string.msg_once)
+        } else OTApp.instance.resourcesWrapped.getString(R.string.msg_once)
 
         triggerConfigSummary.onNext(summary)
 

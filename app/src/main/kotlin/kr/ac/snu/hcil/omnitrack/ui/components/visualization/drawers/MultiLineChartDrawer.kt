@@ -3,7 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.support.v4.content.ContextCompat
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.visualization.CompoundAttributeChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.ILineChartOnTime
@@ -36,7 +36,7 @@ class MultiLineChartDrawer : ATimelineChartDrawer() {
 
     init {
 
-        paddingBottom = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_axis_height_with_legend)
+        paddingBottom = OTApp.instance.resourcesWrapped.getDimension(R.dimen.vis_axis_height_with_legend)
 
         linePaint.style = Paint.Style.STROKE
 
@@ -80,7 +80,7 @@ class MultiLineChartDrawer : ATimelineChartDrawer() {
                 legend.entries.clear()
                 for (attr in (model as CompoundAttributeChartModel).attributes.withIndex()) {
                     legend.entries.add(
-                            Pair(attr.value.name, OTApplication.app.colorPalette[attr.index % OTApplication.app.colorPalette.size])
+                            Pair(attr.value.name, OTApp.instance.colorPalette[attr.index % OTApp.instance.colorPalette.size])
                     )
                 }
                 legend.refresh()
@@ -106,7 +106,7 @@ class MultiLineChartDrawer : ATimelineChartDrawer() {
                         datum ->
                         val lines = PolyLineElement<ILineChartOnTime.TimeSeriesTrendData>(linePaint, markerPaint)
 
-                        lines.thickness = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_line_chart_thickness)
+                        lines.thickness = OTApp.instance.resourcesWrapped.getDimension(R.dimen.vis_line_chart_thickness)
 
                         refreshPolyLine(datum, lines)
 
@@ -127,9 +127,9 @@ class MultiLineChartDrawer : ATimelineChartDrawer() {
                         lines.drawLine = false
                         lines.drawMarker = true
 
-                        lines.markerRadius = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_line_chart_marker_radius)
-                        lines.markerThickness = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_line_chart_marker_stroke)
-                        lines.thickness = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_line_chart_thickness)
+                        lines.markerRadius = OTApp.instance.resourcesWrapped.getDimension(R.dimen.vis_line_chart_marker_radius)
+                        lines.markerThickness = OTApp.instance.resourcesWrapped.getDimension(R.dimen.vis_line_chart_marker_stroke)
+                        lines.thickness = OTApp.instance.resourcesWrapped.getDimension(R.dimen.vis_line_chart_thickness)
 
                         refreshPolyLine(datum, lines)
 
@@ -148,7 +148,7 @@ class MultiLineChartDrawer : ATimelineChartDrawer() {
     fun refreshPolyLine(datum: IndexedValue<ILineChartOnTime.TimeSeriesTrendData>, element: PolyLineElement<ILineChartOnTime.TimeSeriesTrendData>) {
 
         println("coord of line")
-        element.color = OTApplication.app.colorPalette[datum.index % OTApplication.app.colorPalette.size]
+        element.color = OTApp.instance.colorPalette[datum.index % OTApp.instance.colorPalette.size]
         element.fitNumPoints(datum.value.points.count())
         for (point in datum.value.points.withIndex()) {
             element.set(point.index, xScale[point.value.first], verticalAxisScale[point.value.second.toFloat()])
@@ -157,7 +157,7 @@ class MultiLineChartDrawer : ATimelineChartDrawer() {
     }
 
     override fun onDraw(canvas: Canvas) {
-        fillRect(plotAreaRect, ContextCompat.getColor(OTApplication.app, R.color.editTextFormBackground), canvas)
+        fillRect(plotAreaRect, ContextCompat.getColor(OTApp.instance, R.color.editTextFormBackground), canvas)
 
         super.onDraw(canvas)
         legend.onDraw(canvas)

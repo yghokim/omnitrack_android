@@ -6,7 +6,7 @@ import android.location.Location
 import android.view.View
 import com.google.android.gms.maps.model.LatLng
 import io.reactivex.Single
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
@@ -48,7 +48,7 @@ class OTLocationAttributeHelper : OTAttributeHelper() {
     /* TODO switch to Location library usign RxJava2
     override fun makeIntrinsicDefaultValue(attribute: OTAttributeDAO): Single<out Any> {
         return Single.defer {
-            val locationProvider = ReactiveLocationProvider(OTApplication.app)
+            val locationProvider = ReactiveLocationProvider(OTApp.instance)
 
             val request = LocationRequest.create() //standard GMS LocationRequest
                     .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
@@ -64,7 +64,7 @@ class OTLocationAttributeHelper : OTAttributeHelper() {
     }*/
 
     override fun makeIntrinsicDefaultValueMessage(attribute: OTAttributeDAO): CharSequence {
-        return OTApplication.getString(R.string.msg_intrinsic_location)
+        return OTApp.getString(R.string.msg_intrinsic_location)
     }
 
     override fun initialize(attribute: OTAttributeDAO) {

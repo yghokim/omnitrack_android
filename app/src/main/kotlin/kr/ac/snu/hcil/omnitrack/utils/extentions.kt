@@ -19,7 +19,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TimePicker
 import com.google.android.gms.maps.model.LatLng
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import java.math.BigDecimal
 import java.util.*
 
@@ -31,7 +31,7 @@ const val ANDROID_ASSET_PATH = "file:///android_asset"
 
 @TargetApi(23)
 fun isInDozeMode(): Boolean {
-    val powerManager = OTApplication.app.getSystemService(PowerManager::class.java)
+    val powerManager = OTApp.instance.getSystemService(PowerManager::class.java)
     return powerManager.isDeviceIdleMode
 }
 
@@ -45,11 +45,11 @@ fun dipRound(value: Int): Int {
 
 
 fun dipSize(value: Float): Float {
-    return value * OTApplication.app.resourcesWrapped.displayMetrics.density
+    return value * OTApp.instance.resourcesWrapped.displayMetrics.density
 }
 
 fun dipSize(value: Int): Float {
-    return value * OTApplication.app.resourcesWrapped.displayMetrics.density
+    return value * OTApp.instance.resourcesWrapped.displayMetrics.density
 }
 
 fun Boolean.toInt(): Int {

@@ -19,7 +19,7 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposables
 import io.reactivex.subjects.BehaviorSubject
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
@@ -58,7 +58,7 @@ object OTAuthManager {
     private val mGoogleSignInOptions: GoogleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestProfile()
             .requestEmail()
-            .requestIdToken(OTApplication.getString(R.string.default_web_client_id))
+            .requestIdToken(OTApp.getString(R.string.default_web_client_id))
             .build()
 
     //is signIn process in progress
@@ -112,7 +112,7 @@ object OTAuthManager {
         Log.d(LOG_TAG, "Initializing Google SDK...")
 
         // Build GoogleApiClient with access to basic profile
-        mGoogleApiClient = GoogleApiClient.Builder(OTApplication.app)
+        mGoogleApiClient = GoogleApiClient.Builder(OTApp.instance)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, mGoogleSignInOptions)
                 .build()
         mGoogleApiClient.connect()
@@ -145,13 +145,13 @@ object OTAuthManager {
     val userId: String? get() = mFirebaseAuth.currentUser?.uid
 
     var userDeviceLocalKey: String?
-        get() = OTApplication.app.systemSharedPreferences.getString(OTApplication.PREFERENCE_KEY_DEVICE_LOCAL_KEY, null)
+        get() = OTApp.instance.systemSharedPreferences.getString(OTApp.PREFERENCE_KEY_DEVICE_LOCAL_KEY, null)
         set(value) {
             println("set device local key: ${value}")
             if (value != null) {
-                OTApplication.app.systemSharedPreferences.edit().putString(OTApplication.PREFERENCE_KEY_DEVICE_LOCAL_KEY, value).apply()
+                OTApp.instance.systemSharedPreferences.edit().putString(OTApp.PREFERENCE_KEY_DEVICE_LOCAL_KEY, value).apply()
             } else {
-                OTApplication.app.systemSharedPreferences.edit().remove(OTApplication.PREFERENCE_KEY_DEVICE_LOCAL_KEY).apply()
+                OTApp.instance.systemSharedPreferences.edit().remove(OTApp.PREFERENCE_KEY_DEVICE_LOCAL_KEY).apply()
             }
         }
 
@@ -163,7 +163,7 @@ object OTAuthManager {
         val result = try {
             if (isUserSignedIn()) {
                 SignedInLevel.AUTHORIZED
-            } else if (OTUser.isUserStored(OTApplication.app.systemSharedPreferences)) {
+            } else if (OTUser.isUserStored(OTApp.instance.systemSharedPreferences)) {
                 SignedInLevel.CACHED
             } else return SignedInLevel.NONE
         } catch(ex: Exception) {
@@ -294,7 +294,7 @@ object OTAuthManager {
                 println("signed in google account: ${result.signInAccount}")
                 refreshToken()
                 firebaseAuthWithGoogle(googleSignInAccount).flatMap { authResult ->
-                    OTApplication.app.synchronizationServerController.putDeviceInfo(OTDeviceInfo()).
+                    OTApp.instance.synchronizationServerController.putDeviceInfo(OTDeviceInfo()).
                             map { result ->
                                 val localKey = result.deviceLocalKey
                                 if (localKey != null) {
@@ -379,11 +379,11 @@ object OTAuthManager {
     }
 
     private fun notifySignedIn(user: FirebaseUser) {
-        OTApplication.app.sendBroadcast(Intent(OTApplication.BROADCAST_ACTION_USER_SIGNED_IN).putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_USER, userId))
+        OTApp.instance.sendBroadcast(Intent(OTApp.BROADCAST_ACTION_USER_SIGNED_IN).putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_USER, userId))
     }
 
     private fun notifySignedOut() {
-        OTApplication.app.sendBroadcast(Intent(OTApplication.BROADCAST_ACTION_USER_SIGNED_OUT).putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_USER, userId))
+        OTApp.instance.sendBroadcast(Intent(OTApp.BROADCAST_ACTION_USER_SIGNED_OUT).putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_USER, userId))
     }
 
     fun clearUserInfo() {

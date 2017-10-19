@@ -8,7 +8,7 @@ import android.transition.TransitionManager
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.utils.dipSize
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 
@@ -38,7 +38,7 @@ class ColorPaletteView(context: Context, attrs: AttributeSet?, defStyle: Int) : 
 
     var selectedColor: Int
         get() {
-            return OTApplication.app.colorPalette[selectedIndex]
+            return OTApp.instance.colorPalette[selectedIndex]
         }
         set(value) {
             val index = findColorIndex(value)
@@ -54,7 +54,7 @@ class ColorPaletteView(context: Context, attrs: AttributeSet?, defStyle: Int) : 
 
 
     fun findColorIndex(color: Int): Int {
-        return OTApplication.app.colorPalette.indexOf(color)
+        return OTApp.instance.colorPalette.indexOf(color)
     }
 
     inner class Adapter : RecyclerView.Adapter<Adapter.ViewHolder>() {
@@ -75,11 +75,11 @@ class ColorPaletteView(context: Context, attrs: AttributeSet?, defStyle: Int) : 
         }
 
         override fun getItemCount(): Int {
-            return OTApplication.app.colorPalette.size
+            return OTApp.instance.colorPalette.size
         }
 
         override fun getItemId(position: Int): Long {
-            return OTApplication.app.colorPalette[position].toLong()
+            return OTApp.instance.colorPalette[position].toLong()
         }
 
 
@@ -99,7 +99,7 @@ class ColorPaletteView(context: Context, attrs: AttributeSet?, defStyle: Int) : 
             }
 
             fun bind(position: Int) {
-                (view as ColorSelectionButton).color = OTApplication.app.colorPalette[position]
+                (view as ColorSelectionButton).color = OTApp.instance.colorPalette[position]
                 view.isSelected = selectedIndex == position
             }
         }
@@ -109,9 +109,9 @@ class ColorPaletteView(context: Context, attrs: AttributeSet?, defStyle: Int) : 
         override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: State?) {
             super.getItemOffsets(outRect, view, parent, state)
 
-            if (OTApplication.app.colorPalette.count() > 1) {
+            if (OTApp.instance.colorPalette.count() > 1) {
 
-                val margin = (parent.measuredWidth - parent.paddingLeft - parent.paddingRight - OTApplication.app.colorPalette.size * buttonSize) / (OTApplication.app.colorPalette.size - 1)
+                val margin = (parent.measuredWidth - parent.paddingLeft - parent.paddingRight - OTApp.instance.colorPalette.size * buttonSize) / (OTApp.instance.colorPalette.size - 1)
 
                 if (parent.getChildAdapterPosition(view) != 0) {
                     outRect.left = margin

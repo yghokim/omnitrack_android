@@ -1,6 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales
 
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.visualization.Granularity
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.IAxisScale
@@ -29,7 +29,7 @@ class QuantizedTimeScale : IAxisScale<Long> {
                 val hourOfDay = calendarCache.getHourOfDay()
 
                 return if (hourOfDay == 12) {
-                    OTApplication.app.resourcesWrapped.getString(R.string.msg_noon)
+                    OTApp.instance.resourcesWrapped.getString(R.string.msg_noon)
                 } else if (hourOfDay == 0 || hourOfDay == 23) {
                     TimeHelper.FORMAT_DAY.format(Date(value))
                 } else {

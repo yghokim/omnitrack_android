@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.items
 
 import io.reactivex.Maybe
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemBuilderDAO
@@ -19,7 +19,7 @@ class NewItemCreationViewModel : ItemEditionViewModelBase() {
     private lateinit var builderWrapper: OTItemBuilderWrapperBase
 
     override fun onInit(trackerDao: OTTrackerDAO, itemId: String?): Pair<ItemMode, BuilderCreationMode?>? {
-        val builderDaoResult = OTApplication.app.databaseManager.getItemBuilderQuery(trackerDao.objectId!!, OTItemBuilderDAO.HOLDER_TYPE_INPUT_FORM, realm).findFirst()
+        val builderDaoResult = OTApp.instance.databaseManager.getItemBuilderQuery(trackerDao.objectId!!, OTItemBuilderDAO.HOLDER_TYPE_INPUT_FORM, realm).findFirst()
 
         if (builderDaoResult != null) {
             //there is a pending itemBuilder.
@@ -120,7 +120,7 @@ class NewItemCreationViewModel : ItemEditionViewModelBase() {
                 refreshDaoValues()
                 val item = builderWrapper.saveToItem(null, ItemLoggingSource.Manual)
 
-                return@flatMapMaybe Maybe.fromSingle<String>(OTApplication.app.databaseManager.saveItemObservable(item, false, null, realm).map { it.second })
+                return@flatMapMaybe Maybe.fromSingle<String>(OTApp.instance.databaseManager.saveItemObservable(item, false, null, realm).map { it.second })
             }
         } else return Maybe.just(null)
     }

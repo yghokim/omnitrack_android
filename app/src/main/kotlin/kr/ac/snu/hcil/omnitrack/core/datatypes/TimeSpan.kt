@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.datatypes
 
 
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.serialization.IStringSerializable
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
@@ -49,8 +49,8 @@ class TimeSpan : IStringSerializable {
 
 
     override fun toString(): String {
-        val format = SimpleDateFormat(OTApplication.app.resourcesWrapped.getString(R.string.msg_tracker_list_time_format))
-        return "${TimeHelper.getDateText(from, OTApplication.app)}, ${format.format(Date(from))} \n~ ${TimeHelper.getDateText(to, OTApplication.app)}, ${format.format(Date(to))} \n ${from} ~ ${to}"
+        val format = SimpleDateFormat(OTApp.instance.resourcesWrapped.getString(R.string.msg_tracker_list_time_format))
+        return "${TimeHelper.getDateText(from, OTApp.instance)}, ${format.format(Date(from))} \n~ ${TimeHelper.getDateText(to, OTApp.instance)}, ${format.format(Date(to))} \n ${from} ~ ${to}"
     }
 
     constructor(serialized: String) {

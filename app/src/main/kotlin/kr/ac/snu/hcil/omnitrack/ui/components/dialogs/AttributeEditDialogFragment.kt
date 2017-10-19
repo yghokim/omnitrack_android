@@ -12,7 +12,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.disposables.Disposables
 import io.realm.Realm
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemDAO
@@ -32,9 +32,9 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
 
         fun makeInstance(itemId: String, attributeLocalId: String, trackerId: String, listener: Listener): AttributeEditDialogFragment {
             val args = Bundle()
-            args.putString(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
-            args.putString(OTApplication.INTENT_EXTRA_LOCAL_ID_ATTRIBUTE, attributeLocalId)
-            args.putString(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, itemId)
+            args.putString(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
+            args.putString(OTApp.INTENT_EXTRA_LOCAL_ID_ATTRIBUTE, attributeLocalId)
+            args.putString(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM, itemId)
 
             val instance = AttributeEditDialogFragment()
             instance.arguments = args
@@ -72,7 +72,7 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
-        realm = OTApplication.app.databaseManager.getRealmInstance()
+        realm = OTApp.instance.databaseManager.getRealmInstance()
 
         val view = setupViews(LayoutInflater.from(activity), savedInstanceState)
 
@@ -140,13 +140,13 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
         container.alpha = 0.25f
         progressBar.visibility = View.VISIBLE
 
-        if (bundle.containsKey(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
-                && bundle.containsKey(OTApplication.INTENT_EXTRA_LOCAL_ID_ATTRIBUTE)) {
-            trackerId = bundle.getString(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
-            val attributeLocalId = bundle.getString(OTApplication.INTENT_EXTRA_LOCAL_ID_ATTRIBUTE)
-            val itemId = bundle.getString(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM)
+        if (bundle.containsKey(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
+                && bundle.containsKey(OTApp.INTENT_EXTRA_LOCAL_ID_ATTRIBUTE)) {
+            trackerId = bundle.getString(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
+            val attributeLocalId = bundle.getString(OTApp.INTENT_EXTRA_LOCAL_ID_ATTRIBUTE)
+            val itemId = bundle.getString(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM)
 
-            val itemObservable = OTApplication.app.databaseManager
+            val itemObservable = OTApp.instance.databaseManager
                     .makeItemsQuery(trackerId, null, null, realm)
                     .equalTo("objectId", itemId).findFirstAsync()
                     .asFlowable<OTItemDAO>().filter { it.isValid == true && it.isLoaded == true }
@@ -231,15 +231,15 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
         }
 
         trackerId?.let {
-            outState?.putString(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
+            outState?.putString(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
         }
 
         attribute?.let {
-            outState?.putString(OTApplication.INTENT_EXTRA_LOCAL_ID_ATTRIBUTE, it.localId)
+            outState?.putString(OTApp.INTENT_EXTRA_LOCAL_ID_ATTRIBUTE, it.localId)
         }
 
         item?.let {
-            outState?.putString(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, it.objectId)
+            outState?.putString(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM, it.objectId)
         }
     }
 

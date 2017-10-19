@@ -7,7 +7,7 @@ import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
 import io.realm.Realm
 import io.realm.RealmChangeListener
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
@@ -33,7 +33,7 @@ class TrackerDetailViewModel : RealmViewModel() {
     //Observables========================================
     val nameObservable = BehaviorSubject.createDefault<String>("")
     val isBookmarkedObservable = BehaviorSubject.createDefault<Boolean>(false)
-    val colorObservable = BehaviorSubject.createDefault<Int>(OTApplication.app.colorPalette[0])
+    val colorObservable = BehaviorSubject.createDefault<Int>(OTApp.instance.colorPalette[0])
     val attributeViewModelListObservable = BehaviorSubject.create<List<AttributeInformationViewModel>>()
     //===================================================
 
@@ -69,7 +69,7 @@ class TrackerDetailViewModel : RealmViewModel() {
         if (trackerDao?.objectId != trackerId) {
             subscriptions.clear()
             if (trackerId != null) {
-                val dao = OTApplication.app.databaseManager.getTrackerQueryWithId(trackerId, realm).findFirstAsync()
+                val dao = OTApp.instance.databaseManager.getTrackerQueryWithId(trackerId, realm).findFirstAsync()
 
                 subscriptions.add(
                         dao.asFlowable<OTTrackerDAO>().filter { it.isValid }.firstOrError().subscribe { snapshot ->
@@ -88,7 +88,7 @@ class TrackerDetailViewModel : RealmViewModel() {
 
                 /*
                 attributeRealmResults?.removeChangeListener(attributeListChangedListener)
-                attributeRealmResults = OTApplication.app.databaseManager.getAttributeListQuery(trackerId, realm).findAllSortedAsync("position")
+                attributeRealmResults = OTApp.instance.databaseManager.getAttributeListQuery(trackerId, realm).findAllSortedAsync("position")
                 attributeRealmResults?.addChangeListener(attributeListChangedListener)*/
 
             } else trackerDao = null

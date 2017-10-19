@@ -4,7 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import android.view.View
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt
 
 /**
@@ -25,7 +25,7 @@ object TutorialManager {
     }
 
     private val preferences: SharedPreferences by lazy {
-        OTApplication.app.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
+        OTApp.instance.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
     }
 
     fun hasShownTutorials(tag: String): Boolean {

@@ -3,7 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 import android.content.Context
 import io.reactivex.Single
 import io.realm.Realm
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.TimeSpanIntervalSorter
@@ -71,8 +71,8 @@ class OTTimeSpanAttributeHelper : OTAttributeHelper() {
     override fun makePropertyView(propertyKey: String, context: Context): APropertyView<out Any> {
         val superView = super.makePropertyView(propertyKey, context)
         if (propertyKey == PROPERTY_GRANULARITY && superView is SelectionPropertyView) {
-            superView.setEntries(arrayOf(OTApplication.app.resourcesWrapped.getString(R.string.property_time_granularity_day),
-                    OTApplication.app.resourcesWrapped.getString(R.string.property_time_granularity_minute)
+            superView.setEntries(arrayOf(OTApp.instance.resourcesWrapped.getString(R.string.property_time_granularity_day),
+                    OTApp.instance.resourcesWrapped.getString(R.string.property_time_granularity_minute)
             ))
         }
 
@@ -85,7 +85,7 @@ class OTTimeSpanAttributeHelper : OTAttributeHelper() {
 
     override fun getPropertyTitle(propertyKey: String): String {
         return when (propertyKey) {
-            PROPERTY_GRANULARITY -> OTApplication.getString(R.string.property_time_granularity)
+            PROPERTY_GRANULARITY -> OTApp.getString(R.string.property_time_granularity)
             else -> ""
         }
     }
@@ -151,6 +151,6 @@ class OTTimeSpanAttributeHelper : OTAttributeHelper() {
     }
 
     override fun makeIntrinsicDefaultValueMessage(attribute: OTAttributeDAO): CharSequence {
-        return OTApplication.getString(R.string.msg_intrinsic_time)
+        return OTApp.getString(R.string.msg_intrinsic_time)
     }
 }

@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.core.database.abstraction
+package kr.ac.snu.hcil.omnitrack.core.net
 
 /**
  * Created by younghokim on 2017. 9. 26..

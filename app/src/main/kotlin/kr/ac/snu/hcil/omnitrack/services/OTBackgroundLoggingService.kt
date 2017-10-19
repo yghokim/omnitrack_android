@@ -6,7 +6,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import java.util.concurrent.ConcurrentHashMap
@@ -35,7 +35,7 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
         }
 
         private val flagPreferences: SharedPreferences by lazy {
-            OTApplication.app.getSharedPreferences("pref_background_logging_service", Context.MODE_PRIVATE)
+            OTApp.instance.getSharedPreferences("pref_background_logging_service", Context.MODE_PRIVATE)
         }
 
         private fun getLoggingFlag(tracker: OTTracker): Long? {
@@ -76,14 +76,14 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
                 /*
                 val builder = OTItemBuilder(tracker, OTItemBuilder.MODE_BACKGROUND)
 
-                OTApplication.logger.writeSystemLog("start background logging of ${tracker.name}", TAG)
+                OTApp.logger.writeSystemLog("start background logging of ${tracker.name}", TAG)
                 if (android.os.Build.VERSION.SDK_INT >= 23) {
-                    OTApplication.logger.writeSystemLog("idleMode: ${isInDozeMode()}", TAG)
+                    OTApp.logger.writeSystemLog("idleMode: ${isInDozeMode()}", TAG)
                 }
 
                 setLoggingFlag(tracker, System.currentTimeMillis())
                 val notificationId = makeNewNotificationIdSeed()
-                sendBroadcast(context, OTApplication.BROADCAST_ACTION_BACKGROUND_LOGGING_STARTED, tracker, notificationId)
+                sendBroadcast(context, OTApp.BROADCAST_ACTION_BACKGROUND_LOGGING_STARTED, tracker, notificationId)
 
 
                 if (currentBuilderSubscriptionDict.contains(tracker.objectId)) {
@@ -92,14 +92,14 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
                 } else {
                     currentBuilderSubscriptionDict[tracker.objectId] = builder.autoComplete().last().toSingle().map { pair -> true }.doOnSuccess { currentBuilderSubscriptionDict.remove(tracker.objectId) }.flatMap<Pair<Boolean, OTItem>> {
                         val item = builder.makeItem(source)
-                        //OTApplication.app.databaseManager.saveItemObservable(item, tracker).map { success -> Pair(success, item) }
+                        //OTApp.instance.databaseManager.saveItemObservable(item, tracker).map { success -> Pair(success, item) }
                         //TODO fix item save logic in background logging
                         Single.just(Pair(false, item))
 
                     }.subscribe { successItemPair ->
                         if (successItemPair.first == true) {
-                            sendBroadcast(context, OTApplication.BROADCAST_ACTION_BACKGROUND_LOGGING_SUCCEEDED, tracker, successItemPair.second.objectId!!, notify, notificationId)
-                            OTApplication.logger.writeSystemLog("${tracker.name} background logging was successful", TAG)
+                            sendBroadcast(context, OTApp.BROADCAST_ACTION_BACKGROUND_LOGGING_SUCCEEDED, tracker, successItemPair.second.objectId!!, notify, notificationId)
+                            OTApp.logger.writeSystemLog("${tracker.name} background logging was successful", TAG)
                             removeLoggingFlag(tracker)
                             if (!subscriber.isUnsubscribed) {
                                 subscriber.onNext(0)
@@ -107,7 +107,7 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
                             }
                         } else {
 
-                            OTApplication.logger.writeSystemLog("${tracker.name} background logging failed", TAG)
+                            OTApp.logger.writeSystemLog("${tracker.name} background logging failed", TAG)
                             removeLoggingFlag(tracker)
                             if (!subscriber.isUnsubscribed) {
                                 subscriber.onError(Exception("Item storing failed"))
@@ -121,16 +121,16 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
 
         private fun sendBroadcast(context: Context, action: String, tracker: OTTracker, notificationIdSeed: Int) {
             val intent = Intent(action)
-                    .putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
-                    .putExtra(OTApplication.INTENT_EXTRA_NOTIFICATION_ID_SEED, notificationIdSeed)
+                    .putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
+                    .putExtra(OTApp.INTENT_EXTRA_NOTIFICATION_ID_SEED, notificationIdSeed)
             context.sendBroadcast(intent)
         }
 
         private fun sendBroadcast(context: Context, action: String, tracker: OTTracker, itemObjectId: String, notify: Boolean, notificationIdSeed: Int) {
             val intent = Intent(action)
-                    .putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
-                    .putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, itemObjectId)
-                    .putExtra(OTApplication.INTENT_EXTRA_NOTIFICATION_ID_SEED, notificationIdSeed)
+                    .putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
+                    .putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM, itemObjectId)
+                    .putExtra(OTApp.INTENT_EXTRA_NOTIFICATION_ID_SEED, notificationIdSeed)
                     .putExtra(INTENT_EXTRA_NOTIFY, notify)
             context.sendBroadcast(intent)
         }
@@ -142,7 +142,7 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
         fun makeIntent(context: Context, trackerId: String, source: ItemLoggingSource): Intent {
             val intent = Intent(context, OTBackgroundLoggingService::class.java)
             intent.action = "${ACTION_LOG}${trackerId}"
-            intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
+            intent.putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
             intent.putExtra(INTENT_EXTRA_LOGGING_SOURCE, source.toString())
             return intent
         }
@@ -154,7 +154,7 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
             val action = intent.action
             if (action.startsWith(ACTION_LOG, true)) {
                 println("try background logging..")
-                val trackerId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
+                val trackerId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
                 handleLogging(trackerId, intent)
             }
         }
@@ -162,7 +162,7 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
 
     private fun handleLogging(trackerId: String, intent: Intent) {
         /*
-        OTApplication.app.currentUserObservable.flatMap { user -> user.getTrackerObservable(trackerId) }.subscribe { tracker ->
+        OTApp.instance.currentUserObservable.flatMap { user -> user.getTrackerObservable(trackerId) }.subscribe { tracker ->
             log(this, tracker, ItemLoggingSource.valueOf(intent.getStringExtra(INTENT_EXTRA_LOGGING_SOURCE)), true).subscribe()
         }*/
     }

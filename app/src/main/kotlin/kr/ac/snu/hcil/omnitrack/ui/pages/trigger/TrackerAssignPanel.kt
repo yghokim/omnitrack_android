@@ -80,7 +80,7 @@ class TrackerAssignPanel : FlowLayout, View.OnClickListener {
             /*
             subscriptions.add(
 
-                    OTApplication.app.currentUserObservable.subscribe {
+                    OTApplication.instance.currentUserObservable.subscribe {
                         user ->
                         val dialog = TrackerPickerDialogBuilder(user.trackers.unObservedList).createDialog(getActivity()!!, trackerIds.toTypedArray(), {
                             tracker ->

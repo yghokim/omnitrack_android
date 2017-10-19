@@ -10,7 +10,7 @@ import android.preference.PreferenceManager
 import android.support.v4.app.NotificationCompat
 import android.support.v4.app.TaskStackBuilder
 import android.support.v4.content.ContextCompat
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemBrowserActivity
@@ -37,7 +37,7 @@ object OTTrackingNotificationManager {
     }
 
     private val notificationService: NotificationManager by lazy {
-        OTApplication.app.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        OTApp.instance.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     }
 
     fun pushReminderNotification(context: Context, tracker: OTTracker, reminderTime: Long) {
@@ -95,10 +95,10 @@ object OTTrackingNotificationManager {
         val resultPendingIntent = stackBuilder.getPendingIntent(0,
                 PendingIntent.FLAG_UPDATE_CURRENT)
 
-        val itemRemoveIntent = Intent(OTApplication.BROADCAST_ACTION_COMMAND_REMOVE_ITEM)
-        itemRemoveIntent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
-        itemRemoveIntent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_ITEM, itemId)
-        itemRemoveIntent.putExtra(OTApplication.INTENT_EXTRA_NOTIFICATION_ID_SEED, idSeed)
+        val itemRemoveIntent = Intent(OTApp.BROADCAST_ACTION_COMMAND_REMOVE_ITEM)
+        itemRemoveIntent.putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
+        itemRemoveIntent.putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM, itemId)
+        itemRemoveIntent.putExtra(OTApp.INTENT_EXTRA_NOTIFICATION_ID_SEED, idSeed)
 
         val discardAction = NotificationCompat.Action.Builder(0,
                 context.resources.getString(R.string.msg_notification_action_discard_item),
@@ -108,7 +108,7 @@ object OTTrackingNotificationManager {
                 .setSmallIcon(R.drawable.icon_simple_plus)
                 .setContentIntent(resultPendingIntent)
                 .setContentText(
-                        String.format(OTApplication.app.resourcesWrapped.getString(R.string.msg_notification_content_format_new_item),
+                        String.format(OTApp.instance.resourcesWrapped.getString(R.string.msg_notification_content_format_new_item),
                                 tracker.name
                         ))
                 .addAction(discardAction)

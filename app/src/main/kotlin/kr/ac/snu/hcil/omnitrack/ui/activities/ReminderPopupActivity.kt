@@ -10,7 +10,7 @@ import android.view.WindowManager
 import android.widget.Button
 import butterknife.bindView
 import com.badoo.mobile.util.WeakHandler
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.receivers.ScreenReceiverBase
 
@@ -28,8 +28,8 @@ class ReminderPopupActivity : OTActivity(false, false), View.OnClickListener {
         fun makeIntent(context: Context, triggerId: String, triggerTime: Long): Intent {
             return Intent(context, ReminderPopupActivity::class.java).apply {
                 this.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-                this.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRIGGER, triggerId)
-                this.putExtra(OTApplication.INTENT_EXTRA_TRIGGER_TIME, triggerTime)
+                this.putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRIGGER, triggerId)
+                this.putExtra(OTApp.INTENT_EXTRA_TRIGGER_TIME, triggerTime)
             }
         }
     }

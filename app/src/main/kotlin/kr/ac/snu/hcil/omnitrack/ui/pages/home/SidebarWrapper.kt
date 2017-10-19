@@ -13,7 +13,7 @@ import android.widget.TextView
 import com.badoo.mobile.util.WeakHandler
 import com.bumptech.glide.Glide
 import de.hdodenhof.circleimageview.CircleImageView
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
@@ -64,7 +64,7 @@ class SidebarWrapper(val view: View, val parentActivity: AppCompatActivity) : Po
             R.id.action_unlink_with_this_device -> {
                 DialogHelper.makeNegativePhrasedYesNoDialogBuilder(parentActivity, "OmniTrack", parentActivity.getString(R.string.msg_profile_unlink_account_confirm), R.string.msg_logout, onYes = {
                     OTAuthManager.signOut()
-                    OTApplication.app.unlinkUser()
+                    OTApp.instance.unlinkUser()
                 }).show()
                 return true
             }
@@ -95,7 +95,7 @@ class SidebarWrapper(val view: View, val parentActivity: AppCompatActivity) : Po
                 }, true),
 
                 RecyclerViewMenuAdapter.MenuItem(R.drawable.icon_refresh, "Refresh", null, {
-                    OTApplication.app.syncManager.performSynchronizationOf(ESyncDataType.ITEM)
+                    OTApp.instance.syncManager.performSynchronizationOf(ESyncDataType.ITEM)
                 }, true)
         )
 

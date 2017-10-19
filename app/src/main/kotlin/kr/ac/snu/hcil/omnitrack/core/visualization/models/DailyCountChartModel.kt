@@ -6,7 +6,7 @@ import android.support.v4.content.ContextCompat
 import io.reactivex.Single
 import io.realm.Realm
 import io.realm.Sort
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.visualization.Granularity
@@ -26,7 +26,7 @@ import kr.ac.snu.hcil.omnitrack.utils.dipSize
  */
 class DailyCountChartModel(tracker: OTTrackerDAO, realm: Realm) : TrackerChartModel<Pair<Long, Int>>(tracker, realm) {
 
-    override val name: String = String.format(OTApplication.app.getString(R.string.msg_vis_daily_count_title_format), tracker.name)
+    override val name: String = String.format(OTApp.instance.getString(R.string.msg_vis_daily_count_title_format), tracker.name)
 
     override fun reloadData(): Single<List<Pair<Long, Int>>> {
         println("reload chart data. Scope:  ${getTimeScope()}")
@@ -35,7 +35,7 @@ class DailyCountChartModel(tracker: OTTrackerDAO, realm: Realm) : TrackerChartMo
         xScale.setDomain(getTimeScope().from, getTimeScope().to)
         xScale.quantize(currentGranularity)
 
-        return OTApplication.app.databaseManager
+        return OTApp.instance.databaseManager
                 .makeItemsQuery(tracker.objectId, getTimeScope(), realm)
                 .findAllSortedAsync("timestamp", Sort.ASCENDING)
                 .asFlowable()
@@ -59,12 +59,12 @@ class DailyCountChartModel(tracker: OTTrackerDAO, realm: Realm) : TrackerChartMo
 
         private val textPadding: Float
 
-        private val normalRectColor = ContextCompat.getColor(OTApplication.app, R.color.colorPointed)
-        private val todayRectColor = ContextCompat.getColor(OTApplication.app, R.color.colorAccent)
-        private val normalTextColor = ContextCompat.getColor(OTApplication.app, R.color.textColorMid)
-        private val todayTextColor = ContextCompat.getColor(OTApplication.app, R.color.colorAccent)
+        private val normalRectColor = ContextCompat.getColor(OTApp.instance, R.color.colorPointed)
+        private val todayRectColor = ContextCompat.getColor(OTApp.instance, R.color.colorAccent)
+        private val normalTextColor = ContextCompat.getColor(OTApp.instance, R.color.textColorMid)
+        private val todayTextColor = ContextCompat.getColor(OTApp.instance, R.color.colorAccent)
 
-        private val todayBackgroundColor = ContextCompat.getColor(OTApplication.app, R.color.editTextFormBackground)
+        private val todayBackgroundColor = ContextCompat.getColor(OTApp.instance, R.color.editTextFormBackground)
 
 
         private val counterBarGroups = DataEncodedDrawingList<Pair<Long, Int>, Void?>()

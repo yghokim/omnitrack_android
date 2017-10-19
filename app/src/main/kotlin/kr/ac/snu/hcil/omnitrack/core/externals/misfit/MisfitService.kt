@@ -3,7 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.externals.misfit
 import android.app.Activity
 import android.content.Context
 import io.reactivex.Single
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.dependency.OTSystemDependencyResolver
 import kr.ac.snu.hcil.omnitrack.core.dependency.ThirdPartyAppDependencyResolver
@@ -40,7 +40,7 @@ object MisfitService : OTExternalService("MisfitService", 0) {
     override fun onRegisterDependencies(): Array<OTSystemDependencyResolver> {
         return super.onRegisterDependencies() + arrayOf(
                 MisfitAuthResolver(),
-                ThirdPartyAppDependencyResolver.Builder(OTApplication.app)
+                ThirdPartyAppDependencyResolver.Builder(OTApp.instance)
                         .isMandatory(false)
                         .setAppName("Misfit")
                         .setPackageName("com.misfitwearables.prometheus")

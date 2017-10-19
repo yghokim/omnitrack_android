@@ -2,7 +2,7 @@ package kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers
 
 import android.graphics.Canvas
 import android.support.v4.content.ContextCompat
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.ICategoricalBarChart
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
@@ -50,9 +50,9 @@ class CategoricalBarChartDrawer : AChartDrawer() {
     private val barElements = DataEncodedDrawingList<ICategoricalBarChart.Point, Void?>()
 
     init {
-        paddingBottom = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_axis_height).toFloat()
-        paddingLeft = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_axis_width).toFloat()
-        paddingTop = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_axis_label_numeric_size).toFloat()
+        paddingBottom = OTApp.instance.resourcesWrapped.getDimension(R.dimen.vis_axis_height).toFloat()
+        paddingLeft = OTApp.instance.resourcesWrapped.getDimension(R.dimen.vis_axis_width).toFloat()
+        paddingTop = OTApp.instance.resourcesWrapped.getDimension(R.dimen.vis_axis_label_numeric_size).toFloat()
 
         verticalAxis.drawBar = false
         verticalAxis.drawGridLines = true
@@ -61,7 +61,7 @@ class CategoricalBarChartDrawer : AChartDrawer() {
         verticalAxis.scale = verticalAxisScale
         verticalAxis.drawBar = false
         verticalAxis.drawGridLines = true
-        verticalAxis.labelPaint.textSize = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_axis_label_numeric_size).toFloat()
+        verticalAxis.labelPaint.textSize = OTApp.instance.resourcesWrapped.getDimension(R.dimen.vis_axis_label_numeric_size).toFloat()
 
         children.add(horizontalAxis)
         children.add(verticalAxis)
@@ -85,11 +85,11 @@ class CategoricalBarChartDrawer : AChartDrawer() {
         println("bar X : $dataX")
         val dataY = verticalAxisScale[datum.value.value.toFloat()]
         val barWidth = Math.min(
-                horizontalAxisScale.getTickInterval() - OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_bar_spacing),
-                OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_bar_max_width)
+                horizontalAxisScale.getTickInterval() - OTApp.instance.resourcesWrapped.getDimension(R.dimen.vis_bar_spacing),
+                OTApp.instance.resourcesWrapped.getDimension(R.dimen.vis_bar_max_width)
         )
 
-        bar.bound.set(dataX - barWidth / 2, dataY, dataX + barWidth / 2, plotAreaRect.bottom - OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_bar_axis_spacing))
+        bar.bound.set(dataX - barWidth / 2, dataY, dataX + barWidth / 2, plotAreaRect.bottom - OTApp.instance.resourcesWrapped.getDimension(R.dimen.vis_bar_axis_spacing))
 
     }
 
@@ -122,7 +122,7 @@ class CategoricalBarChartDrawer : AChartDrawer() {
                 datum ->
                 println("updating enter selection for datum ${datum}")
                 val newBar = RectElement<ICategoricalBarChart.Point>()
-                newBar.color = ContextCompat.getColor(OTApplication.app, R.color.colorPointed)
+                newBar.color = ContextCompat.getColor(OTApp.instance, R.color.colorPointed)
 
                 mapBarElementToSpace(datum, newBar)
 
@@ -142,7 +142,7 @@ class CategoricalBarChartDrawer : AChartDrawer() {
 
     override fun onDraw(canvas: Canvas) {
 
-        fillRect(plotAreaRect, ContextCompat.getColor(OTApplication.app, R.color.editTextFormBackground), canvas)
+        fillRect(plotAreaRect, ContextCompat.getColor(OTApp.instance, R.color.editTextFormBackground), canvas)
 
         super.onDraw(canvas)
     }

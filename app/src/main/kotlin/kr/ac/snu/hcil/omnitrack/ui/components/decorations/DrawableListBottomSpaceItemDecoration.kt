@@ -3,7 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui.components.decorations
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.support.v4.content.ContextCompat
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 
 /**
  * Created by younghokim on 16. 8. 14..
@@ -13,7 +13,7 @@ class DrawableListBottomSpaceItemDecoration(drawableResourceId: Int, height: Int
     private val drawable: Drawable
 
     init {
-        drawable = ContextCompat.getDrawable(OTApplication.app, drawableResourceId)
+        drawable = ContextCompat.getDrawable(OTApp.instance, drawableResourceId)
         if (super.height == 0) {
             super.height = drawable.intrinsicHeight
         }

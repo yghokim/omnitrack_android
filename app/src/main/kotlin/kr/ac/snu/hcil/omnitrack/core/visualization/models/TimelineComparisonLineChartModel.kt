@@ -3,7 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.visualization.models
 import io.reactivex.Single
 import io.realm.Realm
 import io.realm.Sort
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemDAO
@@ -24,7 +24,7 @@ import java.util.*
 class TimelineComparisonLineChartModel(attributes: List<OTAttributeDAO>, parent: OTTrackerDAO, realm: Realm)
     : CompoundAttributeChartModel<ILineChartOnTime.TimeSeriesTrendData>(attributes, parent, realm), ILineChartOnTime {
 
-    override val name: String = OTApplication.app.resourcesWrapped.getString(R.string.msg_vis_numeric_line_timeline_title)
+    override val name: String = OTApp.instance.resourcesWrapped.getString(R.string.msg_vis_numeric_line_timeline_title)
 
     override fun reloadData(): Single<List<ILineChartOnTime.TimeSeriesTrendData>> {
         val data = ArrayList<ILineChartOnTime.TimeSeriesTrendData>()
@@ -34,7 +34,7 @@ class TimelineComparisonLineChartModel(attributes: List<OTAttributeDAO>, parent:
         xScale.setDomain(getTimeScope().from, getTimeScope().to)
         xScale.quantize(currentGranularity)
 
-        return OTApplication.app.databaseManager
+        return OTApp.instance.databaseManager
                 .makeItemsQuery(parent.objectId, getTimeScope(), realm)
                 .findAllSortedAsync("timestamp", Sort.ASCENDING)
                 .asFlowable()
@@ -108,7 +108,7 @@ class TimelineComparisonLineChartModel(attributes: List<OTAttributeDAO>, parent:
 
 
         drawer.verticalAxis.labelPaint.isFakeBoldText = true
-        drawer.verticalAxis.labelPaint.textSize = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_axis_label_numeric_size)
+        drawer.verticalAxis.labelPaint.textSize = OTApp.instance.resourcesWrapped.getDimension(R.dimen.vis_axis_label_numeric_size)
         return drawer
     }
 }

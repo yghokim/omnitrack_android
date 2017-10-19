@@ -10,7 +10,7 @@ import android.text.style.TypefaceSpan
 import android.util.AttributeSet
 import android.widget.LinearLayout
 import android.widget.TextView
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 
@@ -22,7 +22,7 @@ class StarScoreView : LinearLayout {
     companion object {
         val scoreTypeSpan: TypefaceSpan by lazy { TypefaceSpan("sans-serif") }
         val scoreSizeSpan: RelativeSizeSpan by lazy { RelativeSizeSpan(1.5f) }
-        val scoreColorSpan: ForegroundColorSpan by lazy { ForegroundColorSpan(ContextCompat.getColor(OTApplication.app, R.color.textColorMid)) }
+        val scoreColorSpan: ForegroundColorSpan by lazy { ForegroundColorSpan(ContextCompat.getColor(OTApp.instance, R.color.textColorMid)) }
     }
 
     private val scoreView: TextView

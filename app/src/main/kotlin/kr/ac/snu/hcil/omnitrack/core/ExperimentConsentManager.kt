@@ -2,7 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core
 
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTUserRolePOJO
 import kr.ac.snu.hcil.omnitrack.ui.pages.experiment.ExperimentSignInActivity
@@ -28,12 +28,12 @@ object ExperimentConsentManager {
         mActivity = activity
         mResultListener = resultListener
 
-        if (OTApplication.app.systemSharedPreferences.getBoolean(OTUser.PREFERENCES_KEY_CONSENT_APPROVED, false)) {
+        if (OTApp.instance.systemSharedPreferences.getBoolean(OTUser.PREFERENCES_KEY_CONSENT_APPROVED, false)) {
             mResultListener?.onConsentApproved()
             finishProcess()
         } else {
 
-            OTApplication.app.synchronizationServerController.getUserRoles().subscribe({ result ->
+            OTApp.instance.synchronizationServerController.getUserRoles().subscribe({ result ->
                 val userRole = result.find { it.role == "ServiceUser" }
                 if (userRole == null || !userRole.isConsentApproved) {
                     println("consent form was not approved or is first-time login.")
@@ -76,7 +76,7 @@ object ExperimentConsentManager {
     }
 
     private fun onApproved() {
-        OTApplication.app.systemSharedPreferences.edit().putBoolean(OTUser.PREFERENCES_KEY_CONSENT_APPROVED, true).apply()
+        OTApp.instance.systemSharedPreferences.edit().putBoolean(OTUser.PREFERENCES_KEY_CONSENT_APPROVED, true).apply()
         mResultListener?.onConsentApproved()
     }
 
@@ -108,13 +108,13 @@ object ExperimentConsentManager {
                 profile.role = "ServiceUser"
                 profile.isConsentApproved = true
                 val information = HashMap<String, Any>()
-                information["age"] = data.getStringExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_AGE_GROUP)
-                information["country"] = data.getStringExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_COUNTRY)
-                information["gender"] = data.getStringExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_GENDER)
-                information["purposes"] = data.getStringArrayListExtra(OTApplication.ACCOUNT_DATASET_EXPERIMENT_KEY_PURPOSES)
+                information["age"] = data.getStringExtra(OTApp.ACCOUNT_DATASET_EXPERIMENT_KEY_AGE_GROUP)
+                information["country"] = data.getStringExtra(OTApp.ACCOUNT_DATASET_EXPERIMENT_KEY_COUNTRY)
+                information["gender"] = data.getStringExtra(OTApp.ACCOUNT_DATASET_EXPERIMENT_KEY_GENDER)
+                information["purposes"] = data.getStringArrayListExtra(OTApp.ACCOUNT_DATASET_EXPERIMENT_KEY_PURPOSES)
                 profile.information = information
 
-                OTApplication.app.synchronizationServerController.postUserRoleConsentResult(profile)
+                OTApp.instance.synchronizationServerController.postUserRoleConsentResult(profile)
                         .subscribe({ success ->
                             if (success == true) {
                                 onApproved()

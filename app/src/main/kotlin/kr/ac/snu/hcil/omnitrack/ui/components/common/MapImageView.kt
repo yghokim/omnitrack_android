@@ -11,7 +11,7 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import com.google.android.gms.maps.model.LatLng
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 
 /**
  * Created by Young-Ho Kim on 16. 8. 18
@@ -21,7 +21,7 @@ class MapImageView : PlaceHolderImageView /*FutureCallback<ImageView>*/ {
     companion object {
 
         fun makeGoogleMapQuery(location: LatLng, zoom: Int, width: Int, height: Int): String {
-            return "https://maps.googleapis.com/maps/api/staticmap?center=${location.latitude},${location.longitude}&zoom=$zoom&size=${width / 3}x${height / 3}&markers=size:small|${location.latitude},${location.longitude}&scale=2&key=${OTApplication.app.googleApiKey}"
+            return "https://maps.googleapis.com/maps/api/staticmap?center=${location.latitude},${location.longitude}&zoom=$zoom&size=${width / 3}x${height / 3}&markers=size:small|${location.latitude},${location.longitude}&scale=2&key=${OTApp.instance.googleApiKey}"
         }
     }
 

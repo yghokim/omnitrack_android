@@ -13,7 +13,9 @@ import io.reactivex.Single
 import io.realm.Realm
 import io.realm.RealmList
 import io.realm.RealmObject
+import io.realm.RealmResults
 import io.realm.annotations.Index
+import io.realm.annotations.LinkingObjects
 import io.realm.annotations.PrimaryKey
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTAttributeHelper
@@ -63,6 +65,10 @@ open class OTTrackerDAO : RealmObject() {
     var synchronizedAt: Long? = null // store server time of when synchronized perfectly.
     var updatedAt: Long = System.currentTimeMillis()
     var removed: Boolean = false
+
+    @LinkingObjects("trackers")
+    val triggers: RealmResults<OTTriggerDAO>? = null
+
 
     val creationFlagsMap: Map<String, String> get() = RealmDatabaseManager.convertRealmEntryListToDictionary(creationFlags)
 

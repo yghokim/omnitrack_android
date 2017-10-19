@@ -10,7 +10,7 @@ import io.reactivex.Maybe
 import io.reactivex.Single
 import io.realm.Realm
 import io.realm.Sort
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
@@ -47,7 +47,7 @@ class DurationTimelineModel(attribute: OTAttributeDAO, realm: Realm) : Attribute
             else getTimeScope().to
 
 
-            OTApplication.app.databaseManager
+            OTApp.instance.databaseManager
                     .makeItemsQuery(attribute.trackerId, TimeSpan.fromPoints(from, to), realm)
                     .findAllSortedAsync("timestamp", Sort.ASCENDING)
                     .asFlowable()
@@ -81,7 +81,7 @@ class DurationTimelineModel(attribute: OTAttributeDAO, realm: Realm) : Attribute
                     } else Maybe.just<AggregatedDuration>(null)
                 } else Maybe.just(null)
             }
-            //OTApplication.app.dbHelper.getItems(attribute.tracker!!, TimeSpan.fromPoints(from, to), itemsCache, true)
+            //OTApp.instance.dbHelper.getItems(attribute.tracker!!, TimeSpan.fromPoints(from, to), itemsCache, true)
         }, { it ->
             println(it)
             it.filter { it is AggregatedDuration }.map { it as AggregatedDuration }.toList()
@@ -162,9 +162,9 @@ class DurationTimelineModel(attribute: OTAttributeDAO, realm: Realm) : Attribute
                 val originalColor = pointPaint.color
                 pointPaint.color = Color.WHITE
                 pointPaint.alpha = 200
-                canvas.drawCircle(frontalBound.centerX(), frontalBound.top, frontalBound.width() / 2 - 2 * OTApplication.app.resourcesWrapped.displayMetrics.density, pointPaint)
+                canvas.drawCircle(frontalBound.centerX(), frontalBound.top, frontalBound.width() / 2 - 2 * OTApp.instance.resourcesWrapped.displayMetrics.density, pointPaint)
 
-                canvas.drawCircle(frontalBound.centerX(), frontalBound.bottom, frontalBound.width() / 2 - 2 * OTApplication.app.resourcesWrapped.displayMetrics.density, pointPaint)
+                canvas.drawCircle(frontalBound.centerX(), frontalBound.bottom, frontalBound.width() / 2 - 2 * OTApp.instance.resourcesWrapped.displayMetrics.density, pointPaint)
 
                 pointPaint.color = originalColor
 */
@@ -190,23 +190,23 @@ class DurationTimelineModel(attribute: OTAttributeDAO, realm: Realm) : Attribute
 
         val durationBars = DataEncodedDrawingList<AggregatedDuration, Void?>()
 
-        val durationBarMaxWidth: Float by lazy { OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_duration_bar_max_width) }
+        val durationBarMaxWidth: Float by lazy { OTApp.instance.resourcesWrapped.getDimension(R.dimen.vis_duration_bar_max_width) }
         var durationBarWidth: Float = 0f
 
         init {
 
             paint.style = Paint.Style.FILL
-            paint.color = ContextCompat.getColor(OTApplication.app, R.color.colorPointed_Light)
+            paint.color = ContextCompat.getColor(OTApp.instance, R.color.colorPointed_Light)
 
             pointPaint.strokeWidth = dipSize(2f)
             pointPaint.style = Paint.Style.STROKE
-            pointPaint.color = ContextCompat.getColor(OTApplication.app, R.color.colorPointed)
+            pointPaint.color = ContextCompat.getColor(OTApp.instance, R.color.colorPointed)
 
             pointUnderPaint.style = Paint.Style.FILL
             pointUnderPaint.color = Color.WHITE
             pointUnderPaint.alpha = 100
 
-            paddingLeft = OTApplication.app.resourcesWrapped.getDimension(R.dimen.vis_axis_width_extended).toFloat()
+            paddingLeft = OTApp.instance.resourcesWrapped.getDimension(R.dimen.vis_axis_width_extended).toFloat()
 
             verticalAxis.style = Axis.TickLabelStyle.Small
             verticalAxis.drawBar = false
@@ -221,9 +221,9 @@ class DurationTimelineModel(attribute: OTAttributeDAO, realm: Realm) : Attribute
                 override fun format(value: Float, index: Int): String {
 
                     return when (value.toInt()) {
-                        0 -> OTApplication.app.resourcesWrapped.getString(R.string.msg_midnight)
-                        -12 -> OTApplication.app.resourcesWrapped.getString(R.string.msg_noon)
-                        12 -> OTApplication.app.resourcesWrapped.getString(R.string.msg_noon)
+                        0 -> OTApp.instance.resourcesWrapped.getString(R.string.msg_midnight)
+                        -12 -> OTApp.instance.resourcesWrapped.getString(R.string.msg_noon)
+                        12 -> OTApp.instance.resourcesWrapped.getString(R.string.msg_noon)
                         else -> String.format("%02d", ((12 + value.toInt()) % 12)) + ":00"
                     }
 

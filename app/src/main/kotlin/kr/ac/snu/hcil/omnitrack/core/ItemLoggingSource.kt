@@ -1,6 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core
 
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 
 /**
@@ -14,6 +14,6 @@ enum class ItemLoggingSource(val nameResId: Int) {
     Manual(R.string.msg_tracking_source_manual);
 
     val sourceText: String by lazy {
-        OTApplication.app.resourcesWrapped.getString(nameResId)
+        OTApp.instance.resourcesWrapped.getString(nameResId)
     }
 }

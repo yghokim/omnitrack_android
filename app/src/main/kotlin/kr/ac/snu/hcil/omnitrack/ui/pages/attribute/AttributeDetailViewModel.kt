@@ -3,7 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.attribute
 import android.arch.lifecycle.ViewModel
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
@@ -22,7 +22,7 @@ class AttributeDetailViewModel : ViewModel() {
     var attributeDAO: OTAttributeDAO? = null
         private set
 
-    private val realm = OTApplication.app.databaseManager.getRealmInstance()
+    private val realm = OTApp.instance.databaseManager.getRealmInstance()
 
     val isValid: Boolean get() = attributeDAO?.isValid ?: false
 

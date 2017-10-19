@@ -4,7 +4,7 @@ import android.app.AlarmManager
 import android.content.Context
 import android.content.SharedPreferences
 import com.google.android.gms.gcm.GcmNetworkManager
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.services.DataTriggerCheckService
 import java.util.*
 
@@ -23,10 +23,10 @@ object OTDataTriggerManager {
     //private var batch: MeasureBatchCheckTask? = null
 
     private val preferences: SharedPreferences by lazy {
-        OTApplication.app.getSharedPreferences(PREFERENCE_LAST_CONDITION_TABLE, Context.MODE_PRIVATE)
+        OTApp.instance.getSharedPreferences(PREFERENCE_LAST_CONDITION_TABLE, Context.MODE_PRIVATE)
     }
 
-    private val alarmManager by lazy { OTApplication.app.getSystemService(Context.ALARM_SERVICE) as AlarmManager }
+    private val alarmManager by lazy { OTApp.instance.getSystemService(Context.ALARM_SERVICE) as AlarmManager }
 
     private fun prefKey(trigger: OTDataTrigger): String {
         return PREFERENCE_TRIGGER_ID_PREFIX + trigger.objectId
@@ -35,13 +35,13 @@ object OTDataTriggerManager {
     /*
     private fun makeIntent(context: Context): PendingIntent {
         val intent = Intent(context, OTSystemReceiver::class.java)
-        intent.action = OTApplication.BROADCAST_ACTION_EVENT_TRIGGER_CHECK_ALARM
-        intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_USER, OTApplication.app.currentUser.objectId)
+        intent.action = OTApp.BROADCAST_ACTION_EVENT_TRIGGER_CHECK_ALARM
+        intent.putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_USER, OTApp.instance.currentUser.objectId)
         return PendingIntent.getBroadcast(context, ALARM_ID, intent, PendingIntent.FLAG_CANCEL_CURRENT)
     }*/
 
     private val gcmManager: GcmNetworkManager by lazy {
-        GcmNetworkManager.getInstance(OTApplication.app)
+        GcmNetworkManager.getInstance(OTApp.instance)
     }
 
     fun onEventTriggerOn(trigger: OTDataTrigger) {
@@ -55,7 +55,7 @@ object OTDataTriggerManager {
             preferences.edit().putBoolean(prefKey(trigger), false).putStringSet(PREFERENCE_ENROLLED_IDS, ids).apply()
         }
         gcmManager.schedule(DataTriggerCheckService.makeTask(CHECK_PERIOD))
-        //alarmManager.setsetInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), CHECK_PERIOD, makeIntent(OTApplication.app))
+        //alarmManager.setsetInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), CHECK_PERIOD, makeIntent(OTApp.instance))
     }
 
     fun onEventTriggerOff(trigger: OTDataTrigger) {
@@ -69,7 +69,7 @@ object OTDataTriggerManager {
 
             if (ids.size == 0) {
                 println("No event trigger is on. Cancel alarm.")
-                //alarmManager.cancel(makeIntent(OTApplication.app))
+                //alarmManager.cancel(makeIntent(OTApp.instance))
 
 
                 gcmManager.cancelAllTasks(DataTriggerCheckService::class.java)
@@ -80,7 +80,7 @@ object OTDataTriggerManager {
     fun checkMeasures(@Suppress("UNUSED_PARAMETER") context: Context) {
         println("checking measures for event triggers...")
 
-        //val triggersToCheck = OTApplication.app.currentUser.triggerManager.getFilteredTriggers { it is OTDataTrigger && it.isOn == true }.map { it as OTDataTrigger }.toTypedArray()
+        //val triggersToCheck = OTApp.instance.currentUser.triggerManager.getFilteredTriggers { it is OTDataTrigger && it.isOn == true }.map { it as OTDataTrigger }.toTypedArray()
 /*
         batch?.cancel(true)
 

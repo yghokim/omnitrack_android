@@ -22,7 +22,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import at.markushi.ui.RevealColorView
 import butterknife.bindView
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
@@ -42,7 +42,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
 
         fun makeIntent(trackerId: String?, context: Context): Intent {
             val intent = Intent(context, TrackerDetailActivity::class.java)
-            intent.putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
+            intent.putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
             return intent
         }
 
@@ -123,11 +123,11 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
 
         this.viewModel = ViewModelProviders.of(this).get(TrackerDetailViewModel::class.java)
 
-        isEditMode = intent.hasExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
+        isEditMode = intent.hasExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
 
         setActionBarButtonMode(Mode.SaveCancel)
         if (isEditMode) {
-            val trackerId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
+            val trackerId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
             this.viewModel.init(trackerId)
             //setActionBarButtonMode(Mode.Back)
             title = resources.getString(R.string.title_activity_tracker_edit)
@@ -140,7 +140,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
             title = resources.getString(R.string.title_activity_tracker_new)
         }
 
-        val trackerObjectId = intent.getStringExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER)
+        val trackerObjectId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
 
 
         /*
@@ -231,7 +231,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
         //add
         if (viewModel.isDirty) {
             val newTrackerId = viewModel.applyChanges()
-            setResult(RESULT_OK, Intent().putExtra(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, newTrackerId))
+            setResult(RESULT_OK, Intent().putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, newTrackerId))
         }
         finish()
         /*
@@ -240,7 +240,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
                 tracker.name = namePropertyView.value
                 tracker.color = colorPropertyView.value
 
-                if (!isEditMode) OTApplication.app.currentUser.trackers.add(tracker)
+                if (!isEditMode) OTApp.instance.currentUser.trackers.add(tracker)
                 finish()
             }*/
     }

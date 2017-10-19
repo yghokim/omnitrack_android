@@ -14,7 +14,7 @@ class PackageReceiver : BroadcastReceiver() {
         when (intent.action) {
             Intent.ACTION_INSTALL_PACKAGE -> {
                 /*
-                OTApplication.app.currentUserObservable.observeOn(Schedulers.immediate()).subscribe({
+                OTApp.instance.currentUserObservable.observeOn(Schedulers.immediate()).subscribe({
                     user ->
                     OTShortcutPanelManager.refreshNotificationShortcutViews(user, context)
                     context.startService(OTShortcutPanelWidgetUpdateService.makeNotifyDatesetChangedIntentToAllWidgets(context))
@@ -22,9 +22,9 @@ class PackageReceiver : BroadcastReceiver() {
             }
 
             Intent.ACTION_MY_PACKAGE_REPLACED -> {
-                println("app package replaced")
+                println("instance package replaced")
                 /*
-                OTApplication.app.currentUserObservable.observeOn(Schedulers.immediate()).subscribe({
+                OTApp.instance.currentUserObservable.observeOn(Schedulers.immediate()).subscribe({
                     user ->
                     OTShortcutPanelManager.refreshNotificationShortcutViews(user, context)
                     context.startService(OTShortcutPanelWidgetUpdateService.makeNotifyDatesetChangedIntentToAllWidgets(context))
@@ -39,7 +39,7 @@ class PackageReceiver : BroadcastReceiver() {
 
             Intent.ACTION_PACKAGE_ADDED -> {
                 /*
-                OTApplication.app.currentUserObservable.observeOn(Schedulers.immediate()).subscribe({
+                OTApp.instance.currentUserObservable.observeOn(Schedulers.immediate()).subscribe({
                     user ->
                     OTShortcutPanelManager.refreshNotificationShortcutViews(user, context)
                     context.startService(OTShortcutPanelWidgetUpdateService.makeNotifyDatesetChangedIntentToAllWidgets(context))

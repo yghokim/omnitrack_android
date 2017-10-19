@@ -6,7 +6,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
@@ -31,8 +31,8 @@ class RecentItemValuePickerBottomSheetFragment: DismissingBottomSheetDialogFragm
 
         fun getInstance(trackerId: String, attributeId: String): RecentItemValuePickerBottomSheetFragment {
             val arguments = Bundle()
-            arguments.putString(OTApplication.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
-            arguments.putString(OTApplication.INTENT_EXTRA_OBJECT_ID_ATTRIBUTE, attributeId)
+            arguments.putString(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
+            arguments.putString(OTApp.INTENT_EXTRA_OBJECT_ID_ATTRIBUTE, attributeId)
 
             return RecentItemValuePickerBottomSheetFragment().apply {
                 this.arguments = arguments

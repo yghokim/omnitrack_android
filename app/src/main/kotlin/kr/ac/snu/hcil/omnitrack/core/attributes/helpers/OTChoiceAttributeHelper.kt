@@ -4,7 +4,7 @@ import android.content.Context
 import android.view.View
 import io.reactivex.Single
 import io.realm.Realm
-import kr.ac.snu.hcil.omnitrack.OTApplication
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ChoiceSorter
@@ -79,8 +79,8 @@ class OTChoiceAttributeHelper : OTAttributeHelper() {
 
     override fun getPropertyTitle(propertyKey: String): String {
         return when (propertyKey) {
-            PROPERTY_MULTISELECTION -> OTApplication.getString(R.string.property_choice_allow_multiple_selections)
-            PROPERTY_ENTRIES -> OTApplication.getString(R.string.property_choice_entries)
+            PROPERTY_MULTISELECTION -> OTApp.getString(R.string.property_choice_allow_multiple_selections)
+            PROPERTY_ENTRIES -> OTApp.getString(R.string.property_choice_entries)
             else -> ""
         }
     }
