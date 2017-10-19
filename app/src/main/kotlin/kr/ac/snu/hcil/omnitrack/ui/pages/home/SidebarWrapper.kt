@@ -10,12 +10,11 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.PopupMenu
 import android.widget.TextView
-import com.badoo.mobile.util.WeakHandler
 import com.bumptech.glide.Glide
 import de.hdodenhof.circleimageview.CircleImageView
+import io.reactivex.disposables.CompositeDisposable
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.ui.components.common.viewholders.RecyclerViewMenuAdapter
@@ -33,6 +32,8 @@ class SidebarWrapper(val view: View, val parentActivity: AppCompatActivity) : Po
     private val profileMenuButton: AppCompatImageButton = view.findViewById(R.id.ui_button_profile_menu)
 
     private val menuList: RecyclerView = view.findViewById(R.id.ui_menu_list)
+
+    private val subscriptions = CompositeDisposable()
 
     init {
         /*
@@ -74,11 +75,22 @@ class SidebarWrapper(val view: View, val parentActivity: AppCompatActivity) : Po
         }
     }
 
-    fun refresh(user: OTUser) {
-        WeakHandler().post {
-            Glide.with(parentActivity).load(user.photoUrl).into(photoView)
-            nameView.text = user.name
-        }
+    fun onCreate() {
+        subscriptions.add(
+                OTAuthManager.userNameObservable.subscribe { (name) ->
+                    nameView.text = name
+                }
+        )
+
+        subscriptions.add(
+                OTAuthManager.userImageUrlObservable.subscribe { uri ->
+                    Glide.with(parentActivity).load(uri).into(photoView)
+                }
+        )
+    }
+
+    fun onDestroy() {
+        subscriptions.clear()
     }
 
     inner class SidebarMenuAdapter : RecyclerViewMenuAdapter() {

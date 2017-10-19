@@ -101,6 +101,8 @@ object OTAuthManager {
     init {
         clearUserInfo()
 
+        reloadUserInfo()
+
         mFirebaseAuth.addIdTokenListener { auth ->
             auth.currentUser?.getIdToken(false)?.addOnCompleteListener(object : OnCompleteListener<GetTokenResult> {
                 override fun onComplete(task: Task<GetTokenResult>) {
