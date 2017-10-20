@@ -8,6 +8,7 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.database.NamedObject
+import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTNotificationTriggerAction
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTTriggerAction
 import kr.ac.snu.hcil.omnitrack.utils.ListDelta
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
@@ -154,7 +155,7 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
             }
         }
 
-        triggerAction = OTTriggerAction.extractTriggerActionInstance(this)
+        triggerAction = OTNotificationTriggerAction()
 
         currentDbRef = databasePointRef
         databaseEventListener = object : ChildEventListener {
