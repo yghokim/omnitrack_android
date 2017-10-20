@@ -151,4 +151,31 @@ class OTChoiceAttributeHelper : OTAttributeHelper() {
     override fun makeRecommendedChartModels(attribute: OTAttributeDAO, realm: Realm): Array<ChartModel<*>> {
         return arrayOf(ChoiceCategoricalBarChartModel(attribute, realm))
     }
+
+    private fun getChoiceTexts(attribute: OTAttributeDAO, value: IntArray): List<String> {
+        val entries = getEntries(attribute)
+        val list = ArrayList<String>()
+        if (entries != null) {
+            for (idEntry in value.withIndex()) {
+
+                val indexInEntries = entries.indexOf(idEntry.value)
+                if (indexInEntries >= 0) {
+                    list.add(entries[indexInEntries].text)
+                }
+            }
+        }
+        return list
+    }
+
+    override fun formatAttributeValue(attribute: OTAttributeDAO, value: Any): CharSequence {
+        if (value is IntArray) {
+            return getChoiceTexts(attribute, value).joinToString(",")
+        } else return super.formatAttributeValue(attribute, value)
+    }
+
+    override fun onAddValueToTable(attribute: OTAttributeDAO, value: Any?, out: MutableList<String?>, uniqKey: String?) {
+        if (value is IntArray) {
+            out.add(getChoiceTexts(attribute, value).joinToString(","))
+        } else out.add(null)
+    }
 }

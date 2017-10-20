@@ -21,6 +21,8 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.TimeRangePickerI
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.SelectionPropertyView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
+import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
+import java.text.SimpleDateFormat
 import java.util.*
 
 /**
@@ -152,5 +154,31 @@ class OTTimeSpanAttributeHelper : OTAttributeHelper() {
 
     override fun makeIntrinsicDefaultValueMessage(attribute: OTAttributeDAO): CharSequence {
         return OTApp.getString(R.string.msg_intrinsic_time)
+    }
+
+    override fun onAddColumnToTable(attribute: OTAttributeDAO, out: MutableList<String>) {
+        out.add("${getAttributeUniqueName(attribute)}_start_epoch")
+        out.add("${getAttributeUniqueName(attribute)}_end_epoch")
+        out.add("${getAttributeUniqueName(attribute)}_duration_millis")
+        out.add("${getAttributeUniqueName(attribute)}_timezone")
+    }
+
+    override fun onAddValueToTable(attribute: OTAttributeDAO, value: Any?, out: MutableList<String?>, uniqKey: String?) {
+        if (value is TimeSpan) {
+
+            val formatter = (TimeHelper.FORMAT_ISO_8601.clone() as SimpleDateFormat).apply { timeZone = value.timeZone }
+            val fromFormatted = formatter.format(Date(value.from))
+            val toFormatted = formatter.format(Date(value.to))
+            out.add(fromFormatted)
+            out.add(toFormatted)
+            out.add(value.duration.toString())
+            out.add(value.timeZone.getDisplayName(Locale.ENGLISH))
+
+        } else {
+            out.add(null)
+            out.add(null)
+            out.add(null)
+            out.add(null)
+        }
     }
 }
