@@ -46,7 +46,7 @@ class ConnectionIndicatorStubProxy(val parent: View, stubId: Int) : OnClickListe
                 connectionInvalidMessages = ArrayList<CharSequence>()
             }
             connectionInvalidMessages?.clear()
-            if (connection.isValid(connectionInvalidMessages)) {
+            if (connection.isAvailableToRequestValue(connectionInvalidMessages)) {
                 connectionIndicatorSourceNameView?.setTextColor(ResourcesCompat.getColor(parent.resources, R.color.colorPointed, null))
                 connectionIndicatorErrorMark?.visibility = View.GONE
                 connectionIndicatorLinkIconView?.setImageResource(R.drawable.link)

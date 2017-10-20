@@ -572,7 +572,9 @@ class TrackerListFragment : OTFragment() {
                 subscriptions.add(
                         viewModel.validationResult.subscribe { (isValid, invalidateMessages) ->
                             this.validationErrorMessages.clear()
-                            this.validationErrorMessages.addAll(invalidateMessages)
+                            invalidateMessages?.let {
+                                this.validationErrorMessages.addAll(it)
+                            }
 
                             errorIndicator.visibility = if (isValid) {
                                 View.INVISIBLE
