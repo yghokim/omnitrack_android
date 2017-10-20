@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.home
 
 import android.support.v7.util.DiffUtil
+import io.reactivex.Flowable
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.BehaviorSubject
@@ -14,6 +15,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.UserAttachedViewModel
 import kr.ac.snu.hcil.omnitrack.utils.DefaultNameGenerator
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
+import java.util.*
 
 /**
  * Created by younghokim on 2017-05-30.
@@ -106,7 +108,7 @@ class TrackerListViewModel : UserAttachedViewModel(), OrderedRealmCollectionChan
 
     class TrackerInformationViewModel(val trackerDao: OTTrackerDAO, val realm: Realm) : RealmChangeListener<OTTrackerDAO> {
 
-        val validationResult = BehaviorSubject.create<Pair<Boolean, List<CharSequence>>>()
+        val validationResult = BehaviorSubject.createDefault<Pair<Boolean, List<CharSequence>?>>(Pair(true, null))
 
         val totalItemCount: BehaviorSubject<Long> = BehaviorSubject.create()
 
@@ -132,7 +134,7 @@ class TrackerListViewModel : UserAttachedViewModel(), OrderedRealmCollectionChan
         val trackerItemsResult: RealmResults<OTItemDAO> = OTApp.instance.databaseManager.makeItemsQuery(trackerDao.objectId, null, null, realm).findAllAsync()
         val todayItemsResult: RealmResults<OTItemDAO> = OTApp.instance.databaseManager.makeItemsQueryOfToday(trackerDao.objectId, realm).findAllAsync()
 
-        //private val countTracer: ItemCountTracer = ItemCountTracer(tracker)
+        private val currentAttributeValidationResultDict = Hashtable<String, Pair<Boolean, CharSequence?>>()
 
         private val subscriptions = CompositeDisposable()
 
@@ -143,16 +145,34 @@ class TrackerListViewModel : UserAttachedViewModel(), OrderedRealmCollectionChan
                     //first
                 }
 
-                var valid = true
-                val validationMessages = ArrayList<CharSequence>()
+                //validation
+                currentAttributeValidationResultDict.clear()
+                subscriptions.add(
+                        Flowable.merge(
+                                snapshot.map {
+                                    (it.getParsedConnection()?.makeValidationStateObservable()
+                                            ?: Flowable.just(Pair<Boolean, CharSequence?>(true, null))).map { validationResult ->
+                                        Pair(it.localId, validationResult)
+                                    }
+                                }
+                        ).doOnNext { (localId, validationResult) ->
+                            currentAttributeValidationResultDict[localId] = validationResult
+                        }.subscribe {
+                            if (attributesResult.find { currentAttributeValidationResultDict[it.localId]?.first == false } == null) {
+                                if (validationResult.value.first != true) {
+                                    validationResult.onNext(Pair<Boolean, List<CharSequence>?>(true, null))
+                                }
+                            } else {
+                                //collect invalidation messages
+                                val messages = attributesResult.filter { currentAttributeValidationResultDict[it.localId]?.first == false }
+                                        .mapNotNull { currentAttributeValidationResultDict[it.localId]?.second }
 
-                snapshot.forEach {
-                    if (it.getParsedConnection()?.isAvailableToRequestValue(validationMessages) == false) {
-                        valid = false
+                                if (validationResult.value.first != false) {
+                                    validationResult.onNext(Pair(false, messages))
+                                }
+                            }
                     }
-                }
-
-                validationResult.onNext(Pair(valid, validationMessages))
+                )
             }
 
             trackerItemsResult.addChangeListener { snapshot, changeSet ->
