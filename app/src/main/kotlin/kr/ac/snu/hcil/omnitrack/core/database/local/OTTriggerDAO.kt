@@ -8,6 +8,8 @@ import io.realm.annotations.PrimaryKey
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTBackgroundLoggingTriggerAction
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTNotificationTriggerAction
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTTriggerAction
+import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.ATriggerCondition
+import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTTimeTriggerCondition
 
 /**
  * Created by Young-Ho on 10/9/2017.
@@ -36,6 +38,26 @@ open class OTTriggerDAO : RealmObject() {
     var conditionType: Byte = CONDITION_TYPE_TIME
     var serializedCondition: String? = null
 
+    @Ignore
+    private var _condition: ATriggerCondition? = null
+    val condition: ATriggerCondition
+        get() {
+            if (_condition == null) {
+                _condition = when (conditionType) {
+                    CONDITION_TYPE_TIME -> serializedCondition?.let { OTTimeTriggerCondition.parser.fromJson(it, OTTimeTriggerCondition::class.java) } ?: OTTimeTriggerCondition()
+                    else -> null
+                }
+            }
+            return _condition!!
+        }
+
+    fun saveCondition(): Boolean {
+        val serialized = _condition?.getSerializedString()
+        if (serializedCondition != serialized) {
+            serializedCondition = serialized
+            return true
+        } else return false
+    }
 
     @Index
     var actionType: Byte = ACTION_TYPE_REMIND
@@ -82,4 +104,14 @@ open class OTTriggerDAO : RealmObject() {
     var updatedAt: Long = System.currentTimeMillis()
     var userCreatedAt: Long = System.currentTimeMillis()
 
+    fun initialize() {
+        val action = this.action
+        val condition = this.condition
+        if (this.realm?.isInTransaction == false) {
+            this.realm?.executeTransaction {
+                saveAction()
+                saveCondition()
+            }
+        }
+    }
 }

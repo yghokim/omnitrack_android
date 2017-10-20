@@ -21,7 +21,6 @@ import io.reactivex.disposables.Disposables
 import io.reactivex.subjects.BehaviorSubject
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.getActivity
@@ -165,8 +164,6 @@ object OTAuthManager {
         val result = try {
             if (isUserSignedIn()) {
                 SignedInLevel.AUTHORIZED
-            } else if (OTUser.isUserStored(OTApp.instance.systemSharedPreferences)) {
-                SignedInLevel.CACHED
             } else return SignedInLevel.NONE
         } catch(ex: Exception) {
             SignedInLevel.NONE

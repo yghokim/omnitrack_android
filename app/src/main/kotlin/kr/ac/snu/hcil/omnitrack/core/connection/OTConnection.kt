@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
+import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
@@ -134,25 +135,6 @@ class OTConnection {
 
     constructor() : super()
 
-    fun isValid(invalidMessages: MutableList<CharSequence>?): Boolean {
-        val source = source
-        if (source != null) {
-            val service = source.factory.getService()
-            if (service.state == OTExternalService.ServiceState.ACTIVATED) {
-                return true
-            } else {
-                invalidMessages?.add(TextHelper.fromHtml(String.format(
-                        "<font color=\"blue\">${OTApp.instance.resourcesWrapped.getString(R.string.msg_service_is_not_activated_format)}</font>",
-                        OTApp.instance.resourcesWrapped.getString(service.nameResourceId))))
-                return false
-            }
-        } else {
-            invalidMessages?.add(TextHelper.fromHtml(
-                    "<font color=\"blue\">Connection is not supported on current version.</font>"
-            ))
-            return false
-        }
-    }
 
     fun getRequestedValue(builder: OTItemBuilderWrapperBase): Flowable<Nullable<out Any>> {
         return Flowable.defer {
@@ -193,6 +175,22 @@ class OTConnection {
             ))
             return false
         }
+    }
+
+    fun makeValidationStateObservable(): Flowable<Pair<Boolean, CharSequence?>> {
+        return source?.let { source ->
+            Flowable.defer {
+                val service = source.factory.getService()
+                service.onStateChanged.map { state ->
+                    when (state) {
+                        OTExternalService.ServiceState.ACTIVATED -> Pair(true, null)
+                        else -> Pair<Boolean, CharSequence?>(false, TextHelper.fromHtml(String.format(
+                                "<font color=\"blue\">${OTApp.instance.resourcesWrapped.getString(R.string.msg_service_is_not_activated_format)}</font>",
+                                OTApp.instance.resourcesWrapped.getString(service.nameResourceId))))
+                    }
+                }.toFlowable(BackpressureStrategy.LATEST)
+            }
+        } ?: Flowable.just(Pair<Boolean, CharSequence?>(false, null))
     }
 
 }
