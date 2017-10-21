@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.pages.tracker
+package kr.ac.snu.hcil.omnitrack.ui.pages.tracker.legacy
 
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
@@ -6,10 +6,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import io.reactivex.disposables.CompositeDisposable
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
+import kr.ac.snu.hcil.omnitrack.ui.pages.tracker.TrackerDetailViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.ATriggerListFragmentCore
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.TriggerDetailActivity
 
@@ -21,10 +21,6 @@ class TrackerDetailReminderTabFragment : OTFragment() {
     val core = Core()
 
     private lateinit var viewModel: TrackerDetailViewModel
-
-    private var creationSubscriptions = CompositeDisposable()
-
-    private var resumeSubscriptions = CompositeDisposable()
 
     init {
     }
@@ -50,12 +46,6 @@ class TrackerDetailReminderTabFragment : OTFragment() {
     override fun onDestroy() {
         super.onDestroy()
         core.onDestroy()
-    }
-
-
-    override fun onPause() {
-        super.onPause()
-        resumeSubscriptions.clear()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

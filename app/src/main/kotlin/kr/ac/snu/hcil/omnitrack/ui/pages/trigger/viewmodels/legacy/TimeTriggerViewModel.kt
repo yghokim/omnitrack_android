@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels
+package kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.legacy
 
 import io.reactivex.subjects.BehaviorSubject
 import kr.ac.snu.hcil.omnitrack.OTApp

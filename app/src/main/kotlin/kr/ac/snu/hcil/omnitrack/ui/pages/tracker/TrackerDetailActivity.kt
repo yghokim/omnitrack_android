@@ -280,8 +280,8 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
 
             return (when (position) {
                 0 -> TrackerDetailStructureTabFragment()
-                1 -> TrackerDetailReminderTabFragment()
-                else -> TrackerDetailReminderTabFragment()
+                1 -> ReminderListFragment()
+                else -> ReminderListFragment()
             })
         }
 

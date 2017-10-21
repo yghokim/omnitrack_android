@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.home
 
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -20,6 +21,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.tutorial.TutorialManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.diagnostics.SystemLogActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.services.ServiceListFragment
+import kr.ac.snu.hcil.omnitrack.ui.viewmodels.UserAttachedViewModel
 
 class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), DrawerLayout.DrawerListener {
 
@@ -79,6 +81,8 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
         creationSubscriptions.add(
                 super.signedInUserObservable.subscribe {
                     user ->
+                    val viewModel = ViewModelProviders.of(this).get(UserAttachedViewModel::class.java)
+                    viewModel.userId = user
                     println("OMNITRACK: signed in user instance received.")
                     //Ask permission if needed
                     if (TutorialManager.hasShownTutorials(TutorialManager.FLAG_TRACKER_LIST_ADD_TRACKER)) {

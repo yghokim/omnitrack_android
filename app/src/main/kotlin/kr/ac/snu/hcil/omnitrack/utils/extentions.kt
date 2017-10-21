@@ -19,6 +19,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TimePicker
 import com.google.android.gms.maps.model.LatLng
+import io.reactivex.subjects.BehaviorSubject
 import kr.ac.snu.hcil.omnitrack.OTApp
 import java.math.BigDecimal
 import java.util.*
@@ -295,3 +296,16 @@ val KeyguardManager.isDeviceLockedCompat: Boolean get() {
         return this.isDeviceLocked
     }
 }
+
+fun <T> BehaviorSubject<T>.onNextIfDifferAndNotNull(i: T?) {
+    if (i != null) {
+        if (this.hasValue()) {
+            if (this.value != i) {
+                this.onNext(i)
+            }
+        } else this.onNext(i)
+    }
+}
+
+
+

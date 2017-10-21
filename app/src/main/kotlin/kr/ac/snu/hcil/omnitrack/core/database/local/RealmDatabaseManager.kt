@@ -2,16 +2,13 @@ package kr.ac.snu.hcil.omnitrack.core.database.local
 
 import android.content.Intent
 import android.net.Uri
-import io.reactivex.Flowable
 import io.reactivex.Observable
 import io.reactivex.Single
-import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import io.realm.*
 import io.realm.rx.RealmObservableFactory
 import io.realm.rx.RxObservableFactory
 import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
@@ -21,7 +18,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTItemPOJO
 import kr.ac.snu.hcil.omnitrack.core.database.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.database.synchronization.SyncResultEntry
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
-import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import java.util.*
 
@@ -232,30 +228,16 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
         }
     }
 
-    fun saveTrigger(trigger: OTTrigger, userId: String, position: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    fun findTriggersOfUser(user: OTUser): Observable<List<OTTrigger>> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    fun getTrigger(user: OTUser, key: String): Observable<OTTrigger> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    fun removeTrigger(trigger: OTTrigger) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
     fun getItemBuilderQuery(trackerId: String, holderType: Int, realm: Realm): RealmQuery<OTItemBuilderDAO> {
         return realm.where(OTItemBuilderDAO::class.java).equalTo("tracker.objectId", trackerId).equalTo("holderType", holderType)
     }
 
+    fun makeTriggersOfUserQuery(userId: String, realm: Realm): RealmQuery<OTTriggerDAO> {
+        return realm.where(OTTriggerDAO::class.java).equalTo(FIELD_REMOVED_BOOLEAN, false).equalTo(FIELD_USER_ID, userId)
+    }
 
-    fun findTrackersOfUser(userId: String, realm: Realm): RealmResults<OTTrackerDAO> {
+    fun makeTrackersOfUserQuery(userId: String, realm: Realm): RealmQuery<OTTrackerDAO> {
         return realm.where(OTTrackerDAO::class.java).equalTo(FIELD_REMOVED_BOOLEAN, false).equalTo(FIELD_USER_ID, userId)
-                .findAllAsync()
     }
 
     fun removeTracker(dao: OTTrackerDAO) {
@@ -550,54 +532,7 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
         }
     }
 
-    fun loadItems(tracker: OTTracker, timeRange: TimeSpan? = null, order: Order = Order.DESC): Flowable<List<OTItem>> {
-        return usingRealm { realm ->
-            getItemQueryOfTracker(tracker, realm)
-                    .run {
-                        if (timeRange != null)
-                            return@run this.between(FIELD_TIMESTAMP_LONG, timeRange.from, timeRange.to)
-                        else this
-                    }.findAllSorted(FIELD_TIMESTAMP_LONG, when (order) { Order.ASC -> Sort.ASCENDING; Order.DESC -> Sort.DESCENDING; else -> Sort.ASCENDING
-            })
-                    .asFlowable().map { result ->
-                result.map { dao ->
-                    RealmItemHelper.convertDAOToItem(dao)
-                }
-            }
-        }
-    }
-
-
-    fun getItem(tracker: OTTracker, itemId: String): Observable<OTItem> {
-        return Observable.defer {
-            val dao = getRealmInstance().where(OTItemDAO::class.java).equalTo(FIELD_OBJECT_ID, itemId).findFirst()
-            if (dao != null) {
-                return@defer Observable.just(RealmItemHelper.convertDAOToItem(dao))
-            } else return@defer Observable.empty<OTItem>()
-        }
-    }
-
     fun setUsedAppWidget(widgetName: String, used: Boolean) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    fun getLogCountDuring(tracker: OTTracker, from: Long, to: Long): Observable<Long> =
-            Observable.just(
-                    usingRealm { realm -> getItemQueryOfTracker(tracker, realm).between(FIELD_TIMESTAMP_LONG, from, to).count() }
-            ).subscribeOn(Schedulers.io())
-
-    fun getTotalItemCount(tracker: OTTracker): Observable<Pair<Long, Long>> {
-        return Observable.just(
-                Pair(
-                        usingRealm { realm -> getItemQueryOfTracker(tracker, realm).count() },
-                        System.currentTimeMillis())).subscribeOn(Schedulers.io())
-    }
-
-    fun getLastLoggingTime(tracker: OTTracker): Observable<Long?> {
-        return Observable.just(
-                usingRealm { realm ->
-                    getItemQueryOfTracker(tracker, realm).max(FIELD_TIMESTAMP_LONG)?.toLong()
-                }
-        ).subscribeOn(Schedulers.io())
     }
 }

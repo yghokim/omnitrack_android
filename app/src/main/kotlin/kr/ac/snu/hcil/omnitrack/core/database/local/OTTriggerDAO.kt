@@ -90,7 +90,6 @@ open class OTTriggerDAO : RealmObject() {
                 } else false
             } ?: false
 
-
     //Device-only properties===========
     //When synchronizing them, convey them with corresponding device local ids.
     var lastTriggeredTime: Long? = null

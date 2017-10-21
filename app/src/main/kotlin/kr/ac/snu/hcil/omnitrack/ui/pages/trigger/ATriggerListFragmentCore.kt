@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
-import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.LinearLayoutManager
@@ -27,10 +26,10 @@ import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.FallbackRecyclerView
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.DrawableListBottomSpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
-import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.DataTriggerViewModel
-import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.TimeTriggerViewModel
-import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.TriggerListViewModel
-import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.TriggerViewModel
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.legacy.DataTriggerViewModel
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.legacy.TimeTriggerViewModel
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.legacy.TriggerListViewModel
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.legacy.TriggerViewModel
 import java.util.*
 
 /**
@@ -84,19 +83,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
     private val createViewSubscriptions = CompositeDisposable()
     private val creationSubscriptions = CompositeDisposable()
 
-    private val triggerTypeDialog: AlertDialog by lazy {
-        NewTriggerTypeSelectionDialogHelper.builder(parent.context, triggerActionTypeName) {
-            type ->
-            println("trigger type selected - $type")
-            /*
-            val newTrigger = triggerAdapter?.makeNewTrfiggerInstance(type)
-            if (newTrigger != null) {
-                appendNewTrigger(newTrigger)
-            }*/
-            parent.startActivityForResult(TriggerDetailActivity.makeNewTriggerIntent(parent.context, type, triggerActionType, hideTrackerAssignmentInterface()), DETAIL_REQUEST_CODE)
-            triggerTypeDialog.dismiss()
-        }.create()
-    }
+
 
     open fun hideTrackerAssignmentInterface(): Boolean {
         return false
@@ -208,7 +195,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
     }
 
     protected open fun onNewTriggerButtonClicked() {
-        triggerTypeDialog.show()
+        //triggerTypeDialog.show()
     }
 
     protected open fun onTriggerEditRequested(triggerId: String) {
