@@ -1,6 +1,5 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.items
 
-import android.support.v7.util.DiffUtil
 import io.reactivex.Single
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
@@ -14,6 +13,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.utils.RealmViewModel
 
 /**
@@ -135,7 +135,7 @@ class ItemListViewModel : RealmViewModel(), OrderedRealmCollectionChangeListener
     }
 
     fun removeItem(itemId: String) {
-        val viewModel = itemsInTimestampDescendingOrder.find { it.itemId == itemId }
+        val viewModel = itemsInTimestampDescendingOrder.find { it.objectId == itemId }
         if (viewModel != null) {
             realm.executeTransaction {
                 OTApp.instance.databaseManager.removeItem(viewModel.itemDao, realm)
@@ -149,8 +149,8 @@ class ItemListViewModel : RealmViewModel(), OrderedRealmCollectionChangeListener
             sortedItemsObservable.onNext(itemsSortedList)
     }
 
-    inner class ItemViewModel(val itemDao: OTItemDAO) {
-        val itemId: String? get() = itemDao.objectId
+    inner class ItemViewModel(val itemDao: OTItemDAO) : IReadonlyObjectId {
+        override val objectId: String? get() = itemDao.objectId
         val isSynchronized: Boolean get() = itemDao.synchronizedAt != null
 
         fun getItemValueOf(attributeLocalId: String): Any? = itemDao.getValueOf(attributeLocalId)
@@ -186,19 +186,5 @@ class ItemListViewModel : RealmViewModel(), OrderedRealmCollectionChangeListener
 
         fun save(vararg changedLocalIds: String): Single<Pair<Int, String?>> =
                 OTApp.instance.databaseManager.saveItemObservable(itemDao, false, changedLocalIds.toList().toTypedArray(), realm)
-    }
-
-    class ItemViewModelListDiffUtilCallback(val oldList: List<ItemViewModel>, val newList: List<ItemViewModel>) : DiffUtil.Callback() {
-        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
-                oldList[oldItemPosition].itemId == newList[newItemPosition].itemId
-
-        override fun getOldListSize(): Int = oldList.size
-
-        override fun getNewListSize(): Int = newList.size
-
-        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
-                areItemsTheSame(oldItemPosition, newItemPosition)
-
-
     }
 }

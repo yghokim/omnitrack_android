@@ -3,7 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
-import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.DataTriggerViewModel
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.legacy.DataTriggerViewModel
 
 /**
  * Created by younghokim on 16. 9. 5..

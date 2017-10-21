@@ -1,6 +1,5 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.items
 
-import android.support.v7.util.DiffUtil
 import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
@@ -10,6 +9,7 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.RealmViewModel
 import kr.ac.snu.hcil.omnitrack.utils.ValueWithTimestamp
@@ -97,7 +97,10 @@ abstract class ItemEditionViewModelBase : RealmViewModel(), OTItemBuilderWrapper
         }
     }
 
-    class AttributeInputViewModel(val attributeDAO: OTAttributeDAO) {
+    class AttributeInputViewModel(val attributeDAO: OTAttributeDAO) : IReadonlyObjectId {
+        override val objectId: String?
+            get() = attributeDAO.objectId
+
         val attributeLocalId: String get() = attributeDAO.localId
         val columnNameObservable: Observable<String> = BehaviorSubject.createDefault<String>("")
         val isRequiredObservable: Observable<Boolean> = BehaviorSubject.create<Boolean>()
@@ -182,24 +185,4 @@ abstract class ItemEditionViewModelBase : RealmViewModel(), OTItemBuilderWrapper
     abstract fun applyEditingToDatabase(): Maybe<String>
 
     abstract fun clearHistory()
-
-
-    class AttributeInputViewModelListDiffUtilCallback(val oldList: List<AttributeInputViewModel>, val newList: List<AttributeInputViewModel>) : DiffUtil.Callback() {
-        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return oldList[oldItemPosition] === newList[newItemPosition] ||
-                    oldList[oldItemPosition].attributeDAO.objectId == newList[newItemPosition].attributeDAO.objectId
-        }
-
-        override fun getOldListSize(): Int {
-            return oldList.size
-        }
-
-        override fun getNewListSize(): Int {
-            return newList.size
-        }
-
-        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return areItemsTheSame(oldItemPosition, newItemPosition)
-        }
-    }
 }

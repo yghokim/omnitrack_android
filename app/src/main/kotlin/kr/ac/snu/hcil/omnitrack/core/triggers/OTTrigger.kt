@@ -324,7 +324,7 @@ abstract class OTTrigger(objectId: String?, val user: OTUser, name: String, trac
     fun fire(triggerTime: Long, context: Context): Observable<OTTrigger> {
         return Observable.defer<OTTrigger> {
             handleFire(triggerTime)
-            triggerAction.performAction(triggerTime, context)
+            triggerActionType.performAction(triggerTime, context)
         }.doOnSubscribe {
             fired.onNext(ReadOnlyPair(this, triggerTime))
             this.lastTriggeredTime = triggerTime

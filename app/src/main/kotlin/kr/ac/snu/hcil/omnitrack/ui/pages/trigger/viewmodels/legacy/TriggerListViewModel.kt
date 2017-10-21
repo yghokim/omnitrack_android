@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels
+package kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.legacy
 
 import android.support.v7.util.DiffUtil
 import io.reactivex.subjects.BehaviorSubject

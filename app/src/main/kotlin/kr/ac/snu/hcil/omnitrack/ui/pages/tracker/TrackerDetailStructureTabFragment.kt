@@ -42,6 +42,7 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.ConnectionIndicatorStubProxy
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeDetailActivity
 import kr.ac.snu.hcil.omnitrack.utils.DefaultNameGenerator
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
+import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.utils.dipRound
 
 /**
@@ -81,8 +82,6 @@ class TrackerDetailStructureTabFragment : OTFragment() {
 
     private val attributeListAdapter = AttributeListAdapter()
 
-    private val creationSubscriptions = CompositeDisposable()
-
     private val viewHolderSubscriptions = CompositeDisposable()
 
     private val newAttributePanel: FieldPresetSelectionBottomSheetFragment by lazy {
@@ -115,7 +114,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                     println("new attribute viewmodel list: ${newList}, old: ${currentAttributeViewModelList}")
 
                     val diffResult = DiffUtil.calculateDiff(
-                            TrackerDetailViewModel.AttributeViewModelListDiffUtilCallback(currentAttributeViewModelList, newList)
+                            IReadonlyObjectId.DiffUtilCallback(currentAttributeViewModelList, newList)
                     )
 
                     currentAttributeViewModelList.clear()
@@ -228,12 +227,6 @@ class TrackerDetailStructureTabFragment : OTFragment() {
         }
 
         attributeListView.adapter = attributeListAdapter as AdapterLinearLayout.ViewHolderAdapter<AdapterLinearLayout.AViewHolder>
-
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        creationSubscriptions.clear()
 
     }
 

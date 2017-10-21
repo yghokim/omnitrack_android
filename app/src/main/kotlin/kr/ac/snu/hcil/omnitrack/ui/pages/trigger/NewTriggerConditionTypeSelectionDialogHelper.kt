@@ -1,6 +1,8 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 
 import android.content.Context
+import android.support.annotation.DrawableRes
+import android.support.annotation.StringRes
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.AppCompatImageView
 import android.support.v7.widget.GridLayoutManager
@@ -10,27 +12,29 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTTriggerDAO
 
 /**
  * Created by younghokim on 16. 8. 23..
  */
-object NewTriggerTypeSelectionDialogHelper {
+object NewTriggerConditionTypeSelectionDialogHelper {
 
-    data class TriggerTypeEntry(val typeCode: Int, val iconId: Int, val nameId: Int, val descId: Int, val enabled: Boolean = true)
+    data class TriggerTypeEntry(val typeCode: Byte, @DrawableRes val iconId: Int, @StringRes val nameId: Int, @StringRes val descId: Int, val enabled: Boolean = true)
 
-    val triggerTypes = arrayOf(
-            TriggerTypeEntry(OTTrigger.TYPE_TIME, R.drawable.alarm_dark, R.string.trigger_name_time, R.string.trigger_desc_time),
-            TriggerTypeEntry(OTTrigger.TYPE_DATA_THRESHOLD, R.drawable.event_dark, R.string.trigger_name_event, R.string.trigger_desc_event, enabled = false)
-    )
+    private val triggerTypeEntryDict = HashMap<Byte, TriggerTypeEntry>()
 
-    fun builder(context: Context, triggerActionTypeName: Int, listener: (Int) -> Unit): AlertDialog.Builder {
+    init {
+        triggerTypeEntryDict[OTTriggerDAO.CONDITION_TYPE_TIME] = TriggerTypeEntry(OTTriggerDAO.CONDITION_TYPE_TIME, R.drawable.alarm_dark, R.string.trigger_name_time, R.string.trigger_desc_time)
+        triggerTypeEntryDict[OTTriggerDAO.CONDITION_TYPE_DATA] = TriggerTypeEntry(OTTriggerDAO.CONDITION_TYPE_DATA, R.drawable.event_dark, R.string.trigger_name_event, R.string.trigger_desc_event, enabled = false)
+    }
+
+    fun builder(context: Context, triggerActionTypeName: Int, supportedConditionTypes: Array<Byte>? = null, listener: (Byte) -> Unit): AlertDialog.Builder {
 
         val view = LayoutInflater.from(context).inflate(R.layout.simple_layout_with_recycler_view, null)
         val listView: RecyclerView = view.findViewById(R.id.ui_list)
 
         listView.layoutManager = GridLayoutManager(context, 2)
-        listView.adapter = Adapter(listener)
+        listView.adapter = Adapter(supportedConditionTypes, listener)
 
         return AlertDialog.Builder(context)
                 .setTitle(
@@ -41,14 +45,29 @@ object NewTriggerTypeSelectionDialogHelper {
                 .setView(view)
     }
 
-    private class Adapter(val listener: (Int) -> Unit) : RecyclerView.Adapter<Adapter.ViewHolder>() {
+    private class Adapter(supportedConditionTypes: Array<Byte>? = null, val listener: (Byte) -> Unit) : RecyclerView.Adapter<Adapter.ViewHolder>() {
+        val entries = (supportedConditionTypes?.map { triggerTypeEntryDict[it] } ?: triggerTypeEntryDict.values.toList())
+                .sortedWith(object : Comparator<TriggerTypeEntry?> {
+                    override fun compare(p0: TriggerTypeEntry?, p1: TriggerTypeEntry?): Int {
+                        if (p0?.enabled == true && p1?.enabled == false) {
+                            return -1
+                        } else if (p0?.enabled == p1?.enabled) {
+                            return 0
+                        } else return 1
+                    }
+                })
+
 
         override fun getItemCount(): Int {
-            return triggerTypes.size
+            return entries.size
+        }
+
+        private fun getEntryAt(position: Int): TriggerTypeEntry {
+            return entries[position]!!
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            val element = triggerTypes[position]
+            val element = getEntryAt(position)
             holder.item = element
             holder.iconView.setImageResource(element.iconId)
             holder.nameView.setText(element.nameId)
@@ -86,7 +105,7 @@ object NewTriggerTypeSelectionDialogHelper {
 
             override fun onClick(p0: View?) {
                 if (item?.enabled == true)
-                    listener.invoke(triggerTypes[adapterPosition].typeCode)
+                    listener.invoke(getEntryAt(adapterPosition).typeCode)
             }
         }
 
