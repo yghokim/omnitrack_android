@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.ui.activities
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import io.reactivex.disposables.CompositeDisposable
 import kr.ac.snu.hcil.omnitrack.core.database.EventLoggingManager
 
 /**
@@ -11,8 +12,17 @@ open class OTFragment : Fragment() {
 
     private var shownAt: Long? = null
 
-    override fun onResume() {
-        super.onResume()
+    protected val creationSubscriptions = CompositeDisposable()
+    protected val createViewSubscriptions = CompositeDisposable()
+
+    override fun onDestroy() {
+        super.onDestroy()
+        creationSubscriptions.clear()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        createViewSubscriptions.clear()
     }
 
     override fun onPause() {

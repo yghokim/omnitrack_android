@@ -1,6 +1,5 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.home
 
-import android.support.v7.util.DiffUtil
 import io.reactivex.Flowable
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
@@ -14,6 +13,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.UserAttachedViewModel
 import kr.ac.snu.hcil.omnitrack.utils.DefaultNameGenerator
+import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import java.util.*
 
@@ -73,7 +73,7 @@ class TrackerListViewModel : UserAttachedViewModel(), OrderedRealmCollectionChan
         super.onUserAttached(newUserId)
         trackersRealmResults?.removeAllChangeListeners()
         clearTrackerViewModelList()
-        val trackerQueryResults = OTApp.instance.databaseManager.findTrackersOfUser(newUserId, realm)
+        val trackerQueryResults = OTApp.instance.databaseManager.makeTrackersOfUserQuery(newUserId, realm).findAllAsync()
         trackersRealmResults = trackerQueryResults
 
         trackerQueryResults.addChangeListener(this)
@@ -106,7 +106,9 @@ class TrackerListViewModel : UserAttachedViewModel(), OrderedRealmCollectionChan
         }
     }
 
-    class TrackerInformationViewModel(val trackerDao: OTTrackerDAO, val realm: Realm) : RealmChangeListener<OTTrackerDAO> {
+    class TrackerInformationViewModel(val trackerDao: OTTrackerDAO, val realm: Realm) : IReadonlyObjectId, RealmChangeListener<OTTrackerDAO> {
+        override val objectId: String?
+            get() = trackerDao.objectId
 
         val validationResult = BehaviorSubject.createDefault<Pair<Boolean, List<CharSequence>?>>(Pair(true, null))
 
@@ -235,25 +237,4 @@ class TrackerListViewModel : UserAttachedViewModel(), OrderedRealmCollectionChan
             subscriptions.clear()
         }
     }
-
-    class TrackerViewModelListDiffUtilCallback(val oldList: List<TrackerInformationViewModel>, val newList: List<TrackerInformationViewModel>) : DiffUtil.Callback() {
-        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return oldList[oldItemPosition].trackerDao.objectId == newList[newItemPosition].trackerDao.objectId
-        }
-
-        override fun getOldListSize(): Int {
-            return oldList.size
-        }
-
-        override fun getNewListSize(): Int {
-            return newList.size
-        }
-
-        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return areItemsTheSame(oldItemPosition, newItemPosition)
-        }
-
-
-    }
-
 }

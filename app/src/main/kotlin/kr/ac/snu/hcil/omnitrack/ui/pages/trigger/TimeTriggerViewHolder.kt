@@ -3,7 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
-import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.TimeTriggerViewModel
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.legacy.TimeTriggerViewModel
 
 /**
  * Created by younghokim on 16. 8. 24..

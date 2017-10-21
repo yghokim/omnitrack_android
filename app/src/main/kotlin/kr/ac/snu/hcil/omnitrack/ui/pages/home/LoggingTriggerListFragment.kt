@@ -1,81 +1,22 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.home
 
-import android.content.Intent
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import io.reactivex.disposables.CompositeDisposable
-import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
-import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
-import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.ATriggerListFragmentCore
+import android.arch.lifecycle.ViewModelProviders
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.ATriggerListFragment
+import kr.ac.snu.hcil.omnitrack.ui.viewmodels.UserAttachedViewModel
 
 /**
- * Created by Young-Ho on 9/1/2016.
+ * Created by younghokim on 2017. 10. 21..
  */
-class LoggingTriggerListFragment : OTFragment() {
-    val core: ATriggerListFragmentCore
+class LoggingTriggerListFragment : ATriggerListFragment<LoggingTriggerListViewModel>(LoggingTriggerListViewModel::class.java) {
 
-    private val startSubscriptions = CompositeDisposable()
-
-    init {
-        core = object : ATriggerListFragmentCore(this@LoggingTriggerListFragment) {
-            override val triggerFilter: (OTTrigger) -> Boolean = { trigger -> trigger.action == OTTrigger.ACTION_BACKGROUND_LOGGING }
-
-            override val triggerActionType = OTTrigger.ACTION_BACKGROUND_LOGGING
-            override val triggerActionTypeName: Int = R.string.msg_text_trigger
-            override val emptyMessageId: Int = R.string.msg_trigger_empty
-
-            /*
-            override fun getTriggers(): Array<OTTrigger> {
-                return user?.triggerManager?.getTriggersOfAction(OTTrigger.ACTION_BACKGROUND_LOGGING) ?: emptyArray()
+    override fun onViewModelUpdate(viewModel: LoggingTriggerListViewModel) {
+        val parentViewModel = ViewModelProviders.of(activity).get(UserAttachedViewModel::class.java)
+        creationSubscriptions.add(
+                parentViewModel.userIdObservable.subscribe { (userId) ->
+                    if (userId != null)
+                        viewModel.init(userId)
             }
-
-            override fun makeNewTriggerInstance(type: Int): OTTrigger {
-                return OTTrigger.makeInstance(type, "My Trigger", OTTrigger.ACTION_BACKGROUND_LOGGING, user!!)
-            }*/
-        }
+        )
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        core.onCreate(savedInstanceState)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        core.onDestroy()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        startSubscriptions.clear()
-    }
-
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        val rootView = core.onCreateView(inflater, container, savedInstanceState)
-
-        return rootView
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        core.onDestroyView()
-    }
-
-    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        core.onViewCreated(view, savedInstanceState)
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        core.onSaveInstanceState(outState)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        core.onActivityResult(requestCode, resultCode, data)
-    }
 }

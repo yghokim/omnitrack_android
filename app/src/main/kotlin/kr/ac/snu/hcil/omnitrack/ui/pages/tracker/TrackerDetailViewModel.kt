@@ -1,7 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.tracker
 
 import android.support.annotation.DrawableRes
-import android.support.v7.util.DiffUtil
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
@@ -14,6 +13,7 @@ import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.RealmViewModel
 import kr.ac.snu.hcil.omnitrack.utils.move
@@ -31,6 +31,8 @@ class TrackerDetailViewModel : RealmViewModel() {
     val trackerId: String? get() = this.trackerDao?.objectId
 
     //Observables========================================
+    val trackerIdObservable = BehaviorSubject.createDefault<Nullable<String>>(Nullable(null))
+
     val nameObservable = BehaviorSubject.createDefault<String>("")
     val isBookmarkedObservable = BehaviorSubject.createDefault<Boolean>(false)
     val colorObservable = BehaviorSubject.createDefault<Int>(OTApp.instance.colorPalette[0])
@@ -92,6 +94,8 @@ class TrackerDetailViewModel : RealmViewModel() {
                 attributeRealmResults?.addChangeListener(attributeListChangedListener)*/
 
             } else trackerDao = null
+
+            trackerIdObservable.onNext(Nullable(trackerId))
         }
     }
 
@@ -209,7 +213,10 @@ class TrackerDetailViewModel : RealmViewModel() {
         removedAttributes.clear()
     }
 
-    class AttributeInformationViewModel(_attributeDAO: OTAttributeDAO, val realm: Realm) : RealmChangeListener<OTAttributeDAO> {
+    class AttributeInformationViewModel(_attributeDAO: OTAttributeDAO, val realm: Realm) : IReadonlyObjectId, RealmChangeListener<OTAttributeDAO> {
+        override val objectId: String?
+            get() = attributeDAO.objectId
+
         var attributeDAO: OTAttributeDAO = _attributeDAO
             private set
 
@@ -392,26 +399,5 @@ class TrackerDetailViewModel : RealmViewModel() {
             if (isInDatabase)
                 attributeDAO.addChangeListener(this)
         }
-    }
-
-    class AttributeViewModelListDiffUtilCallback(val oldList: List<AttributeInformationViewModel>, val newList: List<AttributeInformationViewModel>) : DiffUtil.Callback() {
-        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return oldList[oldItemPosition] === newList[newItemPosition] ||
-                    oldList[oldItemPosition].attributeDAO.objectId == newList[newItemPosition].attributeDAO.objectId
-        }
-
-        override fun getOldListSize(): Int {
-            return oldList.size
-        }
-
-        override fun getNewListSize(): Int {
-            return newList.size
-        }
-
-        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return areItemsTheSame(oldItemPosition, newItemPosition)
-        }
-
-
     }
 }

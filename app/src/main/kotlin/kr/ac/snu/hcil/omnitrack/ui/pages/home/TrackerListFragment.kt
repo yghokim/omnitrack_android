@@ -48,6 +48,7 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemDetailActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.tracker.TrackerDetailActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.visualization.ChartViewActivity
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
+import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.startActivityOnDelay
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
@@ -101,9 +102,6 @@ class TrackerListFragment : OTFragment() {
 
     private val collapsedHeight = OTApp.instance.resourcesWrapped.getDimensionPixelSize(R.dimen.tracker_list_element_collapsed_height)
     private val expandedHeight = OTApp.instance.resourcesWrapped.getDimensionPixelSize(R.dimen.tracker_list_element_expanded_height)
-
-    private val createViewSubscriptions: CompositeDisposable = CompositeDisposable()
-    private val resumeSubscriptions: CompositeDisposable = CompositeDisposable()
 
     private val currentTrackerViewModelList = ArrayList<TrackerListViewModel.TrackerInformationViewModel>()
 
@@ -164,7 +162,7 @@ class TrackerListFragment : OTFragment() {
                 viewModel.trackerViewModels.subscribe { trackerViewModelList ->
 
                     val diffResult = DiffUtil.calculateDiff(
-                            TrackerListViewModel.TrackerViewModelListDiffUtilCallback(currentTrackerViewModelList, trackerViewModelList)
+                            IReadonlyObjectId.DiffUtilCallback(currentTrackerViewModelList, trackerViewModelList)
                     )
 
                     currentTrackerViewModelList.clear()
@@ -219,11 +217,6 @@ class TrackerListFragment : OTFragment() {
         trackerListAdapter.viewHolders.clear()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        createViewSubscriptions.clear()
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE_NEW_TRACKER) {
@@ -239,12 +232,6 @@ class TrackerListFragment : OTFragment() {
                 }
             }
         }
-    }
-
-    override fun onPause() {
-        super.onPause()
-        println("tracker list pause")
-        resumeSubscriptions.clear()
     }
 
     private fun handleTrackerClick(tracker: OTTrackerDAO) {

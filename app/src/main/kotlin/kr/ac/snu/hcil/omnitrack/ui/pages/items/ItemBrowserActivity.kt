@@ -42,10 +42,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.decorations.DrawableListBottomSpac
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.AttributeEditDialogFragment
-import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
-import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
-import kr.ac.snu.hcil.omnitrack.utils.dipRound
-import kr.ac.snu.hcil.omnitrack.utils.getDayOfMonth
+import kr.ac.snu.hcil.omnitrack.utils.*
 import kr.ac.snu.hcil.omnitrack.utils.io.FileHelper
 import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
@@ -170,7 +167,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
         creationSubscriptions.add(
                 viewModel.sortedItemsObservable.subscribe {
                     val diffResult = DiffUtil.calculateDiff(
-                            ItemListViewModel.ItemViewModelListDiffUtilCallback(items, it)
+                            IReadonlyObjectId.DiffUtilCallback(items, it)
                     )
                     items.clear()
                     items.addAll(it)
@@ -213,7 +210,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
         if (this.viewModel.trackerId == trackerId) {
             if (itemId != null) {
-                val item = items.find { item -> item.itemId == itemId }
+                val item = items.find { item -> item.objectId == itemId }
                 if (item != null) {
                     item.setValueOf(attributeLocalId, value?.let { TypeStringSerializationHelper.serialize(it) })
 
@@ -292,10 +289,10 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
     fun deleteItemPermanently(position: Int): String? {
         val removedItem = items[position]
-        removedItem.itemId?.let {
+        removedItem.objectId?.let {
             viewModel.removeItem(it)
         }
-        return removedItem.itemId
+        return removedItem.objectId
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -337,7 +334,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
         }
 
         override fun onRemoveItem(position: Int) {
-            items.removeAt(position).itemId?.let { removedItems += it }
+            items.removeAt(position).objectId?.let { removedItems += it }
             removalSnackbar.show()
         }
 
@@ -426,7 +423,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
             override fun onMenuItemClick(p0: MenuItem): Boolean {
                 when (p0.itemId) {
                     R.id.action_edit -> {
-                        val intent = ItemDetailActivity.makeItemEditPageIntent(items[adapterPosition].itemId!!, viewModel.trackerId, this@ItemBrowserActivity)
+                        val intent = ItemDetailActivity.makeItemEditPageIntent(items[adapterPosition].objectId!!, viewModel.trackerId, this@ItemBrowserActivity)
                         intent.putExtra(OTApp.INTENT_EXTRA_FROM, this@ItemBrowserActivity.javaClass.simpleName)
                         startActivityForResult(intent, REQUEST_CODE_EDIT_ITEM)
                         return true
@@ -528,7 +525,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                         try {
 
                             val item = getParent()
-                            AttributeEditDialogFragment.makeInstance(item.itemId!!, attributeLocalId!!, viewModel.trackerId, this@ItemBrowserActivity)
+                            AttributeEditDialogFragment.makeInstance(item.objectId!!, attributeLocalId!!, viewModel.trackerId, this@ItemBrowserActivity)
                                     .show(this@ItemBrowserActivity.supportFragmentManager, "ValueModifyDialog")
                         } catch (e: Exception) {
                             e.printStackTrace()

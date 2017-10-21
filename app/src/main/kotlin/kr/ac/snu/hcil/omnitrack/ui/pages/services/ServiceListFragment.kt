@@ -14,7 +14,6 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import com.afollestad.materialdialogs.MaterialDialog
-import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.SerialDisposable
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
@@ -34,8 +33,6 @@ class ServiceListFragment : OTFragment() {
 
     private lateinit var adapter: Adapter
 
-    private val creationSubscriptions = CompositeDisposable()
-
     private val internetRequiredAlertBuilder: MaterialDialog.Builder by lazy {
         DialogHelper.makeSimpleAlertBuilder(context, context.getString(R.string.msg_external_service_activation_requires_internet))
     }
@@ -54,11 +51,6 @@ class ServiceListFragment : OTFragment() {
         listView.adapter = adapter
 
         return rootView
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        creationSubscriptions.clear()
     }
 
     /*

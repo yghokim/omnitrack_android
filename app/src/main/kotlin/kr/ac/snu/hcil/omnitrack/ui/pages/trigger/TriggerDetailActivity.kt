@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewStub
 import android.widget.FrameLayout
-import io.reactivex.disposables.CompositeDisposable
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTUser
@@ -247,9 +246,6 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_mul
 
         val errorMessages = ArrayList<String>()
 
-        private var startSubscriptions = CompositeDisposable()
-        private var createViewSubscriptions = CompositeDisposable()
-
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
             println("create view")
@@ -276,8 +272,8 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_mul
                                 this.triggerId = trigger.objectId
                             }.subscribe {
                                 trigger ->
-                                triggerType = trigger.typeId
-                                triggerAction = trigger.action
+                                triggerConditionType = trigger.typeId
+                                triggerActionType = trigger.action
                                 //attachedTrigger?.dumpDataToPojo(null)?.toMutable(currentTriggerPojo)
 
                                 onUserLoaded(savedInstanceState)
@@ -285,8 +281,8 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_mul
                 }*/
             } else {
                 /*
-                triggerType = arguments.getInt(INTENT_EXTRA_TRIGGER_TYPE, -1)
-                triggerAction = arguments.getInt(INTENT_EXTRA_TRIGGER_ACTION, -1)
+                triggerConditionType = arguments.getInt(INTENT_EXTRA_TRIGGER_TYPE, -1)
+                triggerActionType = arguments.getInt(INTENT_EXTRA_TRIGGER_ACTION, -1)
                 val activity = activity
                 if (activity is OTActivity) {
                     createViewSubscriptions.add(
@@ -441,11 +437,6 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_mul
 
             actionSettingsView?.applyConfigurationToTrigger(trigger)
             return true
-        }
-
-        override fun onStop() {
-            super.onStop()
-            startSubscriptions.clear()
         }
 
         override fun onDestroyView() {
