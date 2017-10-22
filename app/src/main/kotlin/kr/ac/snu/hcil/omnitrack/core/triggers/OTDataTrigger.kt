@@ -14,10 +14,10 @@ import kr.ac.snu.hcil.omnitrack.utils.ObservableMapDelegate
 class OTDataTrigger(objectId: String?, user: OTUser, name: String, trackerObjectIds: Array<String>?, isOn: Boolean, action: Int, lastTriggeredTime: Long?, propertyData: Map<String, String>? = null) : OTTrigger(objectId, user, name, trackerObjectIds, isOn, action, lastTriggeredTime, propertyData) {
 
     override val configIconId: Int = R.drawable.event_dark
-    override val configTitleId: Int = R.string.trigger_desc_event
+    override val configTitleId: Int = R.string.trigger_desc_time
 
-    override val descriptionResourceId: Int = R.string.trigger_desc_event
-    override val typeNameResourceId: Int = R.string.trigger_name_event
+    override val descriptionResourceId: Int = R.string.trigger_desc_data
+    override val typeNameResourceId: Int = R.string.trigger_name_data
 
     override val typeId: Int = TYPE_DATA_THRESHOLD
 

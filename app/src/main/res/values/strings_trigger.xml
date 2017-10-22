@@ -6,17 +6,17 @@
     <string name="msg_select_trigger_type_format">Select %1$s Type</string>
 
     <string name="trigger_name_time">Time-based</string>
-    <string name="trigger_name_event">Data-driven</string>
+    <string name="trigger_name_data">Data-driven</string>
     <string name="trigger_desc_time">Fires by time-related conditions</string>
-    <string name="trigger_desc_event">Fires when the data passes the threshold</string>
+    <string name="trigger_desc_data">Fires when the data passes the threshold</string>
 
     <string name="msg_trigger_time_config_type">Period Type</string>
 
     <string name="msg_trigger_time_config_interval">Interval</string>
     <string name="msg_trigger_time_config_alarm_time">Trigger time</string>
 
-    <string name="msg_trigger_time_config_type_name_alram">At specific time</string>
-    <string name="msg_trigger_time_config_type_name_interval">Repeated with interval</string>
+    <string name="msg_trigger_time_config_desc_alarm">At specific time</string>
+    <string name="msg_trigger_time_config_desc_interval">Repeated with interval</string>
 
     <string name="msg_trigger_time_is_repeated">Repeat</string>
 

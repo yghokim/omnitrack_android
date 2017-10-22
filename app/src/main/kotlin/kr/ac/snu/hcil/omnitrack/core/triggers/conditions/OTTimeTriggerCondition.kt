@@ -59,8 +59,9 @@ class OTTimeTriggerCondition : ATriggerCondition(OTTriggerDAO.CONDITION_TYPE_TIM
         const val TIME_CONDITION_ALARM = 0
         const val TIME_CONDITION_INTERVAL = 1
 
+        val typeAdapter: TimeTriggerConditionTypeAdapter by lazy { TimeTriggerConditionTypeAdapter() }
         val parser: Gson by lazy {
-            GsonBuilder().registerTypeAdapter(OTTimeTriggerCondition::class.java, TimeTriggerConditionTypeAdapter()).create()
+            GsonBuilder().registerTypeAdapter(OTTimeTriggerCondition::class.java, typeAdapter).create()
         }
     }
 
