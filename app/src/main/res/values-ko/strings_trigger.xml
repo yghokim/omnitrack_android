@@ -6,17 +6,17 @@
     <string name="msg_select_trigger_type_format">%1$s 타입을 선택하세요</string>
 
     <string name="trigger_name_time">시간 기반</string>
-    <string name="trigger_name_event">데이터 기반</string>
+    <string name="trigger_name_data">데이터 기반</string>
     <string name="trigger_desc_time">정해진 시각에, 혹은 특정 시간 간격으로 발동됩니다</string>
-    <string name="trigger_desc_event">연결된 값이 특정 임계치에 도달할 때 발동됩니다</string>
+    <string name="trigger_desc_data">연결된 값이 특정 임계치에 도달할 때 발동됩니다</string>
 
     <string name="msg_trigger_time_config_type">설정 방식</string>
 
     <string name="msg_trigger_time_config_interval">시간 간격</string>
     <string name="msg_trigger_time_config_alarm_time">발동 시각</string>
 
-    <string name="msg_trigger_time_config_type_name_alram">특정한 시각에 발동</string>
-    <string name="msg_trigger_time_config_type_name_interval">정해진 시간 간격으로 발동</string>
+    <string name="msg_trigger_time_config_desc_alarm">특정한 시각에 발동</string>
+    <string name="msg_trigger_time_config_desc_interval">정해진 시간 간격으로 발동</string>
 
     <string name="msg_trigger_time_is_repeated">반복</string>
 

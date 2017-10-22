@@ -25,7 +25,7 @@ object NewTriggerConditionTypeSelectionDialogHelper {
 
     init {
         triggerTypeEntryDict[OTTriggerDAO.CONDITION_TYPE_TIME] = TriggerTypeEntry(OTTriggerDAO.CONDITION_TYPE_TIME, R.drawable.alarm_dark, R.string.trigger_name_time, R.string.trigger_desc_time)
-        triggerTypeEntryDict[OTTriggerDAO.CONDITION_TYPE_DATA] = TriggerTypeEntry(OTTriggerDAO.CONDITION_TYPE_DATA, R.drawable.event_dark, R.string.trigger_name_event, R.string.trigger_desc_event, enabled = false)
+        triggerTypeEntryDict[OTTriggerDAO.CONDITION_TYPE_DATA] = TriggerTypeEntry(OTTriggerDAO.CONDITION_TYPE_DATA, R.drawable.event_dark, R.string.trigger_name_data, R.string.trigger_desc_data, enabled = false)
     }
 
     fun builder(context: Context, triggerActionTypeName: Int, supportedConditionTypes: Array<Byte>? = null, listener: (Byte) -> Unit): AlertDialog.Builder {

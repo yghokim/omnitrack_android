@@ -37,9 +37,9 @@ class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObject
 
         fun configNameId(configType: Int): Int {
             return when (configType) {
-                CONFIG_TYPE_ALARM -> R.string.msg_trigger_time_config_type_name_alram
-                CONFIG_TYPE_INTERVAL -> R.string.msg_trigger_time_config_type_name_interval
-                else -> R.string.msg_trigger_time_config_type_name_alram
+                CONFIG_TYPE_ALARM -> R.string.msg_trigger_time_config_desc_alarm
+                CONFIG_TYPE_INTERVAL -> R.string.msg_trigger_time_config_desc_interval
+                else -> R.string.msg_trigger_time_config_desc_alarm
             }
         }
     }

@@ -28,7 +28,7 @@ class TimeTriggerViewHolder(parent: ViewGroup, listener: ITriggerControlListener
                     viewModel.configuredAlarmTime.subscribe {
                         time ->
                         println("configured alarm time changed: ${time}")
-                        view.setAlarmInformation(time.hour, time.minute, time.amPm)
+                        //view.setAlarmInformation(time.hour, time.minute)
                     }
             )
 

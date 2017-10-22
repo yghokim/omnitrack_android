@@ -42,7 +42,6 @@ class ReminderListViewModel : ATriggerListViewModel() {
         get() = currentDefaultTriggerInterfaceOptions
 
     override fun beforeAddNewTrigger(dao: OTTriggerDAO) {
-        dao.userId = OTAuthManager.userId
         if (dao.trackers.find { it.objectId == trackerId } == null) {
             dao.trackers.add(trackerDao)
         }

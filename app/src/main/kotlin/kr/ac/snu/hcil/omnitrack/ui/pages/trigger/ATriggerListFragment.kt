@@ -13,12 +13,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
+import io.reactivex.disposables.CompositeDisposable
 import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator
 import kotlinx.android.synthetic.main.fragment_tracker_detail_triggers.*
+import kotlinx.android.synthetic.main.trigger_list_element.view.*
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.OTTriggerInformationHelper
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
+import kr.ac.snu.hcil.omnitrack.ui.components.common.SwipelessSwitchCompat
+import kr.ac.snu.hcil.omnitrack.ui.components.common.ValidatedSwitch
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.DrawableListBottomSpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.ATriggerListViewModel
@@ -163,17 +167,82 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel>(val v
             } else VIEWTYPE_NORMAL
         }
 
-
     }
 
     inner abstract class ATriggerViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         abstract fun bind(triggerViewModel: ATriggerListViewModel.TriggerViewModel)
     }
 
-    inner class TriggerViewHolder(parentView: ViewGroup?) : ATriggerViewHolder(LayoutInflater.from(context).inflate(R.layout.trigger_list_element, parentView, false)) {
-        override fun bind(triggerViewModel: ATriggerListViewModel.TriggerViewModel) {
+    inner class TriggerViewHolder(parentView: ViewGroup?) : ATriggerViewHolder(LayoutInflater.from(context).inflate(R.layout.trigger_list_element, parentView, false)), View.OnClickListener, ValidatedSwitch.IValidationListener {
+        val subscriptions = CompositeDisposable()
 
+        private var currentHeaderView: View? = null
+
+        private var attachedViewModel: ATriggerListViewModel.TriggerViewModel? = null
+
+        init {
+            itemView.ui_trigger_switch.switchOnValidator = { validateTriggerSwitchOn() }
+
+            itemView.setOnClickListener(this)
+            itemView.ui_trigger_switch.setOnClickListener(this)
+            itemView.ui_button_remove.setOnClickListener(this)
         }
+
+        override fun onClick(view: View) {
+            if (view === itemView) {
+
+            } else if (view === itemView.ui_trigger_switch) {
+
+            } else if (view === itemView.ui_button_remove) {
+
+            }
+        }
+
+        override fun bind(triggerViewModel: ATriggerListViewModel.TriggerViewModel) {
+            subscriptions.clear()
+            this.attachedViewModel = triggerViewModel
+
+            subscriptions.add(
+                    triggerViewModel.configDescResId.subscribe {
+                        itemView.ui_type_description.setText(it)
+                    }
+            )
+
+            subscriptions.add(
+                    triggerViewModel.configIconResId.subscribe {
+                        itemView.ui_type_icon.setImageResource(it)
+                    }
+            )
+
+            val displayView = OTTriggerViewFactory.getConditionViewProvider(triggerViewModel.dao)?.getTriggerDisplayView(currentHeaderView, triggerViewModel.dao, context)
+            if (displayView != null) {
+                refreshHeaderView(displayView)
+            } else {
+                //unsupported displayview for this datum
+            }
+
+            createViewSubscriptions.add(subscriptions)
+        }
+
+        private fun refreshHeaderView(headerView: View) {
+            if (currentHeaderView !== headerView) {
+                itemView.ui_header_view_container.removeAllViewsInLayout()
+                itemView.ui_header_view_container.addView(headerView)
+                currentHeaderView = headerView
+            }
+        }
+
+        protected open fun validateTriggerSwitchOn(): Boolean {
+            //return viewModel?.currentAttachedTrackers?.isNotEmpty() ?: false
+            return false
+        }
+
+        override fun onValidationFailed(switch: SwipelessSwitchCompat, on: Boolean) {
+        }
+
+        override fun onValidationSucceeded(switch: SwipelessSwitchCompat, on: Boolean) {
+        }
+
 
     }
 
