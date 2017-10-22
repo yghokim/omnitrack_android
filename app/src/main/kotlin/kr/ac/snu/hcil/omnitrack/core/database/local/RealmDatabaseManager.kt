@@ -290,8 +290,36 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
                     dao.removed = true
                     dao.synchronizedAt = null
                     dao.updatedAt = System.currentTimeMillis()
-                    //TODO set synchronization flag
                 }
+            }
+        }
+    }
+
+    fun addNewTrigger(dao: OTTriggerDAO, realm: Realm) {
+        if (realm.isInTransaction) {
+            realm.copyToRealmOrUpdate(dao)
+        } else {
+            realm.executeTransaction { realm ->
+                realm.copyToRealm(dao)
+            }
+        }
+    }
+
+    fun removeTrigger(dao: OTTriggerDAO, realm: Realm) {
+        fun process(realm: Realm) {
+            dao.synchronizedAt = null
+            dao.updatedAt = System.currentTimeMillis()
+            dao.removed = true
+            if (!dao.isManaged) {
+                realm.copyToRealmOrUpdate(dao)
+            }
+        }
+
+        if (realm.isInTransaction) {
+            process(realm)
+        } else {
+            realm.executeTransaction { r ->
+                process(r)
             }
         }
     }
