@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.tracker
 
 import android.arch.lifecycle.ViewModelProviders
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.ATriggerListFragment
 
 /**
@@ -16,5 +17,9 @@ class ReminderListFragment : ATriggerListFragment<ReminderListViewModel>(Reminde
                 }
         )
     }
+
+    override fun onProcessNewDefaultTrigger(dao: OTTriggerDAO) {
+    }
+
 
 }

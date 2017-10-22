@@ -14,6 +14,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.local.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
 import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.utils.onNextIfDifferAndNotNull
+import java.util.*
 
 /**
  * Created by younghokim on 2017. 10. 20..
@@ -26,7 +27,7 @@ import kr.ac.snu.hcil.omnitrack.utils.onNextIfDifferAndNotNull
  */
 abstract class ATriggerListViewModel : ViewModel() {
 
-    private val realm = OTApp.instance.databaseManager.getRealmInstance()
+    protected val realm = OTApp.instance.databaseManager.getRealmInstance()
 
     private val currentTriggerViewModels = ArrayList<TriggerViewModel>()
     private val _currentTriggerViewModelListObservable = BehaviorSubject.create<List<TriggerViewModel>>()
@@ -49,6 +50,8 @@ abstract class ATriggerListViewModel : ViewModel() {
 
 
     protected fun init() {
+        onDispose()
+
         currentTriggerRealmResults = hookTriggerQuery(realm.where(OTTriggerDAO::class.java).equalTo(RealmDatabaseManager.FIELD_REMOVED_BOOLEAN, false))
                 .findAllAsync()
 
@@ -74,8 +77,6 @@ abstract class ATriggerListViewModel : ViewModel() {
 
             _currentTriggerViewModelListObservable.onNext(currentTriggerViewModels)
         }
-
-        onDispose()
     }
 
     fun remove(triggerId: String) {
@@ -84,6 +85,27 @@ abstract class ATriggerListViewModel : ViewModel() {
             realm.executeTransactionAsync {
                 triggerDao.removed = true
             }
+        }
+    }
+
+    protected open fun beforeAddNewTrigger(daoToAdd: OTTriggerDAO) {
+
+    }
+
+    fun addNewTrigger(unManagedDAO: OTTriggerDAO) {
+        if (unManagedDAO.objectId == null) {
+            unManagedDAO.objectId = UUID.randomUUID().toString()
+        }
+
+        beforeAddNewTrigger(unManagedDAO)
+
+        OTApp.instance.databaseManager.addNewTrigger(unManagedDAO, realm)
+    }
+
+    fun removeTrigger(objectId: String) {
+        val dao = currentTriggerViewModels.find { it.objectId == objectId }?.dao
+        if (dao != null) {
+            OTApp.instance.databaseManager.removeTrigger(dao, realm)
         }
     }
 
@@ -133,7 +155,7 @@ abstract class ATriggerListViewModel : ViewModel() {
         }
     }
 
-    fun onDispose() {
+    internal fun onDispose() {
         currentTriggerViewModels.clear()
         currentTriggerRealmResults?.removeAllChangeListeners()
     }
