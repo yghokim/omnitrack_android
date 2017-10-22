@@ -148,7 +148,7 @@ class OTNotificationTriggerAction : OTTriggerAction() {
         println("trigger fired - send notification")
         when (notificationLevelForSystem) {
             NotificationLevel.Noti -> {
-                for (tracker in trigger.trackers) {
+                trigger.trackers.forEach { tracker ->
                     TODO("Implement")
                     //OTTrackingNotificationManager.pushReminderNotification(context, tracker, triggerTime)
                 }

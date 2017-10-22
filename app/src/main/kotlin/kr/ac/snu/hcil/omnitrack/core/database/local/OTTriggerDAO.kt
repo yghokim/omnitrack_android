@@ -40,7 +40,7 @@ open class OTTriggerDAO : RealmObject() {
 
     @Ignore
     private var _condition: ATriggerCondition? = null
-    val condition: ATriggerCondition
+    val condition: ATriggerCondition?
         get() {
             if (_condition == null) {
                 _condition = when (conditionType) {
@@ -48,7 +48,7 @@ open class OTTriggerDAO : RealmObject() {
                     else -> null
                 }
             }
-            return _condition!!
+            return _condition
         }
 
     fun saveCondition(): Boolean {
@@ -71,16 +71,25 @@ open class OTTriggerDAO : RealmObject() {
 
     @Ignore
     private var _action: OTTriggerAction? = null
-    val action: OTTriggerAction
+    val action: OTTriggerAction?
         get() {
             if (_action == null) {
-                when (actionType) {
-                    ACTION_TYPE_LOG -> OTBackgroundLoggingTriggerAction(this)
-                    ACTION_TYPE_REMIND -> OTNotificationTriggerAction.parser.fromJson(serializedAction, OTNotificationTriggerAction::class.java).apply { trigger = this@OTTriggerDAO }
+                _action = if (serializedAction == null) {
+                    when (actionType) {
+                        ACTION_TYPE_LOG -> OTBackgroundLoggingTriggerAction(this)
+                        ACTION_TYPE_REMIND -> OTNotificationTriggerAction().apply { trigger = this@OTTriggerDAO }
+                        else -> null
+                    }
+                } else {
+                    when (actionType) {
+                        ACTION_TYPE_LOG -> OTBackgroundLoggingTriggerAction(this)
+                        ACTION_TYPE_REMIND -> OTNotificationTriggerAction.parser.fromJson(serializedAction, OTNotificationTriggerAction::class.java).apply { trigger = this@OTTriggerDAO }
+                        else -> null
+                    }
                 }
             }
 
-            return _action!!
+            return _action
         }
 
     fun saveAction(): Boolean =
@@ -111,6 +120,9 @@ open class OTTriggerDAO : RealmObject() {
                 saveAction()
                 saveCondition()
             }
+        } else {
+            saveAction()
+            saveCondition()
         }
     }
 }
