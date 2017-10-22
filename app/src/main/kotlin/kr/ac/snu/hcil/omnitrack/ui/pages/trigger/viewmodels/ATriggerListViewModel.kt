@@ -9,6 +9,7 @@ import io.realm.RealmQuery
 import io.realm.RealmResults
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.OTTriggerInformationHelper
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
@@ -89,7 +90,7 @@ abstract class ATriggerListViewModel : ViewModel() {
     }
 
     protected open fun beforeAddNewTrigger(daoToAdd: OTTriggerDAO) {
-
+        daoToAdd.userId = OTAuthManager.userId
     }
 
     fun addNewTrigger(unManagedDAO: OTTriggerDAO) {
@@ -120,7 +121,6 @@ abstract class ATriggerListViewModel : ViewModel() {
 
         val configIconResId: BehaviorSubject<Int> = BehaviorSubject.create()
         val configDescResId: BehaviorSubject<Int> = BehaviorSubject.create()
-        val configNameResId: BehaviorSubject<Int> = BehaviorSubject.create()
 
         val triggerSwitch: BehaviorSubject<Boolean> = BehaviorSubject.create()
 
@@ -136,8 +136,7 @@ abstract class ATriggerListViewModel : ViewModel() {
             triggerConditionType.onNext(dao.conditionType)
 
             configIconResId.onNextIfDifferAndNotNull(OTTriggerInformationHelper.getConfigIconResId(dao))
-            configDescResId.onNextIfDifferAndNotNull(OTTriggerInformationHelper.getConfigDescriptionResId(dao))
-            configNameResId.onNextIfDifferAndNotNull(OTTriggerInformationHelper.getConfigNameRestId(dao))
+            configDescResId.onNextIfDifferAndNotNull(OTTriggerInformationHelper.getConfigDescRestId(dao))
             configSummary.onNextIfDifferAndNotNull(OTTriggerInformationHelper.getConfigSummaryText(dao))
 
             triggerSwitch.onNextIfDifferAndNotNull(dao.isOn)
