@@ -34,7 +34,6 @@ abstract class ATriggerListViewModel : ViewModel() {
     private val _currentTriggerViewModelListObservable = BehaviorSubject.create<List<TriggerViewModel>>()
 
     val currentTriggerViewModelListObservable: Observable<List<TriggerViewModel>> get() = _currentTriggerViewModelListObservable
-
     private var currentTriggerRealmResults: RealmResults<OTTriggerDAO>? = null
 
     /**
@@ -105,7 +104,7 @@ abstract class ATriggerListViewModel : ViewModel() {
         }
     }
 
-    inner open class TriggerViewModel(val dao: OTTriggerDAO) : IReadonlyObjectId, RealmChangeListener<OTTriggerDAO>, OrderedRealmCollectionChangeListener<RealmList<OTTrackerDAO>> {
+    inner open class TriggerViewModel(val dao: OTTriggerDAO) : IReadonlyObjectId, RealmChangeListener<OTTriggerDAO>, OrderedRealmCollectionChangeListener<RealmResults<OTTrackerDAO>> {
 
         override val objectId: String?
             get() = dao.objectId
@@ -121,14 +120,15 @@ abstract class ATriggerListViewModel : ViewModel() {
 
         val configSummary: BehaviorSubject<CharSequence> = BehaviorSubject.create()
 
+        private var attachedTrackersRealmResults: RealmResults<OTTrackerDAO>? = null
         private val currentAttachedTrackerInfoList = ArrayList<Pair<Int, String>>()
         val attachedTrackers = BehaviorSubject.createDefault<List<Pair<Int, String>>>(currentAttachedTrackerInfoList)
-
 
         init {
             applyDaoToFront()
             dao.addChangeListener(this)
-            dao.trackers.addChangeListener(this)
+            attachedTrackersRealmResults = dao.liveTrackersQuery.findAllAsync()
+            attachedTrackersRealmResults?.addChangeListener(this)
         }
 
         private fun applyDaoToFront() {
@@ -148,10 +148,25 @@ abstract class ATriggerListViewModel : ViewModel() {
             }
         }
 
-        override fun onChange(snapshot: RealmList<OTTrackerDAO>, changeSet: OrderedCollectionChangeSet?) {
-            //naive update
-            currentAttachedTrackerInfoList.clear()
-            currentAttachedTrackerInfoList.addAll(snapshot.map { Pair(it.color, it.name) })
+        override fun onChange(snapshot: RealmResults<OTTrackerDAO>, changeSet: OrderedCollectionChangeSet?) {
+            if (changeSet == null) {
+                currentAttachedTrackerInfoList.clear()
+                currentAttachedTrackerInfoList.addAll(snapshot.map { Pair(it.color, it.name) })
+            } else { //deal with deletions
+                val removes = changeSet.deletions.map { i -> currentAttachedTrackerInfoList[i] }
+                currentAttachedTrackerInfoList.removeAll(removes)
+
+                //deal with additions
+                val newDaos = changeSet.insertions.map { i -> snapshot[i] }
+                currentAttachedTrackerInfoList.addAll(
+                        newDaos.mapNotNull { it?.let { Pair(it.color, it.name) } }
+                )
+
+                //deal with update
+                changeSet.changes.forEach { index ->
+                    snapshot[index]?.let { Pair(it.color, it.name) }?.let { currentAttachedTrackerInfoList[index] = it }
+                }
+            }
 
             attachedTrackers.onNext(currentAttachedTrackerInfoList)
         }
@@ -194,7 +209,7 @@ abstract class ATriggerListViewModel : ViewModel() {
 
         fun unregister() {
             dao.removeChangeListener(this)
-            dao.trackers.removeChangeListener(this)
+            attachedTrackersRealmResults?.removeChangeListener(this)
         }
 
 
