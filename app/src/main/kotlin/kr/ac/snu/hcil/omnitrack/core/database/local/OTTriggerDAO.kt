@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.database.local
 
 import io.realm.RealmList
 import io.realm.RealmObject
+import io.realm.RealmQuery
 import io.realm.annotations.Ignore
 import io.realm.annotations.Index
 import io.realm.annotations.PrimaryKey
@@ -114,6 +115,9 @@ open class OTTriggerDAO : RealmObject() {
 
     var trackers = RealmList<OTTrackerDAO>()
 
+    val liveTrackersQuery: RealmQuery<OTTrackerDAO> get() = trackers.where().equalTo(RealmDatabaseManager.FIELD_REMOVED_BOOLEAN, false)
+    val liveTrackerCount: Int get() = trackers.filter { it.removed == false }.size
+
     var synchronizedAt: Long? = null
     var removed: Boolean = false
     var updatedAt: Long = System.currentTimeMillis()
@@ -139,7 +143,7 @@ open class OTTriggerDAO : RealmObject() {
      * @return if null, is valid. is not, the trigger is invalid due to the returned exception.
      */
     fun isValidToTurnOn(): TriggerConfigInvalidException? {
-        val containsTracker = trackers.size > 0
+        val containsTracker = liveTrackerCount > 0
 
         val isConditionValid = when (conditionType) {
             OTTriggerDAO.CONDITION_TYPE_DATA -> {

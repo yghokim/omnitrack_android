@@ -7,6 +7,7 @@ import android.graphics.Color
 import android.graphics.ColorFilter
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
+import android.graphics.drawable.LayerDrawable
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
@@ -36,6 +37,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDivider
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.ATriggerListViewModel
 import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
+import org.jetbrains.anko.backgroundDrawable
 
 /**
  * Created by younghokim on 2017. 10. 21..
@@ -300,17 +302,10 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel>(val v
 
         private fun refreshAttachedTrackerList(newList: List<Pair<Int, String>>) {
             if (viewModel.defaultTriggerInterfaceOptions.showAttachedTrackers) {
-                if (attachedTrackerInfoList.isEmpty()) {
-                    attachedTrackerListView?.ui_attached_tracker_list_empty_fallback?.visibility = View.VISIBLE
-                    attachedTrackerListView?.ui_attached_tracker_list?.visibility = View.GONE
-                } else {
-                    attachedTrackerListView?.ui_attached_tracker_list_empty_fallback?.visibility = View.GONE
-                    attachedTrackerListView?.ui_attached_tracker_list?.visibility = View.VISIBLE
-                }
 
                 val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
                     override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                        return attachedTrackerInfoList[oldItemPosition] == newList[newItemPosition]
+                        return oldItemPosition == newItemPosition
                     }
 
                     override fun getOldListSize(): Int {
@@ -322,10 +317,21 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel>(val v
                     }
 
                     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                        return areItemsTheSame(oldItemPosition, newItemPosition)
+                        return attachedTrackerInfoList[oldItemPosition] == newList[newItemPosition]
                     }
 
                 })
+
+                attachedTrackerInfoList.clear()
+                attachedTrackerInfoList.addAll(newList)
+
+                if (attachedTrackerInfoList.isEmpty()) {
+                    attachedTrackerListView?.ui_attached_tracker_list_empty_fallback?.visibility = View.VISIBLE
+                    attachedTrackerListView?.ui_attached_tracker_list?.visibility = View.GONE
+                } else {
+                    attachedTrackerListView?.ui_attached_tracker_list_empty_fallback?.visibility = View.INVISIBLE
+                    attachedTrackerListView?.ui_attached_tracker_list?.visibility = View.VISIBLE
+                }
 
                 diffResult.dispatchUpdatesTo(attachedTrackerListAdapter)
             }
@@ -342,7 +348,7 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel>(val v
         inner class AttachedTrackerAdapter : RecyclerView.Adapter<AttachedTrackerViewHolder>() {
             override fun onBindViewHolder(holder: AttachedTrackerViewHolder, position: Int) {
                 val info = attachedTrackerInfoList[position]
-                holder.itemView.color_bar.setBackgroundColor(info.first)
+                // holder.itemView.color_bar.setBackgroundColor(info.first)
                 holder.itemView.text.text = info.second
             }
 
@@ -359,7 +365,12 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel>(val v
     }
 
 
-    inner class AttachedTrackerViewHolder(parent: ViewGroup?) : RecyclerView.ViewHolder(
-            LayoutInflater.from(context).inflate(R.layout.layout_attached_tracker_list_element, parent, false)
-    )
+    inner class AttachedTrackerViewHolder(parent: ViewGroup?) : RecyclerView.ViewHolder(LayoutInflater.from(context).inflate(R.layout.layout_attached_tracker_list_element, parent, false)) {
+        init {
+            itemView.backgroundDrawable?.let {
+                if (it is LayerDrawable) {
+                }
+            }
+        }
+    }
 }
