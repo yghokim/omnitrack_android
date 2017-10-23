@@ -2,18 +2,19 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels
 
 import android.arch.lifecycle.ViewModel
 import android.support.annotation.StringRes
+import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
-import io.realm.RealmChangeListener
-import io.realm.RealmQuery
-import io.realm.RealmResults
+import io.realm.*
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.OTTriggerInformationHelper
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
 import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
+import kr.ac.snu.hcil.omnitrack.utils.executeTransactionAsObservable
 import kr.ac.snu.hcil.omnitrack.utils.onNextIfDifferAndNotNull
 import java.util.*
 
@@ -27,7 +28,6 @@ import java.util.*
  *
  */
 abstract class ATriggerListViewModel : ViewModel() {
-
     protected val realm = OTApp.instance.databaseManager.getRealmInstance()
 
     private val currentTriggerViewModels = ArrayList<TriggerViewModel>()
@@ -74,18 +74,13 @@ abstract class ATriggerListViewModel : ViewModel() {
                 changeSet.insertions.forEach { i ->
                     currentTriggerViewModels.add(i, TriggerViewModel(snapshot[i]!!))
                 }
+
+                //deal with refresh
+                changeSet.changes.forEach { i ->
+                }
             }
 
             _currentTriggerViewModelListObservable.onNext(currentTriggerViewModels)
-        }
-    }
-
-    fun remove(triggerId: String) {
-        currentTriggerViewModels.find { it.objectId == triggerId }
-                ?.dao?.let { triggerDao ->
-            realm.executeTransactionAsync {
-                triggerDao.removed = true
-            }
         }
     }
 
@@ -104,13 +99,13 @@ abstract class ATriggerListViewModel : ViewModel() {
     }
 
     fun removeTrigger(objectId: String) {
-        val dao = currentTriggerViewModels.find { it.objectId == objectId }?.dao
-        if (dao != null) {
-            OTApp.instance.databaseManager.removeTrigger(dao, realm)
+        val viewModel = currentTriggerViewModels.find { it.objectId == objectId }
+        if (viewModel != null) {
+            OTApp.instance.databaseManager.removeTrigger(viewModel.dao, realm)
         }
     }
 
-    open class TriggerViewModel(val dao: OTTriggerDAO) : IReadonlyObjectId, RealmChangeListener<OTTriggerDAO> {
+    inner open class TriggerViewModel(val dao: OTTriggerDAO) : IReadonlyObjectId, RealmChangeListener<OTTriggerDAO>, OrderedRealmCollectionChangeListener<RealmList<OTTrackerDAO>> {
 
         override val objectId: String?
             get() = dao.objectId
@@ -126,9 +121,14 @@ abstract class ATriggerListViewModel : ViewModel() {
 
         val configSummary: BehaviorSubject<CharSequence> = BehaviorSubject.create()
 
+        private val currentAttachedTrackerInfoList = ArrayList<Pair<Int, String>>()
+        val attachedTrackers = BehaviorSubject.createDefault<List<Pair<Int, String>>>(currentAttachedTrackerInfoList)
+
+
         init {
             applyDaoToFront()
             dao.addChangeListener(this)
+            dao.trackers.addChangeListener(this)
         }
 
         private fun applyDaoToFront() {
@@ -148,10 +148,56 @@ abstract class ATriggerListViewModel : ViewModel() {
             }
         }
 
+        override fun onChange(snapshot: RealmList<OTTrackerDAO>, changeSet: OrderedCollectionChangeSet?) {
+            //naive update
+            currentAttachedTrackerInfoList.clear()
+            currentAttachedTrackerInfoList.addAll(snapshot.map { Pair(it.color, it.name) })
+
+            attachedTrackers.onNext(currentAttachedTrackerInfoList)
+        }
+
+
+        fun toggleSwitchAsync(): Completable {
+            return Completable.defer {
+                return@defer turnSwitchAsync(!this.triggerSwitch.value)
+            }
+        }
+
+        fun turnSwitchAsync(on: Boolean): Completable {
+            return Completable.defer {
+                if (on) {
+                    if (dao.isOn) {
+                        Completable.complete()
+                    } else {
+                        //TODO handle trigger on
+                        val validationError = dao.isValidToTurnOn()
+                        if (validationError == null) {
+                            val id = dao.objectId
+                            realm.executeTransactionAsObservable { realm ->
+                                realm.where(OTTriggerDAO::class.java).equalTo("objectId", id).findFirst()
+                                        ?.isOn = true
+                            }.doOnComplete { triggerSwitch.onNextIfDifferAndNotNull(true) }
+                        } else Completable.error(validationError)
+                    }
+                } else {
+                    //TODO handle trigger off in system
+                    if (dao.isOn == true) {
+                        val id = dao.objectId
+                        realm.executeTransactionAsObservable { realm ->
+                            realm.where(OTTriggerDAO::class.java).equalTo("objectId", id).findFirst()
+                                    ?.isOn = false
+                        }.doOnComplete { triggerSwitch.onNextIfDifferAndNotNull(false) }
+                    } else Completable.complete()
+                }
+            }
+        }
 
         fun unregister() {
             dao.removeChangeListener(this)
+            dao.trackers.removeChangeListener(this)
         }
+
+
     }
 
     internal fun onDispose() {

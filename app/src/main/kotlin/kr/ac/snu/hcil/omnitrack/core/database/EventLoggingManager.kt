@@ -82,15 +82,13 @@ object EventLoggingManager {
         logEvent(EVENT_NAME_CHANGE_TRACKER_ON_SHORTCUT, makeTrackerChangeEventParams(tracker).apply { putBoolean("on_shortcut", isOnShortcut) })
     }
 
-    fun logTriggerChangeEvent(name: String, triggerId: String, type: Int, action: Int) {
-        logEvent(name, makeTriggerChangeEventParams(triggerId, type, action))
+    fun logTriggerChangeEvent(name: String, triggerId: String) {
+        logEvent(name, makeTriggerChangeEventParams(triggerId))
     }
 
-    fun makeTriggerChangeEventParams(triggerId: String, type: Int, action: Int): Bundle {
+    fun makeTriggerChangeEventParams(triggerId: String): Bundle {
         return Bundle().apply {
             putString("trigger_id", triggerId)
-            putInt("trigger_type", type)
-            putInt("trigger_action", action)
         }
     }
 

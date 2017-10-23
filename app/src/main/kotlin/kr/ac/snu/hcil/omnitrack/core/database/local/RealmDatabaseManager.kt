@@ -307,6 +307,8 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
 
     fun removeTrigger(dao: OTTriggerDAO, realm: Realm) {
         fun process(realm: Realm) {
+            //TODO handle detach trigger from system
+
             dao.synchronizedAt = null
             dao.updatedAt = System.currentTimeMillis()
             dao.removed = true

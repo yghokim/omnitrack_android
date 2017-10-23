@@ -127,6 +127,7 @@ dependencies {
     compile 'jp.wasabeef:recyclerview-animators:2.2.7'
     compile 'com.github.markushi:android-ui:1.2'
     compile 'org.apmem.tools:layouts:1.10@aar'
+    compile 'com.beloo.widget:ChipsLayoutManager:0.3.7@aar'
     compile 'com.github.ybq:Android-SpinKit:1.1.0'
     compile 'com.badoo.mobile:android-weak-handler:1.1'
     compile 'com.squareup.okhttp3:okhttp:3.9.0'

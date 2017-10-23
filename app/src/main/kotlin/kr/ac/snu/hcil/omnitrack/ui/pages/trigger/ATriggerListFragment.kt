@@ -1,32 +1,41 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 
+import android.animation.ValueAnimator
 import android.arch.lifecycle.ViewModelProviders
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.graphics.ColorFilter
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
+import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator
 import kotlinx.android.synthetic.main.fragment_tracker_detail_triggers.*
+import kotlinx.android.synthetic.main.layout_attached_tracker_list.view.*
+import kotlinx.android.synthetic.main.layout_attached_tracker_list_element.view.*
 import kotlinx.android.synthetic.main.trigger_list_element.view.*
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.database.EventLoggingManager
 import kr.ac.snu.hcil.omnitrack.core.database.OTTriggerInformationHelper
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
-import kr.ac.snu.hcil.omnitrack.ui.components.common.SwipelessSwitchCompat
-import kr.ac.snu.hcil.omnitrack.ui.components.common.ValidatedSwitch
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.DrawableListBottomSpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.ATriggerListViewModel
 import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
+import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 
 /**
  * Created by younghokim on 2017. 10. 21..
@@ -39,6 +48,8 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel>(val v
 
         const val VIEWTYPE_NORMAL = 0
         const val VIEWTYPE_GHOST = 1
+
+        val switchColorFilter: ColorFilter by lazy { ColorMatrixColorFilter(ColorMatrix().apply { this.setSaturation(0.1f) }) }
     }
 
     protected lateinit var viewModel: ViewModelType
@@ -51,7 +62,7 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel>(val v
         NewTriggerConditionTypeSelectionDialogHelper.builder(context, OTTriggerInformationHelper.getActionName(viewModel.defaultTriggerInterfaceOptions.defaultActionType) ?: 0, viewModel.defaultTriggerInterfaceOptions.supportedConditionTypes) { type ->
             println("trigger type selected - $type")
             viewModel.addNewTrigger(makeNewDefaultTrigger(type))
-            //startActivityForResult(TriggerDetailActivity.makeNewTriggerIntent(context, type, triggerActionType, hideTrackerAssignmentInterface()), ATriggerListFragmentCore.DETAIL_REQUEST_CODE)
+            //TODO startActivityForResult(TriggerDetailActivity.makeNewTriggerIntent(context, type, triggerActionType, hideTrackerAssignmentInterface()), ATriggerListFragmentCore.DETAIL_REQUEST_CODE)
             triggerTypeDialog.dismiss()
         }.create()
     }
@@ -87,7 +98,7 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel>(val v
             val conditionTypes = viewModel.defaultTriggerInterfaceOptions.supportedConditionTypes
             if (conditionTypes?.size == 1) {
                 //immediately create a trigger.
-                //open trigger activity.
+                //TODO open trigger activity.
                 viewModel.addNewTrigger(makeNewDefaultTrigger(conditionTypes.first()))
             } else {
                 //show dialog
@@ -102,9 +113,8 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel>(val v
     protected open fun makeNewDefaultTrigger(conditionType: Byte): OTTriggerDAO {
         val newDao = OTTriggerDAO()
         newDao.conditionType = conditionType
-        newDao.initialize()
-
         onProcessNewDefaultTrigger(newDao)
+        newDao.initialize()
         return newDao
     }
 
@@ -173,28 +183,60 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel>(val v
         abstract fun bind(triggerViewModel: ATriggerListViewModel.TriggerViewModel)
     }
 
-    inner class TriggerViewHolder(parentView: ViewGroup?) : ATriggerViewHolder(LayoutInflater.from(context).inflate(R.layout.trigger_list_element, parentView, false)), View.OnClickListener, ValidatedSwitch.IValidationListener {
+    inner class TriggerViewHolder(parentView: ViewGroup?) : ATriggerViewHolder(LayoutInflater.from(context).inflate(R.layout.trigger_list_element, parentView, false)), View.OnClickListener {
         val subscriptions = CompositeDisposable()
 
         private var currentHeaderView: View? = null
 
         private var attachedViewModel: ATriggerListViewModel.TriggerViewModel? = null
 
-        init {
-            itemView.ui_trigger_switch.switchOnValidator = { validateTriggerSwitchOn() }
+        private var attachedTrackerListView: View? = null
 
+        private var currentAlertAnimation: ValueAnimator? = null
+
+        private var attachedTrackerInfoList = ArrayList<Pair<Int, String>>()
+        private val attachedTrackerListAdapter = AttachedTrackerAdapter()
+
+
+        init {
             itemView.setOnClickListener(this)
             itemView.ui_trigger_switch.setOnClickListener(this)
+            itemView.ui_trigger_switch.setOnCheckedChangeListener { sender, switched ->
+                InterfaceHelper.setViewColorFilter(itemView.ui_left, !switched, switchColorFilter, 0.65f)
+            }
             itemView.ui_button_remove.setOnClickListener(this)
+
+            setAttachedTrackerListViewVisibility(viewModel.defaultTriggerInterfaceOptions.showAttachedTrackers)
         }
 
         override fun onClick(view: View) {
             if (view === itemView) {
 
             } else if (view === itemView.ui_trigger_switch) {
+                attachedViewModel?.toggleSwitchAsync()
+                        ?.let {
+                            subscriptions.add(
+                                    it.observeOn(AndroidSchedulers.mainThread()).subscribe({
+                                        val params = EventLoggingManager.makeTriggerChangeEventParams(attachedViewModel?.objectId ?: "")
+                                        attachedViewModel?.triggerSwitch?.value?.let { params.putBoolean("switch", it) }
+                                        EventLoggingManager.logEvent(EventLoggingManager.EVENT_NAME_CHANGE_TRIGGER_SWITCH, params)
+                                        println("trigger switch was successfully changed.")
+                                    }, { ex ->
+                                        println("toggle trigger switch failed: ${ex.message}")
+                                        ex.printStackTrace()
+                                        if (ex is OTTriggerDAO.TriggerConfigInvalidException) {
+                                            //TODO handle invalid UI effect
 
+                                        }
+                                    })
+                            )
+                        }
             } else if (view === itemView.ui_button_remove) {
+                attachedViewModel?.objectId?.let {
+                    viewModel.removeTrigger(it)
+                    EventLoggingManager.logTriggerChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_TRIGGER_REMOVE, it)
 
+                }
             }
         }
 
@@ -214,6 +256,19 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel>(val v
                     }
             )
 
+            subscriptions.add(
+                    triggerViewModel.triggerSwitch.subscribe {
+                        itemView.ui_trigger_switch.isChecked = it
+                        InterfaceHelper.setViewColorFilter(itemView.ui_left, !it, switchColorFilter, 0.65f)
+                    }
+            )
+
+            subscriptions.add(
+                    triggerViewModel.attachedTrackers.subscribe { newList ->
+                        refreshAttachedTrackerList(newList)
+                    }
+            )
+
             val displayView = OTTriggerViewFactory.getConditionViewProvider(triggerViewModel.dao)?.getTriggerDisplayView(currentHeaderView, triggerViewModel.dao, context)
             if (displayView != null) {
                 refreshHeaderView(displayView)
@@ -224,6 +279,58 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel>(val v
             createViewSubscriptions.add(subscriptions)
         }
 
+        private fun setAttachedTrackerListViewVisibility(visible: Boolean) {
+            if (visible) {
+                if (attachedTrackerListView == null) {
+                    attachedTrackerListView = itemView.ui_attached_tracker_list_stub.inflate()
+                            .apply {
+                                ui_attached_tracker_list.adapter = attachedTrackerListAdapter
+                                ui_attached_tracker_list.layoutManager = ChipsLayoutManager.newBuilder(context)
+                                        .setChildGravity(Gravity.CENTER_VERTICAL)
+                                        .setOrientation(ChipsLayoutManager.HORIZONTAL)
+                                        .build()
+                            }
+                } else {
+                    attachedTrackerListView?.visibility = View.VISIBLE
+                }
+            } else {
+                attachedTrackerListView?.visibility = View.GONE
+            }
+        }
+
+        private fun refreshAttachedTrackerList(newList: List<Pair<Int, String>>) {
+            if (viewModel.defaultTriggerInterfaceOptions.showAttachedTrackers) {
+                if (attachedTrackerInfoList.isEmpty()) {
+                    attachedTrackerListView?.ui_attached_tracker_list_empty_fallback?.visibility = View.VISIBLE
+                    attachedTrackerListView?.ui_attached_tracker_list?.visibility = View.GONE
+                } else {
+                    attachedTrackerListView?.ui_attached_tracker_list_empty_fallback?.visibility = View.GONE
+                    attachedTrackerListView?.ui_attached_tracker_list?.visibility = View.VISIBLE
+                }
+
+                val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
+                    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                        return attachedTrackerInfoList[oldItemPosition] == newList[newItemPosition]
+                    }
+
+                    override fun getOldListSize(): Int {
+                        return attachedTrackerInfoList.size
+                    }
+
+                    override fun getNewListSize(): Int {
+                        return newList.size
+                    }
+
+                    override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                        return areItemsTheSame(oldItemPosition, newItemPosition)
+                    }
+
+                })
+
+                diffResult.dispatchUpdatesTo(attachedTrackerListAdapter)
+            }
+        }
+
         private fun refreshHeaderView(headerView: View) {
             if (currentHeaderView !== headerView) {
                 itemView.ui_header_view_container.removeAllViewsInLayout()
@@ -232,18 +339,27 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel>(val v
             }
         }
 
-        protected open fun validateTriggerSwitchOn(): Boolean {
-            //return viewModel?.currentAttachedTrackers?.isNotEmpty() ?: false
-            return false
-        }
+        inner class AttachedTrackerAdapter : RecyclerView.Adapter<AttachedTrackerViewHolder>() {
+            override fun onBindViewHolder(holder: AttachedTrackerViewHolder, position: Int) {
+                val info = attachedTrackerInfoList[position]
+                holder.itemView.color_bar.setBackgroundColor(info.first)
+                holder.itemView.text.text = info.second
+            }
 
-        override fun onValidationFailed(switch: SwipelessSwitchCompat, on: Boolean) {
-        }
+            override fun getItemCount(): Int {
+                return attachedTrackerInfoList.size
+            }
 
-        override fun onValidationSucceeded(switch: SwipelessSwitchCompat, on: Boolean) {
-        }
+            override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): AttachedTrackerViewHolder {
+                return AttachedTrackerViewHolder(parent)
+            }
 
+        }
 
     }
 
+
+    inner class AttachedTrackerViewHolder(parent: ViewGroup?) : RecyclerView.ViewHolder(
+            LayoutInflater.from(context).inflate(R.layout.layout_attached_tracker_list_element, parent, false)
+    )
 }
