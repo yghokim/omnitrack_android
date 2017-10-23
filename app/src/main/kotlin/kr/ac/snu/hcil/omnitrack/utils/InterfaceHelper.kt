@@ -2,6 +2,10 @@ package kr.ac.snu.hcil.omnitrack.utils
 
 import android.animation.Animator
 import android.animation.ValueAnimator
+import android.graphics.ColorFilter
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
+import android.graphics.Paint
 import android.support.v4.content.ContextCompat
 import android.support.v4.graphics.ColorUtils
 import android.view.View
@@ -14,6 +18,10 @@ import kr.ac.snu.hcil.omnitrack.R
  * Created by Young-Ho Kim on 2016-07-25
  */
 object InterfaceHelper {
+
+    val grayscaleColorFilter: ColorFilter by lazy {
+        ColorMatrixColorFilter(ColorMatrix().apply { this.setSaturation(0f) })
+    }
 
     fun removeButtonTextDecoration(button: Button) {
         button.transformationMethod = null
@@ -103,5 +111,23 @@ object InterfaceHelper {
 
         })
         return colorAnimator
+    }
+
+    fun setViewGrayscale(view: View, grayscale: Boolean) {
+        setViewColorFilter(view, grayscale, grayscaleColorFilter, null)
+    }
+
+    fun setViewColorFilter(view: View, filtered: Boolean, filter: ColorFilter, toggledAlpha: Float?) {
+        if (filtered) {
+            view.setLayerType(View.LAYER_TYPE_HARDWARE, Paint().apply { this.colorFilter = filter })
+            if (toggledAlpha != null) {
+                view.alpha = toggledAlpha
+            }
+        } else {
+            view.setLayerType(View.LAYER_TYPE_NONE, null)
+            if (toggledAlpha != null) {
+                view.alpha = 1.0f
+            }
+        }
     }
 }

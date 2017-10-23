@@ -19,7 +19,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TimePicker
 import com.google.android.gms.maps.model.LatLng
+import io.reactivex.Completable
+import io.reactivex.disposables.Disposables
 import io.reactivex.subjects.BehaviorSubject
+import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
 import java.math.BigDecimal
 import java.util.*
@@ -304,6 +307,23 @@ fun <T> BehaviorSubject<T>.onNextIfDifferAndNotNull(i: T?) {
                 this.onNext(i)
             }
         } else this.onNext(i)
+    }
+}
+
+fun Realm.executeTransactionAsObservable(transaction: (Realm) -> Unit): Completable {
+    return Completable.create { disposable ->
+        val task =
+                this.executeTransactionAsync(transaction, {
+                    if (!disposable.isDisposed) {
+                        disposable.onComplete()
+                    }
+                }, { err ->
+                    if (!disposable.isDisposed) {
+                        disposable.onError(err)
+                    }
+                })
+
+        disposable.setDisposable(Disposables.fromAction { if (!task.isCancelled) task.cancel() })
     }
 }
 

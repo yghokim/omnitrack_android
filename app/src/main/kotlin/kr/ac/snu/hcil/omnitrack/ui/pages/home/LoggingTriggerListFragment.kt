@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.home
 
 import android.arch.lifecycle.ViewModelProviders
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.ATriggerListFragment
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.UserAttachedViewModel
 
@@ -19,4 +20,8 @@ class LoggingTriggerListFragment : ATriggerListFragment<LoggingTriggerListViewMo
         )
     }
 
+    override fun onProcessNewDefaultTrigger(dao: OTTriggerDAO) {
+        super.onProcessNewDefaultTrigger(dao)
+        dao.actionType = OTTriggerDAO.ACTION_TYPE_LOG
+    }
 }

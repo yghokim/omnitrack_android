@@ -20,7 +20,6 @@ import android.widget.TextView
 import io.reactivex.disposables.CompositeDisposable
 import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.EventLoggingManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.FallbackRecyclerView
@@ -289,7 +288,7 @@ abstract class ATriggerListFragmentCore(val parent: Fragment) {
             viewModel.removeTrigger(triggerViewModel)
             newTriggerButton.visibility = View.VISIBLE
 
-            EventLoggingManager.logTriggerChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_TRIGGER_REMOVE, triggerViewModel.triggerId.value, triggerViewModel.triggerType.value, triggerViewModel.triggerAction.value)
+            //EventLoggingManager.logTriggerChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_TRIGGER_REMOVE, triggerViewModel.triggerId.value, triggerViewModel.triggerType.value, triggerViewModel.triggerAction.value)
         }
     }
 }

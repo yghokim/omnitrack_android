@@ -72,7 +72,7 @@
 
     </LinearLayout>
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.common.ValidatedSwitch
+    <kr.ac.snu.hcil.omnitrack.ui.components.common.ManualSwitch
         android:id="@+id/ui_trigger_switch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
