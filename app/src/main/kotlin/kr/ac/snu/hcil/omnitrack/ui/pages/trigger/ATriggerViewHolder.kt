@@ -317,7 +317,7 @@ abstract class ATriggerViewHolder<T>(parent: ViewGroup, val listener: ITriggerCo
                 viewModel ->
                 println("trigger switch pressed")
                 viewModel.setTriggerSwitch(triggerSwitch.isChecked)
-                val eventParams = EventLoggingManager.makeTriggerChangeEventParams(viewModel.triggerId.value, viewModel.triggerType.value, viewModel.triggerAction.value)
+                val eventParams = EventLoggingManager.makeTriggerChangeEventParams(viewModel.triggerId.value)
                 eventParams.putBoolean("switch", viewModel.triggerSwitch.value)
                 EventLoggingManager.logEvent(EventLoggingManager.EVENT_NAME_CHANGE_TRIGGER_SWITCH, eventParams)
             }

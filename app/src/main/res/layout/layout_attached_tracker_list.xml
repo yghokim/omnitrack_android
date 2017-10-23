@@ -19,7 +19,7 @@
         android:layout_gravity="center_vertical"
         android:layout_weight="1">
 
-        <org.apmem.tools.layouts.FlowLayout
+        <android.support.v7.widget.RecyclerView
             android:id="@+id/ui_attached_tracker_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

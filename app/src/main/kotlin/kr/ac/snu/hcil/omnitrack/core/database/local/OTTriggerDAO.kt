@@ -15,6 +15,13 @@ import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTTimeTriggerCondition
  * Created by Young-Ho on 10/9/2017.
  */
 open class OTTriggerDAO : RealmObject() {
+    enum class TriggerValidationComponent { TRACKER_ATTACHED, CONDITION_VALID }
+    class TriggerConfigInvalidException(vararg _causes: TriggerValidationComponent) : Exception() {
+        val causes: Array<out TriggerValidationComponent> = _causes
+
+        override val message: String?
+            get() = "trigger validation failed because [${causes.joinToString(", ")}] conditions were not met."
+    }
 
     companion object {
         const val CONDITION_TYPE_TIME: Byte = 0
@@ -123,6 +130,34 @@ open class OTTriggerDAO : RealmObject() {
         } else {
             saveAction()
             saveCondition()
+        }
+    }
+
+    /**
+     * Check whether the trigger is valid to be turned on the system.
+     *
+     * @return if null, is valid. is not, the trigger is invalid due to the returned exception.
+     */
+    fun isValidToTurnOn(): TriggerConfigInvalidException? {
+        val containsTracker = trackers.size > 0
+
+        val isConditionValid = when (conditionType) {
+            OTTriggerDAO.CONDITION_TYPE_DATA -> {
+                true
+            }
+            else -> true
+        }
+
+        return if (containsTracker && isConditionValid) null else {
+            val invalids = ArrayList<TriggerValidationComponent>()
+            if (!containsTracker) {
+                invalids.add(TriggerValidationComponent.TRACKER_ATTACHED)
+            }
+            if (!isConditionValid) {
+                invalids.add(TriggerValidationComponent.CONDITION_VALID)
+            }
+
+            TriggerConfigInvalidException(*invalids.toTypedArray())
         }
     }
 }
