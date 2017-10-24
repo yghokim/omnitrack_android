@@ -31,6 +31,7 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
     companion object {
         const val FIELD_OBJECT_ID = "objectId"
         const val FIELD_UPDATED_AT_LONG = "updatedAt"
+        const val FIELD_USER_CREATED_AT = "userCreatedAt"
         const val FIELD_SYNCHRONIZED_AT = "synchronizedAt"
         const val FIELD_REMOVED_BOOLEAN = "removed"
         const val FIELD_TIMESTAMP_LONG = "timestamp"

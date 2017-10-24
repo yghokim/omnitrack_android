@@ -36,15 +36,17 @@ class ReminderListViewModel : ATriggerListViewModel() {
         return originalQuery.equalTo("userId", OTAuthManager.userId).equalTo("trackers.objectId", trackerId!!).equalTo("actionType", OTTriggerDAO.ACTION_TYPE_REMIND)
     }
 
+    override fun beforeAddNewTrigger(daoToAdd: OTTriggerDAO) {
+        super.beforeAddNewTrigger(daoToAdd)
+
+        if (daoToAdd.trackers.find { it.objectId == trackerDao?.objectId } == null) {
+            daoToAdd.trackers.add(trackerDao)
+        }
+    }
+
     override val emptyMessageResId: Int = R.string.msg_reminder_empty
 
     override val defaultTriggerInterfaceOptions: TriggerInterfaceOptions
         get() = currentDefaultTriggerInterfaceOptions
 
-    override fun beforeAddNewTrigger(dao: OTTriggerDAO) {
-        super.beforeAddNewTrigger(dao)
-        if (dao.trackers.find { it.objectId == trackerId } == null) {
-            dao.trackers.add(trackerDao)
-        }
-    }
 }
