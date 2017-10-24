@@ -152,7 +152,7 @@ open class OTAttributeDAO : RealmObject() {
             reader.beginObject()
             while (reader.hasNext()) {
                 when (reader.nextName()) {
-                    "id" -> dao.objectId = reader.nextString()
+                    RealmDatabaseManager.FIELD_OBJECT_ID -> dao.objectId = reader.nextString()
                     "localId" -> dao.localId = reader.nextString()
                     "trackerId" -> dao.trackerId = reader.nextString()
                     "name" -> dao.name = reader.nextString()
@@ -161,8 +161,8 @@ open class OTAttributeDAO : RealmObject() {
                     "type" -> dao.type = reader.nextInt()
                     "fallbackPolicy" -> dao.fallbackValuePolicy = reader.nextInt()
                     "fallbackPreset" -> dao.fallbackPresetSerializedValue = reader.nextString()
-                    "userCreatedAt" -> dao.userCreatedAt = reader.nextLong()
-                    "updatedAt" -> dao.updatedAt = reader.nextLong()
+                    RealmDatabaseManager.FIELD_USER_CREATED_AT -> dao.userCreatedAt = reader.nextLong()
+                    RealmDatabaseManager.FIELD_UPDATED_AT_LONG -> dao.updatedAt = reader.nextLong()
                     "req" -> dao.isRequired = reader.nextBoolean()
                     "conn" -> dao.serializedConnection = reader.nextString()
                     "props" -> {
@@ -194,7 +194,7 @@ open class OTAttributeDAO : RealmObject() {
         override fun write(out: JsonWriter, value: OTAttributeDAO) {
             out.beginObject()
 
-            out.name("id").value(value.objectId)
+            out.name(RealmDatabaseManager.FIELD_OBJECT_ID).value(value.objectId)
             out.name("localId").value(value.localId)
             out.name("trackerId").value(value.trackerId)
             out.name("name").value(value.name)
@@ -203,9 +203,10 @@ open class OTAttributeDAO : RealmObject() {
             out.name("fallbackPolicy").value(value.fallbackValuePolicy)
             out.name("fallbackPreset").value(value.fallbackPresetSerializedValue)
             out.name("type").value(value.type)
-            out.name("userCreatedAt").value(value.userCreatedAt)
+            out.name(RealmDatabaseManager.FIELD_USER_CREATED_AT).value(value.userCreatedAt)
             out.name("req").value(value.isRequired)
             out.name("conn").value(value.serializedConnection)
+            out.name(RealmDatabaseManager.FIELD_UPDATED_AT_LONG).value(value.updatedAt)
             out.name("props").beginArray()
 
             value.properties.forEach { prop ->

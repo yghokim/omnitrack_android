@@ -67,8 +67,9 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel>(val v
     private val triggerTypeDialog: AlertDialog by lazy {
         NewTriggerConditionTypeSelectionDialogHelper.builder(context, OTTriggerInformationHelper.getActionName(viewModel.defaultTriggerInterfaceOptions.defaultActionType) ?: 0, viewModel.defaultTriggerInterfaceOptions.supportedConditionTypes) { type ->
             println("trigger type selected - $type")
-            viewModel.addNewTrigger(makeNewDefaultTrigger(type))
-            //TODO startActivityForResult(TriggerDetailActivity.makeNewTriggerIntent(context, type, triggerActionType, hideTrackerAssignmentInterface()), ATriggerListFragmentCore.DETAIL_REQUEST_CODE)
+            //viewModel.addNewTrigger(makeNewDefaultTrigger(type))
+            val defaultTrigger = makeNewDefaultTrigger(type)
+            startActivityForResult(TriggerDetailActivity.makeNewTriggerIntent(context, defaultTrigger), DETAIL_REQUEST_CODE)
             triggerTypeDialog.dismiss()
         }.create()
     }
