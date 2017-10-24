@@ -2,6 +2,7 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:drawable="@color/editTextFormBackground" />
     <item
+        android:id="@+id/layer_color_indicator"
         android:bottom="-3dp"
         android:left="0dp"
         android:right="-3dp"
