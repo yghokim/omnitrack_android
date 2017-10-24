@@ -25,6 +25,7 @@ import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.FallbackRecyclerView
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.DrawableListBottomSpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.legacy.TriggerDetailActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.legacy.DataTriggerViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.legacy.TimeTriggerViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.legacy.TriggerListViewModel

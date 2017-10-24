@@ -11,7 +11,7 @@ import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.pages.tracker.TrackerDetailViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.ATriggerListFragmentCore
-import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.TriggerDetailActivity
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.legacy.TriggerDetailActivity
 
 /**
  * Created by younghokim on 16. 7. 30..

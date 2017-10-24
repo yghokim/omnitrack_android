@@ -26,7 +26,8 @@ import kotlin.collections.HashSet
  */
 class TrackerDetailViewModel : RealmViewModel() {
 
-    private var trackerDao: OTTrackerDAO? = null
+    var trackerDao: OTTrackerDAO? = null
+        private set
 
     val trackerId: String? get() = this.trackerDao?.objectId
 
