@@ -7,9 +7,11 @@ import android.graphics.Color
 import android.graphics.ColorFilter
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
+import android.graphics.drawable.Drawable
 import android.graphics.drawable.LayerDrawable
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
+import android.support.v4.graphics.drawable.DrawableCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.LinearLayoutManager
@@ -20,6 +22,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager
+import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator
@@ -37,6 +40,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDivider
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.ATriggerListViewModel
 import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
+import kr.ac.snu.hcil.omnitrack.utils.dipRound
 import org.jetbrains.anko.backgroundDrawable
 
 /**
@@ -287,6 +291,7 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel>(val v
                     attachedTrackerListView = itemView.ui_attached_tracker_list_stub.inflate()
                             .apply {
                                 ui_attached_tracker_list.adapter = attachedTrackerListAdapter
+                                ui_attached_tracker_list.addItemDecoration(SpacingItemDecoration(dipRound(8), dipRound(10)))
                                 ui_attached_tracker_list.layoutManager = ChipsLayoutManager.newBuilder(context)
                                         .setChildGravity(Gravity.CENTER_VERTICAL)
                                         .setOrientation(ChipsLayoutManager.HORIZONTAL)
@@ -349,6 +354,7 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel>(val v
             override fun onBindViewHolder(holder: AttachedTrackerViewHolder, position: Int) {
                 val info = attachedTrackerInfoList[position]
                 // holder.itemView.color_bar.setBackgroundColor(info.first)
+                holder.setColor(info.first)
                 holder.itemView.text.text = info.second
             }
 
@@ -366,11 +372,20 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel>(val v
 
 
     inner class AttachedTrackerViewHolder(parent: ViewGroup?) : RecyclerView.ViewHolder(LayoutInflater.from(context).inflate(R.layout.layout_attached_tracker_list_element, parent, false)) {
+        private var indicatorLayer: Drawable? = null
+
         init {
-            itemView.backgroundDrawable?.let {
+            val mutated = itemView.backgroundDrawable?.mutate()
+            mutated?.let {
                 if (it is LayerDrawable) {
+                    indicatorLayer = it.findDrawableByLayerId(R.id.layer_color_indicator)
                 }
             }
+            itemView.background = mutated
+        }
+
+        fun setColor(color: Int) {
+            indicatorLayer?.let { DrawableCompat.setTint(it, color) }
         }
     }
 }

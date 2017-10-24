@@ -3,10 +3,7 @@
     android:id="@+id/text"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="8dp"
-
-    android:layout_marginStart="8dp"
-    android:background="@drawable/attached_tracker_list_background"
+    android:background="@drawable/attached_tracker_list_element_background"
         android:paddingBottom="6.5dp"
         android:paddingLeft="9dp"
         android:paddingRight="9dp"
