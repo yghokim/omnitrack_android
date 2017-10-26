@@ -75,14 +75,14 @@ class AudioRecordingButton : Button, ValueAnimator.AnimatorUpdateListener {
 
 
     private val stopDrawable: Drawable by lazy {
-        val drawable = ContextCompat.getDrawable(context, R.drawable.stop_dark)
+        val drawable = ContextCompat.getDrawable(context, R.drawable.stop_dark)!!
         drawable.setColorFilter(Color.parseColor("#ffffff"), PorterDuff.Mode.SRC_ATOP)
         drawable.alpha = 150
         drawable
     }
 
     private val removeDrawable: Drawable by lazy {
-        val drawable = ContextCompat.getDrawable(context, R.drawable.trashcan)
+        val drawable = ContextCompat.getDrawable(context, R.drawable.trashcan)!!
         drawable.setColorFilter(Color.parseColor("#ffffff"), PorterDuff.Mode.SRC_ATOP)
         drawable.alpha = 200
         drawable

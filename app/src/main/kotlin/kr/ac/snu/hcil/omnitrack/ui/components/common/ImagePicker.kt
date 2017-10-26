@@ -88,7 +88,7 @@ class ImagePicker : FrameLayout, View.OnClickListener {
     init {
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         inflater.inflate(R.layout.component_image_picker, this, true)
-        this.background = applyTint(ContextCompat.getDrawable(context, R.drawable.hatching_repeated_wide_gray), Color.parseColor("#e0e0e0"))
+        this.background = applyTint(ContextCompat.getDrawable(context, R.drawable.hatching_repeated_wide_gray)!!, Color.parseColor("#e0e0e0"))
 
         cameraButton = findViewById(R.id.ui_button_camera)
         galleryButton = findViewById(R.id.ui_button_gallery)

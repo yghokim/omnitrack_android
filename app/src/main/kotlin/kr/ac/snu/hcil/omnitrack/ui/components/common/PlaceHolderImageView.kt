@@ -11,7 +11,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
-import android.widget.ProgressBar
 import com.github.ybq.android.spinkit.SpinKitView
 import com.github.ybq.android.spinkit.style.Circle
 import kr.ac.snu.hcil.omnitrack.R
@@ -78,14 +77,14 @@ open class PlaceHolderImageView : FrameLayout {
         }
 
     private val emptyBackground: Drawable by lazy {
-        applyTint(ContextCompat.getDrawable(context, R.drawable.hatching_repeated_big), Color.parseColor("#e0e0e0"))
+        applyTint(ContextCompat.getDrawable(context, R.drawable.hatching_repeated_big)!!, Color.parseColor("#e0e0e0"))
     }
 
     private val normalBackgroundColor: Int by lazy {
         ContextCompat.getColor(context, R.color.editTextFormBackground)
     }
 
-    private val loadingIndicator: ProgressBar
+    private val loadingIndicator: SpinKitView
     val imageView: ImageView
     var errorRetryButton: AppCompatButton? = null
 
@@ -134,7 +133,7 @@ open class PlaceHolderImageView : FrameLayout {
             button.compoundDrawablePadding = dipRound(8)
             button.background = ContextCompat.getDrawable(context, R.drawable.transparent_button_background)
 
-            button.setCompoundDrawablesRelativeWithIntrinsicBounds(applyTint(ContextCompat.getDrawable(context, R.drawable.error_dark), ContextCompat.getColor(context, R.color.colorRed)), null, null, null)
+            button.setCompoundDrawablesRelativeWithIntrinsicBounds(applyTint(ContextCompat.getDrawable(context, R.drawable.error_dark)!!, ContextCompat.getColor(context, R.color.colorRed)), null, null, null)
             val lp = FrameLayout.LayoutParams(
                     LayoutParams.WRAP_CONTENT,
                     context.resources.getDimensionPixelSize(R.dimen.button_height_small))

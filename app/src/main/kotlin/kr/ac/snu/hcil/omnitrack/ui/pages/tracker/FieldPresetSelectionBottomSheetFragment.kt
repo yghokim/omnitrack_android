@@ -21,6 +21,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTChoiceAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTTimeAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTTimeSpanAttributeHelper
 import kr.ac.snu.hcil.omnitrack.ui.components.common.DismissingBottomSheetDialogFragment
+import org.jetbrains.anko.support.v4.act
 
 /**
  * Created by Young-Ho Kim on 2016-12-28.
@@ -157,7 +158,7 @@ class FieldPresetSelectionBottomSheetFragment : DismissingBottomSheetDialogFragm
                     val typeInfo = presets?.get(adapterPosition)
                     if (typeInfo != null) {
 
-                        OTAttributeManager.showPermissionCheckDialog(this@FieldPresetSelectionBottomSheetFragment.activity,
+                        OTAttributeManager.showPermissionCheckDialog(this@FieldPresetSelectionBottomSheetFragment.act,
                                 typeInfo.typeId, typeInfo.name,
                                 {
                                     dismiss()

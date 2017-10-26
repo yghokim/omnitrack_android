@@ -153,16 +153,16 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
     }
 
 
-    override fun onDrawerClosed(drawerView: View?) {
+    override fun onDrawerClosed(drawerView: View) {
     }
 
     override fun onDrawerStateChanged(newState: Int) {
     }
 
-    override fun onDrawerSlide(drawerView: View?, slideOffset: Float) {
+    override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
     }
 
-    override fun onDrawerOpened(drawerView: View?) {
+    override fun onDrawerOpened(drawerView: View) {
     }
 
 

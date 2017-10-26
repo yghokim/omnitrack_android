@@ -9,6 +9,7 @@ import android.support.v7.content.res.AppCompatResources
 import android.util.AttributeSet
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.applyTint
+import kr.ac.snu.hcil.omnitrack.utils.dipRound
 
 /**
  * Created by younghokim on 2017. 1. 13..
@@ -54,7 +55,13 @@ class CompoundDrawableTintCore {
                 compoundDrawables[BOTTOM] = tint(compoundDrawables[BOTTOM], color)
             }
 
-
+            for (drawable in compoundDrawables) {
+                if (drawable?.bounds?.isEmpty == true) {
+                    drawable.setBounds(0, 0, dipRound(24), dipRound(24))
+                }
+            }
+        } catch (ex: Exception) {
+            ex.printStackTrace()
         } finally {
             a.recycle()
         }

@@ -35,8 +35,8 @@ open class TriggerViewModel(val dao: OTTriggerDAO, val realm: Realm) : IReadonly
     val configSummary: BehaviorSubject<CharSequence> = BehaviorSubject.create()
 
     private var attachedTrackersRealmResults: RealmResults<OTTrackerDAO>? = null
-    private val currentAttachedTrackerInfoList = ArrayList<Pair<Int, String>>()
-    val attachedTrackers = BehaviorSubject.createDefault<List<Pair<Int, String>>>(currentAttachedTrackerInfoList)
+    private val currentAttachedTrackerInfoList = ArrayList<OTTrackerDAO.SimpleTrackerInfo>()
+    val attachedTrackers = BehaviorSubject.createDefault<List<OTTrackerDAO.SimpleTrackerInfo>>(currentAttachedTrackerInfoList)
 
 
     init {
@@ -76,7 +76,7 @@ open class TriggerViewModel(val dao: OTTriggerDAO, val realm: Realm) : IReadonly
     override fun onChange(snapshot: RealmResults<OTTrackerDAO>, changeSet: OrderedCollectionChangeSet?) {
         if (changeSet == null) {
             currentAttachedTrackerInfoList.clear()
-            currentAttachedTrackerInfoList.addAll(snapshot.map { Pair(it.color, it.name) })
+            currentAttachedTrackerInfoList.addAll(snapshot.map { it.getSimpleInfo() })
         } else { //deal with deletions
             val removes = changeSet.deletions.map { i -> currentAttachedTrackerInfoList[i] }
             currentAttachedTrackerInfoList.removeAll(removes)
@@ -84,12 +84,12 @@ open class TriggerViewModel(val dao: OTTriggerDAO, val realm: Realm) : IReadonly
             //deal with additions
             val newDaos = changeSet.insertions.map { i -> snapshot[i] }
             currentAttachedTrackerInfoList.addAll(
-                    newDaos.mapNotNull { it?.let { Pair(it.color, it.name) } }
+                    newDaos.mapNotNull { it?.getSimpleInfo() }
             )
 
             //deal with update
             changeSet.changes.forEach { index ->
-                snapshot[index]?.let { Pair(it.color, it.name) }?.let { currentAttachedTrackerInfoList[index] = it }
+                snapshot[index]?.getSimpleInfo()?.let { currentAttachedTrackerInfoList[index] = it }
             }
         }
 

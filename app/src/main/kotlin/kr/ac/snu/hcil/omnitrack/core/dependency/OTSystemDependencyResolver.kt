@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.support.v4.app.Fragment
 import io.reactivex.Single
+import org.jetbrains.anko.support.v4.act
 
 /**
  * Created by younghokim on 2017. 5. 17..
@@ -37,6 +38,6 @@ abstract class OTSystemDependencyResolver {
 
     abstract fun tryResolve(activity: Activity): Single<Boolean>
     open fun tryResolve(fragment: Fragment): Single<Boolean> {
-        return tryResolve(fragment.activity)
+        return tryResolve(fragment.act)
     }
 }

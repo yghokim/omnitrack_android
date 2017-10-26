@@ -52,11 +52,11 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
     private val listener = CameraListener()
 
     private val cameraFrontDrawable by lazy {
-        applyTint(DrawableCompat.wrap(ContextCompat.getDrawable(OTApp.instance, R.drawable.camera_front)), Color.WHITE)
+        applyTint(DrawableCompat.wrap(ContextCompat.getDrawable(OTApp.instance, R.drawable.camera_front)!!), Color.WHITE)
     }
 
     private val cameraRearDrawable by lazy {
-        applyTint(DrawableCompat.wrap(ContextCompat.getDrawable(OTApp.instance, R.drawable.camera_rear)), Color.WHITE)
+        applyTint(DrawableCompat.wrap(ContextCompat.getDrawable(OTApp.instance, R.drawable.camera_rear)!!), Color.WHITE)
     }
 
     private fun findViews(view: View) {
@@ -125,7 +125,7 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
-        val inflater = activity.layoutInflater
+        val inflater = activity!!.layoutInflater
         val view = inflater.inflate(R.layout.fragment_camera_input, null)
 
         findViews(view)
@@ -150,7 +150,7 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
                 }*/
 
                 arguments?.getString(EXTRA_REQUEST_KEY)?.let {
-                    LocalBroadcastManager.getInstance(context)
+                    LocalBroadcastManager.getInstance(context!!)
                             .sendBroadcast(Intent(EXTRA_ACTION_PHOTO_TAKEN).putExtra(EXTRA_IMAGE_DATA, jpeg).putExtra(EXTRA_REQUEST_KEY, it))
                 }
                 dismiss()

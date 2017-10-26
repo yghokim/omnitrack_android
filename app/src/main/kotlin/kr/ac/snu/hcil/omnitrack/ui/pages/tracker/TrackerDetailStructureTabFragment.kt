@@ -44,6 +44,7 @@ import kr.ac.snu.hcil.omnitrack.utils.DefaultNameGenerator
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.utils.dipRound
+import org.jetbrains.anko.support.v4.act
 
 /**
  * Created by Young-Ho Kim on 16. 7. 29
@@ -98,7 +99,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        this.viewModel = ViewModelProviders.of(activity).get(TrackerDetailViewModel::class.java)
+        this.viewModel = ViewModelProviders.of(activity!!).get(TrackerDetailViewModel::class.java)
 
         //set UI
         namePropertyView.value = this.viewModel.name
@@ -150,7 +151,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
         checkRequiredInformationVisibility()
 
         if (savedInstanceState == null) {
-            TutorialManager.checkAndShowTargetPrompt("TrackerDetail_add_attribute", true, this.activity, newAttributeButton, R.string.msg_tutorial_add_attribute_primary, R.string.msg_tutorial_add_attribute_secondary, this.viewModel.color)
+            TutorialManager.checkAndShowTargetPrompt("TrackerDetail_add_attribute", true, act, newAttributeButton, R.string.msg_tutorial_add_attribute_primary, R.string.msg_tutorial_add_attribute_secondary, this.viewModel.color)
         }
     }
 
@@ -160,8 +161,8 @@ class TrackerDetailStructureTabFragment : OTFragment() {
         } else View.INVISIBLE
     }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        val rootView = inflater!!.inflate(R.layout.fragment_tracker_detail_structure, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        val rootView = inflater.inflate(R.layout.fragment_tracker_detail_structure, container, false)
 
         rootScrollView = rootView.findViewById(R.id.scroll_root)
 
@@ -218,7 +219,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
         return rootView
     }
 
-    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
 
@@ -254,7 +255,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
 
     fun openAttributeDetailActivity(position: Int) {
         val attrViewModel = currentAttributeViewModelList[position]
-        startActivityForResult(AttributeDetailActivity.makeIntent(activity, attrViewModel.makeFrontalChangesToDao(), false), REQUEST_CODE_ATTRIBUTE_DETAIL)
+        startActivityForResult(AttributeDetailActivity.makeIntent(act, attrViewModel.makeFrontalChangesToDao(), false), REQUEST_CODE_ATTRIBUTE_DETAIL)
     }
 
     fun scrollToBottom() {
@@ -394,7 +395,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                 if (view === editButton || view === previewContainer) {
                     openAttributeDetailActivity(adapterPosition)
                 } else if (view === removeButton) {
-                    DialogHelper.makeNegativePhrasedYesNoDialogBuilder(this@TrackerDetailStructureTabFragment.context,
+                    DialogHelper.makeNegativePhrasedYesNoDialogBuilder(act,
                             getString(R.string.msg_remove_field),
                             String.format(getString(R.string.msg_format_confirm_remove_field),
                                     currentAttributeViewModelList[adapterPosition].name
@@ -460,13 +461,13 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                 viewHolderSubscriptions.add(
                         attributeViewModel.typeObservable.subscribe { args ->
 
-                            preview = OTAttributeManager.getAttributeHelper(args).getInputView(context, true, attributeViewModel.makeFrontalChangesToDao(), preview)
+                            preview = OTAttributeManager.getAttributeHelper(args).getInputView(act, true, attributeViewModel.makeFrontalChangesToDao(), preview)
                         }
                 )
 
                 viewHolderSubscriptions.add(
                         attributeViewModel.onPropertyChanged.subscribe {
-                            preview = OTAttributeManager.getAttributeHelper(attributeViewModel.typeObservable.value).getInputView(context, true, attributeViewModel.makeFrontalChangesToDao(), preview)
+                            preview = OTAttributeManager.getAttributeHelper(attributeViewModel.typeObservable.value).getInputView(act, true, attributeViewModel.makeFrontalChangesToDao(), preview)
                         }
                 )
 

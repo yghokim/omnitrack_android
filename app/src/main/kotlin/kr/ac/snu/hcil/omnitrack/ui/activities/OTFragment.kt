@@ -53,7 +53,7 @@ open class OTFragment : Fragment() {
 
             val contentObject = Bundle()
             contentObject.putBoolean("caused_by_activity_pause", activityPausing)
-            contentObject.putString("parent_activity", activity.javaClass.simpleName)
+            contentObject.putString("parent_activity", activity?.javaClass?.simpleName)
             onSessionLogContent(contentObject)
 
             val now = System.currentTimeMillis()

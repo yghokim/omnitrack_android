@@ -17,7 +17,7 @@ class ReminderListFragment : ATriggerListFragment<ATriggerListViewModel>() {
 
     override fun initializeNewViewModel(savedInstanceState: Bundle?): Single<ATriggerListViewModel> {
         return Single.defer {
-            parentViewModel = ViewModelProviders.of(activity).get(TrackerDetailViewModel::class.java)
+            parentViewModel = ViewModelProviders.of(activity!!).get(TrackerDetailViewModel::class.java)
             return@defer parentViewModel.isInitializedObservable.filter { it == true }.firstOrError().map { isInitialized ->
                 val trackerId = parentViewModel.trackerId
                 if (trackerId != null) // editmode
