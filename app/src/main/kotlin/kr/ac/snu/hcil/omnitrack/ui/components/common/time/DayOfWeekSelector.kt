@@ -16,6 +16,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.BitwiseOperationHelper
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.dipSize
+import kr.ac.snu.hcil.omnitrack.utils.events.Event
 
 /**
  * Created by Young-Ho on 8/25/2016.
@@ -32,6 +33,7 @@ class DayOfWeekSelector : LinearLayout, View.OnClickListener {
 
     private val checkedFlags = BooleanArray(7) { false }
 
+    val selectionFlagsChanged = Event<Int>()
 
     var checkedFlagsInteger: Int get() {
 
@@ -45,9 +47,20 @@ class DayOfWeekSelector : LinearLayout, View.OnClickListener {
         return flags
     }
         set(value) {
+            val original = checkedFlagsInteger
+            var changed = false
             for (day in 0..6) {
-                setChecked(day, BitwiseOperationHelper.getBooleanAt(value, 6 - day))
+                if (setChecked(day, BitwiseOperationHelper.getBooleanAt(value, 6 - day))) {
+                    changed = true
+                }
+            }
+
+            if (changed == true) {
                 checkNonSelection()
+                val new = checkedFlagsInteger
+                if (original != new) {
+                    selectionFlagsChanged.invoke(this, new)
+                }
             }
         }
 
@@ -99,12 +112,20 @@ class DayOfWeekSelector : LinearLayout, View.OnClickListener {
 
     operator fun set(day: Int, value: Boolean) {
 
-        setChecked(day, value)
+        val lastFlags = checkedFlagsInteger
+        val checkedChanged = setChecked(day, value)
 
-        checkNonSelection()
+        if (checkedChanged) {
+            checkNonSelection()
+
+            val newFlags = checkedFlagsInteger
+            if (lastFlags != newFlags) {
+                selectionFlagsChanged.invoke(this, newFlags)
+            }
+        }
     }
 
-    private fun setChecked(day: Int, checked: Boolean) {
+    private fun setChecked(day: Int, checked: Boolean): Boolean {
         if (checkedFlags[day] != checked) {
             checkedFlags[day] = checked
             val button = buttons[day]
@@ -117,17 +138,20 @@ class DayOfWeekSelector : LinearLayout, View.OnClickListener {
                 button.drawCircle = false
                 InterfaceHelper.setTextAppearance(button, R.style.dayOfWeekSelectorLetterAppearance_Unselected)
             }
-        }
+
+            return true
+        } else return false
     }
 
-    private fun checkNonSelection() {
+    private fun checkNonSelection(): Boolean {
         if (allowNoneSelection == false) {
             if (checkedFlags.indexOf(true) == -1) {
                 for (day in 0..6) {
                     setChecked(day, true)
                 }
-            }
-        }
+                return true
+            } else return false
+        } else return false
     }
 
     class CircleBackgroundButton : Button, ValueAnimator.AnimatorUpdateListener {

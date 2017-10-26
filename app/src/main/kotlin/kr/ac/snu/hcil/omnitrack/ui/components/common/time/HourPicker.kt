@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.RelativeLayout
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.utils.events.Event
 
 /**
  * Created by Young-Ho on 8/25/2016.
@@ -32,6 +33,8 @@ class HourPicker : RelativeLayout, View.OnClickListener {
                     amPmView.setText(R.string.time_am)
                 else
                     amPmView.setText(R.string.time_pm)
+
+                hourOfDayChanged.invoke(this, hourOfDay)
             }
         }
 
@@ -43,17 +46,21 @@ class HourPicker : RelativeLayout, View.OnClickListener {
             if (field != value % 12) {
                 field = value % 12
                 hourView.text = oClockNames[field]
+                hourOfDayChanged.invoke(this, hourOfDay)
             }
         }
 
     var hourOfDay: Int
         get() {
-            return hour + 12 * amPm
+            return (hour + 12 * amPm) % 24
         }
         set(value) {
             if (hourOfDay != value) {
+                hourOfDayChanged.suspend = true
                 hour = value % 12
                 amPm = if (value >= 12) 1 else 0
+                hourOfDayChanged.suspend = false
+                hourOfDayChanged.invoke(this, value)
             }
         }
 
@@ -63,6 +70,8 @@ class HourPicker : RelativeLayout, View.OnClickListener {
 
     private val upButton: View
     private val downButton: View
+
+    val hourOfDayChanged = Event<Int>()
 
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)

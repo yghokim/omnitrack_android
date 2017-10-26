@@ -2,9 +2,11 @@ package kr.ac.snu.hcil.omnitrack.core.database
 
 import android.support.annotation.DrawableRes
 import android.support.annotation.StringRes
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTTimeTriggerCondition
+import kr.ac.snu.hcil.omnitrack.utils.BitwiseOperationHelper
 
 /**
  * Created by younghokim on 2017. 10. 21..
@@ -12,7 +14,32 @@ import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTTimeTriggerCondition
 object OTTriggerInformationHelper {
 
     fun getConfigSummaryText(trigger: OTTriggerDAO): CharSequence? {
-        return null
+        return when (trigger.conditionType) {
+            OTTriggerDAO.CONDITION_TYPE_TIME -> {
+                val condition = trigger.condition as OTTimeTriggerCondition
+                if (condition.isRepeated) {
+                    //display only days of weeks
+                    if (condition.dayOfWeekFlags == 0b1111111.toByte()) {
+                        OTApp.instance.resourcesWrapped.getString(R.string.msg_everyday)
+                    } else {
+
+                        val names = OTApp.instance.resourcesWrapped.getStringArray(R.array.days_of_week_short)
+
+                        val stringBuilder = StringBuilder()
+
+                        for (day in 0..6) {
+
+                            if (BitwiseOperationHelper.getBooleanAt(condition.dayOfWeekFlags.toInt(), 6 - day)) {
+                                stringBuilder.append(names[day].toUpperCase(), "  ")
+                            }
+                        }
+
+                        stringBuilder.trim()
+                    }
+                } else OTApp.instance.resourcesWrapped.getString(R.string.msg_once)
+            }
+            else -> null
+        }
     }
 
     @StringRes
@@ -46,7 +73,7 @@ object OTTriggerInformationHelper {
     }
 
     @StringRes
-    fun getActionName(actionType: Byte): Int? {
+    fun getActionNameResId(actionType: Byte): Int? {
         return when (actionType) {
             OTTriggerDAO.ACTION_TYPE_LOG -> R.string.msg_text_trigger
             OTTriggerDAO.ACTION_TYPE_REMIND -> R.string.msg_text_reminder

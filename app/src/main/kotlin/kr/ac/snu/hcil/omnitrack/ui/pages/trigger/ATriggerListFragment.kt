@@ -1,17 +1,15 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 
 import android.animation.ValueAnimator
-import android.arch.lifecycle.ViewModelProviders
+import android.app.Activity
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.ColorFilter
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
-import android.graphics.drawable.Drawable
-import android.graphics.drawable.LayerDrawable
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
-import android.support.v4.graphics.drawable.DrawableCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.LinearLayoutManager
@@ -23,6 +21,7 @@ import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager
 import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator
@@ -37,16 +36,18 @@ import kr.ac.snu.hcil.omnitrack.core.database.local.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.DrawableListBottomSpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.AManagedTriggerListViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.ATriggerListViewModel
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.OfflineTriggerListViewModel
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.TriggerViewModel
 import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.dipRound
-import org.jetbrains.anko.backgroundDrawable
 
 /**
  * Created by younghokim on 2017. 10. 21..
  */
-abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel>(val viewModelClass: Class<ViewModelType>) : OTFragment(), View.OnClickListener {
+abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTFragment(), View.OnClickListener {
     companion object {
         // private const val STATE_EXPANDED_POSITION = "expandedTriggerPosition"
         //used when opending TriggerDetailActivity
@@ -60,28 +61,34 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel>(val v
 
     protected lateinit var viewModel: ViewModelType
 
-    private val currentTriggerViewModelList = ArrayList<ATriggerListViewModel.TriggerViewModel>()
+    private val currentTriggerViewModelList = ArrayList<TriggerViewModel>()
 
     private val triggerListAdapter = TriggerListAdapter()
 
     private val triggerTypeDialog: AlertDialog by lazy {
-        NewTriggerConditionTypeSelectionDialogHelper.builder(context, OTTriggerInformationHelper.getActionName(viewModel.defaultTriggerInterfaceOptions.defaultActionType) ?: 0, viewModel.defaultTriggerInterfaceOptions.supportedConditionTypes) { type ->
+        NewTriggerConditionTypeSelectionDialogHelper.builder(context, OTTriggerInformationHelper.getActionNameResId(viewModel.defaultTriggerInterfaceOptions.defaultActionType) ?: 0, viewModel.defaultTriggerInterfaceOptions.supportedConditionTypes) { type ->
             println("trigger type selected - $type")
             //viewModel.addNewTrigger(makeNewDefaultTrigger(type))
             val defaultTrigger = makeNewDefaultTrigger(type)
-            startActivityForResult(TriggerDetailActivity.makeNewTriggerIntent(context, defaultTrigger), DETAIL_REQUEST_CODE)
+            startActivityForResult(TriggerDetailActivity.makeNewTriggerIntent(context, defaultTrigger, viewModel.defaultTriggerInterfaceOptions), DETAIL_REQUEST_CODE)
             triggerTypeDialog.dismiss()
         }.create()
     }
 
-    abstract fun onViewModelUpdate(viewModel: ViewModelType)
+    protected abstract fun initializeNewViewModel(savedInstanceState: Bundle?): Single<ViewModelType>
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        creationSubscriptions.add(
+                initializeNewViewModel(savedInstanceState).doOnSuccess {
+                    this.viewModel = it
+                }.subscribe { model ->
+                    onViewModelMounted(model, savedInstanceState)
+                }
+        )
+    }
 
-        viewModel = ViewModelProviders.of(this).get(viewModelClass)
-        onViewModelUpdate(viewModel)
-
+    protected open fun onViewModelMounted(viewModel: ViewModelType, savedInstanceState: Bundle?) {
         ui_trigger_list.emptyView = ui_empty_list_message.apply {
             setText(viewModel.emptyMessageResId)
         }
@@ -105,8 +112,7 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel>(val v
             val conditionTypes = viewModel.defaultTriggerInterfaceOptions.supportedConditionTypes
             if (conditionTypes?.size == 1) {
                 //immediately create a trigger.
-                //TODO open trigger activity.
-                viewModel.addNewTrigger(makeNewDefaultTrigger(conditionTypes.first()))
+                startActivityForResult(TriggerDetailActivity.makeNewTriggerIntent(context, makeNewDefaultTrigger(conditionTypes.first()), viewModel.defaultTriggerInterfaceOptions), DETAIL_REQUEST_CODE)
             } else {
                 //show dialog
                 triggerTypeDialog.show()
@@ -153,6 +159,16 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel>(val v
         ui_button_new_trigger.rippleColor = Color.HSVToColor(hsv)
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == DETAIL_REQUEST_CODE && resultCode == Activity.RESULT_OK && data != null) {
+            if (data.hasExtra(TriggerDetailActivity.INTENT_EXTRA_TRIGGER_DAO)) {
+                val resultDao = OTTriggerDAO.parser.fromJson(data.getStringExtra(TriggerDetailActivity.INTENT_EXTRA_TRIGGER_DAO), OTTriggerDAO::class.java)
+                viewModel.addNewTrigger(resultDao)
+            }
+        }
+    }
+
     inner class TriggerListAdapter : RecyclerView.Adapter<ATriggerViewHolder>() {
         override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ATriggerViewHolder {
             return when (viewType) {
@@ -174,12 +190,12 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel>(val v
             return currentTriggerViewModelList.size
         }
 
-        private fun getTriggerViewModelAt(position: Int): ATriggerListViewModel.TriggerViewModel {
+        private fun getTriggerViewModelAt(position: Int): TriggerViewModel {
             return currentTriggerViewModelList[position]
         }
 
         override fun getItemViewType(position: Int): Int {
-            return if (OTTriggerViewFactory.getConditionViewProvider(getTriggerViewModelAt(position).dao) == null) {
+            return if (OTTriggerViewFactory.getConditionViewProvider(getTriggerViewModelAt(position).triggerConditionType.value) == null) {
                 VIEWTYPE_GHOST
             } else VIEWTYPE_NORMAL
         }
@@ -187,7 +203,7 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel>(val v
     }
 
     inner abstract class ATriggerViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        abstract fun bind(triggerViewModel: ATriggerListViewModel.TriggerViewModel)
+        abstract fun bind(triggerViewModel: TriggerViewModel)
     }
 
     inner class TriggerViewHolder(parentView: ViewGroup?) : ATriggerViewHolder(LayoutInflater.from(context).inflate(R.layout.trigger_list_element, parentView, false)), View.OnClickListener {
@@ -195,7 +211,7 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel>(val v
 
         private var currentHeaderView: View? = null
 
-        private var attachedViewModel: ATriggerListViewModel.TriggerViewModel? = null
+        private var attachedViewModel: TriggerViewModel? = null
 
         private var attachedTrackerListView: View? = null
 
@@ -218,6 +234,13 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel>(val v
 
         override fun onClick(view: View) {
             if (view === itemView) {
+                val intent = if (viewModel is AManagedTriggerListViewModel) {
+                    TriggerDetailActivity.makeEditTriggerIntent(context, attachedViewModel!!.objectId!!, viewModel.defaultTriggerInterfaceOptions)
+                } else if (viewModel is OfflineTriggerListViewModel) {
+                    TriggerDetailActivity.makeEditTriggerIntent(context, attachedViewModel!!.dao, viewModel.defaultTriggerInterfaceOptions)
+                } else throw UnsupportedOperationException()
+
+                startActivityForResult(intent, DETAIL_REQUEST_CODE)
 
             } else if (view === itemView.ui_trigger_switch) {
                 attachedViewModel?.toggleSwitchAsync()
@@ -247,7 +270,7 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel>(val v
             }
         }
 
-        override fun bind(triggerViewModel: ATriggerListViewModel.TriggerViewModel) {
+        override fun bind(triggerViewModel: TriggerViewModel) {
             subscriptions.clear()
             this.attachedViewModel = triggerViewModel
 
@@ -276,12 +299,23 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel>(val v
                     }
             )
 
-            val displayView = OTTriggerViewFactory.getConditionViewProvider(triggerViewModel.dao)?.getTriggerDisplayView(currentHeaderView, triggerViewModel.dao, context)
-            if (displayView != null) {
-                refreshHeaderView(displayView)
-            } else {
-                //unsupported displayview for this datum
-            }
+            subscriptions.add(
+                    triggerViewModel.triggerCondition.subscribe { condition ->
+                        println("condition changed")
+                        val displayView = OTTriggerViewFactory.getConditionViewProvider(triggerViewModel.triggerConditionType.value)?.getTriggerDisplayView(currentHeaderView, triggerViewModel.dao, context)
+                        if (displayView != null) {
+                            refreshHeaderView(displayView)
+                        } else {
+                            //unsupported displayview for this datum
+                        }
+                    }
+            )
+
+            subscriptions.add(
+                    triggerViewModel.configSummary.subscribe { summary ->
+                        itemView.ui_config_summary.text = summary
+                    }
+            )
 
             createViewSubscriptions.add(subscriptions)
         }
@@ -369,24 +403,5 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel>(val v
 
         }
 
-    }
-
-
-    inner class AttachedTrackerViewHolder(parent: ViewGroup?) : RecyclerView.ViewHolder(LayoutInflater.from(context).inflate(R.layout.layout_attached_tracker_list_element, parent, false)) {
-        private var indicatorLayer: Drawable? = null
-
-        init {
-            val mutated = itemView.backgroundDrawable?.mutate()
-            mutated?.let {
-                if (it is LayerDrawable) {
-                    indicatorLayer = it.findDrawableByLayerId(R.id.layer_color_indicator)
-                }
-            }
-            itemView.background = mutated
-        }
-
-        fun setColor(color: Int) {
-            indicatorLayer?.let { DrawableCompat.setTint(it, color) }
-        }
     }
 }

@@ -26,6 +26,12 @@ import kotlin.collections.HashSet
  */
 class TrackerDetailViewModel : RealmViewModel() {
 
+    private var isInitialized = false
+
+    val isInitializedObservable = BehaviorSubject.create<Boolean>()
+
+    val isEditMode: Boolean get() = trackerDao != null
+
     var trackerDao: OTTrackerDAO? = null
         private set
 
@@ -69,7 +75,7 @@ class TrackerDetailViewModel : RealmViewModel() {
     private val currentAttributeViewModelList = ArrayList<AttributeInformationViewModel>()
 
     fun init(trackerId: String?) {
-        if (trackerDao?.objectId != trackerId) {
+        if (!isInitialized) {
             subscriptions.clear()
             if (trackerId != null) {
                 val dao = OTApp.instance.databaseManager.getTrackerQueryWithId(trackerId, realm).findFirstAsync()
@@ -97,6 +103,9 @@ class TrackerDetailViewModel : RealmViewModel() {
             } else trackerDao = null
 
             trackerIdObservable.onNext(Nullable(trackerId))
+
+            isInitialized = true
+            isInitializedObservable.onNext(true)
         }
     }
 
@@ -316,7 +325,7 @@ class TrackerDetailViewModel : RealmViewModel() {
                         || attributeDAO.fallbackPresetSerializedValue != defaultValuePreset
                         || attributeDAO.serializedConnection != connectionObservable.value?.datum?.getSerializedString()
                         || arePropertiesDirty()
-        }
+            }
 
         fun makeFrontalChangesToDao(): OTAttributeDAO {
             val dao = OTAttributeDAO()

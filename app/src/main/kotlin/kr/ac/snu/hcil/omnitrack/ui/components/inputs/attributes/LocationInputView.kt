@@ -85,7 +85,7 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
 
     private val mapView: MapView = findViewById(R.id.ui_map)
 
-    private val controlPanel: View = findViewById(R.id.ui_control_panel)
+    private val controlPanel: View = findViewById(R.id.ui_condition_control_panel_container)
 
     private val searchButton: View
     private val zoomInButton: View
