@@ -26,6 +26,9 @@ class ReminderListFragment : ATriggerListFragment<ATriggerListViewModel>() {
                             .apply { if (savedInstanceState == null) this.init(trackerId) }
                 } else {
                     //new mode
+                    creationSubscriptions.add(parentViewModel.onChangesApplied.subscribe { trackerId ->
+                        (viewModel as? OfflineReminderListViewModel)?.applyToDb(trackerId)
+                    })
                     return@map ViewModelProviders.of(this@ReminderListFragment).get(OfflineReminderListViewModel::class.java)
                             .apply { if (savedInstanceState == null) this.init() }
                 }

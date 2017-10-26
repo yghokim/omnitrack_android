@@ -52,6 +52,7 @@ class TriggerDetailViewModel : RealmViewModel(), OrderedRealmCollectionChangeLis
             if (dao != null) {
                 this.originalTriggerDao = dao
                 this.attachedTrackersRealmResults = dao.liveTrackersQuery.findAllAsync()
+                this.attachedTrackersRealmResults?.addChangeListener(this)
                 applyToFront(dao)
             }
             isInitialized = true
@@ -140,6 +141,12 @@ class TriggerDetailViewModel : RealmViewModel(), OrderedRealmCollectionChangeLis
 
             fun apply(dao: OTTriggerDAO) {
                 dao.serializedCondition = conditionInstance.value.getSerializedString()
+                dao.trackers.clear()
+                val trackerIds = attachedTrackers.value.mapNotNull { it.objectId }.toTypedArray()
+                if (trackerIds.isNotEmpty()) {
+                    val trackers = realm.where(OTTrackerDAO::class.java).`in`("objectId", attachedTrackers.value.mapNotNull { it.objectId }.toTypedArray()).findAll()
+                    dao.trackers.addAll(trackers)
+                }
             }
 
             if (dao.isManaged) {
