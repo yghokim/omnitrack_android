@@ -1,36 +1,64 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 
 import android.content.Context
+import android.support.v7.util.DiffUtil
+import android.support.v7.util.ListUpdateCallback
 import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
 import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager
 import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.subjects.BehaviorSubject
+import io.realm.Realm
 import kotlinx.android.synthetic.main.layout_attached_tracker_list_element_removable.view.*
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.OTTracker
-import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
+import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.TrackerPickerDialogBuilder
+import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.utils.dipRound
 import kr.ac.snu.hcil.omnitrack.utils.getActivity
-import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 import java.util.*
 
 /**
  * Created by Young-Ho on 9/2/2016.
  */
-class TrackerAssignPanel : RecyclerView, View.OnClickListener {
+class TrackerAssignPanel : RecyclerView {
 
-    private val addButton: View
+    val trackerListChanged = BehaviorSubject.create<List<OTTrackerDAO.SimpleTrackerInfo>>()
 
-    val trackerIds = ArrayList<String>()
+    val trackers = ArrayList<OTTrackerDAO.SimpleTrackerInfo>()
+
+    private var realm: Realm? = null
+
+    private val elementAdapter = AssignElementAdapter()
 
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attributeSet: AttributeSet?) : super(context, attributeSet)
 
     private val subscriptions = CompositeDisposable()
+
+    private val listUpdateCallback = object : ListUpdateCallback {
+        override fun onChanged(position: Int, count: Int, payload: Any?) {
+            notifyTrackerListChanged()
+        }
+
+        override fun onMoved(fromPosition: Int, toPosition: Int) {
+
+        }
+
+        override fun onInserted(position: Int, count: Int) {
+        }
+
+        override fun onRemoved(position: Int, count: Int) {
+        }
+
+    }
 
     init {
         addItemDecoration(SpacingItemDecoration(dipRound(8), dipRound(10)))
@@ -38,50 +66,46 @@ class TrackerAssignPanel : RecyclerView, View.OnClickListener {
                 .setChildGravity(Gravity.CENTER_VERTICAL)
                 .setOrientation(ChipsLayoutManager.HORIZONTAL)
                 .build()
-
-        addButton = inflateContent(R.layout.layout_attached_tracker_list_add, true).findViewById(R.id.ui_button_add)
-        addButton.setOnClickListener(this)
+        this.adapter = elementAdapter
     }
 
-    fun init(trackers: Collection<OTTracker>?) {
-        trackerIds.clear()
-        if (trackers != null)
-            trackerIds.addAll(trackers.map { it.objectId })
-        refresh()
+    fun init(trackers: List<OTTrackerDAO.SimpleTrackerInfo>) {
+        val diffResults = DiffUtil.calculateDiff(IReadonlyObjectId.DiffUtilCallback(this.trackers, trackers))
+        this.trackers.clear()
+        this.trackers.addAll(trackers)
+        diffResults.dispatchUpdatesTo(elementAdapter)
+        //diffResults.dispatchUpdatesTo(listUpdateCallback)
     }
 
-    private fun refresh() {
-/*
-        val differ = trackerIds.size - trackerElementCount
-        if (differ > 0) {
-            for (i in 1..differ) {
 
-                val newView = inflateContent(R.layout.layout_attached_tracker_list_element_removable, false)
-                newView.tag = RemovableAttachedTrackerViewHolder(newView)
-                addView(newView, 0)
-            }
-        } else if (differ < 0) {
-            for (i in 1..-differ) {
-                removeViewAt(trackerElementCount - 1)
-            }
-        }*/
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        realm = OTApp.instance.databaseManager.getRealmInstance()
+    }
 
-        val activity = getActivity()
-        if (activity is OTActivity) {
-            /*
+    private fun notifyTrackerListChanged() {
+        trackerListChanged.onNext(trackers.toList())
+    }
+
+    private fun onAttachButtonClicked() {
+        realm?.let {
             subscriptions.add(
-                    activity.signedInUserObservable.subscribe {
-                        user ->
-                        for (tracker in trackerIds.map { user[it]!! }.withIndex()) {
-                            val vh = (getChildAt(tracker.index).tag as RemovableAttachedTrackerViewHolder)
-                            vh.textView.text = tracker.value.name
-                            vh.colorBar.setBackgroundColor(tracker.value.color)
+                    OTApp.instance.databaseManager.makeTrackersOfUserQuery(OTAuthManager.userId!!, it).findAllAsync()
+                            .asFlowable().filter { it.isLoaded && it.isValid }.firstOrError().subscribe { snapshot ->
+                        val dialog = TrackerPickerDialogBuilder(snapshot.map { it.getSimpleInfo() }).createDialog(getActivity()!!, trackers.mapNotNull { it.objectId }.toTypedArray()) { trackerId ->
+                            snapshot.find { it.objectId == trackerId }?.getSimpleInfo()?.let {
+                                trackers.add(it)
+                                elementAdapter.notifyItemInserted(trackers.size - 1)
+                                notifyTrackerListChanged()
+                            }
                         }
+                        dialog.show()
                     }
-            )*/
+            )
         }
     }
 
+    /*
     override fun onClick(view: View) {
         val fm = this.getActivity()?.supportFragmentManager
         if (fm != null) {
@@ -101,11 +125,51 @@ class TrackerAssignPanel : RecyclerView, View.OnClickListener {
                     }
             )*/
         }
-    }
+    }*/
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         subscriptions.clear()
+        realm?.close()
+    }
+
+    private inner class AssignElementAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+        override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
+            return when (viewType) {
+                0 -> RemovableAttachedTrackerViewHolder(parent)
+                1 -> AttachButtonViewHolder(parent)
+                else -> throw IllegalArgumentException()
+            }
+        }
+
+        override fun getItemViewType(position: Int): Int {
+            if (position < trackers.size) {
+                return 0
+            } else return 1
+        }
+
+        override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
+            if (position < trackers.size) {
+                (holder as RemovableAttachedTrackerViewHolder).run {
+                    val info = trackers[position]
+                    this.setColor(info.color)
+                    this.setName(info.name)
+                }
+            }
+        }
+
+        override fun getItemCount(): Int {
+            return trackers.size + 1
+        }
+
+    }
+
+    private inner class AttachButtonViewHolder(parent: ViewGroup?) : RecyclerView.ViewHolder(LayoutInflater.from(parent?.context).inflate(R.layout.layout_attached_tracker_list_add, parent, false)) {
+        init {
+            itemView.setOnClickListener {
+                onAttachButtonClicked()
+            }
+        }
     }
 
     private inner class RemovableAttachedTrackerViewHolder(viewParent: ViewGroup?) : AttachedTrackerViewHolder(viewParent, R.layout.layout_attached_tracker_list_element_removable), View.OnClickListener {
@@ -116,12 +180,9 @@ class TrackerAssignPanel : RecyclerView, View.OnClickListener {
 
         override fun onClick(clickedView: View) {
             if (clickedView === itemView.ui_button_remove) {
-                /*
-                val position = this@TrackerAssignPanel.indexOfChild(this.view)
-                if (position != -1) {
-                    trackerIds.removeAt(position)
-                    this@TrackerAssignPanel.removeViewAt(position)
-                }*/
+                trackers.removeAt(adapterPosition)
+                elementAdapter.notifyItemRemoved(adapterPosition)
+                notifyTrackerListChanged()
             }
         }
 

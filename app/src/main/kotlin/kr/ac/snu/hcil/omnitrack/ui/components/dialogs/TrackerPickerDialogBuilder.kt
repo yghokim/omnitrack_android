@@ -10,13 +10,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.OTTracker
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
+import org.jetbrains.anko.padding
 
 /**
  * Created by Young-Ho on 9/2/2016.
  */
-class TrackerPickerDialogBuilder(val trackers: List<OTTracker>, val viewHolderFactory: ViewHolderFactory = defaultViewHolderFactory) {
+class TrackerPickerDialogBuilder(val trackers: List<OTTrackerDAO.SimpleTrackerInfo>, val viewHolderFactory: ViewHolderFactory = defaultViewHolderFactory) {
 
     companion object {
         val defaultViewHolderFactory = object : ViewHolderFactory {
@@ -31,25 +32,25 @@ class TrackerPickerDialogBuilder(val trackers: List<OTTracker>, val viewHolderFa
         fun createViewHolder(parent: ViewGroup, viewType: Int): TrackerViewHolder
     }
 
-    fun createDialog(context: Context, title: Int, inactiveIds: Array<String>? = null, onPicked: (OTTracker?) -> Unit): Dialog {
+    fun createDialog(context: Context, title: Int, inactiveIds: Array<String>? = null, onPicked: (String?) -> Unit): Dialog {
         return createDialog(context, context.resources.getString(title), inactiveIds, onPicked)
     }
 
-    fun createDialog(context: Context, inactiveIds: Array<String>? = null, onPicked: (OTTracker?) -> Unit): Dialog {
+    fun createDialog(context: Context, inactiveIds: Array<String>? = null, onPicked: (String?) -> Unit): Dialog {
         return createDialog(context, context.resources.getString(R.string.msg_pick_tracker), inactiveIds, onPicked)
     }
 
-    fun createDialog(context: Context, title: String, inactiveIds: Array<String>? = null, onPicked: (OTTracker?) -> Unit): Dialog {
+    fun createDialog(context: Context, title: String, inactiveIds: Array<String>? = null, onPicked: (String?) -> Unit): Dialog {
 
-        val view = View.inflate(context, R.layout.simple_layout_with_recycler_view, null)
+        val view = RecyclerView(context)
 
         val dialog = AlertDialog.Builder(context)
                 .setTitle(title)
                 .setView(view)
                 .create()
 
-        val listView: RecyclerView = view.findViewById(R.id.ui_list)
-
+        val listView: RecyclerView = view
+        listView.padding = context.resources.getDimensionPixelSize(R.dimen.activity_horizontal_margin)
         listView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
 
 
@@ -67,9 +68,9 @@ class TrackerPickerDialogBuilder(val trackers: List<OTTracker>, val viewHolderFa
         val circle: AppCompatImageView = view.findViewById(R.id.colored_circle)
         val textView: TextView = view.findViewById(R.id.text)
 
-        var onPicked: ((OTTracker?) -> Unit)? = null
+        var onPicked: ((String?) -> Unit)? = null
 
-        var tracker: OTTracker? = null
+        var trackerId: String? = null
 
         var active: Boolean = true
             set(value) {
@@ -85,7 +86,7 @@ class TrackerPickerDialogBuilder(val trackers: List<OTTracker>, val viewHolderFa
 
         override fun onClick(view: View?) {
             if (view === itemView) {
-                onPicked?.invoke(tracker)
+                onPicked?.invoke(trackerId)
             }
         }
 
@@ -93,14 +94,14 @@ class TrackerPickerDialogBuilder(val trackers: List<OTTracker>, val viewHolderFa
             view.setOnClickListener(this)
         }
 
-        open fun bind(tracker: OTTracker) {
-            this.tracker = tracker
-            circle.setColorFilter(tracker.color)
-            textView.text = tracker.name
+        open fun bind(trackerInfo: OTTrackerDAO.SimpleTrackerInfo) {
+            this.trackerId = trackerInfo.objectId
+            circle.setColorFilter(trackerInfo.color)
+            textView.text = trackerInfo.name
         }
     }
 
-    inner class TrackerAdapter(val inactiveIds: Array<String>? = null, val onPicked: ((OTTracker?) -> Unit)) : RecyclerView.Adapter<TrackerViewHolder>() {
+    inner class TrackerAdapter(val inactiveIds: Array<String>? = null, val onPicked: ((String?) -> Unit)) : RecyclerView.Adapter<TrackerViewHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackerViewHolder {
             val vh = viewHolderFactory.createViewHolder(parent, viewType)

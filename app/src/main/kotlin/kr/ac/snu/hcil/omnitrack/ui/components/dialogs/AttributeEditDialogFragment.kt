@@ -76,7 +76,7 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
 
         val view = setupViews(LayoutInflater.from(activity), savedInstanceState)
 
-        val dialog = MaterialDialog.Builder(context)
+        val dialog = MaterialDialog.Builder(context!!)
                 .customView(view, true)
                 .positiveColorRes(R.color.colorPointed)
                 .positiveText(R.string.msg_apply)
@@ -134,7 +134,7 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
     }
 
     override fun onBind(savedInstanceState: Bundle?): Disposable {
-        val bundle = savedInstanceState ?: arguments
+        val bundle = savedInstanceState ?: arguments ?: Bundle()
 
         container.locked = true
         container.alpha = 0.25f
@@ -167,7 +167,7 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
             }.subscribe { (attr, item) ->
                 println("item edit dialog: loaded attribute and item")
                 this.titleView?.text = String.format(resources.getString(R.string.msg_format_attribute_edit_dialog_title), attr.name)
-                this.valueView = attr.getHelper().getInputView(context, false, attr, this.valueView)
+                this.valueView = attr.getHelper().getInputView(context!!, false, attr, this.valueView)
                 this.valueView?.boundAttributeObjectId = attr.objectId
 
                 if (valueView != null) {
@@ -224,22 +224,22 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
         valueView?.onPause()
     }
 
-    override fun onSaveInstanceState(outState: Bundle?) {
+    override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         valueView?.let {
-            outState?.putString(EXTRA_SERIALIZED_VALUE, it.value?.let { TypeStringSerializationHelper.serialize(it) })
+            outState.putString(EXTRA_SERIALIZED_VALUE, it.value?.let { TypeStringSerializationHelper.serialize(it) })
         }
 
         trackerId?.let {
-            outState?.putString(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
+            outState.putString(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
         }
 
         attribute?.let {
-            outState?.putString(OTApp.INTENT_EXTRA_LOCAL_ID_ATTRIBUTE, it.localId)
+            outState.putString(OTApp.INTENT_EXTRA_LOCAL_ID_ATTRIBUTE, it.localId)
         }
 
         item?.let {
-            outState?.putString(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM, it.objectId)
+            outState.putString(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM, it.objectId)
         }
     }
 

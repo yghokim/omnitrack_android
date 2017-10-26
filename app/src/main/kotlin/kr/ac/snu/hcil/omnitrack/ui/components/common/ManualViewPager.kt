@@ -13,8 +13,8 @@ import android.widget.Scroller
  * http://stackoverflow.com/questions/9650265/how-do-disable-paging-by-swiping-with-finger-in-viewpager-but-still-be-able-to-s
  */
 class ManualViewPager : ViewPager {
-    constructor(context: Context?) : super(context)
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
 
     init {
         setMyScroller()

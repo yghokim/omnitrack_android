@@ -5,23 +5,16 @@
     android:layout_height="@dimen/button_height_small"
     android:layout_marginBottom="8dp"
     android:layout_marginRight="16dp"
-    android:background="@color/editTextFormBackground"
+    android:background="@drawable/attached_tracker_list_element_background"
     android:orientation="horizontal">
-
-    <View
-        android:id="@+id/color_bar"
-        android:layout_width="2.5dp"
-        android:layout_height="match_parent"
-        android:layout_alignBottom="@+id/text"
-        android:background="@color/colorPointed" />
-
     <TextView
         android:id="@+id/text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:paddingBottom="6.5dp"
-        android:paddingLeft="9dp"
+        android:paddingEnd="0dp"
+        android:paddingStart="9dp"
         android:paddingTop="6.5dp"
         android:text="Water"
         android:textColor="@color/textColorMid"

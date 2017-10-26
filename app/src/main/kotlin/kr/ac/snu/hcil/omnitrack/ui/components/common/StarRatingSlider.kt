@@ -183,25 +183,25 @@ class StarRatingSlider : HorizontalLinearDrawableView, GestureDetector.OnGesture
         override val numDrawables: Int get() = levels
 
         private val emptyDrawable: Drawable by lazy {
-            ContextCompat.getDrawable(context, R.drawable.rating_star_empty)
+            ContextCompat.getDrawable(context, R.drawable.rating_star_empty)!!
         }
         private val halfDrawable: Drawable by lazy {
-            ContextCompat.getDrawable(context, R.drawable.rating_star_half)
+            ContextCompat.getDrawable(context, R.drawable.rating_star_half)!!
         }
         private val fullDrawable: Drawable by lazy {
-            ContextCompat.getDrawable(context, R.drawable.rating_star_full)
+            ContextCompat.getDrawable(context, R.drawable.rating_star_full)!!
         }
 
         private val emptyDrawableSmall: Drawable by lazy {
-            applyTint(ContextCompat.getDrawable(context, R.drawable.symbol_star_empty),
+            applyTint(ContextCompat.getDrawable(context, R.drawable.symbol_star_empty)!!,
                     ContextCompat.getColor(context, R.color.starColorItemList))
         }
         private val halfDrawableSmall: Drawable by lazy {
-            applyTint(ContextCompat.getDrawable(context, R.drawable.symbol_star_half),
+            applyTint(ContextCompat.getDrawable(context, R.drawable.symbol_star_half)!!,
                     ContextCompat.getColor(context, R.color.starColorItemList))
         }
         private val fullDrawableSmall: Drawable by lazy {
-            applyTint(ContextCompat.getDrawable(context, R.drawable.symbol_star_full),
+            applyTint(ContextCompat.getDrawable(context, R.drawable.symbol_star_full)!!,
                     ContextCompat.getColor(context, R.color.starColorItemList))
         }
 

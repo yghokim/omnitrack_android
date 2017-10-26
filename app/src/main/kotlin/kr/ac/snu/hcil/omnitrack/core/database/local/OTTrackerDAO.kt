@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.database.local
 
 import android.app.Activity
 import android.content.Context
+import android.support.annotation.ColorInt
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.TypeAdapter
@@ -20,6 +21,7 @@ import io.realm.annotations.PrimaryKey
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
+import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import java.io.File
 import java.util.*
@@ -28,6 +30,8 @@ import java.util.*
  * Created by younghokim on 2017. 10. 1..
  */
 open class OTTrackerDAO : RealmObject() {
+
+    data class SimpleTrackerInfo(override val objectId: String?, val name: String, @ColorInt val color: Int) : IReadonlyObjectId
 
     companion object {
         val CREATION_FLAG_TUTORIAL: Map<String, String> by lazy {
@@ -141,6 +145,10 @@ open class OTTrackerDAO : RealmObject() {
             e.printStackTrace()
             return 0
         }
+    }
+
+    fun getSimpleInfo(): SimpleTrackerInfo {
+        return SimpleTrackerInfo(objectId, name, color)
     }
 }
 

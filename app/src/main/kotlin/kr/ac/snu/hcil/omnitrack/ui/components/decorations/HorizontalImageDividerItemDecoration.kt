@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
+import android.support.annotation.DrawableRes
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.RecyclerView
 import android.view.View
@@ -12,9 +13,9 @@ import kr.ac.snu.hcil.omnitrack.R
 /**
  * Created by Young-Ho Kim on 2016-07-25.
  */
-class HorizontalImageDividerItemDecoration(resId: Int = R.drawable.horizontal_separator_pattern, context: Context, heightMultiplier: Float = 1.0f) : RecyclerView.ItemDecoration() {
+class HorizontalImageDividerItemDecoration(@DrawableRes resId: Int = R.drawable.horizontal_separator_pattern, context: Context, heightMultiplier: Float = 1.0f) : RecyclerView.ItemDecoration() {
 
-    private var divider: Drawable = ContextCompat.getDrawable(context, resId)
+    private var divider: Drawable = ContextCompat.getDrawable(context, resId)!!
 
     private var dividerHeight: Int = 0
 

@@ -52,6 +52,7 @@ import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.startActivityOnDelay
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
+import org.jetbrains.anko.support.v4.act
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -79,7 +80,7 @@ class TrackerListFragment : OTFragment() {
     private lateinit var statContentStyleSpan: StyleSpan
 
     private val emptyTrackerDialog: MaterialDialog.Builder by lazy {
-        MaterialDialog.Builder(context)
+        MaterialDialog.Builder(context!!)
                 .cancelable(true)
                 .positiveColorRes(R.color.colorPointed)
                 .negativeColorRes(R.color.colorRed_Light)
@@ -91,7 +92,7 @@ class TrackerListFragment : OTFragment() {
     }
 
     private val newTrackerNameDialog: MaterialDialog.Builder by lazy {
-        MaterialDialog.Builder(this.context)
+        MaterialDialog.Builder(this.context!!)
                 .title(R.string.msg_new_tracker_name)
                 .inputType(InputType.TYPE_CLASS_TEXT)
                 .setSyncWithKeyboard(true)
@@ -138,11 +139,11 @@ class TrackerListFragment : OTFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        lastLoggedTimeFormat = SimpleDateFormat(context.resources.getString(R.string.msg_tracker_list_time_format))
+        lastLoggedTimeFormat = SimpleDateFormat(act.resources.getString(R.string.msg_tracker_list_time_format))
         dateStyleSpan = StyleSpan(Typeface.NORMAL)
         statContentStyleSpan = StyleSpan(Typeface.BOLD)
-        statHeaderSizeSpan = AbsoluteSizeSpan(context.resources.getDimensionPixelSize(R.dimen.tracker_list_element_information_text_headerSize))
-        statHeaderColorSpan = ForegroundColorSpan(ContextCompat.getColor(context, R.color.textColorLight))
+        statHeaderSizeSpan = AbsoluteSizeSpan(act.resources.getDimensionPixelSize(R.dimen.tracker_list_element_information_text_headerSize))
+        statHeaderColorSpan = ForegroundColorSpan(ContextCompat.getColor(act, R.color.textColorLight))
         //attach events
         // user.trackerAdded += onTrackerAddedHandler
         //  user.trackerRemoved += onTrackerRemovedHandler
@@ -172,15 +173,15 @@ class TrackerListFragment : OTFragment() {
         )
     }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        val rootView = inflater!!.inflate(R.layout.fragment_home_trackers, container, false)
+        val rootView = inflater.inflate(R.layout.fragment_home_trackers, container, false)
 
         addTrackerFloatingButton = rootView.findViewById(R.id.fab)
         addTrackerFloatingButton.setOnClickListener { view ->
             newTrackerNameDialog.input(null, viewModel.generateNewTrackerName(), false) {
                     dialog, text ->
-                    startActivityForResult(TrackerDetailActivity.makeNewTrackerIntent(text.toString(), context), REQUEST_CODE_NEW_TRACKER)
+                startActivityForResult(TrackerDetailActivity.makeNewTrackerIntent(text.toString(), act), REQUEST_CODE_NEW_TRACKER)
 
                 }.show()
                 //Toast.makeText(context,String.format(resources.getString(R.string.sentence_new_tracker_added), newTracker.name), Toast.LENGTH_LONG).show()
@@ -192,7 +193,7 @@ class TrackerListFragment : OTFragment() {
         trackerListLayoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         listView.layoutManager = trackerListLayoutManager
 
-        listView.addItemDecoration(HorizontalImageDividerItemDecoration(R.drawable.horizontal_separator_pattern, context, resources.getFraction(R.fraction.tracker_list_separator_height_ratio, 1, 1)))
+        listView.addItemDecoration(HorizontalImageDividerItemDecoration(R.drawable.horizontal_separator_pattern, act, resources.getFraction(R.fraction.tracker_list_separator_height_ratio, 1, 1)))
         listView.addItemDecoration(DrawableListBottomSpaceItemDecoration(R.drawable.expanded_view_inner_shadow_top, 0))
 
         listView.adapter = trackerListAdapter
@@ -202,10 +203,10 @@ class TrackerListFragment : OTFragment() {
 
     override fun onStart() {
         super.onStart()
-        TutorialManager.checkAndShowTargetPrompt(TutorialManager.FLAG_TRACKER_LIST_ADD_TRACKER, true, this.activity, addTrackerFloatingButton,
+        TutorialManager.checkAndShowTargetPrompt(TutorialManager.FLAG_TRACKER_LIST_ADD_TRACKER, true, this.act, addTrackerFloatingButton,
                 R.string.msg_tutorial_add_tracker_primary,
                 R.string.msg_tutorial_add_tracker_secondary,
-                ContextCompat.getColor(context, R.color.colorPointed))
+                ContextCompat.getColor(act, R.color.colorPointed))
     }
 
     override fun onDestroyView() {
@@ -242,11 +243,11 @@ class TrackerListFragment : OTFragment() {
                         //OTBackgroundLoggingService.log(context, tracker, OTItem.ItemLoggingSource.Manual, notify = false).subscribe()
                     }
                     .onNeutral { materialDialog, dialogAction ->
-                        startActivity(TrackerDetailActivity.makeIntent(tracker.objectId, context))
+                        startActivity(TrackerDetailActivity.makeIntent(tracker.objectId, act))
                     }
                     .show()
         } else {
-            startActivityOnDelay(ItemDetailActivity.makeNewItemPageIntent(tracker.objectId!!, context))
+            startActivityOnDelay(ItemDetailActivity.makeNewItemPageIntent(tracker.objectId!!, act))
         }
     }
 
@@ -433,11 +434,11 @@ class TrackerListFragment : OTFragment() {
                 if (view === itemView) {
                     handleTrackerClick(trackerViewModel.trackerDao)
                 } else if (view === editButton) {
-                    startActivityOnDelay(TrackerDetailActivity.makeIntent(trackerId, this@TrackerListFragment.context))
+                    startActivityOnDelay(TrackerDetailActivity.makeIntent(trackerId, this@TrackerListFragment.act))
                 } else if (view === listButton) {
-                    startActivityOnDelay(ItemBrowserActivity.makeIntent(trackerId!!, this@TrackerListFragment.context))
+                    startActivityOnDelay(ItemBrowserActivity.makeIntent(trackerId!!, this@TrackerListFragment.act))
                 } else if (view === removeButton) {
-                    DialogHelper.makeNegativePhrasedYesNoDialogBuilder(context, trackerViewModel.trackerName.value, getString(R.string.msg_confirm_remove_tracker), R.string.msg_remove,
+                    DialogHelper.makeNegativePhrasedYesNoDialogBuilder(this@TrackerListFragment.act, trackerViewModel.trackerName.value, getString(R.string.msg_confirm_remove_tracker), R.string.msg_remove,
                             onYes = { dialog ->
                         viewModel.removeTracker(trackerViewModel)
                         listView.invalidateItemDecorations()
@@ -445,7 +446,7 @@ class TrackerListFragment : OTFragment() {
                         //EventLoggingManager.logTrackerChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_TRACKER_REMOVE, tracker)
                     }).show()
                 } else if (view === chartViewButton) {
-                    startActivityOnDelay(ChartViewActivity.makeIntent(trackerId!!, this@TrackerListFragment.context))
+                    startActivityOnDelay(ChartViewActivity.makeIntent(trackerId!!, this@TrackerListFragment.act))
 
 
                 } else if (view === expandButton) {
@@ -477,14 +478,14 @@ class TrackerListFragment : OTFragment() {
                 println("Last logging time: ${timestamp}")
                 if (timestamp != null) {
                     InterfaceHelper.setTextAppearance(lastLoggingTimeView, R.style.trackerListInformationTextViewStyle)
-                    val dateText = TimeHelper.getDateText(timestamp, context).toUpperCase()
+                    val dateText = TimeHelper.getDateText(timestamp, act).toUpperCase()
                     val timeText = lastLoggedTimeFormat.format(Date(timestamp)).toUpperCase()
                     putStatistics(lastLoggingTimeView, dateText, timeText)
                     todayLoggingCountView.visibility = View.VISIBLE
                     totalItemCountView.visibility = View.VISIBLE
 
                 } else {
-                    lastLoggingTimeView.text = context.resources.getString(R.string.msg_never_logged).toUpperCase()
+                    lastLoggingTimeView.text = act.resources.getString(R.string.msg_never_logged).toUpperCase()
                     InterfaceHelper.setTextAppearance(lastLoggingTimeView, R.style.trackerListInformationTextViewStyle_HeaderAppearance)
                     todayLoggingCountView.visibility = View.INVISIBLE
                     totalItemCountView.visibility = View.INVISIBLE
@@ -492,7 +493,7 @@ class TrackerListFragment : OTFragment() {
             }
 
             private fun setTodayLoggingCount(count: Long) {
-                val header = context.resources.getString(R.string.msg_todays_log).toUpperCase()
+                val header = act.resources.getString(R.string.msg_todays_log).toUpperCase()
                 putStatistics(todayLoggingCountView, header, count.toString())
             }
 

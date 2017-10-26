@@ -93,6 +93,17 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
                         if (trackerAssignPanelContainer == null) {
                             trackerAssignPanelContainer = ui_tracker_assign_panel_stub.inflate()
                             trackerAssignPanel = trackerAssignPanelContainer?.ui_tracker_assign_list
+                            trackerAssignPanel?.let {
+                                if (viewModel.attachedTrackers.hasValue()) {
+                                    it.init(viewModel.attachedTrackers.value)
+                                }
+
+                                creationSubscriptions.add(
+                                        it.trackerListChanged.subscribe { newList ->
+                                            viewModel.attachedTrackers.onNext(newList)
+                                        }
+                                )
+                            }
                         }
                     } else trackerAssignPanelContainer?.visibility = View.GONE
                 }
@@ -131,6 +142,10 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
                                 }
                         )
                     }
+                },
+
+                viewModel.attachedTrackers.subscribe { trackerInfos ->
+                    trackerAssignPanel?.init(trackerInfos)
                 }
         )
     }

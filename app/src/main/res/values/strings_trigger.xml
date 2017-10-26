@@ -26,7 +26,7 @@
 
     <string name="msg_trigger_attached_trackers">Assigned Trackers</string>
 
-    <string name="msg_trigger_assign_tracker">Assign Tracker</string>
+    <string name="msg_trigger_assign_tracker">+ Assign Tracker</string>
 
     <string name="msg_trigger_event_measure_selection">Select Measure</string>
     <string name="msg_trigger_event_comparison_method">Triggered Threshold</string>
