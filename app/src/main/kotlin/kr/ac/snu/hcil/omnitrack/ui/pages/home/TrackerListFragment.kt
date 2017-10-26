@@ -7,6 +7,7 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.graphics.Typeface
 import android.os.Bundle
+import android.support.design.widget.CoordinatorLayout
 import android.support.design.widget.FloatingActionButton
 import android.support.v4.content.ContextCompat
 import android.support.v7.util.DiffUtil
@@ -40,8 +41,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.common.FallbackRecyclerView
 import kr.ac.snu.hcil.omnitrack.ui.components.common.TooltipHelper
-import kr.ac.snu.hcil.omnitrack.ui.components.decorations.DrawableListBottomSpaceItemDecoration
-import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
+import kr.ac.snu.hcil.omnitrack.ui.components.decorations.TopBottomHorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.tutorial.TutorialManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemBrowserActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemDetailActivity
@@ -53,6 +53,7 @@ import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.startActivityOnDelay
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 import org.jetbrains.anko.support.v4.act
+import org.jetbrains.anko.verticalMargin
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -193,9 +194,9 @@ class TrackerListFragment : OTFragment() {
         trackerListLayoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         listView.layoutManager = trackerListLayoutManager
 
-        listView.addItemDecoration(HorizontalImageDividerItemDecoration(R.drawable.horizontal_separator_pattern, act, resources.getFraction(R.fraction.tracker_list_separator_height_ratio, 1, 1)))
-        listView.addItemDecoration(DrawableListBottomSpaceItemDecoration(R.drawable.expanded_view_inner_shadow_top, 0))
-
+        val shadowDecoration = TopBottomHorizontalImageDividerItemDecoration(R.drawable.horizontal_separator_pattern_upper, R.drawable.horizontal_separator_pattern_under, act, resources.getFraction(R.fraction.tracker_list_separator_height_ratio, 1, 1))
+        listView.addItemDecoration(shadowDecoration)
+        (listView.layoutParams as CoordinatorLayout.LayoutParams).verticalMargin = -shadowDecoration.upperDividerHeight
         listView.adapter = trackerListAdapter
 
         return rootView

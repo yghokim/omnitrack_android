@@ -9,6 +9,7 @@ import android.graphics.ColorFilter
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
 import android.os.Bundle
+import android.support.design.widget.CoordinatorLayout
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.util.DiffUtil
@@ -34,8 +35,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.OTTriggerInformationHelper
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
-import kr.ac.snu.hcil.omnitrack.ui.components.decorations.DrawableListBottomSpaceItemDecoration
-import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
+import kr.ac.snu.hcil.omnitrack.ui.components.decorations.TopBottomHorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.AManagedTriggerListViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.ATriggerListViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.OfflineTriggerListViewModel
@@ -44,6 +44,7 @@ import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.dipRound
 import org.jetbrains.anko.support.v4.act
+import org.jetbrains.anko.verticalMargin
 
 /**
  * Created by younghokim on 2017. 10. 21..
@@ -142,8 +143,10 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
         super.onViewCreated(view, savedInstanceState)
 
         ui_trigger_list.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        ui_trigger_list.addItemDecoration(HorizontalImageDividerItemDecoration(context = act))
-        ui_trigger_list.addItemDecoration(DrawableListBottomSpaceItemDecoration(R.drawable.expanded_view_inner_shadow_top, act.resources.getDimensionPixelSize(R.dimen.tracker_list_bottom_space), false))
+        val shadowDecoration = TopBottomHorizontalImageDividerItemDecoration(context = act)
+        ui_trigger_list.addItemDecoration(shadowDecoration)
+
+        (ui_trigger_list.layoutParams as CoordinatorLayout.LayoutParams).verticalMargin = -shadowDecoration.upperDividerHeight
 
         ui_trigger_list.itemAnimator = SlideInLeftAnimator(DecelerateInterpolator(2.0f))
 

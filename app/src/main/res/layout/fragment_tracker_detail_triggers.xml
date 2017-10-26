@@ -2,12 +2,15 @@
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/outerBackground"
     android:orientation="vertical">
 
     <kr.ac.snu.hcil.omnitrack.ui.components.common.FallbackRecyclerView
         android:id="@+id/ui_trigger_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="@dimen/tracker_list_bottom_space" />
 
     <TextView
         android:id="@+id/ui_empty_list_message"
