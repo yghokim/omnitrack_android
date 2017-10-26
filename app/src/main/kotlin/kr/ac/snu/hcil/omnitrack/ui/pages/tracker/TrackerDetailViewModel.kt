@@ -70,6 +70,8 @@ class TrackerDetailViewModel : RealmViewModel() {
             }
         }
 
+    val onChangesApplied = PublishSubject.create<String>()
+
     private val removedAttributes = HashSet<AttributeInformationViewModel>()
 
     private val currentAttributeViewModelList = ArrayList<AttributeInformationViewModel>()
@@ -196,6 +198,8 @@ class TrackerDetailViewModel : RealmViewModel() {
         currentAttributeViewModelList.forEach {
             it.register()
         }
+
+        onChangesApplied.onNext(trackerDao!!.objectId!!)
 
         return trackerDao!!.objectId!!
     }
