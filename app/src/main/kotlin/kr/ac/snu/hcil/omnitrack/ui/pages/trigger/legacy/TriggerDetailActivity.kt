@@ -17,7 +17,6 @@ import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.EventTriggerConfigurationPanel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.ITriggerConfigurationCoordinator
-import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.TimeTriggerConfigurationPanel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.TrackerAssignPanel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.actions.NotificationSettingsPanelView
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
@@ -254,7 +253,7 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_mul
             println("create view")
 
             val view = inflater.inflate(R.layout.activity_trigger_detail, container, false)
-            controlPanelContainer = view.findViewById(R.id.ui_control_panel)
+            controlPanelContainer = view.findViewById(R.id.ui_condition_control_panel_container)
             trackerAssignPanelStub = view.findViewById(R.id.ui_tracker_assign_panel_stub)
             actionSettingsContainer = view.findViewById(R.id.ui_action_settings_container)
 
@@ -371,7 +370,7 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_mul
 
             when (triggerType) {
                 OTTrigger.TYPE_TIME -> {
-                    configurationCoordinatorView = TimeTriggerConfigurationPanel(this.context)
+                    //configurationCoordinatorView = TimeTriggerConfigurationPanel(this.context)
                 }
                 OTTrigger.TYPE_DATA_THRESHOLD -> {
                     configurationCoordinatorView = EventTriggerConfigurationPanel(this.context)

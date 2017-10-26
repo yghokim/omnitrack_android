@@ -11,6 +11,10 @@
 
     <string name="msg_sort_method_timestamp">기록 시각</string>
 
+
+    <string name="msg_format_edit_something">%1$s 수정</string>
+    <string name="msg_format_new_something">새 %1$s</string>
+
     <string name="msg_yes">예</string>
     <string name="msg_no">아니오</string>
 

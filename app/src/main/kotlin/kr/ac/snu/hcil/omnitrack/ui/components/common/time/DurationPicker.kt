@@ -16,6 +16,7 @@ import butterknife.bindView
 import butterknife.bindViews
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
+import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kr.ac.snu.hcil.omnitrack.utils.getActivity
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 
@@ -51,6 +52,8 @@ class DurationPicker : FrameLayout, View.OnClickListener {
     private var mIsInInputMode: Boolean = false
 
     val isInInputMode: Boolean get() = mIsInInputMode
+
+    val onSecondsChanged = Event<Int>()
 
     var durationSeconds: Int = 0
         set(value) {
@@ -90,6 +93,8 @@ class DurationPicker : FrameLayout, View.OnClickListener {
 
                     applyDigitsToView()
                 }
+
+                onSecondsChanged.invoke(this, value)
             }
 
         }

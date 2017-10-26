@@ -44,11 +44,11 @@ open class OTTriggerDAO : RealmObject() {
                     "serializedCondition" -> dao.serializedCondition = reader.nextString()
                     "lastTriggeredTime" -> dao.lastTriggeredTime = reader.nextLong()
                     "trackers" -> {
-                        reader.beginObject()
+                        reader.beginArray()
                         while (reader.hasNext()) {
                             trackerIds.add(reader.nextString())
                         }
-                        reader.endObject()
+                        reader.endArray()
                     }
                 }
             }
@@ -126,7 +126,20 @@ open class OTTriggerDAO : RealmObject() {
 
     @Index
     var conditionType: Byte = CONDITION_TYPE_TIME
+        set(value) {
+            if (field != value) {
+                field = value
+                _condition = null
+            }
+        }
+
     var serializedCondition: String? = null
+        set(value) {
+            if (field != value) {
+                field = value
+                _condition = null
+            }
+        }
 
     @Ignore
     private var _condition: ATriggerCondition? = null
@@ -158,6 +171,12 @@ open class OTTriggerDAO : RealmObject() {
             }
         }
     var serializedAction: String? = null
+        set(value) {
+            if (field != value) {
+                field = value
+                _action = null
+            }
+        }
 
     @Ignore
     private var _action: OTTriggerAction? = null
@@ -205,7 +224,12 @@ open class OTTriggerDAO : RealmObject() {
     var updatedAt: Long = System.currentTimeMillis()
     var userCreatedAt: Long = System.currentTimeMillis()
 
-    fun initialize() {
+    fun initialize(forceRefresh: Boolean = false) {
+        if (forceRefresh) {
+            _action = null
+            _condition = null
+        }
+
         val action = this.action
         val condition = this.condition
         if (this.realm?.isInTransaction == false) {
