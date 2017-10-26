@@ -26,6 +26,7 @@
         android:id="@+id/rootScroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@+id/appbar"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
@@ -34,7 +35,7 @@
             android:orientation="vertical">
 
             <FrameLayout
-                android:id="@+id/ui_control_panel"
+                android:id="@+id/ui_condition_control_panel_container"
             android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 

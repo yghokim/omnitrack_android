@@ -300,9 +300,9 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
         if (realm.isInTransaction) {
             realm.copyToRealmOrUpdate(dao)
         } else {
-            realm.executeTransaction { realm ->
+            realm.executeTransactionAsync({ realm ->
                 realm.copyToRealm(dao)
-            }
+            }, {}, { err -> err.printStackTrace() })
         }
     }
 

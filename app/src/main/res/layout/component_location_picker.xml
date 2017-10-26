@@ -78,7 +78,7 @@
             android:layout_height="match_parent" />
 
         <RelativeLayout
-            android:id="@+id/ui_control_panel"
+            android:id="@+id/ui_condition_control_panel_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:paddingBottom="8dp"

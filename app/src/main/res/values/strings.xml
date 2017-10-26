@@ -75,6 +75,9 @@
     <string name="msg_data_list">Item List</string>
     <string name="msg_remove">Remove</string>
 
+    <string name="msg_format_edit_something">Edit %1$s</string>
+    <string name="msg_format_new_something">New %1$s</string>
+
     <string name="msg_sort_descending">Descending</string>
     <string name="msg_sort_ascending">Ascending</string>
 

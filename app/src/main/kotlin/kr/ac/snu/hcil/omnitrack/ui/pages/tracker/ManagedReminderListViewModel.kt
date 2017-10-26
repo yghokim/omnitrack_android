@@ -5,13 +5,13 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTriggerDAO
-import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.ATriggerListViewModel
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.AManagedTriggerListViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.TriggerInterfaceOptions
 
 /**
  * Created by younghokim on 2017. 10. 22..
  */
-class ReminderListViewModel : ATriggerListViewModel() {
+class ManagedReminderListViewModel : AManagedTriggerListViewModel() {
 
     val trackerId: String?
         get() {

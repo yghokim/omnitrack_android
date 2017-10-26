@@ -12,7 +12,7 @@ import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTTimeTriggerCondition
 object OTTriggerViewFactory {
     interface ITriggerConditionViewProvider {
         fun getTriggerDisplayView(original: View?, trigger: OTTriggerDAO, context: Context): View
-        fun getTriggerConfigurationPanel(original: View?, trigger: OTTriggerDAO, context: Context): View
+        fun getTriggerConfigurationPanel(original: View?, context: Context): IConditionConfigurationView
     }
 
     private val providerDict: SparseArray<ITriggerConditionViewProvider> by lazy {
@@ -37,7 +37,7 @@ object OTTriggerViewFactory {
                     return displayView
                 }
 
-                override fun getTriggerConfigurationPanel(original: View?, trigger: OTTriggerDAO, context: Context): View {
+                override fun getTriggerConfigurationPanel(original: View?, context: Context): IConditionConfigurationView {
                     val configPanel = if (original is TimeTriggerConfigurationPanel) {
                         original
                     } else kr.ac.snu.hcil.omnitrack.ui.pages.trigger.TimeTriggerConfigurationPanel(context)
@@ -48,7 +48,7 @@ object OTTriggerViewFactory {
         }
     }
 
-    fun getConditionViewProvider(trigger: OTTriggerDAO): ITriggerConditionViewProvider? {
-        return providerDict.get(trigger.conditionType.toInt())
+    fun getConditionViewProvider(conditionType: Byte): ITriggerConditionViewProvider? {
+        return providerDict.get(conditionType.toInt())
     }
 }

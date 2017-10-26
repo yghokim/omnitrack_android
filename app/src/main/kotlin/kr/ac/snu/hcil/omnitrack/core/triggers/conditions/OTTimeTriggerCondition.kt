@@ -5,6 +5,8 @@ import com.google.gson.GsonBuilder
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
+import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTriggerDAO
 
 /**
@@ -20,13 +22,14 @@ class OTTimeTriggerCondition : ATriggerCondition(OTTriggerDAO.CONDITION_TYPE_TIM
 
             while (reader.hasNext()) {
                 when (reader.nextName()) {
-                    "cType" -> condition.timeConditionType = reader.nextInt()
+                    "cType" -> condition.timeConditionType = reader.nextInt().toByte()
                     "aHr" -> condition.alarmTimeHour = reader.nextInt().toByte()
                     "aMin" -> condition.alarmTimeMinute = reader.nextInt().toByte()
                     "iSec" -> condition.intervalSeconds = reader.nextInt().toShort()
                     "iRanged" -> condition.intervalIsHourRangeUsed = reader.nextBoolean()
                     "iStartHr" -> condition.intervalHourRangeStart = reader.nextInt().toByte()
                     "iEndHr" -> condition.intervalHourRangeEnd = reader.nextInt().toByte()
+                    "repeat" -> condition.isRepeated = reader.nextBoolean()
                     "dow" -> condition.dayOfWeekFlags = reader.nextInt().toByte()
                     "endAt" -> condition.endAt = reader.nextLong()
                 }
@@ -47,6 +50,7 @@ class OTTimeTriggerCondition : ATriggerCondition(OTTriggerDAO.CONDITION_TYPE_TIM
             out.name("iRanged").value(value.intervalIsHourRangeUsed)
             out.name("iStartHr").value(value.intervalHourRangeStart)
             out.name("iEndHr").value(value.intervalHourRangeEnd)
+            out.name("repeat").value(value.isRepeated)
             out.name("dow").value(value.dayOfWeekFlags)
             out.name("endAt").value(value.endAt)
 
@@ -56,8 +60,8 @@ class OTTimeTriggerCondition : ATriggerCondition(OTTriggerDAO.CONDITION_TYPE_TIM
     }
 
     companion object {
-        const val TIME_CONDITION_ALARM = 0
-        const val TIME_CONDITION_INTERVAL = 1
+        const val TIME_CONDITION_ALARM: Byte = 0
+        const val TIME_CONDITION_INTERVAL: Byte = 1
 
         val typeAdapter: TimeTriggerConditionTypeAdapter by lazy { TimeTriggerConditionTypeAdapter() }
         val parser: Gson by lazy {
@@ -65,7 +69,7 @@ class OTTimeTriggerCondition : ATriggerCondition(OTTriggerDAO.CONDITION_TYPE_TIM
         }
     }
 
-    var timeConditionType: Int = TIME_CONDITION_ALARM
+    var timeConditionType: Byte = TIME_CONDITION_ALARM
 
     var alarmTimeHour: Byte = 17 // 0~23
     var alarmTimeMinute: Byte = 0 //0~59
@@ -75,11 +79,21 @@ class OTTimeTriggerCondition : ATriggerCondition(OTTriggerDAO.CONDITION_TYPE_TIM
     var intervalHourRangeStart: Byte = 9
     var intervalHourRangeEnd: Byte = 24
 
+    var isRepeated: Boolean = false
+
     var dayOfWeekFlags: Byte = 0b1111111
     var endAt: Long? = null
 
 
     override fun getSerializedString(): String? {
         return parser.toJson(this, OTTimeTriggerCondition::class.java)
+    }
+
+
+    override fun isConfigurationValid(validationErrorMessages: MutableList<CharSequence>?): Boolean {
+        if (timeConditionType == TIME_CONDITION_INTERVAL && intervalSeconds <= 0.toShort()) {
+            validationErrorMessages?.add(OTApp.getString(R.string.msg_trigger_error_interval_not_0))
+            return false
+        } else return true
     }
 }
