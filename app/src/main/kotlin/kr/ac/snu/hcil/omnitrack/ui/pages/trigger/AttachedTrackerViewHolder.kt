@@ -7,6 +7,7 @@ import android.support.v4.graphics.drawable.DrawableCompat
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import kotlinx.android.synthetic.main.layout_attached_tracker_list_element.view.*
 import kr.ac.snu.hcil.omnitrack.R
 import org.jetbrains.anko.backgroundDrawable
 
@@ -28,5 +29,9 @@ open class AttachedTrackerViewHolder(parent: ViewGroup?, @LayoutRes layoutId: In
 
     fun setColor(color: Int) {
         indicatorLayer?.let { DrawableCompat.setTint(it, color) }
+    }
+
+    fun setName(name: String) {
+        itemView.text.text = name
     }
 }

@@ -23,6 +23,7 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.home.MeasureFactoryAdapter
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.dipRound
 import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
+import org.jetbrains.anko.support.v4.act
 
 /**
  * Created by Young-Ho on 7/29/2016.
@@ -34,12 +35,12 @@ class ServiceListFragment : OTFragment() {
     private lateinit var adapter: Adapter
 
     private val internetRequiredAlertBuilder: MaterialDialog.Builder by lazy {
-        DialogHelper.makeSimpleAlertBuilder(context, context.getString(R.string.msg_external_service_activation_requires_internet))
+        DialogHelper.makeSimpleAlertBuilder(act, act.getString(R.string.msg_external_service_activation_requires_internet))
     }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        val rootView = inflater!!.inflate(R.layout.fragment_home_services, container, false)
+        val rootView = inflater.inflate(R.layout.fragment_home_services, container, false)
 
         listView = rootView.findViewById(R.id.ui_list)
 
@@ -114,15 +115,15 @@ class ServiceListFragment : OTFragment() {
             val serviceStateSubscription = SerialDisposable()
 
             private val activateColor: ColorStateList by lazy {
-                ColorStateList.valueOf(ContextCompat.getColor(context, R.color.colorPointed))
+                ColorStateList.valueOf(ContextCompat.getColor(act, R.color.colorPointed))
             }
 
             private val deactivateColor: ColorStateList by lazy {
-                ColorStateList.valueOf(ContextCompat.getColor(context, R.color.colorRed_Light))
+                ColorStateList.valueOf(ContextCompat.getColor(act, R.color.colorRed_Light))
             }
 
             private val onActivatingColor: ColorStateList by lazy {
-                ColorStateList.valueOf(ContextCompat.getColor(context, R.color.material_grey_100))
+                ColorStateList.valueOf(ContextCompat.getColor(act, R.color.material_grey_100))
             }
 
 
@@ -144,7 +145,7 @@ class ServiceListFragment : OTFragment() {
                 measureFactoryListView = view.findViewById(R.id.ui_supported_measure_list)
                 measureFactoryListView.adapter = measureFactoryAdapter
                 measureFactoryListView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-                measureFactoryListView.addItemDecoration(HorizontalDividerItemDecoration(ContextCompat.getColor(context, R.color.separator_Light), dipRound(0.6f)))
+                measureFactoryListView.addItemDecoration(HorizontalDividerItemDecoration(ContextCompat.getColor(act, R.color.separator_Light), dipRound(0.6f)))
 
                 activationButton = view.findViewById(R.id.ui_button_activate)
                 activationButton.supportBackgroundTintList = activateColor
@@ -170,7 +171,7 @@ class ServiceListFragment : OTFragment() {
                                 } else {
                                 */
                                 creationSubscriptions.add(
-                                        service.startActivationActivityAsync(context).subscribe({
+                                        service.startActivationActivityAsync(act).subscribe({
                                             success ->
                                         }, { })
                                 )
@@ -206,8 +207,8 @@ class ServiceListFragment : OTFragment() {
             }
 
             fun bind(service: OTExternalService) {
-                nameView.text = context.resources.getString(service.nameResourceId)
-                descriptionView.text = context.resources.getString(service.descResourceId)
+                nameView.text = act.resources.getString(service.nameResourceId)
+                descriptionView.text = act.resources.getString(service.descResourceId)
                 thumbView.setImageResource(service.thumbResourceId)
 
                 measureFactoryAdapter.service = service

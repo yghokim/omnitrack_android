@@ -302,7 +302,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
                 TAB_INDEX_STRUCTURE -> R.drawable.icon_structure
                 TAB_INDEX_REMINDERS -> R.drawable.alarm_dark
                 else -> R.drawable.icon_structure
-            }), Color.WHITE)
+            })!!, Color.WHITE)
         }
 
         override fun getPageTitle(position: Int): CharSequence? {

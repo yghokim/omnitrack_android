@@ -62,7 +62,7 @@ class VersionCheckDialogFragment : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
-        val inflater = activity.layoutInflater
+        val inflater = activity!!.layoutInflater
         val view = inflater.inflate(R.layout.layout_version_compare, null)
         setupViews(view)
 

@@ -46,6 +46,7 @@ import kr.ac.snu.hcil.omnitrack.utils.*
 import kr.ac.snu.hcil.omnitrack.utils.io.FileHelper
 import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
+import org.jetbrains.anko.support.v4.act
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.properties.Delegates
@@ -652,7 +653,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
         override fun onActivityCreated(savedInstanceState: Bundle?) {
             super.onActivityCreated(savedInstanceState)
-            viewModel = ViewModelProviders.of(activity).get(ItemListViewModel::class.java)
+            viewModel = ViewModelProviders.of(activity!!).get(ItemListViewModel::class.java)
 
             dialogSubscriptions.add(
                     viewModel.sortedItemsObservable.subscribe { items ->
@@ -702,7 +703,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
         }
 
         private fun refreshPurgeButton() {
-            val cacheSize = this.viewModel.trackerDao.getTotalCacheFileSize(context)
+            val cacheSize = this.viewModel.trackerDao.getTotalCacheFileSize(act)
             if (cacheSize > 0L) {
                 purgeMenuItem.isEnabled = true
                 purgeMenuItem.description = "${(cacheSize / (1024 * 102.4f) + .5f).toInt() / 10f} Mb"
@@ -715,9 +716,8 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
         override fun setupDialogAndContentView(dialog: Dialog, contentView: View) {
 
-            purgeMenuItem = RecyclerViewMenuAdapter.MenuItem(R.drawable.clear_cache, context.getString(R.string.msg_purge_cache), null, isEnabled = false, onClick = {
-                val cacheDir = viewModel.trackerDao.getItemCacheDir(context, false)
-                if (cacheDir != null) {
+            purgeMenuItem = RecyclerViewMenuAdapter.MenuItem(R.drawable.clear_cache, OTApp.getString(R.string.msg_purge_cache), null, isEnabled = false, onClick = {
+                val cacheDir = viewModel.trackerDao.getItemCacheDir(act, false)
                     println("purge cache dir files")
                     /*
                     RxProgressDialog.Builder(FileHelper.removeAllFilesIn(cacheDir).toObservable()).create(this@SettingsDialogFragment.activity).show().subscribe {
@@ -725,10 +725,9 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                     }*/
                     FileHelper.deleteDirectory(cacheDir)
                     refreshPurgeButton()
-                }
             })
 
-            deletionMenuItem = RecyclerViewMenuAdapter.MenuItem(R.drawable.trashcan, context.getString(R.string.msg_remove_all_the_items_permanently), null, isEnabled = false, onClick = {
+            deletionMenuItem = RecyclerViewMenuAdapter.MenuItem(R.drawable.trashcan, OTApp.getString(R.string.msg_remove_all_the_items_permanently), null, isEnabled = false, onClick = {
                 //TODO remove all items
             })
 
@@ -739,7 +738,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
                 viewModel.trackerDao.let {
 
-                    val configDialog = OTTableExportService.makeConfigurationDialog(context, it) { includeFile, tableFileType ->
+                    val configDialog = OTTableExportService.makeConfigurationDialog(act, it) { includeFile, tableFileType ->
                         exportConfigIncludeFile = includeFile
                         exportConfigTableFileType = tableFileType
 
@@ -751,7 +750,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                         if (includeFile) {
                             val currentNetworkConnectionInfo = NetworkHelper.getCurrentNetworkConnectionInfo()
                             if (currentNetworkConnectionInfo.mobileConnected && !currentNetworkConnectionInfo.wifiConnected) {
-                                DialogHelper.makeYesNoDialogBuilder(this@SettingsDialogFragment.context, "OmniTrack", getString(R.string.msg_export_warning_mobile_network), R.string.msg_export, onYes = {
+                                DialogHelper.makeYesNoDialogBuilder(act, "OmniTrack", getString(R.string.msg_export_warning_mobile_network), R.string.msg_export, onYes = {
                                     this@SettingsDialogFragment.startActivityForResult(intent, ItemBrowserActivity.SettingsDialogFragment.REQUEST_CODE_FILE_LOCATION_PICK)
                                 })
                                         .show()
@@ -801,7 +800,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                     if (exportUri != null) {
                         println(exportUri.toString())
                         viewModel.trackerDao.objectId?.let {
-                            val serviceIntent = OTTableExportService.makeIntent(this@SettingsDialogFragment.context, it, exportUri.toString(), exportConfigIncludeFile, exportConfigTableFileType)
+                            val serviceIntent = OTTableExportService.makeIntent(act, it, exportUri.toString(), exportConfigIncludeFile, exportConfigTableFileType)
                             this@SettingsDialogFragment.dismiss()
                             activity?.startService(serviceIntent)
                         }

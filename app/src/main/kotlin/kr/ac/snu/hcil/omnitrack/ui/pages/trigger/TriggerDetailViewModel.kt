@@ -1,7 +1,11 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 
 import io.reactivex.subjects.BehaviorSubject
+import io.realm.OrderedCollectionChangeSet
+import io.realm.OrderedRealmCollectionChangeListener
+import io.realm.RealmResults
 import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.ATriggerCondition
 import kr.ac.snu.hcil.omnitrack.utils.RealmViewModel
@@ -10,7 +14,8 @@ import kr.ac.snu.hcil.omnitrack.utils.onNextIfDifferAndNotNull
 /**
  * Created by younghokim on 2017-10-24.
  */
-class TriggerDetailViewModel : RealmViewModel() {
+class TriggerDetailViewModel : RealmViewModel(), OrderedRealmCollectionChangeListener<RealmResults<OTTrackerDAO>> {
+
     companion object {
         const val MODE_NEW: Byte = 0
         const val MODE_EDIT: Byte = 1
@@ -21,6 +26,7 @@ class TriggerDetailViewModel : RealmViewModel() {
         private set
 
     private var originalTriggerDao: OTTriggerDAO? = null
+    private var attachedTrackersResult: RealmResults<OTTrackerDAO>? = null
 
     var isOffline: Boolean = false
         private set
@@ -33,6 +39,10 @@ class TriggerDetailViewModel : RealmViewModel() {
     var isInitialized: Boolean = false
         private set
 
+    private var attachedTrackersRealmResults: RealmResults<OTTrackerDAO>? = null
+    private val currentAttachedTrackerInfoList = java.util.ArrayList<OTTrackerDAO.SimpleTrackerInfo>()
+    val attachedTrackers = BehaviorSubject.createDefault<List<OTTrackerDAO.SimpleTrackerInfo>>(currentAttachedTrackerInfoList)
+
     fun initEdit(triggerId: String, userId: String) {
         if (!isInitialized) {
             isOffline = false
@@ -41,6 +51,7 @@ class TriggerDetailViewModel : RealmViewModel() {
             val dao = OTApp.instance.databaseManager.makeTriggersOfUserQuery(userId, realm).equalTo("objectId", triggerId).findFirst()
             if (dao != null) {
                 this.originalTriggerDao = dao
+                this.attachedTrackersRealmResults = dao.liveTrackersQuery.findAllAsync()
                 applyToFront(dao)
             }
             isInitialized = true
@@ -68,6 +79,11 @@ class TriggerDetailViewModel : RealmViewModel() {
         }
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        attachedTrackersRealmResults?.removeAllChangeListeners()
+    }
+
     fun getSerializedDao(): String? {
         return originalTriggerDao?.let { OTTriggerDAO.parser.toJson(it, OTTriggerDAO::class.java) }
     }
@@ -79,10 +95,38 @@ class TriggerDetailViewModel : RealmViewModel() {
         } else return msgs
     }
 
+    override fun onChange(snapshot: RealmResults<OTTrackerDAO>, changeSet: OrderedCollectionChangeSet?) {
+        if (changeSet == null) {
+            currentAttachedTrackerInfoList.clear()
+            currentAttachedTrackerInfoList.addAll(snapshot.map { it.getSimpleInfo() })
+        } else {
+            val removes = changeSet.deletions.map { i -> currentAttachedTrackerInfoList[i] }
+            currentAttachedTrackerInfoList.removeAll(removes)
+
+            //deal with additions
+            val newDaos = changeSet.insertions.map { i -> snapshot[i] }
+            currentAttachedTrackerInfoList.addAll(
+                    newDaos.mapNotNull { it?.getSimpleInfo() }
+            )
+
+            //deal with update
+            changeSet.changes.forEach { index ->
+                snapshot[index]?.getSimpleInfo()?.let { currentAttachedTrackerInfoList[index] = it }
+            }
+        }
+
+        attachedTrackers.onNext(currentAttachedTrackerInfoList)
+    }
+
     private fun applyToFront(dao: OTTriggerDAO) {
         actionType.onNextIfDifferAndNotNull(dao.actionType)
         conditionType.onNextIfDifferAndNotNull(dao.conditionType)
         conditionInstance.onNextIfDifferAndNotNull(dao.condition?.clone() as ATriggerCondition)
+        if (isOffline) {
+            currentAttachedTrackerInfoList.clear()
+            currentAttachedTrackerInfoList.addAll(dao.trackers.map { it.getSimpleInfo() })
+            attachedTrackers.onNext(currentAttachedTrackerInfoList)
+        }
     }
 
     val isDirty: Boolean

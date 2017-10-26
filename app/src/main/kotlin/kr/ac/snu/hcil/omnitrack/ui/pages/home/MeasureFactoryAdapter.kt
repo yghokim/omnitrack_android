@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.OTTracker
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.TrackerPickerDialogBuilder
@@ -93,8 +93,13 @@ class MeasureFactoryAdapter : RecyclerView.Adapter<MeasureFactoryAdapter.Measure
         private inner class TrackerPickerElementViewHolder(view: View) : TrackerPickerDialogBuilder.TrackerViewHolder(view) {
             private val messageView: TextView = view.findViewById(R.id.message)
 
+            override fun bind(trackerInfo: OTTrackerDAO.SimpleTrackerInfo) {
+
+            }
+            /*
             override fun bind(tracker: OTTracker) {
-                super.bind(tracker)
+               //TODO migrate this logic
+                super.bind(tracker.)
                 val numConnectedAttributes = tracker.attributes.filter { it.isMeasureFactoryConnected(measureFactory) }.size
                 if (numConnectedAttributes > 0) {
                     messageView.visibility = View.VISIBLE
@@ -104,7 +109,7 @@ class MeasureFactoryAdapter : RecyclerView.Adapter<MeasureFactoryAdapter.Measure
                 } else {
                     messageView.visibility = View.GONE
                 }
-            }
+            }*/
         }
     }
 
