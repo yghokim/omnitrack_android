@@ -13,6 +13,7 @@ import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.utils.*
 import org.jetbrains.anko.collections.forEachWithIndex
 import java.util.*
@@ -38,6 +39,8 @@ class TrackerDetailViewModel : RealmViewModel() {
 
     //Observables========================================
     val trackerIdObservable = BehaviorSubject.createDefault<Nullable<String>>(Nullable(null))
+
+    val reminderCountObservable = BehaviorSubject.createDefault<Int>(0)
 
     val nameObservable = BehaviorSubject.createDefault<String>("")
     val isBookmarkedObservable = BehaviorSubject.createDefault<Boolean>(false)
@@ -126,6 +129,19 @@ class TrackerDetailViewModel : RealmViewModel() {
                                             attributeViewModelListObservable.onNext(currentAttributeViewModelList)
                                         }
                                 )
+
+
+                                snapshot.liveTriggersQuery?.let {
+                                    subscriptions.add(
+                                            it.equalTo("actionType", OTTriggerDAO.ACTION_TYPE_REMIND)
+                                                    .findAllAsync()
+                                                    .asFlowable()
+                                                    .subscribe {
+                                                        reminderCountObservable.onNextIfDifferAndNotNull(it.size)
+                                                    }
+                                    )
+                                }
+
                                 trackerDao = dao
                             }
                         }
