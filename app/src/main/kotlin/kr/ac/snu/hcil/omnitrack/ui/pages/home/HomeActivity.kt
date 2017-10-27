@@ -70,14 +70,6 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
         sidebar = SidebarWrapper(findViewById(R.id.ui_sidebar), this)
         sidebar.onCreate()
 
-        /*
-        slidingMenu = SlidingMenu(this, SlidingMenu.SLIDING_WINDOW)
-        slidingMenu.mode = SlidingMenu.LEFT
-        slidingMenu.setFadeDegree(0.3f)
-        slidingMenu.setFadeEnabled(true)
-        slidingMenu.setBehindOffsetRes(R.dimen.home_sliding_menu_right_region)
-*/
-
         creationSubscriptions.add(
                 super.signedInUserObservable.subscribe {
                     user ->

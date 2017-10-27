@@ -140,63 +140,19 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
             title = resources.getString(R.string.title_activity_tracker_new)
         }
 
-        val trackerObjectId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
-
-
-        /*
         creationSubscriptions.add(
-                signedInUserObservable.doOnNext { user -> this.user = user }
-                        .flatMap {
-                            user ->
-                            user.getTrackerObservable(trackerObjectId)
-                        }.first().toSingle().timeout(2, TimeUnit.SECONDS).subscribe({
-                    tracker ->
-                    this.tracker = tracker
-                    trackerSubject.onNext(tracker)
-                    onTrackerLoaded(tracker)
-                }, {
-                    ex ->
-                    ex.printStackTrace()
-                    println("Warning: tracker does not exists. wait.")
-                    val intent = Intent(this, HomeActivity::class.java)
-                    startActivity(intent)
-                    finish()
-                })
+                viewModel.reminderCountObservable.subscribe { count ->
+                    (tabLayout.getTabAt(TAB_INDEX_REMINDERS)?.customView?.tag as? TabViewHolder)?.setValue(mSectionsPagerAdapter.getPageTitle(TAB_INDEX_REMINDERS) ?: "Reminders", count)
+                }
         )
 
+        /*
         if (intent.hasExtra(INTENT_KEY_FOCUS_ATTRIBUTE_ID)) {
             //val attributeId = intent.getStringExtra(INTENT_KEY_FOCUS_ATTRIBUTE_ID)
             mViewPager.setCurrentItem(0, true)
 
         }*/
 
-    }
-/*
-    private fun onTrackerLoaded(tracker: OTTracker) {
-        transitionToColor(tracker.color, false)
-        refreshReminderCount()
-
-        creationSubscriptions.add(
-                tracker.reminderAdded.subscribe {
-                    refreshReminderCount()
-                }
-        )
-
-        creationSubscriptions.add(
-                tracker.reminderRemoved.subscribe {
-                    refreshReminderCount()
-                }
-        )
-    }*/
-
-    private fun refreshReminderCount() {
-        //TODO reminder count
-        /*
-        tracker?.let {
-            tracker ->
-            val reminders = tracker.owner?.triggerManager?.getAttachedTriggers(tracker, OTTrigger.ACTION_NOTIFICATION)
-            (tabLayout.getTabAt(TAB_INDEX_REMINDERS)?.customView?.tag as? TabViewHolder)?.setValue(mSectionsPagerAdapter.getPageTitle(TAB_INDEX_REMINDERS) ?: "Reminders", reminders?.size ?: 0)
-        }*/
     }
 
     private fun tossToHome() {

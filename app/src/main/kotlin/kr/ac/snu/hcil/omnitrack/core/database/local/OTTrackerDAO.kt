@@ -11,10 +11,7 @@ import com.google.gson.stream.JsonWriter
 import com.tbruyelle.rxpermissions2.RxPermissions
 import io.reactivex.Observable
 import io.reactivex.Single
-import io.realm.Realm
-import io.realm.RealmList
-import io.realm.RealmObject
-import io.realm.RealmResults
+import io.realm.*
 import io.realm.annotations.Index
 import io.realm.annotations.LinkingObjects
 import io.realm.annotations.PrimaryKey
@@ -73,6 +70,7 @@ open class OTTrackerDAO : RealmObject() {
     @LinkingObjects("trackers")
     val triggers: RealmResults<OTTriggerDAO>? = null
 
+    val liveTriggersQuery: RealmQuery<OTTriggerDAO>? get() = triggers?.where()?.equalTo(RealmDatabaseManager.FIELD_REMOVED_BOOLEAN, false)
 
     val creationFlagsMap: Map<String, String> get() = RealmDatabaseManager.convertRealmEntryListToDictionary(creationFlags)
 
