@@ -287,7 +287,11 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
     }
 
     private fun askChangeAndFinish(backInsteadOfFinish: Boolean = false) {
-        DialogHelper.makeYesNoDialogBuilder(this, "OmniTrack", resources.getString(R.string.msg_confirm_field_apply_change), R.string.msg_apply, onYes = {
+        DialogHelper.makeYesNoDialogBuilder(this, "OmniTrack",
+                String.format(OTApp.getString(R.string.msg_format_confirm_apply_change), OTApp.getString(R.string.msg_text_field)),
+                yesLabel = R.string.msg_save,
+                noLabel = R.string.msg_do_not_save,
+                onYes = {
             saveChanges()
             if (backInsteadOfFinish)
                 super.onBackPressed()

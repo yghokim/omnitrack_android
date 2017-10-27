@@ -152,8 +152,16 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
 
     override fun onToolbarLeftButtonClicked() {
         if (viewModel.isDirty) {
+            val isEditMode = viewModel.viewModelMode.value == TriggerDetailViewModel.MODE_EDIT
+            val actionNameId = OTTriggerInformationHelper.getActionNameResId(viewModel.actionType.value) ?: R.string.msg_text_trigger
+            val msg = if (isEditMode) {
+                String.format(OTApp.getString(R.string.msg_format_confirm_apply_change), OTApp.getString(actionNameId).toLowerCase())
+            } else {
+                String.format(OTApp.getString(R.string.msg_format_confirm_save_creation), OTApp.getString(actionNameId).toLowerCase())
+            }
+
             DialogHelper.makeYesNoDialogBuilder(this, "OmniTrack",
-                    resources.getString(R.string.msg_confirm_trigger_apply_change), R.string.msg_apply, onYes =
+                    msg, yesLabel = R.string.msg_save, noLabel = R.string.msg_do_not_save, onYes =
             {
                 val errorMessages = viewModel.validateConfiguration()
                 if (errorMessages == null) {
@@ -167,6 +175,10 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
         } else {
             finish()
         }
+    }
+
+    override fun onBackPressed() {
+        onToolbarLeftButtonClicked()
     }
 
     override fun onToolbarRightButtonClicked() {
