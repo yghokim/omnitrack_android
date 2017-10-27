@@ -296,11 +296,16 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
         }
     }
 
-    fun addNewTrigger(dao: OTTriggerDAO, realm: Realm) {
+    fun saveTrigger(dao: OTTriggerDAO, realm: Realm) {
         if (realm.isInTransaction) {
             realm.copyToRealmOrUpdate(dao)
         } else {
             realm.executeTransactionAsync({ realm ->
+                if (!dao.isManaged && dao.trackers.isNotEmpty()) {
+                    val trackers = realm.where(OTTrackerDAO::class.java).`in`("objectId", dao.trackers.map { it.objectId }.toTypedArray()).findAll()
+                    dao.trackers.clear()
+                    dao.trackers.addAll(trackers)
+                }
                 realm.copyToRealmOrUpdate(dao)
             }, {}, { err -> err.printStackTrace() })
         }
@@ -506,7 +511,7 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
 
     protected fun handleBinaryUpload(itemId: String, item: OTItemDAO, localIdsToIgnore: Array<String>?) {
 
-        item.fieldValueEntries.filter { !(localIdsToIgnore?.contains(it.key) ?: false) }.forEach { entry ->
+        item.fieldValueEntries.filter { localIdsToIgnore?.contains(it.key) != true }.forEach { entry ->
             val value = entry.value?.let { TypeStringSerializationHelper.deserialize(it) }
             if (value != null) {
                 if (value is SynchronizedUri && value.localUri != Uri.EMPTY) {

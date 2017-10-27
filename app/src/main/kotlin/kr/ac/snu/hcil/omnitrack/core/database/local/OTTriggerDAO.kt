@@ -56,10 +56,10 @@ open class OTTriggerDAO : RealmObject() {
 
             if (trackerIds.isNotEmpty()) {
                 val realm = OTApp.instance.databaseManager.getRealmInstance()
-                dao.trackers.addAll(realm.where(OTTrackerDAO::class.java)
+                dao.trackers.addAll(realm.copyFromRealm(realm.where(OTTrackerDAO::class.java)
                         .equalTo(RealmDatabaseManager.FIELD_REMOVED_BOOLEAN, false)
                         .`in`(RealmDatabaseManager.FIELD_OBJECT_ID, trackerIds.toTypedArray())
-                        .findAll())
+                        .findAll()))
                 realm.close()
             }
 
@@ -206,7 +206,7 @@ open class OTTriggerDAO : RealmObject() {
                 if (serializedAction != it) {
                     serializedAction = it; true
                 } else false
-            } ?: false
+            } == true
 
     //Device-only properties===========
     //When synchronizing them, convey them with corresponding device local ids.

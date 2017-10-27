@@ -66,7 +66,7 @@ abstract class AManagedTriggerListViewModel : ATriggerListViewModel() {
 
         beforeAddNewTrigger(dao)
 
-        OTApp.instance.databaseManager.addNewTrigger(dao, realm)
+        OTApp.instance.databaseManager.saveTrigger(dao, realm)
     }
 
     override fun removeTrigger(objectId: String) {

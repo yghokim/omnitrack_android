@@ -145,7 +145,11 @@ class TriggerDetailViewModel : RealmViewModel(), OrderedRealmCollectionChangeLis
                 val trackerIds = attachedTrackers.value.mapNotNull { it.objectId }.toTypedArray()
                 if (trackerIds.isNotEmpty()) {
                     val trackers = realm.where(OTTrackerDAO::class.java).`in`("objectId", attachedTrackers.value.mapNotNull { it.objectId }.toTypedArray()).findAll()
-                    dao.trackers.addAll(trackers)
+                    if (dao.isManaged) {
+                        dao.trackers.addAll(trackers)
+                    } else {
+                        dao.trackers.addAll(realm.copyFromRealm(trackers))
+                    }
                 }
             }
 
