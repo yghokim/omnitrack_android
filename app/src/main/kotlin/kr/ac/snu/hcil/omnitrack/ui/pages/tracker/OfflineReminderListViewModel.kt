@@ -23,7 +23,7 @@ class OfflineReminderListViewModel : OfflineTriggerListViewModel() {
                     if (trackerDao != null)
                         it.trackers.add(realm.copyFromRealm(trackerDao))
                 }
-                OTApp.instance.databaseManager.addNewTrigger(it, realm)
+                OTApp.instance.databaseManager.saveTrigger(it, realm)
             }
         }
     }
