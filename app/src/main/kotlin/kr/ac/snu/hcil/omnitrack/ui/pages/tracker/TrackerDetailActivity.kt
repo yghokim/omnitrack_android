@@ -129,14 +129,14 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
         if (isEditMode) {
             val trackerId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
             this.viewModel.init(trackerId)
-            //setActionBarButtonMode(Mode.Back)
+            setActionBarButtonMode(Mode.Back)
             title = resources.getString(R.string.title_activity_tracker_edit)
         } else {
             this.viewModel.init(null)
             if (intent.hasExtra(INTENT_KEY_NEW_TRACKER_PRESET_NAME)) {
                 this.viewModel.name = intent.getStringExtra(INTENT_KEY_NEW_TRACKER_PRESET_NAME)
             }
-
+            setActionBarButtonMode(Mode.SaveCancel)
             title = resources.getString(R.string.title_activity_tracker_new)
         }
 
@@ -207,8 +207,9 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
     }
 
     override fun onToolbarLeftButtonClicked() {
-        if (viewModel.isDirty) {
-            DialogHelper.makeYesNoDialogBuilder(this, "OmniTrack", resources.getString(R.string.msg_confirm_tracker_apply_change), R.string.msg_apply, onYes = {
+        if (!viewModel.isEditMode) {
+            DialogHelper.makeYesNoDialogBuilder(this, "OmniTrack",
+                    String.format(OTApp.getString(R.string.msg_format_confirm_save_creation), OTApp.getString(R.string.msg_text_tracker)), yesLabel = R.string.msg_save, noLabel = R.string.msg_do_not_save, onYes = {
                 onToolbarRightButtonClicked()
             }, onNo = {
                 setResult(Activity.RESULT_CANCELED)
@@ -229,7 +230,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
 
     override fun onToolbarRightButtonClicked() {
         //add
-        if (viewModel.isDirty) {
+        if (!viewModel.isEditMode) {
             val newTrackerId = viewModel.applyChanges()
             setResult(RESULT_OK, Intent().putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, newTrackerId))
         }

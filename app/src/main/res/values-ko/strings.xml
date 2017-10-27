@@ -24,13 +24,9 @@
 
     <string name="msg_confirm_log">아이템 기록</string>
 
-    <string name="msg_confirm_field_apply_change">나가기 전에 변경사항을 적용하시겠습니까?</string>
+    <string name="msg_format_confirm_apply_change">%1$s에 대한 변경사항을 저장하시겠습니까?</string>
 
-    <string name="msg_confirm_tracker_apply_change">@string/msg_confirm_field_apply_change</string>
-    <string name="msg_confirm_trigger_apply_change">@string/msg_confirm_field_apply_change</string>
-
-    <string name="msg_confirm_tracker_cancel_creation">트래커 생성을 취소하시겠습니까?</string>
-    <string name="msg_confirm_trigger_cancel_creation">트리거 생성을 취소하시겠습니까?</string>
+    <string name="msg_format_confirm_save_creation">새 $1%s를 저장하시겠습니까?</string>
 
     <string name="msg_confirm_empty_tracker_log">이 트래커에는 필드가 없습니다. 현재 시각만을 기록하시겠습니까?</string>
 
@@ -43,8 +39,13 @@
     <string name="msg_ok">확인</string>
     <string name="msg_apply">적용</string>
     <string name="msg_cancel">취소</string>
+    <string name="msg_discard_creation">생성 취소</string>
+    <string name="msg_do_not_save">저장하지 않음</string>
 
     <string name="msg_send">보내기</string>
+
+    <string name="msg_text_tracker">트래커</string>
+    <string name="msg_text_field">필드</string>
 
     <string name="msg_tab_trackers">트래커</string>
     <string name="msg_tab_services">외부 서비스</string>

@@ -13,10 +13,7 @@ import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
-import kr.ac.snu.hcil.omnitrack.utils.Nullable
-import kr.ac.snu.hcil.omnitrack.utils.RealmViewModel
-import kr.ac.snu.hcil.omnitrack.utils.move
+import kr.ac.snu.hcil.omnitrack.utils.*
 import org.jetbrains.anko.collections.forEachWithIndex
 import java.util.*
 import kotlin.collections.HashSet
@@ -35,6 +32,8 @@ class TrackerDetailViewModel : RealmViewModel() {
     var trackerDao: OTTrackerDAO? = null
         private set
 
+    private var initialSnapshotDao: OTTrackerDAO? = null
+
     val trackerId: String? get() = this.trackerDao?.objectId
 
     //Observables========================================
@@ -49,7 +48,11 @@ class TrackerDetailViewModel : RealmViewModel() {
     var name: String
         get() = nameObservable.value
         set(value) {
-            if (value != nameObservable.value) {
+            if (trackerDao != null) {
+                realm.executeTransactionIfNotIn {
+                    trackerDao?.name = value
+                }
+            } else if (value != nameObservable.value) {
                 nameObservable.onNext(value)
             }
         }
@@ -57,7 +60,11 @@ class TrackerDetailViewModel : RealmViewModel() {
     var isBookmarked: Boolean
         get() = isBookmarkedObservable.value
         set(value) {
-            if (value != isBookmarkedObservable.value) {
+            if (trackerDao != null) {
+                realm.executeTransactionIfNotIn {
+                    trackerDao?.isBookmarked = value
+                }
+            } else if (value != isBookmarkedObservable.value) {
                 isBookmarkedObservable.onNext(value)
             }
         }
@@ -65,7 +72,11 @@ class TrackerDetailViewModel : RealmViewModel() {
     var color: Int
         get() = colorObservable.value
         set(value) {
-            if (value != colorObservable.value) {
+            if (trackerDao != null) {
+                realm.executeTransactionIfNotIn {
+                    trackerDao?.color = value
+                }
+            } else if (value != colorObservable.value) {
                 colorObservable.onNext(value)
             }
         }
@@ -83,19 +94,42 @@ class TrackerDetailViewModel : RealmViewModel() {
                 val dao = OTApp.instance.databaseManager.getTrackerQueryWithId(trackerId, realm).findFirstAsync()
 
                 subscriptions.add(
-                        dao.asFlowable<OTTrackerDAO>().filter { it.isValid }.firstOrError().subscribe { snapshot ->
+                        dao.asFlowable<OTTrackerDAO>().filter { it.isValid && it.isLoaded }.subscribe { snapshot ->
+                            if (initialSnapshotDao == null)
+                                initialSnapshotDao = realm.copyFromRealm(snapshot)
 
-                            name = snapshot.name
-                            isBookmarked = snapshot.isBookmarked
-                            color = snapshot.color
+                            nameObservable.onNextIfDifferAndNotNull(snapshot.name)
+                            isBookmarkedObservable.onNextIfDifferAndNotNull(snapshot.isBookmarked)
+                            colorObservable.onNextIfDifferAndNotNull(snapshot.color)
 
-                            clearCurrentAttributeList()
-                            currentAttributeViewModelList.addAll(snapshot.attributes.map { AttributeInformationViewModel(it, realm) })
-                            attributeViewModelListObservable.onNext(currentAttributeViewModelList)
+                            if (trackerDao != dao) {
+                                subscriptions.add(
+                                        snapshot.attributes.where().findAllAsync().asChangesetObservable().subscribe { changes ->
+                                            val changeset = changes.changeset
+                                            if (changeset == null) {
+                                                //initial
+                                                clearCurrentAttributeList()
+                                                currentAttributeViewModelList.addAll(changes.collection.map { AttributeInformationViewModel(it, realm) })
+                                            } else {
+                                                currentAttributeViewModelList.removeAll(
+                                                        changeset.deletions.map { currentAttributeViewModelList[it].apply { this.unregister() } }
+                                                )
+
+
+                                                changeset.insertions.forEach {
+                                                    currentAttributeViewModelList.add(it,
+                                                            AttributeInformationViewModel(changes.collection[it]!!, realm)
+                                                    )
+                                                }
+                                            }
+
+                                            attributeViewModelListObservable.onNext(currentAttributeViewModelList)
+                                        }
+                                )
+                                trackerDao = dao
+                            }
                         }
                 )
-
-                trackerDao = dao
 
                 /*
                 attributeRealmResults?.removeChangeListener(attributeListChangedListener)
@@ -120,19 +154,44 @@ class TrackerDetailViewModel : RealmViewModel() {
         newDao.initialize()
         processor?.invoke(newDao, realm)
 
-        currentAttributeViewModelList.add(AttributeInformationViewModel(newDao, realm))
-        attributeViewModelListObservable.onNext(currentAttributeViewModelList)
+        if (trackerDao != null) {
+            newDao.localId = OTAttributeManager.makeNewAttributeLocalId(newDao.userCreatedAt)
+            newDao.trackerId = trackerDao?.objectId
+
+            realm.executeTransactionIfNotIn {
+                trackerDao?.attributes?.add(newDao)
+            }
+        } else {
+            currentAttributeViewModelList.add(AttributeInformationViewModel(newDao, realm))
+            attributeViewModelListObservable.onNext(currentAttributeViewModelList)
+        }
     }
 
     fun moveAttribute(from: Int, to: Int) {
-        currentAttributeViewModelList.move(from, to)
-        attributeViewModelListObservable.onNext(currentAttributeViewModelList)
+        if (trackerDao != null) {
+            realm.executeTransactionIfNotIn {
+                trackerDao?.attributes?.move(from, to)
+            }
+        } else {
+            currentAttributeViewModelList.move(from, to)
+            attributeViewModelListObservable.onNext(currentAttributeViewModelList)
+        }
     }
 
     fun removeAttribute(attrViewModel: AttributeInformationViewModel) {
-        removedAttributes.add(attrViewModel)
-        currentAttributeViewModelList.remove(attrViewModel)
-        attributeViewModelListObservable.onNext(currentAttributeViewModelList)
+        if (trackerDao != null) {
+            realm.executeTransactionIfNotIn {
+                val attribute = trackerDao?.attributes?.find { it.objectId == attrViewModel.objectId }
+                if (attribute != null) {
+                    trackerDao?.attributes?.remove(attribute)
+                    trackerDao?.removedAttributes?.add(attribute)
+                }
+            }
+        } else {
+            removedAttributes.add(attrViewModel)
+            currentAttributeViewModelList.remove(attrViewModel)
+            attributeViewModelListObservable.onNext(currentAttributeViewModelList)
+        }
     }
 
     private fun saveAttributes(trackerDao: OTTrackerDAO) {
@@ -156,33 +215,24 @@ class TrackerDetailViewModel : RealmViewModel() {
         removedAttributes.clear()
     }
 
-    val isNameDirty: Boolean get() = trackerDao?.name != nameObservable.value
-    val isBookmarkedDirty: Boolean get() = trackerDao?.isBookmarked != isBookmarkedObservable.value
-    val isColorDirty: Boolean get() = trackerDao?.color != colorObservable.value
+    val isNameDirty: Boolean get() = if (initialSnapshotDao == null) false else initialSnapshotDao?.name != nameObservable.value
+    val isBookmarkedDirty: Boolean get() = if (initialSnapshotDao == null) false else initialSnapshotDao?.isBookmarked != isBookmarkedObservable.value
+    val isColorDirty: Boolean get() = if (initialSnapshotDao == null) false else initialSnapshotDao?.color != colorObservable.value
 
     val areAttributesDirty: Boolean
         get() {
-            return (currentAttributeViewModelList.find { it.isDirty == true } != null) ||
-                    !Arrays.equals(trackerDao?.attributes?.map { attr -> attr.objectId }?.toTypedArray(), currentAttributeViewModelList.map { it.attributeDAO.objectId }.toTypedArray())
+            return if (initialSnapshotDao == null) false else (currentAttributeViewModelList.find { it.isDirty == true } != null) ||
+                    !Arrays.equals(initialSnapshotDao?.attributes?.map { attr -> attr.objectId }?.toTypedArray(), currentAttributeViewModelList.map { it.attributeDAO.objectId }.toTypedArray())
         }
 
     val isDirty: Boolean
         get() {
-            return isNameDirty || isBookmarkedDirty || isColorDirty || areAttributesDirty
+            return if (initialSnapshotDao == null) false
+            else isNameDirty || isBookmarkedDirty || isColorDirty || areAttributesDirty
         }
 
     fun applyChanges(): String {
-        if (trackerDao != null) {
-            trackerDao?.let { dao ->
-                realm.executeTransaction {
-                    dao.name = nameObservable.value
-                    dao.isBookmarked = isBookmarkedObservable.value
-                    dao.color = colorObservable.value
-                    saveAttributes(dao)
-                }
-            }
-
-        } else {
+        if (trackerDao == null) {
             realm.executeTransaction {
                 val trackerDao = realm.createObject(OTTrackerDAO::class.java, UUID.randomUUID().toString())
                 trackerDao.userId = OTAuthManager.userId
@@ -193,25 +243,16 @@ class TrackerDetailViewModel : RealmViewModel() {
 
                 this.trackerDao = trackerDao
             }
-        }
 
-        currentAttributeViewModelList.forEach {
-            it.register()
+            currentAttributeViewModelList.forEach {
+                it.register()
+            }
         }
 
         onChangesApplied.onNext(trackerDao!!.objectId!!)
 
         return trackerDao!!.objectId!!
     }
-
-    val hasChanges: Boolean
-        get() {
-            return trackerDao?.let { dao ->
-                dao.name != nameObservable.value ||
-                        dao.color != colorObservable.value ||
-                        dao.isBookmarked != isBookmarkedObservable.value
-            } ?: true
-        }
 
     private fun clearCurrentAttributeList() {
         currentAttributeViewModelList.forEach {
@@ -392,17 +433,19 @@ class TrackerDetailViewModel : RealmViewModel() {
         }
 
         fun applyChanges() {
-            attributeDAO.name = name
-            attributeDAO.isRequired = isRequired
-            attributeDAO.updatedAt = System.currentTimeMillis()
-            attributeDAO.fallbackValuePolicy = defaultValuePolicy
-            attributeDAO.fallbackPresetSerializedValue = defaultValuePreset
-            for (entry in propertyTable) {
-                println("set new serialized value: $entry")
-                attributeDAO.setPropertySerializedValue(entry.key, entry.value.second)
-                println("get serialized value: ${attributeDAO.getPropertySerializedValue(entry.key)}")
+            realm.executeTransactionIfNotIn {
+                attributeDAO.name = name
+                attributeDAO.isRequired = isRequired
+                attributeDAO.updatedAt = System.currentTimeMillis()
+                attributeDAO.fallbackValuePolicy = defaultValuePolicy
+                attributeDAO.fallbackPresetSerializedValue = defaultValuePreset
+                for (entry in propertyTable) {
+                    println("set new serialized value: $entry")
+                    attributeDAO.setPropertySerializedValue(entry.key, entry.value.second)
+                    println("get serialized value: ${attributeDAO.getPropertySerializedValue(entry.key)}")
+                }
+                attributeDAO.serializedConnection = connectionObservable.value?.datum?.getSerializedString()
             }
-            attributeDAO.serializedConnection = connectionObservable.value?.datum?.getSerializedString()
         }
 
         fun saveToRealm() {

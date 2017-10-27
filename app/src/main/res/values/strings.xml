@@ -32,14 +32,12 @@
 
     <string name="msg_allow_permission">Check permissions</string>
 
-    <string name="msg_confirm_field_apply_change">Apply changes to the field before closing?</string>
 
-    <string name="msg_confirm_tracker_apply_change">Apply changes to the tracker before closing?</string>
-    <string name="msg_confirm_trigger_apply_change">Apply changes to the trigger before closing?</string>
+    <string name="msg_format_confirm_apply_change">Apply changes to the $s before closing?</string>
+    <string name="msg_format_confirm_save_creation">Save new $s before closing?</string>
 
-    <string name="msg_confirm_tracker_cancel_creation">Save this tracker before closing?</string>
-    <string name="msg_confirm_trigger_cancel_creation">Cancel the trigger creation?</string>
-
+    <string name="msg_text_tracker">Tracker</string>
+    <string name="msg_text_field">Field</string>
 
     <string name="msg_confirm_log">Log Item</string>
 
@@ -63,6 +61,9 @@
     <string name="msg_ok">Ok</string>
     <string name="msg_apply">Apply</string>
     <string name="msg_cancel">Cancel</string>
+
+    <string name="msg_discard_creation">Don\'t Create</string>
+    <string name="msg_do_not_save">Don\'t Save</string>
 
     <string name="msg_tab_trackers">Trackers</string>
     <string name="msg_tab_services">Services</string>
