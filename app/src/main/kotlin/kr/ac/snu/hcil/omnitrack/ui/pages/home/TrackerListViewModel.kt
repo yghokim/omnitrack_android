@@ -7,14 +7,12 @@ import io.reactivex.subjects.BehaviorSubject
 import io.realm.*
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.*
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.UserAttachedViewModel
 import kr.ac.snu.hcil.omnitrack.utils.DefaultNameGenerator
 import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
+import kr.ac.snu.hcil.omnitrack.utils.onNextIfDifferAndNotNull
 import java.util.*
 
 /**
@@ -128,7 +126,7 @@ class TrackerListViewModel : UserAttachedViewModel(), OrderedRealmCollectionChan
         val trackerName: BehaviorSubject<String> = BehaviorSubject.create()
         val trackerColor: BehaviorSubject<Int> = BehaviorSubject.create()
 
-        val activeNotificationCount: BehaviorSubject<Int> = BehaviorSubject.create()
+        val activeNotificationCount: BehaviorSubject<Int> = BehaviorSubject.createDefault(0)
 
         val trackerEditable: BehaviorSubject<Boolean> = BehaviorSubject.create()
 
@@ -141,6 +139,15 @@ class TrackerListViewModel : UserAttachedViewModel(), OrderedRealmCollectionChan
         private val subscriptions = CompositeDisposable()
 
         init {
+
+            trackerDao.liveTriggersQuery?.let {
+                subscriptions.add(
+                        it.equalTo("isOn", true).equalTo("actionType", OTTriggerDAO.ACTION_TYPE_REMIND)
+                                .findAllAsync().asFlowable().subscribe { results ->
+                            activeNotificationCount.onNextIfDifferAndNotNull(results.size)
+                        }
+                )
+            }
 
             attributesResult.addChangeListener { snapshot, changeSet ->
                 if (changeSet == null) {
