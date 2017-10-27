@@ -310,6 +310,14 @@ fun <T> BehaviorSubject<T>.onNextIfDifferAndNotNull(i: T?) {
     }
 }
 
+fun Realm.executeTransactionIfNotIn(transaction: (Realm) -> Unit) {
+    if (this.isInTransaction) {
+        transaction.invoke(this)
+    } else {
+        this.executeTransaction(transaction)
+    }
+}
+
 fun Realm.executeTransactionAsObservable(transaction: (Realm) -> Unit): Completable {
     return Completable.create { disposable ->
         val task =

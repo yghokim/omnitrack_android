@@ -271,6 +271,9 @@ class TrackerDetailStructureTabFragment : OTFragment() {
             val correspondingViewModel = currentAttributeViewModelList.find { it.attributeDAO.objectId == editedDao.objectId }
             if (correspondingViewModel != null) {
                 correspondingViewModel.applyDaoChangesToFront(editedDao)
+                if (viewModel.isEditMode) {
+                    correspondingViewModel.applyChanges()
+                }
 
                 attributeListAdapter.notifyItemChanged(currentAttributeViewModelList.indexOf(correspondingViewModel))
             }
@@ -304,9 +307,6 @@ class TrackerDetailStructureTabFragment : OTFragment() {
 
         private var removed: OTAttribute<out Any>? = null
         private var removedPosition: Int = -1
-
-        init {
-        }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val view = LayoutInflater.from(parent.context).inflate(R.layout.attribute_list_element, parent, false)
