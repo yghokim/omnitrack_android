@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.View
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
 
@@ -14,7 +15,7 @@ abstract class APropertyView<T>(layoutId: Int, context: Context, attrs: Attribut
 
     var useIntrinsicPadding: Boolean = false
 
-    var showEdited: Boolean = false
+    var showEditedOnTitle: Boolean = false
         set(value) {
             if (field != value) {
                 field = value
@@ -22,14 +23,14 @@ abstract class APropertyView<T>(layoutId: Int, context: Context, attrs: Attribut
             }
         }
 
-    private var originalValue: T? = null
-
     private var titleBody: CharSequence = ""
     var title: CharSequence
-        get() = titleView.text
+        get() = titleBody
         set(value) {
-            titleBody = value
-            refreshTitle()
+            if (titleBody != value) {
+                titleBody = value
+                refreshTitle()
+            }
         }
 
     abstract fun getSerializedValue(): String?
@@ -53,23 +54,23 @@ abstract class APropertyView<T>(layoutId: Int, context: Context, attrs: Attribut
     }
 
     private fun refreshTitle() {
-        titleView.text = if (showEdited) "$titleBody*" else titleBody
-    }
-
-    open fun watchOriginalValue() {
-        originalValue = value
-        showEdited = false
-    }
-
-    open fun stopWatchOriginalValue() {
-        originalValue = null
-    }
-
-    override fun onValueChanged(newValue: T) {
-        super.onValueChanged(newValue)
-
-        originalValue?.let {
-            showEdited = originalValue != newValue
+        if (titleBody.isBlank()) {
+            titleView.visibility = View.GONE
+        } else {
+            titleView.visibility = View.VISIBLE
+            titleView.text = if (showEditedOnTitle) "$titleBody*" else titleBody
         }
+    }
+
+    open fun compareAndShowEditedAny(comparedTo: Any?) {
+        try {
+            compareAndShowEdited(comparedTo as T)
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+        }
+    }
+
+    open fun compareAndShowEdited(comparedTo: T) {
+        showEditedOnTitle = comparedTo != value
     }
 }
