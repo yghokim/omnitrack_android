@@ -171,7 +171,9 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
                 } else {
                     DialogHelper.makeSimpleAlertBuilder(this, errorMessages.joinToString("\n")).show()
                 }
-            }, onNo = { setResult(Activity.RESULT_CANCELED); finish() }).show()
+            }, onNo = { setResult(Activity.RESULT_CANCELED); finish() })
+                    .cancelable(true)
+                    .neutralText(R.string.msg_cancel).show()
         } else {
             finish()
         }

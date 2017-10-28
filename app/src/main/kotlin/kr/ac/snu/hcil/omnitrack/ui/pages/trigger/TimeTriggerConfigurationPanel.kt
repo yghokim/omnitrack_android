@@ -135,6 +135,7 @@ class TimeTriggerConfigurationPanel : LinearLayout, IConditionConfigurationView,
     }
 
     private fun applyIsRepeated(isRepeated: Boolean, animate: Boolean) {
+        isRepeatedView.value = isRepeated
         if (animate) TransitionManager.beginDelayedTransition(this)
         if (isRepeated) {
             repetitionConfigGroup.visibility = View.VISIBLE
