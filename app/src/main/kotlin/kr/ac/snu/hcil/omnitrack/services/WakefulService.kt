@@ -22,15 +22,15 @@ open class WakefulService(val tag: String) : Service() {
 
         val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, tag)
-        if (!(wakeLock?.isHeld ?: false)) {
-            wakeLock?.acquire()
+        if (wakeLock?.isHeld != true) {
+            wakeLock?.acquire(300000)
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
 
-        if (wakeLock?.isHeld ?: false) {
+        if (wakeLock?.isHeld == true) {
             wakeLock?.release()
         }
     }

@@ -180,6 +180,10 @@
             android:name=".core.database.synchronization.OTSynchronizationService"
             android:exported="false" />
 
+        <service
+            android:name=".services.OTItemLoggingService"
+            android:exported="false" />
+
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/icon_simple" />
