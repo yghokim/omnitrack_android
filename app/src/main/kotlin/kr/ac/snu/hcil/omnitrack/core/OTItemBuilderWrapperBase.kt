@@ -56,7 +56,7 @@ class OTItemBuilderWrapperBase(val dao: OTItemBuilderDAO, val realm: Realm) {
         return itemDaoToSave
     }
 
-    fun makeAutoCompleteObservable(onAttributeStateChangedListener: AttributeStateChangedListener? = null): Observable<Pair<String, ValueWithTimestamp>> {
+    fun makeAutoCompleteObservable(onAttributeStateChangedListener: AttributeStateChangedListener? = null, applyToBuilder: Boolean = false): Observable<Pair<String, ValueWithTimestamp>> {
 
         return Observable.defer {
             val attributes = dao.tracker?.attributes
@@ -97,6 +97,10 @@ class OTItemBuilderWrapperBase(val dao: OTItemBuilderDAO, val realm: Realm) {
                             println("RX doOnNext: ${Thread.currentThread().name}")
                             val attrLocalId = result.first
                             val value = result.second
+
+                            if (applyToBuilder) {
+                                dao.setValue(attrLocalId, value, realm)
+                            }
 
                             onAttributeStateChangedListener?.onAttributeStateChanged(attrLocalId, EAttributeValueState.Idle)
                         }.doOnError { err -> err.printStackTrace(); realm.close() }.doOnComplete {
