@@ -29,32 +29,26 @@ class NumberStyle {
             return NumberStyle().apply {
 
                 input.beginObject()
-                input.nextName()
-                this.unitPositionId = input.nextInt()
-
-                input.nextName()
-                this.unit = input.nextString()
-
-                input.nextName()
-                this.pluralizeUnit = input.nextBoolean()
-
-                input.nextName()
-                this.fractionPart = input.nextInt()
-
-                input.nextName()
-                this.commaUnit = input.nextInt()
-
+                while (input.hasNext()) {
+                    when (input.nextName()) {
+                        "unitPosition" -> this.unitPositionId = input.nextInt()
+                        "unit" -> this.unit = input.nextString()
+                        "pluralize" -> this.pluralizeUnit = input.nextBoolean()
+                        "fraction" -> this.fractionPart = input.nextInt()
+                        "comma" -> this.commaUnit = input.nextInt()
+                    }
+                }
                 input.endObject()
             }
         }
 
         override fun write(out: JsonWriter, value: NumberStyle) {
             out.beginObject()
-            out.name("up").value(value.unitPositionId)
-            out.name("un").value(value.unit)
-            out.name("p").value(value.pluralizeUnit)
-            out.name("f").value(value.fractionPart)
-            out.name("c").value(value.commaUnit)
+            out.name("unitPosition").value(value.unitPositionId)
+            out.name("unit").value(value.unit)
+            out.name("pluralize").value(value.pluralizeUnit)
+            out.name("fraction").value(value.fractionPart)
+            out.name("comma").value(value.commaUnit)
             out.endObject()
         }
     }

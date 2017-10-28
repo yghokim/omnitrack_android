@@ -128,33 +128,18 @@ class RatingOptionsPropertyView(context: Context, attrs: AttributeSet?) : APrope
         }
     }
 
-    override fun watchOriginalValue() {
-        //super.watchOriginalValue()
-        displayTypeSelectionView.watchOriginalValue()
-        starLevelSelectionView.watchOriginalValue()
-        leftmostValuePicker.watchOriginalValue()
-        rightmostValuePicker.watchOriginalValue()
+    override fun compareAndShowEdited(comparedTo: RatingOptions) {
+        val orig = value
+        displayTypeSelectionView.showEditedOnTitle = orig.type != comparedTo.type
+        starLevelSelectionView.showEditedOnTitle = orig.starLevels != comparedTo.starLevels
+        leftmostValuePicker.showEditedOnTitle = orig.leftMost != comparedTo.leftMost
+        rightmostValuePicker.showEditedOnTitle = orig.rightMost != comparedTo.rightMost
 
-        leftLabelPropertyView.watchOriginalValue()
-        middleLabelPropertyView.watchOriginalValue()
-        rightLabelPropertyView.watchOriginalValue()
+        leftLabelPropertyView.showEditedOnTitle = orig.leftLabel != comparedTo.leftLabel
+        middleLabelPropertyView.showEditedOnTitle = orig.middleLabel != comparedTo.middleLabel
+        rightLabelPropertyView.showEditedOnTitle = orig.rightLabel != comparedTo.rightLabel
 
-        allowIntermediatePropertyView.watchOriginalValue()
-
-    }
-
-    override fun stopWatchOriginalValue() {
-        //super.stopWatchOriginalValue()
-        displayTypeSelectionView.stopWatchOriginalValue()
-        starLevelSelectionView.stopWatchOriginalValue()
-        leftmostValuePicker.stopWatchOriginalValue()
-        rightmostValuePicker.stopWatchOriginalValue()
-
-        leftLabelPropertyView.stopWatchOriginalValue()
-        middleLabelPropertyView.stopWatchOriginalValue()
-        rightLabelPropertyView.stopWatchOriginalValue()
-
-        allowIntermediatePropertyView.stopWatchOriginalValue()
+        allowIntermediatePropertyView.showEditedOnTitle = orig.allowIntermediate != comparedTo.allowIntermediate
     }
 
     override fun getSerializedValue(): String? {
