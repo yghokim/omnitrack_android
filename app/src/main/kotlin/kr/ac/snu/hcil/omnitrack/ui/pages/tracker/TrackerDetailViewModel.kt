@@ -118,7 +118,6 @@ class TrackerDetailViewModel : RealmViewModel() {
                                                         changeset.deletions.map { currentAttributeViewModelList[it].apply { this.unregister() } }
                                                 )
 
-
                                                 changeset.insertions.forEach {
                                                     currentAttributeViewModelList.add(it,
                                                             AttributeInformationViewModel(changes.collection[it]!!, realm)

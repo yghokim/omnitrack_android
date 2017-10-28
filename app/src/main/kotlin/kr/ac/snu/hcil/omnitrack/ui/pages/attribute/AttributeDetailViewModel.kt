@@ -19,16 +19,20 @@ class AttributeDetailViewModel : ViewModel() {
         const val CONNECTION_NULL = "null"
     }
 
+    var isInitialized: Boolean = false
+        private set
+
+
     var attributeDAO: OTAttributeDAO? = null
         private set
 
     private val realm = OTApp.instance.databaseManager.getRealmInstance()
 
-    val isValid: Boolean get() = attributeDAO?.isValid ?: false
+    val isValid: Boolean get() = attributeDAO?.isValid == true
 
     val attributeHelper: OTAttributeHelper? get() = attributeDAO?.let { OTAttributeManager.getAttributeHelper(it.type) }
 
-    val isInDatabase: Boolean get() = attributeDAO?.isManaged ?: false
+    val isInDatabase: Boolean get() = attributeDAO?.isManaged == true
 
     val nameObservable = BehaviorSubject.createDefault<String>("")
     val connectionObservable = BehaviorSubject.create<Nullable<OTConnection>>()
@@ -108,7 +112,7 @@ class AttributeDetailViewModel : ViewModel() {
         }
 
     fun init(attributeDao: OTAttributeDAO) {
-        if (this.attributeDAO != attributeDao) {
+        if (!isInitialized) {
             this.attributeDAO = attributeDao
             name = attributeDao.name
             connection = attributeDao.serializedConnection?.let { OTConnection.fromJson(it) }
@@ -132,6 +136,8 @@ class AttributeDetailViewModel : ViewModel() {
 
             if (typeObservable.value != attributeDao.type)
                 typeObservable.onNext(attributeDao.type)
+
+            isInitialized = true
         }
     }
 
@@ -143,7 +149,11 @@ class AttributeDetailViewModel : ViewModel() {
     }
 
     fun isPropertyChanged(propertyKey: String): Boolean {
-        return attributeDAO?.let { propertyTable[propertyKey] != attributeHelper?.getDeserializedPropertyValue<Any>(propertyKey, it) } ?: false
+        return attributeDAO?.let { propertyTable[propertyKey] != attributeHelper?.getDeserializedPropertyValue<Any>(propertyKey, it) } == true
+    }
+
+    fun getOriginalPropertyValue(propertyKey: String): Any? {
+        return attributeDAO?.let { attributeHelper?.getDeserializedPropertyValue<Any>(propertyKey, it) }
     }
 
     fun hasAnyPropertyChanged(): Boolean {

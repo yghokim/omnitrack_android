@@ -103,9 +103,14 @@ class TrackerDetailStructureTabFragment : OTFragment() {
 
         //set UI
         namePropertyView.value = this.viewModel.name
+        namePropertyView.showEditedOnTitle = viewModel.isNameDirty
+
         isOnShortcutPropertyView.value = this.viewModel.isBookmarked
+        isOnShortcutPropertyView.showEditedOnTitle = this.viewModel.isBookmarkedDirty
+
         applyColorTheme(this.viewModel.color, false)
         colorPropertyView.value = this.viewModel.color
+        colorPropertyView.showEditedOnTitle = this.viewModel.isColorDirty
 
         currentAttributeViewModelList.clear()
 
@@ -128,7 +133,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
         creationSubscriptions.add(
                 namePropertyView.valueChanged.observable.subscribe { result ->
                     this.viewModel.name = result.second
-                    namePropertyView.showEdited = viewModel.isNameDirty
+                    namePropertyView.showEditedOnTitle = viewModel.isNameDirty
                 }
         )
 
@@ -137,14 +142,14 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                     println("viewModel color set to ${colorPropertyView.value}")
                     this.viewModel.color = colorPropertyView.value
                     applyColorTheme(colorPropertyView.value, true)
-                    colorPropertyView.showEdited = viewModel.isColorDirty
+                    colorPropertyView.showEditedOnTitle = viewModel.isColorDirty
                 }
         )
 
         creationSubscriptions.add(
                 isOnShortcutPropertyView.valueChanged.observable.subscribe { result ->
                     this.viewModel.isBookmarked = result.second
-                    isOnShortcutPropertyView.showEdited = viewModel.isBookmarkedDirty
+                    isOnShortcutPropertyView.showEditedOnTitle = viewModel.isBookmarkedDirty
                 }
         )
 

@@ -14,16 +14,20 @@ class NumberStylePropertyView(context: Context, attrs: AttributeSet?) : APropert
 
     override var value: NumberStyle
         get() {
-            return numberStyle
+            if (isCacheDirty) {
+                numberStyle = extractStyleFromView()
+            }
+            return numberStyle!!
         }
         set(value) {
-            if (numberStyle != value) {
+            if (this.value != value) {
                 applyStyleToView(value)
                 onValueChanged(value)
             }
         }
 
-    private var numberStyle: NumberStyle
+    private var numberStyle: NumberStyle? = null
+    private var isCacheDirty = true
 
     private val unitPositionSelectionView: SelectionPropertyView = findViewById(R.id.ui_unit_position)
     private val unitTextView: ShortTextPropertyView = findViewById(R.id.ui_unit_text)
@@ -44,7 +48,10 @@ class NumberStylePropertyView(context: Context, attrs: AttributeSet?) : APropert
 
         unitTextView.valueChanged += {
             sender, text ->
-            updateCache(!suspendEvent)
+            isCacheDirty = true
+            if (!suspendEvent) {
+                onValueChanged(value)
+            }
         }
         unitPositionSelectionView.setEntries(NumberStyle.UnitPosition.values().map { context.getString(it.nameResId) }.toTypedArray())
         unitPositionSelectionView.valueChanged += {
@@ -57,12 +64,18 @@ class NumberStylePropertyView(context: Context, attrs: AttributeSet?) : APropert
                 pluralizeCheckView.visibility = VISIBLE
             }
 
-            updateCache(!suspendEvent)
+            isCacheDirty = true
+            if (!suspendEvent) {
+                onValueChanged(value)
+            }
         }
 
         fractionalDigitCountView.valueChanged += {
             sender, text ->
-            updateCache(!suspendEvent)
+            isCacheDirty = true
+            if (!suspendEvent) {
+                onValueChanged(value)
+            }
         }
         fractionalDigitCountView.picker.minValue = 1
         fractionalDigitCountView.picker.maxValue = 5
@@ -70,11 +83,9 @@ class NumberStylePropertyView(context: Context, attrs: AttributeSet?) : APropert
         showFractionView.valueChanged += onBooleanValueChangedHandler
         pluralizeCheckView.valueChanged += onBooleanValueChangedHandler
         showCommasCheckView.valueChanged += onBooleanValueChangedHandler
-
-        numberStyle = extractStyleFromView()
     }
 
-    fun applyStyleToView(style: NumberStyle) {
+    private fun applyStyleToView(style: NumberStyle) {
 
         suspendEvent = true
 
@@ -95,7 +106,7 @@ class NumberStylePropertyView(context: Context, attrs: AttributeSet?) : APropert
         suspendEvent = false
     }
 
-    fun extractStyleFromView(): NumberStyle {
+    private fun extractStyleFromView(): NumberStyle {
         val newStyle = NumberStyle()
         newStyle.unitPosition = NumberStyle.UnitPosition.values()[unitPositionSelectionView.value]
         newStyle.commaUnit = if (showCommasCheckView.value) 3 else 0
@@ -114,43 +125,14 @@ class NumberStylePropertyView(context: Context, attrs: AttributeSet?) : APropert
             }
         }
 
-        updateCache(!suspendEvent)
-    }
-
-    private fun updateCache(dispatchEvent: Boolean = true) {
-        val extracted = extractStyleFromView()
-
-        if (numberStyle != extracted) {
-            numberStyle = extracted
-            if (dispatchEvent)
-                onValueChanged(extracted)
+        isCacheDirty = true
+        if (!suspendEvent) {
+            onValueChanged(this.value)
         }
     }
 
     override fun focus() {
 
-    }
-
-    override fun watchOriginalValue() {
-        //super.watchOriginalValue()
-
-        unitPositionSelectionView.watchOriginalValue()
-        unitTextView.watchOriginalValue()
-        pluralizeCheckView.watchOriginalValue()
-        showCommasCheckView.watchOriginalValue()
-        showFractionView.watchOriginalValue()
-        fractionalDigitCountView.watchOriginalValue()
-    }
-
-    override fun stopWatchOriginalValue() {
-        //super.stopWatchOriginalValue()
-
-        unitPositionSelectionView.stopWatchOriginalValue()
-        unitTextView.stopWatchOriginalValue()
-        pluralizeCheckView.stopWatchOriginalValue()
-        showCommasCheckView.stopWatchOriginalValue()
-        showFractionView.stopWatchOriginalValue()
-        fractionalDigitCountView.stopWatchOriginalValue()
     }
 
     override fun getSerializedValue(): String? {
@@ -169,6 +151,37 @@ class NumberStylePropertyView(context: Context, attrs: AttributeSet?) : APropert
                 return false
             }
         }
+    }
+
+    override fun compareAndShowEdited(comparedTo: NumberStyle) {
+        unitPositionSelectionView.showEditedOnTitle = value.unitPosition != comparedTo.unitPosition
+        unitTextView.showEditedOnTitle = value.unit != comparedTo.unit
+        pluralizeCheckView.showEditedOnTitle = value.pluralizeUnit != comparedTo.pluralizeUnit
+        showCommasCheckView.showEditedOnTitle = (value.commaUnit != 0) != (comparedTo.commaUnit != 0)
+        showFractionView.showEditedOnTitle = (value.fractionPart != 0) != (comparedTo.fractionPart != 0)
+        fractionalDigitCountView.showEditedOnTitle = value.fractionPart != comparedTo.fractionPart
+        /*
+        override fun watchOriginalValue() {
+            //super.watchOriginalValue()
+
+            unitPositionSelectionView.watchOriginalValue()
+            unitTextView.watchOriginalValue()
+            pluralizeCheckView.watchOriginalValue()
+            showCommasCheckView.watchOriginalValue()
+            showFractionView.watchOriginalValue()
+            fractionalDigitCountView.watchOriginalValue()
+        }
+
+        override fun stopWatchOriginalValue() {
+            //super.stopWatchOriginalValue()
+
+            unitPositionSelectionView.stopWatchOriginalValue()
+            unitTextView.stopWatchOriginalValue()
+            pluralizeCheckView.stopWatchOriginalValue()
+            showCommasCheckView.stopWatchOriginalValue()
+            showFractionView.stopWatchOriginalValue()
+            fractionalDigitCountView.stopWatchOriginalValue()
+        }*/
     }
 
 }

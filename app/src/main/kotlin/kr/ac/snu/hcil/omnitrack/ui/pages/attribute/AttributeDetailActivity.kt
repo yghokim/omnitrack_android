@@ -61,12 +61,14 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
         super.onCreate(savedInstanceState)
 
         viewModel = ViewModelProviders.of(this).get(AttributeDetailViewModel::class.java)
-        val serializedAttributeDao = intent.getStringExtra(INTENT_EXTRA_SERIALIZED_ATTRIBUTE_DAO)
-        val applyToDb = intent.getBooleanExtra(INTENT_EXTRA_APPLY_TO_DB, false)
+        if (!viewModel.isInitialized) {
+            val serializedAttributeDao = intent.getStringExtra(INTENT_EXTRA_SERIALIZED_ATTRIBUTE_DAO)
+            val applyToDb = intent.getBooleanExtra(INTENT_EXTRA_APPLY_TO_DB, false)
 
-        if (!serializedAttributeDao.isNullOrBlank()) {
-            val attributeDao = OTAttributeDAO.parser.fromJson(serializedAttributeDao, OTAttributeDAO::class.java)
-            viewModel.init(attributeDao)
+            if (!serializedAttributeDao.isNullOrBlank()) {
+                val attributeDao = OTAttributeDAO.parser.fromJson(serializedAttributeDao, OTAttributeDAO::class.java)
+                viewModel.init(attributeDao)
+            }
         }
 
         setActionBarButtonMode(Mode.SaveCancel)
@@ -83,14 +85,14 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
                 viewModel.name = value
             }
 
-            nameProperty.showEdited = viewModel.isNameDirty
+            nameProperty.showEditedOnTitle = viewModel.isNameDirty
         }
 
         requiredProperty.valueChanged += {
             sender, value ->
             viewModel.isRequired = value
 
-            requiredProperty.showEdited = viewModel.isRequiredDirty
+            requiredProperty.showEditedOnTitle = viewModel.isRequiredDirty
         }
 
         ui_attribute_connection.onRemoveButtonClicked += {
@@ -116,12 +118,14 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
         creationSubscriptions.add(
                 viewModel.nameObservable.subscribe { name ->
                     nameProperty.value = name
+                    nameProperty.showEditedOnTitle = viewModel.isNameDirty
                 }
         )
 
         creationSubscriptions.add(
                 viewModel.isRequiredObservable.subscribe { isRequired ->
                     requiredProperty.value = isRequired
+                    requiredProperty.showEditedOnTitle = viewModel.isRequiredDirty
                 }
         )
 
@@ -194,9 +198,13 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
                                 propView.setPaddingRight(propertyViewHorizontalMargin)
                             }
 
-                            val viewModelValue = viewModel.currentPropertyTable[entry.first]
-                            if (viewModelValue != null) {
-                                propView.value = viewModelValue
+                            val originalViewModelValue = viewModel.getOriginalPropertyValue(entry.first)
+                            val viewModelFrontalValue = viewModel.currentPropertyTable[entry.first]
+                            if (viewModelFrontalValue != null) {
+                                propView.value = viewModelFrontalValue
+                                if (originalViewModelValue != null) {
+                                    propView.compareAndShowEdited(originalViewModelValue)
+                                }
                             }
 
                             //propView.value = attr.getPropertyValue(entry.first)
@@ -204,7 +212,9 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
                                 if (sender is APropertyView<*>) {
                                     if (sender.validate()) {
                                         viewModel.setPropertyValue(entry.first, value)
-                                        sender.showEdited = viewModel.isPropertyChanged(entry.first)
+                                        if (originalViewModelValue != null) {
+                                            sender.compareAndShowEditedAny(originalViewModelValue)
+                                        }
                                     }
                                 }
                             }
@@ -316,7 +326,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
     /*
     private fun checkIsChangedAndIndicate() {
-        columnNameView.showEdited = columnNameView.value != attribute?.name
+        columnNameView.showEditedOnTitle = columnNameView.value != attribute?.name
         if (attribute?.valueConnection != connectionView.connection) {
             connectionViewTitle.text = "${resources.getString(R.string.msg_value_autocompletion)}*"
         } else {
@@ -325,7 +335,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
         for (entry in propertyViewList) {
             if (entry.second is APropertyView<*>) {
-                entry.second.showEdited = attribute?.getPropertyValue<Any>(entry.first) != entry.second.value!!
+                entry.second.showEditedOnTitle = attribute?.getPropertyValue<Any>(entry.first) != entry.second.value!!
             }
         }
     }*/
