@@ -165,7 +165,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
     override fun onToolbarLeftButtonClicked() {
         if (!viewModel.isEditMode) {
             DialogHelper.makeYesNoDialogBuilder(this, "OmniTrack",
-                    String.format(OTApp.getString(R.string.msg_format_confirm_save_creation), OTApp.getString(R.string.msg_text_tracker)), yesLabel = R.string.msg_save, noLabel = R.string.msg_do_not_save, onYes = {
+                    String.format(OTApp.getString(R.string.msg_format_confirm_save_creation), OTApp.getString(R.string.msg_text_tracker).toLowerCase()), yesLabel = R.string.msg_save, noLabel = R.string.msg_do_not_save, onYes = {
                 onToolbarRightButtonClicked()
             }, onNo = {
                 setResult(Activity.RESULT_CANCELED)
@@ -191,15 +191,6 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
             setResult(RESULT_OK, Intent().putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, newTrackerId))
         }
         finish()
-        /*
-            if(namePropertyView.validate()) {
-                //modify
-                tracker.name = namePropertyView.value
-                tracker.color = colorPropertyView.value
-
-                if (!isEditMode) OTApp.instance.currentUser.trackers.add(tracker)
-                finish()
-            }*/
     }
 
     fun transitionToColor(color: Int, animate: Boolean = true) {

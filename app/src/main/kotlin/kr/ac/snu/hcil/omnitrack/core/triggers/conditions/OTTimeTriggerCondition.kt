@@ -96,4 +96,21 @@ class OTTimeTriggerCondition : ATriggerCondition(OTTriggerDAO.CONDITION_TYPE_TIM
             return false
         } else return true
     }
+
+    override fun equals(other: Any?): Boolean {
+        return if (other === this) {
+            true
+        } else if (other is OTTimeTriggerCondition) {
+            timeConditionType == other.timeConditionType
+                    && alarmTimeHour == other.alarmTimeHour
+                    && alarmTimeMinute == other.alarmTimeMinute
+                    && intervalSeconds == other.intervalSeconds
+                    && intervalIsHourRangeUsed == other.intervalIsHourRangeUsed
+                    && intervalHourRangeStart == other.intervalHourRangeStart
+                    && intervalHourRangeEnd == other.intervalHourRangeEnd
+                    && isRepeated == other.isRepeated
+                    && dayOfWeekFlags == other.dayOfWeekFlags
+                    && endAt == other.endAt
+        } else false
+    }
 }
