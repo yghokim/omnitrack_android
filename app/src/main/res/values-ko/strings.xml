@@ -128,7 +128,7 @@
 
     <string name="msg_new_tracker_name">트래커 이름을 입력하세요</string>
 
-    <string name="msg_notification_content_format_new_item">"%1$s 트래커에 새로운 아이템이 기록되었습니다."</string>
+    <string name="msg_notification_title_format_new_item">"%1$s 트래커에 새로운 아이템이 기록되었습니다."</string>
 
     <string name="msg_item_list_empty_message">기록된 아이템이 없습니다.</string>
 
@@ -193,7 +193,9 @@
     <string name="msg_shortcut_added">트래커가 바로가기 패널에 등록되었습니다.</string>
     <string name="msg_shortcut_removed">트래커가 바로가기 패널에서 제거되었습니다.</string>
 
-    <string name="msg_notification_action_discard_item">기록 취소하기</string>
+    <string name="msg_notification_action_discard_item">기록 취소</string>
+    <string name="msg_notification_content_new_item">아이템을 수정하려면 탭하세요.</string>
+    <string name="msg_notification_format_inbox_title">새 [%1$s] 기록</string>
 
     <string name="msg_rescuetime_api_key_input_title">Input RescueTime API key</string>
     <string name="msg_rescuetime_api_key_input_hint">Paste RescueTime api key here.</string>

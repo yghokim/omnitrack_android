@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.items
 
 import io.reactivex.Maybe
+import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
@@ -49,7 +50,8 @@ class ItemEditingViewModel : ItemEditionViewModelBase() {
         return false
     }
 
-    override fun cacheEditingInfo() {
+    override fun cacheEditingInfo(): Single<Boolean> {
+        return Single.just(false)
     }
 
     override fun applyEditingToDatabase(): Maybe<String> {

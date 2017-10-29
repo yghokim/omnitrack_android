@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.PowerManager
 import android.util.SparseArray
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTriggerAlarmManager
@@ -18,7 +19,7 @@ import java.util.*
 class TimeTriggerAlarmReceiver : BroadcastReceiver() {
     companion object {
         const val TAG = "TimeTriggerAlarmReceiver"
-        private val EXTRA_WAKE_LOCK_ID = "kr.ac.snu.hcil.omnitrack.wakelockid"
+        private val EXTRA_WAKE_LOCK_ID = "${BuildConfig.APPLICATION_ID}.wakelockid"
 
         private val mActiveWakeLocks = SparseArray<PowerManager.WakeLock>()
         private var mNextId = 1
