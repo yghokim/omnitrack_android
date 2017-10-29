@@ -15,8 +15,8 @@ class TriggerListViewModel(var triggerFilter: (OTTrigger) -> Boolean = { trigger
 
     val triggerViewModelListSubject: BehaviorSubject<List<TriggerViewModel<OTTrigger>>> = BehaviorSubject.create()
 
-    override fun onDispose() {
-        super.onDispose()
+    override fun onUserDisposed() {
+        super.onUserDisposed()
         clearTriggerList()
     }
 

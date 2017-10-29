@@ -30,7 +30,7 @@ import kr.ac.snu.hcil.omnitrack.core.net.ABinaryUploadService
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationServerSideAPI
 import kr.ac.snu.hcil.omnitrack.core.net.IUserReportServerAPI
 import kr.ac.snu.hcil.omnitrack.core.net.OTOfficialServerApiController
-import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationChannelManager
+import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTriggerAlarmManager
 import kr.ac.snu.hcil.omnitrack.services.OTFirebaseUploadService
@@ -53,6 +53,8 @@ class OTApp : MultiDexApplication() {
 
         lateinit var logger: LoggingDbHelper
             private set
+
+        const val PREFIX_ACTION = "${BuildConfig.APPLICATION_ID}.action"
 
         const val SHARED_PREFERENCES_USER_NAME = "omnitrack_app_system"
 
@@ -77,6 +79,9 @@ class OTApp : MultiDexApplication() {
 
         const val INTENT_EXTRA_TRIGGER_TIME = "triggerTime"
 
+        const val INTENT_EXTRA_NOTIFICATION_ID = "notificationId"
+        const val INTENT_EXTRA_NOTIFICATON_TAG = "notificationTag"
+
         const val INTENT_EXTRA_NOTIFICATION_ID_SEED = "notificationIdSeed"
 
         const val INTENT_EXTRA_IGNORE_SIGN_IN_CHECK = "ignoreSignInCheck"
@@ -85,26 +90,29 @@ class OTApp : MultiDexApplication() {
 
         const val INTENT_EXTRA_ITEMBUILDER = "itemBuilderId"
 
-        const val BROADCAST_ACTION_NEW_VERSION_DETECTED = "kr.ac.snu.hcil.omnitrack.action.NEW_VERSION_DETECTED"
+        const val BROADCAST_ACTION_NEW_VERSION_DETECTED = "$PREFIX_ACTION.NEW_VERSION_DETECTED"
         const val INTENT_EXTRA_LATEST_VERSION_NAME = "latest_version"
 
-        const val BROADCAST_ACTION_USER_SIGNED_IN = "kr.ac.snu.hcil.omnitrack.action.USER_SIGNED_IN"
-        const val BROADCAST_ACTION_USER_SIGNED_OUT = "kr.ac.snu.hcil.omnitrack.action.USER_SIGNED_OUT"
+        const val BROADCAST_ACTION_USER_SIGNED_IN = "$PREFIX_ACTION.USER_SIGNED_IN"
+        const val BROADCAST_ACTION_USER_SIGNED_OUT = "$PREFIX_ACTION.USER_SIGNED_OUT"
 
 
-        const val BROADCAST_ACTION_TIME_TRIGGER_ALARM = "kr.ac.snu.hcil.omnitrack.action.ALARM"
-        const val BROADCAST_ACTION_EVENT_TRIGGER_CHECK_ALARM = "kr.ac.snu.hcil.omnitrack.action.EVENT_TRIGGER_ALARM"
+        const val BROADCAST_ACTION_TIME_TRIGGER_ALARM = "$PREFIX_ACTION.ALARM"
+        const val BROADCAST_ACTION_EVENT_TRIGGER_CHECK_ALARM = "$PREFIX_ACTION.EVENT_TRIGGER_ALARM"
 
-        const val BROADCAST_ACTION_SHORTCUT_REFRESH = "kr.ac.snu.hcil.omnitrack.action.SHORTCUT_TRACKER_REFRESH"
+        const val BROADCAST_ACTION_SHORTCUT_REFRESH = "$PREFIX_ACTION.SHORTCUT_TRACKER_REFRESH"
 
-        const val BROADCAST_ACTION_ITEM_ADDED = "kr.ac.snu.hcil.omnitrack.action.ITEM_ADDED"
-        const val BROADCAST_ACTION_ITEM_REMOVED = "kr.ac.snu.hcil.omnitrack.action.ITEM_REMOVED"
-        const val BROADCAST_ACTION_ITEM_EDITED = "kr.ac.snu.hcil.omnitrack.action.ITEM_EDITED"
+        const val BROADCAST_ACTION_ITEM_ADDED = "$PREFIX_ACTION.ITEM_ADDED"
+        const val BROADCAST_ACTION_ITEM_REMOVED = "$PREFIX_ACTION.ITEM_REMOVED"
+        const val BROADCAST_ACTION_ITEM_EDITED = "$PREFIX_ACTION.ITEM_EDITED"
 
-        const val BROADCAST_ACTION_COMMAND_REMOVE_ITEM = "kr.ac.snu.hcil.omnitrack.action.COMMAND_REMOVE_ITEM"
+        const val BROADCAST_ACTION_COMMAND_REMOVE_ITEM = "$PREFIX_ACTION.COMMAND_REMOVE_ITEM"
 
-        const val BROADCAST_ACTION_BACKGROUND_LOGGING_STARTED = "kr.ac.snu.hcil.omnitrack.action.BACKGROUND_LOGGING_STARTED"
-        const val BROADCAST_ACTION_BACKGROUND_LOGGING_SUCCEEDED = "kr.ac.snu.hcil.omnitrack.action.BACKGROUND_LOGGING_SUCCEEDED"
+        const val BROADCAST_ACTION_BACKGROUND_LOGGING_STARTED = "$PREFIX_ACTION.BACKGROUND_LOGGING_STARTED"
+        const val BROADCAST_ACTION_BACKGROUND_LOGGING_SUCCEEDED = "$PREFIX_ACTION.BACKGROUND_LOGGING_SUCCEEDED"
+
+        const val BROADCAST_ACTION_TRACKER_ON_BOOKMARK = "$PREFIX_ACTION.TRACKER_ON_BOOKMARK"
+
         const val PREFERENCE_KEY_FIREBASE_INSTANCE_ID = "firebase_instance_id"
 
         const val PREFERENCE_KEY_DEVICE_LOCAL_KEY = "device_local_key"
@@ -214,7 +222,7 @@ class OTApp : MultiDexApplication() {
         val wrapped = LocaleHelper.wrapContextWithLocale(context.applicationContext ?: context, LocaleHelper.getLanguageCode(context))
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            OTNotificationChannelManager.refreshChannels(wrapped)
+            OTNotificationManager.refreshChannels(wrapped)
         }
 
         wrappedContext = wrapped

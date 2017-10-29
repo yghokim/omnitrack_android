@@ -69,15 +69,15 @@
 
         <receiver android:name=".receivers.OTSystemReceiver">
             <intent-filter>
-                <action android:name="kr.ac.snu.hcil.omnitrack.action.EVENT_TRIGGER_ALARM" />
-                <action android:name="kr.ac.snu.hcil.omnitrack.action.SHORTCUT_REFRESH" />
-                <action android:name="kr.ac.snu.hcil.omnitrack.action.BACKGROUND_LOGGING_STARTED" />
-                <action android:name="kr.ac.snu.hcil.omnitrack.action.BACKGROUND_LOGGING_SUCCEEDED" />
-                <action android:name="kr.ac.snu.hcil.omnitrack.action.BACKGROUND_LOGGING_FAILED" />
-                <action android:name="kr.ac.snu.hcil.omnitrack.action.ITEM_ADDED" />
-                <action android:name="kr.ac.snu.hcil.omnitrack.action.ITEM_EDITED" />
-                <action android:name="kr.ac.snu.hcil.omnitrack.action.ITEM_REMOVED" />
-                <action android:name="kr.ac.snu.hcil.omnitrack.action.COMMAND_REMOVE_ITEM" />
+                <action android:name="${applicationId}.action.EVENT_TRIGGER_ALARM" />
+                <action android:name="${applicationId}.action.SHORTCUT_REFRESH" />
+                <action android:name="${applicationId}.action.BACKGROUND_LOGGING_STARTED" />
+                <action android:name="${applicationId}.action.BACKGROUND_LOGGING_SUCCEEDED" />
+                <action android:name="${applicationId}.action.BACKGROUND_LOGGING_FAILED" />
+                <action android:name="${applicationId}.action.ITEM_ADDED" />
+                <action android:name="${applicationId}.action.ITEM_EDITED" />
+                <action android:name="${applicationId}.action.ITEM_REMOVED" />
+                <action android:name="${applicationId}.action.COMMAND_REMOVE_ITEM" />
             </intent-filter>
         </receiver>
         <receiver
@@ -110,7 +110,7 @@
             android:enabled="true"
             android:exported="false">
             <intent-filter>
-                <action android:name="kr.ac.snu.hcil.omnitrack.action.ALARM" />
+                <action android:name="${applicationId}.action.ALARM" />
             </intent-filter>
         </receiver>
 
@@ -119,9 +119,9 @@
             android:label="@string/msg_shortcut_widget_name">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="kr.ac.snu.hcil.omnitrack.action.USER_SIGNED_IN" />
-                <action android:name="kr.ac.snu.hcil.omnitrack.action.USER_SIGNED_OUT" />
-                <action android:name="kr.ac.snu.hcil.omnitrack.action.APP_WIDGET_SHORTCUT_TRACKER_CLICKED" />
+                <action android:name="${applicationId}.action.USER_SIGNED_IN" />
+                <action android:name="${applicationId}.action.USER_SIGNED_OUT" />
+                <action android:name="${applicationId}.action.APP_WIDGET_SHORTCUT_TRACKER_CLICKED" />
             </intent-filter>
 
             <meta-data
@@ -245,7 +245,7 @@
         <activity
             android:name=".ui.pages.configs.ShortcutPanelWidgetConfigActivity"
             android:excludeFromRecents="true"
-            android:taskAffinity="kr.ac.snu.hcil.omnitrack.shortcutPanelWidgetConfigTask"
+            android:taskAffinity="${applicationId}.shortcutPanelWidgetConfigTask"
             android:theme="@style/AppTheme.Dialog.DimmedBackground">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
@@ -261,7 +261,7 @@
             android:name=".ui.activities.ReminderPopupActivity"
             android:excludeFromRecents="true"
             android:showOnLockScreen="true"
-            android:taskAffinity="kr.ac.snu.hcil.omnitrack.reminderPopup"
+            android:taskAffinity="${applicationId}.reminderPopup"
             android:theme="@style/AppTheme.Dialog.DimmedBackground" />
 
         <activity

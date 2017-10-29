@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.database.local
 
 import android.content.Intent
 import android.net.Uri
+import io.reactivex.Flowable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.subjects.PublishSubject
@@ -18,6 +19,8 @@ import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTItemPOJO
 import kr.ac.snu.hcil.omnitrack.core.database.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.database.synchronization.SyncResultEntry
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
+import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
+import kr.ac.snu.hcil.omnitrack.utils.executeTransactionIfNotIn
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import java.util.*
 
@@ -89,6 +92,30 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
     fun getTrackerQueryWithId(objectId: String, realm: Realm): RealmQuery<OTTrackerDAO> {
         return realm.where(OTTrackerDAO::class.java).equalTo(FIELD_OBJECT_ID, objectId).equalTo(FIELD_REMOVED_BOOLEAN, false)
     }
+
+    fun makeBookmarkedTrackersObservable(userId: String, realm: Realm): Flowable<RealmResults<OTTrackerDAO>> {
+        return realm.where(OTTrackerDAO::class.java).equalTo(FIELD_REMOVED_BOOLEAN, false).equalTo(FIELD_USER_ID, userId).equalTo("isBookmarked", true).findAllSortedAsync(FIELD_UPDATED_AT_LONG, Sort.DESCENDING)
+                .asFlowable()
+    }
+
+    fun makeShortcutPanelRefreshObservable(userId: String, realm: Realm): Flowable<RealmResults<OTTrackerDAO>> {
+        return makeBookmarkedTrackersObservable(userId, realm).filter { it.isValid && it.isLoaded }
+                .doAfterNext { list ->
+                    OTShortcutPanelManager.refreshNotificationShortcutViews(list, OTApp.instance)
+                }
+    }
+
+    /*
+    fun makeBookmarkedBroadcastObservable(userId: String, realm: Realm): Flowable<Intent> {
+        return makeBookmarkedTrackersObservable(userId, realm).filter { it.isValid && it.isLoaded }.map { snapshot ->
+            Intent(OTShortcutPanelManager.ACTION_BOOKMARKED_TRACKERS_CHANGED)
+                    .apply {
+                        putExtra(OTShortcutPanelManager.INTENT_EXTRA_CURRENT_BOOKMARKED_SNAPSHOT, snapshot.map { it.objectId }.toTypedArray())
+                    }
+        }.doOnNext {
+                intent->
+        }
+    }*/
 
     fun getAttributeListQuery(trackerId: String, realm: Realm): RealmQuery<OTAttributeDAO> {
         return realm.where(OTAttributeDAO::class.java).equalTo(FIELD_TRACKER_ID, trackerId)
@@ -241,38 +268,33 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
         return realm.where(OTTrackerDAO::class.java).equalTo(FIELD_REMOVED_BOOLEAN, false).equalTo(FIELD_USER_ID, userId)
     }
 
-    fun removeTracker(dao: OTTrackerDAO) {
-        if (!dao.removed) {
-
-            (dao.attributes + dao.removedAttributes).forEach { attrDao ->
-                if (attrDao.isManaged) {
-                    attrDao.deleteFromRealm()
+    fun removeTracker(dao: OTTrackerDAO, permanently: Boolean = false, realm: Realm) {
+        if (!permanently) {
+            if (!dao.removed) {
+                realm.executeTransactionIfNotIn {
+                    dao.removed = true
+                    dao.synchronizedAt = null
+                    dao.updatedAt = System.currentTimeMillis()
                 }
             }
-
-            dao.removed = true
-            dao.synchronizedAt = null
-            dao.updatedAt = System.currentTimeMillis()
-        }
-    }
-
-    fun removeTracker(objectId: String, realm: Realm) {
-        val dao = getTrackerQueryWithId(objectId, realm).findFirst()
-        if (dao != null) {
-            removeTracker(dao)
-        }
-    }
-
-    fun removeAttribute(dao: OTAttributeDAO, tracker: OTTrackerDAO, realm: Realm) {
-        if (!realm.isInTransaction) {
-            realm.executeTransaction {
-                tracker.removedAttributes.add(dao)
-            }
         } else {
-            tracker.removedAttributes.add(dao)
+            realm.executeTransactionIfNotIn {
+                (dao.attributes + dao.removedAttributes).forEach { removeAttributeImpl(it, realm) }
+                dao.attributes.clear()
+                dao.removedAttributes.clear()
+                dao.deleteFromRealm()
+            }
         }
     }
 
+    private fun removeAttributeImpl(dao: OTAttributeDAO, realm: Realm) {
+        if (dao.isManaged) {
+            realm.executeTransactionIfNotIn {
+                dao.properties.deleteAllFromRealm()
+                dao.deleteFromRealm()
+            }
+        }
+    }
 
     fun removeTracker(tracker: OTTracker, formerOwner: OTUser, archive: Boolean) {
         val realm = getRealmInstance()
@@ -526,9 +548,9 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
         }
     }
 
-    fun removeItem(itemDao: OTItemDAO, realm: Realm) {
+    fun removeItem(itemDao: OTItemDAO, permanently: Boolean = false, realm: Realm) {
         val trackerId = itemDao.trackerId
-        if (removeItemImpl(itemDao, realm)) {
+        if (removeItemImpl(itemDao, permanently, realm)) {
 
             val intent = Intent(OTApp.BROADCAST_ACTION_ITEM_REMOVED)
 
@@ -542,23 +564,19 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
         }
     }
 
-    private fun removeItemImpl(itemDao: OTItemDAO, realm: Realm): Boolean {
+    private fun removeItemImpl(itemDao: OTItemDAO, permanently: Boolean = false, realm: Realm): Boolean {
         try {
-            fun command() {
-                itemDao.fieldValueEntries.forEach {
-                    it.deleteFromRealm()
+            if (!permanently) {
+                realm.executeTransactionIfNotIn {
+                    itemDao.removed = true
+                    itemDao.synchronizedAt = null
+                    itemDao.updatedAt = System.currentTimeMillis()
                 }
-
-                itemDao.removed = true
-                itemDao.synchronizedAt = null
-                itemDao.updatedAt = System.currentTimeMillis()
-
-            }
-
-            if (!realm.isInTransaction) {
-                realm.executeTransaction { command() }
             } else {
-                command()
+                realm.executeTransactionIfNotIn {
+                    itemDao.fieldValueEntries.deleteAllFromRealm()
+                    itemDao.deleteFromRealm()
+                }
             }
 
             return true

@@ -31,6 +31,8 @@ class TrackerListViewModel : UserAttachedViewModel(), OrderedRealmCollectionChan
     val trackerViewModels: Observable<List<TrackerInformationViewModel>>
         get() = trackerViewModelListSubject
 
+    private val subscriptions = CompositeDisposable()
+
     override fun onChange(snapshot: RealmResults<OTTrackerDAO>, changeSet: OrderedCollectionChangeSet?) {
         if (snapshot.isLoaded && snapshot.isValid) {
             if (changeSet == null) {
@@ -75,6 +77,8 @@ class TrackerListViewModel : UserAttachedViewModel(), OrderedRealmCollectionChan
         trackersRealmResults = trackerQueryResults
 
         trackerQueryResults.addChangeListener(this)
+
+        subscriptions.add(OTApp.instance.databaseManager.makeShortcutPanelRefreshObservable(newUserId, realm).subscribe())
     }
 
     override fun onCleared() {
@@ -83,9 +87,10 @@ class TrackerListViewModel : UserAttachedViewModel(), OrderedRealmCollectionChan
         realm.close()
     }
 
-    override fun onDispose() {
-        super.onDispose()
+    override fun onUserDisposed() {
+        super.onUserDisposed()
         clearTrackerViewModelList()
+        subscriptions.clear()
     }
 
     private fun clearTrackerViewModelList() {
@@ -99,7 +104,7 @@ class TrackerListViewModel : UserAttachedViewModel(), OrderedRealmCollectionChan
     fun removeTracker(model: TrackerInformationViewModel) {
         if (!realm.isInTransaction) {
             realm.executeTransaction {
-                OTApp.instance.databaseManager.removeTracker(model.trackerDao)
+                OTApp.instance.databaseManager.removeTracker(model.trackerDao, false, realm)
             }
         }
     }

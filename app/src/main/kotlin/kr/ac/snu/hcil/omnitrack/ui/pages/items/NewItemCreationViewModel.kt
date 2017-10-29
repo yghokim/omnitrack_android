@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.items
 
 import io.reactivex.Maybe
+import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
@@ -94,12 +95,13 @@ class NewItemCreationViewModel : ItemEditionViewModelBase() {
         }
     }
 
-    override fun cacheEditingInfo() {
-        if (isValid) {
-            println("save builder")
-            refreshDaoValues()
-            subscriptions.add(
-                    isBusyObservable.filter { it == false }.subscribe {
+    override fun cacheEditingInfo(): Single<Boolean> {
+        return Single.defer {
+            if (isValid) {
+                println("save builder")
+                refreshDaoValues()
+                isBusyObservable.filter { it == false }.firstOrError().map { isBusy ->
+                    if (!isBusy) {
                         var highestBuilderEntryId = realm.where(OTItemBuilderFieldValueEntry::class.java).max("id")?.toLong() ?: 0L
                         itemBuilderDao.data.forEach {
                             if (!it.isManaged && it.id == -1L) {
@@ -109,8 +111,10 @@ class NewItemCreationViewModel : ItemEditionViewModelBase() {
                         realm.executeTransaction {
                             realm.copyToRealmOrUpdate(itemBuilderDao)
                         }
-                    }
-            )
+                        true
+                    } else false
+                        }
+            } else Single.just(false)
         }
     }
 

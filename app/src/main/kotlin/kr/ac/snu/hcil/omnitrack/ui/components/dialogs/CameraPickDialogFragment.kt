@@ -30,7 +30,7 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
 
         const val EXTRA_REQUEST_KEY = "req"
         const val EXTRA_IMAGE_DATA = "image"
-        const val EXTRA_ACTION_PHOTO_TAKEN = "kr.ac.snu.hcil.omnitrack.ACTION_CAMERA_PHOTO_TAKEN"
+        const val EXTRA_ACTION_PHOTO_TAKEN = "${OTApp.PREFIX_ACTION}.CAMERA_PHOTO_TAKEN"
 
         fun getInstance(requestKey: String): CameraPickDialogFragment {
             val fragment = CameraPickDialogFragment()

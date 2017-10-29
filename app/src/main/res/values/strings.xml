@@ -140,7 +140,9 @@
 
     <string name="msg_set_new_connection">Connect to External Source</string>
 
-    <string name="msg_notification_content_format_new_item">"New item was logged to %1$s"</string>
+    <string name="msg_notification_title_format_new_item">New item was logged to %1$s</string>
+    <string name="msg_notification_content_new_item">Tap to edit the item.</string>
+    <string name="msg_notification_format_inbox_title">New %1$s Log</string>
 
     <string name="msg_item_list_empty_message">No items collected yet.</string>
 
@@ -205,7 +207,7 @@
     <string name="msg_shortcut_added">Tracker was added to the shortcut panel.</string>
     <string name="msg_shortcut_removed">Tracker was removed from the shortcut panel.</string>
 
-    <string name="msg_notification_action_discard_item">Cancel it</string>
+    <string name="msg_notification_action_discard_item">Discard Item</string>
 
     <string name="msg_rescuetime_api_key_input_title">Input RescueTime API key</string>
     <string name="msg_rescuetime_api_key_input_hint">Paste RescueTime api key here.</string>

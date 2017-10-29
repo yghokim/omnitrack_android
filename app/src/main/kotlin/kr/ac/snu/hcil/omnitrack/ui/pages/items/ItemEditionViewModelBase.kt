@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.items
 
 import io.reactivex.Maybe
 import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
@@ -180,7 +181,7 @@ abstract class ItemEditionViewModelBase : RealmViewModel(), OTItemBuilderWrapper
         }
     }
 
-    abstract fun cacheEditingInfo()
+    abstract fun cacheEditingInfo(): Single<Boolean>
 
     abstract fun applyEditingToDatabase(): Maybe<String>
 

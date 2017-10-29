@@ -22,7 +22,7 @@ class OTBackgroundLoggingService : IntentService("OTBackgroundLoggingService") {
     companion object {
         const val TAG = "BGLoggingService"
 
-        private val ACTION_LOG = "kr.ac.snu.hcil.omnitrack.services.action.LOG"
+        private val ACTION_LOG = "${OTApp.PREFIX_ACTION}.LOG"
 
 
         private const val INTENT_EXTRA_LOGGING_SOURCE = "loggingSource"

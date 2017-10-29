@@ -20,7 +20,7 @@ class OTShortcutPanelWidgetProvider : AppWidgetProvider() {
 
         const val WIDGET_NAME = "Shortcut Panel Widget"
 
-        const val ACTION_TRACKER_CLICK_EVENT = "kr.ac.snu.hcil.omnitrack.action.APP_WIDGET_SHORTCUT_TRACKER_CLICKED"
+        const val ACTION_TRACKER_CLICK_EVENT = "${OTApp.PREFIX_ACTION}.APP_WIDGET_SHORTCUT_TRACKER_CLICKED"
         const val EXTRA_CLICK_COMMAND = "clickCommand"
         const val CLICK_COMMAND_ROW = "rowClicked"
         const val CLICK_COMMAND_INSTANT_LOGGING = "instantLoggingClicked"
