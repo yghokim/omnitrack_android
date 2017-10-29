@@ -90,7 +90,11 @@ object OTTrackingNotificationManager {
         // Adds the back stack for the Intent (but not the Intent itself)
         stackBuilder.addParentStack(ItemDetailActivity::class.java)
         // Adds the Intent that starts the Activity to the top of the stack
-        stackBuilder.addNextIntent(ItemDetailActivity.makeItemEditPageIntent(itemId, trackerId, context))
+        stackBuilder.addNextIntent(
+                ItemDetailActivity.makeItemEditPageIntent(itemId, trackerId, context)
+                        .putExtra(OTApp.INTENT_EXTRA_NOTIFICATION_ID, notificationId)
+                        .putExtra(OTApp.INTENT_EXTRA_NOTIFICATON_TAG, tag)
+        )
 
         val resultPendingIntent = stackBuilder.getPendingIntent(0,
                 PendingIntent.FLAG_UPDATE_CURRENT)
