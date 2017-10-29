@@ -97,7 +97,6 @@ class OTItemBuilderWrapperBase(val dao: OTItemBuilderDAO, val realm: Realm) {
                             println("RX doOnNext: ${Thread.currentThread().name}")
                             val attrLocalId = result.first
                             val value = result.second
-
                             if (applyToBuilder) {
                                 dao.setValue(attrLocalId, value, realm)
                             }

@@ -419,6 +419,9 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                                     dialog, input ->
                                     if (currentAttributeViewModelList[adapterPosition].name.compareTo(input.toString()) != 0) {
                                         currentAttributeViewModelList[adapterPosition].name = input.toString()
+                                        if (currentAttributeViewModelList[adapterPosition].isInDatabase) {
+                                            currentAttributeViewModelList[adapterPosition].applyChanges()
+                                        }
                                         attributeListAdapter.notifyItemChanged(adapterPosition)
                                     }
                                 }.show()
