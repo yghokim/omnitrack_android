@@ -44,12 +44,12 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
         const val INTENT_EXTRA_CURRENT_PROGRESS_RATIO = "audioCurrentProgressRatio"
         const val INTENT_EXTRA_AUDIO_TITLE = "audioTitle"
 
-        const val INTENT_ACTION_PLAY = "kr.ac.snu.hcil.omnitrack.action.ACTION_AUDIO_PLAY"
-        const val INTENT_ACTION_STOP = "kr.ac.snu.hcil.omnitrack.action.ACTION_AUDIO_STOP"
-        const val INTENT_ACTION_STOP_ALL = "kr.ac.snu.hcil.omnitrack.action.ACTION_AUDIO_STOP_ALL"
+        const val INTENT_ACTION_PLAY = "${OTApp.PREFIX_ACTION}.AUDIO_PLAY"
+        const val INTENT_ACTION_STOP = "${OTApp.PREFIX_ACTION}.AUDIO_STOP"
+        const val INTENT_ACTION_STOP_ALL = "${OTApp.PREFIX_ACTION}.AUDIO_STOP_ALL"
 
-        const val INTENT_ACTION_EVENT_AUDIO_COMPLETED = "kr.ac.snu.hcil.omnitrack.action.ACTION_AUDIO_COMPLETED"
-        const val INTENT_ACTION_EVENT_AUDIO_PROGRESS = "kr.ac.snu.hcil.omnitrack.action.ACTION_AUDIO_PROGRESS"
+        const val INTENT_ACTION_EVENT_AUDIO_COMPLETED = "${OTApp.PREFIX_ACTION}.AUDIO_COMPLETED"
+        const val INTENT_ACTION_EVENT_AUDIO_PROGRESS = "${OTApp.PREFIX_ACTION}.AUDIO_PROGRESS"
 
         var currentSessionId: String? = null
             private set
@@ -84,7 +84,7 @@ class OTAudioPlayService : Service(), MediaPlayer.OnCompletionListener, AudioMan
 
         val isSoundPlaying: Boolean
             get() {
-                return currentPlayer?.isPlaying ?: false
+                return currentPlayer?.isPlaying == true
             }
 
         private val commandFilter = IntentFilter().apply {

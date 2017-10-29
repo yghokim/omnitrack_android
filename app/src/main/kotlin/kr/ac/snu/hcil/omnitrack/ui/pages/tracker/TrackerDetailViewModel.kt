@@ -146,6 +146,12 @@ class TrackerDetailViewModel : RealmViewModel() {
                         }
                 )
 
+                subscriptions.add(
+                        OTApp.instance.databaseManager.makeShortcutPanelRefreshObservable(OTAuthManager.userId!!, realm).subscribe { list ->
+                            println("shortcut refresh")
+                        }
+                )
+
                 /*
                 attributeRealmResults?.removeChangeListener(attributeListChangedListener)
                 attributeRealmResults = OTApp.instance.databaseManager.getAttributeListQuery(trackerId, realm).findAllSortedAsync("position")

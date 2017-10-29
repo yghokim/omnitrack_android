@@ -17,6 +17,7 @@ import android.support.v4.app.NotificationCompat
 import android.support.v4.content.LocalBroadcastManager
 import android.util.Log
 import android.widget.RemoteViews
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioRecorderView
@@ -33,7 +34,7 @@ class OTAudioRecordService : Service(), AudioRecordingModule.RecordingListener {
         private const val TAG = "AudioRecordService"
 
         const val RECORD_NOTIFICATION_ID = 2443
-        const val CHANNEL_ID_RECORD = "kr.ac.snu.hcil.omnitrack.notification.channel.record"
+        const val CHANNEL_ID_RECORD = "${BuildConfig.APPLICATION_ID}.notification.channel.record"
         const val INTENT_EXTRA_SESSION_ID = "audioRecordSessionId"
         const val INTENT_EXTRA_CURRENT_PROGRESS_SECONDS = "audioCurrentRecordProgressSeconds"
         const val INTENT_EXTRA_CURRENT_PROGRESS_RATIO = "audioCurrentRecordProgressRatio"
@@ -52,13 +53,13 @@ class OTAudioRecordService : Service(), AudioRecordingModule.RecordingListener {
             addAction(INTENT_ACTION_RECORD_STOP)
         }
 
-        const val INTENT_ACTION_RECORD_START = "kr.ac.snu.hcil.omnitrack.action.ACTION_RECORD_START"
-        const val INTENT_ACTION_RECORD_STOP = "kr.ac.snu.hcil.omnitrack.action.ACTION_RECORD_STOP"
-        const val INTENT_ACTION_RECORD_DISCARD = "kr.ac.snu.hcil.omnitrack.action.ACTION_RECORD_DISCARD"
+        const val INTENT_ACTION_RECORD_START = "${OTApp.PREFIX_ACTION}.RECORD_START"
+        const val INTENT_ACTION_RECORD_STOP = "${OTApp.PREFIX_ACTION}.RECORD_STOP"
+        const val INTENT_ACTION_RECORD_DISCARD = "${OTApp.PREFIX_ACTION}.RECORD_DISCARD"
 
-        const val INTENT_ACTION_EVENT_RECORD_START_CALLBACK = "kr.ac.snu.hcil.omnitrack.action.ACTION_RECORD_START_CALLBACK"
-        const val INTENT_ACTION_EVENT_RECORD_COMPLETED = "kr.ac.snu.hcil.omnitrack.action.ACTION_RECORD_COMPLETED"
-        const val INTENT_ACTION_EVENT_RECORD_PROGRESS = "kr.ac.snu.hcil.omnitrack.action.ACTION_RECORD_PROGRESS"
+        const val INTENT_ACTION_EVENT_RECORD_START_CALLBACK = "${OTApp.PREFIX_ACTION}.RECORD_START_CALLBACK"
+        const val INTENT_ACTION_EVENT_RECORD_COMPLETED = "${OTApp.PREFIX_ACTION}.RECORD_COMPLETED"
+        const val INTENT_ACTION_EVENT_RECORD_PROGRESS = "${OTApp.PREFIX_ACTION}.RECORD_PROGRESS"
 
         fun makeStartIntent(context: Context, sessionId: String, title: String = "Audio Record", file: Uri): Intent {
             return Intent(context, OTAudioRecordService::class.java).setAction(INTENT_ACTION_RECORD_START)

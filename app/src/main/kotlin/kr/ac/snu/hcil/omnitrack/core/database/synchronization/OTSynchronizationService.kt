@@ -13,7 +13,7 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 class OTSynchronizationService : Service() {
     companion object {
 
-        const val ACTION_PERFORM_SYNCHRONIZATION = "kr.ac.snu.hcil.omnitrack.PERFORM_SYNCHRONIZATION"
+        const val ACTION_PERFORM_SYNCHRONIZATION = "${OTApp.PREFIX_ACTION}.PERFORM_SYNCHRONIZATION"
         const val INTENT_EXTRA_SYNC_DATA_TYPE = "syncDataType"
         const val INTENT_EXTRA_SYNC_DIRECTION = "syncDirection"
 

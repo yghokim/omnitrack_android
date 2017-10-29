@@ -18,7 +18,7 @@ open class UserAttachedViewModel : ViewModel() {
                 if (value != null) {
                     onUserAttached(value)
                 } else {
-                    onDispose()
+                    onUserDisposed()
                 }
             }
         }
@@ -29,12 +29,12 @@ open class UserAttachedViewModel : ViewModel() {
 
     }
 
-    protected open fun onDispose() {
+    protected open fun onUserDisposed() {
     }
 
     override fun onCleared() {
         super.onCleared()
-        onDispose()
+        onUserDisposed()
         userId = null
     }
 }

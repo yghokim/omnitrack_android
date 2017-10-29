@@ -9,8 +9,8 @@ import com.tbruyelle.rxpermissions2.RxPermissions
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.*
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
+import kr.ac.snu.hcil.omnitrack.utils.ConcurrentUniqueLongGenerator
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
-import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * Created by Young-Ho on 10/7/2017.
@@ -33,11 +33,10 @@ object OTAttributeManager {
 
     private val attributeCharacteristicsTable = SparseArray<OTAttributeHelper>()
 
-    private val attributeLocalIdSeed = AtomicInteger()
+    private val attributeLocalIdGenerator = ConcurrentUniqueLongGenerator()
 
     fun makeNewAttributeLocalId(createdAt: Long = System.currentTimeMillis()): String {
-        val nanoStamp = createdAt * 1000 + attributeLocalIdSeed.getAndIncrement()
-        attributeLocalIdSeed.compareAndSet(1000, 0)
+        val nanoStamp = attributeLocalIdGenerator.getNewUniqueLong(createdAt)
 
         val id = OTAuthManager.userDeviceLocalKey + "_" + nanoStamp.toString(36)
         println("new attribute local id: ${id}")

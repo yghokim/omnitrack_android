@@ -229,28 +229,6 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
                 - creationMode was new: discard builder (it will yield the same result on later visit)
                 - creationMode was restored: store builder (it is naturally dirty after autoComplete.)
          */
-
-        if (mode == ItemEditionViewModelBase.ItemMode.New) {
-            val needToStoreBuilder = if (viewModel.isValid && viewModel.mode == ItemEditionViewModelBase.ItemMode.New) {
-
-                if (viewModel.isViewModelsDirty()) {
-                    true
-                } else if (currentAttributeViewModelList.filter { it.attributeDAO.getHelper().isAttributeValueVolatile(it.attributeDAO) }.isNotEmpty()) {
-                    true
-                } else viewModel.builderCreationModeObservable.value == ItemEditionViewModelBase.BuilderCreationMode.Restored
-            } else {
-                false
-            }
-
-            if (needToStoreBuilder) {
-                println("store Builder.")
-                viewModel.cacheEditingInfo()
-            } else {
-                println("remove builder")
-                viewModel.clearHistory()
-            }
-        }
-
     }
 
     override fun onLowMemory() {
@@ -270,7 +248,38 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
     override fun onToolbarLeftButtonClicked() {
         //back button
         itemSaved = false
+
+        if (mode == ItemEditionViewModelBase.ItemMode.New) {
+            val needToStoreBuilder = if (viewModel.isValid && viewModel.mode == ItemEditionViewModelBase.ItemMode.New) {
+
+                if (viewModel.isViewModelsDirty()) {
+                    true
+                } else if (currentAttributeViewModelList.filter { it.attributeDAO.getHelper().isAttributeValueVolatile(it.attributeDAO) }.isNotEmpty()) {
+                    true
+                } else viewModel.builderCreationModeObservable.value == ItemEditionViewModelBase.BuilderCreationMode.Restored
+            } else {
+                false
+            }
+
+            if (needToStoreBuilder) {
+                println("store Builder.")
+                creationSubscriptions.add(
+                        viewModel.cacheEditingInfo().subscribe { saved ->
+                            finish()
+                        }
+                )
+            } else {
+                println("remove builder")
+                viewModel.clearHistory()
+                finish()
+            }
+        }
+
         finish()
+    }
+
+    override fun onBackPressed() {
+        onToolbarLeftButtonClicked()
     }
 
     override fun onToolbarRightButtonClicked() {

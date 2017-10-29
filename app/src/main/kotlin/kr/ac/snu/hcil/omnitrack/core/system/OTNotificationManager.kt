@@ -6,17 +6,18 @@ import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import android.support.v4.app.NotificationCompat
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.R
 import org.jetbrains.anko.notificationManager
 
 /**
  * Created by younghokim on 2017-08-09.
  */
-object OTNotificationChannelManager {
-    const val CHANNEL_ID_WIDGETS = "kr.ac.snu.hcil.omnitrack.notification.channel.widgets"
-    const val CHANNEL_ID_IMPORTANT = "kr.ac.snu.hcil.omnitrack.notification.channel.important"
-    const val CHANNEL_ID_SYSTEM = "kr.ac.snu.hcil.omnitrack.notification.channel.system"
-    const val CHANNEL_ID_NOTICE = "kr.ac.snu.hcil.omnitrack.notification.channel.notice"
+object OTNotificationManager {
+    const val CHANNEL_ID_WIDGETS = "${BuildConfig.APPLICATION_ID}.notification.channel.widgets"
+    const val CHANNEL_ID_IMPORTANT = "${BuildConfig.APPLICATION_ID}.notification.channel.important"
+    const val CHANNEL_ID_SYSTEM = "${BuildConfig.APPLICATION_ID}.notification.channel.system"
+    const val CHANNEL_ID_NOTICE = "${BuildConfig.APPLICATION_ID}.notification.channel.notice"
 
     @TargetApi(Build.VERSION_CODES.O)
     fun refreshChannels(context: Context) {

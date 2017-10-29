@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.system
 import android.app.PendingIntent
 import android.content.Context
 import android.support.v4.app.NotificationCompat
+import android.support.v4.content.ContextCompat
 import br.com.goncalves.pugnotification.notification.PugNotification
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.VectorIconHelper
@@ -15,7 +16,7 @@ object OTTaskNotificationManager {
 
     const val PROGRESS_INDETERMINATE = -1
 
-    fun setTaskProgressNotification(context: Context, tag: String? = null, id: Int, title: String, content: String, progress: Int, largeIcon: Int = R.drawable.icon_cloud_download, smallIcon: Int = android.R.drawable.stat_sys_download, dismissedIntent: PendingIntent? = null) {
+    fun setTaskProgressNotification(context: Context, tag: String? = null, id: Int, title: String, content: String, progress: Int, largeIcon: Int? = R.drawable.icon_cloud_download, smallIcon: Int = android.R.drawable.stat_sys_download, dismissedIntent: PendingIntent? = null) {
         val notification = makeTaskProgressNotificationBuilder(context, title, content, progress, largeIcon, smallIcon, dismissedIntent).build()
 
         if (tag != null) {
@@ -26,11 +27,11 @@ object OTTaskNotificationManager {
     }
 
     fun makeTaskProgressNotificationBuilder(context: Context, title: String, content: String, progress: Int, largeIcon: Int? = R.drawable.icon_cloud_download, smallIcon: Int = android.R.drawable.stat_sys_download, dismissedIntent: PendingIntent? = null): NotificationCompat.Builder {
-        return NotificationCompat.Builder(context, OTNotificationChannelManager.CHANNEL_ID_IMPORTANT)
+        return NotificationCompat.Builder(context, OTNotificationManager.CHANNEL_ID_IMPORTANT)
                 .setContentTitle(title)
                 .setContentText(content)
                 .setSmallIcon(smallIcon)
-                .setColor(R.color.colorPrimary)
+                .setColor(ContextCompat.getColor(context, R.color.colorPrimary))
                 .apply {
                     if (largeIcon != null) {
                         setLargeIcon(VectorIconHelper.getConvertedBitmap(context, largeIcon))

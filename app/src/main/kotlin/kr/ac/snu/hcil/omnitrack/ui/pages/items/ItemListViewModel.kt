@@ -138,7 +138,7 @@ class ItemListViewModel : RealmViewModel(), OrderedRealmCollectionChangeListener
         val viewModel = itemsInTimestampDescendingOrder.find { it.objectId == itemId }
         if (viewModel != null) {
             realm.executeTransaction {
-                OTApp.instance.databaseManager.removeItem(viewModel.itemDao, realm)
+                OTApp.instance.databaseManager.removeItem(viewModel.itemDao, false, realm)
             }
         }
     }

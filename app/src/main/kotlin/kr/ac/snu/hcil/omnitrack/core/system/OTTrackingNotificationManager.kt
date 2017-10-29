@@ -4,7 +4,6 @@ import android.app.Notification
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import android.net.Uri
 import android.preference.PreferenceManager
 import android.support.v4.app.NotificationCompat
@@ -13,10 +12,11 @@ import android.support.v4.content.ContextCompat
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
-import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemBrowserActivity
+import kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemDetailActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.settings.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.utils.FillingIntegerIdReservationTable
+import kr.ac.snu.hcil.omnitrack.utils.TextHelper
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -52,7 +52,7 @@ object OTTrackingNotificationManager {
         val ringtone = PreferenceManager.getDefaultSharedPreferences(context).getString(SettingsActivity.PREF_REMINDER_NOTI_RINGTONE, android.provider.Settings.System.DEFAULT_NOTIFICATION_URI.toString())
         val lightColor = PreferenceManager.getDefaultSharedPreferences(context).getInt(SettingsActivity.PREF_REMINDER_LIGHT_COLOR, ContextCompat.getColor(context, R.color.colorPrimary))
 
-        val builder = makeBaseBuilder(context, reminderTime, OTNotificationChannelManager.CHANNEL_ID_IMPORTANT)
+        val builder = makeBaseBuilder(context, reminderTime, OTNotificationManager.CHANNEL_ID_IMPORTANT)
                 .setContentIntent(resultPendingIntent)
                 .setContentText(String.format(context.resources.getString(R.string.msg_noti_tap_for_tracking_format), tracker.name))
                 .setDefaults(Notification.DEFAULT_VIBRATE)
@@ -85,35 +85,56 @@ object OTTrackingNotificationManager {
         notificationService.cancel(tracker.objectId, idSeed)
     }
 
-    fun pushBackgroundLoggingSuccessNotification(context: Context, tracker: OTTracker, itemId: String, loggedTime: Long, idSeed: Int) {
+    fun makeLoggingSuccessNotificationBuilder(context: Context, trackerId: String, trackerName: String, itemId: String, loggedTime: Long, table: List<Pair<String, CharSequence?>>?, notificationId: Int, tag: String): NotificationCompat.Builder {
         val stackBuilder = TaskStackBuilder.create(context)
         // Adds the back stack for the Intent (but not the Intent itself)
-        stackBuilder.addParentStack(ItemBrowserActivity::class.java)
+        stackBuilder.addParentStack(ItemDetailActivity::class.java)
         // Adds the Intent that starts the Activity to the top of the stack
-        stackBuilder.addNextIntent(ItemBrowserActivity.makeIntent(tracker.objectId, context))
+        stackBuilder.addNextIntent(ItemDetailActivity.makeItemEditPageIntent(itemId, trackerId, context))
 
         val resultPendingIntent = stackBuilder.getPendingIntent(0,
                 PendingIntent.FLAG_UPDATE_CURRENT)
 
-        val itemRemoveIntent = Intent(OTApp.BROADCAST_ACTION_COMMAND_REMOVE_ITEM)
-        itemRemoveIntent.putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
-        itemRemoveIntent.putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM, itemId)
-        itemRemoveIntent.putExtra(OTApp.INTENT_EXTRA_NOTIFICATION_ID_SEED, idSeed)
+        val itemRemoveIntent = OTItemLoggingService.makeRemoveItemIntent(context, itemId)
+                .putExtra(OTApp.INTENT_EXTRA_NOTIFICATION_ID, notificationId)
+                .putExtra(OTApp.INTENT_EXTRA_NOTIFICATON_TAG, tag)
 
         val discardAction = NotificationCompat.Action.Builder(0,
-                context.resources.getString(R.string.msg_notification_action_discard_item),
-                PendingIntent.getBroadcast(context, 0, itemRemoveIntent, PendingIntent.FLAG_UPDATE_CURRENT)).build()
+                OTApp.getString(R.string.msg_notification_action_discard_item),
+                PendingIntent.getService(context, 0, itemRemoveIntent, PendingIntent.FLAG_UPDATE_CURRENT)).build()
 
-        val builder = makeBaseBuilder(context, loggedTime, OTNotificationChannelManager.CHANNEL_ID_SYSTEM)
+        val editAction = NotificationCompat.Action.Builder(0, OTApp.getString(R.string.msg_edit), resultPendingIntent).build()
+
+        return makeBaseBuilder(context, loggedTime, OTNotificationManager.CHANNEL_ID_SYSTEM)
                 .setSmallIcon(R.drawable.icon_simple_plus)
                 .setContentIntent(resultPendingIntent)
-                .setContentText(
-                        String.format(OTApp.instance.resourcesWrapped.getString(R.string.msg_notification_content_format_new_item),
-                                tracker.name
-                        ))
+                .setAutoCancel(true)
+                .setContentTitle(String.format(OTApp.getString(R.string.msg_notification_title_format_new_item),
+                        trackerName
+                ))
+                .addAction(editAction)
                 .addAction(discardAction)
+                .apply {
+                    if (table != null && table.isNotEmpty()) {
+                        val inboxStyle = NotificationCompat.InboxStyle()
+                        fun makeRowCharSequence(key: String, value: CharSequence?): CharSequence {
+                            return if (value != null) {
+                                TextHelper.fromHtml("<b>${key}</b> : ${value}")
+                            } else {
+                                TextHelper.fromHtml("<b>${key}</b> : [${OTApp.getString(R.string.msg_empty_value)}]")
+                            }
+                        }
 
-        notificationService.notify(tracker.objectId, idSeed, builder.build())
+                        table.forEach { (key, value) ->
+                            inboxStyle.addLine(makeRowCharSequence(key, value))
+                        }
+                        inboxStyle.setBigContentTitle(String.format(OTApp.getString(R.string.msg_notification_format_inbox_title), trackerName))
+                        setStyle(inboxStyle)
+                        setContentText("${makeRowCharSequence(table.first().first, table.first().second)}...")
+                    } else {
+                        setContentText(OTApp.getString(R.string.msg_notification_content_new_item))
+                    }
+                }
     }
 
     fun notifyReminderChecked(trackerId: String, reminderTime: Long) {
