@@ -33,6 +33,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputV
 import kr.ac.snu.hcil.omnitrack.ui.pages.ConnectionIndicatorStubProxy
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.ValueWithTimestamp
+import org.jetbrains.anko.notificationManager
 import java.util.*
 import kotlin.properties.Delegates
 
@@ -113,6 +114,13 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
             else -> ViewModelProviders.of(this).get(NewItemCreationViewModel::class.java)
         }
 
+        if (intent.hasExtra(OTApp.INTENT_EXTRA_NOTIFICATION_ID)) {
+            val notificationID = intent.getIntExtra(OTApp.INTENT_EXTRA_NOTIFICATION_ID, -1)
+            val tag = intent.getStringExtra(OTApp.INTENT_EXTRA_NOTIFICATON_TAG)
+            if (tag != null) {
+                notificationManager.cancel(tag, notificationID)
+            } else notificationManager.cancel(notificationID)
+        }
 
         attributeListView.layoutManager = layoutManager
         attributeListView.addItemDecoration(HorizontalImageDividerItemDecoration(R.drawable.horizontal_separator_pattern, this))
