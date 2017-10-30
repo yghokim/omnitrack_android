@@ -11,6 +11,7 @@ import com.jawbone.upplatformsdk.utils.UpPlatformSdkConstants
 import com.jawbone.upplatformsdk.utils.UpPlatformSdkConstants.UP_PLATFORM_ACCESS_TOKEN
 import com.jawbone.upplatformsdk.utils.UpPlatformSdkConstants.UP_PLATFORM_REFRESH_TOKEN
 import io.reactivex.Single
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.dependency.OTSystemDependencyResolver
@@ -33,9 +34,9 @@ import java.util.*
  */
 object JawboneUpService : OTExternalService("JawboneUpService", 9) {
 
-    private const val CLIENT_ID = "XLamBoVDTQY"
-    private const val CLIENT_SECRET = "af60fc1d4d06c4de0286c2403702dc5a076c7132"
-    private const val REDIRECT_URI = "up-platform://redirect"
+    private const val CLIENT_ID = BuildConfig.JAWBONE_CLIENT_ID
+    private const val CLIENT_SECRET = BuildConfig.JAWBONE_CLIENT_SECRET
+    private const val REDIRECT_URI = BuildConfig.JAWBONE_REDIRECT_URI
 
     fun makeFormattedDateInteger(date: Long): Int {
         val cal = Calendar.getInstance()

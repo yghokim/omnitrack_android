@@ -3,6 +3,10 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
 
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
 android {
     signingConfigs {
         sign_test {
@@ -59,8 +63,13 @@ android {
         }
     }
     buildTypes.each {
-        it.buildConfigField 'String', 'OMNITRACK_SYNCHRONIZATION_SERVER_URL', OMNITRACK_SYNCHRONIZATION_SERVER_URL
-        it.buildConfigField 'String', 'OMNITRACK_MEDIA_STORAGE_SERVER_URL', OMNITRACK_MEDIA_STORAGE_SERVER_URL
+        buildType->
+        buildType.buildConfigField 'String', 'OMNITRACK_SYNCHRONIZATION_SERVER_URL', OMNITRACK_SYNCHRONIZATION_SERVER_URL
+        buildType.buildConfigField 'String', 'OMNITRACK_MEDIA_STORAGE_SERVER_URL', OMNITRACK_MEDIA_STORAGE_SERVER_URL
+
+        keystoreProperties.keySet().forEach{
+            buildType.buildConfigField 'String', it.toString(), keystoreProperties.getProperty(it)
+        }
     }
 
     sourceSets {

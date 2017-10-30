@@ -35,7 +35,6 @@ class SourceSelectionPage(override val parent: ConnectionWizardView, val attribu
         private set
 
     init {
-
         sources = OTExternalService.getFilteredMeasureFactories {
             it.isAttachableTo(attribute)
         }.map {
