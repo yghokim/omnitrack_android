@@ -29,6 +29,7 @@ import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.applyTint
+import kr.ac.snu.hcil.omnitrack.widgets.OTShortcutPanelWidgetUpdateService
 
 class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tracker_detail) {
 
@@ -153,6 +154,14 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
 
         }*/
 
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if(viewModel.isDirty)
+        {
+            OTApp.instance.startService(OTShortcutPanelWidgetUpdateService.makeNotifyDatesetChangedIntentToAllWidgets(this))
+        }
     }
 
     private fun tossToHome() {

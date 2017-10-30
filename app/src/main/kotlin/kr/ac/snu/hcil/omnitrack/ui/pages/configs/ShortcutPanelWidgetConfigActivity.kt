@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.configs
 
 import android.appwidget.AppWidgetManager
 import android.content.Intent
+import android.os.Bundle
 import android.support.v7.widget.AppCompatCheckBox
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -13,9 +14,12 @@ import android.widget.EditText
 import android.widget.RadioGroup
 import android.widget.TextView
 import butterknife.bindView
+import io.realm.Realm
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.ui.activities.AppWidgetConfigurationActivity
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.WritablePair
@@ -32,10 +36,16 @@ class ShortcutPanelWidgetConfigActivity : AppWidgetConfigurationActivity(R.layou
     private val trackerSelectorGroup: ViewGroup by bindView(R.id.ui_group_selected_trackers)
     private val trackerSelectionList: RecyclerView by bindView(R.id.ui_list_selected_trackers)
 
-    private val user: OTUser? = null
 
-    private var trackerList: List<WritablePair<OTTracker, Boolean>>? = null
+    private var trackerList: List<WritablePair<OTTrackerDAO.SimpleTrackerInfo, Boolean>>? = null
     private var trackerSelectionAdapter: TrackerSelectionAdapter = TrackerSelectionAdapter()
+
+    private lateinit var realm: Realm
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        realm = OTApp.instance.databaseManager.getRealmInstance()
+    }
 
     override fun onCreateWithWidget(appWidgetId: Int) {
         super.onCreateWithWidget(appWidgetId)
@@ -86,15 +96,12 @@ class ShortcutPanelWidgetConfigActivity : AppWidgetConfigurationActivity(R.layou
     private fun refreshTrackerSelectionList() {
         creationSubscriptions.add(
                 signedInUserObservable.subscribe({
-                    user ->
-                    /*TODO shortcut panel refresh
+                    userId ->
                     val selectedTrackerIds = OTShortcutPanelWidgetUpdateService.getSelectedTrackerIds(appWidgetId, OTShortcutPanelWidgetUpdateService.getPreferences(this))
-                    trackerList = user.trackers.map {
-                        WritablePair(it, selectedTrackerIds?.contains(it.objectId) == true)
+                    trackerList = OTApp.instance.databaseManager.makeTrackersOfUserQuery(userId, realm).findAll().map {
+                        WritablePair(it.getSimpleInfo(), selectedTrackerIds?.contains(it.objectId) == true)
                     }
-                    trackerSelectionAdapter.notifyDataSetChanged()*/
-
-
+                    trackerSelectionAdapter.notifyDataSetChanged()
                 }, {
 
                 })
@@ -123,7 +130,7 @@ class ShortcutPanelWidgetConfigActivity : AppWidgetConfigurationActivity(R.layou
         }, editor)
 
         trackerList?.let {
-            OTShortcutPanelWidgetUpdateService.setSelectedTrackerIds(appWidgetId, it.filter { it.second == true }.map { it.first.objectId }.toSet(), editor)
+            OTShortcutPanelWidgetUpdateService.setSelectedTrackerIds(appWidgetId, it.filter { it.second == true }.map { it.first.objectId!! }.toSet(), editor)
         }
         editor.apply()
 
@@ -139,6 +146,7 @@ class ShortcutPanelWidgetConfigActivity : AppWidgetConfigurationActivity(R.layou
     override fun onDestroy() {
         super.onDestroy()
         trackerList = null
+        realm.close()
     }
 
     inner class TrackerSelectionAdapter : RecyclerView.Adapter<TrackerSelectionAdapter.TrackerViewHolder>() {
@@ -146,7 +154,7 @@ class ShortcutPanelWidgetConfigActivity : AppWidgetConfigurationActivity(R.layou
             return trackerList?.size ?: 0
         }
 
-        fun getPairAt(position: Int): WritablePair<OTTracker, Boolean>? {
+        fun getPairAt(position: Int): WritablePair<OTTrackerDAO.SimpleTrackerInfo, Boolean>? {
             return trackerList?.get(position)
         }
 
@@ -172,7 +180,7 @@ class ShortcutPanelWidgetConfigActivity : AppWidgetConfigurationActivity(R.layou
                 }
             }
 
-            fun bind(pair: WritablePair<OTTracker, Boolean>) {
+            fun bind(pair: WritablePair<OTTrackerDAO.SimpleTrackerInfo, Boolean>) {
                 checkBox.text = pair.first.name
                 checkBox.isChecked = pair.second
                 colorBar.setBackgroundColor(pair.first.color)

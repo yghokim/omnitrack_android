@@ -9,10 +9,13 @@ import android.graphics.Paint
 import android.support.v4.graphics.ColorUtils
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
+import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
+import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.utils.VectorIconHelper
 import java.text.SimpleDateFormat
 import java.util.*
@@ -37,27 +40,15 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
 
         private val widgetId: Int
 
-        private var user: OTUser? = null
-
         private var mode: String = OTShortcutPanelWidgetUpdateService.MODE_ALL
 
-        private var trackers = ArrayList<OTTracker>()
+        private var trackers = ArrayList<OTTrackerDAO.SimpleTrackerInfo>()
 
         init {
             widgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
         }
 
         override fun onCreate() {
-            user = null
-        }
-
-        private fun loadUser() {
-            /*
-            user = OTApp.instance.currentUserObservable
-                    .flatMap { user -> user.crawlAllTrackersAndTriggerAtOnce().toObservable() }.onErrorReturn { ex -> null }
-                    .first()
-                    .toBlocking().first()
-            */
         }
 
         override fun getLoadingView(): RemoteViews? {
@@ -69,20 +60,24 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
         }
 
         override fun onDataSetChanged() {
-            loadUser()
+            val userId = OTAuthManager.userId
             val pref = OTShortcutPanelWidgetUpdateService.getPreferences(context)
             mode = OTShortcutPanelWidgetUpdateService.getMode(widgetId, pref)
             trackers.clear()
-            when (mode) {
-                OTShortcutPanelWidgetUpdateService.MODE_ALL -> trackers.addAll(user?.trackers?.unObservedList ?: emptyList())
-                OTShortcutPanelWidgetUpdateService.MODE_SHORTCUT -> trackers.addAll(user?.getTrackersOnShortcut() ?: emptyList())
-                OTShortcutPanelWidgetUpdateService.MODE_SELECTIVE -> {
-                    val selectedTrackerIds = OTShortcutPanelWidgetUpdateService.getSelectedTrackerIds(widgetId, pref)
-                    if (selectedTrackerIds?.isNotEmpty() == true) {
-                        trackers.addAll(user?.trackers?.filter { selectedTrackerIds.contains(it.objectId) } ?: emptyList())
+            val realm = OTApp.instance.databaseManager.getRealmInstance()
+            if(userId!=null) {
+                when (mode) {
+                    OTShortcutPanelWidgetUpdateService.MODE_ALL -> trackers.addAll( OTApp.instance.databaseManager.makeTrackersOfUserQuery(userId, realm).findAll().map{it.getSimpleInfo()})
+                    OTShortcutPanelWidgetUpdateService.MODE_SHORTCUT -> trackers.addAll(OTApp.instance.databaseManager.makeTrackersOfUserQuery(userId, realm).equalTo("isBookmarked", true).findAll().map{it.getSimpleInfo()})
+                    OTShortcutPanelWidgetUpdateService.MODE_SELECTIVE -> {
+                        val selectedTrackerIds = OTShortcutPanelWidgetUpdateService.getSelectedTrackerIds(widgetId, pref)?.toTypedArray()
+                        if (selectedTrackerIds?.isNotEmpty() == true) {
+                            trackers.addAll(OTApp.instance.databaseManager.makeTrackersOfUserQuery(userId, realm).`in`("objectId", selectedTrackerIds).findAll().map{it.getSimpleInfo()})
+                        }
                     }
                 }
             }
+            realm.close()
         }
 
         override fun hasStableIds(): Boolean {
@@ -155,7 +150,6 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
         }
 
         override fun onDestroy() {
-            user = null
             trackers.clear()
         }
 
