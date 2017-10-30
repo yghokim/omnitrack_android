@@ -173,7 +173,7 @@ dependencies {
     compile 'com.larswerkman:lobsterpicker:1.0.1'
     compile 'uk.co.chrisjenx:calligraphy:2.3.0'
     compile 'com.github.VictorAlbertos:RxActivityResult:0.4.5-2.x'
-    compile 'org.nield:kotlinstatistics:0.2.1'
+    compile 'org.nield:kotlin-statistics:1.0.0'
 }
 
 repositories {

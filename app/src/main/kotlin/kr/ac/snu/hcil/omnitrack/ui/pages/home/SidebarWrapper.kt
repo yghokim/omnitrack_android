@@ -17,6 +17,7 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.synchronization.ESyncDataType
+import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.viewholders.RecyclerViewMenuAdapter
 import kr.ac.snu.hcil.omnitrack.ui.pages.AboutActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.settings.SettingsActivity
@@ -66,6 +67,9 @@ class SidebarWrapper(val view: View, val parentActivity: AppCompatActivity) : Po
                 DialogHelper.makeNegativePhrasedYesNoDialogBuilder(parentActivity, "OmniTrack", parentActivity.getString(R.string.msg_profile_unlink_account_confirm), R.string.msg_logout, onYes = {
                     OTAuthManager.signOut()
                     OTApp.instance.unlinkUser()
+                    if (parentActivity is OTActivity) {
+                        parentActivity.goSignIn()
+                    }
                 }).show()
                 return true
             }
