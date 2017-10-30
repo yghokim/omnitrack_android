@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 
 import android.content.Context
+import android.util.SparseArray
 import android.view.View
 import android.widget.TextView
 import io.reactivex.Single
@@ -8,6 +9,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.realm.Realm
 import io.realm.Sort
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.attributes.FallbackPolicyResolver
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyHelper
@@ -31,22 +33,57 @@ import kotlin.collections.set
  * Created by Young-Ho on 10/7/2017.
  */
 abstract class OTAttributeHelper {
+    companion object {
+        val FALLBACK_POLICY_RESOLVER_EMPTY_VALUE = object: FallbackPolicyResolver(R.string.msg_empty_value){
+            override fun getFallbackValue(attribute: OTAttributeDAO, realm: Realm): Single<Nullable<out Any>> {
+                return Single.just<Nullable<out Any>>(Nullable(null)).observeOn(AndroidSchedulers.mainThread())
+            }
+        }
+
+        val FALLBACK_POLICY_RESOLVER_PREVIOUS_VALUE = object: FallbackPolicyResolver(R.string.msg_attribute_fallback_policy_last, isValueVolatile = true){
+            override fun getFallbackValue(attribute: OTAttributeDAO, realm: Realm): Single<Nullable<out Any>> {
+                return Single.defer {
+                    val previousNotNullEntry = try {
+                        realm.where(OTItemValueEntryDAO::class.java)
+                                .equalTo("key", attribute.localId)
+                                .equalTo("item.trackerId", attribute.trackerId)
+                                .equalTo("item.removed", false)
+                                .findAllSorted("item.timestamp", Sort.DESCENDING).filter { it.value != null }.first()
+                    } catch (ex: NoSuchElementException) {
+                        null
+                    }
+
+                    println("previous not null entry: ${previousNotNullEntry}")
+
+                    return@defer if (previousNotNullEntry != null) {
+                        Single.just<Nullable<out Any>>(
+                                Nullable(previousNotNullEntry.value?.let { TypeStringSerializationHelper.deserialize(it) }))
+                    } else Single.just<Nullable<out Any>>(Nullable(null))
+                }.subscribeOn(AndroidSchedulers.mainThread())
+            }
+        }
+    }
+
+    abstract val typeNameForSerialization: String
+
+    open val supportedFallbackPolicies = LinkedHashMap<Int, FallbackPolicyResolver>().apply{
+        put(OTAttributeDAO.DEFAULT_VALUE_POLICY_NULL, FALLBACK_POLICY_RESOLVER_EMPTY_VALUE)
+        put(OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_LAST_ITEM, FALLBACK_POLICY_RESOLVER_PREVIOUS_VALUE)
+    }
+
+    open val propertyKeys: Array<String> = emptyArray()
 
     open fun getValueNumericCharacteristics(attribute: OTAttributeDAO): NumericCharacteristics = NumericCharacteristics(false, false)
 
     open fun getTypeNameResourceId(attribute: OTAttributeDAO): Int = R.drawable.field_icon_shorttext
 
     open fun getTypeSmallIconResourceId(attribute: OTAttributeDAO): Int = R.drawable.icon_small_shorttext
-    open fun isIntrinsicDefaultValueVolatile(attribute: OTAttributeDAO): Boolean = false
     open fun isExternalFile(attribute: OTAttributeDAO): Boolean = false
     open fun getRequiredPermissions(attribute: OTAttributeDAO): Array<String>? = null
-    abstract val typeNameForSerialization: String
 
     open fun getSupportedSorters(attribute: OTAttributeDAO): Array<AFieldValueSorter> {
         return emptyArray()
     }
-
-    open val propertyKeys: Array<String> = emptyArray()
 
     open fun <T> parsePropertyValue(propertyKey: String, serializedValue: String): T {
         return getPropertyHelper<T>(propertyKey).parseValue(serializedValue)
@@ -107,65 +144,21 @@ abstract class OTAttributeHelper {
     }
 
     //Input Values=======================================================================================================
-    open fun isIntrinsicDefaultValueSupported(attribute: OTAttributeDAO): Boolean {
-        return false
-    }
-
-    open fun makeIntrinsicDefaultValue(attribute: OTAttributeDAO): Single<out Any> {
-        return Single.error { NotImplementedError() }
-    }
-
-    open fun makeIntrinsicDefaultValueMessage(attribute: OTAttributeDAO): CharSequence {
-        return ""
-    }
 
     open fun isAttributeValueVolatile(attribute: OTAttributeDAO): Boolean {
         return attribute.serializedConnection?.let { OTConnection.fromJson(it) }?.source != null
-                || (attribute.fallbackValuePolicy == OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_LAST_ITEM)
-                || (attribute.fallbackValuePolicy == OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE && isIntrinsicDefaultValueSupported(attribute) && isIntrinsicDefaultValueVolatile(attribute))
+                || supportedFallbackPolicies[attribute.fallbackValuePolicy]?.isValueVolatile == true
     }
 
     open fun getFallbackValue(attribute: OTAttributeDAO, realm: Realm): Single<Nullable<out Any>> {
-        return Single.defer {
-            println("getFallbackValue. policy: ${attribute.fallbackValuePolicy}. Current thread: ${Thread.currentThread().name}")
-            when (attribute.fallbackValuePolicy) {
-                OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE -> {
-                    return@defer if (isIntrinsicDefaultValueSupported(attribute)) {
-                        makeIntrinsicDefaultValue(attribute).map { value -> Nullable(value) as Nullable<out Any> }
-                    } else Single.just<Nullable<out Any>>(Nullable(null))
-                }
-                OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_LAST_ITEM -> {
-                    Single.defer {
-                        val previousNotNullEntry = try {
-                            realm.where(OTItemValueEntryDAO::class.java)
-                                    .equalTo("key", attribute.localId)
-                                    .equalTo("item.trackerId", attribute.trackerId)
-                                    .equalTo("item.removed", false)
-                                    .findAllSorted("item.timestamp", Sort.DESCENDING).filter { it.value != null }.first()
-                        } catch (ex: NoSuchElementException) {
-                            null
-                        }
-
-                        println("previous not null entry: ${previousNotNullEntry}")
-
-                        return@defer if (previousNotNullEntry != null) {
-                            Single.just<Nullable<out Any>>(
-                                    Nullable(previousNotNullEntry.value?.let { TypeStringSerializationHelper.deserialize(it) }))
-                        } else Single.just<Nullable<out Any>>(Nullable(null))
-                    }.subscribeOn(AndroidSchedulers.mainThread())
-
-                }
-                OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_PRESET -> {
-                    return@defer attribute.fallbackPresetSerializedValue?.let {
-                        Single.just(Nullable(TypeStringSerializationHelper.deserialize(it)) as Nullable<out Any>)
-                    } ?: Single.just<Nullable<out Any>>(Nullable(null))
-                }
-                OTAttributeDAO.DEFAULT_VALUE_POLICY_NULL -> {
-                    return@defer Single.just<Nullable<out Any>>(Nullable(null))
-                }
-                else -> {
-                    return@defer Single.just<Nullable<out Any>>(Nullable(null))
-                }
+        return Single.defer{
+            val resolver = supportedFallbackPolicies[attribute.fallbackValuePolicy]
+            if(resolver==null)
+            {
+                return@defer Single.just<Nullable<out Any>>(Nullable(null))
+            }
+            else{
+                return@defer resolver.getFallbackValue(attribute, realm)
             }
         }
     }

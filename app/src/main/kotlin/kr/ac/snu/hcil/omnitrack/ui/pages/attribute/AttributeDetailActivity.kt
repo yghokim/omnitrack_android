@@ -260,15 +260,8 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
     }
 
     private fun refreshFallbackSpinner(dao: OTAttributeDAO, attrHelper: OTAttributeHelper) {
-        val match = currentSpinnerEntries.find { it.id == OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE }
-        if (attrHelper.isIntrinsicDefaultValueSupported(dao)) {
-            if (match != null) {
-                if (match.text != attrHelper.makeIntrinsicDefaultValueMessage(dao).toString()) {
-                    currentSpinnerEntries.remove(match)
-                    currentSpinnerEntries.add(1, FallbackSpinnerEntry(OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE, attrHelper.makeIntrinsicDefaultValueMessage(dao).toString()))
-                }
-            } else currentSpinnerEntries.add(1, FallbackSpinnerEntry(OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE, attrHelper.makeIntrinsicDefaultValueMessage(dao).toString()))
-        } else currentSpinnerEntries.remove(match)
+        currentSpinnerEntries.clear()
+        currentSpinnerEntries.addAll(attrHelper.supportedFallbackPolicies.map { FallbackSpinnerEntry(it.key, it.value.toString()) })
 
         ui_fallback_policy_spinner.setItems(currentSpinnerEntries)
         ui_fallback_policy_spinner.selectedIndex = currentSpinnerEntries.indexOf(currentSpinnerEntries.find { it.id == dao.fallbackValuePolicy })
@@ -487,6 +480,11 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
             wizardDialog.show()
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        currentSpinnerEntries.clear()
     }
 
     data class FallbackSpinnerEntry(val id: Int, val text: String) {

@@ -5,6 +5,7 @@ import io.reactivex.Single
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.attributes.FallbackPolicyResolver
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.TimeSpanIntervalSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.TimeSpanPivotalSorter
@@ -20,6 +21,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputV
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.TimeRangePickerInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.SelectionPropertyView
+import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 import java.text.SimpleDateFormat
@@ -55,8 +57,6 @@ class OTTimeSpanAttributeHelper : OTAttributeHelper() {
                 TimeSpanIntervalSorter("${attribute.name} interval", attribute.localId)
         )
     }
-
-    override fun isIntrinsicDefaultValueVolatile(attribute: OTAttributeDAO): Boolean = true
 
     override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_TIMESPAN
 
@@ -114,6 +114,17 @@ class OTTimeSpanAttributeHelper : OTAttributeHelper() {
         }
     }
 
+    override val supportedFallbackPolicies: LinkedHashMap<Int, FallbackPolicyResolver>
+        get() = super.supportedFallbackPolicies.apply {
+            this[OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE] = object : FallbackPolicyResolver(R.string.msg_intrinsic_time, isValueVolatile = true) {
+                override fun getFallbackValue(attribute: OTAttributeDAO, realm: Realm): Single<Nullable<out Any>> {
+                    return Single.just(Nullable(TimeSpan()))
+                }
+            }
+
+            this.remove(OTAttributeDAO.DEFAULT_VALUE_POLICY_NULL)
+        }
+
     override fun initialize(attribute: OTAttributeDAO) {
         attribute.fallbackValuePolicy = OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE
     }
@@ -146,14 +157,6 @@ class OTTimeSpanAttributeHelper : OTAttributeHelper() {
 
     override fun makeRecommendedChartModels(attribute: OTAttributeDAO, realm: Realm): Array<ChartModel<*>> {
         return arrayOf(DurationTimelineModel(attribute, realm))
-    }
-
-    override fun makeIntrinsicDefaultValue(attribute: OTAttributeDAO): Single<out Any> {
-        return Single.defer { Single.just(TimeSpan()) }
-    }
-
-    override fun makeIntrinsicDefaultValueMessage(attribute: OTAttributeDAO): CharSequence {
-        return OTApp.getString(R.string.msg_intrinsic_time)
     }
 
     override fun onAddColumnToTable(attribute: OTAttributeDAO, out: MutableList<String>) {

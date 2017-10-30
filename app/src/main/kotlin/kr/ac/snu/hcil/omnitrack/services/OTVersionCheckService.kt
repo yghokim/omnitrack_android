@@ -9,14 +9,18 @@ import android.content.Intent
 import android.net.Uri
 import android.os.IBinder
 import android.preference.PreferenceManager
+import android.support.v4.app.NotificationCompat
+import android.support.v4.content.ContextCompat
 import android.util.Log
-import br.com.goncalves.pugnotification.notification.PugNotification
 import io.reactivex.disposables.Disposables
 import io.reactivex.disposables.SerialDisposable
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.RemoteConfigManager
+import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
+import kr.ac.snu.hcil.omnitrack.utils.VectorIconHelper
+import org.jetbrains.anko.notificationManager
 
 /**
  * Created by younghokim on 2017. 4. 15..
@@ -65,24 +69,21 @@ class OTVersionCheckService : Service() {
 
                         if (!OTApp.instance.isAppInForeground) {
                             Log.d(TAG, "instance is in background. send notification.")
-                            PugNotification.with(this).load()
-                                    .color(R.color.colorPointed)
-                                    .identifier(REQUEST_CODE)
-                                    .tag(TAG)
-                                    .title(R.string.msg_notification_new_version_detected_title)
-                                    .message(R.string.msg_notification_new_version_detected_text)
-                                    .largeIcon(R.drawable.icon_simple)
-                                    .smallIcon(R.drawable.icon_simple)
-                                    .flags(Notification.DEFAULT_ALL)
-                                    .autoCancel(true)
-                                    .click {
-                                        PendingIntent.getActivity(this, REQUEST_CODE,
-                                                Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=kr.ac.snu.hcil.omnitrack")),
-                                                PendingIntent.FLAG_UPDATE_CURRENT)
-                                    }
-                                    .simple()
+                            val notification = NotificationCompat.Builder(this, OTNotificationManager.CHANNEL_ID_NOTICE)
+                                    .setColor(ContextCompat.getColor(this, R.color.colorPointed))
+                                    .setContentTitle(OTApp.getString(R.string.msg_notification_new_version_detected_title))
+                                    .setContentText(OTApp.getString(R.string.msg_notification_new_version_detected_text))
+                                    .setLargeIcon(VectorIconHelper.getConvertedBitmap(this, R.drawable.icon_simple))
+                                    .setSmallIcon(R.drawable.icon_simple)
+                                    .setDefaults(Notification.DEFAULT_ALL)
+                                    .setAutoCancel(true)
+                                    .setContentIntent(
+                                            PendingIntent.getActivity(this, REQUEST_CODE,
+                                                    Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=kr.ac.snu.hcil.omnitrack")),
+                                                    PendingIntent.FLAG_UPDATE_CURRENT)
+                                    )
                                     .build()
-
+                            notificationManager.notify(TAG, REQUEST_CODE, notification)
 
                             OTApp.instance.systemSharedPreferences.edit()
                                     .putString(PREF_LAST_NOTIFIED_VERSION, versionName)
@@ -90,7 +91,7 @@ class OTVersionCheckService : Service() {
                         } else {
 
                             Log.d(TAG, "instance is in foreground. send broadcast.")
-                            PugNotification.with(this).cancel(TAG, REQUEST_CODE)
+                            this.notificationManager.cancel(TAG, REQUEST_CODE)
                             val intent = Intent(OTApp.BROADCAST_ACTION_NEW_VERSION_DETECTED)
                             intent.putExtra(OTApp.INTENT_EXTRA_LATEST_VERSION_NAME, versionName)
 

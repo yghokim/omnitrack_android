@@ -158,7 +158,6 @@ dependencies {
     kapt 'com.github.bumptech.glide:compiler:4.2.0'
     compile 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.4@aar'
     compile 'com.wonderkiln:camerakit:0.11.2'
-    compile 'com.github.halysongoncalves:pugnotification:1.8.1'
     compile 'com.github.mukeshsolanki:country-picker-android:1.1.9'
     compile 'com.patloew.rxlocation:rxlocation:1.0.3'
     compile 'uk.co.samuelwall:material-tap-target-prompt:2.2.0'

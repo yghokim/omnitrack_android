@@ -1,8 +1,10 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 
 import io.reactivex.Single
+import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.attributes.FallbackPolicyResolver
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.NumericSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyHelper
@@ -11,6 +13,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.NumberInputView
+import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.NumberStyle
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 
@@ -22,6 +25,16 @@ class OTNumberAttributeHelper : OTAttributeHelper() {
     companion object {
         const val NUMBERSTYLE = "style"
     }
+
+    override val supportedFallbackPolicies: LinkedHashMap<Int, FallbackPolicyResolver>
+        get() = super.supportedFallbackPolicies.apply{
+            this[OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE] = object: FallbackPolicyResolver(R.string.msg_intrinsic_number, false){
+                override fun getFallbackValue(attribute: OTAttributeDAO, realm: Realm): Single<Nullable<out Any>> {
+                    return Single.just(Nullable(0))
+                }
+
+            }
+        }
 
     override fun getValueNumericCharacteristics(attribute: OTAttributeDAO): NumericCharacteristics = NumericCharacteristics(true, true)
 
@@ -69,17 +82,5 @@ class OTNumberAttributeHelper : OTAttributeHelper() {
         if (inputView is NumberInputView) {
             inputView.numberStyle = getNumberStyle(attribute) ?: NumberStyle()
         }
-    }
-
-    override fun isIntrinsicDefaultValueSupported(attribute: OTAttributeDAO): Boolean {
-        return true
-    }
-
-    override fun makeIntrinsicDefaultValue(attribute: OTAttributeDAO): Single<out Any> {
-        return Single.just(0)
-    }
-
-    override fun makeIntrinsicDefaultValueMessage(attribute: OTAttributeDAO): CharSequence {
-        return OTApp.getString(R.string.msg_intrinsic_number)
     }
 }
