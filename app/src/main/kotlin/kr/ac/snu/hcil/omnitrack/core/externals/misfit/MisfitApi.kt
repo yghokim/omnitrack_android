@@ -5,6 +5,7 @@ import android.app.Activity
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
@@ -51,7 +52,7 @@ object MisfitApi {
     fun authorize(activity: Activity): Single<String> {
 
         val uri = makeUriBuilderRoot().addPathSegments(SUBURL_LOGIN)
-                .addQueryParameter(AuthConstants.PARAM_CLIENT_ID, activity.resources.getString(R.string.misfit_app_key))
+                .addQueryParameter(AuthConstants.PARAM_CLIENT_ID, BuildConfig.MISFIT_APP_KEY)
                 .addQueryParameter(AuthConstants.PARAM_RESPONSE_TYPE, AuthConstants.VALUE_RESPONSE_TYPE_CODE)
                 .addQueryParameter(AuthConstants.PARAM_REDIRECT_URI, AuthConstants.VALUE_REDIRECT_URI)
                 .addQueryParameter(AuthConstants.PARAM_SCOPE, "tracking,sleeps")
@@ -145,8 +146,8 @@ object MisfitApi {
             val uri = makeUriBuilderRoot().addPathSegments(SUBURL_EXCHANGE).build()
             val requestBody = FormBody.Builder()
                     .add(AuthConstants.PARAM_CODE, requestCode)
-                    .add(AuthConstants.PARAM_CLIENT_ID, OTApp.instance.resourcesWrapped.getString(R.string.misfit_app_key))
-                    .add(AuthConstants.PARAM_CLIENT_SECRET, OTApp.instance.resourcesWrapped.getString(R.string.misfit_app_secret))
+                    .add(AuthConstants.PARAM_CLIENT_ID, BuildConfig.MISFIT_APP_KEY)
+                    .add(AuthConstants.PARAM_CLIENT_SECRET, BuildConfig.MISFIT_APP_SECRET)
                     .add(AuthConstants.PARAM_GRANT_TYPE, "authorization_code")
                     .add(AuthConstants.PARAM_REDIRECT_URI, AuthConstants.VALUE_REDIRECT_URI)
                     .build()
