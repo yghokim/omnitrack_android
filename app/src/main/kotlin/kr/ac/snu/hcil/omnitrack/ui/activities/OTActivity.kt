@@ -175,12 +175,13 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
         )
     }
 
-    private fun goSignIn() {
+    fun goSignIn() {
         Log.d(LOG_TAG, "Launching Sign-in Activity...")
 
         val intent = Intent(this, SignInActivity::class.java)
         //val intent = Intent(this, ExperimentSignInActivity::class.java)
         startActivity(intent)
+        finish()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
