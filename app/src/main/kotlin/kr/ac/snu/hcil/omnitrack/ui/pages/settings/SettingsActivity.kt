@@ -10,10 +10,14 @@ import android.preference.ListPreference
 import android.preference.Preference
 import android.preference.PreferenceFragment
 import android.widget.Toast
+import io.reactivex.disposables.CompositeDisposable
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
+import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckService
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
+import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.utils.LocaleHelper
 
 
@@ -68,6 +72,8 @@ class SettingsActivity : MultiButtonActionBarActivity(R.layout.activity_multibut
 
         private var languageOnCreation: String? = null
 
+        private val creationSubscriptions = CompositeDisposable()
+
         var resultCode: Int = Activity.RESULT_CANCELED
             private set
 
@@ -107,6 +113,7 @@ class SettingsActivity : MultiButtonActionBarActivity(R.layout.activity_multibut
             super.onDestroy()
             findPreference(PREF_REMINDER_NOTI_RINGTONE).onPreferenceChangeListener = null
             findPreference(LocaleHelper.PREF_KEY_SELECTED_LANGUAGE).onPreferenceChangeListener = null
+            creationSubscriptions.clear()
         }
 
         override fun onResume() {
@@ -154,25 +161,27 @@ class SettingsActivity : MultiButtonActionBarActivity(R.layout.activity_multibut
         override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
             when (key) {
                 "pref_show_shortcut_panel" -> {
-                    /*TODO fix shortcut panel options
                     if (sharedPreferences.getBoolean(key, true)) {
                         //show if logged in
                         if (OTAuthManager.currentSignedInLevel > OTAuthManager.SignedInLevel.NONE) {
                             val activity = activity
                             if (activity is OTActivity) {
-                                activity.signedInUserObservable.subscribe({
-                                    user ->
-                                    OTShortcutPanelManager.refreshNotificationShortcutViews(user, activity)
-                                }, {
-                                    OTShortcutPanelManager.disposeShortcutPanel()
-                                })
+                                val realm = OTApp.instance.databaseManager.getRealmInstance()
+
+                                creationSubscriptions.add(
+                                        activity.signedInUserObservable.concatMap { userId ->
+                                            OTApp.instance.databaseManager.makeShortcutPanelRefreshObservable(userId, realm).toObservable()
+                                        }
+                                                .firstElement().subscribe { realm.close() })
+                            } else {
+                                OTShortcutPanelManager.disposeShortcutPanel()
                             }
                         } else {
                             OTShortcutPanelManager.disposeShortcutPanel()
                         }
                     } else {
                         OTShortcutPanelManager.disposeShortcutPanel()
-                    }*/
+                    }
                 }
 
                 "pref_check_updates" -> {
