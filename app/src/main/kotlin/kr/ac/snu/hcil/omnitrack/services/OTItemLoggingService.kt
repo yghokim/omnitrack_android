@@ -15,7 +15,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemBuilderDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTTaskNotificationManager
-import kr.ac.snu.hcil.omnitrack.core.system.OTTrackingNotificationManager
+import kr.ac.snu.hcil.omnitrack.core.system.OTTrackingNotificationFactory
 import org.jetbrains.anko.notificationManager
 import org.jetbrains.anko.runOnUiThread
 import java.util.concurrent.atomic.AtomicInteger
@@ -30,6 +30,7 @@ class OTItemLoggingService : Service() {
         private const val ACTION_REMOVE_ITEM = "${BuildConfig.APPLICATION_ID}.services.action.REMOVE_ITEM"
         private const val INTENT_EXTRA_LOGGING_SOURCE = "loggingSource"
 
+        private const val NOTIFICATION_FOREGROUND_ID = 3123
         private const val NOTIFICATION_TAG = "${BuildConfig.APPLICATION_ID}.notification.tag.ITEM_LOGGING_SERVICE"
         private val notificationIdSeed = AtomicInteger(0)
 
@@ -47,6 +48,8 @@ class OTItemLoggingService : Service() {
                 this.putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM, itemId)
             }
         }
+
+        private val currentCommandCount = AtomicInteger(0)
     }
 
     private lateinit var realm: Realm
@@ -129,7 +132,7 @@ class OTItemLoggingService : Service() {
                                 println(table)
 
                                 this.runOnUiThread {
-                                    val builder = OTTrackingNotificationManager.makeLoggingSuccessNotificationBuilder(this, trackerId, trackerName, itemId!!, System.currentTimeMillis(), table, notificationId, NOTIFICATION_TAG)
+                                    val builder = OTTrackingNotificationFactory.makeLoggingSuccessNotificationBuilder(this, trackerId, trackerName, itemId!!, System.currentTimeMillis(), table, notificationId, NOTIFICATION_TAG)
 
                                     this.notificationManager.notify(kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService.NOTIFICATION_TAG, notificationId, builder.build())
                                 }

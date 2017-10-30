@@ -121,6 +121,7 @@ object OTShortcutPanelManager {
                         .setContentTitle(context.resources.getString(R.string.app_name))
                         .setCustomBigContentView(bigView)
                         .setCustomContentView(normalView)
+                        .setOnlyAlertOnce(true)
                         .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                         .setPriority(NotificationCompat.PRIORITY_HIGH)
                         .setAutoCancel(false)
