@@ -9,8 +9,10 @@ import android.text.style.AbsoluteSizeSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import io.reactivex.Single
+import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.attributes.FallbackPolicyResolver
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.TimePointSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyHelper
@@ -23,6 +25,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputV
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.TimePointInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.APropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.SelectionPropertyView
+import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import java.text.SimpleDateFormat
 import java.util.*
@@ -48,6 +51,7 @@ class OTTimeAttributeHelper : OTAttributeHelper() {
         private val timezoneSizeSpan = AbsoluteSizeSpan(OTApp.instance.resourcesWrapped.getDimensionPixelSize(R.dimen.tracker_list_element_information_text_headerSize))
         private val timezoneStyleSpan = StyleSpan(Typeface.BOLD)
         private val timezoneColorSpan = ForegroundColorSpan(ContextCompat.getColor(OTApp.instance.contextCompat, R.color.textColorLight))
+
     }
 
     override fun getValueNumericCharacteristics(attribute: OTAttributeDAO): NumericCharacteristics = NumericCharacteristics(true, true)
@@ -60,7 +64,17 @@ class OTTimeAttributeHelper : OTAttributeHelper() {
         return R.drawable.icon_small_time
     }
 
-    override fun isIntrinsicDefaultValueVolatile(attribute: OTAttributeDAO): Boolean = true
+    override val supportedFallbackPolicies: LinkedHashMap<Int, FallbackPolicyResolver>
+        get() = super.supportedFallbackPolicies.apply {
+            this[OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE] = object : FallbackPolicyResolver(R.string.msg_intrinsic_time, isValueVolatile = true) {
+                override fun getFallbackValue(attribute: OTAttributeDAO, realm: Realm): Single<Nullable<out Any>> {
+                    return Single.just(Nullable(TimePoint()))
+                }
+
+            }
+
+            this.remove(OTAttributeDAO.DEFAULT_VALUE_POLICY_NULL)
+        }
 
     override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_TIMEPOINT
 
@@ -121,18 +135,6 @@ class OTTimeAttributeHelper : OTAttributeHelper() {
             inputView.value = TimePoint()
 
         }
-    }
-
-    override fun isIntrinsicDefaultValueSupported(attribute: OTAttributeDAO): Boolean {
-        return true
-    }
-
-    override fun makeIntrinsicDefaultValue(attribute: OTAttributeDAO): Single<out Any> {
-        return Single.defer { Single.just(TimePoint()) }
-    }
-
-    override fun makeIntrinsicDefaultValueMessage(attribute: OTAttributeDAO): CharSequence {
-        return OTApp.getString(R.string.msg_intrinsic_time)
     }
 
     override fun initialize(attribute: OTAttributeDAO) {

@@ -3,8 +3,10 @@ package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 import android.content.Context
 import android.view.View
 import io.reactivex.Single
+import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.attributes.FallbackPolicyResolver
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.NumericSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyHelper
@@ -16,6 +18,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.StarScoreView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.LikertScaleInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.StarRatingInputView
+import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.RatingOptions
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 
@@ -89,36 +92,36 @@ class OTRatingAttributeHelper : OTAttributeHelper() {
         }
     }
 
-    override fun isIntrinsicDefaultValueSupported(attribute: OTAttributeDAO): Boolean {
-        return true
-    }
+    override val supportedFallbackPolicies: LinkedHashMap<Int, FallbackPolicyResolver>
+        get() = super.supportedFallbackPolicies.apply{
+            this[OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE] = object: FallbackPolicyResolver(R.string.msg_intrinsic_rating, false)
+            {
+                override fun getFallbackValue(attribute: OTAttributeDAO, realm: Realm): Single<Nullable<out Any>> {
+                    return Single.defer {
+                        val ratingOptions = getRatingOptions(attribute)
+                        when (ratingOptions.type) {
+                            RatingOptions.DisplayType.Likert -> {
+                                if (ratingOptions.allowIntermediate) {
+                                    return@defer Single.just((ratingOptions.rightMost + ratingOptions.leftMost) / 2.0f)
+                                } else {
 
-    override fun makeIntrinsicDefaultValue(attribute: OTAttributeDAO): Single<out Any> {
-        return Single.defer {
-            val ratingOptions = getRatingOptions(attribute)
-            when (ratingOptions.type) {
-                RatingOptions.DisplayType.Likert -> {
-                    if (ratingOptions.allowIntermediate) {
-                        return@defer Single.just((ratingOptions.rightMost + ratingOptions.leftMost) / 2.0f)
-                    } else {
+                                    return@defer Single.just(((ratingOptions.rightMost + ratingOptions.leftMost) / 2).toFloat())
+                                }
+                            }
+                            RatingOptions.DisplayType.Star -> {
+                                if (ratingOptions.allowIntermediate) {
+                                    return@defer Single.just(ratingOptions.starLevels.maxScore / 2.0f)
+                                } else {
+                                    return@defer Single.just((ratingOptions.starLevels.maxScore / 2).toFloat())
+                                }
+                            }
+                        }
+                    }.map{value -> Nullable(value)}
+                }
 
-                        return@defer Single.just(((ratingOptions.rightMost + ratingOptions.leftMost) / 2).toFloat())
-                    }
-                }
-                RatingOptions.DisplayType.Star -> {
-                    if (ratingOptions.allowIntermediate) {
-                        return@defer Single.just(ratingOptions.starLevels.maxScore / 2.0f)
-                    } else {
-                        return@defer Single.just((ratingOptions.starLevels.maxScore / 2).toFloat())
-                    }
-                }
             }
         }
-    }
 
-    override fun makeIntrinsicDefaultValueMessage(attribute: OTAttributeDAO): CharSequence {
-        return OTApp.getString(R.string.msg_intrinsic_rating)
-    }
 
     override fun formatAttributeValue(attribute: OTAttributeDAO, value: Any): CharSequence {
         val ratingOptions = getRatingOptions(attribute)
