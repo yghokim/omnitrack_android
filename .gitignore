@@ -9,6 +9,7 @@
 app/app.iml
 app/app-release.apk
 gradle.properties
+keystore.properties
 *.iml
 
 /.idea/
