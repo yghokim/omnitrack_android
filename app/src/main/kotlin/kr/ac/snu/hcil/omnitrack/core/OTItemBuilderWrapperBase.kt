@@ -9,6 +9,7 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemBuilderDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemDAO
+import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.ValueWithTimestamp
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 
@@ -75,9 +76,9 @@ class OTItemBuilderWrapperBase(val dao: OTItemBuilderDAO, val realm: Realm) {
                                 return@flatMap attr.getFallbackValue(realm).toFlowable()
                             } else {
                                 println("Received valueConnection result - ${data.datum}")
-                                return@flatMap Flowable.just(data.datum)
+                                return@flatMap Flowable.just(data)
                             }
-                        }.onErrorResumeNext { err: Throwable -> err.printStackTrace(); attr.getFallbackValue(realm).toFlowable() }.map { value -> Pair(attrLocalId, ValueWithTimestamp(value, System.currentTimeMillis())) }.subscribeOn(Schedulers.io()).doOnSubscribe {
+                        }.onErrorResumeNext { err: Throwable -> err.printStackTrace(); attr.getFallbackValue(realm).toFlowable() }.map { nullable: Nullable<out Any> -> Pair(attrLocalId, ValueWithTimestamp(nullable)) }.subscribeOn(Schedulers.io()).doOnSubscribe {
 
                             onAttributeStateChangedListener?.onAttributeStateChanged(attrLocalId, EAttributeValueState.GettingExternalValue)
                         }.toObservable()
@@ -86,7 +87,7 @@ class OTItemBuilderWrapperBase(val dao: OTItemBuilderDAO, val realm: Realm) {
                         println("No connection. use fallback value: ${attrLocalId}")
                         return@mapIndexed attr.getFallbackValue(realm).map { nullable ->
                             println("No connection. received fallback value: ${attrLocalId}, ${nullable.datum}")
-                            Pair(attrLocalId, ValueWithTimestamp(nullable.datum, System.currentTimeMillis()))
+                            Pair(attrLocalId, ValueWithTimestamp(nullable))
                         }.doOnSubscribe {
                             onAttributeStateChangedListener?.onAttributeStateChanged(attrLocalId, EAttributeValueState.Processing)
                         }.toObservable()

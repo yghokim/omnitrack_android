@@ -5,12 +5,13 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.IBinder
+import android.support.v4.app.NotificationCompat
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.AppCompatCheckBox
 import android.view.LayoutInflater
 import android.webkit.MimeTypeMap
 import android.widget.RadioButton
 import android.widget.Toast
-import br.com.goncalves.pugnotification.notification.PugNotification
 import com.afollestad.materialdialogs.MaterialDialog
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
@@ -19,8 +20,11 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTFileInvolvedAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.database.EventLoggingManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTTaskNotificationManager
+import kr.ac.snu.hcil.omnitrack.utils.VectorIconHelper
 import kr.ac.snu.hcil.omnitrack.utils.io.StringTableSheet
+import org.jetbrains.anko.notificationManager
 import java.io.File
 import java.io.FileOutputStream
 import java.util.concurrent.atomic.AtomicInteger
@@ -149,33 +153,26 @@ class OTTableExportService : WakefulService(TAG) {
                         tableType.extension
                     })
 
-                    PugNotification.with(this)
-                            .load()
-                            .title(String.format(getString(R.string.msg_export_success_notification_message), loadedTracker?.name))
-                            .`when`(System.currentTimeMillis())
-                            .tag(TAG)
-                            .identifier(makeUniqueNotificationId())
-                            .color(R.color.colorPrimary)
-                            .button(0, getString(R.string.msg_open)) {
+                    val notificationId = makeUniqueNotificationId()
 
-                                val choiceIntent = Intent.createChooser(Intent(Intent.ACTION_VIEW).putExtra(Intent.EXTRA_STREAM, exportUri).setDataAndType(exportUri, mimeType).apply { this.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION },
-                                        getString(R.string.msg_open_exported_file))
-
-                                PendingIntent.getActivity(this, makeUniqueNotificationId(),
-                                        choiceIntent, PendingIntent.FLAG_CANCEL_CURRENT)
-                            }
-                            .button(0, getString(R.string.msg_share)) {
-
-                                val choiceIntent = Intent.createChooser(Intent(Intent.ACTION_SEND).setDataAndType(exportUri, mimeType).putExtra(Intent.EXTRA_STREAM, exportUri).apply { this.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION },
-                                        getString(R.string.msg_share_exported_file))
-
-                                PendingIntent.getActivity(this, makeUniqueNotificationId(),
-                                        choiceIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-                            }
-                            .smallIcon(R.drawable.icon_simple_check)
-                            .largeIcon(R.drawable.icon_simple_check)
-                            .simple()
-                            .build()
+                    val notification =
+                            NotificationCompat.Builder(this, OTNotificationManager.CHANNEL_ID_SYSTEM)
+                                    .setContentTitle(String.format(getString(R.string.msg_export_success_notification_message), loadedTracker?.name))
+                                    .setShowWhen(true)
+                                    .setWhen(System.currentTimeMillis())
+                                    .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
+                                    .setSmallIcon(R.drawable.icon_simple_check)
+                                    .setLargeIcon(VectorIconHelper.getConvertedBitmap(this, R.drawable.icon_simple_check))
+                                    .addAction(0, getString(R.string.msg_open), PendingIntent.getActivity(this, notificationId,
+                                            Intent.createChooser(Intent(Intent.ACTION_VIEW).putExtra(Intent.EXTRA_STREAM, exportUri).setDataAndType(exportUri, mimeType).apply { this.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION },
+                                                    getString(R.string.msg_open_exported_file)), PendingIntent.FLAG_CANCEL_CURRENT))
+                                    .addAction(0, getString(R.string.msg_share),
+                                            PendingIntent.getActivity(this, notificationId,
+                                                    Intent.createChooser(Intent(Intent.ACTION_SEND).setDataAndType(exportUri, mimeType).putExtra(Intent.EXTRA_STREAM, exportUri).apply { this.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION },
+                                                            getString(R.string.msg_share_exported_file)), PendingIntent.FLAG_UPDATE_CURRENT)
+                                            )
+                                    .build()
+                    notificationManager.notify(TAG, notificationId, notification)
                 }
                 stopSelf(startId)
             }
