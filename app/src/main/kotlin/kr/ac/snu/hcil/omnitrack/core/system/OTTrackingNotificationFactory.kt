@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger
 /**
  * Created by Young-Ho Kim on 16. 9. 1
  */
-object OTTrackingNotificationManager {
+object OTTrackingNotificationFactory {
 
     private val TAG = "TrackingReminder"
     private val increment = AtomicInteger(500)
@@ -81,10 +81,6 @@ object OTTrackingNotificationManager {
         notificationService.notify(TAG, getNewReminderNotificationId(tracker), builder.build())
     }
 
-    fun cancelBackgroundLoggingSuccessNotification(tracker: OTTracker, idSeed: Int) {
-        notificationService.cancel(tracker.objectId, idSeed)
-    }
-
     fun makeLoggingSuccessNotificationBuilder(context: Context, trackerId: String, trackerName: String, itemId: String, loggedTime: Long, table: List<Pair<String, CharSequence?>>?, notificationId: Int, tag: String): NotificationCompat.Builder {
         val stackBuilder = TaskStackBuilder.create(context)
         // Adds the back stack for the Intent (but not the Intent itself)
@@ -105,7 +101,7 @@ object OTTrackingNotificationManager {
 
         val discardAction = NotificationCompat.Action.Builder(0,
                 OTApp.getString(R.string.msg_notification_action_discard_item),
-                PendingIntent.getService(context, 0, itemRemoveIntent, PendingIntent.FLAG_UPDATE_CURRENT)).build()
+                PendingIntent.getService(context, notificationId, itemRemoveIntent, PendingIntent.FLAG_UPDATE_CURRENT)).build()
 
         val editAction = NotificationCompat.Action.Builder(0, OTApp.getString(R.string.msg_edit), resultPendingIntent).build()
 

@@ -51,7 +51,7 @@ class OTSystemReceiver : BroadcastReceiver() {
                             //OTApp.instance.databaseManager.removeItem(tracker.objectId, itemId)
                         }
 
-                        OTTrackingNotificationManager.cancelBackgroundLoggingSuccessNotification(tracker, notificationId)
+                        OTTrackingNotificationFactory.cancelBackgroundLoggingSuccessNotification(tracker, notificationId)
                     }
                 }
 
@@ -84,7 +84,7 @@ class OTSystemReceiver : BroadcastReceiver() {
                         if (itemId != null && notify) {
                             val notificationId = intent.getIntExtra(OTApp.INTENT_EXTRA_NOTIFICATION_ID_SEED, 1)
                             OTTaskNotificationManager.dismissNotification(context, notificationId, tracker.objectId)
-                            OTTrackingNotificationManager.pushBackgroundLoggingSuccessNotification(context, tracker, itemId, System.currentTimeMillis(), notificationId)
+                            OTTrackingNotificationFactory.pushBackgroundLoggingSuccessNotification(context, tracker, itemId, System.currentTimeMillis(), notificationId)
                         }
                     }
                 }*/
