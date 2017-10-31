@@ -5,6 +5,7 @@ import io.reactivex.subjects.PublishSubject
 import io.realm.*
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.UserAttachedViewModel
 import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.utils.move
@@ -27,7 +28,7 @@ class OrderedTrackerListViewModel: UserAttachedViewModel(), OrderedRealmCollecti
     override fun onUserAttached(newUserId: String) {
         super.onUserAttached(newUserId)
         trackerQueryResults = OTApp.instance.databaseManager.makeTrackersOfUserQuery(newUserId, realm)
-                .findAllSortedAsync("position", Sort.ASCENDING)
+                .findAllSortedAsync(arrayOf("position", RealmDatabaseManager.FIELD_USER_CREATED_AT), arrayOf(Sort.ASCENDING, Sort.DESCENDING))
 
         trackerQueryResults?.addChangeListener(this)
     }
