@@ -58,6 +58,23 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
         // primary sections of the activity.
         mSectionsPagerAdapter = SectionsPagerAdapter(supportFragmentManager)
 
+        tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabReselected(tab: TabLayout.Tab) {
+
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab) {
+            }
+
+            override fun onTabSelected(tab: TabLayout.Tab) {
+                if (tab.position != TAB_INDEX_TRACKERS) {
+                    rightActionBarButton?.visibility = View.INVISIBLE
+                } else
+                    rightActionBarButton?.visibility = View.VISIBLE
+            }
+
+        })
+
         mViewPager.pageMargin = resources.getDimensionPixelSize(R.dimen.viewpager_page_margin)
         mViewPager.setPageMarginDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.darkerBackground)))
         // Set up the ViewPager with the sections adapter.
@@ -136,9 +153,11 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
     }
 
     override fun onToolbarRightButtonClicked() {
-        val intent = Intent(this, TrackerReorderActivity::class.java)
-        startActivity(intent)
-        overridePendingTransition(R.anim.anim_slide_up, R.anim.anim_noop)
+        if (tabLayout.selectedTabPosition == TAB_INDEX_TRACKERS) {
+            val intent = Intent(this, TrackerReorderActivity::class.java)
+            startActivity(intent)
+            overridePendingTransition(R.anim.anim_slide_up, R.anim.anim_noop)
+        }
     }
 
     override fun onDestroy() {
@@ -182,9 +201,9 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
 
         override fun getItem(position: Int): Fragment {
             when (position) {
-                0 -> return TrackerListFragment()
-                1 -> return LoggingTriggerListFragment()
-                2 -> return ServiceListFragment()
+                TAB_INDEX_TRACKERS -> return TrackerListFragment()
+                TAB_INDEX_TRIGGERS -> return LoggingTriggerListFragment()
+                TAB_INDEX_SERVICES -> return ServiceListFragment()
                 else -> throw Exception("wrong tab index")
             }
         }
@@ -196,9 +215,9 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
 
         override fun getPageTitle(position: Int): CharSequence? {
             when (position) {
-                0 -> return resources.getString(R.string.msg_tab_trackers)
-                1 -> return resources.getString(R.string.msg_tab_background_loggers)
-                2 -> return resources.getString(R.string.msg_tab_services)
+                TAB_INDEX_TRACKERS -> return resources.getString(R.string.msg_tab_trackers)
+                TAB_INDEX_TRIGGERS -> return resources.getString(R.string.msg_tab_background_loggers)
+                TAB_INDEX_SERVICES -> return resources.getString(R.string.msg_tab_services)
             }
             return null
         }
