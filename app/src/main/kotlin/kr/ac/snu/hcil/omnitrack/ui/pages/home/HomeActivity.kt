@@ -20,7 +20,6 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.tutorial.TutorialManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
-import kr.ac.snu.hcil.omnitrack.ui.pages.diagnostics.SystemLogActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.services.ServiceListFragment
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.UserAttachedViewModel
 import kr.ac.snu.hcil.omnitrack.widgets.OTShortcutPanelWidgetUpdateService
@@ -51,7 +50,7 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
         super.onCreate(savedInstanceState)
 
         rightActionBarButton?.visibility = View.VISIBLE
-        rightActionBarButton?.setImageResource(R.drawable.settings_dark)
+        rightActionBarButton?.setImageResource(R.drawable.icon_reorder_dark)
         leftActionBarButton?.visibility = View.VISIBLE
         leftActionBarButton?.setImageResource(R.drawable.menu_dark)
 
@@ -137,8 +136,9 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
     }
 
     override fun onToolbarRightButtonClicked() {
-        val intent = Intent(this, SystemLogActivity::class.java)
+        val intent = Intent(this, TrackerReorderActivity::class.java)
         startActivity(intent)
+        overridePendingTransition(R.anim.anim_slide_up, R.anim.anim_noop)
     }
 
     override fun onDestroy() {
