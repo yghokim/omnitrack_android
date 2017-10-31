@@ -46,17 +46,16 @@ class TrackerListViewModel : UserAttachedViewModel(), OrderedRealmCollectionChan
                         currentTrackerViewModelList
                 )
             } else {
-
+                println("tracker list changed")
                 //deal with deletions
                 val removes = changeSet.deletions.map { i -> currentTrackerViewModelList[i] }
                 removes.forEach { it.unregister() }
                 currentTrackerViewModelList.removeAll(removes)
 
                 //deal with additions
-                val newDaos = changeSet.insertions.map { i -> snapshot[i] }
-                currentTrackerViewModelList.addAll(
-                        newDaos.mapNotNull { it?.let { TrackerInformationViewModel(it, realm) } }
-                )
+                changeSet.insertions.forEach { index ->
+                    currentTrackerViewModelList.add(index, TrackerInformationViewModel(snapshot[index]!!, realm))
+                }
 
                 trackerViewModelListSubject.onNext(
                         currentTrackerViewModelList
@@ -73,10 +72,8 @@ class TrackerListViewModel : UserAttachedViewModel(), OrderedRealmCollectionChan
         super.onUserAttached(newUserId)
         trackersRealmResults?.removeAllChangeListeners()
         clearTrackerViewModelList()
-        val trackerQueryResults = OTApp.instance.databaseManager.makeTrackersOfUserQuery(newUserId, realm).findAllAsync()
-        trackersRealmResults = trackerQueryResults
-
-        trackerQueryResults.addChangeListener(this)
+        trackersRealmResults = OTApp.instance.databaseManager.makeTrackersOfUserQuery(newUserId, realm).findAllSortedAsync("position", Sort.ASCENDING)
+        trackersRealmResults?.addChangeListener(this)
 
         subscriptions.add(OTApp.instance.databaseManager.makeShortcutPanelRefreshObservable(newUserId, realm).subscribe())
     }
