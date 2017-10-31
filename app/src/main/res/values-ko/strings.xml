@@ -9,6 +9,9 @@
 
     <string name="msg_sort">정렬</string>
 
+    <string name="msg_confirm_order">변경된 순서를 적용하시겠습니까?</string>
+    <string name="msg_discard_apply">적용하지 않음</string>
+
     <string name="msg_sort_method_timestamp">기록 시각</string>
 
 

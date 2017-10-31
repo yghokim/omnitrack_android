@@ -25,6 +25,9 @@ class OrderedTrackerListViewModel: UserAttachedViewModel(), OrderedRealmCollecti
 
     val onTrackerInfoChanged = PublishSubject.create<String>()
 
+    val isDirty: Boolean
+        get() = currentOrderedTrackerViewModels.filterIndexed { index, model -> model.dao.position != index }.isNotEmpty()
+
     override fun onUserAttached(newUserId: String) {
         super.onUserAttached(newUserId)
         trackerQueryResults = OTApp.instance.databaseManager.makeTrackersOfUserQuery(newUserId, realm)

@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.home
 
+import android.app.Activity
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
@@ -13,9 +14,11 @@ import android.view.View
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.activity_multibutton_single_recyclerview.*
 import kotlinx.android.synthetic.main.sortable_list_element.view.*
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.DragItemTouchHelperCallback
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
+import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
 import org.jetbrains.anko.contentView
 
@@ -33,6 +36,7 @@ class TrackerReorderActivity: MultiButtonActionBarActivity(R.layout.activity_mul
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        setActionBarButtonMode(Mode.SaveCancel)
         contentView?.setBackgroundColor(ContextCompat.getColor(this, R.color.outerBackground))
 
         ui_list.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
@@ -60,12 +64,27 @@ class TrackerReorderActivity: MultiButtonActionBarActivity(R.layout.activity_mul
     }
 
     override fun onToolbarLeftButtonClicked() {
-        finish()
+        if (viewModel.isDirty) {
+            DialogHelper.makeYesNoDialogBuilder(this, "OmniTrack",
+                    OTApp.getString(R.string.msg_confirm_order), yesLabel = R.string.msg_apply, noLabel = R.string.msg_discard_apply, onYes = {
+                onToolbarRightButtonClicked()
+            }, onNo = {
+                setResult(Activity.RESULT_CANCELED)
+                finish()
+            }
+            ).cancelable(true)
+                    .neutralText(R.string.msg_cancel)
+                    .show()
+        } else finish()
     }
 
     override fun onToolbarRightButtonClicked() {
         viewModel.applyOrders()
         finish()
+    }
+
+    override fun onBackPressed() {
+        onToolbarLeftButtonClicked()
     }
 
     override fun finish() {
