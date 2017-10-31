@@ -72,7 +72,7 @@ class TrackerListViewModel : UserAttachedViewModel(), OrderedRealmCollectionChan
         super.onUserAttached(newUserId)
         trackersRealmResults?.removeAllChangeListeners()
         clearTrackerViewModelList()
-        trackersRealmResults = OTApp.instance.databaseManager.makeTrackersOfUserQuery(newUserId, realm).findAllSortedAsync("position", Sort.ASCENDING)
+        trackersRealmResults = OTApp.instance.databaseManager.makeTrackersOfUserQuery(newUserId, realm).findAllSortedAsync(arrayOf("position", RealmDatabaseManager.FIELD_USER_CREATED_AT), arrayOf(Sort.ASCENDING, Sort.DESCENDING))
         trackersRealmResults?.addChangeListener(this)
 
         subscriptions.add(OTApp.instance.databaseManager.makeShortcutPanelRefreshObservable(newUserId, realm).subscribe())
