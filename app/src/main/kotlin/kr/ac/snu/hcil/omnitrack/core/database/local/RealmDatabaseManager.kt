@@ -94,7 +94,7 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
     }
 
     fun makeBookmarkedTrackersObservable(userId: String, realm: Realm): Flowable<RealmResults<OTTrackerDAO>> {
-        return realm.where(OTTrackerDAO::class.java).equalTo(FIELD_REMOVED_BOOLEAN, false).equalTo(FIELD_USER_ID, userId).equalTo("isBookmarked", true).findAllSortedAsync(FIELD_UPDATED_AT_LONG, Sort.DESCENDING)
+        return realm.where(OTTrackerDAO::class.java).equalTo(FIELD_REMOVED_BOOLEAN, false).equalTo(FIELD_USER_ID, userId).equalTo("isBookmarked", true).findAllSortedAsync("position", Sort.ASCENDING)
                 .asFlowable()
     }
 
