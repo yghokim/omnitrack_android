@@ -13,13 +13,16 @@ import android.webkit.MimeTypeMap
 import android.widget.RadioButton
 import android.widget.Toast
 import com.afollestad.materialdialogs.MaterialDialog
+import dagger.Lazy
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
+import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTFileInvolvedAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.database.EventLoggingManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTTaskNotificationManager
 import kr.ac.snu.hcil.omnitrack.utils.VectorIconHelper
@@ -28,6 +31,8 @@ import org.jetbrains.anko.notificationManager
 import java.io.File
 import java.io.FileOutputStream
 import java.util.concurrent.atomic.AtomicInteger
+import javax.inject.Inject
+import javax.inject.Provider
 
 /**
  * Created by Young-Ho on 3/9/2017.
@@ -99,11 +104,23 @@ class OTTableExportService : WakefulService(TAG) {
 
     }
 
+    @Inject
+    lateinit var realm: Realm
+
+    @Inject
+    lateinit var dbManager: Lazy<RealmDatabaseManager>
+
     private val subscriptions = CompositeDisposable()
+
+    override fun onCreate() {
+        super.onCreate()
+        (application as OTApp).applicationComponent.inject(this)
+    }
 
     override fun onDestroy() {
         super.onDestroy()
         subscriptions.clear()
+        realm.close()
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
@@ -179,9 +196,7 @@ class OTTableExportService : WakefulService(TAG) {
 
             subscriptions.add(
                     Single.defer<Boolean> {
-                        val realm = OTApp.instance.databaseManager.getRealmInstance()
-                        val tracker = OTApp.instance.databaseManager.getUnManagedTrackerDao(trackerId, realm)
-                        realm.close()
+                        val tracker = dbManager.get().getUnManagedTrackerDao(trackerId, realm)
                         loadedTracker = tracker
                         if (tracker == null) {
                             return@defer Single.just(true)
@@ -204,7 +219,8 @@ class OTTableExportService : WakefulService(TAG) {
                                 it.getHelper().onAddColumnToTable(it, table.columns)
                             }
 
-                            val items = OTApp.instance.databaseManager.makeItemsQuery(trackerId, null, null, realm).findAll()
+
+                            val items = dbManager.get().makeItemsQuery(trackerId, null, null, realm).findAll()
                             items.withIndex().forEach { itemWithIndex ->
                                 val item = itemWithIndex.value
                                 val row = ArrayList<String?>()
@@ -213,8 +229,6 @@ class OTTableExportService : WakefulService(TAG) {
                                 row.add(item.loggingSource.name)
                                 tracker.attributes.forEach { attribute ->
                                     attribute.getHelper().onAddValueToTable(attribute, item.getValueOf(attribute.localId), row, itemWithIndex.index.toString())
-                                    //TODO add value
-                                    //attribute.onAddValueToTable(item.getValueOf(attribute), row, itemWithIndex.index.toString())
                                 }
                                 table.rows.add(row)
                             }
@@ -279,8 +293,7 @@ class OTTableExportService : WakefulService(TAG) {
                         println("file making task finished")
 
                         val successful: Boolean = if (externalFilesInvolved) {
-                            involvedFileList?.let {
-                                list ->
+                            involvedFileList?.let { list ->
                                 println("Involved files: ")
                                 for (path in list) {
                                     println(path)
@@ -294,7 +307,7 @@ class OTTableExportService : WakefulService(TAG) {
                                     ex.printStackTrace()
                                     false
                                 }
-                            } ?: false
+                            } == true
                         } else {
                             try {
                                 println("store table itself to output")
@@ -330,7 +343,7 @@ class OTTableExportService : WakefulService(TAG) {
 
 
 
-            return START_NOT_STICKY
+            return START_REDELIVER_INTENT
         } else {
             stopSelf(startId)
             return START_NOT_STICKY

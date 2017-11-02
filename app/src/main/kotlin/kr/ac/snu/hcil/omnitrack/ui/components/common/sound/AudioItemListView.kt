@@ -7,11 +7,14 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.TextView
 import com.github.ybq.android.spinkit.SpinKitView
+import dagger.Lazy
 import io.reactivex.disposables.CompositeDisposable
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
+import kr.ac.snu.hcil.omnitrack.core.net.IBinaryDownloadAPI
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
+import javax.inject.Inject
 
 /**
  * Created by Young-Ho on 4/23/2017.
@@ -54,17 +57,22 @@ class AudioItemListView : ConstraintLayout {
     private val durationView: TextView
     private val unitView: TextView
 
+    @Inject
+    lateinit var binaryDownloader: Lazy<IBinaryDownloadAPI>
+
     init {
         inflateContent(R.layout.component_audio_item_list_view, true)
         loadingIndicatorView = findViewById(R.id.ui_loading_indicator)
         iconView = findViewById(R.id.icon)
         durationView = findViewById(R.id.ui_duration_view)
         unitView = findViewById(R.id.ui_unit_text)
+
+        (context.applicationContext as OTApp).applicationComponent.inject(this)
     }
 
     private fun startDownload() {
         subscriptions.add(
-                OTApp.instance.storageHelper.downloadFileTo(mountedUri.serverUri.toString(), mountedUri.localUri)
+                binaryDownloader.get().downloadFileTo(mountedUri.serverUri.toString(), mountedUri.localUri)
                         .subscribe({
                             uri ->
                             println("audio file download complete: $uri")

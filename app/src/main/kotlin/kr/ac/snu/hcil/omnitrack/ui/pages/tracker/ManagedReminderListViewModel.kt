@@ -1,17 +1,20 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.tracker
 
+import android.app.Application
 import io.realm.RealmQuery
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.AManagedTriggerListViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.TriggerInterfaceOptions
+import javax.inject.Inject
+import javax.inject.Named
 
 /**
  * Created by younghokim on 2017. 10. 22..
  */
-class ManagedReminderListViewModel : AManagedTriggerListViewModel() {
+class ManagedReminderListViewModel(app: Application) : AManagedTriggerListViewModel(app) {
 
     val trackerId: String?
         get() {
@@ -23,6 +26,9 @@ class ManagedReminderListViewModel : AManagedTriggerListViewModel() {
 
     private lateinit var currentDefaultTriggerInterfaceOptions: TriggerInterfaceOptions
 
+    init {
+        getApplication<OTApp>().applicationComponent.inject(this)
+    }
 
     fun init(trackerId: String) {
         if (this.trackerId != trackerId) {
@@ -33,7 +39,7 @@ class ManagedReminderListViewModel : AManagedTriggerListViewModel() {
     }
 
     override fun hookTriggerQuery(originalQuery: RealmQuery<OTTriggerDAO>): RealmQuery<OTTriggerDAO> {
-        return originalQuery.equalTo("userId", OTAuthManager.userId).equalTo("trackers.objectId", trackerId!!).equalTo("actionType", OTTriggerDAO.ACTION_TYPE_REMIND)
+        return originalQuery.equalTo("userId", authManager.userId).equalTo("trackers.objectId", trackerId!!).equalTo("actionType", OTTriggerDAO.ACTION_TYPE_REMIND)
     }
 
     override fun beforeAddNewTrigger(daoToAdd: OTTriggerDAO) {

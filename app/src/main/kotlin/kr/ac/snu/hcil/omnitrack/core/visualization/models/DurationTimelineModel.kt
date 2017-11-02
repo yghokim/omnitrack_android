@@ -34,6 +34,10 @@ class DurationTimelineModel(attribute: OTAttributeDAO, realm: Realm) : Attribute
 
     data class AggregatedDuration(val time: Long, val count: Int, val avgFrom: Float, val avgTo: Float, val earliest: Float = avgFrom, val latest: Float = avgTo)
 
+    init{
+        OTApp.instance.applicationComponent.inject(this)
+    }
+
     override fun reloadData(): Single<List<AggregatedDuration>> {
 
         val xScale = QuantizedTimeScale()
@@ -47,8 +51,7 @@ class DurationTimelineModel(attribute: OTAttributeDAO, realm: Realm) : Attribute
             else getTimeScope().to
 
 
-            OTApp.instance.databaseManager
-                    .makeItemsQuery(attribute.trackerId, TimeSpan.fromPoints(from, to), realm)
+            dbManager.makeItemsQuery(attribute.trackerId, TimeSpan.fromPoints(from, to), realm)
                     .findAllSortedAsync("timestamp", Sort.ASCENDING)
                     .asFlowable()
                     .filter { it.isLoaded == true }.firstElement().flatMap<AggregatedDuration?> {

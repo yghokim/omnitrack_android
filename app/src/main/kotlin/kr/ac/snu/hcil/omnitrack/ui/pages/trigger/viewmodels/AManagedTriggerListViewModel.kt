@@ -1,8 +1,8 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels
 
+import android.app.Application
 import io.realm.RealmQuery
 import io.realm.RealmResults
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
 
@@ -15,7 +15,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
  *
  *
  */
-abstract class AManagedTriggerListViewModel : ATriggerListViewModel() {
+abstract class AManagedTriggerListViewModel(app: Application) : ATriggerListViewModel(app) {
 
     private var currentTriggerRealmResults: RealmResults<OTTriggerDAO>? = null
 
@@ -66,13 +66,13 @@ abstract class AManagedTriggerListViewModel : ATriggerListViewModel() {
 
         beforeAddNewTrigger(dao)
 
-        OTApp.instance.databaseManager.saveTrigger(dao, realm)
+        dbManager.get().saveTrigger(dao, realm)
     }
 
     override fun removeTrigger(objectId: String) {
         val viewModel = currentTriggerViewModels.find { it.objectId == objectId }
         if (viewModel != null) {
-            OTApp.instance.databaseManager.removeTrigger(viewModel.dao, realm)
+            dbManager.get().removeTrigger(viewModel.dao, realm)
         }
     }
 

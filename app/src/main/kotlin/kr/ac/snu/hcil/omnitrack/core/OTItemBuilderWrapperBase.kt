@@ -12,6 +12,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.ValueWithTimestamp
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
+import javax.inject.Provider
 
 /**
  * Created by Young-Ho Kim on 16. 7. 25
@@ -57,14 +58,14 @@ class OTItemBuilderWrapperBase(val dao: OTItemBuilderDAO, val realm: Realm) {
         return itemDaoToSave
     }
 
-    fun makeAutoCompleteObservable(onAttributeStateChangedListener: AttributeStateChangedListener? = null, applyToBuilder: Boolean = false): Observable<Pair<String, ValueWithTimestamp>> {
+    fun makeAutoCompleteObservable(realmProvider: Provider<Realm>, onAttributeStateChangedListener: AttributeStateChangedListener? = null, applyToBuilder: Boolean = false): Observable<Pair<String, ValueWithTimestamp>> {
 
         return Observable.defer {
             val attributes = dao.tracker?.attributes
             if (attributes == null) {
                 return@defer Observable.empty<Pair<String, ValueWithTimestamp>>()
             } else {
-                val realm = OTApp.instance.databaseManager.getRealmInstance()
+                val realm = realmProvider.get()
                 Observable.merge(attributes.mapIndexed { i, attr: OTAttributeDAO ->
                     val attrLocalId = attr.localId
                     val connection = attr.getParsedConnection()

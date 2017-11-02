@@ -13,12 +13,15 @@ import android.support.v4.app.TaskStackBuilder
 import android.util.Log
 import android.view.View
 import android.widget.RemoteViews
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.configs.ShortcutPanelWidgetConfigActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 import kr.ac.snu.hcil.omnitrack.utils.VectorIconHelper
+import javax.inject.Inject
+import javax.inject.Provider
 
 /**
  * Created by Young-Ho Kim on 2017-04-04.
@@ -169,12 +172,16 @@ class OTShortcutPanelWidgetUpdateService : Service() {
         }
     }
 
+    @Inject
+    protected lateinit var currentSignedInLevel: Provider<OTAuthManager.SignedInLevel>
+
     override fun onBind(p0: Intent?): IBinder? {
         return null
     }
 
     override fun onCreate() {
         super.onCreate()
+        (application as OTApp).applicationComponent.inject(this)
     }
 
     override fun onDestroy() {
@@ -191,7 +198,7 @@ class OTShortcutPanelWidgetUpdateService : Service() {
             val appWidgetManager = AppWidgetManager.getInstance(this)
             when (intent.action) {
                 ACTION_INITIALIZE -> {
-                    if (OTAuthManager.currentSignedInLevel > OTAuthManager.SignedInLevel.NONE) {
+                    if (currentSignedInLevel.get() > OTAuthManager.SignedInLevel.NONE) {
 
                         for (id in appWidgetIds) {
                             val options = appWidgetManager.getAppWidgetOptions(id)
@@ -224,7 +231,7 @@ class OTShortcutPanelWidgetUpdateService : Service() {
                 }
 
                 ACTION_RESIZED -> {
-                    if (OTAuthManager.currentSignedInLevel > OTAuthManager.SignedInLevel.NONE) {
+                    if (currentSignedInLevel.get() > OTAuthManager.SignedInLevel.NONE) {
                         for (id in appWidgetIds) {
                             val options = appWidgetManager.getAppWidgetOptions(id)
                             val rv = RemoteViews(this.packageName, R.layout.remoteview_widget_shortcut_body)

@@ -1,6 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.viewmodels
 
-import android.arch.lifecycle.ViewModel
+import android.app.Application
 import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
@@ -8,7 +8,8 @@ import kr.ac.snu.hcil.omnitrack.utils.Nullable
 /**
  * Created by Young-Ho on 6/4/2017.
  */
-open class UserAttachedViewModel : ViewModel() {
+open class UserAttachedViewModel(application: Application) : RealmViewModel(application) {
+
     private val _userIdSubject = BehaviorSubject.createDefault<Nullable<String>>(Nullable<String>(null))
     var userId: String?
         get() = _userIdSubject.value.datum

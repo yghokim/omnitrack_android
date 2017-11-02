@@ -17,13 +17,14 @@ import butterknife.bindView
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.OTTracker
-import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
 import kr.ac.snu.hcil.omnitrack.ui.activities.AppWidgetConfigurationActivity
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.WritablePair
 import kr.ac.snu.hcil.omnitrack.widgets.OTShortcutPanelWidgetUpdateService
+import javax.inject.Inject
+import javax.inject.Provider
 
 /**
  * Created by Young-Ho Kim on 2017-04-05.
@@ -40,11 +41,15 @@ class ShortcutPanelWidgetConfigActivity : AppWidgetConfigurationActivity(R.layou
     private var trackerList: List<WritablePair<OTTrackerDAO.SimpleTrackerInfo, Boolean>>? = null
     private var trackerSelectionAdapter: TrackerSelectionAdapter = TrackerSelectionAdapter()
 
-    private lateinit var realm: Realm
+    @Inject
+    lateinit var dbManager: RealmDatabaseManager
+
+    @Inject
+    lateinit var realm: Realm
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        realm = OTApp.instance.databaseManager.getRealmInstance()
+        (application as OTApp).applicationComponent.inject(this)
     }
 
     override fun onCreateWithWidget(appWidgetId: Int) {
@@ -98,7 +103,7 @@ class ShortcutPanelWidgetConfigActivity : AppWidgetConfigurationActivity(R.layou
                 signedInUserObservable.subscribe({
                     userId ->
                     val selectedTrackerIds = OTShortcutPanelWidgetUpdateService.getSelectedTrackerIds(appWidgetId, OTShortcutPanelWidgetUpdateService.getPreferences(this))
-                    trackerList = OTApp.instance.databaseManager.makeTrackersOfUserQuery(userId, realm).findAll().map {
+                    trackerList = dbManager.makeTrackersOfUserQuery(userId, realm).findAll().map {
                         WritablePair(it.getSimpleInfo(), selectedTrackerIds?.contains(it.objectId) == true)
                     }
                     trackerSelectionAdapter.notifyDataSetChanged()

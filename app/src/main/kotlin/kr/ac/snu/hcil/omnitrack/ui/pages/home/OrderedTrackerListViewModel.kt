@@ -1,9 +1,12 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.home
 
+import android.app.Application
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
-import io.realm.*
-import kr.ac.snu.hcil.omnitrack.OTApp
+import io.realm.OrderedCollectionChangeSet
+import io.realm.OrderedRealmCollectionChangeListener
+import io.realm.RealmResults
+import io.realm.Sort
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.UserAttachedViewModel
@@ -13,9 +16,7 @@ import kr.ac.snu.hcil.omnitrack.utils.move
 /**
  * Created by younghokim on 2017. 10. 31..
  */
-class OrderedTrackerListViewModel: UserAttachedViewModel(), OrderedRealmCollectionChangeListener<RealmResults<OTTrackerDAO>> {
-
-    private val realm: Realm = OTApp.instance.databaseManager.getRealmInstance()
+class OrderedTrackerListViewModel(app: Application) : UserAttachedViewModel(app), OrderedRealmCollectionChangeListener<RealmResults<OTTrackerDAO>> {
 
     private var trackerQueryResults: RealmResults<OTTrackerDAO>? = null
 
@@ -30,7 +31,7 @@ class OrderedTrackerListViewModel: UserAttachedViewModel(), OrderedRealmCollecti
 
     override fun onUserAttached(newUserId: String) {
         super.onUserAttached(newUserId)
-        trackerQueryResults = OTApp.instance.databaseManager.makeTrackersOfUserQuery(newUserId, realm)
+        trackerQueryResults = dbManager.get().makeTrackersOfUserQuery(newUserId, realm)
                 .findAllSortedAsync(arrayOf("position", RealmDatabaseManager.FIELD_USER_CREATED_AT), arrayOf(Sort.ASCENDING, Sort.DESCENDING))
 
         trackerQueryResults?.addChangeListener(this)
@@ -59,11 +60,6 @@ class OrderedTrackerListViewModel: UserAttachedViewModel(), OrderedRealmCollecti
     override fun onUserDisposed() {
         super.onUserDisposed()
         trackerQueryResults?.removeAllChangeListeners()
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        realm.close()
     }
 
     fun moveTracker(from: Int, to: Int){

@@ -28,6 +28,10 @@ class DailyCountChartModel(tracker: OTTrackerDAO, realm: Realm) : TrackerChartMo
 
     override val name: String = String.format(OTApp.instance.getString(R.string.msg_vis_daily_count_title_format), tracker.name)
 
+    init{
+        OTApp.instance.applicationComponent.inject(this)
+    }
+
     override fun reloadData(): Single<List<Pair<Long, Int>>> {
         println("reload chart data. Scope:  ${getTimeScope()}")
 
@@ -35,7 +39,7 @@ class DailyCountChartModel(tracker: OTTrackerDAO, realm: Realm) : TrackerChartMo
         xScale.setDomain(getTimeScope().from, getTimeScope().to)
         xScale.quantize(currentGranularity)
 
-        return OTApp.instance.databaseManager
+        return dbManager
                 .makeItemsQuery(tracker.objectId, getTimeScope(), realm)
                 .findAllSortedAsync("timestamp", Sort.ASCENDING)
                 .asFlowable()

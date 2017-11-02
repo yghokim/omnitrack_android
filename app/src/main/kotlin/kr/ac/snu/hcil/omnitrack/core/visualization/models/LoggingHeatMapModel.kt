@@ -33,6 +33,9 @@ class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm) : TrackerChartMod
 
     val hoursInYBin = 2
 
+    init{
+        OTApp.instance.applicationComponent.inject(this)
+    }
 
     override fun reloadData(): Single<List<ITimeBinnedHeatMap.CounterVector>> {
         val data = ArrayList<ITimeBinnedHeatMap.CounterVector>()
@@ -54,7 +57,7 @@ class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm) : TrackerChartMod
 
 
 
-        return OTApp.instance.databaseManager
+        return dbManager
                 .makeItemsQuery(tracker.objectId, getTimeScope(), realm)
                 .findAllSortedAsync("timestamp", Sort.ASCENDING)
                 .asFlowable()

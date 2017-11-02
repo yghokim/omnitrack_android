@@ -26,6 +26,10 @@ class TimelineComparisonLineChartModel(attributes: List<OTAttributeDAO>, parent:
 
     override val name: String = OTApp.instance.resourcesWrapped.getString(R.string.msg_vis_numeric_line_timeline_title)
 
+    init{
+        OTApp.instance.applicationComponent.inject(this)
+    }
+
     override fun reloadData(): Single<List<ILineChartOnTime.TimeSeriesTrendData>> {
         val data = ArrayList<ILineChartOnTime.TimeSeriesTrendData>()
         val values = ArrayList<BigDecimal>()
@@ -34,7 +38,7 @@ class TimelineComparisonLineChartModel(attributes: List<OTAttributeDAO>, parent:
         xScale.setDomain(getTimeScope().from, getTimeScope().to)
         xScale.quantize(currentGranularity)
 
-        return OTApp.instance.databaseManager
+        return dbManager
                 .makeItemsQuery(parent.objectId, getTimeScope(), realm)
                 .findAllSortedAsync("timestamp", Sort.ASCENDING)
                 .asFlowable()

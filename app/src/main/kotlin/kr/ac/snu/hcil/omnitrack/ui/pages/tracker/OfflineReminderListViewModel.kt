@@ -1,6 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.tracker
 
-import kr.ac.snu.hcil.omnitrack.OTApp
+import android.app.Application
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.OfflineTriggerListViewModel
@@ -9,7 +9,7 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.TriggerInterfaceOpti
 /**
  * Created by younghokim on 2017. 10. 24..
  */
-class OfflineReminderListViewModel : OfflineTriggerListViewModel() {
+class OfflineReminderListViewModel(app: Application) : OfflineTriggerListViewModel(app) {
     override val defaultTriggerInterfaceOptions: TriggerInterfaceOptions = TriggerInterfaceOptions(false, null, arrayOf(OTTriggerDAO.CONDITION_TYPE_TIME), OTTriggerDAO.ACTION_TYPE_REMIND)
 
 
@@ -23,7 +23,7 @@ class OfflineReminderListViewModel : OfflineTriggerListViewModel() {
                     if (trackerDao != null)
                         it.trackers.add(realm.copyFromRealm(trackerDao))
                 }
-                OTApp.instance.databaseManager.saveTrigger(it, realm)
+                dbManager.get().saveTrigger(it, realm)
             }
         }
     }

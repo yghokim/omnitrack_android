@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.auth
 
+import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.net.Uri
@@ -15,6 +16,7 @@ import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.*
+import dagger.Lazy
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposables
@@ -22,17 +24,22 @@ import io.reactivex.subjects.BehaviorSubject
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
+import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationServerSideAPI
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.getActivity
-import java.util.concurrent.Executors
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Created by Young-Ho Kim on 2017-02-03.
  */
-object OTAuthManager {
+class OTAuthManager(val app: OTApp) {
 
-    const val LOG_TAG = "OMNITRACK Auth Manager"
-
+    companion object {
+        const val LOG_TAG = "OMNITRACK Auth Manager"
+        private const val RC_SIGN_IN = 9913
+        private val REQUEST_GOOGLE_PLAY_SERVICES = 1363
+    }
     enum class SignedInLevel {
         NONE, CACHED, AUTHORIZED
     }
@@ -43,22 +50,20 @@ object OTAuthManager {
         fun onCancel()
     }
 
-    private const val RC_SIGN_IN = 9913
-    private val REQUEST_GOOGLE_PLAY_SERVICES = 1363
-
-
-    private val executorService = Executors.newFixedThreadPool(2)
+    @Inject lateinit var synchronizationServerController: Lazy<ISynchronizationServerSideAPI>
 
     private val mFirebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
 
     private val mGoogleApiClient: GoogleApiClient
     private var googleSignInAccount: GoogleSignInAccount? = null
 
-    private val mGoogleSignInOptions: GoogleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestProfile()
-            .requestEmail()
-            .requestIdToken(OTApp.getString(R.string.default_web_client_id))
-            .build()
+    private val mGoogleSignInOptions: GoogleSignInOptions by lazy {
+        GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestProfile()
+                .requestEmail()
+                .requestIdToken(app.getString(R.string.default_web_client_id))
+                .build()
+    }
 
     //is signIn process in progress
     private var mIntentInProgress = false
@@ -98,6 +103,8 @@ object OTAuthManager {
         }
 
     init {
+        app.applicationComponent.inject(this)
+
         clearUserInfo()
 
         reloadUserInfo()
@@ -115,7 +122,7 @@ object OTAuthManager {
         Log.d(LOG_TAG, "Initializing Google SDK...")
 
         // Build GoogleApiClient with access to basic profile
-        mGoogleApiClient = GoogleApiClient.Builder(OTApp.instance)
+        mGoogleApiClient = GoogleApiClient.Builder(app)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, mGoogleSignInOptions)
                 .build()
         mGoogleApiClient.connect()
@@ -295,7 +302,7 @@ object OTAuthManager {
                 println("signed in google account: ${result.signInAccount}")
                 refreshToken()
                 firebaseAuthWithGoogle(googleSignInAccount).flatMap { authResult ->
-                    OTApp.instance.synchronizationServerController.putDeviceInfo(OTDeviceInfo()).
+                    synchronizationServerController.get().putDeviceInfo(OTDeviceInfo()).
                             map { result ->
                                 val localKey = result.deviceLocalKey
                                 if (localKey != null) {
@@ -371,7 +378,6 @@ object OTAuthManager {
     }
 
     fun signOut() {
-        val uid = userId
         clearUserInfo()
         mFirebaseAuth.signOut()
         Auth.GoogleSignInApi.signOut(mGoogleApiClient)

@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.items
 
+import android.app.Application
 import io.reactivex.Single
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
@@ -13,13 +14,13 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.ui.viewmodels.RealmViewModel
 import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
-import kr.ac.snu.hcil.omnitrack.utils.RealmViewModel
 
 /**
  * Created by Young-Ho on 10/12/2017.
  */
-class ItemListViewModel : RealmViewModel(), OrderedRealmCollectionChangeListener<RealmResults<OTItemDAO>> {
+class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCollectionChangeListener<RealmResults<OTItemDAO>> {
 
     private var currentItemQueryResults: RealmResults<OTItemDAO>? = null
     lateinit var trackerDao: OTTrackerDAO
@@ -66,14 +67,14 @@ class ItemListViewModel : RealmViewModel(), OrderedRealmCollectionChangeListener
     val onItemContentChanged = PublishSubject.create<Array<OrderedCollectionChangeSet.Range>>()
 
     fun init(trackerId: String) {
-        val dao = OTApp.instance.databaseManager.getTrackerQueryWithId(trackerId, realm).findFirst()
+        val dao = dbManager.get().getTrackerQueryWithId(trackerId, realm).findFirst()
 
         if (dao != null) {
-            managedTrackerDao = OTApp.instance.databaseManager.getTrackerQueryWithId(trackerId, realm).findFirstAsync()
+            managedTrackerDao = dbManager.get().getTrackerQueryWithId(trackerId, realm).findFirstAsync()
             managedTrackerDao.addChangeListener<OTTrackerDAO> { snapshot ->
                 println("tracker db changed in background")
             }
-            managedAttributeList = OTApp.instance.databaseManager.getAttributeListQuery(trackerId, realm).findAllAsync()
+            managedAttributeList = dbManager.get().getAttributeListQuery(trackerId, realm).findAllAsync()
             managedAttributeList.addChangeListener { snapshot, changeSet ->
                 println("tracker attribute list db changed in background")
             }
@@ -96,7 +97,7 @@ class ItemListViewModel : RealmViewModel(), OrderedRealmCollectionChangeListener
         onSchemaChanged.onNext(trackerDao.attributes.toList())
 
         currentItemQueryResults?.removeAllChangeListeners()
-        currentItemQueryResults = OTApp.instance.databaseManager
+        currentItemQueryResults = dbManager.get()
                 .makeItemsQuery(trackerDao.objectId, null, null, realm)
                 .findAllSortedAsync("timestamp", Sort.DESCENDING)
         currentItemQueryResults?.addChangeListener(this)
@@ -138,7 +139,7 @@ class ItemListViewModel : RealmViewModel(), OrderedRealmCollectionChangeListener
         val viewModel = itemsInTimestampDescendingOrder.find { it.objectId == itemId }
         if (viewModel != null) {
             realm.executeTransaction {
-                OTApp.instance.databaseManager.removeItem(viewModel.itemDao, false, realm)
+                dbManager.get().removeItem(viewModel.itemDao, false, realm)
             }
         }
     }
@@ -185,6 +186,6 @@ class ItemListViewModel : RealmViewModel(), OrderedRealmCollectionChangeListener
         }
 
         fun save(vararg changedLocalIds: String): Single<Pair<Int, String?>> =
-                OTApp.instance.databaseManager.saveItemObservable(itemDao, false, changedLocalIds.toList().toTypedArray(), realm)
+                dbManager.get().saveItemObservable(itemDao, false, changedLocalIds.toList().toTypedArray(), realm)
     }
 }
