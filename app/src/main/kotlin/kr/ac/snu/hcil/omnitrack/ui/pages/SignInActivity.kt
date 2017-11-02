@@ -10,7 +10,6 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
 import android.widget.Toast
-import com.badoo.mobile.util.WeakHandler
 import com.tbruyelle.rxpermissions2.RxPermissions
 import io.reactivex.disposables.CompositeDisposable
 import kr.ac.snu.hcil.omnitrack.OTApp
@@ -97,14 +96,14 @@ class SignInActivity : AppCompatActivity() {
     }
 
     private fun toBusyMode() {
-        WeakHandler().post {
+        runOnUiThread {
             this.googleLoginButton.visibility = View.GONE
             this.loginInProgressIndicator.visibility = View.VISIBLE
         }
     }
 
     private fun toIdleMode() {
-        WeakHandler().post {
+        runOnUiThread {
             this.googleLoginButton.visibility = View.VISIBLE
             this.loginInProgressIndicator.visibility = View.GONE
         }
