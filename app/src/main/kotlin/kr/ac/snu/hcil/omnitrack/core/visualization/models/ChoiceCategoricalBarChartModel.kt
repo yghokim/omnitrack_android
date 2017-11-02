@@ -26,6 +26,10 @@ class ChoiceCategoricalBarChartModel(attribute: OTAttributeDAO, realm: Realm) : 
     override val name: String
         get() = String.format(OTApp.instance.resourcesWrapped.getString(R.string.msg_vis_categorical_distribution_title_format), super.name)
 
+    init{
+        OTApp.instance.applicationComponent.inject(this)
+    }
+
     override fun recycle() {
         counterDictCache.clear()
         categoriesCache.clear()
@@ -34,7 +38,7 @@ class ChoiceCategoricalBarChartModel(attribute: OTAttributeDAO, realm: Realm) : 
     override fun reloadData(): Single<List<ICategoricalBarChart.Point>> {
         val trackerId = attribute.trackerId
         if (trackerId != null) {
-            return OTApp.instance.databaseManager
+            return dbManager
                     .makeItemsQuery(trackerId, getTimeScope(), realm)
                     .findAllSortedAsync("timestamp", Sort.ASCENDING)
                     .asFlowable()

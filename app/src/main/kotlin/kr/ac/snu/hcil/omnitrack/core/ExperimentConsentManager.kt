@@ -5,14 +5,21 @@ import android.support.v7.app.AppCompatActivity
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTUserRolePOJO
+import kr.ac.snu.hcil.omnitrack.core.di.OmniTrackModule_ProvideSynchronizationServerControllerFactory
+import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationServerSideAPI
 import kr.ac.snu.hcil.omnitrack.ui.pages.experiment.ExperimentSignInActivity
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Created by Young-Ho Kim on 2017-01-31.
  */
-object ExperimentConsentManager {
+@Singleton
+class ExperimentConsentManager @Inject constructor(val authManager: OTAuthManager, val synchronizationServerController: ISynchronizationServerSideAPI) {
 
-    const val REQUEST_CODE_EXPERIMENT_SIGN_IN = 6550
+    companion object {
+        const val REQUEST_CODE_EXPERIMENT_SIGN_IN = 6550
+    }
 
     interface ResultListener {
         fun onConsentApproved()
@@ -33,7 +40,7 @@ object ExperimentConsentManager {
             finishProcess()
         } else {
 
-            OTApp.instance.synchronizationServerController.getUserRoles().subscribe({ result ->
+            synchronizationServerController.getUserRoles().subscribe({ result ->
                 val userRole = result.find { it.role == "ServiceUser" }
                 if (userRole == null || !userRole.isConsentApproved) {
                     println("consent form was not approved or is first-time login.")
@@ -86,7 +93,7 @@ object ExperimentConsentManager {
                 if (deleteAccountIfDenied) {
                     //DatabaseManager.experimentProfileRef?.removeValue()
 
-                    OTAuthManager.deleteUser(object : OTAuthManager.SignInResultsHandler {
+                    authManager.deleteUser(object : OTAuthManager.SignInResultsHandler {
                         override fun onCancel() {
                         }
 
@@ -114,7 +121,7 @@ object ExperimentConsentManager {
                 information["purposes"] = data.getStringArrayListExtra(OTApp.ACCOUNT_DATASET_EXPERIMENT_KEY_PURPOSES)
                 profile.information = information
 
-                OTApp.instance.synchronizationServerController.postUserRoleConsentResult(profile)
+                synchronizationServerController.postUserRoleConsentResult(profile)
                         .subscribe({ success ->
                             if (success == true) {
                                 onApproved()

@@ -32,6 +32,7 @@ import kr.ac.snu.hcil.omnitrack.utils.LocaleHelper
 import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper
 import java.util.*
+import javax.inject.Inject
 
 /**
  * Created by younghokim on 2016. 11. 15..
@@ -54,7 +55,7 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
          */
         override fun onSuccess() {
 
-            ExperimentConsentManager.startProcess(this@OTActivity, OTAuthManager.userId!!, object : ExperimentConsentManager.ResultListener {
+            consentManager.startProcess(this@OTActivity, authManager.userId!!, object : ExperimentConsentManager.ResultListener {
                 override fun onConsentApproved() {
                     performSignInProcessCompletelyFinished()
                 }
@@ -95,6 +96,11 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
         }
     }
 
+    @Inject
+    protected lateinit var consentManager: ExperimentConsentManager
+    @Inject
+    protected lateinit var authManager: OTAuthManager
+
     protected var isSessionLoggingEnabled = true
 
     private var resumedAt: Long = 0
@@ -132,10 +138,10 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
                 .observeOn(AndroidSchedulers.mainThread())
 
     private fun refreshCredentialsWithFallbackSignIn() {
-        if (OTAuthManager.isUserSignedIn() && NetworkHelper.isConnectedToInternet()) {
+        if (authManager.isUserSignedIn() && NetworkHelper.isConnectedToInternet()) {
             //println("${LOG_TAG} OMNITRACK Google is signed in.")
             if (NetworkHelper.isConnectedToInternet()) {
-                OTAuthManager.refreshCredentialWithFallbackSignIn(this, OmniTrackSignInResultsHandler())
+                authManager.refreshCredentialWithFallbackSignIn(this, OmniTrackSignInResultsHandler())
             }
         } else {
             goSignInUnlessUserCached()
@@ -144,9 +150,9 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        (application as OTApp).applicationComponent.inject(this)
 
         processAuthorization()
-
         PreferenceManager.setDefaultValues(this, R.xml.global_preferences, false)
     }
 
@@ -164,9 +170,9 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
     private fun goSignInUnlessUserCached() {
         println("OMNITRACK Check whether user is cached. Otherwise, go to sign in")
         creationSubscriptions.add(
-                OTAuthManager.getAuthStateRefreshObservable().firstOrError().subscribe { signInResult ->
+                authManager.getAuthStateRefreshObservable().firstOrError().subscribe { signInResult ->
                     if (signInResult > OTAuthManager.SignedInLevel.NONE) {
-                        signedInUserSubject.onNext(OTAuthManager.userId!!)
+                        signedInUserSubject.onNext(authManager.userId!!)
                         onSignInProcessCompletelyFinished()
                     } else {
                         goSignIn()
@@ -194,7 +200,7 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
                 recreate()
             }
         } else {
-            ExperimentConsentManager.handleActivityResult(false, requestCode, resultCode, data)
+            consentManager.handleActivityResult(false, requestCode, resultCode, data)
         }
 
     }
@@ -255,7 +261,7 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
     private fun performSignInProcessCompletelyFinished() {
         println("OMNITRACK loading user from the application global instance")
 
-        this.signedInUserSubject.onNext(OTAuthManager.userId!!)
+        this.signedInUserSubject.onNext(authManager.userId!!)
 
         onSignInProcessCompletelyFinished()
     }

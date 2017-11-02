@@ -19,15 +19,19 @@ import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTItemPOJO
 import kr.ac.snu.hcil.omnitrack.core.database.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.database.synchronization.SyncResultEntry
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
+import kr.ac.snu.hcil.omnitrack.core.net.ABinaryUploadService
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.utils.executeTransactionIfNotIn
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import java.util.*
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Created by younghokim on 2017. 9. 25..
  */
-class RealmDatabaseManager(val config: Configuration = Configuration()) {
+@Singleton
+class RealmDatabaseManager @Inject constructor(private val config: Configuration, private val authManager: OTAuthManager, private val binaryUploadServiceController: ABinaryUploadService.ABinaryUploadServiceController) {
 
     enum class Order { ASC, DESC }
 
@@ -71,13 +75,13 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
             val fileName: String = "localDatabase"
     )
 
-    fun getRealmInstance(): Realm = Realm.getInstance(RealmConfiguration.Builder().name(config.fileName).build())
+    fun makeNewRealmInstance(): Realm = Realm.getInstance(RealmConfiguration.Builder().name(config.fileName).build())
     private val observableFactory: RxObservableFactory by lazy {
         RealmObservableFactory()
     }
 
     private fun <R> usingRealm(func: (Realm) -> R): R {
-        val realm = getRealmInstance()
+        val realm = makeNewRealmInstance()
         val result = func.invoke(realm)
         realm.close()
         return result
@@ -128,7 +132,7 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
 
         val realmInstance = if (realm != null) {
             realm
-        } else getRealmInstance()
+        } else makeNewRealmInstance()
 
         val trackerDao = getTrackerQueryWithId(trackerId, realmInstance).findFirst()
         if (trackerDao != null) {
@@ -192,7 +196,7 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
     fun getDirtyItemsToSync(): Single<List<OTItemPOJO>> {
         println("get items of Realm local.")
         return Single.just(
-                getRealmInstance().where(OTItemDAO::class.java).equalTo(FIELD_SYNCHRONIZED_AT, null as Long?).findAll().map { itemDao ->
+                makeNewRealmInstance().where(OTItemDAO::class.java).equalTo(FIELD_SYNCHRONIZED_AT, null as Long?).findAll().map { itemDao ->
                     val itemPojo = OTItemPOJO()
                     RealmItemHelper.applyDaoToPojo(itemDao, itemPojo)
                     itemPojo
@@ -205,7 +209,7 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
 
     fun applyServerItemsToSync(itemList: List<OTItemPOJO>): Single<Boolean> {
         return Single.defer {
-            val realm = getRealmInstance()
+            val realm = makeNewRealmInstance()
             try {
                 for (serverPojo in itemList) {
                     val match = realm.where(OTItemDAO::class.java).equalTo(FIELD_OBJECT_ID, serverPojo.objectId).findFirst()
@@ -297,7 +301,7 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
     }
 
     fun removeTracker(tracker: OTTracker, formerOwner: OTUser, archive: Boolean) {
-        val realm = getRealmInstance()
+        val realm = makeNewRealmInstance()
         val dao = getTrackerQueryWithId(tracker.objectId, realm).findFirst()
         if (dao != null) {
             realm.executeTransaction {
@@ -355,7 +359,7 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
     }
 
     fun removeAttribute(trackerId: String, objectId: String) {
-        val realm = getRealmInstance()
+        val realm = makeNewRealmInstance()
         val dao = realm.where(OTAttributeDAO::class.java).equalTo("trackerId", trackerId).equalTo("objectId", objectId).findFirst()
         if (dao != null) {
 
@@ -373,7 +377,7 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
 
     fun getTracker(key: String): Observable<OTTrackerDAO> {
         return Observable.defer {
-            val realm = getRealmInstance()
+            val realm = makeNewRealmInstance()
             try {
                 val dao = realm.where(OTTrackerDAO::class.java)
                         .equalTo(FIELD_REMOVED_BOOLEAN, false)
@@ -391,14 +395,14 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
     }
 
     fun saveAttribute(trackerId: String?, attribute: OTAttribute<out Any>, position: Int) {
-        val realm = getRealmInstance()
+        val realm = makeNewRealmInstance()
         realm.executeTransaction {
             //saveAttribute(attribute, trackerId, position, realm)
         }
     }
 
     fun saveTracker(tracker: OTTracker, position: Int) {
-        val realm = getRealmInstance()
+        val realm = makeNewRealmInstance()
         realm.executeTransaction {
             val baseDao = getTrackerQueryWithId(tracker.objectId, realm).findFirst() ?:
                     realm.createObject(OTTrackerDAO::class.java, UUID.randomUUID().toString())
@@ -445,7 +449,7 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
     private fun setSynchronizationFlagsImpl(daoClass: Class<out RealmObject>, idTimestampPair: List<SyncResultEntry>): Single<Boolean> {
         return Single.defer {
             try {
-                getRealmInstance().let {
+                makeNewRealmInstance().let {
 
                     it.executeTransaction { realm ->
                         for (pair in idTimestampPair) {
@@ -469,7 +473,7 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
     }
 
     private fun getLatestSynchronizedServerTimeImpl(daoClass: Class<out RealmObject>): Single<Long> {
-        return Single.just(getRealmInstance().where(daoClass).max(FIELD_SYNCHRONIZED_AT)?.toLong() ?: 0)
+        return Single.just(makeNewRealmInstance().where(daoClass).max(FIELD_SYNCHRONIZED_AT)?.toLong() ?: 0)
     }
 
     //Items
@@ -538,10 +542,10 @@ class RealmDatabaseManager(val config: Configuration = Configuration()) {
             if (value != null) {
                 if (value is SynchronizedUri && value.localUri != Uri.EMPTY) {
                     println("upload Synchronized Uri file to server...")
-                    value.setSynchronized(OTApp.instance.binaryUploadServiceController.makeFilePath(itemId, item.trackerId!!, OTAuthManager.userId!!, value.localUri.lastPathSegment))
+                    value.setSynchronized(binaryUploadServiceController.makeFilePath(itemId, item.trackerId!!, authManager.userId!!, value.localUri.lastPathSegment))
                     entry.value = TypeStringSerializationHelper.serialize(value)
                     OTApp.instance.startService(
-                            OTApp.instance.binaryUploadServiceController.makeUploadServiceIntent(value, itemId, item.trackerId!!, OTAuthManager.userId!!)
+                            binaryUploadServiceController.makeUploadServiceIntent(value, itemId, item.trackerId!!, authManager.userId!!)
                     )
                 }
             }

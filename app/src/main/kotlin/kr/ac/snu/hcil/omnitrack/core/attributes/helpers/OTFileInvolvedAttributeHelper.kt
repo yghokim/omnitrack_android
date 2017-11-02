@@ -1,20 +1,34 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 
 import android.net.Uri
+import dagger.Lazy
 import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.net.IBinaryDownloadAPI
 import kr.ac.snu.hcil.omnitrack.utils.io.FileHelper
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.util.concurrent.Callable
+import javax.inject.Inject
 
 /**
  * Created by younghokim on 2017. 10. 13..
  */
 abstract class OTFileInvolvedAttributeHelper : OTAttributeHelper() {
+
+    @Inject
+    protected lateinit var binaryDownloadApi: Lazy<IBinaryDownloadAPI>
+
+    @Inject
+    protected lateinit var databaseManager: Lazy<RealmDatabaseManager>
+
+    init {
+        OTApp.instance.applicationComponent.inject(this)
+    }
 
     override fun isExternalFile(attribute: OTAttributeDAO): Boolean {
         return true
@@ -29,7 +43,7 @@ abstract class OTFileInvolvedAttributeHelper : OTAttributeHelper() {
             return Single.defer<Uri>(Callable<Single<Uri>> {
 
                 fun tryServerDownload(): Single<Uri> {
-                    return OTApp.instance.storageHelper.downloadFileTo(value.serverUri.path, outputUri).flatMap { uri ->
+                    return binaryDownloadApi.get().downloadFileTo(value.serverUri.path, outputUri).flatMap { uri ->
                         Single.just<Uri>(uri)
                     }
                 }

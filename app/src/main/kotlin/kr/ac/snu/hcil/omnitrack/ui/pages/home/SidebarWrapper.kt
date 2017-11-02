@@ -26,7 +26,7 @@ import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 /**
  * Created by Young-Ho Kim on 2017-01-31.
  */
-class SidebarWrapper(val view: View, val parentActivity: AppCompatActivity) : PopupMenu.OnMenuItemClickListener {
+class SidebarWrapper(val view: View, val parentActivity: AppCompatActivity, val authManager: OTAuthManager) : PopupMenu.OnMenuItemClickListener {
 
     private val photoView: CircleImageView = view.findViewById(R.id.ui_user_photo)
     private val nameView: TextView = view.findViewById(R.id.ui_user_name)
@@ -65,7 +65,7 @@ class SidebarWrapper(val view: View, val parentActivity: AppCompatActivity) : Po
         when (item.itemId) {
             R.id.action_unlink_with_this_device -> {
                 DialogHelper.makeNegativePhrasedYesNoDialogBuilder(parentActivity, "OmniTrack", parentActivity.getString(R.string.msg_profile_unlink_account_confirm), R.string.msg_logout, onYes = {
-                    OTAuthManager.signOut()
+                    authManager.signOut()
                     OTApp.instance.unlinkUser()
                     if (parentActivity is OTActivity) {
                         parentActivity.goSignIn()
@@ -81,13 +81,13 @@ class SidebarWrapper(val view: View, val parentActivity: AppCompatActivity) : Po
 
     fun onCreate() {
         subscriptions.add(
-                OTAuthManager.userNameObservable.subscribe { (name) ->
+                authManager.userNameObservable.subscribe { (name) ->
                     nameView.text = name
                 }
         )
 
         subscriptions.add(
-                OTAuthManager.userImageUrlObservable.subscribe { uri ->
+                authManager.userImageUrlObservable.subscribe { uri ->
                     Glide.with(parentActivity).load(uri).into(photoView)
                 }
         )
@@ -111,7 +111,7 @@ class SidebarWrapper(val view: View, val parentActivity: AppCompatActivity) : Po
                 }, true),
 
                 RecyclerViewMenuAdapter.MenuItem(R.drawable.icon_refresh, "Refresh", null, {
-                    OTApp.instance.syncManager.performSynchronizationOf(ESyncDataType.ITEM)
+                    //OTApp.instance.syncManager.performSynchronizationOf(ESyncDataType.ITEM)
                 }, true)
         )
 

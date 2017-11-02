@@ -58,11 +58,16 @@ import org.jetbrains.anko.support.v4.act
 import org.jetbrains.anko.verticalMargin
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.Inject
+import javax.inject.Named
 
 /**
  * Created by Young-Ho Kim on 2016-07-18.
  */
 class TrackerListFragment : OTFragment() {
+
+    @Inject
+    lateinit var authManager: OTAuthManager
 
     lateinit private var listView: FallbackRecyclerView
 
@@ -159,8 +164,10 @@ class TrackerListFragment : OTFragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
+        (act.application as OTApp).applicationComponent.inject(this)
+
         viewModel = ViewModelProviders.of(this).get(TrackerListViewModel::class.java)
-        viewModel.userId = OTAuthManager.userId
+        viewModel.userId = authManager.userId
 
         createViewSubscriptions.add(
                 viewModel.trackerViewModels.subscribe { trackerViewModelList ->

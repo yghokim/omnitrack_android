@@ -385,6 +385,6 @@ abstract class OTAttribute<DataType>(objectId: String?, localKey: Int?, parentTr
     }
 
     override fun save() {
-        OTApp.instance.databaseManager.saveAttribute(tracker?.objectId, this as OTAttribute<out Any>, intrinsicPosition)
+        //OTApp.instance.databaseManager.saveAttribute(tracker?.objectId, this as OTAttribute<out Any>, intrinsicPosition)
     }
 }

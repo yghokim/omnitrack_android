@@ -1,18 +1,18 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.visualization
 
+import android.app.Application
 import android.support.v7.util.DiffUtil
 import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.TrackerHelper
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.Granularity
-import kr.ac.snu.hcil.omnitrack.utils.RealmViewModel
+import kr.ac.snu.hcil.omnitrack.ui.viewmodels.RealmViewModel
 
 /**
  * Created by younghokim on 2017. 8. 6..
  */
-class TrackerChartViewListViewModel : RealmViewModel() {
+class TrackerChartViewListViewModel(app: Application) : RealmViewModel(app) {
 
     val currentGranularitySubject: BehaviorSubject<Granularity> = BehaviorSubject.createDefault(Granularity.WEEK_REL)
     val currentPointSubject: BehaviorSubject<Long> = BehaviorSubject.createDefault(System.currentTimeMillis())
@@ -61,7 +61,7 @@ class TrackerChartViewListViewModel : RealmViewModel() {
             currentTrackerId = trackerId
 
             clearChartViewModels(false)
-            val trackerDao = OTApp.instance.databaseManager.getTrackerQueryWithId(trackerId, realm).findFirst()
+            val trackerDao = dbManager.get().getTrackerQueryWithId(trackerId, realm).findFirst()
             if (trackerDao != null) {
                 currentChartViewModelList.addAll(TrackerHelper.makeRecommendedChartModels(trackerDao, realm))
                 chartViewModelListSubject.onNext(currentChartViewModelList)

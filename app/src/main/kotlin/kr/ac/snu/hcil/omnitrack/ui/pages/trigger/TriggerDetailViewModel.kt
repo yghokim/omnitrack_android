@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 
+import android.app.Application
 import io.reactivex.subjects.BehaviorSubject
 import io.realm.OrderedCollectionChangeSet
 import io.realm.OrderedRealmCollectionChangeListener
@@ -8,13 +9,13 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.ATriggerCondition
-import kr.ac.snu.hcil.omnitrack.utils.RealmViewModel
+import kr.ac.snu.hcil.omnitrack.ui.viewmodels.RealmViewModel
 import kr.ac.snu.hcil.omnitrack.utils.onNextIfDifferAndNotNull
 
 /**
  * Created by younghokim on 2017-10-24.
  */
-class TriggerDetailViewModel : RealmViewModel(), OrderedRealmCollectionChangeListener<RealmResults<OTTrackerDAO>> {
+class TriggerDetailViewModel(app: Application) : RealmViewModel(app), OrderedRealmCollectionChangeListener<RealmResults<OTTrackerDAO>> {
 
     companion object {
         const val MODE_NEW: Byte = 0
@@ -48,7 +49,7 @@ class TriggerDetailViewModel : RealmViewModel(), OrderedRealmCollectionChangeLis
             isOffline = false
             viewModelMode.onNext(MODE_EDIT)
             this.triggerId = triggerId
-            val dao = OTApp.instance.databaseManager.makeTriggersOfUserQuery(userId, realm).equalTo("objectId", triggerId).findFirst()
+            val dao = dbManager.get().makeTriggersOfUserQuery(userId, realm).equalTo("objectId", triggerId).findFirst()
             if (dao != null) {
                 this.originalTriggerDao = dao
                 this.attachedTrackersRealmResults = dao.liveTrackersQuery.findAllAsync()
@@ -86,7 +87,7 @@ class TriggerDetailViewModel : RealmViewModel(), OrderedRealmCollectionChangeLis
     }
 
     fun getSerializedDao(): String? {
-        return originalTriggerDao?.let { OTTriggerDAO.parser.toJson(it, OTTriggerDAO::class.java) }
+        return originalTriggerDao?.let { getApplication<OTApp>().daoSerializationComponent.manager().get().serializeTrigger(it) }
     }
 
     fun validateConfiguration(): List<CharSequence>? {

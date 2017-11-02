@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.legacy
 
+import android.app.Application
 import android.support.v7.util.DiffUtil
 import io.reactivex.subjects.BehaviorSubject
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTrigger
@@ -9,7 +10,7 @@ import kr.ac.snu.hcil.omnitrack.ui.viewmodels.UserAttachedViewModel
 /**
  * Created by Young-Ho on 6/4/2017.
  */
-class TriggerListViewModel(var triggerFilter: (OTTrigger) -> Boolean = { trigger -> true }) : UserAttachedViewModel() {
+class TriggerListViewModel(app: Application) : UserAttachedViewModel(app) {
 
     private val currentTriggerViewModels = ArrayList<TriggerViewModel<OTTrigger>>()
 

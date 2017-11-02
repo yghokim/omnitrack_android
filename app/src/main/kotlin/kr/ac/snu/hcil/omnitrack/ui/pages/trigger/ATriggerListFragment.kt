@@ -29,6 +29,7 @@ import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator
 import kotlinx.android.synthetic.main.fragment_tracker_detail_triggers.*
 import kotlinx.android.synthetic.main.layout_attached_tracker_list.view.*
 import kotlinx.android.synthetic.main.trigger_list_element.view.*
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.EventLoggingManager
 import kr.ac.snu.hcil.omnitrack.core.database.OTTriggerInformationHelper
@@ -167,7 +168,8 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == DETAIL_REQUEST_CODE && resultCode == Activity.RESULT_OK && data != null) {
             if (data.hasExtra(TriggerDetailActivity.INTENT_EXTRA_TRIGGER_DAO)) {
-                val resultDao = OTTriggerDAO.parser.fromJson(data.getStringExtra(TriggerDetailActivity.INTENT_EXTRA_TRIGGER_DAO), OTTriggerDAO::class.java)
+                val resultDao =
+                        (act.application as OTApp).daoSerializationComponent.manager().get().parseTrigger(data.getStringExtra(TriggerDetailActivity.INTENT_EXTRA_TRIGGER_DAO))
                 viewModel.addNewTrigger(resultDao)
             }
         }
