@@ -42,7 +42,7 @@ repositories {
     mavenCentral()
 }
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }
 sourceSets {
     main.java.srcDirs += 'src/main/kotlin'

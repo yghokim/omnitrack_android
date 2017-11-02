@@ -9,7 +9,6 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.Button
 import butterknife.bindView
-import com.badoo.mobile.util.WeakHandler
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.receivers.ScreenReceiverBase
@@ -51,9 +50,6 @@ class ReminderPopupActivity : OTActivity(false, false), View.OnClickListener {
     }
 
     private var finishingAction: Action? = null
-
-    private var turnOffHandler: WeakHandler? = null
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
