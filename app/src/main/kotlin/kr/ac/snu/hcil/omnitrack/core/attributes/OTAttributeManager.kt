@@ -6,62 +6,68 @@ import android.support.v4.content.ContextCompat
 import android.util.SparseArray
 import com.afollestad.materialdialogs.MaterialDialog
 import com.tbruyelle.rxpermissions2.RxPermissions
+import dagger.Lazy
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.*
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.utils.ConcurrentUniqueLongGenerator
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Created by Young-Ho on 10/7/2017.
  */
-object OTAttributeManager {
+@Singleton
+class OTAttributeManager @Inject constructor(val authManager: Lazy<OTAuthManager>) {
 
-    const val VIEW_FOR_ITEM_LIST_CONTAINER_TYPE_MULTILINE = 0
-    const val VIEW_FOR_ITEM_LIST_CONTAINER_TYPE_SINGLELINE = 1
+    companion object {
+        const val VIEW_FOR_ITEM_LIST_CONTAINER_TYPE_MULTILINE = 0
+        const val VIEW_FOR_ITEM_LIST_CONTAINER_TYPE_SINGLELINE = 1
 
-    const val TYPE_NUMBER = 0
-    const val TYPE_TIME = 1
-    const val TYPE_TIMESPAN = 2
-    const val TYPE_SHORT_TEXT = 3
-    const val TYPE_LONG_TEXT = 4
-    const val TYPE_LOCATION = 5
-    const val TYPE_CHOICE = 6
-    const val TYPE_RATING = 7
-    const val TYPE_IMAGE = 8
-    const val TYPE_AUDIO = 9
+        const val TYPE_NUMBER = 0
+        const val TYPE_TIME = 1
+        const val TYPE_TIMESPAN = 2
+        const val TYPE_SHORT_TEXT = 3
+        const val TYPE_LONG_TEXT = 4
+        const val TYPE_LOCATION = 5
+        const val TYPE_CHOICE = 6
+        const val TYPE_RATING = 7
+        const val TYPE_IMAGE = 8
+        const val TYPE_AUDIO = 9
 
-    private val attributeCharacteristicsTable = SparseArray<OTAttributeHelper>()
+        private val attributeCharacteristicsTable = SparseArray<OTAttributeHelper>()
+
+        fun getAttributeHelper(type: Int): OTAttributeHelper {
+            val characteristics = attributeCharacteristicsTable[type]
+            if (characteristics == null) {
+                val fallback = when (type) {
+                    TYPE_NUMBER -> OTNumberAttributeHelper()
+                    TYPE_TIME -> OTTimeAttributeHelper()
+                    TYPE_TIMESPAN -> OTTimeSpanAttributeHelper()
+                    TYPE_SHORT_TEXT -> OTShortTextAttributeHelper()
+                    TYPE_LONG_TEXT -> OTLongTextAttributeHelper()
+                    TYPE_LOCATION -> OTLocationAttributeHelper()
+                    TYPE_CHOICE -> OTChoiceAttributeHelper()
+                    TYPE_RATING -> OTRatingAttributeHelper()
+                    TYPE_IMAGE -> OTImageAttributeHelper()
+                    TYPE_AUDIO -> OTAudioRecordAttributeHelper()
+                    else -> throw Exception("Unsupported type key: ${type}")
+                }
+                this.attributeCharacteristicsTable.setValueAt(type, fallback)
+                return fallback
+            } else return characteristics
+        }
+    }
 
     private val attributeLocalIdGenerator = ConcurrentUniqueLongGenerator()
 
     fun makeNewAttributeLocalId(createdAt: Long = System.currentTimeMillis()): String {
         val nanoStamp = attributeLocalIdGenerator.getNewUniqueLong(createdAt)
 
-        val id = OTAuthManager.userDeviceLocalKey + "_" + nanoStamp.toString(36)
+        val id = authManager.get().userDeviceLocalKey + "_" + nanoStamp.toString(36)
         println("new attribute local id: ${id}")
         return id
-    }
-
-    fun getAttributeHelper(type: Int): OTAttributeHelper {
-        val characteristics = attributeCharacteristicsTable[type]
-        if (characteristics == null) {
-            val fallback = when (type) {
-                TYPE_NUMBER -> OTNumberAttributeHelper()
-                TYPE_TIME -> OTTimeAttributeHelper()
-                TYPE_TIMESPAN -> OTTimeSpanAttributeHelper()
-                TYPE_SHORT_TEXT -> OTShortTextAttributeHelper()
-                TYPE_LONG_TEXT -> OTLongTextAttributeHelper()
-                TYPE_LOCATION -> OTLocationAttributeHelper()
-                TYPE_CHOICE -> OTChoiceAttributeHelper()
-                TYPE_RATING -> OTRatingAttributeHelper()
-                TYPE_IMAGE -> OTImageAttributeHelper()
-                TYPE_AUDIO -> OTAudioRecordAttributeHelper()
-                else -> throw Exception("Unsupported type key: ${type}")
-            }
-            this.attributeCharacteristicsTable.setValueAt(type, fallback)
-            return fallback
-        } else return characteristics
     }
 
     fun showPermissionCheckDialog(activity: Activity, typeId: Int, typeName: String, onGranted: (Boolean) -> Unit, onDenied: (() -> Unit)? = null): MaterialDialog? {

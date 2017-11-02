@@ -19,6 +19,8 @@ import kr.ac.snu.hcil.omnitrack.core.system.OTTrackingNotificationFactory
 import org.jetbrains.anko.notificationManager
 import org.jetbrains.anko.runOnUiThread
 import java.util.concurrent.atomic.AtomicInteger
+import javax.inject.Inject
+import javax.inject.Provider
 
 /**
  * Created by Young-Ho on 10/17/2017.
@@ -52,7 +54,15 @@ class OTItemLoggingService : Service() {
         private val currentCommandCount = AtomicInteger(0)
     }
 
-    private lateinit var realm: Realm
+    @Inject
+    lateinit var realm: Realm
+
+    @Inject
+    lateinit var realmProvider: Provider<Realm>
+
+    @Inject
+    lateinit var dbManager: RealmDatabaseManager
+
     private val subscriptions = CompositeDisposable()
 
     override fun onBind(p0: Intent?): IBinder? {
@@ -61,7 +71,7 @@ class OTItemLoggingService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        realm = OTApp.instance.databaseManager.getRealmInstance()
+        (application as OTApp).applicationComponent.inject(this)
     }
 
     override fun onDestroy() {
@@ -85,7 +95,7 @@ class OTItemLoggingService : Service() {
         {
             val singles = trackerIds.mapNotNull { trackerId ->
                 Single.defer {
-                    val trackerDao = OTApp.instance.databaseManager.getTrackerQueryWithId(trackerId, realm).findFirst()
+                    val trackerDao = dbManager.getTrackerQueryWithId(trackerId, realm).findFirst()
                     if (trackerDao != null) {
                         val unManagedTrackerDao = realm.copyFromRealm(trackerDao)
                         val builder = OTItemBuilderDAO()
@@ -97,11 +107,11 @@ class OTItemLoggingService : Service() {
 
                         var pushedItemDao: OTItemDAO? = null
 
-                        wrapper.makeAutoCompleteObservable(applyToBuilder = true)
+                        wrapper.makeAutoCompleteObservable(realmProvider, applyToBuilder = true)
                                 .ignoreElements().toSingleDefault(trackerId).flatMap {
                             val item = wrapper.saveToItem(null, loggingSource)
                             pushedItemDao = item
-                            OTApp.instance.databaseManager.saveItemObservable(item, true, null, realm)
+                            dbManager.saveItemObservable(item, true, null, realm)
                         }.doOnSubscribe {
                             this.runOnUiThread {
                                 OTTaskNotificationManager
@@ -159,10 +169,10 @@ class OTItemLoggingService : Service() {
     private fun handleRemoveAction(intent: Intent, startId: Int): Int {
         val itemId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM)
         if (!itemId.isNullOrBlank()) {
-            val item = OTApp.instance.databaseManager.makeSingleItemQuery(itemId, realm).findFirst()
+            val item = dbManager.makeSingleItemQuery(itemId, realm).findFirst()
             if (item != null) {
                 realm.executeTransaction {
-                    OTApp.instance.databaseManager.removeItem(item, false, realm)
+                    dbManager.removeItem(item, false, realm)
                 }
 
                 if (intent.hasExtra(OTApp.INTENT_EXTRA_NOTIFICATION_ID)) {

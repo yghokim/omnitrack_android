@@ -9,6 +9,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StreamDownloadTask
 import io.reactivex.Single
 import io.reactivex.disposables.Disposables
+import kr.ac.snu.hcil.omnitrack.core.net.IBinaryDownloadAPI
 import java.io.File
 import java.io.InputStream
 
@@ -16,7 +17,7 @@ import java.io.InputStream
 /**
  * Created by Young-Ho on 3/4/2017.
  */
-class FirebaseStorageHelper(context: Context) {
+class FirebaseStorageHelper(): IBinaryDownloadAPI {
 
     fun restartUploadTask() {
 
@@ -85,7 +86,7 @@ class FirebaseStorageHelper(context: Context) {
         }
     }
 
-    fun downloadFileTo(pathString: String, localUri: Uri): Single<Uri> {
+    override fun downloadFileTo(pathString: String, localUri: Uri): Single<Uri> {
         return Single.create {
             subscriber ->
 

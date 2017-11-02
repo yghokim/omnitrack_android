@@ -1,6 +1,8 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.tracker
 
+import android.app.Application
 import android.support.annotation.DrawableRes
+import dagger.Lazy
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
@@ -14,15 +16,25 @@ import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.ui.viewmodels.RealmViewModel
 import kr.ac.snu.hcil.omnitrack.utils.*
 import org.jetbrains.anko.collections.forEachWithIndex
 import java.util.*
+import javax.inject.Inject
 import kotlin.collections.HashSet
 
 /**
  * Created by younghokim on 2017. 10. 3..
  */
-class TrackerDetailViewModel : RealmViewModel() {
+class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
+
+    @Inject
+    protected lateinit var attributeManager: Lazy<OTAttributeManager>
+
+    @Inject
+    protected lateinit var authManager: Lazy<OTAuthManager>
+
 
     private var isInitialized = false
 
@@ -90,11 +102,15 @@ class TrackerDetailViewModel : RealmViewModel() {
 
     private val currentAttributeViewModelList = ArrayList<AttributeInformationViewModel>()
 
+    init {
+        getApplication<OTApp>().applicationComponent.inject(this)
+    }
+
     fun init(trackerId: String?) {
         if (!isInitialized) {
             subscriptions.clear()
             if (trackerId != null) {
-                val dao = OTApp.instance.databaseManager.getTrackerQueryWithId(trackerId, realm).findFirstAsync()
+                val dao = dbManager.get().getTrackerQueryWithId(trackerId, realm).findFirstAsync()
 
                 subscriptions.add(
                         dao.asFlowable<OTTrackerDAO>().filter { it.isValid && it.isLoaded }.subscribe { snapshot ->
@@ -112,7 +128,7 @@ class TrackerDetailViewModel : RealmViewModel() {
                                             if (changeset == null) {
                                                 //initial
                                                 clearCurrentAttributeList()
-                                                currentAttributeViewModelList.addAll(changes.collection.map { AttributeInformationViewModel(it, realm) })
+                                                currentAttributeViewModelList.addAll(changes.collection.map { AttributeInformationViewModel(it, realm, attributeManager.get()) })
                                             } else {
                                                 currentAttributeViewModelList.removeAll(
                                                         changeset.deletions.map { currentAttributeViewModelList[it].apply { this.unregister() } }
@@ -120,7 +136,7 @@ class TrackerDetailViewModel : RealmViewModel() {
 
                                                 changeset.insertions.forEach {
                                                     currentAttributeViewModelList.add(it,
-                                                            AttributeInformationViewModel(changes.collection[it]!!, realm)
+                                                            AttributeInformationViewModel(changes.collection[it]!!, realm, attributeManager.get())
                                                     )
                                                 }
                                             }
@@ -147,7 +163,7 @@ class TrackerDetailViewModel : RealmViewModel() {
                 )
 
                 subscriptions.add(
-                        OTApp.instance.databaseManager.makeShortcutPanelRefreshObservable(OTAuthManager.userId!!, realm).subscribe { list ->
+                        dbManager.get().makeShortcutPanelRefreshObservable(authManager.get().userId!!, realm).subscribe { list ->
                             println("shortcut refresh")
                         }
                 )
@@ -176,14 +192,14 @@ class TrackerDetailViewModel : RealmViewModel() {
         processor?.invoke(newDao, realm)
 
         if (trackerDao != null) {
-            newDao.localId = OTAttributeManager.makeNewAttributeLocalId(newDao.userCreatedAt)
+            newDao.localId = attributeManager.get().makeNewAttributeLocalId(newDao.userCreatedAt)
             newDao.trackerId = trackerDao?.objectId
 
             realm.executeTransactionIfNotIn {
                 trackerDao?.attributes?.add(newDao)
             }
         } else {
-            currentAttributeViewModelList.add(AttributeInformationViewModel(newDao, realm))
+            currentAttributeViewModelList.add(AttributeInformationViewModel(newDao, realm, attributeManager.get()))
             attributeViewModelListObservable.onNext(currentAttributeViewModelList)
         }
     }
@@ -220,7 +236,7 @@ class TrackerDetailViewModel : RealmViewModel() {
 
         currentAttributeViewModelList.forEachWithIndex { index, attrViewModel ->
             if (!attrViewModel.isInDatabase) {
-                attrViewModel.attributeDAO.localId = OTAttributeManager.makeNewAttributeLocalId(attrViewModel.attributeDAO.userCreatedAt)
+                attrViewModel.attributeDAO.localId = attributeManager.get().makeNewAttributeLocalId(attrViewModel.attributeDAO.userCreatedAt)
                 attrViewModel.attributeDAO.trackerId = trackerDao.objectId
                 attrViewModel.saveToRealm()
             }
@@ -256,7 +272,7 @@ class TrackerDetailViewModel : RealmViewModel() {
         if (trackerDao == null) {
             realm.executeTransaction {
                 val trackerDao = realm.createObject(OTTrackerDAO::class.java, UUID.randomUUID().toString())
-                trackerDao.userId = OTAuthManager.userId
+                trackerDao.userId = authManager.get().userId
                 trackerDao.name = nameObservable.value
                 trackerDao.isBookmarked = isBookmarkedObservable.value
                 trackerDao.color = colorObservable.value
@@ -289,7 +305,7 @@ class TrackerDetailViewModel : RealmViewModel() {
         removedAttributes.clear()
     }
 
-    class AttributeInformationViewModel(_attributeDAO: OTAttributeDAO, val realm: Realm) : IReadonlyObjectId, RealmChangeListener<OTAttributeDAO> {
+    class AttributeInformationViewModel(_attributeDAO: OTAttributeDAO, val realm: Realm, val attributeManager: OTAttributeManager) : IReadonlyObjectId, RealmChangeListener<OTAttributeDAO> {
         override val objectId: String?
             get() = attributeDAO.objectId
 

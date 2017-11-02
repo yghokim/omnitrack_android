@@ -5,19 +5,33 @@ import android.net.Uri
 import android.util.AttributeSet
 import android.view.View
 import com.github.ybq.android.spinkit.SpinKitView
+import dagger.Lazy
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
-import kr.ac.snu.hcil.omnitrack.OTApp
+import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.net.IBinaryDownloadAPI
 import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioRecorderView
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
+import javax.inject.Inject
+import javax.inject.Provider
 
 /**
  * Created by Young-Ho Kim on 2016-07-22.
  */
 class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAttributeInputView<SynchronizedUri>(R.layout.input_audio_record, context, attrs) {
+    @Inject
+    lateinit var binaryDownloader: Lazy<IBinaryDownloadAPI>
+
+    @Inject
+    lateinit var dbManager: Lazy<RealmDatabaseManager>
+
+    @Inject
+    lateinit var realmProvider: Provider<Realm>
+
     override val typeId: Int = VIEW_TYPE_AUDIO_RECORD
 
     private var inLoadingMode: Boolean = false
@@ -49,7 +63,7 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
                 } else if (value?.isSynchronized == true) {
                     inLoadingMode = true
                     subscriptions.add(
-                            OTApp.instance.storageHelper.downloadFileTo(value.serverUri.path, value.localUri).subscribe(
+                            binaryDownloader.get().downloadFileTo(value.serverUri.path, value.localUri).subscribe(
                                     {
                                         uri ->
                                         valueView.audioFileUriChanged.suspend = true
@@ -119,16 +133,17 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
     override fun onAttributeBound(attributeObjectId: String) {
         valueView.mediaSessionId = attributeObjectId
 
-        val realm = OTApp.instance.databaseManager.getRealmInstance()
+        val realm = realmProvider.get()
         val attributeInfo = realm.where(OTAttributeDAO::class.java).equalTo("objectId", attributeObjectId).findFirst()
         if (attributeInfo != null) {
             val trackerName = attributeInfo.trackerId?.let {
-                val trackerInfo = OTApp.instance.databaseManager.getTrackerQueryWithId(it, realm).findFirst()
+                val trackerInfo = dbManager.get().getTrackerQueryWithId(it, realm).findFirst()
                 trackerInfo?.name ?: "No Tracker"
             } ?: "No Tracker"
 
             valueView.audioTitle = "${attributeInfo.name} | ${trackerName}"
         }
+        realm.close()
     }
 
     override fun onPause() {

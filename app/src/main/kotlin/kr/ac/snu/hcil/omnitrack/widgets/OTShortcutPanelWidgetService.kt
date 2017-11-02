@@ -9,16 +9,15 @@ import android.graphics.Paint
 import android.support.v4.graphics.ColorUtils
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
-import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.OTTracker
-import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
 import kr.ac.snu.hcil.omnitrack.utils.VectorIconHelper
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.Inject
 
 /**
  * Created by younghokim on 2017. 4. 2..
@@ -32,11 +31,21 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
         }
     }
 
-    override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {
-        return PanelWidgetElementFactory(this.applicationContext, intent)
+    @Inject
+    protected lateinit var dbManager: RealmDatabaseManager
+    @Inject
+    protected lateinit var authManager: OTAuthManager
+
+    override fun onCreate() {
+        super.onCreate()
+        (application as OTApp).applicationComponent.inject(this)
     }
 
-    class PanelWidgetElementFactory(val context: Context, intent: Intent) : RemoteViewsFactory {
+    override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {
+        return PanelWidgetElementFactory(this.applicationContext, intent, dbManager, authManager)
+    }
+
+    class PanelWidgetElementFactory(val context: Context, intent: Intent, val dbManager: RealmDatabaseManager, val authManager: OTAuthManager) : RemoteViewsFactory {
 
         private val widgetId: Int
 
@@ -46,6 +55,7 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
 
         init {
             widgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
+
         }
 
         override fun onCreate() {
@@ -60,19 +70,19 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
         }
 
         override fun onDataSetChanged() {
-            val userId = OTAuthManager.userId
+            val userId = authManager.userId
             val pref = OTShortcutPanelWidgetUpdateService.getPreferences(context)
             mode = OTShortcutPanelWidgetUpdateService.getMode(widgetId, pref)
             trackers.clear()
-            val realm = OTApp.instance.databaseManager.getRealmInstance()
+            val realm = dbManager.makeNewRealmInstance()
             if(userId!=null) {
                 when (mode) {
-                    OTShortcutPanelWidgetUpdateService.MODE_ALL -> trackers.addAll( OTApp.instance.databaseManager.makeTrackersOfUserQuery(userId, realm).findAll().map{it.getSimpleInfo()})
-                    OTShortcutPanelWidgetUpdateService.MODE_SHORTCUT -> trackers.addAll(OTApp.instance.databaseManager.makeTrackersOfUserQuery(userId, realm).equalTo("isBookmarked", true).findAll().map{it.getSimpleInfo()})
+                    OTShortcutPanelWidgetUpdateService.MODE_ALL -> trackers.addAll(dbManager.makeTrackersOfUserQuery(userId, realm).findAll().map { it.getSimpleInfo() })
+                    OTShortcutPanelWidgetUpdateService.MODE_SHORTCUT -> trackers.addAll(dbManager.makeTrackersOfUserQuery(userId, realm).equalTo("isBookmarked", true).findAll().map { it.getSimpleInfo() })
                     OTShortcutPanelWidgetUpdateService.MODE_SELECTIVE -> {
                         val selectedTrackerIds = OTShortcutPanelWidgetUpdateService.getSelectedTrackerIds(widgetId, pref)?.toTypedArray()
                         if (selectedTrackerIds?.isNotEmpty() == true) {
-                            trackers.addAll(OTApp.instance.databaseManager.makeTrackersOfUserQuery(userId, realm).`in`("objectId", selectedTrackerIds).findAll().map{it.getSimpleInfo()})
+                            trackers.addAll(dbManager.makeTrackersOfUserQuery(userId, realm).`in`("objectId", selectedTrackerIds).findAll().map { it.getSimpleInfo() })
                         }
                     }
                 }

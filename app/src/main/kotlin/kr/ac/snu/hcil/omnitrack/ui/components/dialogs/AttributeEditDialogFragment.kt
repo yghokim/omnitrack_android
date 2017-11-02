@@ -16,10 +16,12 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.common.RxBoundDialogFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
+import javax.inject.Inject
 
 /**
  * Created by younghokim on 2017. 4. 14..
@@ -62,7 +64,11 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
 
     private val listeners = HashSet<Listener>()
 
-    private lateinit var realm: Realm
+    @Inject
+    lateinit var realm: Realm
+
+    @Inject
+    lateinit var dbManager: RealmDatabaseManager
 
     private val subscriptions = CompositeDisposable()
 
@@ -71,9 +77,6 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-
-        realm = OTApp.instance.databaseManager.getRealmInstance()
-
         val view = setupViews(LayoutInflater.from(activity), savedInstanceState)
 
         val dialog = MaterialDialog.Builder(context!!)
@@ -128,6 +131,10 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         val activity = activity
+        if (activity != null) {
+            (activity.application as OTApp).applicationComponent.inject(this)
+        }
+
         if (activity is Listener && savedInstanceState != null) {
             addListener(activity)
         }
@@ -146,7 +153,7 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
             val attributeLocalId = bundle.getString(OTApp.INTENT_EXTRA_LOCAL_ID_ATTRIBUTE)
             val itemId = bundle.getString(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM)
 
-            val itemObservable = OTApp.instance.databaseManager
+            val itemObservable = dbManager
                     .makeItemsQuery(trackerId, null, null, realm)
                     .equalTo("objectId", itemId).findFirstAsync()
                     .asFlowable<OTItemDAO>().filter { it.isValid == true && it.isLoaded == true }

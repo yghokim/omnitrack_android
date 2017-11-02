@@ -1,9 +1,11 @@
 package kr.ac.snu.hcil.omnitrack.core.net
 
 import com.google.gson.JsonObject
+import dagger.Lazy
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import kr.ac.snu.hcil.omnitrack.BuildConfig
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTItemPOJO
@@ -16,11 +18,20 @@ import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.IOException
+import javax.inject.Inject
+import javax.inject.Provider
 
 /**
  * Created by younghokim on 2017. 9. 28..
  */
-class OTOfficialServerApiController : ISynchronizationServerSideAPI, IUserReportServerAPI {
+class OTOfficialServerApiController (app: OTApp) : ISynchronizationServerSideAPI, IUserReportServerAPI {
+
+    @Inject
+    lateinit var authManager: Lazy<OTAuthManager>
+
+    init{
+        app.applicationComponent.inject(this)
+    }
 
     private val retrofit: Retrofit by lazy {
 
@@ -28,7 +39,7 @@ class OTOfficialServerApiController : ISynchronizationServerSideAPI, IUserReport
             @Throws(IOException::class)
             override fun intercept(chain: Interceptor.Chain): Response {
                 val newRequest = chain.request().newBuilder()
-                        .addHeader("Authorization", "Bearer " + OTAuthManager.authToken)
+                        .addHeader("Authorization", "Bearer " + authManager.get().authToken)
                         .build()
 
                 println("chaining for official server: ${chain.request().url()}")

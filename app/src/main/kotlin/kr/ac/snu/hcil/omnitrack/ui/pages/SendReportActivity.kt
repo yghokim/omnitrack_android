@@ -6,12 +6,13 @@ import android.text.TextWatcher
 import android.view.View
 import android.widget.Toast
 import com.google.gson.Gson
+import dagger.Lazy
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.activity_send_report.*
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
+import kr.ac.snu.hcil.omnitrack.core.net.IUserReportServerAPI
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 
@@ -26,6 +27,8 @@ class SendReportActivity : MultiButtonActionBarActivity(R.layout.activity_send_r
         const val KEY_CONTENT = "content"
     }
 
+    lateinit var userReportServerController: Lazy<IUserReportServerAPI>
+
     private val selectedReportType: String get() = reportTypes[ui_spinner_report_type.selectedIndex]
     private val reportContent: String get() = ui_text_content.text.toString()
     private val isAnonymous: Boolean get() = ui_checkbox_anonymous.isChecked
@@ -36,6 +39,7 @@ class SendReportActivity : MultiButtonActionBarActivity(R.layout.activity_send_r
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        (application as OTApp).applicationComponent.inject(this)
 
         rightActionBarTextButton?.visibility = View.VISIBLE
         rightActionBarTextButton?.setText(R.string.msg_send)
@@ -114,13 +118,13 @@ class SendReportActivity : MultiButtonActionBarActivity(R.layout.activity_send_r
             val inquiry = HashMap<String, Any>()
             inquiry["anonymous"] = isAnonymous
             if (!isAnonymous) {
-                OTAuthManager.reloadUserInfo()
+                authManager.reloadUserInfo()
 
-                OTAuthManager.email?.let {
+                authManager.email?.let {
                     inquiry["email"] = it
                 }
 
-                OTAuthManager.userId?.let {
+                authManager.userId?.let {
                     inquiry["sender"] = it
                 }
             }
@@ -137,7 +141,7 @@ class SendReportActivity : MultiButtonActionBarActivity(R.layout.activity_send_r
             println("inquiry json: ${inquiryJson}")
 
             creationSubscriptions.add(
-                    OTApp.instance.userReportServerController.sendUserReport(inquiryJson).observeOn(AndroidSchedulers.mainThread()).subscribe({ success ->
+                    userReportServerController.get().sendUserReport(inquiryJson).observeOn(AndroidSchedulers.mainThread()).subscribe({ success ->
                         if (success) {
                             Toast.makeText(this, getString(R.string.msg_send_report_success_message), Toast.LENGTH_SHORT).show()
                             dialog.dismiss()

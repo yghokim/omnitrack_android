@@ -1,11 +1,12 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels
 
+import android.app.Application
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTriggerDAO
 
 /**
  * Created by younghokim on 2017. 10. 24..
  */
-open class OfflineTriggerListViewModel : ATriggerListViewModel() {
+open class OfflineTriggerListViewModel(app: Application) : ATriggerListViewModel(app) {
 
     fun init() {
         currentTriggerViewModels.forEach { it.unregister() }

@@ -1,20 +1,20 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.attribute
 
-import android.arch.lifecycle.ViewModel
+import android.app.Application
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.ui.viewmodels.RealmViewModel
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import java.util.*
 
 /**
  * Created by Young-Ho on 10/8/2017.
  */
-class AttributeDetailViewModel : ViewModel() {
+class AttributeDetailViewModel(app: Application) : RealmViewModel(app) {
     companion object {
         const val CONNECTION_NULL = "null"
     }
@@ -25,8 +25,6 @@ class AttributeDetailViewModel : ViewModel() {
 
     var attributeDAO: OTAttributeDAO? = null
         private set
-
-    private val realm = OTApp.instance.databaseManager.getRealmInstance()
 
     val isValid: Boolean get() = attributeDAO?.isValid == true
 
@@ -209,7 +207,6 @@ class AttributeDetailViewModel : ViewModel() {
 
     override fun onCleared() {
         super.onCleared()
-        realm.close()
         attributeDAO = null
     }
 }

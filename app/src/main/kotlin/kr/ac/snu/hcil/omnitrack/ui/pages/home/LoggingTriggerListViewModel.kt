@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.home
 
+import android.app.Application
 import io.realm.RealmQuery
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
@@ -8,7 +9,7 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.AManagedTriggerListV
 /**
  * Created by younghokim on 2017. 10. 21..
  */
-class LoggingTriggerListViewModel : AManagedTriggerListViewModel() {
+class LoggingTriggerListViewModel(app: Application) : AManagedTriggerListViewModel(app) {
 
     var userId: String? = null
         private set

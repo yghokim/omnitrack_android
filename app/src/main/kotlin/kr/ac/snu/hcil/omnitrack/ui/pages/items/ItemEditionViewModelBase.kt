@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.items
 
+import android.app.Application
 import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -10,15 +11,15 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.ui.viewmodels.RealmViewModel
 import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
-import kr.ac.snu.hcil.omnitrack.utils.RealmViewModel
 import kr.ac.snu.hcil.omnitrack.utils.ValueWithTimestamp
 
 /**
  * Created by Young-Ho on 10/15/2017.
  */
-abstract class ItemEditionViewModelBase : RealmViewModel(), OTItemBuilderWrapperBase.AttributeStateChangedListener {
+abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app), OTItemBuilderWrapperBase.AttributeStateChangedListener {
     enum class ItemMode {
         Edit, New
     }
@@ -65,7 +66,7 @@ abstract class ItemEditionViewModelBase : RealmViewModel(), OTItemBuilderWrapper
     fun init(trackerId: String, itemId: String?) {
         isValid = true
         if (trackerDao?.objectId != trackerId) {
-            trackerDao = OTApp.instance.databaseManager.getTrackerQueryWithId(trackerId, realm).findFirst()
+            trackerDao = dbManager.get().getTrackerQueryWithId(trackerId, realm).findFirst()
             trackerNameObservable.onNext(trackerDao?.name ?: "")
             subscriptions.clear()
 

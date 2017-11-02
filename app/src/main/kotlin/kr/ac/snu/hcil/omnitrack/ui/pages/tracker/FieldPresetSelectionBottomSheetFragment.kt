@@ -13,6 +13,7 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.AttributePresetInfo
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
@@ -22,6 +23,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTTimeAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTTimeSpanAttributeHelper
 import kr.ac.snu.hcil.omnitrack.ui.components.common.DismissingBottomSheetDialogFragment
 import org.jetbrains.anko.support.v4.act
+import javax.inject.Inject
 
 /**
  * Created by Young-Ho Kim on 2016-12-28.
@@ -32,6 +34,9 @@ class FieldPresetSelectionBottomSheetFragment : DismissingBottomSheetDialogFragm
         fun onAttributePermittedToAdd(typeInfo: AttributePresetInfo)
     }
 
+    @Inject
+    protected lateinit var attributeManager: OTAttributeManager
+
     private lateinit var newAttributeGrid: RecyclerView
 
     private lateinit var gridAdapter: GridAdapter
@@ -41,8 +46,14 @@ class FieldPresetSelectionBottomSheetFragment : DismissingBottomSheetDialogFragm
 
     private val subscriptions = CompositeDisposable()
 
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        (act.application as OTApp).applicationComponent.inject(this)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         gridAdapter = GridAdapter()
 
         subscriptions.add(
@@ -158,7 +169,7 @@ class FieldPresetSelectionBottomSheetFragment : DismissingBottomSheetDialogFragm
                     val typeInfo = presets?.get(adapterPosition)
                     if (typeInfo != null) {
 
-                        OTAttributeManager.showPermissionCheckDialog(this@FieldPresetSelectionBottomSheetFragment.act,
+                        attributeManager.showPermissionCheckDialog(this@FieldPresetSelectionBottomSheetFragment.act,
                                 typeInfo.typeId, typeInfo.name,
                                 {
                                     dismiss()

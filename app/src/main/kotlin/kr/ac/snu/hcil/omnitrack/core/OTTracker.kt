@@ -3,7 +3,6 @@ package kr.ac.snu.hcil.omnitrack.core
 //import kr.ac.snu.hcil.omnitrack.core.database.TrackerEntity
 import android.content.Context
 import android.graphics.Color
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
 import kr.ac.snu.hcil.omnitrack.core.database.NamedObject
@@ -178,15 +177,6 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
             onAttributeRemoved(args.first, args.second)
         }
 
-        attributes.elementReordered += {
-            sender, range ->
-            if (!suspendDatabaseSync) {
-                for (i in range) {
-                    OTApp.instance.databaseManager.saveAttribute(this.objectId, attributes[i], i)
-                }
-                OTApp.instance.databaseManager.saveTracker(this, intrinsicPosition)
-            }
-        }
 
         suspendDatabaseSync = false
 
@@ -324,7 +314,6 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
     }
 
     override fun save() {
-        OTApp.instance.databaseManager.saveTracker(this, intrinsicPosition)
     }
 
     fun dispose() {
@@ -392,8 +381,8 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
             _removedAttributeIds.removeAll { it == new.objectId }*/
 
         if (!suspendDatabaseSync) {
-            OTApp.instance.databaseManager.saveTracker(this, intrinsicPosition)
-            OTApp.instance.databaseManager.saveAttribute(this.objectId, new, index)
+            //OTApp.instance.databaseManager.saveTracker(this, intrinsicPosition)
+            //OTApp.instance.databaseManager.saveAttribute(this.objectId, new, index)
         }
 
         attributeAdded.invoke(this, ReadOnlyPair(new, index))
@@ -408,8 +397,8 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
 
         attributeRemoved.invoke(this, ReadOnlyPair(attribute, index))
         if (!suspendDatabaseSync) {
-            OTApp.instance.databaseManager.saveTracker(this, intrinsicPosition)
-            OTApp.instance.databaseManager.removeAttribute(objectId, attribute.objectId)
+            //OTApp.instance.databaseManager.saveTracker(this, intrinsicPosition)
+            //OTApp.instance.databaseManager.removeAttribute(objectId, attribute.objectId)
         }
     }
 

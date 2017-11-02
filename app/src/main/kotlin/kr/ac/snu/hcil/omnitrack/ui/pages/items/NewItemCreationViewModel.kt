@@ -1,7 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.items
 
+import android.app.Application
 import io.reactivex.Maybe
 import io.reactivex.Single
+import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
@@ -10,17 +12,25 @@ import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemBuilderFieldValueEntry
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.utils.ValueWithTimestamp
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
+import javax.inject.Inject
+import javax.inject.Provider
 
 /**
  * Created by Young-Ho on 10/9/2017.
  */
-class NewItemCreationViewModel : ItemEditionViewModelBase() {
+class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app) {
 
     private lateinit var itemBuilderDao: OTItemBuilderDAO
     private lateinit var builderWrapper: OTItemBuilderWrapperBase
 
+    @Inject lateinit var realmProvider: Provider<Realm>
+
+    init {
+        getApplication<OTApp>().applicationComponent.inject(this)
+    }
+
     override fun onInit(trackerDao: OTTrackerDAO, itemId: String?): Pair<ItemMode, BuilderCreationMode?>? {
-        val builderDaoResult = OTApp.instance.databaseManager.getItemBuilderQuery(trackerDao.objectId!!, OTItemBuilderDAO.HOLDER_TYPE_INPUT_FORM, realm).findFirst()
+        val builderDaoResult = dbManager.get().getItemBuilderQuery(trackerDao.objectId!!, OTItemBuilderDAO.HOLDER_TYPE_INPUT_FORM, realm).findFirst()
 
         if (builderDaoResult != null) {
             //there is a pending itemBuilder.
@@ -58,7 +68,7 @@ class NewItemCreationViewModel : ItemEditionViewModelBase() {
     override fun startAutoComplete() {
         isBusy = true
         subscriptions.add(
-                this.builderWrapper.makeAutoCompleteObservable(this).subscribe({ (attrLocalId, valueWithTimestamp) ->
+                this.builderWrapper.makeAutoCompleteObservable(realmProvider, this).subscribe({ (attrLocalId, valueWithTimestamp) ->
                     setValueOfAttribute(attrLocalId, valueWithTimestamp)
                 }, {
 
@@ -124,7 +134,7 @@ class NewItemCreationViewModel : ItemEditionViewModelBase() {
                 refreshDaoValues()
                 val item = builderWrapper.saveToItem(null, ItemLoggingSource.Manual)
 
-                return@flatMapMaybe Maybe.fromSingle<String>(OTApp.instance.databaseManager.saveItemObservable(item, false, null, realm).map { it.second })
+                return@flatMapMaybe Maybe.fromSingle<String>(dbManager.get().saveItemObservable(item, false, null, realm).map { it.second })
             }
         } else return Maybe.just(null)
     }

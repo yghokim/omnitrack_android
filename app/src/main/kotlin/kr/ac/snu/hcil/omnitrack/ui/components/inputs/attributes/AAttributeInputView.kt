@@ -113,7 +113,7 @@ abstract class AAttributeInputView<DataType>(layoutId: Int, context: Context, at
     override fun onLowMemory() {
     }
 
-    protected open fun onAttributeBound(attributeId: String) {
+    protected open fun onAttributeBound(attributeObjectId: String) {
 
     }
 

@@ -19,8 +19,14 @@ import kr.ac.snu.hcil.omnitrack.core.ExperimentConsentManager
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
+import javax.inject.Inject
 
 class SignInActivity : AppCompatActivity() {
+
+    @Inject
+    protected lateinit var authManager: OTAuthManager
+    @Inject
+    protected lateinit var consentManager: ExperimentConsentManager
 
     /** The Google OnClick listener, since we must override it to get permissions on Marshmallow and above.  */
     private var googleOnClickListener: View.OnClickListener? = null
@@ -32,13 +38,15 @@ class SignInActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        (application as OTApp).applicationComponent.inject(this)
+
         setContentView(R.layout.activity_sign_in)
 
         googleLoginButton = findViewById(R.id.g_login_button)
         loginInProgressIndicator = findViewById(R.id.ui_loading_indicator)
 
         // Initialize sign-in buttons.
-        googleOnClickListener = OTAuthManager.initializeSignInButton(googleLoginButton, SignInResultsHandler())
+        googleOnClickListener = authManager.initializeSignInButton(googleLoginButton, SignInResultsHandler())
 
         if (googleOnClickListener != null) {
             // if the onClick listener was null, initializeSignInButton will have removed the view.
@@ -104,8 +112,8 @@ class SignInActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        OTAuthManager.handleActivityResult(requestCode, resultCode, data)
-        ExperimentConsentManager.handleActivityResult(true, requestCode, resultCode, data)
+        authManager.handleActivityResult(requestCode, resultCode, data)
+        consentManager.handleActivityResult(true, requestCode, resultCode, data)
     }
 
     private fun goHomeActivity() {
@@ -118,7 +126,7 @@ class SignInActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        ExperimentConsentManager.finishProcess()
+        consentManager.finishProcess()
         creationSubscription.clear()
     }
 
@@ -136,7 +144,7 @@ class SignInActivity : AppCompatActivity() {
 
             Toast.makeText(this@SignInActivity, String.format(getString(R.string.msg_sign_in_google_succeeded)), Toast.LENGTH_LONG).show()
 
-            ExperimentConsentManager.startProcess(this@SignInActivity, OTAuthManager.userId!!, object : ExperimentConsentManager.ResultListener {
+            consentManager.startProcess(this@SignInActivity, authManager.userId!!, object : ExperimentConsentManager.ResultListener {
                 override fun onConsentApproved() {
                     goHomeActivity()
                 }

@@ -14,7 +14,7 @@ import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager.VIEW_FOR_ITEM_LIST_CONTAINER_TYPE_MULTILINE
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager.Companion.VIEW_FOR_ITEM_LIST_CONTAINER_TYPE_MULTILINE
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
@@ -54,7 +54,7 @@ class OTImageAttributeHelper : OTFileInvolvedAttributeHelper() {
 
     override fun refreshInputViewUI(inputView: AAttributeInputView<out Any>, attribute: OTAttributeDAO) {
         if (inputView is ImageInputView) {
-            OTApp.instance.databaseManager.getUnManagedTrackerDao(attribute.trackerId, null)?.let {
+            databaseManager.get().getUnManagedTrackerDao(attribute.trackerId, null)?.let {
                 inputView.picker.overrideLocalUriFolderPath = it.getItemCacheDir(inputView.context, true)
             }
         }
@@ -105,7 +105,7 @@ class OTImageAttributeHelper : OTFileInvolvedAttributeHelper() {
 
                                 view.currentMode = PlaceHolderImageView.Mode.LOADING
                                 //OTApp.instance.storageHelper.downloadFileTo(value.serverUri.toString(), value.localUri).onErrorReturn{Uri.EMPTY}
-                                return OTApp.instance.storageHelper.downloadFileTo(value.serverUri.toString(), value.localUri).doOnError { error ->
+                                return this.binaryDownloadApi.get().downloadFileTo(value.serverUri.toString(), value.localUri).doOnError { error ->
                                     error.printStackTrace()
                                     view.currentMode = PlaceHolderImageView.Mode.EMPTY
                                 }

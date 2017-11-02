@@ -10,15 +10,21 @@ import android.preference.ListPreference
 import android.preference.Preference
 import android.preference.PreferenceFragment
 import android.widget.Toast
+import dagger.Lazy
 import io.reactivex.disposables.CompositeDisposable
+import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckService
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.utils.LocaleHelper
+import org.jetbrains.anko.act
+import javax.inject.Inject
+import javax.inject.Provider
 
 
 /**
@@ -70,6 +76,15 @@ class SettingsActivity : MultiButtonActionBarActivity(R.layout.activity_multibut
 
     class SettingsFragment : PreferenceFragment(), SharedPreferences.OnSharedPreferenceChangeListener, Preference.OnPreferenceChangeListener {
 
+        @Inject
+        protected lateinit var currentSignedInLevel: Provider<OTAuthManager.SignedInLevel>
+
+        @Inject
+        protected lateinit var dbManager: Lazy<RealmDatabaseManager>
+
+        @Inject
+        protected lateinit var realmProvider: Provider<Realm>
+
         private var languageOnCreation: String? = null
 
         private val creationSubscriptions = CompositeDisposable()
@@ -106,6 +121,7 @@ class SettingsActivity : MultiButtonActionBarActivity(R.layout.activity_multibut
         override fun onActivityCreated(savedInstanceState: Bundle?) {
             super.onActivityCreated(savedInstanceState)
 
+            (act.application as OTApp).applicationComponent.inject(this)
             languageOnCreation = LocaleHelper.getLanguageCode(activity)
         }
 
@@ -163,14 +179,14 @@ class SettingsActivity : MultiButtonActionBarActivity(R.layout.activity_multibut
                 "pref_show_shortcut_panel" -> {
                     if (sharedPreferences.getBoolean(key, true)) {
                         //show if logged in
-                        if (OTAuthManager.currentSignedInLevel > OTAuthManager.SignedInLevel.NONE) {
+                        if (currentSignedInLevel.get() > OTAuthManager.SignedInLevel.NONE) {
                             val activity = activity
                             if (activity is OTActivity) {
-                                val realm = OTApp.instance.databaseManager.getRealmInstance()
+                                val realm = realmProvider.get()
 
                                 creationSubscriptions.add(
                                         activity.signedInUserObservable.concatMap { userId ->
-                                            OTApp.instance.databaseManager.makeShortcutPanelRefreshObservable(userId, realm).toObservable()
+                                            dbManager.get().makeShortcutPanelRefreshObservable(userId, realm).toObservable()
                                         }
                                                 .firstElement().subscribe { realm.close() })
                             } else {

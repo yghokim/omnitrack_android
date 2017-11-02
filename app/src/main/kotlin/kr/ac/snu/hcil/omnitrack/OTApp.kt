@@ -7,39 +7,29 @@ import android.content.res.Resources
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
-import android.os.Looper
 import android.os.SystemClock
 import android.preference.PreferenceManager
 import android.provider.Settings
 import android.support.multidex.MultiDex
 import android.support.multidex.MultiDexApplication
 import android.support.v7.app.AppCompatDelegate
-import com.google.firebase.iid.FirebaseInstanceId
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.squareup.leakcanary.LeakCanary
-import io.reactivex.Single
 import io.realm.Realm
-import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.database.FirebaseStorageHelper
+import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
-import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
-import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
-import kr.ac.snu.hcil.omnitrack.core.database.synchronization.OTSyncManager
+import kr.ac.snu.hcil.omnitrack.core.di.*
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
-import kr.ac.snu.hcil.omnitrack.core.net.ABinaryUploadService
-import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationServerSideAPI
-import kr.ac.snu.hcil.omnitrack.core.net.IUserReportServerAPI
-import kr.ac.snu.hcil.omnitrack.core.net.OTOfficialServerApiController
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTriggerAlarmManager
-import kr.ac.snu.hcil.omnitrack.services.OTFirebaseUploadService
 import kr.ac.snu.hcil.omnitrack.utils.LocaleHelper
 import org.jetbrains.anko.telephonyManager
 import rx_activity_result2.RxActivityResult
 import java.nio.charset.Charset
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
+import javax.inject.Inject
 
 /**
  * Created by Young-Ho Kim on 2016-07-11.
@@ -149,13 +139,18 @@ class OTApp : MultiDexApplication() {
             if (!androidUUID.isNullOrBlank()) {
                 deviceUUID = UUID.nameUUIDFromBytes(androidUUID.toByteArray(Charset.forName("utf8")))
             } else {
-                val phoneUUID = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    this.telephonyManager.imei
-                } else this.telephonyManager.deviceId
-                if (!phoneUUID.isNullOrBlank()) {
-                    deviceUUID = UUID.nameUUIDFromBytes(phoneUUID.toByteArray(Charset.forName("utf8")))
-                } else {
-                    deviceUUID = UUID.randomUUID()
+                try {
+                    val phoneUUID = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        this.telephonyManager.imei
+                    } else this.telephonyManager.deviceId
+
+                    if (!phoneUUID.isNullOrBlank()) {
+                        deviceUUID = UUID.nameUUIDFromBytes(phoneUUID.toByteArray(Charset.forName("utf8")))
+                    } else {
+                        deviceUUID = UUID.randomUUID()
+                    }
+                } catch (ex: SecurityException) {
+                    throw ex
                 }
             }
         }
@@ -174,29 +169,18 @@ class OTApp : MultiDexApplication() {
 
     private var wrappedContext: Context? = null
 
+    //Dependency Injection
+    val applicationComponent: ApplicationComponent by lazy {
+        DaggerApplicationComponent.builder()
+                .applicationModule(ApplicationModule(this))
+                .omniTrackModule(OmniTrackModule(this))
+                .build()
+    }
 
-    lateinit var syncManager: OTSyncManager
-        private set
-
-
-    val databaseManager: RealmDatabaseManager = RealmDatabaseManager()
-
-    //Modules=======================================================
-
-    lateinit var storageHelper: FirebaseStorageHelper
-        private set
-
-    lateinit var binaryUploadServiceController: ABinaryUploadService.ABinaryUploadServiceController
-        private set
-
-    lateinit var synchronizationServerController: ISynchronizationServerSideAPI
-        private set
-
-
-    lateinit var userReportServerController: IUserReportServerAPI
-        private set
-
-    //Modules end===================================================
+    val daoSerializationComponent: DaoSerializationComponent by lazy {
+        applicationComponent.makeDaoSerializationComponentBuilder()
+                .setModule(DaoSerializationModule()).build()
+    }
 
     val colorPalette: IntArray by lazy {
         this.resources.getStringArray(R.array.colorPaletteArray).map { Color.parseColor(it) }.toIntArray()
@@ -208,8 +192,6 @@ class OTApp : MultiDexApplication() {
 
     lateinit var timeTriggerAlarmManager: OTTimeTriggerAlarmManager
         private set
-
-    private lateinit var userLoadingLooper: Looper
 
     override fun attachBaseContext(base: Context) {
         LocaleHelper.init(base)
@@ -230,8 +212,7 @@ class OTApp : MultiDexApplication() {
 
     override fun onCreate() {
         super.onCreate()
-        instance = this
-        println("set application instance.")
+        val startedAt = SystemClock.elapsedRealtime()
 
         AndroidThreeTen.init(this)
         RxActivityResult.register(this)
@@ -244,23 +225,20 @@ class OTApp : MultiDexApplication() {
             LeakCanary.install(this)
         }
 
-        val startedAt = SystemClock.elapsedRealtime()
+        applicationComponent.inject(this)
+        applicationComponent.inject(OTAttributeManager.Companion)
+
+
+        instance = this
+        println("set application instance.")
+
 
         //initialize modules===============================================
-
-        this.binaryUploadServiceController = OTFirebaseUploadService.ServiceController(this)
-        val backend = OTOfficialServerApiController()
-        this.synchronizationServerController = backend
-        this.userReportServerController = backend
 
         logger = LoggingDbHelper(this)
         logger.writeSystemLog("Application creates.", "OTApp")
 
-        storageHelper = FirebaseStorageHelper(this)
-        storageHelper.restartUploadTask()
         //=================================================================
-        syncManager = OTSyncManager(this, synchronizationServerController)
-
         timeTriggerAlarmManager = OTTimeTriggerAlarmManager()
 
         OTExternalService.init()
@@ -304,7 +282,8 @@ class OTApp : MultiDexApplication() {
             }
         })
 
-        startService(this.binaryUploadServiceController.makeResumeUploadIntent())
+        //TODO start service in job controller
+        //startService(this.binaryUploadServiceController.makeResumeUploadIntent())
 
 
         //OTVersionCheckService.setupServiceAlarm(this)
@@ -322,29 +301,6 @@ class OTApp : MultiDexApplication() {
 
         logger.writeSystemLog("App terminates.", "Application")
 
-    }
-
-    fun refreshInstanceIdToServerIfExists(ignoreIfStored: Boolean): Single<Boolean> {
-        if (ignoreIfStored) {
-            if (OTApp.instance.systemSharedPreferences.contains(OTApp.PREFERENCE_KEY_FIREBASE_INSTANCE_ID)) {
-                return Single.just(false)
-            }
-        }
-
-        val token = FirebaseInstanceId.getInstance().token
-        if (token != null && OTAuthManager.currentSignedInLevel > OTAuthManager.SignedInLevel.NONE) {
-            OTApp.instance.systemSharedPreferences.edit().putString(OTApp.PREFERENCE_KEY_FIREBASE_INSTANCE_ID, token)
-                    .apply()
-            return synchronizationServerController.putDeviceInfo(OTDeviceInfo()).map { deviceInfoResult ->
-                val localKey = deviceInfoResult.deviceLocalKey
-                if (localKey != null) {
-                    OTAuthManager.userDeviceLocalKey = localKey
-                    return@map true
-                } else return@map false
-            }
-        } else {
-            return Single.just(false)
-        }
     }
 
 /*    private fun createUsabilityTestingTrackers(user: OTUser) {

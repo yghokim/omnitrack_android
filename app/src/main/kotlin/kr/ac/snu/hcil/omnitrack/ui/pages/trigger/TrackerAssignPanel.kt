@@ -19,11 +19,14 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.TrackerPickerDialogBuilder
 import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.utils.dipRound
 import kr.ac.snu.hcil.omnitrack.utils.getActivity
 import java.util.*
+import javax.inject.Inject
+import javax.inject.Provider
 
 /**
  * Created by Young-Ho on 9/2/2016.
@@ -36,10 +39,22 @@ class TrackerAssignPanel : RecyclerView {
 
     private var realm: Realm? = null
 
+    @Inject
+    lateinit var realmProvider: Provider<Realm>
+    @Inject
+    lateinit var dbManager: RealmDatabaseManager
+    @Inject
+    lateinit var authManager: OTAuthManager
+
     private val elementAdapter = AssignElementAdapter()
 
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attributeSet: AttributeSet?) : super(context, attributeSet)
+
+    override fun onFinishInflate() {
+        super.onFinishInflate()
+        (context.applicationContext as OTApp).applicationComponent.inject(this)
+    }
 
     private val subscriptions = CompositeDisposable()
 
@@ -80,7 +95,7 @@ class TrackerAssignPanel : RecyclerView {
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        realm = OTApp.instance.databaseManager.getRealmInstance()
+        realm = realmProvider.get()
     }
 
     private fun notifyTrackerListChanged() {
@@ -90,7 +105,7 @@ class TrackerAssignPanel : RecyclerView {
     private fun onAttachButtonClicked() {
         realm?.let {
             subscriptions.add(
-                    OTApp.instance.databaseManager.makeTrackersOfUserQuery(OTAuthManager.userId!!, it).findAllAsync()
+                    dbManager.makeTrackersOfUserQuery(authManager.userId!!, it).findAllAsync()
                             .asFlowable().filter { it.isLoaded && it.isValid }.firstOrError().subscribe { snapshot ->
                         val dialog = TrackerPickerDialogBuilder(snapshot.map { it.getSimpleInfo() }).createDialog(getActivity()!!, trackers.mapNotNull { it.objectId }.toTypedArray()) { trackerId ->
                             snapshot.find { it.objectId == trackerId }?.getSimpleInfo()?.let {

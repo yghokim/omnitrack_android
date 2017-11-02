@@ -294,8 +294,9 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
         //trackerAdded.onNext(ReadOnlyPair(new, index))
 
         println("tracker was added")
-        if (!suspendDatabaseSync)
-            OTApp.instance.databaseManager.saveTracker(new, index)
+        if (!suspendDatabaseSync) {
+            //OTApp.instance.databaseManager.saveTracker(new, index)
+        }
     }
 
     private fun onTrackerRemoved(tracker: OTTracker, index: Int) {
@@ -311,8 +312,9 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
         println("tracker was removed.")
         tracker.suspendDatabaseSync = false
 
-        if (!suspendDatabaseSync)
-            OTApp.instance.databaseManager.removeTracker(tracker, this, true)
+        if (!suspendDatabaseSync) {
+            //OTApp.instance.databaseManager.removeTracker(tracker, this, true)
+        }
     }
 
     fun findAttributeByObjectId(trackerId: String, attributeId: String): OTAttribute<out Any>? {

@@ -6,14 +6,21 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.BehaviorSubject
 import io.realm.Realm
+import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.IChartInterface
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
+import javax.inject.Inject
 
 /**
  * Created by younghokim on 16. 9. 7..
  */
 abstract class ChartModel<T>(val realm: Realm) : IChartInterface<T> {
+
+    @Inject
+    protected lateinit var dbManager: RealmDatabaseManager
+
     override fun getDataPointAt(position: Int): T {
         return cachedData[position]
     }

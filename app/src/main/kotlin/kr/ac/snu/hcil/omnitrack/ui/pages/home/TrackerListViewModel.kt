@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.home
 
+import android.app.Application
 import io.reactivex.Flowable
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
@@ -19,9 +20,8 @@ import java.util.*
  * Created by younghokim on 2017-05-30.
  */
 
-class TrackerListViewModel : UserAttachedViewModel(), OrderedRealmCollectionChangeListener<RealmResults<OTTrackerDAO>> {
+class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), OrderedRealmCollectionChangeListener<RealmResults<OTTrackerDAO>> {
 
-    private val realm = OTApp.instance.databaseManager.getRealmInstance()
     private var trackersRealmResults: RealmResults<OTTrackerDAO>? = null
 
     private var trackerViewModelListSubject: BehaviorSubject<List<TrackerInformationViewModel>> = BehaviorSubject.create()
@@ -31,15 +31,13 @@ class TrackerListViewModel : UserAttachedViewModel(), OrderedRealmCollectionChan
     val trackerViewModels: Observable<List<TrackerInformationViewModel>>
         get() = trackerViewModelListSubject
 
-    private val subscriptions = CompositeDisposable()
-
     override fun onChange(snapshot: RealmResults<OTTrackerDAO>, changeSet: OrderedCollectionChangeSet?) {
         if (snapshot.isLoaded && snapshot.isValid) {
             if (changeSet == null) {
                 println("Viewmodel first time limit")
                 //first time emit
                 clearTrackerViewModelList()
-                val viewModels = snapshot.map { TrackerInformationViewModel(it, realm) }
+                val viewModels = snapshot.map { TrackerInformationViewModel(it, realm, dbManager.get()) }
                 currentTrackerViewModelList.addAll(viewModels)
 
                 trackerViewModelListSubject.onNext(
@@ -54,7 +52,7 @@ class TrackerListViewModel : UserAttachedViewModel(), OrderedRealmCollectionChan
 
                 //deal with additions
                 changeSet.insertions.forEach { index ->
-                    currentTrackerViewModelList.add(index, TrackerInformationViewModel(snapshot[index]!!, realm))
+                    currentTrackerViewModelList.add(index, TrackerInformationViewModel(snapshot[index]!!, realm, dbManager.get()))
                 }
 
                 trackerViewModelListSubject.onNext(
@@ -72,22 +70,20 @@ class TrackerListViewModel : UserAttachedViewModel(), OrderedRealmCollectionChan
         super.onUserAttached(newUserId)
         trackersRealmResults?.removeAllChangeListeners()
         clearTrackerViewModelList()
-        trackersRealmResults = OTApp.instance.databaseManager.makeTrackersOfUserQuery(newUserId, realm).findAllSortedAsync(arrayOf("position", RealmDatabaseManager.FIELD_USER_CREATED_AT), arrayOf(Sort.ASCENDING, Sort.DESCENDING))
+        trackersRealmResults = dbManager.get().makeTrackersOfUserQuery(newUserId, realm).findAllSortedAsync(arrayOf("position", RealmDatabaseManager.FIELD_USER_CREATED_AT), arrayOf(Sort.ASCENDING, Sort.DESCENDING))
         trackersRealmResults?.addChangeListener(this)
 
-        subscriptions.add(OTApp.instance.databaseManager.makeShortcutPanelRefreshObservable(newUserId, realm).subscribe())
+        subscriptions.add(dbManager.get().makeShortcutPanelRefreshObservable(newUserId, realm).subscribe())
     }
 
     override fun onCleared() {
-        super.onCleared()
         trackersRealmResults?.removeAllChangeListeners()
-        realm.close()
+        super.onCleared()
     }
 
     override fun onUserDisposed() {
         super.onUserDisposed()
         clearTrackerViewModelList()
-        subscriptions.clear()
     }
 
     private fun clearTrackerViewModelList() {
@@ -101,12 +97,12 @@ class TrackerListViewModel : UserAttachedViewModel(), OrderedRealmCollectionChan
     fun removeTracker(model: TrackerInformationViewModel) {
         if (!realm.isInTransaction) {
             realm.executeTransaction {
-                OTApp.instance.databaseManager.removeTracker(model.trackerDao, false, realm)
+                dbManager.get().removeTracker(model.trackerDao, false, realm)
             }
         }
     }
 
-    class TrackerInformationViewModel(val trackerDao: OTTrackerDAO, val realm: Realm) : IReadonlyObjectId, RealmChangeListener<OTTrackerDAO> {
+    class TrackerInformationViewModel(val trackerDao: OTTrackerDAO, val realm: Realm, dbManager: RealmDatabaseManager) : IReadonlyObjectId, RealmChangeListener<OTTrackerDAO> {
         override val objectId: String?
             get() = trackerDao.objectId
 
@@ -132,9 +128,9 @@ class TrackerListViewModel : UserAttachedViewModel(), OrderedRealmCollectionChan
 
         val trackerEditable: BehaviorSubject<Boolean> = BehaviorSubject.create()
 
-        val attributesResult: RealmResults<OTAttributeDAO> = OTApp.instance.databaseManager.getAttributeListQuery(trackerDao.objectId!!, realm).findAllAsync()
-        val trackerItemsResult: RealmResults<OTItemDAO> = OTApp.instance.databaseManager.makeItemsQuery(trackerDao.objectId, null, null, realm).findAllAsync()
-        val todayItemsResult: RealmResults<OTItemDAO> = OTApp.instance.databaseManager.makeItemsQueryOfToday(trackerDao.objectId, realm).findAllAsync()
+        val attributesResult: RealmResults<OTAttributeDAO> = dbManager.getAttributeListQuery(trackerDao.objectId!!, realm).findAllAsync()
+        val trackerItemsResult: RealmResults<OTItemDAO> = dbManager.makeItemsQuery(trackerDao.objectId, null, null, realm).findAllAsync()
+        val todayItemsResult: RealmResults<OTItemDAO> = dbManager.makeItemsQueryOfToday(trackerDao.objectId, realm).findAllAsync()
 
         private val currentAttributeValidationResultDict = Hashtable<String, Pair<Boolean, CharSequence?>>()
 

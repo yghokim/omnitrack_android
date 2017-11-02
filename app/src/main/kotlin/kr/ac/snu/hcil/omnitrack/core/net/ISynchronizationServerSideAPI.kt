@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.net
 
+import android.net.Uri
 import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTItemPOJO
