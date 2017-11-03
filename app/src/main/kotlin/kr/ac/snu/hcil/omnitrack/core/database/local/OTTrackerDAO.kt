@@ -3,11 +3,6 @@ package kr.ac.snu.hcil.omnitrack.core.database.local
 import android.app.Activity
 import android.content.Context
 import android.support.annotation.ColorInt
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
-import com.google.gson.TypeAdapter
-import com.google.gson.stream.JsonReader
-import com.google.gson.stream.JsonWriter
 import com.tbruyelle.rxpermissions2.RxPermissions
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -18,7 +13,6 @@ import io.realm.annotations.PrimaryKey
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
-import kr.ac.snu.hcil.omnitrack.core.database.local.typeadapters.AttributeTypeAdapter
 import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import java.io.File
@@ -235,9 +229,5 @@ open class OTAttributeDAO : RealmObject() {
         const val DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE = 1
         const val DEFAULT_VALUE_POLICY_FILL_WITH_PRESET = 2
         const val DEFAULT_VALUE_POLICY_FILL_WITH_LAST_ITEM = 3
-
-        val parser: Gson by lazy {
-            GsonBuilder().registerTypeAdapter(OTAttributeDAO::class.java, AttributeTypeAdapter()).create()
-        }
     }
 }

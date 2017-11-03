@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.support.v7.app.AppCompatActivity
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
@@ -14,7 +15,7 @@ import javax.inject.Singleton
  * Created by Young-Ho Kim on 2017-01-31.
  */
 @Singleton
-class ExperimentConsentManager @Inject constructor(val authManager: OTAuthManager, val synchronizationServerController: ISynchronizationServerSideAPI) {
+class ExperimentConsentManager @Inject constructor(val authManager: OTAuthManager, val systemPreferences: SharedPreferences, val synchronizationServerController: ISynchronizationServerSideAPI) {
 
     companion object {
         const val REQUEST_CODE_EXPERIMENT_SIGN_IN = 6550
@@ -34,7 +35,7 @@ class ExperimentConsentManager @Inject constructor(val authManager: OTAuthManage
         mActivity = activity
         mResultListener = resultListener
 
-        if (OTApp.instance.systemSharedPreferences.getBoolean(OTUser.PREFERENCES_KEY_CONSENT_APPROVED, false)) {
+        if (systemPreferences.getBoolean(OTUser.PREFERENCES_KEY_CONSENT_APPROVED, false)) {
             mResultListener?.onConsentApproved()
             finishProcess()
         } else {
@@ -82,7 +83,7 @@ class ExperimentConsentManager @Inject constructor(val authManager: OTAuthManage
     }
 
     private fun onApproved() {
-        OTApp.instance.systemSharedPreferences.edit().putBoolean(OTUser.PREFERENCES_KEY_CONSENT_APPROVED, true).apply()
+        systemPreferences.edit().putBoolean(OTUser.PREFERENCES_KEY_CONSENT_APPROVED, true).apply()
         mResultListener?.onConsentApproved()
     }
 

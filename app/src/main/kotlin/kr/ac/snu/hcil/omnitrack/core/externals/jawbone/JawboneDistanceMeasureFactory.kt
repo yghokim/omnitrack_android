@@ -1,13 +1,13 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.jawbone
 
 import com.google.gson.JsonObject
+import com.google.gson.stream.JsonReader
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
-import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableTypedQueue
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 
 /**
@@ -33,8 +33,16 @@ object JawboneDistanceMeasureFactory : OTMeasureFactory("dist") {
         return JawboneDistanceMeasure()
     }
 
+    override fun makeMeasure(reader: JsonReader): OTMeasure {
+        return JawboneDistanceMeasure()
+    }
+
     override fun makeMeasure(serialized: String): OTMeasure {
-        return JawboneDistanceMeasure(serialized)
+        return JawboneDistanceMeasure()
+    }
+
+    override fun serializeMeasure(measure: OTMeasure): String {
+        return "{}"
     }
 
     override fun getService(): OTExternalService {
@@ -44,7 +52,7 @@ object JawboneDistanceMeasureFactory : OTMeasureFactory("dist") {
     override val descResourceId: Int = R.string.measure_jawbone_distance_desc
     override val nameResourceId: Int = R.string.measure_jawbone_distance_name
 
-    class JawboneDistanceMeasure : AJawboneMoveMeasure {
+    class JawboneDistanceMeasure : AJawboneMoveMeasure() {
 
         override fun extractValueFromItem(item: JsonObject): Float {
             return item.getAsJsonObject("details").get("distance").asFloat
@@ -53,15 +61,6 @@ object JawboneDistanceMeasureFactory : OTMeasureFactory("dist") {
         override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_FLOAT
 
         override val factory: OTMeasureFactory = JawboneDistanceMeasureFactory
-
-        constructor() : super()
-        constructor(serialized: String) : super(serialized)
-
-        override fun onSerialize(typedQueue: SerializableTypedQueue) {
-        }
-
-        override fun onDeserialize(typedQueue: SerializableTypedQueue) {
-        }
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true

@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.di
 
+import android.content.SharedPreferences
 import dagger.Component
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
@@ -46,7 +47,10 @@ import javax.inject.Singleton
         InformationHelpersModule::class))
 interface ApplicationComponent {
 
+    fun defaultPreferences(): SharedPreferences
+
     fun makeDaoSerializationComponentBuilder(): DaoSerializationComponent.Builder
+    fun makeScheduledJobComponentBuilder(): ScheduledJobComponent.Builder
 
     fun inject(application: OTApp)
     fun inject(realmViewModel: RealmViewModel)
@@ -73,8 +77,6 @@ interface ApplicationComponent {
     fun inject(fragment: TrackerListFragment)
 
     fun inject(viewModel: ManagedReminderListViewModel)
-
-    fun inject(fragment: SettingsActivity.SettingsFragment)
 
     fun inject(service: OTFirebaseInstanceIdService)
 

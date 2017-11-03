@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.misfit
 
+import com.google.gson.stream.JsonReader
 import io.reactivex.Flowable
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
@@ -8,7 +9,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
-import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableTypedQueue
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import java.util.*
 
@@ -41,22 +41,27 @@ object MisfitStepMeasureFactory : OTMeasureFactory("step") {
         return MisfitStepMeasure()
     }
 
+    override fun makeMeasure(reader: JsonReader): OTMeasure {
+        return MisfitStepMeasure()
+    }
+
     override fun makeMeasure(serialized: String): OTMeasure {
-        return MisfitStepMeasure(serialized)
+        return MisfitStepMeasure()
+    }
+
+    override fun serializeMeasure(measure: OTMeasure): String {
+        return "{}"
     }
 
     override val nameResourceId: Int = R.string.measure_steps_name
     override val descResourceId: Int = R.string.measure_steps_desc
 
 
-    class MisfitStepMeasure : OTRangeQueriedMeasure {
+    class MisfitStepMeasure : OTRangeQueriedMeasure() {
 
         override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_INT
 
         override val factory: OTMeasureFactory = MisfitStepMeasureFactory
-
-        constructor() : super()
-        constructor(serialized: String) : super(serialized)
 
         override fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>> {
             return Flowable.defer {
@@ -67,12 +72,6 @@ object MisfitStepMeasureFactory : OTMeasureFactory("step") {
                     return@defer Flowable.error<Nullable<out Any>>(Exception("no token"))
                 }
             }
-        }
-
-        override fun onSerialize(typedQueue: SerializableTypedQueue) {
-        }
-
-        override fun onDeserialize(typedQueue: SerializableTypedQueue) {
         }
 
         override fun equals(other: Any?): Boolean {

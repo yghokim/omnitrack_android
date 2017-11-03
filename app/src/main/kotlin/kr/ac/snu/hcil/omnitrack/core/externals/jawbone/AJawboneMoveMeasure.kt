@@ -18,10 +18,7 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 2017-01-25.
  */
-abstract class AJawboneMoveMeasure : OTMeasureFactory.OTRangeQueriedMeasure {
-
-    constructor() : super()
-    constructor(serialized: String) : super(serialized)
+abstract class AJawboneMoveMeasure : OTMeasureFactory.OTRangeQueriedMeasure() {
 
     override fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>> {
         if (TimeHelper.isSameDay(start, end - 10)) {

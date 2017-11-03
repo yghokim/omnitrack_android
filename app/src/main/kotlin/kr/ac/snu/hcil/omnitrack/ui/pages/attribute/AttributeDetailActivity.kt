@@ -66,7 +66,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
             val applyToDb = intent.getBooleanExtra(INTENT_EXTRA_APPLY_TO_DB, false)
 
             if (!serializedAttributeDao.isNullOrBlank()) {
-                val attributeDao = OTAttributeDAO.parser.fromJson(serializedAttributeDao, OTAttributeDAO::class.java)
+                val attributeDao = (application as OTApp).daoSerializationComponent.manager().get().parseAttribute(serializedAttributeDao)
                 viewModel.init(attributeDao)
             }
         }
@@ -356,7 +356,9 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
     private fun saveChanges() {
         viewModel.applyChanges()
-        setResult(Activity.RESULT_OK, Intent().putExtra(INTENT_EXTRA_SERIALIZED_ATTRIBUTE_DAO, OTAttributeDAO.parser.toJson(viewModel.attributeDAO, OTAttributeDAO::class.java)))
+        viewModel.attributeDAO?.let {
+            setResult(Activity.RESULT_OK, Intent().putExtra(INTENT_EXTRA_SERIALIZED_ATTRIBUTE_DAO, (application as OTApp).daoSerializationComponent.manager().get().serializeAttribute(it)))
+        }
     }
 
     /*

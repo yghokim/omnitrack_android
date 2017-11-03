@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.auth
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.ApplicationInfo
 import android.net.Uri
 import android.support.v7.app.AppCompatActivity
@@ -30,7 +31,7 @@ import kr.ac.snu.hcil.omnitrack.utils.getActivity
 /**
  * Created by Young-Ho Kim on 2017-02-03.
  */
-class OTAuthManager(val app: OTApp, val synchronizationServerController: Lazy<ISynchronizationServerSideAPI>) {
+class OTAuthManager(val app: OTApp, val sharedPreferences: SharedPreferences, val synchronizationServerController: Lazy<ISynchronizationServerSideAPI>) {
 
     companion object {
         const val LOG_TAG = "OMNITRACK Auth Manager"
@@ -149,13 +150,13 @@ class OTAuthManager(val app: OTApp, val synchronizationServerController: Lazy<IS
     val userId: String? get() = mFirebaseAuth.currentUser?.uid
 
     var userDeviceLocalKey: String?
-        get() = OTApp.instance.systemSharedPreferences.getString(OTApp.PREFERENCE_KEY_DEVICE_LOCAL_KEY, null)
+        get() = sharedPreferences.getString(OTApp.PREFERENCE_KEY_DEVICE_LOCAL_KEY, null)
         set(value) {
             println("set device local key: ${value}")
             if (value != null) {
-                OTApp.instance.systemSharedPreferences.edit().putString(OTApp.PREFERENCE_KEY_DEVICE_LOCAL_KEY, value).apply()
+                sharedPreferences.edit().putString(OTApp.PREFERENCE_KEY_DEVICE_LOCAL_KEY, value).apply()
             } else {
-                OTApp.instance.systemSharedPreferences.edit().remove(OTApp.PREFERENCE_KEY_DEVICE_LOCAL_KEY).apply()
+                sharedPreferences.edit().remove(OTApp.PREFERENCE_KEY_DEVICE_LOCAL_KEY).apply()
             }
         }
 

@@ -6,65 +6,81 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.Uri
+import dagger.Lazy
 import android.os.IBinder
 import android.preference.PreferenceManager
 import android.support.v4.app.NotificationCompat
 import android.support.v4.content.ContextCompat
 import android.util.Log
+import com.firebase.jobdispatcher.FirebaseJobDispatcher
+import com.firebase.jobdispatcher.Job
+import com.firebase.jobdispatcher.JobParameters
+import com.firebase.jobdispatcher.JobService
 import io.reactivex.disposables.Disposables
 import io.reactivex.disposables.SerialDisposable
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.RemoteConfigManager
+import kr.ac.snu.hcil.omnitrack.core.di.ApplicationScope
+import kr.ac.snu.hcil.omnitrack.core.di.VersionCheck
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
 import kr.ac.snu.hcil.omnitrack.utils.VectorIconHelper
 import org.jetbrains.anko.notificationManager
+import javax.inject.Inject
 
 /**
  * Created by younghokim on 2017. 4. 15..
  */
-class OTVersionCheckService : Service() {
+class OTVersionCheckService : JobService() {
+
 
     companion object {
         const val TAG = "VersionCheckService"
-
         const val REQUEST_CODE = 20
-
+        const val PREF_CHECK_UPDATES = "pref_check_updates"
         const val PREF_LAST_NOTIFIED_VERSION = "last_notified_version"
+    }
 
-        private val checkSubscription = SerialDisposable()
+    @ApplicationScope
+    class Controller @Inject constructor(val pref: Lazy<SharedPreferences>, val dispatcher: Lazy<FirebaseJobDispatcher>, @VersionCheck val job: Lazy<Job>){
 
-        fun setupServiceAlarm(context: Context) {
-            val serviceIntent = Intent(context, OTVersionCheckService::class.java)
-            val pendingIntent = PendingIntent.getService(context, REQUEST_CODE, serviceIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+        val versionCheckSwitchTurnedOn: Boolean
+            get() = pref.get().getBoolean(PREF_CHECK_UPDATES, false)
 
-            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        fun turnOnService(){
+            dispatcher.get().schedule(job.get())
+        }
 
-            if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("pref_check_updates", false)) {
-                alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, 1000, 7200 * 1000, pendingIntent)
-            } else {
-                alarmManager.cancel(pendingIntent)
-                context.stopService(serviceIntent)
-            }
+        fun turnOffService(){
+            dispatcher.get().cancel(TAG)
         }
     }
 
-    override fun onBind(intent: Intent?): IBinder? {
-        return null
+
+    private val checkSubscription = SerialDisposable()
+
+    @Inject
+    lateinit var systemPreferences: SharedPreferences
+
+    override fun onCreate() {
+        super.onCreate()
+        (application as OTApp).scheduledJobComponent.inject(this)
     }
 
-    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-
+    override fun onStartJob(job: JobParameters): Boolean {
         synchronized(checkSubscription)
         {
             Log.d(TAG, "check latest version of OmniTrack...: Service")
-            RemoteConfigManager.getServerLatestVersionName().subscribe({
+            RemoteConfigManager.getServerLatestVersionName().doAfterTerminate {
+                jobFinished(job, true)
+            }.subscribe({
                 versionName ->
                 Log.d(TAG, "received version name.: ${versionName}")
                 if (BuildConfig.DEBUG || RemoteConfigManager.isNewVersionGreater(BuildConfig.VERSION_NAME, versionName)) {
-                    val lastNotifiedVersion = OTApp.instance.systemSharedPreferences.getString(PREF_LAST_NOTIFIED_VERSION, "")
+                    val lastNotifiedVersion = systemPreferences.getString(PREF_LAST_NOTIFIED_VERSION, "")
                     if (lastNotifiedVersion != versionName) {
 
                         if (!OTApp.instance.isAppInForeground) {
@@ -85,7 +101,7 @@ class OTVersionCheckService : Service() {
                                     .build()
                             notificationManager.notify(TAG, REQUEST_CODE, notification)
 
-                            OTApp.instance.systemSharedPreferences.edit()
+                            systemPreferences.edit()
                                     .putString(PREF_LAST_NOTIFIED_VERSION, versionName)
                                     .apply()
                         } else {
@@ -101,10 +117,13 @@ class OTVersionCheckService : Service() {
                         Log.d(TAG, "this version was already notified. ignore notification.")
                     }
                 }
-            }, { e -> e.printStackTrace() })
+            }, { e -> e.printStackTrace()  })
         }
+        return true
+    }
 
-        return START_NOT_STICKY
+    override fun onStopJob(job: JobParameters): Boolean {
+        return true
     }
 
     override fun onDestroy() {

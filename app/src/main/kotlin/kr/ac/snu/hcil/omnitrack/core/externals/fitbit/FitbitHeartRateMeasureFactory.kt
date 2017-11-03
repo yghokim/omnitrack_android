@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.fitbit
 
+import com.google.gson.stream.JsonReader
 import io.reactivex.Flowable
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
@@ -8,7 +9,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
-import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableTypedQueue
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import org.json.JSONObject
 
@@ -33,8 +33,16 @@ object FitbitHeartRateMeasureFactory : OTMeasureFactory("heart") {
         return FitbitHeartRateMeasure()
     }
 
+    override fun makeMeasure(reader: JsonReader): OTMeasure {
+        return FitbitHeartRateMeasure()
+    }
+
     override fun makeMeasure(serialized: String): OTMeasure {
-        return FitbitHeartRateMeasure(serialized)
+        return FitbitHeartRateMeasure()
+    }
+
+    override fun serializeMeasure(measure: OTMeasure): String {
+        return "{}"
     }
 
     override val exampleAttributeType: Int
@@ -45,7 +53,7 @@ object FitbitHeartRateMeasureFactory : OTMeasureFactory("heart") {
     override val nameResourceId: Int = R.string.measure_fitbit_heart_rate_name
     override val descResourceId: Int = R.string.measure_fitbit_heart_rate_desc
 
-    class FitbitHeartRateMeasure : OTRangeQueriedMeasure {
+    class FitbitHeartRateMeasure : OTRangeQueriedMeasure() {
         companion object {
             val converter = object : FitbitApi.AIntraDayConverter<Int, Int>("activities-heart-intraday") {
                 override fun extractValueFromDatum(datum: JSONObject): Int {
@@ -66,15 +74,6 @@ object FitbitHeartRateMeasureFactory : OTMeasureFactory("heart") {
 
         override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_INT
         override val factory: OTMeasureFactory = FitbitHeartRateMeasureFactory
-
-        override fun onSerialize(typedQueue: SerializableTypedQueue) {
-        }
-
-        override fun onDeserialize(typedQueue: SerializableTypedQueue) {
-        }
-
-        constructor() : super()
-        constructor(serialized: String) : super(serialized)
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
