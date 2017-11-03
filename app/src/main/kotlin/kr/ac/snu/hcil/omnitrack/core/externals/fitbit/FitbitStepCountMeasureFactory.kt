@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.fitbit
 
+import com.google.gson.stream.JsonReader
 import io.reactivex.Flowable
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
@@ -9,7 +10,6 @@ import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.auth.OAuth2Client
-import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableTypedQueue
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 import org.json.JSONObject
@@ -40,8 +40,16 @@ object FitbitStepCountMeasureFactory : OTMeasureFactory("step") {
         return FitbitStepMeasure()
     }
 
+    override fun makeMeasure(reader: JsonReader): OTMeasure {
+        return FitbitStepMeasure()
+    }
+
     override fun makeMeasure(serialized: String): OTMeasure {
-        return FitbitStepMeasure(serialized)
+        return FitbitStepMeasure()
+    }
+
+    override fun serializeMeasure(measure: OTMeasure): String {
+        return "{}"
     }
 
     override fun getService(): OTExternalService {
@@ -52,7 +60,7 @@ object FitbitStepCountMeasureFactory : OTMeasureFactory("step") {
     override val nameResourceId: Int = R.string.measure_steps_name
 
 
-    class FitbitStepMeasure : OTRangeQueriedMeasure {
+    class FitbitStepMeasure : OTRangeQueriedMeasure() {
 
         override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_INT
 
@@ -82,10 +90,6 @@ object FitbitStepCountMeasureFactory : OTMeasureFactory("step") {
 
         }
 
-        constructor() : super()
-        constructor(serialized: String) : super(serialized)
-
-
         override fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>> {
 
             return if (TimeHelper.isSameDay(start, end - 10)) {
@@ -97,12 +101,6 @@ object FitbitStepCountMeasureFactory : OTMeasureFactory("step") {
             //TODO: Can be optimized by querying summary data of middle days.
                 FitbitService.getRequest(intraDayConverter, *FitbitApi.makeIntraDayRequestUrls(FitbitApi.REQUEST_INTRADAY_RESOURCE_PATH_STEPS, start, end)).toFlowable()
                         as Flowable<Nullable<out Any>>
-        }
-
-        override fun onDeserialize(typedQueue: SerializableTypedQueue) {
-        }
-
-        override fun onSerialize(typedQueue: SerializableTypedQueue) {
         }
 
         override fun equals(other: Any?): Boolean {

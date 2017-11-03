@@ -1,17 +1,16 @@
 package kr.ac.snu.hcil.omnitrack.core.externals
 
 import android.text.Html
+import com.google.gson.stream.JsonReader
 import io.reactivex.Flowable
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
-import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.calculation.AConditioner
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.utils.INameDescriptionResourceProvider
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
-import kr.ac.snu.hcil.omnitrack.utils.serialization.ATypedQueueSerializable
 
 /**
  * Created by Young-Ho Kim on 16. 7. 28
@@ -106,7 +105,9 @@ abstract class OTMeasureFactory(val factoryTypeName: String) : INameDescriptionR
     abstract val minimumGranularity: OTTimeRangeQuery.Granularity
 
     abstract fun makeMeasure(): OTMeasure
+    abstract fun makeMeasure(reader: JsonReader): OTMeasure
     abstract fun makeMeasure(serialized: String): OTMeasure
+    abstract fun serializeMeasure(measure: OTMeasure): String
 
     open fun getFormattedName(): CharSequence {
         val html = "<b>${OTApp.instance.resourcesWrapped.getString(nameResourceId)}</b> | ${OTApp.instance.getString(getService().nameResourceId)}"
@@ -121,28 +122,7 @@ abstract class OTMeasureFactory(val factoryTypeName: String) : INameDescriptionR
     protected abstract val exampleAttributeType: Int
     protected abstract fun getExampleAttributeConfigurator(): IExampleAttributeConfigurator
 
-
-    open fun makeNewExampleAttribute(tracker: OTTracker): OTAttribute<out Any> {
-
-        /*
-        val attr = OTAttribute.Companion.createAttribute(tracker,
-                "${OTApp.instance.getString(getService().nameResourceId)} ${OTApp.instance.resourcesWrapped.getString(nameResourceId)}",
-                exampleAttributeType)
-
-        getExampleAttributeConfigurator().configureExampleAttribute(attr)
-
-        val connection = OTConnection()
-        connection.source = makeMeasure()
-        if (isRangedQueryAvailable) {
-            connection.rangedQuery = OTTimeRangeQuery.Preset.PresentDate.makeQueryInstance()
-        }
-        attr.valueConnection = connection
-        */
-
-        TODO("Revise")
-    }
-
-    abstract class OTMeasure : ATypedQueueSerializable {
+    abstract class OTMeasure {
 
         /*** Typename in TypeStringSerializer
          *
@@ -153,7 +133,6 @@ abstract class OTMeasureFactory(val factoryTypeName: String) : INameDescriptionR
         abstract val factory: OTMeasureFactory
 
         constructor() : super()
-        constructor(serialized: String) : super(serialized)
 
         abstract fun getValueRequest(builder: OTItemBuilderWrapperBase, query: OTTimeRangeQuery?): Flowable<Nullable<out Any>>
     }
@@ -161,7 +140,6 @@ abstract class OTMeasureFactory(val factoryTypeName: String) : INameDescriptionR
     abstract class OTRangeQueriedMeasure : OTMeasure {
 
         constructor() : super()
-        constructor(serialized: String) : super(serialized)
 
         abstract fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>>
 

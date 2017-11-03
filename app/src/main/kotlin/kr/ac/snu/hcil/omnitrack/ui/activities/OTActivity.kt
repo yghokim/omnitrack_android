@@ -1,9 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.activities
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import android.graphics.PointF
 import android.graphics.Rect
 import android.os.Bundle
@@ -100,6 +97,8 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
     protected lateinit var consentManager: ExperimentConsentManager
     @Inject
     protected lateinit var authManager: OTAuthManager
+    @Inject
+    protected lateinit var systemPreferences: SharedPreferences
 
     protected var isSessionLoggingEnabled = true
 
@@ -123,7 +122,7 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
                     VersionCheckDialogFragment.makeInstance(versionName)
                             .show(supportFragmentManager, "VersionCheck")
 
-                    OTApp.instance.systemSharedPreferences.edit()
+                    systemPreferences.edit()
                             .putString(OTVersionCheckService.PREF_LAST_NOTIFIED_VERSION, versionName)
                             .apply()
                 }

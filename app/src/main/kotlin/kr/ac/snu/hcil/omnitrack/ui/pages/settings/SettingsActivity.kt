@@ -85,6 +85,10 @@ class SettingsActivity : MultiButtonActionBarActivity(R.layout.activity_multibut
         @Inject
         protected lateinit var realmProvider: Provider<Realm>
 
+        @Inject
+        protected lateinit var versionCheckServiceController: Lazy<OTVersionCheckService.Controller>
+
+
         private var languageOnCreation: String? = null
 
         private val creationSubscriptions = CompositeDisposable()
@@ -121,7 +125,7 @@ class SettingsActivity : MultiButtonActionBarActivity(R.layout.activity_multibut
         override fun onActivityCreated(savedInstanceState: Bundle?) {
             super.onActivityCreated(savedInstanceState)
 
-            (act.application as OTApp).applicationComponent.inject(this)
+            (act.application as OTApp).scheduledJobComponent.inject(this)
             languageOnCreation = LocaleHelper.getLanguageCode(activity)
         }
 
@@ -201,7 +205,13 @@ class SettingsActivity : MultiButtonActionBarActivity(R.layout.activity_multibut
                 }
 
                 "pref_check_updates" -> {
-                    OTVersionCheckService.setupServiceAlarm(activity)
+                    if(sharedPreferences.getBoolean(key, false))
+                    {
+                        versionCheckServiceController.get().turnOnService()
+                    }
+                    else{
+                        versionCheckServiceController.get().turnOffService()
+                    }
                 }
 
                 PREF_REMINDER_NOTI_RINGTONE -> {

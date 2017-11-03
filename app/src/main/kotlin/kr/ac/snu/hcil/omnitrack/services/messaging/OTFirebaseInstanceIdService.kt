@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.services.messaging
 
+import android.content.SharedPreferences
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.iid.FirebaseInstanceIdService
 import io.reactivex.Single
@@ -19,6 +20,9 @@ class OTFirebaseInstanceIdService : FirebaseInstanceIdService() {
     lateinit var authManager: OTAuthManager
     @Inject
     lateinit var synchronizationServerController: ISynchronizationServerSideAPI
+
+    @Inject
+    lateinit var systemPreferences: SharedPreferences
 
     private val subscriptions = CompositeDisposable()
 
@@ -41,14 +45,14 @@ class OTFirebaseInstanceIdService : FirebaseInstanceIdService() {
 
     fun refreshInstanceIdToServerIfExists(ignoreIfStored: Boolean): Single<Boolean> {
         if (ignoreIfStored) {
-            if (OTApp.instance.systemSharedPreferences.contains(OTApp.PREFERENCE_KEY_FIREBASE_INSTANCE_ID)) {
+            if (systemPreferences.contains(OTApp.PREFERENCE_KEY_FIREBASE_INSTANCE_ID)) {
                 return Single.just(false)
             }
         }
 
         val token = FirebaseInstanceId.getInstance().token
         if (token != null && authManager.currentSignedInLevel > OTAuthManager.SignedInLevel.NONE) {
-            OTApp.instance.systemSharedPreferences.edit().putString(OTApp.PREFERENCE_KEY_FIREBASE_INSTANCE_ID, token)
+            systemPreferences.edit().putString(OTApp.PREFERENCE_KEY_FIREBASE_INSTANCE_ID, token)
                     .apply()
             return synchronizationServerController.putDeviceInfo(OTDeviceInfo()).map { deviceInfoResult ->
                 val localKey = deviceInfoResult.deviceLocalKey

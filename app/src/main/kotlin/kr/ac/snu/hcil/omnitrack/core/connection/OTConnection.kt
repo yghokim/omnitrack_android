@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
@@ -22,23 +23,6 @@ class OTConnection {
 
     class ConnectionTypeAdapter : TypeAdapter<OTConnection>() {
         override fun read(reader: JsonReader): OTConnection {
-            /*
-            if (typedQueue.getBoolean()) {
-                val factoryCode = typedQueue.getString()
-                val factory = OTExternalService.getMeasureFactoryByCode(typeCode = factoryCode)
-                if (factory == null) {
-                    println("$factoryCode is deprecated in System.")
-
-                } else {
-                    source = factory.makeMeasure(typedQueue.getString())
-                }
-            }
-
-            if (typedQueue.getBoolean()) {
-                rangedQuery = OTTimeRangeQuery()
-                rangedQuery?.onDeserialize(typedQueue)
-            }*/
-
             val connection = OTConnection()
             reader.beginObject()
 
@@ -46,23 +30,26 @@ class OTConnection {
                 when (reader.nextName()) {
                     "factory" -> {
                         var factoryCode: String = ""
-                        var serialized: String = ""
                         reader.beginObject()
                         while (reader.hasNext()) {
                             when (reader.nextName()) {
                                 "code" -> factoryCode = reader.nextString()
-                                "serialized" -> serialized = reader.nextString()
+                                "data" -> {
+                                    val factory = OTExternalService.getMeasureFactoryByCode(typeCode = factoryCode)
+                                    if (factory == null) {
+                                        println("$factoryCode is not supported in System.")
+                                        reader.skipValue()
+                                    } else {
+                                        connection.source = factory.makeMeasure(reader)
+                                        if (reader.peek() != JsonToken.NAME || reader.peek() != JsonToken.END_OBJECT) {
+                                            reader.skipValue()
+                                        }
+                                    }
+                                }
                             }
                         }
+
                         reader.endObject()
-
-                        val factory = OTExternalService.getMeasureFactoryByCode(typeCode = factoryCode)
-                        if (factory == null) {
-                            println("$factoryCode is deprecated in System.")
-
-                        } else {
-                            connection.source = factory.makeMeasure(serialized)
-                        }
                     }
 
                     "query" -> {
@@ -83,7 +70,7 @@ class OTConnection {
             value.source?.let {
                 out.name("factory").beginObject()
                 out.name("code").value(it.factoryCode)
-                out.name("serialized").value(it.getSerializedString())
+                out.name("data").jsonValue(it.factory.serializeMeasure(it))
                 out.endObject()
             }
 
@@ -104,14 +91,12 @@ class OTConnection {
         }
 
         fun fromJson(serialized: String): OTConnection {
+            println("serialized connection: ${serialized}")
             return parser.fromJson(serialized, OTConnection::class.java)
         }
     }
 
     var source: OTMeasureFactory.OTMeasure? = null
-        get() {
-            return field
-        }
         set(value) {
             if (field != value) {
                 field = value
@@ -126,7 +111,7 @@ class OTConnection {
 
     val isRangedQueryAvailable: Boolean
         get() = if (source != null) {
-            source?.factory?.isRangedQueryAvailable ?: false
+            source?.factory?.isRangedQueryAvailable == true
         } else false
 
 

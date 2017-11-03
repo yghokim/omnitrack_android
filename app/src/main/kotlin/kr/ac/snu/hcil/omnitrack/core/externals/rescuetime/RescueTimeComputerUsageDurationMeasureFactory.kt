@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.rescuetime
 
+import com.google.gson.stream.JsonReader
 import io.reactivex.Flowable
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
@@ -9,7 +10,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
-import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableTypedQueue
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import org.json.JSONObject
 import java.util.*
@@ -58,8 +58,16 @@ object RescueTimeComputerUsageDurationMeasureFactory : OTMeasureFactory("cud") {
         return ComputerUsageDurationMeasure()
     }
 
+    override fun makeMeasure(reader: JsonReader): OTMeasure {
+        return ComputerUsageDurationMeasure()
+    }
+
     override fun makeMeasure(serialized: String): OTMeasure {
-        return ComputerUsageDurationMeasure(serialized)
+        return ComputerUsageDurationMeasure()
+    }
+
+    override fun serializeMeasure(measure: OTMeasure): String {
+        return "{}"
     }
 
     override val nameResourceId: Int = R.string.measure_rescuetime_computer_usage_name
@@ -74,7 +82,7 @@ object RescueTimeComputerUsageDurationMeasureFactory : OTMeasureFactory("cud") {
 
     }
 
-    class ComputerUsageDurationMeasure : OTRangeQueriedMeasure {
+    class ComputerUsageDurationMeasure : OTRangeQueriedMeasure() {
         override val dataTypeName: String = TypeStringSerializationHelper.TYPENAME_DOUBLE
         override val factory: OTMeasureFactory = RescueTimeComputerUsageDurationMeasureFactory
 
@@ -82,15 +90,6 @@ object RescueTimeComputerUsageDurationMeasureFactory : OTMeasureFactory("cud") {
         override fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>> {
             return RescueTimeService.getSummaryRequest(Date(start), Date(end - 1), usageDurationCalculator).toFlowable() as Flowable<Nullable<out Any>>
         }
-
-        override fun onSerialize(typedQueue: SerializableTypedQueue) {
-        }
-
-        override fun onDeserialize(typedQueue: SerializableTypedQueue) {
-        }
-
-        constructor() : super()
-        constructor(serialized: String) : super(serialized)
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true

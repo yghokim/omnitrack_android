@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.externals.microsoft.band
 
+import com.google.gson.stream.JsonReader
 import com.microsoft.band.sensors.BandHeartRateEvent
 import com.microsoft.band.sensors.BandHeartRateEventListener
 import kr.ac.snu.hcil.omnitrack.R
@@ -27,12 +28,20 @@ class MicrosoftBandHeartRateFactory : OTMeasureFactory("heart") {
         return MicrosoftBandService
     }
 
-    override fun makeMeasure(serialized: String): OTMeasure {
+    override fun makeMeasure(reader: JsonReader): OTMeasure {
         throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun makeMeasure(serialized: String): OTMeasure {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun makeMeasure(): OTMeasure {
         throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun serializeMeasure(measure: OTMeasure): String {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun isAttachableTo(attribute: OTAttributeDAO): Boolean {
