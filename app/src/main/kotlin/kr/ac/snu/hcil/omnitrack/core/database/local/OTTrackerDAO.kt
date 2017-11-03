@@ -60,8 +60,9 @@ open class OTTrackerDAO : RealmObject() {
     var attributes = RealmList<OTAttributeDAO>()
     var removedAttributes = RealmList<OTAttributeDAO>()
 
-    var creationFlags = RealmList<OTStringStringEntryDAO>()
-    var isEditable: Boolean = true
+    var serializedCreationFlags: String = "{}"
+
+    var serializedLockedPropertyInfo: String = "{}"
 
     var userCreatedAt: Long = System.currentTimeMillis()
     var synchronizedAt: Long? = null // store server time of when synchronized perfectly.
@@ -72,8 +73,6 @@ open class OTTrackerDAO : RealmObject() {
     val triggers: RealmResults<OTTriggerDAO>? = null
 
     val liveTriggersQuery: RealmQuery<OTTriggerDAO>? get() = triggers?.where()?.equalTo(RealmDatabaseManager.FIELD_REMOVED_BOOLEAN, false)
-
-    val creationFlagsMap: Map<String, String> get() = RealmDatabaseManager.convertRealmEntryListToDictionary(creationFlags)
 
     val isExternalFilesInvolved: Boolean
         get() {

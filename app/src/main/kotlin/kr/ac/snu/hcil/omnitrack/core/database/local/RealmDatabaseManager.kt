@@ -43,6 +43,9 @@ class RealmDatabaseManager @Inject constructor(private val config: Configuration
         const val FIELD_REMOVED_BOOLEAN = "removed"
         const val FIELD_TIMESTAMP_LONG = "timestamp"
 
+        const val FIELD_NAME = "name"
+        const val FIELD_POSITION = "position"
+
         const val FIELD_USER_ID = "userId"
         const val FIELD_TRACKER_ID = "trackerId"
 
@@ -392,47 +395,6 @@ class RealmDatabaseManager @Inject constructor(private val config: Configuration
             }
         }
 
-    }
-
-    fun saveAttribute(trackerId: String?, attribute: OTAttribute<out Any>, position: Int) {
-        val realm = makeNewRealmInstance()
-        realm.executeTransaction {
-            //saveAttribute(attribute, trackerId, position, realm)
-        }
-    }
-
-    fun saveTracker(tracker: OTTracker, position: Int) {
-        val realm = makeNewRealmInstance()
-        realm.executeTransaction {
-            val baseDao = getTrackerQueryWithId(tracker.objectId, realm).findFirst() ?:
-                    realm.createObject(OTTrackerDAO::class.java, UUID.randomUUID().toString())
-
-            //baseDao.attributeLocalKeySeed = tracker.attributeLocalKeySeed
-            baseDao.name = tracker.name
-            baseDao.color = tracker.color
-            baseDao.isBookmarked = tracker.isOnShortcut
-            baseDao.isEditable = tracker.isEditable
-
-            if (tracker.creationFlags != null) {
-                convertDictionaryToRealmList(realm, tracker.creationFlags, baseDao.creationFlags)
-            }
-
-            //Deal with removed attributes===============================
-            val attributeIds = tracker.attributes.map { it.objectId }
-            val removedAttributeDaos = baseDao.attributes.filter { !attributeIds.contains(it.objectId) }
-            removedAttributeDaos.forEach {
-                it.updatedAt = System.currentTimeMillis()
-            }
-
-            //Update attributes dao updates================================
-            baseDao.attributes.clear()
-            tracker.attributes.unObservedList.forEachIndexed { index, attr ->
-                //saveAttribute(attr, tracker.objectId, index, realm)
-            }
-
-            baseDao.synchronizedAt = null
-            baseDao.updatedAt = System.currentTimeMillis()
-        }
     }
 
     fun getLatestSynchronizedServerTimeOf(type: ESyncDataType): Single<Long>
