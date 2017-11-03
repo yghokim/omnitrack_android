@@ -29,7 +29,6 @@ import rx_activity_result2.RxActivityResult
 import java.nio.charset.Charset
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
-import javax.inject.Inject
 
 /**
  * Created by Young-Ho Kim on 2016-07-11.
@@ -173,7 +172,10 @@ class OTApp : MultiDexApplication() {
     val applicationComponent: ApplicationComponent by lazy {
         DaggerApplicationComponent.builder()
                 .applicationModule(ApplicationModule(this))
-                .omniTrackModule(OmniTrackModule(this))
+                .authModule(AuthModule(this))
+                .networkModule(NetworkModule(this))
+                .localDatabaseModule(LocalDatabaseModule())
+                .informationHelpersModule(InformationHelpersModule())
                 .build()
     }
 

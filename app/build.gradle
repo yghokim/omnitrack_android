@@ -122,6 +122,7 @@ dependencies {
     implementation "com.google.firebase:firebase-config:$rootProject.ext.google_play_version"
     implementation "com.google.firebase:firebase-messaging:$rootProject.ext.google_play_version"
     implementation "com.google.firebase:firebase-crash:$rootProject.ext.google_play_version"
+    implementation 'com.firebase:firebase-jobdispatcher:0.8.4'
 
     implementation "android.arch.lifecycle:extensions:1.0.0-rc1"
     kapt "android.arch.lifecycle:compiler:1.0.0-rc1"

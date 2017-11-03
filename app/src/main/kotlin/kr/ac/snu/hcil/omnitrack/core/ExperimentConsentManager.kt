@@ -5,7 +5,6 @@ import android.support.v7.app.AppCompatActivity
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTUserRolePOJO
-import kr.ac.snu.hcil.omnitrack.core.di.OmniTrackModule_ProvideSynchronizationServerControllerFactory
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationServerSideAPI
 import kr.ac.snu.hcil.omnitrack.ui.pages.experiment.ExperimentSignInActivity
 import javax.inject.Inject

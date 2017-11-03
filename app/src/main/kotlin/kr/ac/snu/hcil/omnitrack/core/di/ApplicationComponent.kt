@@ -9,7 +9,6 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTImageAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.synchronization.OTSynchronizationService
 import kr.ac.snu.hcil.omnitrack.core.net.OTOfficialServerApiController
-import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.models.*
 import kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService
 import kr.ac.snu.hcil.omnitrack.services.OTTableExportService
@@ -39,7 +38,12 @@ import javax.inject.Singleton
  * Created by Young-Ho on 10/31/2017.
  */
 @Singleton
-@Component(modules = arrayOf(ApplicationModule::class, OmniTrackModule::class))
+@Component(modules = arrayOf(
+        ApplicationModule::class,
+        AuthModule::class,
+        LocalDatabaseModule::class,
+        NetworkModule::class,
+        InformationHelpersModule::class))
 interface ApplicationComponent {
 
     fun makeDaoSerializationComponentBuilder(): DaoSerializationComponent.Builder

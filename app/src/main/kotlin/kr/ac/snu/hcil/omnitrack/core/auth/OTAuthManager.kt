@@ -1,6 +1,5 @@
 package kr.ac.snu.hcil.omnitrack.core.auth
 
-import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.net.Uri
@@ -27,13 +26,11 @@ import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationServerSideAPI
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.getActivity
-import javax.inject.Inject
-import javax.inject.Singleton
 
 /**
  * Created by Young-Ho Kim on 2017-02-03.
  */
-class OTAuthManager(val app: OTApp) {
+class OTAuthManager(val app: OTApp, val synchronizationServerController: Lazy<ISynchronizationServerSideAPI>) {
 
     companion object {
         const val LOG_TAG = "OMNITRACK Auth Manager"
@@ -49,8 +46,6 @@ class OTAuthManager(val app: OTApp) {
         fun onError(e: Throwable)
         fun onCancel()
     }
-
-    @Inject lateinit var synchronizationServerController: Lazy<ISynchronizationServerSideAPI>
 
     private val mFirebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
 
@@ -103,7 +98,6 @@ class OTAuthManager(val app: OTApp) {
         }
 
     init {
-        app.applicationComponent.inject(this)
 
         clearUserInfo()
 
