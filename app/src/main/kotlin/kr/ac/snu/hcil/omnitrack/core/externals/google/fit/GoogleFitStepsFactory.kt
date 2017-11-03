@@ -6,6 +6,7 @@ import com.google.android.gms.fitness.Fitness
 import com.google.android.gms.fitness.data.DataType
 import com.google.android.gms.fitness.data.Field
 import com.google.android.gms.fitness.request.DataReadRequest
+import com.google.gson.stream.JsonReader
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
@@ -16,7 +17,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
-import kr.ac.snu.hcil.omnitrack.utils.serialization.SerializableTypedQueue
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import java.util.concurrent.TimeUnit
 
@@ -57,18 +57,23 @@ object GoogleFitStepsFactory : GoogleFitService.GoogleFitMeasureFactory("step") 
         return Measure()
     }
 
-    override fun makeMeasure(serialized: String): OTMeasure {
-        return Measure(serialized)
+    override fun makeMeasure(reader: JsonReader): OTMeasure {
+        return Measure()
     }
 
-    class Measure : OTRangeQueriedMeasure {
+    override fun makeMeasure(serialized: String): OTMeasure {
+        return Measure()
+    }
+
+    override fun serializeMeasure(measure: OTMeasure): String {
+        return "{}"
+    }
+
+    class Measure : OTRangeQueriedMeasure() {
 
         override val dataTypeName = TypeStringSerializationHelper.TYPENAME_INT
 
         override val factory: OTMeasureFactory = GoogleFitStepsFactory
-
-        constructor() : super()
-        constructor(serialized: String) : super(serialized)
 
         override fun getValueRequest(start: Long, end: Long): Flowable<Nullable<out Any>> {
             println("Requested Google Fit Step Measure")
@@ -95,14 +100,6 @@ object GoogleFitStepsFactory : GoogleFitService.GoogleFitMeasureFactory("step") 
             } else {
                 Flowable.error<Nullable<out Any>>(Exception("Service is not activated."))
             }
-        }
-
-        override fun onSerialize(typedQueue: SerializableTypedQueue) {
-
-        }
-
-        override fun onDeserialize(typedQueue: SerializableTypedQueue) {
-
         }
 
         override fun equals(other: Any?): Boolean {

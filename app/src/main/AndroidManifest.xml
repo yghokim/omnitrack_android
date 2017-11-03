@@ -136,12 +136,15 @@
         <service
             android:name=".receivers.TimeTriggerAlarmReceiver$TimeTriggerWakefulHandlingService"
             android:exported="false" />
-        <service
-            android:name=".services.OTBackgroundLoggingService"
-            android:exported="false" />
+
         <service
             android:name=".services.OTVersionCheckService"
-            android:exported="false" />
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE"/>
+            </intent-filter>
+        </service>
+
         <service
             android:name=".services.DataTriggerCheckService"
             android:exported="true"

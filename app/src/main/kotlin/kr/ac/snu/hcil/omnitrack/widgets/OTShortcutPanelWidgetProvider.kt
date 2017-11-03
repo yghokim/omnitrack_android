@@ -8,7 +8,6 @@ import android.content.Intent
 import android.os.Bundle
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
-import kr.ac.snu.hcil.omnitrack.services.OTBackgroundLoggingService
 import kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemDetailActivity
 

@@ -25,7 +25,7 @@ class OTDataTrigger(objectId: String?, user: OTUser, name: String, trackerObject
     var measure: OTMeasureFactory.OTMeasure?
         get() {
             val s = serializedMeasure
-            if (s.isNullOrBlank()) return null
+            if (s.isBlank()) return null
             else {
                 val factory = OTExternalService.getMeasureFactoryByCode(typeCode = measureFactoryCode)
                 if (factory != null) {
@@ -40,7 +40,7 @@ class OTDataTrigger(objectId: String?, user: OTUser, name: String, trackerObject
                     serializedMeasure = ""
                 } else {
                     measureFactoryCode = value.factoryCode
-                    serializedMeasure = value.getSerializedString()
+                    serializedMeasure = value.factory.serializeMeasure(value)
                 }
 
                 onMeasureChanged()

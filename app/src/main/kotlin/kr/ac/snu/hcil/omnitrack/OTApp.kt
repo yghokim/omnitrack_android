@@ -124,13 +124,9 @@ class OTApp : MultiDexApplication() {
         return wrappedContext ?: this
     }
 
-    val systemSharedPreferences: SharedPreferences by lazy {
-        PreferenceManager.getDefaultSharedPreferences(this)
-    }
-
     val deviceId: String by lazy {
         val deviceUUID: UUID
-        val cached: String? = systemSharedPreferences.getString("cached_device_id", "")
+        val cached: String? = applicationComponent.defaultPreferences().getString("cached_device_id", "")
         if (!cached.isNullOrBlank()) {
             deviceUUID = UUID.fromString(cached)
         } else {
@@ -154,7 +150,7 @@ class OTApp : MultiDexApplication() {
             }
         }
 
-        systemSharedPreferences.edit().putString("cached_device_id", deviceUUID.toString()).apply()
+        applicationComponent.defaultPreferences().edit().putString("cached_device_id", deviceUUID.toString()).apply()
         deviceUUID.toString()
     }
 
@@ -182,6 +178,12 @@ class OTApp : MultiDexApplication() {
     val daoSerializationComponent: DaoSerializationComponent by lazy {
         applicationComponent.makeDaoSerializationComponentBuilder()
                 .setModule(DaoSerializationModule()).build()
+    }
+
+    val scheduledJobComponent: ScheduledJobComponent by lazy{
+        applicationComponent.makeScheduledJobComponentBuilder()
+                .setModule(ScheduledJobModule())
+                .build()
     }
 
     val colorPalette: IntArray by lazy {
@@ -295,7 +297,7 @@ class OTApp : MultiDexApplication() {
 
     fun unlinkUser() {
         OTShortcutPanelManager.disposeShortcutPanel()
-        systemSharedPreferences.edit().remove(INTENT_EXTRA_OBJECT_ID_USER).apply()
+        applicationComponent.defaultPreferences().edit().remove(INTENT_EXTRA_OBJECT_ID_USER).apply()
     }
 
     override fun onTerminate() {

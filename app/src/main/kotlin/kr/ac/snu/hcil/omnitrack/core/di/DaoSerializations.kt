@@ -1,8 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.di
 
-import com.firebase.jobdispatcher.Trigger
 import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import com.google.gson.TypeAdapter
 import dagger.Lazy
 import dagger.Module
@@ -36,7 +34,7 @@ class DaoSerializationModule {
     @Provides
     @ApplicationScope
     @ForAttribute
-    fun provideAttributeAdapter(): TypeAdapter<OTAttributeDAO> = AttributeTypeAdapter()
+    fun provideAttributeAdapter(@ForGeneric gson: Lazy<Gson>): TypeAdapter<OTAttributeDAO> = AttributeTypeAdapter(gson)
 
     @Provides
     @ApplicationScope

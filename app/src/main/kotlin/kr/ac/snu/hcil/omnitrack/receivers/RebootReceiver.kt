@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.PowerManager
 import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckService
 
 /**
@@ -21,10 +22,10 @@ class RebootReceiver : BroadcastReceiver() {
         val result = goAsync()
         val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
         val wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG)
-        wl.acquire()
+        wl.acquire(3000)
 
-
-        OTVersionCheckService.setupServiceAlarm(context)
+        result.finish()
+        wl.release()
 
         OTApp.instance.timeTriggerAlarmManager.activateOnSystem()
 
