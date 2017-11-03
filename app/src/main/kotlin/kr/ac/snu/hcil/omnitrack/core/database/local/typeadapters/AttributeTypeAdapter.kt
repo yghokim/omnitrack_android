@@ -29,7 +29,9 @@ class AttributeTypeAdapter : TypeAdapter<OTAttributeDAO>() {
                 RealmDatabaseManager.FIELD_USER_CREATED_AT -> dao.userCreatedAt = reader.nextLong()
                 RealmDatabaseManager.FIELD_UPDATED_AT_LONG -> dao.updatedAt = reader.nextLong()
                 "req" -> dao.isRequired = reader.nextBoolean()
-                "conn" -> dao.serializedConnection = reader.nextString()
+                "conn" ->{
+                    dao.serializedConnection = reader.nextString()
+                }
                 "props" -> {
                     val list = ArrayList<OTStringStringEntryDAO>()
                     reader.beginArray()

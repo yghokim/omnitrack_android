@@ -217,9 +217,10 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
                 trackerName.onNext(snapshot.name)
             }
 
+            /* TODO editable flags
             if (trackerEditable.value != snapshot.isEditable) {
                 trackerEditable.onNext(snapshot.isEditable)
-            }
+            }*/
 
         }
 
