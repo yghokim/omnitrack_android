@@ -7,11 +7,9 @@ import dagger.Module
 import dagger.Provides
 import dagger.Subcomponent
 import io.realm.Realm
-import kr.ac.snu.hcil.omnitrack.core.database.local.DaoSerializationManager
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.*
 import kr.ac.snu.hcil.omnitrack.core.database.local.typeadapters.AttributeTypeAdapter
+import kr.ac.snu.hcil.omnitrack.core.database.local.typeadapters.ItemTypeAdapter
 import kr.ac.snu.hcil.omnitrack.core.database.local.typeadapters.TrackerTypeAdapter
 import kr.ac.snu.hcil.omnitrack.core.database.local.typeadapters.TriggerTypeAdapter
 import javax.inject.Provider
@@ -46,6 +44,12 @@ class DaoSerializationModule {
     @ForTracker
     fun provideTrackerAdapter(@ForAttribute attributeTypeAdapter: Lazy<TypeAdapter<OTAttributeDAO>>, @ForGeneric gson: Lazy<Gson>): TypeAdapter<OTTrackerDAO>
             = TrackerTypeAdapter(attributeTypeAdapter, gson)
+
+    @Provides
+    @ApplicationScope
+    @ForItem
+    fun provideItemAdapter(): TypeAdapter<OTItemDAO>
+        = ItemTypeAdapter()
 }
 
 @ApplicationScope
@@ -60,12 +64,6 @@ interface DaoSerializationComponent {
 
     fun manager(): Lazy<DaoSerializationManager>
 }
-
-
-
-@Qualifier
-@Retention(AnnotationRetention.RUNTIME) annotation class ForDbModels
-
 
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME) annotation class ForGeneric

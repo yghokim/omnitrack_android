@@ -67,7 +67,6 @@ open class OTItemDAO : RealmObject() {
                         id = UUID.randomUUID().toString()
                         key = attributeLocalId
                         value = serializedValue
-                        item = this@OTItemDAO
                     }
             )
         }
@@ -79,10 +78,6 @@ open class OTItemDAO : RealmObject() {
 }
 
 object RealmItemHelper {
-
-    fun convertDAOToItem(dao: OTItemDAO): OTItem =//objectId notNull is guaranteed.
-            OTItem(dao.objectId ?: dao.trackerId + UUID.randomUUID().toString(), dao.trackerId!!, dao.serializedValueTable(), dao.timestamp, dao.loggingSource, dao.deviceId)
-
 
     fun applyDaoToPojo(dao: OTItemDAO, pojo: OTItemPOJO) {
         pojo.objectId = dao.objectId ?: ""
@@ -126,9 +121,8 @@ open class OTItemValueEntryDAO : RealmObject() {
     var key: String = ""
 
     var value: String? = null
-    var item: OTItemDAO? = null
 
     override fun toString(): String {
-        return "{Item Value Entry | id : $id, key : $key, value : $value, item: ${item?.objectId}}"
+        return "{Item Value Entry | id : $id, key : $key, value : $value}"
     }
 }

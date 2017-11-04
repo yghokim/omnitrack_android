@@ -12,6 +12,21 @@ enum class SyncDirection(val code: Short) {
         fun fromCode(code: Short): SyncDirection {
             return SyncDirection.values().find { it.code == code } ?: throw IllegalArgumentException("Unexpected code.")
         }
+
+        fun union(directions: Collection<SyncDirection>): SyncDirection{
+            var union: SyncDirection? = null
+            for(direction in directions)
+            {
+                if(union != null) {
+                    union = union + direction
+                }
+                else union = direction
+
+                if(union == BIDIRECTIONAL) break
+            }
+
+            return union!!
+        }
     }
 }
 

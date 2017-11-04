@@ -180,7 +180,7 @@
         <service android:name=".services.OTAudioRecordService"/>
 
         <service
-            android:name=".core.database.synchronization.OTSynchronizationService"
+            android:name=".services.OTSynchronizationService"
             android:exported="false" />
 
         <service

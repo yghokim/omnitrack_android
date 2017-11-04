@@ -8,7 +8,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTAudioRecordAttributeHe
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTFileInvolvedAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTImageAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.database.synchronization.OTSynchronizationService
+import kr.ac.snu.hcil.omnitrack.services.OTSynchronizationService
 import kr.ac.snu.hcil.omnitrack.core.net.OTOfficialServerApiController
 import kr.ac.snu.hcil.omnitrack.core.visualization.models.*
 import kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService
@@ -24,7 +24,6 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.configs.ShortcutPanelWidgetConfigActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.TrackerListFragment
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.NewItemCreationViewModel
-import kr.ac.snu.hcil.omnitrack.ui.pages.settings.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.tracker.FieldPresetSelectionBottomSheetFragment
 import kr.ac.snu.hcil.omnitrack.ui.pages.tracker.ManagedReminderListViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.tracker.TrackerDetailViewModel
@@ -42,7 +41,7 @@ import javax.inject.Singleton
 @Component(modules = arrayOf(
         ApplicationModule::class,
         AuthModule::class,
-        LocalDatabaseModule::class,
+        BackendDatabaseModule::class,
         NetworkModule::class,
         InformationHelpersModule::class))
 interface ApplicationComponent {
@@ -51,6 +50,7 @@ interface ApplicationComponent {
 
     fun makeDaoSerializationComponentBuilder(): DaoSerializationComponent.Builder
     fun makeScheduledJobComponentBuilder(): ScheduledJobComponent.Builder
+    fun makeSynchronizationComponentBuilder(): SynchronizationComponent.Builder
 
     fun inject(application: OTApp)
     fun inject(realmViewModel: RealmViewModel)
@@ -97,8 +97,6 @@ interface ApplicationComponent {
     fun inject(imageInputView: ImageInputView)
 
     fun inject(activity: ShortcutPanelWidgetConfigActivity)
-
-    fun inject(service: OTSynchronizationService)
 
     fun inject(service: OTTableExportService)
 
