@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.database.synchronization
 
 import android.content.Context
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationServerSideAPI
+import kr.ac.snu.hcil.omnitrack.services.OTSynchronizationService
 
 /**
  * Created by younghokim on 2017. 9. 27..

@@ -11,16 +11,16 @@ import javax.inject.Singleton
  * Created by Young-Ho on 11/3/2017.
  */
 @Module(includes = arrayOf(AuthModule::class, NetworkModule::class))
-class LocalDatabaseModule {
+class BackendDatabaseModule {
 
     @Provides
     @Singleton
-    fun localDatabaseConfiguration(): RealmDatabaseManager.Configuration {
+    fun backendDatabaseConfiguration(): RealmDatabaseManager.Configuration {
         return RealmDatabaseManager.Configuration()
     }
 
     @Provides
-    fun makeLocalDbRealm(configuration: RealmDatabaseManager.Configuration): Realm {
+    fun makeBackendDbRealm(configuration: RealmDatabaseManager.Configuration): Realm {
         return Realm.getInstance(RealmConfiguration.Builder().name(configuration.fileName).build())
     }
 }
