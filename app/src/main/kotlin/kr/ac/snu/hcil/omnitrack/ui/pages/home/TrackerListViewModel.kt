@@ -126,7 +126,7 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
 
         val activeNotificationCount: BehaviorSubject<Int> = BehaviorSubject.createDefault(0)
 
-        val trackerEditable: BehaviorSubject<Boolean> = BehaviorSubject.create()
+        val trackerEditable: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(true)
 
         val attributesResult: RealmResults<OTAttributeDAO> = dbManager.getAttributeListQuery(trackerDao.objectId!!, realm).findAllAsync()
         val trackerItemsResult: RealmResults<OTItemDAO> = dbManager.makeItemsQuery(trackerDao.objectId, null, null, realm).findAllAsync()
