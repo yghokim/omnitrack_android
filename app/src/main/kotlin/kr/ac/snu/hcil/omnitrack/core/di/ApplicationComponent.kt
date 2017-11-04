@@ -43,12 +43,13 @@ import javax.inject.Singleton
         AuthModule::class,
         BackendDatabaseModule::class,
         NetworkModule::class,
-        InformationHelpersModule::class))
+        InformationHelpersModule::class,
+        DaoSerializationModule::class
+))
 interface ApplicationComponent {
 
     fun defaultPreferences(): SharedPreferences
 
-    fun makeDaoSerializationComponentBuilder(): DaoSerializationComponent.Builder
     fun makeScheduledJobComponentBuilder(): ScheduledJobComponent.Builder
     fun makeSynchronizationComponentBuilder(): SynchronizationComponent.Builder
 

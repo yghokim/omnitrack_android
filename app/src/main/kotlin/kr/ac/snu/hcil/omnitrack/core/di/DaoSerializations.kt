@@ -2,10 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.di
 
 import com.google.gson.Gson
 import com.google.gson.TypeAdapter
-import dagger.Lazy
-import dagger.Module
-import dagger.Provides
-import dagger.Subcomponent
+import dagger.*
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.core.database.local.*
 import kr.ac.snu.hcil.omnitrack.core.database.local.typeadapters.AttributeTypeAdapter
@@ -14,6 +11,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.local.typeadapters.TrackerTypeAdap
 import kr.ac.snu.hcil.omnitrack.core.database.local.typeadapters.TriggerTypeAdapter
 import javax.inject.Provider
 import javax.inject.Qualifier
+import javax.inject.Singleton
 
 /**
  * Created by younghokim on 2017-11-02.
@@ -22,7 +20,7 @@ import javax.inject.Qualifier
 class DaoSerializationModule {
 
     @Provides
-    @ApplicationScope
+    @Singleton
     @ForGeneric
     fun provideGenericGson(): Gson
     {
@@ -30,37 +28,31 @@ class DaoSerializationModule {
     }
 
     @Provides
-    @ApplicationScope
+    @Singleton
     @ForAttribute
     fun provideAttributeAdapter(@ForGeneric gson: Lazy<Gson>): TypeAdapter<OTAttributeDAO> = AttributeTypeAdapter(gson)
 
     @Provides
-    @ApplicationScope
+    @Singleton
     @ForTrigger
     fun provideTriggerAdapter(realmProvider: Provider<Realm>): TypeAdapter<OTTriggerDAO> = TriggerTypeAdapter(realmProvider)
 
     @Provides
-    @ApplicationScope
+    @Singleton
     @ForTracker
     fun provideTrackerAdapter(@ForAttribute attributeTypeAdapter: Lazy<TypeAdapter<OTAttributeDAO>>, @ForGeneric gson: Lazy<Gson>): TypeAdapter<OTTrackerDAO>
             = TrackerTypeAdapter(attributeTypeAdapter, gson)
 
     @Provides
-    @ApplicationScope
+    @Singleton
     @ForItem
     fun provideItemAdapter(): TypeAdapter<OTItemDAO>
         = ItemTypeAdapter()
 }
 
-@ApplicationScope
-@Subcomponent(modules = arrayOf(DaoSerializationModule::class))
+@Singleton
+@Component(modules = arrayOf(DaoSerializationModule::class, BackendDatabaseModule::class))
 interface DaoSerializationComponent {
-
-    @Subcomponent.Builder
-    interface Builder {
-        fun setModule(module: DaoSerializationModule): Builder
-        fun build(): DaoSerializationComponent
-    }
 
     fun manager(): Lazy<DaoSerializationManager>
 }

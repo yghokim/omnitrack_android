@@ -5,6 +5,7 @@ import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTItemPOJO
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTUserRolePOJO
+import kr.ac.snu.hcil.omnitrack.core.database.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.database.synchronization.SyncResultEntry
 import retrofit2.http.*
 
@@ -13,12 +14,6 @@ import retrofit2.http.*
  * Retrofit service interface to communicate between OmniTrack Official server
  */
 interface OTOfficialServerService {
-
-    @GET("api/items/changes")
-    fun getItemServerChanges(@Query("timestamp") timestamp: String): Single<List<OTItemPOJO>>
-
-    @POST("api/items/changes")
-    fun postItemLocalChanges(@Body list: List<OTItemPOJO>): Single<List<SyncResultEntry>>
 
     @GET("api/user/roles")
     fun getUserRoles(): Single<List<OTUserRolePOJO>>
@@ -32,4 +27,9 @@ interface OTOfficialServerService {
     @POST("api/user/report")
     fun postUserReport(@Body data: JsonObject): Single<Boolean>
 
+    @GET("api/batch/changes")
+    fun getServerDataChanges(@Query("types[]") types: Array<ESyncDataType>, @Query("timestamps[]") timestamps: Array<Long>): Single<Map<ESyncDataType, Array<String>>>
+
+    @POST("api/batch/changes")
+    fun postLocalDataChanges(@Body parameter: Array<out ISynchronizationServerSideAPI.DirtyRowBatchParameter>): Single<Map<ESyncDataType, Array<SyncResultEntry>>>
 }

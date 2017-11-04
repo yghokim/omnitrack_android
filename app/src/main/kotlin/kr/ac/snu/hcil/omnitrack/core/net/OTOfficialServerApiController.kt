@@ -10,6 +10,7 @@ import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTItemPOJO
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTUserRolePOJO
+import kr.ac.snu.hcil.omnitrack.core.database.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.database.synchronization.SyncResultEntry
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -60,16 +61,6 @@ class OTOfficialServerApiController (app: OTApp) : ISynchronizationServerSideAPI
         retrofit.create(OTOfficialServerService::class.java)
     }
 
-    override fun getItemsAfter(timestamp: Long): Single<List<OTItemPOJO>> {
-        return service.getItemServerChanges(timestamp.toString())
-                .subscribeOn(Schedulers.io())
-    }
-
-    override fun postItemsDirty(items: List<OTItemPOJO>): Single<List<SyncResultEntry>> {
-        return service.postItemLocalChanges(items)
-                .subscribeOn(Schedulers.io())
-    }
-
     override fun getUserRoles(): Single<List<OTUserRolePOJO>> {
         return service.getUserRoles().subscribeOn(Schedulers.io())
     }
@@ -87,7 +78,16 @@ class OTOfficialServerApiController (app: OTApp) : ISynchronizationServerSideAPI
     }
 
     override fun removeDeviceInfo(userId: String, deviceId: String): Single<Boolean> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO()
+    }
+
+    override fun getRowsSynchronizedAfter(vararg batch: Pair<ESyncDataType, Long>): Single<Map<ESyncDataType, Array<String>>> {
+        return service.getServerDataChanges(batch.map { it.first }.toTypedArray(), batch.map { it.second }.toTypedArray())
+                .subscribeOn(Schedulers.io())
+    }
+
+    override fun postDirtyRows(vararg batch: ISynchronizationServerSideAPI.DirtyRowBatchParameter): Single<Map<ESyncDataType, Array<SyncResultEntry>>> {
+        return service.postLocalDataChanges(batch).subscribeOn(Schedulers.io())
     }
 
 }
