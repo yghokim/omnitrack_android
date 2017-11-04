@@ -57,7 +57,8 @@ class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
         }
 
     override var value: IntArray? = null
-        set(value) {
+        set(_value) {
+            val value = if (_value?.isEmpty() == false) _value else null
             if (field != value) {
                 field = value
                 if ((field == null && value?.size == 0) || (field?.size == 0 && value == null)) {
