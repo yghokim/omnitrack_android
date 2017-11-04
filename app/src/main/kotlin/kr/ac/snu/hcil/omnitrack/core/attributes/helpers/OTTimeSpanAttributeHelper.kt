@@ -2,7 +2,9 @@ package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 
 import android.content.Context
 import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.realm.Realm
+import io.realm.Sort
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.FallbackPolicyResolver
@@ -12,6 +14,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.logics.TimeSpanPivotalSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemValueEntryDAO
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.models.DurationTimelineModel
@@ -35,6 +38,8 @@ class OTTimeSpanAttributeHelper : OTAttributeHelper() {
     companion object {
         const val PROPERTY_GRANULARITY = "granularity"
         const val PROPERTY_TYPE = "type"
+
+        const val FALLBACK_POLICY_ID_TIMESPAN_CONNECT_PREVIOUS = 11
 
         const val GRANULARITY_DAY = 0
         const val GRANULARITY_MINUTE = 1
@@ -119,6 +124,28 @@ class OTTimeSpanAttributeHelper : OTAttributeHelper() {
             this[OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE] = object : FallbackPolicyResolver(R.string.msg_intrinsic_time, isValueVolatile = true) {
                 override fun getFallbackValue(attribute: OTAttributeDAO, realm: Realm): Single<Nullable<out Any>> {
                     return Single.just(Nullable(TimeSpan()))
+                }
+            }
+
+            this[FALLBACK_POLICY_ID_TIMESPAN_CONNECT_PREVIOUS] = object : FallbackPolicyResolver(R.string.msg_attribute_fallback_policy_timespan_connect_previous, isValueVolatile = true) {
+                override fun getFallbackValue(attribute: OTAttributeDAO, realm: Realm): Single<Nullable<out Any>> {
+                    return Single.defer {
+                        val previousNotNullEntry = try {
+                            realm.where(OTItemValueEntryDAO::class.java)
+                                    .equalTo("key", attribute.localId)
+                                    .equalTo("item.trackerId", attribute.trackerId)
+                                    .equalTo("item.removed", false)
+                                    .findAllSorted("item.timestamp", Sort.DESCENDING).filter { it.value != null }.first()
+                        } catch (ex: NoSuchElementException) {
+                            null
+                        }
+
+                        val previousTimespan = previousNotNullEntry?.value?.let { TypeStringSerializationHelper.deserialize(it) as? TimeSpan }
+                        return@defer if (previousTimespan != null) {
+                            Single.just<Nullable<out Any>>(
+                                    Nullable(TimeSpan.fromPoints(previousTimespan.to, System.currentTimeMillis())))
+                        } else Single.just<Nullable<out Any>>(Nullable(null))
+                    }.subscribeOn(AndroidSchedulers.mainThread())
                 }
             }
 

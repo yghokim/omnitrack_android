@@ -60,7 +60,7 @@
 
     <string name="msg_confirm_order">Apply the revised order to the list?</string>
     <string name="msg_discard_apply">Discard</string>
-    <string name="msg_ok">Ok</string>
+    <string name="msg_ok">OK</string>
     <string name="msg_apply">Apply</string>
     <string name="msg_cancel">Cancel</string>
 
@@ -123,6 +123,8 @@
     <string name="msg_attribute_fallback_policy_null">Set empty</string>
     <string name="msg_attribute_fallback_policy_last">Fill with the previous logging value</string>
     <string name="msg_attribute_fallback_policy_preset">Fill with the preset value</string>
+
+    <string name="msg_attribute_fallback_policy_timespan_connect_previous">Start from the end of the previous item</string>
 
     <string name="msg_value_autocompletion">Value Autocompletion</string>
 
