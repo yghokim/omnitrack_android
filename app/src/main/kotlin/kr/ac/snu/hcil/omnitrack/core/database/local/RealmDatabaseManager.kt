@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.database.local
 
 import android.content.Intent
 import android.net.Uri
+import com.google.gson.JsonObject
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Observable
@@ -25,6 +26,7 @@ import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationClientSideAPI
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.utils.executeTransactionIfNotIn
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
+import org.json.JSONObject
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -33,7 +35,7 @@ import javax.inject.Singleton
  * Created by younghokim on 2017. 9. 25..
  */
 @Singleton
-class RealmDatabaseManager @Inject constructor(private val config: Configuration, private val authManager: OTAuthManager, private val binaryUploadServiceController: ABinaryUploadService.ABinaryUploadServiceController)
+class RealmDatabaseManager @Inject constructor(private val config: Configuration, private val authManager: OTAuthManager, private val serializationManager: DaoSerializationManager, private val binaryUploadServiceController: ABinaryUploadService.ABinaryUploadServiceController)
     :ISynchronizationClientSideAPI{
 
     companion object {
@@ -255,23 +257,17 @@ class RealmDatabaseManager @Inject constructor(private val config: Configuration
         }
     }
 
-    fun removeTrigger(dao: OTTriggerDAO, realm: Realm) {
-        fun process(realm: Realm) {
-            //TODO handle detach trigger from system
-
-            dao.synchronizedAt = null
-            dao.updatedAt = System.currentTimeMillis()
-            dao.removed = true
-            if (!dao.isManaged) {
-                realm.copyToRealmOrUpdate(dao)
-            }
-        }
-
-        if (realm.isInTransaction) {
-            process(realm)
-        } else {
-            realm.executeTransaction { r ->
-                process(r)
+    fun removeTrigger(dao: OTTriggerDAO, permanently: Boolean, realm: Realm) {
+        realm.executeTransactionIfNotIn { realm ->
+            if (permanently) {
+                dao.deleteFromRealm()
+            } else {
+                dao.synchronizedAt = null
+                dao.updatedAt = System.currentTimeMillis()
+                dao.removed = true
+                if (!dao.isManaged) {
+                    realm.copyToRealmOrUpdate(dao)
+                }
             }
         }
     }
@@ -479,24 +475,82 @@ class RealmDatabaseManager @Inject constructor(private val config: Configuration
         }
     }
 
-    override fun getDirtyRowsToSync(type: ESyncDataType): Single<List<Any>> {
+    override fun getDirtyRowsToSync(type: ESyncDataType): Single<List<String>> {
         return when(type)
         {
-            ESyncDataType.TRIGGER->getDirtyRowsToSyncImpl(OTTriggerDAO::class.java)
-            ESyncDataType.TRACKER->getDirtyRowsToSyncImpl(OTTrackerDAO::class.java)
-            ESyncDataType.ITEM->getDirtyRowsToSyncImpl(OTItemDAO::class.java)
+            ESyncDataType.TRIGGER -> getDirtyRowsToSyncImpl(OTTriggerDAO::class.java, { trigger -> serializationManager.serializeTrigger(trigger) })
+            ESyncDataType.TRACKER -> getDirtyRowsToSyncImpl(OTTrackerDAO::class.java, { tracker -> serializationManager.serializeTracker(tracker) })
+            ESyncDataType.ITEM -> getDirtyRowsToSyncImpl(OTItemDAO::class.java, { item -> serializationManager.serializeItem(item) })
         }
     }
 
-    override fun applyServerRowsToSync(type: ESyncDataType, list: List<Any>): Completable {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun applyServerRowsToSync(type: ESyncDataType, jsonList: List<String>): Completable {
+        return when (type) {
+            ESyncDataType.TRACKER -> applyServerRowsToSyncImpl(OTTrackerDAO::class.java, jsonList, { tracker -> tracker.synchronizedAt }, { tracker, realm -> removeTracker(tracker, true, realm) }, { dao, serverPojo -> dao.updatedAt < serverPojo.getLong(FIELD_UPDATED_AT_LONG) })
+            ESyncDataType.TRIGGER -> applyServerRowsToSyncImpl(OTTriggerDAO::class.java, jsonList, { trigger -> trigger.synchronizedAt }, { trigger, realm -> removeTrigger(trigger, true, realm) }, { dao, serverPojo -> dao.updatedAt < serverPojo.getLong(FIELD_UPDATED_AT_LONG) })
+            ESyncDataType.ITEM -> applyServerRowsToSyncImpl(OTItemDAO::class.java, jsonList, { item -> item.synchronizedAt }, { item, realm -> removeItemImpl(item, true, realm) }, { dao, serverPojo -> dao.timestamp < serverPojo.getLong(FIELD_TIMESTAMP_LONG) })
+        }
+    }
+
+    private fun <T : RealmObject> applyServerRowsToSyncImpl(tableClass: Class<T>, serverRowJsonList: List<String>, synchronizedAtFunc: (T) -> Long?, removeRowInDbFunc: (T, Realm) -> Unit, isServerWinForResolutionFunc: (T, JSONObject) -> Boolean): Completable {
+        return Completable.defer {
+            val realm = makeNewRealmInstance()
+            try {
+                for (serverPojo in serverRowJsonList.map { JSONObject(it) }.filter { it.has(FIELD_OBJECT_ID) }) {
+                    val match = realm.where(tableClass).equalTo(FIELD_OBJECT_ID, serverPojo.getString(FIELD_OBJECT_ID)).findFirst()
+                    if (match == null) {
+                        if (!serverPojo.getBoolean(FIELD_REMOVED_BOOLEAN)) {
+                            //insert
+                            println("synchronization: server row not matched and is not a removed row. append new in local db.")
+
+                            realm.executeTransaction { realm ->
+                                realm.createObjectFromJson(tableClass, serverPojo)
+                            }
+                        }
+                    } else if (synchronizedAtFunc(match) == null) {
+                        //found matched row, but it is dirty. Conflict!
+                        //late timestamp win policy
+                        println("conflict")
+                        if (isServerWinForResolutionFunc(match, serverPojo)) {
+                            //server win
+                            println("server win")
+                            realm.executeTransaction {
+                                removeRowInDbFunc(match, realm)
+                                //removeItemImpl(match, true, realm)
+                            }
+                        } else {
+                            //client win
+                            println("client win")
+                        }
+                    } else {
+                        //update
+                        realm.executeTransaction {
+                            if (serverPojo.getBoolean(FIELD_REMOVED_BOOLEAN)) {
+                                removeRowInDbFunc(match, realm)
+                                //removeItemImpl(match, true, realm)
+                            } else {
+                                realm.createOrUpdateObjectFromJson(tableClass, serverPojo)
+                            }
+                        }
+                    }
+                }
+
+                realm.close()
+                return@defer Completable.complete()
+            } catch (ex: Exception) {
+                ex.printStackTrace()
+                return@defer Completable.error(ex)
+            } finally {
+                realm.close()
+            }
+        }
     }
 
 
-    private fun <T: RealmObject> getDirtyRowsToSyncImpl(tableClass: Class<T>): Single<List<Any>>{
+    private fun <T : RealmObject> getDirtyRowsToSyncImpl(tableClass: Class<T>, serialize: (T) -> String): Single<List<String>> {
         return Single.defer{
             val realm = makeNewRealmInstance()
-            realm.where(tableClass).equalTo(FIELD_SYNCHRONIZED_AT, null as Long?).findAllAsync().asFlowable().map { it->it.toList() }.first(emptyList())
+            realm.where(tableClass).equalTo(FIELD_SYNCHRONIZED_AT, null as Long?).findAllAsync().asFlowable().map { it -> it.map { serialize(it) }.toList() }.first(emptyList())
                     .doOnSuccess { realm.close() }
         }
     }

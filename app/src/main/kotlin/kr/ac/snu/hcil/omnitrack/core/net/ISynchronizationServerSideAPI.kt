@@ -9,6 +9,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTUserRolePOJO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.database.synchronization.SyncResultEntry
 
 /**
@@ -18,6 +19,8 @@ interface ISynchronizationServerSideAPI {
 
     data class DeviceInfoResult(var result: String, var deviceLocalKey: String?)
 
+    data class DirtyRowBatchParameter(val type: ESyncDataType, val rows: Array<String>)
+
     fun getUserRoles(): Single<List<OTUserRolePOJO>>
 
     fun postUserRoleConsentResult(result: OTUserRolePOJO): Single<Boolean>
@@ -25,19 +28,11 @@ interface ISynchronizationServerSideAPI {
     fun putDeviceInfo(info: OTDeviceInfo): Single<DeviceInfoResult>
     fun removeDeviceInfo(userId: String, deviceId: String): Single<Boolean>
 
-
+    //=================================================================================================================================
     //server returns server-side changes after designated timestamp.
-    fun getItemsAfter(timestamp: Long): Single<List<OTItemDAO>>
+    fun getRowsSynchronizedAfter(vararg batch: Pair<ESyncDataType, Long>): Single<Map<ESyncDataType, Array<String>>>
 
-    //server receives
-    fun postItemsDirty(items: List<OTItemDAO>): Single<List<SyncResultEntry>>
-
-    fun getTrackersAfter(timestamp: Long): Single<List<OTTrackerDAO>>
-
-    fun postTrackersDirty(trackers: List<OTTrackerDAO>) : Single<List<SyncResultEntry>>
-
-    fun getTriggersAfter(timestamp: Long): Single<List<OTTriggerDAO>>
-
-    fun postTriggersDirty(triggers: List<OTTriggerDAO>): Single<List<SyncResultEntry>>
-
+    //send dirty data to server
+    fun postDirtyRows(vararg batch: DirtyRowBatchParameter): Single<Map<ESyncDataType, Array<SyncResultEntry>>>
+    //==================================================================================================================================
 }

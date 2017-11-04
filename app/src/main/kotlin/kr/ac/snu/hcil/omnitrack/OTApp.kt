@@ -163,23 +163,31 @@ class OTApp : MultiDexApplication() {
     private var wrappedContext: Context? = null
 
     //Dependency Injection
+
+
+    private val backendDatabaseModule: BackendDatabaseModule by lazy {
+        BackendDatabaseModule()
+    }
+
+    private val scheduledJobModule: ScheduledJobModule by lazy {
+        ScheduledJobModule()
+    }
+
     val applicationComponent: ApplicationComponent by lazy {
         DaggerApplicationComponent.builder()
                 .applicationModule(ApplicationModule(this))
                 .authModule(AuthModule(this))
                 .networkModule(NetworkModule(this))
-                .localDatabaseModule(BackendDatabaseModule())
+                .backendDatabaseModule(backendDatabaseModule)
                 .informationHelpersModule(InformationHelpersModule())
                 .build()
     }
 
     val daoSerializationComponent: DaoSerializationComponent by lazy {
-        applicationComponent.makeDaoSerializationComponentBuilder()
-                .setModule(DaoSerializationModule()).build()
-    }
-
-    private val scheduledJobModule: ScheduledJobModule by lazy{
-        ScheduledJobModule()
+        DaggerDaoSerializationComponent.builder()
+                .daoSerializationModule(DaoSerializationModule())
+                .backendDatabaseModule(backendDatabaseModule)
+                .build()
     }
 
     val scheduledJobComponent: ScheduledJobComponent by lazy{
