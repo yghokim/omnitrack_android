@@ -5,6 +5,7 @@ import android.icu.util.TimeUnit
 import com.firebase.jobdispatcher.*
 import dagger.Module
 import dagger.Provides
+import kr.ac.snu.hcil.omnitrack.services.OTSynchronizationService
 import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckService
 import javax.inject.Qualifier
 import javax.xml.datatype.DatatypeConstants.MINUTES
@@ -42,9 +43,30 @@ class ScheduledJobModule {
                 ).build()
     }
 
+    @Provides
+    @ApplicationScope
+    @ServerSync
+    fun providesServerSyncJob(builder: Job.Builder): Job
+    {
+        return builder.setRecurring(true)
+                .setService(OTSynchronizationService::class.java)
+                .setTag(OTVersionCheckService.TAG)
+                .setLifetime(Lifetime.FOREVER)
+                .setReplaceCurrent(true)
+                .setTrigger(Trigger.executionWindow(0, 3600*12))
+                .setRetryStrategy(RetryStrategy.DEFAULT_EXPONENTIAL)
+                .setConstraints(
+                        Constraint.ON_ANY_NETWORK
+                ).build()
+    }
+
 }
 
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME) annotation class VersionCheck
+
+@Qualifier
+@Retention(AnnotationRetention.RUNTIME) annotation class ServerSync
+
 
 

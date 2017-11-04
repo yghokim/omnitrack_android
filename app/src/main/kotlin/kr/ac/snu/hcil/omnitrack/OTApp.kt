@@ -2,13 +2,11 @@ package kr.ac.snu.hcil.omnitrack
 
 import android.app.Activity
 import android.content.Context
-import android.content.SharedPreferences
 import android.content.res.Resources
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
-import android.preference.PreferenceManager
 import android.provider.Settings
 import android.support.multidex.MultiDex
 import android.support.multidex.MultiDexApplication
@@ -170,7 +168,7 @@ class OTApp : MultiDexApplication() {
                 .applicationModule(ApplicationModule(this))
                 .authModule(AuthModule(this))
                 .networkModule(NetworkModule(this))
-                .localDatabaseModule(LocalDatabaseModule())
+                .localDatabaseModule(BackendDatabaseModule())
                 .informationHelpersModule(InformationHelpersModule())
                 .build()
     }
@@ -180,9 +178,20 @@ class OTApp : MultiDexApplication() {
                 .setModule(DaoSerializationModule()).build()
     }
 
+    private val scheduledJobModule: ScheduledJobModule by lazy{
+        ScheduledJobModule()
+    }
+
     val scheduledJobComponent: ScheduledJobComponent by lazy{
         applicationComponent.makeScheduledJobComponentBuilder()
-                .setModule(ScheduledJobModule())
+                .setModule(scheduledJobModule)
+                .build()
+    }
+
+    val synchronizationComponent: SynchronizationComponent by lazy{
+        applicationComponent.makeSynchronizationComponentBuilder()
+                .setMainModule(SynchronizationModule())
+                .setScheduledJobModule(scheduledJobModule)
                 .build()
     }
 
