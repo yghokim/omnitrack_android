@@ -72,7 +72,7 @@ abstract class AManagedTriggerListViewModel(app: Application) : ATriggerListView
     override fun removeTrigger(objectId: String) {
         val viewModel = currentTriggerViewModels.find { it.objectId == objectId }
         if (viewModel != null) {
-            dbManager.get().removeTrigger(viewModel.dao, realm)
+            dbManager.get().removeTrigger(viewModel.dao, false, realm)
         }
     }
 

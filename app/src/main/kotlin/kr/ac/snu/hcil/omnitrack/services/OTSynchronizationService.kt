@@ -30,13 +30,6 @@ class OTSynchronizationService : JobService() {
         const val ACTION_PERFORM_SYNCHRONIZATION = "${OTApp.PREFIX_ACTION}.PERFORM_SYNCHRONIZATION"
         const val INTENT_EXTRA_SYNC_DATA_TYPE = "syncDataType"
         const val INTENT_EXTRA_SYNC_DIRECTION = "syncDirection"
-
-        fun makePerformSynchronizationSessionIntent(context: Context, syncDataType: ESyncDataType, syncDirection: SyncDirection): Intent {
-            return Intent(context, OTSynchronizationService::class.java)
-                    .setAction(ACTION_PERFORM_SYNCHRONIZATION)
-                    .putExtra(INTENT_EXTRA_SYNC_DATA_TYPE, syncDataType.name)
-                    .putExtra(INTENT_EXTRA_SYNC_DIRECTION, syncDirection.name)
-        }
     }
 
     @Inject
@@ -59,11 +52,10 @@ class OTSynchronizationService : JobService() {
 
     private fun fetchPendingQueueData(internalSubject: PublishSubject<SyncQueueDbHelper.AggregatedSyncQueue>): Boolean {
         val pendingQueue = syncQueueDbHelper.get().getAggregatedData()
-        if(pendingQueue!=null) {
+        if (pendingQueue != null) {
             internalSubject.onNext(pendingQueue)
             return true
-        }
-        else {
+        } else {
             internalSubject.onComplete()
             return false
         }
@@ -73,12 +65,10 @@ class OTSynchronizationService : JobService() {
         val internalSubject = PublishSubject.create<SyncQueueDbHelper.AggregatedSyncQueue>()
 
         subscriptions.add(
-                internalSubject.doAfterNext{
-                    batchData->
+                internalSubject.doAfterNext { batchData ->
                     syncQueueDbHelper.get().purgeEntries(batchData.ids)
                     fetchPendingQueueData(internalSubject)
-                }.subscribe({
-                    batchData->
+                }.subscribe({ batchData ->
                     startSynchronization(batchData)
                 }, {
                     jobFinished(job, true)
@@ -96,11 +86,10 @@ class OTSynchronizationService : JobService() {
 
     private fun startSynchronization(syncDataType: ESyncDataType, direction: SyncDirection): Completable {
         return dbManager.get().getLatestSynchronizedServerTimeOf(syncDataType).observeOn(Schedulers.io())
-                .flatMapCompletable {
-                    serverTime->
+                .flatMapCompletable { serverTime ->
                     println("last synchronized server time was ${serverTime}.")
                     val newSession = SyncSession(serverTime, syncDataType, direction)
-                    return@flatMapCompletable newSession.performSync().flatMapCompletable { (session, success)-> if(success) Completable.complete() else Completable.error(Exception("Sync failed")) } }
+                    return@flatMapCompletable newSession.performSync().flatMapCompletable { (session, success) -> if (success) Completable.complete() else Completable.error(Exception("Sync failed")) }
                 }
     }
 }

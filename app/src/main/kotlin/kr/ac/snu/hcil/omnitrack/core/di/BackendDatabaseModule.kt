@@ -10,7 +10,7 @@ import javax.inject.Singleton
 /**
  * Created by Young-Ho on 11/3/2017.
  */
-@Module(includes = arrayOf(AuthModule::class, NetworkModule::class))
+@Module(includes = arrayOf(AuthModule::class, NetworkModule::class, DaoSerializationModule::class))
 class BackendDatabaseModule {
 
     @Provides
