@@ -19,7 +19,6 @@ abstract class RxBoundDialogFragment : DialogFragment() {
         subscription.set(onBind(savedInstanceState))
     }
 
-
     override fun onDestroyView() {
         super.onDestroyView()
         onUnbind()

@@ -48,8 +48,8 @@ class AttributeTypeAdapter(val gson: Lazy<Gson>) : TypeAdapter<OTAttributeDAO>()
                             while (reader.hasNext()) {
                                 when (reader.nextName()) {
                                     "id" -> entry.id = reader.nextString()
-                                    "k" -> entry.key = reader.nextString()
-                                    "v" -> entry.value = reader.nextString()
+                                    "key" -> entry.key = reader.nextString()
+                                    "serializedValue" -> entry.value = reader.nextString()
                                 }
                             }
                             reader.endObject()
@@ -86,8 +86,8 @@ class AttributeTypeAdapter(val gson: Lazy<Gson>) : TypeAdapter<OTAttributeDAO>()
         value.properties.forEach { prop ->
             out.beginObject()
             out.name("id").value(prop.id)
-            out.name("k").value(prop.key)
-            out.name("v").value(prop.value)
+            out.name("key").value(prop.key)
+            out.name("sVal").value(prop.value)
             out.endObject()
         }
 

@@ -1,13 +1,11 @@
 package kr.ac.snu.hcil.omnitrack.core.database.local
 
-import com.google.gson.Gson
 import com.google.gson.TypeAdapter
 import dagger.Lazy
-import kr.ac.snu.hcil.omnitrack.core.database.local.typeadapters.AttributeTypeAdapter
-import kr.ac.snu.hcil.omnitrack.core.database.local.typeadapters.ItemTypeAdapter
-import kr.ac.snu.hcil.omnitrack.core.database.local.typeadapters.TrackerTypeAdapter
-import kr.ac.snu.hcil.omnitrack.core.database.local.typeadapters.TriggerTypeAdapter
-import kr.ac.snu.hcil.omnitrack.core.di.*
+import kr.ac.snu.hcil.omnitrack.core.di.ForAttribute
+import kr.ac.snu.hcil.omnitrack.core.di.ForItem
+import kr.ac.snu.hcil.omnitrack.core.di.ForTracker
+import kr.ac.snu.hcil.omnitrack.core.di.ForTrigger
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -19,7 +17,7 @@ class DaoSerializationManager @Inject constructor(
         @ForTrigger val triggerTypeAdapter: Lazy<TypeAdapter<OTTriggerDAO>>,
         @ForAttribute val attributeTypeAdapter: Lazy<TypeAdapter<OTAttributeDAO>>,
         @ForTracker val trackerTypeAdapter: Lazy<TypeAdapter<OTTrackerDAO>>,
-        @ForItem val itemTypeAdapter: Lazy<ItemTypeAdapter>
+        @ForItem val itemTypeAdapter: Lazy<TypeAdapter<OTItemDAO>>
 ) {
 
     fun parseTrigger(triggerJson: String): OTTriggerDAO {

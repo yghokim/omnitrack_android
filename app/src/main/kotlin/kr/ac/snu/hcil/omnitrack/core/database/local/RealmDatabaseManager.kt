@@ -2,19 +2,15 @@ package kr.ac.snu.hcil.omnitrack.core.database.local
 
 import android.content.Intent
 import android.net.Uri
-import com.google.gson.JsonObject
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.subjects.PublishSubject
 import io.realm.*
-import io.realm.rx.RealmObservableFactory
-import io.realm.rx.RxObservableFactory
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.OTUser
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTItemPOJO
@@ -40,11 +36,12 @@ class RealmDatabaseManager @Inject constructor(private val config: Configuration
 
     companion object {
         const val FIELD_OBJECT_ID = "objectId"
-        const val FIELD_UPDATED_AT_LONG = "updatedAt"
+        const val FIELD_UPDATED_AT_LONG = "userUpdatedAt"
         const val FIELD_USER_CREATED_AT = "userCreatedAt"
         const val FIELD_SYNCHRONIZED_AT = "synchronizedAt"
         const val FIELD_REMOVED_BOOLEAN = "removed"
         const val FIELD_TIMESTAMP_LONG = "timestamp"
+
 
         const val FIELD_NAME = "name"
         const val FIELD_POSITION = "position"
@@ -62,16 +59,6 @@ class RealmDatabaseManager @Inject constructor(private val config: Configuration
     )
 
     fun makeNewRealmInstance(): Realm = Realm.getInstance(RealmConfiguration.Builder().name(config.fileName).build())
-    private val observableFactory: RxObservableFactory by lazy {
-        RealmObservableFactory()
-    }
-
-    private fun <R> usingRealm(func: (Realm) -> R): R {
-        val realm = makeNewRealmInstance()
-        val result = func.invoke(realm)
-        realm.close()
-        return result
-    }
 
     val OnItemListUpdated = PublishSubject.create<String>() // trackerId
 
@@ -198,7 +185,7 @@ class RealmDatabaseManager @Inject constructor(private val config: Configuration
                 realm.executeTransactionIfNotIn {
                     dao.removed = true
                     dao.synchronizedAt = null
-                    dao.updatedAt = System.currentTimeMillis()
+                    dao.userUpdatedAt = System.currentTimeMillis()
                 }
             }
         } else {
@@ -236,7 +223,7 @@ class RealmDatabaseManager @Inject constructor(private val config: Configuration
 
                     dao.removed = true
                     dao.synchronizedAt = null
-                    dao.updatedAt = System.currentTimeMillis()
+                    dao.userUpdatedAt = System.currentTimeMillis()
                 }
             }
         }
@@ -263,7 +250,7 @@ class RealmDatabaseManager @Inject constructor(private val config: Configuration
                 dao.deleteFromRealm()
             } else {
                 dao.synchronizedAt = null
-                dao.updatedAt = System.currentTimeMillis()
+                dao.userUpdatedAt = System.currentTimeMillis()
                 dao.removed = true
                 if (!dao.isManaged) {
                     realm.copyToRealmOrUpdate(dao)
@@ -283,7 +270,7 @@ class RealmDatabaseManager @Inject constructor(private val config: Configuration
                 {
                     dao.removed = true
                     dao.synchronizedAt = null
-                    dao.updatedAt = System.currentTimeMillis()
+                    dao.userUpdatedAt = System.currentTimeMillis()
                 }
             }*/
         }
@@ -406,7 +393,7 @@ class RealmDatabaseManager @Inject constructor(private val config: Configuration
                 realm.executeTransactionIfNotIn {
                     itemDao.removed = true
                     itemDao.synchronizedAt = null
-                    itemDao.updatedAt = System.currentTimeMillis()
+                    itemDao.userUpdatedAt = System.currentTimeMillis()
                 }
             } else {
                 realm.executeTransactionIfNotIn {
@@ -429,17 +416,20 @@ class RealmDatabaseManager @Inject constructor(private val config: Configuration
 
     //Item Sync APIs==========================================
 
-    override fun getLatestSynchronizedServerTimeOf(type: ESyncDataType): Single<Long>
+    override fun getLatestSynchronizedServerTimeOf(type: ESyncDataType): Long
             = when (type) {
         ESyncDataType.ITEM -> getLatestSynchronizedServerTimeImpl(OTItemDAO::class.java)
         ESyncDataType.TRIGGER -> getLatestSynchronizedServerTimeImpl(OTTriggerDAO::class.java)
         ESyncDataType.TRACKER -> getLatestSynchronizedServerTimeImpl(OTTrackerDAO::class.java)
-        else -> Single.just(0L)
+        else -> Long.MIN_VALUE
     //TODO implement user type
     }
 
-    private fun getLatestSynchronizedServerTimeImpl(daoClass: Class<out RealmObject>): Single<Long> {
-        return Single.just(makeNewRealmInstance().where(daoClass).max(FIELD_SYNCHRONIZED_AT)?.toLong() ?: 0)
+    private fun getLatestSynchronizedServerTimeImpl(daoClass: Class<out RealmObject>): Long {
+        val realm = makeNewRealmInstance()
+        val max = realm.where(daoClass).max(FIELD_SYNCHRONIZED_AT)?.toLong() ?: 0
+        realm.close()
+        return max
     }
 
     private fun <T: RealmObject> setSynchronizationFlagsImpl(daoClass: Class<T>, idTimestampPair: List<SyncResultEntry>, setFlagFunc: (T,Long)->Unit): Completable {
@@ -484,19 +474,19 @@ class RealmDatabaseManager @Inject constructor(private val config: Configuration
         }
     }
 
-    override fun applyServerRowsToSync(type: ESyncDataType, jsonList: List<String>): Completable {
+    override fun applyServerRowsToSync(type: ESyncDataType, jsonList: List<JSONObject>): Completable {
         return when (type) {
-            ESyncDataType.TRACKER -> applyServerRowsToSyncImpl(OTTrackerDAO::class.java, jsonList, { tracker -> tracker.synchronizedAt }, { tracker, realm -> removeTracker(tracker, true, realm) }, { dao, serverPojo -> dao.updatedAt < serverPojo.getLong(FIELD_UPDATED_AT_LONG) })
-            ESyncDataType.TRIGGER -> applyServerRowsToSyncImpl(OTTriggerDAO::class.java, jsonList, { trigger -> trigger.synchronizedAt }, { trigger, realm -> removeTrigger(trigger, true, realm) }, { dao, serverPojo -> dao.updatedAt < serverPojo.getLong(FIELD_UPDATED_AT_LONG) })
+            ESyncDataType.TRACKER -> applyServerRowsToSyncImpl(OTTrackerDAO::class.java, jsonList, { tracker -> tracker.synchronizedAt }, { tracker, realm -> removeTracker(tracker, true, realm) }, { dao, serverPojo -> dao.userUpdatedAt < serverPojo.getLong(FIELD_UPDATED_AT_LONG) })
+            ESyncDataType.TRIGGER -> applyServerRowsToSyncImpl(OTTriggerDAO::class.java, jsonList, { trigger -> trigger.synchronizedAt }, { trigger, realm -> removeTrigger(trigger, true, realm) }, { dao, serverPojo -> dao.userUpdatedAt < serverPojo.getLong(FIELD_UPDATED_AT_LONG) })
             ESyncDataType.ITEM -> applyServerRowsToSyncImpl(OTItemDAO::class.java, jsonList, { item -> item.synchronizedAt }, { item, realm -> removeItemImpl(item, true, realm) }, { dao, serverPojo -> dao.timestamp < serverPojo.getLong(FIELD_TIMESTAMP_LONG) })
         }
     }
 
-    private fun <T : RealmObject> applyServerRowsToSyncImpl(tableClass: Class<T>, serverRowJsonList: List<String>, synchronizedAtFunc: (T) -> Long?, removeRowInDbFunc: (T, Realm) -> Unit, isServerWinForResolutionFunc: (T, JSONObject) -> Boolean): Completable {
+    private fun <T : RealmObject> applyServerRowsToSyncImpl(tableClass: Class<T>, serverRowJsonList: List<JSONObject>, synchronizedAtFunc: (T) -> Long?, removeRowInDbFunc: (T, Realm) -> Unit, isServerWinForResolutionFunc: (T, JSONObject) -> Boolean): Completable {
         return Completable.defer {
             val realm = makeNewRealmInstance()
             try {
-                for (serverPojo in serverRowJsonList.map { JSONObject(it) }.filter { it.has(FIELD_OBJECT_ID) }) {
+                for (serverPojo in serverRowJsonList.filter { it.has(FIELD_OBJECT_ID) }) {
                     val match = realm.where(tableClass).equalTo(FIELD_OBJECT_ID, serverPojo.getString(FIELD_OBJECT_ID)).findFirst()
                     if (match == null) {
                         if (!serverPojo.getBoolean(FIELD_REMOVED_BOOLEAN)) {
@@ -550,8 +540,9 @@ class RealmDatabaseManager @Inject constructor(private val config: Configuration
     private fun <T : RealmObject> getDirtyRowsToSyncImpl(tableClass: Class<T>, serialize: (T) -> String): Single<List<String>> {
         return Single.defer{
             val realm = makeNewRealmInstance()
-            realm.where(tableClass).equalTo(FIELD_SYNCHRONIZED_AT, null as Long?).findAllAsync().asFlowable().map { it -> it.map { serialize(it) }.toList() }.first(emptyList())
-                    .doOnSuccess { realm.close() }
+            val list = realm.where(tableClass).equalTo(FIELD_SYNCHRONIZED_AT, null as Long?).findAll().map { it -> serialize(it) }.toList()
+            realm.close()
+            return@defer Single.just(list)
         }
     }
 

@@ -23,7 +23,7 @@ class TriggerTypeAdapter(val realmProvider: Provider<Realm>) : TypeAdapter<OTTri
             when (reader.nextName()) {
                 RealmDatabaseManager.FIELD_OBJECT_ID -> dao.objectId = reader.nextString()
                 RealmDatabaseManager.FIELD_USER_CREATED_AT -> dao.userCreatedAt = reader.nextLong()
-                RealmDatabaseManager.FIELD_UPDATED_AT_LONG -> dao.updatedAt = reader.nextLong()
+                RealmDatabaseManager.FIELD_UPDATED_AT_LONG -> dao.userUpdatedAt = reader.nextLong()
                 RealmDatabaseManager.FIELD_REMOVED_BOOLEAN -> dao.removed = reader.nextBoolean()
                 "alias" -> dao.alias = reader.nextString()
                 "position" -> dao.position = reader.nextInt()
@@ -69,7 +69,7 @@ class TriggerTypeAdapter(val realmProvider: Provider<Realm>) : TypeAdapter<OTTri
         out.name("lastTriggeredTime").value(value.lastTriggeredTime)
         out.name(RealmDatabaseManager.FIELD_SYNCHRONIZED_AT).value(value.synchronizedAt)
         out.name(RealmDatabaseManager.FIELD_REMOVED_BOOLEAN).value(value.removed)
-        out.name(RealmDatabaseManager.FIELD_UPDATED_AT_LONG).value(value.updatedAt)
+        out.name(RealmDatabaseManager.FIELD_UPDATED_AT_LONG).value(value.userUpdatedAt)
         out.name(RealmDatabaseManager.FIELD_USER_CREATED_AT).value(value.userCreatedAt)
 
         out.name("trackers")

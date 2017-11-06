@@ -4,7 +4,6 @@ import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
-import io.realm.OTItemDAORealmProxy
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemValueEntryDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
@@ -26,7 +25,7 @@ class ItemTypeAdapter: TypeAdapter<OTItemDAO>() {
                 RealmDatabaseManager.FIELD_REMOVED_BOOLEAN -> dao.removed = reader.nextBoolean()
                 RealmDatabaseManager.FIELD_SYNCHRONIZED_AT -> dao.synchronizedAt = reader.nextLong()
                 RealmDatabaseManager.FIELD_TIMESTAMP_LONG -> dao.timestamp = reader.nextLong()
-                RealmDatabaseManager.FIELD_UPDATED_AT_LONG -> dao.updatedAt = reader.nextLong()
+                RealmDatabaseManager.FIELD_UPDATED_AT_LONG -> dao.userUpdatedAt = reader.nextLong()
                 "deviceId"->dao.deviceId = reader.nextString()
                 "source"-> dao.source = reader.nextString()
                 "dataTable" ->{
@@ -65,11 +64,12 @@ class ItemTypeAdapter: TypeAdapter<OTItemDAO>() {
     }
 
     override fun write(out: JsonWriter, item: OTItemDAO) {
+        out.beginObject()
         out.name(RealmDatabaseManager.FIELD_OBJECT_ID).value(item.objectId)
         out.name(RealmDatabaseManager.FIELD_TRACKER_ID).value(item.trackerId)
         out.name(RealmDatabaseManager.FIELD_REMOVED_BOOLEAN).value(item.removed)
         out.name(RealmDatabaseManager.FIELD_TIMESTAMP_LONG).value(item.timestamp)
-        out.name(RealmDatabaseManager.FIELD_UPDATED_AT_LONG).value(item.updatedAt)
+        out.name(RealmDatabaseManager.FIELD_UPDATED_AT_LONG).value(item.userUpdatedAt)
         out.name(RealmDatabaseManager.FIELD_SYNCHRONIZED_AT).value(item.synchronizedAt)
         out.name("deviceId").value(item.deviceId)
         out.name("source").value(item.source)

@@ -45,7 +45,7 @@ class OTItemBuilderWrapperBase(val dao: OTItemBuilderDAO, val realm: Realm) {
             itemDaoToSave.loggingSource = loggingSource ?: ItemLoggingSource.Unspecified
             itemDaoToSave.trackerId = dao.tracker?.objectId
         } else {
-            itemDaoToSave.updatedAt = System.currentTimeMillis()
+            itemDaoToSave.userUpdatedAt = System.currentTimeMillis()
         }
         itemDaoToSave.synchronizedAt = null
 

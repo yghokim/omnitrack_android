@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.database.synchronization
 
+import kotlin.experimental.and
 import kotlin.experimental.or
 
 /**
@@ -7,6 +8,10 @@ import kotlin.experimental.or
  */
 enum class SyncDirection(val code: Short) {
     DOWNLOAD(0b01), UPLOAD(0b10), BIDIRECTIONAL(0b11);
+
+    fun contains(direction: SyncDirection): Boolean {
+        return this.code and direction.code == direction.code
+    }
 
     companion object {
         fun fromCode(code: Short): SyncDirection {
@@ -18,7 +23,7 @@ enum class SyncDirection(val code: Short) {
             for(direction in directions)
             {
                 if(union != null) {
-                    union = union + direction
+                    union += direction
                 }
                 else union = direction
 

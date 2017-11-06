@@ -4,8 +4,6 @@ import android.content.Context
 import dagger.Module
 import dagger.Provides
 import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
-import kr.ac.snu.hcil.omnitrack.core.database.synchronization.ESyncDataType
-import kr.ac.snu.hcil.omnitrack.core.database.synchronization.SyncDirection
 import kr.ac.snu.hcil.omnitrack.core.database.synchronization.SyncQueueDbHelper
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationClientSideAPI
 import javax.inject.Qualifier
@@ -30,21 +28,17 @@ class SynchronizationModule {
     {
         return backendDatabaseManager
     }
-
-    @Provides
-    @ApplicationScope
-    @FullSync
-    fun provideFullSyncQueue(): SyncQueueDbHelper.AggregatedSyncQueue
-    {
-        return SyncQueueDbHelper.AggregatedSyncQueue(
-                IntArray(0),
-                ESyncDataType.values().map { Pair(it, SyncDirection.BIDIRECTIONAL) }.toTypedArray()
-        )
-    }
 }
 
 
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME) annotation class FullSync
+
+@Qualifier
+@Retention(AnnotationRetention.RUNTIME) annotation class Download
+
+@Qualifier
+@Retention(AnnotationRetention.RUNTIME) annotation class Upload
+
 
 
