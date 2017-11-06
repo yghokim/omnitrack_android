@@ -2,7 +2,6 @@ package kr.ac.snu.hcil.omnitrack.core.database.local.typeadapters
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import dagger.Lazy
@@ -13,18 +12,19 @@ import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
 /**
  * Created by younghokim on 2017. 11. 3..
  */
-class TrackerTypeAdapter(val attributeTypeAdapter: Lazy<TypeAdapter<OTAttributeDAO>>, val gson: Lazy<Gson>): TypeAdapter<OTTrackerDAO>() {
+class TrackerTypeAdapter(isServerMode: Boolean, val attributeTypeAdapter: Lazy<ServerCompatibleTypeAdapter<OTAttributeDAO>>, val gson: Lazy<Gson>) : ServerCompatibleTypeAdapter<OTTrackerDAO>(isServerMode) {
 
-    override fun read(reader: JsonReader): OTTrackerDAO {
+    override fun read(reader: JsonReader, isServerMode: Boolean): OTTrackerDAO {
         val dao = OTTrackerDAO()
 
+        reader.beginObject()
         while(reader.hasNext())
         {
             when(reader.nextName())
             {
                 RealmDatabaseManager.FIELD_OBJECT_ID -> dao.objectId = reader.nextString()
                 RealmDatabaseManager.FIELD_REMOVED_BOOLEAN -> dao.removed = reader.nextBoolean()
-                RealmDatabaseManager.FIELD_USER_ID -> dao.userId = reader.nextString()
+                if (isServerMode) "user" else RealmDatabaseManager.FIELD_USER_ID -> dao.userId = reader.nextString()
                 RealmDatabaseManager.FIELD_USER_CREATED_AT -> dao.userCreatedAt = reader.nextLong()
                 RealmDatabaseManager.FIELD_SYNCHRONIZED_AT -> dao.synchronizedAt = reader.nextLong()
                 RealmDatabaseManager.FIELD_UPDATED_AT_LONG -> dao.userUpdatedAt = reader.nextLong()
@@ -54,44 +54,50 @@ class TrackerTypeAdapter(val attributeTypeAdapter: Lazy<TypeAdapter<OTAttributeD
 
                     reader.endArray()
                 }
-
+                else -> reader.skipValue()
             }
         }
+        reader.endObject()
 
         return dao
     }
 
-    override fun write(out: JsonWriter, tracker: OTTrackerDAO) {
-        out.beginObject()
+    override fun write(writer: JsonWriter, value: OTTrackerDAO, isServerMode: Boolean) {
+        writer.beginObject()
 
-        out.name(RealmDatabaseManager.FIELD_OBJECT_ID).value(tracker.objectId)
-        out.name(RealmDatabaseManager.FIELD_REMOVED_BOOLEAN).value(tracker.removed)
-        out.name(RealmDatabaseManager.FIELD_USER_ID).value(tracker.userId)
-        out.name(RealmDatabaseManager.FIELD_USER_CREATED_AT).value(tracker.userCreatedAt)
-        out.name(RealmDatabaseManager.FIELD_SYNCHRONIZED_AT).value(tracker.synchronizedAt)
-        out.name(RealmDatabaseManager.FIELD_UPDATED_AT_LONG).value(tracker.userUpdatedAt)
+        writer.name(RealmDatabaseManager.FIELD_OBJECT_ID).value(value.objectId)
+        writer.name(RealmDatabaseManager.FIELD_REMOVED_BOOLEAN).value(value.removed)
+        writer.name(if (isServerMode) "user" else RealmDatabaseManager.FIELD_USER_ID).value(value.userId)
+        writer.name(RealmDatabaseManager.FIELD_USER_CREATED_AT).value(value.userCreatedAt)
+        writer.name(RealmDatabaseManager.FIELD_UPDATED_AT_LONG).value(value.userUpdatedAt)
 
-        out.name(RealmDatabaseManager.FIELD_POSITION).value(tracker.position)
-        out.name(RealmDatabaseManager.FIELD_NAME).value(tracker.name)
-        out.name("color").value(tracker.color)
-        out.name("isBookmarked").value(tracker.isBookmarked)
-        out.name("lockedProperties").jsonValue(tracker.serializedLockedPropertyInfo)
-        out.name("flags").jsonValue(tracker.serializedCreationFlags)
-        out.name("attributes").beginArray()
-            for(attribute in tracker.attributes)
+        if (!isServerMode)
+            writer.name(RealmDatabaseManager.FIELD_SYNCHRONIZED_AT).value(value.synchronizedAt)
+
+        writer.name(RealmDatabaseManager.FIELD_POSITION).value(value.position)
+        writer.name(RealmDatabaseManager.FIELD_NAME).value(value.name)
+        writer.name("color").value(value.color)
+        writer.name("isBookmarked").value(value.isBookmarked)
+        writer.name("lockedProperties").jsonValue(value.serializedLockedPropertyInfo)
+        writer.name("flags").jsonValue(value.serializedCreationFlags)
+        writer.name("attributes").beginArray()
+        for (attribute in value.attributes)
             {
-                attributeTypeAdapter.get().write(out, attribute)
+                attributeTypeAdapter.get().write(writer, attribute)
             }
-        out.endArray()
+        writer.endArray()
 
-        out.name("removedAttributes").beginArray()
-        for(attribute in tracker.removedAttributes)
+        writer.name("removedAttributes").beginArray()
+        for (attribute in value.removedAttributes)
         {
-            attributeTypeAdapter.get().write(out, attribute)
+            attributeTypeAdapter.get().write(writer, attribute)
         }
-        out.endArray()
+        writer.endArray()
 
-        out.endObject()
+        writer.endObject()
     }
 
+    override fun applyToManagedDao(json: JsonObject, applyTo: OTTrackerDAO) {
+
+    }
 }

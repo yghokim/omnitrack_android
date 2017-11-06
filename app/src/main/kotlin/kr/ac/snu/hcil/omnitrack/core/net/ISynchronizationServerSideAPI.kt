@@ -1,11 +1,11 @@
 package kr.ac.snu.hcil.omnitrack.core.net
 
+import com.google.gson.JsonObject
 import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTUserRolePOJO
 import kr.ac.snu.hcil.omnitrack.core.database.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.database.synchronization.SyncResultEntry
-import org.json.JSONObject
 
 /**
  * Created by younghokim on 2017. 9. 27..
@@ -25,7 +25,7 @@ interface ISynchronizationServerSideAPI {
 
     //=================================================================================================================================
     //server returns server-side changes after designated timestamp.
-    fun getRowsSynchronizedAfter(vararg batch: Pair<ESyncDataType, Long>): Single<Map<ESyncDataType, Array<JSONObject>>>
+    fun getRowsSynchronizedAfter(vararg batch: Pair<ESyncDataType, Long>): Single<Map<ESyncDataType, Array<JsonObject>>>
 
     //send dirty data to server
     fun postDirtyRows(vararg batch: DirtyRowBatchParameter): Single<Map<ESyncDataType, Array<SyncResultEntry>>>

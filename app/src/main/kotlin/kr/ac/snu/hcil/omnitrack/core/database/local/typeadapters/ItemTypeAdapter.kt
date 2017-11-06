@@ -1,6 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.database.local.typeadapters
 
-import com.google.gson.TypeAdapter
+import com.google.gson.JsonObject
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
@@ -12,15 +12,16 @@ import java.util.*
 /**
  * Created by younghokim on 2017. 11. 4..
  */
-class ItemTypeAdapter: TypeAdapter<OTItemDAO>() {
-    override fun read(reader: JsonReader): OTItemDAO {
+class ItemTypeAdapter(isServerMode: Boolean) : ServerCompatibleTypeAdapter<OTItemDAO>(isServerMode) {
+
+    override fun read(reader: JsonReader, isServerMode: Boolean): OTItemDAO {
         val dao = OTItemDAO()
         reader.beginObject()
         while(reader.hasNext())
         {
             when(reader.nextName())
             {
-                RealmDatabaseManager.FIELD_TRACKER_ID->dao.trackerId = reader.nextString()
+                RealmDatabaseManager.FIELD_TRACKER_ID, "tracker" -> dao.trackerId = reader.nextString()
                 RealmDatabaseManager.FIELD_OBJECT_ID ->dao.objectId = reader.nextString()
                 RealmDatabaseManager.FIELD_REMOVED_BOOLEAN -> dao.removed = reader.nextBoolean()
                 RealmDatabaseManager.FIELD_SYNCHRONIZED_AT -> dao.synchronizedAt = reader.nextLong()
@@ -39,8 +40,8 @@ class ItemTypeAdapter: TypeAdapter<OTItemDAO>() {
                         {
                             when(reader.nextName())
                             {
-                                "attrId"->key = reader.nextString()
-                                "serializedValue"->serializedValue = if(reader.peek() == JsonToken.NULL) null else reader.nextString()
+                                "attrLocalId" -> key = reader.nextString()
+                                "sVal" -> serializedValue = if (reader.peek() == JsonToken.NULL) null else reader.nextString()
                             }
                         }
                         reader.endObject()
@@ -63,28 +64,30 @@ class ItemTypeAdapter: TypeAdapter<OTItemDAO>() {
         return dao
     }
 
-    override fun write(out: JsonWriter, item: OTItemDAO) {
-        out.beginObject()
-        out.name(RealmDatabaseManager.FIELD_OBJECT_ID).value(item.objectId)
-        out.name(RealmDatabaseManager.FIELD_TRACKER_ID).value(item.trackerId)
-        out.name(RealmDatabaseManager.FIELD_REMOVED_BOOLEAN).value(item.removed)
-        out.name(RealmDatabaseManager.FIELD_TIMESTAMP_LONG).value(item.timestamp)
-        out.name(RealmDatabaseManager.FIELD_UPDATED_AT_LONG).value(item.userUpdatedAt)
-        out.name(RealmDatabaseManager.FIELD_SYNCHRONIZED_AT).value(item.synchronizedAt)
-        out.name("deviceId").value(item.deviceId)
-        out.name("source").value(item.source)
-        out.name("dataTable").beginArray()
+    override fun write(writer: JsonWriter, value: OTItemDAO, isServerMode: Boolean) {
+        writer.beginObject()
+        writer.name(RealmDatabaseManager.FIELD_OBJECT_ID).value(value.objectId)
+        writer.name(if (isServerMode) "tracker" else RealmDatabaseManager.FIELD_TRACKER_ID).value(value.trackerId)
+        writer.name(RealmDatabaseManager.FIELD_REMOVED_BOOLEAN).value(value.removed)
+        writer.name(RealmDatabaseManager.FIELD_TIMESTAMP_LONG).value(value.timestamp)
+        writer.name(RealmDatabaseManager.FIELD_UPDATED_AT_LONG).value(value.userUpdatedAt)
+        writer.name(RealmDatabaseManager.FIELD_SYNCHRONIZED_AT).value(value.synchronizedAt)
+        writer.name("deviceId").value(value.deviceId)
+        writer.name("source").value(value.source)
+        writer.name("dataTable").beginArray()
 
-        for(entry in item.fieldValueEntries)
+        for (entry in value.fieldValueEntries)
         {
-            out.beginObject()
-            out.name("attrId").value(entry.key)
-            out.name("serializedValue").value(entry.value)
-            out.endObject()
+            writer.beginObject()
+            writer.name("attrLocalId").value(entry.key)
+            writer.name("sVal").value(entry.value)
+            writer.endObject()
         }
 
-        out.endArray()
-        out.endObject()
+        writer.endArray()
+        writer.endObject()
     }
 
+    override fun applyToManagedDao(json: JsonObject, applyTo: OTItemDAO) {
+    }
 }

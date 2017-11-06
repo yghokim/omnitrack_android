@@ -2,7 +2,6 @@ package kr.ac.snu.hcil.omnitrack.core.database.local.typeadapters
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
@@ -15,8 +14,9 @@ import java.util.*
 /**
  * Created by younghokim on 2017. 11. 2..
  */
-class AttributeTypeAdapter(val gson: Lazy<Gson>) : TypeAdapter<OTAttributeDAO>() {
-    override fun read(reader: JsonReader): OTAttributeDAO {
+class AttributeTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>) : ServerCompatibleTypeAdapter<OTAttributeDAO>(isServerMode) {
+
+    override fun read(reader: JsonReader, isServerMode: Boolean): OTAttributeDAO {
         val dao = OTAttributeDAO()
         reader.beginObject()
         while (reader.hasNext()) {
@@ -27,7 +27,7 @@ class AttributeTypeAdapter(val gson: Lazy<Gson>) : TypeAdapter<OTAttributeDAO>()
                 when (name) {
                     RealmDatabaseManager.FIELD_OBJECT_ID -> dao.objectId = reader.nextString()
                     "localId" -> dao.localId = reader.nextString()
-                    "trackerId" -> reader.nextString()
+                    "trackerId", "tracker" -> dao.trackerId = reader.nextString()
                     RealmDatabaseManager.FIELD_NAME -> dao.name = reader.nextString()
                     "isRequired" -> dao.isRequired = reader.nextBoolean()
                     RealmDatabaseManager.FIELD_POSITION -> dao.position = reader.nextInt()
@@ -35,7 +35,7 @@ class AttributeTypeAdapter(val gson: Lazy<Gson>) : TypeAdapter<OTAttributeDAO>()
                     "fallbackPolicy" -> dao.fallbackValuePolicy = reader.nextInt()
                     "fallbackPreset" -> dao.fallbackPresetSerializedValue = reader.nextString()
                     RealmDatabaseManager.FIELD_USER_CREATED_AT -> dao.userCreatedAt = reader.nextLong()
-                    RealmDatabaseManager.FIELD_UPDATED_AT_LONG -> dao.updatedAt = reader.nextLong()
+                    RealmDatabaseManager.FIELD_UPDATED_AT_LONG -> dao.userUpdatedAt = reader.nextLong()
                     "connection" -> {
                         dao.serializedConnection = gson.get().fromJson<JsonObject>(reader, JsonObject::class.java).toString()
                     }
@@ -49,7 +49,7 @@ class AttributeTypeAdapter(val gson: Lazy<Gson>) : TypeAdapter<OTAttributeDAO>()
                                 when (reader.nextName()) {
                                     "id" -> entry.id = reader.nextString()
                                     "key" -> entry.key = reader.nextString()
-                                    "serializedValue" -> entry.value = reader.nextString()
+                                    "sVal" -> entry.value = reader.nextString()
                                 }
                             }
                             reader.endObject()
@@ -66,33 +66,69 @@ class AttributeTypeAdapter(val gson: Lazy<Gson>) : TypeAdapter<OTAttributeDAO>()
         return dao
     }
 
-    override fun write(out: JsonWriter, value: OTAttributeDAO) {
-        out.beginObject()
+    override fun write(writer: JsonWriter, value: OTAttributeDAO, isServerMode: Boolean) {
+        writer.beginObject()
 
-        out.name(RealmDatabaseManager.FIELD_OBJECT_ID).value(value.objectId)
-        out.name("localId").value(value.localId)
-        out.name("trackerId").value(value.trackerId)
-        out.name(RealmDatabaseManager.FIELD_NAME).value(value.name)
-        out.name("isRequired").value(value.isRequired)
-        out.name(RealmDatabaseManager.FIELD_POSITION).value(value.position)
-        out.name("fallbackPolicy").value(value.fallbackValuePolicy)
-        out.name("fallbackPreset").value(value.fallbackPresetSerializedValue)
-        out.name("type").value(value.type)
-        out.name(RealmDatabaseManager.FIELD_USER_CREATED_AT).value(value.userCreatedAt)
-        out.name("connection").jsonValue(value.serializedConnection)
-        out.name(RealmDatabaseManager.FIELD_UPDATED_AT_LONG).value(value.updatedAt)
-        out.name("properties").beginArray()
+        if (!isServerMode)
+            writer.name(RealmDatabaseManager.FIELD_OBJECT_ID).value(value.objectId)
+
+        writer.name("localId").value(value.localId)
+        writer.name(if (isServerMode) "trackerId" else "tracker").value(value.trackerId)
+        writer.name(RealmDatabaseManager.FIELD_NAME).value(value.name)
+        writer.name("isRequired").value(value.isRequired)
+        writer.name(RealmDatabaseManager.FIELD_POSITION).value(value.position)
+        writer.name("fallbackPolicy").value(value.fallbackValuePolicy)
+        writer.name("fallbackPreset").value(value.fallbackPresetSerializedValue)
+        writer.name("type").value(value.type)
+        writer.name(RealmDatabaseManager.FIELD_USER_CREATED_AT).value(value.userCreatedAt)
+        writer.name("connection").jsonValue(value.serializedConnection)
+        writer.name(RealmDatabaseManager.FIELD_UPDATED_AT_LONG).value(value.userUpdatedAt)
+        writer.name("properties").beginArray()
 
         value.properties.forEach { prop ->
-            out.beginObject()
-            out.name("id").value(prop.id)
-            out.name("key").value(prop.key)
-            out.name("sVal").value(prop.value)
-            out.endObject()
+            writer.beginObject()
+
+            if (!isServerMode)
+                writer.name("id").value(prop.id)
+
+            writer.name("key").value(prop.key)
+            writer.name("sVal").value(prop.value)
+            writer.endObject()
         }
 
-        out.endArray()
+        writer.endArray()
 
-        out.endObject()
+        writer.endObject()
     }
+
+    override fun applyToManagedDao(json: JsonObject, applyTo: OTAttributeDAO) {
+        json.keySet().forEach { key ->
+            when (key) {
+                RealmDatabaseManager.FIELD_NAME -> applyTo.name = json[key].asString
+                "isRequired" -> applyTo.isRequired = json[key].asBoolean
+                RealmDatabaseManager.FIELD_POSITION -> applyTo.position = json[key].asInt
+                "connection" -> applyTo.serializedConnection = json[key].asString
+                "type" -> applyTo.type = json[key].asInt
+                "fallbackPolicy" -> applyTo.fallbackValuePolicy = json[key].asInt
+                "fallbackPreset" -> applyTo.fallbackPresetSerializedValue = json[key].asString
+
+                "properties" -> {
+                    if (json[key].isJsonArray) {
+                        val jsonProperties = json[key].asJsonArray.mapNotNull { if (it.isJsonObject) it.asJsonObject else null }
+                        jsonProperties.forEach { jsonProp ->
+                            applyTo.setPropertySerializedValue(jsonProp["key"].asString, jsonProp["sVal"].asString)
+                        }
+
+                        val toRemoves = applyTo.properties.filter { prop -> jsonProperties.find { it["key"].asString == prop.key } == null }
+                        applyTo.properties.removeAll(toRemoves)
+                        toRemoves.forEach { it.deleteFromRealm() }
+                    }
+                }
+
+                RealmDatabaseManager.FIELD_UPDATED_AT_LONG -> applyTo.userUpdatedAt = json[key].asLong
+
+            }
+        }
+    }
+
 }

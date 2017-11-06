@@ -29,27 +29,19 @@ class OTConnection {
             while (reader.hasNext()) {
                 when (reader.nextName()) {
                     "factory" -> {
-                        var factoryCode: String = ""
-                        reader.beginObject()
-                        while (reader.hasNext()) {
-                            when (reader.nextName()) {
-                                "code" -> factoryCode = reader.nextString()
-                                "data" -> {
-                                    val factory = OTExternalService.getMeasureFactoryByCode(typeCode = factoryCode)
-                                    if (factory == null) {
-                                        println("$factoryCode is not supported in System.")
-                                        reader.skipValue()
-                                    } else {
-                                        connection.source = factory.makeMeasure(reader)
-                                        if (reader.peek() != JsonToken.NAME || reader.peek() != JsonToken.END_OBJECT) {
-                                            reader.skipValue()
-                                        }
-                                    }
-                                }
+                        reader.beginArray()
+                        val factoryCode = reader.nextString()
+                        val factory = OTExternalService.getMeasureFactoryByCode(typeCode = factoryCode)
+                        if (factory == null) {
+                            println("$factoryCode is not supported in System.")
+                            reader.skipValue()
+                        } else {
+                            connection.source = factory.makeMeasure(reader)
+                            if (reader.peek() != JsonToken.NAME || reader.peek() != JsonToken.END_ARRAY) {
+                                reader.skipValue()
                             }
                         }
-
-                        reader.endObject()
+                        reader.endArray()
                     }
 
                     "query" -> {
@@ -68,10 +60,11 @@ class OTConnection {
             out.beginObject()
 
             value.source?.let {
-                out.name("factory").beginObject()
-                out.name("code").value(it.factoryCode)
-                out.name("data").jsonValue(it.factory.serializeMeasure(it))
-                out.endObject()
+                out.name("factory")
+                out.beginArray()
+                out.value(it.factoryCode)
+                out.jsonValue(it.factory.serializeMeasure(it))
+                out.endArray()
             }
 
             value.rangedQuery?.let {
