@@ -60,7 +60,7 @@ open class OTTrackerDAO : RealmObject() {
 
     var userCreatedAt: Long = System.currentTimeMillis()
     var synchronizedAt: Long? = null // store server time of when synchronized perfectly.
-    var updatedAt: Long = System.currentTimeMillis()
+    var userUpdatedAt: Long = System.currentTimeMillis()
     var removed: Boolean = false
 
     @LinkingObjects("trackers")

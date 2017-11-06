@@ -1,23 +1,18 @@
 package kr.ac.snu.hcil.omnitrack.services
 
-import android.content.Context
-import android.content.Intent
 import com.firebase.jobdispatcher.JobParameters
 import com.firebase.jobdispatcher.JobService
 import dagger.Lazy
 import io.reactivex.Completable
-import io.reactivex.CompletableSource
-import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.database.synchronization.SyncDirection
 import kr.ac.snu.hcil.omnitrack.core.database.synchronization.SyncQueueDbHelper
-import kr.ac.snu.hcil.omnitrack.core.database.synchronization.SyncSession
-import java.util.concurrent.TimeUnit
+import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationClientSideAPI
+import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationServerSideAPI
 import javax.inject.Inject
 
 /**
@@ -27,13 +22,14 @@ class OTSynchronizationService : JobService() {
 
     companion object {
 
-        const val ACTION_PERFORM_SYNCHRONIZATION = "${OTApp.PREFIX_ACTION}.PERFORM_SYNCHRONIZATION"
-        const val INTENT_EXTRA_SYNC_DATA_TYPE = "syncDataType"
-        const val INTENT_EXTRA_SYNC_DIRECTION = "syncDirection"
+        const val EXTRA_KEY_ONESHOT = "isOneShot"
     }
 
     @Inject
-    lateinit var dbManager: Lazy<RealmDatabaseManager>
+    lateinit var syncClient: Lazy<ISynchronizationClientSideAPI>
+
+    @Inject
+    lateinit var syncServerController: Lazy<ISynchronizationServerSideAPI>
 
     @Inject
     lateinit var syncQueueDbHelper: Lazy<SyncQueueDbHelper>
@@ -54,42 +50,76 @@ class OTSynchronizationService : JobService() {
         val pendingQueue = syncQueueDbHelper.get().getAggregatedData()
         if (pendingQueue != null) {
             internalSubject.onNext(pendingQueue)
+            println("synchQueue data is pending. update internal subject.")
             return true
         } else {
             internalSubject.onComplete()
+            println("synchQueue is empty. complete the internal subject.")
             return false
         }
     }
 
     override fun onStartJob(job: JobParameters): Boolean {
+        println("start synchronization... ${job.extras}")
         val internalSubject = PublishSubject.create<SyncQueueDbHelper.AggregatedSyncQueue>()
 
         subscriptions.add(
                 internalSubject.doAfterNext { batchData ->
                     syncQueueDbHelper.get().purgeEntries(batchData.ids)
                     fetchPendingQueueData(internalSubject)
-                }.subscribe({ batchData ->
-                    startSynchronization(batchData)
-                }, {
-                    jobFinished(job, true)
-                }, {
-                    jobFinished(job, true)
-                })
+                }.concatMap { batchData ->
+                    startSynchronization(batchData).toSingle { batchData }.toObservable()
+                }
+                        .subscribe({ batchData ->
+                            println(batchData)
+                        }, { err ->
+                            err.printStackTrace()
+                            jobFinished(job, true)
+                        }, {
+                            jobFinished(job, true)
+                        })
         )
 
         return fetchPendingQueueData(internalSubject)
     }
 
     private fun startSynchronization(batchData: SyncQueueDbHelper.AggregatedSyncQueue): Completable {
-        return Completable.complete()
-    }
-
-    private fun startSynchronization(syncDataType: ESyncDataType, direction: SyncDirection): Completable {
-        return dbManager.get().getLatestSynchronizedServerTimeOf(syncDataType).observeOn(Schedulers.io())
-                .flatMapCompletable { serverTime ->
-                    println("last synchronized server time was ${serverTime}.")
-                    val newSession = SyncSession(serverTime, syncDataType, direction)
-                    return@flatMapCompletable newSession.performSync().flatMapCompletable { (session, success) -> if (success) Completable.complete() else Completable.error(Exception("Sync failed")) }
+        val downDirection = Completable.defer {
+            val dbLatestTimestamps = batchData.data.filter { it.second.contains(SyncDirection.DOWNLOAD) }
+                    .map { (type, _) ->
+                        Pair(type, syncClient.get().getLatestSynchronizedServerTimeOf(type))
+                    }.toTypedArray()
+            if (dbLatestTimestamps.isNotEmpty()) {
+                syncServerController.get().getRowsSynchronizedAfter(*dbLatestTimestamps).flatMapCompletable { serverItemsMap ->
+                    println(serverItemsMap)
+                    Completable.merge(
+                            serverItemsMap.map { (type, serverItems) ->
+                                if (serverItems.isNotEmpty()) {
+                                    syncClient.get().applyServerRowsToSync(type, serverItems.toList())
+                                } else {
+                                    Completable.complete()
+                                }
+                            }
+                    )
                 }
+            } else {
+                return@defer Completable.complete()
+            }
+        }
+
+        val upDirection = Completable.defer {
+            val downTypes = batchData.data.filter { it.second.contains(SyncDirection.UPLOAD) }.map { it.first }.toTypedArray()
+            println("start sync download from server: ${downTypes.joinToString(",")}")
+            Single.zip(downTypes.map { type -> syncClient.get().getDirtyRowsToSync(type).map { Pair(type, it) } }) { clientDirtyRowsArray ->
+                clientDirtyRowsArray.map { it as Pair<ESyncDataType, List<String>> }
+            }.flatMap {
+                println("sync send dirty rows to server: ${it}")
+                syncServerController.get().postDirtyRows(*it.map { entry -> ISynchronizationServerSideAPI.DirtyRowBatchParameter(entry.first, entry.second.toTypedArray()) }.toTypedArray())
+            }.flatMapCompletable { result ->
+                Completable.merge(result.map { entry -> syncClient.get().setTableSynchronizationFlags(entry.key, entry.value.toList()) })
+            }
+        }
+
+        return downDirection.andThen(upDirection)
     }
 }

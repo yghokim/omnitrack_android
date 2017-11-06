@@ -1,9 +1,5 @@
 package kr.ac.snu.hcil.omnitrack.core.database.local
 
-import com.google.gson.TypeAdapter
-import com.google.gson.stream.JsonReader
-import com.google.gson.stream.JsonWriter
-import io.realm.Realm
 import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.RealmQuery
@@ -15,7 +11,6 @@ import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTNotificationTriggerActio
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTTriggerAction
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.ATriggerCondition
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTTimeTriggerCondition
-import javax.inject.Provider
 
 /**
  * Created by Young-Ho on 10/9/2017.
@@ -145,7 +140,7 @@ open class OTTriggerDAO : RealmObject() {
 
     var synchronizedAt: Long? = null
     var removed: Boolean = false
-    var updatedAt: Long = System.currentTimeMillis()
+    var userUpdatedAt: Long = System.currentTimeMillis()
     var userCreatedAt: Long = System.currentTimeMillis()
 
     fun initialize(forceRefresh: Boolean = false) {

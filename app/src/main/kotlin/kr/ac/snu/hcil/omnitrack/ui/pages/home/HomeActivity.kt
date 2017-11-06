@@ -85,7 +85,7 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
         //Setup sliding menu
         drawerLayout.addDrawerListener(this)
 
-        sidebar = SidebarWrapper(findViewById(R.id.ui_sidebar), this, authManager)
+        sidebar = SidebarWrapper(findViewById(R.id.ui_sidebar), this)
         sidebar.onCreate()
 
         creationSubscriptions.add(
