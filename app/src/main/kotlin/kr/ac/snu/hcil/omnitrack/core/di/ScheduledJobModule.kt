@@ -1,14 +1,13 @@
 package kr.ac.snu.hcil.omnitrack.core.di
 
 import android.content.Context
-import android.icu.util.TimeUnit
+import android.os.Bundle
 import com.firebase.jobdispatcher.*
 import dagger.Module
 import dagger.Provides
 import kr.ac.snu.hcil.omnitrack.services.OTSynchronizationService
 import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckService
 import javax.inject.Qualifier
-import javax.xml.datatype.DatatypeConstants.MINUTES
 
 /**
  * Created by Young-Ho on 11/3/2017.
@@ -45,6 +44,15 @@ class ScheduledJobModule {
 
     @Provides
     @ApplicationScope
+    @ServerSyncOneShot
+    fun makeOneShotBundle(): Bundle {
+        return Bundle().apply { putBoolean(OTSynchronizationService.EXTRA_KEY_ONESHOT, true) }
+    }
+
+
+
+    @Provides
+    @ApplicationScope
     @ServerSync
     fun providesServerSyncJob(builder: Job.Builder): Job
     {
@@ -60,6 +68,24 @@ class ScheduledJobModule {
                 ).build()
     }
 
+    @Provides
+    @ApplicationScope
+    @ServerSyncOneShot
+    fun providesImmediateServerSyncJob(builder: Job.Builder, @ServerSyncOneShot oneShotBundle: Bundle): Job {
+        return builder.setRecurring(false)
+                .setService(OTSynchronizationService::class.java)
+                .setTag(OTVersionCheckService.TAG)
+                .setLifetime(Lifetime.FOREVER)
+                .setExtras(oneShotBundle)
+                .setReplaceCurrent(true)
+                .setTrigger(Trigger.executionWindow(0, 0))
+                .setRetryStrategy(RetryStrategy.DEFAULT_EXPONENTIAL)
+                .setConstraints(
+                        Constraint.ON_ANY_NETWORK
+                ).build()
+    }
+
+
 }
 
 @Qualifier
@@ -68,5 +94,5 @@ class ScheduledJobModule {
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME) annotation class ServerSync
 
-
-
+@Qualifier
+@Retention(AnnotationRetention.RUNTIME) annotation class ServerSyncOneShot

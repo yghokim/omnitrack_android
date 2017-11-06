@@ -76,6 +76,11 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
         this.listeners.add(listener)
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        (activity?.application as? OTApp)?.applicationComponent?.inject(this)
+    }
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val view = setupViews(LayoutInflater.from(activity), savedInstanceState)
 
@@ -131,10 +136,6 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         val activity = activity
-        if (activity != null) {
-            (activity.application as OTApp).applicationComponent.inject(this)
-        }
-
         if (activity is Listener && savedInstanceState != null) {
             addListener(activity)
         }

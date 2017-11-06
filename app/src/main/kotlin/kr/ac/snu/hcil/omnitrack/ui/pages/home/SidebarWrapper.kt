@@ -11,22 +11,30 @@ import android.view.View
 import android.widget.PopupMenu
 import android.widget.TextView
 import com.bumptech.glide.Glide
+import dagger.Lazy
 import de.hdodenhof.circleimageview.CircleImageView
 import io.reactivex.disposables.CompositeDisposable
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.database.synchronization.ESyncDataType
+import kr.ac.snu.hcil.omnitrack.core.database.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.viewholders.RecyclerViewMenuAdapter
 import kr.ac.snu.hcil.omnitrack.ui.pages.AboutActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.settings.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
+import javax.inject.Inject
 
 /**
  * Created by Young-Ho Kim on 2017-01-31.
  */
-class SidebarWrapper(val view: View, val parentActivity: AppCompatActivity, val authManager: OTAuthManager) : PopupMenu.OnMenuItemClickListener {
+class SidebarWrapper(val view: View, val parentActivity: AppCompatActivity) : PopupMenu.OnMenuItemClickListener {
+
+    @Inject
+    lateinit var authManager: OTAuthManager
+
+    @Inject
+    lateinit var syncManager: Lazy<OTSyncManager>
 
     private val photoView: CircleImageView = view.findViewById(R.id.ui_user_photo)
     private val nameView: TextView = view.findViewById(R.id.ui_user_name)
@@ -37,6 +45,8 @@ class SidebarWrapper(val view: View, val parentActivity: AppCompatActivity, val 
     private val subscriptions = CompositeDisposable()
 
     init {
+
+        (parentActivity.application as OTApp).synchronizationComponent.inject(this)
         /*
         val signOutButton = view.findViewById(R.id.ui_button_sign_out)
         signOutButton.setOnClickListener {
@@ -112,6 +122,8 @@ class SidebarWrapper(val view: View, val parentActivity: AppCompatActivity, val 
 
                 RecyclerViewMenuAdapter.MenuItem(R.drawable.icon_refresh, "Refresh", null, {
                     //OTApp.instance.syncManager.performSynchronizationOf(ESyncDataType.ITEM)
+                    syncManager.get().queueFullSync()
+                    syncManager.get().reserveSyncServiceNow()
                 }, true)
         )
 

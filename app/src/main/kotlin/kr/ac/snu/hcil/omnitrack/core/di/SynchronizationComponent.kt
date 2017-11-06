@@ -1,7 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.core.di
 
 import dagger.Subcomponent
+import kr.ac.snu.hcil.omnitrack.core.database.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.services.OTSynchronizationService
+import kr.ac.snu.hcil.omnitrack.ui.pages.home.SidebarWrapper
 
 /**
  * Created by younghokim on 2017. 11. 4..
@@ -16,6 +18,9 @@ interface SynchronizationComponent {
         fun build(): SynchronizationComponent
     }
 
+    fun getManager(): OTSyncManager
+
 
     fun inject(service: OTSynchronizationService)
+    fun inject(sidebar: SidebarWrapper)
 }

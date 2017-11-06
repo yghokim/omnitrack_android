@@ -6,7 +6,6 @@ import io.realm.RealmObject
 import io.realm.annotations.Index
 import io.realm.annotations.PrimaryKey
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
-import kr.ac.snu.hcil.omnitrack.core.OTItem
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTItemPOJO
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import java.util.*
@@ -33,7 +32,7 @@ open class OTItemDAO : RealmObject() {
 
     var synchronizedAt: Long? = null // store server time of when synchronized perfectly.
 
-    var updatedAt: Long = System.currentTimeMillis()
+    var userUpdatedAt: Long = System.currentTimeMillis()
 
     var removed: Boolean = false
 

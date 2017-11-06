@@ -6,7 +6,6 @@ import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import dagger.Lazy
-import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
@@ -28,7 +27,7 @@ class TrackerTypeAdapter(val attributeTypeAdapter: Lazy<TypeAdapter<OTAttributeD
                 RealmDatabaseManager.FIELD_USER_ID -> dao.userId = reader.nextString()
                 RealmDatabaseManager.FIELD_USER_CREATED_AT -> dao.userCreatedAt = reader.nextLong()
                 RealmDatabaseManager.FIELD_SYNCHRONIZED_AT -> dao.synchronizedAt = reader.nextLong()
-                RealmDatabaseManager.FIELD_UPDATED_AT_LONG -> dao.updatedAt = reader.nextLong()
+                RealmDatabaseManager.FIELD_UPDATED_AT_LONG -> dao.userUpdatedAt = reader.nextLong()
                 RealmDatabaseManager.FIELD_POSITION -> dao.position = reader.nextInt()
                 RealmDatabaseManager.FIELD_NAME -> dao.name = reader.nextString()
                 "color" -> dao.color = reader.nextInt()
@@ -70,7 +69,7 @@ class TrackerTypeAdapter(val attributeTypeAdapter: Lazy<TypeAdapter<OTAttributeD
         out.name(RealmDatabaseManager.FIELD_USER_ID).value(tracker.userId)
         out.name(RealmDatabaseManager.FIELD_USER_CREATED_AT).value(tracker.userCreatedAt)
         out.name(RealmDatabaseManager.FIELD_SYNCHRONIZED_AT).value(tracker.synchronizedAt)
-        out.name(RealmDatabaseManager.FIELD_UPDATED_AT_LONG).value(tracker.updatedAt)
+        out.name(RealmDatabaseManager.FIELD_UPDATED_AT_LONG).value(tracker.userUpdatedAt)
 
         out.name(RealmDatabaseManager.FIELD_POSITION).value(tracker.position)
         out.name(RealmDatabaseManager.FIELD_NAME).value(tracker.name)
