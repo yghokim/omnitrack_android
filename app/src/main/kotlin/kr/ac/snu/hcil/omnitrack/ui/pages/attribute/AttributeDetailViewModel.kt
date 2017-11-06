@@ -187,7 +187,7 @@ class AttributeDetailViewModel(app: Application) : RealmViewModel(app) {
             dao.localId = it.localId
             dao.position = it.position
             dao.trackerId = it.trackerId
-            dao.updatedAt = it.updatedAt
+            dao.userUpdatedAt = it.userUpdatedAt
             dao.isRequired = it.isRequired
             dao.fallbackValuePolicy = defaultValuePolicy
             dao.fallbackPresetSerializedValue = defaultValuePreset

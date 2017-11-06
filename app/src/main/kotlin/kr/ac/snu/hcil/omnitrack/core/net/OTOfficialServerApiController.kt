@@ -14,7 +14,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.synchronization.SyncResultEntry
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Response
-import org.json.JSONObject
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
@@ -80,7 +79,7 @@ class OTOfficialServerApiController (app: OTApp) : ISynchronizationServerSideAPI
         TODO()
     }
 
-    override fun getRowsSynchronizedAfter(vararg batch: Pair<ESyncDataType, Long>): Single<Map<ESyncDataType, Array<JSONObject>>> {
+    override fun getRowsSynchronizedAfter(vararg batch: Pair<ESyncDataType, Long>): Single<Map<ESyncDataType, Array<JsonObject>>> {
         return service.getServerDataChanges(batch.map { it.first }.toTypedArray(), batch.map { it.second }.toTypedArray())
                 .subscribeOn(Schedulers.io())
     }
