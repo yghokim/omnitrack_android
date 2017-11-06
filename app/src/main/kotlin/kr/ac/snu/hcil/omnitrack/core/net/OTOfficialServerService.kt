@@ -6,7 +6,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTUserRolePOJO
 import kr.ac.snu.hcil.omnitrack.core.database.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.database.synchronization.SyncResultEntry
-import org.json.JSONObject
 import retrofit2.http.*
 
 /**
@@ -28,7 +27,7 @@ interface OTOfficialServerService {
     fun postUserReport(@Body data: JsonObject): Single<Boolean>
 
     @GET("api/batch/changes")
-    fun getServerDataChanges(@Query("types[]") types: Array<ESyncDataType>, @Query("timestamps[]") timestamps: Array<Long>): Single<Map<ESyncDataType, Array<JSONObject>>>
+    fun getServerDataChanges(@Query("types[]") types: Array<ESyncDataType>, @Query("timestamps[]") timestamps: Array<Long>): Single<Map<ESyncDataType, Array<JsonObject>>>
 
     @POST("api/batch/changes")
     fun postLocalDataChanges(@Body parameter: Array<out ISynchronizationServerSideAPI.DirtyRowBatchParameter>): Single<Map<ESyncDataType, Array<SyncResultEntry>>>

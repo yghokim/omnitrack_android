@@ -1,6 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.database.local.typeadapters
 
-import com.google.gson.TypeAdapter
+import com.google.gson.JsonObject
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import io.realm.Realm
@@ -12,8 +12,9 @@ import javax.inject.Provider
 /**
  * Created by younghokim on 2017. 11. 2..
  */
-class TriggerTypeAdapter(val realmProvider: Provider<Realm>) : TypeAdapter<OTTriggerDAO>() {
-    override fun read(reader: JsonReader): OTTriggerDAO {
+class TriggerTypeAdapter(isServerMode: Boolean, val realmProvider: Provider<Realm>) : ServerCompatibleTypeAdapter<OTTriggerDAO>(isServerMode) {
+
+    override fun read(reader: JsonReader, isServerMode: Boolean): OTTriggerDAO {
         val dao = OTTriggerDAO()
 
         val trackerIds = ArrayList<String>()
@@ -56,30 +57,33 @@ class TriggerTypeAdapter(val realmProvider: Provider<Realm>) : TypeAdapter<OTTri
         return dao
     }
 
-    override fun write(out: JsonWriter, value: OTTriggerDAO) {
-        out.beginObject()
-        out.name(RealmDatabaseManager.FIELD_OBJECT_ID).value(value.objectId)
-        out.name("alias").value(value.alias)
-        out.name("position").value(value.position)
-        out.name("userId").value(value.userId)
-        out.name("conditionType").value(value.conditionType)
-        out.name("serializedCondition").value(value.serializedCondition)
-        out.name("actionType").value(value.actionType)
-        out.name("serializedAction").value(value.serializedAction)
-        out.name("lastTriggeredTime").value(value.lastTriggeredTime)
-        out.name(RealmDatabaseManager.FIELD_SYNCHRONIZED_AT).value(value.synchronizedAt)
-        out.name(RealmDatabaseManager.FIELD_REMOVED_BOOLEAN).value(value.removed)
-        out.name(RealmDatabaseManager.FIELD_UPDATED_AT_LONG).value(value.userUpdatedAt)
-        out.name(RealmDatabaseManager.FIELD_USER_CREATED_AT).value(value.userCreatedAt)
+    override fun write(writer: JsonWriter, value: OTTriggerDAO, isServerMode: Boolean) {
+        writer.beginObject()
+        writer.name(RealmDatabaseManager.FIELD_OBJECT_ID).value(value.objectId)
+        writer.name("alias").value(value.alias)
+        writer.name("position").value(value.position)
+        writer.name("userId").value(value.userId)
+        writer.name("conditionType").value(value.conditionType)
+        writer.name("serializedCondition").value(value.serializedCondition)
+        writer.name("actionType").value(value.actionType)
+        writer.name("serializedAction").value(value.serializedAction)
+        writer.name("lastTriggeredTime").value(value.lastTriggeredTime)
+        writer.name(RealmDatabaseManager.FIELD_SYNCHRONIZED_AT).value(value.synchronizedAt)
+        writer.name(RealmDatabaseManager.FIELD_REMOVED_BOOLEAN).value(value.removed)
+        writer.name(RealmDatabaseManager.FIELD_UPDATED_AT_LONG).value(value.userUpdatedAt)
+        writer.name(RealmDatabaseManager.FIELD_USER_CREATED_AT).value(value.userCreatedAt)
 
-        out.name("trackers")
-        out.beginArray()
+        writer.name("trackers")
+        writer.beginArray()
         for (trackerId in value.trackers.filter { it.removed == false }.map { it.objectId }) {
-            out.value(trackerId)
+            writer.value(trackerId)
         }
-        out.endArray()
+        writer.endArray()
 
-        out.endObject()
+        writer.endObject()
     }
 
+    override fun applyToManagedDao(json: JsonObject, applyTo: OTTriggerDAO) {
+
+    }
 }

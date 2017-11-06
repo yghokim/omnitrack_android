@@ -16,7 +16,6 @@ import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTriggerDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.RealmViewModel
 import kr.ac.snu.hcil.omnitrack.utils.*
 import org.jetbrains.anko.collections.forEachWithIndex
@@ -416,7 +415,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
             dao.localId = attributeDAO.localId
             dao.position = attributeDAO.position
             dao.trackerId = attributeDAO.trackerId
-            dao.updatedAt = attributeDAO.updatedAt
+            dao.userUpdatedAt = attributeDAO.userUpdatedAt
 
             dao.isRequired = this.isRequired
             dao.fallbackValuePolicy = this.defaultValuePolicy
@@ -473,7 +472,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
             realm.executeTransactionIfNotIn {
                 attributeDAO.name = name
                 attributeDAO.isRequired = isRequired
-                attributeDAO.updatedAt = System.currentTimeMillis()
+                attributeDAO.userUpdatedAt = System.currentTimeMillis()
                 attributeDAO.fallbackValuePolicy = defaultValuePolicy
                 attributeDAO.fallbackPresetSerializedValue = defaultValuePreset
                 for (entry in propertyTable) {

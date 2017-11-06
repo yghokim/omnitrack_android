@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.database.local
 import android.app.Activity
 import android.content.Context
 import android.support.annotation.ColorInt
+import com.google.gson.JsonSyntaxException
 import com.tbruyelle.rxpermissions2.RxPermissions
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -168,10 +169,14 @@ open class OTAttributeDAO : RealmObject() {
     var fallbackPresetSerializedValue: String? = null
 
     var userCreatedAt: Long = System.currentTimeMillis()
-    var updatedAt: Long = System.currentTimeMillis()
+    var userUpdatedAt: Long = System.currentTimeMillis()
 
     fun getParsedConnection(): OTConnection? {
-        return serializedConnection?.let { OTConnection.fromJson(it) }
+        return try {
+            serializedConnection?.let { OTConnection.fromJson(it) }
+        } catch (ex: JsonSyntaxException) {
+            ex.printStackTrace(); null
+        }
     }
 
     fun getHelper(): OTAttributeHelper {
