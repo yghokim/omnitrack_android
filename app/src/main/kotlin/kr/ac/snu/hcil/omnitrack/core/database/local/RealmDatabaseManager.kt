@@ -423,7 +423,6 @@ class RealmDatabaseManager @Inject constructor(private val config: Configuration
         ESyncDataType.TRIGGER -> getLatestSynchronizedServerTimeImpl(OTTriggerDAO::class.java)
         ESyncDataType.TRACKER -> getLatestSynchronizedServerTimeImpl(OTTrackerDAO::class.java)
         else -> Long.MIN_VALUE
-    //TODO implement user type
     }
 
     private fun getLatestSynchronizedServerTimeImpl(daoClass: Class<out RealmObject>): Long {
@@ -487,8 +486,8 @@ class RealmDatabaseManager @Inject constructor(private val config: Configuration
         return Completable.defer {
             val realm = makeNewRealmInstance()
             try {
-                for (serverPojo in serverRowJsonList.filter { it.has("_id") }) {
-                    val match = realm.where(tableClass).equalTo(FIELD_OBJECT_ID, serverPojo.get("_id").asString).findFirst()
+                for (serverPojo in serverRowJsonList.filter { it.has(FIELD_OBJECT_ID) }) {
+                    val match = realm.where(tableClass).equalTo(FIELD_OBJECT_ID, serverPojo.get(FIELD_OBJECT_ID).asString).findFirst()
                     if (match == null) {
                         if (!serverPojo.get(FIELD_REMOVED_BOOLEAN).asBoolean) {
                             //insert
@@ -496,7 +495,7 @@ class RealmDatabaseManager @Inject constructor(private val config: Configuration
 
                             try {
                                 realm.executeTransaction { realm ->
-                                    realm.copyToRealm(applier.get().decodeToDao(serverPojo))
+                                    realm.copyToRealmOrUpdate(applier.get().decodeToDao(serverPojo))
                                 }
                             } catch (ex: Exception) {
                                 println("synchronization failed. skip object: $serverPojo")
