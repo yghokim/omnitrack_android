@@ -53,6 +53,11 @@ class AttributeTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>) : Server
                                 }
                             }
                             reader.endObject()
+
+                            if (isServerMode || entry.id.isBlank()) {
+                                entry.id = UUID.randomUUID().toString()
+                            }
+
                             list.add(entry)
                         }
                         reader.endArray()
@@ -70,9 +75,7 @@ class AttributeTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>) : Server
     override fun write(writer: JsonWriter, value: OTAttributeDAO, isServerMode: Boolean) {
         writer.beginObject()
 
-        if (!isServerMode)
-            writer.name(RealmDatabaseManager.FIELD_OBJECT_ID).value(value.objectId)
-
+        writer.name(RealmDatabaseManager.FIELD_OBJECT_ID).value(value.objectId)
         writer.name("localId").value(value.localId)
         writer.name(if (isServerMode) "trackerId" else "tracker").value(value.trackerId)
         writer.name(RealmDatabaseManager.FIELD_NAME).value(value.name)
