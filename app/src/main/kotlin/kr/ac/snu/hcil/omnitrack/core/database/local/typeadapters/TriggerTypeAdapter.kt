@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.database.local.typeadapters
 
 import com.google.gson.JsonObject
 import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
@@ -21,14 +22,20 @@ class TriggerTypeAdapter(isServerMode: Boolean, val realmProvider: Provider<Real
 
         reader.beginObject()
         while (reader.hasNext()) {
-            when (reader.nextName()) {
+            val nextName = reader.nextName()
+            if (reader.peek() == JsonToken.NULL) {
+                reader.skipValue()
+                continue
+            }
+            when (nextName) {
                 RealmDatabaseManager.FIELD_OBJECT_ID -> dao.objectId = reader.nextString()
                 RealmDatabaseManager.FIELD_USER_CREATED_AT -> dao.userCreatedAt = reader.nextLong()
                 RealmDatabaseManager.FIELD_UPDATED_AT_LONG -> dao.userUpdatedAt = reader.nextLong()
                 RealmDatabaseManager.FIELD_REMOVED_BOOLEAN -> dao.removed = reader.nextBoolean()
                 "alias" -> dao.alias = reader.nextString()
                 "position" -> dao.position = reader.nextInt()
-                "userId" -> dao.userId = reader.nextString()
+                "userId", "user" -> dao.userId = reader.nextString()
+                "isOn" -> dao.isOn = reader.nextBoolean()
                 "conditionType" -> dao.conditionType = reader.nextInt().toByte()
                 "actionType" -> dao.actionType = reader.nextInt().toByte()
                 "serializedAction" -> dao.serializedAction = reader.nextString()
@@ -63,7 +70,8 @@ class TriggerTypeAdapter(isServerMode: Boolean, val realmProvider: Provider<Real
         writer.name(RealmDatabaseManager.FIELD_OBJECT_ID).value(value.objectId)
         writer.name("alias").value(value.alias)
         writer.name("position").value(value.position)
-        writer.name("userId").value(value.userId)
+        writer.name(if (isServerMode) "user" else "userId").value(value.userId)
+        writer.name("isOn").value(value.isOn)
         writer.name("conditionType").value(value.conditionType)
         writer.name("serializedCondition").value(value.serializedCondition)
         writer.name("actionType").value(value.actionType)
