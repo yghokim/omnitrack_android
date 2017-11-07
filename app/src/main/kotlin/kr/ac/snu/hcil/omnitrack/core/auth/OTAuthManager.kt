@@ -13,13 +13,17 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.common.api.GoogleApiClient
-import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.*
+import com.google.firebase.auth.AuthResult
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.GoogleAuthProvider
 import dagger.Lazy
+import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposables
+import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
@@ -51,7 +55,6 @@ class OTAuthManager(val app: OTApp, val sharedPreferences: SharedPreferences, va
     private val mFirebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
 
     private val mGoogleApiClient: GoogleApiClient
-    private var googleSignInAccount: GoogleSignInAccount? = null
 
     private val mGoogleSignInOptions: GoogleSignInOptions by lazy {
         GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -64,9 +67,6 @@ class OTAuthManager(val app: OTApp, val sharedPreferences: SharedPreferences, va
     //is signIn process in progress
     private var mIntentInProgress = false
     private var mResultsHandler: SignInResultsHandler? = null
-
-    @Volatile var authToken: String? = null
-        private set
 
     private val _emailSubject = BehaviorSubject.createDefault<Nullable<String>>(Nullable())
     val emailObservable: Observable<Nullable<String>> get() = _emailSubject
@@ -103,16 +103,6 @@ class OTAuthManager(val app: OTApp, val sharedPreferences: SharedPreferences, va
         clearUserInfo()
 
         reloadUserInfo()
-
-        mFirebaseAuth.addIdTokenListener { auth ->
-            auth.currentUser?.getIdToken(false)?.addOnCompleteListener(object : OnCompleteListener<GetTokenResult> {
-                override fun onComplete(task: Task<GetTokenResult>) {
-                    if(task.isSuccessful) {
-                        authToken = task.result.token
-                    }
-                }
-            })
-        }
 
         Log.d(LOG_TAG, "Initializing Google SDK...")
 
@@ -177,41 +167,49 @@ class OTAuthManager(val app: OTApp, val sharedPreferences: SharedPreferences, va
         return result
     }
 
-    fun refreshGoogleAccount(finished: (Boolean) -> Unit) {
-        Thread {
-            val result = mGoogleApiClient.blockingConnect()
-            if (result.isSuccess) {
-                try {
-                    googleSignInAccount = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient).await().signInAccount
-                    Log.d("OMNITRACK", "Google SigninAccount: " + googleSignInAccount)
-                    refreshToken()
-                    finished.invoke(true)
-                } catch (e: Exception) {
-                    Log.w(LOG_TAG, "Failed to update Google token", e)
-                    finished.invoke(false)
-                }
+    fun loadGoogleSignInAccount(): Maybe<GoogleSignInAccount> {
+        return Maybe.defer {
+            val connectionResult = mGoogleApiClient.blockingConnect()
+            if (connectionResult.isSuccess) {
+                return@defer Maybe.just(Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient).await().signInAccount!!)
+            } else return@defer Maybe.never<GoogleSignInAccount>()
+        }.observeOn(Schedulers.io())
+    }
 
-            } else finished.invoke(false)
-        }.start()
+    fun getAuthToken(): Maybe<String> {
+        return Maybe.create { disposable ->
+            val user = mFirebaseAuth.currentUser
+            if (user != null) {
+                val task = user.getIdToken(true).addOnCompleteListener { result ->
+                    if (result.isSuccessful) {
+                        val token = result.result.token!!
+                        if (!disposable.isDisposed) {
+                            disposable.onSuccess(token)
+                        }
+                    } else {
+                        if (!disposable.isDisposed) {
+                            disposable.onError(result.exception ?: Exception("Token error"))
+                        }
+                    }
+                }
+            } else {
+                if (!disposable.isDisposed) {
+                    disposable.onComplete()
+                }
+            }
+        }
     }
 
     private fun signInSilently(resultsHandler: SignInResultsHandler) {
-        refreshGoogleAccount {
-            success ->
-            if (success) {
-                firebaseAuthWithGoogle(googleSignInAccount).subscribe({
-                    authResult ->
-                    reloadUserInfo()
-                    notifySignedIn(authResult.user)
-                    resultsHandler.onSuccess()
-                }, {
-                    ex ->
-                    resultsHandler.onError(ex)
-                })
-            } else {
-                resultsHandler.onError(Exception("Google sign in failed."))
-            }
-        }
+        loadGoogleSignInAccount().flatMapObservable { acc ->
+            firebaseAuthWithGoogle(acc)
+        }.subscribe({ authResult ->
+            reloadUserInfo()
+            notifySignedIn(authResult.user)
+            resultsHandler.onSuccess()
+        }, { ex ->
+            resultsHandler.onError(ex)
+        })
     }
 
     fun refreshCredentialSilently(skipValidationIfCacheHit: Boolean, resultsHandler: SignInResultsHandler) {
@@ -293,10 +291,8 @@ class OTAuthManager(val app: OTApp, val sharedPreferences: SharedPreferences, va
             val result = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
             if (result.isSuccess) {
                 //Signed in successfully.
-                googleSignInAccount = result.signInAccount
                 println("signed in google account: ${result.signInAccount}")
-                refreshToken()
-                firebaseAuthWithGoogle(googleSignInAccount).flatMap { authResult ->
+                firebaseAuthWithGoogle(result.signInAccount!!).flatMap { authResult ->
                     synchronizationServerController.get().putDeviceInfo(OTDeviceInfo()).
                             map { result ->
                                 val localKey = result.deviceLocalKey
@@ -332,14 +328,12 @@ class OTAuthManager(val app: OTApp, val sharedPreferences: SharedPreferences, va
         }
     }
 
-    private fun firebaseAuthWithGoogle(acct: GoogleSignInAccount?): Observable<AuthResult> {
-        return Observable.create<AuthResult> {
-            subscriber ->
-            Log.d(LOG_TAG, "firebaseAuthWithGooogle:" + acct?.id)
-            val credential = getAuthCredential()
+    private fun firebaseAuthWithGoogle(acct: GoogleSignInAccount): Observable<AuthResult> {
+        return Observable.create<AuthResult> { subscriber ->
+            Log.d(LOG_TAG, "firebaseAuthWithGooogle:" + acct.id)
+            val credential = GoogleAuthProvider.getCredential(acct.idToken, null)
             mFirebaseAuth.signInWithCredential(credential)
-                    .addOnCompleteListener {
-                        task: Task<AuthResult> ->
+                    .addOnCompleteListener { task: Task<AuthResult> ->
                         Log.d(LOG_TAG, "signInWithCredential:onComplete:" + task.isSuccessful)
                         // If sign in fails, display a message to the user. If sign in succeeds
                         // the auth state listener will be notified and logic to handle the
@@ -357,7 +351,6 @@ class OTAuthManager(val app: OTApp, val sharedPreferences: SharedPreferences, va
                         }
                     }
         }
-
     }
 
     fun deleteUser(resultsHandler: SignInResultsHandler) {
@@ -393,24 +386,6 @@ class OTAuthManager(val app: OTApp, val sharedPreferences: SharedPreferences, va
         userImageUrl = Uri.EMPTY
         email = null
 
-    }
-
-    fun refreshToken(): String? {
-        Log.d(LOG_TAG, "Google provider refreshing token...")
-
-        try {
-            Log.w(LOG_TAG, "update Google token")
-            authToken = this.googleSignInAccount?.idToken
-        } catch (e: Exception) {
-            Log.w(LOG_TAG, "Failed to update Google token", e)
-            authToken = null
-        }
-
-        return authToken
-    }
-
-    fun getAuthCredential(): AuthCredential {
-        return GoogleAuthProvider.getCredential(authToken, null)
     }
 
     fun reloadUserInfo() {

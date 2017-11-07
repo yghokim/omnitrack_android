@@ -56,6 +56,7 @@ class ItemTypeAdapter(isServerMode: Boolean) : ServerCompatibleTypeAdapter<OTIte
                     }
                     reader.endArray()
                 }
+                else -> reader.skipValue()
 
             }
         }
