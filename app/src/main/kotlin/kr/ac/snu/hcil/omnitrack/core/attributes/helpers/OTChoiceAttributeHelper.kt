@@ -8,7 +8,6 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ChoiceSorter
-import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTChoiceEntryListProperty
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTChoiceEntryListPropertyHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyManager
@@ -68,7 +67,7 @@ class OTChoiceAttributeHelper : OTAttributeHelper() {
     override fun getPropertyInitialValue(propertyKey: String): Any? {
         return when (propertyKey) {
             PROPERTY_MULTISELECTION -> false
-            PROPERTY_ENTRIES -> UniqueStringEntryList(OTChoiceEntryListProperty.PREVIEW_ENTRIES)
+            PROPERTY_ENTRIES -> UniqueStringEntryList(OTChoiceEntryListPropertyHelper.PREVIEW_ENTRIES)
             else -> null
         }
     }
@@ -98,7 +97,7 @@ class OTChoiceAttributeHelper : OTAttributeHelper() {
     override fun refreshInputViewUI(inputView: AAttributeInputView<out Any>, attribute: OTAttributeDAO) {
         if (inputView is ChoiceInputView) {
             inputView.entries = getEntries(attribute)?.toArray() ?: emptyArray()
-            inputView.multiSelectionMode = getAllowedMultiSelection(attribute) ?: false
+            inputView.multiSelectionMode = getAllowedMultiSelection(attribute) == true
         }
     }
 

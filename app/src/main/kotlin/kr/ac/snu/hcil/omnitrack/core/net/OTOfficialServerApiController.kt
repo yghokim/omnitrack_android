@@ -37,11 +37,12 @@ class OTOfficialServerApiController (app: OTApp) : ISynchronizationServerSideAPI
         val client = OkHttpClient.Builder().addInterceptor(object : Interceptor {
             @Throws(IOException::class)
             override fun intercept(chain: Interceptor.Chain): Response {
+                val bearer = "Bearer " + authManager.get().getAuthToken().blockingGet()
                 val newRequest = chain.request().newBuilder()
-                        .addHeader("Authorization", "Bearer " + authManager.get().authToken)
+                        .addHeader("Authorization", bearer)
                         .build()
 
-                println("chaining for official server: ${chain.request().url()}")
+                println("chaining for official server: ${chain.request().url()}, token: ${bearer}")
 
                 return chain.proceed(newRequest)
             }

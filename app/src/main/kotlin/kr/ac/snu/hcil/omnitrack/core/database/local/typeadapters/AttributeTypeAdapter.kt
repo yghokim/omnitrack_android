@@ -58,6 +58,7 @@ class AttributeTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>) : Server
                         reader.endArray()
                         dao.properties.addAll(list)
                     }
+                    else -> reader.skipValue()
                 }
             }
         }

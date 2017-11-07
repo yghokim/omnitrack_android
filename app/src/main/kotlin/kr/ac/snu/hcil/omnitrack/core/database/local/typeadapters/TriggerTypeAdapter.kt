@@ -41,6 +41,7 @@ class TriggerTypeAdapter(isServerMode: Boolean, val realmProvider: Provider<Real
                     }
                     reader.endArray()
                 }
+                else -> reader.skipValue()
             }
         }
         reader.endObject()
