@@ -41,7 +41,11 @@ class ItemTypeAdapter(isServerMode: Boolean) : ServerCompatibleTypeAdapter<OTIte
                             when(reader.nextName())
                             {
                                 "attrLocalId" -> key = reader.nextString()
-                                "sVal" -> serializedValue = if (reader.peek() == JsonToken.NULL) null else reader.nextString()
+                                "sVal" -> {
+                                    if (reader.peek() == JsonToken.NULL) {
+                                        reader.skipValue()
+                                    } else serializedValue = reader.nextString()
+                                }
                             }
                         }
                         reader.endObject()
@@ -52,6 +56,7 @@ class ItemTypeAdapter(isServerMode: Boolean) : ServerCompatibleTypeAdapter<OTIte
                             entry.id = UUID.randomUUID().toString()
                             entry.key = key
                             entry.value = serializedValue
+                            dao.fieldValueEntries.add(entry)
                         }
                     }
                     reader.endArray()
