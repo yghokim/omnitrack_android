@@ -54,17 +54,17 @@ open class OTTrackerDAO : RealmObject() {
 
     var attributes = RealmList<OTAttributeDAO>()
 
-    fun makeAttributesQuery(inTrashcan:Boolean?=false, hidden: Boolean? = false): RealmQuery<OTAttributeDAO>
-        = attributes.where().run {
+    fun makeAttributesQuery(inTrashcan:Boolean?=false, hidden: Boolean? = false): RealmQuery<OTAttributeDAO> {
+        var query = attributes.where()
         if (inTrashcan != null) {
-            return equalTo(RealmDatabaseManager.FIELD_IS_IN_TRASHCAN, inTrashcan)
+            query = query.equalTo(RealmDatabaseManager.FIELD_IS_IN_TRASHCAN, inTrashcan)
         }
-        else this
-    }.run{
-        if(hidden!=null){
-            return equalTo(RealmDatabaseManager.FIELD_IS_HIDDEN, hidden)
+
+        if (hidden != null) {
+            query = query.equalTo(RealmDatabaseManager.FIELD_IS_HIDDEN, inTrashcan)
         }
-        else this
+
+        return query
     }
 
 

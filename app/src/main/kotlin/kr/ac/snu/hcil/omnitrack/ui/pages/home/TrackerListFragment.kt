@@ -59,7 +59,6 @@ import org.jetbrains.anko.verticalMargin
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
-import javax.inject.Named
 
 /**
  * Created by Young-Ho Kim on 2016-07-18.
@@ -246,7 +245,9 @@ class TrackerListFragment : OTFragment() {
     }
 
     private fun handleTrackerClick(tracker: OTTrackerDAO) {
-        if (tracker.makeAttributesQuery().findAll().count() == 0) {
+        val attrs = tracker.makeAttributesQuery(false, false).findAll().count()
+
+        if (tracker.makeAttributesQuery(false, false).findAll().count() == 0) {
             emptyTrackerDialog
                     .onPositive { materialDialog, dialogAction ->
                         activity?.startService(OTItemLoggingService.makeLoggingIntent(act, ItemLoggingSource.Manual, tracker.objectId!!))
@@ -257,7 +258,7 @@ class TrackerListFragment : OTFragment() {
                     }
                     .show()
         } else {
-            startActivityOnDelay(ItemDetailActivity.makeNewItemPageIntent(tracker.objectId!!, act))
+            startActivity(ItemDetailActivity.makeNewItemPageIntent(tracker.objectId!!, act))
         }
     }
 

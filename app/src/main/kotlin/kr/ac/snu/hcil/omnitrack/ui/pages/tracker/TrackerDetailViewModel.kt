@@ -205,8 +205,11 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
     fun moveAttribute(from: Int, to: Int) {
         if (trackerDao != null) {
+            val attributes = currentAttributeViewModelList.map { it.attributeDAO }.toMutableList()
+            attributes.move(from, to)
             realm.executeTransactionIfNotIn {
-                trackerDao?.attributes?.move(from, to)
+                trackerDao?.attributes?.removeAll(attributes)
+                trackerDao?.attributes?.addAll(0, attributes)
             }
         } else {
             currentAttributeViewModelList.move(from, to)
@@ -311,6 +314,8 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
         val defaultValuePolicyObservable = BehaviorSubject.createDefault<Int>(OTAttributeDAO.DEFAULT_VALUE_POLICY_NULL)
         val defaultValuePresetObservable = BehaviorSubject.createDefault<Nullable<String>>(Nullable<String>(null))
 
+        val isHiddenObservable = BehaviorSubject.createDefault(false)
+
         val onPropertyChanged = PublishSubject.create<Long>()
 
         val internalSubscription = CompositeDisposable()
@@ -339,6 +344,14 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
             set(value) {
                 if (isRequiredObservable.value != value) {
                     isRequiredObservable.onNext(value)
+                }
+            }
+
+        var isHidden: Boolean
+            get() = isHiddenObservable.value
+            set(value) {
+                if (isHiddenObservable.value != value) {
+                    isHiddenObservable.onNext(value)
                 }
             }
 
@@ -395,6 +408,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
                         || attributeDAO.fallbackValuePolicy != defaultValuePolicy
                         || attributeDAO.fallbackPresetSerializedValue != defaultValuePreset
                         || attributeDAO.serializedConnection != connectionObservable.value?.datum?.getSerializedString()
+                        || attributeDAO.isHidden != isHidden
                         || arePropertiesDirty()
             }
 
@@ -410,6 +424,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
             dao.isRequired = this.isRequired
             dao.fallbackValuePolicy = this.defaultValuePolicy
             dao.fallbackPresetSerializedValue = this.defaultValuePreset
+            dao.isHidden = this.isHidden
             dao.name = name
             for (entry in propertyTable) {
                 dao.setPropertySerializedValue(entry.key, entry.value.second)
@@ -427,6 +442,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
             defaultValuePolicy = editedDao.fallbackValuePolicy
             defaultValuePreset = editedDao.fallbackPresetSerializedValue
+            isHidden = editedDao.isHidden
 
             println("serialized connection of dao: ${editedDao.serializedConnection}")
             editedDao.serializedConnection?.let {
@@ -461,6 +477,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
         fun applyChanges() {
             realm.executeTransactionIfNotIn {
                 attributeDAO.name = name
+                attributeDAO.isHidden = isHidden
                 attributeDAO.isRequired = isRequired
                 attributeDAO.userUpdatedAt = System.currentTimeMillis()
                 attributeDAO.fallbackValuePolicy = defaultValuePolicy
