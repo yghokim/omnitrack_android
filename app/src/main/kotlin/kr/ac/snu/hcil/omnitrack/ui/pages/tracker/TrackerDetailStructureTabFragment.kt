@@ -401,7 +401,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                 } else if (view === removeButton) {
                     DialogHelper.makeNegativePhrasedYesNoDialogBuilder(act,
                             getString(R.string.msg_remove_field),
-                            String.format(getString(R.string.msg_format_confirm_remove_field),
+                            String.format(getString(R.string.msg_format_confirm_move_to_trashcan_field),
                                     currentAttributeViewModelList[adapterPosition].name
                             ),
                             R.string.msg_remove, R.string.msg_cancel, {

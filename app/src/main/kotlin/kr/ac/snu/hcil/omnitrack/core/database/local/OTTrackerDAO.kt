@@ -53,7 +53,20 @@ open class OTTrackerDAO : RealmObject() {
     var isBookmarked: Boolean = false
 
     var attributes = RealmList<OTAttributeDAO>()
-    var removedAttributes = RealmList<OTAttributeDAO>()
+
+    fun makeAttributesQuery(inTrashcan:Boolean?=false, hidden: Boolean? = false): RealmQuery<OTAttributeDAO>
+        = attributes.where().run {
+        if (inTrashcan != null) {
+            return equalTo(RealmDatabaseManager.FIELD_IS_IN_TRASHCAN, inTrashcan)
+        }
+        else this
+    }.run{
+        if(hidden!=null){
+            return equalTo(RealmDatabaseManager.FIELD_IS_HIDDEN, hidden)
+        }
+        else this
+    }
+
 
     var serializedCreationFlags: String = "{}"
 
@@ -71,12 +84,12 @@ open class OTTrackerDAO : RealmObject() {
 
     val isExternalFilesInvolved: Boolean
         get() {
-            return attributes.find { it.getHelper().isExternalFile(it) } != null
+            return makeAttributesQuery(false, false).findAll().find { it.getHelper().isExternalFile(it) } != null
         }
 
     fun getRequiredPermissions(): Array<String> {
         val list = ArrayList<String>()
-        attributes.forEach {
+        makeAttributesQuery(false, false).findAll().forEach {
             try {
                 val perms = it.getHelper().getRequiredPermissions(it)
                 if (perms != null) {
@@ -157,6 +170,9 @@ open class OTAttributeDAO : RealmObject() {
     var trackerId: String? = null
 
     var name: String = ""
+
+    var isHidden: Boolean = false
+    var isInTrashcan: Boolean = false
 
     var position: Int = 0
     var serializedConnection: String? = null

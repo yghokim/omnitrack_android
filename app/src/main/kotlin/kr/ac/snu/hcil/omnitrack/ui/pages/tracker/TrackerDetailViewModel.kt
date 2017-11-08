@@ -122,7 +122,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
                             if (trackerDao != dao) {
                                 subscriptions.add(
-                                        snapshot.attributes.where().findAllAsync().asChangesetObservable().subscribe { changes ->
+                                        snapshot.makeAttributesQuery(false, null).findAllAsync().asChangesetObservable().subscribe { changes ->
                                             val changeset = changes.changeset
                                             if (changeset == null) {
                                                 //initial
@@ -219,8 +219,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
             realm.executeTransactionIfNotIn {
                 val attribute = trackerDao?.attributes?.find { it.objectId == attrViewModel.objectId }
                 if (attribute != null) {
-                    trackerDao?.attributes?.remove(attribute)
-                    trackerDao?.removedAttributes?.add(attribute)
+                    attribute.isInTrashcan = true
                 }
             }
         } else {
@@ -228,27 +227,6 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
             currentAttributeViewModelList.remove(attrViewModel)
             attributeViewModelListObservable.onNext(currentAttributeViewModelList)
         }
-    }
-
-    private fun saveAttributes(trackerDao: OTTrackerDAO) {
-        trackerDao.attributes.clear()
-
-        currentAttributeViewModelList.forEachWithIndex { index, attrViewModel ->
-            if (!attrViewModel.isInDatabase) {
-                attrViewModel.attributeDAO.localId = attributeManager.get().makeNewAttributeLocalId(attrViewModel.attributeDAO.userCreatedAt)
-                attrViewModel.attributeDAO.trackerId = trackerDao.objectId
-                attrViewModel.saveToRealm()
-            }
-            attrViewModel.attributeDAO.position = index
-            attrViewModel.applyChanges()
-            trackerDao.attributes.add(attrViewModel.attributeDAO)
-        }
-        removedAttributes.forEach { viewModel ->
-            if (viewModel.isInDatabase) {
-                viewModel.attributeDAO.deleteFromRealm()
-            }
-        }
-        removedAttributes.clear()
     }
 
     val isNameDirty: Boolean get() = if (initialSnapshotDao == null) false else initialSnapshotDao?.name != nameObservable.value
@@ -275,7 +253,19 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
                 trackerDao.name = nameObservable.value
                 trackerDao.isBookmarked = isBookmarkedObservable.value
                 trackerDao.color = colorObservable.value
-                saveAttributes(trackerDao)
+
+                currentAttributeViewModelList.forEachWithIndex { index, attrViewModel ->
+                    if (!attrViewModel.isInDatabase) {
+                        attrViewModel.attributeDAO.localId = attributeManager.get().makeNewAttributeLocalId(attrViewModel.attributeDAO.userCreatedAt)
+                        attrViewModel.attributeDAO.trackerId = trackerDao.objectId
+                        attrViewModel.saveToRealm()
+                    }
+                    attrViewModel.attributeDAO.position = index
+                    attrViewModel.applyChanges()
+                    trackerDao.attributes.add(attrViewModel.attributeDAO)
+                }
+
+                removedAttributes.clear()
 
                 this.trackerDao = trackerDao
             }

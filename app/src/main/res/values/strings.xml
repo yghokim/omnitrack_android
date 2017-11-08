@@ -419,7 +419,7 @@
     <string name="msg_widget_mode_selected_trackers">Tracker List</string>
     <string name="msg_at_least_one_tracker_must_be_selected">At least one tracker must be selected.</string>
     <string name="msg_remove_field">Remove Field</string>
-    <string name="msg_format_confirm_remove_field">Do you want to remove %1$s field?</string>
+    <string name="msg_format_confirm_move_to_trashcan_field">Do you want to remove %1$s field?</string>
 
     <string name="msg_next">Next</string>
     <string name="msg_current_version">Current Version</string>

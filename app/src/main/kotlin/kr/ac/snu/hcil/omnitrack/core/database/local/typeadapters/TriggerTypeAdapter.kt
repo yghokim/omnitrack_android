@@ -1,9 +1,11 @@
 package kr.ac.snu.hcil.omnitrack.core.database.local.typeadapters
 
+import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
+import dagger.Lazy
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTriggerDAO
@@ -13,7 +15,7 @@ import javax.inject.Provider
 /**
  * Created by younghokim on 2017. 11. 2..
  */
-class TriggerTypeAdapter(isServerMode: Boolean, val realmProvider: Provider<Realm>) : ServerCompatibleTypeAdapter<OTTriggerDAO>(isServerMode) {
+class TriggerTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>, val realmProvider: Provider<Realm>) : ServerCompatibleTypeAdapter<OTTriggerDAO>(isServerMode) {
 
     override fun read(reader: JsonReader, isServerMode: Boolean): OTTriggerDAO {
         val dao = OTTriggerDAO()
@@ -41,6 +43,7 @@ class TriggerTypeAdapter(isServerMode: Boolean, val realmProvider: Provider<Real
                 "serializedAction" -> dao.serializedAction = reader.nextString()
                 "serializedCondition" -> dao.serializedCondition = reader.nextString()
                 "lastTriggeredTime" -> dao.lastTriggeredTime = reader.nextLong()
+                "lockedProperties" -> dao.serializedLockedPropertyInfo = gson.get().fromJson<JsonObject>(reader, JsonObject::class.java).toString()
                 "trackers" -> {
                     reader.beginArray()
                     while (reader.hasNext()) {
@@ -77,6 +80,7 @@ class TriggerTypeAdapter(isServerMode: Boolean, val realmProvider: Provider<Real
         writer.name("actionType").value(value.actionType)
         writer.name("serializedAction").value(value.serializedAction)
         writer.name("lastTriggeredTime").value(value.lastTriggeredTime)
+        writer.name(RealmDatabaseManager.FIELD_LOCKED_PROPERTIES_SERIALIZED).jsonValue(value.serializedLockedPropertyInfo)
         writer.name(RealmDatabaseManager.FIELD_SYNCHRONIZED_AT).value(value.synchronizedAt)
         writer.name(RealmDatabaseManager.FIELD_REMOVED_BOOLEAN).value(value.removed)
         writer.name(RealmDatabaseManager.FIELD_UPDATED_AT_LONG).value(value.userUpdatedAt)
