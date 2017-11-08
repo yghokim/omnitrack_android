@@ -16,6 +16,9 @@ import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.synchronization.ESyncDataType
+import kr.ac.snu.hcil.omnitrack.core.database.synchronization.OTSyncManager
+import kr.ac.snu.hcil.omnitrack.core.database.synchronization.SyncDirection
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.RealmViewModel
 import kr.ac.snu.hcil.omnitrack.utils.*
 import org.jetbrains.anko.collections.forEachWithIndex
@@ -33,6 +36,9 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
     @Inject
     protected lateinit var authManager: Lazy<OTAuthManager>
+
+    @Inject
+    protected lateinit var syncManager: OTSyncManager
 
 
     private var isInitialized = false
@@ -65,7 +71,9 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
             if (trackerDao != null) {
                 realm.executeTransactionIfNotIn {
                     trackerDao?.name = value
+                    trackerDao?.synchronizedAt = null
                 }
+                registerSyncJob()
             } else if (value != nameObservable.value) {
                 nameObservable.onNext(value)
             }
@@ -77,7 +85,9 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
             if (trackerDao != null) {
                 realm.executeTransactionIfNotIn {
                     trackerDao?.isBookmarked = value
+                    trackerDao?.synchronizedAt = null
                 }
+                registerSyncJob()
             } else if (value != isBookmarkedObservable.value) {
                 isBookmarkedObservable.onNext(value)
             }
@@ -89,7 +99,9 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
             if (trackerDao != null) {
                 realm.executeTransactionIfNotIn {
                     trackerDao?.color = value
+                    trackerDao?.synchronizedAt = null
                 }
+                registerSyncJob()
             } else if (value != colorObservable.value) {
                 colorObservable.onNext(value)
             }
@@ -101,8 +113,12 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
     private val currentAttributeViewModelList = ArrayList<AttributeInformationViewModel>()
 
-    init {
-        getApplication<OTApp>().applicationComponent.inject(this)
+    fun registerSyncJob() {
+        syncManager.registerSyncQueue(ESyncDataType.TRACKER, SyncDirection.UPLOAD)
+    }
+
+    override fun onInject(app: OTApp) {
+        app.synchronizationComponent.inject(this)
     }
 
     fun init(trackerId: String?) {
@@ -210,7 +226,9 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
             realm.executeTransactionIfNotIn {
                 trackerDao?.attributes?.removeAll(attributes)
                 trackerDao?.attributes?.addAll(0, attributes)
+                trackerDao?.synchronizedAt = null
             }
+            registerSyncJob()
         } else {
             currentAttributeViewModelList.move(from, to)
             attributeViewModelListObservable.onNext(currentAttributeViewModelList)
@@ -224,7 +242,9 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
                 if (attribute != null) {
                     attribute.isInTrashcan = true
                 }
+                trackerDao?.synchronizedAt = null
             }
+            registerSyncJob()
         } else {
             removedAttributes.add(attrViewModel)
             currentAttributeViewModelList.remove(attrViewModel)
@@ -266,6 +286,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
                     attrViewModel.attributeDAO.position = index
                     attrViewModel.applyChanges()
                     trackerDao.attributes.add(attrViewModel.attributeDAO)
+                    trackerDao.synchronizedAt = null
                 }
 
                 removedAttributes.clear()
@@ -276,6 +297,8 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
             currentAttributeViewModelList.forEach {
                 it.register()
             }
+
+            registerSyncJob()
         }
 
         onChangesApplied.onNext(trackerDao!!.objectId!!)

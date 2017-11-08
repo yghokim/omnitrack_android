@@ -49,6 +49,7 @@ open class OTTrackerDAO : RealmObject() {
     var name: String = ""
 
     var position: Int = 0
+
     var color: Int = 0
     var isBookmarked: Boolean = false
 

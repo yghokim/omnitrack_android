@@ -15,7 +15,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.MotionEventCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.SparseArray;
@@ -198,6 +197,27 @@ public class DragLinearLayout extends LinearLayout {
         if (this == child.getParent()) {
             final int index = indexOfChild(child);
             removeView(child);
+
+            // update drag-able children mappings
+            final int mappings = draggableChildren.size();
+            for (int i = 0; i < mappings; i++) {
+                final int key = draggableChildren.keyAt(i);
+                if (key >= index) {
+                    DraggableChild next = draggableChildren.get(key + 1);
+                    if (null == next) {
+                        draggableChildren.delete(key);
+                    } else {
+                        draggableChildren.put(key, next);
+                    }
+                }
+            }
+        }
+    }
+
+    public void removeDragViewInLayout(View child) {
+        if (this == child.getParent()) {
+            final int index = indexOfChild(child);
+            removeViewInLayout(child);
 
             // update drag-able children mappings
             final int mappings = draggableChildren.size();
@@ -514,18 +534,18 @@ public class DragLinearLayout extends LinearLayout {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
-        switch (MotionEventCompat.getActionMasked(event)) {
+        switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN: {
                 if (draggedItem.detecting) return false; // an existing item is (likely) settling
-                downY = (int) MotionEventCompat.getY(event, 0);
-                activePointerId = MotionEventCompat.getPointerId(event, 0);
+                downY = (int) event.getY(0);
+                activePointerId = event.getPointerId(0);
                 break;
             }
             case MotionEvent.ACTION_MOVE: {
                 if (!draggedItem.detecting) return false;
                 if (INVALID_POINTER_ID == activePointerId) break;
                 final int pointerIndex = event.findPointerIndex(activePointerId);
-                final float y = MotionEventCompat.getY(event, pointerIndex);
+                final float y = event.getY(pointerIndex);
                 final float dy = y - downY;
                 if (Math.abs(dy) > slop) {
                     startDrag();
@@ -534,8 +554,8 @@ public class DragLinearLayout extends LinearLayout {
                 return false;
             }
             case MotionEvent.ACTION_POINTER_UP: {
-                final int pointerIndex = MotionEventCompat.getActionIndex(event);
-                final int pointerId = MotionEventCompat.getPointerId(event, pointerIndex);
+                final int pointerIndex = event.getActionIndex();
+                final int pointerId = event.getPointerId(pointerIndex);
 
                 if (pointerId != activePointerId)
                     break; // if active pointer, fall through and cancel!
@@ -554,7 +574,7 @@ public class DragLinearLayout extends LinearLayout {
 
     @Override
     public boolean onTouchEvent(@NonNull MotionEvent event) {
-        switch (MotionEventCompat.getActionMasked(event)) {
+        switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN: {
                 if (!draggedItem.detecting || draggedItem.settling()) return false;
                 startDrag();
@@ -565,15 +585,15 @@ public class DragLinearLayout extends LinearLayout {
                 if (INVALID_POINTER_ID == activePointerId) break;
 
                 int pointerIndex = event.findPointerIndex(activePointerId);
-                int lastEventY = (int) MotionEventCompat.getY(event, pointerIndex);
+                int lastEventY = (int) event.getY(pointerIndex);
                 int deltaY = lastEventY - downY;
 
                 onDrag(deltaY);
                 return true;
             }
             case MotionEvent.ACTION_POINTER_UP: {
-                final int pointerIndex = MotionEventCompat.getActionIndex(event);
-                final int pointerId = MotionEventCompat.getPointerId(event, pointerIndex);
+                final int pointerIndex = event.getActionIndex();
+                final int pointerId = event.getPointerId(pointerIndex);
 
                 if (pointerId != activePointerId)
                     break; // if active pointer, fall through and cancel!
@@ -754,7 +774,7 @@ public class DragLinearLayout extends LinearLayout {
 
         @Override
         public boolean onTouch(View v, MotionEvent event) {
-            if (MotionEvent.ACTION_DOWN == MotionEventCompat.getActionMasked(event)) {
+            if (MotionEvent.ACTION_DOWN == event.getActionMasked()) {
                 startDetectingDrag(view);
             }
             return false;

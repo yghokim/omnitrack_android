@@ -18,6 +18,7 @@ import android.view.ViewGroup
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import com.jmedeisis.draglinearlayout.DragLinearLayout
+import kotlinx.android.synthetic.main.attribute_list_element.view.*
 import kr.ac.snu.hcil.omnitrack.R
 import java.util.*
 import kotlin.collections.HashMap
@@ -103,7 +104,7 @@ class AdapterLinearLayout : DragLinearLayout {
                 }
             }
 
-            val viewHolder = onCreateViewHolder(parent, getItemViewType(position))
+            val viewHolder = createViewHolder(parent, getItemViewType(position))
             bindViewHolder(viewHolder, position)
             return viewHolder.itemView
         }
@@ -176,14 +177,16 @@ class AdapterLinearLayout : DragLinearLayout {
                 adapter ->
                 val viewType = adapter.getItemViewType(position)
                 val viewHolder = getChildAt(position)?.tag as? AViewHolder
+
                 if (viewHolder != null) {
                     if (viewHolder.viewType == viewType) {
                         adapter.bindViewHolder(viewHolder, position)
                     } else {
                         pushNewViewHolder(viewHolder)
-                        removeViewInLayout(viewHolder.itemView)
+                        removeDragViewInLayout(viewHolder.itemView)
                         val view = makeView(position)
                         addViewInLayout(view, position, view.layoutParams)
+                        setViewDraggable(view, view.ui_drag_handle)
                         requestLayout()
                     }
                 }
@@ -330,7 +333,7 @@ class AdapterLinearLayout : DragLinearLayout {
 
                 if (this.indexOfChild(view) == -1) {
                     addViewInLayout(view, i, view.layoutParams)
-                    setViewDraggable(view, view.findViewById(R.id.ui_drag_handle))
+                    setViewDraggable(view, view.ui_drag_handle)
                 }
                 //addView(view)
                 //addView(viewHolder.itemView)

@@ -21,9 +21,17 @@ open class RealmViewModel(app: Application) : AndroidViewModel(app) {
 
     protected val subscriptions = CompositeDisposable()
 
-    init {
-        val component = getApplication<OTApp>().applicationComponent
+    fun inject(app: OTApp) {
+        onInject(app)
+    }
+
+    protected open fun onInject(app: OTApp) {
+        val component = app.applicationComponent
         component.inject(this)
+    }
+
+    init {
+        inject(app as OTApp)
     }
 
     override fun onCleared() {
