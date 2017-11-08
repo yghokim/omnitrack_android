@@ -40,6 +40,8 @@ open class OTTriggerDAO : RealmObject() {
     var alias: String = ""
     var position: Int = 0
 
+    var serializedLockedPropertyInfo: String = "{}"
+
     @Index
     var userId: String? = null
 

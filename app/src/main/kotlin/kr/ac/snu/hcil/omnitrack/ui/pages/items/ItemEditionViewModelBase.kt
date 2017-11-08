@@ -76,7 +76,7 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
             currentAttributeViewModelList.forEach { it.unregister() }
             currentAttributeViewModelList.clear()
 
-            currentAttributeViewModelList.addAll(unManagedTrackerDao.attributes.map { AttributeInputViewModel(it) })
+            currentAttributeViewModelList.addAll(unManagedTrackerDao.attributes.filter{it.isHidden==false && it.isInTrashcan == false}.map { AttributeInputViewModel(it) })
             attributeViewModelListObservable.onNext(currentAttributeViewModelList)
 
             val initResult = onInit(trackerDao!!, itemId)

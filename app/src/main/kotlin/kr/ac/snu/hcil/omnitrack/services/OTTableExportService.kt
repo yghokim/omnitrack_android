@@ -197,6 +197,7 @@ class OTTableExportService : WakefulService(TAG) {
             subscriptions.add(
                     Single.defer<Boolean> {
                         val tracker = dbManager.get().getUnManagedTrackerDao(trackerId, realm)
+                        val attributes = tracker?.attributes?.filter { it.isHidden == false && it.isInTrashcan == false }?: emptyList()
                         loadedTracker = tracker
                         if (tracker == null) {
                             return@defer Single.just(true)
@@ -215,7 +216,7 @@ class OTTableExportService : WakefulService(TAG) {
                             table.columns.add("logged_at")
                             table.columns.add("source")
 
-                            tracker.attributes.forEach {
+                            attributes.forEach {
                                 it.getHelper().onAddColumnToTable(it, table.columns)
                             }
 
@@ -227,7 +228,7 @@ class OTTableExportService : WakefulService(TAG) {
                                 row.add(itemWithIndex.index.toString())
                                 row.add(item.timestamp.toString())
                                 row.add(item.loggingSource.name)
-                                tracker.attributes.forEach { attribute ->
+                                attributes.forEach { attribute ->
                                     attribute.getHelper().onAddValueToTable(attribute, item.getValueOf(attribute.localId), row, itemWithIndex.index.toString())
                                 }
                                 table.rows.add(row)
@@ -253,7 +254,7 @@ class OTTableExportService : WakefulService(TAG) {
                                 }
 
                                 val storeObservables = ArrayList<Single<Uri>>()
-                                tracker.attributes.filter { it.getHelper().isExternalFile(it) && it.getHelper() is OTFileInvolvedAttributeHelper }.forEach { attr ->
+                                attributes.filter { it.getHelper().isExternalFile(it) && it.getHelper() is OTFileInvolvedAttributeHelper }.forEach { attr ->
                                     val helper = attr.getHelper() as OTFileInvolvedAttributeHelper
                                     items.withIndex().forEach { itemWithIndex ->
                                         val itemValue = itemWithIndex.value.getValueOf(attr.localId)

@@ -22,6 +22,7 @@ import android.widget.Toast
 import butterknife.bindView
 import com.afollestad.materialdialogs.MaterialDialog
 import io.reactivex.disposables.CompositeDisposable
+import kotlinx.android.synthetic.main.attribute_list_element.view.*
 import kotlinx.android.synthetic.main.fragment_tracker_detail_structure.*
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
@@ -385,6 +386,8 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                 removeButton.setOnClickListener(this)
                 columnNameButton.setOnClickListener(this)
 
+                itemView.ui_button_visible.setOnClickListener(this)
+
                 columnNameChangeDialog = MaterialDialog.Builder(this.view.context)
                         .title(R.string.msg_change_field_name)
                         .inputType(InputType.TYPE_CLASS_TEXT)
@@ -401,7 +404,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                 } else if (view === removeButton) {
                     DialogHelper.makeNegativePhrasedYesNoDialogBuilder(act,
                             getString(R.string.msg_remove_field),
-                            String.format(getString(R.string.msg_format_confirm_remove_field),
+                            String.format(getString(R.string.msg_format_confirm_move_to_trashcan_field),
                                     currentAttributeViewModelList[adapterPosition].name
                             ),
                             R.string.msg_remove, R.string.msg_cancel, {
@@ -424,6 +427,13 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                                         attributeListAdapter.notifyItemChanged(adapterPosition)
                                     }
                                 }.show()
+                } else if (view === itemView.ui_button_visible) {
+                    val attrViewModel = currentAttributeViewModelList[adapterPosition]
+                    attrViewModel.isHidden = !attrViewModel.isHidden
+                    if (attrViewModel.isInDatabase) {
+                        attrViewModel.applyChanges()
+                    }
+                    attributeListAdapter.notifyItemChanged(adapterPosition)
                 }
             }
 
@@ -462,6 +472,24 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                 viewHolderSubscriptions.add(
                         attributeViewModel.iconObservable.subscribe { args ->
                             typeIconView.setImageResource(args)
+                        }
+                )
+
+                viewHolderSubscriptions.add(
+                        attributeViewModel.isHiddenObservable.subscribe { isHidden ->
+                            itemView.ui_button_visible.setImageResource(if (isHidden) R.drawable.icon_invisible else R.drawable.icon_visible)
+
+                            if (isHidden) {
+                                typeIconView.alpha = 0.2f
+                                columnNameButton.alpha = 0.2f
+                                previewContainer.visibility = View.GONE
+                                connectionIndicatorStubProxy.setVisibility(View.GONE)
+                            } else {
+                                typeIconView.alpha = 1.0f
+                                columnNameButton.alpha = 1.0f
+                                previewContainer.visibility = View.VISIBLE
+                                connectionIndicatorStubProxy.setVisibility(View.VISIBLE)
+                            }
                         }
                 )
 

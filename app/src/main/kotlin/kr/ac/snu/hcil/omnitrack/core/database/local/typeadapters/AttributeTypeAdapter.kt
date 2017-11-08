@@ -36,6 +36,9 @@ class AttributeTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>) : Server
                     "fallbackPreset" -> dao.fallbackPresetSerializedValue = reader.nextString()
                     RealmDatabaseManager.FIELD_USER_CREATED_AT -> dao.userCreatedAt = reader.nextLong()
                     RealmDatabaseManager.FIELD_UPDATED_AT_LONG -> dao.userUpdatedAt = reader.nextLong()
+                    RealmDatabaseManager.FIELD_IS_HIDDEN -> dao.isHidden = reader.nextBoolean()
+                    RealmDatabaseManager.FIELD_IS_IN_TRASHCAN -> dao.isInTrashcan = reader.nextBoolean()
+
                     "connection" -> {
                         dao.serializedConnection = gson.get().fromJson<JsonObject>(reader, JsonObject::class.java).toString()
                     }
@@ -77,13 +80,17 @@ class AttributeTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>) : Server
 
         writer.name(RealmDatabaseManager.FIELD_OBJECT_ID).value(value.objectId)
         writer.name("localId").value(value.localId)
+        writer.name("type").value(value.type)
         writer.name(if (isServerMode) "trackerId" else "tracker").value(value.trackerId)
         writer.name(RealmDatabaseManager.FIELD_NAME).value(value.name)
         writer.name("isRequired").value(value.isRequired)
         writer.name(RealmDatabaseManager.FIELD_POSITION).value(value.position)
         writer.name("fallbackPolicy").value(value.fallbackValuePolicy)
         writer.name("fallbackPreset").value(value.fallbackPresetSerializedValue)
-        writer.name("type").value(value.type)
+
+        writer.name(RealmDatabaseManager.FIELD_IS_HIDDEN).value(value.isHidden)
+        writer.name(RealmDatabaseManager.FIELD_IS_IN_TRASHCAN).value(value.isInTrashcan)
+
         writer.name(RealmDatabaseManager.FIELD_USER_CREATED_AT).value(value.userCreatedAt)
         writer.name("connection").jsonValue(value.serializedConnection)
         writer.name(RealmDatabaseManager.FIELD_UPDATED_AT_LONG).value(value.userUpdatedAt)
@@ -115,6 +122,9 @@ class AttributeTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>) : Server
                 "type" -> applyTo.type = json[key].asInt
                 "fallbackPolicy" -> applyTo.fallbackValuePolicy = json[key].asInt
                 "fallbackPreset" -> applyTo.fallbackPresetSerializedValue = json[key].asString
+
+                RealmDatabaseManager.FIELD_IS_IN_TRASHCAN -> applyTo.isInTrashcan = json[key].asBoolean
+                RealmDatabaseManager.FIELD_IS_HIDDEN -> applyTo.isHidden = json[key].asBoolean
 
                 "properties" -> {
                     if (json[key].isJsonArray) {

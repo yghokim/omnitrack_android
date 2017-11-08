@@ -39,12 +39,12 @@ class DaoSerializationModule {
     @Provides
     @Singleton
     @ForTrigger
-    fun provideTriggerAdapter(realmProvider: Provider<Realm>): ServerCompatibleTypeAdapter<OTTriggerDAO> = TriggerTypeAdapter(false, realmProvider)
+    fun provideTriggerAdapter(@ForGeneric gson: Lazy<Gson>, realmProvider: Provider<Realm>): ServerCompatibleTypeAdapter<OTTriggerDAO> = TriggerTypeAdapter(false, gson, realmProvider)
 
     @Provides
     @Singleton
     @ForServerTrigger
-    fun provideServerTriggerAdapter(realmProvider: Provider<Realm>): ServerCompatibleTypeAdapter<OTTriggerDAO> = TriggerTypeAdapter(true, realmProvider)
+    fun provideServerTriggerAdapter(@ForGeneric gson: Lazy<Gson>, realmProvider: Provider<Realm>): ServerCompatibleTypeAdapter<OTTriggerDAO> = TriggerTypeAdapter(true, gson, realmProvider)
 
     @Provides
     @Singleton
@@ -78,7 +78,7 @@ class DaoSerializationModule {
 }
 
 @Singleton
-@Component(modules = arrayOf(DaoSerializationModule::class, BackendDatabaseModule::class))
+@Component(modules = arrayOf(DaoSerializationModule::class, BackendDatabaseModule::class), dependencies = arrayOf())
 interface DaoSerializationComponent {
 
     fun manager(): Lazy<DaoSerializationManager>

@@ -43,6 +43,11 @@ class RealmDatabaseManager @Inject constructor(private val config: Configuration
         const val FIELD_REMOVED_BOOLEAN = "removed"
         const val FIELD_TIMESTAMP_LONG = "timestamp"
 
+        const val FIELD_IS_IN_TRASHCAN = "isInTrashcan"
+        const val FIELD_IS_HIDDEN = "isHidden"
+
+        const val FIELD_LOCKED_PROPERTIES_SERIALIZED = "lockedProperties"
+
 
         const val FIELD_NAME = "name"
         const val FIELD_POSITION = "position"
@@ -191,9 +196,8 @@ class RealmDatabaseManager @Inject constructor(private val config: Configuration
             }
         } else {
             realm.executeTransactionIfNotIn {
-                (dao.attributes + dao.removedAttributes).forEach { removeAttributeImpl(it, realm) }
+                dao.attributes.forEach { removeAttributeImpl(it, realm) }
                 dao.attributes.clear()
-                dao.removedAttributes.clear()
                 dao.deleteFromRealm()
             }
         }

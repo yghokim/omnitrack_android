@@ -128,7 +128,7 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
 
         val trackerEditable: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(true)
 
-        val attributesResult: RealmResults<OTAttributeDAO> = dbManager.getAttributeListQuery(trackerDao.objectId!!, realm).findAllAsync()
+        val attributesResult: RealmResults<OTAttributeDAO> = trackerDao.makeAttributesQuery(false, false).findAllAsync()
         val trackerItemsResult: RealmResults<OTItemDAO> = dbManager.makeItemsQuery(trackerDao.objectId, null, null, realm).findAllAsync()
         val todayItemsResult: RealmResults<OTItemDAO> = dbManager.makeItemsQueryOfToday(trackerDao.objectId, realm).findAllAsync()
 

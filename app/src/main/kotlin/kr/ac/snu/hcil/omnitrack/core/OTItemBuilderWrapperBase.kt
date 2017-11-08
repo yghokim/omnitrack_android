@@ -61,7 +61,7 @@ class OTItemBuilderWrapperBase(val dao: OTItemBuilderDAO, val realm: Realm) {
     fun makeAutoCompleteObservable(realmProvider: Provider<Realm>, onAttributeStateChangedListener: AttributeStateChangedListener? = null, applyToBuilder: Boolean = false): Observable<Pair<String, ValueWithTimestamp>> {
 
         return Observable.defer {
-            val attributes = dao.tracker?.attributes
+            val attributes = dao.tracker?.attributes?.filter { it.isHidden == false && it.isInTrashcan == false }
             if (attributes == null) {
                 return@defer Observable.empty<Pair<String, ValueWithTimestamp>>()
             } else {

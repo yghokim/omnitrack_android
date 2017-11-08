@@ -40,8 +40,8 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
             }
         }
 
-    val attributes: List<OTAttributeDAO> get() = trackerDao.attributes.toList()
-
+    lateinit var attributes: List<OTAttributeDAO>
+    private set
     //localKey / Type
     val onSchemaChanged = PublishSubject.create<List<OTAttributeDAO>>()
 
@@ -85,16 +85,17 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
 
     private fun refreshTracker(trackerDao: OTTrackerDAO) {
         this.trackerDao = trackerDao
+        this.attributes =  trackerDao.attributes.filter { it.isHidden == false && it.isInTrashcan == false }.toList()
         trackerName = trackerDao.name
 
         currentSorterSet.clear()
         currentSorterSet.add(ItemComparator.TIMESTAMP_SORTER)
-        this.trackerDao.attributes.forEach {
+        attributes.forEach {
             currentSorterSet += it.getHelper().getSupportedSorters(it)
         }
 
         sorterSetObservable.onNext(currentSorterSet)
-        onSchemaChanged.onNext(trackerDao.attributes.toList())
+        onSchemaChanged.onNext(attributes)
 
         currentItemQueryResults?.removeAllChangeListeners()
         currentItemQueryResults = dbManager.get()
