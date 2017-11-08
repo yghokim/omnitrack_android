@@ -28,6 +28,10 @@ class ConnectionIndicatorStubProxy(val parent: View, stubId: Int) : OnClickListe
         parent.addOnAttachStateChangeListener(this)
     }
 
+    fun setVisibility(visibility: Int) {
+        connectionIndicator?.visibility = visibility
+    }
+
     fun onBind(connection: OTConnection?) {
         val connectionSource = connection?.source
         if (connectionSource != null) {

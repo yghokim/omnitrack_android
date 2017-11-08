@@ -25,14 +25,13 @@ object TrackerHelper {
         list += LoggingHeatMapModel(trackerDao, realm)
 
         //add line timeline if numeric variables exist
-        val numberAttrs = trackerDao.attributes
-                .filter { it.type == OTAttributeManager.TYPE_NUMBER }
+        val numberAttrs = trackerDao.makeAttributesQuery(false,false).equalTo("type", OTAttributeManager.TYPE_NUMBER).findAll()
         if (numberAttrs.isNotEmpty()) {
             list.add(TimelineComparisonLineChartModel(numberAttrs, trackerDao, realm))
         }
 
 
-        for (attribute in trackerDao.attributes) {
+        for (attribute in trackerDao.attributes.filter { it.isHidden == false && it.isInTrashcan == false }) {
             list.addAll(attribute.getHelper().makeRecommendedChartModels(attribute, realm))
         }
 
