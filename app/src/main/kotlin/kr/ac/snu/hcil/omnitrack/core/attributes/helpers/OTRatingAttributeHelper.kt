@@ -4,7 +4,6 @@ import android.content.Context
 import android.view.View
 import io.reactivex.Single
 import io.realm.Realm
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.FallbackPolicyResolver
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
@@ -29,6 +28,32 @@ class OTRatingAttributeHelper : OTAttributeHelper() {
 
     companion object {
         const val PROPERTY_OPTIONS = "options"
+    }
+
+    inner class MiddleValueFallbackPolicyResolver : FallbackPolicyResolver(R.string.msg_intrinsic_rating, false) {
+        override fun getFallbackValue(attribute: OTAttributeDAO, realm: Realm): Single<Nullable<out Any>> {
+            return Single.defer {
+                val ratingOptions = getRatingOptions(attribute)
+                when (ratingOptions.type) {
+                    RatingOptions.DisplayType.Likert -> {
+                        if (ratingOptions.allowIntermediate) {
+                            return@defer Single.just((ratingOptions.rightMost + ratingOptions.leftMost) / 2.0f)
+                        } else {
+
+                            return@defer Single.just(((ratingOptions.rightMost + ratingOptions.leftMost) / 2).toFloat())
+                        }
+                    }
+                    RatingOptions.DisplayType.Star -> {
+                        if (ratingOptions.allowIntermediate) {
+                            return@defer Single.just(ratingOptions.starLevels.maxScore / 2.0f)
+                        } else {
+                            return@defer Single.just((ratingOptions.starLevels.maxScore / 2).toFloat())
+                        }
+                    }
+                }
+            }.map { value -> Nullable(value) }
+        }
+
     }
 
     override fun getValueNumericCharacteristics(attribute: OTAttributeDAO): NumericCharacteristics = NumericCharacteristics(true, true)
@@ -94,32 +119,7 @@ class OTRatingAttributeHelper : OTAttributeHelper() {
 
     override val supportedFallbackPolicies: LinkedHashMap<Int, FallbackPolicyResolver>
         get() = super.supportedFallbackPolicies.apply{
-            this[OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE] = object: FallbackPolicyResolver(R.string.msg_intrinsic_rating, false)
-            {
-                override fun getFallbackValue(attribute: OTAttributeDAO, realm: Realm): Single<Nullable<out Any>> {
-                    return Single.defer {
-                        val ratingOptions = getRatingOptions(attribute)
-                        when (ratingOptions.type) {
-                            RatingOptions.DisplayType.Likert -> {
-                                if (ratingOptions.allowIntermediate) {
-                                    return@defer Single.just((ratingOptions.rightMost + ratingOptions.leftMost) / 2.0f)
-                                } else {
-
-                                    return@defer Single.just(((ratingOptions.rightMost + ratingOptions.leftMost) / 2).toFloat())
-                                }
-                            }
-                            RatingOptions.DisplayType.Star -> {
-                                if (ratingOptions.allowIntermediate) {
-                                    return@defer Single.just(ratingOptions.starLevels.maxScore / 2.0f)
-                                } else {
-                                    return@defer Single.just((ratingOptions.starLevels.maxScore / 2).toFloat())
-                                }
-                            }
-                        }
-                    }.map{value -> Nullable(value)}
-                }
-
-            }
+            this[OTAttributeDAO.DEFAULT_VALUE_POLICY_FILL_WITH_INTRINSIC_VALUE] = MiddleValueFallbackPolicyResolver()
         }
 
 

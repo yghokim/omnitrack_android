@@ -7,16 +7,25 @@ import io.realm.OrderedCollectionChangeSet
 import io.realm.OrderedRealmCollectionChangeListener
 import io.realm.RealmResults
 import io.realm.Sort
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.synchronization.ESyncDataType
+import kr.ac.snu.hcil.omnitrack.core.database.synchronization.OTSyncManager
+import kr.ac.snu.hcil.omnitrack.core.database.synchronization.SyncDirection
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.UserAttachedViewModel
 import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.utils.move
+import java.util.*
+import javax.inject.Inject
 
 /**
  * Created by younghokim on 2017. 10. 31..
  */
 class OrderedTrackerListViewModel(app: Application) : UserAttachedViewModel(app), OrderedRealmCollectionChangeListener<RealmResults<OTTrackerDAO>> {
+
+    @Inject
+    protected lateinit var syncManager: OTSyncManager
 
     private var trackerQueryResults: RealmResults<OTTrackerDAO>? = null
 
@@ -26,8 +35,19 @@ class OrderedTrackerListViewModel(app: Application) : UserAttachedViewModel(app)
 
     val onTrackerInfoChanged = PublishSubject.create<String>()
 
+    private lateinit var initialOrder: Array<String>
+
     val isDirty: Boolean
-        get() = currentOrderedTrackerViewModels.filterIndexed { index, model -> model.dao.position != index }.isNotEmpty()
+        get() {
+            if (currentOrderedTrackerViewModels.filterIndexed { index, model -> model.dao.position != index }.isNotEmpty()) {
+                return !Arrays.equals(initialOrder, currentOrderedTrackerViewModels.map { it.dao.objectId!! }.toTypedArray())
+
+            } else return false
+        }
+
+    override fun onInject(app: OTApp) {
+        app.synchronizationComponent.inject(this)
+    }
 
     override fun onUserAttached(newUserId: String) {
         super.onUserAttached(newUserId)
@@ -41,6 +61,8 @@ class OrderedTrackerListViewModel(app: Application) : UserAttachedViewModel(app)
         if(changeSet == null)
         {
             //initial
+            initialOrder = snapshot.map { it.objectId!! }.toTypedArray()
+
             currentOrderedTrackerViewModels.clear()
             currentOrderedTrackerViewModels.addAll(snapshot.map{OrderedTrackerViewModel(it)})
             orderedTrackerViewModels.onNext(currentOrderedTrackerViewModels)
@@ -68,11 +90,18 @@ class OrderedTrackerListViewModel(app: Application) : UserAttachedViewModel(app)
     }
 
     fun applyOrders(){
-        realm.executeTransaction {
-            currentOrderedTrackerViewModels.forEachIndexed { index, viewModel ->
-                viewModel.dao.position = index
+        if (isDirty) {
+            realm.executeTransaction {
+                currentOrderedTrackerViewModels.forEachIndexed { index, viewModel ->
+                    if (viewModel.dao.position != index) {
+                        viewModel.dao.position = index
+                        viewModel.dao.synchronizedAt = null
+                    }
+                }
             }
+            syncManager.registerSyncQueue(ESyncDataType.TRACKER, SyncDirection.UPLOAD)
         }
+
     }
 
     class OrderedTrackerViewModel(internal val dao: OTTrackerDAO) : IReadonlyObjectId {

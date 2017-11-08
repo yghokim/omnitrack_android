@@ -8,7 +8,6 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTAudioRecordAttributeHe
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTFileInvolvedAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTImageAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.services.OTSynchronizationService
 import kr.ac.snu.hcil.omnitrack.core.net.OTOfficialServerApiController
 import kr.ac.snu.hcil.omnitrack.core.visualization.models.*
 import kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService
@@ -26,7 +25,6 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.home.TrackerListFragment
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.NewItemCreationViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.tracker.FieldPresetSelectionBottomSheetFragment
 import kr.ac.snu.hcil.omnitrack.ui.pages.tracker.ManagedReminderListViewModel
-import kr.ac.snu.hcil.omnitrack.ui.pages.tracker.TrackerDetailViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.TrackerAssignPanel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.ATriggerListViewModel
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.RealmViewModel
@@ -71,7 +69,6 @@ interface ApplicationComponent {
 
     fun inject(fragment: AttributeEditDialogFragment)
 
-    fun inject(viewModel: TrackerDetailViewModel)
 
     fun inject(fragment: FieldPresetSelectionBottomSheetFragment)
 

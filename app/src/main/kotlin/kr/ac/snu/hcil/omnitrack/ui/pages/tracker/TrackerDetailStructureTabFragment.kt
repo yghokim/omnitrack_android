@@ -278,6 +278,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                 correspondingViewModel.applyDaoChangesToFront(editedDao)
                 if (viewModel.isEditMode) {
                     correspondingViewModel.applyChanges()
+                    viewModel.registerSyncJob()
                 }
 
                 attributeListAdapter.notifyItemChanged(currentAttributeViewModelList.indexOf(correspondingViewModel))

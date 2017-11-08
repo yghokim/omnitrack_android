@@ -89,6 +89,9 @@
 -keep public class com.google.android.gms.location.DetectedActivity
 -dontwarn com.google.android.gms.location.DetectedActivity
 
+-dontwarn com.google.errorprone.annotations.*
+-dontwarn com.beloo.widget.chipslayoutmanager.Orientation
+
 # for DexGuard only
 #-keepresourcexmlelements manifest/application/meta-data@value=GlideModule
 # end Glide settings
