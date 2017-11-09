@@ -16,7 +16,7 @@ class LoggingTriggerListFragment : ATriggerListFragment<LoggingTriggerListViewMo
     }
 
     override fun onViewModelMounted(viewModel: LoggingTriggerListViewModel, savedInstanceState: Bundle?) {
-        val parentViewModel = ViewModelProviders.of(activity!!).get(UserAttachedViewModel::class.java)
+        val parentViewModel = ViewModelProviders.of(activity!!).get(HomeScreenViewModel::class.java)
         creationSubscriptions.add(
                 parentViewModel.userIdObservable.subscribe { (userId) ->
                     if (userId != null)

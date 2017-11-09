@@ -15,6 +15,7 @@ import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import butterknife.bindView
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
@@ -22,7 +23,9 @@ import kr.ac.snu.hcil.omnitrack.ui.components.tutorial.TutorialManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.services.ServiceListFragment
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.UserAttachedViewModel
+import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
 import kr.ac.snu.hcil.omnitrack.widgets.OTShortcutPanelWidgetUpdateService
+import org.jetbrains.anko.networkStatsManager
 
 class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), DrawerLayout.DrawerListener {
 
@@ -31,6 +34,7 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
         const val TAB_INDEX_TRIGGERS = 1
         const val TAB_INDEX_SERVICES = 2
 
+        const val INTENT_EXTRA_INITIAL_LOGIN = "${BuildConfig.APPLICATION_ID}.extra.initial_login"
     }
 
     private var mSectionsPagerAdapter: SectionsPagerAdapter? = null
@@ -45,6 +49,8 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
     private lateinit var sidebar: SidebarWrapper
 
     private val tabLayout: TabLayout by bindView(R.id.tabs)
+
+    private lateinit var viewModel: HomeScreenViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -91,7 +97,7 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
         creationSubscriptions.add(
                 super.signedInUserObservable.subscribe {
                     user ->
-                    val viewModel = ViewModelProviders.of(this).get(UserAttachedViewModel::class.java)
+                    viewModel = ViewModelProviders.of(this).get(HomeScreenViewModel::class.java)
                     viewModel.userId = user
                     println("OMNITRACK: signed in user instance received.")
                     //Ask permission if needed
@@ -139,6 +145,13 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
                                 noLabel = R.string.msg_cancel
                         ).show()
                     }*/
+
+                    if(intent.getBooleanExtra(INTENT_EXTRA_INITIAL_LOGIN, false))
+                    {
+                        if(NetworkHelper.isConnectedToInternet()) {
+                            viewModel.startPullSync()
+                        }
+                    }
                 }
         )
     }

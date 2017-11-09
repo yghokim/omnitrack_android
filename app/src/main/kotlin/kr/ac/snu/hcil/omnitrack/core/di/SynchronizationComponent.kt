@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.di
 import dagger.Subcomponent
 import kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService
 import kr.ac.snu.hcil.omnitrack.services.OTSynchronizationService
+import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeScreenViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.OrderedTrackerListViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.SidebarWrapper
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.TrackerListViewModel
@@ -27,6 +28,7 @@ interface SynchronizationComponent {
         fun build(): SynchronizationComponent
     }
 
+    fun inject(viewModel: HomeScreenViewModel)
     fun inject(service: OTSynchronizationService)
     fun inject(sidebar: SidebarWrapper)
     fun inject(viewModel: OrderedTrackerListViewModel)
