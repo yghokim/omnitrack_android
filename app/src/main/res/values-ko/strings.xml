@@ -392,6 +392,7 @@
     <string name="msg_required_information_text">*필수항목</string>
     <string name="msg_reorder">순서 바꾸기</string>
     <string name="msg_edit_tracker_order">트래커 순서 변경</string>
+    <string name="msg_format_confirm_remove_trigger">이 %1$s를 삭제하시겠습니까?</string>
 
     <string-array name="purpose_entries">
         <item>directive|건강 관련 정보를 기록하기 위해서</item>

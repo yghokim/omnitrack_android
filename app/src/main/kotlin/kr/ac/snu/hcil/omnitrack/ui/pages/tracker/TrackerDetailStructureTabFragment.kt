@@ -27,9 +27,7 @@ import kotlinx.android.synthetic.main.fragment_tracker_detail_structure.*
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.AttributePresetInfo
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
-import kr.ac.snu.hcil.omnitrack.core.database.EventLoggingManager
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.common.AdapterLinearLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
@@ -212,7 +210,13 @@ class TrackerDetailStructureTabFragment : OTFragment() {
         removalSnackbar = Snackbar.make(rootView, resources.getText(R.string.msg_attribute_removed_message), 5000)
         removalSnackbar.setAction(resources.getText(R.string.msg_undo)) {
             view ->
-            //attributeListAdapter.undoRemove()
+            createViewSubscriptions.add(
+                    viewModel.undoRemove().subscribe({
+
+                    }, {
+
+                    })
+            )
         }
 
         newAttributeButton = rootView.findViewById(R.id.ui_button_new_attribute)
@@ -312,9 +316,6 @@ class TrackerDetailStructureTabFragment : OTFragment() {
             return false
         }
 
-        private var removed: OTAttribute<out Any>? = null
-        private var removedPosition: Int = -1
-
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val view = LayoutInflater.from(parent.context).inflate(R.layout.attribute_list_element, parent, false)
             return ViewHolder(view)
@@ -330,17 +331,6 @@ class TrackerDetailStructureTabFragment : OTFragment() {
 
         override fun getItemId(position: Int): Long {
             return position.toLong()
-        }
-
-        fun undoRemove() {
-            if (removed != null) {
-                //tracker?.attributes?.addAt(removed!!, removedPosition)
-                //notifyItemInserted(removedPosition)
-            }
-        }
-
-        fun clearTrashcan() {
-            removed = null
         }
 
         fun onMoveItem(fromPosition: Int, toPosition: Int) {
@@ -412,9 +402,8 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                             R.string.msg_remove, R.string.msg_cancel, {
                         viewModel.removeAttribute(currentAttributeViewModelList[adapterPosition])
                         showRemovalSnackbar()
-                        if (removed != null) {
-                            EventLoggingManager.logAttributeChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_ATTRIBUTE_REMOVE, removed!!.typeId, removed!!.objectId, viewModel.trackerId ?: "null")
-                        }
+                        // if (removed != null) {
+                        //     EventLoggingManager.logAttributeChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_ATTRIBUTE_REMOVE, removed!!.typeId, removed!!.objectId, viewModel.trackerId ?: "null") //}
                     }, onNo = null).show()
                 } else if (view === columnNameButton) {
 

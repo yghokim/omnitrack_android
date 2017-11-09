@@ -3,8 +3,8 @@ package kr.ac.snu.hcil.omnitrack.core.net
 import com.google.gson.JsonObject
 import io.reactivex.Completable
 import io.reactivex.Single
-import kr.ac.snu.hcil.omnitrack.core.database.synchronization.ESyncDataType
-import kr.ac.snu.hcil.omnitrack.core.database.synchronization.SyncResultEntry
+import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
+import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncResultEntry
 
 /**
  * Created by younghokim on 2017. 11. 4..

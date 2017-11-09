@@ -2,10 +2,10 @@ package kr.ac.snu.hcil.omnitrack.core.net
 
 import com.google.gson.JsonObject
 import io.reactivex.Single
+import kr.ac.snu.hcil.omnitrack.core.OTUserRolePOJO
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
-import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTUserRolePOJO
-import kr.ac.snu.hcil.omnitrack.core.database.synchronization.ESyncDataType
-import kr.ac.snu.hcil.omnitrack.core.database.synchronization.SyncResultEntry
+import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
+import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncResultEntry
 import retrofit2.http.*
 
 /**

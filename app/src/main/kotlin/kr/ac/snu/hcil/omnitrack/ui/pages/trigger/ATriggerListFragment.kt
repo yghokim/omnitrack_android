@@ -41,6 +41,7 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.AManagedTriggerListV
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.ATriggerListViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.OfflineTriggerListViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.TriggerViewModel
+import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.dipRound
@@ -268,11 +269,19 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
                             )
                         }
             } else if (view === itemView.ui_button_remove) {
-                attachedViewModel?.objectId?.let {
-                    viewModel.removeTrigger(it)
-                    EventLoggingManager.logTriggerChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_TRIGGER_REMOVE, it)
 
-                }
+                DialogHelper.makeNegativePhrasedYesNoDialogBuilder(act,
+                        "OmniTrack",
+                        String.format(OTApp.getString(R.string.msg_format_confirm_remove_trigger), OTApp.getString(OTTriggerInformationHelper.getActionNameResId(viewModel.defaultTriggerInterfaceOptions.defaultActionType) ?: 0)),
+                        R.string.msg_remove, R.string.msg_cancel, {
+                    attachedViewModel?.objectId?.let {
+                        viewModel.removeTrigger(it)
+                        EventLoggingManager.logTriggerChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_TRIGGER_REMOVE, it)
+
+                    }
+                }, onNo = null).show()
+
+
             }
         }
 

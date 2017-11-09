@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.core.database.synchronization
+package kr.ac.snu.hcil.omnitrack.core.synchronization
 
 import com.firebase.jobdispatcher.FirebaseJobDispatcher
 import com.firebase.jobdispatcher.Job

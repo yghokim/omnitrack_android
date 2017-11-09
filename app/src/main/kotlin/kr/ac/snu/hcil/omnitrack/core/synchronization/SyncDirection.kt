@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.core.database.synchronization
+package kr.ac.snu.hcil.omnitrack.core.synchronization
 
 import kotlin.experimental.and
 import kotlin.experimental.or

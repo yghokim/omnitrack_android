@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.core.database.synchronization
+package kr.ac.snu.hcil.omnitrack.core.synchronization
 
 /**
  * Created by younghokim on 2017. 9. 28..
