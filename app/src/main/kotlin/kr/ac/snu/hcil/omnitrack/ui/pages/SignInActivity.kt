@@ -118,7 +118,10 @@ class SignInActivity : AppCompatActivity() {
     private fun goHomeActivity() {
         Log.d(LOG_TAG, "Launching Main Activity...")
         startActivity(Intent(this@SignInActivity, HomeActivity::class.java)
-                .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP).putExtra(OTApp.INTENT_EXTRA_IGNORE_SIGN_IN_CHECK, true))
+                .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                .putExtra(OTApp.INTENT_EXTRA_IGNORE_SIGN_IN_CHECK, true)
+                .putExtra(HomeActivity.INTENT_EXTRA_INITIAL_LOGIN, true)
+        )
         // finish should always be called on the main thread.
         finish()
     }
@@ -145,6 +148,7 @@ class SignInActivity : AppCompatActivity() {
 
             consentManager.startProcess(this@SignInActivity, authManager.userId!!, object : ExperimentConsentManager.ResultListener {
                 override fun onConsentApproved() {
+
                     goHomeActivity()
                 }
 
