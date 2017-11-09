@@ -11,10 +11,14 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.synchronization.ESyncDataType
+import kr.ac.snu.hcil.omnitrack.core.database.synchronization.OTSyncManager
+import kr.ac.snu.hcil.omnitrack.core.database.synchronization.SyncDirection
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.RealmViewModel
 import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.ValueWithTimestamp
+import javax.inject.Inject
 
 /**
  * Created by Young-Ho on 10/15/2017.
@@ -27,6 +31,9 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
     enum class BuilderCreationMode {
         NewBuilder, Restored
     }
+
+    @Inject
+    protected lateinit var syncManager: OTSyncManager
 
     var trackerDao: OTTrackerDAO? = null
         protected set
@@ -62,6 +69,10 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
                 modeObservable.onNext(value)
             }
         }
+
+    override fun onInject(app: OTApp) {
+        app.synchronizationComponent.inject(this)
+    }
 
     fun init(trackerId: String, itemId: String?) {
         isValid = true
@@ -180,6 +191,10 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
         if (match != null) {
             match.state = state
         }
+    }
+
+    protected fun syncItemToServer() {
+        syncManager.registerSyncQueue(ESyncDataType.ITEM, SyncDirection.UPLOAD)
     }
 
     abstract fun cacheEditingInfo(): Single<Boolean>

@@ -58,7 +58,7 @@ class ScheduledJobModule {
     {
         return builder.setRecurring(true)
                 .setService(OTSynchronizationService::class.java)
-                .setTag(OTVersionCheckService.TAG)
+                .setTag(OTSynchronizationService.TAG)
                 .setLifetime(Lifetime.FOREVER)
                 .setReplaceCurrent(true)
                 .setTrigger(Trigger.executionWindow(0, 3600*12))
@@ -74,7 +74,7 @@ class ScheduledJobModule {
     fun providesImmediateServerSyncJob(builder: Job.Builder, @ServerSyncOneShot oneShotBundle: Bundle): Job {
         return builder.setRecurring(false)
                 .setService(OTSynchronizationService::class.java)
-                .setTag(OTVersionCheckService.TAG)
+                .setTag(OTSynchronizationService.TAG)
                 .setLifetime(Lifetime.FOREVER)
                 .setExtras(oneShotBundle)
                 .setReplaceCurrent(true)

@@ -14,6 +14,9 @@ import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemBuilderDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.synchronization.ESyncDataType
+import kr.ac.snu.hcil.omnitrack.core.database.synchronization.OTSyncManager
+import kr.ac.snu.hcil.omnitrack.core.database.synchronization.SyncDirection
 import kr.ac.snu.hcil.omnitrack.core.system.OTTaskNotificationManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTTrackingNotificationFactory
 import org.jetbrains.anko.notificationManager
@@ -63,6 +66,9 @@ class OTItemLoggingService : Service() {
     @Inject
     lateinit var dbManager: RealmDatabaseManager
 
+    @Inject
+    lateinit var syncManager: OTSyncManager
+
     private val subscriptions = CompositeDisposable()
 
     override fun onBind(p0: Intent?): IBinder? {
@@ -71,7 +77,7 @@ class OTItemLoggingService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        (application as OTApp).applicationComponent.inject(this)
+        (application as OTApp).synchronizationComponent.inject(this)
     }
 
     override fun onDestroy() {
@@ -141,6 +147,8 @@ class OTItemLoggingService : Service() {
 
                                 println(table)
 
+                                syncManager.registerSyncQueue(ESyncDataType.ITEM, SyncDirection.UPLOAD)
+
                                 this.runOnUiThread {
                                     val builder = OTTrackingNotificationFactory.makeLoggingSuccessNotificationBuilder(this, trackerId, trackerName, itemId!!, System.currentTimeMillis(), table, notificationId, NOTIFICATION_TAG)
 
@@ -174,6 +182,7 @@ class OTItemLoggingService : Service() {
                 realm.executeTransaction {
                     dbManager.removeItem(item, false, realm)
                 }
+                syncManager.registerSyncQueue(ESyncDataType.ITEM, SyncDirection.UPLOAD)
 
                 if (intent.hasExtra(OTApp.INTENT_EXTRA_NOTIFICATION_ID)) {
                     val notiId = intent.getIntExtra(OTApp.INTENT_EXTRA_NOTIFICATION_ID, -100)
@@ -184,7 +193,6 @@ class OTItemLoggingService : Service() {
                         this.notificationManager.cancel(notiId)
                     }
                 }
-
             }
         }
         stopSelf(startId)

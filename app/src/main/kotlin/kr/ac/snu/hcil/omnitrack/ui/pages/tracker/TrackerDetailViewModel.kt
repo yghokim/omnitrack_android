@@ -256,7 +256,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
     val isBookmarkedDirty: Boolean get() = if (initialSnapshotDao == null) false else initialSnapshotDao?.isBookmarked != isBookmarkedObservable.value
     val isColorDirty: Boolean get() = if (initialSnapshotDao == null) false else initialSnapshotDao?.color != colorObservable.value
 
-    val areAttributesDirty: Boolean
+    private val areAttributesDirty: Boolean
         get() {
             return if (initialSnapshotDao == null) false else (currentAttributeViewModelList.find { it.isDirty == true } != null) ||
                     !Arrays.equals(initialSnapshotDao?.attributes?.map { attr -> attr.objectId }?.toTypedArray(), currentAttributeViewModelList.map { it.attributeDAO.objectId }.toTypedArray())
@@ -286,10 +286,11 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
                     attrViewModel.attributeDAO.position = index
                     attrViewModel.applyChanges()
                     trackerDao.attributes.add(attrViewModel.attributeDAO)
-                    trackerDao.synchronizedAt = null
                 }
 
                 removedAttributes.clear()
+
+                trackerDao.synchronizedAt = null
 
                 this.trackerDao = trackerDao
             }
@@ -304,6 +305,12 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
         onChangesApplied.onNext(trackerDao!!.objectId!!)
 
         return trackerDao!!.objectId!!
+    }
+
+    fun clearTrackerSynchronizationFlag() {
+        realm.executeTransactionIfNotIn {
+            trackerDao?.synchronizedAt = null
+        }
     }
 
     private fun clearCurrentAttributeList() {

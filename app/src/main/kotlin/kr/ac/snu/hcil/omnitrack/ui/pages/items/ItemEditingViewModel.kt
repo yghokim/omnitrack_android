@@ -66,7 +66,9 @@ class ItemEditingViewModel(app: Application) : ItemEditionViewModelBase(app) {
                                 originalItemFieldKeys -= viewModel.attributeLocalId
                             }
                         }
+                        originalUnmanagedItemDao.synchronizedAt = null
                         Maybe.fromSingle(dbManager.get().saveItemObservable(originalUnmanagedItemDao, false, originalItemFieldKeys.toTypedArray(), realm).map { it.second })
+                                .doAfterSuccess { syncItemToServer() }
                     }
                 } else Maybe.just(originalUnmanagedItemDao.objectId)
             }

@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels
 
 import android.app.Application
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTriggerDAO
 
 /**
@@ -22,7 +23,7 @@ open class OfflineTriggerListViewModel(app: Application) : ATriggerListViewModel
             }
         }
 
-        currentTriggerViewModels.add(TriggerViewModel(dao, realm))
+        currentTriggerViewModels.add(TriggerViewModel(getApplication<OTApp>(), dao, realm))
         notifyNewTriggerViewModels()
     }
 

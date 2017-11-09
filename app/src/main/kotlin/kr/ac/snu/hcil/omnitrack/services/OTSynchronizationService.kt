@@ -21,6 +21,7 @@ import javax.inject.Inject
 class OTSynchronizationService : JobService() {
 
     companion object {
+        val TAG = OTSynchronizationService::class.java.simpleName
 
         const val EXTRA_KEY_ONESHOT = "isOneShot"
     }
@@ -42,6 +43,7 @@ class OTSynchronizationService : JobService() {
     }
 
     override fun onStopJob(job: JobParameters): Boolean {
+        //accidental finish
         subscriptions.clear()
         return true
     }
@@ -76,12 +78,13 @@ class OTSynchronizationService : JobService() {
                             err.printStackTrace()
                             jobFinished(job, true)
                         }, {
-                            jobFinished(job, true)
+                            jobFinished(job, false)
                         })
         )
 
         return fetchPendingQueueData(internalSubject)
     }
+
 
     private fun startSynchronization(batchData: SyncQueueDbHelper.AggregatedSyncQueue): Completable {
         val downDirection = Completable.defer {
@@ -110,7 +113,11 @@ class OTSynchronizationService : JobService() {
         val upDirection = Completable.defer {
             val downTypes = batchData.data.filter { it.second.contains(SyncDirection.UPLOAD) }.map { it.first }.toTypedArray()
             println("start sync download from server: ${downTypes.joinToString(",")}")
-            Single.zip(downTypes.map { type -> syncClient.get().getDirtyRowsToSync(type).map { Pair(type, it) } }) { clientDirtyRowsArray ->
+            if (downTypes.isEmpty()) {
+                return@defer Completable.complete()
+            }
+
+            return@defer Single.zip(downTypes.map { type -> syncClient.get().getDirtyRowsToSync(type).map { Pair(type, it) } }) { clientDirtyRowsArray ->
                 clientDirtyRowsArray.map { it as Pair<ESyncDataType, List<String>> }
             }.flatMap {
                 println("sync send dirty rows to server: ${it}")

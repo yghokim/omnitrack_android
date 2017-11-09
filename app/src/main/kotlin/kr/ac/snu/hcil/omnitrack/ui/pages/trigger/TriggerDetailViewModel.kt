@@ -8,9 +8,14 @@ import io.realm.RealmResults
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.synchronization.ESyncDataType
+import kr.ac.snu.hcil.omnitrack.core.database.synchronization.OTSyncManager
+import kr.ac.snu.hcil.omnitrack.core.database.synchronization.SyncDirection
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.ATriggerCondition
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.RealmViewModel
 import kr.ac.snu.hcil.omnitrack.utils.onNextIfDifferAndNotNull
+import java.util.*
+import javax.inject.Inject
 
 /**
  * Created by younghokim on 2017-10-24.
@@ -22,6 +27,8 @@ class TriggerDetailViewModel(app: Application) : RealmViewModel(app), OrderedRea
         const val MODE_EDIT: Byte = 1
     }
 
+    @Inject
+    protected lateinit var syncManager: OTSyncManager
 
     var triggerId: String? = null
         private set
@@ -43,6 +50,10 @@ class TriggerDetailViewModel(app: Application) : RealmViewModel(app), OrderedRea
     private var attachedTrackersRealmResults: RealmResults<OTTrackerDAO>? = null
     private val currentAttachedTrackerInfoList = java.util.ArrayList<OTTrackerDAO.SimpleTrackerInfo>()
     val attachedTrackers = BehaviorSubject.createDefault<List<OTTrackerDAO.SimpleTrackerInfo>>(currentAttachedTrackerInfoList)
+
+    override fun onInject(app: OTApp) {
+        app.synchronizationComponent.inject(this)
+    }
 
     fun initEdit(triggerId: String, userId: String) {
         if (!isInitialized) {
@@ -131,15 +142,26 @@ class TriggerDetailViewModel(app: Application) : RealmViewModel(app), OrderedRea
         }
     }
 
+    val isAttachedTrackersDirty: Boolean
+        get() {
+            val triggerDao = originalTriggerDao
+            if (triggerDao == null) return true
+            else {
+                return !Arrays.equals(
+                        attachedTrackers.value?.map { it.objectId }?.toTypedArray() ?: emptyArray(),
+                        triggerDao.trackers.map { it.objectId }.toTypedArray()
+                )
+            }
+        }
+
     val isDirty: Boolean
         get() {
-            return viewModelMode.value == MODE_EDIT && conditionInstance.value != originalTriggerDao?.condition
+            return (conditionInstance.value != originalTriggerDao?.condition || isAttachedTrackersDirty)
         }
 
     fun saveFrontToDao() {
         val dao = originalTriggerDao
-        if (dao != null) {
-
+        if (dao != null && isDirty) {
             fun apply(dao: OTTriggerDAO) {
                 dao.serializedCondition = conditionInstance.value.getSerializedString()
                 dao.trackers.clear()
@@ -152,10 +174,14 @@ class TriggerDetailViewModel(app: Application) : RealmViewModel(app), OrderedRea
                         dao.trackers.addAll(realm.copyFromRealm(trackers))
                     }
                 }
+                dao.synchronizedAt = null
             }
 
             if (dao.isManaged) {
-                realm.executeTransaction { apply(dao) }
+                realm.executeTransaction {
+                    apply(dao)
+                }
+                syncManager.registerSyncQueue(ESyncDataType.TRIGGER, SyncDirection.UPLOAD)
             } else {
                 apply(dao)
             }

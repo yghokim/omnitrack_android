@@ -14,8 +14,11 @@ import javax.inject.Provider
 @ApplicationScope
 class OTSyncManager @Inject constructor(val syncQueueDbHelper: SyncQueueDbHelper, @ServerSyncOneShot val oneShotJobProvider: Provider<Job>, val dispatcher: Lazy<FirebaseJobDispatcher>) {
 
-    fun registerSyncQueue(type: ESyncDataType, direction: SyncDirection) {
+    fun registerSyncQueue(type: ESyncDataType, direction: SyncDirection, reserveService: Boolean = true) {
         syncQueueDbHelper.insertNewEntry(type, direction, System.currentTimeMillis())
+        if (reserveService) {
+            reserveSyncServiceNow()
+        }
     }
 
     fun queueFullSync() {
