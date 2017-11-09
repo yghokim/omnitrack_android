@@ -1,12 +1,10 @@
 package kr.ac.snu.hcil.omnitrack.core.database.local
 
-import io.realm.Realm
 import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.annotations.Index
 import io.realm.annotations.PrimaryKey
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
-import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTItemPOJO
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import java.util.*
 
@@ -73,41 +71,6 @@ open class OTItemDAO : RealmObject() {
 
     fun getValueOf(attributeLocalId: String): Any? {
         return fieldValueEntries.find { it.key == attributeLocalId }?.value?.let { TypeStringSerializationHelper.deserialize(it) }
-    }
-}
-
-object RealmItemHelper {
-
-    fun applyDaoToPojo(dao: OTItemDAO, pojo: OTItemPOJO) {
-        pojo.objectId = dao.objectId ?: ""
-        pojo.deviceId = dao.deviceId
-        pojo.source = dao.source
-        pojo.synchronizedAt = dao.synchronizedAt
-        pojo.timestamp = dao.timestamp
-        pojo.trackerObjectId = dao.trackerId!!
-        pojo.removed = dao.removed
-
-        pojo.serializedValueTable = dao.serializedValueTable()
-    }
-
-    fun applyPojoToDao(pojo: OTItemPOJO, dao: OTItemDAO, realm: Realm) {
-        dao.deviceId = pojo.deviceId
-        dao.source = pojo.source
-        dao.synchronizedAt = pojo.synchronizedAt
-        dao.timestamp = pojo.timestamp
-        dao.trackerId = pojo.trackerObjectId
-        dao.removed = pojo.removed
-
-        if (pojo.serializedValueTable != null) {
-            pojo.serializedValueTable!!.entries.forEach { (key, serializedValue) ->
-                dao.setValueOf(key, serializedValue)
-            }
-        } else {
-            dao.fieldValueEntries.forEach {
-                it.deleteFromRealm()
-            }
-            dao.fieldValueEntries.clear()
-        }
     }
 }
 

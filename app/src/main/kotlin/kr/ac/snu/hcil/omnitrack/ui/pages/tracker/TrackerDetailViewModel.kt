@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.tracker
 import android.app.Application
 import android.support.annotation.DrawableRes
 import dagger.Lazy
+import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
@@ -16,9 +17,10 @@ import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTriggerDAO
-import kr.ac.snu.hcil.omnitrack.core.database.synchronization.ESyncDataType
-import kr.ac.snu.hcil.omnitrack.core.database.synchronization.OTSyncManager
-import kr.ac.snu.hcil.omnitrack.core.database.synchronization.SyncDirection
+import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
+import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
+import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.RealmViewModel
 import kr.ac.snu.hcil.omnitrack.utils.*
 import org.jetbrains.anko.collections.forEachWithIndex
@@ -64,6 +66,8 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
     val colorObservable = BehaviorSubject.createDefault<Int>(OTApp.instance.colorPalette[0])
     val attributeViewModelListObservable = BehaviorSubject.create<List<AttributeInformationViewModel>>()
     //===================================================
+
+    private var lastRemovedAttributeId: String? = null
 
     var name: String
         get() = nameObservable.value
@@ -123,6 +127,8 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
     fun init(trackerId: String?) {
         if (!isInitialized) {
+            removedAttributes.clear()
+            lastRemovedAttributeId = null
             subscriptions.clear()
             if (trackerId != null) {
                 val dao = dbManager.get().getTrackerQueryWithId(trackerId, realm).findFirstAsync()
@@ -237,6 +243,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
     fun removeAttribute(attrViewModel: AttributeInformationViewModel) {
         if (trackerDao != null) {
+            lastRemovedAttributeId = attrViewModel.objectId
             realm.executeTransactionIfNotIn {
                 val attribute = trackerDao?.attributes?.find { it.objectId == attrViewModel.objectId }
                 if (attribute != null) {
@@ -249,6 +256,39 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
             removedAttributes.add(attrViewModel)
             currentAttributeViewModelList.remove(attrViewModel)
             attributeViewModelListObservable.onNext(currentAttributeViewModelList)
+        }
+    }
+
+    fun undoRemove(): Completable {
+        return Completable.defer {
+
+            if (isEditMode) {
+                if (lastRemovedAttributeId != null) {
+                    val trackerId = trackerId
+                    return@defer realm.executeTransactionAsObservable { realm ->
+                        val removedItem = realm.where(OTAttributeDAO::class.java).equalTo(RealmDatabaseManager.FIELD_OBJECT_ID, lastRemovedAttributeId!!).findFirst()
+                        if (removedItem != null) {
+                            removedItem.isInTrashcan = false
+
+                            val trackerDao = dbManager.get().getTrackerQueryWithId(trackerId!!, realm).findFirst()
+                            if (trackerDao?.synchronizedAt != null) {
+                                trackerDao.synchronizedAt = null
+                                registerSyncJob()
+                            }
+                        }
+                    }.doAfterTerminate {
+                        lastRemovedAttributeId = null
+                    }
+                } else return@defer Completable.complete()
+            } else {
+                if (removedAttributes.isNotEmpty()) {
+                    val last = removedAttributes.last()
+                    removedAttributes.remove(last)
+                    currentAttributeViewModelList.add(last)
+                    attributeViewModelListObservable.onNext(currentAttributeViewModelList)
+                }
+                return@defer Completable.complete()
+            }
         }
     }
 

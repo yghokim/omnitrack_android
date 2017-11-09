@@ -4,8 +4,8 @@ import android.content.Context
 import dagger.Module
 import dagger.Provides
 import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
-import kr.ac.snu.hcil.omnitrack.core.database.synchronization.SyncQueueDbHelper
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationClientSideAPI
+import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncQueueDbHelper
 import javax.inject.Qualifier
 
 /**

@@ -3,17 +3,13 @@ package kr.ac.snu.hcil.omnitrack.services
 import com.firebase.jobdispatcher.JobParameters
 import com.firebase.jobdispatcher.JobService
 import dagger.Lazy
-import io.reactivex.Completable
-import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.PublishSubject
 import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.core.database.synchronization.ESyncDataType
-import kr.ac.snu.hcil.omnitrack.core.database.synchronization.OTSyncManager
-import kr.ac.snu.hcil.omnitrack.core.database.synchronization.SyncDirection
-import kr.ac.snu.hcil.omnitrack.core.database.synchronization.SyncQueueDbHelper
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationClientSideAPI
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationServerSideAPI
+import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
+import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncQueueDbHelper
 import javax.inject.Inject
 
 /**

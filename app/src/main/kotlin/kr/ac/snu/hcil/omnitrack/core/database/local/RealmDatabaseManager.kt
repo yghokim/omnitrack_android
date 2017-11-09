@@ -6,21 +6,17 @@ import com.google.gson.JsonObject
 import dagger.Lazy
 import io.reactivex.Completable
 import io.reactivex.Flowable
-import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.subjects.PublishSubject
 import io.realm.*
 import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.core.OTTracker
-import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
-import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTItemPOJO
-import kr.ac.snu.hcil.omnitrack.core.database.synchronization.ESyncDataType
-import kr.ac.snu.hcil.omnitrack.core.database.synchronization.SyncResultEntry
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.net.ABinaryUploadService
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationClientSideAPI
+import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
+import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncResultEntry
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.utils.executeTransactionIfNotIn
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
@@ -67,10 +63,6 @@ class RealmDatabaseManager @Inject constructor(private val config: Configuration
     fun makeNewRealmInstance(): Realm = Realm.getInstance(RealmConfiguration.Builder().name(config.fileName).build())
 
     val OnItemListUpdated = PublishSubject.create<String>() // trackerId
-
-    private fun getItemQueryOfTracker(tracker: OTTracker, realm: Realm): RealmQuery<OTItemDAO> {
-        return realm.where(OTItemDAO::class.java).equalTo(FIELD_TRACKER_ID, tracker.objectId).equalTo(FIELD_REMOVED_BOOLEAN, false)
-    }
 
     fun getTrackerQueryWithId(objectId: String, realm: Realm): RealmQuery<OTTrackerDAO> {
         return realm.where(OTTrackerDAO::class.java).equalTo(FIELD_OBJECT_ID, objectId).equalTo(FIELD_REMOVED_BOOLEAN, false)
@@ -212,28 +204,6 @@ class RealmDatabaseManager @Inject constructor(private val config: Configuration
         }
     }
 
-    fun removeTracker(tracker: OTTracker, formerOwner: OTUser, archive: Boolean) {
-        val realm = makeNewRealmInstance()
-        val dao = getTrackerQueryWithId(tracker.objectId, realm).findFirst()
-        if (dao != null) {
-            realm.executeTransaction {
-
-                if (dao.removed != true) {
-
-                    dao.attributes.forEach { attrDao ->
-                        attrDao.objectId?.let {
-                            removeAttribute(tracker.objectId, it)
-                        }
-                    }
-
-                    dao.removed = true
-                    dao.synchronizedAt = null
-                    dao.userUpdatedAt = System.currentTimeMillis()
-                }
-            }
-        }
-    }
-
     fun saveTrigger(dao: OTTriggerDAO, realm: Realm) {
         if (realm.isInTransaction) {
             realm.copyToRealmOrUpdate(dao)
@@ -262,42 +232,6 @@ class RealmDatabaseManager @Inject constructor(private val config: Configuration
                 }
             }
         }
-    }
-
-    fun removeAttribute(trackerId: String, objectId: String) {
-        val realm = makeNewRealmInstance()
-        val dao = realm.where(OTAttributeDAO::class.java).equalTo("trackerId", trackerId).equalTo("objectId", objectId).findFirst()
-        if (dao != null) {
-
-            /*
-            realm.executeTransaction {
-                if(dao.removed != true)
-                {
-                    dao.removed = true
-                    dao.synchronizedAt = null
-                    dao.userUpdatedAt = System.currentTimeMillis()
-                }
-            }*/
-        }
-    }
-
-    fun getTracker(key: String): Observable<OTTrackerDAO> {
-        return Observable.defer {
-            val realm = makeNewRealmInstance()
-            try {
-                val dao = realm.where(OTTrackerDAO::class.java)
-                        .equalTo(FIELD_REMOVED_BOOLEAN, false)
-                        .equalTo(FIELD_OBJECT_ID, key).findFirst()
-                if (dao != null) {
-                    return@defer Observable.just(dao)
-                } else return@defer Observable.error<OTTrackerDAO>(Exception("No tracker with such key in database."))
-            } catch (ex: Exception) {
-                return@defer Observable.error<OTTrackerDAO>(ex)
-            } finally {
-                realm.close()
-            }
-        }
-
     }
 
     //Items
@@ -552,59 +486,6 @@ class RealmDatabaseManager @Inject constructor(private val config: Configuration
             val list = realm.where(tableClass).equalTo(FIELD_SYNCHRONIZED_AT, null as Long?).findAll().map { it -> serialize(it) }.toList()
             realm.close()
             return@defer Single.just(list)
-        }
-    }
-
-    fun applyServerItemsToSync(itemList: List<OTItemPOJO>): Single<Boolean> {
-        return Single.defer {
-            val realm = makeNewRealmInstance()
-            try {
-                for (serverPojo in itemList) {
-                    val match = realm.where(OTItemDAO::class.java).equalTo(FIELD_OBJECT_ID, serverPojo.objectId).findFirst()
-                    if (match == null) {
-                        if (!serverPojo.removed) {
-                            //insert
-                            println("synchronization: server row not matched and is not a removed row. append new in local db.")
-
-                            realm.executeTransaction { realm ->
-                                val dao = realm.createObject(OTItemDAO::class.java, serverPojo.objectId)
-                                RealmItemHelper.applyPojoToDao(serverPojo, dao, realm)
-                            }
-                        }
-                    } else if (match.synchronizedAt == null) {
-                        //found matched row, but it is dirty. Conflict!
-                        //late timestamp win policy
-                        println("conflict")
-                        if (match.timestamp > serverPojo.timestamp) {
-                            //client win
-                            println("client win")
-                        } else {
-                            //server win
-                            println("server win")
-                            realm.executeTransaction {
-                                RealmItemHelper.applyPojoToDao(serverPojo, match, realm)
-                            }
-                        }
-                    } else {
-                        //update
-                        realm.executeTransaction {
-                            if (serverPojo.removed) {
-                                removeItemImpl(match, true, realm)
-                            } else {
-                                RealmItemHelper.applyPojoToDao(serverPojo, match, realm)
-                            }
-                        }
-                    }
-                }
-
-                realm.close()
-                return@defer Single.just(true)
-            } catch (ex: Exception) {
-                ex.printStackTrace()
-                return@defer Single.just(false)
-            } finally {
-                realm.close()
-            }
         }
     }
 }

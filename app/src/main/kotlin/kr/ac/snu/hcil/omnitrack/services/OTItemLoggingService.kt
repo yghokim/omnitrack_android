@@ -14,9 +14,9 @@ import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemBuilderDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
-import kr.ac.snu.hcil.omnitrack.core.database.synchronization.ESyncDataType
-import kr.ac.snu.hcil.omnitrack.core.database.synchronization.OTSyncManager
-import kr.ac.snu.hcil.omnitrack.core.database.synchronization.SyncDirection
+import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
+import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
+import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
 import kr.ac.snu.hcil.omnitrack.core.system.OTTaskNotificationManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTTrackingNotificationFactory
 import org.jetbrains.anko.notificationManager

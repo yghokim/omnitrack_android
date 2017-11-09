@@ -6,11 +6,11 @@ import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.core.OTUserRolePOJO
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
-import kr.ac.snu.hcil.omnitrack.core.database.abstraction.pojos.OTUserRolePOJO
-import kr.ac.snu.hcil.omnitrack.core.database.synchronization.ESyncDataType
-import kr.ac.snu.hcil.omnitrack.core.database.synchronization.SyncResultEntry
+import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
+import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncResultEntry
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Response

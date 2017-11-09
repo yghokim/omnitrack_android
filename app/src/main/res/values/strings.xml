@@ -554,6 +554,7 @@
     <string name="msg_required_information_text">*Required</string>
     <string name="msg_reorder">Reorder</string>
     <string name="msg_edit_tracker_order">Edit Tracker Order</string>
+    <string name="msg_format_confirm_remove_trigger">Do you really want to remove the %1$s?</string>
 
     <string-array name="supported_language_names">
         <item>English</item>
