@@ -25,8 +25,8 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
 
     @Inject lateinit var realmProvider: Provider<Realm>
 
-    init {
-        getApplication<OTApp>().applicationComponent.inject(this)
+    override fun onInject(app: OTApp) {
+        app.synchronizationComponent.inject(this)
     }
 
     override fun onInit(trackerDao: OTTrackerDAO, itemId: String?): Pair<ItemMode, BuilderCreationMode?>? {
@@ -135,6 +135,7 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
                 val item = builderWrapper.saveToItem(null, ItemLoggingSource.Manual)
 
                 return@flatMapMaybe Maybe.fromSingle<String>(dbManager.get().saveItemObservable(item, false, null, realm).map { it.second })
+                        .doAfterSuccess { syncItemToServer() }
             }
         } else return Maybe.just(null)
     }

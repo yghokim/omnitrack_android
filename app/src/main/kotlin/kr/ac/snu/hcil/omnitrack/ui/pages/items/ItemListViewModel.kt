@@ -14,13 +14,20 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.synchronization.ESyncDataType
+import kr.ac.snu.hcil.omnitrack.core.database.synchronization.OTSyncManager
+import kr.ac.snu.hcil.omnitrack.core.database.synchronization.SyncDirection
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.RealmViewModel
 import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
+import javax.inject.Inject
 
 /**
  * Created by Young-Ho on 10/12/2017.
  */
 class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCollectionChangeListener<RealmResults<OTItemDAO>> {
+
+    @Inject
+    protected lateinit var syncManager: OTSyncManager
 
     private var currentItemQueryResults: RealmResults<OTItemDAO>? = null
     lateinit var trackerDao: OTTrackerDAO
@@ -65,6 +72,10 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
     private val itemComparerMethod = Comparator<ItemViewModel> { p0, p1 -> currentSorter.compare(p0?.itemDao, p1?.itemDao) }
 
     val onItemContentChanged = PublishSubject.create<Array<OrderedCollectionChangeSet.Range>>()
+
+    override fun onInject(app: OTApp) {
+        app.synchronizationComponent.inject(this)
+    }
 
     fun init(trackerId: String) {
         val dao = dbManager.get().getTrackerQueryWithId(trackerId, realm).findFirst()
@@ -142,6 +153,7 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
             realm.executeTransaction {
                 dbManager.get().removeItem(viewModel.itemDao, false, realm)
             }
+            syncManager.registerSyncQueue(ESyncDataType.ITEM, SyncDirection.UPLOAD)
         }
     }
 

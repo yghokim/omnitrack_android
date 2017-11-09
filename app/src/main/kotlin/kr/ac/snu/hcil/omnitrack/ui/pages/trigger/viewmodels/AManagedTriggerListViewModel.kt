@@ -3,8 +3,13 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels
 import android.app.Application
 import io.realm.RealmQuery
 import io.realm.RealmResults
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.synchronization.ESyncDataType
+import kr.ac.snu.hcil.omnitrack.core.database.synchronization.OTSyncManager
+import kr.ac.snu.hcil.omnitrack.core.database.synchronization.SyncDirection
+import javax.inject.Inject
 
 /**
  * Created by younghokim on 2017. 10. 20..
@@ -17,6 +22,9 @@ import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
  */
 abstract class AManagedTriggerListViewModel(app: Application) : ATriggerListViewModel(app) {
 
+    @Inject
+    protected lateinit var syncManager: OTSyncManager
+
     private var currentTriggerRealmResults: RealmResults<OTTriggerDAO>? = null
 
     /**
@@ -25,6 +33,10 @@ abstract class AManagedTriggerListViewModel(app: Application) : ATriggerListView
      */
     protected open fun hookTriggerQuery(originalQuery: RealmQuery<OTTriggerDAO>): RealmQuery<OTTriggerDAO> {
         return originalQuery
+    }
+
+    override fun onInject(app: OTApp) {
+        app.synchronizationComponent.inject(this)
     }
 
 
@@ -39,7 +51,7 @@ abstract class AManagedTriggerListViewModel(app: Application) : ATriggerListView
                 //initial set
                 currentTriggerViewModels.clear()
                 currentTriggerViewModels.addAll(
-                        snapshot.map { TriggerViewModel(it, realm) }
+                        snapshot.map { TriggerViewModel(getApplication<OTApp>(), it, realm) }
                 )
             } else {
                 //changes
@@ -50,7 +62,7 @@ abstract class AManagedTriggerListViewModel(app: Application) : ATriggerListView
 
                 //deal with additions
                 changeSet.insertions.forEach { i ->
-                    currentTriggerViewModels.add(i, TriggerViewModel(snapshot[i]!!, realm))
+                    currentTriggerViewModels.add(i, TriggerViewModel(getApplication<OTApp>(), snapshot[i]!!, realm))
                 }
 
                 //deal with refresh
@@ -67,13 +79,17 @@ abstract class AManagedTriggerListViewModel(app: Application) : ATriggerListView
         beforeAddNewTrigger(dao)
 
         dbManager.get().saveTrigger(dao, realm)
+        syncManager.registerSyncQueue(ESyncDataType.TRIGGER, SyncDirection.UPLOAD)
+
     }
 
     override fun removeTrigger(objectId: String) {
         val viewModel = currentTriggerViewModels.find { it.objectId == objectId }
         if (viewModel != null) {
             dbManager.get().removeTrigger(viewModel.dao, false, realm)
+            syncManager.registerSyncQueue(ESyncDataType.TRIGGER, SyncDirection.UPLOAD)
         }
+
     }
 
     protected fun onDispose() {

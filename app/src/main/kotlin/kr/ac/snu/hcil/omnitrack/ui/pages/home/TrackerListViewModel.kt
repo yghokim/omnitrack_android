@@ -9,18 +9,25 @@ import io.realm.*
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.local.*
+import kr.ac.snu.hcil.omnitrack.core.database.synchronization.ESyncDataType
+import kr.ac.snu.hcil.omnitrack.core.database.synchronization.OTSyncManager
+import kr.ac.snu.hcil.omnitrack.core.database.synchronization.SyncDirection
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.UserAttachedViewModel
 import kr.ac.snu.hcil.omnitrack.utils.DefaultNameGenerator
 import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.onNextIfDifferAndNotNull
 import java.util.*
+import javax.inject.Inject
 
 /**
  * Created by younghokim on 2017-05-30.
  */
 
 class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), OrderedRealmCollectionChangeListener<RealmResults<OTTrackerDAO>> {
+
+    @Inject
+    lateinit var syncManager: OTSyncManager
 
     private var trackersRealmResults: RealmResults<OTTrackerDAO>? = null
 
@@ -30,6 +37,10 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
 
     val trackerViewModels: Observable<List<TrackerInformationViewModel>>
         get() = trackerViewModelListSubject
+
+    override fun onInject(app: OTApp) {
+        app.synchronizationComponent.inject(this)
+    }
 
     override fun onChange(snapshot: RealmResults<OTTrackerDAO>, changeSet: OrderedCollectionChangeSet?) {
         if (snapshot.isLoaded && snapshot.isValid) {
@@ -100,6 +111,7 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
                 dbManager.get().removeTracker(model.trackerDao, false, realm)
             }
         }
+        syncManager.registerSyncQueue(ESyncDataType.TRACKER, SyncDirection.UPLOAD)
     }
 
     class TrackerInformationViewModel(val trackerDao: OTTrackerDAO, val realm: Realm, dbManager: RealmDatabaseManager) : IReadonlyObjectId, RealmChangeListener<OTTrackerDAO> {

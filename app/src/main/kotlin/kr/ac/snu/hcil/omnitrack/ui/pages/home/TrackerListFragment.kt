@@ -245,8 +245,6 @@ class TrackerListFragment : OTFragment() {
     }
 
     private fun handleTrackerClick(tracker: OTTrackerDAO) {
-        val attrs = tracker.makeAttributesQuery(false, false).findAll().count()
-
         if (tracker.makeAttributesQuery(false, false).findAll().count() == 0) {
             emptyTrackerDialog
                     .onPositive { materialDialog, dialogAction ->

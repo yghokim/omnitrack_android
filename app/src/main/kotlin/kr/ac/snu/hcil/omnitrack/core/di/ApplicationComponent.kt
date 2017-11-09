@@ -10,7 +10,6 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTImageAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.net.OTOfficialServerApiController
 import kr.ac.snu.hcil.omnitrack.core.visualization.models.*
-import kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService
 import kr.ac.snu.hcil.omnitrack.services.OTTableExportService
 import kr.ac.snu.hcil.omnitrack.services.messaging.OTFirebaseInstanceIdService
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
@@ -22,9 +21,7 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.SendReportActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.configs.ShortcutPanelWidgetConfigActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.TrackerListFragment
-import kr.ac.snu.hcil.omnitrack.ui.pages.items.NewItemCreationViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.tracker.FieldPresetSelectionBottomSheetFragment
-import kr.ac.snu.hcil.omnitrack.ui.pages.tracker.ManagedReminderListViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.TrackerAssignPanel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.ATriggerListViewModel
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.RealmViewModel
@@ -56,10 +53,6 @@ interface ApplicationComponent {
 
     fun inject(triggerViewModel: ATriggerListViewModel)
 
-    fun inject(loggingService: OTItemLoggingService)
-
-    fun inject(itemViewModel: NewItemCreationViewModel)
-
     fun inject(service: OTShortcutPanelWidgetService)
     fun inject(service: OTShortcutPanelWidgetUpdateService)
 
@@ -73,8 +66,6 @@ interface ApplicationComponent {
     fun inject(fragment: FieldPresetSelectionBottomSheetFragment)
 
     fun inject(fragment: TrackerListFragment)
-
-    fun inject(viewModel: ManagedReminderListViewModel)
 
     fun inject(service: OTFirebaseInstanceIdService)
 

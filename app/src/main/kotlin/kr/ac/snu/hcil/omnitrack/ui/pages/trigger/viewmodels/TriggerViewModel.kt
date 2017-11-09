@@ -3,20 +3,28 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels
 import io.reactivex.Completable
 import io.reactivex.subjects.BehaviorSubject
 import io.realm.*
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.database.OTTriggerInformationHelper
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.synchronization.ESyncDataType
+import kr.ac.snu.hcil.omnitrack.core.database.synchronization.OTSyncManager
+import kr.ac.snu.hcil.omnitrack.core.database.synchronization.SyncDirection
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTTriggerAction
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.ATriggerCondition
 import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.utils.executeTransactionAsObservable
 import kr.ac.snu.hcil.omnitrack.utils.onNextIfDifferAndNotNull
 import java.util.*
+import javax.inject.Inject
 
 /**
  * Created by younghokim on 2017. 10. 24..
  */
-open class TriggerViewModel(val dao: OTTriggerDAO, val realm: Realm) : IReadonlyObjectId, RealmChangeListener<OTTriggerDAO>, OrderedRealmCollectionChangeListener<RealmResults<OTTrackerDAO>> {
+open class TriggerViewModel(app: OTApp, val dao: OTTriggerDAO, val realm: Realm) : IReadonlyObjectId, RealmChangeListener<OTTriggerDAO>, OrderedRealmCollectionChangeListener<RealmResults<OTTrackerDAO>> {
+
+    @Inject
+    protected lateinit var syncManager: OTSyncManager
 
     override val objectId: String?
         get() = dao.objectId
@@ -40,6 +48,8 @@ open class TriggerViewModel(val dao: OTTriggerDAO, val realm: Realm) : IReadonly
 
 
     init {
+        app.synchronizationComponent.inject(this)
+
         applyDaoToFront()
         println("trigger user id: ${dao.userId}")
         if (dao.isManaged) {
@@ -130,7 +140,11 @@ open class TriggerViewModel(val dao: OTTriggerDAO, val realm: Realm) : IReadonly
                             realm.executeTransactionAsObservable { realm ->
                                 realm.where(OTTriggerDAO::class.java).equalTo("objectId", id).findFirst()
                                         ?.isOn = true
-                            }.doOnComplete { triggerSwitch.onNextIfDifferAndNotNull(true) }
+                            }.doOnComplete {
+                                triggerSwitch.onNextIfDifferAndNotNull(true)
+                            }.doAfterTerminate {
+                                syncManager.registerSyncQueue(ESyncDataType.TRIGGER, SyncDirection.UPLOAD)
+                            }
                         } else Completable.error(validationError)
                     } else {
                         //offline mode
@@ -155,7 +169,11 @@ open class TriggerViewModel(val dao: OTTriggerDAO, val realm: Realm) : IReadonly
                         realm.executeTransactionAsObservable { realm ->
                             realm.where(OTTriggerDAO::class.java).equalTo("objectId", id).findFirst()
                                     ?.isOn = false
-                        }.doOnComplete { triggerSwitch.onNextIfDifferAndNotNull(false) }
+                        }.doOnComplete {
+                            triggerSwitch.onNextIfDifferAndNotNull(false)
+                        }.doAfterTerminate {
+                            syncManager.registerSyncQueue(ESyncDataType.TRIGGER, SyncDirection.UPLOAD)
+                        }
                     } else {
                         println("offline mode trigger switch off")
                         dao.isOn = false
