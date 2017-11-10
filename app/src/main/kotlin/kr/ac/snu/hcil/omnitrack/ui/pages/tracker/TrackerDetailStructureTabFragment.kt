@@ -32,7 +32,6 @@ import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.common.AdapterLinearLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.BooleanPropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ColorPalettePropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ModalTextPropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.tutorial.TutorialManager
@@ -64,7 +63,6 @@ class TrackerDetailStructureTabFragment : OTFragment() {
 
     private lateinit var namePropertyView: ModalTextPropertyView
     private lateinit var colorPropertyView: ColorPalettePropertyView
-    private lateinit var isOnShortcutPropertyView: BooleanPropertyView
     //private lateinit var fab: FloatingActionButton
 
     private lateinit var contentContainer: ViewGroup
@@ -112,8 +110,8 @@ class TrackerDetailStructureTabFragment : OTFragment() {
         namePropertyView.value = this.viewModel.name
         namePropertyView.showEditedOnTitle = viewModel.isNameDirty
 
-        isOnShortcutPropertyView.value = this.viewModel.isBookmarked
-        isOnShortcutPropertyView.showEditedOnTitle = this.viewModel.isBookmarkedDirty
+        isOnShortcutProperty.setToggleMode(this.viewModel.isBookmarked, false)
+        isOnShortcutProperty.showEditedOnTitle = this.viewModel.isBookmarkedDirty
 
         applyColorTheme(this.viewModel.color, false)
         colorPropertyView.value = this.viewModel.color
@@ -154,9 +152,9 @@ class TrackerDetailStructureTabFragment : OTFragment() {
         )
 
         creationSubscriptions.add(
-                isOnShortcutPropertyView.valueChanged.observable.subscribe { result ->
+                isOnShortcutProperty.valueChanged.observable.subscribe { result ->
                     this.viewModel.isBookmarked = result.second
-                    isOnShortcutPropertyView.showEditedOnTitle = viewModel.isBookmarkedDirty
+                    isOnShortcutProperty.showEditedOnTitle = viewModel.isBookmarkedDirty
                 }
         )
 
@@ -184,8 +182,6 @@ class TrackerDetailStructureTabFragment : OTFragment() {
         //namePropertyView.addNewValidator("Name cannot be empty.", ShortTextPropertyView.NOT_EMPTY_VALIDATOR)
 
         colorPropertyView = rootView.findViewById(R.id.colorProperty)
-
-        isOnShortcutPropertyView = rootView.findViewById(R.id.isOnShortcutProperty)
         /*
         isOnShortcutPropertyView.valueChanged += {
             sender, isOnShortcut ->

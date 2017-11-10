@@ -35,6 +35,7 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.tbruyelle.rxpermissions2.RxPermissions
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import kotlinx.android.synthetic.main.tracker_list_element.view.*
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
@@ -550,6 +551,16 @@ class TrackerListFragment : OTFragment() {
                         viewModel.trackerColor.subscribe {
                             colorInt ->
                             color.setBackgroundColor(colorInt)
+                        }
+                )
+
+                subscriptions.add(
+                        viewModel.isBookmarked.subscribe { isBookmarked ->
+                            if (isBookmarked) {
+                                itemView.ui_bookmark_indicator.visibility = View.VISIBLE
+                            } else {
+                                itemView.ui_bookmark_indicator.visibility = View.GONE
+                            }
                         }
                 )
 
