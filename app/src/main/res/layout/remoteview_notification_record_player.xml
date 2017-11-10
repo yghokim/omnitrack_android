@@ -50,7 +50,7 @@
             android:layout_marginTop="4dp"
             android:ellipsize="marquee"
             android:fontFamily="sans-serif-condensed"
-            android:maxLines="1"
+            android:singleLine="true"
             android:textColor="#FFF"
             android:textSize="18sp"
             tools:text="Voice Log | Diary" />

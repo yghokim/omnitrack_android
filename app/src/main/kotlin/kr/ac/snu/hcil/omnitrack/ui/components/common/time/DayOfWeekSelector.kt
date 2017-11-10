@@ -6,6 +6,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.support.v4.content.ContextCompat
+import android.support.v7.widget.AppCompatButton
 import android.util.AttributeSet
 import android.view.Gravity
 import android.view.View
@@ -154,7 +155,7 @@ class DayOfWeekSelector : LinearLayout, View.OnClickListener {
         } else return false
     }
 
-    class CircleBackgroundButton : Button, ValueAnimator.AnimatorUpdateListener {
+    class CircleBackgroundButton : AppCompatButton, ValueAnimator.AnimatorUpdateListener {
 
         var inset: Float = 0f
 

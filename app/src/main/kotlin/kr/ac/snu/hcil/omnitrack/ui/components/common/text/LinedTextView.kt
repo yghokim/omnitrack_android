@@ -3,13 +3,14 @@ package kr.ac.snu.hcil.omnitrack.ui.components.common.text
 import android.annotation.TargetApi
 import android.content.Context
 import android.graphics.Canvas
+import android.support.v7.widget.AppCompatTextView
 import android.util.AttributeSet
 import android.widget.TextView
 
 /**
  * Created by Young-Ho Kim on 16. 8. 16
  */
-class LinedTextView : TextView {
+class LinedTextView : AppCompatTextView {
 
 
     val base: LinedTextBase

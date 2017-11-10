@@ -217,8 +217,8 @@ class ChoiceFormView : LinearLayout {
                         .backgroundColorRes(R.color.frontalBackground)
                         .titleColorRes(R.color.textColorDark)
                         .contentColorRes(R.color.textColorMidDark)
-                        .positiveColor(R.color.colorPointed)
-                        .negativeColor(R.color.colorRed_Light)
+                        .positiveColorRes(R.color.colorPointed)
+                        .negativeColorRes(R.color.colorRed_Light)
                         .cancelable(true)
                         .negativeText(R.string.msg_cancel)
                         .input(null, entry?.text, true, {
