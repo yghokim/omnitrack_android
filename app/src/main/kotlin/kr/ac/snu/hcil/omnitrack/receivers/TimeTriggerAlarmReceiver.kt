@@ -39,7 +39,7 @@ class TimeTriggerAlarmReceiver : BroadcastReceiver() {
                 val wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
                         "wake:" + comp.flattenToShortString())
                 wl.setReferenceCounted(false)
-                wl.acquire() // remove timeout
+                wl.acquire(100000) // remove timeout
                 mActiveWakeLocks.put(id, wl)
                 return comp
             }

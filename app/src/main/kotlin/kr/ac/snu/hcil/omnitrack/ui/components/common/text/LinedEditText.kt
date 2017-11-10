@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui.components.common.text
 import android.annotation.TargetApi
 import android.content.Context
 import android.graphics.Canvas
+import android.support.v7.widget.AppCompatEditText
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.AttributeSet
@@ -11,7 +12,7 @@ import android.widget.EditText
 /**
  * Created by Young-Ho Kim on 16. 7. 24
  */
-class LinedEditText : EditText {
+class LinedEditText : AppCompatEditText {
 
     val base: LinedTextBase
 

@@ -65,10 +65,10 @@
         style="@style/Widget.AppCompat.Button.Borderless.Colored"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="right"
+        android:layout_gravity="end"
         android:text="Select Time"
         android:textColor="@color/colorPointed"
-        android:textSize="16dp"
+        android:textSize="16sp"
         app:drawableEndCompat="@drawable/right_dark" />
 
     <View style="@style/HorizontalSeparator.NoVerticalMargin" />

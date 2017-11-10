@@ -11,8 +11,6 @@
         style="@style/Base.Widget.AppCompat.Button.Borderless.Colored"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
         android:layout_weight="1"
         android:text="@string/msg_cancel"
         android:textColor="#FFF" />
@@ -22,8 +20,6 @@
         style="@style/Base.Widget.AppCompat.Button.Borderless.Colored"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
         android:layout_weight="1"
         android:text="@string/msg_ok"
         android:textColor="#FFF" />

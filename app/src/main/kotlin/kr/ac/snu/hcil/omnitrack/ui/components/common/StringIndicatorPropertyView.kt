@@ -62,6 +62,8 @@ open class StringIndicatorPropertyView : LinearLayout {
 
         indicatorView = findViewById(R.id.ui_indicator)
         titleView = findViewById(R.id.ui_title)
+
+        typedArray.recycle()
     }
 
     private fun init(context: Context, attrs: AttributeSet?) {
