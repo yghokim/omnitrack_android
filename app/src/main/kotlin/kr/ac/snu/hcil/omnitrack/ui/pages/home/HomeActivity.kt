@@ -22,10 +22,8 @@ import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.tutorial.TutorialManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.services.ServiceListFragment
-import kr.ac.snu.hcil.omnitrack.ui.viewmodels.UserAttachedViewModel
 import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
 import kr.ac.snu.hcil.omnitrack.widgets.OTShortcutPanelWidgetUpdateService
-import org.jetbrains.anko.networkStatsManager
 
 class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), DrawerLayout.DrawerListener {
 
@@ -122,29 +120,6 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
                                         )
                                 ))
                     }
-
-                    /* TODO permission check in trackerlist fragment
-                    val rxPermissions = RxPermissions(this)
-
-                    val permissions = viewModel.getPermissionsRequiredForFields().filter { ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED }
-
-                    if (permissions.isNotEmpty()) {
-                        DialogHelper.makeYesNoDialogBuilder(this, resources.getString(R.string.msg_permission_required),
-                                String.format(resources.getString(R.string.msg_permission_request_of_tracker)),
-                                cancelable = false,
-                                onYes = {
-                                    rxPermissions.request(*permissions.toTypedArray()).subscribe {
-                                        granted ->
-                                        if (granted)
-                                            println("permissions granted.")
-                                        else println("permissions not granted.")
-                                    }
-                                },
-                                onCancel = null,
-                                yesLabel = R.string.msg_allow_permission,
-                                noLabel = R.string.msg_cancel
-                        ).show()
-                    }*/
 
                     if(intent.getBooleanExtra(INTENT_EXTRA_INITIAL_LOGIN, false))
                     {

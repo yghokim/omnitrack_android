@@ -46,7 +46,7 @@ class SidebarWrapper(val view: View, val parentActivity: AppCompatActivity) : Po
 
     init {
 
-        (parentActivity.application as OTApp).synchronizationComponent.inject(this)
+        (parentActivity.application as OTApp).applicationComponent.inject(this)
         /*
         val signOutButton = view.findViewById(R.id.ui_button_sign_out)
         signOutButton.setOnClickListener {

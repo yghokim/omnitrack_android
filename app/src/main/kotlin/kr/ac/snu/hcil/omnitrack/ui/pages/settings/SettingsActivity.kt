@@ -88,6 +88,9 @@ class SettingsActivity : MultiButtonActionBarActivity(R.layout.activity_multibut
         @Inject
         protected lateinit var versionCheckServiceController: Lazy<OTVersionCheckService.Controller>
 
+        @Inject
+        protected lateinit var shortcutPanelManager: OTShortcutPanelManager
+
 
         private var languageOnCreation: String? = null
 
@@ -125,7 +128,7 @@ class SettingsActivity : MultiButtonActionBarActivity(R.layout.activity_multibut
         override fun onActivityCreated(savedInstanceState: Bundle?) {
             super.onActivityCreated(savedInstanceState)
 
-            (act.application as OTApp).scheduledJobComponent.inject(this)
+            (act.application as OTApp).applicationComponent.inject(this)
             languageOnCreation = LocaleHelper.getLanguageCode(activity)
         }
 
@@ -194,13 +197,13 @@ class SettingsActivity : MultiButtonActionBarActivity(R.layout.activity_multibut
                                         }
                                                 .firstElement().subscribe { realm.close() })
                             } else {
-                                OTShortcutPanelManager.disposeShortcutPanel()
+                                shortcutPanelManager.disposeShortcutPanel()
                             }
                         } else {
-                            OTShortcutPanelManager.disposeShortcutPanel()
+                            shortcutPanelManager.disposeShortcutPanel()
                         }
                     } else {
-                        OTShortcutPanelManager.disposeShortcutPanel()
+                        shortcutPanelManager.disposeShortcutPanel()
                     }
                 }
 

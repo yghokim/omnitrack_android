@@ -7,7 +7,6 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
 import kr.ac.snu.hcil.omnitrack.core.database.NamedObject
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
-import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
 import kr.ac.snu.hcil.omnitrack.utils.DefaultNameGenerator
 import kr.ac.snu.hcil.omnitrack.utils.ObservableList
@@ -123,7 +122,7 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
     {
         prop, old, new ->
         if (old != new) {
-            OTShortcutPanelManager.notifyAppearanceChanged(this)
+            //OTShortcutPanelManager.notifyAppearanceChanged(this)
 
             if (!suspendDatabaseSync) save()
         }
@@ -133,9 +132,9 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
         prop, old, new ->
         if (old != new) {
             if (new == true) {
-                OTShortcutPanelManager += this
+                //OTShortcutPanelManager += this
             } else {
-                OTShortcutPanelManager -= this
+                //OTShortcutPanelManager -= this
             }
 
             if (!suspendDatabaseSync) save()
@@ -365,7 +364,7 @@ class OTTracker(objectId: String?, name: String, color: Int = Color.WHITE, isOnS
 
     override fun onNameChanged(newName: String) {
         super.onNameChanged(newName)
-        OTShortcutPanelManager.notifyAppearanceChanged(this)
+        //OTShortcutPanelManager.notifyAppearanceChanged(this)
 
         nameChanged.onNext(Pair(this, newName))
     }

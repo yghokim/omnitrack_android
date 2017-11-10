@@ -5,6 +5,7 @@ import android.animation.ValueAnimator
 import android.app.Activity.RESULT_OK
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Typeface
 import android.os.Bundle
 import android.support.design.widget.CoordinatorLayout
@@ -31,6 +32,7 @@ import android.widget.ImageButton
 import android.widget.TextView
 import butterknife.bindView
 import com.afollestad.materialdialogs.MaterialDialog
+import com.tbruyelle.rxpermissions2.RxPermissions
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import kr.ac.snu.hcil.omnitrack.OTApp
@@ -170,6 +172,27 @@ class TrackerListFragment : OTFragment() {
 
         createViewSubscriptions.add(
                 viewModel.trackerViewModels.subscribe { trackerViewModelList ->
+
+                    val rxPermissions = RxPermissions(act)
+
+                    val permissions = viewModel.getPermissionsRequiredForFields().filter { ContextCompat.checkSelfPermission(act, it) != PackageManager.PERMISSION_GRANTED }
+
+                    if (permissions.isNotEmpty()) {
+                        DialogHelper.makeYesNoDialogBuilder(act, resources.getString(R.string.msg_permission_required),
+                                String.format(resources.getString(R.string.msg_permission_request_of_tracker)),
+                                cancelable = false,
+                                onYes = {
+                                    rxPermissions.request(*permissions.toTypedArray()).subscribe { granted ->
+                                        if (granted)
+                                            println("permissions granted.")
+                                        else println("permissions not granted.")
+                                    }
+                                },
+                                onCancel = null,
+                                yesLabel = R.string.msg_allow_permission,
+                                noLabel = R.string.msg_cancel
+                        ).show()
+                    }
 
                     val diffResult = DiffUtil.calculateDiff(
                             IReadonlyObjectId.DiffUtilCallback(currentTrackerViewModelList, trackerViewModelList)

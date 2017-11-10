@@ -5,17 +5,17 @@ import com.firebase.jobdispatcher.Job
 import dagger.Lazy
 import io.reactivex.Completable
 import io.reactivex.Single
-import kr.ac.snu.hcil.omnitrack.core.di.ApplicationScope
 import kr.ac.snu.hcil.omnitrack.core.di.ServerSyncOneShot
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationClientSideAPI
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationServerSideAPI
 import javax.inject.Inject
 import javax.inject.Provider
+import javax.inject.Singleton
 
 /**
  * Created by younghokim on 2017. 9. 27..
  */
-@ApplicationScope
+@Singleton
 class OTSyncManager @Inject constructor(
         private val syncQueueDbHelper: SyncQueueDbHelper,
         private val syncClient: Lazy<ISynchronizationClientSideAPI>,

@@ -35,7 +35,7 @@ class HomeScreenViewModel(app: Application):UserAttachedViewModel(app) {
     private val _syncStateSubject = BehaviorSubject.createDefault(SYNC_STATE_SUCCESSFUL)
 
     override fun onInject(app: OTApp) {
-        app.synchronizationComponent.inject(this)
+        app.applicationComponent.inject(this)
     }
 
     fun startPullSync():Boolean{

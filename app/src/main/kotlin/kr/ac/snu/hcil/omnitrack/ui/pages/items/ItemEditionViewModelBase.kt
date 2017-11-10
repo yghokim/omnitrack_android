@@ -71,7 +71,7 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
         }
 
     override fun onInject(app: OTApp) {
-        app.synchronizationComponent.inject(this)
+        app.applicationComponent.inject(this)
     }
 
     fun init(trackerId: String, itemId: String?) {

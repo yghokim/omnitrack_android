@@ -19,7 +19,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
 import kr.ac.snu.hcil.omnitrack.core.di.*
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
-import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTriggerAlarmManager
 import kr.ac.snu.hcil.omnitrack.utils.LocaleHelper
 import org.jetbrains.anko.telephonyManager
@@ -164,6 +163,13 @@ class OTApp : MultiDexApplication() {
 
     //Dependency Injection
 
+    private val appModule: ApplicationModule by lazy {
+        ApplicationModule(this)
+    }
+
+    private val authModule: AuthModule by lazy {
+        AuthModule(this)
+    }
 
     private val backendDatabaseModule: BackendDatabaseModule by lazy {
         BackendDatabaseModule()
@@ -173,33 +179,41 @@ class OTApp : MultiDexApplication() {
         ScheduledJobModule()
     }
 
+    private val synchronizationModule: SynchronizationModule by lazy {
+        SynchronizationModule()
+    }
+
+    private val triggerSystemModule: TriggerSystemModule by lazy {
+        TriggerSystemModule()
+    }
+
+    private val daoSerializationModule: DaoSerializationModule by lazy {
+        DaoSerializationModule()
+    }
+
     val applicationComponent: ApplicationComponent by lazy {
         DaggerApplicationComponent.builder()
-                .applicationModule(ApplicationModule(this))
-                .authModule(AuthModule(this))
+                .applicationModule(appModule)
+                .authModule(authModule)
                 .networkModule(NetworkModule(this))
                 .backendDatabaseModule(backendDatabaseModule)
+                .scheduledJobModule(scheduledJobModule)
+                .triggerSystemModule(triggerSystemModule)
                 .informationHelpersModule(InformationHelpersModule())
                 .build()
     }
 
     val daoSerializationComponent: DaoSerializationComponent by lazy {
         DaggerDaoSerializationComponent.builder()
-                .daoSerializationModule(DaoSerializationModule())
+                .daoSerializationModule(daoSerializationModule)
                 .backendDatabaseModule(backendDatabaseModule)
                 .build()
     }
 
     val scheduledJobComponent: ScheduledJobComponent by lazy{
-        applicationComponent.makeScheduledJobComponentBuilder()
-                .setModule(scheduledJobModule)
-                .build()
-    }
-
-    val synchronizationComponent: SynchronizationComponent by lazy{
-        applicationComponent.makeSynchronizationComponentBuilder()
-                .setMainModule(SynchronizationModule())
-                .setScheduledJobModule(scheduledJobModule)
+        DaggerScheduledJobComponent.builder()
+                .scheduledJobModule(scheduledJobModule)
+                .applicationModule(appModule)
                 .build()
     }
 
@@ -313,7 +327,7 @@ class OTApp : MultiDexApplication() {
     }
 
     fun unlinkUser() {
-        OTShortcutPanelManager.disposeShortcutPanel()
+        applicationComponent.shortcutPanelManager().get().disposeShortcutPanel()
         applicationComponent.defaultPreferences().edit().remove(INTENT_EXTRA_OBJECT_ID_USER).apply()
     }
 

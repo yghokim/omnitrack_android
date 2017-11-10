@@ -1,16 +1,10 @@
 package kr.ac.snu.hcil.omnitrack.services
 
-import android.app.AlarmManager
 import android.app.Notification
 import android.app.PendingIntent
-import android.app.Service
-import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
-import dagger.Lazy
-import android.os.IBinder
-import android.preference.PreferenceManager
 import android.support.v4.app.NotificationCompat
 import android.support.v4.content.ContextCompat
 import android.util.Log
@@ -18,18 +12,19 @@ import com.firebase.jobdispatcher.FirebaseJobDispatcher
 import com.firebase.jobdispatcher.Job
 import com.firebase.jobdispatcher.JobParameters
 import com.firebase.jobdispatcher.JobService
+import dagger.Lazy
 import io.reactivex.disposables.Disposables
 import io.reactivex.disposables.SerialDisposable
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.RemoteConfigManager
-import kr.ac.snu.hcil.omnitrack.core.di.ApplicationScope
 import kr.ac.snu.hcil.omnitrack.core.di.VersionCheck
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
 import kr.ac.snu.hcil.omnitrack.utils.VectorIconHelper
 import org.jetbrains.anko.notificationManager
 import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Created by younghokim on 2017. 4. 15..
@@ -44,7 +39,7 @@ class OTVersionCheckService : JobService() {
         const val PREF_LAST_NOTIFIED_VERSION = "last_notified_version"
     }
 
-    @ApplicationScope
+    @Singleton
     class Controller @Inject constructor(val pref: Lazy<SharedPreferences>, val dispatcher: Lazy<FirebaseJobDispatcher>, @VersionCheck val job: Lazy<Job>){
 
         val versionCheckSwitchTurnedOn: Boolean

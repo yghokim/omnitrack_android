@@ -48,7 +48,7 @@ open class TriggerViewModel(app: OTApp, val dao: OTTriggerDAO, val realm: Realm)
 
 
     init {
-        app.synchronizationComponent.inject(this)
+        app.applicationComponent.inject(this)
 
         applyDaoToFront()
         println("trigger user id: ${dao.userId}")

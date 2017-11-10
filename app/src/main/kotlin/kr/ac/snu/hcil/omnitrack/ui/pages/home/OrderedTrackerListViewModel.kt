@@ -46,7 +46,7 @@ class OrderedTrackerListViewModel(app: Application) : UserAttachedViewModel(app)
         }
 
     override fun onInject(app: OTApp) {
-        app.synchronizationComponent.inject(this)
+        app.applicationComponent.inject(this)
     }
 
     override fun onUserAttached(newUserId: String) {

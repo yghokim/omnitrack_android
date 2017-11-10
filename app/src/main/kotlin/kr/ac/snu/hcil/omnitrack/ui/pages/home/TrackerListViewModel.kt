@@ -39,7 +39,7 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
         get() = trackerViewModelListSubject
 
     override fun onInject(app: OTApp) {
-        app.synchronizationComponent.inject(this)
+        app.applicationComponent.inject(this)
     }
 
     override fun onChange(snapshot: RealmResults<OTTrackerDAO>, changeSet: OrderedCollectionChangeSet?) {
@@ -71,6 +71,16 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
                 )
             }
         }
+    }
+
+    fun getPermissionsRequiredForFields(): Set<String> {
+        val set = HashSet<String>()
+        for (tracker in currentTrackerViewModelList) {
+            tracker.trackerDao.attributes
+                    .mapNotNull { it.getHelper().getRequiredPermissions(it) }
+                    .forEach { set.addAll(it) }
+        }
+        return set
     }
 
     fun generateNewTrackerName(): String {

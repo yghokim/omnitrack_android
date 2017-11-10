@@ -74,7 +74,7 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
     val onItemContentChanged = PublishSubject.create<Array<OrderedCollectionChangeSet.Range>>()
 
     override fun onInject(app: OTApp) {
-        app.synchronizationComponent.inject(this)
+        app.applicationComponent.inject(this)
     }
 
     fun init(trackerId: String) {

@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.di
 
 import android.content.SharedPreferences
 import dagger.Component
+import dagger.Lazy
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTAudioRecordAttributeHelper
@@ -9,7 +10,11 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTFileInvolvedAttributeH
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTImageAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.net.OTOfficialServerApiController
+import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.core.visualization.models.*
+import kr.ac.snu.hcil.omnitrack.receivers.RebootReceiver
+import kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService
+import kr.ac.snu.hcil.omnitrack.services.OTSynchronizationService
 import kr.ac.snu.hcil.omnitrack.services.OTTableExportService
 import kr.ac.snu.hcil.omnitrack.services.messaging.OTFirebaseInstanceIdService
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
@@ -20,10 +25,18 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.ImageInputView
 import kr.ac.snu.hcil.omnitrack.ui.pages.SendReportActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.configs.ShortcutPanelWidgetConfigActivity
-import kr.ac.snu.hcil.omnitrack.ui.pages.home.TrackerListFragment
+import kr.ac.snu.hcil.omnitrack.ui.pages.home.*
+import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemEditionViewModelBase
+import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemListViewModel
+import kr.ac.snu.hcil.omnitrack.ui.pages.items.NewItemCreationViewModel
+import kr.ac.snu.hcil.omnitrack.ui.pages.settings.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.tracker.FieldPresetSelectionBottomSheetFragment
+import kr.ac.snu.hcil.omnitrack.ui.pages.tracker.TrackerDetailViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.TrackerAssignPanel
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.TriggerDetailViewModel
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.AManagedTriggerListViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.ATriggerListViewModel
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.TriggerViewModel
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.RealmViewModel
 import kr.ac.snu.hcil.omnitrack.widgets.OTShortcutPanelWidgetService
 import kr.ac.snu.hcil.omnitrack.widgets.OTShortcutPanelWidgetUpdateService
@@ -39,14 +52,16 @@ import javax.inject.Singleton
         BackendDatabaseModule::class,
         NetworkModule::class,
         InformationHelpersModule::class,
-        DaoSerializationModule::class
+        DaoSerializationModule::class,
+        ScheduledJobModule::class,
+        SynchronizationModule::class,
+        TriggerSystemModule::class
 ))
 interface ApplicationComponent {
 
     fun defaultPreferences(): SharedPreferences
 
-    fun makeScheduledJobComponentBuilder(): ScheduledJobComponent.Builder
-    fun makeSynchronizationComponentBuilder(): SynchronizationComponent.Builder
+    fun shortcutPanelManager(): Lazy<OTShortcutPanelManager>
 
     fun inject(application: OTApp)
     fun inject(realmViewModel: RealmViewModel)
@@ -62,6 +77,7 @@ interface ApplicationComponent {
 
     fun inject(fragment: AttributeEditDialogFragment)
 
+    fun inject(fragment: SettingsActivity.SettingsFragment)
 
     fun inject(fragment: FieldPresetSelectionBottomSheetFragment)
 
@@ -98,4 +114,21 @@ interface ApplicationComponent {
     fun inject(chartModel: TimelineComparisonLineChartModel)
     fun inject(chartModel: DurationTimelineModel)
     fun inject(chartModel: ChoiceCategoricalBarChartModel)
+
+    fun inject(receiver: RebootReceiver)
+
+
+    fun inject(viewModel: HomeScreenViewModel)
+    fun inject(service: OTSynchronizationService)
+    fun inject(sidebar: SidebarWrapper)
+    fun inject(viewModel: OrderedTrackerListViewModel)
+    fun inject(viewModel: TrackerDetailViewModel)
+    fun inject(viewModel: TrackerListViewModel)
+    fun inject(viewModel: ItemListViewModel)
+    fun inject(viewModel: AManagedTriggerListViewModel)
+    fun inject(viewModel: ItemEditionViewModelBase)
+    fun inject(service: OTItemLoggingService)
+    fun inject(viewModel: TriggerDetailViewModel)
+    fun inject(viewModel: TriggerViewModel)
+    fun inject(viewModel: NewItemCreationViewModel)
 }
