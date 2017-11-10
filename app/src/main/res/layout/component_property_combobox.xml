@@ -14,7 +14,7 @@
         android:text="@string/msg_trigger_time_config_type" />
 
     <kr.ac.snu.hcil.omnitrack.ui.components.common.ExtendedSpinner
-        android:id="@+id/value"
+        android:id="@+id/ui_value"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"

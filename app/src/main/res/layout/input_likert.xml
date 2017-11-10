@@ -4,7 +4,7 @@
     android:layout_height="match_parent">
 
     <kr.ac.snu.hcil.omnitrack.ui.components.common.LikertScalePicker
-        android:id="@+id/value"
+        android:id="@+id/ui_value"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 </merge>

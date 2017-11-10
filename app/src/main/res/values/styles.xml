@@ -146,6 +146,10 @@
         <item name="android:imeOptions">actionDone</item>
         <item name="android:inputType">textShortMessage</item>
 
+
+        <item name="android:textSize">17sp</item>
+        <item name="android:textColor">@color/textColorMid</item>
+
         <item name="android:maxLines">1</item>
         <item name="android:lines">1</item>
 

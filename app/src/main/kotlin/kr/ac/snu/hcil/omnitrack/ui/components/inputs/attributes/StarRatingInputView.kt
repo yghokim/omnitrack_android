@@ -11,7 +11,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.StarRatingSlider
 class StarRatingInputView(context: Context, attrs: AttributeSet? = null, initialValue: Float? = null) : AAttributeInputView<Float>(R.layout.input_stars, context, attrs) {
     override val typeId: Int = VIEW_TYPE_RATING_STARS
 
-    val ratingView: StarRatingSlider = findViewById(R.id.value)
+    val ratingView: StarRatingSlider = findViewById(R.id.ui_value)
 
     override var value: Float? = initialValue
         set(value) {

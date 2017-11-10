@@ -33,7 +33,7 @@
                     android:paddingRight="@dimen/activity_horizontal_margin"
                     android:text="@string/msg_basic_information" />
 
-                <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ShortTextPropertyView
+                <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ModalTextPropertyView
                     android:id="@+id/nameProperty"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

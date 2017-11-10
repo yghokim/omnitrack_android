@@ -11,7 +11,7 @@ import kr.ac.snu.hcil.omnitrack.R
  */
 class BooleanPropertyView(context: Context, attrs: AttributeSet?) : APropertyView<Boolean>(R.layout.component_property_boolean, context, attrs), View.OnClickListener {
 
-    private val switch: SwitchCompat = findViewById(R.id.value)
+    private val switch: SwitchCompat = findViewById(R.id.ui_value)
 
     private val proxyButton: View = findViewById(R.id.ui_button_proxy)
 
