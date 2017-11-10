@@ -14,8 +14,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.ToggleButton
-import com.wonderkiln.camerakit.CameraKit
-import com.wonderkiln.camerakit.CameraView
+import com.wonderkiln.camerakit.*
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LoadingIndicatorBar
@@ -61,7 +60,7 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
 
     private fun findViews(view: View) {
         cameraView = view.findViewById(R.id.ui_camera_view)
-        cameraView.setCameraListener(listener)
+        cameraView.addCameraKitListener(listener)
 
         shutterButton = view.findViewById(R.id.ui_camera_shutter)
         shutterButton.setOnClickListener(this)
@@ -135,10 +134,17 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
                 .create()
     }
 
-    inner class CameraListener : com.wonderkiln.camerakit.CameraListener() {
-        override fun onPictureTaken(jpeg: ByteArray?) {
-            super.onPictureTaken(jpeg)
-            if (jpeg != null) {
+    inner class CameraListener : com.wonderkiln.camerakit.CameraKitEventListener {
+        override fun onVideo(p0: CameraKitVideo?) {
+
+        }
+
+        override fun onEvent(p0: CameraKitEvent?) {
+
+        }
+
+        override fun onImage(image: CameraKitImage?) {
+            if (image != null) {
                 /*
                 val activity = activity
                 if (activity is OTActivity) {
@@ -151,11 +157,14 @@ class CameraPickDialogFragment : DialogFragment(), View.OnClickListener {
 
                 arguments?.getString(EXTRA_REQUEST_KEY)?.let {
                     LocalBroadcastManager.getInstance(context!!)
-                            .sendBroadcast(Intent(EXTRA_ACTION_PHOTO_TAKEN).putExtra(EXTRA_IMAGE_DATA, jpeg).putExtra(EXTRA_REQUEST_KEY, it))
+                            .sendBroadcast(Intent(EXTRA_ACTION_PHOTO_TAKEN).putExtra(EXTRA_IMAGE_DATA, image.jpeg).putExtra(EXTRA_REQUEST_KEY, it))
                 }
                 dismiss()
             }
         }
 
+        override fun onError(p0: CameraKitError?) {
+
+        }
     }
 }
