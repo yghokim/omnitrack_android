@@ -18,6 +18,7 @@ import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationClientSideAPI
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncResultEntry
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
+import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerSystemManager
 import kr.ac.snu.hcil.omnitrack.utils.executeTransactionIfNotIn
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import java.util.*
@@ -28,7 +29,13 @@ import javax.inject.Singleton
  * Created by younghokim on 2017. 9. 25..
  */
 @Singleton
-class RealmDatabaseManager @Inject constructor(private val config: Configuration, private val authManager: OTAuthManager, private val shortcutPanelManager: Lazy<OTShortcutPanelManager>, private val serializationManager: DaoSerializationManager, private val binaryUploadServiceController: ABinaryUploadService.ABinaryUploadServiceController)
+class RealmDatabaseManager @Inject constructor(
+        private val config: Configuration,
+        private val authManager: OTAuthManager,
+        private val shortcutPanelManager: Lazy<OTShortcutPanelManager>,
+        private val serializationManager: DaoSerializationManager,
+        private val triggerSystemManager: OTTriggerSystemManager,
+        private val binaryUploadServiceController: ABinaryUploadService.ABinaryUploadServiceController)
     :ISynchronizationClientSideAPI{
 
     companion object {

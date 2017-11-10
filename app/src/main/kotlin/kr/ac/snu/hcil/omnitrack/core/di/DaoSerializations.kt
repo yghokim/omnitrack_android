@@ -8,6 +8,7 @@ import dagger.Provides
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.core.database.local.*
 import kr.ac.snu.hcil.omnitrack.core.database.local.typeadapters.*
+import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerSystemManager
 import javax.inject.Provider
 import javax.inject.Qualifier
 import javax.inject.Singleton
@@ -39,12 +40,12 @@ class DaoSerializationModule {
     @Provides
     @Singleton
     @ForTrigger
-    fun provideTriggerAdapter(@ForGeneric gson: Lazy<Gson>, realmProvider: Provider<Realm>): ServerCompatibleTypeAdapter<OTTriggerDAO> = TriggerTypeAdapter(false, gson, realmProvider)
+    fun provideTriggerAdapter(@ForGeneric gson: Lazy<Gson>, realmProvider: Provider<Realm>, triggerSystemManager: Lazy<OTTriggerSystemManager>): ServerCompatibleTypeAdapter<OTTriggerDAO> = TriggerTypeAdapter(false, gson, realmProvider)
 
     @Provides
     @Singleton
     @ForServerTrigger
-    fun provideServerTriggerAdapter(@ForGeneric gson: Lazy<Gson>, realmProvider: Provider<Realm>): ServerCompatibleTypeAdapter<OTTriggerDAO> = TriggerTypeAdapter(true, gson, realmProvider)
+    fun provideServerTriggerAdapter(@ForGeneric gson: Lazy<Gson>, realmProvider: Provider<Realm>, triggerSystemManager: Lazy<OTTriggerSystemManager>): ServerCompatibleTypeAdapter<OTTriggerDAO> = TriggerTypeAdapter(true, gson, realmProvider)
 
     @Provides
     @Singleton
