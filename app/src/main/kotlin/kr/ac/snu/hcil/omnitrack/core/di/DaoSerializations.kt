@@ -16,7 +16,7 @@ import javax.inject.Singleton
 /**
  * Created by younghokim on 2017-11-02.
  */
-@Module
+@Module(includes = arrayOf(TriggerSystemModule::class))
 class DaoSerializationModule {
 
     @Provides
@@ -40,12 +40,12 @@ class DaoSerializationModule {
     @Provides
     @Singleton
     @ForTrigger
-    fun provideTriggerAdapter(@ForGeneric gson: Lazy<Gson>, realmProvider: Provider<Realm>, triggerSystemManager: Lazy<OTTriggerSystemManager>): ServerCompatibleTypeAdapter<OTTriggerDAO> = TriggerTypeAdapter(false, gson, realmProvider)
+    fun provideTriggerAdapter(@ForGeneric gson: Lazy<Gson>, realmProvider: Provider<Realm>, triggerSystemManager: Lazy<OTTriggerSystemManager>): ServerCompatibleTypeAdapter<OTTriggerDAO> = TriggerTypeAdapter(false, gson, realmProvider, triggerSystemManager)
 
     @Provides
     @Singleton
     @ForServerTrigger
-    fun provideServerTriggerAdapter(@ForGeneric gson: Lazy<Gson>, realmProvider: Provider<Realm>, triggerSystemManager: Lazy<OTTriggerSystemManager>): ServerCompatibleTypeAdapter<OTTriggerDAO> = TriggerTypeAdapter(true, gson, realmProvider)
+    fun provideServerTriggerAdapter(@ForGeneric gson: Lazy<Gson>, realmProvider: Provider<Realm>, triggerSystemManager: Lazy<OTTriggerSystemManager>): ServerCompatibleTypeAdapter<OTTriggerDAO> = TriggerTypeAdapter(true, gson, realmProvider, triggerSystemManager)
 
     @Provides
     @Singleton

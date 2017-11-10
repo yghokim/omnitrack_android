@@ -180,6 +180,7 @@ class TriggerDetailViewModel(app: Application) : RealmViewModel(app), OrderedRea
             if (dao.isManaged) {
                 realm.executeTransaction {
                     apply(dao)
+                    dbManager.get().saveTrigger(dao, realm)
                 }
                 syncManager.registerSyncQueue(ESyncDataType.TRIGGER, SyncDirection.UPLOAD)
             } else {

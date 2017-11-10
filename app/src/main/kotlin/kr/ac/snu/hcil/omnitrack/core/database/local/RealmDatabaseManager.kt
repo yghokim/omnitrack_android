@@ -215,17 +215,24 @@ class RealmDatabaseManager @Inject constructor(
     }
 
     fun saveTrigger(dao: OTTriggerDAO, realm: Realm) {
-        if (realm.isInTransaction) {
-            realm.copyToRealmOrUpdate(dao)
+        if (dao.isManaged) {
+            triggerSystemManager.tryCheckInToSystem(dao)
         } else {
-            realm.executeTransactionAsync({ realm ->
-                if (!dao.isManaged && dao.trackers.isNotEmpty()) {
-                    val trackers = realm.where(OTTrackerDAO::class.java).`in`("objectId", dao.trackers.map { it.objectId }.toTypedArray()).findAll()
-                    dao.trackers.clear()
-                    dao.trackers.addAll(trackers)
-                }
+            if (realm.isInTransaction) {
                 realm.copyToRealmOrUpdate(dao)
-            }, {}, { err -> err.printStackTrace() })
+                val managedDao = realm.copyToRealmOrUpdate(dao)
+                triggerSystemManager.tryCheckInToSystem(managedDao)
+            } else {
+                realm.executeTransactionAsync({ realm ->
+                    if (dao.trackers.isNotEmpty()) {
+                        val trackers = realm.where(OTTrackerDAO::class.java).`in`("objectId", dao.trackers.map { it.objectId }.toTypedArray()).findAll()
+                        dao.trackers.clear()
+                        dao.trackers.addAll(trackers)
+                    }
+                    val managedDao = realm.copyToRealmOrUpdate(dao)
+                    triggerSystemManager.tryCheckInToSystem(managedDao)
+                }, { err -> err.printStackTrace() })
+            }
         }
     }
 
@@ -233,13 +240,15 @@ class RealmDatabaseManager @Inject constructor(
         realm.executeTransactionIfNotIn { realm ->
             if (permanently) {
                 dao.deleteFromRealm()
+                triggerSystemManager.tryCheckOutFromSystem(dao)
             } else {
                 dao.synchronizedAt = null
                 dao.userUpdatedAt = System.currentTimeMillis()
                 dao.removed = true
                 if (!dao.isManaged) {
-                    realm.copyToRealmOrUpdate(dao)
-                }
+                    val managed = realm.copyToRealmOrUpdate(dao)
+                    triggerSystemManager.tryCheckOutFromSystem(managed)
+                } else triggerSystemManager.tryCheckOutFromSystem(dao)
             }
         }
     }
@@ -424,13 +433,19 @@ class RealmDatabaseManager @Inject constructor(
 
     override fun applyServerRowsToSync(type: ESyncDataType, jsonList: List<JsonObject>): Completable {
         return when (type) {
-            ESyncDataType.TRACKER -> applyServerRowsToSyncImpl(OTTrackerDAO::class.java, jsonList, { tracker -> tracker.synchronizedAt }, { tracker, realm -> removeTracker(tracker, true, realm) }, { dao, serverPojo -> dao.userUpdatedAt < serverPojo.get(FIELD_UPDATED_AT_LONG).asLong }, serializationManager.serverTrackerTypeAdapter as Lazy<JsonObjectApplier<OTTrackerDAO>>)
-            ESyncDataType.TRIGGER -> applyServerRowsToSyncImpl(OTTriggerDAO::class.java, jsonList, { trigger -> trigger.synchronizedAt }, { trigger, realm -> removeTrigger(trigger, true, realm) }, { dao, serverPojo -> dao.userUpdatedAt < serverPojo.get(FIELD_UPDATED_AT_LONG).asLong }, serializationManager.serverTriggerTypeAdapter as Lazy<JsonObjectApplier<OTTriggerDAO>>)
-            ESyncDataType.ITEM -> applyServerRowsToSyncImpl(OTItemDAO::class.java, jsonList, { item -> item.synchronizedAt }, { item, realm -> removeItemImpl(item, true, realm) }, { dao, serverPojo -> dao.timestamp < serverPojo.get(FIELD_TIMESTAMP_LONG).asLong }, serializationManager.serverItemTypeAdapter as Lazy<JsonObjectApplier<OTItemDAO>>)
+            ESyncDataType.TRACKER -> applyServerRowsToSyncImpl(OTTrackerDAO::class.java, jsonList, { tracker -> tracker.synchronizedAt },
+                    { tracker, realm -> realm.copyToRealmOrUpdate(tracker) },
+                    { tracker, realm -> removeTracker(tracker, true, realm) }, { dao, serverPojo -> dao.userUpdatedAt < serverPojo.get(FIELD_UPDATED_AT_LONG).asLong }, serializationManager.serverTrackerTypeAdapter as Lazy<JsonObjectApplier<OTTrackerDAO>>)
+            ESyncDataType.TRIGGER -> applyServerRowsToSyncImpl(OTTriggerDAO::class.java, jsonList, { trigger -> trigger.synchronizedAt },
+                    { trigger, realm -> saveTrigger(trigger, realm) },
+                    { trigger, realm -> removeTrigger(trigger, true, realm) }, { dao, serverPojo -> dao.userUpdatedAt < serverPojo.get(FIELD_UPDATED_AT_LONG).asLong }, serializationManager.serverTriggerTypeAdapter as Lazy<JsonObjectApplier<OTTriggerDAO>>)
+            ESyncDataType.ITEM -> applyServerRowsToSyncImpl(OTItemDAO::class.java, jsonList, { item -> item.synchronizedAt },
+                    { item, realm -> realm.copyToRealmOrUpdate(item) },
+                    { item, realm -> removeItemImpl(item, true, realm) }, { dao, serverPojo -> dao.timestamp < serverPojo.get(FIELD_TIMESTAMP_LONG).asLong }, serializationManager.serverItemTypeAdapter as Lazy<JsonObjectApplier<OTItemDAO>>)
         }
     }
 
-    private fun <T : RealmObject> applyServerRowsToSyncImpl(tableClass: Class<T>, serverRowJsonList: List<JsonObject>, synchronizedAtFunc: (T) -> Long?, removeRowInDbFunc: (T, Realm) -> Unit, isServerWinForResolutionFunc: (T, JsonObject) -> Boolean, applier: Lazy<JsonObjectApplier<T>>): Completable {
+    private fun <T : RealmObject> applyServerRowsToSyncImpl(tableClass: Class<T>, serverRowJsonList: List<JsonObject>, synchronizedAtFunc: (T) -> Long?, saveRowInDbFunc: (T, Realm) -> Unit, removeRowInDbFunc: (T, Realm) -> Unit, isServerWinForResolutionFunc: (T, JsonObject) -> Boolean, applier: Lazy<JsonObjectApplier<T>>): Completable {
         return Completable.defer {
             val realm = makeNewRealmInstance()
             try {
@@ -443,7 +458,7 @@ class RealmDatabaseManager @Inject constructor(
 
                             try {
                                 realm.executeTransaction { realm ->
-                                    realm.copyToRealmOrUpdate(applier.get().decodeToDao(serverPojo))
+                                    saveRowInDbFunc.invoke(applier.get().decodeToDao(serverPojo), realm)
                                 }
                             } catch (ex: Exception) {
                                 println("synchronization failed. skip object: $serverPojo")

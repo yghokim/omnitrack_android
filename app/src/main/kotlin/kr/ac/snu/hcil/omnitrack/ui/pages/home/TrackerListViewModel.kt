@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.home
 
 import android.app.Application
+import dagger.Lazy
 import io.reactivex.Flowable
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
@@ -12,6 +13,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.local.*
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
+import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.UserAttachedViewModel
 import kr.ac.snu.hcil.omnitrack.utils.DefaultNameGenerator
 import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
@@ -26,8 +28,15 @@ import javax.inject.Inject
 
 class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), OrderedRealmCollectionChangeListener<RealmResults<OTTrackerDAO>> {
 
+    companion object {
+        const val TAG = "TrackerListViewModel"
+    }
+
     @Inject
-    lateinit var syncManager: OTSyncManager
+    lateinit var syncManager: Lazy<OTSyncManager>
+
+    @Inject
+    lateinit var shortcutPanelManager: Lazy<OTShortcutPanelManager>
 
     private var trackersRealmResults: RealmResults<OTTrackerDAO>? = null
 
@@ -94,7 +103,7 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
         trackersRealmResults = dbManager.get().makeTrackersOfUserQuery(newUserId, realm).findAllSortedAsync(arrayOf("position", RealmDatabaseManager.FIELD_USER_CREATED_AT), arrayOf(Sort.ASCENDING, Sort.DESCENDING))
         trackersRealmResults?.addChangeListener(this)
 
-        subscriptions.add(dbManager.get().makeShortcutPanelRefreshObservable(newUserId, realm).subscribe())
+        shortcutPanelManager.get().registerShortcutRefreshSubscription(newUserId, TAG)
     }
 
     override fun onCleared() {
@@ -105,6 +114,7 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
     override fun onUserDisposed() {
         super.onUserDisposed()
         clearTrackerViewModelList()
+        shortcutPanelManager.get().unregisterShortcutRefreshSubscription(TAG)
     }
 
     private fun clearTrackerViewModelList() {
@@ -121,7 +131,7 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
                 dbManager.get().removeTracker(model.trackerDao, false, realm)
             }
         }
-        syncManager.registerSyncQueue(ESyncDataType.TRACKER, SyncDirection.UPLOAD)
+        syncManager.get().registerSyncQueue(ESyncDataType.TRACKER, SyncDirection.UPLOAD)
     }
 
     class TrackerInformationViewModel(val trackerDao: OTTrackerDAO, val realm: Realm, dbManager: RealmDatabaseManager) : IReadonlyObjectId, RealmChangeListener<OTTrackerDAO> {

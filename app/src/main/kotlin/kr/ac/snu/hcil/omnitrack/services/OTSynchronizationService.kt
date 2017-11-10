@@ -6,10 +6,10 @@ import dagger.Lazy
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.PublishSubject
 import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationClientSideAPI
-import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationServerSideAPI
+import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncQueueDbHelper
+import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import javax.inject.Inject
 
 /**
@@ -27,10 +27,10 @@ class OTSynchronizationService : JobService() {
     lateinit var syncManager: Lazy<OTSyncManager>
 
     @Inject
-    lateinit var syncClient: Lazy<ISynchronizationClientSideAPI>
+    lateinit var authManager: Lazy<OTAuthManager>
 
     @Inject
-    lateinit var syncServerController: Lazy<ISynchronizationServerSideAPI>
+    lateinit var shortcutPanelManager: Lazy<OTShortcutPanelManager>
 
     @Inject
     lateinit var syncQueueDbHelper: Lazy<SyncQueueDbHelper>
@@ -40,6 +40,15 @@ class OTSynchronizationService : JobService() {
     override fun onCreate() {
         super.onCreate()
         (application as OTApp).applicationComponent.inject(this)
+        val userId = authManager.get().userId
+        if (userId != null) {
+            shortcutPanelManager.get().registerShortcutRefreshSubscription(userId, TAG)
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        shortcutPanelManager.get().unregisterShortcutRefreshSubscription(TAG)
     }
 
     override fun onStopJob(job: JobParameters): Boolean {
