@@ -9,7 +9,7 @@
 
 
     <kr.ac.snu.hcil.omnitrack.ui.components.common.ColorPaletteView
-        android:id="@+id/value"
+        android:id="@+id/ui_value"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="9dp" />

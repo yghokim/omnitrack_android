@@ -12,7 +12,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.time.TimeRangePicker
 class TimeRangePickerInputView(context: Context, attrs: AttributeSet? = null) : AAttributeInputView<TimeSpan>(R.layout.input_time_range_picker, context, attrs) {
     override val typeId: Int = VIEW_TYPE_TIME_RANGE_PICKER
 
-    private var valueView: TimeRangePicker = findViewById(R.id.value)
+    private var valueView: TimeRangePicker = findViewById(R.id.ui_value)
 
     override var value: TimeSpan? = TimeSpan()
         set(value) {

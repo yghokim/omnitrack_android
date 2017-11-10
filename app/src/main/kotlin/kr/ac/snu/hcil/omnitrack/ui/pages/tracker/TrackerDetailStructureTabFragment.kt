@@ -34,7 +34,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.BooleanPropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ColorPalettePropertyView
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ShortTextPropertyView
+import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ModalTextPropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.tutorial.TutorialManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.ConnectionIndicatorStubProxy
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeDetailActivity
@@ -62,7 +62,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
 
     lateinit private var attributeListItemTouchHelper: ItemTouchHelper
 
-    private lateinit var namePropertyView: ShortTextPropertyView
+    private lateinit var namePropertyView: ModalTextPropertyView
     private lateinit var colorPropertyView: ColorPalettePropertyView
     private lateinit var isOnShortcutPropertyView: BooleanPropertyView
     //private lateinit var fab: FloatingActionButton
@@ -82,6 +82,15 @@ class TrackerDetailStructureTabFragment : OTFragment() {
     private val attributeListAdapter = AttributeListAdapter()
 
     private val viewHolderSubscriptions = CompositeDisposable()
+
+    private val columnNameDialogBuilder: MaterialDialog.Builder by lazy {
+        MaterialDialog.Builder(act)
+                .title(R.string.msg_change_field_name)
+                .inputType(InputType.TYPE_CLASS_TEXT)
+                .inputRangeRes(1, 20, R.color.colorRed)
+                .cancelable(true)
+                .negativeText(R.string.msg_cancel)
+    }
 
     private val newAttributePanel: FieldPresetSelectionBottomSheetFragment by lazy {
 
@@ -172,7 +181,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
         contentContainer = rootView.findViewById(R.id.ui_content_container)
 
         namePropertyView = rootView.findViewById(R.id.nameProperty)
-        namePropertyView.addNewValidator("Name cannot be empty.", ShortTextPropertyView.NOT_EMPTY_VALIDATOR)
+        //namePropertyView.addNewValidator("Name cannot be empty.", ShortTextPropertyView.NOT_EMPTY_VALIDATOR)
 
         colorPropertyView = rootView.findViewById(R.id.colorProperty)
 
@@ -353,8 +362,6 @@ class TrackerDetailStructureTabFragment : OTFragment() {
 
             private val connectionIndicatorStubProxy: ConnectionIndicatorStubProxy
 
-            private val columnNameChangeDialog: MaterialDialog.Builder
-
             var preview: AAttributeInputView<out Any>? = null
                 get
                 set(value) {
@@ -380,13 +387,6 @@ class TrackerDetailStructureTabFragment : OTFragment() {
 
                 itemView.ui_button_visible.setOnClickListener(this)
 
-                columnNameChangeDialog = MaterialDialog.Builder(this.view.context)
-                        .title(R.string.msg_change_field_name)
-                        .inputType(InputType.TYPE_CLASS_TEXT)
-                        .inputRangeRes(1, 20, R.color.colorRed)
-                        .cancelable(true)
-                        .negativeText(R.string.msg_cancel)
-
                 previewContainer.setOnClickListener(this)
             }
 
@@ -407,7 +407,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                     }, onNo = null).show()
                 } else if (view === columnNameButton) {
 
-                        columnNameChangeDialog
+                    columnNameDialogBuilder
                                 .input(null, currentAttributeViewModelList[adapterPosition].name, false) {
                                     dialog, input ->
                                     if (currentAttributeViewModelList[adapterPosition].name.compareTo(input.toString()) != 0) {

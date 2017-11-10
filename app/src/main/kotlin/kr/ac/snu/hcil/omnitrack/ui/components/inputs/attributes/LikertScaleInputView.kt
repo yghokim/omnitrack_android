@@ -24,7 +24,7 @@ class LikertScaleInputView(context: Context, attrs: AttributeSet? = null, initia
             }
         }
 
-    val scalePicker: LikertScalePicker = findViewById(R.id.value)
+    val scalePicker: LikertScalePicker = findViewById(R.id.ui_value)
 
     override fun focus() {
     }

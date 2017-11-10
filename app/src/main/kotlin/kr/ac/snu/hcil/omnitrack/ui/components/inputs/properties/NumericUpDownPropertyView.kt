@@ -17,7 +17,7 @@ class NumericUpDownPropertyView(context: Context, attrs: AttributeSet?) : APrope
         }
 
 
-    val picker: NumericUpDown = findViewById(R.id.value)
+    val picker: NumericUpDown = findViewById(R.id.ui_value)
 
     init {
         picker.valueChanged += {

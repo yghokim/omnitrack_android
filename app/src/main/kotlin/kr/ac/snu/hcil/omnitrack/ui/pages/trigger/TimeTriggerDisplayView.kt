@@ -41,7 +41,7 @@ class TimeTriggerDisplayView : LinearLayout {
         private var shownInstances = HashSet<TimeTriggerDisplayView>()
     }
 
-    private val mainView: TextView by bindView(R.id.value)
+    private val mainView: TextView by bindView(R.id.ui_value)
     private val nextTriggerView: TextView by bindView(R.id.ui_next_trigger)
 
     init {

@@ -11,7 +11,7 @@ import kr.ac.snu.hcil.omnitrack.utils.UniqueStringEntryList
  */
 class ChoiceEntryListPropertyView(context: Context, attrs: AttributeSet?) : APropertyView<UniqueStringEntryList>(R.layout.component_property_choice_entry_list, context, attrs), ChoiceEntryListEditor.IListEditedListener {
 
-    private val valueView: ChoiceEntryListEditor = findViewById(R.id.value)
+    private val valueView: ChoiceEntryListEditor = findViewById(R.id.ui_value)
 
     private var cache: UniqueStringEntryList? = null
 
