@@ -55,13 +55,14 @@
                     android:layout_marginRight="@dimen/activity_horizontal_margin"
                     android:background="@color/separator.Light" />
 
-                <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.BooleanPropertyView
+                <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ToggleAnimPropertyView
                     android:id="@+id/isOnShortcutProperty"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingLeft="@dimen/activity_horizontal_margin"
                     android:paddingRight="@dimen/activity_horizontal_margin"
-                    android:text="@string/msg_show_on_shortcut" />
+                    android:text="@string/msg_show_on_shortcut"
+                    app:lottie_fileName="lottie/lottie_bookmark_star.json" />
 
             </LinearLayout>
 

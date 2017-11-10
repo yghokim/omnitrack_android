@@ -160,6 +160,8 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
 
         val trackerEditable: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(true)
 
+        val isBookmarked: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(false)
+
         val attributesResult: RealmResults<OTAttributeDAO> = trackerDao.makeAttributesQuery(false, false).findAllAsync()
         val trackerItemsResult: RealmResults<OTItemDAO> = dbManager.makeItemsQuery(trackerDao.objectId, null, null, realm).findAllAsync()
         val todayItemsResult: RealmResults<OTItemDAO> = dbManager.makeItemsQueryOfToday(trackerDao.objectId, realm).findAllAsync()
@@ -241,13 +243,9 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
         }
 
         private fun updateValues(snapshot: OTTrackerDAO) {
-            if (trackerColor.value != snapshot.color) {
-                trackerColor.onNext(snapshot.color)
-            }
-
-            if (trackerName.value != snapshot.name) {
-                trackerName.onNext(snapshot.name)
-            }
+            trackerColor.onNextIfDifferAndNotNull(snapshot.color)
+            trackerName.onNextIfDifferAndNotNull(snapshot.name)
+            isBookmarked.onNextIfDifferAndNotNull(snapshot.isBookmarked)
 
             /* TODO editable flags
             if (trackerEditable.value != snapshot.isEditable) {
