@@ -15,6 +15,7 @@ import android.view.View
 import android.widget.RemoteViews
 import dagger.Lazy
 import io.reactivex.Completable
+import io.reactivex.disposables.SerialDisposable
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
@@ -46,6 +47,12 @@ class OTShortcutPanelManager @Inject constructor(
 
         const val MAX_NUM_SHORTCUTS = 5
     }
+
+    private val shortcutRefreshSubscriberTags = HashSet<String>()
+    private val shortcutRefreshSubscription = SerialDisposable()
+
+    val isWatchingForShortcutRefresh: Boolean get() = shortcutRefreshSubscription.get() != null && !shortcutRefreshSubscription.isDisposed
+
     val showPanels: Boolean
         get() {
             return PreferenceManager.getDefaultSharedPreferences(OTApp.instance).getBoolean("pref_show_shortcut_panel", false)
@@ -115,6 +122,33 @@ class OTShortcutPanelManager @Inject constructor(
         }
 
         return rv
+    }
+
+    @Synchronized
+    fun registerShortcutRefreshSubscription(userId: String, tag: String): Boolean {
+        shortcutRefreshSubscriberTags.add(tag)
+        if (!isWatchingForShortcutRefresh) {
+            val realm = backendRealmProvider.get()
+            shortcutRefreshSubscription.set(
+                    dbManager.get().makeShortcutPanelRefreshObservable(userId, realm).doAfterTerminate { realm.close() }
+                            .subscribe({}, {}, {})
+            )
+            return true
+        } else return false
+    }
+
+    @Synchronized
+    fun unregisterShortcutRefreshSubscription(tag: String): Boolean {
+        if (isWatchingForShortcutRefresh) {
+            if (shortcutRefreshSubscriberTags.remove(tag)) {
+                if (shortcutRefreshSubscriberTags.isEmpty()) {
+                    println("shortcut watch tags are empty. unsubscribe the subscription.")
+                    shortcutRefreshSubscription.dispose()
+                    return true
+                }
+            }
+        }
+        return false
     }
 
     fun refreshNotificationShortcutViewsObservable(context: Context): Completable {

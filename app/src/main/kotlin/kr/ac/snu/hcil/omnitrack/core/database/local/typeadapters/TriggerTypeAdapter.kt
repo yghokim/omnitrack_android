@@ -106,7 +106,7 @@ class TriggerTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>, val realmP
             {
                 RealmDatabaseManager.FIELD_REMOVED_BOOLEAN-> {
                     if (!json.get(key).isJsonNull) {
-                        val value = json.get(key)?.asBoolean?:false
+                        val value = json.get(key)?.asBoolean == true
                         if(applyTo.removed != value)
                         {
                             applyTo.removed = value
@@ -122,7 +122,7 @@ class TriggerTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>, val realmP
                 "alias" -> json[key]?.let{ applyTo.alias = it.asString }
                 RealmDatabaseManager.FIELD_LOCKED_PROPERTIES_SERIALIZED->applyTo.serializedLockedPropertyInfo = json[key]?.toString() ?: "null"
                 "isOn" ->{
-                    val switchValue = json[key]?.asBoolean ?: false
+                    val switchValue = json[key]?.asBoolean == true
                     if(switchValue != applyTo.isOn)
                     {
                         applyTo.isOn = switchValue
@@ -139,23 +139,10 @@ class TriggerTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>, val realmP
             }
         }
 
-        if(removedFlagChanged)
-        {
-            if(applyTo.removed)
-            {
-                triggerSystemManager.get().detachFromSystem(applyTo)
-            }
-        }
-
-        if(switchChanged && applyTo.removed==false)
-        {
-            if(applyTo.isOn)
-            {
-                triggerSystemManager.get().handleTriggerOn(applyTo)
-            }
-            else{
-                triggerSystemManager.get().handleTriggerOff(applyTo)
-            }
+        if (applyTo.removed) {
+            triggerSystemManager.get().tryCheckOutFromSystem(applyTo)
+        } else {
+            triggerSystemManager.get().tryCheckInToSystem(applyTo)
         }
     }
 }

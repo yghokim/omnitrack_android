@@ -17,14 +17,21 @@ class OTTriggerSystemManager(
     }
 
     fun handleTriggerOn(managedTrigger: OTTriggerDAO) {
-
+        println("TriggerSystemManager: handleTriggerOn: ${managedTrigger.objectId}")
     }
 
     fun handleTriggerOff(managedTrigger: OTTriggerDAO) {
+        println("TriggerSystemManager: handleTriggerOff: ${managedTrigger.objectId}")
 
     }
 
-    fun detachFromSystem(managedTrigger: OTTriggerDAO) {
+    fun tryCheckInToSystem(managedTrigger: OTTriggerDAO): Boolean {
+        println("TriggerSystemManager: tryCheckInToSystem: ${managedTrigger.objectId}")
+        return false
+    }
 
+    fun tryCheckOutFromSystem(managedTrigger: OTTriggerDAO): Boolean {
+        println("TriggerSystemManager: tryCheckOutFromSystem: ${managedTrigger.objectId}")
+        return false
     }
 }

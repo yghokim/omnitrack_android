@@ -21,6 +21,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
+import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.RealmViewModel
 import kr.ac.snu.hcil.omnitrack.utils.*
 import org.jetbrains.anko.collections.forEachWithIndex
@@ -33,11 +34,18 @@ import kotlin.collections.HashSet
  */
 class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
+    companion object {
+        const val TAG = "TrackerDetailViewModel"
+    }
+
     @Inject
     protected lateinit var attributeManager: Lazy<OTAttributeManager>
 
     @Inject
     protected lateinit var authManager: Lazy<OTAuthManager>
+
+    @Inject
+    protected lateinit var shortcutPanelManager: Lazy<OTShortcutPanelManager>
 
     @Inject
     protected lateinit var syncManager: OTSyncManager
@@ -183,11 +191,8 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
                         }
                 )
 
-                subscriptions.add(
-                        dbManager.get().makeShortcutPanelRefreshObservable(authManager.get().userId!!, realm).subscribe { list ->
-                            println("shortcut refresh")
-                        }
-                )
+
+                shortcutPanelManager.get().registerShortcutRefreshSubscription(authManager.get().userId!!, TAG)
 
                 /*
                 attributeRealmResults?.removeChangeListener(attributeListChangedListener)
@@ -365,6 +370,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
         super.onCleared()
         clearCurrentAttributeList()
         removedAttributes.clear()
+        shortcutPanelManager.get().unregisterShortcutRefreshSubscription(TAG)
     }
 
     class AttributeInformationViewModel(_attributeDAO: OTAttributeDAO, val realm: Realm, val attributeManager: OTAttributeManager) : IReadonlyObjectId, RealmChangeListener<OTAttributeDAO> {
