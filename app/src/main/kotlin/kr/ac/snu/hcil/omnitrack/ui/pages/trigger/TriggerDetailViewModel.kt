@@ -52,7 +52,7 @@ class TriggerDetailViewModel(app: Application) : RealmViewModel(app), OrderedRea
     val attachedTrackers = BehaviorSubject.createDefault<List<OTTrackerDAO.SimpleTrackerInfo>>(currentAttachedTrackerInfoList)
 
     override fun onInject(app: OTApp) {
-        app.synchronizationComponent.inject(this)
+        app.applicationComponent.inject(this)
     }
 
     fun initEdit(triggerId: String, userId: String) {

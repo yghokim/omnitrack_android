@@ -28,7 +28,7 @@ import javax.inject.Singleton
  * Created by younghokim on 2017. 9. 25..
  */
 @Singleton
-class RealmDatabaseManager @Inject constructor(private val config: Configuration, private val authManager: OTAuthManager, private val serializationManager: DaoSerializationManager, private val binaryUploadServiceController: ABinaryUploadService.ABinaryUploadServiceController)
+class RealmDatabaseManager @Inject constructor(private val config: Configuration, private val authManager: OTAuthManager, private val shortcutPanelManager: Lazy<OTShortcutPanelManager>, private val serializationManager: DaoSerializationManager, private val binaryUploadServiceController: ABinaryUploadService.ABinaryUploadServiceController)
     :ISynchronizationClientSideAPI{
 
     companion object {
@@ -68,6 +68,9 @@ class RealmDatabaseManager @Inject constructor(private val config: Configuration
         return realm.where(OTTrackerDAO::class.java).equalTo(FIELD_OBJECT_ID, objectId).equalTo(FIELD_REMOVED_BOOLEAN, false)
     }
 
+    fun makeBookmarkedTrackersQuery(userId: String, realm: Realm): RealmQuery<OTTrackerDAO>
+            = realm.where(OTTrackerDAO::class.java).equalTo(FIELD_REMOVED_BOOLEAN, false).equalTo(FIELD_USER_ID, userId).equalTo("isBookmarked", true)
+
     fun makeBookmarkedTrackersObservable(userId: String, realm: Realm): Flowable<RealmResults<OTTrackerDAO>> {
         return realm.where(OTTrackerDAO::class.java).equalTo(FIELD_REMOVED_BOOLEAN, false).equalTo(FIELD_USER_ID, userId).equalTo("isBookmarked", true).findAllSortedAsync("position", Sort.ASCENDING)
                 .asFlowable()
@@ -76,7 +79,7 @@ class RealmDatabaseManager @Inject constructor(private val config: Configuration
     fun makeShortcutPanelRefreshObservable(userId: String, realm: Realm): Flowable<RealmResults<OTTrackerDAO>> {
         return makeBookmarkedTrackersObservable(userId, realm).filter { it.isValid && it.isLoaded }
                 .doAfterNext { list ->
-                    OTShortcutPanelManager.refreshNotificationShortcutViews(list, OTApp.instance)
+                    shortcutPanelManager.get().refreshNotificationShortcutViews(list, OTApp.instance)
                 }
     }
 

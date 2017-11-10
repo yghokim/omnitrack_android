@@ -26,7 +26,7 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
     @Inject lateinit var realmProvider: Provider<Realm>
 
     override fun onInject(app: OTApp) {
-        app.synchronizationComponent.inject(this)
+        app.applicationComponent.inject(this)
     }
 
     override fun onInit(trackerDao: OTTrackerDAO, itemId: String?): Pair<ItemMode, BuilderCreationMode?>? {

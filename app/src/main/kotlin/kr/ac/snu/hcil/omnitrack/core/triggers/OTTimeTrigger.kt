@@ -369,20 +369,18 @@ class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObject
 
     private fun onConfigChanged() {
         OTApp.logger.writeSystemLog("Time trigger config changed. cancel trigger", TAG)
-        //val alarmManager = OTApp.instance.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-        OTApp.instance.timeTriggerAlarmManager.cancelTrigger(this)
+        //OTApp.instance.timeTriggerAlarmManager.cancelTrigger(this)
         if (reserveNextAlarmToSystem(lastTriggeredTime) == null) {
             isOn = false
         }
     }
 
     private fun onRangeChanged() {
-        //val alarmManager = OTApp.instance.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
         OTApp.logger.writeSystemLog("Time trigger range changed. cancel trigger", TAG)
 
-        OTApp.instance.timeTriggerAlarmManager.cancelTrigger(this)
+        //OTApp.instance.timeTriggerAlarmManager.cancelTrigger(this)
         if (reserveNextAlarmToSystem(lastTriggeredTime) == null) {
             isOn = false
         }
@@ -415,9 +413,9 @@ class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObject
 
             OTApp.logger.writeSystemLog("Next alarm is reserved at ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(nextAlarmTime))}", TAG)
 
-            val nextAlarmInfo = OTApp.instance.timeTriggerAlarmManager.reserveAlarm(this, nextAlarmTime, !isRepeated)
-            onAlarmReserved.onNext(nextAlarmInfo.reservedAlarmTime)
-            return nextAlarmInfo
+            //val nextAlarmInfo = OTApp.instance.timeTriggerAlarmManager.reserveAlarm(this, nextAlarmTime, !isRepeated)
+            //onAlarmReserved.onNext(nextAlarmInfo.reservedAlarmTime)
+            return /*nextAlarmInfo*/ null
         } else {
             println("Finish trigger. Do not repeat.")
             onAlarmReserved.onNext(/*null*/0)
@@ -440,10 +438,10 @@ class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObject
         Log.d(TAG, "handle Time trigger off.")
         lastTriggeredTime = null
         OTApp.logger.writeSystemLog("Time trigger turned off. cancel trigger", TAG)
-        OTApp.instance.timeTriggerAlarmManager.cancelTrigger(this)
+        //TApp.instance.timeTriggerAlarmManager.cancelTrigger(this)
     }
 
     override fun onDetachFromSystem() {
-        OTApp.instance.timeTriggerAlarmManager.cancelTrigger(this)
+        //OTApp.instance.timeTriggerAlarmManager.cancelTrigger(this)
     }
 }

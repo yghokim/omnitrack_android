@@ -13,29 +13,39 @@ import android.support.v4.app.TaskStackBuilder
 import android.support.v4.graphics.ColorUtils
 import android.view.View
 import android.widget.RemoteViews
+import dagger.Lazy
+import io.reactivex.Completable
+import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
-import kr.ac.snu.hcil.omnitrack.core.OTTracker
+import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
 import kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemDetailActivity
 import kr.ac.snu.hcil.omnitrack.utils.VectorIconHelper
-import kr.ac.snu.hcil.omnitrack.widgets.OTShortcutPanelWidgetUpdateService
+import javax.inject.Inject
+import javax.inject.Provider
+import javax.inject.Singleton
 
 /**
  * Created by Young-Ho Kim on 9/4/2016
  */
-object OTShortcutPanelManager {
+@Singleton
+class OTShortcutPanelManager @Inject constructor(
+        val authManager: Lazy<OTAuthManager>,
+        val dbManager: Lazy<RealmDatabaseManager>,
+        val backendRealmProvider: Provider<Realm>
+) {
 
-    const val NOTIFICATION_ID = 200000
+    companion object {
 
-    const val MAX_NUM_SHORTCUTS = 5
+        const val NOTIFICATION_ID = 200000
 
-    const val ACTION_BOOKMARKED_TRACKERS_CHANGED = "${OTApp.PREFIX_ACTION}.bookmarked_trackers_changed"
-    const val INTENT_EXTRA_CURRENT_BOOKMARKED_SNAPSHOT = "bookmarked_list"
-
+        const val MAX_NUM_SHORTCUTS = 5
+    }
     val showPanels: Boolean
         get() {
             return PreferenceManager.getDefaultSharedPreferences(OTApp.instance).getBoolean("pref_show_shortcut_panel", false)
@@ -107,6 +117,29 @@ object OTShortcutPanelManager {
         return rv
     }
 
+    fun refreshNotificationShortcutViewsObservable(context: Context): Completable {
+        return Completable.defer {
+            if (showPanels) {
+                val userId = authManager.get().userId
+                if (userId != null) {
+                    println("user is signed in. initialize shortcut panel.")
+                    val realm = backendRealmProvider.get()
+                    return@defer dbManager.get().makeBookmarkedTrackersObservable(userId, realm).filter { it.isLoaded && it.isValid }.map { it.toList() }.first(emptyList())
+                            .doOnSuccess { trackers ->
+                                refreshNotificationShortcutViews(trackers, context)
+                                realm.close()
+                            }.doOnError { realm.close() }
+                            .toCompletable()
+                } else {
+                    println("user is NOT signed in. dispose shortcut panel.")
+                }
+            }
+
+            disposeShortcutPanel()
+            return@defer Completable.complete()
+        }
+    }
+
     fun refreshNotificationShortcutViews(trackers: List<OTTrackerDAO>, context: Context = OTApp.instance.contextCompat) {
 
         if (showPanels) {
@@ -132,44 +165,13 @@ object OTShortcutPanelManager {
                         .notify(NOTIFICATION_ID, noti)
             } else {
                 //dismiss notification
-                notificationManager.cancel(NOTIFICATION_ID)
+                disposeShortcutPanel()
             }
         } else {
-            //dismiss
-            notificationManager.cancel(NOTIFICATION_ID)
+            disposeShortcutPanel()
         }
     }
 
-
-    fun notifyAppearanceChanged(@Suppress("UNUSED_PARAMETER") tracker: OTTracker) {
-
-    }
-
-    operator fun plusAssign(@Suppress("UNUSED_PARAMETER") tracker: OTTracker) {/*
-        val intent = Intent(OTApp.BROADCAST_ACTION_SHORTCUT_INCLUDE_TRACKER)
-        intent.putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
-
-        OTApp.instance.sendBroadcast(intent)*/
-
-        val user = tracker.owner
-        if (user != null) {
-            //refreshNotificationShortcutViews(user)
-        }
-
-        OTApp.instance.startService(OTShortcutPanelWidgetUpdateService.makeNotifyDatesetChangedIntentToAllWidgets(OTApp.instance))
-    }
-
-    operator fun minusAssign(@Suppress("UNUSED_PARAMETER") tracker: OTTracker) {
-        /*    val intent = Intent(OTApp.BROADCAST_ACTION_SHORTCUT_EXCLUDE_TRACKER)
-            intent.putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
-
-            OTApp.instance.sendBroadcast(intent)*/
-        val user = tracker.owner
-        if (user != null)
-        //refreshNotificationShortcutViews(user)
-
-            OTApp.instance.startService(OTShortcutPanelWidgetUpdateService.makeNotifyDatesetChangedIntentToAllWidgets(OTApp.instance))
-    }
 
     fun disposeShortcutPanel() {
         notificationManager.cancel(NOTIFICATION_ID)

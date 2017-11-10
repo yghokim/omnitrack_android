@@ -13,7 +13,7 @@ import javax.inject.Singleton
 /**
  * Created by Young-Ho on 11/3/2017.
  */
-@Module(includes = arrayOf(NetworkModule::class))
+@Module(includes = arrayOf(NetworkModule::class, ApplicationModule::class))
 class AuthModule(val app: OTApp) {
 
     @Provides

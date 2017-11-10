@@ -5,7 +5,6 @@ import android.content.SharedPreferences
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
-import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.utils.DefaultNameGenerator
 import kr.ac.snu.hcil.omnitrack.utils.ObservableList
 import kr.ac.snu.hcil.omnitrack.widgets.OTShortcutPanelWidgetUpdateService
@@ -281,14 +280,13 @@ class OTUser(val objectId: String, var name: String?, var photoUrl: String?, _tr
                 }
             }
         }
-
         return set
     }
 
     private fun onTrackerAdded(new: OTTracker, index: Int) {
         new.owner = this
         if (new.isOnShortcut) {
-            OTShortcutPanelManager += new
+            //OTShortcutPanelManager += new
         }
 
         //trackerAdded.onNext(ReadOnlyPair(new, index))

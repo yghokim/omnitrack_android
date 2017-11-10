@@ -8,6 +8,7 @@ import dagger.Provides
 import kr.ac.snu.hcil.omnitrack.services.OTSynchronizationService
 import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckService
 import javax.inject.Qualifier
+import javax.inject.Singleton
 
 /**
  * Created by Young-Ho on 11/3/2017.
@@ -15,18 +16,18 @@ import javax.inject.Qualifier
 @Module
 class ScheduledJobModule {
     @Provides
-    @ApplicationScope
+    @Singleton
     fun providesDispatcher(context: Context): FirebaseJobDispatcher
     {
         return FirebaseJobDispatcher(GooglePlayDriver(context))
     }
 
     @Provides
-    @ApplicationScope
+    @Singleton
     fun providesJobBuilder(dispatcher: FirebaseJobDispatcher) = dispatcher.newJobBuilder()
 
     @Provides
-    @ApplicationScope
+    @Singleton
     @VersionCheck
     fun providesVersionCheckJob(builder: Job.Builder): Job
     {
@@ -43,7 +44,7 @@ class ScheduledJobModule {
     }
 
     @Provides
-    @ApplicationScope
+    @Singleton
     @ServerSyncOneShot
     fun makeOneShotBundle(): Bundle {
         return Bundle().apply { putBoolean(OTSynchronizationService.EXTRA_KEY_ONESHOT, true) }
@@ -52,7 +53,7 @@ class ScheduledJobModule {
 
 
     @Provides
-    @ApplicationScope
+    @Singleton
     @ServerSync
     fun providesServerSyncJob(builder: Job.Builder): Job
     {
@@ -69,7 +70,7 @@ class ScheduledJobModule {
     }
 
     @Provides
-    @ApplicationScope
+    @Singleton
     @ServerSyncOneShot
     fun providesImmediateServerSyncJob(builder: Job.Builder, @ServerSyncOneShot oneShotBundle: Bundle): Job {
         return builder.setRecurring(false)

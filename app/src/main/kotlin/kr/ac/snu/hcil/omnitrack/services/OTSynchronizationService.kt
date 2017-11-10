@@ -39,7 +39,7 @@ class OTSynchronizationService : JobService() {
 
     override fun onCreate() {
         super.onCreate()
-        (application as OTApp).synchronizationComponent.inject(this)
+        (application as OTApp).applicationComponent.inject(this)
     }
 
     override fun onStopJob(job: JobParameters): Boolean {

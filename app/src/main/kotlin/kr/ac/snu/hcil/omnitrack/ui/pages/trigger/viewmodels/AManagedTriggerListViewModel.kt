@@ -36,7 +36,7 @@ abstract class AManagedTriggerListViewModel(app: Application) : ATriggerListView
     }
 
     override fun onInject(app: OTApp) {
-        app.synchronizationComponent.inject(this)
+        app.applicationComponent.inject(this)
     }
 
 

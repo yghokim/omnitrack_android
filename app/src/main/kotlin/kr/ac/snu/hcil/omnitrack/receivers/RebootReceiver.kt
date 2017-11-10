@@ -6,7 +6,9 @@ import android.content.Intent
 import android.os.PowerManager
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
-import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckService
+import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerSystemManager
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 /**
  * Created by Young-Ho on 9/4/2016.
@@ -16,18 +18,33 @@ class RebootReceiver : BroadcastReceiver() {
         const val TAG = "RebootReceiver"
     }
 
+    @Inject
+    protected lateinit var triggerManager: OTTriggerSystemManager
+
+    @Inject
+    protected lateinit var shortcutPanelManager: OTShortcutPanelManager
+
     override fun onReceive(context: Context, intent: Intent) {
         println("OMNITRACK: reboot receiver called - ${intent.action}")
+
+        (context.applicationContext as OTApp).applicationComponent.inject(this)
 
         val result = goAsync()
         val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
         val wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG)
         wl.acquire(3000)
 
-        result.finish()
-        wl.release()
+        triggerManager.onSystemRebooted()
+        shortcutPanelManager.refreshNotificationShortcutViewsObservable(context).timeout(2, TimeUnit.SECONDS).doAfterTerminate {
+            result.finish()
+            wl.release()
+            println("OMNITRACK: reboot receiver finished.")
+        }.subscribe({
 
-        OTApp.instance.timeTriggerAlarmManager.activateOnSystem()
+        }, { err ->
+            err.printStackTrace()
+        })
+
 
         /*
         OTApp.instance.currentUserObservable.observeOn(Schedulers.newThread()).subscribe({
@@ -35,9 +52,7 @@ class RebootReceiver : BroadcastReceiver() {
             OTShortcutPanelManager.refreshNotificationShortcutViews(user, context)
 
         }, {}, {
-            result.finish()
-            wl.release()
-            println("OMNITRACK: reboot receiver finished.")
+
         })*/
 
     }

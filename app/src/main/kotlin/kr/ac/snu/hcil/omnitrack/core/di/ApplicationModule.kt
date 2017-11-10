@@ -11,7 +11,7 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 /**
  * Created by Young-Ho on 10/31/2017.
  */
-@Module(subcomponents = arrayOf(ScheduledJobComponent::class, SynchronizationComponent::class))
+@Module()
 class ApplicationModule(private val mApp: OTApp) {
 
     @Provides

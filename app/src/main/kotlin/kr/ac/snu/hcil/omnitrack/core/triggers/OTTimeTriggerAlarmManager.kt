@@ -7,12 +7,15 @@ import android.content.Intent
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.core.OTUser
+import kr.ac.snu.hcil.omnitrack.core.database.local.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTTimeTriggerCondition
 import kr.ac.snu.hcil.omnitrack.core.triggers.database.AlarmInfo
 import kr.ac.snu.hcil.omnitrack.core.triggers.database.AlarmInstance
 import kr.ac.snu.hcil.omnitrack.core.triggers.database.TriggerSchedule
 import kr.ac.snu.hcil.omnitrack.core.triggers.database.TriggerSchedulePOJO
 import kr.ac.snu.hcil.omnitrack.receivers.TimeTriggerAlarmReceiver
+import kr.ac.snu.hcil.omnitrack.utils.time.DesignatedTimeScheduleCalculator
+import kr.ac.snu.hcil.omnitrack.utils.time.IntervalTimeScheduleCalculator
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 
 /**
@@ -67,8 +70,7 @@ class OTTimeTriggerAlarmManager {
         val now = System.currentTimeMillis() + 1000
 
         realm.beginTransaction()
-        unManagedAlarms.forEach {
-            alarm ->
+        unManagedAlarms.forEach { alarm ->
             if (alarm.reservedAlarmTime < now) {
                 //failed alarm.
                 alarm.skipped = true
@@ -90,12 +92,11 @@ class OTTimeTriggerAlarmManager {
         realm.close()
     }
 
-    fun reserveAlarm(trigger: OTTrigger, alarmTime: Long, oneShot: Boolean): AlarmInfo {
-        Realm.getInstance(realmDbConfiguration).use {
-            realm ->
+    fun reserveAlarm(trigger: OTTriggerDAO, alarmTime: Long, oneShot: Boolean): AlarmInfo {
+        Realm.getInstance(realmDbConfiguration).use { realm ->
             realm.beginTransaction()
             val schedule = TriggerSchedule().apply {
-                this.triggerId = trigger.objectId
+                this.triggerId = trigger.objectId!!
                 this.intrinsicAlarmTime = alarmTime
                 this.oneShot = oneShot
             }
@@ -126,12 +127,12 @@ class OTTimeTriggerAlarmManager {
                 alarmInstance.reservedAlarmTime = alarmTimeToReserve
                 schedule.parentAlarmId = alarmInstance.id
                 alarmInstance.triggerSchedules.add(schedule)
-                alarmInstance.userId = trigger.user.objectId
+                alarmInstance.userId = trigger.userId
 
                 realm.insertOrUpdate(alarmInstance)
                 realm.commitTransaction()
 
-                registerSystemAlarm(alarmTimeToReserve, trigger.user.objectId, newAlarmId)
+                registerSystemAlarm(alarmTimeToReserve, trigger.userId!!, newAlarmId)
 
                 return alarmInstance.getInfo()
             }
@@ -146,7 +147,7 @@ class OTTimeTriggerAlarmManager {
         }
     }
 
-    fun cancelTrigger(trigger: OTTrigger) {
+    fun cancelTrigger(trigger: OTTriggerDAO) {
         val realm = Realm.getInstance(realmDbConfiguration)
 
         val pendingTriggerSchedules = realm.where(TriggerSchedule::class.java)
@@ -155,11 +156,8 @@ class OTTimeTriggerAlarmManager {
                 .equalTo(TriggerSchedule.FIELD_SKIPPED, false)
                 .findAll()
 
-        OTApp
-
         realm.beginTransaction()
-        pendingTriggerSchedules.forEach {
-            schedule ->
+        pendingTriggerSchedules.forEach { schedule ->
             val parentAlarmId = schedule.parentAlarmId
             if (parentAlarmId != null) {
                 val parentAlarm = realm.where(AlarmInstance::class.java).equalTo("id", parentAlarmId).findFirst()
@@ -170,7 +168,7 @@ class OTTimeTriggerAlarmManager {
                     if (parentAlarm.triggerSchedules.isEmpty()) {
                         //cancel system alarm.
                         println("remove system alarm")
-                        val pendingIntent = makeIntent(OTApp.instance, trigger.user.objectId, parentAlarm.reservedAlarmTime, parentAlarm.alarmId)
+                        val pendingIntent = makeIntent(OTApp.instance, trigger.userId!!, parentAlarm.reservedAlarmTime, parentAlarm.alarmId)
                         alarmManager.cancel(pendingIntent)
                         pendingIntent.cancel()
                         parentAlarm.deleteFromRealm()
@@ -189,8 +187,7 @@ class OTTimeTriggerAlarmManager {
     }
 
     fun getNearestAlarmTime(trigger: OTTimeTrigger, now: Long): Long? {
-        Realm.getInstance(realmDbConfiguration).use {
-            realm ->
+        Realm.getInstance(realmDbConfiguration).use { realm ->
             val nearestTime = realm.where(TriggerSchedule::class.java)
                     .equalTo(TriggerSchedule.FIELD_TRIGGER_ID, trigger.objectId)
                     .equalTo(TriggerSchedule.FIELD_FIRED, false)
@@ -202,9 +199,8 @@ class OTTimeTriggerAlarmManager {
         }
     }
 
-    fun handleAlarmAndGetTriggerInfo(user: OTUser, alarmId: Int, intentTriggerTime: Long, reallyFiredAt: Long): List<TriggerSchedulePOJO>? {
-        Realm.getInstance(realmDbConfiguration).use {
-            realm ->
+    fun handleAlarmAndGetTriggerInfo(alarmId: Int): List<TriggerSchedulePOJO>? {
+        Realm.getInstance(realmDbConfiguration).use { realm ->
             println("find alarm instance with id: ${alarmId}")
             val alarmInstance = realm.where(AlarmInstance::class.java)
                     .equalTo(AlarmInstance.FIELD_ALARM_ID, alarmId)
@@ -231,4 +227,49 @@ class OTTimeTriggerAlarmManager {
             } else return null
         }
     }
+
+
+    fun getNextAlarmTime(pivot: Long, condition: OTTimeTriggerCondition): Long? {
+        val now = System.currentTimeMillis()
+
+        val limitExclusive = if (condition.isRepeated && condition.endAt != null) {
+            condition.endAt!!
+        } else Long.MAX_VALUE
+
+        val nextTimeCalculator = when (condition.timeConditionType) {
+            OTTimeTriggerCondition.TIME_CONDITION_ALARM -> {
+
+                val calculator = DesignatedTimeScheduleCalculator().setAlarmTime(condition.alarmTimeHour.toInt(), condition.alarmTimeMinute.toInt(), 0)
+                if (condition.isRepeated) {
+                    calculator.setAvailableDaysOfWeekFlag(condition.dayOfWeekFlags.toInt())
+                            .setEndAt(limitExclusive)
+                }
+
+                calculator
+            }
+            OTTimeTriggerCondition.TIME_CONDITION_INTERVAL -> {
+                val intervalMillis = condition.intervalSeconds * 1000
+
+                val calculator = IntervalTimeScheduleCalculator().setInterval(intervalMillis.toLong())
+
+                if (condition.isRepeated) {
+                    calculator
+                            .setAvailableDaysOfWeekFlag(condition.dayOfWeekFlags.toInt())
+                            .setEndAt(limitExclusive)
+
+                    if (condition.intervalIsHourRangeUsed) {
+                        calculator.setHourBoundingRange(condition.intervalHourRangeStart.toInt(), condition.intervalHourRangeEnd.toInt())
+                    }
+                } else {
+                    calculator.setNoLimit()
+                }
+
+                calculator
+            }
+            else -> throw Exception("Unsupported Time Config Type")
+        }
+
+        return nextTimeCalculator.calculateNext(pivot, now)
+    }
+
 }
