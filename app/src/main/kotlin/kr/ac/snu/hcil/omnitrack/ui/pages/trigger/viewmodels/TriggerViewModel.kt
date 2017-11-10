@@ -10,6 +10,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.local.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
+import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerSystemManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTTriggerAction
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.ATriggerCondition
 import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
@@ -25,6 +26,9 @@ open class TriggerViewModel(app: OTApp, val dao: OTTriggerDAO, val realm: Realm)
 
     @Inject
     protected lateinit var syncManager: OTSyncManager
+
+    @Inject
+    protected lateinit var triggerSystemManager: OTTriggerSystemManager
 
     override val objectId: String?
         get() = dao.objectId
@@ -133,7 +137,6 @@ open class TriggerViewModel(app: OTApp, val dao: OTTriggerDAO, val realm: Realm)
                     Completable.complete()
                 } else {
                     if (dao.isManaged) {
-                        //TODO handle trigger on
                         val validationError = dao.isValidToTurnOn()
                         if (validationError == null) {
                             val id = dao.objectId
@@ -142,6 +145,7 @@ open class TriggerViewModel(app: OTApp, val dao: OTTriggerDAO, val realm: Realm)
                                         ?.isOn = true
                             }.doOnComplete {
                                 triggerSwitch.onNextIfDifferAndNotNull(true)
+                                triggerSystemManager.handleTriggerOn(dao)
                             }.doAfterTerminate {
                                 syncManager.registerSyncQueue(ESyncDataType.TRIGGER, SyncDirection.UPLOAD)
                             }
@@ -162,7 +166,6 @@ open class TriggerViewModel(app: OTApp, val dao: OTTriggerDAO, val realm: Realm)
                     }
                 }
             } else {
-                //TODO handle trigger off in system
                 if (dao.isOn == true) {
                     if (dao.isManaged) {
                         val id = dao.objectId
@@ -171,6 +174,7 @@ open class TriggerViewModel(app: OTApp, val dao: OTTriggerDAO, val realm: Realm)
                                     ?.isOn = false
                         }.doOnComplete {
                             triggerSwitch.onNextIfDifferAndNotNull(false)
+                            triggerSystemManager.handleTriggerOff(dao)
                         }.doAfterTerminate {
                             syncManager.registerSyncQueue(ESyncDataType.TRIGGER, SyncDirection.UPLOAD)
                         }
