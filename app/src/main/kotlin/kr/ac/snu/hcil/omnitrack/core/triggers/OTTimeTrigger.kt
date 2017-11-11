@@ -7,7 +7,7 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTUser
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
-import kr.ac.snu.hcil.omnitrack.core.triggers.database.AlarmInfo
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels.OTTriggerAlarmInstance
 import kr.ac.snu.hcil.omnitrack.utils.BitwiseOperationHelper
 import kr.ac.snu.hcil.omnitrack.utils.ObservableMapDelegate
 import kr.ac.snu.hcil.omnitrack.utils.time.DesignatedTimeScheduleCalculator
@@ -370,7 +370,7 @@ class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObject
     private fun onConfigChanged() {
         OTApp.logger.writeSystemLog("Time trigger config changed. cancel trigger", TAG)
 
-        //OTApp.instance.timeTriggerAlarmManager.cancelTrigger(this)
+        //OTApp.instance.triggerAlarmManager.cancelTrigger(this)
         if (reserveNextAlarmToSystem(lastTriggeredTime) == null) {
             isOn = false
         }
@@ -380,7 +380,7 @@ class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObject
 
         OTApp.logger.writeSystemLog("Time trigger range changed. cancel trigger", TAG)
 
-        //OTApp.instance.timeTriggerAlarmManager.cancelTrigger(this)
+        //OTApp.instance.triggerAlarmManager.cancelTrigger(this)
         if (reserveNextAlarmToSystem(lastTriggeredTime) == null) {
             isOn = false
         }
@@ -392,7 +392,7 @@ class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObject
         if (isOn == false) {
             handleOff()
         } else {
-            if (OTApp.instance.timeTriggerAlarmManager.getNearestAlarmTime(this, System.currentTimeMillis()) == null) {
+            if (OTApp.instance.triggerAlarmManager.getNearestAlarmTime(this, System.currentTimeMillis()) == null) {
                 if (reserveNextAlarmToSystem(lastTriggeredTime) == null) {
                     isOn = false
                 }
@@ -400,7 +400,7 @@ class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObject
         }
     }
 
-    fun reserveNextAlarmToSystem(currentTriggerTime: Long?): AlarmInfo? {
+    fun reserveNextAlarmToSystem(currentTriggerTime: Long?): OTTriggerAlarmInstance.AlarmInfo? {
 
         println("current trigger time: ${currentTriggerTime}")
 
@@ -413,7 +413,7 @@ class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObject
 
             OTApp.logger.writeSystemLog("Next alarm is reserved at ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(nextAlarmTime))}", TAG)
 
-            //val nextAlarmInfo = OTApp.instance.timeTriggerAlarmManager.reserveAlarm(this, nextAlarmTime, !isRepeated)
+            //val nextAlarmInfo = OTApp.instance.triggerAlarmManager.reserveAlarm(this, nextAlarmTime, !isRepeated)
             //onAlarmReserved.onNext(nextAlarmInfo.reservedAlarmTime)
             return /*nextAlarmInfo*/ null
         } else {
@@ -438,10 +438,10 @@ class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObject
         Log.d(TAG, "handle Time trigger off.")
         lastTriggeredTime = null
         OTApp.logger.writeSystemLog("Time trigger turned off. cancel trigger", TAG)
-        //TApp.instance.timeTriggerAlarmManager.cancelTrigger(this)
+        //TApp.instance.triggerAlarmManager.cancelTrigger(this)
     }
 
     override fun onDetachFromSystem() {
-        //OTApp.instance.timeTriggerAlarmManager.cancelTrigger(this)
+        //OTApp.instance.triggerAlarmManager.cancelTrigger(this)
     }
 }

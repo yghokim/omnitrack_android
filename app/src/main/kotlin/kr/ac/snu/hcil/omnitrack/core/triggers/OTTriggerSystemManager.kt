@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.triggers
 
 import dagger.Lazy
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTriggerDAO
 import javax.inject.Singleton
 
 /**
@@ -9,11 +9,15 @@ import javax.inject.Singleton
  */
 @Singleton
 class OTTriggerSystemManager(
-        val timeTriggerAlarmManager: Lazy<OTTimeTriggerAlarmManager>
+        val triggerAlarmManager: Lazy<OTTriggerAlarmManager>
 ) {
 
     fun onSystemRebooted() {
-        timeTriggerAlarmManager.get().activateOnSystem()
+        triggerAlarmManager.get().activateOnSystem()
+    }
+
+    fun onTriggerConfigurationChanged(managedTrigger: OTTriggerDAO) {
+
     }
 
     fun handleTriggerOn(managedTrigger: OTTriggerDAO) {

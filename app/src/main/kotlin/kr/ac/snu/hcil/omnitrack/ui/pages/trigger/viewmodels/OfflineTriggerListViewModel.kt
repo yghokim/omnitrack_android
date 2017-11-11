@@ -2,7 +2,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels
 
 import android.app.Application
 import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTriggerDAO
 
 /**
  * Created by younghokim on 2017. 10. 24..

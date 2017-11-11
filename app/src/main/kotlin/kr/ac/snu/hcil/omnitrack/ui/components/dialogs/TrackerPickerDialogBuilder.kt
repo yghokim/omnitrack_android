@@ -10,7 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 import org.jetbrains.anko.padding
 
@@ -117,7 +117,7 @@ class TrackerPickerDialogBuilder(val trackers: List<OTTrackerDAO.SimpleTrackerIn
         override fun onBindViewHolder(holder: TrackerViewHolder, position: Int) {
             val tracker = trackers[position]
             holder.bind(tracker)
-            holder.active = !(inactiveIds?.contains(tracker.objectId) ?: false)
+            holder.active = inactiveIds?.contains(tracker.objectId) != true
         }
     }
 }

@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.visualization
 
 import io.realm.Realm
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
 
 /**
  * Created by younghokim on 16. 9. 7..

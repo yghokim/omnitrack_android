@@ -1,11 +1,14 @@
-package kr.ac.snu.hcil.omnitrack.core.database.local
+package kr.ac.snu.hcil.omnitrack.core.database.local.models
 
+import android.content.Context
+import io.reactivex.Completable
 import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.RealmQuery
 import io.realm.annotations.Ignore
 import io.realm.annotations.Index
 import io.realm.annotations.PrimaryKey
+import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTBackgroundLoggingTriggerAction
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTNotificationTriggerAction
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTTriggerAction
@@ -173,7 +176,7 @@ open class OTTriggerDAO : RealmObject() {
         val containsTracker = liveTrackerCount > 0
 
         val isConditionValid = when (conditionType) {
-            OTTriggerDAO.CONDITION_TYPE_DATA -> {
+            CONDITION_TYPE_DATA -> {
                 true
             }
             else -> true
@@ -190,5 +193,9 @@ open class OTTriggerDAO : RealmObject() {
 
             TriggerConfigInvalidException(*invalids.toTypedArray())
         }
+    }
+
+    fun performFire(triggerTime: Long, context: Context): Completable {
+        return action?.performAction(triggerTime, context) ?: Completable.error(IllegalStateException("Not proper action instance is generated."))
     }
 }
