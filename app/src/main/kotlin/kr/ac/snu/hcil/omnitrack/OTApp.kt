@@ -19,7 +19,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
 import kr.ac.snu.hcil.omnitrack.core.di.*
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
-import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTriggerAlarmManager
+import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerAlarmManager
 import kr.ac.snu.hcil.omnitrack.utils.LocaleHelper
 import org.jetbrains.anko.telephonyManager
 import rx_activity_result2.RxActivityResult
@@ -217,6 +217,11 @@ class OTApp : MultiDexApplication() {
                 .build()
     }
 
+    val triggerSystemComponent: TriggerSystemComponent by lazy {
+        DaggerTriggerSystemComponent.builder()
+                .build()
+    }
+
     val colorPalette: IntArray by lazy {
         this.resources.getStringArray(R.array.colorPaletteArray).map { Color.parseColor(it) }.toIntArray()
     }
@@ -225,7 +230,7 @@ class OTApp : MultiDexApplication() {
         this.resources.getString(R.string.google_maps_key)
     }
 
-    lateinit var timeTriggerAlarmManager: OTTimeTriggerAlarmManager
+    lateinit var triggerAlarmManager: OTTriggerAlarmManager
         private set
 
     override fun attachBaseContext(base: Context) {
@@ -274,7 +279,6 @@ class OTApp : MultiDexApplication() {
         logger.writeSystemLog("Application creates.", "OTApp")
 
         //=================================================================
-        timeTriggerAlarmManager = OTTimeTriggerAlarmManager()
 
         OTExternalService.init()
         for (service in OTExternalService.availableServices) {

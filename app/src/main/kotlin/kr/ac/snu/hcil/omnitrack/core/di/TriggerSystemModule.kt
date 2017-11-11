@@ -1,27 +1,31 @@
 package kr.ac.snu.hcil.omnitrack.core.di
 
+import android.content.Context
 import dagger.Lazy
 import dagger.Module
 import dagger.Provides
-import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTriggerAlarmManager
+import io.realm.Realm
+import kr.ac.snu.hcil.omnitrack.core.triggers.ITriggerAlarmController
+import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerAlarmManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerSystemManager
+import javax.inject.Provider
 import javax.inject.Singleton
 
 /**
  * Created by younghokim on 2017. 11. 9..
  */
 @Singleton
-@Module(includes = arrayOf(ScheduledJobModule::class))
+@Module(includes = arrayOf(ApplicationModule::class, ScheduledJobModule::class))
 class TriggerSystemModule {
     @Provides
     @Singleton
-    fun provideTimeTriggerManager(): OTTimeTriggerAlarmManager {
-        return OTTimeTriggerAlarmManager()
+    fun provideTriggerAlarmController(context: Context, realmProvider: Provider<Realm>): ITriggerAlarmController {
+        return OTTriggerAlarmManager(context, realmProvider)
     }
 
     @Provides
     @Singleton
-    fun provideTriggerSystemManager(timeTriggerAlarmManager: Lazy<OTTimeTriggerAlarmManager>): OTTriggerSystemManager {
-        return OTTriggerSystemManager(timeTriggerAlarmManager)
+    fun provideTriggerSystemManager(triggerAlarmManager: Lazy<OTTriggerAlarmManager>): OTTriggerSystemManager {
+        return OTTriggerSystemManager(triggerAlarmManager)
     }
 }

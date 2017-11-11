@@ -12,9 +12,8 @@ import com.google.gson.GsonBuilder
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
-import io.reactivex.Single
+import io.reactivex.Completable
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.ui.activities.ReminderPopupActivity
 import kr.ac.snu.hcil.omnitrack.utils.isDeviceLockedCompat
@@ -144,35 +143,37 @@ class OTNotificationTriggerAction : OTTriggerAction() {
         }
 
 
-    override fun performAction(triggerTime: Long, context: Context): Single<OTTriggerDAO> {
-        println("trigger fired - send notification")
-        when (notificationLevelForSystem) {
-            NotificationLevel.Noti -> {
-                trigger.trackers.forEach { tracker ->
-                    TODO("Implement")
-                    //OTTrackingNotificationManager.pushReminderNotification(context, tracker, triggerTime)
+    override fun performAction(triggerTime: Long, context: Context): Completable {
+        return Completable.defer {
+            println("trigger fired - send notification")
+            when (notificationLevelForSystem) {
+                NotificationLevel.Noti -> {
+                    trigger.trackers.forEach { tracker ->
+                        TODO("Implement")
+                        //OTTrackingNotificationManager.pushReminderNotification(context, tracker, triggerTime)
+                    }
+                }
+                NotificationLevel.Popup -> {
+
+                    val TAG = "ReminderPopup"
+
+                    if (popupTriggerQueueTime != triggerTime) {
+                        Log.d(TAG, "there are remaining triggers: ${popupTriggersQueue.size}. Clear.")
+                        popupTriggersQueue.clear()
+                    }
+
+                    Log.d(TAG, "add one trigger for ${triggerTime}}")
+                    //TODO
+                    // popupTriggersQueue.add(WeakReference(trigger))
+                    popupTriggerQueueTime = triggerTime
+                }
+                NotificationLevel.Impose -> {
+
                 }
             }
-            NotificationLevel.Popup -> {
 
-                val TAG = "ReminderPopup"
-
-                if (popupTriggerQueueTime != triggerTime) {
-                    Log.d(TAG, "there are remaining triggers: ${popupTriggersQueue.size}. Clear.")
-                    popupTriggersQueue.clear()
-                }
-
-                Log.d(TAG, "add one trigger for ${triggerTime}}")
-                //TODO
-                // popupTriggersQueue.add(WeakReference(trigger))
-                popupTriggerQueueTime = triggerTime
-            }
-            NotificationLevel.Impose -> {
-
-            }
+            return@defer Completable.complete()
         }
-
-        return Single.just(trigger)
     }
 
 }

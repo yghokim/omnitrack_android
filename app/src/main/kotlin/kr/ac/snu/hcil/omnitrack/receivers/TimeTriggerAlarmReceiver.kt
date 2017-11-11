@@ -9,9 +9,9 @@ import android.os.PowerManager
 import android.util.SparseArray
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
-import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTriggerAlarmManager
-import java.util.*
+import kr.ac.snu.hcil.omnitrack.core.triggers.ITriggerAlarmController
+import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerAlarmManager
+import javax.inject.Inject
 
 /**
  * Created by Young-Ho Kim on 2016-10-11.
@@ -80,18 +80,33 @@ class TimeTriggerAlarmReceiver : BroadcastReceiver() {
 
     class TimeTriggerWakefulHandlingService : IntentService("TimeTriggerHandlingService") {
 
+        @Inject
+        protected lateinit var triggerAlarmController: ITriggerAlarmController
+
+        override fun onCreate() {
+            super.onCreate()
+            (application as OTApp).triggerSystemComponent.inject(this)
+        }
+
         override fun onHandleIntent(intent: Intent) {
-            val alarmId = intent.getIntExtra(OTTimeTriggerAlarmManager.INTENT_EXTRA_ALARM_ID, -1)
-            val triggerTime = intent.getLongExtra(OTTimeTriggerAlarmManager.INTENT_EXTRA_TRIGGER_TIME, System.currentTimeMillis())
+            val alarmId = intent.getIntExtra(OTTriggerAlarmManager.INTENT_EXTRA_ALARM_ID, -1)
 
+            println("Wakeful Trigger Alarm Service handleIntent")
 
-            println("Wakeful Service handleIntent, trigger time: ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(triggerTime))}")
+            triggerAlarmController.onAlarmFired(alarmId).doAfterTerminate {
+                completeWakefulIntent(intent)
+            }.subscribe({
+                println("successfully handled fired alarm: ${alarmId}")
+            }, {
+
+            })
+
 
             /*TODO trigger alarm service handling
             OTApp.instance.currentUserObservable.first().flatMap {
                 user ->
                 println("Returned user")
-                val triggerSchedules = OTApp.instance.timeTriggerAlarmManager.handleAlarmAndGetTriggerInfo(user, alarmId, triggerTime, System.currentTimeMillis())
+                val triggerSchedules = OTApp.instance.triggerAlarmManager.handleFiredAlarmAndGetTriggerInfo(user, alarmId, triggerTime, System.currentTimeMillis())
                 println("Handled system alarm and retrieved corresponding trigger schedules - ${triggerSchedules?.size}")
 
                 OTApp.logger.writeSystemLog("Handled system alarm and retrieved corresponding trigger schedules: ${triggerSchedules?.size}", TAG)

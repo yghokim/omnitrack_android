@@ -6,7 +6,11 @@ import dagger.Lazy
 import dagger.Module
 import dagger.Provides
 import io.realm.Realm
-import kr.ac.snu.hcil.omnitrack.core.database.local.*
+import kr.ac.snu.hcil.omnitrack.core.database.local.DaoSerializationManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTItemDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.typeadapters.*
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerSystemManager
 import javax.inject.Provider

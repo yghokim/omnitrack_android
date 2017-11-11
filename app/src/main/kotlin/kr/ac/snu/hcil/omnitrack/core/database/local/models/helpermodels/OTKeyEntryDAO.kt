@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.core.database.local
+package kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels
 
 import android.support.v7.util.DiffUtil
 import io.realm.RealmObject

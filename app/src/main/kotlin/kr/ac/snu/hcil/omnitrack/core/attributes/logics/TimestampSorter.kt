@@ -2,7 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.attributes.logics
 
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTItemDAO
 
 /**
  * Created by Young-Ho Kim on 2016-09-07

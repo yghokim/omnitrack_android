@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.core.database.local
+package kr.ac.snu.hcil.omnitrack.core.database.local.models
 
 import android.app.Activity
 import android.content.Context
@@ -14,6 +14,8 @@ import io.realm.annotations.PrimaryKey
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
+import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels.OTStringStringEntryDAO
 import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import java.io.File

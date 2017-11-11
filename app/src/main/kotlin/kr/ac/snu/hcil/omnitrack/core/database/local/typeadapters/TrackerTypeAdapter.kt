@@ -5,10 +5,9 @@ import com.google.gson.JsonObject
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import dagger.Lazy
-import io.realm.RealmList
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
 import java.util.*
 
 /**
@@ -87,7 +86,7 @@ class TrackerTypeAdapter(isServerMode: Boolean, val attributeTypeAdapter: Lazy<S
             key->
             when(key)
             {
-                RealmDatabaseManager.FIELD_REMOVED_BOOLEAN->applyTo.removed = json.get(key)?.asBoolean?:false
+                RealmDatabaseManager.FIELD_REMOVED_BOOLEAN -> applyTo.removed = json.get(key)?.asBoolean == true
                 "user", RealmDatabaseManager.FIELD_USER_ID->applyTo.userId = json.get(key)?.asString
                 RealmDatabaseManager.FIELD_USER_CREATED_AT -> applyTo.userCreatedAt = json[key]?.asLong?:0
                 RealmDatabaseManager.FIELD_UPDATED_AT_LONG->applyTo.userUpdatedAt = json[key]?.asLong?:0

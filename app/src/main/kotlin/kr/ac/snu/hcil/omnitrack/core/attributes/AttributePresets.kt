@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.attributes
 
 import io.realm.Realm
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
 
 /**
  * Created by younghokim on 16. 8. 13..

@@ -2,7 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core
 
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.models.DailyCountChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.models.LoggingHeatMapModel

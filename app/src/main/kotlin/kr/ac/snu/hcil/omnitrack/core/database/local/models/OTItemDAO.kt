@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.core.database.local
+package kr.ac.snu.hcil.omnitrack.core.database.local.models
 
 import io.realm.RealmList
 import io.realm.RealmObject

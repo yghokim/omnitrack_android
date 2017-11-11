@@ -5,8 +5,8 @@ import dagger.Lazy
 import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.net.IBinaryDownloadAPI
 import kr.ac.snu.hcil.omnitrack.utils.io.FileHelper
 import java.io.File

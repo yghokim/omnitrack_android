@@ -12,6 +12,11 @@ import io.realm.*
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTItemDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels.OTItemBuilderDAO
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.net.ABinaryUploadService
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationClientSideAPI
@@ -416,9 +421,9 @@ class RealmDatabaseManager @Inject constructor(
     override fun setTableSynchronizationFlags(type: ESyncDataType, idTimestampPair: List<SyncResultEntry>): Completable {
         return when(type)
         {
-            ESyncDataType.TRACKER->setSynchronizationFlagsImpl(OTTrackerDAO::class.java, idTimestampPair, {dao, stamp-> dao.synchronizedAt = stamp })
-            ESyncDataType.TRIGGER->setSynchronizationFlagsImpl(OTTriggerDAO::class.java, idTimestampPair, {dao, stamp-> dao.synchronizedAt = stamp })
-            ESyncDataType.ITEM->setSynchronizationFlagsImpl(OTItemDAO::class.java, idTimestampPair, {dao, stamp-> dao.synchronizedAt = stamp })
+            ESyncDataType.TRACKER -> setSynchronizationFlagsImpl(OTTrackerDAO::class.java, idTimestampPair, { dao, stamp -> dao.synchronizedAt = stamp })
+            ESyncDataType.TRIGGER -> setSynchronizationFlagsImpl(OTTriggerDAO::class.java, idTimestampPair, { dao, stamp -> dao.synchronizedAt = stamp })
+            ESyncDataType.ITEM -> setSynchronizationFlagsImpl(OTItemDAO::class.java, idTimestampPair, { dao, stamp -> dao.synchronizedAt = stamp })
         }
     }
 
