@@ -8,7 +8,7 @@ import javax.inject.Singleton
  * Created by younghokim on 2017. 11. 9..
  */
 @Singleton
-@Component(modules = arrayOf(TriggerSystemModule::class))
+@Component(modules = arrayOf(TriggerSystemModule::class, BackendDatabaseModule::class))
 interface TriggerSystemComponent {
     fun inject(alarmService: TimeTriggerAlarmReceiver.TimeTriggerWakefulHandlingService)
 }

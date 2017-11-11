@@ -9,7 +9,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class OTTriggerSystemManager(
-        val triggerAlarmManager: Lazy<OTTriggerAlarmManager>
+        val triggerAlarmManager: Lazy<ITriggerAlarmController>
 ) {
 
     fun onSystemRebooted() {
@@ -22,11 +22,20 @@ class OTTriggerSystemManager(
 
     fun handleTriggerOn(managedTrigger: OTTriggerDAO) {
         println("TriggerSystemManager: handleTriggerOn: ${managedTrigger.objectId}")
+        when (managedTrigger.conditionType) {
+            OTTriggerDAO.CONDITION_TYPE_TIME -> {
+                triggerAlarmManager.get().registerTriggerAlarm(System.currentTimeMillis(), managedTrigger)
+            }
+        }
     }
 
     fun handleTriggerOff(managedTrigger: OTTriggerDAO) {
         println("TriggerSystemManager: handleTriggerOff: ${managedTrigger.objectId}")
-
+        when (managedTrigger.conditionType) {
+            OTTriggerDAO.CONDITION_TYPE_TIME -> {
+                triggerAlarmManager.get().cancelTrigger(managedTrigger)
+            }
+        }
     }
 
     fun tryCheckInToSystem(managedTrigger: OTTriggerDAO): Boolean {

@@ -392,7 +392,7 @@ class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObject
         if (isOn == false) {
             handleOff()
         } else {
-            if (OTApp.instance.triggerAlarmManager.getNearestAlarmTime(this, System.currentTimeMillis()) == null) {
+            if (OTApp.instance.triggerAlarmManager.getNearestAlarmTime(this.objectId, System.currentTimeMillis()) == null) {
                 if (reserveNextAlarmToSystem(lastTriggeredTime) == null) {
                     isOn = false
                 }
