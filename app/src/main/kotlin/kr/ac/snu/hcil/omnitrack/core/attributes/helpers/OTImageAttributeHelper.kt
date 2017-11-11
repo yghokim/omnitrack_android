@@ -113,7 +113,6 @@ class OTImageAttributeHelper : OTFileInvolvedAttributeHelper() {
                                             println("downloaded: ${uri}")
                                             Glide.with(view.context)
                                                     .load(uri)
-                                                    .apply(RequestOptions.overrideOf(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL))
                                                     .listener(object : RequestListener<Drawable> {
                                                         override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
                                                             if (resource != null) {

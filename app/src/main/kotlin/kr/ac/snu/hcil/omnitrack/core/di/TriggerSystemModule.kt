@@ -25,7 +25,7 @@ class TriggerSystemModule {
 
     @Provides
     @Singleton
-    fun provideTriggerSystemManager(triggerAlarmManager: Lazy<OTTriggerAlarmManager>): OTTriggerSystemManager {
+    fun provideTriggerSystemManager(triggerAlarmManager: Lazy<ITriggerAlarmController>): OTTriggerSystemManager {
         return OTTriggerSystemManager(triggerAlarmManager)
     }
 }

@@ -26,7 +26,6 @@ import javax.inject.Provider
  */
 class OTTriggerAlarmManager(val context: Context, val realmProvider: Provider<Realm>) : ITriggerAlarmController {
 
-
     companion object {
 
         const val TAG = "TimeTriggerAlarmManager"
@@ -61,7 +60,7 @@ class OTTriggerAlarmManager(val context: Context, val realmProvider: Provider<Re
 
     //==========================================================
 
-    fun activateOnSystem() {
+    override fun activateOnSystem() {
         val realm = realmProvider.get()
         realm.use {
             realm.executeTransactionAsync({ realm ->
@@ -101,6 +100,21 @@ class OTTriggerAlarmManager(val context: Context, val realmProvider: Provider<Re
         }
     }
 
+
+    override fun registerTriggerAlarm(pivot: Long?, trigger: OTTriggerDAO) {
+        val condition = retrieveTimeCondition(trigger)
+        val nextAlarmTime = getNextAlarmTime(pivot, condition)
+        if (nextAlarmTime != null) {
+            reserveAlarm(trigger, nextAlarmTime, !condition.isRepeated)
+        } else {
+            realmProvider.get().use { realm ->
+                realm.executeTransaction {
+                    trigger.isOn = false
+                }
+            }
+        }
+    }
+
     override fun onAlarmFired(systemAlarmId: Int): Completable {
         return handleFiredAlarmAndGetTriggerInfo(systemAlarmId).flatMapCompletable { (list) ->
             if (list?.isNotEmpty() == true) {
@@ -112,16 +126,7 @@ class OTTriggerAlarmManager(val context: Context, val realmProvider: Provider<Re
 
                                 if (!schedule.oneShot) {
                                     //reserve next alarm.
-                                    val nextAlarmTime = getNextAlarmTime(triggerTime, retrieveTimeCondition(trigger))
-                                    if (nextAlarmTime != null) {
-                                        reserveAlarm(trigger, nextAlarmTime, false)
-                                    } else {
-                                        realmProvider.get().use { realm ->
-                                            realm.executeTransaction {
-                                                trigger.isOn = false
-                                            }
-                                        }
-                                    }
+                                    registerTriggerAlarm(triggerTime, trigger)
                                 } else {
                                     realmProvider.get().use { realm ->
                                         realm.executeTransaction {
@@ -205,7 +210,7 @@ class OTTriggerAlarmManager(val context: Context, val realmProvider: Provider<Re
         }
     }
 
-    fun cancelTrigger(trigger: OTTriggerDAO) {
+    override fun cancelTrigger(trigger: OTTriggerDAO) {
         val realm = realmProvider.get()
 
         val pendingTriggerSchedules = realm.where(OTTriggerSchedule::class.java)

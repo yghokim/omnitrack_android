@@ -92,8 +92,7 @@ class MapImageView : PlaceHolderImageView /*FutureCallback<ImageView>*/ {
 
                 Glide.with(context).load(makeGoogleMapQuery(location, zoom, width, desiredHeight))
                         .apply(
-                                RequestOptions.overrideOf(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
-                                        .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                                RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)
                                         .dontAnimate()
                         )
                         .listener(object : RequestListener<Drawable> {
