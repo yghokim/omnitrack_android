@@ -38,13 +38,24 @@ class OTTriggerSystemManager(
         }
     }
 
+
     fun tryCheckInToSystem(managedTrigger: OTTriggerDAO): Boolean {
         println("TriggerSystemManager: tryCheckInToSystem: ${managedTrigger.objectId}")
+        if (managedTrigger.isOn) {
+            when (managedTrigger.conditionType) {
+                OTTriggerDAO.CONDITION_TYPE_TIME -> {
+                    return triggerAlarmManager.get().continueTriggerInChainIfPossible(managedTrigger)
+                }
+            }
+        } else {
+            handleTriggerOff(managedTrigger)
+        }
         return false
     }
 
     fun tryCheckOutFromSystem(managedTrigger: OTTriggerDAO): Boolean {
         println("TriggerSystemManager: tryCheckOutFromSystem: ${managedTrigger.objectId}")
+        handleTriggerOff(managedTrigger)
         return false
     }
 }

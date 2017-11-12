@@ -21,6 +21,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.tutorial.TutorialManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
+import kr.ac.snu.hcil.omnitrack.ui.pages.diagnostics.SystemLogActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.services.ServiceListFragment
 import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
 import kr.ac.snu.hcil.omnitrack.widgets.OTShortcutPanelWidgetUpdateService
@@ -72,8 +73,13 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
 
             override fun onTabSelected(tab: TabLayout.Tab) {
                 if (tab.position != TAB_INDEX_TRACKERS) {
-                    rightActionBarButton?.visibility = View.INVISIBLE
+                    if (BuildConfig.DEBUG) {
+                        rightActionBarButton?.setImageResource(R.drawable.settings_dark)
+                    } else {
+                        rightActionBarButton?.visibility = View.INVISIBLE
+                    }
                 } else
+                    rightActionBarButton?.setImageResource(R.drawable.icon_reorder_dark)
                     rightActionBarButton?.visibility = View.VISIBLE
             }
 
@@ -133,10 +139,10 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
 
     override fun onToolbarLeftButtonClicked() {
         //       slidingMenu.toggle(true)
-        if (drawerLayout.isDrawerOpen(Gravity.LEFT)) {
-            drawerLayout.closeDrawer(Gravity.LEFT)
+        if (drawerLayout.isDrawerOpen(Gravity.START)) {
+            drawerLayout.closeDrawer(Gravity.START)
         } else {
-            drawerLayout.openDrawer(Gravity.LEFT)
+            drawerLayout.openDrawer(Gravity.START)
         }
     }
 
@@ -145,6 +151,8 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
             val intent = Intent(this, TrackerReorderActivity::class.java)
             startActivity(intent)
             overridePendingTransition(R.anim.anim_slide_up, R.anim.anim_noop)
+        } else if (BuildConfig.DEBUG) {
+            startActivity(Intent(this, SystemLogActivity::class.java))
         }
     }
 

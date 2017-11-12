@@ -12,7 +12,9 @@ import kr.ac.snu.hcil.omnitrack.utils.Nullable
 interface ITriggerAlarmController {
     fun onAlarmFired(systemAlarmId: Int): Completable
 
-    fun registerTriggerAlarm(pivot: Long?, trigger: OTTriggerDAO)
+    fun registerTriggerAlarm(pivot: Long?, trigger: OTTriggerDAO): Boolean
+
+    fun continueTriggerInChainIfPossible(trigger: OTTriggerDAO): Boolean
 
     fun cancelTrigger(trigger: OTTriggerDAO)
 

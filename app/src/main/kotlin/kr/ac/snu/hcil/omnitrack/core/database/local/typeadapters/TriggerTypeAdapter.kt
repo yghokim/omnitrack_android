@@ -41,8 +41,8 @@ class TriggerTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>, val realmP
                 "isOn" -> dao.isOn = reader.nextBoolean()
                 "conditionType" -> dao.conditionType = reader.nextInt().toByte()
                 "actionType" -> dao.actionType = reader.nextInt().toByte()
-                "serializedAction" -> dao.serializedAction = reader.nextString()
-                "serializedCondition" -> dao.serializedCondition = reader.nextString()
+                "action", "serializedAction" -> dao.serializedAction = reader.nextString()
+                "condition", "serializedCondition" -> dao.serializedCondition = reader.nextString()
                 "lastTriggeredTime" -> dao.lastTriggeredTime = reader.nextLong()
                 "lockedProperties" -> dao.serializedLockedPropertyInfo = gson.get().fromJson<JsonObject>(reader, JsonObject::class.java).toString()
                 "trackers" -> {
@@ -77,9 +77,9 @@ class TriggerTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>, val realmP
         writer.name(if (isServerMode) "user" else "userId").value(value.userId)
         writer.name("isOn").value(value.isOn)
         writer.name("conditionType").value(value.conditionType)
-        writer.name("serializedCondition").value(value.serializedCondition)
+        writer.name("condition").value(value.serializedCondition)
         writer.name("actionType").value(value.actionType)
-        writer.name("serializedAction").value(value.serializedAction)
+        writer.name("action").value(value.serializedAction)
         writer.name("lastTriggeredTime").value(value.lastTriggeredTime)
         writer.name(RealmDatabaseManager.FIELD_LOCKED_PROPERTIES_SERIALIZED).jsonValue(value.serializedLockedPropertyInfo)
         writer.name(RealmDatabaseManager.FIELD_SYNCHRONIZED_AT).value(value.synchronizedAt)
@@ -100,6 +100,7 @@ class TriggerTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>, val realmP
     override fun applyToManagedDao(json: JsonObject, applyTo: OTTriggerDAO) {
         var switchChanged = false
         var removedFlagChanged = false
+        var conditionChanged = false
         json.keySet().forEach{
             key->
             when(key)
@@ -131,10 +132,35 @@ class TriggerTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>, val realmP
                 }
                 "trackers"->{
                     val jsonList = try{json[key]?.asJsonArray}catch(ex:Exception){null}
+                    applyTo.trackers.clear()
                     if(jsonList!=null)
                     {
-
+                        val realm = realmProvider.get()
+                        applyTo.trackers.addAll(realm.copyFromRealm(realm.where(OTTrackerDAO::class.java)
+                                .equalTo(RealmDatabaseManager.FIELD_REMOVED_BOOLEAN, false)
+                                .`in`(RealmDatabaseManager.FIELD_OBJECT_ID, jsonList.map { it.asString }.toTypedArray())
+                                .findAll()))
+                        realm.close()
                     }
+                }
+                "conditionType" -> {
+                    val value = json[key].asByte
+                    if (applyTo.conditionType != value) {
+                        conditionChanged = true
+                        applyTo.conditionType = value
+                    }
+                }
+                "condition" -> {
+                    val value = json[key].toString()
+                    if (applyTo.serializedCondition != value) {
+                        applyTo.serializedCondition = value
+                    }
+                }
+                "actionType" -> {
+                    applyTo.actionType = json[key].asByte
+                }
+                "action" -> {
+                    applyTo.serializedAction = json[key].toString()
                 }
             }
         }

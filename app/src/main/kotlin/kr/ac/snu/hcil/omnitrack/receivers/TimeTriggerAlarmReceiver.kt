@@ -91,12 +91,13 @@ class TimeTriggerAlarmReceiver : BroadcastReceiver() {
         override fun onHandleIntent(intent: Intent) {
             val alarmId = intent.getIntExtra(OTTriggerAlarmManager.INTENT_EXTRA_ALARM_ID, -1)
 
-            println("Wakeful Trigger Alarm Service handleIntent")
+            OTApp.logger.writeSystemLog("Wakeful Trigger Alarm Service handleIntent", TAG)
 
             triggerAlarmController.onAlarmFired(alarmId).doAfterTerminate {
                 completeWakefulIntent(intent)
             }.subscribe({
                 println("successfully handled fired alarm: ${alarmId}")
+                OTApp.logger.writeSystemLog("successfully handled fired alarm: ${alarmId}", TAG)
             }, { err ->
                 println("trigger alarm handling error")
                 err.printStackTrace()
