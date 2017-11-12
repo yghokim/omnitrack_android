@@ -389,6 +389,7 @@ class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObject
 
     override fun handleActivationOnSystem(context: Context) {
 
+        /*
         if (isOn == false) {
             handleOff()
         } else {
@@ -397,7 +398,7 @@ class OTTimeTrigger(objectId: String?, user: OTUser, name: String, trackerObject
                     isOn = false
                 }
             }
-        }
+        }*/
     }
 
     fun reserveNextAlarmToSystem(currentTriggerTime: Long?): OTTriggerAlarmInstance.AlarmInfo? {

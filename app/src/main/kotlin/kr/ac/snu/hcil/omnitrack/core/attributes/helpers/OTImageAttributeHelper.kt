@@ -88,7 +88,7 @@ class OTImageAttributeHelper : OTFileInvolvedAttributeHelper() {
                             view.currentMode = PlaceHolderImageView.Mode.IMAGE
                             Glide.with(view.context)
                                     .load(value.localUri.toString())
-                                    .apply(RequestOptions().override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL))
+                                    .apply(RequestOptions().override(Target.SIZE_ORIGINAL))
                                     .into(view.imageView)
                             return Single.just(true)
                         } else {

@@ -82,6 +82,7 @@ class OTApp : MultiDexApplication() {
         const val BROADCAST_ACTION_USER_SIGNED_IN = "$PREFIX_ACTION.USER_SIGNED_IN"
         const val BROADCAST_ACTION_USER_SIGNED_OUT = "$PREFIX_ACTION.USER_SIGNED_OUT"
 
+        const val BROADCAST_ACTION_TRIGGER_FIRED = "$PREFIX_ACTION.TRIGGER_FIRED"
 
         const val BROADCAST_ACTION_TIME_TRIGGER_ALARM = "$PREFIX_ACTION.ALARM"
         const val BROADCAST_ACTION_EVENT_TRIGGER_CHECK_ALARM = "$PREFIX_ACTION.EVENT_TRIGGER_ALARM"
@@ -205,6 +206,7 @@ class OTApp : MultiDexApplication() {
 
     val daoSerializationComponent: DaoSerializationComponent by lazy {
         DaggerDaoSerializationComponent.builder()
+                .applicationModule(appModule)
                 .daoSerializationModule(daoSerializationModule)
                 .backendDatabaseModule(backendDatabaseModule)
                 .build()
@@ -219,6 +221,9 @@ class OTApp : MultiDexApplication() {
 
     val triggerSystemComponent: TriggerSystemComponent by lazy {
         DaggerTriggerSystemComponent.builder()
+                .applicationModule(appModule)
+                .backendDatabaseModule(backendDatabaseModule)
+                .triggerSystemModule(triggerSystemModule)
                 .build()
     }
 

@@ -22,9 +22,20 @@ open class OTTriggerSchedule : RealmObject() {
     @Index
     var intrinsicAlarmTime: Long = 0L
 
+    /**
+     * Indicates the schedule's former timestamp.
+     * If null, the schedule is the first one since the user turned the trigger on.
+     * */
+    var pivot: Long? = null
+
+    /**
+     * this schedule is not repeated.
+     * If true, the system is responsible to reschedule next alarm with the triggered time as a next pivot.
+     */
+    var oneShot: Boolean = false
+
     var trigger: OTTriggerDAO? = null
 
-    var oneShot: Boolean = false
 
     @Index
     var fired: Boolean = false

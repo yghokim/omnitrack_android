@@ -97,8 +97,9 @@ class TimeTriggerAlarmReceiver : BroadcastReceiver() {
                 completeWakefulIntent(intent)
             }.subscribe({
                 println("successfully handled fired alarm: ${alarmId}")
-            }, {
-
+            }, { err ->
+                println("trigger alarm handling error")
+                err.printStackTrace()
             })
 
 

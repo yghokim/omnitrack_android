@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 
 import android.animation.ValueAnimator
 import android.app.Activity
+import android.content.BroadcastReceiver
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -11,6 +12,7 @@ import android.graphics.ColorMatrixColorFilter
 import android.os.Bundle
 import android.support.design.widget.CoordinatorLayout
 import android.support.v4.content.ContextCompat
+import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AlertDialog
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.LinearLayoutManager
@@ -35,6 +37,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.EventLoggingManager
 import kr.ac.snu.hcil.omnitrack.core.database.OTTriggerInformationHelper
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.triggers.TriggerFireBroadcastReceiver
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.TopBottomHorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.AManagedTriggerListViewModel
@@ -61,6 +64,14 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
         const val VIEWTYPE_GHOST = 1
 
         val switchColorFilter: ColorFilter by lazy { ColorMatrixColorFilter(ColorMatrix().apply { this.setSaturation(0.1f) }) }
+    }
+
+    private val triggerFireBroadcastReceiver: BroadcastReceiver by lazy {
+        object : TriggerFireBroadcastReceiver() {
+            override fun onTriggerFired(triggerId: String, triggerTime: Long) {
+                currentTriggerViewModelList.find { it.dao.objectId == triggerId }?.onFired(triggerTime)
+            }
+        }
     }
 
     protected lateinit var viewModel: ViewModelType
@@ -139,6 +150,16 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
         val rootView = inflater.inflate(R.layout.fragment_tracker_detail_triggers, container, false)
 
         return rootView
+    }
+
+    override fun onStart() {
+        super.onStart()
+        LocalBroadcastManager.getInstance(act).registerReceiver(triggerFireBroadcastReceiver, TriggerFireBroadcastReceiver.makeIntentFilter())
+    }
+
+    override fun onStop() {
+        super.onStop()
+        LocalBroadcastManager.getInstance(act).unregisterReceiver(triggerFireBroadcastReceiver)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -397,6 +418,15 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
                 itemView.ui_header_view_container.removeAllViewsInLayout()
                 itemView.ui_header_view_container.addView(headerView)
                 currentHeaderView = headerView
+
+                attachedViewModel?.getConditionViewModel()?.let {
+                    val conditionType = attachedViewModel?.triggerConditionType?.value
+                    if (conditionType != null) {
+                        OTTriggerViewFactory.getConditionViewProvider(conditionType)?.connectViewModelToDisplayView(
+                                it, headerView, subscriptions
+                        )
+                    }
+                }
             }
         }
 
