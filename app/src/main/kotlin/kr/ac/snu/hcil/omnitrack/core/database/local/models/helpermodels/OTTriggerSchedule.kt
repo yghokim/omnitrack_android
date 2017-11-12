@@ -23,10 +23,9 @@ open class OTTriggerSchedule : RealmObject() {
     var intrinsicAlarmTime: Long = 0L
 
     /**
-     * Indicates the schedule's former timestamp.
-     * If null, the schedule is the first one since the user turned the trigger on.
-     * */
-    var pivot: Long? = null
+     * This flag is set true when the trigger was stopped by user or the system, breaking the chain.
+     */
+    var final: Boolean = false
 
     /**
      * this schedule is not repeated.

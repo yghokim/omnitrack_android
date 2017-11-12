@@ -1,6 +1,8 @@
 package kr.ac.snu.hcil.omnitrack.utils.time
 
 import android.text.format.DateUtils
+import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
 import kr.ac.snu.hcil.omnitrack.utils.getDayOfWeek
 import kr.ac.snu.hcil.omnitrack.utils.getHourOfDay
 import kr.ac.snu.hcil.omnitrack.utils.setHourOfDay
@@ -50,6 +52,7 @@ class IntervalTimeScheduleCalculator : TimeScheduleCalculator<IntervalTimeSchedu
     override fun calculateInfiniteNextTime(last: Long?, now: Long): Long? {
 
         println("trigger time last: ${last}, now: ${now}")
+        OTApp.logger.writeSystemLog("calc next alarm. last: ${last?.let { LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(last)) }}, now: ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(now))}", "IntervalTimeScheduleCalculator")
         val realPivot: Long = last ?: now
         val isHourRangeBound = fromHourOfDay != toHourOfDay
 

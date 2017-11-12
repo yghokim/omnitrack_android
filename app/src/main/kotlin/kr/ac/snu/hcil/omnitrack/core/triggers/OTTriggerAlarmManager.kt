@@ -11,6 +11,7 @@ import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
 import io.realm.Sort
 import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
 import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels.OTTriggerAlarmInstance
@@ -22,6 +23,7 @@ import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.time.DesignatedTimeScheduleCalculator
 import kr.ac.snu.hcil.omnitrack.utils.time.IntervalTimeScheduleCalculator
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
+import java.util.*
 import javax.inject.Provider
 
 /**
@@ -103,35 +105,47 @@ class OTTriggerAlarmManager(val context: Context, val realmProvider: Provider<Re
     }
 
 
-    override fun registerTriggerAlarm(pivot: Long?, trigger: OTTriggerDAO) {
+    override fun registerTriggerAlarm(pivot: Long?, trigger: OTTriggerDAO): Boolean {
         val condition = retrieveTimeCondition(trigger)
         val nextAlarmTime = calculateNextAlarmTime(pivot, condition)
         if (nextAlarmTime != null) {
+            OTApp.logger.writeSystemLog("Next alarm time is ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(nextAlarmTime))}", TAG)
             reserveAlarm(trigger, nextAlarmTime, !condition.isRepeated)
+            return true
         } else {
             realmProvider.get().use { realm ->
                 realm.executeTransaction {
                     trigger.isOn = false
                 }
             }
+            return false
         }
     }
 
     override fun onAlarmFired(systemAlarmId: Int): Completable {
         return Completable.defer {
+            OTApp.logger.writeSystemLog("System alarm is fired. alarmId: ${systemAlarmId}", TAG)
             val realm = realmProvider.get()
             return@defer handleFiredAlarmAndGetTriggerInfo(systemAlarmId, realm).flatMapCompletable { (list) ->
                 if (list?.isNotEmpty() == true) {
                     Completable.merge(
                             list.map { schedule ->
+                                OTApp.logger.writeSystemLog("handling trigger schedule (id: ${schedule.id}). oneshot: ${schedule.oneShot}, intrinsicAlarmTime: ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(schedule.intrinsicAlarmTime))}", TAG)
                                 val trigger = schedule.trigger
                                 if (trigger != null) {
                                     val triggerTime = schedule.intrinsicAlarmTime
 
                                     if (!schedule.oneShot) {
                                         //reserve next alarm.
-                                        registerTriggerAlarm(triggerTime, trigger)
+                                        OTApp.logger.writeSystemLog("This schedule is not oneshot. reserve next alarm.", TAG)
+                                        if (!registerTriggerAlarm(triggerTime, trigger)) {
+                                            //time trigger chain was broken.
+                                            realm.executeTransaction {
+                                                schedule.final = true
+                                            }
+                                        }
                                     } else {
+                                        OTApp.logger.writeSystemLog("This schedule is oneshot. turn off the trigger.", TAG)
                                         realm.executeTransaction {
                                             trigger.isOn = false
                                         }
@@ -140,6 +154,8 @@ class OTTriggerAlarmManager(val context: Context, val realmProvider: Provider<Re
                                     when (trigger.conditionType) {
                                         OTTriggerDAO.CONDITION_TYPE_TIME -> {
                                             //simple alarm. fire
+
+                                            OTApp.logger.writeSystemLog("Fire time trigger. schedule id: ${schedule.id}", TAG)
                                             trigger.performFire(triggerTime, context)
                                         }
                                         OTTriggerDAO.CONDITION_TYPE_ITEM -> {
@@ -158,6 +174,7 @@ class OTTriggerAlarmManager(val context: Context, val realmProvider: Provider<Re
                 } else {
                     Completable.complete()
                 }.doOnTerminate {
+                    OTApp.logger.writeSystemLog("System alarm fire was succesfully handled. alarmId: ${systemAlarmId}", TAG)
                     realm.close()
                 }
             }
@@ -173,6 +190,7 @@ class OTTriggerAlarmManager(val context: Context, val realmProvider: Provider<Re
                     this.trigger = trigger
                     this.intrinsicAlarmTime = alarmTime
                     this.oneShot = oneShot
+                    this.final = oneShot
                 }
 
                 val appendableAlarm = findAppendableAlarmInstance(alarmTime, realm)
@@ -194,11 +212,13 @@ class OTTriggerAlarmManager(val context: Context, val realmProvider: Provider<Re
 
                     val alarmTimeToReserve = TimeHelper.roundToSeconds(alarmTime)
 
+
                     alarmInstance.reservedAlarmTime = alarmTimeToReserve
                     schedule.parentAlarm = alarmInstance
                     alarmInstance.userId = trigger.userId
 
                     registerSystemAlarm(alarmTimeToReserve, trigger.userId!!, newAlarmId)
+                    OTApp.logger.writeSystemLog("The actual alarm was reserved at: ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(alarmTimeToReserve))}", TAG)
 
                     result = alarmInstance.getInfo()
                 }
@@ -313,6 +333,34 @@ class OTTriggerAlarmManager(val context: Context, val realmProvider: Provider<Re
         }
     }
 
+
+    override fun continueTriggerInChainIfPossible(trigger: OTTriggerDAO): Boolean {
+
+        val realm = realmProvider.get()
+        val latestPastSchedule = realm.where(OTTriggerSchedule::class.java)
+                .equalTo("trigger.${RealmDatabaseManager.FIELD_OBJECT_ID}", trigger.objectId)
+                .findAllSorted(OTTriggerSchedule.FIELD_INTRINSIC_ALARM_TIME, Sort.DESCENDING)
+                .find { it.fired || it.skipped }
+
+        if (latestPastSchedule == null) {
+            //start new Alarm
+            //TODO naive. check condition the same.
+            cancelTrigger(trigger)
+            registerTriggerAlarm(null, trigger)
+        } else {
+            if (!latestPastSchedule.final) {
+                //TODO naive. check condition the same.
+                cancelTrigger(trigger)
+                registerTriggerAlarm(latestPastSchedule.intrinsicAlarmTime, trigger)
+            } else {
+                //start new chain.
+                cancelTrigger(trigger)
+                registerTriggerAlarm(null, trigger)
+            }
+        }
+        return false
+    }
+
     fun isAlarmRegistered(pivot: Long?, trigger: OTTriggerDAO): Boolean {
         realmProvider.get().use { realm ->
             val triggerSchedules = realm.where(OTTriggerSchedule::class.java)
@@ -332,7 +380,7 @@ class OTTriggerAlarmManager(val context: Context, val realmProvider: Provider<Re
 
 
     fun calculateNextAlarmTime(pivot: Long?, condition: OTTimeTriggerCondition): Long? {
-        val now = pivot ?: System.currentTimeMillis()
+        val now = System.currentTimeMillis()
 
         val limitExclusive = if (condition.isRepeated && condition.endAt != null) {
             condition.endAt!!
