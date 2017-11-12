@@ -3,21 +3,32 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 import android.content.Context
 import android.util.SparseArray
 import android.view.View
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTTimeTriggerCondition
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.ATriggerConditionViewModel
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.TimeConditionViewModel
 
 /**
  * Created by younghokim on 2017. 10. 22..
  */
 object OTTriggerViewFactory {
     interface ITriggerConditionViewProvider {
+        fun getTriggerConditionViewModel(trigger: OTTriggerDAO, context: Context): ATriggerConditionViewModel
         fun getTriggerDisplayView(original: View?, trigger: OTTriggerDAO, context: Context): View
         fun getTriggerConfigurationPanel(original: View?, context: Context): IConditionConfigurationView
+        fun connectViewModelToDisplayView(viewModel: ATriggerConditionViewModel, displayView: View, outSubscription: CompositeDisposable)
     }
 
     private val providerDict: SparseArray<ITriggerConditionViewProvider> by lazy {
         SparseArray<ITriggerConditionViewProvider>().apply {
             this.append(OTTriggerDAO.CONDITION_TYPE_TIME.toInt(), object : ITriggerConditionViewProvider {
+                override fun getTriggerConditionViewModel(trigger: OTTriggerDAO, context: Context): ATriggerConditionViewModel {
+                    return TimeConditionViewModel(trigger, context.applicationContext as OTApp)
+                }
+
                 override fun getTriggerDisplayView(original: View?, trigger: OTTriggerDAO, context: Context): View {
                     val displayView: TimeTriggerDisplayView = if (original is TimeTriggerDisplayView) {
                         original
@@ -42,6 +53,16 @@ object OTTriggerViewFactory {
                         original
                     } else kr.ac.snu.hcil.omnitrack.ui.pages.trigger.TimeTriggerConfigurationPanel(context)
                     return configPanel
+                }
+
+                override fun connectViewModelToDisplayView(viewModel: ATriggerConditionViewModel, displayView: View, outSubscription: CompositeDisposable) {
+                    if (viewModel is TimeConditionViewModel && displayView is TimeTriggerDisplayView) {
+                        outSubscription.add(
+                                viewModel.nextAlarmTime.observeOn(AndroidSchedulers.mainThread()).subscribe { nextAlarmTime ->
+                                    displayView.nextTriggerTime = nextAlarmTime.datum
+                                }
+                        )
+                    }
                 }
 
             })

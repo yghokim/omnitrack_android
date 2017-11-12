@@ -13,6 +13,7 @@ import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerSystemManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTTriggerAction
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.ATriggerCondition
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.OTTriggerViewFactory
 import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.utils.executeTransactionAsObservable
 import kr.ac.snu.hcil.omnitrack.utils.onNextIfDifferAndNotNull
@@ -22,7 +23,7 @@ import javax.inject.Inject
 /**
  * Created by younghokim on 2017. 10. 24..
  */
-open class TriggerViewModel(app: OTApp, val dao: OTTriggerDAO, val realm: Realm) : IReadonlyObjectId, RealmChangeListener<OTTriggerDAO>, OrderedRealmCollectionChangeListener<RealmResults<OTTrackerDAO>> {
+open class TriggerViewModel(val app: OTApp, val dao: OTTriggerDAO, val realm: Realm) : IReadonlyObjectId, RealmChangeListener<OTTriggerDAO>, OrderedRealmCollectionChangeListener<RealmResults<OTTrackerDAO>> {
 
     @Inject
     protected lateinit var syncManager: OTSyncManager
@@ -51,6 +52,14 @@ open class TriggerViewModel(app: OTApp, val dao: OTTriggerDAO, val realm: Realm)
     val attachedTrackers = BehaviorSubject.createDefault<List<OTTrackerDAO.SimpleTrackerInfo>>(currentAttachedTrackerInfoList)
 
 
+    private var currentConditionViewModel: ATriggerConditionViewModel? = null
+        set(value) {
+            if (field != value) {
+                field?.onDispose()
+                field = value
+            }
+        }
+
     init {
         app.applicationComponent.inject(this)
 
@@ -63,10 +72,24 @@ open class TriggerViewModel(app: OTApp, val dao: OTTriggerDAO, val realm: Realm)
         }
     }
 
+    fun getConditionViewModel(): ATriggerConditionViewModel? {
+        return currentConditionViewModel
+    }
+
+    fun onFired(triggerTime: Long) {
+        println("trigger fired at ${triggerTime}")
+        currentConditionViewModel?.afterTriggerFired(triggerTime)
+    }
+
     private fun applyDaoToFront() {
         dao.initialize(true)
         triggerActionType.onNext(dao.actionType)
         dao.action?.let { triggerAction.onNext(it) }
+        if (currentConditionViewModel?.conditionType != dao.conditionType) {
+            currentConditionViewModel = OTTriggerViewFactory.getConditionViewProvider(dao.conditionType)?.getTriggerConditionViewModel(dao, app)
+        }
+        currentConditionViewModel?.refreshDaoToFront(dao)
+
         triggerConditionType.onNext(dao.conditionType)
         dao.condition?.let { triggerCondition.onNext(it) }
 
@@ -192,6 +215,7 @@ open class TriggerViewModel(app: OTApp, val dao: OTTriggerDAO, val realm: Realm)
     fun unregister() {
         dao.removeChangeListener(this)
         attachedTrackersRealmResults?.removeChangeListener(this)
+        currentConditionViewModel?.onDispose()
     }
 
 }

@@ -1,6 +1,8 @@
 package kr.ac.snu.hcil.omnitrack.core.database.local.models
 
 import android.content.Context
+import android.content.Intent
+import android.support.v4.content.LocalBroadcastManager
 import io.reactivex.Completable
 import io.realm.RealmList
 import io.realm.RealmObject
@@ -8,12 +10,14 @@ import io.realm.RealmQuery
 import io.realm.annotations.Ignore
 import io.realm.annotations.Index
 import io.realm.annotations.PrimaryKey
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTBackgroundLoggingTriggerAction
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTNotificationTriggerAction
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTTriggerAction
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.ATriggerCondition
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTTimeTriggerCondition
+import org.jetbrains.anko.runOnUiThread
 
 /**
  * Created by Young-Ho on 10/9/2017.
@@ -196,6 +200,15 @@ open class OTTriggerDAO : RealmObject() {
     }
 
     fun performFire(triggerTime: Long, context: Context): Completable {
-        return action?.performAction(triggerTime, context) ?: Completable.error(IllegalStateException("Not proper action instance is generated."))
+        val triggerId = objectId
+        return (action?.performAction(triggerTime, context) ?: Completable.error(IllegalStateException("Not proper action instance is generated.")))
+                .doOnComplete {
+                    context.runOnUiThread {
+                        LocalBroadcastManager.getInstance(context).sendBroadcastSync(Intent(OTApp.BROADCAST_ACTION_TRIGGER_FIRED)
+                                .putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRIGGER, triggerId)
+                                .putExtra(OTApp.INTENT_EXTRA_TRIGGER_TIME, triggerTime)
+                        )
+                    }
+                }
     }
 }

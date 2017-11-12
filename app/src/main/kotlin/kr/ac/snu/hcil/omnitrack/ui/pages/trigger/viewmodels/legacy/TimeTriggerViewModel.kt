@@ -25,7 +25,7 @@ class TimeTriggerViewModel(trigger: OTTimeTrigger) : TriggerViewModel<OTTimeTrig
     override fun register() {
         super.register()
 
-        nextAlarmTime.onNext(OTApp.instance.triggerAlarmManager.getNearestAlarmTime(trigger.objectId, System.currentTimeMillis())!!)
+        //nextAlarmTime.onNext(OTApp.instance.triggerAlarmManager.getNearestAlarmTime(trigger.objectId, System.currentTimeMillis())!!)
 
         subscriptions.add(
                 trigger.switchTurned.subscribe {
