@@ -13,5 +13,5 @@ abstract class OTTriggerAction {
 
     abstract fun performAction(triggerTime: Long, context: Context): Completable
 
-    abstract fun getSerializedString(): String?
+    abstract fun getSerializedString(): String
 }

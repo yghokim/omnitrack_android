@@ -50,7 +50,7 @@ class OTNotificationTriggerAction : OTTriggerAction() {
 
     }
 
-    override fun getSerializedString(): String? {
+    override fun getSerializedString(): String {
         return parser.toJson(this, OTNotificationTriggerAction::class.java)
     }
 

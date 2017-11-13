@@ -1,6 +1,5 @@
 package kr.ac.snu.hcil.omnitrack.services
 
-import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
@@ -28,21 +27,26 @@ import javax.inject.Provider
 /**
  * Created by Young-Ho on 10/17/2017.
  */
-class OTItemLoggingService : Service() {
+class OTItemLoggingService : WakefulService(TAG) {
 
     companion object {
+
+        const val TAG = "OTItemLoggingService"
+
         private const val ACTION_LOG = "${BuildConfig.APPLICATION_ID}.services.action.LOG"
         private const val ACTION_REMOVE_ITEM = "${BuildConfig.APPLICATION_ID}.services.action.REMOVE_ITEM"
         private const val INTENT_EXTRA_LOGGING_SOURCE = "loggingSource"
+        private const val INTENT_EXTRA_NOTIFY = "notify"
 
         private const val NOTIFICATION_FOREGROUND_ID = 3123
         private const val NOTIFICATION_TAG = "${BuildConfig.APPLICATION_ID}.notification.tag.ITEM_LOGGING_SERVICE"
         private val notificationIdSeed = AtomicInteger(0)
 
-        fun makeLoggingIntent(context: Context, loggingSource: ItemLoggingSource, vararg trackerIds: String): Intent {
+        fun makeLoggingIntent(context: Context, loggingSource: ItemLoggingSource, notify: Boolean, vararg trackerIds: String): Intent {
             return Intent(context, OTItemLoggingService::class.java).apply {
                 this.action = ACTION_LOG
                 this.putExtra(INTENT_EXTRA_LOGGING_SOURCE, loggingSource.name)
+                this.putExtra(INTENT_EXTRA_NOTIFY, notify)
                 this.putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER_ARRAY, trackerIds)
             }
         }
@@ -81,10 +85,9 @@ class OTItemLoggingService : Service() {
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         subscriptions.clear()
         realm.close()
-        println("ItemLoggingService onDestroy")
+        super.onDestroy()
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int =
@@ -97,6 +100,7 @@ class OTItemLoggingService : Service() {
     private fun handleLogAction(intent: Intent, startId: Int): Int {
         val trackerIds = intent.getStringArrayExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER_ARRAY)
         val loggingSource = ItemLoggingSource.valueOf(intent.getStringExtra(INTENT_EXTRA_LOGGING_SOURCE))
+        val notify = intent.getBooleanExtra(INTENT_EXTRA_NOTIFY, true)
         if (trackerIds?.size ?: 0 >= 1) // intent contains one or more trackers
         {
             val singles = trackerIds.mapNotNull { trackerId ->
@@ -149,10 +153,12 @@ class OTItemLoggingService : Service() {
 
                                 syncManager.registerSyncQueue(ESyncDataType.ITEM, SyncDirection.UPLOAD)
 
-                                this.runOnUiThread {
-                                    val builder = OTTrackingNotificationFactory.makeLoggingSuccessNotificationBuilder(this, trackerId, trackerName, itemId!!, System.currentTimeMillis(), table, notificationId, NOTIFICATION_TAG)
+                                if (notify) {
+                                    this.runOnUiThread {
+                                        val successfulNotiBuilder = OTTrackingNotificationFactory.makeLoggingSuccessNotificationBuilder(this, trackerId, trackerName, itemId!!, System.currentTimeMillis(), table, notificationId, NOTIFICATION_TAG)
 
-                                    this.notificationManager.notify(kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService.NOTIFICATION_TAG, notificationId, builder.build())
+                                        this.notificationManager.notify(kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService.NOTIFICATION_TAG, notificationId, successfulNotiBuilder.build())
+                                    }
                                 }
                             } else {
                                 OTTaskNotificationManager.dismissNotification(this, notificationId, kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService.NOTIFICATION_TAG)

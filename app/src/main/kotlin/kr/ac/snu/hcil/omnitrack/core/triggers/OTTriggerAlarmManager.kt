@@ -20,6 +20,7 @@ import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTTimeTriggerCondition
 import kr.ac.snu.hcil.omnitrack.receivers.TimeTriggerAlarmReceiver
 import kr.ac.snu.hcil.omnitrack.utils.ConcurrentUniqueLongGenerator
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
+import kr.ac.snu.hcil.omnitrack.utils.executeTransactionIfNotIn
 import kr.ac.snu.hcil.omnitrack.utils.time.DesignatedTimeScheduleCalculator
 import kr.ac.snu.hcil.omnitrack.utils.time.IntervalTimeScheduleCalculator
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
@@ -114,7 +115,7 @@ class OTTriggerAlarmManager(val context: Context, val realmProvider: Provider<Re
             return true
         } else {
             realmProvider.get().use { realm ->
-                realm.executeTransaction {
+                realm.executeTransactionIfNotIn {
                     trigger.isOn = false
                 }
             }
@@ -146,7 +147,7 @@ class OTTriggerAlarmManager(val context: Context, val realmProvider: Provider<Re
                                         }
                                     } else {
                                         OTApp.logger.writeSystemLog("This schedule is oneshot. turn off the trigger.", TAG)
-                                        realm.executeTransaction {
+                                        realm.executeTransactionIfNotIn {
                                             trigger.isOn = false
                                         }
                                     }
@@ -185,7 +186,7 @@ class OTTriggerAlarmManager(val context: Context, val realmProvider: Provider<Re
 
         var result: OTTriggerAlarmInstance.AlarmInfo? = null
         realmProvider.get().use { realm ->
-            realm.executeTransaction {
+            realm.executeTransactionIfNotIn {
                 val schedule = realm.createObject(OTTriggerSchedule::class.java, scheduleIdGenerator.getNewUniqueLong()).apply {
                     this.trigger = trigger
                     this.intrinsicAlarmTime = alarmTime
@@ -247,7 +248,7 @@ class OTTriggerAlarmManager(val context: Context, val realmProvider: Provider<Re
         println("canceling trigger - found ${pendingTriggerSchedules.size} pending schedules.")
 
         if (pendingTriggerSchedules.isNotEmpty()) {
-            realm.executeTransaction { realm ->
+            realm.executeTransactionIfNotIn { realm ->
                 pendingTriggerSchedules.forEach { schedule ->
                     val parent = schedule.parentAlarm
                     schedule.parentAlarm = null
@@ -317,7 +318,7 @@ class OTTriggerAlarmManager(val context: Context, val realmProvider: Provider<Re
                     .findFirst()
 
             if (alarmInstance != null) {
-                realm.executeTransaction {
+                realm.executeTransactionIfNotIn {
                     alarmInstance.triggerSchedules?.forEach { schedule ->
                         schedule.fired = true
                         schedule.skipped = false
