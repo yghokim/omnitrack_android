@@ -204,10 +204,7 @@ class OTTriggerAlarmManager(val context: Context, val realmProvider: Provider<Re
                 * s: false, f: false
                 *
                 * */
-                    val newAlarmId = (realm.where(OTTriggerAlarmInstance::class.java)
-                            .equalTo(OTTriggerAlarmInstance.FIELD_SKIPPED, false)
-                            .equalTo(OTTriggerAlarmInstance.FIELD_FIRED, false)
-                            .max("alarmId") ?: 0).toInt() + 1
+                    val newAlarmId = System.currentTimeMillis().toInt()
                     val alarmInstance = realm.createObject(OTTriggerAlarmInstance::class.java, alarmDbIdGenerator.getNewUniqueLong())
                     alarmInstance.alarmId = newAlarmId
 
@@ -360,23 +357,6 @@ class OTTriggerAlarmManager(val context: Context, val realmProvider: Provider<Re
             }
         }
         return false
-    }
-
-    fun isAlarmRegistered(pivot: Long?, trigger: OTTriggerDAO): Boolean {
-        realmProvider.get().use { realm ->
-            val triggerSchedules = realm.where(OTTriggerSchedule::class.java)
-                    .equalTo(OTTriggerSchedule.FIELD_TRIGGER_ID, trigger.objectId!!)
-                    .findAll()
-
-
-            if (triggerSchedules.isEmpty()) {
-                return false
-            } else {
-                val nextAlarmTime = calculateNextAlarmTime(pivot, trigger.condition as OTTimeTriggerCondition)
-                return triggerSchedules.where().equalTo(OTTriggerSchedule.FIELD_INTRINSIC_ALARM_TIME, nextAlarmTime)
-                        .findAll().isNotEmpty()
-            }
-        }
     }
 
 

@@ -178,9 +178,9 @@ dependencies {
     kapt 'com.github.bumptech.glide:compiler:4.3.1'
     implementation 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.4@aar'
     implementation 'com.wonderkiln:camerakit:0.12.0'
-    implementation 'com.github.mukeshsolanki:country-picker-android:1.1.9'
+    implementation 'com.github.mukeshsolanki:country-picker-android:1.2.0'
     implementation 'com.patloew.rxlocation:rxlocation:1.0.3'
-    implementation 'uk.co.samuelwall:material-tap-target-prompt:2.3.0'
+    implementation 'uk.co.samuelwall:material-tap-target-prompt:2.4.0'
     implementation 'com.wdullaer:materialdatetimepicker:3.4.0'
     implementation 'com.jakewharton.threetenabp:threetenabp:1.0.5'
 

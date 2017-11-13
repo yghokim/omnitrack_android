@@ -80,6 +80,11 @@ class RealmDatabaseManager @Inject constructor(
         return realm.where(OTTrackerDAO::class.java).equalTo(FIELD_OBJECT_ID, objectId).equalTo(FIELD_REMOVED_BOOLEAN, false)
     }
 
+    fun getTriggerQueryWithId(objectId: String, realm: Realm): RealmQuery<OTTriggerDAO> {
+        return realm.where(OTTriggerDAO::class.java).equalTo(FIELD_OBJECT_ID, objectId).equalTo(FIELD_REMOVED_BOOLEAN, false)
+    }
+
+
     fun makeBookmarkedTrackersQuery(userId: String, realm: Realm): RealmQuery<OTTrackerDAO>
             = realm.where(OTTrackerDAO::class.java).equalTo(FIELD_REMOVED_BOOLEAN, false).equalTo(FIELD_USER_ID, userId).equalTo("isBookmarked", true)
 

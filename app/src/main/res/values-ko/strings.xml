@@ -79,6 +79,7 @@
 
     <string name="msg_trigger_remove_confirm">트리거를 삭제하면 다시 되돌릴 수 없습니다. 정말 삭제하시겠습니까?</string>
 
+    <string name="msg_format_reminder_noti_title">%1$s 트래커를 기록하세요.</string>
 
     <string name="msg_clear_form">초기화</string>
 

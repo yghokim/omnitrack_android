@@ -164,7 +164,7 @@ class TimeTriggerAlarmReceiver : BroadcastReceiver() {
 
                         println("every trigger was done. finish the wakeup")
 
-                        OTNotificationTriggerAction.notifyPopupQueue(this)
+                        OTReminderAction.notifyPopupQueue(this)
                     }
                 } else {
                     Observable.just(null)

@@ -19,7 +19,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
 import kr.ac.snu.hcil.omnitrack.core.di.*
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
-import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerAlarmManager
 import kr.ac.snu.hcil.omnitrack.utils.LocaleHelper
 import org.jetbrains.anko.telephonyManager
 import rx_activity_result2.RxActivityResult
@@ -180,6 +179,10 @@ class OTApp : MultiDexApplication() {
         ScheduledJobModule()
     }
 
+    private val networkModule: NetworkModule by lazy {
+        NetworkModule(this)
+    }
+
     private val synchronizationModule: SynchronizationModule by lazy {
         SynchronizationModule()
     }
@@ -196,10 +199,11 @@ class OTApp : MultiDexApplication() {
         DaggerApplicationComponent.builder()
                 .applicationModule(appModule)
                 .authModule(authModule)
-                .networkModule(NetworkModule(this))
+                .networkModule(networkModule)
                 .backendDatabaseModule(backendDatabaseModule)
                 .scheduledJobModule(scheduledJobModule)
                 .triggerSystemModule(triggerSystemModule)
+                .synchronizationModule(synchronizationModule)
                 .informationHelpersModule(InformationHelpersModule())
                 .build()
     }
@@ -209,6 +213,7 @@ class OTApp : MultiDexApplication() {
                 .applicationModule(appModule)
                 .daoSerializationModule(daoSerializationModule)
                 .backendDatabaseModule(backendDatabaseModule)
+                .triggerSystemModule(triggerSystemModule)
                 .build()
     }
 
@@ -224,6 +229,9 @@ class OTApp : MultiDexApplication() {
                 .applicationModule(appModule)
                 .backendDatabaseModule(backendDatabaseModule)
                 .triggerSystemModule(triggerSystemModule)
+                .networkModule(networkModule)
+                .daoSerializationModule(daoSerializationModule)
+                .authModule(authModule)
                 .build()
     }
 
@@ -234,9 +242,6 @@ class OTApp : MultiDexApplication() {
     val googleApiKey: String by lazy {
         this.resources.getString(R.string.google_maps_key)
     }
-
-    lateinit var triggerAlarmManager: OTTriggerAlarmManager
-        private set
 
     override fun attachBaseContext(base: Context) {
         LocaleHelper.init(base)
