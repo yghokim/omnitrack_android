@@ -13,7 +13,7 @@ import io.realm.annotations.PrimaryKey
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTBackgroundLoggingTriggerAction
-import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTNotificationTriggerAction
+import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTReminderAction
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTTriggerAction
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.ATriggerCondition
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTTimeTriggerCondition
@@ -114,13 +114,13 @@ open class OTTriggerDAO : RealmObject() {
                 _action = if (serializedAction == null) {
                     when (actionType) {
                         ACTION_TYPE_LOG -> OTBackgroundLoggingTriggerAction().apply { trigger = this@OTTriggerDAO }
-                        ACTION_TYPE_REMIND -> OTNotificationTriggerAction().apply { trigger = this@OTTriggerDAO }
+                        ACTION_TYPE_REMIND -> OTReminderAction().apply { trigger = this@OTTriggerDAO }
                         else -> null
                     }
                 } else {
                     when (actionType) {
-                        ACTION_TYPE_LOG -> OTBackgroundLoggingTriggerAction.typeAdapter.fromJson(serializedAction!!).apply { trigger = this@OTTriggerDAO }
-                        ACTION_TYPE_REMIND -> OTNotificationTriggerAction.parser.fromJson(serializedAction, OTNotificationTriggerAction::class.java).apply { trigger = this@OTTriggerDAO }
+                        ACTION_TYPE_LOG -> OTBackgroundLoggingTriggerAction.typeAdapter.fromJson(serializedAction).apply { trigger = this@OTTriggerDAO }
+                        ACTION_TYPE_REMIND -> OTReminderAction.typeAdapter.fromJson(serializedAction).apply { trigger = this@OTTriggerDAO }
                         else -> null
                     }
                 }
@@ -145,7 +145,12 @@ open class OTTriggerDAO : RealmObject() {
     var trackers = RealmList<OTTrackerDAO>()
 
     val liveTrackersQuery: RealmQuery<OTTrackerDAO> get() = trackers.where().equalTo(RealmDatabaseManager.FIELD_REMOVED_BOOLEAN, false)
-    val liveTrackerCount: Int get() = trackers.filter { it.removed == false }.size
+    val liveTrackerCount: Int
+        get() {
+            return if (this.isManaged) {
+                liveTrackersQuery.findAll().count()
+            } else trackers.filter { !it.removed }.size
+        }
 
     var synchronizedAt: Long? = null
     var removed: Boolean = false

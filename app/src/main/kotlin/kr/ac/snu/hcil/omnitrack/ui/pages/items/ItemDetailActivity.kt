@@ -25,6 +25,7 @@ import io.reactivex.disposables.CompositeDisposable
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
+import kr.ac.snu.hcil.omnitrack.services.OTReminderService
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LoadingIndicatorBar
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
@@ -308,9 +309,10 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
                         viewModel.applyEditingToDatabase()
                     }
                 }.subscribe({ result ->
-                        viewModel.clearHistory()
+                    viewModel.clearHistory()
+                    startService(OTReminderService.makeUserLoggedIntent(this, viewModel.trackerDao?.objectId!!, System.currentTimeMillis()))
                     setResult(RESULT_OK, Intent().putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM, result))
-                        finish()
+                    finish()
                 }, { ex ->
                     if (ex is RequiredFieldsNotCompleteException) {
                         val incompleteFields = currentAttributeViewModelList.mapIndexed { index, attributeInputViewModel -> Pair(index, attributeInputViewModel) }.filter { ex.inCompleteFieldLocalIds.contains(it.second.attributeLocalId) }

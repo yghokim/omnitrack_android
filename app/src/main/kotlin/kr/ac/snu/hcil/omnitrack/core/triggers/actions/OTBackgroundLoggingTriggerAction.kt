@@ -49,9 +49,13 @@ class OTBackgroundLoggingTriggerAction : OTTriggerAction() {
 
     override fun performAction(triggerTime: Long, context: Context): Completable {
         return Completable.defer {
-            if (trigger.trackers.isNotEmpty()) {
+            if (trigger.liveTrackerCount > 0) {
                 context.startService(
-                        OTItemLoggingService.makeLoggingIntent(context, ItemLoggingSource.Trigger, notify, *(trigger.trackers.map { it.objectId!! }.toTypedArray()))
+                        OTItemLoggingService
+                                .makeLoggingIntent(context,
+                                        ItemLoggingSource.Trigger,
+                                        notify,
+                                        *(trigger.liveTrackersQuery.findAll().map { it.objectId!! }.toTypedArray()))
                 )
             }
             Completable.complete()

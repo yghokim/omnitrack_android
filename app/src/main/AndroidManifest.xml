@@ -186,6 +186,7 @@
         <service
             android:name=".services.OTItemLoggingService"
             android:exported="false" />
+        <service android:name=".services.OTReminderService" />
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"

@@ -17,7 +17,7 @@ import android.widget.TextView
 import com.afollestad.materialdialogs.MaterialDialog
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
-import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTNotificationTriggerAction
+import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTReminderAction
 import kr.ac.snu.hcil.omnitrack.ui.components.common.StringIndicatorPropertyView
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.ITriggerConfigurationCoordinator
 import kr.ac.snu.hcil.omnitrack.utils.dipRound
@@ -31,7 +31,7 @@ class NotificationSettingsPanelView : StringIndicatorPropertyView, ITriggerConfi
         const val REQUEST_CODE = 20
     }
 
-    private var selectedNotificationLevel: OTNotificationTriggerAction.NotificationLevel = OTNotificationTriggerAction.NotificationLevel.Noti
+    private var selectedNotificationLevel: OTReminderAction.NotificationLevel = OTReminderAction.NotificationLevel.Noti
         set(value) {
             if (field != value) {
                 field = value
@@ -48,7 +48,7 @@ class NotificationSettingsPanelView : StringIndicatorPropertyView, ITriggerConfi
 
     init {
         title = resources.getString(R.string.msg_notification_level)
-        indicator = resources.getString(OTNotificationTriggerAction.NotificationLevel.Noti.nameRes)
+        indicator = resources.getString(OTReminderAction.NotificationLevel.Noti.nameRes)
         setOnClickListener(this)
     }
 
@@ -63,7 +63,7 @@ class NotificationSettingsPanelView : StringIndicatorPropertyView, ITriggerConfi
 
 
     override fun applyConfigurationToTrigger(trigger: OTTrigger) {
-        val action = trigger.triggerAction as? OTNotificationTriggerAction
+        val action = trigger.triggerAction as? OTReminderAction
         if (action != null) {
             if (overrideAllDevices) {
                 action.intrinsicNotificationLevel = selectedNotificationLevel
@@ -84,7 +84,7 @@ class NotificationSettingsPanelView : StringIndicatorPropertyView, ITriggerConfi
     }
 
     override fun importTriggerConfiguration(trigger: OTTrigger) {
-        val action = trigger.triggerAction as? OTNotificationTriggerAction
+        val action = trigger.triggerAction as? OTReminderAction
         if (action != null) {
             val localLevel = action.localNotificationLevel
             if (localLevel != null) {
@@ -128,7 +128,7 @@ class NotificationSettingsPanelView : StringIndicatorPropertyView, ITriggerConfi
                 .negativeText(R.string.msg_cancel)
                 .onPositive {
                     dialog, a ->
-                    selectedNotificationLevel = OTNotificationTriggerAction.NotificationLevel.values()[adapter.selectedLevelIndex]
+                    selectedNotificationLevel = OTReminderAction.NotificationLevel.values()[adapter.selectedLevelIndex]
                     overrideAllDevices = syncToServerCheckBox.isChecked
                 }
                 .build()
@@ -138,11 +138,11 @@ class NotificationSettingsPanelView : StringIndicatorPropertyView, ITriggerConfi
     inner class LevelAdapter(internal var selectedLevelIndex: Int) : RecyclerView.Adapter<LevelAdapter.ViewHolder>() {
 
         override fun getItemCount(): Int {
-            return OTNotificationTriggerAction.NotificationLevel.values().size
+            return OTReminderAction.NotificationLevel.values().size
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.bind(OTNotificationTriggerAction.NotificationLevel.values()[position])
+            holder.bind(OTReminderAction.NotificationLevel.values()[position])
             holder.isSelected = selectedLevelIndex == position
         }
 
@@ -169,7 +169,7 @@ class NotificationSettingsPanelView : StringIndicatorPropertyView, ITriggerConfi
                     }
                 }
 
-            fun bind(level: OTNotificationTriggerAction.NotificationLevel) {
+            fun bind(level: OTReminderAction.NotificationLevel) {
                 thumbnailView.setImageResource(level.thumbnailRes)
                 titleView.setText(level.nameRes)
                 descView.setText(level.descRes)
