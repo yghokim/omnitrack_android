@@ -113,13 +113,13 @@ open class OTTriggerDAO : RealmObject() {
             if (_action == null) {
                 _action = if (serializedAction == null) {
                     when (actionType) {
-                        ACTION_TYPE_LOG -> OTBackgroundLoggingTriggerAction(this)
+                        ACTION_TYPE_LOG -> OTBackgroundLoggingTriggerAction().apply { trigger = this@OTTriggerDAO }
                         ACTION_TYPE_REMIND -> OTNotificationTriggerAction().apply { trigger = this@OTTriggerDAO }
                         else -> null
                     }
                 } else {
                     when (actionType) {
-                        ACTION_TYPE_LOG -> OTBackgroundLoggingTriggerAction(this)
+                        ACTION_TYPE_LOG -> OTBackgroundLoggingTriggerAction.typeAdapter.fromJson(serializedAction!!).apply { trigger = this@OTTriggerDAO }
                         ACTION_TYPE_REMIND -> OTNotificationTriggerAction.parser.fromJson(serializedAction, OTNotificationTriggerAction::class.java).apply { trigger = this@OTTriggerDAO }
                         else -> null
                     }

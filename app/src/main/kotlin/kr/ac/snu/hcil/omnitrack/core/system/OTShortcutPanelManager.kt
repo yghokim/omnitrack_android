@@ -111,7 +111,7 @@ class OTShortcutPanelManager @Inject constructor(
                     element.setViewVisibility(R.id.ui_background_image, View.INVISIBLE)
                 }
 
-                val instantLoggingIntent = PendingIntent.getService(context, i, OTItemLoggingService.makeLoggingIntent(context, ItemLoggingSource.Shortcut, trackers[i].objectId!!), PendingIntent.FLAG_UPDATE_CURRENT)
+                val instantLoggingIntent = PendingIntent.getService(context, i, OTItemLoggingService.makeLoggingIntent(context, ItemLoggingSource.Shortcut, true, trackers[i].objectId!!), PendingIntent.FLAG_UPDATE_CURRENT)
                 val openItemActivityIntent = PendingIntent.getActivity(context, i, ItemDetailActivity.makeNewItemPageIntent(trackers[i].objectId!!, context), PendingIntent.FLAG_UPDATE_CURRENT)
 
                 element.setOnClickPendingIntent(R.id.ui_button_instant, instantLoggingIntent)
