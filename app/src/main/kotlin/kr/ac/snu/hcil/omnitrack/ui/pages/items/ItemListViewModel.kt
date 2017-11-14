@@ -11,6 +11,7 @@ import io.realm.Sort
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
+import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
@@ -194,11 +195,20 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
 
         fun setValueOf(attributeLocalId: String, serializedValue: String?) {
             realm.executeTransaction {
+                itemDao.synchronizedAt = null
                 itemDao.setValueOf(attributeLocalId, serializedValue)
             }
         }
 
-        fun save(vararg changedLocalIds: String): Single<Pair<Int, String?>> =
-                dbManager.get().saveItemObservable(itemDao, false, changedLocalIds.toList().toTypedArray(), realm)
+        fun save(vararg changedLocalIds: String): Single<Pair<Int, String?>> {
+
+            return dbManager.get().saveItemObservable(itemDao, false, changedLocalIds.toList().toTypedArray(), realm)
+                    .doAfterSuccess { (resultCode, _) ->
+                        if (resultCode != RealmDatabaseManager.SAVE_RESULT_FAIL) {
+                            syncManager.registerSyncQueue(ESyncDataType.ITEM, SyncDirection.UPLOAD)
+                        }
+                    }
+        }
+
     }
 }
