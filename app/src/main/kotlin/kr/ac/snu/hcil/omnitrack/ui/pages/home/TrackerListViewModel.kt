@@ -168,7 +168,7 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
 
         val attributesResult: RealmResults<OTAttributeDAO> = trackerDao.makeAttributesQuery(false, false).findAllAsync()
         val trackerItemsResult: RealmResults<OTItemDAO> = dbManager.makeItemsQuery(trackerDao.objectId, null, null, realm).findAllAsync()
-        val todayItemsResult: RealmResults<OTItemDAO> = dbManager.makeItemsQueryOfToday(trackerDao.objectId, realm).findAllAsync()
+        val todayItemsResult: RealmResults<OTItemDAO> = dbManager.makeItemsQueryOfTheDay(trackerDao.objectId, realm).findAllAsync()
 
         private val currentAttributeValidationResultDict = Hashtable<String, Pair<Boolean, CharSequence?>>()
 
