@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.TextView
 import kotlinx.android.synthetic.main.activity_trigger_detail.*
 import kotlinx.android.synthetic.main.layout_tracker_assign_panel.view.*
 import kr.ac.snu.hcil.omnitrack.OTApp
@@ -15,6 +16,9 @@ import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.TriggerInterfaceOptions
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
+import kr.ac.snu.hcil.omnitrack.utils.Nullable
+import kr.ac.snu.hcil.omnitrack.utils.onNextIfDifferAndNotNull
+import org.jetbrains.anko.sdk25.coroutines.onFocusChange
 
 /**
  * Created by younghokim on 2017-10-24.
@@ -63,6 +67,11 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
         super.onCreate(savedInstanceState)
 
         setActionBarButtonMode(Mode.ApplyCancel)
+
+        ui_script_form.onFocusChange { v, hasFocus ->
+            if (!hasFocus)
+                viewModel.script.onNextIfDifferAndNotNull(Nullable(ui_script_form.text.toString().let { if (it.isBlank()) null else it }))
+        }
 
         creationSubscriptions.add(
                 signedInUserObservable.subscribe { userId ->
@@ -144,6 +153,22 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
                     }
                 },
 
+                viewModel.useScript.subscribe { uses ->
+                    ui_use_script_property_view.value = uses
+                    ui_script_form.isEnabled = uses
+                },
+
+                viewModel.script.subscribe { (scriptText) ->
+                    val text = scriptText ?: ""
+                    if (!ui_script_form.text.toString().trim().equals(text)) {
+                        ui_script_form.setText(text, TextView.BufferType.EDITABLE)
+                    }
+                },
+
+                ui_use_script_property_view.valueChanged.observable.subscribe { (sender, uses) ->
+                    viewModel.useScript.onNextIfDifferAndNotNull(uses)
+                },
+
                 viewModel.attachedTrackers.subscribe { trackerInfos ->
                     trackerAssignPanel?.init(trackerInfos)
                 }
@@ -151,6 +176,7 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
     }
 
     override fun onToolbarLeftButtonClicked() {
+        ui_script_form.clearFocus()
         if (viewModel.isDirty) {
             val isEditMode = viewModel.viewModelMode.value == TriggerDetailViewModel.MODE_EDIT
             val actionNameId = OTTriggerInformationHelper.getActionNameResId(viewModel.actionType.value) ?: R.string.msg_text_trigger
@@ -184,6 +210,7 @@ class TriggerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tri
     }
 
     override fun onToolbarRightButtonClicked() {
+        ui_script_form.clearFocus()
         val errorMessages = viewModel.validateConfiguration()
         if (errorMessages == null) {
             viewModel.saveFrontToDao()

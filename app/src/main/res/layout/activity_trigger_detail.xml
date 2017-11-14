@@ -39,6 +39,34 @@
             android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
+            <kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.BooleanPropertyView
+                android:id="@+id/ui_use_script_property_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingEnd="@dimen/activity_horizontal_margin"
+                android:paddingStart="@dimen/activity_horizontal_margin"
+                android:text="@string/msg_use_validation_script" />
+
+            <EditText
+                android:id="@+id/ui_script_form"
+                style="@style/LongTextInputStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:background="@drawable/background_dark_code_form"
+                android:enabled="false"
+                android:fontFamily="monospace"
+                android:hint="Write script code here"
+                android:minLines="1"
+                android:text=""
+                android:textColor="@color/color_text_code_form"
+                android:textColorHint="#80ffffff"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <View style="@style/HorizontalSeparator" />
+
             <FrameLayout
                 android:id="@+id/ui_action_settings_container"
                 android:layout_width="match_parent"

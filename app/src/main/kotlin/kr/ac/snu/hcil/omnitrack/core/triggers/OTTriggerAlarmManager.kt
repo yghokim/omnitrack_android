@@ -100,7 +100,6 @@ class OTTriggerAlarmManager(val context: Context, val realmProvider: Provider<Re
     private fun retrieveTimeCondition(trigger: OTTriggerDAO): OTTimeTriggerCondition {
         return when (trigger.conditionType) {
             OTTriggerDAO.CONDITION_TYPE_TIME -> trigger.condition as OTTimeTriggerCondition
-            OTTriggerDAO.CONDITION_TYPE_ITEM -> TODO("Implement item condition's time condition extraction")
             else -> throw Exception("Unsupported time condition trigger.")
         }
     }
@@ -157,12 +156,9 @@ class OTTriggerAlarmManager(val context: Context, val realmProvider: Provider<Re
                                             //simple alarm. fire
 
                                             OTApp.logger.writeSystemLog("Fire time trigger. schedule id: ${schedule.id}", TAG)
-                                            trigger.performFire(triggerTime, context)
-                                        }
-                                        OTTriggerDAO.CONDITION_TYPE_ITEM -> {
-                                            //check items
-                                            //TODO("Implement ItemCondition check and fire")
-                                            Completable.complete()
+                                            if (trigger.validateScriptIfExist(context)) {
+                                                trigger.performFire(triggerTime, context)
+                                            } else Completable.complete()
                                         }
                                         else -> {
                                             println("Condition type ${trigger.conditionType} is not related to alarm.")

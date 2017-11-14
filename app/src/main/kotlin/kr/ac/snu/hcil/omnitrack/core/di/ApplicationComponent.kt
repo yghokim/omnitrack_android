@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.di
 
 import android.content.SharedPreferences
+import com.udojava.evalex.Expression
 import dagger.Component
 import dagger.Lazy
 import kr.ac.snu.hcil.omnitrack.OTApp
@@ -9,6 +10,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTAudioRecordAttributeHe
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTFileInvolvedAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTImageAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
+import kr.ac.snu.hcil.omnitrack.core.calculation.expression.TodayLogCountExpression
 import kr.ac.snu.hcil.omnitrack.core.net.OTOfficialServerApiController
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.core.visualization.models.*
@@ -55,13 +57,16 @@ import javax.inject.Singleton
         DaoSerializationModule::class,
         ScheduledJobModule::class,
         SynchronizationModule::class,
-        TriggerSystemModule::class
+        TriggerSystemModule::class,
+        ScriptingModule::class
 ))
 interface ApplicationComponent {
 
     fun defaultPreferences(): SharedPreferences
 
     fun shortcutPanelManager(): Lazy<OTShortcutPanelManager>
+
+    fun getSupportedScriptFunctions(): Array<Expression.LazyFunction>
 
     fun inject(application: OTApp)
     fun inject(realmViewModel: RealmViewModel)
@@ -131,4 +136,6 @@ interface ApplicationComponent {
     fun inject(viewModel: TriggerDetailViewModel)
     fun inject(viewModel: TriggerViewModel)
     fun inject(viewModel: NewItemCreationViewModel)
+
+    fun inject(expression: TodayLogCountExpression)
 }

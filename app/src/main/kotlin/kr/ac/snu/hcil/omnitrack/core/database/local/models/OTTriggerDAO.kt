@@ -11,6 +11,7 @@ import io.realm.annotations.Ignore
 import io.realm.annotations.Index
 import io.realm.annotations.PrimaryKey
 import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.core.calculation.expression.ExpressionEvaluator
 import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTBackgroundLoggingTriggerAction
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTReminderAction
@@ -36,7 +37,6 @@ open class OTTriggerDAO : RealmObject() {
         const val CONDITION_TYPE_TIME: Byte = 0
         const val CONDITION_TYPE_DATA: Byte = 1
         const val CONDITION_TYPE_EVENT: Byte = 2
-        const val CONDITION_TYPE_ITEM: Byte = 3
 
         const val ACTION_TYPE_REMIND: Byte = 0
         const val ACTION_TYPE_LOG: Byte = 1
@@ -75,7 +75,7 @@ open class OTTriggerDAO : RealmObject() {
         get() {
             if (_condition == null) {
                 _condition = when (conditionType) {
-                    CONDITION_TYPE_TIME -> serializedCondition?.let { OTTimeTriggerCondition.parser.fromJson(it, OTTimeTriggerCondition::class.java) } ?: OTTimeTriggerCondition()
+                    CONDITION_TYPE_TIME -> serializedCondition?.let { OTTimeTriggerCondition.typeAdapter.fromJson(it) } ?: OTTimeTriggerCondition()
                     else -> null
                 }
             }
@@ -142,6 +142,9 @@ open class OTTriggerDAO : RealmObject() {
     var isOn: Boolean = false
     //=================================
 
+    var additionalScript: String? = null
+    var checkScript: Boolean = false
+
     var trackers = RealmList<OTTrackerDAO>()
 
     val liveTrackersQuery: RealmQuery<OTTrackerDAO> get() = trackers.where().equalTo(RealmDatabaseManager.FIELD_REMOVED_BOOLEAN, false)
@@ -173,6 +176,20 @@ open class OTTriggerDAO : RealmObject() {
         } else {
             saveAction()
             saveCondition()
+        }
+    }
+
+    fun validateScriptIfExist(context: Context): Boolean {
+        if (checkScript) {
+            if (additionalScript == null || additionalScript?.contentEquals("TRUE") == true) {
+                return true
+            } else {
+                //evaluate
+                val evaluator = ExpressionEvaluator(additionalScript!!, *(context.applicationContext as OTApp).applicationComponent.getSupportedScriptFunctions())
+                return evaluator.evalBoolean()
+            }
+        } else {
+            return true
         }
     }
 
