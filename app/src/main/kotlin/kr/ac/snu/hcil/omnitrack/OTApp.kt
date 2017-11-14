@@ -205,6 +205,7 @@ class OTApp : MultiDexApplication() {
                 .triggerSystemModule(triggerSystemModule)
                 .synchronizationModule(synchronizationModule)
                 .informationHelpersModule(InformationHelpersModule())
+                .scriptingModule(ScriptingModule())
                 .build()
     }
 
@@ -333,9 +334,6 @@ class OTApp : MultiDexApplication() {
 
         //TODO start service in job controller
         //startService(this.binaryUploadServiceController.makeResumeUploadIntent())
-
-
-        //OTVersionCheckService.setupServiceAlarm(this)
 
         println("creation took ${SystemClock.elapsedRealtime() - startedAt}")
     }

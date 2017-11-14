@@ -43,6 +43,12 @@ class TriggerTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>, val realmP
                 "actionType" -> dao.actionType = reader.nextInt().toByte()
                 "action", "serializedAction" -> dao.serializedAction = gson.get().fromJson<JsonObject>(reader, JsonObject::class.java).toString()
                 "condition", "serializedCondition" -> dao.serializedCondition = gson.get().fromJson<JsonObject>(reader, JsonObject::class.java).toString()
+                "script" -> if (reader.peek() == JsonToken.STRING) {
+                    dao.additionalScript = reader.nextString()
+                } else {
+                    reader.skipValue()
+                }
+                "checkScript" -> dao.checkScript = reader.nextBoolean()
                 "lastTriggeredTime" -> dao.lastTriggeredTime = reader.nextLong()
                 "lockedProperties" -> dao.serializedLockedPropertyInfo = gson.get().fromJson<JsonObject>(reader, JsonObject::class.java).toString()
                 "trackers" -> {
@@ -81,6 +87,8 @@ class TriggerTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>, val realmP
         writer.name("actionType").value(value.actionType)
         writer.name("action").jsonValue(value.serializedAction)
         writer.name("lastTriggeredTime").value(value.lastTriggeredTime)
+        writer.name("script").value(value.additionalScript)
+        writer.name("checkScript").value(value.checkScript)
         writer.name(RealmDatabaseManager.FIELD_LOCKED_PROPERTIES_SERIALIZED).jsonValue(value.serializedLockedPropertyInfo)
         writer.name(RealmDatabaseManager.FIELD_SYNCHRONIZED_AT).value(value.synchronizedAt)
         writer.name(RealmDatabaseManager.FIELD_REMOVED_BOOLEAN).value(value.removed)
@@ -161,6 +169,12 @@ class TriggerTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>, val realmP
                 }
                 "action" -> {
                     applyTo.serializedAction = json[key].toString()
+                }
+                "checkScript" -> {
+                    applyTo.checkScript = json[key]?.asBoolean ?: false
+                }
+                "script" -> {
+                    applyTo.additionalScript = json[key]?.asString
                 }
             }
         }

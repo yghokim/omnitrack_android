@@ -1,9 +1,8 @@
 package kr.ac.snu.hcil.omnitrack.core.triggers.conditions
 
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
@@ -31,7 +30,10 @@ class OTTimeTriggerCondition : ATriggerCondition(OTTriggerDAO.CONDITION_TYPE_TIM
                     "iEndHr" -> condition.intervalHourRangeEnd = reader.nextInt().toByte()
                     "repeat" -> condition.isRepeated = reader.nextBoolean()
                     "dow" -> condition.dayOfWeekFlags = reader.nextInt().toByte()
-                    "endAt" -> condition.endAt = reader.nextLong()
+                    "endAt" -> if (reader.peek() == JsonToken.STRING) {
+                        condition.endAt = reader.nextLong()
+                    } else reader.skipValue()
+                    else -> reader.skipValue()
                 }
             }
 
@@ -64,9 +66,6 @@ class OTTimeTriggerCondition : ATriggerCondition(OTTriggerDAO.CONDITION_TYPE_TIM
         const val TIME_CONDITION_INTERVAL: Byte = 1
 
         val typeAdapter: TimeTriggerConditionTypeAdapter by lazy { TimeTriggerConditionTypeAdapter() }
-        val parser: Gson by lazy {
-            GsonBuilder().registerTypeAdapter(OTTimeTriggerCondition::class.java, typeAdapter).create()
-        }
     }
 
     var timeConditionType: Byte = TIME_CONDITION_ALARM
@@ -84,9 +83,8 @@ class OTTimeTriggerCondition : ATriggerCondition(OTTriggerDAO.CONDITION_TYPE_TIM
     var dayOfWeekFlags: Byte = 0b1111111
     var endAt: Long? = null
 
-
-    override fun getSerializedString(): String? {
-        return parser.toJson(this, OTTimeTriggerCondition::class.java)
+    override fun getSerializedString(): String {
+        return typeAdapter.toJson(this)
     }
 
 

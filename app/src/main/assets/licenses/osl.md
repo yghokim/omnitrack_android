@@ -159,6 +159,11 @@ MIT license
 Copyright 2013 Christopher Jenkins<br>
 Apache 2.0 license
 
+#####EvalEx - Java Expression Evaluator
+<https://github.com/uklimaschewski/EvalEx><br>
+Copyright 2012-2017 by Udo Klimaschewski<br>
+MIT Open Source license
+
 ---
 
 ---
