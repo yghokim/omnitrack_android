@@ -47,6 +47,8 @@ open class TriggerViewModel(val app: OTApp, val dao: OTTriggerDAO, val realm: Re
 
     val configSummary: BehaviorSubject<CharSequence> = BehaviorSubject.create()
 
+    val scriptUsed = BehaviorSubject.createDefault(false)
+
     private var attachedTrackersRealmResults: RealmResults<OTTrackerDAO>? = null
     private val currentAttachedTrackerInfoList = ArrayList<OTTrackerDAO.SimpleTrackerInfo>()
     val attachedTrackers = BehaviorSubject.createDefault<List<OTTrackerDAO.SimpleTrackerInfo>>(currentAttachedTrackerInfoList)
@@ -96,7 +98,7 @@ open class TriggerViewModel(val app: OTApp, val dao: OTTriggerDAO, val realm: Re
         configIconResId.onNextIfDifferAndNotNull(OTTriggerInformationHelper.getConfigIconResId(dao))
         configDescResId.onNextIfDifferAndNotNull(OTTriggerInformationHelper.getConfigDescRestId(dao))
         configSummary.onNextIfDifferAndNotNull(OTTriggerInformationHelper.getConfigSummaryText(dao))
-
+        scriptUsed.onNextIfDifferAndNotNull(dao.checkScript && dao.additionalScript?.isNotBlank() == true)
         triggerSwitch.onNextIfDifferAndNotNull(dao.isOn)
 
         if (!dao.isManaged) {
@@ -141,6 +143,10 @@ open class TriggerViewModel(val app: OTApp, val dao: OTTriggerDAO, val realm: Re
             dao.serializedAction = newDao.serializedAction
             dao.trackers.clear()
             dao.trackers.addAll(newDao.trackers)
+
+            dao.checkScript = newDao.checkScript
+            dao.additionalScript = newDao.additionalScript
+
             applyDaoToFront()
         }
     }

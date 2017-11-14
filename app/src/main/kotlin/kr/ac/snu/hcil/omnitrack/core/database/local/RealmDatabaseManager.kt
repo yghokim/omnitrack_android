@@ -36,7 +36,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class RealmDatabaseManager @Inject constructor(
-        private val config: Configuration,
+        private val config: RealmConfiguration,
         private val authManager: OTAuthManager,
         private val shortcutPanelManager: Lazy<OTShortcutPanelManager>,
         private val serializationManager: DaoSerializationManager,
@@ -69,11 +69,7 @@ class RealmDatabaseManager @Inject constructor(
         const val SAVE_RESULT_FAIL = 0
     }
 
-    data class Configuration(
-            val fileName: String = "localDatabase"
-    )
-
-    fun makeNewRealmInstance(): Realm = Realm.getInstance(RealmConfiguration.Builder().name(config.fileName).build())
+    fun makeNewRealmInstance(): Realm = Realm.getInstance(config)
 
     val OnItemListUpdated = PublishSubject.create<String>() // trackerId
 

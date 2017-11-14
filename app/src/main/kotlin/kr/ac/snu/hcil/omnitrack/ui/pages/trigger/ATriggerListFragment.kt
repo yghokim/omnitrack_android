@@ -253,7 +253,7 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
             itemView.setOnClickListener(this)
             itemView.ui_trigger_switch.setOnClickListener(this)
             itemView.ui_trigger_switch.setOnCheckedChangeListener { sender, switched ->
-                InterfaceHelper.setViewColorFilter(itemView.ui_left, !switched, switchColorFilter, 0.65f)
+                toggleColorFilter(switched)
             }
             itemView.ui_button_remove.setOnClickListener(this)
 
@@ -325,13 +325,19 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
             subscriptions.add(
                     triggerViewModel.triggerSwitch.subscribe {
                         itemView.ui_trigger_switch.isChecked = it
-                        InterfaceHelper.setViewColorFilter(itemView.ui_left, !it, switchColorFilter, 0.65f)
+                        toggleColorFilter(it)
                     }
             )
 
             subscriptions.add(
                     triggerViewModel.attachedTrackers.subscribe { newList ->
                         refreshAttachedTrackerList(newList)
+                    }
+            )
+
+            subscriptions.add(
+                    triggerViewModel.scriptUsed.subscribe { used ->
+                        itemView.ui_script_wappen.visibility = if (used) View.VISIBLE else View.INVISIBLE
                     }
             )
 
@@ -411,6 +417,15 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
 
                 diffResult.dispatchUpdatesTo(attachedTrackerListAdapter)
             }
+        }
+
+        private fun toggleColorFilter(switchOn: Boolean) {
+            arrayOf(itemView.ui_wappen_type, itemView.ui_left, itemView.ui_script_wappen)
+                    .forEach {
+                        if (it != null) {
+                            InterfaceHelper.setViewColorFilter(it, !switchOn, switchColorFilter, 0.65f)
+                        }
+                    }
         }
 
         private fun refreshHeaderView(headerView: View) {

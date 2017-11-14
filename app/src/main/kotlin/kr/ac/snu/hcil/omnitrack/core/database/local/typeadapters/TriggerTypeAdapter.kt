@@ -49,7 +49,6 @@ class TriggerTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>, val realmP
                     reader.skipValue()
                 }
                 "checkScript" -> dao.checkScript = reader.nextBoolean()
-                "lastTriggeredTime" -> dao.lastTriggeredTime = reader.nextLong()
                 "lockedProperties" -> dao.serializedLockedPropertyInfo = gson.get().fromJson<JsonObject>(reader, JsonObject::class.java).toString()
                 "trackers" -> {
                     reader.beginArray()
@@ -86,7 +85,6 @@ class TriggerTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>, val realmP
         writer.name("condition").jsonValue(value.serializedCondition)
         writer.name("actionType").value(value.actionType)
         writer.name("action").jsonValue(value.serializedAction)
-        writer.name("lastTriggeredTime").value(value.lastTriggeredTime)
         writer.name("script").value(value.additionalScript)
         writer.name("checkScript").value(value.checkScript)
         writer.name(RealmDatabaseManager.FIELD_LOCKED_PROPERTIES_SERIALIZED).jsonValue(value.serializedLockedPropertyInfo)
