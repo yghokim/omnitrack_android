@@ -10,7 +10,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTAudioRecordAttributeHe
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTFileInvolvedAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTImageAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.calculation.expression.TodayLogCountExpression
+import kr.ac.snu.hcil.omnitrack.core.calculation.expression.expressions.RealmLazyFunction
 import kr.ac.snu.hcil.omnitrack.core.net.OTOfficialServerApiController
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.core.visualization.models.*
@@ -137,5 +137,5 @@ interface ApplicationComponent {
     fun inject(viewModel: TriggerViewModel)
     fun inject(viewModel: NewItemCreationViewModel)
 
-    fun inject(expression: TodayLogCountExpression)
+    fun inject(expression: RealmLazyFunction)
 }

@@ -17,6 +17,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels.OTItemBuilderDAO
+import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.net.ABinaryUploadService
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationClientSideAPI
@@ -165,12 +166,44 @@ class RealmDatabaseManager @Inject constructor(
                 }
     }
 
-    fun makeItemsQueryOfToday(trackerId: String?, realm: Realm): RealmQuery<OTItemDAO> {
+    fun getItemCountDuring(trackerId: String?, realm: Realm, offsetFromToday: Int = 0, overrideTimeColumnLocalId: String?): Long {
         val cal = Calendar.getInstance()
         cal.set(Calendar.HOUR_OF_DAY, 0)
         cal.set(Calendar.MINUTE, 0)
         cal.set(Calendar.SECOND, 0)
         cal.set(Calendar.MILLISECOND, 0)
+        cal.add(Calendar.DAY_OF_YEAR, offsetFromToday) // offset from today
+
+        val first = cal.timeInMillis
+
+        cal.add(Calendar.DAY_OF_YEAR, 1)
+        val second = cal.timeInMillis
+
+        if (overrideTimeColumnLocalId == null) {
+            //use timestamp column
+            return makeItemsQuery(trackerId, first, second, realm).count()
+        } else {
+            val baseQuery = makeItemsQuery(trackerId, null, null, realm)
+            return baseQuery.equalTo("fieldValueEntries.key", overrideTimeColumnLocalId)
+                    .findAll()
+                    .filter {
+                        val timeValue = it.getValueOf(overrideTimeColumnLocalId)
+                        if (timeValue is TimePoint) {
+                            return@filter timeValue.timestamp >= first && timeValue.timestamp < second
+                        } else if (timeValue is TimeSpan) {
+                            return@filter timeValue.from < second && first <= timeValue.to
+                        } else return@filter false
+                    }.count().toLong()
+        }
+    }
+
+    fun makeItemsQueryOfTheDay(trackerId: String?, realm: Realm, offsetFromToday: Int = 0): RealmQuery<OTItemDAO> {
+        val cal = Calendar.getInstance()
+        cal.set(Calendar.HOUR_OF_DAY, 0)
+        cal.set(Calendar.MINUTE, 0)
+        cal.set(Calendar.SECOND, 0)
+        cal.set(Calendar.MILLISECOND, 0)
+        cal.add(Calendar.DAY_OF_YEAR, offsetFromToday) // offset from today
 
         val first = cal.timeInMillis
 
