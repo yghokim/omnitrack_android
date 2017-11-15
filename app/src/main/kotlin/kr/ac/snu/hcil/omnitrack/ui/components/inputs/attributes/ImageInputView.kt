@@ -13,10 +13,9 @@ import android.util.AttributeSet
 import dagger.Lazy
 import gun0912.tedbottompicker.TedBottomPicker
 import io.reactivex.disposables.CompositeDisposable
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
-import kr.ac.snu.hcil.omnitrack.core.net.IBinaryDownloadAPI
+import kr.ac.snu.hcil.omnitrack.core.net.OTBinaryStorageController
 import kr.ac.snu.hcil.omnitrack.ui.components.common.ImagePicker
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.CameraPickDialogFragment
 import kr.ac.snu.hcil.omnitrack.utils.getActivity
@@ -40,7 +39,7 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
     }
 
     @Inject
-    lateinit var binaryDownloader: Lazy<IBinaryDownloadAPI>
+    lateinit var storageServerController: Lazy<OTBinaryStorageController>
 
     override val typeId: Int = VIEW_TYPE_IMAGE
 
@@ -58,7 +57,7 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
                 } else if (value?.isSynchronized == true) {
                     picker.isEnabled = false
                     subscriptions.add(
-                            binaryDownloader.get().downloadFileTo(value.serverUri.path, value.localUri).subscribe({
+                            storageServerController.get().downloadFileTo(value.serverUri.path, value.localUri).subscribe({
                                 uri ->
                                 picker.uriChanged.suspend = true
                                 picker.imageUri = uri

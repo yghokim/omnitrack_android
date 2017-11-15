@@ -12,7 +12,7 @@ import io.reactivex.disposables.CompositeDisposable
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
-import kr.ac.snu.hcil.omnitrack.core.net.IBinaryDownloadAPI
+import kr.ac.snu.hcil.omnitrack.core.net.OTBinaryStorageController
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 import javax.inject.Inject
 
@@ -58,7 +58,7 @@ class AudioItemListView : ConstraintLayout {
     private val unitView: TextView
 
     @Inject
-    lateinit var binaryDownloader: Lazy<IBinaryDownloadAPI>
+    lateinit var binaryDownloader: Lazy<OTBinaryStorageController>
 
     init {
         inflateContent(R.layout.component_audio_item_list_view, true)

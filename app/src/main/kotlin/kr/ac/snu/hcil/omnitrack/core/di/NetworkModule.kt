@@ -1,49 +1,46 @@
 package kr.ac.snu.hcil.omnitrack.core.di
 
+import android.content.Context
 import dagger.Module
 import dagger.Provides
 import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.core.database.FirebaseStorageHelper
 import kr.ac.snu.hcil.omnitrack.core.net.*
-import kr.ac.snu.hcil.omnitrack.services.OTFirebaseUploadService
 import javax.inject.Singleton
 
 /**
  * Created by younghokim on 2017-11-01.
  */
-@Module
-class NetworkModule(val app: OTApp) {
+@Module(includes = arrayOf(ApplicationModule::class))
+class NetworkModule {
 
     @Provides
     @Singleton
-    fun provideOfficialBackend(): OTOfficialServerApiController
+    fun provideOfficialServerController(app: OTApp): OTOfficialServerApiController
     {
         return OTOfficialServerApiController(app)
     }
 
     @Provides
     @Singleton
-    fun provideBinaryUploadServiceController(): ABinaryUploadService.ABinaryUploadServiceController {
-        return OTFirebaseUploadService.ServiceController(app)
+    fun provideBinaryStorageController(context: Context, core: IBinaryStorageCore): OTBinaryStorageController {
+        return OTBinaryStorageController(context, core)
     }
 
     @Provides
     @Singleton
-    fun provideSynchronizationServerController(): ISynchronizationServerSideAPI {
-        return provideOfficialBackend()
+    fun provideBinaryStorageCore(): IBinaryStorageCore {
+        return OTFirebaseStorageCore()
     }
 
     @Provides
     @Singleton
-    fun provideUserReportServerController(): IUserReportServerAPI {
-        return provideOfficialBackend()
+    fun provideSynchronizationServerController(app: OTApp): ISynchronizationServerSideAPI {
+        return provideOfficialServerController(app)
     }
 
     @Provides
     @Singleton
-    fun provideBinaryDownloadApi(): IBinaryDownloadAPI
-    {
-        return FirebaseStorageHelper()
+    fun provideUserReportServerController(app: OTApp): IUserReportServerAPI {
+        return provideOfficialServerController(app)
     }
-
 }

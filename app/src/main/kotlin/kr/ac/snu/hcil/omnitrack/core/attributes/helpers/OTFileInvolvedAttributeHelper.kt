@@ -7,7 +7,7 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.net.IBinaryDownloadAPI
+import kr.ac.snu.hcil.omnitrack.core.net.OTBinaryStorageController
 import kr.ac.snu.hcil.omnitrack.utils.io.FileHelper
 import java.io.File
 import java.io.FileInputStream
@@ -21,7 +21,7 @@ import javax.inject.Inject
 abstract class OTFileInvolvedAttributeHelper : OTAttributeHelper() {
 
     @Inject
-    protected lateinit var binaryDownloadApi: Lazy<IBinaryDownloadAPI>
+    protected lateinit var binaryDownloadApi: Lazy<OTBinaryStorageController>
 
     @Inject
     protected lateinit var databaseManager: Lazy<RealmDatabaseManager>

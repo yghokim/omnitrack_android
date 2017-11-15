@@ -13,7 +13,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.net.IBinaryDownloadAPI
+import kr.ac.snu.hcil.omnitrack.core.net.OTBinaryStorageController
 import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioRecorderView
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import javax.inject.Inject
@@ -24,7 +24,7 @@ import javax.inject.Provider
  */
 class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAttributeInputView<SynchronizedUri>(R.layout.input_audio_record, context, attrs) {
     @Inject
-    lateinit var binaryDownloader: Lazy<IBinaryDownloadAPI>
+    lateinit var binaryServerController: Lazy<OTBinaryStorageController>
 
     @Inject
     lateinit var dbManager: Lazy<RealmDatabaseManager>
@@ -63,7 +63,7 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
                 } else if (value?.isSynchronized == true) {
                     inLoadingMode = true
                     subscriptions.add(
-                            binaryDownloader.get().downloadFileTo(value.serverUri.path, value.localUri).subscribe(
+                            binaryServerController.get().downloadFileTo(value.serverUri.path, value.localUri).subscribe(
                                     {
                                         uri ->
                                         valueView.audioFileUriChanged.suspend = true

@@ -1,0 +1,96 @@
+package kr.ac.snu.hcil.omnitrack.core.net
+
+import android.net.Uri
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.Task
+import com.google.firebase.storage.*
+import io.reactivex.Completable
+import io.reactivex.Single
+import io.reactivex.disposables.Disposables
+import kr.ac.snu.hcil.omnitrack.core.database.UploadTaskInfo
+import java.io.File
+
+/**
+ * Created by younghokim on 2017. 11. 15..
+ */
+class OTFirebaseStorageCore : IBinaryStorageCore {
+    private fun getItemStorageReference(itemId: String, trackerId: String, userId: String): StorageReference {
+        return FirebaseStorage.getInstance().reference.child("entry_data").child(userId).child(trackerId).child(itemId)
+    }
+
+    override fun startNewUploadTaskImpl(taskInfo: UploadTaskInfo, onProgress: (session: String) -> Unit): Completable {
+        return Completable.create { subscriber ->
+
+            val itemId = taskInfo.itemId
+            val userId = taskInfo.userId
+            val trackerId = taskInfo.trackerId
+            val localUri = taskInfo.localUriCompat()
+
+            val storageRef = getItemStorageReference(itemId, trackerId, userId).child(localUri.lastPathSegment)
+
+            val task = storageRef.putFile(localUri, StorageMetadata.Builder().build(), if (taskInfo.sessionUri != null) Uri.parse(taskInfo.sessionUri!!) else null)
+
+            task.addOnProgressListener { snapshot: UploadTask.TaskSnapshot ->
+                val sessionUri = snapshot.uploadSessionUri?.toString()
+                println("refresh sessionUri: ${snapshot.uploadSessionUri?.toString()}")
+
+                if (sessionUri != null) {
+                    onProgress.invoke(sessionUri)
+                }
+            }.addOnCompleteListener { finishedTask ->
+                if (finishedTask.isSuccessful) {
+                    if (!subscriber.isDisposed) {
+                        subscriber.onComplete()
+                    }
+                } else {
+                    if (!subscriber.isDisposed) {
+                        subscriber.onError(finishedTask.exception!!)
+                    }
+                }
+            }
+        }
+    }
+
+    override fun makeFilePath(itemId: String, trackerId: String, userId: String, fileName: String): Uri
+            = Uri.parse(getItemStorageReference(itemId, trackerId, userId).child(fileName).path)
+
+    override fun downloadFileTo(pathString: String, localUri: Uri): Single<Uri> {
+        return Single.create { subscriber ->
+
+            println("download firebase from ${pathString} to ${localUri}")
+
+            val localFileRoot = File(localUri.path).parentFile
+            if (!localFileRoot.exists()) {
+                localFileRoot.mkdirs()
+            }
+
+            val downloadTask = FirebaseStorage.getInstance().reference.child(pathString).getFile(localUri)
+            val listener = object : OnCompleteListener<FileDownloadTask.TaskSnapshot> {
+                override fun onComplete(task: Task<FileDownloadTask.TaskSnapshot>) {
+                    if (!subscriber.isDisposed) {
+                        if (task.isSuccessful) {
+                            println("firebase storage image successfully downloaded at ${localUri}")
+                            subscriber.onSuccess(localUri)
+                        } else {
+                            task.exception?.printStackTrace()
+                            subscriber.onError(task.exception ?: Exception("downloadfile to file task was failed."))
+                        }
+                    }
+                }
+
+            }
+
+            downloadTask.addOnCompleteListener(listener)
+
+            subscriber.setDisposable(
+                    Disposables.fromAction {
+                        println("download task was unsubscribed.")
+                        if (downloadTask.isInProgress)
+                            downloadTask.cancel()
+                        downloadTask.removeOnCompleteListener(listener)
+                    }
+            )
+        }
+    }
+
+}
