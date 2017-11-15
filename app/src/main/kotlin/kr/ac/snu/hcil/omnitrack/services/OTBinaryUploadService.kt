@@ -57,6 +57,7 @@ class OTBinaryUploadService : JobService() {
     }
 
     override fun onStopJob(job: JobParameters?): Boolean {
+        //Network aborted, etc.
         subscriptions.clear()
         if (realm.where(UploadTaskInfo::class.java).findAll().isEmpty()) {
             return false
@@ -77,21 +78,25 @@ class OTBinaryUploadService : JobService() {
         return crawlAndUpload(job)
     }
 
-    private fun crawlAndUpload(job: JobParameters): Boolean {
+    private fun crawlAndUpload(job: JobParameters, maxTrialCount: Int = Int.MAX_VALUE): Boolean {
 
-        val currentUploadTasks = realm.where(UploadTaskInfo::class.java).findAll().toMutableList()
+        val currentUploadTasks = realm.where(UploadTaskInfo::class.java).lessThanOrEqualTo("trialCount", maxTrialCount).findAll().toMutableList()
         val localInvalidTasks = currentUploadTasks.filter { it ->
             !FileHelper.exists(it.localUri)
         }
         currentUploadTasks.removeAll(localInvalidTasks)
         realm.executeTransaction {
             localInvalidTasks.forEach { it.deleteFromRealm() }
+            currentUploadTasks.forEach {
+                it.trialCount.increment(1)
+            }
         }
 
         if (currentUploadTasks.isEmpty()) {
             println("task is empty. finish download service.")
             notificationManager.cancel(TAG, NOTIFICATION_IDENTIFIER)
-            jobFinished(job, true)
+
+            jobFinished(job, realm.where(UploadTaskInfo::class.java).count() > 0)
             return false
         } else {
             println("continue with ${currentUploadTasks.count()} upload tasks...")
@@ -117,7 +122,7 @@ class OTBinaryUploadService : JobService() {
                                 }.onErrorComplete()
                             }
                     ).subscribe({
-                        crawlAndUpload(job)
+                        crawlAndUpload(job, 0) // retry if fresh tasks inserted.
                     })
             )
             return true
