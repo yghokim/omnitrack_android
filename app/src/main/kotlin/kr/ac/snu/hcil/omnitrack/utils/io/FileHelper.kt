@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.utils.io
 
 import android.content.Intent
+import android.net.Uri
 import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
@@ -24,6 +25,15 @@ object FileHelper {
             }
         }
         return path.delete()
+    }
+
+    fun exists(path: String): Boolean {
+        try {
+            val file = File(Uri.parse(path).path)
+            return file.exists()
+        } catch (ex: Exception) {
+            return false
+        }
     }
 
     fun makeSaveLocationPickIntent(filename: String): Intent {

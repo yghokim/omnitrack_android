@@ -5,6 +5,7 @@ import android.os.Bundle
 import com.firebase.jobdispatcher.*
 import dagger.Module
 import dagger.Provides
+import kr.ac.snu.hcil.omnitrack.services.OTBinaryUploadService
 import kr.ac.snu.hcil.omnitrack.services.OTSynchronizationService
 import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckService
 import javax.inject.Qualifier
@@ -67,6 +68,24 @@ class ScheduledJobModule {
                 .setConstraints(
                         Constraint.ON_ANY_NETWORK
                 ).build()
+    }
+
+
+    @Provides
+    @Singleton
+    @BinaryStorageServer
+    fun provideBinaryUploadJob(builder: Job.Builder): Job {
+        return builder.setService(OTBinaryUploadService::class.java)
+                .setRecurring(false)
+                .setTag(OTBinaryUploadService.TAG)
+                .setLifetime(Lifetime.FOREVER)
+                .setReplaceCurrent(true)
+                .setTrigger(Trigger.executionWindow(0, 30))
+                .setRetryStrategy(RetryStrategy.DEFAULT_EXPONENTIAL)
+                .setConstraints(
+                        Constraint.ON_ANY_NETWORK
+                )
+                .build()
     }
 
     @Provides

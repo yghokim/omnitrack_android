@@ -178,13 +178,24 @@
 
         <service
             android:name=".services.OTSynchronizationService"
-            android:exported="false" />
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE" />
+            </intent-filter>
+        </service>
 
         <service
             android:name=".services.OTItemLoggingService"
             android:exported="false" />
         <service android:name=".services.OTReminderService" />
-        <service android:name=".services.OTBinaryUploadService" />
+        <service
+            android:name=".services.OTBinaryUploadService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE" />
+            </intent-filter>
+        </service>
+
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"

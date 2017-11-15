@@ -13,6 +13,7 @@ import android.util.AttributeSet
 import dagger.Lazy
 import gun0912.tedbottompicker.TedBottomPicker
 import io.reactivex.disposables.CompositeDisposable
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.core.net.OTBinaryStorageController
@@ -105,6 +106,8 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
     }
 
     init {
+        (context.applicationContext as OTApp).networkComponent.inject(this)
+
         picker.callback = this
 
         picker.uriChanged += {
