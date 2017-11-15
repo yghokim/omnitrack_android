@@ -1,45 +1,26 @@
-package kr.ac.snu.hcil.omnitrack.core.net
+package kr.ac.snu.hcil.omnitrack.services
 
-import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.widget.Toast
+import io.reactivex.disposables.CompositeDisposable
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.core.database.UploadTaskInfo
+import kr.ac.snu.hcil.omnitrack.core.net.IBinaryStorageCore
 import kr.ac.snu.hcil.omnitrack.core.system.OTTaskNotificationManager
-import kr.ac.snu.hcil.omnitrack.services.WakefulService
 import java.util.*
+import javax.inject.Inject
 
 /**
  * Created by younghokim on 2017. 9. 26..
  */
-abstract class ABinaryUploadService(tag: String) : WakefulService(tag) {
-
-    abstract class ABinaryUploadServiceController(val serviceClass: Class<*>, val context: Context) {
-        fun makeUploadServiceIntent(outUri: SynchronizedUri, itemId: String, trackerId: String, userId: String): Intent {
-            return Intent(context, serviceClass)
-                    .setAction(ACTION_UPLOAD)
-                    .putExtra(EXTRA_OUT_URI, SynchronizedUri.parser.toJson(outUri))
-                    .putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM, itemId)
-                    .putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
-                    .putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_USER, userId)
-        }
-
-
-        fun makeResumeUploadIntent(): Intent {
-            return Intent(context, serviceClass)
-                    .setAction(ACTION_RESUME)
-        }
-
-        abstract fun makeFilePath(itemId: String, trackerId: String, userId: String, fileName: String): Uri
-    }
+class OTBinaryUploadService : WakefulService(TAG) {
 
     companion object {
-
+        const val TAG = "OTBinaryUploadService"
         const val NOTIFICATION_IDENTIFIER: Int = 903829784
 
         const val ACTION_UPLOAD = "omnitrack_binary_upload"
@@ -50,6 +31,26 @@ abstract class ABinaryUploadService(tag: String) : WakefulService(tag) {
         private val realmConfiguration: RealmConfiguration by lazy {
             RealmConfiguration.Builder().name("uploadTask").deleteRealmIfMigrationNeeded().build()
         }
+    }
+
+    @Inject
+    lateinit var core: IBinaryStorageCore
+
+    private val ongoingTaskIds = HashSet<String>()
+
+    private val subscriptions = CompositeDisposable()
+    private lateinit var realm: Realm
+
+    override fun onCreate() {
+        super.onCreate()
+        (application as OTApp).networkComponent.inject(this)
+        realm = Realm.getInstance(realmConfiguration)
+    }
+
+    override fun onDestroy() {
+        realm.close()
+        subscriptions.clear()
+        super.onDestroy()
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
@@ -69,35 +70,32 @@ abstract class ABinaryUploadService(tag: String) : WakefulService(tag) {
 
     }
 
-    protected open fun isTaskOngoing(taskInfo: UploadTaskInfo): Boolean = true
+    protected fun isTaskOngoing(taskInfo: UploadTaskInfo): Boolean = ongoingTaskIds.contains(taskInfo.id)
 
     private fun resumeCachedUploads() {
-        val realm = Realm.getInstance(realmConfiguration)
         val tasks = realm.where(UploadTaskInfo::class.java).findAll()
         println("${tasks.size} upload tasks were hanging.")
 
         for (taskInfo in tasks) {
-
             if (!isTaskOngoing(taskInfo)) {
                 println("restart uploading ${taskInfo.localUri}")
-
-                startNewUploadTaskImpl(taskInfo, { sessionUri ->
-                    realm.executeTransaction {
-                        taskInfo.sessionUri = sessionUri
-                        realm.copyToRealmOrUpdate(taskInfo)
-                    }
-                }, {
-                    realm.executeTransaction {
-                        realm.where(UploadTaskInfo::class.java).equalTo("id", taskInfo.id).findAll().deleteAllFromRealm()
-                        realm.commitTransaction()
-                    }
-                })
+                subscriptions.add(
+                        core.startNewUploadTaskImpl(taskInfo, { sessionUri ->
+                            realm.executeTransaction {
+                                taskInfo.sessionUri = sessionUri
+                            }
+                        }).subscribe({
+                            realm.executeTransaction {
+                                realm.where(UploadTaskInfo::class.java).equalTo("id", taskInfo.id).findAll().deleteAllFromRealm()
+                            }
+                        }, { err ->
+                            println("A resumed binary upload task was failed")
+                            err.printStackTrace()
+                        }))
             }
         }
 
     }
-
-    protected abstract fun startNewUploadTaskImpl(taskInfo: UploadTaskInfo, onProgress: (session: String) -> Unit, finished: () -> Unit)
 
     private fun startNewUploadTask(intent: Intent, startId: Int): Int {
         if (intent.hasExtra(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM)
@@ -120,9 +118,9 @@ abstract class ABinaryUploadService(tag: String) : WakefulService(tag) {
             println("SynchronizedUri: ${outUri}")
             println("local uri info: ${outUri.localUri.scheme}, isAbsolute: ${outUri.localUri.isAbsolute}, isRelative: ${outUri.localUri.isRelative}, scheme: ${outUri.localUri.scheme}")
 
-            val realm = Realm.getDefaultInstance()
             val dbObject = UploadTaskInfo()
             dbObject.id = UUID.randomUUID().toString()
+            ongoingTaskIds.add(dbObject.id)
 
             //realm.createObject(UploadTaskInfo::class.java, UUID.randomUUID().toString())
             dbObject.itemId = itemId
@@ -135,23 +133,32 @@ abstract class ABinaryUploadService(tag: String) : WakefulService(tag) {
                 realm.copyToRealmOrUpdate(dbObject)
             }
 
-            startNewUploadTaskImpl(dbObject,
-                    { sessionUri ->
-                        realm.executeTransaction {
-                            dbObject.sessionUri = sessionUri
-                            realm.copyToRealmOrUpdate(dbObject)
-                        }
-                    },
-                    {
-                        realm.executeTransaction {
-                            realm.where(UploadTaskInfo::class.java).equalTo("id", dbObject.id).findAll().deleteAllFromRealm()
-                        }
+            subscriptions.add(
+                    core.startNewUploadTaskImpl(dbObject,
+                            { sessionUri ->
+                                realm.executeTransaction {
+                                    dbObject.sessionUri = sessionUri
+                                    realm.copyToRealmOrUpdate(dbObject)
+                                }
+                            }).doAfterTerminate {
+
                         stopSelf(startId)
 
                         if (realm.where(UploadTaskInfo::class.java).count() == 0L) {
                             stopSelf()
                         }
+                    }.subscribe({
+                        ongoingTaskIds.remove(dbObject.id)
+
+                        realm.executeTransaction {
+                            realm.where(UploadTaskInfo::class.java).equalTo("id", dbObject.id).findAll().deleteAllFromRealm()
+                        }
+
+                    }, { err ->
+                        println("binary upload error")
+                        err.printStackTrace()
                     })
+            )
 
         } else {
             stopSelf(startId)

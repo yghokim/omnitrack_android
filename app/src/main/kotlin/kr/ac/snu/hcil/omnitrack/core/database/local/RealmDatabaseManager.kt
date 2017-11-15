@@ -19,8 +19,8 @@ import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels.OTItemBuilderDAO
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
-import kr.ac.snu.hcil.omnitrack.core.net.ABinaryUploadService
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationClientSideAPI
+import kr.ac.snu.hcil.omnitrack.core.net.OTBinaryStorageController
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncResultEntry
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
@@ -41,7 +41,7 @@ class RealmDatabaseManager @Inject constructor(
         private val shortcutPanelManager: Lazy<OTShortcutPanelManager>,
         private val serializationManager: DaoSerializationManager,
         private val triggerSystemManager: OTTriggerSystemManager,
-        private val binaryUploadServiceController: ABinaryUploadService.ABinaryUploadServiceController)
+        private val binaryUploadServiceController: OTBinaryStorageController)
     :ISynchronizationClientSideAPI{
 
     companion object {

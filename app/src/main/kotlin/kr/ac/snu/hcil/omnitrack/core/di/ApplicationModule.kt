@@ -15,6 +15,11 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 class ApplicationModule(private val mApp: OTApp) {
 
     @Provides
+    fun application(): OTApp {
+        return mApp
+    }
+
+    @Provides
     fun wrappedContext(): Context
     {
         return mApp.contextCompat

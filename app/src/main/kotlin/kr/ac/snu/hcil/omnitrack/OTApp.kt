@@ -180,7 +180,7 @@ class OTApp : MultiDexApplication() {
     }
 
     private val networkModule: NetworkModule by lazy {
-        NetworkModule(this)
+        NetworkModule()
     }
 
     private val synchronizationModule: SynchronizationModule by lazy {
@@ -233,6 +233,12 @@ class OTApp : MultiDexApplication() {
                 .networkModule(networkModule)
                 .daoSerializationModule(daoSerializationModule)
                 .authModule(authModule)
+                .build()
+    }
+
+    val networkComponent: NetworkComponent by lazy {
+        DaggerNetworkComponent.builder()
+                .networkModule(networkModule)
                 .build()
     }
 

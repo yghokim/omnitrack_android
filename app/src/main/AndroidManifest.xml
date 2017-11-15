@@ -156,9 +156,6 @@
         <service
             android:name=".services.OTTableExportService"
             android:exported="false" />
-        <service
-            android:name=".services.OTFirebaseUploadService"
-            android:exported="false" />
 
         <service
             android:name=".widgets.OTShortcutPanelWidgetService"
@@ -187,6 +184,7 @@
             android:name=".services.OTItemLoggingService"
             android:exported="false" />
         <service android:name=".services.OTReminderService" />
+        <service android:name=".services.OTBinaryUploadService" />
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
