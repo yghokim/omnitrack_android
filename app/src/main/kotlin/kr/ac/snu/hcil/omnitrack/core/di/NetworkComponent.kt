@@ -8,7 +8,7 @@ import javax.inject.Singleton
  * Created by younghokim on 2017. 11. 15..
  */
 @Singleton
-@Component(modules = arrayOf(NetworkModule::class))
+@Component(modules = arrayOf(NetworkModule::class, AuthModule::class))
 interface NetworkComponent {
     fun inject(service: OTBinaryUploadService)
 }
