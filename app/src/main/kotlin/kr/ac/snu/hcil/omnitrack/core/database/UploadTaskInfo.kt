@@ -20,6 +20,8 @@ open class UploadTaskInfo : RealmObject() {
     var itemId: String = ""
     var userId: String = ""
 
+    var errorCount: Int = 0
+
     fun localUriCompat(): Uri {
 
         var uri = Uri.parse(localUri)

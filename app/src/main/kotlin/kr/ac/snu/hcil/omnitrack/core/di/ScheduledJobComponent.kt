@@ -1,8 +1,11 @@
 package kr.ac.snu.hcil.omnitrack.core.di
 
+import com.firebase.jobdispatcher.Job
 import dagger.Component
+import kr.ac.snu.hcil.omnitrack.core.net.OTBinaryStorageController
 import kr.ac.snu.hcil.omnitrack.receivers.PackageReceiver
 import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckService
+import javax.inject.Provider
 import javax.inject.Singleton
 
 /**
@@ -12,6 +15,10 @@ import javax.inject.Singleton
 @Component(modules = arrayOf(ScheduledJobModule::class, ApplicationModule::class))
 interface ScheduledJobComponent {
 
+    @BinaryStorageServer
+    fun getBinaryUploadJob(): Provider<Job>
+
     fun inject(service: OTVersionCheckService)
     fun inject(receiver: PackageReceiver)
+    fun inject(controller: OTBinaryStorageController)
 }

@@ -4,6 +4,8 @@ import android.content.Context
 import dagger.Lazy
 import dagger.Module
 import dagger.Provides
+import io.realm.Realm
+import io.realm.RealmConfiguration
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.net.*
@@ -12,6 +14,7 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Provider
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
@@ -82,7 +85,7 @@ class NetworkModule {
     @Provides
     @Singleton
     fun provideBinaryStorageController(context: Context, core: IBinaryStorageCore): OTBinaryStorageController {
-        return OTBinaryStorageController(context, core)
+        return OTBinaryStorageController(context, core, provideRealm())
     }
 
     /**
@@ -104,6 +107,19 @@ class NetworkModule {
     @Singleton
     fun provideUserReportServerController(controller: OTOfficialServerApiController): IUserReportServerAPI {
         return controller
+    }
+
+    private val realmConfiguration: RealmConfiguration by lazy {
+        RealmConfiguration.Builder().name("uploadTaskQueue.db").deleteRealmIfMigrationNeeded().build()
+    }
+
+    private fun provideRealm(): Provider<Realm> {
+        return object : Provider<Realm> {
+            override fun get(): Realm {
+                return Realm.getInstance(realmConfiguration)
+            }
+
+        }
     }
 }
 

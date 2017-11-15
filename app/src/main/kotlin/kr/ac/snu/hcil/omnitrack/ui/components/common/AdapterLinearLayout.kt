@@ -185,6 +185,7 @@ class AdapterLinearLayout : DragLinearLayout {
                         pushNewViewHolder(viewHolder)
                         removeDragViewInLayout(viewHolder.itemView)
                         val view = makeView(position)
+                        view.id = View.generateViewId()
                         addViewInLayout(view, position, view.layoutParams)
                         setViewDraggable(view, view.ui_drag_handle)
                         requestLayout()

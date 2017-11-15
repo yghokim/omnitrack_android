@@ -360,9 +360,7 @@ class RealmDatabaseManager @Inject constructor(
                     println("upload Synchronized Uri file to server...")
                     value.setSynchronized(binaryUploadServiceController.makeFilePath(itemId, item.trackerId!!, authManager.userId!!, value.localUri.lastPathSegment))
                     entry.value = TypeStringSerializationHelper.serialize(value)
-                    OTApp.instance.startService(
-                            binaryUploadServiceController.makeUploadServiceIntent(value, itemId, item.trackerId!!, authManager.userId!!)
-                    )
+                    binaryUploadServiceController.registerNewUploadTask(value, itemId, item.trackerId!!, authManager.userId!!)
                 }
             }
         }

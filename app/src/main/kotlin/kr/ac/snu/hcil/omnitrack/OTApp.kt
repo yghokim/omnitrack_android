@@ -239,6 +239,7 @@ class OTApp : MultiDexApplication() {
     val networkComponent: NetworkComponent by lazy {
         DaggerNetworkComponent.builder()
                 .networkModule(networkModule)
+                .applicationModule(appModule)
                 .build()
     }
 
