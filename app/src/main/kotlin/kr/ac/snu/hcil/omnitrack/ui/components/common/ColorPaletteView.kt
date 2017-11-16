@@ -2,6 +2,8 @@ package kr.ac.snu.hcil.omnitrack.ui.components.common
 
 import android.content.Context
 import android.graphics.Rect
+import android.os.Parcel
+import android.os.Parcelable
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.transition.TransitionManager
@@ -16,6 +18,7 @@ import kr.ac.snu.hcil.omnitrack.utils.events.Event
  * Created by Young-Ho Kim on 2016-07-19
  */
 class ColorPaletteView(context: Context, attrs: AttributeSet?, defStyle: Int) : RecyclerView(context, attrs, defStyle) {
+
     private var selectedIndex: Int = 0
 
     private var buttonSize: Int = 0
@@ -120,4 +123,42 @@ class ColorPaletteView(context: Context, attrs: AttributeSet?, defStyle: Int) : 
         }
     }
 
+    override fun onSaveInstanceState(): Parcelable {
+        val superState = super.onSaveInstanceState()
+        val thisState = SavedState(superState)
+        thisState.selectedIndex = selectedIndex
+        return thisState
+    }
+
+    override fun onRestoreInstanceState(state: Parcelable?) {
+        val thisState = state as SavedState
+        super.onRestoreInstanceState(state)
+        selectedIndex = thisState.selectedIndex
+    }
+
+    class SavedState : BaseSavedState {
+
+        var selectedIndex: Int = 0
+
+        constructor(source: Parcel) : super(source) {
+            selectedIndex = source.readInt()
+        }
+
+        constructor(superState: Parcelable?) : super(superState)
+
+        override fun writeToParcel(out: Parcel, flags: Int) {
+            super.writeToParcel(out, flags)
+            out.writeInt(selectedIndex)
+        }
+
+        val CREATOR: Parcelable.Creator<SavedState> = object : Parcelable.Creator<SavedState> {
+            override fun createFromParcel(`in`: Parcel): SavedState {
+                return SavedState(`in`)
+            }
+
+            override fun newArray(size: Int): Array<SavedState?> {
+                return arrayOfNulls(size)
+            }
+        }
+    }
 }
