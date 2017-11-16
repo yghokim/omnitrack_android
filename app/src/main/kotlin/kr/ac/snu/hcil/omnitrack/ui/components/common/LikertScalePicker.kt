@@ -12,6 +12,7 @@ import android.view.MotionEvent
 import android.view.View
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.datatypes.Fraction
 import kr.ac.snu.hcil.omnitrack.utils.dipSize
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kotlin.properties.Delegates
@@ -73,6 +74,41 @@ class LikertScalePicker : View, GestureDetector.OnGestureListener {
             valueChanged.invoke(this, new)
         }
     }
+
+    var fractionValue: Fraction?
+        get() {
+            val currentValue = value
+            if (currentValue == null) {
+                return null
+            } else {
+                val under = if (allowIntermediate) {
+                    (rightMost - leftMost) * 10
+                } else {
+                    rightMost - leftMost
+                }
+                var upper = currentValue - leftMost
+                if (allowIntermediate) upper *= 10
+
+                return Fraction(Math.round(upper).toShort(), under.toShort())
+            }
+        }
+        set(fraction) {
+            if (fraction == null) {
+                value = null
+            } else {
+                val under = if (allowIntermediate) {
+                    (rightMost - leftMost) * 10
+                } else {
+                    rightMost - leftMost
+                }
+                var upper = Math.round((fraction.toFloat() * under))
+                if (fraction.upper > 0) {
+                    upper = Math.max(upper, 1)
+                }
+
+                value = (upper.toFloat() / under) * (rightMost - leftMost) + leftMost
+            }
+        }
 
     val valueChanged = Event<Float?>()
 

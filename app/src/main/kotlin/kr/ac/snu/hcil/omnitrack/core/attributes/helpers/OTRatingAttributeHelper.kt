@@ -11,6 +11,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.logics.NumericSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.datatypes.Fraction
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.common.StarRatingSlider
 import kr.ac.snu.hcil.omnitrack.ui.components.common.StarScoreView
@@ -66,7 +67,7 @@ class OTRatingAttributeHelper : OTAttributeHelper() {
         return R.drawable.icon_small_star //TODO Options
     }
 
-    override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_FLOAT
+    override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_FRACTION
 
     override fun getSupportedSorters(attribute: OTAttributeDAO): Array<AFieldValueSorter> {
         return arrayOf(NumericSorter(attribute.name, attribute.localId))
@@ -105,7 +106,7 @@ class OTRatingAttributeHelper : OTAttributeHelper() {
         if (inputView is StarRatingInputView) {
             inputView.ratingView.allowIntermediate = options.allowIntermediate
             inputView.ratingView.levels = options.starLevels.maxScore
-            inputView.ratingView.score = options.starLevels.maxScore / 2.0f
+            //inputView.ratingView.score = options.starLevels.maxScore / 2.0f
         } else if (inputView is LikertScaleInputView) {
             inputView.scalePicker.allowIntermediate = options.allowIntermediate
             inputView.scalePicker.leftMost = options.leftMost
@@ -113,7 +114,7 @@ class OTRatingAttributeHelper : OTAttributeHelper() {
             inputView.scalePicker.leftLabel = options.leftLabel
             inputView.scalePicker.rightLabel = options.rightLabel
             inputView.scalePicker.middleLabel = options.middleLabel
-            inputView.scalePicker.value = ((options.rightMost + options.leftMost) shr 1).toFloat()
+            //inputView.scalePicker.value = ((options.rightMost + options.leftMost) shr 1).toFloat()
         }
     }
 
@@ -126,8 +127,8 @@ class OTRatingAttributeHelper : OTAttributeHelper() {
     override fun formatAttributeValue(attribute: OTAttributeDAO, value: Any): CharSequence {
         val ratingOptions = getRatingOptions(attribute)
         return when (ratingOptions.type) {
-            RatingOptions.DisplayType.Star -> value.toString() + " / ${ratingOptions.starLevels.maxScore}"
-            RatingOptions.DisplayType.Likert -> value.toString()
+            RatingOptions.DisplayType.Star -> "${ratingOptions.convertFractionToRealScore(value as Fraction)} / ${ratingOptions.starLevels.maxScore}"
+            RatingOptions.DisplayType.Likert -> ratingOptions.convertFractionToRealScore(value as Fraction).toString()
         }
     }
 
@@ -161,13 +162,13 @@ class OTRatingAttributeHelper : OTAttributeHelper() {
     override fun applyValueToViewForItemList(attribute: OTAttributeDAO, value: Any?, view: View): Single<Boolean> {
         return Single.defer {
             val ratingOptions = getRatingOptions(attribute)
-            if (view is StarRatingSlider && value is Float) {
-                view.score = value
+            if (view is StarRatingSlider && value is Fraction) {
+                view.score = ratingOptions.convertFractionToRealScore(value)
                 view.allowIntermediate = ratingOptions.allowIntermediate
                 view.levels = ratingOptions.starLevels.maxScore
                 Single.just(true)
-            } else if (view is StarScoreView && value is Float) {
-                view.setScore(value, ratingOptions.starLevels.maxScore.toFloat())
+            } else if (view is StarScoreView && value is Fraction) {
+                view.setScore(ratingOptions.convertFractionToRealScore(value), ratingOptions.starLevels.maxScore.toFloat())
                 Single.just(true)
             } else super.applyValueToViewForItemList(attribute, value, view)
         }

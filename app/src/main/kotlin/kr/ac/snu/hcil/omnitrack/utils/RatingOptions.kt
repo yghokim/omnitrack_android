@@ -1,12 +1,11 @@
 package kr.ac.snu.hcil.omnitrack.utils
 
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.datatypes.Fraction
 
 /**
  * Created by Young-Ho Kim on 2016-09-23.
@@ -14,8 +13,8 @@ import kr.ac.snu.hcil.omnitrack.R
 class RatingOptions {
 
     companion object {
-        val parser: Gson by lazy {
-            GsonBuilder().registerTypeAdapter(RatingOptions::class.java, RatingOptionsTypeAdapter()).create()
+        val typeAdapter: TypeAdapter<RatingOptions> by lazy {
+            RatingOptionsTypeAdapter()
         }
     }
 
@@ -105,5 +104,37 @@ class RatingOptions {
 
     override fun toString(): String {
         return "{RationOptions | allowIntermediate: $allowIntermediate , type: $type, starLevels: $starLevels, leftMost: $leftMost, rightMost: $rightMost, leftLabel: $leftLabel, rightLabel: $rightLabel, middleLable: $middleLabel"
+    }
+
+    fun convertFractionToRealScore(fraction: Fraction): Float {
+        when (type) {
+            DisplayType.Star -> {
+                val under = if (allowIntermediate) {
+                    starLevels.maxScore * 2
+                } else {
+                    starLevels.maxScore
+                }
+                var upper = Math.round((fraction.toFloat() * under))
+                if (fraction.upper > 0) {
+                    upper = Math.max(upper, 1)
+                }
+
+                return (upper.toFloat() / under) * starLevels.maxScore
+            }
+
+            DisplayType.Likert -> {
+                val under = if (allowIntermediate) {
+                    (rightMost - leftMost) * 10
+                } else {
+                    rightMost - leftMost
+                }
+                var upper = Math.round((fraction.toFloat() * under))
+                if (fraction.upper > 0) {
+                    upper = Math.max(upper, 1)
+                }
+
+                return (upper.toFloat() / under) * (rightMost - leftMost) + leftMost
+            }
+        }
     }
 }

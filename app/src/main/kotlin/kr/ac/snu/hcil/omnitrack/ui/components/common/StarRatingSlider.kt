@@ -7,6 +7,7 @@ import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.MotionEvent
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.datatypes.Fraction
 import kr.ac.snu.hcil.omnitrack.utils.applyTint
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kotlin.properties.Delegates
@@ -53,6 +54,41 @@ class StarRatingSlider : HorizontalLinearDrawableView, GestureDetector.OnGesture
             scoreChanged.invoke(this, new)
         }
     }
+
+    var fractionValue: Fraction?
+        get() {
+            val currentValue = score
+            if (currentValue == null) {
+                return null
+            } else {
+                val under = if (allowIntermediate) {
+                    levels * 2
+                } else {
+                    levels
+                }
+                var upper = currentValue
+                if (allowIntermediate) upper *= 2
+
+                return Fraction(Math.round(upper).toShort(), under.toShort())
+            }
+        }
+        set(fraction) {
+            if (fraction == null) {
+                score = null
+            } else {
+                val under = if (allowIntermediate) {
+                    levels * 2
+                } else {
+                    levels
+                }
+                var upper = Math.round((fraction.toFloat() * under))
+                if (fraction.upper > 0) {
+                    upper = Math.max(upper, 1)
+                }
+
+                score = (upper.toFloat() / under) * levels
+            }
+        }
 
     private val starAdapter: ADrawableAdapter = StarAdapter()
 
