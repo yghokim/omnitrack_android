@@ -9,6 +9,7 @@ import dagger.Lazy
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.realm.Realm
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
@@ -100,6 +101,8 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
     private var subscriptions = CompositeDisposable()
 
     init {
+
+        (context.applicationContext as OTApp).applicationComponent.inject(this)
 
         valueView.audioFileUriChanged += {
             sender, uri ->

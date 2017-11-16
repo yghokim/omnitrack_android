@@ -10,6 +10,7 @@ import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.net.*
 import okhttp3.Cache
+import okhttp3.MediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
@@ -54,6 +55,22 @@ class NetworkModule {
 
     @Provides
     @Singleton
+    @OkHttpMediaType(MediaTypeValue.IMAGE)
+    fun provideImageMediaType(): MediaType {
+        return MediaType.parse("image/*")!!
+    }
+
+    @Provides
+    @Singleton
+    @OkHttpMediaType(MediaTypeValue.PLAINTEXT)
+    fun providePlainTextMediaType(): MediaType {
+        return MediaType.parse("text/plain")!!
+    }
+
+
+
+    @Provides
+    @Singleton
     @SynchronizationServer
     fun provideSynchronizationRetrofit(@Authorized client: OkHttpClient): Retrofit {
         return Retrofit.Builder()
@@ -93,7 +110,7 @@ class NetworkModule {
      */
     @Provides
     @Singleton
-    fun provideBinaryStorageCore(): IBinaryStorageCore {
+    fun provideBinaryStorageCore(context: Context): IBinaryStorageCore {
         return OTFirebaseStorageCore()
     }
 
@@ -123,6 +140,10 @@ class NetworkModule {
     }
 }
 
+enum class MediaTypeValue {
+    IMAGE, BINARY, PLAINTEXT, JSON,
+}
+
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME) annotation class Authorized
 
@@ -131,3 +152,6 @@ class NetworkModule {
 
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME) annotation class BinaryStorageServer
+
+@Qualifier
+@Retention(AnnotationRetention.RUNTIME) annotation class OkHttpMediaType(val type: MediaTypeValue)

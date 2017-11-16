@@ -5,7 +5,7 @@ import android.app.Dialog
 import android.app.Fragment
 import android.support.v7.widget.RecyclerView.ViewHolder
 import android.view.View
-import kr.ac.snu.hcil.omnitrack.ui.components.common.AdapterLinearLayout
+import kr.ac.snu.hcil.omnitrack.ui.components.common.container.AdapterLinearLayout
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 import android.support.v4.app.Fragment as SupportFragment

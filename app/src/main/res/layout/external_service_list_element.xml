@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/no_round_card"
@@ -10,85 +12,78 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:adjustViewBounds="true"
-        android:scaleType="centerInside" />
+        android:scaleType="centerInside"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/service_thumb_fitbit" />
 
     <ProgressBar
         android:id="@+id/ui_progress_bar"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
         android:indeterminate="false"
         android:indeterminateOnly="true"
-        android:visibility="gone" />
+        android:visibility="invisible"
+        app:layout_constraintTop_toBottomOf="@+id/thumb" />
 
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="25dp"
-        android:layout_marginTop="12dp">
-
-        <TextView
-            android:id="@+id/name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginStart="@dimen/service_list_element_horizontal_padding"
-            android:layout_marginTop="@dimen/service_list_element_vertical_padding"
-            android:layout_toStartOf="@+id/ui_button_activate"
-            android:text="Microsoft Band"
-            android:textColor="@color/textColorMidDark"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/description"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignEnd="@+id/name"
-            android:layout_alignStart="@+id/name"
-            android:layout_below="@+id/name"
-            android:layout_marginTop="5dp"
-            android:text="ms band description"
-            android:textColor="@color/textColorMidLight"
-            android:textSize="14sp" />
-
-        <android.support.v7.widget.AppCompatButton
-            android:id="@+id/ui_button_activate"
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/button_height_normal"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentTop="true"
-            android:layout_gravity="center"
-            android:layout_marginLeft="@dimen/service_list_element_horizontal_padding"
-            android:layout_marginRight="@dimen/service_list_element_horizontal_padding"
-            android:backgroundTint="@color/colorPointed"
-            android:paddingEnd="@dimen/service_list_element_horizontal_padding"
-
-            android:paddingStart="@dimen/service_list_element_horizontal_padding"
-            android:text="@string/msg_activate"
-            android:textColor="#fff"
-            android:textStyle="bold" />
-
-    </RelativeLayout>
-
-    <!--<View style="@style/HorizontalSeparator.NoVerticalMargin" />
 
     <TextView
-        android:layout_width="wrap_content"
+        android:id="@+id/name"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
-        android:layout_marginTop="12dp"
-        android:paddingStart="@dimen/activity_horizontal_margin"
-        android:text="@string/msg_external_service_element_supported_measures"
-        android:textColor="#ff9f22"
-        android:textSize="16dp"
-        android:textStyle="bold" />-->
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="@dimen/service_list_element_horizontal_padding"
+        android:layout_marginTop="@dimen/service_list_element_vertical_padding"
+        android:textColor="@color/textColorMidDark"
+
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/ui_button_activate"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ui_progress_bar"
+        tools:text="Microsoft Band" />
+
+
+    <TextView
+        android:id="@+id/description"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="25dp"
+        android:layout_marginTop="5dp"
+        android:textColor="@color/textColorMidLight"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toStartOf="@+id/ui_button_activate"
+        app:layout_constraintStart_toStartOf="@+id/name"
+        app:layout_constraintTop_toBottomOf="@+id/name"
+        tools:text="ms band description lorem ipsum lorem ipsum n lorem ipsum lorem ipsum n lorem ipsum lorem ipsum n lorem ipsum lorem ipsum n lorem ipsum lorem ipsum n lorem ipsum lorem ipsum n lorem ipsum lorem ipsum n lorem ipsum lorem ipsum n lorem ipsum lorem ipsum n lorem ipsum lorem ipsum n lorem ipsum lorem ipsum n lorem ipsum lorem ipsum n lorem ipsum lorem ipsum n lorem ipsum lorem ipsum " />
+
+
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/ui_button_activate"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/button_height_normal"
+        android:layout_gravity="center"
+        android:layout_marginBottom="25dp"
+        android:layout_marginLeft="@dimen/service_list_element_horizontal_padding"
+        android:layout_marginRight="@dimen/service_list_element_horizontal_padding"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="@color/colorPointed"
+        android:paddingEnd="@dimen/service_list_element_horizontal_padding"
+        android:paddingStart="@dimen/service_list_element_horizontal_padding"
+        android:text="@string/msg_activate"
+        android:textColor="#fff"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ui_progress_bar" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/ui_supported_measure_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/top_separator_dark" />
+        android:layout_marginTop="25dp"
+        android:background="@drawable/top_separator_dark"
+        app:layout_constraintTop_toBottomOf="@id/description" />
 
-</LinearLayout>
+</android.support.constraint.ConstraintLayout>

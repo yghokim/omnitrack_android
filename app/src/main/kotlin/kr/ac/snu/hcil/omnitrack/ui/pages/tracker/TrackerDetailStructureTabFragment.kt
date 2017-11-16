@@ -29,11 +29,9 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.AttributePresetInfo
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
-import kr.ac.snu.hcil.omnitrack.ui.components.common.AdapterLinearLayout
-import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
+import kr.ac.snu.hcil.omnitrack.ui.components.common.container.AdapterLinearLayout
+import kr.ac.snu.hcil.omnitrack.ui.components.common.container.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ColorPalettePropertyView
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ModalTextPropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.tutorial.TutorialManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.ConnectionIndicatorStubProxy
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeDetailActivity
@@ -61,8 +59,6 @@ class TrackerDetailStructureTabFragment : OTFragment() {
 
     lateinit private var attributeListItemTouchHelper: ItemTouchHelper
 
-    private lateinit var namePropertyView: ModalTextPropertyView
-    private lateinit var colorPropertyView: ColorPalettePropertyView
     //private lateinit var fab: FloatingActionButton
 
     private lateinit var contentContainer: ViewGroup
@@ -107,15 +103,15 @@ class TrackerDetailStructureTabFragment : OTFragment() {
         this.viewModel = ViewModelProviders.of(activity!!).get(TrackerDetailViewModel::class.java)
 
         //set UI
-        namePropertyView.value = this.viewModel.name
-        namePropertyView.showEditedOnTitle = viewModel.isNameDirty
+        nameProperty.value = this.viewModel.name
+        nameProperty.showEditedOnTitle = viewModel.isNameDirty
 
         isOnShortcutProperty.setToggleMode(this.viewModel.isBookmarked, false)
         isOnShortcutProperty.showEditedOnTitle = this.viewModel.isBookmarkedDirty
 
         applyColorTheme(this.viewModel.color, false)
-        colorPropertyView.value = this.viewModel.color
-        colorPropertyView.showEditedOnTitle = this.viewModel.isColorDirty
+        colorProperty.value = this.viewModel.color
+        colorProperty.showEditedOnTitle = this.viewModel.isColorDirty
 
         currentAttributeViewModelList.clear()
 
@@ -136,18 +132,18 @@ class TrackerDetailStructureTabFragment : OTFragment() {
         )
 
         creationSubscriptions.add(
-                namePropertyView.valueChanged.observable.subscribe { result ->
+                nameProperty.valueChanged.observable.subscribe { result ->
                     this.viewModel.name = result.second
-                    namePropertyView.showEditedOnTitle = viewModel.isNameDirty
+                    nameProperty.showEditedOnTitle = viewModel.isNameDirty
                 }
         )
 
         creationSubscriptions.add(
-                colorPropertyView.valueChanged.observable.subscribe { result ->
-                    println("viewModel color set to ${colorPropertyView.value}")
-                    this.viewModel.color = colorPropertyView.value
-                    applyColorTheme(colorPropertyView.value, true)
-                    colorPropertyView.showEditedOnTitle = viewModel.isColorDirty
+                colorProperty.valueChanged.observable.subscribe { result ->
+                    println("viewModel color set to ${colorProperty.value}")
+                    this.viewModel.color = colorProperty.value
+                    applyColorTheme(colorProperty.value, true)
+                    colorProperty.showEditedOnTitle = viewModel.isColorDirty
                 }
         )
 
@@ -178,27 +174,23 @@ class TrackerDetailStructureTabFragment : OTFragment() {
 
         contentContainer = rootView.findViewById(R.id.ui_content_container)
 
-        namePropertyView = rootView.findViewById(R.id.nameProperty)
-        //namePropertyView.addNewValidator("Name cannot be empty.", ShortTextPropertyView.NOT_EMPTY_VALIDATOR)
-
-        colorPropertyView = rootView.findViewById(R.id.colorProperty)
         /*
-        isOnShortcutPropertyView.valueChanged += {
-            sender, isOnShortcut ->
-            if (tracker?.isOnShortcut != isOnShortcut) {
-                tracker?.isOnShortcut = isOnShortcut
+            isOnShortcutPropertyView.valueChanged += {
+                sender, isOnShortcut ->
+                if (tracker?.isOnShortcut != isOnShortcut) {
+                    tracker?.isOnShortcut = isOnShortcut
 
-                tracker?.let {
-                    EventLoggingManager.logTrackerOnShortcutChangeEvent(it, isOnShortcut)
-                }
+                    tracker?.let {
+                        EventLoggingManager.logTrackerOnShortcutChangeEvent(it, isOnShortcut)
+                    }
 
-                if (tracker?.isOnShortcut == true) {
-                    toastForAdded.show()
-                } else {
-                    toastForRemoved.show()
+                    if (tracker?.isOnShortcut == true) {
+                        toastForAdded.show()
+                    } else {
+                        toastForRemoved.show()
+                    }
                 }
-            }
-        }*/
+            }*/
 
         attributeListView = rootView.findViewById(R.id.ui_attribute_list)
         attributeListView.setViewIntervalDistance(dipRound(8))

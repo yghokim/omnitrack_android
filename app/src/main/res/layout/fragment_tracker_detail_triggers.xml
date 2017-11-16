@@ -5,7 +5,7 @@
     android:background="@color/outerBackground"
     android:orientation="vertical">
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.common.FallbackRecyclerView
+    <kr.ac.snu.hcil.omnitrack.ui.components.common.container.FallbackRecyclerView
         android:id="@+id/ui_trigger_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

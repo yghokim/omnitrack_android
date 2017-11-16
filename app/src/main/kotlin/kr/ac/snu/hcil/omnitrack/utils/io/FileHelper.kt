@@ -1,7 +1,10 @@
 package kr.ac.snu.hcil.omnitrack.utils.io
 
+import android.content.ContentResolver
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.webkit.MimeTypeMap
 import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
@@ -52,6 +55,14 @@ object FileHelper {
         while (len > 0) {
             outputStream.write(buf, 0, len)
             len = inputStream.read(buf)
+        }
+    }
+
+    fun getMimeTypeOf(uri: Uri, context: Context): String? {
+        if (uri.scheme.equals(ContentResolver.SCHEME_CONTENT)) {
+            return context.contentResolver.getType(uri)
+        } else {
+            return MimeTypeMap.getSingleton().getMimeTypeFromExtension(MimeTypeMap.getFileExtensionFromUrl(uri.toString()))
         }
     }
 }

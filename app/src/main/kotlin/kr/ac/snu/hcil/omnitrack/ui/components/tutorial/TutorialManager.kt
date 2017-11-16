@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui.components.tutorial
 import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
+import android.graphics.Color
 import android.view.View
 import kr.ac.snu.hcil.omnitrack.OTApp
 import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt
@@ -47,6 +48,7 @@ object TutorialManager {
                                     .setTarget(sequence.target)
                                     .setPrimaryText(sequence.primaryTextRes)
                                     .setSecondaryText(sequence.secondaryTextRes)
+                                    .setFocalColour(Color.TRANSPARENT)
                                     //.setFocalColourAlpha(sequence.focalColorAlpha)
                                     .setCaptureTouchEventOutsidePrompt(true)
                                     .setBackgroundColour(sequence.backgroundColor), sequenceFlagKey)
@@ -85,6 +87,7 @@ object TutorialManager {
         if (DEBUG_ALWAYS_SHOW_TUTORIAL || !hasShownTutorials(tag)) {
             val builder = MaterialTapTargetPrompt.Builder(activity)
                     .setTarget(target)
+                    .setFocalColour(Color.TRANSPARENT)
                     //.setFocalColourAlpha(focalColorAlpha)
                     .setBackgroundColour(backgroundColor)
                     .setCaptureTouchEventOutsidePrompt(true)

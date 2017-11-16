@@ -3,7 +3,7 @@
     android:layout_height="match_parent"
     android:background="@color/outerBackground">
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.common.FallbackRecyclerView
+    <kr.ac.snu.hcil.omnitrack.ui.components.common.container.FallbackRecyclerView
         android:id="@+id/ui_tracker_list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.components.common
+package kr.ac.snu.hcil.omnitrack.ui.components.common.container
 
 import android.animation.Animator
 import android.animation.AnimatorSet
@@ -213,6 +213,7 @@ class AdapterLinearLayout : DragLinearLayout {
                 }
 
                 val view = makeView(position)
+                view.id = View.generateViewId()
                 TransitionManager.beginDelayedTransition(this@AdapterLinearLayout)
                 addDragView(view, view.findViewById(R.id.ui_drag_handle), position)
 
