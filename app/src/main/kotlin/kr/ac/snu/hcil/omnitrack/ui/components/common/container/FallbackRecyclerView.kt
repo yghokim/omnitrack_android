@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.ui.components.common
+package kr.ac.snu.hcil.omnitrack.ui.components.common.container
 
 import android.content.Context
 import android.support.v7.widget.RecyclerView

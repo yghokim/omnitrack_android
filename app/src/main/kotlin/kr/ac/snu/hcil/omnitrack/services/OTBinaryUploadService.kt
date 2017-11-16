@@ -8,7 +8,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.UploadTaskInfo
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels.UploadTaskInfo
 import kr.ac.snu.hcil.omnitrack.core.net.IBinaryStorageCore
 import kr.ac.snu.hcil.omnitrack.core.net.OTBinaryStorageController
 import kr.ac.snu.hcil.omnitrack.core.system.OTTaskNotificationManager

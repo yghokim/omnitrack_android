@@ -9,7 +9,7 @@ import io.reactivex.Single
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
-import kr.ac.snu.hcil.omnitrack.core.database.UploadTaskInfo
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels.UploadTaskInfo
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Provider

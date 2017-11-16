@@ -3,7 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
+import kr.ac.snu.hcil.omnitrack.ui.components.common.container.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import java.util.*

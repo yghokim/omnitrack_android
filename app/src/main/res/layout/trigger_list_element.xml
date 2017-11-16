@@ -116,7 +116,7 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
+    <kr.ac.snu.hcil.omnitrack.ui.components.common.container.LockableFrameLayout
         android:id="@+id/ui_bottom_bar"
         android:layout_width="match_parent"
         android:layout_height="@dimen/button_height_normal"
@@ -147,5 +147,5 @@
             app:srcCompat="@drawable/trashcan" />
 
 
-    </kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout>
+    </kr.ac.snu.hcil.omnitrack.ui.components.common.container.LockableFrameLayout>
 </android.support.constraint.ConstraintLayout>

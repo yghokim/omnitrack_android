@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.core.database
+package kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels
 
 import android.net.Uri
 import io.realm.MutableRealmInteger
@@ -21,7 +21,7 @@ open class UploadTaskInfo : RealmObject() {
     var itemId: String = ""
     var userId: String = ""
 
-    var trialCount = MutableRealmInteger.valueOf(0)
+    val trialCount = MutableRealmInteger.valueOf(0)
 
     fun localUriCompat(): Uri {
 

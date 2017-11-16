@@ -17,8 +17,8 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTItemDAO
-import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.common.RxBoundDialogFragment
+import kr.ac.snu.hcil.omnitrack.ui.components.common.container.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import javax.inject.Inject

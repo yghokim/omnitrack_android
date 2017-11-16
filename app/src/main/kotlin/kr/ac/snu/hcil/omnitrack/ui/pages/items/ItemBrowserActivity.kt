@@ -36,7 +36,7 @@ import kr.ac.snu.hcil.omnitrack.ui.DragItemTouchHelperCallback
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.DismissingBottomSheetDialogFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.common.ExtendedSpinner
-import kr.ac.snu.hcil.omnitrack.ui.components.common.FallbackRecyclerView
+import kr.ac.snu.hcil.omnitrack.ui.components.common.container.FallbackRecyclerView
 import kr.ac.snu.hcil.omnitrack.ui.components.common.viewholders.RecyclerViewMenuAdapter
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.DrawableListBottomSpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
