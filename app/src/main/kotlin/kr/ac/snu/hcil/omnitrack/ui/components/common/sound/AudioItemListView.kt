@@ -46,14 +46,17 @@ class AudioItemListView : ConstraintLayout {
                             context.runOnUiThread {
                                 mode = Mode.Loading
                             }
-                        }.subscribe { (refreshed, localFileUri) ->
+                        }.subscribe({ (refreshed, localFileUri) ->
                             this.localFileUri = localFileUri
                             if (localFileUri != Uri.EMPTY) {
                                 mode = Mode.Mounted
                             } else {
                                 mode = Mode.Empty
                             }
-                        }
+                        }, { error ->
+                            error.printStackTrace()
+                            mode = Mode.Error
+                        })
                 )
             }
         }
