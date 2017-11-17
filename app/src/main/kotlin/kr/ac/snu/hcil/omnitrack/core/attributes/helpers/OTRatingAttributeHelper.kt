@@ -35,24 +35,8 @@ class OTRatingAttributeHelper : OTAttributeHelper() {
         override fun getFallbackValue(attribute: OTAttributeDAO, realm: Realm): Single<Nullable<out Any>> {
             return Single.defer {
                 val ratingOptions = getRatingOptions(attribute)
-                when (ratingOptions.type) {
-                    RatingOptions.DisplayType.Likert -> {
-                        if (ratingOptions.allowIntermediate) {
-                            return@defer Single.just((ratingOptions.rightMost + ratingOptions.leftMost) / 2.0f)
-                        } else {
-
-                            return@defer Single.just(((ratingOptions.rightMost + ratingOptions.leftMost) / 2).toFloat())
-                        }
-                    }
-                    RatingOptions.DisplayType.Star -> {
-                        if (ratingOptions.allowIntermediate) {
-                            return@defer Single.just(ratingOptions.starLevels.maxScore / 2.0f)
-                        } else {
-                            return@defer Single.just((ratingOptions.starLevels.maxScore / 2).toFloat())
-                        }
-                    }
-                }
-            }.map { value -> Nullable(value) }
+                return@defer Single.just(Nullable(Fraction.fromRatioAndUnder(0.5f, ratingOptions.getMaximumPrecisionIntegerRangeLength())))
+            }
         }
 
     }

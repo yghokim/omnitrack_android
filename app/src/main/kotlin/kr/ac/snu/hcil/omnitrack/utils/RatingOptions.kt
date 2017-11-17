@@ -106,14 +106,30 @@ class RatingOptions {
         return "{RationOptions | allowIntermediate: $allowIntermediate , type: $type, starLevels: $starLevels, leftMost: $leftMost, rightMost: $rightMost, leftLabel: $leftLabel, rightLabel: $rightLabel, middleLable: $middleLabel"
     }
 
-    fun convertFractionToRealScore(fraction: Fraction): Float {
-        when (type) {
+    fun getMaximumPrecisionIntegerRangeLength(): Short {
+        return when (type) {
             DisplayType.Star -> {
-                val under = if (allowIntermediate) {
+                if (allowIntermediate) {
                     starLevels.maxScore * 2
                 } else {
                     starLevels.maxScore
                 }
+            }
+
+            DisplayType.Likert -> {
+                if (allowIntermediate) {
+                    (rightMost - leftMost) * 10
+                } else {
+                    rightMost - leftMost
+                }
+            }
+        }.toShort()
+    }
+
+    fun convertFractionToRealScore(fraction: Fraction): Float {
+        val under = getMaximumPrecisionIntegerRangeLength()
+        when (type) {
+            DisplayType.Star -> {
                 var upper = Math.round((fraction.toFloat() * under))
                 if (fraction.upper > 0) {
                     upper = Math.max(upper, 1)
@@ -123,11 +139,6 @@ class RatingOptions {
             }
 
             DisplayType.Likert -> {
-                val under = if (allowIntermediate) {
-                    (rightMost - leftMost) * 10
-                } else {
-                    rightMost - leftMost
-                }
                 var upper = Math.round((fraction.toFloat() * under))
                 if (fraction.upper > 0) {
                     upper = Math.max(upper, 1)

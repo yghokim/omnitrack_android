@@ -114,16 +114,17 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
                         })
             }
         }
-        /*
-        valueView.fileRemoved += {
-            sender, time ->
-            this.onValueChanged(SynchronizedUri(valueView.audioFileUri))
-        }
+    }
 
-        valueView.recordingComplete += {
-            sender, length ->
-            this.onValueChanged(SynchronizedUri(valueView.audioFileUri))
-        }*/
+    private fun convertNewUriToServerFile(uri: Uri): Single<Nullable<OTServerFile>> {
+        if (uri == Uri.EMPTY) {
+            return Single.just(Nullable<OTServerFile>(null))
+        } else if (!uri.equals(value?.let { localCacheManager.get().getCachedUriImmediately(it.serverPath) } ?: Uri.EMPTY)) {
+            val newServerPath = localCacheManager.get().generateRandomServerPath(uri)
+            return localCacheManager.get().insertOrUpdateNewLocalMedia(uri, newServerPath).map { serverUri ->
+                Nullable(OTServerFile.fromLocalFile(serverUri, uri, context))
+            }.onErrorReturn { err -> err.printStackTrace(); Nullable<OTServerFile>() }
+        } else return Single.just(Nullable(value))
     }
 
     override fun focus() {
@@ -131,7 +132,7 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
     }
 
     override fun forceApplyValueAsync(): Single<Nullable<out Any>> {
-        return valueView.stopRecordingAndApplyUri() as Single<Nullable<out Any>>
+        return valueView.stopRecordingAndApplyUri().flatMap { (uri) -> convertNewUriToServerFile(uri ?: Uri.EMPTY) } as Single<Nullable<out Any>>
     }
 
     override fun onDetachedFromWindow() {
