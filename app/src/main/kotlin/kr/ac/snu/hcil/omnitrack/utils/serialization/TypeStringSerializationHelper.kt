@@ -1,12 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.utils.serialization
 
-import android.net.Uri
 import com.google.android.gms.maps.model.LatLng
-import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
-import kr.ac.snu.hcil.omnitrack.core.datatypes.Fraction
-import kr.ac.snu.hcil.omnitrack.core.datatypes.Route
-import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
-import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
+import kr.ac.snu.hcil.omnitrack.core.datatypes.*
 import kr.ac.snu.hcil.omnitrack.utils.isNumericPrimitive
 import kr.ac.snu.hcil.omnitrack.utils.toBigDecimal
 import java.math.BigDecimal
@@ -39,9 +34,8 @@ object TypeStringSerializationHelper {
     const val TYPENAME_LATITUDE_LONGITUDE = "Crd"
     const val TYPENAME_ROUTE = "R"
     const val TYPENAME_TIMESPAN = "TS"
-    const val TYPENAME_URI = "U"
-    const val TYPENAME_SYNCHRONIZED_URI = "SyncU"
     const val TYPENAME_FRACTION = "Fr"
+    const val TYPENAME_SERVERFILE = "SF"
 
 
     val classNameDictionary: Map<String, String> = mapOf(
@@ -59,8 +53,7 @@ object TypeStringSerializationHelper {
             LongArray::class.java.name to TYPENAME_LONG_ARRAY,
             LatLng::class.java.name to TYPENAME_LATITUDE_LONGITUDE,
             Route::class.java.name to TYPENAME_ROUTE,
-            Uri::class.java.name to TYPENAME_URI,
-            SynchronizedUri::class.java.name to TYPENAME_SYNCHRONIZED_URI,
+            OTServerFile::class.java.name to TYPENAME_SERVERFILE,
             Fraction::class.java.name to TYPENAME_FRACTION
     )
 
@@ -89,10 +82,12 @@ object TypeStringSerializationHelper {
             TYPENAME_LONG_ARRAY -> (value as IntArray).joinToString(",")
             TYPENAME_LATITUDE_LONGITUDE -> (value as LatLng).serialize()
             TYPENAME_ROUTE -> (value as Route).getSerializedString()
-            TYPENAME_SYNCHRONIZED_URI -> (SynchronizedUri.parser.toJson(value))
             TYPENAME_FRACTION -> {
                 val value = value as Fraction
                 "${value.upper}/${value.under}"
+            }
+            TYPENAME_SERVERFILE -> {
+                (value as OTServerFile).getSerializedString()
             }
             else -> value.toString()
         }
@@ -121,20 +116,19 @@ object TypeStringSerializationHelper {
             TYPENAME_BIGDECIMAL -> BigDecimal(value)
             TYPENAME_TIMEPOINT -> TimePoint(value)
             TYPENAME_TIMESPAN -> TimeSpan(value)
-            TYPENAME_INT_ARRAY -> if (value.isNullOrEmpty()) {
+            TYPENAME_INT_ARRAY -> if (value.isEmpty()) {
                 intArrayOf()
             } else {
                 value.split(",").map(String::toInt).toIntArray()
             }
-            TYPENAME_LONG_ARRAY -> if (value.isNullOrEmpty()) {
+            TYPENAME_LONG_ARRAY -> if (value.isEmpty()) {
                 longArrayOf()
             } else {
                 value.split(",").map(String::toLong).toLongArray()
             }
             TYPENAME_LATITUDE_LONGITUDE -> deserializeLatLng(value)
             TYPENAME_ROUTE -> Route(value)
-            TYPENAME_URI -> Uri.parse(value)
-            TYPENAME_SYNCHRONIZED_URI -> SynchronizedUri.parser.fromJson(value, SynchronizedUri::class.java)
+            TYPENAME_SERVERFILE -> OTServerFile.typeAdapter.fromJson(value)
             TYPENAME_FRACTION -> {
                 val split = value.split("/")
                 Fraction(split[0].toShort(), split[1].toShort())

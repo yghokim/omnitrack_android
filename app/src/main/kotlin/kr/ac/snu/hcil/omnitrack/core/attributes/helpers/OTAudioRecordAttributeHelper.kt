@@ -5,13 +5,12 @@ import android.content.Context
 import android.view.View
 import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.datatypes.OTServerFile
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioItemListView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AudioRecordInputView
-import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import java.util.*
 
 /**
@@ -37,15 +36,11 @@ class OTAudioRecordAttributeHelper : OTFileInvolvedAttributeHelper() {
 
     override fun getRequiredPermissions(attribute: OTAttributeDAO): Array<String>? = permissions
 
-    override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_SYNCHRONIZED_URI
-
     override fun getInputViewType(previewMode: Boolean, attribute: OTAttributeDAO): Int = AAttributeInputView.VIEW_TYPE_AUDIO_RECORD
 
     override fun refreshInputViewUI(inputView: AAttributeInputView<out Any>, attribute: OTAttributeDAO) {
-        if (inputView is AudioRecordInputView) {   //TODO cacheDir
-            databaseManager.get().getUnManagedTrackerDao(attribute.trackerId, null)?.let {
-                inputView.valueView.recordingOutputDirectoryPathOverride = it.getItemCacheDir(inputView.context, true)
-            }
+        if (inputView is AudioRecordInputView) {
+            inputView.valueView.recordingOutputDirectoryPathOverride = localCacheManager.getItemCacheDir(attribute.trackerId ?: "audios", true)
         }
     }
 
@@ -60,8 +55,8 @@ class OTAudioRecordAttributeHelper : OTFileInvolvedAttributeHelper() {
     }
 
     override fun applyValueToViewForItemList(attribute: OTAttributeDAO, value: Any?, view: View): Single<Boolean> {
-        if (view is AudioItemListView && value is SynchronizedUri) {
-            view.mountedUri = value
+        if (view is AudioItemListView && value is OTServerFile) {
+            view.mountedServerPath = value.serverPath
         }
         return super.applyValueToViewForItemList(attribute, value, view)
     }

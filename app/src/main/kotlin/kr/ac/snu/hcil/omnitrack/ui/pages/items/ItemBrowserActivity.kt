@@ -31,6 +31,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
 import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.net.OTLocalMediaCacheManager
 import kr.ac.snu.hcil.omnitrack.services.OTTableExportService
 import kr.ac.snu.hcil.omnitrack.ui.DragItemTouchHelperCallback
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
@@ -49,6 +50,7 @@ import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelpe
 import org.jetbrains.anko.support.v4.act
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.Inject
 import kotlin.properties.Delegates
 
 class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_browser), ExtendedSpinner.OnItemSelectedListener, View.OnClickListener, AttributeEditDialogFragment.Listener {
@@ -634,6 +636,9 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
             }
         }
 
+        @Inject
+        lateinit var localCacheManager: OTLocalMediaCacheManager
+
         private lateinit var viewModel: ItemListViewModel
 
         private var listView: RecyclerView by Delegates.notNull()
@@ -653,6 +658,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
         override fun onActivityCreated(savedInstanceState: Bundle?) {
             super.onActivityCreated(savedInstanceState)
+            (act.application as OTApp).networkComponent.inject(this)
             viewModel = ViewModelProviders.of(activity!!).get(ItemListViewModel::class.java)
 
             dialogSubscriptions.add(
@@ -703,7 +709,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
         }
 
         private fun refreshPurgeButton() {
-            val cacheSize = this.viewModel.trackerDao.getTotalCacheFileSize(act)
+            val cacheSize = localCacheManager.getTotalCacheFileSize(this.viewModel.trackerId)
             if (cacheSize > 0L) {
                 purgeMenuItem.isEnabled = true
                 purgeMenuItem.description = "${(cacheSize / (1024 * 102.4f) + .5f).toInt() / 10f} Mb"
@@ -717,7 +723,9 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
         override fun setupDialogAndContentView(dialog: Dialog, contentView: View) {
 
             purgeMenuItem = RecyclerViewMenuAdapter.MenuItem(R.drawable.clear_cache, OTApp.getString(R.string.msg_purge_cache), null, isEnabled = false, onClick = {
-                val cacheDir = viewModel.trackerDao.getItemCacheDir(act, false)
+                //TODO do not remove unsynchronized cache
+                //TODO refactor not to remove the directory here. make purge synchronized cache API
+                val cacheDir = localCacheManager.getItemCacheDir(viewModel.trackerId, false)
                     println("purge cache dir files")
                     /*
                     RxProgressDialog.Builder(FileHelper.removeAllFilesIn(cacheDir).toObservable()).create(this@SettingsDialogFragment.activity).show().subscribe {

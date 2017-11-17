@@ -8,8 +8,8 @@ import dagger.Lazy
 import io.reactivex.Single
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels.UploadTaskInfo
+import kr.ac.snu.hcil.omnitrack.utils.executeTransactionIfNotIn
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Provider
@@ -30,27 +30,23 @@ class OTBinaryStorageController(val context: Context, val core: IBinaryStorageCo
         jobProvider = component.getBinaryUploadJob()
     }
 
-    fun registerNewUploadTask(outUri: SynchronizedUri, itemId: String, trackerId: String, userId: String) {
+    fun registerNewUploadTask(localPath: String, serverPath: String) {
         realmProvider.get().use { realm ->
-            val dbObject = UploadTaskInfo()
-            dbObject.id = UUID.randomUUID().toString()
-
-            //realm.createObject(UploadTaskInfo::class.java, UUID.randomUUID().toString())
-            dbObject.itemId = itemId
-            dbObject.trackerId = trackerId
-            dbObject.userId = userId
-            dbObject.localUri = outUri.localUri.toString()
-            dbObject.serverUri = outUri.serverUri.toString()
-
-            realm.executeTransaction {
-                realm.copyToRealmOrUpdate(dbObject)
+            realm.executeTransactionIfNotIn {
+                val dbObject = realm.where(UploadTaskInfo::class.java)
+                        .equalTo("serverPath", serverPath).findFirst() ?: realm.createObject(UploadTaskInfo::class.java, UUID.randomUUID().toString())
+                dbObject.localFilePath = localPath
+                dbObject.serverPath = serverPath
+                if (dbObject.trialCount.isNull) {
+                    dbObject.trialCount.set(0L)
+                }
             }
         }
         dispatcher.get().mustSchedule(jobProvider.get())
     }
 
-    fun makeFilePath(itemId: String, trackerId: String, userId: String, fileName: String): Uri {
-        return core.makeFilePath(itemId, trackerId, userId, fileName)
+    fun makeServerPath(userId: String, trackerId: String, itemId: String, attributeLocalId: String, fileIdentifier: String): String {
+        return core.makeServerPath(userId, trackerId, itemId, attributeLocalId, fileIdentifier)
     }
 
     fun downloadFileTo(pathString: String, localUri: Uri): Single<Uri> {

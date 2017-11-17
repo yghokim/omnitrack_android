@@ -14,19 +14,17 @@ import java.io.File
  * Created by younghokim on 2017. 11. 15..
  */
 class OTFirebaseStorageCore : IBinaryStorageCore {
-    private fun getItemStorageReference(itemId: String, trackerId: String, userId: String): StorageReference {
-        return FirebaseStorage.getInstance().reference.child("entry_data").child(userId).child(trackerId).child(itemId)
+    private fun getItemStorageReference(relPath: String): StorageReference {
+        return FirebaseStorage.getInstance().reference.child(relPath)
     }
 
     override fun startNewUploadTaskImpl(taskInfo: UploadTaskInfo, onProgress: (session: String) -> Unit): Completable {
         return Completable.create { subscriber ->
 
-            val itemId = taskInfo.itemId
-            val userId = taskInfo.userId
-            val trackerId = taskInfo.trackerId
+
             val localUri = taskInfo.localUriCompat()
 
-            val storageRef = getItemStorageReference(itemId, trackerId, userId).child(localUri.lastPathSegment)
+            val storageRef = getItemStorageReference(taskInfo.serverPath)
 
             val task = storageRef.putFile(localUri, StorageMetadata.Builder().build(), if (taskInfo.sessionUri != null) Uri.parse(taskInfo.sessionUri!!) else null)
 
@@ -39,11 +37,13 @@ class OTFirebaseStorageCore : IBinaryStorageCore {
                 }
             }.addOnCompleteListener { finishedTask ->
                 if (finishedTask.isSuccessful) {
+                    println("Firebsae Storage upload was successful: ${finishedTask.result.downloadUrl}")
                     if (!subscriber.isDisposed) {
                         subscriber.onComplete()
                     }
                 } else {
                     if (!subscriber.isDisposed) {
+                        finishedTask.exception?.printStackTrace()
                         subscriber.onError(finishedTask.exception!!)
                     }
                 }
@@ -51,8 +51,8 @@ class OTFirebaseStorageCore : IBinaryStorageCore {
         }
     }
 
-    override fun makeFilePath(itemId: String, trackerId: String, userId: String, fileName: String): Uri
-            = Uri.parse(getItemStorageReference(itemId, trackerId, userId).child(fileName).path)
+    override fun makeServerPath(userId: String, trackerId: String, itemId: String, attributeLocalId: String, fileIdentifier: String): String
+            = "entry_data/$userId/$trackerId/$itemId/$attributeLocalId/$fileIdentifier"
 
     override fun downloadFileTo(pathString: String, localUri: Uri): Single<Uri> {
         return Single.create { subscriber ->

@@ -109,9 +109,10 @@ object VectorIconHelper {
                         ex.printStackTrace()
                     }
                 }
-
                 bitmap
             }
+
+            realm.close()
 
             memCache.put(cacheKey, finalBitmap)
 

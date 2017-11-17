@@ -10,6 +10,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels.UploadTa
  */
 interface IBinaryStorageCore {
     fun startNewUploadTaskImpl(taskInfo: UploadTaskInfo, onProgress: (session: String) -> Unit): Completable
-    fun makeFilePath(itemId: String, trackerId: String, userId: String, fileName: String): Uri
+    fun makeServerPath(userId: String, trackerId: String, itemId: String, attributeLocalId: String, fileIdentifier: String): String
     fun downloadFileTo(pathString: String, localUri: Uri): Single<Uri>
 }
