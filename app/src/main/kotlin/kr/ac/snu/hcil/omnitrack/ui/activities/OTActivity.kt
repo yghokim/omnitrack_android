@@ -147,10 +147,13 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
         }
     }
 
+    protected open fun onInject(app: OTApp) {
+        app.applicationComponent.inject(this)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        (application as OTApp).applicationComponent.inject(this)
-
+        onInject(application as OTApp)
         processAuthorization()
         PreferenceManager.setDefaultValues(this, R.xml.global_preferences, false)
     }

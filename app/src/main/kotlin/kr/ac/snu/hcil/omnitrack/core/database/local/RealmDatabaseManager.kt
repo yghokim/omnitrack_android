@@ -1,7 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.database.local
 
 import android.content.Intent
-import android.net.Uri
 import com.google.gson.JsonObject
 import dagger.Lazy
 import io.reactivex.Completable
@@ -11,16 +10,16 @@ import io.reactivex.subjects.PublishSubject
 import io.realm.*
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels.OTItemBuilderDAO
+import kr.ac.snu.hcil.omnitrack.core.datatypes.OTServerFile
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationClientSideAPI
-import kr.ac.snu.hcil.omnitrack.core.net.OTBinaryStorageController
+import kr.ac.snu.hcil.omnitrack.core.net.OTLocalMediaCacheManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncResultEntry
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
@@ -41,7 +40,8 @@ class RealmDatabaseManager @Inject constructor(
         private val shortcutPanelManager: Lazy<OTShortcutPanelManager>,
         private val serializationManager: DaoSerializationManager,
         private val triggerSystemManager: OTTriggerSystemManager,
-        private val binaryUploadServiceController: OTBinaryStorageController)
+        private val localCacheManager: OTLocalMediaCacheManager
+)
     :ISynchronizationClientSideAPI{
 
     companion object {
@@ -331,14 +331,23 @@ class RealmDatabaseManager @Inject constructor(
                     item.objectId = newItemId
                 }
 
-                if (realm.isInTransaction) {
-                    handleBinaryUpload(item.objectId!!, item, localIdsToIgnore)
-                    realm.copyToRealmOrUpdate(item)
-                } else {
-                    realm.executeTransaction { realm ->
-                        handleBinaryUpload(item.objectId!!, item, localIdsToIgnore)
-                        realm.copyToRealmOrUpdate(item)
+                realm.executeTransactionIfNotIn {
+                    item.fieldValueEntries.filter { localIdsToIgnore?.contains(it.key) != true }.forEach { entry ->
+                        val value = entry.value?.let { TypeStringSerializationHelper.deserialize(it) }
+                        if (value != null) {
+                            if (value is OTServerFile && value.serverPath.isNotBlank()) {
+                                if (localCacheManager.isServerPathTemporal(value.serverPath)) {
+                                    val newServerPath = localCacheManager.replaceTemporalServerPath(value.serverPath, item.trackerId ?: "noTracker", item.objectId!!, entry.key)
+                                    if (newServerPath != null) {
+                                        value.serverPath = newServerPath
+                                        entry.value = TypeStringSerializationHelper.serialize(value)
+                                        localCacheManager.registerSynchronization()
+                                    }
+                                }
+                            }
+                        }
                     }
+                    realm.copyToRealmOrUpdate(item)
                 }
 
             } catch (ex: Exception) {
@@ -346,21 +355,6 @@ class RealmDatabaseManager @Inject constructor(
             } finally {
                 if (!subscriber.isDisposed) {
                     subscriber.onSuccess(Pair(result, item.objectId))
-                }
-            }
-        }
-    }
-
-    protected fun handleBinaryUpload(itemId: String, item: OTItemDAO, localIdsToIgnore: Array<String>?) {
-
-        item.fieldValueEntries.filter { localIdsToIgnore?.contains(it.key) != true }.forEach { entry ->
-            val value = entry.value?.let { TypeStringSerializationHelper.deserialize(it) }
-            if (value != null) {
-                if (value is SynchronizedUri && value.localUri != Uri.EMPTY) {
-                    println("upload Synchronized Uri file to server...")
-                    value.setSynchronized(binaryUploadServiceController.makeFilePath(itemId, item.trackerId!!, authManager.userId!!, value.localUri.lastPathSegment))
-                    entry.value = TypeStringSerializationHelper.serialize(value)
-                    binaryUploadServiceController.registerNewUploadTask(value, itemId, item.trackerId!!, authManager.userId!!)
                 }
             }
         }

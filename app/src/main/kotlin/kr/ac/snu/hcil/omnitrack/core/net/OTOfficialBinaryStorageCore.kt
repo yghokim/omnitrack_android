@@ -12,9 +12,7 @@ import okhttp3.MultipartBody
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Retrofit
-import retrofit2.http.Multipart
-import retrofit2.http.POST
-import retrofit2.http.Part
+import retrofit2.http.*
 import java.io.File
 import java.io.FileNotFoundException
 
@@ -22,6 +20,7 @@ import java.io.FileNotFoundException
  * Created by younghokim on 2017-11-15.
  */
 class OTOfficialBinaryStorageCore(val context: Context, val retrofit: Lazy<Retrofit>) : IBinaryStorageCore {
+
     /**
      * Retrofit Interface
      */
@@ -29,7 +28,10 @@ class OTOfficialBinaryStorageCore(val context: Context, val retrofit: Lazy<Retro
 
         @Multipart
         @POST("api/upload/item_media")
-        fun uploadItemMediaFile(@Part("trackerId") trackerId: String, @Part("itemId") itemId: String, @Part file: MultipartBody.Part): Call<ResponseBody>
+        fun uploadItemMediaFile(@Url filePath: String, @Part file: MultipartBody.Part): Call<ResponseBody>
+
+        @GET("api/dowload/item_media")
+        fun downloadMediaFile(@Url filePath: String): Call<ResponseBody>
     }
 
     private val service: OfficialBinaryStorageServerService by lazy {
@@ -50,10 +52,9 @@ class OTOfficialBinaryStorageCore(val context: Context, val retrofit: Lazy<Retro
         }
     }
 
-    override fun makeFilePath(itemId: String, trackerId: String, userId: String, fileName: String): Uri {
-        return Uri.parse(fileName)
+    override fun makeServerPath(userId: String, trackerId: String, itemId: String, attributeLocalId: String, fileIdentifier: String): String {
+        return "${trackerId}/${itemId}/${attributeLocalId}/${fileIdentifier}"
     }
-
     override fun downloadFileTo(pathString: String, localUri: Uri): Single<Uri> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }

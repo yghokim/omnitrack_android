@@ -20,7 +20,6 @@ import kr.ac.snu.hcil.omnitrack.services.OTSynchronizationService
 import kr.ac.snu.hcil.omnitrack.services.OTTableExportService
 import kr.ac.snu.hcil.omnitrack.services.messaging.OTFirebaseInstanceIdService
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
-import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioItemListView
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.AttributeEditDialogFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AudioRecordInputView
 import kr.ac.snu.hcil.omnitrack.ui.pages.SendReportActivity
@@ -98,8 +97,6 @@ interface ApplicationComponent {
     fun inject(activity: SendReportActivity)
 
     fun inject(attributeManager: OTAttributeManager.Companion)
-
-    fun inject(audioItemListView: AudioItemListView)
 
     fun inject(audioRecordInputView: AudioRecordInputView)
 

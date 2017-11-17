@@ -7,25 +7,29 @@ import android.view.View
 import com.github.ybq.android.spinkit.SpinKitView
 import dagger.Lazy
 import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.SerialDisposable
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.net.OTBinaryStorageController
+import kr.ac.snu.hcil.omnitrack.core.datatypes.OTServerFile
+import kr.ac.snu.hcil.omnitrack.core.net.OTLocalMediaCacheManager
 import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioRecorderView
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
+import org.jetbrains.anko.runOnUiThread
 import javax.inject.Inject
 import javax.inject.Provider
 
 /**
  * Created by Young-Ho Kim on 2016-07-22.
  */
-class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAttributeInputView<SynchronizedUri>(R.layout.input_audio_record, context, attrs) {
+class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAttributeInputView<OTServerFile>(R.layout.input_audio_record, context, attrs) {
+
     @Inject
-    lateinit var binaryServerController: Lazy<OTBinaryStorageController>
+    lateinit var localCacheManager: Lazy<OTLocalMediaCacheManager>
 
     @Inject
     lateinit var dbManager: Lazy<RealmDatabaseManager>
@@ -51,45 +55,37 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
             }
         }
 
-    override var value: SynchronizedUri? = null
+    override var value: OTServerFile? = null
         set(rawValue) {
-            val value = if (rawValue?.isEmpty == true) null else rawValue
+            val value = if (rawValue?.serverPath?.isBlank() == true) null else rawValue
             if (field != value) {
-                subscriptions.clear()
                 field = value
-                if (value?.isLocalUriValid == true) {
+                if (value == null) {
                     valueView.audioFileUriChanged.suspend = true
-                    valueView.audioFileUri = value.localUri
+                    valueView.audioFileUri = Uri.EMPTY
                     valueView.audioFileUriChanged.suspend = false
-                } else if (value?.isSynchronized == true) {
-                    inLoadingMode = true
-                    subscriptions.add(
-                            binaryServerController.get().downloadFileTo(value.serverUri.path, value.localUri).subscribe(
-                                    {
-                                        uri ->
-                                        valueView.audioFileUriChanged.suspend = true
-                                        valueView.audioFileUri = uri
-                                        valueView.audioFileUriChanged.suspend = false
-                                        inLoadingMode = false
-                                    }, {
-                                error ->
+                } else {
+                    loadingSubscription.set(
+                            localCacheManager.get().getCachedUri(value.serverPath).observeOn(AndroidSchedulers.mainThread()).doOnSubscribe {
+                                context.runOnUiThread {
+                                    inLoadingMode = true
+                                }
+                            }.subscribe({ (refreshed, localUri) ->
+                                valueView.audioFileUriChanged.suspend = true
+                                valueView.audioFileUri = localUri
+                                valueView.audioFileUriChanged.suspend = false
+                                inLoadingMode = false
+                            }, { error ->
                                 error?.printStackTrace()
                                 valueView.audioFileUriChanged.suspend = true
                                 valueView.audioFileUri = Uri.EMPTY
                                 valueView.audioFileUriChanged.suspend = false
                                 inLoadingMode = false
-                            }
-                            )
+                            })
                     )
-                } else {
-                    //null
-                    valueView.audioFileUriChanged.suspend = true
-                    valueView.audioFileUri = Uri.EMPTY
-                    valueView.audioFileUriChanged.suspend = false
-                    inLoadingMode = false
                 }
 
-                this.onValueChanged(value)
+                onValueChanged(value)
             }
         }
 
@@ -98,7 +94,8 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
 
     private var audioTitleInformation: String = ""
 
-    private var subscriptions = CompositeDisposable()
+    private val loadingSubscription = SerialDisposable()
+    private val subscriptions = CompositeDisposable()
 
     init {
 
@@ -106,7 +103,16 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
 
         valueView.audioFileUriChanged += {
             sender, uri ->
-            this.value = SynchronizedUri(uri)
+            println("picker uri changed to $uri")
+            if (uri == Uri.EMPTY) {
+                value = null
+            } else if (!uri.equals(value?.let { localCacheManager.get().getCachedUriImmediately(it.serverPath) } ?: Uri.EMPTY)) {
+                val newServerPath = localCacheManager.get().generateRandomServerPath(uri)
+                subscriptions.add(
+                        localCacheManager.get().insertOrUpdateNewLocalMedia(uri, newServerPath).subscribe { serverUri ->
+                            value = OTServerFile.fromLocalFile(serverUri, uri, context)
+                        })
+            }
         }
         /*
         valueView.fileRemoved += {
@@ -130,6 +136,7 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
+        loadingSubscription.set(null)
         subscriptions.clear()
     }
 

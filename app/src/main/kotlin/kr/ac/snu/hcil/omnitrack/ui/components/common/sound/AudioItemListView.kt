@@ -1,6 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.common.sound
 
 import android.content.Context
+import android.net.Uri
 import android.support.constraint.ConstraintLayout
 import android.support.v7.widget.AppCompatImageView
 import android.util.AttributeSet
@@ -8,12 +9,13 @@ import android.view.View
 import android.widget.TextView
 import com.github.ybq.android.spinkit.SpinKitView
 import dagger.Lazy
-import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.SerialDisposable
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
-import kr.ac.snu.hcil.omnitrack.core.net.OTBinaryStorageController
+import kr.ac.snu.hcil.omnitrack.core.net.OTLocalMediaCacheManager
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
+import org.jetbrains.anko.runOnUiThread
 import javax.inject.Inject
 
 /**
@@ -33,24 +35,30 @@ class AudioItemListView : ConstraintLayout {
             }
         }
 
-    private val subscriptions = CompositeDisposable()
+    private val downloadSubscription = SerialDisposable()
 
-    var mountedUri: SynchronizedUri = SynchronizedUri()
+    var mountedServerPath: String = ""
         set(value) {
             if (field != value) {
                 field = value
-                if (!mountedUri.isEmpty) {
-                    if (mountedUri.isLocalUriValid) {
-                        mode = Mode.Mounted
-                    } else if (mountedUri.isSynchronized) {
-                        mode = Mode.Loading
-                        startDownload()
-                    }
-                } else {
-                    mode = Mode.Empty
-                }
+                downloadSubscription.set(
+                        localCacheManager.get().getCachedUri(value).observeOn(AndroidSchedulers.mainThread()).doOnSubscribe {
+                            context.runOnUiThread {
+                                mode = Mode.Loading
+                            }
+                        }.subscribe { (refreshed, localFileUri) ->
+                            this.localFileUri = localFileUri
+                            if (localFileUri != Uri.EMPTY) {
+                                mode = Mode.Mounted
+                            } else {
+                                mode = Mode.Empty
+                            }
+                        }
+                )
             }
         }
+
+    private var localFileUri: Uri = Uri.EMPTY
 
     private val loadingIndicatorView: SpinKitView
     private val iconView: AppCompatImageView
@@ -58,7 +66,7 @@ class AudioItemListView : ConstraintLayout {
     private val unitView: TextView
 
     @Inject
-    lateinit var binaryDownloader: Lazy<OTBinaryStorageController>
+    lateinit var localCacheManager: Lazy<OTLocalMediaCacheManager>
 
     init {
         inflateContent(R.layout.component_audio_item_list_view, true)
@@ -67,23 +75,12 @@ class AudioItemListView : ConstraintLayout {
         durationView = findViewById(R.id.ui_duration_view)
         unitView = findViewById(R.id.ui_unit_text)
 
-        (context.applicationContext as OTApp).applicationComponent.inject(this)
-    }
-
-    private fun startDownload() {
-        subscriptions.add(
-                binaryDownloader.get().downloadFileTo(mountedUri.serverUri.toString(), mountedUri.localUri)
-                        .subscribe({
-                            uri ->
-                            println("audio file download complete: $uri")
-                            mode = Mode.Mounted
-                        }, { mode = Mode.Error })
-        )
+        (context.applicationContext as OTApp).networkComponent.inject(this)
     }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        subscriptions.clear()
+        downloadSubscription.set(null)
     }
 
     private fun onModeChanged(mode: Mode, oldMode: Mode) {
@@ -98,7 +95,7 @@ class AudioItemListView : ConstraintLayout {
                 iconView.visibility = View.VISIBLE
                 loadingIndicatorView.visibility = View.INVISIBLE
                 iconView.setImageResource(R.drawable.icon_waveform)
-                val metadata = AudioRecordMetadata.readMetadata(mountedUri.localUri.path)
+                val metadata = AudioRecordMetadata.readMetadata(localFileUri.path)
                 if (metadata != null) {
                     durationView.visibility = View.VISIBLE
                     durationView.text = ((metadata.durationMillis / 10) / 100f).toString()

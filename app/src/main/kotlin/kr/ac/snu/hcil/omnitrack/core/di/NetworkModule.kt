@@ -122,6 +122,12 @@ class NetworkModule {
 
     @Provides
     @Singleton
+    fun provideLocalMediaCacheManager(context: Context, authManager: Lazy<OTAuthManager>, storageController: Lazy<OTBinaryStorageController>): OTLocalMediaCacheManager {
+        return OTLocalMediaCacheManager(context, authManager, storageController)
+    }
+
+    @Provides
+    @Singleton
     fun provideUserReportServerController(controller: OTOfficialServerApiController): IUserReportServerAPI {
         return controller
     }

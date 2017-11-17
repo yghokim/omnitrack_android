@@ -2,27 +2,20 @@ package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 
 import android.Manifest
 import android.content.Context
-import android.graphics.drawable.Drawable
 import android.view.View
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import io.reactivex.Single
-import io.reactivex.schedulers.Schedulers
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager.Companion.VIEW_FOR_ITEM_LIST_CONTAINER_TYPE_MULTILINE
-import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.datatypes.OTServerFile
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.common.PlaceHolderImageView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.ImageInputView
-import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
-import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
+import org.jetbrains.anko.runOnUiThread
 import java.util.*
 
 /**
@@ -50,13 +43,9 @@ class OTImageAttributeHelper : OTFileInvolvedAttributeHelper() {
 
     override fun getRequiredPermissions(attribute: OTAttributeDAO): Array<String>? = permissions
 
-    override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_SYNCHRONIZED_URI
-
     override fun refreshInputViewUI(inputView: AAttributeInputView<out Any>, attribute: OTAttributeDAO) {
         if (inputView is ImageInputView) {
-            databaseManager.get().getUnManagedTrackerDao(attribute.trackerId, null)?.let {
-                inputView.picker.overrideLocalUriFolderPath = it.getItemCacheDir(inputView.context, true)
-            }
+            inputView.picker.overrideLocalUriFolderPath = localCacheManager.getItemCacheDir(attribute.trackerId ?: "images", true)
         }
     }
 
@@ -83,62 +72,28 @@ class OTImageAttributeHelper : OTFileInvolvedAttributeHelper() {
                 view.currentMode = PlaceHolderImageView.Mode.EMPTY
 
                 fun function(): Single<Boolean> {
-                    if (value is SynchronizedUri && !value.isEmpty) {
-                        if (value.isLocalUriValid) {
-                            view.currentMode = PlaceHolderImageView.Mode.IMAGE
-                            Glide.with(view.context)
-                                    .load(value.localUri.toString())
-                                    .apply(RequestOptions().override(Target.SIZE_ORIGINAL))
-                                    .into(view.imageView)
-                            return Single.just(true)
-                        } else {
-                            println("local uri is invalid. download server image.")
-                            if (value.isSynchronized) {
-
-                                println("value is synchronized. download server image from firebase ${value.serverUri}")
-
-                                if (!NetworkHelper.isConnectedToInternet()) {
-                                    println("internet is not connected.")
-                                    view.setErrorMode(OTApp.getString(R.string.msg_network_error_tap_to_retry))
-                                    return@function Single.just(false)
-                                }
-
+                    if (value is OTServerFile) {
+                        return localCacheManager.getCachedUri(value.serverPath).doOnSubscribe {
+                            view.context.runOnUiThread {
                                 view.currentMode = PlaceHolderImageView.Mode.LOADING
-                                //OTApp.instance.storageHelper.downloadFileTo(value.serverUri.toString(), value.localUri).onErrorReturn{Uri.EMPTY}
-                                return this.binaryDownloadApi.get().downloadFileTo(value.serverUri.toString(), value.localUri).doOnError { error ->
-                                    error.printStackTrace()
-                                    view.currentMode = PlaceHolderImageView.Mode.EMPTY
-                                }
-                                        .map { uri ->
-                                            println("downloaded: ${uri}")
-                                            Glide.with(view.context)
-                                                    .load(uri)
-                                                    .listener(object : RequestListener<Drawable> {
-                                                        override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
-                                                            if (resource != null) {
-                                                                view.currentMode = PlaceHolderImageView.Mode.IMAGE
-                                                            }
-                                                            return false
-                                                        }
-
-                                                        override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable>?, isFirstResource: Boolean): Boolean {
-                                                            view.currentMode = PlaceHolderImageView.Mode.ERROR
-                                                            return false
-                                                        }
-
-                                                    }).into(view.imageView)
-                                            true
-                                        }.subscribeOn(Schedulers.io())
-                            } else {
-                                println("image is not synchronized. serverUri is empty.")
-                                //not synchronized yet.
-                                view.setErrorMode(OTApp.getString(R.string.msg_network_error_tap_to_retry))
-                                return Single.just(false)
                             }
-                        }
-                    } else {
+                        }.doOnError { error ->
+                            error.printStackTrace()
+                            view.context.runOnUiThread {
+                                view.currentMode = PlaceHolderImageView.Mode.ERROR
+                            }
+                        }.doOnSuccess { (refreshed, localUri) ->
+                            view.context.runOnUiThread {
+                                view.currentMode = PlaceHolderImageView.Mode.IMAGE
+                                Glide.with(view.context)
+                                        .load(localUri.path)
+                                        .apply(RequestOptions().override(Target.SIZE_ORIGINAL))
+                                        .into(view.imageView)
+                            }
+                        }.map { true }
+                    } else return Single.defer {
                         view.currentMode = PlaceHolderImageView.Mode.EMPTY
-                        return Single.just(false)
+                        Single.just(false)
                     }
                 }
 

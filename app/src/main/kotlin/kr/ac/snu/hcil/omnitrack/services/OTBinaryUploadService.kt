@@ -8,6 +8,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels.LocalMediaCacheEntry
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels.UploadTaskInfo
 import kr.ac.snu.hcil.omnitrack.core.net.IBinaryStorageCore
 import kr.ac.snu.hcil.omnitrack.core.net.OTBinaryStorageController
@@ -80,15 +81,17 @@ class OTBinaryUploadService : JobService() {
 
     private fun crawlAndUpload(job: JobParameters, maxTrialCount: Int = Int.MAX_VALUE): Boolean {
 
-        val currentUploadTasks = realm.where(UploadTaskInfo::class.java).lessThanOrEqualTo("trialCount", maxTrialCount).findAll().toMutableList()
+        val currentUploadTasks = realm.where(UploadTaskInfo::class.java).findAll().filter { it.trialCount.get() ?: 0L < maxTrialCount }.toMutableList()
         val localInvalidTasks = currentUploadTasks.filter { it ->
-            !FileHelper.exists(it.localUri)
+            !FileHelper.exists(it.localFilePath)
         }
         currentUploadTasks.removeAll(localInvalidTasks)
         realm.executeTransaction {
             localInvalidTasks.forEach { it.deleteFromRealm() }
             currentUploadTasks.forEach {
-                it.trialCount.increment(1)
+                if (it.trialCount.isNull) {
+                    it.trialCount.set(0)
+                } else it.trialCount.increment(1)
             }
         }
 
@@ -112,7 +115,9 @@ class OTBinaryUploadService : JobService() {
                                         }).doOnComplete {
                                     ongoingTaskIds.remove(dbObject.id)
 
+                                    val cacheEntry = realm.where(LocalMediaCacheEntry::class.java).equalTo("serverPath", dbObject.serverPath).findFirst()
                                     realm.executeTransaction {
+                                        cacheEntry?.synchronizedAt = System.currentTimeMillis()
                                         dbObject.deleteFromRealm()
                                     }
 

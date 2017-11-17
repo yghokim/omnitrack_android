@@ -240,6 +240,7 @@ class OTApp : MultiDexApplication() {
         DaggerNetworkComponent.builder()
                 .networkModule(networkModule)
                 .applicationModule(appModule)
+                .authModule(authModule)
                 .build()
     }
 
