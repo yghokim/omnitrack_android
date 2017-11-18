@@ -34,7 +34,7 @@ class ExperimentConsentManager @Inject constructor(val authManager: OTAuthManage
         mActivity = activity
         mResultListener = resultListener
 
-        if (systemPreferences.getBoolean(OTUser.PREFERENCES_KEY_CONSENT_APPROVED, false)) {
+        if (systemPreferences.getBoolean(OTApp.PREFERENCE_KEY_CONSENT_APPROVED, false)) {
             mResultListener?.onConsentApproved()
             finishProcess()
         } else {
@@ -82,7 +82,7 @@ class ExperimentConsentManager @Inject constructor(val authManager: OTAuthManage
     }
 
     private fun onApproved() {
-        systemPreferences.edit().putBoolean(OTUser.PREFERENCES_KEY_CONSENT_APPROVED, true).apply()
+        systemPreferences.edit().putBoolean(OTApp.PREFERENCE_KEY_CONSENT_APPROVED, true).apply()
         mResultListener?.onConsentApproved()
     }
 

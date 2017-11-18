@@ -10,14 +10,12 @@ import javax.inject.Singleton
 @Singleton
 class OTTriggerSystemManager(
         val triggerAlarmManager: Lazy<ITriggerAlarmController>
+
+
 ) {
 
     fun onSystemRebooted() {
         triggerAlarmManager.get().activateOnSystem()
-    }
-
-    fun onTriggerConfigurationChanged(managedTrigger: OTTriggerDAO) {
-
     }
 
     fun handleTriggerOn(managedTrigger: OTTriggerDAO) {

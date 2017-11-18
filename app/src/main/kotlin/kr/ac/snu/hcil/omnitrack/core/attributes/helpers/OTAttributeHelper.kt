@@ -25,14 +25,8 @@ import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 import kr.ac.snu.hcil.omnitrack.utils.TextHelper
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import java.util.ArrayList
-import kotlin.collections.Collection
 import kotlin.collections.HashMap
 import kotlin.collections.LinkedHashMap
-import kotlin.collections.Map
-import kotlin.collections.MutableList
-import kotlin.collections.filter
-import kotlin.collections.first
-import kotlin.collections.forEach
 import kotlin.collections.set
 
 /**
@@ -85,7 +79,7 @@ abstract class OTAttributeHelper {
 
     open fun getTypeSmallIconResourceId(attribute: OTAttributeDAO): Int = R.drawable.icon_small_shorttext
     open fun isExternalFile(attribute: OTAttributeDAO): Boolean = false
-    open fun getRequiredPermissions(attribute: OTAttributeDAO): Array<String>? = null
+    open fun getRequiredPermissions(attribute: OTAttributeDAO?): Array<String>? = null
 
     open fun getSupportedSorters(attribute: OTAttributeDAO): Array<AFieldValueSorter> {
         return emptyArray()

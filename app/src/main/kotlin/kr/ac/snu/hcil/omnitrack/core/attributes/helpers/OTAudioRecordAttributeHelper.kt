@@ -34,7 +34,7 @@ class OTAudioRecordAttributeHelper : OTFileInvolvedAttributeHelper() {
         return true
     }
 
-    override fun getRequiredPermissions(attribute: OTAttributeDAO): Array<String>? = permissions
+    override fun getRequiredPermissions(attribute: OTAttributeDAO?): Array<String>? = permissions
 
     override fun getInputViewType(previewMode: Boolean, attribute: OTAttributeDAO): Int = AAttributeInputView.VIEW_TYPE_AUDIO_RECORD
 

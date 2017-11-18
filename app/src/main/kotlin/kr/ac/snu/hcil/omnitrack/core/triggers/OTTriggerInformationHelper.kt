@@ -1,4 +1,4 @@
-package kr.ac.snu.hcil.omnitrack.core.database
+package kr.ac.snu.hcil.omnitrack.core.triggers
 
 import android.support.annotation.DrawableRes
 import android.support.annotation.StringRes
@@ -43,15 +43,9 @@ object OTTriggerInformationHelper {
     }
 
     @StringRes
-    fun getConfigDescRestId(trigger: OTTriggerDAO): Int? {
+    fun getConfigDescResId(trigger: OTTriggerDAO): Int? {
         return when (trigger.conditionType) {
-            OTTriggerDAO.CONDITION_TYPE_TIME -> {
-                when ((trigger.condition as OTTimeTriggerCondition).timeConditionType) {
-                    OTTimeTriggerCondition.TIME_CONDITION_ALARM -> R.string.msg_trigger_time_config_desc_alarm
-                    OTTimeTriggerCondition.TIME_CONDITION_INTERVAL -> R.string.msg_trigger_time_config_desc_interval
-                    else -> null
-                }
-            }
+            OTTriggerDAO.CONDITION_TYPE_TIME -> getTimeConfigDescResId((trigger.condition as OTTimeTriggerCondition).timeConditionType)
             OTTriggerDAO.CONDITION_TYPE_DATA -> R.string.trigger_desc_time
             else -> null
         }
@@ -60,16 +54,28 @@ object OTTriggerInformationHelper {
     @DrawableRes
     fun getConfigIconResId(trigger: OTTriggerDAO): Int? {
         return when (trigger.conditionType) {
-            OTTriggerDAO.CONDITION_TYPE_TIME -> {
-                when ((trigger.condition as OTTimeTriggerCondition).timeConditionType) {
+            OTTriggerDAO.CONDITION_TYPE_TIME -> getTimeConfigIconResId((trigger.condition as OTTimeTriggerCondition).timeConditionType)
+            OTTriggerDAO.CONDITION_TYPE_DATA -> R.drawable.event_dark
+            else -> null
+        }
+    }
+
+    @StringRes
+    fun getTimeConfigDescResId(timeConditionType: Byte): Int? {
+        return when (timeConditionType) {
+            OTTimeTriggerCondition.TIME_CONDITION_ALARM -> R.string.msg_trigger_time_config_desc_alarm
+            OTTimeTriggerCondition.TIME_CONDITION_INTERVAL -> R.string.msg_trigger_time_config_desc_interval
+            else -> null
+        }
+    }
+
+    @DrawableRes
+    fun getTimeConfigIconResId(timeConditionType: Byte): Int? {
+        return when (timeConditionType) {
                     OTTimeTriggerCondition.TIME_CONDITION_ALARM -> R.drawable.alarm_dark
                     OTTimeTriggerCondition.TIME_CONDITION_INTERVAL -> R.drawable.repeat_dark
                     else -> null
                 }
-            }
-            OTTriggerDAO.CONDITION_TYPE_DATA -> R.drawable.event_dark
-            else -> null
-        }
     }
 
     @StringRes

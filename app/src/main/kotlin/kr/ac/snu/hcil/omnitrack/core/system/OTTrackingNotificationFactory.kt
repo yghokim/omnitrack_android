@@ -1,6 +1,5 @@
 package kr.ac.snu.hcil.omnitrack.core.system
 
-import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.support.v4.app.NotificationCompat
@@ -8,13 +7,9 @@ import android.support.v4.app.TaskStackBuilder
 import android.support.v4.content.ContextCompat
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemDetailActivity
-import kr.ac.snu.hcil.omnitrack.utils.FillingIntegerIdReservationTable
 import kr.ac.snu.hcil.omnitrack.utils.TextHelper
-import java.util.*
-import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * Created by Young-Ho Kim on 16. 9. 1
@@ -22,19 +17,6 @@ import java.util.concurrent.atomic.AtomicInteger
 object OTTrackingNotificationFactory {
 
     private val TAG = "TrackingReminder"
-    private val increment = AtomicInteger(500)
-
-    private val reminderTrackerPendingCounts = Hashtable<String, Int>()
-
-    private val reminderTrackerNotificationIdTable = FillingIntegerIdReservationTable<String>()
-
-    private fun getNewReminderNotificationId(tracker: OTTracker): Int {
-        return reminderTrackerNotificationIdTable[tracker.objectId]
-    }
-
-    private val notificationService: NotificationManager by lazy {
-        OTApp.instance.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-    }
 
     fun makeLoggingSuccessNotificationBuilder(context: Context, trackerId: String, trackerName: String, itemId: String, loggedTime: Long, table: List<Pair<String, CharSequence?>>?, notificationId: Int, tag: String): NotificationCompat.Builder {
         val stackBuilder = TaskStackBuilder.create(context)
@@ -90,24 +72,6 @@ object OTTrackingNotificationFactory {
                         setContentText(OTApp.getString(R.string.msg_notification_content_new_item))
                     }
                 }
-    }
-
-    fun notifyReminderChecked(trackerId: String, reminderTime: Long) {
-        println("reminder checked - ${reminderTime}")
-        //if(reminderTrackerPendingCounts[trackerId] != null)
-        //{
-        //  if(reminderTrackerPendingCounts[trackerId]!! == 1)
-        //  {
-        //remove reminder
-        reminderTrackerPendingCounts.remove(trackerId)
-        notificationService.cancel(TAG, reminderTrackerNotificationIdTable[trackerId])
-        reminderTrackerNotificationIdTable.removeKey(trackerId)
-        //  }
-        //  else{
-        //      reminderTrackerPendingCounts[trackerId] = reminderTrackerPendingCounts[trackerId]!! - 1
-        //  }
-
-        // }
     }
 
     fun makeBaseBuilder(context: Context, time: Long, channelId: String): NotificationCompat.Builder {

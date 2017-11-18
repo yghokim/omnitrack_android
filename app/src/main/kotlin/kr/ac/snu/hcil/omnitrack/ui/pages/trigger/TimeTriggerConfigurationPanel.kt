@@ -12,7 +12,7 @@ import butterknife.bindView
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTrigger
+import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerInformationHelper
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.ATriggerCondition
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTTimeTriggerCondition
 import kr.ac.snu.hcil.omnitrack.ui.components.common.time.DateTimePicker
@@ -59,6 +59,7 @@ class TimeTriggerConfigurationPanel : LinearLayout, IConditionConfigurationView,
 
     private var suspendConditionChangeEvent = false
 
+
     private val conditionChanged = PublishSubject.create<ATriggerCondition>()
     override val onConditionChanged: Observable<ATriggerCondition>
         get() = conditionChanged
@@ -72,15 +73,15 @@ class TimeTriggerConfigurationPanel : LinearLayout, IConditionConfigurationView,
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         addView(inflater.inflate(R.layout.trigger_time_trigger_config_panel, this, false))
         orientation = LinearLayout.VERTICAL
-
         repeatEndDate = GregorianCalendar(2016, 1, 1)
 
         configTypePropertyView.adapter = IconNameEntryArrayAdapter(context,
                 arrayOf(
-                        IconNameEntryArrayAdapter.Entry(OTTimeTrigger.configIconId(OTTimeTrigger.CONFIG_TYPE_ALARM),
-                                OTTimeTrigger.configNameId(OTTimeTrigger.CONFIG_TYPE_ALARM)),
-                        IconNameEntryArrayAdapter.Entry(OTTimeTrigger.configIconId(OTTimeTrigger.CONFIG_TYPE_INTERVAL),
-                                OTTimeTrigger.configNameId(OTTimeTrigger.CONFIG_TYPE_INTERVAL))
+                        IconNameEntryArrayAdapter.Entry(OTTriggerInformationHelper.getTimeConfigIconResId(OTTimeTriggerCondition.TIME_CONDITION_ALARM)!!,
+                                OTTriggerInformationHelper.getTimeConfigDescResId(OTTimeTriggerCondition.TIME_CONDITION_ALARM)!!),
+
+                        IconNameEntryArrayAdapter.Entry(OTTriggerInformationHelper.getTimeConfigIconResId(OTTimeTriggerCondition.TIME_CONDITION_INTERVAL)!!,
+                                OTTriggerInformationHelper.getTimeConfigDescResId(OTTimeTriggerCondition.TIME_CONDITION_INTERVAL)!!)
                 ))
 
         configTypePropertyView.valueChanged += this

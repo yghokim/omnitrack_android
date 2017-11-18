@@ -3,7 +3,6 @@ package kr.ac.snu.hcil.omnitrack.core.externals.rescuetime
 import com.google.gson.stream.JsonReader
 import io.reactivex.Flowable
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
@@ -21,7 +20,7 @@ object RescueTimeProductivityMeasureFactory : OTMeasureFactory("prd") {
 
 
     val configurator = object : IExampleAttributeConfigurator {
-        override fun configureExampleAttribute(attr: OTAttribute<out Any>): Boolean {
+        override fun configureExampleAttribute(attr: OTAttributeDAO): Boolean {
             /*if (attr is OTNumberAttribute) {
                 val ns = NumberStyle()
                 ns.fractionPart = 0
