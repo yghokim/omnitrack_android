@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.net
 
 import android.content.Context
 import android.net.Uri
+import android.webkit.MimeTypeMap
 import dagger.Lazy
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -9,7 +10,7 @@ import io.reactivex.schedulers.Schedulers
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels.LocalMediaCacheEntry
-import kr.ac.snu.hcil.omnitrack.utils.io.FileHelper
+import kr.ac.snu.hcil.omnitrack.core.datatypes.OTServerFile
 import java.io.File
 import java.io.FileNotFoundException
 import java.util.*
@@ -75,20 +76,27 @@ class OTLocalMediaCacheManager(val context: Context, val authManager: Lazy<OTAut
         }
     }
 
-    fun getCachedUri(serverPath: String, localCacheUri: Uri = makeLocalCacheUri("cache", ".cache"), storeCache: Boolean = true): Single<Pair<Boolean, Uri>> {
+    fun getCachedUri(serverFile: OTServerFile, localCacheUri: Uri = makeLocalCacheUri("cache", MimeTypeMap.getFileExtensionFromUrl(serverFile.originalFileName)), storeCache: Boolean = true): Single<Pair<Boolean, Uri>> {
         return Single.defer {
             val realm = binaryStorageController.get().realmProvider.get()
             val cachedEntry = realm.where(LocalMediaCacheEntry::class.java)
-                    .equalTo("serverPath", serverPath).findFirst()
-            val cachedUri = cachedEntry?.localUriCompat()
+                    .equalTo("serverPath", serverFile.serverPath).findFirst()
+
+            val cachedUri = if (cachedEntry != null
+                    && cachedEntry.originalFileName == serverFile.originalFileName
+                    && cachedEntry.originalFileByteSize == serverFile.fileSize
+                    && cachedEntry.originalMimeType == serverFile.mimeType) {
+                cachedEntry.localUriCompat()
+            } else null
+
             realm.close()
             if (cachedUri != null) {
                 return@defer Single.just(Pair(false, cachedUri))
             } else {
-                return@defer binaryStorageController.get().downloadFileTo(serverPath, localCacheUri)
+                return@defer binaryStorageController.get().downloadFileTo(serverFile.serverPath, localCacheUri)
                         .flatMap { uri ->
                             if (storeCache) {
-                                insertOrUpdateNewLocalMedia(uri, serverPath, System.currentTimeMillis()).map { Pair(true, uri) }
+                                insertOrUpdateNewLocalMedia(uri, serverFile, System.currentTimeMillis()).map { Pair(true, uri) }
                             } else Single.just(Pair(true, uri))
                         }
             }
@@ -106,25 +114,26 @@ class OTLocalMediaCacheManager(val context: Context, val authManager: Lazy<OTAut
     /**
      * @return serverPath
      */
-    fun insertOrUpdateNewLocalMedia(localUri: Uri, serverPath: String, synchronizedAt: Long? = null): Single<String> {
+    fun insertOrUpdateNewLocalMedia(localUri: Uri, serverFile: OTServerFile, synchronizedAt: Long? = null): Single<OTServerFile> {
         return Single.defer {
-            val mimeType = FileHelper.getMimeTypeOf(localUri, context)
             if (File(localUri.path).exists()) {
                 binaryStorageController.get().realmProvider.get().use { realm ->
                     realm.executeTransaction {
                         val cacheEntry = realm.where(LocalMediaCacheEntry::class.java)
-                                .equalTo("serverPath", serverPath)
+                                .equalTo("serverPath", serverFile.serverPath)
                                 .findFirst() ?: realm.createObject(LocalMediaCacheEntry::class.java, UUID.randomUUID().toString())
 
-                        cacheEntry.serverPath = serverPath
+                        cacheEntry.serverPath = serverFile.serverPath
                         cacheEntry.localUri = localUri.path
-                        cacheEntry.mimeType = mimeType ?: "unknown"
+                        cacheEntry.originalMimeType = serverFile.mimeType
+                        cacheEntry.originalFileByteSize = serverFile.fileSize
+                        cacheEntry.originalFileName = serverFile.originalFileName
                         cacheEntry.synchronizedAt = synchronizedAt
                     }
-                    return@defer Single.just(serverPath)
+                    return@defer Single.just(serverFile)
                 }
             } else {
-                return@defer Single.error<String>(FileNotFoundException("File does not exists"))
+                return@defer Single.error<OTServerFile>(FileNotFoundException("File does not exists"))
             }
         }.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
     }

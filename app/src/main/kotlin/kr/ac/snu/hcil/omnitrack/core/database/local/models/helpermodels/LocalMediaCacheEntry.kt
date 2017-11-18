@@ -13,8 +13,9 @@ open class LocalMediaCacheEntry: RealmObject(){
     @PrimaryKey
     var id: String = ""
 
-    var mimeType: String = "*/*"
-    var fileByteSize: Long = 0
+    var originalMimeType: String = "*/*"
+    var originalFileByteSize: Long = 0
+    var originalFileName: String = ""
 
     @Index
     var serverPath: String = ""

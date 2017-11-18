@@ -66,7 +66,7 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
                     valueView.audioFileUriChanged.suspend = false
                 } else {
                     loadingSubscription.set(
-                            localCacheManager.get().getCachedUri(value.serverPath).observeOn(AndroidSchedulers.mainThread()).doOnSubscribe {
+                            localCacheManager.get().getCachedUri(value).observeOn(AndroidSchedulers.mainThread()).doOnSubscribe {
                                 context.runOnUiThread {
                                     inLoadingMode = true
                                 }
@@ -108,9 +108,10 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
                 value = null
             } else if (!uri.equals(value?.let { localCacheManager.get().getCachedUriImmediately(it.serverPath) } ?: Uri.EMPTY)) {
                 val newServerPath = localCacheManager.get().generateRandomServerPath(uri)
+                val newServerFile = OTServerFile.fromLocalFile(newServerPath, uri, context)
                 subscriptions.add(
-                        localCacheManager.get().insertOrUpdateNewLocalMedia(uri, newServerPath).subscribe { serverUri ->
-                            value = OTServerFile.fromLocalFile(serverUri, uri, context)
+                        localCacheManager.get().insertOrUpdateNewLocalMedia(uri, newServerFile).subscribe { serverFile ->
+                            value = serverFile
                         })
             }
         }
@@ -121,8 +122,9 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
             return Single.just(Nullable<OTServerFile>(null))
         } else if (!uri.equals(value?.let { localCacheManager.get().getCachedUriImmediately(it.serverPath) } ?: Uri.EMPTY)) {
             val newServerPath = localCacheManager.get().generateRandomServerPath(uri)
-            return localCacheManager.get().insertOrUpdateNewLocalMedia(uri, newServerPath).map { serverUri ->
-                Nullable(OTServerFile.fromLocalFile(serverUri, uri, context))
+            val newServerFile = OTServerFile.fromLocalFile(newServerPath, uri, context)
+            return localCacheManager.get().insertOrUpdateNewLocalMedia(uri, newServerFile).map { serverUri ->
+                Nullable(newServerFile)
             }.onErrorReturn { err -> err.printStackTrace(); Nullable<OTServerFile>() }
         } else return Single.just(Nullable(value))
     }

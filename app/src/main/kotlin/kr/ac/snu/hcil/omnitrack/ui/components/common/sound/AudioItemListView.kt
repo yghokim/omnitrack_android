@@ -13,6 +13,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.SerialDisposable
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.datatypes.OTServerFile
 import kr.ac.snu.hcil.omnitrack.core.net.OTLocalMediaCacheManager
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 import org.jetbrains.anko.runOnUiThread
@@ -37,27 +38,29 @@ class AudioItemListView : ConstraintLayout {
 
     private val downloadSubscription = SerialDisposable()
 
-    var mountedServerPath: String = ""
+    var mountedServerFile: OTServerFile? = null
         set(value) {
             if (field != value) {
                 field = value
-                downloadSubscription.set(
-                        localCacheManager.get().getCachedUri(value).observeOn(AndroidSchedulers.mainThread()).doOnSubscribe {
-                            context.runOnUiThread {
-                                mode = Mode.Loading
-                            }
-                        }.subscribe({ (refreshed, localFileUri) ->
-                            this.localFileUri = localFileUri
-                            if (localFileUri != Uri.EMPTY) {
-                                mode = Mode.Mounted
-                            } else {
-                                mode = Mode.Empty
-                            }
-                        }, { error ->
-                            error.printStackTrace()
-                            mode = Mode.Error
-                        })
-                )
+                if (value != null) {
+                    downloadSubscription.set(
+                            localCacheManager.get().getCachedUri(value).observeOn(AndroidSchedulers.mainThread()).doOnSubscribe {
+                                context.runOnUiThread {
+                                    mode = Mode.Loading
+                                }
+                            }.subscribe({ (refreshed, localFileUri) ->
+                                this.localFileUri = localFileUri
+                                if (localFileUri != Uri.EMPTY) {
+                                    mode = Mode.Mounted
+                                } else {
+                                    mode = Mode.Empty
+                                }
+                            }, { error ->
+                                error.printStackTrace()
+                                mode = Mode.Error
+                            })
+                    )
+                } else mode = Mode.Empty
             }
         }
 

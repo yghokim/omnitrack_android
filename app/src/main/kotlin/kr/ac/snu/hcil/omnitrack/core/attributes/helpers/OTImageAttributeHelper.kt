@@ -73,7 +73,7 @@ class OTImageAttributeHelper : OTFileInvolvedAttributeHelper() {
 
                 fun function(): Single<Boolean> {
                     if (value is OTServerFile) {
-                        return localCacheManager.getCachedUri(value.serverPath).doOnSubscribe {
+                        return localCacheManager.getCachedUri(value).doOnSubscribe {
                             view.context.runOnUiThread {
                                 view.currentMode = PlaceHolderImageView.Mode.LOADING
                             }
