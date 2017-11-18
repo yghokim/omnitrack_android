@@ -2,9 +2,9 @@ package kr.ac.snu.hcil.omnitrack.core.di
 
 import dagger.Module
 import dagger.Provides
-import io.realm.BuildConfig
 import io.realm.Realm
 import io.realm.RealmConfiguration
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import javax.inject.Singleton
 
 /**

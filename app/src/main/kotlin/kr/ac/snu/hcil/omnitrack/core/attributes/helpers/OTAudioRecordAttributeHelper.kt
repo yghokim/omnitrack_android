@@ -56,7 +56,7 @@ class OTAudioRecordAttributeHelper : OTFileInvolvedAttributeHelper() {
 
     override fun applyValueToViewForItemList(attribute: OTAttributeDAO, value: Any?, view: View): Single<Boolean> {
         if (view is AudioItemListView && value is OTServerFile) {
-            view.mountedServerPath = value.serverPath
+            view.mountedServerFile = value
         }
         return super.applyValueToViewForItemList(attribute, value, view)
     }

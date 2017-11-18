@@ -38,7 +38,7 @@ abstract class OTFileInvolvedAttributeHelper : OTAttributeHelper() {
 
     fun storeValueFile(attribute: OTAttributeDAO, value: Any?, outputUri: Uri): Single<Uri> {
         if (value is OTServerFile) {
-            return localCacheManager.getCachedUri(value.serverPath, outputUri, false).flatMap { (refreshed, resultUri) ->
+            return localCacheManager.getCachedUri(value, outputUri, false).flatMap { (refreshed, resultUri) ->
                 if (!refreshed || resultUri != outputUri) {
                     val inputStream = FileInputStream(File(resultUri.path))
                         val outputStream = FileOutputStream(outputUri.path)
