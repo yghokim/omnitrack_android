@@ -110,8 +110,9 @@ class NetworkModule {
      */
     @Provides
     @Singleton
-    fun provideBinaryStorageCore(context: Context): IBinaryStorageCore {
-        return OTFirebaseStorageCore()
+    fun provideBinaryStorageCore(context: Context, @BinaryStorageServer retrofit: Lazy<Retrofit>): IBinaryStorageCore {
+        //return OTFirebaseStorageCore()
+        return OTOfficialBinaryStorageCore(context, retrofit)
     }
 
     @Provides

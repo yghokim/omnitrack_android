@@ -4,6 +4,7 @@ import android.net.Uri
 import io.realm.RealmObject
 import io.realm.annotations.Index
 import io.realm.annotations.PrimaryKey
+import kr.ac.snu.hcil.omnitrack.core.datatypes.OTServerFile
 import kr.ac.snu.hcil.omnitrack.utils.io.FileHelper
 
 /**
@@ -29,5 +30,14 @@ open class LocalMediaCacheEntry: RealmObject(){
 
     fun localUriCompat(): Uri {
         return FileHelper.getSchemedUri(localUri)
+    }
+
+    fun toServerFile(): OTServerFile {
+        return OTServerFile().apply {
+            this.serverPath = this@LocalMediaCacheEntry.serverPath
+            this.originalFileName = this@LocalMediaCacheEntry.originalFileName
+            this.mimeType = this@LocalMediaCacheEntry.originalMimeType
+            this.fileSize = this@LocalMediaCacheEntry.originalFileByteSize
+        }
     }
 }

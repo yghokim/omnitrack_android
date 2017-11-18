@@ -143,7 +143,7 @@ class OTLocalMediaCacheManager(val context: Context, val authManager: Lazy<OTAut
         binaryStorageController.get().realmProvider.get().use { realm ->
             val entry = realm.where(LocalMediaCacheEntry::class.java).equalTo("serverPath", oldServerPath).findFirst()
             if (entry != null) {
-                val newServerPath = binaryStorageController.get().makeServerPath(authManager.get().userId!!, trackerId, itemId, attributeLocalId, entry.localUriCompat().lastPathSegment)
+                val newServerPath = binaryStorageController.get().makeServerPath(authManager.get().userId!!, trackerId, itemId, attributeLocalId, "0")
                 realm.executeTransaction {
                     realm.where(LocalMediaCacheEntry::class.java).equalTo("serverPath", newServerPath).findAll().deleteAllFromRealm()
                     entry.serverPath = newServerPath
@@ -163,7 +163,7 @@ class OTLocalMediaCacheManager(val context: Context, val authManager: Lazy<OTAut
                     .endGroup()
                     .findAll()
                     .forEach { entry ->
-                        binaryStorageController.get().registerNewUploadTask(entry.localUri, entry.serverPath)
+                        binaryStorageController.get().registerNewUploadTask(entry.localUri, entry.toServerFile())
                     }
         }
     }
