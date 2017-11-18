@@ -9,6 +9,7 @@ import io.reactivex.Single
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels.UploadTaskInfo
+import kr.ac.snu.hcil.omnitrack.core.datatypes.OTServerFile
 import kr.ac.snu.hcil.omnitrack.utils.executeTransactionIfNotIn
 import java.util.*
 import javax.inject.Inject
@@ -30,13 +31,15 @@ class OTBinaryStorageController(val context: Context, val core: IBinaryStorageCo
         jobProvider = component.getBinaryUploadJob()
     }
 
-    fun registerNewUploadTask(localPath: String, serverPath: String) {
+    fun registerNewUploadTask(localPath: String, serverFile: OTServerFile) {
         realmProvider.get().use { realm ->
             realm.executeTransactionIfNotIn {
                 val dbObject = realm.where(UploadTaskInfo::class.java)
-                        .equalTo("serverPath", serverPath).findFirst() ?: realm.createObject(UploadTaskInfo::class.java, UUID.randomUUID().toString())
+                        .equalTo("serverPath", serverFile.serverPath).findFirst() ?: realm.createObject(UploadTaskInfo::class.java, UUID.randomUUID().toString())
                 dbObject.localFilePath = localPath
-                dbObject.serverPath = serverPath
+                dbObject.serverPath = serverFile.serverPath
+                dbObject.localFileMimeType = serverFile.mimeType
+
                 if (dbObject.trialCount.isNull) {
                     dbObject.trialCount.set(0L)
                 }

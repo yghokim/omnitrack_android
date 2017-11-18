@@ -5,16 +5,18 @@ import android.net.Uri
 import dagger.Lazy
 import io.reactivex.Completable
 import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels.UploadTaskInfo
 import kr.ac.snu.hcil.omnitrack.utils.io.FileHelper
 import okhttp3.MediaType
 import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import okhttp3.ResponseBody
-import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.http.*
 import java.io.File
 import java.io.FileNotFoundException
+import java.io.FileOutputStream
 
 /**
  * Created by younghokim on 2017-11-15.
@@ -27,11 +29,25 @@ class OTOfficialBinaryStorageCore(val context: Context, val retrofit: Lazy<Retro
     interface OfficialBinaryStorageServerService {
 
         @Multipart
-        @POST("api/upload/item_media")
-        fun uploadItemMediaFile(@Url filePath: String, @Part file: MultipartBody.Part): Call<ResponseBody>
+        @POST("api/upload/item_media/{trackerId}/{itemId}/{attrLocalId}/{fileIdentifier}")
+        fun uploadItemMediaFile(@Path("trackerId") trackerId: String, @Path("itemId") itemId: String, @Path("attrLocalId") attributeLocalId: String, @Path("fileIdentifier") fileIdentifier: String, @Part file: MultipartBody.Part): Single<ResponseBody>
 
-        @GET("api/dowload/item_media")
-        fun downloadMediaFile(@Url filePath: String): Call<ResponseBody>
+        @GET("api/files/item_media/{trackerId}/{itemId}/{attrLocalId}/{fileIdentifier}/{processingType}")
+        fun downloadMediaFile(
+                @Path("trackerId") trackerId: String,
+                @Path("itemId") itemId: String,
+                @Path("attrLocalId") attributeLocalId: String,
+                @Path("fileIdentifier") fileIdentifie: String,
+                @Path("processingType") processingType: String): Single<ResponseBody>
+
+        @GET("api/files/item_media/{trackerId}/{itemId}/{attrLocalId}/{fileIdentifier}")
+        fun downloadMediaFile(
+                @Path("trackerId") trackerId: String,
+                @Path("itemId") itemId: String,
+                @Path("attrLocalId") attributeLocalId: String,
+                @Path("fileIdentifier") fileIdentifier: String): Single<ResponseBody>
+
+
     }
 
     private val service: OfficialBinaryStorageServerService by lazy {
@@ -41,14 +57,19 @@ class OTOfficialBinaryStorageCore(val context: Context, val retrofit: Lazy<Retro
     override fun startNewUploadTaskImpl(taskInfo: UploadTaskInfo, onProgress: (session: String) -> Unit): Completable {
         return Completable.defer {
             val uri = taskInfo.localUriCompat()
-            val mimeType = FileHelper.getMimeTypeOf(uri, context)
-            if (mimeType != null) {
-                val mediaType = MediaType.parse(mimeType)
+            val fileSize = FileHelper.getFileSizeOf(uri, context)
+            if (fileSize > 0) {
+                val mediaType = MediaType.parse(taskInfo.localFileMimeType)
                 if (mediaType != null) {
-                    val fileBody = MultipartBody.create(mediaType, File(uri.path))
-                    return@defer Completable.complete()
+                    val fileBody = MultipartBody.Part.createFormData("file", taskInfo.localUriCompat().lastPathSegment, RequestBody.create(mediaType, File(uri.path)))
+                    val split = taskInfo.serverPath.split("/")
+                    return@defer service.uploadItemMediaFile(split[0], split[1], split[2], split[3], fileBody).subscribeOn(Schedulers.io())
+                            .doOnError { error ->
+                                error.printStackTrace()
+                            }
+                            .toCompletable()
                 } else return@defer Completable.error(FileNotFoundException("MimeType extraction was failed"))
-            } else return@defer Completable.error(FileNotFoundException("MimeType extraction was failed"))
+            } else return@defer Completable.error(FileNotFoundException("file size zero"))
         }
     }
 
@@ -56,7 +77,17 @@ class OTOfficialBinaryStorageCore(val context: Context, val retrofit: Lazy<Retro
         return "${trackerId}/${itemId}/${attributeLocalId}/${fileIdentifier}"
     }
     override fun downloadFileTo(pathString: String, localUri: Uri): Single<Uri> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val split = pathString.split("/")
+        return service.downloadMediaFile(split[0], split[1], split[2], split[3]).subscribeOn(Schedulers.io()).map { responseBody: ResponseBody ->
+
+            println("downloaded file size: ${responseBody.contentLength()}")
+            println("downloaded file type: ${responseBody.contentType()}")
+            FileHelper.dumpStreamToOther(responseBody.byteStream(), FileOutputStream(localUri.path))
+
+            localUri
+        }.doOnError { error ->
+            error.printStackTrace()
+        }
     }
 
 }

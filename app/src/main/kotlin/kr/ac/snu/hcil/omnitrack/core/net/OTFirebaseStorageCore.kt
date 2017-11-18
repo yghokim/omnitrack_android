@@ -24,7 +24,7 @@ class OTFirebaseStorageCore : IBinaryStorageCore {
 
             val localUri = taskInfo.localUriCompat()
 
-            val storageRef = getItemStorageReference(taskInfo.serverPath)
+            val storageRef = getItemStorageReference(taskInfo.serverPath).child("")
 
             val task = storageRef.putFile(localUri, StorageMetadata.Builder().build(), if (taskInfo.sessionUri != null) Uri.parse(taskInfo.sessionUri!!) else null)
 
@@ -64,7 +64,7 @@ class OTFirebaseStorageCore : IBinaryStorageCore {
                 localFileRoot.mkdirs()
             }
 
-            val downloadTask = FirebaseStorage.getInstance().reference.child(pathString).getFile(localUri)
+            val downloadTask = getItemStorageReference(pathString).getFile(localUri)
             val listener = object : OnCompleteListener<FileDownloadTask.TaskSnapshot> {
                 override fun onComplete(task: Task<FileDownloadTask.TaskSnapshot>) {
                     if (!subscriber.isDisposed) {

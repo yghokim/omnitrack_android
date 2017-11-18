@@ -17,6 +17,7 @@ open class UploadTaskInfo : RealmObject() {
 
     var serverPath: String = ""
     var localFilePath: String = ""
+    var localFileMimeType: String = "*/*"
 
     val trialCount = MutableRealmInteger.valueOf(0)
 

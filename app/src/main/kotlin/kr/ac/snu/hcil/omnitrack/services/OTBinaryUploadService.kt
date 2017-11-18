@@ -4,6 +4,7 @@ import android.widget.Toast
 import com.firebase.jobdispatcher.JobParameters
 import com.firebase.jobdispatcher.JobService
 import io.reactivex.Completable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
@@ -15,6 +16,7 @@ import kr.ac.snu.hcil.omnitrack.core.net.OTBinaryStorageController
 import kr.ac.snu.hcil.omnitrack.core.system.OTTaskNotificationManager
 import kr.ac.snu.hcil.omnitrack.utils.io.FileHelper
 import org.jetbrains.anko.notificationManager
+import org.jetbrains.anko.runOnUiThread
 import java.util.*
 import javax.inject.Inject
 
@@ -108,17 +110,22 @@ class OTBinaryUploadService : JobService() {
                             currentUploadTasks.map { dbObject ->
                                 core.startNewUploadTaskImpl(dbObject,
                                         { sessionUri ->
-                                            realm.executeTransaction {
-                                                dbObject.sessionUri = sessionUri
-                                                realm.copyToRealmOrUpdate(dbObject)
+                                            this.runOnUiThread {
+                                                realm.executeTransaction {
+                                                    dbObject.sessionUri = sessionUri
+                                                    realm.copyToRealmOrUpdate(dbObject)
+                                                }
                                             }
                                         }).doOnComplete {
-                                    ongoingTaskIds.remove(dbObject.id)
 
-                                    val cacheEntry = realm.where(LocalMediaCacheEntry::class.java).equalTo("serverPath", dbObject.serverPath).findFirst()
-                                    realm.executeTransaction {
-                                        cacheEntry?.synchronizedAt = System.currentTimeMillis()
-                                        dbObject.deleteFromRealm()
+                                    this.runOnUiThread {
+                                        ongoingTaskIds.remove(dbObject.id)
+
+                                        val cacheEntry = realm.where(LocalMediaCacheEntry::class.java).equalTo("serverPath", dbObject.serverPath).findFirst()
+                                        realm.executeTransaction {
+                                            cacheEntry?.synchronizedAt = System.currentTimeMillis()
+                                            dbObject.deleteFromRealm()
+                                        }
                                     }
 
                                 }.doOnError { err ->
@@ -126,7 +133,7 @@ class OTBinaryUploadService : JobService() {
                                     err.printStackTrace()
                                 }.onErrorComplete()
                             }
-                    ).subscribe({
+                    ).observeOn(AndroidSchedulers.mainThread()).subscribe({
                         crawlAndUpload(job, 0) // retry if fresh tasks inserted.
                     })
             )
