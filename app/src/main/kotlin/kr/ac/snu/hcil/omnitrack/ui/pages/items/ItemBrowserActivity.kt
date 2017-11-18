@@ -16,10 +16,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.*
-import android.widget.ArrayAdapter
-import android.widget.PopupMenu
-import android.widget.TextView
-import android.widget.ToggleButton
+import android.widget.*
 import butterknife.bindView
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.SerialDisposable
@@ -39,15 +36,15 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.DismissingBottomSheetDialog
 import kr.ac.snu.hcil.omnitrack.ui.components.common.ExtendedSpinner
 import kr.ac.snu.hcil.omnitrack.ui.components.common.container.FallbackRecyclerView
 import kr.ac.snu.hcil.omnitrack.ui.components.common.viewholders.RecyclerViewMenuAdapter
-import kr.ac.snu.hcil.omnitrack.ui.components.decorations.DrawableListBottomSpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
-import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
+import kr.ac.snu.hcil.omnitrack.ui.components.decorations.TopBottomHorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.AttributeEditDialogFragment
 import kr.ac.snu.hcil.omnitrack.utils.*
 import kr.ac.snu.hcil.omnitrack.utils.io.FileHelper
 import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import org.jetbrains.anko.support.v4.act
+import org.jetbrains.anko.verticalMargin
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -105,8 +102,11 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
         itemListView.emptyView = emptyListMessageView
         itemListView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        itemListView.addItemDecoration(HorizontalImageDividerItemDecoration(context = this))
-        itemListView.addItemDecoration(DrawableListBottomSpaceItemDecoration(R.drawable.expanded_view_inner_shadow_top, 0))
+
+        val shadowDecoration = TopBottomHorizontalImageDividerItemDecoration(context = this)
+        itemListView.addItemDecoration(shadowDecoration)
+
+        (itemListView.layoutParams as RelativeLayout.LayoutParams).verticalMargin = -shadowDecoration.upperDividerHeight
 
         itemListViewAdapter = ItemListViewAdapter()
 
@@ -121,11 +121,6 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
             }
 
         })
-
-
-        /*ItemTouchHelper(DragItemTouchHelperCallback(itemListViewAdapter, this, false, true))
-                .attachToRecyclerView(itemListView)*/
-
 
         sortOrderButton.setOnCheckedChangeListener { compoundButton, b ->
             if (b) {
