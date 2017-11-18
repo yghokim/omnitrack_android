@@ -225,7 +225,7 @@ class TrackerListFragment : OTFragment() {
         trackerListLayoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         listView.layoutManager = trackerListLayoutManager
 
-        val shadowDecoration = TopBottomHorizontalImageDividerItemDecoration(R.drawable.horizontal_separator_pattern_upper, R.drawable.horizontal_separator_pattern_under, act, resources.getFraction(R.fraction.tracker_list_separator_height_ratio, 1, 1))
+        val shadowDecoration = TopBottomHorizontalImageDividerItemDecoration(context = act, heightMultiplier = resources.getFraction(R.fraction.tracker_list_separator_height_ratio, 1, 1))
         listView.addItemDecoration(shadowDecoration)
         (listView.layoutParams as CoordinatorLayout.LayoutParams).verticalMargin = -shadowDecoration.upperDividerHeight
         listView.adapter = trackerListAdapter

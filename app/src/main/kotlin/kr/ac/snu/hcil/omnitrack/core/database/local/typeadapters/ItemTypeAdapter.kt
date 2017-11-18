@@ -77,7 +77,11 @@ class ItemTypeAdapter(isServerMode: Boolean) : ServerCompatibleTypeAdapter<OTIte
         writer.name(RealmDatabaseManager.FIELD_REMOVED_BOOLEAN).value(value.removed)
         writer.name(RealmDatabaseManager.FIELD_TIMESTAMP_LONG).value(value.timestamp)
         writer.name(RealmDatabaseManager.FIELD_UPDATED_AT_LONG).value(value.userUpdatedAt)
-        writer.name(RealmDatabaseManager.FIELD_SYNCHRONIZED_AT).value(value.synchronizedAt)
+
+
+        if (!isServerMode)
+            writer.name(RealmDatabaseManager.FIELD_SYNCHRONIZED_AT).value(value.synchronizedAt)
+
         writer.name("deviceId").value(value.deviceId)
         writer.name("source").value(value.source)
         writer.name("dataTable").beginArray()
@@ -95,5 +99,6 @@ class ItemTypeAdapter(isServerMode: Boolean) : ServerCompatibleTypeAdapter<OTIte
     }
 
     override fun applyToManagedDao(json: JsonObject, applyTo: OTItemDAO) {
+
     }
 }
