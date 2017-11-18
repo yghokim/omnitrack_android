@@ -24,7 +24,6 @@ import at.markushi.ui.RevealColorView
 import butterknife.bindView
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
@@ -52,12 +51,6 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
                     .apply {
                         this.putExtra(INTENT_KEY_NEW_TRACKER_PRESET_NAME, presetName)
                     }
-        }
-
-        fun makeIntent(trackerId: String, focusAttribute: OTAttribute<out Any>, context: Context): Intent {
-            val intent = makeIntent(trackerId, context)
-            intent.putExtra(INTENT_KEY_FOCUS_ATTRIBUTE_ID, focusAttribute.objectId)
-            return intent
         }
     }
 

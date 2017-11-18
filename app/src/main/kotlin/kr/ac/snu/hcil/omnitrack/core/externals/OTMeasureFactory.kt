@@ -5,7 +5,6 @@ import com.google.gson.stream.JsonReader
 import io.reactivex.Flowable
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.core.calculation.AConditioner
 import kr.ac.snu.hcil.omnitrack.core.connection.OTTimeRangeQuery
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
@@ -22,7 +21,7 @@ abstract class OTMeasureFactory(val factoryTypeName: String) : INameDescriptionR
         val CONDITIONERS_FOR_TIMEPOINT_VALUE = intArrayOf()
 
         val CONFIGURATOR_STEP_ATTRIBUTE = object : IExampleAttributeConfigurator {
-            override fun configureExampleAttribute(attr: OTAttribute<out Any>): Boolean {
+            override fun configureExampleAttribute(attr: OTAttributeDAO): Boolean {
                 /*if (attr is OTNumberAttribute) {
                     val ns = NumberStyle()
                     ns.commaUnit = 3
@@ -39,7 +38,7 @@ abstract class OTMeasureFactory(val factoryTypeName: String) : INameDescriptionR
         }
 
         val CONFIGURATOR_DISTANCE_ATTRIBUTE = object : IExampleAttributeConfigurator {
-            override fun configureExampleAttribute(attr: OTAttribute<out Any>): Boolean {
+            override fun configureExampleAttribute(attr: OTAttributeDAO): Boolean {
                 /*if (attr is OTNumberAttribute) {
                     val ns = NumberStyle()
                     ns.commaUnit = 3
@@ -56,7 +55,7 @@ abstract class OTMeasureFactory(val factoryTypeName: String) : INameDescriptionR
         }
 
         val CONFIGURATOR_FOR_HEART_RATE_ATTRIBUTE = object : IExampleAttributeConfigurator {
-            override fun configureExampleAttribute(attr: OTAttribute<out Any>): Boolean {
+            override fun configureExampleAttribute(attr: OTAttributeDAO): Boolean {
                 /*if (attr is OTNumberAttribute) {
                     val ns = NumberStyle()
                     ns.commaUnit = 3
@@ -71,7 +70,7 @@ abstract class OTMeasureFactory(val factoryTypeName: String) : INameDescriptionR
         }
 
         val CONFIGURATOR_FOR_TIMESPAN_ATTRIBUTE = object : IExampleAttributeConfigurator {
-            override fun configureExampleAttribute(attr: OTAttribute<out Any>): Boolean {
+            override fun configureExampleAttribute(attr: OTAttributeDAO): Boolean {
                 /*if (attr is OTTimeSpanAttribute) {
                     attr.setPropertyValue(OTTimeSpanAttribute.PROPERTY_GRANULARITY, 1)
                     attr.setPropertyValue(OTTimeSpanAttribute.PROPERTY_TYPE, 0)
@@ -85,7 +84,7 @@ abstract class OTMeasureFactory(val factoryTypeName: String) : INameDescriptionR
     }
 
     interface IExampleAttributeConfigurator {
-        fun configureExampleAttribute(attr: OTAttribute<out Any>): Boolean
+        fun configureExampleAttribute(attr: OTAttributeDAO): Boolean
     }
 
     val typeCode: String by lazy {

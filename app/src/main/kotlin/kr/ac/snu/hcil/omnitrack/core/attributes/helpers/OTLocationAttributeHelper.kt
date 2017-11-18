@@ -68,7 +68,7 @@ class OTLocationAttributeHelper : OTAttributeHelper() {
 
     override fun getTypeSmallIconResourceId(attribute: OTAttributeDAO): Int = R.drawable.icon_small_location
 
-    override fun getRequiredPermissions(attribute: OTAttributeDAO): Array<String>? = permissions
+    override fun getRequiredPermissions(attribute: OTAttributeDAO?): Array<String>? = permissions
 
     override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_LATITUDE_LONGITUDE
 

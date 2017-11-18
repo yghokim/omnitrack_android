@@ -41,7 +41,7 @@ class OTImageAttributeHelper : OTFileInvolvedAttributeHelper() {
         return true
     }
 
-    override fun getRequiredPermissions(attribute: OTAttributeDAO): Array<String>? = permissions
+    override fun getRequiredPermissions(attribute: OTAttributeDAO?): Array<String>? = permissions
 
     override fun refreshInputViewUI(inputView: AAttributeInputView<out Any>, attribute: OTAttributeDAO) {
         if (inputView is ImageInputView) {

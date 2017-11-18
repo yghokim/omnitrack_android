@@ -40,6 +40,8 @@ class OTApp : MultiDexApplication() {
             private set
 
         const val PREFIX_ACTION = "${BuildConfig.APPLICATION_ID}.action"
+        const val PREFIX_PREF_KEY = "${BuildConfig.APPLICATION_ID}.preference"
+
 
         const val SHARED_PREFERENCES_USER_NAME = "omnitrack_app_system"
 
@@ -99,10 +101,11 @@ class OTApp : MultiDexApplication() {
 
         const val BROADCAST_ACTION_TRACKER_ON_BOOKMARK = "$PREFIX_ACTION.TRACKER_ON_BOOKMARK"
 
-        const val PREFERENCE_KEY_FIREBASE_INSTANCE_ID = "firebase_instance_id"
+        const val PREFERENCE_KEY_FIREBASE_INSTANCE_ID = "$PREFIX_PREF_KEY.firebase_instance_id"
 
-        const val PREFERENCE_KEY_DEVICE_LOCAL_KEY = "device_local_key"
+        const val PREFERENCE_KEY_DEVICE_LOCAL_KEY = "${PREFIX_PREF_KEY}.device_local_key"
 
+        const val PREFERENCE_KEY_CONSENT_APPROVED = "${PREFIX_PREF_KEY}.consent_approvde"
 
         fun getString(resId: Int): String {
             return instance.resourcesWrapped.getString(resId)

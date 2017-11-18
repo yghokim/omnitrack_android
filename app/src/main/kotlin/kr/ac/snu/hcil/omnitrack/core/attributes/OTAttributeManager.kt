@@ -71,7 +71,7 @@ class OTAttributeManager @Inject constructor(val authManager: Lazy<OTAuthManager
     }
 
     fun showPermissionCheckDialog(activity: Activity, typeId: Int, typeName: String, onGranted: (Boolean) -> Unit, onDenied: (() -> Unit)? = null): MaterialDialog? {
-        val requiredPermissions = OTAttribute.getPermissionsForAttribute(typeId)
+        val requiredPermissions = OTAttributeManager.getAttributeHelper(typeId).getRequiredPermissions(null)
         if (requiredPermissions != null) {
             val notGrantedPermissions = requiredPermissions.filter { ContextCompat.checkSelfPermission(activity, it) != PackageManager.PERMISSION_GRANTED }
             if (notGrantedPermissions.isNotEmpty()) {

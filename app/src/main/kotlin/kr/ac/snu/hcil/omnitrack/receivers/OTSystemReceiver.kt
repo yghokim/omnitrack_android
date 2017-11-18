@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.core.triggers.OTDataTriggerManager
 import kr.ac.snu.hcil.omnitrack.widgets.OTShortcutPanelWidgetUpdateService
 
 /**
@@ -91,7 +90,7 @@ class OTSystemReceiver : BroadcastReceiver() {
             }
 
             OTApp.BROADCAST_ACTION_EVENT_TRIGGER_CHECK_ALARM -> {
-                OTDataTriggerManager.checkMeasures(context)
+                //OTDataTriggerManager.checkMeasures(context)
             }
         }
     }

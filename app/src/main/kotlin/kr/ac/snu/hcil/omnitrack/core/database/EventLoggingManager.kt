@@ -4,7 +4,7 @@ import android.os.Bundle
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.database.FirebaseDatabase
 import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.core.OTTracker
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
 import java.util.*
 
 /**
@@ -67,18 +67,18 @@ object EventLoggingManager {
         logEvent(name, bundle)
     }
 
-    fun logTrackerChangeEvent(name: String, tracker: OTTracker) {
+    fun logTrackerChangeEvent(name: String, tracker: OTTrackerDAO) {
         logEvent(name, makeTrackerChangeEventParams(tracker))
     }
 
-    fun makeTrackerChangeEventParams(tracker: OTTracker): Bundle {
+    fun makeTrackerChangeEventParams(tracker: OTTrackerDAO): Bundle {
         return Bundle().apply {
             putString("tracker_id", tracker.objectId)
             putString("tracker_name", tracker.name)
         }
     }
 
-    fun logTrackerOnShortcutChangeEvent(tracker: OTTracker, isOnShortcut: Boolean) {
+    fun logTrackerOnShortcutChangeEvent(tracker: OTTrackerDAO, isOnShortcut: Boolean) {
         logEvent(EVENT_NAME_CHANGE_TRACKER_ON_SHORTCUT, makeTrackerChangeEventParams(tracker).apply { putBoolean("on_shortcut", isOnShortcut) })
     }
 

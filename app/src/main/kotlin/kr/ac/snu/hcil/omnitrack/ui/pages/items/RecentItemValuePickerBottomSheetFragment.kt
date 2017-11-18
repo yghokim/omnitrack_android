@@ -8,8 +8,6 @@ import android.view.ViewGroup
 import android.widget.ProgressBar
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.OTTracker
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
 import kr.ac.snu.hcil.omnitrack.ui.components.common.DismissingBottomSheetDialogFragment
 
 /**
@@ -24,10 +22,6 @@ class RecentItemValuePickerBottomSheetFragment: DismissingBottomSheetDialogFragm
     companion object {
 
         const val TAG = "FieldValueHistoryPicker"
-
-        fun <T> getInstance(tracker: OTTracker, attribute: OTAttribute<T>): RecentItemValuePickerBottomSheetFragment {
-            return getInstance(tracker.objectId, attribute.objectId)
-        }
 
         fun getInstance(trackerId: String, attributeId: String): RecentItemValuePickerBottomSheetFragment {
             val arguments = Bundle()

@@ -1,7 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 
 import android.content.Context
-import android.os.Bundle
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -14,15 +13,13 @@ import kr.ac.snu.hcil.omnitrack.core.calculation.AConditioner
 import kr.ac.snu.hcil.omnitrack.core.calculation.SingleNumericComparison
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
-import kr.ac.snu.hcil.omnitrack.core.triggers.OTDataTrigger
-import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ComboBoxPropertyView
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.conditionerviews.SingleNumericConditionerSettingView
 
 /**
  * Created by younghokim on 16. 9. 5..
  */
-class EventTriggerConfigurationPanel : FrameLayout, ITriggerConfigurationCoordinator {
+class EventTriggerConfigurationPanel : FrameLayout {
 
 
     var selectedMeasureFactory: OTMeasureFactory?
@@ -112,6 +109,7 @@ class EventTriggerConfigurationPanel : FrameLayout, ITriggerConfigurationCoordin
             titleView.setText(factory.nameResourceId)
         }
     }
+    /*
 
     override fun applyConfigurationToTrigger(trigger: OTTrigger) {
         if (trigger is OTDataTrigger) {
@@ -137,5 +135,5 @@ class EventTriggerConfigurationPanel : FrameLayout, ITriggerConfigurationCoordin
 
     override fun readConfigurationFromBundle(bundle: Bundle) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    }*/
 }

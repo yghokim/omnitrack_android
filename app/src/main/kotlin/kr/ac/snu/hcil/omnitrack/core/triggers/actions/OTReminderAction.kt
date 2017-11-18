@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.triggers.actions
 
 import android.app.KeyguardManager
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.PowerManager
 import android.os.Vibrator
 import android.support.annotation.DrawableRes
@@ -12,8 +13,9 @@ import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import io.reactivex.Completable
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.services.OTReminderService
 import kr.ac.snu.hcil.omnitrack.ui.activities.ReminderPopupActivity
 import kr.ac.snu.hcil.omnitrack.utils.isDeviceLockedCompat
@@ -92,8 +94,12 @@ class OTReminderAction : OTTriggerAction() {
             ReminderActionTypeAdapter()
         }
 
-        val popupTriggersQueue = ArrayList<WeakReference<OTTrigger>>()
+        val popupTriggersQueue = ArrayList<WeakReference<OTTriggerDAO>>()
         var popupTriggerQueueTime: Long? = null
+
+        val localSettingsPreferences: SharedPreferences by lazy {
+            OTApp.instance.getSharedPreferences("Trigger_local_settings", Context.MODE_PRIVATE)
+        }
 
         fun notifyPopupQueue(context: Context) {
             val triggerTime = popupTriggerQueueTime
@@ -138,7 +144,7 @@ class OTReminderAction : OTTriggerAction() {
 
     var localNotificationLevel: NotificationLevel?
         get() {
-            val deviceSetting = OTTrigger.localSettingsPreferences.getString("${KEY_NOTIFICATION_LEVEL}_${trigger.objectId}", null)
+            val deviceSetting = localSettingsPreferences.getString("${KEY_NOTIFICATION_LEVEL}_${trigger.objectId}", null)
             if (deviceSetting != null) {
                 try {
                     return NotificationLevel.valueOf(deviceSetting)
@@ -150,9 +156,9 @@ class OTReminderAction : OTTriggerAction() {
         }
         set(value) {
             if (value != null) {
-                OTTrigger.localSettingsPreferences.edit().putString("${KEY_NOTIFICATION_LEVEL}_${trigger.objectId}", value.name).apply()
+                localSettingsPreferences.edit().putString("${KEY_NOTIFICATION_LEVEL}_${trigger.objectId}", value.name).apply()
             } else {
-                OTTrigger.localSettingsPreferences.edit().remove("${KEY_NOTIFICATION_LEVEL}_${trigger.objectId}").apply()
+                localSettingsPreferences.edit().remove("${KEY_NOTIFICATION_LEVEL}_${trigger.objectId}").apply()
             }
         }
 

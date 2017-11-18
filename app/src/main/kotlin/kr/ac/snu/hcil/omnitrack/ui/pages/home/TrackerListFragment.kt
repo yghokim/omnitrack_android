@@ -39,7 +39,6 @@ import kotlinx.android.synthetic.main.tracker_list_element.view.*
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
-import kr.ac.snu.hcil.omnitrack.core.OTTracker
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService
@@ -283,26 +282,6 @@ class TrackerListFragment : OTFragment() {
             startActivity(ItemDetailActivity.makeNewItemPageIntent(tracker.objectId!!, act))
         }
     }
-
-    private fun handleTrackerLongClick(tracker: OTTracker) {
-        /*
-        val builder = AlertDialog.Builder(context)
-        builder.setTitle(tracker.name)
-        builder.setItems(popupMessages){
-            dialog, which ->
-            when(which) {
-                CHANGE_TRACKER_SETTINGS -> {
-                    val intent = Intent(context, TrackerDetailActivity::class.java)
-                    intent.putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
-                    startActivityOnDelay(intent)
-
-                }
-                REMOVE_TRACKER -> DialogHelper.makeYesNoDialogBuilder(context, tracker.name, getString(R.string.msg_confirm_remove_tracker), {->user.trackers.remove(tracker)}).show()
-            }
-        }
-        builder.show()*/
-    }
-
 
     inner class TrackerListAdapter : RecyclerView.Adapter<TrackerListAdapter.ViewHolder>() {
 

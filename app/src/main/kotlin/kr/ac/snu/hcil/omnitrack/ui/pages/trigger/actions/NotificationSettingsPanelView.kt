@@ -3,7 +3,6 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.trigger.actions
 import android.app.Dialog
 import android.content.Context
 import android.graphics.Color
-import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -16,16 +15,14 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.afollestad.materialdialogs.MaterialDialog
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.triggers.OTTrigger
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTReminderAction
 import kr.ac.snu.hcil.omnitrack.ui.components.common.StringIndicatorPropertyView
-import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.ITriggerConfigurationCoordinator
 import kr.ac.snu.hcil.omnitrack.utils.dipRound
 
 /**
  * Created by younghokim on 2017. 4. 18..
  */
-class NotificationSettingsPanelView : StringIndicatorPropertyView, ITriggerConfigurationCoordinator, View.OnClickListener {
+class NotificationSettingsPanelView : StringIndicatorPropertyView, View.OnClickListener {
 
     companion object {
         const val REQUEST_CODE = 20
@@ -61,7 +58,7 @@ class NotificationSettingsPanelView : StringIndicatorPropertyView, ITriggerConfi
         }
     }
 
-
+/*
     override fun applyConfigurationToTrigger(trigger: OTTrigger) {
         val action = trigger.triggerAction as? OTReminderAction
         if (action != null) {
@@ -99,7 +96,7 @@ class NotificationSettingsPanelView : StringIndicatorPropertyView, ITriggerConfi
 
     override fun validateConfigurations(errorMessagesOut: MutableList<String>): Boolean {
         return true
-    }
+    }*/
 
 
     fun makeLevelSelectionDialog(): Dialog {
