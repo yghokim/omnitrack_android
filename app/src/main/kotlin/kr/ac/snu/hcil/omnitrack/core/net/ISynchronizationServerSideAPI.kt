@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.net
 
+import android.support.annotation.Keep
 import com.google.gson.JsonObject
 import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.core.OTUserRolePOJO
@@ -12,8 +13,11 @@ import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncResultEntry
  */
 interface ISynchronizationServerSideAPI {
 
+
+    @Keep
     data class DeviceInfoResult(var result: String, var deviceLocalKey: String?)
 
+    @Keep
     data class DirtyRowBatchParameter(val type: ESyncDataType, val rows: Array<String>)
 
     fun getUserRoles(): Single<List<OTUserRolePOJO>>
