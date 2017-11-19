@@ -10,25 +10,10 @@ keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 android {
     signingConfigs {
         sign_test {
-            if(project.hasProperty(RELEASE_KEYSTORE_LOCATION))
-            {
-                storeFile file(RELEASE_KEYSTORE_LOCATION)
-            }
-
-            if(project.hasProperty(RELEASE_ALIAS))
-            {
-                keyAlias RELEASE_ALIAS
-            }
-
-            if(project.hasProperty(RELEASE_KEY_PASSWORD))
-            {
-                keyPassword RELEASE_KEY_PASSWORD
-            }
-
-            if(project.hasProperty(RELEASE_STORE_PASSWORD))
-            {
-                storePassword RELEASE_STORE_PASSWORD
-            }
+            storeFile file(RELEASE_KEYSTORE_LOCATION)
+            keyAlias RELEASE_ALIAS
+            keyPassword RELEASE_KEY_PASSWORD
+            storePassword RELEASE_STORE_PASSWORD
         }
     }
 
@@ -43,6 +28,8 @@ android {
         //multidex support
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
+
+        manifestPlaceholders = [GOOGLE_MAPS_API_KEY: keystoreProperties.getProperty("GOOGLE_MAPS_API_KEY").toString()]
     }
     dexOptions {
         javaMaxHeapSize "4g"
@@ -54,12 +41,11 @@ android {
 
     buildTypes {
         release {
+            debuggable true
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            if(signingConfigs.hasProperty("sign_test")) {
-                signingConfig signingConfigs.sign_test
-            }
+            signingConfig signingConfigs.sign_test
         }
         debug {
             applicationIdSuffix '.debug'
