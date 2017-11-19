@@ -76,6 +76,15 @@ class OTOfficialBinaryStorageCore(val context: Context, val retrofit: Lazy<Retro
     override fun makeServerPath(userId: String, trackerId: String, itemId: String, attributeLocalId: String, fileIdentifier: String): String {
         return "${trackerId}/${itemId}/${attributeLocalId}/${fileIdentifier}"
     }
+
+    override fun decodeTrackerIdFromServerPath(serverPath: String): String? {
+        val split = serverPath.split("/")
+        if (split.size >= 4) {
+            return split[0]
+        } else return null
+    }
+
+
     override fun downloadFileTo(pathString: String, localUri: Uri): Single<Uri> {
         val split = pathString.split("/")
         return service.downloadMediaFile(split[0], split[1], split[2], split[3]).subscribeOn(Schedulers.io()).map { responseBody: ResponseBody ->

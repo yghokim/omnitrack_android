@@ -284,7 +284,7 @@
     <string name="msg_profile_unlink_account_confirm">Any unsynchronized data will be lost.\nDo you want to unlink your account with this device?</string>
     <string name="msg_signup_complete">Sign up process is complete</string>
     <string name="msg_signup_complete_description">You can now start tracking!</string>
-    <string name="msg_purge_cache">Clear all cached media files</string>
+    <string name="msg_purge_cache">Clear cached media files that are alread synchronized</string>
     <string name="msg_remove_all_the_items_permanently">Remove all the items permanently</string>
     <string name="msg_no_cache">No cache</string>
     <string name="msg_tab_to_take_a_photo">Tab to take a photo</string>

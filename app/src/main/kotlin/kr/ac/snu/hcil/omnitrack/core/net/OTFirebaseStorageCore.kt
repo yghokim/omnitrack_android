@@ -14,6 +14,7 @@ import java.io.File
  * Created by younghokim on 2017. 11. 15..
  */
 class OTFirebaseStorageCore : IBinaryStorageCore {
+
     private fun getItemStorageReference(relPath: String): StorageReference {
         return FirebaseStorage.getInstance().reference.child(relPath)
     }
@@ -53,6 +54,14 @@ class OTFirebaseStorageCore : IBinaryStorageCore {
 
     override fun makeServerPath(userId: String, trackerId: String, itemId: String, attributeLocalId: String, fileIdentifier: String): String
             = "entry_data/$userId/$trackerId/$itemId/$attributeLocalId/$fileIdentifier"
+
+    override fun decodeTrackerIdFromServerPath(serverPath: String): String? {
+        val split = serverPath.split("/")
+        if (split.size >= 6) {
+            return split[2]
+        } else return null
+    }
+
 
     override fun downloadFileTo(pathString: String, localUri: Uri): Single<Uri> {
         return Single.create { subscriber ->
