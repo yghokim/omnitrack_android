@@ -7,10 +7,12 @@ import dagger.Lazy
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels.LocalMediaCacheEntry
 import kr.ac.snu.hcil.omnitrack.core.datatypes.OTServerFile
+import kr.ac.snu.hcil.omnitrack.utils.io.FileHelper
 import java.io.File
 import java.io.FileNotFoundException
 import java.util.*
@@ -21,7 +23,7 @@ import java.util.*
 class OTLocalMediaCacheManager(val context: Context, val authManager: Lazy<OTAuthManager>, val binaryStorageController: Lazy<OTBinaryStorageController>) {
 
 
-    fun getItemCacheDir(trackerId: String, createIfNotExist: Boolean = true): File {
+    fun getDefaultItemCacheDir(trackerId: String, createIfNotExist: Boolean = true): File {
         val file = context.externalCacheDir.resolve("${authManager.get().userId ?: "anonymous"}/${trackerId}")
         if (createIfNotExist && !file.exists()) {
             file.mkdirs()
@@ -29,41 +31,54 @@ class OTLocalMediaCacheManager(val context: Context, val authManager: Lazy<OTAut
         return file
     }
 
-    fun getTotalCacheFileSize(trackerId: String): Long {
-        val cacheDirectory = getItemCacheDir(trackerId, false)
-        try {
-            if (cacheDirectory.isDirectory && cacheDirectory.exists()) {
-
-                fun getSizeRecur(dir: File): Long {
-                    var size = 0L
-
-                    if (dir.isDirectory) {
-                        for (file in dir.listFiles()) {
-                            if (file.isFile) {
-                                size += file.length()
-                            } else {
-                                size += getSizeRecur(file)
-                            }
-                        }
-                    } else if (dir.isFile) {
-                        size += dir.length()
-                    }
-
-                    return size
-                }
-
-                return getSizeRecur(cacheDirectory)
-            } else {
-                return 0
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            return 0
+    private fun findSynchronizedCacheEntries(trackerId: String, realm: Realm): List<LocalMediaCacheEntry> {
+        return realm.where(LocalMediaCacheEntry::class.java)
+                .isNotNull(RealmDatabaseManager.FIELD_SYNCHRONIZED_AT)
+                .and()
+                .and()
+                .not()
+                .beginsWith("serverPath", "temporary")
+                .findAll().filter {
+            binaryStorageController.get().core.decodeTrackerIdFromServerPath(it.serverPath) != null
         }
     }
 
+    fun calcTotalCacheFileSize(trackerId: String): Single<Long> {
+        return Single.defer {
+            binaryStorageController.get().realmProvider.get().use { realm ->
+                val cacheEntries = findSynchronizedCacheEntries(trackerId, realm)
+                        .map { FileHelper.getFileSizeOf(it.localUriCompat(), context) }
+
+                return@defer Single.just(cacheEntries.sum())
+            }
+        }.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+    }
+
+    /**
+     * @return A Single containing the number of files removed
+     *
+     */
+    fun purgeSynchronizedCacheFiles(trackerId: String): Single<Int> {
+        return Single.defer {
+            binaryStorageController.get().realmProvider.get().use { realm ->
+                var removeCount = 0
+                val cacheEntries = findSynchronizedCacheEntries(trackerId, realm)
+                cacheEntries.forEach { entry ->
+                    if (File(entry.localUriCompat().path).delete()) {
+                        removeCount++
+                    }
+                    realm.executeTransaction {
+                        entry.deleteFromRealm()
+                    }
+                }
+
+                return@defer Single.just(removeCount)
+            }
+        }.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+    }
+
     fun makeLocalCacheUri(parentDirectoryName: String, extension: String): Uri {
-        return Uri.fromFile(File.createTempFile("cache", extension, getItemCacheDir(parentDirectoryName, true)))
+        return Uri.fromFile(File.createTempFile("cache", extension, getDefaultItemCacheDir(parentDirectoryName, true)))
     }
 
     fun getCachedUriImmediately(serverPath: String): Uri? {

@@ -45,7 +45,7 @@ class OTImageAttributeHelper : OTFileInvolvedAttributeHelper() {
 
     override fun refreshInputViewUI(inputView: AAttributeInputView<out Any>, attribute: OTAttributeDAO) {
         if (inputView is ImageInputView) {
-            inputView.picker.overrideLocalUriFolderPath = localCacheManager.getItemCacheDir(attribute.trackerId ?: "images", true)
+            inputView.picker.overrideLocalUriFolderPath = localCacheManager.getDefaultItemCacheDir(attribute.trackerId ?: "images", true)
         }
     }
 

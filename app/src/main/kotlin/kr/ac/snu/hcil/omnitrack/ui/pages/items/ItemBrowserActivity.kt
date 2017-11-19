@@ -18,6 +18,7 @@ import android.util.Log
 import android.view.*
 import android.widget.*
 import butterknife.bindView
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.SerialDisposable
 import kr.ac.snu.hcil.omnitrack.OTApp
@@ -704,30 +705,32 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
         }
 
         private fun refreshPurgeButton() {
-            val cacheSize = localCacheManager.getTotalCacheFileSize(this.viewModel.trackerId)
-            if (cacheSize > 0L) {
-                purgeMenuItem.isEnabled = true
-                purgeMenuItem.description = "${(cacheSize / (1024 * 102.4f) + .5f).toInt() / 10f} Mb"
-            } else {
-                purgeMenuItem.isEnabled = false
-                purgeMenuItem.description = getString(R.string.msg_no_cache)
-            }
-            menuAdapter.notifyItemChanged(0)
+            dialogSubscriptions.add(
+                    localCacheManager.calcTotalCacheFileSize(this.viewModel.trackerId)
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe { cacheSize ->
+                                if (cacheSize > 0L) {
+                                    purgeMenuItem.isEnabled = true
+                                    purgeMenuItem.description = "${(cacheSize / (1024 * 102.4f) + .5f).toInt() / 10f} Mb"
+                                } else {
+                                    purgeMenuItem.isEnabled = false
+                                    purgeMenuItem.description = getString(R.string.msg_no_cache)
+                                }
+                                menuAdapter.notifyItemChanged(0)
+                            }
+            )
         }
 
         override fun setupDialogAndContentView(dialog: Dialog, contentView: View) {
 
             purgeMenuItem = RecyclerViewMenuAdapter.MenuItem(R.drawable.clear_cache, OTApp.getString(R.string.msg_purge_cache), null, isEnabled = false, onClick = {
-                //TODO do not remove unsynchronized cache
-                //TODO refactor not to remove the directory here. make purge synchronized cache API
-                val cacheDir = localCacheManager.getItemCacheDir(viewModel.trackerId, false)
-                    println("purge cache dir files")
-                    /*
-                    RxProgressDialog.Builder(FileHelper.removeAllFilesIn(cacheDir).toObservable()).create(this@SettingsDialogFragment.activity).show().subscribe {
-                        refreshPurgeButton()
-                    }*/
-                    FileHelper.deleteDirectory(cacheDir)
-                    refreshPurgeButton()
+                dialogSubscriptions.add(
+                        localCacheManager.purgeSynchronizedCacheFiles(viewModel.trackerId).subscribe { count ->
+                            Toast.makeText(act, "Removed ${count} files", Toast.LENGTH_LONG).show()
+                            refreshPurgeButton()
+                        }
+                )
+
             })
 
             deletionMenuItem = RecyclerViewMenuAdapter.MenuItem(R.drawable.trashcan, OTApp.getString(R.string.msg_remove_all_the_items_permanently), null, isEnabled = false, onClick = {

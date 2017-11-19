@@ -40,7 +40,7 @@ class OTAudioRecordAttributeHelper : OTFileInvolvedAttributeHelper() {
 
     override fun refreshInputViewUI(inputView: AAttributeInputView<out Any>, attribute: OTAttributeDAO) {
         if (inputView is AudioRecordInputView) {
-            inputView.valueView.recordingOutputDirectoryPathOverride = localCacheManager.getItemCacheDir(attribute.trackerId ?: "audios", true)
+            inputView.valueView.recordingOutputDirectoryPathOverride = localCacheManager.getDefaultItemCacheDir(attribute.trackerId ?: "audios", true)
         }
     }
 

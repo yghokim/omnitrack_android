@@ -12,4 +12,5 @@ interface IBinaryStorageCore {
     fun startNewUploadTaskImpl(taskInfo: UploadTaskInfo, onProgress: (session: String) -> Unit): Completable
     fun makeServerPath(userId: String, trackerId: String, itemId: String, attributeLocalId: String, fileIdentifier: String): String
     fun downloadFileTo(pathString: String, localUri: Uri): Single<Uri>
+    fun decodeTrackerIdFromServerPath(serverPath: String): String?
 }
