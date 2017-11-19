@@ -251,10 +251,6 @@ class OTApp : MultiDexApplication() {
         this.resources.getStringArray(R.array.colorPaletteArray).map { Color.parseColor(it) }.toIntArray()
     }
 
-    val googleApiKey: String by lazy {
-        this.resources.getString(R.string.google_maps_key)
-    }
-
     override fun attachBaseContext(base: Context) {
         LocaleHelper.init(base)
         refreshConfiguration(base)
