@@ -176,7 +176,9 @@ class TriggerTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>, val realmP
                     applyTo.checkScript = json[key]?.asBoolean ?: false
                 }
                 "script" -> {
-                    applyTo.additionalScript = json[key]?.asString
+                    applyTo.additionalScript = if (json[key].isJsonNull) {
+                        null
+                    } else json[key].asString
                 }
             }
         }
