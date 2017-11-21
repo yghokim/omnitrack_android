@@ -19,6 +19,7 @@ import kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService
 import kr.ac.snu.hcil.omnitrack.services.OTSynchronizationService
 import kr.ac.snu.hcil.omnitrack.services.OTTableExportService
 import kr.ac.snu.hcil.omnitrack.services.messaging.OTFirebaseInstanceIdService
+import kr.ac.snu.hcil.omnitrack.services.messaging.OTFirebaseMessagingService
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.AttributeEditDialogFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AudioRecordInputView
@@ -132,4 +133,6 @@ interface ApplicationComponent {
     fun inject(viewModel: NewItemCreationViewModel)
 
     fun inject(expression: RealmLazyFunction)
+
+    fun inject(service: OTFirebaseMessagingService)
 }
