@@ -53,6 +53,7 @@ class AttributeTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>) : Server
                                     "id" -> entry.id = reader.nextString()
                                     "key" -> entry.key = reader.nextString()
                                     "sVal" -> entry.value = reader.nextString()
+                                    else -> reader.skipValue()
                                 }
                             }
                             reader.endObject()
