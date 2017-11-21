@@ -483,7 +483,7 @@ class RealmDatabaseManager @Inject constructor(
                 for (serverPojo in serverRowJsonList.filter { it.has(FIELD_OBJECT_ID) }) {
                     val match = realm.where(tableClass).equalTo(FIELD_OBJECT_ID, serverPojo.get(FIELD_OBJECT_ID).asString).findFirst()
                     if (match == null) {
-                        if (!serverPojo.get(FIELD_REMOVED_BOOLEAN).asBoolean) {
+                        if (serverPojo.get(FIELD_REMOVED_BOOLEAN)?.asBoolean != true) {
                             //insert
                             println("synchronization: server row not matched and is not a removed row. append new in local db.")
 
@@ -514,7 +514,7 @@ class RealmDatabaseManager @Inject constructor(
                     } else {
                         //update
                         realm.executeTransaction {
-                            if (serverPojo.get(FIELD_REMOVED_BOOLEAN).asBoolean) {
+                            if (serverPojo.get(FIELD_REMOVED_BOOLEAN)?.asBoolean == true) {
                                 removeRowInDbFunc(match, realm)
                                 //removeItemImpl(match, true, realm)
                             } else {
