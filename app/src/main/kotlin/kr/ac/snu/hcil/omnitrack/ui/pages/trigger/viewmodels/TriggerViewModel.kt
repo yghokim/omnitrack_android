@@ -171,7 +171,10 @@ open class TriggerViewModel(val app: OTApp, val dao: OTTriggerDAO, val realm: Re
                             val id = dao.objectId
                             realm.executeTransactionAsObservable { realm ->
                                 realm.where(OTTriggerDAO::class.java).equalTo("objectId", id).findFirst()
-                                        ?.isOn = true
+                                        ?.apply {
+                                            isOn = true
+                                            synchronizedAt = null
+                                        }
                             }.doOnComplete {
                                 triggerSwitch.onNextIfDifferAndNotNull(true)
                                 triggerSystemManager.handleTriggerOn(dao)
@@ -200,7 +203,10 @@ open class TriggerViewModel(val app: OTApp, val dao: OTTriggerDAO, val realm: Re
                         val id = dao.objectId
                         realm.executeTransactionAsObservable { realm ->
                             realm.where(OTTriggerDAO::class.java).equalTo("objectId", id).findFirst()
-                                    ?.isOn = false
+                                    ?.apply {
+                                        isOn = false
+                                        synchronizedAt = null
+                                    }
                         }.doOnComplete {
                             triggerSwitch.onNextIfDifferAndNotNull(false)
                             triggerSystemManager.handleTriggerOff(dao)
