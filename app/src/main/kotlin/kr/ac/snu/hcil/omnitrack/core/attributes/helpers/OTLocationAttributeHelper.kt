@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit
  */
 class OTLocationAttributeHelper : OTAttributeHelper() {
 
-    private val permissions = arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION)
+    private val permissions = arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
 
     override val supportedFallbackPolicies: LinkedHashMap<Int, FallbackPolicyResolver>
         get() = super.supportedFallbackPolicies.apply{

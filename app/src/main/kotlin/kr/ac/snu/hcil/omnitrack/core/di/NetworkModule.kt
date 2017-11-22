@@ -41,13 +41,16 @@ class NetworkModule {
     @Provides
     @Singleton
     @Authorized
-    fun provideOkHttpClient(authManager: Lazy<OTAuthManager>, cache: Cache): OkHttpClient {
+    fun provideOkHttpClient(authManager: Lazy<OTAuthManager>, @DeviceId deviceId: Lazy<String>, @Sha1FingerPrint fingerPrint: String, cache: Cache): OkHttpClient {
         return OkHttpClient.Builder()
                 .cache(cache)
                 .addInterceptor { chain ->
                     val bearer = "Bearer " + authManager.get().getAuthToken().blockingGet()
                     val newRequest = chain.request().newBuilder()
                             .addHeader("Authorization", bearer)
+                            .addHeader("OTDeviceId", deviceId.get())
+                            .addHeader("OTFingerPrint", fingerPrint)
+                            .addHeader("OTPackageName", BuildConfig.APPLICATION_ID)
                             .build()
                     chain.proceed(newRequest)
                 }.build()

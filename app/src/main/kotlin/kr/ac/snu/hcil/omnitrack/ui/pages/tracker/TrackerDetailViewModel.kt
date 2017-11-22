@@ -374,8 +374,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
     }
 
     class AttributeInformationViewModel(_attributeDAO: OTAttributeDAO, val realm: Realm, val attributeManager: OTAttributeManager) : IReadonlyObjectId, RealmChangeListener<OTAttributeDAO> {
-        override val objectId: String?
-            get() = attributeDAO.objectId
+        override val objectId: String? = _attributeDAO.objectId
 
         var attributeDAO: OTAttributeDAO = _attributeDAO
             private set

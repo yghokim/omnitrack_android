@@ -140,7 +140,9 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
 
     class TrackerInformationViewModel(val trackerDao: OTTrackerDAO, val realm: Realm, dbManager: RealmDatabaseManager) : IReadonlyObjectId, RealmChangeListener<OTTrackerDAO> {
         override val objectId: String?
-            get() = trackerDao.objectId
+            get() = _objectId
+
+        private var _objectId: String? = trackerDao.objectId
 
         val validationResult = BehaviorSubject.createDefault<Pair<Boolean, List<CharSequence>?>>(Pair(true, null))
 
@@ -175,7 +177,6 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
         private val subscriptions = CompositeDisposable()
 
         init {
-
             trackerDao.liveTriggersQuery?.let {
                 subscriptions.add(
                         it.equalTo("isOn", true).equalTo("actionType", OTTriggerDAO.ACTION_TYPE_REMIND)

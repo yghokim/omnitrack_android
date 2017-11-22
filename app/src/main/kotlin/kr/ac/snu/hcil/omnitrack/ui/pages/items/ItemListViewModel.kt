@@ -165,7 +165,9 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
     }
 
     inner class ItemViewModel(val itemDao: OTItemDAO) : IReadonlyObjectId {
-        override val objectId: String? get() = itemDao.objectId
+        override val objectId: String? get() = _objectId
+
+        private var _objectId: String? = null
         val isSynchronized: Boolean get() = itemDao.synchronizedAt != null
 
         fun getItemValueOf(attributeLocalId: String): Any? = itemDao.getValueOf(attributeLocalId)
@@ -189,6 +191,7 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
             }
 
         init {
+            _objectId = itemDao.objectId
             timestamp = itemDao.timestamp
             loggingSource = itemDao.loggingSource
         }

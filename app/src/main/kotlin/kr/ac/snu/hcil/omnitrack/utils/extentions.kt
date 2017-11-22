@@ -19,6 +19,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TimePicker
 import com.google.android.gms.maps.model.LatLng
+import com.google.gson.JsonElement
+import com.google.gson.JsonObject
 import io.reactivex.Completable
 import io.reactivex.disposables.Disposables
 import io.reactivex.subjects.BehaviorSubject
@@ -335,4 +337,25 @@ fun Realm.executeTransactionAsObservable(transaction: (Realm) -> Unit): Completa
     }
 }
 
+fun JsonObject.getElementCompat(key: String): JsonElement? {
+    val value = this[key]
+    if (value?.isJsonNull != false) {
+        return null
+    } else return value
+}
 
+fun JsonObject.getStringCompat(key: String): String? {
+    return getElementCompat(key)?.asString
+}
+
+fun JsonObject.getBooleanCompat(key: String): Boolean? {
+    return getElementCompat(key)?.asBoolean
+}
+
+fun JsonObject.getIntCompat(key: String): Int? {
+    return getElementCompat(key)?.asInt
+}
+
+fun JsonObject.getLongCompat(key: String): Long? {
+    return getElementCompat(key)?.asLong
+}
