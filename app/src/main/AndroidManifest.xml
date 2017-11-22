@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="kr.ac.snu.hcil.omnitrack"
-    android:versionCode="109"
-    android:versionName="2.0.0.6 beta">
+    package="kr.ac.snu.hcil.omnitrack">
 
     <!-- To auto-complete the email text field in the login form with the user's emails -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
