@@ -28,8 +28,42 @@ android {
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
 
+        def versionPropsFile = rootProject.file("version.properties")
+        Properties versionProperties = new Properties()
+        versionProperties.load(new FileInputStream(versionPropsFile))
+        def runTasks = gradle.startParameter.taskNames
+        def releaseIncrease = 0
+        if('assemble' in runTasks || 'assembleRelease' in runTasks || 'aR' in runTasks)
+        {
+            releaseIncrease = 1
+        }
+
+        def patternVersionNumber = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)\\.(\\d+)(\\s[a-zA-Z0-9]+)?")
+        def matcherVersionNumber = patternVersionNumber.matcher(versionProperties["versionName"])
+        matcherVersionNumber.find()
+        def majorVersion = Integer.parseInt(matcherVersionNumber.group(1))
+        def minorVersion = Integer.parseInt(matcherVersionNumber.group(2))
+        def pointVersion = Integer.parseInt(matcherVersionNumber.group(3))
+        def buildVersion = Integer.parseInt(matcherVersionNumber.group(4))
+        def suffix = matcherVersionNumber.group(5)
+
+        versionName = majorVersion + "." + minorVersion + "." + (pointVersion + releaseIncrease) + "." + (buildVersion + 1) + suffix
+        versionCode = versionProperties["versionCode"].toInteger() + releaseIncrease
+        versionProperties.setProperty("versionName", versionName)
+        versionProperties.setProperty("versionCode", versionCode.toString())
+        versionProperties.store(versionPropsFile.newWriter(), "auto-incremented version information.")
+        println("new versionName: ${versionName}, versionCode: ${versionCode}")
+
         manifestPlaceholders = [GOOGLE_MAPS_API_KEY: keystoreProperties.getProperty("GOOGLE_MAPS_API_KEY").toString()]
     }
+
+
+    applicationVariants.all { variant ->
+        variant.outputs.all{ output ->
+            outputFileName = "${variant.name}-${defaultConfig.versionName}.apk"
+        }
+    }
+
     dexOptions {
         javaMaxHeapSize "4g"
     }
@@ -205,38 +239,3 @@ repositories {
 
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'realm-android'
-
-
-task('increaseVersionCode') << {
-    def manifestFile = file("src/main/AndroidManifest.xml")
-    def pattern = Pattern.compile("versionCode=\"(\\d+)\"")
-    def manifestText = manifestFile.getText()
-    def matcher = pattern.matcher(manifestText)
-    matcher.find()
-    def versionCode = Integer.parseInt(matcher.group(1))
-    def manifestContent = matcher.replaceAll("versionCode=\"" + ++versionCode + "\"")
-    manifestFile.write(manifestContent)
-}
-
-task('incrementVersionName') << {
-    def manifestFile = file("src/main/AndroidManifest.xml")
-    def patternVersionNumber = Pattern.compile("versionName=\"(\\d+)\\.(\\d+)\\.(\\d+)\\.(\\d+)(\\s[a-zA-Z0-9]+)?\"")
-    def manifestText = manifestFile.getText()
-    def matcherVersionNumber = patternVersionNumber.matcher(manifestText)
-    matcherVersionNumber.find()
-    def majorVersion = Integer.parseInt(matcherVersionNumber.group(1))
-    def minorVersion = Integer.parseInt(matcherVersionNumber.group(2))
-    def pointVersion = Integer.parseInt(matcherVersionNumber.group(3))
-    def buildVersion = Integer.parseInt(matcherVersionNumber.group(4))
-    def suffix = matcherVersionNumber.group(5)
-    def mNextVersionName = majorVersion + "." + minorVersion + "." + pointVersion + "." + (buildVersion + 1) + suffix
-    def manifestContent = matcherVersionNumber.replaceAll("versionName=\"" + mNextVersionName + "\"")
-    manifestFile.write(manifestContent)
-}
-
-tasks.whenTaskAdded { task ->
-    if (task.name == 'generateReleaseBuildConfig' || task.name == 'generateDebugBuildConfig') {
-        task.dependsOn 'increaseVersionCode'
-        task.dependsOn 'incrementVersionName'
-    }
-}
