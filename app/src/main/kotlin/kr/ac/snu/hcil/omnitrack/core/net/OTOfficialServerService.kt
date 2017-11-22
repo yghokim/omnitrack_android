@@ -13,7 +13,6 @@ import retrofit2.http.*
  * Retrofit service interface to communicate between OmniTrack Official server
  */
 interface OTOfficialServerService {
-
     @GET("api/user/roles")
     fun getUserRoles(): Single<List<OTUserRolePOJO>>
 

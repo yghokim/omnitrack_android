@@ -237,17 +237,8 @@ class RealmDatabaseManager @Inject constructor(
             }
         } else {
             realm.executeTransactionIfNotIn {
-                dao.attributes.forEach { removeAttributeImpl(it, realm) }
-                dao.attributes.clear()
-                dao.deleteFromRealm()
-            }
-        }
-    }
-
-    private fun removeAttributeImpl(dao: OTAttributeDAO, realm: Realm) {
-        if (dao.isManaged) {
-            realm.executeTransactionIfNotIn {
-                dao.properties.deleteAllFromRealm()
+                dao.attributes.forEach { it.properties.deleteAllFromRealm() }
+                dao.attributes.deleteAllFromRealm()
                 dao.deleteFromRealm()
             }
         }

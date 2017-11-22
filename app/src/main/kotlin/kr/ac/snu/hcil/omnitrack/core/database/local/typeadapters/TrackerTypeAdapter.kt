@@ -5,9 +5,14 @@ import com.google.gson.JsonObject
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import dagger.Lazy
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.utils.getBooleanCompat
+import kr.ac.snu.hcil.omnitrack.utils.getIntCompat
+import kr.ac.snu.hcil.omnitrack.utils.getLongCompat
+import kr.ac.snu.hcil.omnitrack.utils.getStringCompat
 import java.util.*
 
 /**
@@ -40,7 +45,11 @@ class TrackerTypeAdapter(isServerMode: Boolean, val attributeTypeAdapter: Lazy<S
 
                     while(reader.hasNext())
                     {
-                        dao.attributes.add(attributeTypeAdapter.get().read(reader))
+                        val attribute = attributeTypeAdapter.get().read(reader)
+                        if (isServerMode && attribute.objectId.isNullOrBlank()) {
+                            attribute.objectId = UUID.randomUUID().toString()
+                        }
+                        dao.attributes.add(attribute)
                     }
 
                     reader.endArray()
@@ -86,15 +95,15 @@ class TrackerTypeAdapter(isServerMode: Boolean, val attributeTypeAdapter: Lazy<S
             key->
             when(key)
             {
-                RealmDatabaseManager.FIELD_REMOVED_BOOLEAN -> applyTo.removed = json.get(key)?.asBoolean == true
-                "user", RealmDatabaseManager.FIELD_USER_ID->applyTo.userId = json.get(key)?.asString
-                RealmDatabaseManager.FIELD_USER_CREATED_AT -> applyTo.userCreatedAt = json[key]?.asLong?:0
-                RealmDatabaseManager.FIELD_UPDATED_AT_LONG->applyTo.userUpdatedAt = json[key]?.asLong?:0
-                RealmDatabaseManager.FIELD_POSITION->applyTo.position = json[key]?.asInt ?: 0
-                RealmDatabaseManager.FIELD_SYNCHRONIZED_AT->applyTo.synchronizedAt = json[key]?.asLong
-                RealmDatabaseManager.FIELD_NAME -> json[key]?.let{ applyTo.name = it.asString }
-                "color"->json[key]?.let{applyTo.color = it.asInt}
-                "isBookmarked"->json[key]?.let{applyTo.isBookmarked = it.asBoolean}
+                RealmDatabaseManager.FIELD_REMOVED_BOOLEAN -> applyTo.removed = json.getBooleanCompat(key) ?: false
+                "user", RealmDatabaseManager.FIELD_USER_ID -> applyTo.userId = json.getStringCompat(key)
+                RealmDatabaseManager.FIELD_USER_CREATED_AT -> applyTo.userCreatedAt = json.getLongCompat(key) ?: 0
+                RealmDatabaseManager.FIELD_UPDATED_AT_LONG -> applyTo.userUpdatedAt = json.getLongCompat(key) ?: 0
+                RealmDatabaseManager.FIELD_POSITION -> applyTo.position = json.getIntCompat(key) ?: 0
+                RealmDatabaseManager.FIELD_SYNCHRONIZED_AT -> applyTo.synchronizedAt = json.getLongCompat(key)
+                RealmDatabaseManager.FIELD_NAME -> applyTo.name = json.getStringCompat(key) ?: ""
+                "color" -> applyTo.color = json.getIntCompat(key) ?: OTApp.instance.colorPalette[0]
+                "isBookmarked" -> applyTo.isBookmarked = json.getBooleanCompat(key) ?: false
                 "lockedProperties"->applyTo.serializedLockedPropertyInfo = json[key]?.toString() ?: "null"
                 "flags"->applyTo.serializedCreationFlags = json[key]?.toString() ?: "null"
                 "attributes"->{
@@ -108,7 +117,7 @@ class TrackerTypeAdapter(isServerMode: Boolean, val attributeTypeAdapter: Lazy<S
                         jsonList.forEach {
                             attrJson->
                             val attrJsonObj = attrJson.asJsonObject
-                            val matchedDao = copiedAttributes.find { it.localId == attrJsonObj[RealmDatabaseManager.FIELD_OBJECT_ID].asString }
+                            val matchedDao = copiedAttributes.find { it.localId == attrJsonObj.getStringCompat("localId") }
                             if(matchedDao != null)
                             {
                                 //update attribute
@@ -118,7 +127,7 @@ class TrackerTypeAdapter(isServerMode: Boolean, val attributeTypeAdapter: Lazy<S
                             }
                             else{
                                 //add new attribute
-                                val newAttribute = applyTo.realm.createObject(OTAttributeDAO::class.java, UUID.randomUUID())
+                                val newAttribute = applyTo.realm.createObject(OTAttributeDAO::class.java, UUID.randomUUID().toString())
                                 attributeTypeAdapter.get().applyToManagedDao(attrJsonObj, newAttribute)
                                 applyTo.attributes.add(newAttribute)
                             }

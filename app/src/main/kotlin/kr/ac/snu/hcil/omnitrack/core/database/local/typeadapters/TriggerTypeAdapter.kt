@@ -11,6 +11,10 @@ import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerSystemManager
+import kr.ac.snu.hcil.omnitrack.utils.getBooleanCompat
+import kr.ac.snu.hcil.omnitrack.utils.getIntCompat
+import kr.ac.snu.hcil.omnitrack.utils.getLongCompat
+import kr.ac.snu.hcil.omnitrack.utils.getStringCompat
 import javax.inject.Provider
 
 /**
@@ -116,24 +120,21 @@ class TriggerTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>, val realmP
             when(key)
             {
                 RealmDatabaseManager.FIELD_REMOVED_BOOLEAN-> {
-                    if (!json.get(key).isJsonNull) {
-                        val value = json.get(key)?.asBoolean == true
-                        if(applyTo.removed != value)
-                        {
-                            applyTo.removed = value
-                            removedFlagChanged = true
-                        }
+                    val value = json.getBooleanCompat(key) ?: false
+                    if (applyTo.removed != value) {
+                        applyTo.removed = value
+                        removedFlagChanged = true
                     }
                 }
-                "user", RealmDatabaseManager.FIELD_USER_ID->applyTo.userId = json.get(key)?.asString
-                RealmDatabaseManager.FIELD_USER_CREATED_AT -> applyTo.userCreatedAt = json[key]?.asLong?:0
-                RealmDatabaseManager.FIELD_UPDATED_AT_LONG->applyTo.userUpdatedAt = json[key]?.asLong?:0
-                RealmDatabaseManager.FIELD_POSITION->applyTo.position = json[key]?.asInt ?: 0
-                RealmDatabaseManager.FIELD_SYNCHRONIZED_AT->applyTo.synchronizedAt = json[key]?.asLong
-                "alias" -> json[key]?.let{ applyTo.alias = it.asString }
+                "user", RealmDatabaseManager.FIELD_USER_ID -> applyTo.userId = json.getStringCompat(key)
+                RealmDatabaseManager.FIELD_USER_CREATED_AT -> applyTo.userCreatedAt = json.getLongCompat(key) ?: 0
+                RealmDatabaseManager.FIELD_UPDATED_AT_LONG -> applyTo.userUpdatedAt = json.getLongCompat(key) ?: 0
+                RealmDatabaseManager.FIELD_POSITION -> applyTo.position = json.getIntCompat(key) ?: 0
+                RealmDatabaseManager.FIELD_SYNCHRONIZED_AT -> applyTo.synchronizedAt = json.getLongCompat(key)
+                "alias" -> applyTo.alias = json.getStringCompat(key) ?: ""
                 RealmDatabaseManager.FIELD_LOCKED_PROPERTIES_SERIALIZED->applyTo.serializedLockedPropertyInfo = json[key]?.toString() ?: "null"
                 "isOn" ->{
-                    val switchValue = json[key]?.asBoolean == true
+                    val switchValue = json.getBooleanCompat(key) ?: false
                     if(switchValue != applyTo.isOn)
                     {
                         applyTo.isOn = switchValue
@@ -143,7 +144,7 @@ class TriggerTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>, val realmP
                 "trackers"->{
                     val jsonList = try{json[key]?.asJsonArray}catch(ex:Exception){null}
                     applyTo.trackers.clear()
-                    if(jsonList!=null)
+                    if (jsonList != null && jsonList.size() > 0)
                     {
                         val realm = realmProvider.get()
                         applyTo.trackers.addAll(realm.copyFromRealm(realm.where(OTTrackerDAO::class.java)
@@ -161,7 +162,7 @@ class TriggerTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>, val realmP
                     }
                 }
                 "condition" -> {
-                    val value = json[key].toString()
+                    val value = json[key]?.toString() ?: "null"
                     if (applyTo.serializedCondition != value) {
                         applyTo.serializedCondition = value
                     }
@@ -170,15 +171,13 @@ class TriggerTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>, val realmP
                     applyTo.actionType = json[key].asByte
                 }
                 "action" -> {
-                    applyTo.serializedAction = json[key].toString()
+                    applyTo.serializedAction = json[key]?.toString() ?: "null"
                 }
                 "checkScript" -> {
-                    applyTo.checkScript = json[key]?.asBoolean ?: false
+                    applyTo.checkScript = json.getBooleanCompat(key) ?: false
                 }
                 "script" -> {
-                    applyTo.additionalScript = if (json[key].isJsonNull) {
-                        null
-                    } else json[key].asString
+                    applyTo.additionalScript = json.getStringCompat(key)
                 }
             }
         }

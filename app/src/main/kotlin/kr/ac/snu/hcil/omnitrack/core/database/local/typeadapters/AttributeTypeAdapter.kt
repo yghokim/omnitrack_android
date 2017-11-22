@@ -9,6 +9,9 @@ import dagger.Lazy
 import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels.OTStringStringEntryDAO
+import kr.ac.snu.hcil.omnitrack.utils.getBooleanCompat
+import kr.ac.snu.hcil.omnitrack.utils.getIntCompat
+import kr.ac.snu.hcil.omnitrack.utils.getStringCompat
 import java.util.*
 
 /**
@@ -116,16 +119,16 @@ class AttributeTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>) : Server
     override fun applyToManagedDao(json: JsonObject, applyTo: OTAttributeDAO) {
         json.keySet().forEach { key ->
             when (key) {
-                RealmDatabaseManager.FIELD_NAME -> applyTo.name = json[key].asString
-                "isRequired" -> applyTo.isRequired = json[key].asBoolean
-                RealmDatabaseManager.FIELD_POSITION -> applyTo.position = json[key].asInt
-                "connection" -> applyTo.serializedConnection = json[key].asString
-                "type" -> applyTo.type = json[key].asInt
+                RealmDatabaseManager.FIELD_NAME -> applyTo.name = json.getStringCompat(key) ?: ""
+                "isRequired" -> applyTo.isRequired = json.getBooleanCompat(key) ?: false
+                RealmDatabaseManager.FIELD_POSITION -> applyTo.position = json.getIntCompat(key) ?: 0
+                "connection" -> applyTo.serializedConnection = json.getStringCompat(key)
+                "type" -> json.getIntCompat(key)?.let { applyTo.type = it }
                 "fallbackPolicy" -> applyTo.fallbackValuePolicy = json[key].asInt
-                "fallbackPreset" -> applyTo.fallbackPresetSerializedValue = json[key].asString
+                "fallbackPreset" -> applyTo.fallbackPresetSerializedValue = json.getStringCompat(key)
 
-                RealmDatabaseManager.FIELD_IS_IN_TRASHCAN -> applyTo.isInTrashcan = json[key].asBoolean
-                RealmDatabaseManager.FIELD_IS_HIDDEN -> applyTo.isHidden = json[key].asBoolean
+                RealmDatabaseManager.FIELD_IS_IN_TRASHCAN -> applyTo.isInTrashcan = json.getBooleanCompat(key) ?: false
+                RealmDatabaseManager.FIELD_IS_HIDDEN -> applyTo.isHidden = json.getBooleanCompat(key) ?: false
 
                 "properties" -> {
                     if (json[key].isJsonArray) {

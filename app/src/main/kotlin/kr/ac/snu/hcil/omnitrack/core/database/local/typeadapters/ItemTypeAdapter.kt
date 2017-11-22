@@ -7,6 +7,9 @@ import com.google.gson.stream.JsonWriter
 import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTItemValueEntryDAO
+import kr.ac.snu.hcil.omnitrack.utils.getBooleanCompat
+import kr.ac.snu.hcil.omnitrack.utils.getLongCompat
+import kr.ac.snu.hcil.omnitrack.utils.getStringCompat
 import java.util.*
 
 /**
@@ -99,6 +102,51 @@ class ItemTypeAdapter(isServerMode: Boolean) : ServerCompatibleTypeAdapter<OTIte
     }
 
     override fun applyToManagedDao(json: JsonObject, applyTo: OTItemDAO) {
+        json.keySet().forEach { key ->
+            when (key) {
+                RealmDatabaseManager.FIELD_REMOVED_BOOLEAN -> applyTo.removed = json.getBooleanCompat(key) ?: false
+                "tracker", RealmDatabaseManager.FIELD_TRACKER_ID -> applyTo.trackerId = json.getStringCompat(key)
+                RealmDatabaseManager.FIELD_TIMESTAMP_LONG -> json.getLongCompat(key)?.let { applyTo.timestamp = it }
+                RealmDatabaseManager.FIELD_UPDATED_AT_LONG -> applyTo.userUpdatedAt = json.getLongCompat(key) ?: 0
+                RealmDatabaseManager.FIELD_SYNCHRONIZED_AT -> applyTo.synchronizedAt = json.getLongCompat(key)
+                "deviceId" -> applyTo.deviceId = json.getStringCompat(key)
+                "source" -> applyTo.source = json.getStringCompat(key)
+                "dataTable" -> {
+                    val jsonList = try {
+                        json[key]?.asJsonArray
+                    } catch (ex: Exception) {
+                        null
+                    }
+                    if (jsonList != null) {
+                        val copiedEntries = ArrayList<OTItemValueEntryDAO>(applyTo.fieldValueEntries)
+                        applyTo.fieldValueEntries.clear()
 
+                        //synchronize
+                        jsonList.forEach { entryJson ->
+                            val entryJsonObj = entryJson.asJsonObject
+                            val matchedDao = copiedEntries.find { it.key == entryJsonObj.getStringCompat("attrLocalId") }
+                            if (matchedDao != null) {
+                                //update entry
+                                matchedDao.value = entryJsonObj.getStringCompat("sVal")
+                                applyTo.fieldValueEntries.add(matchedDao)
+                                copiedEntries.remove(matchedDao)
+                            } else {
+                                //add new entry
+                                val newEntry = applyTo.realm.createObject(OTItemValueEntryDAO::class.java, UUID.randomUUID().toString())
+                                newEntry.key = entryJsonObj.getStringCompat("attrLocalId") ?: ""
+                                newEntry.value = entryJsonObj.getStringCompat("sVal")
+                                applyTo.fieldValueEntries.add(newEntry)
+                            }
+                        }
+
+                        //deal with dangling attributes
+                        copiedEntries.forEach {
+                            it.deleteFromRealm()
+                        }
+
+                    }
+                }
+            }
+        }
     }
 }
