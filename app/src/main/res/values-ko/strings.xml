@@ -25,7 +25,7 @@
 
     <string name="msg_allow_permission">권한 확인하기</string>
 
-    <string name="msg_confirm_log">아이템 기록</string>
+    <string name="msg_confirm_log">로그 아이템 기록</string>
 
     <string name="msg_format_confirm_apply_change">%1$s에 대한 변경사항을 저장하시겠습니까?</string>
 
@@ -49,6 +49,7 @@
 
     <string name="msg_text_tracker">트래커</string>
     <string name="msg_text_field">필드</string>
+    <string name="msg_text_item">로그</string>
 
     <string name="msg_tab_trackers">트래커</string>
     <string name="msg_tab_services">외부 서비스</string>
@@ -71,9 +72,9 @@
     <string name="msg_attribute_removed_message">필드가 삭제되었습니다.</string>
     <string name="msg_add_new_attribute">새로운 필드 추가</string>
 
-    <string name="msg_item_removed_message">아이템이 삭제되었습니다.</string>
+    <string name="msg_item_removed_message">로그가 삭제되었습니다.</string>
 
-    <string name="msg_item_remove_confirm">아이템을 삭제하면 되돌릴 수 없습니다. 정말 삭제하시겠습니까?</string>
+    <string name="msg_item_remove_confirm">로그를 삭제하면 되돌릴 수 없습니다. 정말 삭제하시겠습니까?</string>
 
     <string name="msg_new_item_confirm_restore_previous_input">이전에 입력한 내용이 임시로 저장되어 있습니다. 다시 불러오시겠습니까?</string>
 
@@ -107,7 +108,7 @@
     <string name="msg_attribute_fallback_policy_last">이전 데이터 값으로 자동입력</string>
     <string name="msg_attribute_fallback_policy_preset">미리 지정한 값으로 자동입력</string>
 
-    <string name="msg_attribute_fallback_policy_timespan_connect_previous">이전 아이템의 끝난 시간부터 시작</string>
+    <string name="msg_attribute_fallback_policy_timespan_connect_previous">이전 로그의 끝난 시간부터 시작</string>
 
 
     <string name="msg_column_name">필드 이름</string>
@@ -127,7 +128,7 @@
     <string name="msg_set_new_connection">외부 측정값 연결하기</string>
 
     <string name="msg_tracker_empty">아직 트래커가 없습니다.\n새 트래커를 추가하여 트래킹을 시작하세요.</string>
-    <string name="msg_trigger_empty">아직 트리거가 없습니다.\n트리커를 설정하여 트래커 아이템을 자동으로 로깅하세요.</string>
+    <string name="msg_trigger_empty">아직 트리거가 없습니다.\n트리커를 설정하여 트래커 로그를 자동으로 기록하세요.</string>
     <string name="msg_reminder_empty">리마인더가 없습니다.\n리마인더를 설정하면 기록을 잊지 않도록\n원하는 때에 알림을 보낼 수 있습니다.</string>
     <string name="msg_field_empty">현재 이 트래커는 필드가 없습니다.\n필드 없는 트래커는 타임스탬프만을 기록할 것입니다.</string>
 
@@ -136,9 +137,9 @@
 
     <string name="msg_new_tracker_name">트래커 이름을 입력하세요</string>
 
-    <string name="msg_notification_title_format_new_item">"%1$s 트래커에 새로운 아이템이 기록되었습니다."</string>
+    <string name="msg_notification_title_format_new_item">"%1$s 트래커에 새로운 로그 아이템이 기록되었습니다."</string>
 
-    <string name="msg_item_list_empty_message">기록된 아이템이 없습니다.</string>
+    <string name="msg_item_list_empty_message">기록된 로그가 없습니다.</string>
 
     <string name="msg_builder_restored">저장하지 않은 이전 입력값을 불러왔습니다.</string>
 
@@ -171,7 +172,9 @@
 
     <string name="msg_format_login_to">%1$s에 로그인</string>
 
-    <string name="msg_noti_tap_for_tracking_format">%1$s 아이템을 기록하려면 탭하세요.</string>
+    <string name="msg_noti_tap_for_tracking_format">%1$s 로그를 기록하려면 탭하세요.</string>
+
+    <string name="msg_format_removed_outside_return_home">%1$s이(가) 외부에서 삭제되었습니다. 스크린을 닫습니다.</string>
 
     <string name="msg_no_trackers_are_assigned">트래커가 등록되지 않았습니다.</string>
 
@@ -202,7 +205,7 @@
     <string name="msg_shortcut_removed">트래커가 바로가기 패널에서 제거되었습니다.</string>
 
     <string name="msg_notification_action_discard_item">기록 취소</string>
-    <string name="msg_notification_content_new_item">아이템을 수정하려면 탭하세요.</string>
+    <string name="msg_notification_content_new_item">탭해서 기록 수정하기</string>
     <string name="msg_notification_format_inbox_title">새 [%1$s] 기록</string>
 
     <string name="msg_rescuetime_api_key_input_title">Input RescueTime API key</string>
@@ -274,7 +277,7 @@
     <string name="msg_signup_complete">회원가입이 완료되었습니다</string>
     <string name="msg_signup_complete_description">이제 트래킹을 시작할 수 있습니다!</string>
     <string name="msg_purge_cache">이미 동기화된 미디어 파일 캐시 삭제</string>
-    <string name="msg_remove_all_the_items_permanently">모든 아이템 영구 삭제</string>
+    <string name="msg_remove_all_the_items_permanently">모든 기록 영구 삭제</string>
     <string name="msg_no_cache">임시저장 파일 없음</string>
     <string name="msg_tab_to_take_a_photo">탭해서 사진을 찍습니다</string>
     <string name="msg_turn_to_selfie">셀카 모드로 전환</string>
@@ -286,7 +289,7 @@
 
     <string name="msg_indicator_message_processing">처리중…</string>
     <string name="msg_export_to_file_tracker">파일로 내보내기..</string>
-    <string name="msg_desc_export_to_file_tracker">트래커의 전체 아이템을 표로 불러옵니다</string>
+    <string name="msg_desc_export_to_file_tracker">트래커의 전체 기록을 표로 저장합니다</string>
     <string name="msg_export_success_notification_message">%1$s 트래킹 데이터를 성공적으로 저장했습니다.</string>
     <string name="msg_export_title_progress">트래킹 데이터 내보내는 중…</string>
     <string name="msg_export_warning_mobile_network">3G 혹은 LTE 환경에서 트래킹 데이터를 다운로드할 경우, 요금제에 따라 많은 요금이 청구될 수 있습니다. 계속 진행하시겠습니까?</string>
@@ -308,7 +311,7 @@
     <string name="msg_send_report_to_omnitrack_team">개발진에게 문의사항을 전송하시겠습니까?</string>
     <string name="msg_send_report_error_message">에러로 메시지를 전송하지 못했습니다. 다음에 다시 시도해 주세요.</string>
     <string name="msg_send_report_success_message">문의 메시지를 성공적으로 전송했습니다.</string>
-    <string name="msg_background_logging_started_notification_message">새 아이템 값을 생성중입니다…</string>
+    <string name="msg_background_logging_started_notification_message">새 로그 값을 생성중입니다…</string>
     <string name="msg_background_logging_notification_title_format">%1$s 아이템 로깅</string>
     <string name="msg_sign_in_google_succeeded">구글 계정으로 로그인에 성공했습니다</string>
     <string name="msg_sign_in_google_canceled">구글 계정 로그인이 취소되었습니다.</string>

@@ -17,6 +17,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import butterknife.bindView
+import com.afollestad.materialdialogs.MaterialDialog
 import com.airbnb.lottie.LottieAnimationView
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -32,6 +33,7 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.container.LockableFrameLayo
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.pages.ConnectionIndicatorStubProxy
+import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.ValueWithTimestamp
 import org.jetbrains.anko.notificationManager
@@ -95,6 +97,12 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
     private val currentAttributeViewModelList = ArrayList<ItemEditionViewModelBase.AttributeInputViewModel>()
 
     private var itemSaved: Boolean = false
+
+    private val invalidOutsideDialogBuilder: MaterialDialog.Builder by lazy {
+        DialogHelper.makeSimpleAlertBuilder(this, "") {
+            finish()
+        }
+    }
 
     override fun onSessionLogContent(contentObject: Bundle) {
         super.onSessionLogContent(contentObject)
@@ -162,7 +170,7 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
         )
 
         creationSubscriptions.add(
-                viewModel.onInitialized.observeOn(AndroidSchedulers.mainThread()).subscribe { (itemMode, builderCreationMode) ->
+                viewModel.lastInitializedState.observeOn(AndroidSchedulers.mainThread()).subscribe { (itemMode, builderCreationMode) ->
 
                     println("ItemEditingViewModel initialized: itemMode - ${itemMode}, builderMode - ${builderCreationMode}")
                     this.mode = itemMode
@@ -200,6 +208,19 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
                 }
         )
 
+        creationSubscriptions.add(
+                viewModel.hasTrackerRemovedOutside.subscribe {
+                    invalidOutsideDialogBuilder.content(R.string.msg_format_removed_outside_return_home, OTApp.getString(R.string.msg_text_tracker))
+                    invalidOutsideDialogBuilder.show()
+                }
+        )
+
+        creationSubscriptions.add(
+                viewModel.hasItemRemovedOutside.subscribe {
+                    invalidOutsideDialogBuilder.content(R.string.msg_format_removed_outside_return_home, OTApp.getString(R.string.msg_text_item))
+                    invalidOutsideDialogBuilder.show()
+                }
+        )
 
         val trackerId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
         viewModel.init(trackerId, intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM))

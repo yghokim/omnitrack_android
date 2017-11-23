@@ -20,6 +20,13 @@ class ItemEditingViewModel(app: Application) : ItemEditionViewModelBase(app) {
             val itemDao = dbManager.get().makeSingleItemQuery(itemId, realm).findFirst()
             if (itemDao != null) {
                 originalUnmanagedItemDao = realm.copyFromRealm(itemDao)
+                subscriptions.add(
+                        itemDao.asFlowable<OTItemDAO>().subscribe { dao ->
+                            if (!dao.isValid) {
+                                hasItemRemovedOutside.onNext(itemId)
+                            }
+                        }
+                )
 
                 return Pair(ItemMode.Edit, null)
             } else return null

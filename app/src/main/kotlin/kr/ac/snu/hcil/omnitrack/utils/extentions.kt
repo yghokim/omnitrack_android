@@ -345,7 +345,12 @@ fun JsonObject.getElementCompat(key: String): JsonElement? {
 }
 
 fun JsonObject.getStringCompat(key: String): String? {
-    return getElementCompat(key)?.asString
+    val element = getElementCompat(key)
+    return try {
+        element?.asString
+    } catch (ex: UnsupportedOperationException) {
+        element?.toString()
+    }
 }
 
 fun JsonObject.getBooleanCompat(key: String): Boolean? {

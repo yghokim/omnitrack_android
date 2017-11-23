@@ -62,9 +62,11 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
     private var initialSnapshotDao: OTTrackerDAO? = null
 
-    val trackerId: String? get() = this.trackerDao?.objectId
+    var trackerId: String? = null
+        private set
 
     //Observables========================================
+    val hasTrackerRemovedOutside = BehaviorSubject.create<String>()
     val trackerIdObservable = BehaviorSubject.createDefault<Nullable<String>>(Nullable(null))
 
     val reminderCountObservable = BehaviorSubject.createDefault<Int>(0)
@@ -139,54 +141,60 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
             lastRemovedAttributeId = null
             subscriptions.clear()
             if (trackerId != null) {
+                this.trackerId = trackerId
                 val dao = dbManager.get().getTrackerQueryWithId(trackerId, realm).findFirstAsync()
 
                 subscriptions.add(
-                        dao.asFlowable<OTTrackerDAO>().filter { it.isValid && it.isLoaded }.subscribe { snapshot ->
-                            if (initialSnapshotDao == null)
-                                initialSnapshotDao = realm.copyFromRealm(snapshot)
+                        dao.asFlowable<OTTrackerDAO>().filter { it.isLoaded }.subscribe { snapshot ->
+                            if (snapshot.isValid) {
+                                if (initialSnapshotDao == null)
+                                    initialSnapshotDao = realm.copyFromRealm(snapshot)
 
-                            nameObservable.onNextIfDifferAndNotNull(snapshot.name)
-                            isBookmarkedObservable.onNextIfDifferAndNotNull(snapshot.isBookmarked)
-                            colorObservable.onNextIfDifferAndNotNull(snapshot.color)
+                                nameObservable.onNextIfDifferAndNotNull(snapshot.name)
+                                isBookmarkedObservable.onNextIfDifferAndNotNull(snapshot.isBookmarked)
+                                colorObservable.onNextIfDifferAndNotNull(snapshot.color)
 
-                            if (trackerDao != dao) {
-                                subscriptions.add(
-                                        snapshot.makeAttributesQuery(false, null).findAllAsync().asChangesetObservable().subscribe { changes ->
-                                            val changeset = changes.changeset
-                                            if (changeset == null) {
-                                                //initial
-                                                clearCurrentAttributeList()
-                                                currentAttributeViewModelList.addAll(changes.collection.map { AttributeInformationViewModel(it, realm, attributeManager.get()) })
-                                            } else {
-                                                currentAttributeViewModelList.removeAll(
-                                                        changeset.deletions.map { currentAttributeViewModelList[it].apply { this.unregister() } }
-                                                )
-
-                                                changeset.insertions.forEach {
-                                                    currentAttributeViewModelList.add(it,
-                                                            AttributeInformationViewModel(changes.collection[it]!!, realm, attributeManager.get())
-                                                    )
-                                                }
-                                            }
-
-                                            attributeViewModelListObservable.onNext(currentAttributeViewModelList)
-                                        }
-                                )
-
-
-                                snapshot.liveTriggersQuery?.let {
+                                if (trackerDao != dao) {
                                     subscriptions.add(
-                                            it.equalTo("actionType", OTTriggerDAO.ACTION_TYPE_REMIND)
-                                                    .findAllAsync()
-                                                    .asFlowable()
-                                                    .subscribe {
-                                                        reminderCountObservable.onNextIfDifferAndNotNull(it.size)
-                                                    }
-                                    )
-                                }
+                                            snapshot.makeAttributesQuery(false, null).findAllAsync().asChangesetObservable().subscribe { changes ->
+                                                val changeset = changes.changeset
+                                                if (changeset == null) {
+                                                    //initial
+                                                    clearCurrentAttributeList()
+                                                    currentAttributeViewModelList.addAll(changes.collection.map { AttributeInformationViewModel(it, realm, attributeManager.get()) })
+                                                } else {
+                                                    currentAttributeViewModelList.removeAll(
+                                                            changeset.deletions.map { currentAttributeViewModelList[it].apply { this.unregister() } }
+                                                    )
 
-                                trackerDao = dao
+                                                    changeset.insertions.forEach {
+                                                        currentAttributeViewModelList.add(it,
+                                                                AttributeInformationViewModel(changes.collection[it]!!, realm, attributeManager.get())
+                                                        )
+                                                    }
+                                                }
+
+                                                attributeViewModelListObservable.onNext(currentAttributeViewModelList)
+                                            }
+                                    )
+
+
+                                    snapshot.liveTriggersQuery?.let {
+                                        subscriptions.add(
+                                                it.equalTo("actionType", OTTriggerDAO.ACTION_TYPE_REMIND)
+                                                        .findAllAsync()
+                                                        .asFlowable()
+                                                        .subscribe {
+                                                            reminderCountObservable.onNextIfDifferAndNotNull(it.size)
+                                                        }
+                                        )
+                                    }
+
+                                    trackerDao = dao
+                                }
+                            } else if (trackerDao != null) {
+                                //the tracker was removed outside
+                                hasTrackerRemovedOutside.onNext(trackerId)
                             }
                         }
                 )
