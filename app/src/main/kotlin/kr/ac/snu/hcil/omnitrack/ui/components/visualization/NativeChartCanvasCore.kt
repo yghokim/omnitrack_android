@@ -9,7 +9,7 @@ import kotlin.properties.Delegates
 /**
  * Created by Young-Ho Kim on 2016-09-08
  */
-class ChartCanvasView : View {
+class NativeChartCanvasCore : View {
 
 
     var chartDrawer: AChartDrawer? by Delegates.observable(null as AChartDrawer?) {

@@ -11,26 +11,13 @@
 
     >
 
-    <LinearLayout
-        android:id="@+id/ui_content_container"
+    <TextView
+        android:id="@+id/ui_chart_name"
+        style="@style/PropertyHeaderStyle"
         android:layout_width="wrap_content"
+
         android:layout_height="@dimen/attribute_list_element_header_height"
-        android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/ui_chart_name"
-            style="@style/PropertyHeaderStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:text="Text"
-            android:textSize="16sp" />
-
-    </LinearLayout>
-
-    <kr.ac.snu.hcil.omnitrack.ui.components.visualization.ChartView
-        android:id="@+id/ui_chart_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
+        android:gravity="center_vertical"
+        android:text="Text"
+        android:textSize="16sp" />
 </LinearLayout>

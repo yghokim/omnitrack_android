@@ -10,6 +10,7 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.visualization.Granularity
+import kr.ac.snu.hcil.omnitrack.core.visualization.INativeChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.TrackerChartModel
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.Axis
@@ -24,7 +25,7 @@ import kr.ac.snu.hcil.omnitrack.utils.dipSize
 /**
  * Created by younghokim on 2017. 5. 8..
  */
-class DailyCountChartModel(tracker: OTTrackerDAO, realm: Realm) : TrackerChartModel<Pair<Long, Int>>(tracker, realm) {
+class DailyCountChartModel(tracker: OTTrackerDAO, realm: Realm) : TrackerChartModel<Pair<Long, Int>>(tracker, realm), INativeChartModel {
 
     override val name: String = String.format(OTApp.instance.getString(R.string.msg_vis_daily_count_title_format), tracker.name)
 

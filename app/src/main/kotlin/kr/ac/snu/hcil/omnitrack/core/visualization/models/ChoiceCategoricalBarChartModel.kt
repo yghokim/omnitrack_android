@@ -10,6 +10,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTChoiceAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.visualization.AttributeChartModel
+import kr.ac.snu.hcil.omnitrack.core.visualization.INativeChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.ICategoricalBarChart
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers.CategoricalBarChartDrawer
@@ -18,7 +19,7 @@ import java.util.*
 /**
  * Created by younghokim on 16. 9. 7..
  */
-class ChoiceCategoricalBarChartModel(attribute: OTAttributeDAO, realm: Realm) : AttributeChartModel<ICategoricalBarChart.Point>(attribute, realm), ICategoricalBarChart {
+class ChoiceCategoricalBarChartModel(attribute: OTAttributeDAO, realm: Realm) : AttributeChartModel<ICategoricalBarChart.Point>(attribute, realm), ICategoricalBarChart, INativeChartModel {
 
     private val counterDictCache = SparseIntArray() // entry id : count
     private val categoriesCache = HashSet<Int>()
