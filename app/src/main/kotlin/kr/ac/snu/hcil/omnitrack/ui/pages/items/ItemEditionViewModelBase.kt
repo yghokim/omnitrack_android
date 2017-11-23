@@ -6,7 +6,6 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.BehaviorSubject
-import io.reactivex.subjects.PublishSubject
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
@@ -38,6 +37,9 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
     var trackerDao: OTTrackerDAO? = null
         protected set
 
+    val hasTrackerRemovedOutside = BehaviorSubject.create<String>()
+    val hasItemRemovedOutside = BehaviorSubject.create<String>()
+
     val trackerNameObservable = BehaviorSubject.create<String>()
     val modeObservable = BehaviorSubject.createDefault<ItemMode>(ItemMode.New)
     val builderCreationModeObservable = BehaviorSubject.create<BuilderCreationMode>()
@@ -57,7 +59,7 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
                 isBusyObservable.onNext(value)
             }
         }
-    var onInitialized = PublishSubject.create<Pair<ItemMode, BuilderCreationMode?>>()
+    var lastInitializedState = BehaviorSubject.create<Pair<ItemMode, BuilderCreationMode?>>()
     protected val currentAttributeViewModelList = ArrayList<AttributeInputViewModel>()
 
     var mode: ItemMode
@@ -78,24 +80,34 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
         isValid = true
         if (trackerDao?.objectId != trackerId) {
             trackerDao = dbManager.get().getTrackerQueryWithId(trackerId, realm).findFirst()
-            trackerNameObservable.onNext(trackerDao?.name ?: "")
-            subscriptions.clear()
+            if (trackerDao != null) {
+                trackerNameObservable.onNext(trackerDao?.name ?: "")
+                subscriptions.clear()
+
+                val unManagedTrackerDao = realm.copyFromRealm(trackerDao)!!
 
 
-            val unManagedTrackerDao = realm.copyFromRealm(trackerDao)!!
+                currentAttributeViewModelList.forEach { it.unregister() }
+                currentAttributeViewModelList.clear()
 
-            currentAttributeViewModelList.forEach { it.unregister() }
-            currentAttributeViewModelList.clear()
+                currentAttributeViewModelList.addAll(unManagedTrackerDao.attributes.filter { it.isHidden == false && it.isInTrashcan == false }.map { AttributeInputViewModel(it) })
+                attributeViewModelListObservable.onNext(currentAttributeViewModelList)
 
-            currentAttributeViewModelList.addAll(unManagedTrackerDao.attributes.filter{it.isHidden==false && it.isInTrashcan == false}.map { AttributeInputViewModel(it) })
-            attributeViewModelListObservable.onNext(currentAttributeViewModelList)
+                val initResult = onInit(trackerDao!!, itemId)
 
-            val initResult = onInit(trackerDao!!, itemId)
+                if (initResult != null) {
+                    mode = initResult.first
 
-            if (initResult != null) {
-                mode = initResult.first
+                    lastInitializedState.onNext(initResult)
+                }
 
-                onInitialized.onNext(initResult)
+                subscriptions.add(
+                        trackerDao!!.asFlowable<OTTrackerDAO>().filter { it.isLoaded }.subscribe { dao ->
+                            if (dao.isValid == false) {
+                                hasTrackerRemovedOutside.onNext(unManagedTrackerDao.objectId!!)
+                            }
+                        }
+                )
             }
         }
     }

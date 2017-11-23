@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.tracker
 
 import android.animation.Animator
 import android.app.Activity
+import android.app.Dialog
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
@@ -68,6 +69,14 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
     private val tabLayout: TabLayout by bindView(R.id.tabs)
 
     private lateinit var viewModel: TrackerDetailViewModel
+
+    private val removedOutsideAlert: Dialog by lazy {
+        DialogHelper.makeSimpleAlertBuilder(this,
+                String.format(OTApp.getString(R.string.msg_format_removed_outside_return_home), OTApp.getString(R.string.msg_text_tracker)))
+        {
+            finish()
+        }.build()
+    }
 
     override fun onSessionLogContent(contentObject: Bundle) {
         super.onSessionLogContent(contentObject)
@@ -137,6 +146,12 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
         creationSubscriptions.add(
                 viewModel.reminderCountObservable.subscribe { count ->
                     (tabLayout.getTabAt(TAB_INDEX_REMINDERS)?.customView?.tag as? TabViewHolder)?.setValue(mSectionsPagerAdapter.getPageTitle(TAB_INDEX_REMINDERS) ?: "Reminders", count)
+                }
+        )
+
+        creationSubscriptions.add(
+                viewModel.hasTrackerRemovedOutside.subscribe { id ->
+                    removedOutsideAlert.show()
                 }
         )
 

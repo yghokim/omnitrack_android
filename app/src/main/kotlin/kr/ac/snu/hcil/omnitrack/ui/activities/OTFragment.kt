@@ -12,6 +12,7 @@ open class OTFragment : Fragment() {
 
     private var shownAt: Long? = null
 
+    protected val startSubscriptions = CompositeDisposable()
     protected val creationSubscriptions = CompositeDisposable()
     protected val createViewSubscriptions = CompositeDisposable()
 
@@ -31,6 +32,11 @@ open class OTFragment : Fragment() {
         if (userVisibleHint) {
             logSession(true)
         }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        startSubscriptions.clear()
     }
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {

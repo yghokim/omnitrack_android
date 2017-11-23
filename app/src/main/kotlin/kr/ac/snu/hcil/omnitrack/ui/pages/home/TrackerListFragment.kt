@@ -88,6 +88,8 @@ class TrackerListFragment : OTFragment() {
 
     private lateinit var statContentStyleSpan: StyleSpan
 
+    private var pendingNewTrackerId: String? = null
+
     private val emptyTrackerDialog: MaterialDialog.Builder by lazy {
         MaterialDialog.Builder(context!!)
                 .cancelable(true)
@@ -169,40 +171,6 @@ class TrackerListFragment : OTFragment() {
 
         viewModel = ViewModelProviders.of(this).get(TrackerListViewModel::class.java)
         viewModel.userId = authManager.userId
-
-        createViewSubscriptions.add(
-                viewModel.trackerViewModels.subscribe { trackerViewModelList ->
-
-                    val rxPermissions = RxPermissions(act)
-
-                    val permissions = viewModel.getPermissionsRequiredForFields().filter { ContextCompat.checkSelfPermission(act, it) != PackageManager.PERMISSION_GRANTED }
-
-                    if (permissions.isNotEmpty()) {
-                        DialogHelper.makeYesNoDialogBuilder(act, resources.getString(R.string.msg_permission_required),
-                                String.format(resources.getString(R.string.msg_permission_request_of_tracker)),
-                                cancelable = false,
-                                onYes = {
-                                    rxPermissions.request(*permissions.toTypedArray()).subscribe { granted ->
-                                        if (granted)
-                                            println("permissions granted.")
-                                        else println("permissions not granted.")
-                                    }
-                                },
-                                onCancel = null,
-                                yesLabel = R.string.msg_allow_permission,
-                                noLabel = R.string.msg_cancel
-                        ).show()
-                    }
-
-                    val diffResult = DiffUtil.calculateDiff(
-                            IReadonlyObjectId.DiffUtilCallback(currentTrackerViewModelList, trackerViewModelList)
-                    )
-
-                    currentTrackerViewModelList.clear()
-                    currentTrackerViewModelList.addAll(trackerViewModelList)
-                    diffResult.dispatchUpdatesTo(trackerListAdapter)
-                }
-        )
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -235,6 +203,48 @@ class TrackerListFragment : OTFragment() {
 
     override fun onStart() {
         super.onStart()
+        startSubscriptions.add(
+                viewModel.trackerViewModels.subscribe { trackerViewModelList ->
+
+                    val rxPermissions = RxPermissions(act)
+
+                    val permissions = viewModel.getPermissionsRequiredForFields().filter { ContextCompat.checkSelfPermission(act, it) != PackageManager.PERMISSION_GRANTED }
+
+                    if (permissions.isNotEmpty()) {
+                        DialogHelper.makeYesNoDialogBuilder(act, resources.getString(R.string.msg_permission_required),
+                                String.format(resources.getString(R.string.msg_permission_request_of_tracker)),
+                                cancelable = false,
+                                onYes = {
+                                    rxPermissions.request(*permissions.toTypedArray()).subscribe { granted ->
+                                        if (granted)
+                                            println("permissions granted.")
+                                        else println("permissions not granted.")
+                                    }
+                                },
+                                onCancel = null,
+                                yesLabel = R.string.msg_allow_permission,
+                                noLabel = R.string.msg_cancel
+                        ).show()
+                    }
+
+                    val diffResult = DiffUtil.calculateDiff(
+                            IReadonlyObjectId.DiffUtilCallback(currentTrackerViewModelList, trackerViewModelList)
+                    )
+
+                    currentTrackerViewModelList.clear()
+                    currentTrackerViewModelList.addAll(trackerViewModelList)
+                    diffResult.dispatchUpdatesTo(trackerListAdapter)
+
+                    if (pendingNewTrackerId != null) {
+                        val position = currentTrackerViewModelList.indexOfFirst { it.objectId == pendingNewTrackerId }
+                        if (position != -1) {
+                            listView.smoothScrollToPosition(position)
+                        }
+                        pendingNewTrackerId = null
+                    }
+                }
+        )
+
         TutorialManager.checkAndShowTargetPrompt(TutorialManager.FLAG_TRACKER_LIST_ADD_TRACKER, true, this.act, addTrackerFloatingButton,
                 R.string.msg_tutorial_add_tracker_primary,
                 R.string.msg_tutorial_add_tracker_secondary,
@@ -257,7 +267,7 @@ class TrackerListFragment : OTFragment() {
                 if (data != null) {
                     if (data.hasExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)) {
                         val newTrackerId = data.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
-
+                        pendingNewTrackerId = newTrackerId
                         /* TODO logging
                         EventLoggingManager.logTrackerChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_TRACKER_ADD, newTracker)
                         */

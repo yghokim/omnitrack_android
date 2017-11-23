@@ -38,6 +38,7 @@
 
     <string name="msg_text_tracker">Tracker</string>
     <string name="msg_text_field">Field</string>
+    <string name="msg_text_item">Item Log</string>
 
     <string name="msg_confirm_log">Log Item</string>
 
@@ -158,6 +159,8 @@
     <string name="sentence_new_tracker_added">Tracker \'%1$s\' was added</string>
 
     <string name="action_settings">Settings</string>
+
+    <string name="msg_format_removed_outside_return_home">The %1$s was removed outside. This screen will be closed.</string>
 
     <string name="msg_connection_wizard_title_source_selection">Choose a data source</string>
     <string name="msg_connection_wizard_title_time_query">Configure time query</string>
