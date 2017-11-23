@@ -15,6 +15,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.visualization.AttributeChartModel
+import kr.ac.snu.hcil.omnitrack.core.visualization.INativeChartModel
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.Axis
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.IAxisScale
@@ -30,7 +31,7 @@ import java.util.*
 /**
  * Created by Young-Ho on 9/9/2016.
  */
-class DurationTimelineModel(attribute: OTAttributeDAO, realm: Realm) : AttributeChartModel<DurationTimelineModel.AggregatedDuration>(attribute, realm) {
+class DurationTimelineModel(attribute: OTAttributeDAO, realm: Realm) : AttributeChartModel<DurationTimelineModel.AggregatedDuration>(attribute, realm), INativeChartModel {
 
     data class AggregatedDuration(val time: Long, val count: Int, val avgFrom: Float, val avgTo: Float, val earliest: Float = avgFrom, val latest: Float = avgTo)
 
