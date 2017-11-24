@@ -2,7 +2,9 @@ package kr.ac.snu.hcil.omnitrack.core.database.local.models
 
 import io.realm.RealmList
 import io.realm.RealmObject
+import io.realm.RealmResults
 import io.realm.annotations.Index
+import io.realm.annotations.LinkingObjects
 import io.realm.annotations.PrimaryKey
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
@@ -83,6 +85,9 @@ open class OTItemValueEntryDAO : RealmObject() {
     var key: String = ""
 
     var value: String? = null
+
+    @LinkingObjects("fieldValueEntries")
+    val items: RealmResults<OTItemDAO>? = null
 
     override fun toString(): String {
         return "{Item Value Entry | id : $id, key : $key, value : $value}"
