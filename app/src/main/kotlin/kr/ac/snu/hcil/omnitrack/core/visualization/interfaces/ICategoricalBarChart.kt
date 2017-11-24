@@ -21,6 +21,10 @@ interface ICategoricalBarChart : IChartInterface<ICategoricalBarChart.Point> {
         companion object {
             val VALUE_COMPARATOR = ValueComparator()
         }
+
+        fun toJsonString(): String {
+            return "{\"label\": \"$label\", \"value\":$value, \"category\":\"$category\"}"
+        }
     }
 
 

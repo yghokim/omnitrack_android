@@ -17,6 +17,7 @@ import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.Granularity
 import kr.ac.snu.hcil.omnitrack.core.visualization.INativeChartModel
+import kr.ac.snu.hcil.omnitrack.core.visualization.IWebBasedChartModel
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.choice.SelectionView
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
@@ -180,7 +181,7 @@ class ChartViewActivity : MultiButtonActionBarActivity(R.layout.activity_chart_v
             val model = currentChartViewModelList[position]
             return if (model is INativeChartModel) {
                 VIEW_TYPE_NATIVE
-            } else VIEW_TYPE_WEB
+            } else if (model is IWebBasedChartModel) VIEW_TYPE_WEB else throw IllegalArgumentException("model should implement either INativeChartModel or IWebBasedChartModel.")
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChartViewHolder {

@@ -2,19 +2,28 @@ package kr.ac.snu.hcil.omnitrack.ui.components.visualization
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Bitmap
+import android.net.http.SslError
+import android.support.v4.content.ContextCompat
 import android.util.AttributeSet
-import android.webkit.JavascriptInterface
-import android.webkit.WebView
-import android.webkit.WebViewClient
+import android.webkit.*
+import android.widget.FrameLayout
 import io.reactivex.disposables.SerialDisposable
+import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
+import kr.ac.snu.hcil.omnitrack.core.visualization.IWebBasedChartModel
+import kr.ac.snu.hcil.omnitrack.utils.argbIntToCssString
 import org.jetbrains.anko.runOnUiThread
 import kotlin.properties.Delegates
 
 /**
  * Created by younghokim on 2017. 11. 23..
  */
-class WebBasedChartView : WebView, IChartView {
+class WebBasedChartView : FrameLayout, IChartView {
+
+    companion object {
+        const val INITIALIZE_URL = "file:///android_asset/web/visualization/chart.html"
+    }
 
     override var model: ChartModel<*>? by Delegates.observable(null as ChartModel<*>?)
     { prop, old, new ->
@@ -25,15 +34,23 @@ class WebBasedChartView : WebView, IChartView {
             }
 
             if (new != null) {
-
-                //TODO update chartClient Data
+                subscribeToModelEvent(new)
             }
         }
     }
-    private var intrinsicHeight: Int = -1
+
+    private val castedModel: IWebBasedChartModel? get() = model as IWebBasedChartModel
+
+    private var intrinsicRatio: Float = 0f
 
     private val modelSubscription = SerialDisposable()
+
+    private lateinit var webView: WebView
+
     private val client = ChartWebViewClient()
+
+    private var wasDataChangedPending: Boolean = false
+    private var isWebViewReady: Boolean = false
 
     constructor(context: Context) : super(context) {
         init(context, null)
@@ -49,63 +66,58 @@ class WebBasedChartView : WebView, IChartView {
 
     @SuppressLint("SetJavaScriptEnabled")
     fun init(context: Context, attrs: AttributeSet?) {
-        settings.javaScriptEnabled = true
-        addJavascriptInterface(this, "ChartView")
-        webViewClient = client
+        webView = WebView(context, attrs)
+        addView(webView)
+
+        webView.settings.javaScriptEnabled = true
+        webView.settings.javaScriptCanOpenWindowsAutomatically = true
+        webView.settings.setSupportZoom(false)
+        webView.settings.allowFileAccess = true
+        webView.isVerticalFadingEdgeEnabled = false
+        webView.isVerticalScrollBarEnabled = false
+        webView.isHorizontalScrollBarEnabled = false
+        webView.addJavascriptInterface(this, "chartView")
+        webView.webViewClient = client
+        webView.loadUrl(INITIALIZE_URL)
+
     }
 
     @JavascriptInterface
-    fun setIntrinsicChartHeight(height: Float) {
+    fun getChartType(): String {
+        return castedModel?.getChartTypeCommand() ?: ""
+    }
+
+    @JavascriptInterface
+    fun requestChartDataString(): String {
+        println("chartmodel data was requested by javascript.")
+        return castedModel?.getDataInJsonString() ?: "{}"
+    }
+
+    @JavascriptInterface
+    fun onChartCanvasResized(width: Int, height: Int) {
+        intrinsicRatio = width.toFloat() / height
         context.runOnUiThread {
-            intrinsicHeight = (height + 0.5f).toInt()
+            webView.layoutParams = FrameLayout.LayoutParams(width, height)
             requestLayout()
         }
     }
 
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-
-        if (intrinsicHeight != -1 && model != null) {
-            val widthMode = MeasureSpec.getMode(widthMeasureSpec)
-            val widthSize = MeasureSpec.getSize(widthMeasureSpec)
-            val heightMode = MeasureSpec.getMode(heightMeasureSpec)
-            val heightSize = MeasureSpec.getSize(heightMeasureSpec)
-
-            val measuredWidth: Int
-            val measuredHeight: Int
-
-            if (widthMode == MeasureSpec.EXACTLY) {
-                measuredWidth = widthSize
-            } else if (widthMode == MeasureSpec.AT_MOST) {
-                measuredWidth = widthSize
-            } else {
-                measuredWidth = 400 + paddingLeft + paddingRight
-            }
-
-            if (heightMode == MeasureSpec.EXACTLY) {
-                measuredHeight = heightSize
-            } else if (heightMode == MeasureSpec.AT_MOST) {
-                measuredHeight = Math.min(intrinsicHeight + paddingTop + paddingBottom, heightSize)
-            } else {
-                measuredHeight = intrinsicHeight + paddingTop + paddingBottom
-            }
-
-            setMeasuredDimension(measuredWidth, measuredHeight)
-        } else super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+    @JavascriptInterface
+    fun requestGlobalOptions(): String {
+        return "{\"elementMainColor\":\"${argbIntToCssString(ContextCompat.getColor(this.context, R.color.colorPointed))}\"}"
     }
-
-    override fun setWebViewClient(client: WebViewClient?) {
-        if (this.client != client) {
-            throw IllegalAccessException("don't use setWebViewClient on WebBasedChartView.")
-        }
-    }
-
 
     private fun subscribeToModelEvent(model: ChartModel<*>) {
         modelSubscription.set(
                 model.stateObservable.subscribe { state ->
                     when (state) {
                         ChartModel.State.Loaded -> {
-                            //TODO model data changed
+                            if (isWebViewReady) {
+                                webView.loadUrl("javascript:onDataChanged()")
+                            } else {
+                                println("webview is not ready to draw chart. store pending flag.")
+                                wasDataChangedPending = true
+                            }
                         }
                     }
                 }
@@ -124,5 +136,53 @@ class WebBasedChartView : WebView, IChartView {
         modelSubscription.set(null)
     }
 
-    private inner class ChartWebViewClient : WebViewClient()
+    inner class ChartWebViewClient : WebViewClient() {
+        override fun onPageFinished(view: WebView, url: String) {
+            super.onPageFinished(view, url)
+            println("webview page finished for ${url}")
+            if (!isWebViewReady && url.startsWith(INITIALIZE_URL)) {
+                println("webview chart is now ready.")
+                isWebViewReady = true
+            }
+
+            if (wasDataChangedPending) {
+                println("there is a pending update of data for webview. call Javascript function.")
+                wasDataChangedPending = false
+                webView.loadUrl("javascript:onDataChanged()")
+            }
+        }
+
+        override fun onLoadResource(view: WebView?, url: String?) {
+            super.onLoadResource(view, url)
+            println("onLoadResource")
+        }
+
+        override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+            super.onPageStarted(view, url, favicon)
+            println("webview page started: ${url}")
+        }
+
+        override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
+            super.onReceivedError(view, request, error)
+            println("webview error when ${request}")
+            println(error)
+        }
+
+        override fun onReceivedSslError(view: WebView, handler: SslErrorHandler, error: SslError) {
+            super.onReceivedSslError(view, handler, error)
+            println("received SSL error")
+            println(handler.obtainMessage())
+            println(error.primaryError)
+        }
+
+        override fun onReceivedHttpError(view: WebView, request: WebResourceRequest, errorResponse: WebResourceResponse) {
+            super.onReceivedHttpError(view, request, errorResponse)
+            println("http error when ${request}")
+        }
+
+        override fun onRenderProcessGone(view: WebView, detail: RenderProcessGoneDetail): Boolean {
+            println("render process was gone.")
+            return super.onRenderProcessGone(view, detail)
+        }
+    }
 }
