@@ -40,6 +40,7 @@ class DailyCountChartModel(tracker: OTTrackerDAO, realm: Realm) : TrackerChartMo
         xScale.setDomain(getTimeScope().from, getTimeScope().to)
         xScale.quantize(currentGranularity)
 
+        println("reload data for tracker ${tracker.objectId} - DailyCount")
         return dbManager
                 .makeItemsQuery(tracker.objectId, getTimeScope(), realm)
                 .findAllSortedAsync("timestamp", Sort.ASCENDING)

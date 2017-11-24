@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chart</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=600, initial-scale=1">
+    <script src="visualization.js"></script>
+    <style type="text/css">
+        *{
+          margin: 0px;
+          padding:0px;
+        }
+
+
+    </style>
+    <script>
+        OTVis.OTChartFactory.setOverrideSettings(JSON.parse(window.chartView.requestGlobalOptions()));
+
+        function onDataChanged(){
+            var data = JSON.parse(window.chartView.requestChartDataString());
+            var chart = OTVis.OTChartFactory.makeChart(window.chartView.getChartType());
+            chart.addOnResizedListener(function(width, height){
+                window.chartView.onChartCanvasResized(width, height);
+            })
+            chart.setData(data);
+            chart.updateChartToCanvas("chart");
+        }
+
+
+    </script>
+</head>
+<body>
+<canvas id="chart" width="600"></canvas>
+</body>
+</html>

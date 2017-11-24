@@ -5,6 +5,7 @@ import android.app.KeyguardManager
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.location.Address
 import android.location.Geocoder
@@ -363,4 +364,8 @@ fun JsonObject.getIntCompat(key: String): Int? {
 
 fun JsonObject.getLongCompat(key: String): Long? {
     return getElementCompat(key)?.asLong
+}
+
+fun argbIntToCssString(color: Int): String {
+    return "rgba(${Color.red(color)}, ${Color.green(color)}, ${Color.blue(color)}, ${Color.alpha(color).toFloat() / 255})"
 }

@@ -21,7 +21,7 @@ open class WordListView : FlowLayout {
     companion object {
         private var _colorPalette: IntArray? = null
 
-        protected fun getColorPalette(context: Context): IntArray {
+        fun getColorPalette(context: Context): IntArray {
             if (_colorPalette == null) {
                 _colorPalette = context.resources.getStringArray(R.array.choiceColorPaletteArray).map { Color.parseColor(it) }.toIntArray()
             }
