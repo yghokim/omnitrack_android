@@ -162,6 +162,16 @@ class RealmDatabaseManager @Inject constructor(
                 }
     }
 
+    fun makeItemsQuery(trackerId: String?, scope: TimeSpan, timeAttributeLocalId: String, realm: Realm): RealmQuery<OTItemDAO> {
+        return realm.where(OTItemDAO::class.java).equalTo("removed", false)
+                .run {
+                    if (trackerId != null) {
+                        return@run this.equalTo(FIELD_TRACKER_ID, trackerId)
+                    } else return@run this
+                }
+                .isNotNull("")
+    }
+
     fun getItemCountDuring(trackerId: String?, realm: Realm, offsetFromToday: Int = 0, overrideTimeColumnLocalId: String?): Long {
         val cal = Calendar.getInstance()
         cal.set(Calendar.HOUR_OF_DAY, 0)

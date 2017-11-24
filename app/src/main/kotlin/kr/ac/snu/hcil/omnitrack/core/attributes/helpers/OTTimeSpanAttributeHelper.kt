@@ -4,7 +4,6 @@ import android.content.Context
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.realm.Realm
-import io.realm.Sort
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.FallbackPolicyResolver
@@ -133,9 +132,10 @@ class OTTimeSpanAttributeHelper : OTAttributeHelper() {
                         val previousNotNullEntry = try {
                             realm.where(OTItemValueEntryDAO::class.java)
                                     .equalTo("key", attribute.localId)
-                                    .equalTo("item.trackerId", attribute.trackerId)
-                                    .equalTo("item.removed", false)
-                                    .findAllSorted("item.timestamp", Sort.DESCENDING).filter { it.value != null }.first()
+                                    .equalTo("items.trackerId", attribute.trackerId)
+                                    .equalTo("items.removed", false)
+                                    .isNotNull("value")
+                                    .findAll().sortedByDescending { it.items?.firstOrNull()?.timestamp ?: 0L }.firstOrNull()
                         } catch (ex: NoSuchElementException) {
                             null
                         }
