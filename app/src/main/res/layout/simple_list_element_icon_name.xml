@@ -34,5 +34,6 @@
         android:textSize="16sp"
 
         android:textStyle="italic"
+        tools:ignore="MissingPrefix"
         tools:text="Repeat with Interval" />
 </LinearLayout>

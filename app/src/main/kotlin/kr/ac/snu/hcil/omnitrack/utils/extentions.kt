@@ -146,13 +146,7 @@ fun isNumericPrimitive(value: Any?): Boolean {
 }
 
 fun convertNumericToDouble(value: Any): Double {
-    if (value is Int) {
-        return value.toDouble()
-    } else if (value is Long) {
-        return value.toDouble()
-    } else if (value is Float) {
-        return value.toDouble()
-    } else if (value is Double) {
+    if (value is Number) {
         return value.toDouble()
     } else return value.toString().toDouble()
 }

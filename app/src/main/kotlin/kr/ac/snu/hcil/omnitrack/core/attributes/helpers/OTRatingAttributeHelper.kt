@@ -25,7 +25,7 @@ import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelpe
 /**
  * Created by Young-Ho on 10/7/2017.
  */
-class OTRatingAttributeHelper : OTAttributeHelper() {
+class OTRatingAttributeHelper : OTAttributeHelper(), ISingleNumberAttributeHelper {
 
     companion object {
         const val PROPERTY_OPTIONS = "options"
@@ -155,6 +155,15 @@ class OTRatingAttributeHelper : OTAttributeHelper() {
                 view.setScore(ratingOptions.convertFractionToRealScore(value), ratingOptions.starLevels.maxScore.toFloat())
                 Single.just(true)
             } else super.applyValueToViewForItemList(attribute, value, view)
+        }
+    }
+
+
+    override fun convertValueToSingleNumber(value: Any, attribute: OTAttributeDAO): Double {
+        if (value is Number) return value.toDouble()
+        else {
+            val ratingOptions = getRatingOptions(attribute)
+            return ratingOptions.convertFractionToRealScore(value as Fraction).toDouble()
         }
     }
 }

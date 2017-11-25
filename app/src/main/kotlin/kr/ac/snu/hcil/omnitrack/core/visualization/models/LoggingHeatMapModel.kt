@@ -9,7 +9,9 @@ import io.realm.Realm
 import io.realm.Sort
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
 import kr.ac.snu.hcil.omnitrack.core.visualization.INativeChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.TrackerChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.ITimeBinnedHeatMap
@@ -30,9 +32,12 @@ import java.util.*
  */
 
 
-class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm) : TrackerChartModel<ITimeBinnedHeatMap.CounterVector>(tracker, realm), ITimeBinnedHeatMap, INativeChartModel {
+class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm, timeAttribute: OTAttributeDAO? = null) : TrackerChartModel<ITimeBinnedHeatMap.CounterVector>(tracker, realm), ITimeBinnedHeatMap, INativeChartModel {
 
     val hoursInYBin = 2
+
+    val timeAttributeLocalId: String? = timeAttribute?.localId
+    val timeAttributeName: String? = timeAttribute?.name
 
     init{
         OTApp.instance.applicationComponent.inject(this)
@@ -58,13 +63,18 @@ class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm) : TrackerChartMod
 
 
 
-        return dbManager
-                .makeItemsQuery(tracker.objectId, getTimeScope(), realm)
-                .findAllSortedAsync("timestamp", Sort.ASCENDING)
-                .asFlowable()
-                .filter { it.isLoaded == true }
-                .firstOrError()
-                .map {
+        return if (timeAttributeLocalId != null) {
+
+            Single.just(dbManager.getItemsQueriedWithTimePointAttribute(tracker.objectId, getTimeScope(),
+                    timeAttributeLocalId, realm).sortedBy { (it.getValueOf(timeAttributeLocalId) as TimePoint).timestamp })
+        } else {
+            dbManager
+                    .makeItemsQuery(tracker.objectId, getTimeScope(), realm)
+                    .findAllSortedAsync("timestamp", Sort.ASCENDING)
+                    .asFlowable()
+                    .filter { it.isLoaded == true }
+                    .firstOrError()
+        }.map {
             items ->
             println("items for loging heatmap: ${items.size}")
             //println(items)
@@ -137,8 +147,11 @@ class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm) : TrackerChartMod
     }
 
     override val name: String
-        get() = String.format(OTApp.instance.resourcesWrapped.getString(R.string.msg_vis_logging_heatmap_title_format), tracker.name)
-
+        get() {
+            return if (timeAttributeLocalId != null) {
+                String.format(OTApp.getString(R.string.msg_vis_logging_heatmap_title_format_with_time_attr), tracker.name, timeAttributeName)
+            } else String.format(OTApp.instance.resourcesWrapped.getString(R.string.msg_vis_logging_heatmap_title_format), tracker.name)
+        }
     override fun getChartDrawer(): AChartDrawer {
         return HeatMapDrawer()
     }

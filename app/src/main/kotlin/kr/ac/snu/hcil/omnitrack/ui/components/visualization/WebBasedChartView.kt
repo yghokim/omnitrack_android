@@ -6,8 +6,12 @@ import android.graphics.Bitmap
 import android.net.http.SslError
 import android.support.v4.content.ContextCompat
 import android.util.AttributeSet
+import android.view.Gravity
+import android.view.View
 import android.webkit.*
 import android.widget.FrameLayout
+import android.widget.ProgressBar
+import com.github.ybq.android.spinkit.SpinKitView
 import io.reactivex.disposables.SerialDisposable
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
@@ -46,6 +50,7 @@ class WebBasedChartView : FrameLayout, IChartView {
     private val modelSubscription = SerialDisposable()
 
     private lateinit var webView: WebView
+    private lateinit var spinner: ProgressBar
 
     private val client = ChartWebViewClient()
 
@@ -67,6 +72,7 @@ class WebBasedChartView : FrameLayout, IChartView {
     @SuppressLint("SetJavaScriptEnabled")
     fun init(context: Context, attrs: AttributeSet?) {
         webView = WebView(context, attrs)
+        webView.id = View.generateViewId()
         addView(webView)
 
         webView.settings.javaScriptEnabled = true
@@ -80,6 +86,18 @@ class WebBasedChartView : FrameLayout, IChartView {
         webView.webViewClient = client
         webView.loadUrl(INITIALIZE_URL)
 
+        spinner = SpinKitView(context, attrs).apply {
+            this.setIndeterminateDrawable(com.github.ybq.android.spinkit.style.Circle())
+            this.setColor(ContextCompat.getColor(context, R.color.colorPointed))
+        }
+        spinner.id = View.generateViewId()
+        val spinnerLayoutParams = FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
+        spinnerLayoutParams.topMargin = context.resources.getDimensionPixelSize(R.dimen.activity_vertical_margin)
+        spinnerLayoutParams.bottomMargin = context.resources.getDimensionPixelSize(R.dimen.activity_vertical_margin)
+        spinnerLayoutParams.gravity = Gravity.CENTER
+        spinner.layoutParams = spinnerLayoutParams
+        //spinner.progressTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.colorPointed))
+        addView(spinner)
     }
 
     @JavascriptInterface
@@ -142,6 +160,7 @@ class WebBasedChartView : FrameLayout, IChartView {
             println("webview page finished for ${url}")
             if (!isWebViewReady && url.startsWith(INITIALIZE_URL)) {
                 println("webview chart is now ready.")
+                spinner.visibility = View.GONE
                 isWebViewReady = true
             }
 
