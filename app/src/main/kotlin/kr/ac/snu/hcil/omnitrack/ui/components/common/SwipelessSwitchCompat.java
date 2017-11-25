@@ -15,6 +15,7 @@ package kr.ac.snu.hcil.omnitrack.ui.components.common;
  * limitations under the License.
  */
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
@@ -81,6 +82,7 @@ import android.widget.CompoundButton;
  * @attr ref android.support.v7.appcompat.R.styleable#SwitchCompat_thumbTextPadding
  * @attr ref android.support.v7.appcompat.R.styleable#SwitchCompat_track
  */
+@SuppressLint("RestrictedApi")
 public class SwipelessSwitchCompat extends CompoundButton {
     private static final int THUMB_ANIMATION_DURATION = 250;
     private static final int TOUCH_MODE_IDLE = 0;

@@ -14,12 +14,13 @@ import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputV
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.NumberInputView
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.NumberStyle
+import kr.ac.snu.hcil.omnitrack.utils.convertNumericToDouble
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 
 /**
  * Created by Young-Ho on 10/7/2017.
  */
-class OTNumberAttributeHelper : OTAttributeHelper() {
+class OTNumberAttributeHelper : OTAttributeHelper(), ISingleNumberAttributeHelper {
 
     companion object {
         const val NUMBERSTYLE = "style"
@@ -81,5 +82,9 @@ class OTNumberAttributeHelper : OTAttributeHelper() {
         if (inputView is NumberInputView) {
             inputView.numberStyle = getNumberStyle(attribute) ?: NumberStyle()
         }
+    }
+
+    override fun convertValueToSingleNumber(value: Any, attribute: OTAttributeDAO): Double {
+        return convertNumericToDouble(value)
     }
 }

@@ -10,10 +10,7 @@ import io.reactivex.subjects.PublishSubject
 import io.realm.*
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTItemDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.*
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels.OTItemBuilderDAO
 import kr.ac.snu.hcil.omnitrack.core.datatypes.OTServerFile
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
@@ -162,14 +159,25 @@ class RealmDatabaseManager @Inject constructor(
                 }
     }
 
-    fun makeItemsQuery(trackerId: String?, scope: TimeSpan, timeAttributeLocalId: String, realm: Realm): RealmQuery<OTItemDAO> {
-        return realm.where(OTItemDAO::class.java).equalTo("removed", false)
+    fun getItemsQueriedWithTimePointAttribute(trackerId: String?, scope: TimeSpan, timeAttributeLocalId: String, realm: Realm, queryInjection: ((RealmQuery<OTItemValueEntryDAO>) -> RealmQuery<OTItemValueEntryDAO>)? = null): List<OTItemDAO> {
+        return realm.where(OTItemValueEntryDAO::class.java)
                 .run {
                     if (trackerId != null) {
-                        return@run this.equalTo(FIELD_TRACKER_ID, trackerId)
+                        return@run this.equalTo("items.trackerId", trackerId)
                     } else return@run this
                 }
-                .isNotNull("")
+                .run {
+                    if (queryInjection != null) {
+                        return@run queryInjection(this)
+                    } else return@run this
+                }
+                .isNotNull("value")
+                .equalTo("key", timeAttributeLocalId)
+                .beginsWith("value", "${TypeStringSerializationHelper.TYPENAME_TIMEPOINT.length}${TypeStringSerializationHelper.TYPENAME_TIMEPOINT}")
+                .findAll().filter {
+            val time = TypeStringSerializationHelper.deserialize(it.value!!) as TimePoint
+            return@filter time.timestamp >= scope.from && time.timestamp < scope.to
+        }.mapNotNull { it.items?.firstOrNull() }
     }
 
     fun getItemCountDuring(trackerId: String?, realm: Realm, offsetFromToday: Int = 0, overrideTimeColumnLocalId: String?): Long {

@@ -94,7 +94,7 @@ class ChoiceCategoricalBarChartModel(attribute: OTAttributeDAO, realm: Realm) : 
     }
 
     override fun getDataInJsonString(): String {
-        return "{\"data\":[${cachedData.map { it.toJsonString() }.joinToString(", ")}]}"
+        return "{\"data\":[${cachedData.joinToString(", ") { it.toJsonString() }}]}"
     }
 
     override fun getChartTypeCommand(): String {
