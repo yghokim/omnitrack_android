@@ -90,7 +90,7 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
                 currentAttributeViewModelList.forEach { it.unregister() }
                 currentAttributeViewModelList.clear()
 
-                currentAttributeViewModelList.addAll(unManagedTrackerDao.attributes.filter { it.isHidden == false && it.isInTrashcan == false }.map { AttributeInputViewModel(it) })
+                currentAttributeViewModelList.addAll(unManagedTrackerDao.attributes.filter { !it.isHidden && !it.isInTrashcan }.map { AttributeInputViewModel(it) })
                 attributeViewModelListObservable.onNext(currentAttributeViewModelList)
 
                 val initResult = onInit(trackerDao!!, itemId)
@@ -103,7 +103,7 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
 
                 subscriptions.add(
                         trackerDao!!.asFlowable<OTTrackerDAO>().filter { it.isLoaded }.subscribe { dao ->
-                            if (dao.isValid == false) {
+                            if (!dao.isValid) {
                                 hasTrackerRemovedOutside.onNext(unManagedTrackerDao.objectId!!)
                             }
                         }

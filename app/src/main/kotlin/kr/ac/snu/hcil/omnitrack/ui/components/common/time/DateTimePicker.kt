@@ -40,7 +40,7 @@ class DateTimePicker(context: Context, attrs: AttributeSet? = null) : FrameLayou
     var isDayUsed: Boolean by Delegates.observable(true)
     {
         prop, old, new ->
-        if (new == true) {
+        if (new) {
             if (mode != DATE)
                 dateButton.visibility = VISIBLE
         } else {

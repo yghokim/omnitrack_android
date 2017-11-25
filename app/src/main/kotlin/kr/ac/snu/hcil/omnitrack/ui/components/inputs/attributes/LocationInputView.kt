@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes
 
 import android.content.Context
 import android.content.Intent
+import android.location.Address
 import android.os.Bundle
 import android.util.AttributeSet
 import android.view.MotionEvent
@@ -18,10 +19,16 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.SerialDisposable
+import io.reactivex.schedulers.Schedulers
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.utils.LatLngToAddressTask
+import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.contains
 import kr.ac.snu.hcil.omnitrack.utils.getActivity
+import kr.ac.snu.hcil.omnitrack.utils.getAddress
 
 /**
  * Created by Young-Ho on 8/3/2016.
@@ -29,7 +36,7 @@ import kr.ac.snu.hcil.omnitrack.utils.getActivity
  * https://github.com/googlesamples/android-play-places/blob/master/PlaceCompleteFragment/Application/src/main/java/com/example/google/playservices/placecompletefragment/MainActivity.java
  *
  */
-class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttributeInputView<LatLng>(R.layout.component_location_picker, context, attrs), OnMapReadyCallback, View.OnClickListener, LatLngToAddressTask.OnFinishListener, GoogleMap.OnCameraIdleListener {
+class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttributeInputView<LatLng>(R.layout.component_location_picker, context, attrs), OnMapReadyCallback, View.OnClickListener, GoogleMap.OnCameraIdleListener {
 
     companion object {
         const val REQUEST_TYPE_GOOGLE_PLACE_PICKER = 2
@@ -55,7 +62,7 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
             if (field != value) {
                 field = value
 
-                if (value == true) // adjustMode
+                if (value) // adjustMode
                 {
                     controlPanel.visibility = View.GONE
 
@@ -111,8 +118,7 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
 
     private var valueMarker: Marker? = null
 
-    private var isLocationConversionTaskRunning = false
-    private var queuedLocationToConvert: LatLng? = null
+    private val addressConversionTaskSubscription = SerialDisposable()
 
     init {
 
@@ -224,29 +230,36 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
 
 
     private fun reserveAddressChange(location: LatLng?) {
-        if (isLocationConversionTaskRunning) {
-            queuedLocationToConvert = location
-        } else if (location != null) {
-            isLocationConversionTaskRunning = true
-            LatLngToAddressTask(this, this).execute(location)
+        if (location != null) {
             addressBusyIndicator.visibility = View.VISIBLE
-        }
-    }
+            addressConversionTaskSubscription.set(
+                    Single.create<Nullable<String>> { subscriber ->
+                        var cancelled = false
+                        subscriber.setCancellable {
+                            cancelled = true
+                        }
+                        var googleAddress: Address? = null
+                        while (googleAddress == null && !cancelled) {
+                            googleAddress = location.getAddress(OTApp.instance)
+                        }
 
-    override fun onAddressReceived(address: String?) {
-        if (queuedLocationToConvert == null) {
+                        if (!subscriber.isDisposed) {
+                            subscriber.onSuccess(
+                                    Nullable(googleAddress?.getAddressLine(googleAddress.maxAddressLineIndex))
+                            )
+                        }
+                    }.observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io()).subscribe { (address) ->
+                        addressBusyIndicator.visibility = View.INVISIBLE
+                        if (address != null) {
+                            addressView.text = address
+                        }
+                    }
+            )
+        } else {
+            addressConversionTaskSubscription.set(null)
             addressBusyIndicator.visibility = View.INVISIBLE
-            isLocationConversionTaskRunning = false
-            if (address != null)
-                addressView.text = address
-        }
-
-        if (queuedLocationToConvert != null) {
-            LatLngToAddressTask(this, this).execute(queuedLocationToConvert)
-            queuedLocationToConvert = null
         }
     }
-
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
         //find parent recyclerview
@@ -301,6 +314,7 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
     override fun onDestroy() {
         println("destroy google map")
         googleMap?.clear()
+        addressConversionTaskSubscription.set(null)
         mapView.onDestroy()
     }
 }

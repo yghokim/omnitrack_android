@@ -18,7 +18,7 @@ open class LockableFrameLayout : FrameLayout {
     var locked: Boolean by Delegates.observable(false) {
         prop, old, new ->
         if (old != new) {
-            if (new == true) {
+            if (new) {
                 onViewLocked()
             } else {
                 onViewUnlocked()

@@ -134,7 +134,7 @@ class ShortcutPanelWidgetConfigActivity : AppWidgetConfigurationActivity(R.layou
         }, editor)
 
         trackerList?.let {
-            OTShortcutPanelWidgetUpdateService.setSelectedTrackerIds(appWidgetId, it.filter { it.second == true }.map { it.first.objectId!! }.toSet(), editor)
+            OTShortcutPanelWidgetUpdateService.setSelectedTrackerIds(appWidgetId, it.filter { it.second }.map { it.first.objectId!! }.toSet(), editor)
         }
         editor.apply()
 

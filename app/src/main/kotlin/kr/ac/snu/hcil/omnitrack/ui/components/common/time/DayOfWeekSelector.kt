@@ -11,7 +11,6 @@ import android.util.AttributeSet
 import android.view.Gravity
 import android.view.View
 import android.view.animation.DecelerateInterpolator
-import android.widget.Button
 import android.widget.LinearLayout
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.BitwiseOperationHelper
@@ -56,7 +55,7 @@ class DayOfWeekSelector : LinearLayout, View.OnClickListener {
                 }
             }
 
-            if (changed == true) {
+            if (changed) {
                 checkNonSelection()
                 val new = checkedFlagsInteger
                 if (original != new) {
@@ -145,7 +144,7 @@ class DayOfWeekSelector : LinearLayout, View.OnClickListener {
     }
 
     private fun checkNonSelection(): Boolean {
-        if (allowNoneSelection == false) {
+        if (!allowNoneSelection) {
             if (checkedFlags.indexOf(true) == -1) {
                 for (day in 0..6) {
                     setChecked(day, true)

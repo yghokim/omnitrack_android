@@ -198,7 +198,7 @@ open class TriggerViewModel(val app: OTApp, val dao: OTTriggerDAO, val realm: Re
                     }
                 }
             } else {
-                if (dao.isOn == true) {
+                if (dao.isOn) {
                     if (dao.isManaged) {
                         val id = dao.objectId
                         realm.executeTransactionAsObservable { realm ->

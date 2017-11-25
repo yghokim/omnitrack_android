@@ -55,7 +55,7 @@ class DurationTimelineModel(attribute: OTAttributeDAO, realm: Realm) : Attribute
             dbManager.makeItemsQuery(attribute.trackerId, TimeSpan.fromPoints(from, to), realm)
                     .findAllSortedAsync("timestamp", Sort.ASCENDING)
                     .asFlowable()
-                    .filter { it.isLoaded == true }.firstElement().flatMap<AggregatedDuration?> {
+                    .filter { it.isLoaded }.firstElement().flatMap<AggregatedDuration?> {
                 items ->
                 println("items during ${TimeSpan.fromPoints(from, to)}; count: ${items.size}")
                 if (items.isNotEmpty()) {

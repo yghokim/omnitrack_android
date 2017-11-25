@@ -192,12 +192,13 @@ public class SwipelessSwitchCompat extends CompoundButton {
      *                     reference to a style resource that supplies default values for
      *                     the view. Can be 0 to not look for defaults.
      */
+    @SuppressLint("RestrictedApi")
     public SwipelessSwitchCompat(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         mTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
         final Resources res = getResources();
         mTextPaint.density = res.getDisplayMetrics().density;
-        final TintTypedArray a = TintTypedArray.obtainStyledAttributes(context,
+        @SuppressLint("RestrictedApi") final TintTypedArray a = TintTypedArray.obtainStyledAttributes(context,
                 attrs, R.styleable.SwitchCompat, defStyleAttr, 0);
         mThumbDrawable = a.getDrawable(R.styleable.SwitchCompat_android_thumb);
         if (mThumbDrawable != null) {
@@ -217,7 +218,7 @@ public class SwipelessSwitchCompat extends CompoundButton {
         mSwitchPadding = a.getDimensionPixelSize(
                 R.styleable.SwitchCompat_switchPadding, 0);
         mSplitTrack = a.getBoolean(R.styleable.SwitchCompat_splitTrack, false);
-        ColorStateList thumbTintList = a.getColorStateList(R.styleable.SwitchCompat_thumbTint);
+        @SuppressLint("RestrictedApi") ColorStateList thumbTintList = a.getColorStateList(R.styleable.SwitchCompat_thumbTint);
         if (thumbTintList != null) {
             mThumbTintList = thumbTintList;
             mHasThumbTint = true;
@@ -233,7 +234,7 @@ public class SwipelessSwitchCompat extends CompoundButton {
         if (mHasThumbTint || mHasThumbTintMode) {
             applyThumbTint();
         }
-        ColorStateList trackTintList = a.getColorStateList(R.styleable.SwitchCompat_trackTint);
+        @SuppressLint("RestrictedApi") ColorStateList trackTintList = a.getColorStateList(R.styleable.SwitchCompat_trackTint);
         if (trackTintList != null) {
             mTrackTintList = trackTintList;
             mHasTrackTint = true;
@@ -249,7 +250,7 @@ public class SwipelessSwitchCompat extends CompoundButton {
         if (mHasTrackTint || mHasTrackTintMode) {
             applyTrackTint();
         }
-        final int appearance = a.getResourceId(
+        @SuppressLint("RestrictedApi") final int appearance = a.getResourceId(
                 R.styleable.SwitchCompat_switchTextAppearance, 0);
         if (appearance != 0) {
             setSwitchTextAppearance(context, appearance);
@@ -276,8 +277,9 @@ public class SwipelessSwitchCompat extends CompoundButton {
      *
      * @attr ref android.support.v7.appcompat.R.styleable#SwitchCompat_switchTextAppearance
      */
+    @SuppressLint("RestrictedApi")
     public void setSwitchTextAppearance(Context context, int resid) {
-        final TintTypedArray appearance = TintTypedArray.obtainStyledAttributes(context, resid,
+        @SuppressLint("RestrictedApi") final TintTypedArray appearance = TintTypedArray.obtainStyledAttributes(context, resid,
                 R.styleable.TextAppearance);
         ColorStateList colors;
         int ts;
@@ -299,7 +301,7 @@ public class SwipelessSwitchCompat extends CompoundButton {
         typefaceIndex = appearance.getInt(R.styleable.TextAppearance_android_typeface, -1);
         styleIndex = appearance.getInt(R.styleable.TextAppearance_android_textStyle, -1);
         setSwitchTypefaceByIndex(typefaceIndex, styleIndex);
-        boolean allCaps = appearance.getBoolean(R.styleable.TextAppearance_textAllCaps, false);
+        @SuppressLint("RestrictedApi") boolean allCaps = appearance.getBoolean(R.styleable.TextAppearance_textAllCaps, false);
         if (allCaps) {
             mSwitchTransformationMethod = new AllCapsTransformationMethod(getContext());
         } else {
@@ -777,7 +779,7 @@ public class SwipelessSwitchCompat extends CompoundButton {
         int paddingLeft = padding.left;
         int paddingRight = padding.right;
         if (mThumbDrawable != null) {
-            final Rect inset = DrawableUtils.getOpticalBounds(mThumbDrawable);
+            @SuppressLint("RestrictedApi") final Rect inset = DrawableUtils.getOpticalBounds(mThumbDrawable);
             paddingLeft = Math.max(paddingLeft, inset.left);
             paddingRight = Math.max(paddingRight, inset.right);
         }
@@ -830,6 +832,7 @@ public class SwipelessSwitchCompat extends CompoundButton {
         return x > thumbLeft && x < thumbRight && y > thumbTop && y < thumbBottom;
     }
 
+    @SuppressLint("RestrictedApi")
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
         mVelocityTracker.addMovement(ev);
@@ -918,6 +921,7 @@ public class SwipelessSwitchCompat extends CompoundButton {
      *
      * @param ev Event that triggered the end of drag mode - ACTION_UP or ACTION_CANCEL
      */
+    @SuppressLint("RestrictedApi")
     private void stopDrag(MotionEvent ev) {
         mTouchMode = TOUCH_MODE_IDLE;
         // Commit the change if the event is up and not canceled and the switch
@@ -1013,6 +1017,7 @@ public class SwipelessSwitchCompat extends CompoundButton {
         }
     }
 
+    @SuppressLint("RestrictedApi")
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
@@ -1025,7 +1030,7 @@ public class SwipelessSwitchCompat extends CompoundButton {
             } else {
                 trackPadding.setEmpty();
             }
-            final Rect insets = DrawableUtils.getOpticalBounds(mThumbDrawable);
+            @SuppressLint("RestrictedApi") final Rect insets = DrawableUtils.getOpticalBounds(mThumbDrawable);
             opticalInsetLeft = Math.max(0, insets.left - trackPadding.left);
             opticalInsetRight = Math.max(0, insets.right - trackPadding.right);
         }
@@ -1062,6 +1067,7 @@ public class SwipelessSwitchCompat extends CompoundButton {
         mSwitchRight = switchRight;
     }
 
+    @SuppressLint("RestrictedApi")
     @Override
     public void draw(Canvas c) {
         final Rect padding = mTempRect;
@@ -1135,7 +1141,7 @@ public class SwipelessSwitchCompat extends CompoundButton {
         final Drawable thumbDrawable = mThumbDrawable;
         if (trackDrawable != null) {
             if (mSplitTrack && thumbDrawable != null) {
-                final Rect insets = DrawableUtils.getOpticalBounds(thumbDrawable);
+                @SuppressLint("RestrictedApi") final Rect insets = DrawableUtils.getOpticalBounds(thumbDrawable);
                 thumbDrawable.copyBounds(padding);
                 padding.left += insets.left;
                 padding.right -= insets.right;
@@ -1173,6 +1179,7 @@ public class SwipelessSwitchCompat extends CompoundButton {
         canvas.restoreToCount(saveCount);
     }
 
+    @SuppressLint("RestrictedApi")
     @Override
     public int getCompoundPaddingLeft() {
         if (!ViewUtils.isLayoutRtl(this)) {
@@ -1185,6 +1192,7 @@ public class SwipelessSwitchCompat extends CompoundButton {
         return padding;
     }
 
+    @SuppressLint("RestrictedApi")
     @Override
     public int getCompoundPaddingRight() {
         if (ViewUtils.isLayoutRtl(this)) {
@@ -1203,6 +1211,7 @@ public class SwipelessSwitchCompat extends CompoundButton {
      *
      * @return thumb offset
      */
+    @SuppressLint("RestrictedApi")
     private int getThumbOffset() {
         final float thumbPosition;
         if (ViewUtils.isLayoutRtl(this)) {
@@ -1213,6 +1222,7 @@ public class SwipelessSwitchCompat extends CompoundButton {
         return (int) (thumbPosition * getThumbScrollRange() + 0.5f);
     }
 
+    @SuppressLint("RestrictedApi")
     private int getThumbScrollRange() {
         if (mTrackDrawable != null) {
             final Rect padding = mTempRect;
@@ -1277,17 +1287,15 @@ public class SwipelessSwitchCompat extends CompoundButton {
 
     @Override
     public void jumpDrawablesToCurrentState() {
-        if (Build.VERSION.SDK_INT >= 11) {
-            super.jumpDrawablesToCurrentState();
-            if (mThumbDrawable != null) {
-                mThumbDrawable.jumpToCurrentState();
-            }
-            if (mTrackDrawable != null) {
-                mTrackDrawable.jumpToCurrentState();
-            }
-            cancelPositionAnimator();
-            setThumbPosition(isChecked() ? 1 : 0);
+        super.jumpDrawablesToCurrentState();
+        if (mThumbDrawable != null) {
+            mThumbDrawable.jumpToCurrentState();
         }
+        if (mTrackDrawable != null) {
+            mTrackDrawable.jumpToCurrentState();
+        }
+        cancelPositionAnimator();
+        setThumbPosition(isChecked() ? 1 : 0);
     }
 
     @Override
@@ -1298,19 +1306,17 @@ public class SwipelessSwitchCompat extends CompoundButton {
 
     @Override
     public void onInitializeAccessibilityNodeInfo(AccessibilityNodeInfo info) {
-        if (Build.VERSION.SDK_INT >= 14) {
-            super.onInitializeAccessibilityNodeInfo(info);
-            info.setClassName(ACCESSIBILITY_EVENT_CLASS_NAME);
-            CharSequence switchText = isChecked() ? mTextOn : mTextOff;
-            if (!TextUtils.isEmpty(switchText)) {
-                CharSequence oldText = info.getText();
-                if (TextUtils.isEmpty(oldText)) {
-                    info.setText(switchText);
-                } else {
-                    StringBuilder newText = new StringBuilder();
-                    newText.append(oldText).append(' ').append(switchText);
-                    info.setText(newText);
-                }
+        super.onInitializeAccessibilityNodeInfo(info);
+        info.setClassName(ACCESSIBILITY_EVENT_CLASS_NAME);
+        CharSequence switchText = isChecked() ? mTextOn : mTextOff;
+        if (!TextUtils.isEmpty(switchText)) {
+            CharSequence oldText = info.getText();
+            if (TextUtils.isEmpty(oldText)) {
+                info.setText(switchText);
+            } else {
+                StringBuilder newText = new StringBuilder();
+                newText.append(oldText).append(' ').append(switchText);
+                info.setText(newText);
             }
         }
     }

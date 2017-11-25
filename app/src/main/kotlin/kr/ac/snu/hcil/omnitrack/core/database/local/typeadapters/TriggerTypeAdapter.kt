@@ -103,7 +103,7 @@ class TriggerTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>, val realmP
 
         writer.name("trackers")
         writer.beginArray()
-        for (trackerId in value.trackers.filter { it.removed == false }.map { it.objectId }) {
+        for (trackerId in value.trackers.filter { !it.removed }.map { it.objectId }) {
             writer.value(trackerId)
         }
         writer.endArray()

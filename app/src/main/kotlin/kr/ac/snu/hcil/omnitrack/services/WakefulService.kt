@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.services
 
+import android.annotation.SuppressLint
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -10,6 +11,7 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 /**
  * Created by younghokim on 2017. 3. 14..
  */
+@SuppressLint("Registered")
 open class WakefulService(val tag: String) : Service() {
 
     private var wakeLock: PowerManager.WakeLock? = null

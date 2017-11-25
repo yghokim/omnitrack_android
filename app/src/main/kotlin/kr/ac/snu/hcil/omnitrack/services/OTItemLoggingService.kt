@@ -139,7 +139,7 @@ class OTItemLoggingService : WakefulService(TAG) {
                                 val item = pushedItemDao
                                 val tracker = unManagedTrackerDao
                                 if (item != null && tracker != null) {
-                                    tracker.attributes.filter{it.isHidden==false && it.isInTrashcan==false}.forEach {
+                                    tracker.attributes.filter { !it.isHidden && !it.isInTrashcan }.forEach {
                                         val value = item.getValueOf(it.localId)
                                         if (value != null) {
                                             table.add(Pair(it.name, it.getHelper().formatAttributeValue(it, value)))

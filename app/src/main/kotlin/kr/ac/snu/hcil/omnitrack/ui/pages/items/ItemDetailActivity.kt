@@ -424,7 +424,7 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
 
             private var currentValidationState: Boolean by Delegates.observable(true) { property, old, new ->
                 if (old != new) {
-                    if (new == true) {
+                    if (new) {
 
                         //validation
                         if (validationIndicator.progress != 1f || validationIndicator.progress != 0f) {

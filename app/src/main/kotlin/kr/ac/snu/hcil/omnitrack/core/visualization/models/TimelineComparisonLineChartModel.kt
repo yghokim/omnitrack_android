@@ -43,7 +43,7 @@ class TimelineComparisonLineChartModel(attributes: List<OTAttributeDAO>, parent:
                 .makeItemsQuery(parent.objectId, getTimeScope(), realm)
                 .findAllSortedAsync("timestamp", Sort.ASCENDING)
                 .asFlowable()
-                .filter { it.isLoaded == true && it.isValid }.firstOrError().map { items ->
+                .filter { it.isLoaded && it.isValid }.firstOrError().map { items ->
 
             var currentItemPointer = 0
 
