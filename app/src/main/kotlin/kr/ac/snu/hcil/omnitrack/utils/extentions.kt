@@ -60,7 +60,7 @@ fun dipSize(value: Int): Float {
 }
 
 fun Boolean.toInt(): Int {
-    return if (this == true) 1 else 0
+    return if (this) 1 else 0
 }
 
 fun Int.toBoolean(): Boolean {

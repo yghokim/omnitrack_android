@@ -42,7 +42,7 @@ class ChoiceCategoricalBarChartModel(attribute: OTAttributeDAO, realm: Realm) : 
                     .makeItemsQuery(trackerId, getTimeScope(), realm)
                     .findAllSortedAsync("timestamp", Sort.ASCENDING)
                     .asFlowable()
-                    .filter { it.isLoaded == true && it.isValid }
+                    .filter { it.isLoaded && it.isValid }
                     .firstOrError().map {
                 items ->
 
@@ -57,7 +57,7 @@ class ChoiceCategoricalBarChartModel(attribute: OTAttributeDAO, realm: Realm) : 
                         .forEach {
                             if (it != null && it.isNotEmpty()) {
                                 for (id in it) {
-                                    if (categoriesCache.contains(id) == false) {
+                                    if (!categoriesCache.contains(id)) {
                                         categoriesCache.add(id)
                                         counterDictCache.put(id, 1)
                                     } else {

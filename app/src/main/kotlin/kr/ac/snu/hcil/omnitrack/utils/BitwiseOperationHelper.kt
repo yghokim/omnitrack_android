@@ -7,7 +7,7 @@ object BitwiseOperationHelper {
 
 
     fun setBooleanAt(integer: Int, value: Boolean, leftShift: Int): Int {
-        if (value == true) {
+        if (value) {
             return integer or (0b1 shl leftShift)
         } else {
             return integer and (0b1 shl leftShift).inv()

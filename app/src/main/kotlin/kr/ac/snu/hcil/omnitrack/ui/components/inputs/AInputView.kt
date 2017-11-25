@@ -50,7 +50,7 @@ abstract class AInputView<T>(layoutId: Int, context: Context, attrs: AttributeSe
 
         var passed = true
         for (entry in validators) {
-            if (entry.second(value) == false) {
+            if (!entry.second(value)) {
                 passed = false
                 val msg = entry.first
                 if (msg != null) {
@@ -59,7 +59,7 @@ abstract class AInputView<T>(layoutId: Int, context: Context, attrs: AttributeSe
             }
         }
 
-        if (passed == false) {
+        if (!passed) {
             validationFailed.invoke(this, validationErrorMessageList.joinToString("\n"))
         }
         onValidated(passed)

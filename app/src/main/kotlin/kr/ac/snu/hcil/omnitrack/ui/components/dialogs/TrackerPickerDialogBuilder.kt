@@ -75,7 +75,7 @@ class TrackerPickerDialogBuilder(val trackers: List<OTTrackerDAO.SimpleTrackerIn
         var active: Boolean = true
             set(value) {
                 field = value
-                if (value == true) {
+                if (value) {
                     itemView.setOnClickListener(this)
                     itemView.alpha = 1.0f
                 } else {

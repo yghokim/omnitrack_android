@@ -20,7 +20,7 @@ object TrackerHelper {
 
         val list = ArrayList<ChartModel<*>>()
 
-        val timePointAttributes = trackerDao.attributes.filter { it.isHidden == false && it.isInTrashcan == false && it.type == OTAttributeManager.TYPE_TIME }
+        val timePointAttributes = trackerDao.attributes.filter { !it.isHidden && !it.isInTrashcan && it.type == OTAttributeManager.TYPE_TIME }
 
 
         //generate tracker-level charts
@@ -35,14 +35,14 @@ object TrackerHelper {
         }
 
         //add time-value scatterplots
-        val singleNumberAttributes = trackerDao.attributes.filter { it.isHidden == false && it.isInTrashcan == false && it.getHelper() is ISingleNumberAttributeHelper }
+        val singleNumberAttributes = trackerDao.attributes.filter { !it.isHidden && !it.isInTrashcan && it.getHelper() is ISingleNumberAttributeHelper }
         for (timeAttr in timePointAttributes) {
             for (numAttr in singleNumberAttributes) {
                 list.add(TimeSeriesPlotModel(trackerDao, timeAttr, numAttr, realm))
             }
         }
 
-        for (attribute in trackerDao.attributes.filter { it.isHidden == false && it.isInTrashcan == false }) {
+        for (attribute in trackerDao.attributes.filter { !it.isHidden && !it.isInTrashcan }) {
             list.addAll(attribute.getHelper().makeRecommendedChartModels(attribute, realm))
         }
 

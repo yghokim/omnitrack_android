@@ -36,7 +36,7 @@ class Ticker(var unit: Int = 1000) {
     }
 
     fun start() {
-        if (tickerStopped == true) {
+        if (tickerStopped) {
             tickerStopped = false
             ticker.run()
         }

@@ -72,7 +72,7 @@ class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm, timeAttribute: OT
                     .makeItemsQuery(tracker.objectId, getTimeScope(), realm)
                     .findAllSortedAsync("timestamp", Sort.ASCENDING)
                     .asFlowable()
-                    .filter { it.isLoaded == true }
+                    .filter { it.isLoaded }
                     .firstOrError()
         }.map {
             items ->

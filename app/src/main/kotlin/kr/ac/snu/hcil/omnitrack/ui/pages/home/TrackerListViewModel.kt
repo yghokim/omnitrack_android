@@ -205,7 +205,7 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
                             currentAttributeValidationResultDict[localId] = validationResult
                         }.subscribe {
                             if (attributesResult.find { currentAttributeValidationResultDict[it.localId]?.first == false } == null) {
-                                if (validationResult.value.first != true) {
+                                if (!validationResult.value.first) {
                                     validationResult.onNext(Pair<Boolean, List<CharSequence>?>(true, null))
                                 }
                             } else {
@@ -213,7 +213,7 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
                                 val messages = attributesResult.filter { currentAttributeValidationResultDict[it.localId]?.first == false }
                                         .mapNotNull { currentAttributeValidationResultDict[it.localId]?.second }
 
-                                if (validationResult.value.first != false) {
+                                if (validationResult.value.first) {
                                     validationResult.onNext(Pair(false, messages))
                                 }
                             }

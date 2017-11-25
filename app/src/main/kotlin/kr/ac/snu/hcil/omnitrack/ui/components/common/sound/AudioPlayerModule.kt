@@ -43,7 +43,7 @@ class AudioPlayerModule(var listener: PlayerListener?, val filePath: String, pro
     }
 
     override fun onTick(time: Long) {
-        if (isReady.get() == true) {
+        if (isReady.get()) {
             listener?.onAudioPlayerProgress(this, 0)
         }
     }
@@ -68,7 +68,7 @@ class AudioPlayerModule(var listener: PlayerListener?, val filePath: String, pro
             player.release()
         }
         isPlaying = false
-        if (cancel != true) {
+        if (!cancel) {
             listener?.onAudioPlayerFinished(this, filePath)
         } else {
             listener?.onAudioPlayerFinished(this, null)

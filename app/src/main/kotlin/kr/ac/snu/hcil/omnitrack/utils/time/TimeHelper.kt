@@ -160,13 +160,13 @@ object TimeHelper {
 
         var different = duration
         val elapsedDays = different / daysInMilli
-        different = different % daysInMilli
+        different %= daysInMilli
 
         val elapsedHours = different / hoursInMilli
-        different = different % hoursInMilli
+        different %= hoursInMilli
 
         val elapsedMinutes = different / minutesInMilli
-        different = different % minutesInMilli
+        different %= minutesInMilli
 
         val elapsedSeconds = different / secondsInMilli
 

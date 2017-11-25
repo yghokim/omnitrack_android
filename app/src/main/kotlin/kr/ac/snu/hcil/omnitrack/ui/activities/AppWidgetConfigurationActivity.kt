@@ -1,11 +1,13 @@
 package kr.ac.snu.hcil.omnitrack.ui.activities
 
+import android.annotation.SuppressLint
 import android.appwidget.AppWidgetManager
 import android.os.Bundle
 
 /**
  * Created by Young-Ho Kim on 2017-04-05.
  */
+@SuppressLint("Registered")
 open class AppWidgetConfigurationActivity(val layoutId: Int) : OTActivity() {
 
     private var _appWidgetId: Int = AppWidgetManager.INVALID_APPWIDGET_ID

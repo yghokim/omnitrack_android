@@ -73,7 +73,7 @@ abstract class ChartModel<T>(val realm: Realm) : IChartInterface<T> {
 
                         println("chart data loading finished: ${this.name}")
                         onNewDataLoaded(data)
-                        if (invalidated == true) {
+                        if (invalidated) {
                             reload()
                         }
                     }, {

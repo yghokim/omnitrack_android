@@ -63,7 +63,7 @@ class ItemEditingViewModel(app: Application) : ItemEditionViewModelBase(app) {
 
     override fun applyEditingToDatabase(): Maybe<String> {
         return if (isValid) {
-            return isBusyObservable.filter { it == false }.firstOrError().flatMapMaybe {
+            return isBusyObservable.filter { !it }.firstOrError().flatMapMaybe {
                 if (isViewModelsDirty()) {
                     return@flatMapMaybe Maybe.defer {
                         val originalItemFieldKeys = originalUnmanagedItemDao.fieldValueEntries.map { it.key }.toMutableList()

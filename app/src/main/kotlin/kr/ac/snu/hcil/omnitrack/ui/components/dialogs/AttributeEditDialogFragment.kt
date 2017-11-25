@@ -157,13 +157,13 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
             val itemObservable = dbManager
                     .makeItemsQuery(trackerId, null, null, realm)
                     .equalTo("objectId", itemId).findFirstAsync()
-                    .asFlowable<OTItemDAO>().filter { it.isValid == true && it.isLoaded == true }
+                    .asFlowable<OTItemDAO>().filter { it.isValid && it.isLoaded }
                     .firstOrError()
                     .doOnSuccess { this.item = it }
 
             val attributeObservable = realm.where(OTAttributeDAO::class.java).equalTo("trackerId", trackerId).equalTo("localId", attributeLocalId)
                     .findFirstAsync()
-                    .asFlowable<OTAttributeDAO>().filter { it.isValid == true && it.isLoaded == true }
+                    .asFlowable<OTAttributeDAO>().filter { it.isValid && it.isLoaded }
                     .firstOrError()
                     .doOnSuccess { this.attribute = it }
 

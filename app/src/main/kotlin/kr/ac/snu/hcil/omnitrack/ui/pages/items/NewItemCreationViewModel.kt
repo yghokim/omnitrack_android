@@ -110,7 +110,7 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
             if (isValid) {
                 println("save builder")
                 refreshDaoValues()
-                isBusyObservable.filter { it == false }.firstOrError().map { isBusy ->
+                isBusyObservable.filter { !it }.firstOrError().map { isBusy ->
                     if (!isBusy) {
                         var highestBuilderEntryId = realm.where(OTItemBuilderFieldValueEntry::class.java).max("id")?.toLong() ?: 0L
                         itemBuilderDao.data.forEach {
@@ -130,7 +130,7 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
 
     override fun applyEditingToDatabase(): Maybe<String> {
         if (isValid) {
-            return isBusyObservable.filter { it == false }.firstOrError().flatMapMaybe {
+            return isBusyObservable.filter { !it }.firstOrError().flatMapMaybe {
                 refreshDaoValues()
                 val item = builderWrapper.saveToItem(null, ItemLoggingSource.Manual)
 
@@ -143,7 +143,7 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
 
     override fun clearHistory() {
         subscriptions.add(
-                isBusyObservable.filter { it == false }.subscribe {
+                isBusyObservable.filter { !it }.subscribe {
                     realm.executeTransaction {
                         val daos = realm.where(OTItemBuilderDAO::class.java).equalTo("id", itemBuilderDao.id).findAll()
                         daos.forEach {

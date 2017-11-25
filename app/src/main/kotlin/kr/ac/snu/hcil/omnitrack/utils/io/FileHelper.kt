@@ -77,9 +77,11 @@ object FileHelper {
         return when (uri.scheme) {
             ContentResolver.SCHEME_CONTENT -> {
                 val returnCursor = context.contentResolver.query(uri, null, null, null, null)
-                val sizeIndex = returnCursor.getColumnIndex(OpenableColumns.SIZE)
-                returnCursor.moveToFirst()
-                return returnCursor.getLong(sizeIndex)
+                returnCursor.use {
+                    val sizeIndex = returnCursor.getColumnIndex(OpenableColumns.SIZE)
+                    returnCursor.moveToFirst()
+                    return returnCursor.getLong(sizeIndex)
+                }
             }
             ContentResolver.SCHEME_FILE -> {
                 try {
