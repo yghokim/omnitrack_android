@@ -54,7 +54,7 @@ class DailyCountChartModel(tracker: OTTrackerDAO, realm: Realm, timeAttribute: O
         println("reload data for tracker ${tracker.objectId} - DailyCount")
         return if (timeAttributeLocalId != null) {
 
-            Single.just(dbManager.getItemsQueriedWithTimePointAttribute(tracker.objectId, getTimeScope(),
+            Single.just(dbManager.getItemsQueriedWithTimeAttribute(tracker.objectId, getTimeScope(),
                     timeAttributeLocalId, realm).sortedBy { (it.getValueOf(timeAttributeLocalId) as TimePoint).timestamp })
         } else {
             dbManager

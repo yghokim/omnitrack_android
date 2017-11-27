@@ -65,7 +65,7 @@ class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm, timeAttribute: OT
 
         return if (timeAttributeLocalId != null) {
 
-            Single.just(dbManager.getItemsQueriedWithTimePointAttribute(tracker.objectId, getTimeScope(),
+            Single.just(dbManager.getItemsQueriedWithTimeAttribute(tracker.objectId, getTimeScope(),
                     timeAttributeLocalId, realm).sortedBy { (it.getValueOf(timeAttributeLocalId) as TimePoint).timestamp })
         } else {
             dbManager

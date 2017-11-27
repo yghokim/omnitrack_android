@@ -15,8 +15,6 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTItemValueEntryDAO
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
-import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
-import kr.ac.snu.hcil.omnitrack.core.visualization.models.DurationTimelineModel
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.common.time.TimeRangePicker
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
@@ -135,7 +133,8 @@ class OTTimeSpanAttributeHelper : OTAttributeHelper() {
                                     .equalTo("items.trackerId", attribute.trackerId)
                                     .equalTo("items.removed", false)
                                     .isNotNull("value")
-                                    .findAll().sortedByDescending { it.items?.firstOrNull()?.timestamp ?: 0L }.firstOrNull()
+                                    .beginsWith("value", "${TypeStringSerializationHelper.TYPENAME_TIMESPAN.length}${TypeStringSerializationHelper.TYPENAME_TIMESPAN}")
+                                    .findAll().sortedByDescending { (it.items?.firstOrNull()?.getValueOf(attribute.localId) as TimeSpan).to }.firstOrNull()
                         } catch (ex: NoSuchElementException) {
                             null
                         }
@@ -182,9 +181,10 @@ class OTTimeSpanAttributeHelper : OTAttributeHelper() {
         } ?: ""
     }
 
+    /*
     override fun makeRecommendedChartModels(attribute: OTAttributeDAO, realm: Realm): Array<ChartModel<*>> {
         return arrayOf(DurationTimelineModel(attribute, realm))
-    }
+    }*/
 
     override fun onAddColumnToTable(attribute: OTAttributeDAO, out: MutableList<String>) {
         out.add("${getAttributeUniqueName(attribute)}_start_epoch")

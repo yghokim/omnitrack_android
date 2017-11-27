@@ -108,8 +108,11 @@ class QuantizedTimeScale : IAxisScale<Long> {
     //Calendar flag
     private var calendarLevel: Int = Calendar.DAY_OF_YEAR
 
-    private var domainTimeMin: Long = 0
-    private var domainTimeMax: Long = 0
+    var domainTimeMin: Long = 0
+        private set
+
+    var domainTimeMax: Long = 0
+        private set
 
     /**
      * inset start and end coord with half of bin size.
