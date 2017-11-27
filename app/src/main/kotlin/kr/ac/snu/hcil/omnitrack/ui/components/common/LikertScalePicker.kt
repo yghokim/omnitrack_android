@@ -106,7 +106,7 @@ class LikertScalePicker : View, GestureDetector.OnGestureListener {
                     upper = Math.max(upper, 1)
                 }
 
-                value = (upper.toFloat() / under) * (rightMost - leftMost) + leftMost
+                value = (((upper.toFloat() / under) * (rightMost - leftMost) + leftMost) * 10 + .5f).toInt() / 10f
             }
         }
 
@@ -292,7 +292,7 @@ class LikertScalePicker : View, GestureDetector.OnGestureListener {
 
             canvas.drawCircle(valuePosition, _lineY, valueIndicatorRadius, valueIndicatorPaint)
 
-            val valueText = value.toString()
+            val valueText = String.format("%.1f", value)
             valueTextPaint.getTextBounds(valueText, 0, valueText.length, boundRect)
             val valueCenter = getWrappedCenterPoint(valuePosition, boundRect.width() / 2 + valueBoxHorizontalPadding)
             boxRect.set(valueCenter - boundRect.width() / 2 - valueBoxHorizontalPadding, 0f, valueCenter + boundRect.width() / 2 + valueBoxHorizontalPadding, valueTextSize + 2 * valueBoxVerticalPadding)
