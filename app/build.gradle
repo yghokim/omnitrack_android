@@ -28,40 +28,18 @@ android {
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
 
-        def versionPropsFile = rootProject.file("version.properties")
-        Properties versionProperties = new Properties()
-        versionProperties.load(new FileInputStream(versionPropsFile))
-        def runTasks = gradle.startParameter.taskNames
-        def releaseIncrease = 0
-        if('assemble' in runTasks || 'assembleRelease' in runTasks || 'aR' in runTasks)
-        {
-            releaseIncrease = 1
-        }
-
-        def patternVersionNumber = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)\\.(\\d+)(\\s[a-zA-Z0-9]+)?")
-        def matcherVersionNumber = patternVersionNumber.matcher(versionProperties["versionName"])
-        matcherVersionNumber.find()
-        def majorVersion = Integer.parseInt(matcherVersionNumber.group(1))
-        def minorVersion = Integer.parseInt(matcherVersionNumber.group(2))
-        def pointVersion = Integer.parseInt(matcherVersionNumber.group(3))
-        def buildVersion = Integer.parseInt(matcherVersionNumber.group(4))
-        def suffix = matcherVersionNumber.group(5)
-
-        versionName = majorVersion + "." + minorVersion + "." + (pointVersion + releaseIncrease) + "." + (buildVersion + 1) + suffix
-        versionCode = versionProperties["versionCode"].toInteger() + releaseIncrease
-        versionProperties.setProperty("versionName", versionName)
-        versionProperties.setProperty("versionCode", versionCode.toString())
-        versionProperties.store(versionPropsFile.newWriter(), "auto-incremented version information.")
-        println("new versionName: ${versionName}, versionCode: ${versionCode}")
-
         manifestPlaceholders = [GOOGLE_MAPS_API_KEY: keystoreProperties.getProperty("GOOGLE_MAPS_API_KEY").toString()]
     }
 
 
     applicationVariants.all { variant ->
-        variant.outputs.all{ output ->
-            outputFileName = "${variant.name}-${defaultConfig.versionName}.apk"
+        println("variant name: ${variant.name}")
+        if(variant.name.toLowerCase().contains("release"))
+        {
+            variant.generateBuildConfig.dependsOn("refreshVersionsByIncreasingVersionCode")
         }
+        else
+            variant.generateBuildConfig.dependsOn("refreshVersionsNotRelease")
     }
 
     dexOptions {
@@ -239,3 +217,51 @@ repositories {
 
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'realm-android'
+
+ext.refreshVersion = {
+    increase->
+        println("refresh versions.")
+        def versionPropsFile = rootProject.file("version.properties")
+        Properties versionProperties = new Properties()
+        versionProperties.load(new FileInputStream(versionPropsFile))
+        def releaseIncrease = increase ? 1 : 0
+
+        def patternVersionNumber = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)\\.(\\d+)(\\s[a-zA-Z0-9]+)?")
+        def matcherVersionNumber = patternVersionNumber.matcher(versionProperties["versionName"])
+        matcherVersionNumber.find()
+        def majorVersion = Integer.parseInt(matcherVersionNumber.group(1))
+        def minorVersion = Integer.parseInt(matcherVersionNumber.group(2))
+        def pointVersion = Integer.parseInt(matcherVersionNumber.group(3))
+        def buildVersion = Integer.parseInt(matcherVersionNumber.group(4))
+        def suffix = matcherVersionNumber.group(5)
+
+        def versionName = majorVersion + "." + minorVersion + "." + (pointVersion + releaseIncrease) + "." + (buildVersion + 1) + suffix
+        def versionCode = versionProperties["versionCode"].toInteger() + releaseIncrease
+        versionProperties.setProperty("versionName", versionName)
+        versionProperties.setProperty("versionCode", versionCode.toString())
+        versionProperties.store(versionPropsFile.newWriter(), "auto-incremented version information.")
+
+        android.defaultConfig.versionName = versionName
+        android.defaultConfig.versionCode = versionCode
+        android.applicationVariants.all {
+            variant->
+                variant.mergedFlavor.versionCode = versionCode
+                variant.mergedFlavor.versionName = versionName
+        }
+        println("new versionName: ${versionName}, versionCode: ${versionCode}")
+
+        android.applicationVariants.all {
+            variant->
+                variant.outputs.all{ output ->
+                    outputFileName = "${variant.name}-${versionName}.apk"
+                }
+        }
+}
+
+task("refreshVersionsNotRelease") << {
+    refreshVersion(false)
+}
+
+task("refreshVersionsByIncreasingVersionCode") << {
+    refreshVersion(true)
+}
