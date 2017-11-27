@@ -19,9 +19,9 @@ import kr.ac.snu.hcil.omnitrack.utils.RatingOptions
  */
 open class DurationHeatMapModel(tracker: OTTrackerDAO, timeSpanAttribute: OTAttributeDAO, val numericAttribute: OTAttributeDAO, realm: Realm) : TrackerChartModel<DurationHeatMapModel.DataPoint>(tracker, realm), IWebBasedChartModel {
 
-    data class DataPoint(val dateIndex: Int, val fromDateRatio: Float, val toDateRatio: Float, val value: Double) {
+    data class DataPoint(val dateIndex: Int, val fromDateRatio: Float, val toDateRatio: Float, val value: Double, val cutOnLeft: Boolean, val cutOnRight: Boolean) {
         fun toJsonString(): String {
-            return "{\"i\": $dateIndex, \"fromRatio\":$fromDateRatio, \"toRatio\":$toDateRatio, \"value\": $value}"
+            return "{\"i\": $dateIndex, \"fromRatio\":$fromDateRatio, \"toRatio\":$toDateRatio, \"value\": $value, \"cutL\":$cutOnLeft, \"cutR\":$cutOnRight}"
         }
     }
 
@@ -101,7 +101,9 @@ open class DurationHeatMapModel(tracker: OTTrackerDAO, timeSpanAttribute: OTAttr
                     data.add(DataPoint(i,
                             (startingPoint - binStart).toFloat() / (binEnd - binStart),
                             (endPoint - binStart).toFloat() / (binEnd - binStart),
-                            value
+                            value,
+                            (timeSpan.from < binStart),
+                            (timeSpan.to > binEnd)
                     ))
 
                     if (timeSpan.to <= binEnd) {
