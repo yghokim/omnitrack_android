@@ -92,6 +92,8 @@
 -dontwarn com.google.errorprone.annotations.*
 -dontwarn com.beloo.widget.chipslayoutmanager.Orientation
 
+-dontwarn kr.ac.snu.hcil.omnitrack.core.visualization.models.DurationHeatMapModel
+
 # for DexGuard only
 #-keepresourcexmlelements manifest/application/meta-data@value=GlideModule
 # end Glide settings
