@@ -86,7 +86,7 @@ class StarRatingSlider : HorizontalLinearDrawableView, GestureDetector.OnGesture
                     upper = Math.max(upper, 1)
                 }
 
-                score = (upper.toFloat() / under) * levels
+                score = ((upper.toFloat() / under) * levels * 10 + .5f).toInt() / 10f
             }
         }
 

@@ -128,14 +128,14 @@ class RatingOptions {
 
     fun convertFractionToRealScore(fraction: Fraction): Float {
         val under = getMaximumPrecisionIntegerRangeLength()
-        when (type) {
+        val score = when (type) {
             DisplayType.Star -> {
                 var upper = Math.round((fraction.toFloat() * under))
                 if (fraction.upper > 0) {
                     upper = Math.max(upper, 1)
                 }
 
-                return (upper.toFloat() / under) * starLevels.maxScore
+                (upper.toFloat() / under) * starLevels.maxScore
             }
 
             DisplayType.Likert -> {
@@ -144,8 +144,10 @@ class RatingOptions {
                     upper = Math.max(upper, 1)
                 }
 
-                return (upper.toFloat() / under) * (rightMost - leftMost) + leftMost
+                (upper.toFloat() / under) * (rightMost - leftMost) + leftMost
             }
         }
+
+        return (score * 10 + .5f).toInt() / 10f
     }
 }
