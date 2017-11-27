@@ -132,6 +132,7 @@ interface ApplicationComponent {
     fun inject(viewModel: TriggerViewModel)
     fun inject(viewModel: NewItemCreationViewModel)
     fun inject(viewModel: TimeSeriesPlotModel)
+    fun inject(viewModel: DurationHeatMapModel)
 
     fun inject(expression: RealmLazyFunction)
 

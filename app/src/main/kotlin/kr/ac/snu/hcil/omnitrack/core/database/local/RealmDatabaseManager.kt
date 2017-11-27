@@ -159,7 +159,7 @@ class RealmDatabaseManager @Inject constructor(
                 }
     }
 
-    fun getItemsQueriedWithTimePointAttribute(trackerId: String?, scope: TimeSpan, timeAttributeLocalId: String, realm: Realm, queryInjection: ((RealmQuery<OTItemValueEntryDAO>) -> RealmQuery<OTItemValueEntryDAO>)? = null): List<OTItemDAO> {
+    fun getItemsQueriedWithTimeAttribute(trackerId: String?, scope: TimeSpan, timeAttributeLocalId: String, realm: Realm, queryInjection: ((RealmQuery<OTItemValueEntryDAO>) -> RealmQuery<OTItemValueEntryDAO>)? = null): List<OTItemDAO> {
         return realm.where(OTItemValueEntryDAO::class.java)
                 .run {
                     if (trackerId != null) {
@@ -171,12 +171,21 @@ class RealmDatabaseManager @Inject constructor(
                         return@run queryInjection(this)
                     } else return@run this
                 }
+                .equalTo("items.removed", false)
                 .isNotNull("value")
                 .equalTo("key", timeAttributeLocalId)
+                .beginGroup()
                 .beginsWith("value", "${TypeStringSerializationHelper.TYPENAME_TIMEPOINT.length}${TypeStringSerializationHelper.TYPENAME_TIMEPOINT}")
+                .or()
+                .beginsWith("value", "${TypeStringSerializationHelper.TYPENAME_TIMESPAN.length}${TypeStringSerializationHelper.TYPENAME_TIMESPAN}")
+                .endGroup()
                 .findAll().filter {
-            val time = TypeStringSerializationHelper.deserialize(it.value!!) as TimePoint
-            return@filter time.timestamp >= scope.from && time.timestamp < scope.to
+            val time = TypeStringSerializationHelper.deserialize(it.value!!)
+            return@filter if (time is TimePoint) {
+                time.timestamp >= scope.from && time.timestamp < scope.to
+            } else if (time is TimeSpan) {
+                return@filter time.from < scope.to && scope.from < time.to
+            } else false
         }.mapNotNull { it.items?.firstOrNull() }
     }
 
@@ -205,7 +214,7 @@ class RealmDatabaseManager @Inject constructor(
                         if (timeValue is TimePoint) {
                             return@filter timeValue.timestamp >= first && timeValue.timestamp < second
                         } else if (timeValue is TimeSpan) {
-                            return@filter timeValue.from < second && first <= timeValue.to
+                            return@filter timeValue.from < second && first < timeValue.to
                         } else return@filter false
                     }.count().toLong()
         }
