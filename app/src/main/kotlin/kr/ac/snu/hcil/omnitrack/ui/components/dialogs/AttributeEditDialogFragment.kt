@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
 import com.afollestad.materialdialogs.MaterialDialog
+import dagger.internal.Factory
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
@@ -65,8 +66,11 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
 
     private val listeners = HashSet<Listener>()
 
-    @field:[Inject Backend]
     lateinit var realm: Realm
+
+
+    @field:[Inject Backend]
+    lateinit var realmFactory: Factory<Realm>
 
     @Inject
     lateinit var dbManager: BackendDbManager
@@ -80,6 +84,7 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         (activity?.application as? OTApp)?.applicationComponent?.inject(this)
+        realm = realmFactory.get()
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

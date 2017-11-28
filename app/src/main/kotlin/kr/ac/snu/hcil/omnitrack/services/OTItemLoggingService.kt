@@ -62,7 +62,6 @@ class OTItemLoggingService : WakefulService(TAG) {
         private val currentCommandCount = AtomicInteger(0)
     }
 
-    @field:[Inject Backend]
     lateinit var realm: Realm
 
     @field:[Inject Backend]
@@ -83,6 +82,7 @@ class OTItemLoggingService : WakefulService(TAG) {
     override fun onCreate() {
         super.onCreate()
         (application as OTApp).applicationComponent.inject(this)
+        realm = realmProvider.get()
     }
 
     override fun onDestroy() {
