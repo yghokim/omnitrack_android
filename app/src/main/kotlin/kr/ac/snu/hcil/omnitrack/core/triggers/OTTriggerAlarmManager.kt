@@ -4,6 +4,7 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import dagger.internal.Factory
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
@@ -12,7 +13,7 @@ import io.realm.Realm
 import io.realm.Sort
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
-import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels.OTTriggerAlarmInstance
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels.OTTriggerSchedule
@@ -25,12 +26,11 @@ import kr.ac.snu.hcil.omnitrack.utils.time.DesignatedTimeScheduleCalculator
 import kr.ac.snu.hcil.omnitrack.utils.time.IntervalTimeScheduleCalculator
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 import java.util.*
-import javax.inject.Provider
 
 /**
  * Created by younghokim on 16. 8. 29..
  */
-class OTTriggerAlarmManager(val context: Context, val realmProvider: Provider<Realm>) : ITriggerAlarmController {
+class OTTriggerAlarmManager(val context: Context, val realmProvider: Factory<Realm>) : ITriggerAlarmController {
     companion object {
 
         const val TAG = "TimeTriggerAlarmManager"
@@ -233,7 +233,7 @@ class OTTriggerAlarmManager(val context: Context, val realmProvider: Provider<Re
         val realm = realmProvider.get()
 
         val pendingTriggerSchedules = realm.where(OTTriggerSchedule::class.java)
-                .equalTo("trigger.${RealmDatabaseManager.FIELD_OBJECT_ID}", trigger.objectId)
+                .equalTo("trigger.${BackendDbManager.FIELD_OBJECT_ID}", trigger.objectId)
                 .equalTo(OTTriggerSchedule.FIELD_FIRED, false)
                 .equalTo(OTTriggerSchedule.FIELD_SKIPPED, false)
                 .findAll()
@@ -267,7 +267,7 @@ class OTTriggerAlarmManager(val context: Context, val realmProvider: Provider<Re
         return Single.defer {
             realmProvider.get().use { realm ->
                 val nearestTime = realm.where(OTTriggerSchedule::class.java)
-                        .equalTo("trigger.${RealmDatabaseManager.FIELD_OBJECT_ID}", triggerId)
+                        .equalTo("trigger.${BackendDbManager.FIELD_OBJECT_ID}", triggerId)
                         .equalTo(OTTriggerSchedule.FIELD_FIRED, false)
                         .equalTo(OTTriggerSchedule.FIELD_SKIPPED, false)
                         .greaterThan(OTTriggerSchedule.FIELD_INTRINSIC_ALARM_TIME, now)
@@ -282,7 +282,7 @@ class OTTriggerAlarmManager(val context: Context, val realmProvider: Provider<Re
         return Flowable.defer {
             val realm = realmProvider.get()
             return@defer realm.where(OTTriggerSchedule::class.java)
-                    .equalTo("trigger.${RealmDatabaseManager.FIELD_OBJECT_ID}", triggerId)
+                    .equalTo("trigger.${BackendDbManager.FIELD_OBJECT_ID}", triggerId)
                     .equalTo(OTTriggerSchedule.FIELD_FIRED, false)
                     .equalTo(OTTriggerSchedule.FIELD_SKIPPED, false)
                     .findAllSorted(OTTriggerSchedule.FIELD_INTRINSIC_ALARM_TIME, Sort.ASCENDING)
@@ -332,7 +332,7 @@ class OTTriggerAlarmManager(val context: Context, val realmProvider: Provider<Re
 
         val realm = realmProvider.get()
         val latestPastSchedule = realm.where(OTTriggerSchedule::class.java)
-                .equalTo("trigger.${RealmDatabaseManager.FIELD_OBJECT_ID}", trigger.objectId)
+                .equalTo("trigger.${BackendDbManager.FIELD_OBJECT_ID}", trigger.objectId)
                 .findAllSorted(OTTriggerSchedule.FIELD_INTRINSIC_ALARM_TIME, Sort.DESCENDING)
                 .find { it.fired || it.skipped }
 

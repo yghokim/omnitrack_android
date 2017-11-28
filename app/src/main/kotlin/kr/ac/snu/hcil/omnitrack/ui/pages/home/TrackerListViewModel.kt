@@ -9,7 +9,7 @@ import io.reactivex.subjects.BehaviorSubject
 import io.realm.*
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
@@ -104,7 +104,7 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
         super.onUserAttached(newUserId)
         trackersRealmResults?.removeAllChangeListeners()
         clearTrackerViewModelList()
-        trackersRealmResults = dbManager.get().makeTrackersOfUserQuery(newUserId, realm).findAllSortedAsync(arrayOf("position", RealmDatabaseManager.FIELD_USER_CREATED_AT), arrayOf(Sort.ASCENDING, Sort.DESCENDING))
+        trackersRealmResults = dbManager.get().makeTrackersOfUserQuery(newUserId, realm).findAllSortedAsync(arrayOf("position", BackendDbManager.FIELD_USER_CREATED_AT), arrayOf(Sort.ASCENDING, Sort.DESCENDING))
         trackersRealmResults?.addChangeListener(this)
 
         shortcutPanelManager.get().registerShortcutRefreshSubscription(newUserId, TAG)
@@ -138,7 +138,7 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
         syncManager.get().registerSyncQueue(ESyncDataType.TRACKER, SyncDirection.UPLOAD)
     }
 
-    class TrackerInformationViewModel(val trackerDao: OTTrackerDAO, val realm: Realm, dbManager: RealmDatabaseManager) : IReadonlyObjectId, RealmChangeListener<OTTrackerDAO> {
+    class TrackerInformationViewModel(val trackerDao: OTTrackerDAO, val realm: Realm, dbManager: BackendDbManager) : IReadonlyObjectId, RealmChangeListener<OTTrackerDAO> {
         override val objectId: String?
             get() = _objectId
 
@@ -232,7 +232,7 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
                     }
                 }
 
-                lastLoggingTime = snapshot.max(RealmDatabaseManager.FIELD_TIMESTAMP_LONG)?.toLong()
+                lastLoggingTime = snapshot.max(BackendDbManager.FIELD_TIMESTAMP_LONG)?.toLong()
             }
 
             todayItemsResult.addChangeListener { snapshot, changeSet ->

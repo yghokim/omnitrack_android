@@ -4,10 +4,14 @@ import android.content.Context
 import dagger.Lazy
 import dagger.Module
 import dagger.Provides
+import dagger.internal.Factory
 import io.realm.Realm
 import io.realm.RealmConfiguration
+import io.realm.annotations.RealmModule
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels.LocalMediaCacheEntry
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels.UploadTaskInfo
 import kr.ac.snu.hcil.omnitrack.core.net.*
 import okhttp3.Cache
 import okhttp3.MediaType
@@ -15,7 +19,6 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
-import javax.inject.Provider
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
@@ -136,12 +139,18 @@ class NetworkModule {
         return controller
     }
 
-    private val realmConfiguration: RealmConfiguration by lazy {
-        RealmConfiguration.Builder().name("uploadTaskQueue.db").deleteRealmIfMigrationNeeded().build()
+    @Provides
+    @Singleton
+    fun provideUsageLogUploadController(controller: OTOfficialServerApiController): IUsageLogUploadAPI {
+        return controller
     }
 
-    private fun provideRealm(): Provider<Realm> {
-        return object : Provider<Realm> {
+    private val realmConfiguration: RealmConfiguration by lazy {
+        RealmConfiguration.Builder().name("media_storage.db").modules(UploadTaskQueueRealmModule()).deleteRealmIfMigrationNeeded().build()
+    }
+
+    private fun provideRealm(): Factory<Realm> {
+        return object : Factory<Realm> {
             override fun get(): Realm {
                 return Realm.getInstance(realmConfiguration)
             }
@@ -165,3 +174,6 @@ enum class MediaTypeValue {
 
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME) annotation class OkHttpMediaType(val type: MediaTypeValue)
+
+@RealmModule(classes = arrayOf(UploadTaskInfo::class, LocalMediaCacheEntry::class))
+class UploadTaskQueueRealmModule

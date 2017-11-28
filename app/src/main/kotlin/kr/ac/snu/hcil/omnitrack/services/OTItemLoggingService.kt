@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.services
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
+import dagger.internal.Factory
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.realm.Realm
@@ -10,9 +11,10 @@ import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
-import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels.OTItemBuilderDAO
+import kr.ac.snu.hcil.omnitrack.core.di.Backend
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
@@ -22,7 +24,6 @@ import org.jetbrains.anko.notificationManager
 import org.jetbrains.anko.runOnUiThread
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
-import javax.inject.Provider
 
 /**
  * Created by Young-Ho on 10/17/2017.
@@ -61,14 +62,14 @@ class OTItemLoggingService : WakefulService(TAG) {
         private val currentCommandCount = AtomicInteger(0)
     }
 
-    @Inject
+    @field:[Inject Backend]
     lateinit var realm: Realm
 
-    @Inject
-    lateinit var realmProvider: Provider<Realm>
+    @field:[Inject Backend]
+    lateinit var realmProvider: Factory<Realm>
 
     @Inject
-    lateinit var dbManager: RealmDatabaseManager
+    lateinit var dbManager: BackendDbManager
 
     @Inject
     lateinit var syncManager: OTSyncManager
@@ -134,7 +135,7 @@ class OTItemLoggingService : WakefulService(TAG) {
                                         )
                             }
                         }.doOnSuccess { (result, itemId) ->
-                            if (result != RealmDatabaseManager.SAVE_RESULT_FAIL) {
+                            if (result != BackendDbManager.SAVE_RESULT_FAIL) {
                                 val table = ArrayList<Pair<String, CharSequence?>>()
                                 val item = pushedItemDao
                                 val tracker = unManagedTrackerDao

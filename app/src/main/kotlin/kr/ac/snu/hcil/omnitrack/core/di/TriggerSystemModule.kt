@@ -4,11 +4,11 @@ import android.content.Context
 import dagger.Lazy
 import dagger.Module
 import dagger.Provides
+import dagger.internal.Factory
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.core.triggers.ITriggerAlarmController
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerAlarmManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerSystemManager
-import javax.inject.Provider
 import javax.inject.Singleton
 
 /**
@@ -19,7 +19,7 @@ import javax.inject.Singleton
 class TriggerSystemModule {
     @Provides
     @Singleton
-    fun provideTriggerAlarmController(context: Context, realmProvider: Provider<Realm>): ITriggerAlarmController {
+    fun provideTriggerAlarmController(context: Context, @Backend realmProvider: Factory<Realm>): ITriggerAlarmController {
         return OTTriggerAlarmManager(context, realmProvider)
     }
 

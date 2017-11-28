@@ -10,6 +10,9 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import com.github.salomonbrys.kotson.set
+import com.google.gson.JsonObject
+import dagger.Lazy
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -18,8 +21,8 @@ import io.reactivex.subjects.BehaviorSubject
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.ExperimentConsentManager
+import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.database.EventLoggingManager
 import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckService
 import kr.ac.snu.hcil.omnitrack.ui.components.common.time.DurationPicker
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.VersionCheckDialogFragment
@@ -99,6 +102,8 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
     protected lateinit var authManager: OTAuthManager
     @Inject
     protected lateinit var systemPreferences: SharedPreferences
+    @Inject
+    protected lateinit var eventLogger: Lazy<IEventLogger>
 
     protected var isSessionLoggingEnabled = true
 
@@ -242,12 +247,12 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
                 intent.getStringExtra(OTApp.INTENT_EXTRA_FROM)
             } else null
 
-            val contentObject = Bundle()
-            contentObject.putBoolean("isFinishing", isFinishing)
-            onSessionLogContent(contentObject)
-
             val now = System.currentTimeMillis()
-            EventLoggingManager.logSession(this, now - resumedAt, now, from, contentObject)
+
+            eventLogger.get().logSession(this.localClassName, IEventLogger.SUB_SESSION_TYPE_ACTIVITY, now - resumedAt, now, from) { content ->
+                content["isFinishing"] = isFinishing
+                onSessionLogContent(content)
+            }
         }
 
         if (checkUpdateAvailable) {
@@ -272,7 +277,7 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
 
     }
 
-    protected open fun onSessionLogContent(contentObject: Bundle) {
+    protected open fun onSessionLogContent(contentObject: JsonObject) {
     }
 
     override fun attachBaseContext(newBase: Context) {

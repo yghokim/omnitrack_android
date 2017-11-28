@@ -19,10 +19,11 @@ import io.reactivex.disposables.CompositeDisposable
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTFileInvolvedAttributeHelper
-import kr.ac.snu.hcil.omnitrack.core.database.EventLoggingManager
-import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.di.Backend
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTTaskNotificationManager
 import kr.ac.snu.hcil.omnitrack.utils.VectorIconHelper
@@ -103,11 +104,14 @@ class OTTableExportService : WakefulService(TAG) {
 
     }
 
-    @Inject
+    @field:[Inject Backend]
     lateinit var realm: Realm
 
     @Inject
-    lateinit var dbManager: Lazy<RealmDatabaseManager>
+    lateinit var dbManager: Lazy<BackendDbManager>
+
+    @Inject
+    lateinit var logger: Lazy<IEventLogger>
 
     private val subscriptions = CompositeDisposable()
 
@@ -149,7 +153,7 @@ class OTTableExportService : WakefulService(TAG) {
             fun finish(successful: Boolean) {
                 println("export observable completed")
 
-                EventLoggingManager.logExport(trackerId)
+                logger.get().logExport(trackerId)
 
                 cacheDirectory?.let {
                     if (it.exists()) {

@@ -7,6 +7,7 @@ import dagger.Module
 import dagger.Provides
 import kr.ac.snu.hcil.omnitrack.services.OTBinaryUploadService
 import kr.ac.snu.hcil.omnitrack.services.OTSynchronizationService
+import kr.ac.snu.hcil.omnitrack.services.OTUsageLogUploadService
 import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckService
 import javax.inject.Qualifier
 import javax.inject.Singleton
@@ -103,6 +104,20 @@ class ScheduledJobModule {
                 .setConstraints(
                         Constraint.ON_ANY_NETWORK
                 ).build()
+    }
+
+    @Provides
+    @Singleton
+    @UsageLogger
+    fun providesUsageLogUploadJob(builder: Job.Builder): Job {
+        return builder.setService(OTUsageLogUploadService::class.java)
+                .setTag(OTUsageLogUploadService.TAG)
+                .setLifetime(Lifetime.FOREVER)
+                .setReplaceCurrent(true)
+                .setTrigger(Trigger.executionWindow(5, 30))
+                .setRetryStrategy(RetryStrategy.DEFAULT_EXPONENTIAL)
+                .addConstraint(Constraint.ON_ANY_NETWORK)
+                .build()
     }
 
 

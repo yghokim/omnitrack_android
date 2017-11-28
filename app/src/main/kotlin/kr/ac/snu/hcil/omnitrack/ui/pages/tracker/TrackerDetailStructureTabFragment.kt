@@ -21,11 +21,13 @@ import android.widget.TextView
 import android.widget.Toast
 import butterknife.bindView
 import com.afollestad.materialdialogs.MaterialDialog
+import com.github.salomonbrys.kotson.set
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.attribute_list_element.view.*
 import kotlinx.android.synthetic.main.fragment_tracker_detail_structure.*
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.attributes.AttributePresetInfo
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
@@ -134,7 +136,14 @@ class TrackerDetailStructureTabFragment : OTFragment() {
         creationSubscriptions.add(
                 nameProperty.valueChanged.observable.subscribe { result ->
                     this.viewModel.name = result.second
-                    nameProperty.showEditedOnTitle = viewModel.isNameDirty
+                    if (viewModel.isNameDirty) {
+                        nameProperty.showEditedOnTitle = true
+
+                        eventLogger.get().logTrackerChangeEvent(IEventLogger.SUB_EDIT, viewModel.trackerId) { content ->
+                            content[IEventLogger.CONTENT_KEY_PROPERTY] = "color"
+                            content[IEventLogger.CONTENT_KEY_NEWVALUE] = result.second
+                        }
+                    } else nameProperty.showEditedOnTitle = false
                 }
         )
 
@@ -143,14 +152,23 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                     println("viewModel color set to ${colorProperty.value}")
                     this.viewModel.color = colorProperty.value
                     applyColorTheme(colorProperty.value, true)
-                    colorProperty.showEditedOnTitle = viewModel.isColorDirty
+                    if (viewModel.isColorDirty) {
+                        colorProperty.showEditedOnTitle = true
+                        eventLogger.get().logTrackerChangeEvent(IEventLogger.SUB_EDIT, viewModel.trackerId) { content ->
+                            content[IEventLogger.CONTENT_KEY_PROPERTY] = "color"
+                            content[IEventLogger.CONTENT_KEY_NEWVALUE] = result.second
+                        }
+                    } else colorProperty.showEditedOnTitle = false
                 }
         )
 
         creationSubscriptions.add(
                 isOnShortcutProperty.valueChanged.observable.subscribe { result ->
                     this.viewModel.isBookmarked = result.second
-                    isOnShortcutProperty.showEditedOnTitle = viewModel.isBookmarkedDirty
+                    if (viewModel.isBookmarkedDirty) {
+                        isOnShortcutProperty.showEditedOnTitle = true
+                        eventLogger.get().logTrackerOnShortcutChangeEvent(viewModel.trackerId, result.second)
+                    } else isOnShortcutProperty.showEditedOnTitle = false
                 }
         )
 
@@ -351,7 +369,6 @@ class TrackerDetailStructureTabFragment : OTFragment() {
             private val connectionIndicatorStubProxy: ConnectionIndicatorStubProxy
 
             var preview: AAttributeInputView<out Any>? = null
-                get
                 set(value) {
                     if (field !== value) {
                         previewContainer.removeAllViews()
@@ -388,10 +405,12 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                                     currentAttributeViewModelList[adapterPosition].name
                             ),
                             R.string.msg_remove, R.string.msg_cancel, {
-                        viewModel.removeAttribute(currentAttributeViewModelList[adapterPosition])
+                        val removedViewModel = currentAttributeViewModelList[adapterPosition]
+                        viewModel.removeAttribute(removedViewModel)
                         showRemovalSnackbar()
-                        // if (removed != null) {
-                        //     EventLoggingManager.logAttributeChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_ATTRIBUTE_REMOVE, removed!!.typeId, removed!!.objectId, viewModel.trackerId ?: "null") //}
+
+                        eventLogger.get().logAttributeChangeEvent(IEventLogger.SUB_REMOVE, removedViewModel.attributeDAO.localId, viewModel.trackerId)
+
                     }, onNo = null).show()
                 } else if (view === columnNameButton) {
 
@@ -496,8 +515,10 @@ class TrackerDetailStructureTabFragment : OTFragment() {
         val newAttributeName = DefaultNameGenerator.generateName(typeInfo.name, currentAttributeViewModelList.map { it.nameObservable.value }, true)
         this.viewModel.addNewAttribute(newAttributeName, typeInfo.typeId, typeInfo.processor)
         scrollToBottomReserved = true
-
-        //EventLoggingManager.logAttributeChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_ATTRIBUTE_ADD, newAttribute.typeId, newAttribute.objectId, tracker.objectId)
+        eventLogger.get().logAttributeChangeEvent(IEventLogger.SUB_ADD, "", viewModel.trackerId) { content ->
+            content["type"] = typeInfo.typeId
+            content["name"] = newAttributeName
+        }
     }
 
 }

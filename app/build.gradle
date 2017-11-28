@@ -161,7 +161,7 @@ dependencies {
     implementation 'org.apmem.tools:layouts:1.10@aar'
     implementation 'com.beloo.widget:ChipsLayoutManager:0.3.7@aar'
     implementation 'com.github.ybq:Android-SpinKit:1.1.0'
-    implementation 'com.squareup.okhttp3:okhttp:3.9.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.9.1'
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
     implementation 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
@@ -192,6 +192,7 @@ dependencies {
     implementation 'com.larswerkman:lobsterpicker:1.0.1'
     implementation 'uk.co.chrisjenx:calligraphy:2.3.0'
     implementation 'com.github.VictorAlbertos:RxActivityResult:0.4.5-2.x'
+    compile 'com.github.salomonbrys.kotson:kotson:2.5.0'
     implementation 'org.nield:kotlin-statistics:1.0.0'
 }
 

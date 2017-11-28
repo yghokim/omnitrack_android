@@ -18,16 +18,18 @@ import android.util.Log
 import android.view.*
 import android.widget.*
 import butterknife.bindView
+import com.github.salomonbrys.kotson.set
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.SerialDisposable
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTTimeAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
-import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.net.OTLocalMediaCacheManager
 import kr.ac.snu.hcil.omnitrack.services.OTTableExportService
@@ -214,11 +216,19 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                     item.setValueOf(attributeLocalId, value?.let { TypeStringSerializationHelper.serialize(it) })
 
                     creationSubscriptions.add(
-                            item.save(*(item.itemDao.fieldValueEntries.map { it.key } - attributeLocalId).toTypedArray()).subscribe { (resultCode, itemId) ->
-                                if (resultCode != RealmDatabaseManager.SAVE_RESULT_FAIL) {
-                                    println("item was modified successfully.")
-                                }
-                            }
+                            item.save(*(item.itemDao.fieldValueEntries.map { it.key } - attributeLocalId).toTypedArray()).observeOn(AndroidSchedulers.mainThread())
+                                    .subscribe { (resultCode, itemId) ->
+                                        if (resultCode != BackendDbManager.SAVE_RESULT_FAIL) {
+                                            println("item was modified successfully.")
+                                            if (itemId != null) {
+                                                eventLogger.get().logItemEditEvent(itemId) { content ->
+                                                    content[IEventLogger.CONTENT_IS_INDIVIDUAL] = true
+                                                    content[IEventLogger.CONTENT_KEY_PROPERTY] = attributeLocalId
+                                                    content[IEventLogger.CONTENT_KEY_NEWVALUE] = value?.let { TypeStringSerializationHelper.serialize(it) }
+                                                }
+                                            }
+                                        }
+                                    }
                     )
                     itemListViewAdapter.notifyItemChanged(items.indexOf(item))
                 }

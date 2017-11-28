@@ -3,7 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core.di
 import android.content.Context
 import dagger.Module
 import dagger.Provides
-import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationClientSideAPI
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncQueueDbHelper
 import javax.inject.Qualifier
@@ -25,7 +25,7 @@ class SynchronizationModule {
 
     @Provides
     @Singleton
-    fun provideClientSideApi(backendDatabaseManager: RealmDatabaseManager): ISynchronizationClientSideAPI
+    fun provideClientSideApi(backendDatabaseManager: BackendDbManager): ISynchronizationClientSideAPI
     {
         return backendDatabaseManager
     }

@@ -11,12 +11,14 @@ import android.preference.Preference
 import android.preference.PreferenceFragment
 import android.widget.Toast
 import dagger.Lazy
+import dagger.internal.Factory
 import io.reactivex.disposables.CompositeDisposable
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
+import kr.ac.snu.hcil.omnitrack.core.di.Backend
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckService
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
@@ -80,10 +82,10 @@ class SettingsActivity : MultiButtonActionBarActivity(R.layout.activity_multibut
         protected lateinit var currentSignedInLevel: Provider<OTAuthManager.SignedInLevel>
 
         @Inject
-        protected lateinit var dbManager: Lazy<RealmDatabaseManager>
+        protected lateinit var dbManager: Lazy<BackendDbManager>
 
-        @Inject
-        protected lateinit var realmProvider: Provider<Realm>
+        @field:[Inject Backend]
+        protected lateinit var realmProvider: Factory<Realm>
 
         @Inject
         protected lateinit var versionCheckServiceController: Lazy<OTVersionCheckService.Controller>

@@ -12,7 +12,7 @@ import io.realm.annotations.Index
 import io.realm.annotations.PrimaryKey
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.calculation.expression.ExpressionEvaluator
-import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTBackgroundLoggingTriggerAction
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTReminderAction
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTTriggerAction
@@ -146,7 +146,7 @@ open class OTTriggerDAO : RealmObject() {
 
     var trackers = RealmList<OTTrackerDAO>()
 
-    val liveTrackersQuery: RealmQuery<OTTrackerDAO> get() = trackers.where().equalTo(RealmDatabaseManager.FIELD_REMOVED_BOOLEAN, false)
+    val liveTrackersQuery: RealmQuery<OTTrackerDAO> get() = trackers.where().equalTo(BackendDbManager.FIELD_REMOVED_BOOLEAN, false)
     val liveTrackerCount: Int
         get() {
             return if (this.isManaged) {
@@ -155,6 +155,8 @@ open class OTTriggerDAO : RealmObject() {
         }
 
     var synchronizedAt: Long? = null
+
+    @Index
     var removed: Boolean = false
     var userUpdatedAt: Long = System.currentTimeMillis()
     var userCreatedAt: Long = System.currentTimeMillis()

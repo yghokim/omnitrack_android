@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager
 import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration
+import dagger.internal.Factory
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.BehaviorSubject
 import io.realm.Realm
@@ -18,15 +19,15 @@ import kotlinx.android.synthetic.main.layout_attached_tracker_list_element_remov
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.di.Backend
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.TrackerPickerDialogBuilder
 import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.utils.dipRound
 import kr.ac.snu.hcil.omnitrack.utils.getActivity
 import java.util.*
 import javax.inject.Inject
-import javax.inject.Provider
 
 /**
  * Created by Young-Ho on 9/2/2016.
@@ -39,10 +40,12 @@ class TrackerAssignPanel : RecyclerView {
 
     private var realm: Realm? = null
 
+    @field:[Inject Backend]
+    lateinit var realmProvider: Factory<Realm>
+
     @Inject
-    lateinit var realmProvider: Provider<Realm>
-    @Inject
-    lateinit var dbManager: RealmDatabaseManager
+    lateinit var dbManager: BackendDbManager
+
     @Inject
     lateinit var authManager: OTAuthManager
 

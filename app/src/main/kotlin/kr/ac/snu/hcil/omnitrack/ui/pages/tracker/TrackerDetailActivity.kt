@@ -23,8 +23,11 @@ import android.widget.ImageView
 import android.widget.TextView
 import at.markushi.ui.RevealColorView
 import butterknife.bindView
+import com.github.salomonbrys.kotson.set
+import com.google.gson.JsonObject
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
@@ -78,9 +81,9 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
         }.build()
     }
 
-    override fun onSessionLogContent(contentObject: Bundle) {
+    override fun onSessionLogContent(contentObject: JsonObject) {
         super.onSessionLogContent(contentObject)
-        contentObject.putBoolean("isEditMode", isEditMode)
+        contentObject["isEditMode"] = isEditMode
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -205,6 +208,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
         //add
         if (!viewModel.isEditMode) {
             val newTrackerId = viewModel.applyChanges()
+            eventLogger.get().logTrackerChangeEvent(IEventLogger.SUB_ADD, newTrackerId)
             setResult(RESULT_OK, Intent().putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, newTrackerId))
         }
         finish()

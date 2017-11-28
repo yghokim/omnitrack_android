@@ -7,6 +7,7 @@ import android.net.Uri
 import android.preference.PreferenceManager
 import android.support.v4.app.NotificationCompat
 import android.support.v4.content.ContextCompat
+import dagger.internal.Factory
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -15,9 +16,10 @@ import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels.OTTriggerReminderEntry
+import kr.ac.snu.hcil.omnitrack.core.di.Backend
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTTrackingNotificationFactory
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTReminderAction
@@ -29,7 +31,6 @@ import org.jetbrains.anko.notificationManager
 import org.jetbrains.anko.runOnUiThread
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
-import javax.inject.Provider
 
 /**
  * Created by younghokim on 2017. 11. 13..
@@ -80,11 +81,11 @@ class OTReminderService : WakefulService(TAG) {
     private val entryIdGenerator = ConcurrentUniqueLongGenerator()
     private val notificationIdSeed = AtomicInteger()
 
-    @Inject
-    protected lateinit var realmProvider: Provider<Realm>
+    @field:[Inject Backend]
+    protected lateinit var realmProvider: Factory<Realm>
 
     @Inject
-    protected lateinit var dbManager: RealmDatabaseManager
+    protected lateinit var dbManager: BackendDbManager
 
     private val subscriptions = CompositeDisposable()
 
@@ -182,7 +183,7 @@ class OTReminderService : WakefulService(TAG) {
             val realm = realmProvider.get()
             val trigger = dbManager.getTriggerQueryWithId(triggerId, realm).findFirst()
             if (trigger != null) {
-                trigger.liveTrackersQuery.equalTo(RealmDatabaseManager.FIELD_OBJECT_ID, trackerId).findFirst()?.let {
+                trigger.liveTrackersQuery.equalTo(BackendDbManager.FIELD_OBJECT_ID, trackerId).findFirst()?.let {
                     ItemDetailActivity.makeNewItemPageIntent(it.objectId!!, this)
                 }?.let {
                     it.flags = Intent.FLAG_ACTIVITY_NEW_TASK

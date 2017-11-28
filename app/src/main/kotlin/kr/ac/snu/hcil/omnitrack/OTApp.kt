@@ -174,6 +174,10 @@ class OTApp : MultiDexApplication() {
         AuthModule(this)
     }
 
+    private val loggingModule: UsageLoggingModule by lazy {
+        UsageLoggingModule()
+    }
+
     private val backendDatabaseModule: BackendDatabaseModule by lazy {
         BackendDatabaseModule()
     }
@@ -207,6 +211,7 @@ class OTApp : MultiDexApplication() {
                 .scheduledJobModule(scheduledJobModule)
                 .triggerSystemModule(triggerSystemModule)
                 .synchronizationModule(synchronizationModule)
+                .usageLoggingModule(loggingModule)
                 .informationHelpersModule(InformationHelpersModule())
                 .scriptingModule(ScriptingModule())
                 .build()
