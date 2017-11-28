@@ -14,6 +14,7 @@ import android.widget.RadioButton
 import android.widget.Toast
 import com.afollestad.materialdialogs.MaterialDialog
 import dagger.Lazy
+import dagger.internal.Factory
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.realm.Realm
@@ -26,7 +27,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.di.Backend
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTTaskNotificationManager
-import kr.ac.snu.hcil.omnitrack.utils.VectorIconHelper
 import kr.ac.snu.hcil.omnitrack.utils.io.StringTableSheet
 import org.jetbrains.anko.notificationManager
 import java.io.File
@@ -104,8 +104,11 @@ class OTTableExportService : WakefulService(TAG) {
 
     }
 
-    @field:[Inject Backend]
     lateinit var realm: Realm
+
+    @field:[Inject Backend]
+    lateinit var realmProvider: Factory<Realm>
+
 
     @Inject
     lateinit var dbManager: Lazy<BackendDbManager>
@@ -118,6 +121,7 @@ class OTTableExportService : WakefulService(TAG) {
     override fun onCreate() {
         super.onCreate()
         (application as OTApp).applicationComponent.inject(this)
+        realm = realmProvider.get()
     }
 
     override fun onDestroy() {
@@ -182,7 +186,6 @@ class OTTableExportService : WakefulService(TAG) {
                                     .setWhen(System.currentTimeMillis())
                                     .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
                                     .setSmallIcon(R.drawable.icon_simple_check)
-                                    .setLargeIcon(VectorIconHelper.getConvertedBitmap(this, R.drawable.icon_simple_check))
                                     .addAction(0, getString(R.string.msg_open), PendingIntent.getActivity(this, notificationId,
                                             Intent.createChooser(Intent(Intent.ACTION_VIEW).putExtra(Intent.EXTRA_STREAM, exportUri).setDataAndType(exportUri, mimeType).apply { this.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION },
                                                     getString(R.string.msg_open_exported_file)), PendingIntent.FLAG_CANCEL_CURRENT))

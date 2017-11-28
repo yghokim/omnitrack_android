@@ -30,26 +30,23 @@ class OTUsageLogUploadService : JobService() {
     @Inject
     lateinit var usageLogUploadApi: Lazy<IUsageLogUploadAPI>
 
-
-    private lateinit var realm: Realm
-
     private val subscriptions = CompositeDisposable()
 
     override fun onCreate() {
         super.onCreate()
         (application as OTApp).applicationComponent.inject(this)
-        realm = realmFactory.get()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         subscriptions.clear()
-        realm.close()
     }
 
     @Synchronized
     private fun getPendingUsageLogCount(): Long {
-        return realm.where(UsageLog::class.java).equalTo("isSynchronized", false).count()
+        realmFactory.get().use { realm ->
+            return realm.where(UsageLog::class.java).equalTo("isSynchronized", false).count()
+        }
     }
 
     @Synchronized

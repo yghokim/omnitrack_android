@@ -88,12 +88,20 @@ open class OTTrackerDAO : RealmObject() {
 
     val isExternalFilesInvolved: Boolean
         get() {
-            return makeAttributesQuery(false, false).findAll().find { it.getHelper().isExternalFile(it) } != null
+            return getLiveAttributesSync().find { it.getHelper().isExternalFile(it) } != null
         }
+
+    fun getLiveAttributesSync(): List<OTAttributeDAO> {
+        return if (isManaged) {
+            makeAttributesQuery(false, false).findAll()
+        } else {
+            attributes.filter { !it.isInTrashcan && !it.isHidden }
+        }
+    }
 
     fun getRequiredPermissions(): Array<String> {
         val list = ArrayList<String>()
-        makeAttributesQuery(false, false).findAll().forEach {
+        getLiveAttributesSync().forEach {
             try {
                 val perms = it.getHelper().getRequiredPermissions(it)
                 if (perms != null) {

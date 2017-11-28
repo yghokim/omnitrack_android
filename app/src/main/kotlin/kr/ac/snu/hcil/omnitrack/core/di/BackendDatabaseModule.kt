@@ -40,13 +40,6 @@ class BackendDatabaseModule {
     @Provides
     @Singleton
     @Backend
-    fun makeBackendDbRealm(@Backend configuration: RealmConfiguration): Realm {
-        return Realm.getInstance(configuration)
-    }
-
-    @Provides
-    @Singleton
-    @Backend
     fun makeBackendDbRealmProvider(@Backend configuration: RealmConfiguration): Factory<Realm> {
         return object : Factory<Realm> {
             override fun get(): Realm {

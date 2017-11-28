@@ -278,7 +278,7 @@ class TrackerListFragment : OTFragment() {
     }
 
     private fun handleTrackerClick(tracker: OTTrackerDAO) {
-        if (tracker.makeAttributesQuery(false, false).findAll().count() == 0) {
+        if (tracker.makeAttributesQuery(false, false).count() == 0L) {
             emptyTrackerDialog
                     .onPositive { materialDialog, dialogAction ->
                         activity?.startService(OTItemLoggingService.makeLoggingIntent(act, ItemLoggingSource.Manual, true, tracker.objectId!!))

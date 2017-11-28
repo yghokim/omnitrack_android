@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui.viewmodels
 import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
 import dagger.Lazy
+import dagger.internal.Factory
 import io.reactivex.disposables.CompositeDisposable
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
@@ -15,10 +16,12 @@ import javax.inject.Inject
  */
 open class RealmViewModel(app: Application) : AndroidViewModel(app) {
     @field:[Inject Backend]
-    protected lateinit var realm: Realm
+    protected lateinit var realmProvider: Factory<Realm>
 
     @Inject
     protected lateinit var dbManager: Lazy<BackendDbManager>
+
+    protected val realm: Realm
 
     protected val subscriptions = CompositeDisposable()
 
@@ -33,6 +36,7 @@ open class RealmViewModel(app: Application) : AndroidViewModel(app) {
 
     init {
         inject(app as OTApp)
+        realm = realmProvider.get()
     }
 
     override fun onCleared() {

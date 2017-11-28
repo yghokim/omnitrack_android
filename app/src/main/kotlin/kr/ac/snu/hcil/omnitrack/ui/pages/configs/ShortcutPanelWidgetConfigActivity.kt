@@ -14,6 +14,7 @@ import android.widget.EditText
 import android.widget.RadioGroup
 import android.widget.TextView
 import butterknife.bindView
+import dagger.internal.Factory
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
@@ -44,12 +45,16 @@ class ShortcutPanelWidgetConfigActivity : AppWidgetConfigurationActivity(R.layou
     @Inject
     lateinit var dbManager: BackendDbManager
 
-    @field:[Inject Backend]
     lateinit var realm: Realm
+
+
+    @field:[Inject Backend]
+    lateinit var realmProvider: Factory<Realm>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         (application as OTApp).applicationComponent.inject(this)
+        realm = realmProvider.get()
     }
 
     override fun onCreateWithWidget(appWidgetId: Int) {

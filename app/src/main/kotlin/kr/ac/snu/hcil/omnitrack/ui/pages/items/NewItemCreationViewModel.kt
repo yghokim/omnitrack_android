@@ -1,20 +1,16 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.items
 
 import android.app.Application
-import dagger.internal.Factory
 import io.reactivex.Maybe
 import io.reactivex.Single
-import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels.OTItemBuilderDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels.OTItemBuilderFieldValueEntry
-import kr.ac.snu.hcil.omnitrack.core.di.Backend
 import kr.ac.snu.hcil.omnitrack.utils.ValueWithTimestamp
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
-import javax.inject.Inject
 
 /**
  * Created by Young-Ho on 10/9/2017.
@@ -23,8 +19,6 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
 
     private lateinit var itemBuilderDao: OTItemBuilderDAO
     private lateinit var builderWrapper: OTItemBuilderWrapperBase
-
-    @field:[Inject Backend] lateinit var realmProvider: Factory<Realm>
 
     override fun onInject(app: OTApp) {
         app.applicationComponent.inject(this)
