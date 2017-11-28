@@ -28,7 +28,9 @@ android {
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
 
-        manifestPlaceholders = [GOOGLE_MAPS_API_KEY: keystoreProperties.getProperty("GOOGLE_MAPS_API_KEY").toString()]
+        def googleMapsKey = keystoreProperties.getProperty("GOOGLE_MAPS_API_KEY").toString()
+        println(googleMapsKey)
+        manifestPlaceholders = [GOOGLE_MAPS_API_KEY: googleMapsKey.replaceAll("\"", "").trim()]
     }
 
 
