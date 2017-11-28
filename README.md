@@ -9,6 +9,8 @@ OmniTrack Android implementation
 
 - Support libray 27.0.1
 
+- Node.js and npm
+
 ### Android System Requirements
 - Minimum SDK Level : 19 (Kitkat), but we recommend Lollipop or higher.
 
@@ -33,10 +35,26 @@ OmniTrack Android implementation
   ```
   cd omnitrack_android
   ```
-3. Update git submodules
+3. Run setup to update all the submodules and visualization Javascripts.<br>
+Make sure that the bash can use the 'npm' command before running the setup.sh file.
+  
+  Mac/Linux:
   ```
-  git submodule update --init
+  sh setup.sh
   ``` 
+
+4. Generate google-services.json file from https://console.firebase.google.com
+   <br>
+   Download the file from the Firebase console and put it to /app.
+
+----
+
+## Author
+
+#### Young-Ho Kim (yhkim@hcil.snu.ac.kr)
+
+Ph.D Candidate
+Seoul National University
 
 ----
 
