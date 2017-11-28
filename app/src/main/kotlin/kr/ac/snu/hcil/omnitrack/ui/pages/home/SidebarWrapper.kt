@@ -16,6 +16,7 @@ import de.hdodenhof.circleimageview.CircleImageView
 import io.reactivex.disposables.CompositeDisposable
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
@@ -35,6 +36,9 @@ class SidebarWrapper(val view: View, val parentActivity: AppCompatActivity) : Po
 
     @Inject
     lateinit var syncManager: Lazy<OTSyncManager>
+
+    @Inject
+    lateinit var eventLogger: Lazy<IEventLogger>
 
     private val photoView: CircleImageView = view.findViewById(R.id.ui_user_photo)
     private val nameView: TextView = view.findViewById(R.id.ui_user_name)
@@ -77,6 +81,9 @@ class SidebarWrapper(val view: View, val parentActivity: AppCompatActivity) : Po
                 DialogHelper.makeNegativePhrasedYesNoDialogBuilder(parentActivity, "OmniTrack", parentActivity.getString(R.string.msg_profile_unlink_account_confirm), R.string.msg_logout, onYes = {
                     authManager.signOut()
                     OTApp.instance.unlinkUser()
+
+                    eventLogger.get().logEvent(IEventLogger.NAME_AUTH, IEventLogger.SUB_SIGNED_OUT)
+
                     if (parentActivity is OTActivity) {
                         parentActivity.goSignIn()
                     }

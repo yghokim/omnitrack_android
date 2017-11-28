@@ -6,6 +6,7 @@ import android.util.AttributeSet
 import android.view.View
 import com.github.ybq.android.spinkit.SpinKitView
 import dagger.Lazy
+import dagger.internal.Factory
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -13,15 +14,15 @@ import io.reactivex.disposables.SerialDisposable
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.datatypes.OTServerFile
+import kr.ac.snu.hcil.omnitrack.core.di.Backend
 import kr.ac.snu.hcil.omnitrack.core.net.OTLocalMediaCacheManager
 import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioRecorderView
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import org.jetbrains.anko.runOnUiThread
 import javax.inject.Inject
-import javax.inject.Provider
 
 /**
  * Created by Young-Ho Kim on 2016-07-22.
@@ -32,10 +33,10 @@ class AudioRecordInputView(context: Context, attrs: AttributeSet? = null) : AAtt
     lateinit var localCacheManager: Lazy<OTLocalMediaCacheManager>
 
     @Inject
-    lateinit var dbManager: Lazy<RealmDatabaseManager>
+    lateinit var dbManager: Lazy<BackendDbManager>
 
-    @Inject
-    lateinit var realmProvider: Provider<Realm>
+    @field:[Inject Backend]
+    lateinit var realmProvider: Factory<Realm>
 
     override val typeId: Int = VIEW_TYPE_AUDIO_RECORD
 

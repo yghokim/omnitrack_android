@@ -15,6 +15,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels.OTItemBu
 import kr.ac.snu.hcil.omnitrack.core.datatypes.OTServerFile
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
+import kr.ac.snu.hcil.omnitrack.core.di.Backend
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationClientSideAPI
 import kr.ac.snu.hcil.omnitrack.core.net.OTLocalMediaCacheManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
@@ -31,15 +32,14 @@ import javax.inject.Singleton
  * Created by younghokim on 2017. 9. 25..
  */
 @Singleton
-class RealmDatabaseManager @Inject constructor(
-        private val config: RealmConfiguration,
+class BackendDbManager @Inject constructor(
+        @Backend private val config: RealmConfiguration,
         private val authManager: OTAuthManager,
         private val shortcutPanelManager: Lazy<OTShortcutPanelManager>,
         private val serializationManager: DaoSerializationManager,
         private val triggerSystemManager: OTTriggerSystemManager,
         private val localCacheManager: OTLocalMediaCacheManager
-)
-    :ISynchronizationClientSideAPI{
+) : ISynchronizationClientSideAPI {
 
     companion object {
         const val FIELD_OBJECT_ID = "objectId"
@@ -438,7 +438,7 @@ class RealmDatabaseManager @Inject constructor(
         return max
     }
 
-    private fun <T: RealmObject> setSynchronizationFlagsImpl(daoClass: Class<T>, idTimestampPair: List<SyncResultEntry>, setFlagFunc: (T,Long)->Unit): Completable {
+    private fun <T : RealmObject> setSynchronizationFlagsImpl(daoClass: Class<T>, idTimestampPair: List<SyncResultEntry>, setFlagFunc: (T, Long) -> Unit): Completable {
         return Completable.defer {
             try {
                 makeNewRealmInstance().let {
@@ -463,8 +463,7 @@ class RealmDatabaseManager @Inject constructor(
     }
 
     override fun setTableSynchronizationFlags(type: ESyncDataType, idTimestampPair: List<SyncResultEntry>): Completable {
-        return when(type)
-        {
+        return when (type) {
             ESyncDataType.TRACKER -> setSynchronizationFlagsImpl(OTTrackerDAO::class.java, idTimestampPair, { dao, stamp -> dao.synchronizedAt = stamp })
             ESyncDataType.TRIGGER -> setSynchronizationFlagsImpl(OTTriggerDAO::class.java, idTimestampPair, { dao, stamp -> dao.synchronizedAt = stamp })
             ESyncDataType.ITEM -> setSynchronizationFlagsImpl(OTItemDAO::class.java, idTimestampPair, { dao, stamp -> dao.synchronizedAt = stamp })
@@ -472,8 +471,7 @@ class RealmDatabaseManager @Inject constructor(
     }
 
     override fun getDirtyRowsToSync(type: ESyncDataType): Single<List<String>> {
-        return when(type)
-        {
+        return when (type) {
             ESyncDataType.TRIGGER -> getDirtyRowsToSyncImpl(OTTriggerDAO::class.java, { trigger -> serializationManager.serializeTrigger(trigger, true) })
             ESyncDataType.TRACKER -> getDirtyRowsToSyncImpl(OTTrackerDAO::class.java, { tracker -> serializationManager.serializeTracker(tracker, true) })
             ESyncDataType.ITEM -> getDirtyRowsToSyncImpl(OTItemDAO::class.java, { item -> serializationManager.serializeItem(item, true) })
@@ -555,7 +553,7 @@ class RealmDatabaseManager @Inject constructor(
 
 
     private fun <T : RealmObject> getDirtyRowsToSyncImpl(tableClass: Class<T>, serialize: (T) -> String): Single<List<String>> {
-        return Single.defer{
+        return Single.defer {
             val realm = makeNewRealmInstance()
             val list = realm.where(tableClass).equalTo(FIELD_SYNCHRONIZED_AT, null as Long?).findAll().map { it -> serialize(it) }.toList()
             realm.close()

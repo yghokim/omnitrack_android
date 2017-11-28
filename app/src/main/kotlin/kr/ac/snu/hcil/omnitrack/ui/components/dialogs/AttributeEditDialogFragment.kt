@@ -14,9 +14,10 @@ import io.reactivex.disposables.Disposables
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTItemDAO
+import kr.ac.snu.hcil.omnitrack.core.di.Backend
 import kr.ac.snu.hcil.omnitrack.ui.components.common.RxBoundDialogFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.common.container.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
@@ -64,11 +65,11 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
 
     private val listeners = HashSet<Listener>()
 
-    @Inject
+    @field:[Inject Backend]
     lateinit var realm: Realm
 
     @Inject
-    lateinit var dbManager: RealmDatabaseManager
+    lateinit var dbManager: BackendDbManager
 
     private val subscriptions = CompositeDisposable()
 

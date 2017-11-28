@@ -34,6 +34,7 @@ open class OTItemDAO : RealmObject() {
 
     var userUpdatedAt: Long = System.currentTimeMillis()
 
+    @Index
     var removed: Boolean = false
 
     var loggingSource: ItemLoggingSource

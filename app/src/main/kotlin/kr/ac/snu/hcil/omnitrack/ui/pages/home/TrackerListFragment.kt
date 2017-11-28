@@ -39,6 +39,7 @@ import kotlinx.android.synthetic.main.tracker_list_element.view.*
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
+import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService
@@ -164,10 +165,12 @@ class TrackerListFragment : OTFragment() {
         trackerListAdapter.currentlyExpandedIndex = savedInstanceState?.getInt(STATE_EXPANDED_TRACKER_INDEX, -1) ?: -1
     }
 
+    override fun onInject(application: OTApp) {
+        (act.application as OTApp).applicationComponent.inject(this)
+    }
+
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-
-        (act.application as OTApp).applicationComponent.inject(this)
 
         viewModel = ViewModelProviders.of(this).get(TrackerListViewModel::class.java)
         viewModel.userId = authManager.userId
@@ -268,9 +271,6 @@ class TrackerListFragment : OTFragment() {
                     if (data.hasExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)) {
                         val newTrackerId = data.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
                         pendingNewTrackerId = newTrackerId
-                        /* TODO logging
-                        EventLoggingManager.logTrackerChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_TRACKER_ADD, newTracker)
-                        */
                     }
                 }
             }
@@ -464,8 +464,7 @@ class TrackerListFragment : OTFragment() {
                             onYes = { dialog ->
                         viewModel.removeTracker(trackerViewModel)
                         listView.invalidateItemDecorations()
-                        //TODO logging tracker removal
-                        //EventLoggingManager.logTrackerChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_TRACKER_REMOVE, tracker)
+                                eventLogger.get().logTrackerChangeEvent(IEventLogger.SUB_REMOVE, trackerViewModel.objectId)
                     }).show()
                 } else if (view === chartViewButton) {
                     startActivityOnDelay(ChartViewActivity.makeIntent(trackerId!!, this@TrackerListFragment.act))

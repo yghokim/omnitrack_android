@@ -79,7 +79,9 @@ class TrackerReorderActivity: MultiButtonActionBarActivity(R.layout.activity_mul
     }
 
     override fun onToolbarRightButtonClicked() {
-        viewModel.applyOrders()
+        if (viewModel.applyOrders()) {
+            eventLogger.get().logTrackerReorderEvent()
+        }
         finish()
     }
 

@@ -17,8 +17,9 @@ import butterknife.bindView
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.di.Backend
 import kr.ac.snu.hcil.omnitrack.ui.activities.AppWidgetConfigurationActivity
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.WritablePair
@@ -41,9 +42,9 @@ class ShortcutPanelWidgetConfigActivity : AppWidgetConfigurationActivity(R.layou
     private var trackerSelectionAdapter: TrackerSelectionAdapter = TrackerSelectionAdapter()
 
     @Inject
-    lateinit var dbManager: RealmDatabaseManager
+    lateinit var dbManager: BackendDbManager
 
-    @Inject
+    @field:[Inject Backend]
     lateinit var realm: Realm
 
     override fun onCreate(savedInstanceState: Bundle?) {

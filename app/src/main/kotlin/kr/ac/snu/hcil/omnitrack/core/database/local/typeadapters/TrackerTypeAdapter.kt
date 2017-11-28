@@ -6,7 +6,7 @@ import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import dagger.Lazy
 import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.utils.getBooleanCompat
@@ -28,17 +28,17 @@ class TrackerTypeAdapter(isServerMode: Boolean, val attributeTypeAdapter: Lazy<S
         {
             when(reader.nextName())
             {
-                RealmDatabaseManager.FIELD_OBJECT_ID -> dao.objectId = reader.nextString()
-                RealmDatabaseManager.FIELD_REMOVED_BOOLEAN -> dao.removed = reader.nextBoolean()
-                if (isServerMode) "user" else RealmDatabaseManager.FIELD_USER_ID -> dao.userId = reader.nextString()
-                RealmDatabaseManager.FIELD_USER_CREATED_AT -> dao.userCreatedAt = reader.nextLong()
-                RealmDatabaseManager.FIELD_SYNCHRONIZED_AT -> dao.synchronizedAt = reader.nextLong()
-                RealmDatabaseManager.FIELD_UPDATED_AT_LONG -> dao.userUpdatedAt = reader.nextLong()
-                RealmDatabaseManager.FIELD_POSITION -> dao.position = reader.nextInt()
-                RealmDatabaseManager.FIELD_NAME -> dao.name = reader.nextString()
+                BackendDbManager.FIELD_OBJECT_ID -> dao.objectId = reader.nextString()
+                BackendDbManager.FIELD_REMOVED_BOOLEAN -> dao.removed = reader.nextBoolean()
+                if (isServerMode) "user" else BackendDbManager.FIELD_USER_ID -> dao.userId = reader.nextString()
+                BackendDbManager.FIELD_USER_CREATED_AT -> dao.userCreatedAt = reader.nextLong()
+                BackendDbManager.FIELD_SYNCHRONIZED_AT -> dao.synchronizedAt = reader.nextLong()
+                BackendDbManager.FIELD_UPDATED_AT_LONG -> dao.userUpdatedAt = reader.nextLong()
+                BackendDbManager.FIELD_POSITION -> dao.position = reader.nextInt()
+                BackendDbManager.FIELD_NAME -> dao.name = reader.nextString()
                 "color" -> dao.color = reader.nextInt()
                 "isBookmarked" -> dao.isBookmarked = reader.nextBoolean()
-                RealmDatabaseManager.FIELD_LOCKED_PROPERTIES_SERIALIZED -> dao.serializedLockedPropertyInfo = gson.get().fromJson<JsonObject>(reader, JsonObject::class.java).toString()
+                BackendDbManager.FIELD_LOCKED_PROPERTIES_SERIALIZED -> dao.serializedLockedPropertyInfo = gson.get().fromJson<JsonObject>(reader, JsonObject::class.java).toString()
                 "flags" -> dao.serializedCreationFlags = gson.get().fromJson<JsonObject>(reader, JsonObject::class.java).toString()
                 "attributes" -> {
                     reader.beginArray()
@@ -65,20 +65,20 @@ class TrackerTypeAdapter(isServerMode: Boolean, val attributeTypeAdapter: Lazy<S
     override fun write(writer: JsonWriter, value: OTTrackerDAO, isServerMode: Boolean) {
         writer.beginObject()
 
-        writer.name(RealmDatabaseManager.FIELD_OBJECT_ID).value(value.objectId)
-        writer.name(RealmDatabaseManager.FIELD_REMOVED_BOOLEAN).value(value.removed)
-        writer.name(if (isServerMode) "user" else RealmDatabaseManager.FIELD_USER_ID).value(value.userId)
-        writer.name(RealmDatabaseManager.FIELD_USER_CREATED_AT).value(value.userCreatedAt)
-        writer.name(RealmDatabaseManager.FIELD_UPDATED_AT_LONG).value(value.userUpdatedAt)
+        writer.name(BackendDbManager.FIELD_OBJECT_ID).value(value.objectId)
+        writer.name(BackendDbManager.FIELD_REMOVED_BOOLEAN).value(value.removed)
+        writer.name(if (isServerMode) "user" else BackendDbManager.FIELD_USER_ID).value(value.userId)
+        writer.name(BackendDbManager.FIELD_USER_CREATED_AT).value(value.userCreatedAt)
+        writer.name(BackendDbManager.FIELD_UPDATED_AT_LONG).value(value.userUpdatedAt)
 
         if (!isServerMode)
-            writer.name(RealmDatabaseManager.FIELD_SYNCHRONIZED_AT).value(value.synchronizedAt)
+            writer.name(BackendDbManager.FIELD_SYNCHRONIZED_AT).value(value.synchronizedAt)
 
-        writer.name(RealmDatabaseManager.FIELD_POSITION).value(value.position)
-        writer.name(RealmDatabaseManager.FIELD_NAME).value(value.name)
+        writer.name(BackendDbManager.FIELD_POSITION).value(value.position)
+        writer.name(BackendDbManager.FIELD_NAME).value(value.name)
         writer.name("color").value(value.color)
         writer.name("isBookmarked").value(value.isBookmarked)
-        writer.name(RealmDatabaseManager.FIELD_LOCKED_PROPERTIES_SERIALIZED).jsonValue(value.serializedLockedPropertyInfo)
+        writer.name(BackendDbManager.FIELD_LOCKED_PROPERTIES_SERIALIZED).jsonValue(value.serializedLockedPropertyInfo)
         writer.name("flags").jsonValue(value.serializedCreationFlags)
         writer.name("attributes").beginArray()
         for (attribute in value.attributes)
@@ -95,13 +95,13 @@ class TrackerTypeAdapter(isServerMode: Boolean, val attributeTypeAdapter: Lazy<S
             key->
             when(key)
             {
-                RealmDatabaseManager.FIELD_REMOVED_BOOLEAN -> applyTo.removed = json.getBooleanCompat(key) ?: false
-                "user", RealmDatabaseManager.FIELD_USER_ID -> applyTo.userId = json.getStringCompat(key)
-                RealmDatabaseManager.FIELD_USER_CREATED_AT -> applyTo.userCreatedAt = json.getLongCompat(key) ?: 0
-                RealmDatabaseManager.FIELD_UPDATED_AT_LONG -> applyTo.userUpdatedAt = json.getLongCompat(key) ?: 0
-                RealmDatabaseManager.FIELD_POSITION -> applyTo.position = json.getIntCompat(key) ?: 0
-                RealmDatabaseManager.FIELD_SYNCHRONIZED_AT -> applyTo.synchronizedAt = json.getLongCompat(key)
-                RealmDatabaseManager.FIELD_NAME -> applyTo.name = json.getStringCompat(key) ?: ""
+                BackendDbManager.FIELD_REMOVED_BOOLEAN -> applyTo.removed = json.getBooleanCompat(key) ?: false
+                "user", BackendDbManager.FIELD_USER_ID -> applyTo.userId = json.getStringCompat(key)
+                BackendDbManager.FIELD_USER_CREATED_AT -> applyTo.userCreatedAt = json.getLongCompat(key) ?: 0
+                BackendDbManager.FIELD_UPDATED_AT_LONG -> applyTo.userUpdatedAt = json.getLongCompat(key) ?: 0
+                BackendDbManager.FIELD_POSITION -> applyTo.position = json.getIntCompat(key) ?: 0
+                BackendDbManager.FIELD_SYNCHRONIZED_AT -> applyTo.synchronizedAt = json.getLongCompat(key)
+                BackendDbManager.FIELD_NAME -> applyTo.name = json.getStringCompat(key) ?: ""
                 "color" -> applyTo.color = json.getIntCompat(key) ?: OTApp.instance.colorPalette[0]
                 "isBookmarked" -> applyTo.isBookmarked = json.getBooleanCompat(key) ?: false
                 "lockedProperties"->applyTo.serializedLockedPropertyInfo = json[key]?.toString() ?: "null"

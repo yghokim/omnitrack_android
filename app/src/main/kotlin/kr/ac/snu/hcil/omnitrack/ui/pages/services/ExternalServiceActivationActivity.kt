@@ -164,6 +164,7 @@ class ExternalServiceActivationActivity : OTActivity(false, false) {
             creationSubscriptions.add(
                     viewModel.activateService().subscribe { activated: Boolean ->
                         if (activated) {
+                            eventLogger.get().logServiceActivationChangeEvent(viewModel.attachedService?.identifier ?: "", true)
                             setResult(RESULT_OK)
                             finish()
                         }

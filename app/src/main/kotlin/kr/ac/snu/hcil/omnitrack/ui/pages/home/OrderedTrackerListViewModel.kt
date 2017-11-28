@@ -8,7 +8,7 @@ import io.realm.OrderedRealmCollectionChangeListener
 import io.realm.RealmResults
 import io.realm.Sort
 import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
@@ -52,7 +52,7 @@ class OrderedTrackerListViewModel(app: Application) : UserAttachedViewModel(app)
     override fun onUserAttached(newUserId: String) {
         super.onUserAttached(newUserId)
         trackerQueryResults = dbManager.get().makeTrackersOfUserQuery(newUserId, realm)
-                .findAllSortedAsync(arrayOf("position", RealmDatabaseManager.FIELD_USER_CREATED_AT), arrayOf(Sort.ASCENDING, Sort.DESCENDING))
+                .findAllSortedAsync(arrayOf("position", BackendDbManager.FIELD_USER_CREATED_AT), arrayOf(Sort.ASCENDING, Sort.DESCENDING))
 
         trackerQueryResults?.addChangeListener(this)
     }
@@ -90,7 +90,7 @@ class OrderedTrackerListViewModel(app: Application) : UserAttachedViewModel(app)
         orderedTrackerViewModels.onNext(currentOrderedTrackerViewModels)
     }
 
-    fun applyOrders(){
+    fun applyOrders(): Boolean {
         if (isDirty) {
             realm.executeTransaction {
                 currentOrderedTrackerViewModels.forEachIndexed { index, viewModel ->
@@ -101,8 +101,8 @@ class OrderedTrackerListViewModel(app: Application) : UserAttachedViewModel(app)
                 }
             }
             syncManager.registerSyncQueue(ESyncDataType.TRACKER, SyncDirection.UPLOAD)
-        }
-
+            return true
+        } else return false
     }
 
     class OrderedTrackerViewModel(internal val dao: OTTrackerDAO) : IReadonlyObjectId {

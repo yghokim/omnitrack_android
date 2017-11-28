@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.core.net
 
 import com.google.gson.JsonObject
 import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kr.ac.snu.hcil.omnitrack.core.OTUserRolePOJO
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
@@ -12,7 +13,7 @@ import retrofit2.Retrofit
 /**
  * Created by younghokim on 2017. 9. 28..
  */
-class OTOfficialServerApiController(retrofit: Retrofit) : ISynchronizationServerSideAPI, IUserReportServerAPI {
+class OTOfficialServerApiController(retrofit: Retrofit) : ISynchronizationServerSideAPI, IUserReportServerAPI, IUsageLogUploadAPI {
 
     private val service: OTOfficialServerService by lazy {
         retrofit.create(OTOfficialServerService::class.java)
@@ -46,5 +47,12 @@ class OTOfficialServerApiController(retrofit: Retrofit) : ISynchronizationServer
     override fun postDirtyRows(vararg batch: ISynchronizationServerSideAPI.DirtyRowBatchParameter): Single<Map<ESyncDataType, Array<SyncResultEntry>>> {
         return service.postLocalDataChanges(batch).subscribeOn(Schedulers.io())
     }
+
+    override fun uploadLocalUsageLogs(serializedLogs: List<String>): Single<List<Long>> {
+        return service.uploadUsageLogs(serializedLogs)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
 
 }

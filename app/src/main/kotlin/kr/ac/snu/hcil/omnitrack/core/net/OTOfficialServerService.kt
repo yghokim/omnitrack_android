@@ -30,4 +30,7 @@ interface OTOfficialServerService {
 
     @POST("api/batch/changes")
     fun postLocalDataChanges(@Body parameter: Array<out ISynchronizationServerSideAPI.DirtyRowBatchParameter>): Single<Map<ESyncDataType, Array<SyncResultEntry>>>
+
+    @POST("api/usage_logs/batch/insert")
+    fun uploadUsageLogs(@Body logs: List<String>): Single<List<Long>>
 }

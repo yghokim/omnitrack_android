@@ -1,6 +1,5 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.services
 
-import android.content.res.ColorStateList
 import android.graphics.PorterDuff
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
@@ -150,6 +149,7 @@ class ServiceListFragment : OTFragment() {
                     when (service.state) {
                         OTExternalService.ServiceState.ACTIVATED -> {
                             service.deactivate()
+                            eventLogger.get().logServiceActivationChangeEvent(service.identifier, false)
                         }
                         OTExternalService.ServiceState.ACTIVATING -> {
 
@@ -167,6 +167,8 @@ class ServiceListFragment : OTFragment() {
                                 creationSubscriptions.add(
                                         service.startActivationActivityAsync(act).subscribe({
                                             success ->
+                                            if (success)
+                                                eventLogger.get().logServiceActivationChangeEvent(service.identifier, true)
                                         }, { })
                                 )
                                 //}

@@ -5,6 +5,8 @@ import com.udojava.evalex.Expression
 import dagger.Component
 import dagger.Lazy
 import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
+import kr.ac.snu.hcil.omnitrack.core.analytics.OTUsageLoggingManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTAudioRecordAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTFileInvolvedAttributeHelper
@@ -18,9 +20,11 @@ import kr.ac.snu.hcil.omnitrack.receivers.RebootReceiver
 import kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService
 import kr.ac.snu.hcil.omnitrack.services.OTSynchronizationService
 import kr.ac.snu.hcil.omnitrack.services.OTTableExportService
+import kr.ac.snu.hcil.omnitrack.services.OTUsageLogUploadService
 import kr.ac.snu.hcil.omnitrack.services.messaging.OTFirebaseInstanceIdService
 import kr.ac.snu.hcil.omnitrack.services.messaging.OTFirebaseMessagingService
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
+import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.AttributeEditDialogFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AudioRecordInputView
 import kr.ac.snu.hcil.omnitrack.ui.pages.SendReportActivity
@@ -57,7 +61,8 @@ import javax.inject.Singleton
         ScheduledJobModule::class,
         SynchronizationModule::class,
         TriggerSystemModule::class,
-        ScriptingModule::class
+        ScriptingModule::class,
+        UsageLoggingModule::class
 ))
 interface ApplicationComponent {
 
@@ -67,10 +72,14 @@ interface ApplicationComponent {
 
     fun getSupportedScriptFunctions(): Array<Expression.LazyFunction>
 
+    fun getLoggingManager(): Lazy<IEventLogger>
+
     fun inject(application: OTApp)
     fun inject(realmViewModel: RealmViewModel)
 
     fun inject(triggerViewModel: ATriggerListViewModel)
+
+    fun inject(loggingManager: OTUsageLoggingManager)
 
     fun inject(service: OTShortcutPanelWidgetService)
     fun inject(service: OTShortcutPanelWidgetUpdateService)
@@ -78,6 +87,8 @@ interface ApplicationComponent {
     fun inject(activity: OTActivity)
 
     fun inject(activity: SignInActivity)
+
+    fun inject(fragment: OTFragment)
 
     fun inject(fragment: AttributeEditDialogFragment)
 
@@ -137,4 +148,5 @@ interface ApplicationComponent {
     fun inject(expression: RealmLazyFunction)
 
     fun inject(service: OTFirebaseMessagingService)
+    fun inject(service: OTUsageLogUploadService)
 }

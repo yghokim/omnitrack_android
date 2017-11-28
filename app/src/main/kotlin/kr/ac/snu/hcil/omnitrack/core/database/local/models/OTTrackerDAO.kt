@@ -13,7 +13,7 @@ import io.realm.annotations.PrimaryKey
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
-import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels.OTStringStringEntryDAO
 import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
@@ -48,6 +48,7 @@ open class OTTrackerDAO : RealmObject() {
 
     var name: String = ""
 
+    @Index
     var position: Int = 0
 
     var color: Int = 0
@@ -58,11 +59,11 @@ open class OTTrackerDAO : RealmObject() {
     fun makeAttributesQuery(inTrashcan:Boolean?=false, hidden: Boolean? = false): RealmQuery<OTAttributeDAO> {
         var query = attributes.where()
         if (inTrashcan != null) {
-            query = query.equalTo(RealmDatabaseManager.FIELD_IS_IN_TRASHCAN, inTrashcan)
+            query = query.equalTo(BackendDbManager.FIELD_IS_IN_TRASHCAN, inTrashcan)
         }
 
         if (hidden != null) {
-            query = query.equalTo(RealmDatabaseManager.FIELD_IS_HIDDEN, inTrashcan)
+            query = query.equalTo(BackendDbManager.FIELD_IS_HIDDEN, inTrashcan)
         }
 
         return query
@@ -76,12 +77,14 @@ open class OTTrackerDAO : RealmObject() {
     var userCreatedAt: Long = System.currentTimeMillis()
     var synchronizedAt: Long? = null // store server time of when synchronized perfectly.
     var userUpdatedAt: Long = System.currentTimeMillis()
+
+    @Index
     var removed: Boolean = false
 
     @LinkingObjects("trackers")
     val triggers: RealmResults<OTTriggerDAO>? = null
 
-    val liveTriggersQuery: RealmQuery<OTTriggerDAO>? get() = triggers?.where()?.equalTo(RealmDatabaseManager.FIELD_REMOVED_BOOLEAN, false)
+    val liveTriggersQuery: RealmQuery<OTTriggerDAO>? get() = triggers?.where()?.equalTo(BackendDbManager.FIELD_REMOVED_BOOLEAN, false)
 
     val isExternalFilesInvolved: Boolean
         get() {
@@ -124,6 +127,7 @@ open class OTAttributeDAO : RealmObject() {
     @PrimaryKey
     var objectId: String? = null
 
+    @Index
     var localId: String = ""
 
     @Index
@@ -131,7 +135,9 @@ open class OTAttributeDAO : RealmObject() {
 
     var name: String = ""
 
+    @Index
     var isHidden: Boolean = false
+    @Index
     var isInTrashcan: Boolean = false
 
     var position: Int = 0

@@ -5,7 +5,7 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.calculation.expression.ExpressionConstants
 import kr.ac.snu.hcil.omnitrack.core.calculation.expression.ExpressionConstants.Companion.EXPRESSION_ZERO
 import kr.ac.snu.hcil.omnitrack.core.calculation.expression.LongLazyNumber
-import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 
@@ -21,7 +21,7 @@ class LatestItemTimestampExpression(app: OTApp) : RealmLazyFunction(app, Express
 
             val overrideAttributeLocalId = lazyParams?.get(1)?.string
             if (overrideAttributeLocalId == null) {
-                return LongLazyNumber(queryBase.max(RealmDatabaseManager.FIELD_TIMESTAMP_LONG)?.toLong() ?: 0)
+                return LongLazyNumber(queryBase.max(BackendDbManager.FIELD_TIMESTAMP_LONG)?.toLong() ?: 0)
             } else {
                 val latestItem = queryBase.findAll().maxBy {
                     val value = it.getValueOf(overrideAttributeLocalId)

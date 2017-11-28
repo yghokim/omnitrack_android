@@ -7,7 +7,7 @@ import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import dagger.Lazy
 import io.realm.Realm
-import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerSystemManager
@@ -35,10 +35,10 @@ class TriggerTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>, val realmP
                 continue
             }
             when (nextName) {
-                RealmDatabaseManager.FIELD_OBJECT_ID -> dao.objectId = reader.nextString()
-                RealmDatabaseManager.FIELD_USER_CREATED_AT -> dao.userCreatedAt = reader.nextLong()
-                RealmDatabaseManager.FIELD_UPDATED_AT_LONG -> dao.userUpdatedAt = reader.nextLong()
-                RealmDatabaseManager.FIELD_REMOVED_BOOLEAN -> dao.removed = reader.nextBoolean()
+                BackendDbManager.FIELD_OBJECT_ID -> dao.objectId = reader.nextString()
+                BackendDbManager.FIELD_USER_CREATED_AT -> dao.userCreatedAt = reader.nextLong()
+                BackendDbManager.FIELD_UPDATED_AT_LONG -> dao.userUpdatedAt = reader.nextLong()
+                BackendDbManager.FIELD_REMOVED_BOOLEAN -> dao.removed = reader.nextBoolean()
                 "alias" -> dao.alias = reader.nextString()
                 "position" -> dao.position = reader.nextInt()
                 "userId", "user" -> dao.userId = reader.nextString()
@@ -69,8 +69,8 @@ class TriggerTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>, val realmP
         if (trackerIds.isNotEmpty()) {
             val realm = realmProvider.get()
             dao.trackers.addAll(realm.copyFromRealm(realm.where(OTTrackerDAO::class.java)
-                    .equalTo(RealmDatabaseManager.FIELD_REMOVED_BOOLEAN, false)
-                    .`in`(RealmDatabaseManager.FIELD_OBJECT_ID, trackerIds.toTypedArray())
+                    .equalTo(BackendDbManager.FIELD_REMOVED_BOOLEAN, false)
+                    .`in`(BackendDbManager.FIELD_OBJECT_ID, trackerIds.toTypedArray())
                     .findAll()))
             realm.close()
         }
@@ -80,9 +80,9 @@ class TriggerTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>, val realmP
 
     override fun write(writer: JsonWriter, value: OTTriggerDAO, isServerMode: Boolean) {
         writer.beginObject()
-        writer.name(RealmDatabaseManager.FIELD_OBJECT_ID).value(value.objectId)
+        writer.name(BackendDbManager.FIELD_OBJECT_ID).value(value.objectId)
         writer.name("alias").value(value.alias)
-        writer.name(RealmDatabaseManager.FIELD_POSITION).value(value.position)
+        writer.name(BackendDbManager.FIELD_POSITION).value(value.position)
         writer.name(if (isServerMode) "user" else "userId").value(value.userId)
         writer.name("isOn").value(value.isOn)
         writer.name("conditionType").value(value.conditionType)
@@ -91,15 +91,15 @@ class TriggerTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>, val realmP
         writer.name("action").jsonValue(value.serializedAction)
         writer.name("script").value(value.additionalScript)
         writer.name("checkScript").value(value.checkScript)
-        writer.name(RealmDatabaseManager.FIELD_LOCKED_PROPERTIES_SERIALIZED).jsonValue(value.serializedLockedPropertyInfo)
+        writer.name(BackendDbManager.FIELD_LOCKED_PROPERTIES_SERIALIZED).jsonValue(value.serializedLockedPropertyInfo)
 
         if (!isServerMode)
-            writer.name(RealmDatabaseManager.FIELD_SYNCHRONIZED_AT).value(value.synchronizedAt)
+            writer.name(BackendDbManager.FIELD_SYNCHRONIZED_AT).value(value.synchronizedAt)
 
 
-        writer.name(RealmDatabaseManager.FIELD_REMOVED_BOOLEAN).value(value.removed)
-        writer.name(RealmDatabaseManager.FIELD_UPDATED_AT_LONG).value(value.userUpdatedAt)
-        writer.name(RealmDatabaseManager.FIELD_USER_CREATED_AT).value(value.userCreatedAt)
+        writer.name(BackendDbManager.FIELD_REMOVED_BOOLEAN).value(value.removed)
+        writer.name(BackendDbManager.FIELD_UPDATED_AT_LONG).value(value.userUpdatedAt)
+        writer.name(BackendDbManager.FIELD_USER_CREATED_AT).value(value.userCreatedAt)
 
         writer.name("trackers")
         writer.beginArray()
@@ -119,20 +119,20 @@ class TriggerTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>, val realmP
             key->
             when(key)
             {
-                RealmDatabaseManager.FIELD_REMOVED_BOOLEAN-> {
+                BackendDbManager.FIELD_REMOVED_BOOLEAN -> {
                     val value = json.getBooleanCompat(key) ?: false
                     if (applyTo.removed != value) {
                         applyTo.removed = value
                         removedFlagChanged = true
                     }
                 }
-                "user", RealmDatabaseManager.FIELD_USER_ID -> applyTo.userId = json.getStringCompat(key)
-                RealmDatabaseManager.FIELD_USER_CREATED_AT -> applyTo.userCreatedAt = json.getLongCompat(key) ?: 0
-                RealmDatabaseManager.FIELD_UPDATED_AT_LONG -> applyTo.userUpdatedAt = json.getLongCompat(key) ?: 0
-                RealmDatabaseManager.FIELD_POSITION -> applyTo.position = json.getIntCompat(key) ?: 0
-                RealmDatabaseManager.FIELD_SYNCHRONIZED_AT -> applyTo.synchronizedAt = json.getLongCompat(key)
+                "user", BackendDbManager.FIELD_USER_ID -> applyTo.userId = json.getStringCompat(key)
+                BackendDbManager.FIELD_USER_CREATED_AT -> applyTo.userCreatedAt = json.getLongCompat(key) ?: 0
+                BackendDbManager.FIELD_UPDATED_AT_LONG -> applyTo.userUpdatedAt = json.getLongCompat(key) ?: 0
+                BackendDbManager.FIELD_POSITION -> applyTo.position = json.getIntCompat(key) ?: 0
+                BackendDbManager.FIELD_SYNCHRONIZED_AT -> applyTo.synchronizedAt = json.getLongCompat(key)
                 "alias" -> applyTo.alias = json.getStringCompat(key) ?: ""
-                RealmDatabaseManager.FIELD_LOCKED_PROPERTIES_SERIALIZED->applyTo.serializedLockedPropertyInfo = json[key]?.toString() ?: "null"
+                BackendDbManager.FIELD_LOCKED_PROPERTIES_SERIALIZED -> applyTo.serializedLockedPropertyInfo = json[key]?.toString() ?: "null"
                 "isOn" ->{
                     val switchValue = json.getBooleanCompat(key) ?: false
                     if(switchValue != applyTo.isOn)
@@ -148,8 +148,8 @@ class TriggerTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>, val realmP
                     {
                         val realm = realmProvider.get()
                         applyTo.trackers.addAll(realm.copyFromRealm(realm.where(OTTrackerDAO::class.java)
-                                .equalTo(RealmDatabaseManager.FIELD_REMOVED_BOOLEAN, false)
-                                .`in`(RealmDatabaseManager.FIELD_OBJECT_ID, jsonList.map { it.asString }.toTypedArray())
+                                .equalTo(BackendDbManager.FIELD_REMOVED_BOOLEAN, false)
+                                .`in`(BackendDbManager.FIELD_OBJECT_ID, jsonList.map { it.asString }.toTypedArray())
                                 .findAll()))
                         realm.close()
                     }

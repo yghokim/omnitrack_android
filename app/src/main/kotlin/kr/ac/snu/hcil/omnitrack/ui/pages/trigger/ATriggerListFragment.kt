@@ -24,6 +24,7 @@ import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager
 import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration
+import com.github.salomonbrys.kotson.set
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -33,7 +34,7 @@ import kotlinx.android.synthetic.main.layout_attached_tracker_list.view.*
 import kotlinx.android.synthetic.main.trigger_list_element.view.*
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.EventLoggingManager
+import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerInformationHelper
@@ -275,9 +276,14 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
                         ?.let {
                             subscriptions.add(
                                     it.observeOn(AndroidSchedulers.mainThread()).subscribe({
-                                        val params = EventLoggingManager.makeTriggerChangeEventParams(attachedViewModel?.objectId ?: "")
-                                        attachedViewModel?.triggerSwitch?.value?.let { params.putBoolean("switch", it) }
-                                        EventLoggingManager.logEvent(EventLoggingManager.EVENT_NAME_CHANGE_TRIGGER_SWITCH, params)
+                                        eventLogger.get().logTriggerChangeEvent(
+                                                IEventLogger.SUB_EDIT, attachedViewModel?.objectId
+                                        ) { content ->
+                                            content[IEventLogger.CONTENT_KEY_PROPERTY] = "switch"
+                                            attachedViewModel?.triggerSwitch?.value?.let {
+                                                content[IEventLogger.CONTENT_KEY_NEWVALUE] = it
+                                            }
+                                        }
                                         println("trigger switch was successfully changed.")
                                     }, { ex ->
                                         println("toggle trigger switch failed: ${ex.message}")
@@ -297,8 +303,9 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
                         R.string.msg_remove, R.string.msg_cancel, {
                     attachedViewModel?.objectId?.let {
                         viewModel.removeTrigger(it)
-                        EventLoggingManager.logTriggerChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_TRIGGER_REMOVE, it)
-
+                        eventLogger.get().logTriggerChangeEvent(
+                                IEventLogger.SUB_REMOVE, attachedViewModel?.objectId
+                        )
                     }
                 }, onNo = null).show()
 

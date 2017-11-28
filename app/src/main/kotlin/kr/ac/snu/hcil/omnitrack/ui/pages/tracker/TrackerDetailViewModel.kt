@@ -14,7 +14,7 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
-import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTriggerDAO
@@ -279,7 +279,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
                 if (lastRemovedAttributeId != null) {
                     val trackerId = trackerId
                     return@defer realm.executeTransactionAsObservable { realm ->
-                        val removedItem = realm.where(OTAttributeDAO::class.java).equalTo(RealmDatabaseManager.FIELD_OBJECT_ID, lastRemovedAttributeId!!).findFirst()
+                        val removedItem = realm.where(OTAttributeDAO::class.java).equalTo(BackendDbManager.FIELD_OBJECT_ID, lastRemovedAttributeId!!).findFirst()
                         if (removedItem != null) {
                             removedItem.isInTrashcan = false
 

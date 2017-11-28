@@ -9,7 +9,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels.LocalMediaCacheEntry
 import kr.ac.snu.hcil.omnitrack.core.datatypes.OTServerFile
 import kr.ac.snu.hcil.omnitrack.utils.io.FileHelper
@@ -33,7 +33,7 @@ class OTLocalMediaCacheManager(val context: Context, val authManager: Lazy<OTAut
 
     private fun findSynchronizedCacheEntries(trackerId: String, realm: Realm): List<LocalMediaCacheEntry> {
         return realm.where(LocalMediaCacheEntry::class.java)
-                .isNotNull(RealmDatabaseManager.FIELD_SYNCHRONIZED_AT)
+                .isNotNull(BackendDbManager.FIELD_SYNCHRONIZED_AT)
                 .and()
                 .and()
                 .not()
@@ -171,7 +171,7 @@ class OTLocalMediaCacheManager(val context: Context, val authManager: Lazy<OTAut
     fun registerSynchronization() {
         binaryStorageController.get().realmProvider.get().use { realm ->
             realm.where(LocalMediaCacheEntry::class.java)
-                    .isNull(RealmDatabaseManager.FIELD_SYNCHRONIZED_AT)
+                    .isNull(BackendDbManager.FIELD_SYNCHRONIZED_AT)
                     .not()
                     .beginGroup()
                     .beginsWith("serverPath", "temporary")

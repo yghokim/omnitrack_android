@@ -19,13 +19,17 @@ import android.widget.Toast
 import butterknife.bindView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.airbnb.lottie.LottieAnimationView
+import com.github.salomonbrys.kotson.set
+import com.google.gson.JsonObject
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
+import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.services.OTReminderService
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LoadingIndicatorBar
@@ -104,11 +108,11 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
         }
     }
 
-    override fun onSessionLogContent(contentObject: Bundle) {
+    override fun onSessionLogContent(contentObject: JsonObject) {
         super.onSessionLogContent(contentObject)
-        contentObject.putString("mode", mode.name)
+        contentObject["mode"] = mode.name
         if (isFinishing) {
-            contentObject.putBoolean("item_saved", itemSaved)
+            contentObject["item_saved"] = itemSaved
         }
     }
 
@@ -331,7 +335,21 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
                     }
                 }.subscribe({ result ->
                     viewModel.clearHistory()
-                    startService(OTReminderService.makeUserLoggedIntent(this, viewModel.trackerDao?.objectId!!, System.currentTimeMillis()))
+                    if (viewModel.mode == ItemEditionViewModelBase.ItemMode.New) {
+                        startService(OTReminderService.makeUserLoggedIntent(this, viewModel.trackerDao?.objectId!!, System.currentTimeMillis()))
+                    }
+
+                    when (viewModel.mode) {
+                        ItemEditionViewModelBase.ItemMode.New -> {
+                            itemSaved = true
+                            eventLogger.get().logItemAddedEvent(result, ItemLoggingSource.Manual)
+                        }
+                        ItemEditionViewModelBase.ItemMode.Edit ->
+                            eventLogger.get().logItemEditEvent(result) { content ->
+                                content[IEventLogger.CONTENT_IS_INDIVIDUAL] = false
+                            }
+                    }
+
                     setResult(RESULT_OK, Intent().putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM, result))
                     finish()
                 }, { ex ->
