@@ -24,12 +24,12 @@
             android:drawablePadding="4dp"
             android:ellipsize="marquee"
             android:gravity="center_vertical"
-            android:singleLine="true"
             android:marqueeRepeatLimit="marquee_forever"
             android:paddingBottom="6dp"
             android:paddingEnd="8dp"
             android:paddingStart="8dp"
             android:paddingTop="6dp"
+            android:singleLine="true"
             android:textColor="@color/textColorMid"
             app:drawableStartCompat="@drawable/map_dark"
             app:drawableTint="@color/textColorLight" />
@@ -76,7 +76,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-        <RelativeLayout
+        <android.support.constraint.ConstraintLayout
             android:id="@+id/ui_condition_control_panel_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -86,11 +86,20 @@
             android:paddingTop="8dp">
 
             <android.support.v7.widget.AppCompatImageButton
+                android:id="@+id/ui_button_my_location"
+                style="@style/mapViewOverlayButton"
+                android:padding="10dp"
+                android:tint="@color/buttonIconColorDark"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/icon_my_location" />
+
+            <android.support.v7.widget.AppCompatImageButton
                 android:id="@+id/ui_button_zoom_in"
                 style="@style/mapViewOverlayButton"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentTop="true"
                 android:tint="@color/buttonIconColorDark"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/plus" />
 
             <android.support.v7.widget.AppCompatImageButton
@@ -99,16 +108,17 @@
                 android:layout_alignEnd="@id/ui_button_zoom_in"
                 android:layout_below="@+id/ui_button_zoom_in"
                 android:tint="@color/buttonIconColorDark"
+                app:layout_constraintLeft_toLeftOf="@+id/ui_button_zoom_in"
+                app:layout_constraintTop_toBottomOf="@+id/ui_button_zoom_in"
                 app:srcCompat="@drawable/minus" />
 
 
             <android.support.v7.widget.AppCompatImageButton
                 android:id="@+id/ui_button_fit"
-
                 style="@style/mapViewOverlayButton"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
                 android:padding="12dp"
+                app:layout_constraintLeft_toLeftOf="@+id/ui_button_zoom_in"
+                app:layout_constraintTop_toBottomOf="@+id/ui_button_zoom_out"
                 app:srcCompat="@drawable/fit" />
 
 
@@ -116,14 +126,14 @@
                 android:id="@+id/ui_button_adjust"
                 style="@style/mapViewOverlayButton"
                 android:layout_width="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentEnd="true"
                 android:padding="10dp"
                 android:text="@string/adjust"
                 android:textColor="@color/textColorMid"
                 app:drawableStartCompat="@drawable/edit_location"
-                app:drawableTint="@color/colorSecondary" />
-        </RelativeLayout>
+                app:drawableTint="@color/colorSecondary"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintRight_toRightOf="parent" />
+        </android.support.constraint.ConstraintLayout>
 
         <ViewStub
             android:id="@+id/ui_adjust_panel_stub"
