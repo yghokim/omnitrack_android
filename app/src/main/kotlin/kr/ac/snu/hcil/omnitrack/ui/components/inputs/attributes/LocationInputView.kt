@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewStub
 import android.widget.ProgressBar
 import android.widget.TextView
+import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.places.ui.PlacePicker
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -19,16 +20,20 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.patloew.rxlocation.RxLocation
+import io.reactivex.BackpressureStrategy
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.SerialDisposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.component_location_picker.view.*
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.contains
 import kr.ac.snu.hcil.omnitrack.utils.getActivity
 import kr.ac.snu.hcil.omnitrack.utils.getAddress
+import java.util.concurrent.TimeUnit
 
 /**
  * Created by Young-Ho on 8/3/2016.
@@ -44,18 +49,25 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
 
     override val typeId: Int = VIEW_TYPE_LOCATION
 
-    override var value: LatLng? = LatLng(0.0, 0.0)
+    private var _value: LatLng? = LatLng(0.0, 0.0)
+    override var value: LatLng?
+        get() = _value
         set(value) {
-            if (field != value) {
-                field = value
-                if (value != null) {
-                    fitToValueLocation(false)
-                }
-                onValueChanged(value)
-                //addressView.text = value.getAddress(context)?.getAddressLine(0)
-                reserveAddressChange(value)
-            }
+            setValue(value, false)
         }
+
+    fun setValue(value: LatLng?, animate: Boolean) {
+        if (_value != value) {
+            _value = value
+            if (value != null) {
+                fitToValueLocation(animate)
+            }
+
+            onValueChanged(value)
+            //addressView.text = value.getAddress(context)?.getAddressLine(0)
+            reserveAddressChange(value)
+        }
+    }
 
     private var isAdjustMode: Boolean = false
         set(value) {
@@ -119,6 +131,7 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
     private var valueMarker: Marker? = null
 
     private val addressConversionTaskSubscription = SerialDisposable()
+    private val myLocationTaskSubscription = SerialDisposable()
 
     init {
 
@@ -136,6 +149,33 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
         fitButton.setOnClickListener(this)
         adjustButton.setOnClickListener(this)
         searchButton.setOnClickListener(this)
+
+        ui_button_my_location.setOnClickListener {
+            myLocationTaskSubscription.set(
+                    Single.defer {
+                        val rxLocation = RxLocation(OTApp.instance)
+                        val request = LocationRequest.create() //standard GMS LocationRequest
+                                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                                .setNumUpdates(2)
+                                .setInterval(100)
+                                .setMaxWaitTime(500)
+                                .setExpirationDuration(2000)
+
+                        try {
+                            return@defer rxLocation.location().updates(request, BackpressureStrategy.LATEST)
+                                    .map { location -> LatLng(location.latitude, location.longitude) }
+                                    .timeout(2L, TimeUnit.SECONDS, rxLocation.location().lastLocation().map { location -> LatLng(location.latitude, location.longitude) }.toFlowable())
+                                    .firstOrError()
+                                    .map { loc -> Nullable(loc) }
+                        } catch (ex: SecurityException) {
+                            ex.printStackTrace()
+                            return@defer Single.just(Nullable(LatLng(0.0, 0.0)))
+                        }
+                    }.subscribe { (location) ->
+                        setValue(location, true)
+                    }
+            )
+        }
     }
 
     private fun inflateAdjustPanel(): View {
@@ -192,7 +232,7 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
     }
 
     private fun fitToValueLocation(animate: Boolean) {
-        if (googleMap != null) {
+        if (googleMap != null && value != null) {
 
             val update = CameraUpdateFactory.newCameraPosition(CameraPosition.builder()
                     .target(value)
@@ -277,12 +317,20 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
     override fun focus() {
     }
 
-    override fun onMapReady(map: GoogleMap?) {
+    override fun onMapReady(map: GoogleMap) {
         this.googleMap = map
-        this.googleMap?.setMinZoomPreference(3.0f)
-        this.googleMap?.setMaxZoomPreference(17.0f)
+        map.setMinZoomPreference(3.0f)
+        map.setMaxZoomPreference(17.0f)
 
-        this.googleMap?.setOnCameraIdleListener(this)
+        map.uiSettings.isMyLocationButtonEnabled = false
+
+        try {
+            map.isMyLocationEnabled = true
+        } catch (ex: SecurityException) {
+            ex.printStackTrace()
+        }
+
+        map.setOnCameraIdleListener(this)
 
         fitToValueLocation(false)
     }
@@ -315,6 +363,7 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
         println("destroy google map")
         googleMap?.clear()
         addressConversionTaskSubscription.set(null)
+        myLocationTaskSubscription.set(null)
         mapView.onDestroy()
     }
 }
