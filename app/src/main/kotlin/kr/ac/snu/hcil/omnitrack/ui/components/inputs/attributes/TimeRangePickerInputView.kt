@@ -19,14 +19,19 @@ class TimeRangePickerInputView(context: Context, attrs: AttributeSet? = null) : 
             //TODO Null UI
             if (field != value) {
                 field = value
+
+                valueView.timeRangeChanged.suspend = true
                 valueView.setTimeSpan(value ?: TimeSpan())
+                valueView.timeRangeChanged.suspend = false
+
+                onValueChanged(value)
             }
         }
 
     init {
         valueView.timeRangeChanged += {
             sender, timeSpan ->
-            onValueChanged(timeSpan)
+            value = timeSpan
         }
     }
 

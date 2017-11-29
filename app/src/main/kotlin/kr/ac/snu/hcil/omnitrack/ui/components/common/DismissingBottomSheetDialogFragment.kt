@@ -5,20 +5,21 @@ import android.app.Dialog
 import android.support.design.widget.BottomSheetBehavior
 import android.support.design.widget.BottomSheetDialogFragment
 import android.support.design.widget.CoordinatorLayout
+import android.support.v4.app.DialogFragment
 import android.view.View
 
 /**
  * Created by younghokim on 2017. 9. 23..
  */
 abstract class DismissingBottomSheetDialogFragment(private val dialogLayoutId: Int) : BottomSheetDialogFragment() {
-    private val behaviorCallback = object : BottomSheetBehavior.BottomSheetCallback() {
+    class DismissOnHiddenCallback(val fragment: DialogFragment) : BottomSheetBehavior.BottomSheetCallback() {
         override fun onSlide(bottomSheet: View, slideOffset: Float) {
 
         }
 
         override fun onStateChanged(bottomSheet: View, newState: Int) {
             if (newState == BottomSheetBehavior.STATE_HIDDEN) {
-                dismiss()
+                fragment.dismiss()
             }
         }
 
@@ -32,7 +33,7 @@ abstract class DismissingBottomSheetDialogFragment(private val dialogLayoutId: I
         val lp = ((contentView.parent as View).layoutParams as CoordinatorLayout.LayoutParams)
         val behavior = lp.behavior
         if (behavior is BottomSheetBehavior) {
-            behavior.setBottomSheetCallback(behaviorCallback)
+            behavior.setBottomSheetCallback(DismissOnHiddenCallback(this))
         }
 
         setupDialogAndContentView(dialog, contentView)

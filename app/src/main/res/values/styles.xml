@@ -496,6 +496,36 @@
         <item name="android:paddingLeft">@dimen/activity_horizontal_margin</item>
     </style>
 
+    <style name="TimeRangePickerSubButtonStyle">
+        <item name="android:textSize">14sp</item>
+        <item name="fb_textColor">@color/textColorLight</item>
+        <item name="fb_defaultColor">@color/editTextFormBackground</item>
+        <item name="fb_focusColor">@color/colorPointed.Light</item>
+        <item name="fb_radius">8dp</item>
+        <item name="android:minHeight">@dimen/button_height_small</item>
+    </style>
+
+    <style name="TinyCircularFancyButtonStyle">
+
+        <item name="android:layout_width">@dimen/button_height_tiny</item>
+        <item name="android:layout_height">@dimen/button_height_tiny</item>
+        <item name="fb_defaultColor">@color/colorAccent.Light</item>
+        <item name="fb_radius">300dp</item>
+        <item name="fb_focusColor">@color/colorRed</item>
+        <item name="fb_iconPaddingLeft">0dp</item>
+        <item name="fb_iconPaddingRight">0dp</item>
+        <item name="fb_iconResource">@drawable/ic_arrow_downward_black_24dp</item>
+        <item name="drawableTint">#FFF</item>
+    </style>
+
+    <style name="TinyCircularFancyButtonStyle.blackAndWhite" parent="TinyCircularFancyButtonStyle">
+        <item name="fb_defaultColor">@color/editTextFormBackground</item>
+        <item name="fb_focusColor">@color/colorPointed.Light</item>
+        <item name="fb_iconResource">@drawable/ic_arrow_downward_black_24dp</item>
+        <item name="drawableTint">@color/textColorLight</item>
+    </style>
+
+
     <style name="AppTheme.NoActionBar.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.NoActionBar.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
