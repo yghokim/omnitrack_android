@@ -43,6 +43,8 @@ Make sure that the bash can use the 'npm' command before running the setup.sh fi
   sh setup.sh
   ``` 
 
+  Windows: run **setup.bat**.
+
 4. Generate google-services.json file from https://console.firebase.google.com
    <br>
    Download the file from the Firebase console and put it to /app.
@@ -52,10 +54,13 @@ Make sure that the bash can use the 'npm' command before running the setup.sh fi
 ## Author
 
 #### Young-Ho Kim (yhkim@hcil.snu.ac.kr)
-
-Ph.D Candidate
+http://younghokim.net
 Seoul National University
 
 ----
 
 ## License
+
+### Source Code
+
+### Design Resources including Logos and Assets
