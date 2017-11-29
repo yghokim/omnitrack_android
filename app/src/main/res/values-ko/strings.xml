@@ -400,6 +400,13 @@
     <string name="msg_format_confirm_remove_trigger">이 %1$s를 삭제하시겠습니까?</string>
     <string name="msg_use_validation_script">Use Validation Script</string>
 
+    <string name="time_range_picker_30_mins">+ 30분</string>
+    <string name="time_range_picker_1_hour">+ 1시간</string>
+
+    <string name="time_range_picker_1_day">+ 1일</string>
+    <string name="time_range_picker_1_week">+ 1주</string>
+    <string name="msg_time_range_picker_to_now">현재시각</string>
+
     <string-array name="purpose_entries">
         <item>directive|건강 관련 정보를 기록하기 위해서</item>
         <item>documentary|리뷰/일기 등을 기록하기 위해서</item>

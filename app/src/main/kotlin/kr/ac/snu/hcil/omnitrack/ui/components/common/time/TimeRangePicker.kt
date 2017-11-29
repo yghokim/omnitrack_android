@@ -9,6 +9,8 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog
+import kotlinx.android.synthetic.main.component_time_range_picker.view.*
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
@@ -49,7 +51,8 @@ class TimeRangePicker : FrameLayout, View.OnClickListener {
                 field = processed
 
                 suspendInvalidate = true
-                to = Math.max(processed, to)
+                //to = Math.max(processed, to)
+                to = processed
                 suspendInvalidate = false
                 invalidateViewSettings()
             }
@@ -109,6 +112,13 @@ class TimeRangePicker : FrameLayout, View.OnClickListener {
         fromButton.setOnClickListener(this)
         toButton.setOnClickListener(this)
 
+        ui_button_preset_1.setOnClickListener(this)
+        ui_button_preset_2.setOnClickListener(this)
+        ui_button_preset_now.setOnClickListener(this)
+
+        ui_button_up.setOnClickListener(this)
+        ui_button_down.setOnClickListener(this)
+
         durationIndicator = findViewById(R.id.ui_interval_indicator)
 
         InterfaceHelper.removeButtonTextDecoration(fromButton)
@@ -143,12 +153,20 @@ class TimeRangePicker : FrameLayout, View.OnClickListener {
             fromButton.text = format.format(Date(from))
             toButton.text = format.format(Date(to))
             durationIndicator.text = TimeHelper.durationToText(to - from, true, context)
+
+            if (granularity == Granularity.DATE) {
+                ui_button_preset_1.text = OTApp.getString(R.string.time_range_picker_1_day)
+                ui_button_preset_2.text = OTApp.getString(R.string.time_range_picker_1_week)
+            } else if (granularity == Granularity.TIME) {
+                ui_button_preset_1.text = OTApp.getString(R.string.time_range_picker_30_mins)
+                ui_button_preset_2.text = OTApp.getString(R.string.time_range_picker_1_hour)
+            }
         }
     }
 
 
     override fun onClick(button: View) {
-        if (button is Button) {
+        if (button === fromButton || button === toButton) {
             val activity = getActivity()
             if (activity != null) {
 
@@ -266,6 +284,47 @@ class TimeRangePicker : FrameLayout, View.OnClickListener {
                     }*/
                 }
             }
+        } else if (button === ui_button_preset_1) {
+            when (granularity) {
+                Granularity.DATE -> {
+                    to += TimeHelper.daysInMilli * 1
+                }
+                Granularity.TIME -> {
+                    to += TimeHelper.minutesInMilli * 30
+                }
+            }
+            timeRangeChanged.invoke(this@TimeRangePicker, getTimeSpan())
+        } else if (button === ui_button_preset_2) {
+            when (granularity) {
+                Granularity.DATE -> {
+                    to += TimeHelper.daysInMilli * 7
+                }
+                Granularity.TIME -> {
+                    to += TimeHelper.hoursInMilli * 1
+                }
+            }
+            timeRangeChanged.invoke(this@TimeRangePicker, getTimeSpan())
+        } else if (button === ui_button_preset_now) {
+            val beforeFrom = from
+            val beforeTo = to
+            to = System.currentTimeMillis()
+
+            if (beforeFrom != from || beforeTo != to)
+                timeRangeChanged.invoke(this@TimeRangePicker, getTimeSpan())
+        } else if (button === ui_button_up) {
+            val beforeFrom = from
+            val beforeTo = to
+            from = to
+
+            if (beforeFrom != from || beforeTo != to)
+                timeRangeChanged.invoke(this@TimeRangePicker, getTimeSpan())
+        } else if (button === ui_button_down) {
+            val beforeFrom = from
+            val beforeTo = to
+            to = from
+
+            if (beforeFrom != from || beforeTo != to)
+                timeRangeChanged.invoke(this@TimeRangePicker, getTimeSpan())
         }
     }
 }
