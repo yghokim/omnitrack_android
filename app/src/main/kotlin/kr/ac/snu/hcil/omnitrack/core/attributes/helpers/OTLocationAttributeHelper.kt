@@ -16,7 +16,7 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.FallbackPolicyResolver
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
-import kr.ac.snu.hcil.omnitrack.ui.components.common.MapImageView
+import kr.ac.snu.hcil.omnitrack.ui.components.common.LiteMapView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
@@ -90,12 +90,12 @@ class OTLocationAttributeHelper : OTAttributeHelper() {
     }
 
     override fun getViewForItemList(attribute: OTAttributeDAO, context: Context, recycledView: View?): View {
-        return recycledView as? MapImageView ?: MapImageView(context)
+        return recycledView as? LiteMapView ?: LiteMapView(context)
     }
 
     override fun applyValueToViewForItemList(attribute: OTAttributeDAO, value: Any?, view: View): Single<Boolean> {
         return Single.defer {
-            if (view is MapImageView && value != null) {
+            if (view is LiteMapView && value != null) {
                 if (value is LatLng) {
                     view.location = value
                     Single.just(true)
