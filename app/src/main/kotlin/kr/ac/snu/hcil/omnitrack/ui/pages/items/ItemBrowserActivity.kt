@@ -34,6 +34,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.net.OTLocalMediaCacheManager
 import kr.ac.snu.hcil.omnitrack.services.OTTableExportService
 import kr.ac.snu.hcil.omnitrack.ui.DragItemTouchHelperCallback
+import kr.ac.snu.hcil.omnitrack.ui.IActivityLifeCycle
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.DismissingBottomSheetDialogFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.common.ExtendedSpinner
@@ -570,6 +571,10 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                         val itemValue = getParent().getItemValueOf(attribute.localId)
                         if (itemValue != null) {
                             val newValueView = attribute.getHelper().getViewForItemList(attribute, this@ItemBrowserActivity, valueView)
+                            if (newValueView is IActivityLifeCycle && newValueView !== valueView) {
+                                newValueView.onCreate(null)
+                            }
+                            newValueView.setOnClickListener(this)
                             changeNewValueView(newValueView)
 
                             valueApplySubscription.set(attribute.getHelper().applyValueToViewForItemList(attribute, itemValue, valueView).subscribe({
