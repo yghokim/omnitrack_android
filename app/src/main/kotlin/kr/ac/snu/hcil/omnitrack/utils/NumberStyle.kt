@@ -1,7 +1,5 @@
 package kr.ac.snu.hcil.omnitrack.utils
 
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
@@ -17,8 +15,8 @@ import java.text.DecimalFormat
 class NumberStyle {
 
     companion object {
-        val parser: Gson by lazy {
-            GsonBuilder().registerTypeAdapter(NumberStyle::class.java, NumberStyleTypeAdapter()).create()
+        val typeAdapter: TypeAdapter<NumberStyle> by lazy {
+            NumberStyleTypeAdapter()
         }
     }
 

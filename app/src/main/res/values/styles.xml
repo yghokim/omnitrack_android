@@ -525,6 +525,18 @@
         <item name="drawableTint">@color/textColorLight</item>
     </style>
 
+    <style name="NumberPickerStyleImmersive">
+        <item name="np_selectedTextColor">@color/colorPointed</item>
+        <item name="android:textColor">@color/textColorLight</item>
+        <item name="np_dividerThickness">1dp</item>
+        <item name="np_wheelItemCount">5</item>
+        <item name="np_dividerColor">@color/textColorLightLight</item>
+        <item name="np_selectedTextSize">25sp</item>
+        <item name="android:textSize">20sp</item>
+        <item name="np_textColor">@color/textColorMidLight</item>
+        <item name="np_typeface">fonts/Roboto-Thin.ttf</item>
+        <item name="np_wrapSelectorWheel">true</item>
+    </style>
 
     <style name="AppTheme.NoActionBar.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
