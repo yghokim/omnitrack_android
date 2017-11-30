@@ -1,14 +1,16 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.common.time
 
+import android.app.Dialog
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.OnClickListener
 import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.TextView
+import com.afollestad.materialdialogs.MaterialDialog
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog
-import com.wdullaer.materialdatetimepicker.time.TimePickerDialog
 import kotlinx.android.synthetic.main.component_time_range_picker.view.*
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
@@ -79,6 +81,34 @@ class TimeRangePicker : FrameLayout, View.OnClickListener {
         }
 
     private lateinit var format: SimpleDateFormat
+
+
+    private val dateTimeDialogPicker: ImmersiveDateTimePicker by lazy {
+        ImmersiveDateTimePicker(context)
+    }
+    private val datetimeDialog: Dialog by lazy {
+        val builder = MaterialDialog.Builder(context)
+        builder.customView(dateTimeDialogPicker, false)
+        builder.autoDismiss(true)
+        val dialog = builder.build()
+        dateTimeDialogPicker.setOnApplyButtonClickedListener(OnClickListener {
+            val beforeFrom = from
+            val beforeTo = to
+
+            if (dateTimeDialogPicker.tag == "from") {
+                from = dateTimeDialogPicker.value
+            } else if (dateTimeDialogPicker.tag == "to") {
+                to = dateTimeDialogPicker.value
+            }
+
+            if (beforeFrom != from || beforeTo != to) {
+                timeRangeChanged.invoke(this@TimeRangePicker, getTimeSpan())
+            }
+            dialog.dismiss()
+        })
+
+        return@lazy dialog
+    }
 
     fun getTimeSpan(): TimeSpan {
         return TimeSpan.fromPoints(from, to)
@@ -213,75 +243,18 @@ class TimeRangePicker : FrameLayout, View.OnClickListener {
                         }
                     }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH))
                             .show(activity.fragmentManager, "DatePickerDialog")
-                    /*
-                    CalendarPickerDialogFragment.getInstance(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).showDialog(activity.supportFragmentManager) {
-                        timestamp: Long, year: Int, month: Int, day: Int ->
 
-                        val beforeFrom = from
-                        val beforeTo = to
-
-                        if (button === fromButton) {
-                            from = timestamp
-                        } else if (button === toButton) {
-                            to = timestamp
-                        }
-
-                        if (beforeFrom != from || beforeTo != to) {
-                            timeRangeChanged.invoke(this@TimeRangePicker, getTimeSpan())
-                        }
-                    }*/
                 } else {
-                    //datetime picking
-                    val datePickerDialog = DatePickerDialog.newInstance({ dialog, year, monthOfYear, dayOfMonth ->
-                        cal.set(Calendar.YEAR, year)
-                        cal.set(Calendar.MONTH, monthOfYear)
-                        cal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+                    dateTimeDialogPicker.value = cal.timeInMillis
+                    dateTimeDialogPicker.tag = if (button === fromButton) {
+                        "from"
+                    } else if (button === toButton) {
+                        "to"
+                    } else null
 
-                        val timePickerDialog = TimePickerDialog.newInstance({ dialog, hourOfDay, minute, second ->
-                            cal.set(Calendar.HOUR_OF_DAY, hourOfDay)
-                            cal.set(Calendar.MINUTE, minute)
-                            cal.set(Calendar.SECOND, 0)
-                            cal.set(Calendar.MILLISECOND, 0)
-                            val timestamp = cal.timeInMillis
-
-                            val beforeFrom = from
-                            val beforeTo = to
-
-                            if (button === fromButton) {
-                                from = timestamp
-                            } else if (button === toButton) {
-                                to = timestamp
-                            }
-
-                            if (beforeFrom != from || beforeTo != to) {
-                                timeRangeChanged.invoke(this@TimeRangePicker, getTimeSpan())
-                            }
-
-                        }, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), false)
-                        timePickerDialog.enableSeconds(false)
-                        timePickerDialog.show(activity.fragmentManager, "TimePicker")
-
-                    }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH))
-                    datePickerDialog.setOkText(R.string.msg_next)
-                    datePickerDialog.show(activity.fragmentManager, "DatePicker")
-
-                    /*
-                    DateTimePickerDialogFragment.getInstance(timestamp).showDialog(activity.supportFragmentManager) {
-                        timestamp ->
-
-                        val beforeFrom = from
-                        val beforeTo = to
-
-                        if (button === fromButton) {
-                            from = timestamp
-                        } else if (button === toButton) {
-                            to = timestamp
-                        }
-
-                        if (beforeFrom != from || beforeTo != to) {
-                            timeRangeChanged.invoke(this@TimeRangePicker, getTimeSpan())
-                        }
-                    }*/
+                    if (!datetimeDialog.isShowing) {
+                        datetimeDialog.show()
+                    }
                 }
             }
         } else if (button === ui_button_preset_1) {
