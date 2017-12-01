@@ -374,6 +374,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                         previewContainer.removeAllViews()
                         if (value != null) {
                             previewContainer.addView(value, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+                            value.onCreate(null)
                         }
 
                         field = value

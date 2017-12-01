@@ -103,4 +103,14 @@ class LiteMapView : ConstraintLayout, IActivityLifeCycle, OnMapReadyCallback {
     override fun onLowMemory() {
         ui_map.onLowMemory()
     }
+
+
+    override fun onStart() {
+        ui_map.onStart()
+    }
+
+    override fun onStop() {
+        ui_map.onStop()
+    }
+
 }
