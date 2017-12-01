@@ -236,10 +236,6 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
         super.onPause()
 
         for (inputView in attributeListAdapter.inputViews) {
-            inputView.onPause()
-        }
-
-        for (inputView in attributeListAdapter.inputViews) {
             inputView.clearFocus()
         }
 
@@ -249,10 +245,6 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
     override fun onDestroy() {
         super.onDestroy()
         println("onDestroy ItemDetailActivity")
-
-        for (inputView in attributeListAdapter.inputViews) {
-            inputView.onDestroy()
-        }
 
         /*
         ItemBuilder Caching Policy:
@@ -269,13 +261,6 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
         super.onLowMemory()
         for (inputView in attributeListAdapter.inputViews) {
             inputView.onLowMemory()
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        for (inputView in attributeListAdapter.inputViews) {
-            inputView.onResume()
         }
     }
 

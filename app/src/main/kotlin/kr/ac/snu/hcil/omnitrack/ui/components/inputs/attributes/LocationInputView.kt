@@ -151,31 +151,35 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
         searchButton.setOnClickListener(this)
 
         ui_button_my_location.setOnClickListener {
-            myLocationTaskSubscription.set(
-                    Single.defer {
-                        val rxLocation = RxLocation(OTApp.instance)
-                        val request = LocationRequest.create() //standard GMS LocationRequest
-                                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                                .setNumUpdates(2)
-                                .setInterval(100)
-                                .setMaxWaitTime(500)
-                                .setExpirationDuration(2000)
-
-                        try {
-                            return@defer rxLocation.location().updates(request, BackpressureStrategy.LATEST)
-                                    .map { location -> LatLng(location.latitude, location.longitude) }
-                                    .timeout(2L, TimeUnit.SECONDS, rxLocation.location().lastLocation().map { location -> LatLng(location.latitude, location.longitude) }.toFlowable())
-                                    .firstOrError()
-                                    .map { loc -> Nullable(loc) }
-                        } catch (ex: SecurityException) {
-                            ex.printStackTrace()
-                            return@defer Single.just(Nullable(LatLng(0.0, 0.0)))
-                        }
-                    }.subscribe { (location) ->
-                        setValue(location, true)
-                    }
-            )
+            setToMyLocation(true)
         }
+    }
+
+    private fun setToMyLocation(animate: Boolean) {
+        myLocationTaskSubscription.set(
+                Single.defer {
+                    val rxLocation = RxLocation(OTApp.instance)
+                    val request = LocationRequest.create() //standard GMS LocationRequest
+                            .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                            .setNumUpdates(2)
+                            .setInterval(100)
+                            .setMaxWaitTime(500)
+                            .setExpirationDuration(2000)
+
+                    try {
+                        return@defer rxLocation.location().updates(request, BackpressureStrategy.LATEST)
+                                .map { location -> LatLng(location.latitude, location.longitude) }
+                                .timeout(2L, TimeUnit.SECONDS, rxLocation.location().lastLocation().map { location -> LatLng(location.latitude, location.longitude) }.toFlowable())
+                                .firstOrError()
+                                .map { loc -> Nullable(loc) }
+                    } catch (ex: SecurityException) {
+                        ex.printStackTrace()
+                        return@defer Single.just(Nullable(LatLng(0.0, 0.0)))
+                    }
+                }.subscribe { (location) ->
+                    setValue(location, animate)
+                }
+        )
     }
 
     private fun inflateAdjustPanel(): View {
@@ -188,6 +192,14 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
         adjustCancelButton?.setOnClickListener(this)
 
         return view
+    }
+
+    override fun onSetPreviewMode(mode: Boolean) {
+        super.onSetPreviewMode(mode)
+        if (mode == true) {
+            setToMyLocation(false)
+
+        }
     }
 
     override fun onClick(view: View) {
@@ -347,6 +359,16 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
 
     override fun onSaveInstanceState(outState: Bundle?) {
         mapView.onSaveInstanceState(outState)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        mapView.onStart()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        mapView.onStop()
     }
 
     override fun onResume() {

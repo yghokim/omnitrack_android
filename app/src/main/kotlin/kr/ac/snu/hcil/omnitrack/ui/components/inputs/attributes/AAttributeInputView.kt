@@ -1,20 +1,24 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes
 
+import android.arch.lifecycle.Lifecycle
+import android.arch.lifecycle.LifecycleObserver
+import android.arch.lifecycle.OnLifecycleEvent
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.util.AttributeSet
 import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.ui.IActivityLifeCycle
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.AInputView
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
+import kr.ac.snu.hcil.omnitrack.utils.getActivity
 import kotlin.properties.Delegates
 
 /**
  * Created by Young-Ho Kim on 2016-07-22.
  */
-abstract class AAttributeInputView<DataType>(layoutId: Int, context: Context, attrs: AttributeSet? = null) : AInputView<DataType?>(layoutId, context, attrs), IActivityLifeCycle {
-
+abstract class AAttributeInputView<DataType>(layoutId: Int, context: Context, attrs: AttributeSet? = null) : AInputView<DataType?>(layoutId, context, attrs), IActivityLifeCycle, LifecycleObserver {
 
     companion object {
         const val VIEW_TYPE_NUMBER = 0
@@ -62,7 +66,6 @@ abstract class AAttributeInputView<DataType>(layoutId: Int, context: Context, at
     }
 
     abstract val typeId: Int
-        get
 
     var boundAttributeObjectId: String? by Delegates.observable(null as String?) {
         prop, old, new ->
@@ -72,6 +75,8 @@ abstract class AAttributeInputView<DataType>(layoutId: Int, context: Context, at
             }
         }
     }
+
+    private var activity: AppCompatActivity? = null
 
     init {
     }
@@ -95,6 +100,58 @@ abstract class AAttributeInputView<DataType>(layoutId: Int, context: Context, at
         isEnabled = !mode
     }
 
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        activity = getActivity()
+        activity?.lifecycle?.addObserver(this)
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        activity?.lifecycle?.removeObserver(this)
+        activity = null
+    }
+
+    /*
+    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
+    fun onCreateLifecycle(){
+        println("lifecycle create")
+        onCreate(null)
+    }*/
+
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+    fun onResumeLifecycle() {
+        println("lifecycle resume. activity state: ${activity?.lifecycle?.currentState}")
+        onResume()
+    }
+
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_START)
+    open fun onStartLifecycle() {
+        println("lifecycle start")
+        onStart()
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+    fun onPauseLifecycle() {
+        println("lifecycle pause")
+        onPause()
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+    open fun onStopLifecycle() {
+        println("lifecycle stop")
+        onStop()
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+    fun onDestroyLifecycle() {
+        println("lifecycle destroy")
+        onDestroy()
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
     }
 
@@ -112,6 +169,14 @@ abstract class AAttributeInputView<DataType>(layoutId: Int, context: Context, at
 
     override fun onLowMemory() {
     }
+
+    override fun onStart() {
+    }
+
+    override fun onStop() {
+    }
+
+
 
     protected open fun onAttributeBound(attributeObjectId: String) {
 
