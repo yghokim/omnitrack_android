@@ -56,7 +56,7 @@ class DateTimePicker(context: Context, attrs: AttributeSet? = null) : FrameLayou
 
     //private lateinit var timeZoneSpinner: Spinner
 
-    private var calendar = Calendar.getInstance()
+    private val calendar = Calendar.getInstance()
 
     private var dateFormat: DateFormat
 
@@ -173,8 +173,12 @@ class DateTimePicker(context: Context, attrs: AttributeSet? = null) : FrameLayou
             if (activity != null) {
                 CalendarPickerDialogFragment.getInstance(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).showDialog(activity.supportFragmentManager) {
                     t, y, m, d ->
+                    val before = calendar.timeInMillis
                     calendar.set(y, m, d)
-                    refresh()
+                    if (before != calendar.timeInMillis) {
+                        refresh()
+                        timeChanged.invoke(this, time)
+                    }
                 }
             }
         }
@@ -218,7 +222,7 @@ class DateTimePicker(context: Context, attrs: AttributeSet? = null) : FrameLayou
 
 
     fun setToPresent() {
-        calendar = Calendar.getInstance()
+        calendar.timeInMillis = System.currentTimeMillis()
         refresh()
         timeChanged.invoke(this, time)
     }
