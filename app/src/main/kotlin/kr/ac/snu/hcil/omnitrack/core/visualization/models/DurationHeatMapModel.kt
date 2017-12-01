@@ -43,7 +43,7 @@ open class DurationHeatMapModel(tracker: OTTrackerDAO, timeSpanAttribute: OTAttr
             val ratingOptions = (attr.getHelper() as OTRatingAttributeHelper).getRatingOptions(attr)
             this.intrinsicValueLevels = when (ratingOptions.type) {
                 RatingOptions.DisplayType.Likert -> (ratingOptions.rightMost - ratingOptions.leftMost)
-                RatingOptions.DisplayType.Star -> ratingOptions.starLevels.maxScore
+                RatingOptions.DisplayType.Star -> ratingOptions.stars
             }
 
             when (ratingOptions.type) {
@@ -52,8 +52,8 @@ open class DurationHeatMapModel(tracker: OTTrackerDAO, timeSpanAttribute: OTAttr
                     intrinsicValueMin = ratingOptions.leftMost.toDouble()
                 }
                 RatingOptions.DisplayType.Star -> {
-                    intrinsicValueMin = if (ratingOptions.allowIntermediate) 0.5 else 1.0
-                    intrinsicValueMax = ratingOptions.starLevels.maxScore.toDouble()
+                    intrinsicValueMin = if (ratingOptions.isFractional) 0.5 else 1.0
+                    intrinsicValueMax = ratingOptions.stars.toDouble()
                 }
             }
         }

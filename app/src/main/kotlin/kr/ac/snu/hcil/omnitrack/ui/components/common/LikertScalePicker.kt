@@ -60,7 +60,7 @@ class LikertScalePicker : View, GestureDetector.OnGestureListener {
         }
     }
 
-    var allowIntermediate: Boolean by Delegates.observable(true) {
+    var isFractional: Boolean by Delegates.observable(true) {
         prop, old, new ->
         if (old != new) {
             invalidate()
@@ -81,13 +81,13 @@ class LikertScalePicker : View, GestureDetector.OnGestureListener {
             if (currentValue == null) {
                 return null
             } else {
-                val under = if (allowIntermediate) {
+                val under = if (isFractional) {
                     (rightMost - leftMost) * 10
                 } else {
                     rightMost - leftMost
                 }
                 var upper = currentValue - leftMost
-                if (allowIntermediate) upper *= 10
+                if (isFractional) upper *= 10
 
                 return Fraction(Math.round(upper).toShort(), under.toShort())
             }
@@ -96,7 +96,7 @@ class LikertScalePicker : View, GestureDetector.OnGestureListener {
             if (fraction == null) {
                 value = null
             } else {
-                val under = if (allowIntermediate) {
+                val under = if (isFractional) {
                     (rightMost - leftMost) * 10
                 } else {
                     rightMost - leftMost
@@ -315,7 +315,7 @@ class LikertScalePicker : View, GestureDetector.OnGestureListener {
     }
 
     fun getSnappedValue(original: Float): Float {
-        return if (allowIntermediate) {
+        return if (isFractional) {
             (original * 10 + .5f).toInt() / 10f
         } else {
             Math.round(original).toFloat()

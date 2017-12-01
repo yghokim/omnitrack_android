@@ -400,7 +400,7 @@ class OTApp : MultiDexApplication() {
 
         diaryTracker.attributes += OTAttribute.createAttribute(diaryTracker, "기분", OTAttributeManager.TYPE_RATING).apply {
             this.setPropertyValue(OTRatingAttribute.PROPERTY_OPTIONS, kr.ac.snu.hcil.omnitrack.utils.RatingOptions().apply {
-                this.allowIntermediate = true
+                this.isFractional = true
                 this.leftLabel = "매우 나쁨"
                 this.middleLabel = "보통"
                 this.rightLabel = "매우 좋음"
@@ -424,7 +424,7 @@ class OTApp : MultiDexApplication() {
 
         stressTracker.attributes += OTAttribute.createAttribute(stressTracker, "기분", OTAttributeManager.TYPE_RATING).apply {
             this.setPropertyValue(OTRatingAttribute.PROPERTY_OPTIONS, kr.ac.snu.hcil.omnitrack.utils.RatingOptions().apply {
-                this.allowIntermediate = true
+                this.isFractional = true
                 this.leftLabel = "매우 나쁨"
                 this.middleLabel = "보통"
                 this.rightLabel = "매우 좋음"

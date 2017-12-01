@@ -13,11 +13,13 @@ import kr.ac.snu.hcil.omnitrack.utils.RatingOptions
  * Created by Young-Ho Kim on 2016-09-23.
  */
 class RatingOptionsPropertyView(context: Context, attrs: AttributeSet?) : APropertyView<RatingOptions>(R.layout.component_property_rating_options, context, attrs) {
+    private val selectableStarLevels = arrayOf(5, 7, 10)
+
     override var value: RatingOptions
         get() {
             val result = RatingOptions()
-            result.allowIntermediate = allowIntermediatePropertyView.value
-            result.starLevels = RatingOptions.StarLevel.values()[starLevelSelectionView.value]
+            result.isFractional = allowIntermediatePropertyView.value
+            result.stars = selectableStarLevels[starLevelSelectionView.value]
             result.type = RatingOptions.DisplayType.values()[displayTypeSelectionView.value]
 
             result.leftLabel = leftLabelPropertyView.value
@@ -30,8 +32,8 @@ class RatingOptionsPropertyView(context: Context, attrs: AttributeSet?) : APrope
             return result
         }
         set(value) {
-            allowIntermediatePropertyView.value = value.allowIntermediate
-            starLevelSelectionView.value = value.starLevels.ordinal
+            allowIntermediatePropertyView.value = value.isFractional
+            starLevelSelectionView.value = selectableStarLevels.indexOf(value.stars)
             displayTypeSelectionView.value = value.type.ordinal
 
             leftLabelPropertyView.value = value.leftLabel
@@ -68,7 +70,7 @@ class RatingOptionsPropertyView(context: Context, attrs: AttributeSet?) : APrope
             onValueChanged(value)
         }
 
-        starLevelSelectionView.setEntries(RatingOptions.StarLevel.values().map { it.maxScore.toString() }.toTypedArray())
+        starLevelSelectionView.setEntries(selectableStarLevels.map { it.toString() }.toTypedArray())
         starLevelSelectionView.valueChanged += {
             sender, v ->
             onValueChanged(value)
@@ -131,7 +133,7 @@ class RatingOptionsPropertyView(context: Context, attrs: AttributeSet?) : APrope
     override fun compareAndShowEdited(comparedTo: RatingOptions) {
         val orig = value
         displayTypeSelectionView.showEditedOnTitle = orig.type != comparedTo.type
-        starLevelSelectionView.showEditedOnTitle = orig.starLevels != comparedTo.starLevels
+        starLevelSelectionView.showEditedOnTitle = orig.stars != comparedTo.stars
         leftmostValuePicker.showEditedOnTitle = orig.leftMost != comparedTo.leftMost
         rightmostValuePicker.showEditedOnTitle = orig.rightMost != comparedTo.rightMost
 
@@ -139,7 +141,7 @@ class RatingOptionsPropertyView(context: Context, attrs: AttributeSet?) : APrope
         middleLabelPropertyView.showEditedOnTitle = orig.middleLabel != comparedTo.middleLabel
         rightLabelPropertyView.showEditedOnTitle = orig.rightLabel != comparedTo.rightLabel
 
-        allowIntermediatePropertyView.showEditedOnTitle = orig.allowIntermediate != comparedTo.allowIntermediate
+        allowIntermediatePropertyView.showEditedOnTitle = orig.isFractional != comparedTo.isFractional
     }
 
     override fun getSerializedValue(): String? {
