@@ -24,6 +24,8 @@
     public static ** valueOf(java.lang.String);
 }
 
+-keepnames class * extends kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
+
 -dontwarn okio.**
 
 -dontwarn org.apache.commons.math3.**

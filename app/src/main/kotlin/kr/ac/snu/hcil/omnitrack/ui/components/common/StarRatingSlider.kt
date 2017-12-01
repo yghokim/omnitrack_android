@@ -40,7 +40,7 @@ class StarRatingSlider : HorizontalLinearDrawableView, GestureDetector.OnGesture
         }
     }
 
-    var allowIntermediate: Boolean by Delegates.observable(true) {
+    var isFractional: Boolean by Delegates.observable(true) {
         prop, old, new ->
         if (old != new) {
             refresh()
@@ -61,13 +61,13 @@ class StarRatingSlider : HorizontalLinearDrawableView, GestureDetector.OnGesture
             if (currentValue == null) {
                 return null
             } else {
-                val under = if (allowIntermediate) {
+                val under = if (isFractional) {
                     levels * 2
                 } else {
                     levels
                 }
                 var upper = currentValue
-                if (allowIntermediate) upper *= 2
+                if (isFractional) upper *= 2
 
                 return Fraction(Math.round(upper).toShort(), under.toShort())
             }
@@ -76,7 +76,7 @@ class StarRatingSlider : HorizontalLinearDrawableView, GestureDetector.OnGesture
             if (fraction == null) {
                 score = null
             } else {
-                val under = if (allowIntermediate) {
+                val under = if (isFractional) {
                     levels * 2
                 } else {
                     levels
@@ -156,7 +156,7 @@ class StarRatingSlider : HorizontalLinearDrawableView, GestureDetector.OnGesture
     private fun handleTouchEvent(event: MotionEvent) {
         val adapter = adapter!!
         if (event.x < paddingLeft) {
-            score = if (allowIntermediate) {
+            score = if (isFractional) {
                 0.5f
             } else 1f
         } else if (event.x > paddingLeft + currentCellWidth * adapter.numDrawables) {
@@ -168,7 +168,7 @@ class StarRatingSlider : HorizontalLinearDrawableView, GestureDetector.OnGesture
 
                 if (left <= event.x && right >= event.x) {
                     val fraction = (event.x - left) / currentCellWidth
-                    score = Math.max(if (allowIntermediate) {
+                    score = Math.max(if (isFractional) {
                         0.5f
                     } else 1f, i + discreteFraction(fraction))
                     break
@@ -202,7 +202,7 @@ class StarRatingSlider : HorizontalLinearDrawableView, GestureDetector.OnGesture
     }
 
     private fun discreteFraction(fraction: Float): Float {
-        if (allowIntermediate) {
+        if (isFractional) {
 
             if (fraction < 0.75f && fraction >= 0.25f) {
                 return 0.5f

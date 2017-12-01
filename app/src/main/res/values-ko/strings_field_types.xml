@@ -75,7 +75,7 @@
     <string name="property_rating_options_leftmost_label_example">전혀 그렇지 않다</string>
     <string name="property_rating_options_rightmost_label_example">매우 그렇다</string>
 
-    <string name="property_rating_options_allow_intermediate">중간점수 허용</string>
+    <string name="property_rating_options_allow_fractional">소숫점/별 반개 허용</string>
 
     <string name="property_location_msg_adjust_pin">원하는 장소를 핀 끝으로 이동하세요</string>
 

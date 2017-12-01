@@ -73,7 +73,7 @@
     <string name="property_rating_options_leftmost_label_example">strongly disagree</string>
     <string name="property_rating_options_rightmost_label_example">strongly agree</string>
 
-    <string name="property_rating_options_allow_intermediate">Allow intermediate</string>
+    <string name="property_rating_options_allow_fractional">Allow fractional scoring</string>
 
     <string name="property_location_msg_adjust_pin">Adjust location to center</string>
 

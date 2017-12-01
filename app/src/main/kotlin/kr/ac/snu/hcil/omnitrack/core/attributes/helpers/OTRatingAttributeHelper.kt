@@ -88,11 +88,11 @@ class OTRatingAttributeHelper : OTAttributeHelper(), ISingleNumberAttributeHelpe
     override fun refreshInputViewUI(inputView: AAttributeInputView<out Any>, attribute: OTAttributeDAO) {
         val options = getRatingOptions(attribute)
         if (inputView is StarRatingInputView) {
-            inputView.ratingView.allowIntermediate = options.allowIntermediate
-            inputView.ratingView.levels = options.starLevels.maxScore
-            //inputView.ratingView.score = options.starLevels.maxScore / 2.0f
+            inputView.ratingView.isFractional = options.isFractional
+            inputView.ratingView.levels = options.stars
+            //inputView.ratingView.score = options.stars.maxScore / 2.0f
         } else if (inputView is LikertScaleInputView) {
-            inputView.scalePicker.allowIntermediate = options.allowIntermediate
+            inputView.scalePicker.isFractional = options.isFractional
             inputView.scalePicker.leftMost = options.leftMost
             inputView.scalePicker.rightMost = options.rightMost
             inputView.scalePicker.leftLabel = options.leftLabel
@@ -111,7 +111,7 @@ class OTRatingAttributeHelper : OTAttributeHelper(), ISingleNumberAttributeHelpe
     override fun formatAttributeValue(attribute: OTAttributeDAO, value: Any): CharSequence {
         val ratingOptions = getRatingOptions(attribute)
         return when (ratingOptions.type) {
-            RatingOptions.DisplayType.Star -> "${ratingOptions.convertFractionToRealScore(value as Fraction)} / ${ratingOptions.starLevels.maxScore}"
+            RatingOptions.DisplayType.Star -> "${ratingOptions.convertFractionToRealScore(value as Fraction)} / ${ratingOptions.stars}"
             RatingOptions.DisplayType.Likert -> ratingOptions.convertFractionToRealScore(value as Fraction).toString()
         }
     }
@@ -124,7 +124,7 @@ class OTRatingAttributeHelper : OTAttributeHelper(), ISingleNumberAttributeHelpe
         when (ratingOptions.type) {
             RatingOptions.DisplayType.Star -> {
 
-                if (ratingOptions.starLevels <= RatingOptions.StarLevel.Level5) {
+                if (ratingOptions.stars <= 5) {
                     val target = recycledView as? StarRatingSlider ?: StarRatingSlider(context)
 
                     target.isLightMode = true
@@ -148,11 +148,11 @@ class OTRatingAttributeHelper : OTAttributeHelper(), ISingleNumberAttributeHelpe
             val ratingOptions = getRatingOptions(attribute)
             if (view is StarRatingSlider && value is Fraction) {
                 view.score = ratingOptions.convertFractionToRealScore(value)
-                view.allowIntermediate = ratingOptions.allowIntermediate
-                view.levels = ratingOptions.starLevels.maxScore
+                view.isFractional = ratingOptions.isFractional
+                view.levels = ratingOptions.stars
                 Single.just(true)
             } else if (view is StarScoreView && value is Fraction) {
-                view.setScore(ratingOptions.convertFractionToRealScore(value), ratingOptions.starLevels.maxScore.toFloat())
+                view.setScore(ratingOptions.convertFractionToRealScore(value), ratingOptions.stars.toFloat())
                 Single.just(true)
             } else super.applyValueToViewForItemList(attribute, value, view)
         }

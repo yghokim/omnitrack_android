@@ -22,6 +22,7 @@ object OTPropertyManager {
                 EPropertyType.RatingOptions -> OTRatingOptionsPropertyHelper()
                 EPropertyType.Selection -> OTSelectionPropertyHelper()
             }
+            propertyHelperTable.set(type, newHelper)
 
             newHelper
         } else helperInTable
