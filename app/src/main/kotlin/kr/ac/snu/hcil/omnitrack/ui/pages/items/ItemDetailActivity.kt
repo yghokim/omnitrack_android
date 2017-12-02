@@ -25,6 +25,7 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import kotlinx.android.synthetic.main.activity_new_item.*
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
@@ -142,7 +143,7 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
 
         loadingIndicatorBar.setMessage(R.string.msg_indicator_message_item_autocomplete)
 
-        builderRestoredSnackbar = Snackbar.make(findViewById(R.id.ui_snackbar_container), resources.getText(R.string.msg_builder_restored), Snackbar.LENGTH_INDEFINITE)
+        builderRestoredSnackbar = Snackbar.make(ui_root, resources.getText(R.string.msg_builder_restored), Snackbar.LENGTH_INDEFINITE)
         builderRestoredSnackbar.setAction(resources.getText(R.string.msg_clear_form)) { view ->
 
             creationSubscriptions.add(

@@ -568,6 +568,7 @@
     <string name="time_range_picker_1_day">+ 1 day</string>
     <string name="time_range_picker_1_week">+ 1 week</string>
     <string name="msg_time_range_picker_to_now">To Now</string>
+    <string name="tag_map_control_panel">map_control_panel</string>
 
     <string-array name="supported_language_names">
         <item>English</item>

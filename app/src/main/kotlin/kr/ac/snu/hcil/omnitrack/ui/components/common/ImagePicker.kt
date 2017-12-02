@@ -1,26 +1,26 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.common
 
+import android.animation.LayoutTransition
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
 import android.provider.MediaStore
+import android.support.constraint.ConstraintLayout
 import android.support.v4.content.ContextCompat
 import android.support.v4.content.FileProvider
 import android.support.v7.app.AppCompatActivity
 import android.util.AttributeSet
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.webkit.URLUtil
-import android.widget.FrameLayout
-import android.widget.ImageView
 import com.bumptech.glide.Glide
+import kotlinx.android.synthetic.main.component_image_picker.view.*
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.CameraPickDialogFragment
 import kr.ac.snu.hcil.omnitrack.utils.applyTint
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
+import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -28,10 +28,9 @@ import java.util.*
 /**
  * Created by younghokim on 16. 9. 6..
  */
-class ImagePicker : FrameLayout, View.OnClickListener {
+class ImagePicker : ConstraintLayout, View.OnClickListener {
 
     //https://developer.android.com/training/camera/photobasics.html
-    companion object
 
     interface ImagePickerCallback {
         fun onRequestCameraImage(view: ImagePicker)
@@ -47,22 +46,24 @@ class ImagePicker : FrameLayout, View.OnClickListener {
                 field = value
 
                 if (URLUtil.isNetworkUrl(value.toString())) {
-                    println("uri is network. download the image and put it to the imageview.")
-                    Glide.with(context).load(value.toString()).into(imageView)
+                    println("uri is network. download the image and put it to the ui_image_view.")
+                    Glide.with(context).load(value.toString()).into(ui_image_view)
 
                 } else {
                     Glide.with(context).load(value.toString())
-                            .into(imageView)
+                            .into(ui_image_view)
                 }
 
                 if (value == Uri.EMPTY) {
-                    removeButton.visibility = View.INVISIBLE
-                    buttonGroup.visibility = View.VISIBLE
-                    imageView.visibility = View.GONE
+                    ui_button_cancel.visibility = View.INVISIBLE
+                    ui_button_gallery.visibility = View.VISIBLE
+                    ui_button_camera.visibility = View.VISIBLE
+                    ui_image_view.visibility = View.GONE
                 } else {
-                    removeButton.visibility = View.VISIBLE
-                    buttonGroup.visibility = View.INVISIBLE
-                    imageView.visibility = View.VISIBLE
+                    ui_button_cancel.visibility = View.VISIBLE
+                    ui_button_gallery.visibility = View.INVISIBLE
+                    ui_button_camera.visibility = View.INVISIBLE
+                    ui_image_view.visibility = View.VISIBLE
                 }
                 uriChanged.invoke(this, value)
             }
@@ -70,41 +71,37 @@ class ImagePicker : FrameLayout, View.OnClickListener {
 
     val uriChanged = Event<Uri>()
 
-    private val cameraButton: View
-    private val galleryButton: View
-    private val removeButton: View
-
-    private val buttonGroup: ViewGroup
-    private val imageView: ImageView
-
     var overrideLocalUriFolderPath: File? = null
 
-    constructor(context: Context?) : super(context)
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
+    constructor(context: Context) : super(context) {
+        init(context, null)
+    }
 
-    init {
-        val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        inflater.inflate(R.layout.component_image_picker, this, true)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
+        init(context, attrs)
+    }
+
+    private fun init(context: Context, attrs: AttributeSet?) {
+        inflateContent(R.layout.component_image_picker, true)
+
+        layoutTransition = LayoutTransition().apply {
+            enableTransitionType(LayoutTransition.CHANGING)
+        }
+
         this.background = applyTint(ContextCompat.getDrawable(context, R.drawable.hatching_repeated_wide_gray)!!, Color.parseColor("#e0e0e0"))
 
-        cameraButton = findViewById(R.id.ui_button_camera)
-        galleryButton = findViewById(R.id.ui_button_gallery)
-        removeButton = findViewById(R.id.ui_button_cancel)
-        buttonGroup = findViewById(R.id.ui_button_container)
-        imageView = findViewById(R.id.ui_image_view)
-
-        cameraButton.setOnClickListener(this)
-        galleryButton.setOnClickListener(this)
-        removeButton.setOnClickListener(this)
+        ui_button_camera.setOnClickListener(this)
+        ui_button_gallery.setOnClickListener(this)
+        ui_button_cancel.setOnClickListener(this)
     }
 
     override fun onClick(view: View?) {
-        if (view === cameraButton) {
+        if (view === ui_button_camera) {
             callback?.onRequestCameraImage(this)
 
-        } else if (view === galleryButton) {
+        } else if (view === ui_button_gallery) {
             callback?.onRequestGalleryImage(this)
-        } else if (view === removeButton) {
+        } else if (view === ui_button_cancel) {
             imageUri = Uri.EMPTY
         }
     }

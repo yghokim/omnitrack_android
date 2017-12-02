@@ -22,6 +22,7 @@ import com.github.salomonbrys.kotson.set
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.SerialDisposable
+import kotlinx.android.synthetic.main.activity_item_browser.*
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
@@ -110,7 +111,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
         val shadowDecoration = TopBottomHorizontalImageDividerItemDecoration(context = this)
         itemListView.addItemDecoration(shadowDecoration)
 
-        (itemListView.layoutParams as RelativeLayout.LayoutParams).verticalMargin = -shadowDecoration.upperDividerHeight
+        (itemListView.layoutParams as CoordinatorLayout.LayoutParams).verticalMargin = -shadowDecoration.upperDividerHeight
 
         itemListViewAdapter = ItemListViewAdapter()
 
@@ -137,8 +138,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
         sortOrderButton.setOnClickListener(this)
 
-        val snackBarContainer: CoordinatorLayout = findViewById(R.id.ui_snackbar_container)
-        removalSnackbar = Snackbar.make(snackBarContainer, resources.getText(R.string.msg_item_removed_message), Snackbar.LENGTH_INDEFINITE)
+        removalSnackbar = Snackbar.make(ui_root, resources.getText(R.string.msg_item_removed_message), Snackbar.LENGTH_INDEFINITE)
         removalSnackbar.setAction(resources.getText(R.string.msg_undo)) { view ->
             itemListViewAdapter.undoRemoval()
         }.addCallback(object : BaseTransientBottomBar.BaseCallback<Snackbar>() {

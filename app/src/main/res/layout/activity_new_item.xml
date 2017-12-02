@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/ui_root"
     android:layout_width="match_parent"
@@ -20,26 +21,18 @@
 
         <include layout="@layout/common_toolbar_with_buttons" />
 
-    </android.support.design.widget.AppBarLayout>
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.common.LoadingIndicatorBar
-        android:id="@+id/ui_loading_indicator"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_below="@+id/appbar"
-        android:visibility="gone" />
+        <kr.ac.snu.hcil.omnitrack.ui.components.common.LoadingIndicatorBar
+            android:id="@+id/ui_loading_indicator"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_below="@+id/appbar"
+            android:visibility="visible" />
+    </android.support.design.widget.AppBarLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/ui_attribute_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/ui_snackbar_container"
-        android:layout_below="@+id/ui_loading_indicator" />
-
-    <android.support.design.widget.CoordinatorLayout
-        android:id="@+id/ui_snackbar_container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"></android.support.design.widget.CoordinatorLayout>
-
-</RelativeLayout>
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+</android.support.design.widget.CoordinatorLayout>

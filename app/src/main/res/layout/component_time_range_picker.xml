@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
     tools:background="@color/frontalBackground"
-    tools:padding="@dimen/activity_horizontal_margin">
+    tools:padding="@dimen/activity_horizontal_margin"
+    tools:parentTag="android.support.constraint.ConstraintLayout">
 
     <View
         android:id="@+id/ui_process_bullet_from"
@@ -134,4 +133,4 @@
         app:layout_constraintLeft_toRightOf="@+id/ui_button_preset_2"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="@+id/ui_button_preset_1" />
-</android.support.constraint.ConstraintLayout>
+</merge>

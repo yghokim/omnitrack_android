@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/main_content"
@@ -39,11 +39,10 @@
             android:id="@+id/container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/appbar"
             android:nestedScrollingEnabled="false"
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-    </RelativeLayout>
+    </android.support.design.widget.CoordinatorLayout>
 
     <include
         layout="@layout/layout_home_sidebar"

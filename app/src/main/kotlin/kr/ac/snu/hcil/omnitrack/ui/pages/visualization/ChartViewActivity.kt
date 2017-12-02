@@ -40,7 +40,6 @@ class ChartViewActivity : MultiButtonActionBarActivity(R.layout.activity_chart_v
         const val VIEW_TYPE_WEB = 1
     }
 
-    private lateinit var timeNavigator: View
     private lateinit var currentScopeView: TextView
     private lateinit var currentYearView: TextView
 
@@ -63,7 +62,6 @@ class ChartViewActivity : MultiButtonActionBarActivity(R.layout.activity_chart_v
         super.onCreate(savedInstanceState)
         setActionBarButtonMode(Mode.Back)
 
-        timeNavigator = findViewById(R.id.ui_time_navigation)
         leftNavigationButton = findViewById(R.id.ui_navigate_left)
         rightNavigationButton = findViewById(R.id.ui_navigate_right)
         leftNavigationButton.setOnClickListener(this)
