@@ -3,7 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui.components.common.time
 import android.content.Context
 import android.os.Parcel
 import android.os.Parcelable
-import android.support.design.widget.CoordinatorLayout
+import android.support.constraint.ConstraintLayout
 import android.text.format.DateUtils
 import android.util.AttributeSet
 import android.view.MotionEvent
@@ -19,7 +19,7 @@ import kotlin.math.abs
 /**
  * Created by younghokim on 2017. 11. 30..
  */
-class ImmersiveDateTimePicker : CoordinatorLayout, NumberPicker.OnValueChangeListener {
+class ImmersiveDateTimePicker : ConstraintLayout, NumberPicker.OnValueChangeListener {
 
     constructor(context: Context) : super(context) {
         init(context, null)

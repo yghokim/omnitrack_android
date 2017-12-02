@@ -1,62 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    tools:parentTag="android.support.constraint.ConstraintLayout">
 
-    <Button
+    <mehdi.sakout.fancybuttons.FancyButton
         android:id="@+id/ui_button_date"
+        style="@style/TimeRangePickerSubButtonStyle"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:background="@drawable/timepoint_date_button_background"
-        android:text="February 2nd, 2016, Sunday"
-        android:textAllCaps="false"
+        android:layout_height="@dimen/button_height_normal"
         android:textColor="@color/titleTextColor"
-        android:textSize="15sp" />
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:fb_borderColor="@color/textColorLightLight"
 
-    <LinearLayout
-        android:layout_width="match_parent"
+        app:fb_borderWidth="1dp"
+        app:fb_defaultColor="@color/transparent"
+        app:fb_text="February 2nd, 2016, Sunday"
+
+        />
+
+
+    <kr.ac.snu.hcil.omnitrack.ui.components.common.NumericUpDown
+        android:id="@+id/ui_left_picker"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_marginTop="16dp"
+        android:orientation="vertical"
+        app:layout_constraintHorizontal_weight="0.1"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/ui_separator_1"
+        app:layout_constraintTop_toBottomOf="@+id/ui_button_date" />
+
+    <android.support.v7.widget.AppCompatImageView
+        android:id="@+id/ui_separator_1"
+        android:layout_width="18dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:tint="@color/textColorLight"
+        app:layout_constraintBottom_toBottomOf="@+id/ui_left_picker"
+        app:layout_constraintLeft_toRightOf="@+id/ui_left_picker"
+        app:layout_constraintRight_toLeftOf="@id/ui_middle_picker"
+        app:layout_constraintTop_toTopOf="@+id/ui_left_picker"
+        app:srcCompat="@drawable/time_digit_separator" />
+
+    <kr.ac.snu.hcil.omnitrack.ui.components.common.NumericUpDown
+        android:id="@+id/ui_middle_picker"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintHorizontal_weight="0.1"
+        app:layout_constraintLeft_toRightOf="@+id/ui_separator_1"
+        app:layout_constraintRight_toLeftOf="@+id/ui_separator_2"
+
+        app:layout_constraintTop_toTopOf="@+id/ui_left_picker" />
+
+    <android.support.v7.widget.AppCompatImageView
+        android:id="@+id/ui_separator_2"
+        android:layout_width="18dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:tint="@color/textColorLight"
+        app:layout_constraintBottom_toBottomOf="@+id/ui_left_picker"
+        app:layout_constraintHorizontal_weight="0.1"
+        app:layout_constraintLeft_toRightOf="@+id/ui_middle_picker"
+        app:layout_constraintRight_toLeftOf="@+id/ui_right_picker"
+        app:layout_constraintTop_toTopOf="@+id/ui_left_picker"
+        app:srcCompat="@drawable/time_digit_separator" />
+
+    <kr.ac.snu.hcil.omnitrack.ui.components.common.NumericUpDown
+        android:id="@+id/ui_right_picker"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintHorizontal_weight="0.1"
+        app:layout_constraintLeft_toRightOf="@+id/ui_separator_2"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/ui_left_picker" />
 
 
-        <kr.ac.snu.hcil.omnitrack.ui.components.common.NumericUpDown
-            android:id="@+id/ui_left_picker"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.3"
-            android:orientation="vertical" />
-
-        <android.support.v7.widget.AppCompatImageView
-            android:layout_width="18dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:tint="@color/textColorLight"
-            app:srcCompat="@drawable/time_digit_separator" />
-
-        <kr.ac.snu.hcil.omnitrack.ui.components.common.NumericUpDown
-            android:id="@+id/ui_middle_picker"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.3"
-            android:orientation="vertical" />
-
-        <android.support.v7.widget.AppCompatImageView
-            android:layout_width="18dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:tint="@color/textColorLight"
-            app:srcCompat="@drawable/time_digit_separator" />
-
-        <kr.ac.snu.hcil.omnitrack.ui.components.common.NumericUpDown
-            android:id="@+id/ui_right_picker"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.3"
-            android:orientation="vertical" />
-
-    </LinearLayout>
-
-</LinearLayout>
+</merge>

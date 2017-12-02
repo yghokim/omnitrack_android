@@ -2,13 +2,10 @@ package kr.ac.snu.hcil.omnitrack.ui.components.common.time
 
 import android.app.Dialog
 import android.content.Context
+import android.support.constraint.ConstraintLayout
 import android.util.AttributeSet
-import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnClickListener
-import android.widget.Button
-import android.widget.FrameLayout
-import android.widget.TextView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog
 import kotlinx.android.synthetic.main.component_time_range_picker.view.*
@@ -18,6 +15,7 @@ import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kr.ac.snu.hcil.omnitrack.utils.getActivity
+import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 import java.text.SimpleDateFormat
 import java.util.*
@@ -26,17 +24,13 @@ import kotlin.properties.Delegates
 /**
  * Created by Young-Ho on 8/7/2016.
  */
-class TimeRangePicker : FrameLayout, View.OnClickListener {
+class TimeRangePicker : ConstraintLayout, View.OnClickListener {
 
     enum class Granularity {
         DATE, TIME
     }
 
     private var suspendInvalidate: Boolean = false
-
-    private var fromButton: Button
-    private var toButton: Button
-    private var durationIndicator: TextView
 
     val timeRangeChanged = Event<TimeSpan>()
 
@@ -128,19 +122,19 @@ class TimeRangePicker : FrameLayout, View.OnClickListener {
         }
     }
 
-    constructor(context: Context?) : super(context)
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
+    constructor(context: Context) : super(context) {
+        init(context, null)
+    }
 
-    init {
-        val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        addView(inflater.inflate(R.layout.component_time_range_picker, this, false))
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
+        init(context, attrs)
+    }
 
+    private fun init(context: Context, attrs: AttributeSet?) {
+        inflateContent(R.layout.component_time_range_picker, true)
 
-        fromButton = findViewById(R.id.ui_button_from)
-        toButton = findViewById(R.id.ui_button_to)
-
-        fromButton.setOnClickListener(this)
-        toButton.setOnClickListener(this)
+        ui_button_from.setOnClickListener(this)
+        ui_button_to.setOnClickListener(this)
 
         ui_button_preset_1.setOnClickListener(this)
         ui_button_preset_2.setOnClickListener(this)
@@ -149,10 +143,8 @@ class TimeRangePicker : FrameLayout, View.OnClickListener {
         ui_button_up.setOnClickListener(this)
         ui_button_down.setOnClickListener(this)
 
-        durationIndicator = findViewById(R.id.ui_interval_indicator)
-
-        InterfaceHelper.removeButtonTextDecoration(fromButton)
-        InterfaceHelper.removeButtonTextDecoration(toButton)
+        InterfaceHelper.removeButtonTextDecoration(ui_button_from)
+        InterfaceHelper.removeButtonTextDecoration(ui_button_to)
 
         invalidateDateFormat()
         invalidateViewSettings()
@@ -180,9 +172,9 @@ class TimeRangePicker : FrameLayout, View.OnClickListener {
 
     private fun invalidateViewSettings() {
         if (!suspendInvalidate) {
-            fromButton.text = format.format(Date(from))
-            toButton.text = format.format(Date(to))
-            durationIndicator.text = TimeHelper.durationToText(to - from, true, context)
+            ui_button_from.text = format.format(Date(from))
+            ui_button_to.text = format.format(Date(to))
+            ui_interval_indicator.text = TimeHelper.durationToText(to - from, true, context)
 
             if (granularity == Granularity.DATE) {
                 ui_button_preset_1.text = OTApp.getString(R.string.time_range_picker_1_day)
@@ -196,13 +188,13 @@ class TimeRangePicker : FrameLayout, View.OnClickListener {
 
 
     override fun onClick(button: View) {
-        if (button === fromButton || button === toButton) {
+        if (button === ui_button_from || button === ui_button_to) {
             val activity = getActivity()
             if (activity != null) {
 
-                val timestamp = if (button === fromButton) {
+                val timestamp = if (button === ui_button_from) {
                     from
-                } else if (button === toButton) {
+                } else if (button === ui_button_to) {
                     to
                 } else {
                     0
@@ -232,9 +224,9 @@ class TimeRangePicker : FrameLayout, View.OnClickListener {
                         val beforeFrom = from
                         val beforeTo = to
 
-                        if (button === fromButton) {
+                        if (button === ui_button_from) {
                             from = timestamp
-                        } else if (button === toButton) {
+                        } else if (button === ui_button_to) {
                             to = timestamp
                         }
 
@@ -246,9 +238,9 @@ class TimeRangePicker : FrameLayout, View.OnClickListener {
 
                 } else {
                     dateTimeDialogPicker.value = cal.timeInMillis
-                    dateTimeDialogPicker.tag = if (button === fromButton) {
+                    dateTimeDialogPicker.tag = if (button === ui_button_from) {
                         "from"
-                    } else if (button === toButton) {
+                    } else if (button === ui_button_to) {
                         "to"
                     } else null
 

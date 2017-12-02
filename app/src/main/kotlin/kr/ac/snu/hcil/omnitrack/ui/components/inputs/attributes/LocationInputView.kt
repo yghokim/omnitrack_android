@@ -31,7 +31,6 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.contains
-import kr.ac.snu.hcil.omnitrack.utils.getActivity
 import kr.ac.snu.hcil.omnitrack.utils.getAddress
 import java.util.concurrent.TimeUnit
 
@@ -76,7 +75,7 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
 
                 if (value) // adjustMode
                 {
-                    controlPanel.visibility = View.GONE
+                    controlPanelViews.forEach { it.visibility = View.GONE }
 
                     if (adjustPanel == null) {
                         adjustPanel = inflateAdjustPanel()
@@ -88,7 +87,7 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
 
 
                 } else {
-                    controlPanel.visibility = View.VISIBLE
+                    controlPanelViews.forEach { it.visibility = View.VISIBLE }
 
                     if (adjustPanel != null) {
                         adjustPanel?.visibility = View.GONE
@@ -104,9 +103,6 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
 
     private val mapView: MapView = findViewById(R.id.ui_map)
 
-    private val controlPanel: View = findViewById(R.id.ui_condition_control_panel_container)
-
-    private val searchButton: View
     private val zoomInButton: View
     private val zoomOutButton: View
     private val adjustButton: View
@@ -133,6 +129,8 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
     private val addressConversionTaskSubscription = SerialDisposable()
     private val myLocationTaskSubscription = SerialDisposable()
 
+    private val controlPanelViews = ArrayList<View>()
+
     init {
 
         addressBusyIndicator.visibility = View.INVISIBLE
@@ -142,17 +140,26 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
         fitButton = findViewById(R.id.ui_button_fit)
         adjustButton = findViewById(R.id.ui_button_adjust)
 
-        searchButton = findViewById(R.id.ui_button_search)
+        //searchButton = findViewById(R.id.ui_button_search)
 
         zoomInButton.setOnClickListener(this)
         zoomOutButton.setOnClickListener(this)
         fitButton.setOnClickListener(this)
         adjustButton.setOnClickListener(this)
-        searchButton.setOnClickListener(this)
 
         ui_button_my_location.setOnClickListener {
             setToMyLocation(true)
         }
+
+        controlPanelViews.addAll(
+                arrayOf(
+                        zoomInButton,
+                        zoomOutButton,
+                        fitButton,
+                        adjustButton,
+                        ui_button_my_location
+                )
+        )
     }
 
     private fun setToMyLocation(animate: Boolean) {
@@ -222,7 +229,9 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
             isAdjustMode = false
             reserveAddressChange(value)
             fitToValueLocation(animate = true)
-        } else if (view === searchButton) {
+        }
+
+        /*else if (view === searchButton) {
             val activity = getActivity()
             if (activity != null) {
                 if (position >= 0) {
@@ -232,7 +241,7 @@ class LocationInputView(context: Context, attrs: AttributeSet? = null) : AAttrib
             }
             //getActivity()?.startActivityForResult()
 
-        }
+        }*/
     }
 
     override fun setValueFromActivityResult(data: Intent, requestType: Int): Boolean {

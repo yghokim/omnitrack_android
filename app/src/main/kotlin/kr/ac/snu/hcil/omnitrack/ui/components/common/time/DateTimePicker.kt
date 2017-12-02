@@ -1,30 +1,25 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.common.time
 
 import android.content.Context
+import android.support.constraint.ConstraintLayout
 import android.util.AttributeSet
-import android.view.LayoutInflater
 import android.view.View
-import android.widget.Button
-import android.widget.FrameLayout
+import kotlinx.android.synthetic.main.component_timepoint.view.*
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
-import kr.ac.snu.hcil.omnitrack.ui.components.common.NumericUpDown
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.CalendarPickerDialogFragment
+import kr.ac.snu.hcil.omnitrack.utils.*
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
-import kr.ac.snu.hcil.omnitrack.utils.getActivity
-import kr.ac.snu.hcil.omnitrack.utils.getAmPm
-import kr.ac.snu.hcil.omnitrack.utils.getHour
-import kr.ac.snu.hcil.omnitrack.utils.getMinute
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.properties.Delegates
 
+
 /**
  * Created by younghokim on 16. 7. 22..
  */
-class DateTimePicker(context: Context, attrs: AttributeSet? = null) : FrameLayout(context, attrs) {
-
+class DateTimePicker : ConstraintLayout {
     companion object {
         const val DATE = 0
         const val MINUTE = 1
@@ -42,25 +37,20 @@ class DateTimePicker(context: Context, attrs: AttributeSet? = null) : FrameLayou
         prop, old, new ->
         if (new) {
             if (mode != DATE)
-                dateButton.visibility = VISIBLE
+                ui_button_date.visibility = VISIBLE
         } else {
-            dateButton.visibility = GONE
+            ui_button_date.visibility = GONE
         }
     }
 
-    private lateinit var leftPicker: NumericUpDown
-    private lateinit var middlePicker: NumericUpDown
-    private lateinit var rightPicker: NumericUpDown
-
-    private var dateButton: Button
 
     //private lateinit var timeZoneSpinner: Spinner
 
     private val calendar = Calendar.getInstance()
 
-    private var dateFormat: DateFormat
+    private lateinit var dateFormat: DateFormat
 
-    private var hourNames: Array<String>
+    private lateinit var hourNames: Array<String>
 
     var mode: Int by Delegates.observable(-1)
     {
@@ -101,15 +91,15 @@ class DateTimePicker(context: Context, attrs: AttributeSet? = null) : FrameLayou
         when (mode) {
             SECOND -> {
                 when (picker) {
-                    leftPicker -> //hour_of_day
+                    ui_left_picker -> //hour_of_day
                     {
                         calendar.set(Calendar.HOUR_OF_DAY, newVal)
                     }
-                    middlePicker -> //minute
+                    ui_middle_picker -> //minute
                     {
                         calendar.set(Calendar.MINUTE, newVal)
                     }
-                    rightPicker -> //second
+                    ui_right_picker -> //second
                     {
                         calendar.set(Calendar.SECOND, newVal)
                     }
@@ -118,15 +108,15 @@ class DateTimePicker(context: Context, attrs: AttributeSet? = null) : FrameLayou
 
             MINUTE -> {
                 when (picker) {
-                    leftPicker -> //hour
+                    ui_left_picker -> //hour
                     {
-                        calendar.set(Calendar.HOUR_OF_DAY, (newVal % 12) + 12 * rightPicker.value)
+                        calendar.set(Calendar.HOUR_OF_DAY, (newVal % 12) + 12 * ui_right_picker.value)
                     }
-                    middlePicker -> //minute
+                    ui_middle_picker -> //minute
                     {
                         calendar.set(Calendar.MINUTE, newVal)
                     }
-                    rightPicker -> //ampm
+                    ui_right_picker -> //ampm
                     {
                         calendar.set(Calendar.AM_PM, newVal)
                     }
@@ -135,14 +125,14 @@ class DateTimePicker(context: Context, attrs: AttributeSet? = null) : FrameLayou
 
             DATE -> {
                 when (picker) {
-                    leftPicker -> { //year
+                    ui_left_picker -> { //year
                         calendar.set(Calendar.YEAR, newVal)
                     }
-                    middlePicker -> { //month
+                    ui_middle_picker -> { //month
                         calendar.set(Calendar.DAY_OF_MONTH, Math.min(calendar.get(Calendar.DAY_OF_MONTH), calendar.getActualMaximum(Calendar.DAY_OF_MONTH)))
                         calendar.set(Calendar.MONTH, newVal)
                     }
-                    rightPicker -> { //day
+                    ui_right_picker -> { //day
                         calendar.set(Calendar.DAY_OF_MONTH, newVal)
                     }
                 }
@@ -158,17 +148,24 @@ class DateTimePicker(context: Context, attrs: AttributeSet? = null) : FrameLayou
 
     val timeChanged = Event<TimePoint>()
 
-    init {
-        val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        addView(inflater.inflate(R.layout.component_timepoint, this, false))
 
-        leftPicker = findViewById(R.id.ui_left_picker)
-        middlePicker = findViewById(R.id.ui_middle_picker)
-        rightPicker = findViewById(R.id.ui_right_picker)
+    constructor(context: Context) : super(context) {
+        init(context, null)
+    }
 
-        dateButton = findViewById(R.id.ui_button_date)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
+        init(context, attrs)
+    }
 
-        dateButton.setOnClickListener {
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
+        init(context, attrs)
+    }
+
+
+    private fun init(context: Context, attrs: AttributeSet?) {
+        inflateContent(R.layout.component_timepoint, true)
+
+        ui_button_date.setOnClickListener {
             val activity = getActivity()
             if (activity != null) {
                 CalendarPickerDialogFragment.getInstance(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).showDialog(activity.supportFragmentManager) {
@@ -210,14 +207,14 @@ class DateTimePicker(context: Context, attrs: AttributeSet? = null) : FrameLayou
         mode = MINUTE
 
 
-        leftPicker.zeroPad = 2
-        middlePicker.zeroPad = 2
-        rightPicker.zeroPad = 2
+        ui_left_picker.zeroPad = 2
+        ui_middle_picker.zeroPad = 2
+        ui_right_picker.zeroPad = 2
 
 
-        leftPicker.valueChanged += pickerValueChangedHandler
-        middlePicker.valueChanged += pickerValueChangedHandler
-        rightPicker.valueChanged += pickerValueChangedHandler
+        ui_left_picker.valueChanged += pickerValueChangedHandler
+        ui_middle_picker.valueChanged += pickerValueChangedHandler
+        ui_right_picker.valueChanged += pickerValueChangedHandler
     }
 
 
@@ -239,60 +236,60 @@ class DateTimePicker(context: Context, attrs: AttributeSet? = null) : FrameLayou
 
     private fun refresh() {
 
-        leftPicker.displayedValues = null
-        middlePicker.displayedValues = null
-        rightPicker.displayedValues = null
+        ui_left_picker.displayedValues = null
+        ui_middle_picker.displayedValues = null
+        ui_right_picker.displayedValues = null
 
         when (mode) {
             SECOND -> {
                 //button shown, pickers are hour/minute/second
                 if (isDayUsed)
-                    dateButton.visibility = View.VISIBLE
+                    ui_button_date.visibility = View.VISIBLE
                 else
-                    dateButton.visibility = View.GONE
+                    ui_button_date.visibility = View.GONE
 
-                dateButton.text = dateFormat.format(calendar.time)
+                ui_button_date.text = dateFormat.format(calendar.time)
 
-                leftPicker.minValue = 0
-                leftPicker.maxValue = 23
-                leftPicker.displayedValues = hourNames
+                ui_left_picker.minValue = 0
+                ui_left_picker.maxValue = 23
+                ui_left_picker.displayedValues = hourNames
 
-                leftPicker.value = calendar.get(Calendar.HOUR_OF_DAY)
+                ui_left_picker.value = calendar.get(Calendar.HOUR_OF_DAY)
 
-                middlePicker.minValue = 0
-                middlePicker.maxValue = 59
-                middlePicker.value = calendar.get(Calendar.MINUTE)
+                ui_middle_picker.minValue = 0
+                ui_middle_picker.maxValue = 59
+                ui_middle_picker.value = calendar.get(Calendar.MINUTE)
 
-                rightPicker.minValue = 0
-                rightPicker.maxValue = 59
-                rightPicker.value = calendar.get(Calendar.SECOND)
+                ui_right_picker.minValue = 0
+                ui_right_picker.maxValue = 59
+                ui_right_picker.value = calendar.get(Calendar.SECOND)
             }
 
             MINUTE -> {
                 if (isDayUsed)
-                    dateButton.visibility = View.VISIBLE
+                    ui_button_date.visibility = View.VISIBLE
                 else
-                    dateButton.visibility = View.GONE
+                    ui_button_date.visibility = View.GONE
 
-                dateButton.text = dateFormat.format(calendar.time)
+                ui_button_date.text = dateFormat.format(calendar.time)
 
-                leftPicker.minValue = 1
-                leftPicker.maxValue = 12
+                ui_left_picker.minValue = 1
+                ui_left_picker.maxValue = 12
 
-                middlePicker.minValue = 0
-                middlePicker.maxValue = 59
+                ui_middle_picker.minValue = 0
+                ui_middle_picker.maxValue = 59
 
-                rightPicker.minValue = 0
-                rightPicker.maxValue = 1
-                rightPicker.displayedValues = arrayOf("AM", "PM")
+                ui_right_picker.minValue = 0
+                ui_right_picker.maxValue = 1
+                ui_right_picker.displayedValues = arrayOf("AM", "PM")
 
 
-                rightPicker.value = calendar.getAmPm()
+                ui_right_picker.value = calendar.getAmPm()
 
-                middlePicker.value = calendar.getMinute()
+                ui_middle_picker.value = calendar.getMinute()
 
                 val hour = calendar.getHour()
-                leftPicker.value = if (hour == 0) {
+                ui_left_picker.value = if (hour == 0) {
                     12
                 } else {
                     hour
@@ -302,20 +299,20 @@ class DateTimePicker(context: Context, attrs: AttributeSet? = null) : FrameLayou
 
             DATE -> {
                 //button removed, pickers are year/month/day
-                dateButton.visibility = View.GONE
+                ui_button_date.visibility = View.GONE
 
-                leftPicker.minValue = 1950
-                leftPicker.maxValue = 2050
-                leftPicker.value = calendar.get(Calendar.YEAR)
+                ui_left_picker.minValue = 1950
+                ui_left_picker.maxValue = 2050
+                ui_left_picker.value = calendar.get(Calendar.YEAR)
 
-                middlePicker.minValue = 0
-                middlePicker.maxValue = 11
-                middlePicker.value = calendar.get(Calendar.MONTH)
-                middlePicker.displayedValues = monthNames
+                ui_middle_picker.minValue = 0
+                ui_middle_picker.maxValue = 11
+                ui_middle_picker.value = calendar.get(Calendar.MONTH)
+                ui_middle_picker.displayedValues = monthNames
 
-                rightPicker.minValue = 1
-                rightPicker.maxValue = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
-                rightPicker.value = calendar.get(Calendar.DAY_OF_MONTH)
+                ui_right_picker.minValue = 1
+                ui_right_picker.maxValue = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
+                ui_right_picker.value = calendar.get(Calendar.DAY_OF_MONTH)
             }
         }
     }
