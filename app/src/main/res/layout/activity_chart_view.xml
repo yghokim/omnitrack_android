@@ -17,29 +17,127 @@
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/appbar_padding_top"
         android:theme="@style/AppTheme.AppBarOverlay">
-        <include layout="@layout/common_toolbar_with_buttons" />
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:contentInsetEnd="0dp"
+            app:contentInsetStart="0dp"
+            app:layout_scrollFlags="scroll|enterAlways"
+            app:popupTheme="@style/AppTheme.PopupOverlay">
+
+            <android.support.constraint.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <android.support.constraint.Guideline
+                    android:id="@+id/guideline_appbar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:layout_constraintGuide_begin="@dimen/action_bar_height"
+                    app:layout_constraintGuide_end="@dimen/action_bar_height" />
+
+                <android.support.v7.widget.AppCompatImageButton
+                    android:id="@+id/ui_appbar_button_left"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginRight="-8dp"
+                    android:background="?selectableItemBackgroundBorderless"
+                    android:minWidth="@dimen/action_bar_height"
+                    android:tint="#FFF"
+                    app:layout_constraintBottom_toBottomOf="@id/guideline_appbar"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/cancel" />
+
+                <TextView
+                    android:id="@+id/ui_appbar_title"
+                    style="@style/TextAppearance.Widget.AppCompat.Toolbar.Title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                    android:layout_marginRight="@dimen/activity_horizontal_margin"
+                    android:textColor="#ffffff"
+                    android:textSize="20sp"
+                    app:layout_constraintBottom_toBottomOf="@id/guideline_appbar"
+
+                    app:layout_constraintLeft_toRightOf="@+id/ui_appbar_button_left"
+                    app:layout_constraintRight_toLeftOf="@+id/ui_appbar_button_right_sub"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="Activity title" />
+
+
+                <android.support.v7.widget.AppCompatImageButton
+                    android:id="@+id/ui_appbar_button_right_sub"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:background="?selectableItemBackgroundBorderless"
+                    android:minWidth="@dimen/action_bar_height"
+                    android:tint="#FFF"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="@id/guideline_appbar"
+                    app:layout_constraintRight_toLeftOf="@+id/ui_appbar_button_right"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/more" />
+
+                <android.support.v7.widget.AppCompatImageButton
+                    android:id="@+id/ui_appbar_button_right"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:background="?selectableItemBackgroundBorderless"
+                    android:minWidth="@dimen/action_bar_height"
+                    android:tint="#FFF"
+                    app:layout_constraintBottom_toBottomOf="@id/guideline_appbar"
+                    app:layout_constraintRight_toLeftOf="@+id/ui_appbar_text_button_right"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/done" />
+
+                <android.support.v7.widget.AppCompatButton
+                    android:id="@+id/ui_appbar_text_button_right"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:background="?selectableItemBackgroundBorderless"
+                    android:minWidth="@dimen/action_bar_height"
+                    android:paddingLeft="12dp"
+                    android:paddingRight="12dp"
+                    android:text="Save"
+                    android:textColor="#fff"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="@id/guideline_appbar"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/frontalBackground"
+                    app:layout_constraintTop_toBottomOf="@id/guideline_appbar">
+
+                    <kr.ac.snu.hcil.omnitrack.ui.components.common.choice.SelectionView
+                        android:id="@+id/ui_scope_selection"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:paddingBottom="6dp"
+                        android:paddingTop="6dp" />
+                </FrameLayout>
+
+
+                <View
+                    style="@style/HorizontalSeparator.NoVerticalMargin"
+                    android:background="@color/textColorLightLight"
+                    app:layout_constraintBottom_toBottomOf="parent" />
+            </android.support.constraint.ConstraintLayout>
+        </android.support.v7.widget.Toolbar>
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/frontalBackground"
-            android:paddingBottom="5dp"
-            app:layout_scrollFlags="scroll|enterAlways">
-
-            <kr.ac.snu.hcil.omnitrack.ui.components.common.choice.SelectionView
-                android:id="@+id/ui_scope_selection"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingBottom="12dp"
-                android:paddingTop="12dp"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent" />
-
-            <View
-                style="@style/HorizontalSeparator.NoVerticalMargin"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                app:layout_constraintTop_toBottomOf="@+id/ui_scope_selection" />
+            android:paddingBottom="5dp">
 
             <android.support.v7.widget.AppCompatImageButton
                 android:id="@+id/ui_navigate_left"
@@ -51,7 +149,6 @@
                 app:layout_constraintHorizontal_chainStyle="spread_inside"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toLeftOf="@id/ui_current_time"
-                app:layout_constraintTop_toBottomOf="@+id/ui_scope_selection"
                 app:srcCompat="@drawable/left_dark" />
 
             <TextView
@@ -65,7 +162,7 @@
                 app:layout_constraintBottom_toTopOf="@+id/ui_current_time"
                 app:layout_constraintLeft_toRightOf="@+id/ui_navigate_left"
                 app:layout_constraintRight_toLeftOf="@+id/ui_navigate_right"
-                app:layout_constraintTop_toBottomOf="@+id/ui_scope_selection"
+                app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_chainStyle="packed" />
 
             <TextView
@@ -104,12 +201,4 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-
-        android:background="@drawable/expanded_view_inner_shadow_top"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-
 </android.support.design.widget.CoordinatorLayout>
