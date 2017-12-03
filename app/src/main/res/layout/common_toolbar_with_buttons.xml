@@ -2,20 +2,6 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/action_bar_height"
-        android:contentInsetEnd="0dp"
-        android:contentInsetLeft="0dp"
-        android:contentInsetRight="0dp"
-        android:contentInsetStart="0dp"
-        app:contentInsetEnd="0dp"
-        app:contentInsetLeft="0dp"
-        app:contentInsetRight="0dp"
-        app:contentInsetStart="0dp"
-        app:popupTheme="@style/AppTheme.PopupOverlay">
-
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -85,5 +71,4 @@
             </LinearLayout>
 
         </RelativeLayout>
-    </android.support.v7.widget.Toolbar>
 </merge>
