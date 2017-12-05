@@ -85,15 +85,25 @@ class OTTriggerAlarmManager(val context: Context, val realmProvider: Factory<Rea
 
                             if (it.oneShot) {
                                 //one-shot trigger was failed
+                                OTApp.logger.writeSystemLog("Trigger was missed at ${it.intrinsicAlarmTime}. It was one-shot so just ignored.", TAG)
                             } else {
                                 //repeated trigger was failed.
+                                it.trigger?.let { trigger ->
+                                    registerTriggerAlarm(it.intrinsicAlarmTime, trigger)
+                                    OTApp.logger.writeSystemLog("Trigger was missed at ${it.intrinsicAlarmTime}. reserve next alarm - ${trigger.objectId}", TAG)
+                                }
                             }
                         }
                     } else {
                         registerSystemAlarm(alarm.reservedAlarmTime, alarm.userId ?: "", alarm.alarmId)
                     }
                 }
-            }, {}, {})
+            }, {
+                OTApp.logger.writeSystemLog("TriggerAlarmManager was successfully initialized the alarms", TAG)
+            }, { err ->
+                err.printStackTrace()
+                OTApp.logger.writeSystemLog("TriggerAlarmManager find transaction was failed due to an error : ${err.message}", TAG)
+            })
         }
     }
 
@@ -178,43 +188,55 @@ class OTTriggerAlarmManager(val context: Context, val realmProvider: Factory<Rea
         }
     }
 
-    fun reserveAlarm(trigger: OTTriggerDAO, alarmTime: Long, oneShot: Boolean): OTTriggerAlarmInstance.AlarmInfo {
+    private fun reserveAlarm(trigger: OTTriggerDAO, alarmTime: Long, oneShot: Boolean): OTTriggerAlarmInstance.AlarmInfo {
 
         var result: OTTriggerAlarmInstance.AlarmInfo? = null
         realmProvider.get().use { realm ->
+
             realm.executeTransactionIfNotIn {
-                val schedule = realm.createObject(OTTriggerSchedule::class.java, scheduleIdGenerator.getNewUniqueLong()).apply {
+                val schedule = (realm.where(OTTriggerSchedule::class.java)
+                        .equalTo(OTTriggerSchedule.FIELD_INTRINSIC_ALARM_TIME, alarmTime)
+                        .equalTo("trigger.objectId", trigger.objectId).findFirst() ?:
+                        realm.createObject(OTTriggerSchedule::class.java, scheduleIdGenerator.getNewUniqueLong())).apply {
                     this.trigger = trigger
                     this.intrinsicAlarmTime = alarmTime
                     this.oneShot = oneShot
                     this.final = oneShot
                 }
 
-                val appendableAlarm = findAppendableAlarmInstance(alarmTime, realm)
-                if (appendableAlarm != null) {
-                    schedule.parentAlarm = appendableAlarm
-                    result = appendableAlarm.getInfo()
+                if (schedule.parentAlarm != null) {
+                    //schedule alarm is already existing.
+                    schedule.parentAlarm?.let { parentAlarm ->
+                        registerSystemAlarm(parentAlarm.reservedAlarmTime, trigger.userId!!, parentAlarm.alarmId)
+                    }
                 } else {
-                    //make new alarm
-                    /*
+
+                    val appendableAlarm = findAppendableAlarmInstance(alarmTime, realm)
+                    if (appendableAlarm != null) {
+                        schedule.parentAlarm = appendableAlarm
+                        result = appendableAlarm.getInfo()
+                    } else {
+                        //make new alarm
+                        /*
                 * s: false, f: false
                 *
                 * */
-                    val newAlarmId = System.currentTimeMillis().toInt()
-                    val alarmInstance = realm.createObject(OTTriggerAlarmInstance::class.java, alarmDbIdGenerator.getNewUniqueLong())
-                    alarmInstance.alarmId = newAlarmId
+                        val newAlarmId = System.currentTimeMillis().toInt()
+                        val alarmInstance = realm.createObject(OTTriggerAlarmInstance::class.java, alarmDbIdGenerator.getNewUniqueLong())
+                        alarmInstance.alarmId = newAlarmId
 
-                    val alarmTimeToReserve = TimeHelper.roundToSeconds(alarmTime)
+                        val alarmTimeToReserve = TimeHelper.roundToSeconds(alarmTime)
 
 
-                    alarmInstance.reservedAlarmTime = alarmTimeToReserve
-                    schedule.parentAlarm = alarmInstance
-                    alarmInstance.userId = trigger.userId
+                        alarmInstance.reservedAlarmTime = alarmTimeToReserve
+                        schedule.parentAlarm = alarmInstance
+                        alarmInstance.userId = trigger.userId
 
-                    registerSystemAlarm(alarmTimeToReserve, trigger.userId!!, newAlarmId)
-                    OTApp.logger.writeSystemLog("The actual alarm was reserved at: ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(alarmTimeToReserve))}", TAG)
+                        registerSystemAlarm(alarmTimeToReserve, trigger.userId!!, newAlarmId)
+                        OTApp.logger.writeSystemLog("The actual alarm was reserved at: ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(alarmTimeToReserve))}", TAG)
 
-                    result = alarmInstance.getInfo()
+                        result = alarmInstance.getInfo()
+                    }
                 }
             }
         }
