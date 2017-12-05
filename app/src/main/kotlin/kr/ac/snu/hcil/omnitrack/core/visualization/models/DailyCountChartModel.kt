@@ -9,6 +9,7 @@ import io.realm.Sort
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
 import kr.ac.snu.hcil.omnitrack.core.visualization.Granularity
@@ -39,6 +40,11 @@ class DailyCountChartModel(tracker: OTTrackerDAO, realm: Realm, timeAttribute: O
     val timeAttributeLocalId: String? = timeAttribute?.localId
     val timeAttributeName: String? = timeAttribute?.name
 
+    private fun getTimestampOfItem(item: OTItemDAO): Long? {
+        return if (timeAttributeLocalId == null) {
+            item.timestamp
+        } else (item.getValueOf(timeAttributeLocalId) as? TimePoint)?.timestamp
+    }
 
     init{
         OTApp.instance.applicationComponent.inject(this)
@@ -65,7 +71,7 @@ class DailyCountChartModel(tracker: OTTrackerDAO, realm: Realm, timeAttribute: O
                     .firstOrError()
         }.map { items ->
                     DataHelper.ConvertSortedListToBinWithLong((xScale.binPointsOnDomain + getTimeScope().to).toTypedArray(),
-                            items, { item -> item.timestamp }).map { bin -> Pair(bin.x0, bin.values.size) }
+                            items, { item -> getTimestampOfItem(item) ?: 0L }).map { bin -> Pair(bin.x0, bin.values.size) }
                 }
     }
 

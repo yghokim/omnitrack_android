@@ -10,6 +10,7 @@ import io.realm.Sort
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
 import kr.ac.snu.hcil.omnitrack.core.visualization.INativeChartModel
@@ -39,8 +40,14 @@ class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm, timeAttribute: OT
     val timeAttributeLocalId: String? = timeAttribute?.localId
     val timeAttributeName: String? = timeAttribute?.name
 
-    init{
+    init {
         OTApp.instance.applicationComponent.inject(this)
+    }
+
+    private fun getTimestampOfItem(item: OTItemDAO): Long? {
+        return if (timeAttributeLocalId == null) {
+            item.timestamp
+        } else (item.getValueOf(timeAttributeLocalId) as? TimePoint)?.timestamp
     }
 
     override fun reloadData(): Single<List<ITimeBinnedHeatMap.CounterVector>> {
@@ -54,8 +61,7 @@ class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm, timeAttribute: OT
          */
 
         //make 2D array
-        val countMatrix = Array<IntArray>(xScale.numTicks) {
-            index ->
+        val countMatrix = Array<IntArray>(xScale.numTicks) { index ->
             IntArray(24 / hoursInYBin)
         }
 
@@ -64,7 +70,6 @@ class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm, timeAttribute: OT
 
 
         return if (timeAttributeLocalId != null) {
-
             Single.just(dbManager.getItemsQueriedWithTimeAttribute(tracker.objectId, getTimeScope(),
                     timeAttributeLocalId, realm).sortedBy { (it.getValueOf(timeAttributeLocalId) as TimePoint).timestamp })
         } else {
@@ -74,14 +79,12 @@ class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm, timeAttribute: OT
                     .asFlowable()
                     .filter { it.isLoaded }
                     .firstOrError()
-        }.map {
-            items ->
-            println("items for loging heatmap: ${items.size}")
+        }.map { items ->
             //println(items)
 
             var currentItemPointer = 0
 
-            for (xIndex in 0..xScale.numTicks - 1) {
+            for (xIndex in 0 until xScale.numTicks) {
                 //from this tick to next tick
                 val from = xScale.binPointsOnDomain[xIndex]
 
@@ -103,7 +106,7 @@ class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm, timeAttribute: OT
                         //counter = items.filter{ it.timestamp >= queryFrom && it.timestamp < queryTo }.size
 
                         if (currentItemPointer < items.size) {
-                            var timestamp = items[currentItemPointer]!!.timestamp
+                            var timestamp = getTimestampOfItem(items[currentItemPointer]) ?: items[currentItemPointer].timestamp
 
                             while (timestamp < queryTo) {
                                 if (timestamp >= queryFrom) {
@@ -112,7 +115,8 @@ class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm, timeAttribute: OT
 
                                 currentItemPointer++
                                 if (currentItemPointer >= items.size) break
-                                timestamp = items[currentItemPointer]!!.timestamp
+                                timestamp = getTimestampOfItem(items[currentItemPointer]) ?: items[currentItemPointer].timestamp
+
                             }
                         }
 
@@ -142,7 +146,7 @@ class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm, timeAttribute: OT
                 countMatrix.withIndex().mapTo(data) { xEntry -> ITimeBinnedHeatMap.CounterVector(xScale.binPointsOnDomain[xEntry.index], xEntry.value.map { it / maxValue.toFloat() }.toFloatArray()) }
             }
 
-                    data.toList()
+            data.toList()
         }
     }
 
@@ -152,6 +156,7 @@ class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm, timeAttribute: OT
                 String.format(OTApp.getString(R.string.msg_vis_logging_heatmap_title_format_with_time_attr), tracker.name, timeAttributeName)
             } else String.format(OTApp.instance.resourcesWrapped.getString(R.string.msg_vis_logging_heatmap_title_format), tracker.name)
         }
+
     override fun getChartDrawer(): AChartDrawer {
         return HeatMapDrawer()
     }
@@ -192,8 +197,7 @@ class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm, timeAttribute: OT
             verticalAxis.drawGridLines = true
             verticalAxis.drawBar = false
 
-            yScale.setCategories(*Array<String>(24 / hoursInYBin) {
-                index ->
+            yScale.setCategories(*Array<String>(24 / hoursInYBin) { index ->
                 val cal = Calendar.getInstance()
                 cal.setHourOfDay(index * hoursInYBin)
                 (index * hoursInYBin).toString()
@@ -242,17 +246,14 @@ class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm, timeAttribute: OT
 
             if (model is LoggingHeatMapModel) {
                 cellColumns.setData(this@LoggingHeatMapModel.cachedData)
-                cellColumns.appendEnterSelection {
-                    datum ->
-                    println("updating enter selection for datum ${datum}")
+                cellColumns.appendEnterSelection { datum ->
 
                     val cellGroup = DataEncodedDrawingList<Float, ITimeBinnedHeatMap.CounterVector>()
                     cellGroup.setData(
                             datum.value.distribution.toList()
                     )
 
-                    cellGroup.appendEnterSelection {
-                        count ->
+                    cellGroup.appendEnterSelection { count ->
                         val newCell = RectElement<Float>()
                         newCell.color = ColorUtils.setAlphaComponent(ContextCompat.getColor(OTApp.instance, R.color.colorPointed), (255 * count.value + 0.5f).toInt())
                         mapCellRectToSpace(newCell, datum.value.time, count.index)
@@ -265,8 +266,7 @@ class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm, timeAttribute: OT
                     @Suppress("UNCHECKED_CAST")
                     val rectList = column as DataEncodedDrawingList<Float, ITimeBinnedHeatMap.CounterVector>
                     rectList.setData(datum.value.distribution.toList())
-                    rectList.appendEnterSelection {
-                        count ->
+                    rectList.appendEnterSelection { count ->
                         val newCell = RectElement<Float>()
                         newCell.color = ColorUtils.setAlphaComponent(ContextCompat.getColor(OTApp.instance, R.color.colorPointed), (255 * count.value + 0.5f).toInt())
                         mapCellRectToSpace(newCell, datum.value.time, count.index)
