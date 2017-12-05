@@ -158,8 +158,6 @@ class OTApp : MultiDexApplication() {
         return numActivitiesActive.get() > 0
     }
 
-    private var initialRun = false
-
     private val numActivitiesActive = AtomicInteger(0)
 
     private var wrappedContext: Context? = null
@@ -346,6 +344,8 @@ class OTApp : MultiDexApplication() {
 
         //TODO start service in job controller
         //startService(this.binaryUploadServiceController.makeResumeUploadIntent())
+
+        triggerSystemComponent.getTriggerAlarmController().get().activateOnSystem()
 
         println("creation took ${SystemClock.elapsedRealtime() - startedAt}")
     }
