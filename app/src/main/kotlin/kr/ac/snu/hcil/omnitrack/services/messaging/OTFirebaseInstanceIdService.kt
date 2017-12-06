@@ -5,7 +5,6 @@ import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.iid.FirebaseInstanceIdService
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
@@ -43,7 +42,7 @@ class OTFirebaseInstanceIdService : FirebaseInstanceIdService() {
         )
     }
 
-    fun refreshInstanceIdToServerIfExists(ignoreIfStored: Boolean): Single<Boolean> {
+    private fun refreshInstanceIdToServerIfExists(ignoreIfStored: Boolean): Single<Boolean> {
         if (ignoreIfStored) {
             if (systemPreferences.contains(OTApp.PREFERENCE_KEY_FIREBASE_INSTANCE_ID)) {
                 return Single.just(false)
@@ -54,12 +53,8 @@ class OTFirebaseInstanceIdService : FirebaseInstanceIdService() {
         if (token != null && authManager.currentSignedInLevel > OTAuthManager.SignedInLevel.NONE) {
             systemPreferences.edit().putString(OTApp.PREFERENCE_KEY_FIREBASE_INSTANCE_ID, token)
                     .apply()
-            return synchronizationServerController.putDeviceInfo(OTDeviceInfo()).map { deviceInfoResult ->
-                val localKey = deviceInfoResult.deviceLocalKey
-                if (localKey != null) {
-                    authManager.userDeviceLocalKey = localKey
-                    return@map true
-                } else return@map false
+            return synchronizationServerController.putDeviceInfo(OTDeviceInfo()).flatMap { deviceInfoResult ->
+                authManager.handlePutDeviceInfoResult(deviceInfoResult)
             }
         } else {
             return Single.just(false)

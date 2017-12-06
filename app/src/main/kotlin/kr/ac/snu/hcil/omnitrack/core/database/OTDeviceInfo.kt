@@ -10,9 +10,9 @@ import kr.ac.snu.hcil.omnitrack.OTApp
  */
 @Keep
 class OTDeviceInfo {
-    var os: String? = "Android api-${android.os.Build.VERSION.SDK_INT}"
-    var deviceId: String? = OTApp.instance.deviceId
+    var os: String = "Android api-${android.os.Build.VERSION.SDK_INT}"
+    var deviceId: String = OTApp.instance.deviceId
     var instanceId: String? = FirebaseInstanceId.getInstance().token
     var firstLoginAt: Long = System.currentTimeMillis()
-    var appVersion: String? = BuildConfig.VERSION_NAME
+    var appVersion: String = BuildConfig.VERSION_NAME
 }

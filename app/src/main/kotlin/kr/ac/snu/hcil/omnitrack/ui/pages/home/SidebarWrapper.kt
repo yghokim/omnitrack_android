@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.home
 
+import android.arch.lifecycle.LifecycleObserver
 import android.content.Intent
-import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.AppCompatImageButton
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -9,15 +9,21 @@ import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
 import android.widget.PopupMenu
-import android.widget.TextView
 import com.bumptech.glide.Glide
 import dagger.Lazy
+import dagger.internal.Factory
 import de.hdodenhof.circleimageview.CircleImageView
+import io.reactivex.BackpressureStrategy
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.SerialDisposable
+import io.realm.Realm
+import kotlinx.android.synthetic.main.layout_home_sidebar.view.*
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTUserDAO
+import kr.ac.snu.hcil.omnitrack.core.di.Backend
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.viewholders.RecyclerViewMenuAdapter
@@ -29,7 +35,10 @@ import javax.inject.Inject
 /**
  * Created by Young-Ho Kim on 2017-01-31.
  */
-class SidebarWrapper(val view: View, val parentActivity: AppCompatActivity) : PopupMenu.OnMenuItemClickListener {
+class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu.OnMenuItemClickListener, LifecycleObserver {
+
+    @field:[Inject Backend]
+    lateinit var realmFactory: Factory<Realm>
 
     @Inject
     lateinit var authManager: OTAuthManager
@@ -40,8 +49,11 @@ class SidebarWrapper(val view: View, val parentActivity: AppCompatActivity) : Po
     @Inject
     lateinit var eventLogger: Lazy<IEventLogger>
 
+    private lateinit var realm: Realm
+
+    private val userWatchDisposable = SerialDisposable()
+
     private val photoView: CircleImageView = view.findViewById(R.id.ui_user_photo)
-    private val nameView: TextView = view.findViewById(R.id.ui_user_name)
     private val profileMenuButton: AppCompatImageButton = view.findViewById(R.id.ui_button_profile_menu)
 
     private val menuList: RecyclerView = view.findViewById(R.id.ui_menu_list)
@@ -84,9 +96,7 @@ class SidebarWrapper(val view: View, val parentActivity: AppCompatActivity) : Po
 
                     eventLogger.get().logEvent(IEventLogger.NAME_AUTH, IEventLogger.SUB_SIGNED_OUT)
 
-                    if (parentActivity is OTActivity) {
-                        parentActivity.goSignIn()
-                    }
+                    parentActivity.goSignIn()
                 }).show()
                 return true
             }
@@ -97,21 +107,36 @@ class SidebarWrapper(val view: View, val parentActivity: AppCompatActivity) : Po
     }
 
     fun onCreate() {
-        subscriptions.add(
-                authManager.userNameObservable.subscribe { (name) ->
-                    nameView.text = name
-                }
-        )
+        realm = realmFactory.get()
 
-        subscriptions.add(
-                authManager.userImageUrlObservable.subscribe { uri ->
-                    Glide.with(parentActivity).load(uri).into(photoView)
-                }
-        )
+        userWatchDisposable.set(
+                parentActivity.signedInUserObservable.toFlowable(BackpressureStrategy.LATEST).flatMap { userId ->
+                    realm = realmFactory.get()
+                    return@flatMap realm.where(OTUserDAO::class.java).equalTo("uid", userId).findFirstAsync().asFlowable<OTUserDAO>().filter { it.isValid && it.isLoaded }
+                }.subscribe { user ->
+                    view.ui_user_name.text = user.name
+                    view.ui_user_email.text = user.email
+                    Glide.with(parentActivity).load(user.photoServerPath).into(photoView)
+                })
     }
 
     fun onDestroy() {
+        userWatchDisposable.set(null)
         subscriptions.clear()
+
+        if (this::realm.isInitialized) {
+            if (!realm.isClosed) {
+                realm.close()
+            }
+        }
+    }
+
+    fun onShowSidebar() {
+        println("sidebar showed")
+    }
+
+    fun onHideSidebar() {
+        println("sidebar hidden")
     }
 
     inner class SidebarMenuAdapter : RecyclerViewMenuAdapter() {

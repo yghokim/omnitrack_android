@@ -203,6 +203,7 @@
             </intent-filter>
         </service>
         <service android:name=".services.OTBinaryLocalCacheService" />
+        <service android:name=".services.OTInformationUploadService" />
 
 
         <meta-data

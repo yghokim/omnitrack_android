@@ -42,12 +42,6 @@ class OTApp : MultiDexApplication() {
         const val PREFIX_ACTION = "${BuildConfig.APPLICATION_ID}.action"
         const val PREFIX_PREF_KEY = "${BuildConfig.APPLICATION_ID}.preference"
 
-
-        const val SHARED_PREFERENCES_USER_NAME = "omnitrack_app_system"
-
-        const val ACCOUNT_DATASET_EXPERIMENT = "experiment"
-        const val ACCOUNT_DATASET_EXPERIMENT_KEY_EMAIL = "email"
-        const val ACCOUNT_DATASET_EXPERIMENT_KEY_IS_CONSENT_APPROVED = "consent_approved"
         const val ACCOUNT_DATASET_EXPERIMENT_KEY_GENDER = "gender"
         const val ACCOUNT_DATASET_EXPERIMENT_KEY_OCCUPATION = "occupation"
         const val ACCOUNT_DATASET_EXPERIMENT_KEY_AGE_GROUP = "age_group"
@@ -103,9 +97,6 @@ class OTApp : MultiDexApplication() {
 
         const val PREFERENCE_KEY_FIREBASE_INSTANCE_ID = "$PREFIX_PREF_KEY.firebase_instance_id"
 
-        const val PREFERENCE_KEY_DEVICE_LOCAL_KEY = "${PREFIX_PREF_KEY}.device_local_key"
-
-        const val PREFERENCE_KEY_CONSENT_APPROVED = "${PREFIX_PREF_KEY}.consent_approvde"
 
         fun getString(resId: Int): String {
             return instance.resourcesWrapped.getString(resId)
@@ -126,9 +117,9 @@ class OTApp : MultiDexApplication() {
 
     val deviceId: String by lazy {
         val deviceUUID: UUID
-        val cached: String? = applicationComponent.defaultPreferences().getString("cached_device_id", "")
-        if (!cached.isNullOrBlank()) {
-            deviceUUID = UUID.fromString(cached)
+        val cached: String = applicationComponent.defaultPreferences().getString("cached_device_id", "")
+        if (cached.isNotBlank()) {
+            return@lazy cached
         } else {
             val androidUUID = Settings.Secure.getString(this.contentResolver, Settings.Secure.ANDROID_ID)
             if (!androidUUID.isNullOrBlank()) {
@@ -148,10 +139,11 @@ class OTApp : MultiDexApplication() {
                     throw ex
                 }
             }
-        }
+            val finalId = "$deviceUUID;${BuildConfig.APPLICATION_ID}"
 
-        applicationComponent.defaultPreferences().edit().putString("cached_device_id", deviceUUID.toString()).apply()
-        deviceUUID.toString()
+            applicationComponent.defaultPreferences().edit().putString("cached_device_id", finalId).apply()
+            finalId
+        }
     }
 
     val isAppInForeground: Boolean get() {

@@ -118,12 +118,6 @@ class SendReportActivity : MultiButtonActionBarActivity(R.layout.activity_send_r
             val inquiry = HashMap<String, Any>()
             inquiry["anonymous"] = isAnonymous
             if (!isAnonymous) {
-                authManager.reloadUserInfo()
-
-                authManager.email?.let {
-                    inquiry["email"] = it
-                }
-
                 authManager.userId?.let {
                     inquiry["sender"] = it
                 }
@@ -134,8 +128,8 @@ class SendReportActivity : MultiButtonActionBarActivity(R.layout.activity_send_r
 
             val deviceInfo = OTDeviceInfo()
 
-            inquiry["os"] = deviceInfo.os ?: "unknown"
-            inquiry["appVersion"] = deviceInfo.appVersion ?: "unknown"
+            inquiry["os"] = deviceInfo.os
+            inquiry["appVersion"] = deviceInfo.appVersion
 
             val inquiryJson = Gson().toJsonTree(inquiry).asJsonObject
             println("inquiry json: ${inquiryJson}")

@@ -54,6 +54,7 @@ class NetworkModule {
                             .addHeader("OTDeviceId", deviceId.get())
                             .addHeader("OTFingerPrint", fingerPrint)
                             .addHeader("OTPackageName", BuildConfig.APPLICATION_ID)
+                            .addHeader("OTRole", "ServiceUser")
                             .build()
                     chain.proceed(newRequest)
                 }.build()

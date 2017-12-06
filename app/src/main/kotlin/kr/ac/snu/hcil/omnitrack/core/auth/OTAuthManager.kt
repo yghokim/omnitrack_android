@@ -3,7 +3,6 @@ package kr.ac.snu.hcil.omnitrack.core.auth
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.ApplicationInfo
-import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
@@ -19,23 +18,29 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import dagger.Lazy
+import dagger.internal.Factory
 import io.reactivex.Maybe
 import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposables
 import io.reactivex.schedulers.Schedulers
-import io.reactivex.subjects.BehaviorSubject
+import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTUserDAO
+import kr.ac.snu.hcil.omnitrack.core.di.Backend
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationServerSideAPI
-import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.getActivity
+import javax.inject.Inject
 
 /**
  * Created by Young-Ho Kim on 2017-02-03.
  */
-class OTAuthManager(val app: OTApp, val sharedPreferences: SharedPreferences, val synchronizationServerController: Lazy<ISynchronizationServerSideAPI>) {
+class OTAuthManager(val app: OTApp,
+                    private val sharedPreferences: SharedPreferences,
+                    private val synchronizationServerController: Lazy<ISynchronizationServerSideAPI>) {
 
     companion object {
         const val LOG_TAG = "OMNITRACK Auth Manager"
@@ -68,41 +73,11 @@ class OTAuthManager(val app: OTApp, val sharedPreferences: SharedPreferences, va
     private var mIntentInProgress = false
     private var mResultsHandler: SignInResultsHandler? = null
 
-    private val _emailSubject = BehaviorSubject.createDefault<Nullable<String>>(Nullable())
-    val emailObservable: Observable<Nullable<String>> get() = _emailSubject
-    var email: String?
-        get() = _emailSubject.value.datum
-        private set(value) {
-            if (_emailSubject.value.datum != value) {
-                _emailSubject.onNext(Nullable(value))
-            }
-        }
-
-    private val _userNameSubject = BehaviorSubject.createDefault<Nullable<String>>(Nullable())
-    val userNameObservable: Observable<Nullable<String>> get() = _userNameSubject
-    var userName: String?
-        get() = _userNameSubject.value.datum
-        private set(value) {
-            if (_userNameSubject.value.datum != value) {
-                _userNameSubject.onNext(Nullable(value))
-            }
-        }
-
-    private val _userImageUrlSubject = BehaviorSubject.createDefault(Uri.EMPTY)
-    val userImageUrlObservable: Observable<Uri> get() = _userImageUrlSubject
-    var userImageUrl: Uri
-        get() = _userImageUrlSubject.value
-        private set(value) {
-            if (_userImageUrlSubject.value != value) {
-                _userImageUrlSubject.onNext(value)
-            }
-        }
+    @field:[Inject Backend]
+    lateinit var realmFactory: Factory<Realm>
 
     init {
-
-        clearUserInfo()
-
-        reloadUserInfo()
+        app.applicationComponent.inject(this)
 
         Log.d(LOG_TAG, "Initializing Google SDK...")
 
@@ -111,6 +86,41 @@ class OTAuthManager(val app: OTApp, val sharedPreferences: SharedPreferences, va
                 .addApi(Auth.GOOGLE_SIGN_IN_API, mGoogleSignInOptions)
                 .build()
         mGoogleApiClient.connect()
+    }
+
+    fun getDeviceLocalKey(): String? {
+        val uid = userId
+        if (uid != null) {
+            return realmFactory.get().use { realm ->
+                realm.where(OTUserDAO::class.java).equalTo("uid", uid)
+                        .findFirst()?.uid
+            }
+        } else return null
+    }
+
+
+    fun getIsConsentApproved(): Boolean {
+        val uid = userId
+        if (uid != null) {
+            return realmFactory.get().use { realm ->
+                realm.where(OTUserDAO::class.java).equalTo("uid", uid)
+                        .findFirst()?.consentApproved ?: false
+            }
+        } else return false
+    }
+
+    fun setIsConsentApproved(approved: Boolean) {
+        val uid = userId
+        if (uid != null) {
+            return realmFactory.get().use { realm ->
+                realm.where(OTUserDAO::class.java).equalTo("uid", uid)
+                        .findFirst()?.let { user ->
+                    realm.executeTransaction {
+                        user.consentApproved = approved
+                    }
+                }
+            }
+        }
     }
 
     /*
@@ -137,17 +147,11 @@ class OTAuthManager(val app: OTApp, val sharedPreferences: SharedPreferences, va
         }
     }.share().observeOn(Schedulers.io())
     */
-    val userId: String? get() = mFirebaseAuth.currentUser?.uid
-
-    var userDeviceLocalKey: String?
-        get() = sharedPreferences.getString(OTApp.PREFERENCE_KEY_DEVICE_LOCAL_KEY, null)
-        set(value) {
-            println("set device local key: ${value}")
-            if (value != null) {
-                sharedPreferences.edit().putString(OTApp.PREFERENCE_KEY_DEVICE_LOCAL_KEY, value).apply()
-            } else {
-                sharedPreferences.edit().remove(OTApp.PREFERENCE_KEY_DEVICE_LOCAL_KEY).apply()
-            }
+    val userId: String?
+        get() {
+            val id = mFirebaseAuth.currentUser?.uid
+            println("user id: $id")
+            return id
         }
 
     fun isUserSignedIn(): Boolean {
@@ -204,7 +208,6 @@ class OTAuthManager(val app: OTApp, val sharedPreferences: SharedPreferences, va
         loadGoogleSignInAccount().flatMapObservable { acc ->
             firebaseAuthWithGoogle(acc)
         }.subscribe({ authResult ->
-            reloadUserInfo()
             notifySignedIn(authResult.user)
             resultsHandler.onSuccess()
         }, { ex ->
@@ -275,6 +278,32 @@ class OTAuthManager(val app: OTApp, val sharedPreferences: SharedPreferences, va
         activity.startActivityForResult(signInIntent, RC_SIGN_IN)
     }
 
+    fun handlePutDeviceInfoResult(result: ISynchronizationServerSideAPI.DeviceInfoResult): Single<Boolean> {
+        return Single.defer {
+            val localKey = result.deviceLocalKey
+            if (localKey != null) {
+                userId?.let { uid ->
+                    realmFactory.get().use { realm ->
+                        realm.executeTransaction {
+                            val user = realm.where(OTUserDAO::class.java).equalTo("uid", uid).findFirst() ?: realm.createObject(OTUserDAO::class.java, uid)
+                            user.thisDeviceLocalKey = localKey
+
+                            if (result.payloads != null) {
+                                user.email = result.payloads["email"] ?: ""
+                                user.photoServerPath = result.payloads["picture"] ?: ""
+                                user.name = result.payloads["name"] ?: ""
+                                user.consentApproved = result.payloads["consentApproved"]?.toBoolean() ?: false
+                                user.informationSynchronizedAt = System.currentTimeMillis()
+                            }
+                        }
+                    }
+
+                    return@defer Single.just(true)
+                }
+            } else return@defer Single.just(false)
+        }
+    }
+
     fun handleActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == RC_SIGN_IN) {
             mIntentInProgress = false
@@ -294,12 +323,8 @@ class OTAuthManager(val app: OTApp, val sharedPreferences: SharedPreferences, va
                 println("signed in google account: ${result.signInAccount}")
                 firebaseAuthWithGoogle(result.signInAccount!!).flatMap { authResult ->
                     synchronizationServerController.get().putDeviceInfo(OTDeviceInfo()).
-                            map { result ->
-                                val localKey = result.deviceLocalKey
-                                if (localKey != null) {
-                                    userDeviceLocalKey = localKey
-                                    return@map true
-                                } else return@map false
+                            flatMap { result ->
+                                handlePutDeviceInfoResult(result)
                             }
                             .toObservable()
                             .map { success ->
@@ -310,7 +335,6 @@ class OTAuthManager(val app: OTApp, val sharedPreferences: SharedPreferences, va
                             }
                 }.observeOn(AndroidSchedulers.mainThread()).subscribe({ authResult ->
                     println("sign in succeeded.")
-                    reloadUserInfo()
                     notifySignedIn(authResult.user)
                     resultHandler?.onSuccess()
                 }, {
@@ -369,7 +393,6 @@ class OTAuthManager(val app: OTApp, val sharedPreferences: SharedPreferences, va
         clearUserInfo()
         mFirebaseAuth.signOut()
         Auth.GoogleSignInApi.signOut(mGoogleApiClient)
-        userDeviceLocalKey = null
         notifySignedOut()
     }
 
@@ -382,19 +405,12 @@ class OTAuthManager(val app: OTApp, val sharedPreferences: SharedPreferences, va
     }
 
     fun clearUserInfo() {
-        userName = null
-        userImageUrl = Uri.EMPTY
-        email = null
-
-    }
-
-    fun reloadUserInfo() {
-        userName = mFirebaseAuth.currentUser?.displayName
-        email = mFirebaseAuth.currentUser?.email
-        Log.v("OMNITRACK", "email: " + email)
-        val photoUrl = mFirebaseAuth.currentUser?.photoUrl
-        if (photoUrl != null) {
-            userImageUrl = photoUrl
+        if (userId != null) {
+            realmFactory.get().use { realm ->
+                realm.executeTransaction { realm ->
+                    realm.where(OTUserDAO::class.java).equalTo("uid", userId).findAll().deleteAllFromRealm()
+                }
+            }
         }
     }
 

@@ -17,10 +17,7 @@ import kr.ac.snu.hcil.omnitrack.core.net.OTOfficialServerApiController
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.core.visualization.models.*
 import kr.ac.snu.hcil.omnitrack.receivers.RebootReceiver
-import kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService
-import kr.ac.snu.hcil.omnitrack.services.OTSynchronizationService
-import kr.ac.snu.hcil.omnitrack.services.OTTableExportService
-import kr.ac.snu.hcil.omnitrack.services.OTUsageLogUploadService
+import kr.ac.snu.hcil.omnitrack.services.*
 import kr.ac.snu.hcil.omnitrack.services.messaging.OTFirebaseInstanceIdService
 import kr.ac.snu.hcil.omnitrack.services.messaging.OTFirebaseMessagingService
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
@@ -149,4 +146,5 @@ interface ApplicationComponent {
 
     fun inject(service: OTFirebaseMessagingService)
     fun inject(service: OTUsageLogUploadService)
+    fun inject(service: OTInformationUploadService)
 }

@@ -117,7 +117,7 @@ class SignInActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         authManager.handleActivityResult(requestCode, resultCode, data)
-        consentManager.handleActivityResult(true, requestCode, resultCode, data)
+        consentManager.handleActivityResult(requestCode, resultCode, data)
     }
 
     private fun goHomeActivity() {
