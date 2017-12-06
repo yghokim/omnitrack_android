@@ -15,7 +15,7 @@ interface ISynchronizationServerSideAPI {
 
 
     @Keep
-    data class DeviceInfoResult(var result: String, var deviceLocalKey: String?)
+    data class DeviceInfoResult(var result: String, var deviceLocalKey: String?, val payloads: Map<String, String>? = null)
 
     @Keep
     data class DirtyRowBatchParameter(val type: ESyncDataType, val rows: Array<String>)

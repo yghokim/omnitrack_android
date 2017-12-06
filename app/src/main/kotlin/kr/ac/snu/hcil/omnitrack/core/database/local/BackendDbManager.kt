@@ -9,7 +9,6 @@ import io.reactivex.Single
 import io.reactivex.subjects.PublishSubject
 import io.realm.*
 import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.*
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels.OTItemBuilderDAO
 import kr.ac.snu.hcil.omnitrack.core.datatypes.OTServerFile
@@ -34,7 +33,6 @@ import javax.inject.Singleton
 @Singleton
 class BackendDbManager @Inject constructor(
         @Backend private val config: RealmConfiguration,
-        private val authManager: OTAuthManager,
         private val shortcutPanelManager: Lazy<OTShortcutPanelManager>,
         private val serializationManager: DaoSerializationManager,
         private val triggerSystemManager: OTTriggerSystemManager,

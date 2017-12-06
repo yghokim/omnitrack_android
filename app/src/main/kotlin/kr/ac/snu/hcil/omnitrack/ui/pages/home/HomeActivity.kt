@@ -15,6 +15,7 @@ import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import butterknife.bindView
+import kotlinx.android.synthetic.main.layout_home_sidebar.*
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
@@ -95,7 +96,7 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
         //Setup sliding menu
         drawerLayout.addDrawerListener(this)
 
-        sidebar = SidebarWrapper(findViewById(R.id.ui_sidebar), this)
+        sidebar = SidebarWrapper(ui_sidebar, this)
         sidebar.onCreate()
 
         creationSubscriptions.add(
@@ -163,6 +164,7 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
 
 
     override fun onDrawerClosed(drawerView: View) {
+        sidebar.onHideSidebar()
     }
 
     override fun onDrawerStateChanged(newState: Int) {
@@ -172,6 +174,7 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
     }
 
     override fun onDrawerOpened(drawerView: View) {
+        sidebar.onShowSidebar()
     }
 
 
@@ -180,6 +183,14 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
             super.onBackPressed()
         } else {
             mViewPager.setCurrentItem(0, true)
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        if (drawerLayout.isDrawerOpen(ui_sidebar)) {
+            sidebar.onShowSidebar()
         }
     }
 

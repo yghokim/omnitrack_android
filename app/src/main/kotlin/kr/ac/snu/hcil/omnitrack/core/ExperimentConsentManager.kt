@@ -3,6 +3,7 @@ package kr.ac.snu.hcil.omnitrack.core
 import android.content.Intent
 import android.content.SharedPreferences
 import android.support.v7.app.AppCompatActivity
+import io.reactivex.disposables.CompositeDisposable
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationServerSideAPI
@@ -29,16 +30,25 @@ class ExperimentConsentManager @Inject constructor(val authManager: OTAuthManage
     private var mActivity: AppCompatActivity? = null
     private var mResultListener: ResultListener? = null
 
+    private val subscriptions = CompositeDisposable()
+
+    fun destroyProcess() {
+        subscriptions.clear()
+    }
+
 
     fun startProcess(activity: AppCompatActivity, userId: String, resultListener: ResultListener? = null) {
         mActivity = activity
         mResultListener = resultListener
 
-        if (systemPreferences.getBoolean(OTApp.PREFERENCE_KEY_CONSENT_APPROVED, false)) {
+
+
+        if (authManager.getIsConsentApproved()) {
             mResultListener?.onConsentApproved()
             finishProcess()
         } else {
-
+            activity.startActivityForResult(Intent(activity, ExperimentSignInActivity::class.java), REQUEST_CODE_EXPERIMENT_SIGN_IN)
+/*
             synchronizationServerController.getUserRoles().subscribe({ result ->
                 val userRole = result.find { it.role == "ServiceUser" }
                 if (userRole == null || !userRole.isConsentApproved) {
@@ -53,7 +63,8 @@ class ExperimentConsentManager @Inject constructor(val authManager: OTAuthManage
                 error.printStackTrace()
                 mResultListener?.onConsentFailed()
                 finishProcess()
-            })
+            })*/
+
         }
 
         /*
@@ -82,31 +93,13 @@ class ExperimentConsentManager @Inject constructor(val authManager: OTAuthManage
     }
 
     private fun onApproved() {
-        systemPreferences.edit().putBoolean(OTApp.PREFERENCE_KEY_CONSENT_APPROVED, true).apply()
+        authManager.setIsConsentApproved(true)
         mResultListener?.onConsentApproved()
     }
 
-    fun handleActivityResult(deleteAccountIfDenied: Boolean, requestCode: Int, resultCode: Int, data: Intent?) {
+    fun handleActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_CODE_EXPERIMENT_SIGN_IN) {
             if (resultCode != AppCompatActivity.RESULT_OK || data == null) {
-                if (deleteAccountIfDenied) {
-                    //DatabaseManager.experimentProfileRef?.removeValue()
-
-                    authManager.deleteUser(object : OTAuthManager.SignInResultsHandler {
-                        override fun onCancel() {
-                        }
-
-                        override fun onError(e: Throwable) {
-
-                        }
-
-                        override fun onSuccess() {
-
-                        }
-
-                    })
-                }
-
                 mResultListener?.onConsentFailed()
                 finishProcess()
             } else {

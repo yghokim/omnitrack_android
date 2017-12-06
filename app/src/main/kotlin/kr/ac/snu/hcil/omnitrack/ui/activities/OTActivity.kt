@@ -207,7 +207,7 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
                 recreate()
             }
         } else {
-            consentManager.handleActivityResult(false, requestCode, resultCode, data)
+            consentManager.handleActivityResult(requestCode, resultCode, data)
         }
 
     }

@@ -65,7 +65,7 @@ class OTAttributeManager @Inject constructor(val authManager: Lazy<OTAuthManager
     fun makeNewAttributeLocalId(createdAt: Long = System.currentTimeMillis()): String {
         val nanoStamp = attributeLocalIdGenerator.getNewUniqueLong(createdAt)
 
-        val id = authManager.get().userDeviceLocalKey + "_" + nanoStamp.toString(36)
+        val id = authManager.get().getDeviceLocalKey() + "_" + nanoStamp.toString(36)
         println("new attribute local id: ${id}")
         return id
     }

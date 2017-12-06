@@ -5,10 +5,7 @@ import android.os.Bundle
 import com.firebase.jobdispatcher.*
 import dagger.Module
 import dagger.Provides
-import kr.ac.snu.hcil.omnitrack.services.OTBinaryUploadService
-import kr.ac.snu.hcil.omnitrack.services.OTSynchronizationService
-import kr.ac.snu.hcil.omnitrack.services.OTUsageLogUploadService
-import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckService
+import kr.ac.snu.hcil.omnitrack.services.*
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
@@ -120,6 +117,17 @@ class ScheduledJobModule {
                 .build()
     }
 
+    @Provides
+    @Singleton
+    @InformationUpload
+    fun providesInformationUploadJobBuilder(builder: Job.Builder): Job.Builder {
+        return builder.setService(OTInformationUploadService::class.java)
+                .setLifetime(Lifetime.FOREVER)
+                .setReplaceCurrent(true)
+                .setTrigger(Trigger.executionWindow(0, 20))
+                .setRetryStrategy(RetryStrategy.DEFAULT_EXPONENTIAL)
+                .addConstraint(Constraint.ON_ANY_NETWORK)
+    }
 
 }
 
@@ -131,3 +139,7 @@ class ScheduledJobModule {
 
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME) annotation class ServerSyncOneShot
+
+
+@Qualifier
+@Retention(AnnotationRetention.RUNTIME) annotation class InformationUpload
