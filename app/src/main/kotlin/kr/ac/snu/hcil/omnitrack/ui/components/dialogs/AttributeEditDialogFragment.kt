@@ -1,7 +1,11 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.dialogs
 
+import android.app.Application
 import android.app.Dialog
+import android.arch.lifecycle.ViewModelProviders
+import android.content.Context
 import android.os.Bundle
+import android.support.v4.app.DialogFragment
 import android.support.v4.app.FragmentManager
 import android.view.LayoutInflater
 import android.view.View
@@ -10,8 +14,8 @@ import com.afollestad.materialdialogs.MaterialDialog
 import dagger.internal.Factory
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
-import io.reactivex.disposables.Disposables
+import io.reactivex.disposables.SerialDisposable
+import io.reactivex.subjects.BehaviorSubject
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
@@ -19,16 +23,18 @@ import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.di.Backend
-import kr.ac.snu.hcil.omnitrack.ui.components.common.RxBoundDialogFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.common.container.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
-import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
+import kr.ac.snu.hcil.omnitrack.ui.viewmodels.RealmViewModel
+import kr.ac.snu.hcil.omnitrack.utils.Nullable
+import kr.ac.snu.hcil.omnitrack.utils.onNextIfDifferAndNotNull
+import org.jetbrains.anko.support.v4.act
 import javax.inject.Inject
 
 /**
  * Created by younghokim on 2017. 4. 14..
  */
-class AttributeEditDialogFragment : RxBoundDialogFragment() {
+class AttributeEditDialogFragment : DialogFragment() {
 
     companion object {
         const val TAG = "AttributeEditDialog"
@@ -52,19 +58,15 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
         fun onOkAttributeEditDialog(changed: Boolean, value: Any?, trackerId: String, attributeLocalId: String, itemId: String?)
     }
 
-    private var trackerId: String? = null
-    private var item: OTItemDAO? = null
-    private var attribute: OTAttributeDAO? = null
-
     private lateinit var container: LockableFrameLayout
     private lateinit var progressBar: View
 
     private var titleView: TextView? = null
     private var valueView: AAttributeInputView<out Any>? = null
 
-    private var isContentLoaded: Boolean = false
-
     private val listeners = HashSet<Listener>()
+
+    private lateinit var viewModel: ViewModel
 
     lateinit var realm: Realm
 
@@ -81,10 +83,27 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
         this.listeners.add(listener)
     }
 
+    override fun onDetach() {
+        super.onDetach()
+        subscriptions.clear()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        //retainInstance = true
         (activity?.application as? OTApp)?.applicationComponent?.inject(this)
         realm = realmFactory.get()
+
+        viewModel = ViewModelProviders.of(this).get(ViewModel::class.java)
+
+        val arguments = this.arguments
+        if (arguments != null) {
+            val trackerId = arguments.getString(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
+            val attributeLocalId = arguments.getString(OTApp.INTENT_EXTRA_LOCAL_ID_ATTRIBUTE)
+            val itemId = arguments.getString(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM)
+
+            viewModel.init(trackerId, itemId, attributeLocalId)
+        }
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -107,18 +126,10 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
                         subscriptions.add(
                                 valueView.forceApplyValueAsync().subscribe { (value) ->
                                     val changed: Boolean
-                                    if (this.item == null) {
-                                        changed = true
-                                    } else {
-                                        val itemValue = attribute?.localId?.let { this.item?.getValueOf(it) }
-                                        changed = value != itemValue
-                                    }
-
-                                    val attribute = attribute
-                                    val trackerId = trackerId
-                                    if (trackerId != null && attribute != null) {
+                                    if (viewModel.initialized) {
+                                        changed = viewModel.originalValue != viewModel.frontalItemValue.value?.datum
                                         for (listener in listeners) {
-                                            listener.onOkAttributeEditDialog(changed, value, trackerId, attribute.localId, item?.objectId)
+                                            listener.onOkAttributeEditDialog(changed, value, viewModel.trackerId, viewModel.attributeLocalId, viewModel.itemId)
                                         }
                                     }
 
@@ -145,74 +156,52 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
         if (activity is Listener && savedInstanceState != null) {
             addListener(activity)
         }
-    }
-
-    override fun onBind(savedInstanceState: Bundle?): Disposable {
-        val bundle = savedInstanceState ?: arguments ?: Bundle()
 
         container.locked = true
         container.alpha = 0.25f
         progressBar.visibility = View.VISIBLE
 
-        if (bundle.containsKey(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
-                && bundle.containsKey(OTApp.INTENT_EXTRA_LOCAL_ID_ATTRIBUTE)) {
-            trackerId = bundle.getString(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
-            val attributeLocalId = bundle.getString(OTApp.INTENT_EXTRA_LOCAL_ID_ATTRIBUTE)
-            val itemId = bundle.getString(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM)
-
-            val itemObservable = dbManager
-                    .makeItemsQuery(trackerId, null, null, realm)
-                    .equalTo("objectId", itemId).findFirstAsync()
-                    .asFlowable<OTItemDAO>().filter { it.isValid && it.isLoaded }
-                    .firstOrError()
-                    .doOnSuccess { this.item = it }
-
-            val attributeObservable = realm.where(OTAttributeDAO::class.java).equalTo("trackerId", trackerId).equalTo("localId", attributeLocalId)
-                    .findFirstAsync()
-                    .asFlowable<OTAttributeDAO>().filter { it.isValid && it.isLoaded }
-                    .firstOrError()
-                    .doOnSuccess { this.attribute = it }
-
-            return Single.zip(listOf(attributeObservable, itemObservable)) { array ->
-                println("item edit dialog: loaded attribute and item (zip)")
-                val attribute = array[0] as OTAttributeDAO
-                val item = array[1] as OTItemDAO
-                Pair(attribute, item)
-            }.subscribe { (attr, item) ->
-                println("item edit dialog: loaded attribute and item")
-                this.titleView?.text = String.format(resources.getString(R.string.msg_format_attribute_edit_dialog_title), attr.name)
-                this.valueView = attr.getHelper().getInputView(context!!, false, attr, this.valueView)
-                this.valueView?.boundAttributeObjectId = attr.objectId
-
-                if (valueView != null) {
-                    valueView?.onCreate(savedInstanceState)
-                    valueView?.onResume()
-                    if (this.container.getChildAt(0) !== valueView) {
-                        this.container.removeAllViewsInLayout()
-                        this.container.addView(valueView)
-                    }
+        subscriptions.add(
+                viewModel.attributeName.subscribe {
+                    this.titleView?.text = String.format(resources.getString(R.string.msg_format_attribute_edit_dialog_title), it)
                 }
+        )
 
-                val cachedItemValue = bundle.getString(EXTRA_SERIALIZED_VALUE)
-                if (cachedItemValue != null) {
-                    val value = TypeStringSerializationHelper.deserialize(cachedItemValue)
-                    this.valueView?.setAnyValue(value)
-                } else {
-                    if (this.attribute != null) {
-                        val value = item.getValueOf(attr.localId)
-                        if (value != null) {
-                            println("value : $value")
-                            this.valueView?.setAnyValue(value)
+        subscriptions.add(
+                viewModel.onInformationMounted.subscribe {
+                    println("item edit dialog: loaded attribute and item")
+                    this.valueView = viewModel.makeItemView(act, this.valueView)
+                    if (valueView != null) {
+                        valueView?.onCreate(savedInstanceState)
+                        valueView?.onResume()
+                        if (this.container.getChildAt(0) !== valueView) {
+                            this.container.removeAllViewsInLayout()
+                            valueView?.id = View.generateViewId()
+                            this.container.addView(valueView)
                         }
-                    }
-                }
 
-                progressBar.visibility = View.GONE
-                container.alpha = 1f
-                container.locked = false
-                isContentLoaded = true
-            }
-        } else return Disposables.empty()
+
+                        subscriptions.add(
+                                this.valueView!!.valueChanged.observable.subscribe { (sender, value) ->
+                                    viewModel.frontalItemValue.onNextIfDifferAndNotNull(Nullable(value))
+                                }
+                        )
+                    }
+
+                    subscriptions.add(
+                            viewModel.frontalItemValue.subscribe { (value) ->
+                                println("value : $value")
+                                this.valueView?.setAnyValue(value)
+
+                                progressBar.visibility = View.GONE
+                                container.alpha = 1f
+                                container.locked = false
+                            }
+                    )
+
+                }
+        )
+
     }
 
     override fun onLowMemory() {
@@ -227,9 +216,6 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        trackerId = null
-        item = null
-        attribute = null
         valueView?.onDestroy()
     }
 
@@ -238,35 +224,15 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
         valueView?.onPause()
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        valueView?.let {
-            outState.putString(EXTRA_SERIALIZED_VALUE, it.value?.let { TypeStringSerializationHelper.serialize(it) })
-        }
-
-        trackerId?.let {
-            outState.putString(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, trackerId)
-        }
-
-        attribute?.let {
-            outState.putString(OTApp.INTENT_EXTRA_LOCAL_ID_ATTRIBUTE, it.localId)
-        }
-
-        item?.let {
-            outState.putString(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM, it.objectId)
-        }
-    }
-
     private fun setupViews(inflater: LayoutInflater, savedInstanceState: Bundle?): View {
-
         /*
-        val layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-        val view = FrameLayout(activity)
-        view.layoutParams = layoutParams
-        val horizontalPadding = resources.getDimensionPixelSize(R.dimen.activity_horizontal_margin)
-        val verticalPadding = resources.getDimensionPixelSize(R.dimen.activity_vertical_margin)
-        view.setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding)
-        */
+    val layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+    val view = FrameLayout(activity)
+    view.layoutParams = layoutParams
+    val horizontalPadding = resources.getDimensionPixelSize(R.dimen.activity_horizontal_margin)
+    val verticalPadding = resources.getDimensionPixelSize(R.dimen.activity_vertical_margin)
+    view.setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding)
+    */
         val view = inflater.inflate(R.layout.layout_item_field_edit_dialog, null, false)
         progressBar = view.findViewById(R.id.ui_progress_bar)
         container = view.findViewById(R.id.container)
@@ -277,4 +243,78 @@ class AttributeEditDialogFragment : RxBoundDialogFragment() {
         this.show(fragmentManager, TAG)
     }
 
+    class ViewModel(app: Application) : RealmViewModel(app) {
+
+        lateinit var trackerId: String
+            private set
+        private lateinit var item: OTItemDAO
+        private lateinit var attribute: OTAttributeDAO
+
+        lateinit var attributeLocalId: String
+            private set
+        lateinit var itemId: String
+            private set
+
+        var initialized = false
+            private set
+
+        private val loadingSubscription = SerialDisposable()
+
+        val onInformationMounted = BehaviorSubject.create<Int>()
+
+        var originalValue: Any? = null
+        val frontalItemValue = BehaviorSubject.create<Nullable<Any>>()
+
+        val attributeName = BehaviorSubject.create<String>()
+
+        fun makeItemView(context: Context, originalView: AAttributeInputView<out Any>?): AAttributeInputView<out Any> {
+            val view = attribute.getHelper().getInputView(context, false, attribute, originalView)
+            view.boundAttributeObjectId = attribute.objectId
+            return view
+        }
+
+        fun init(trackerId: String, itemId: String, attributeLocalId: String) {
+            if (initialized == false) {
+                this.trackerId = trackerId
+                this.attributeLocalId = attributeLocalId
+                this.itemId = itemId
+                val itemObservable = dbManager.get()
+                        .makeItemsQuery(trackerId, null, null, realm)
+                        .equalTo("objectId", itemId).findFirstAsync()
+                        .asFlowable<OTItemDAO>().filter { it.isValid && it.isLoaded }
+                        .firstOrError()
+                        .doOnSuccess { this.item = it }
+
+                val attributeObservable = realm.where(OTAttributeDAO::class.java).equalTo("trackerId", trackerId).equalTo("localId", attributeLocalId)
+                        .findFirstAsync()
+                        .asFlowable<OTAttributeDAO>().filter { it.isValid && it.isLoaded }
+                        .firstOrError()
+                        .doOnSuccess {
+                            this.attribute = it
+                            attributeName.onNextIfDifferAndNotNull(it.name)
+                        }
+
+                loadingSubscription.set(Single.zip(listOf(attributeObservable, itemObservable)) { array ->
+                    println("item edit dialog: loaded attribute and item (zip)")
+                    val attribute = array[0] as OTAttributeDAO
+                    val item = array[1] as OTItemDAO
+                    Pair(attribute, item)
+                }.subscribe { (attr, item) ->
+                    initialized = true
+                    this.attribute = attr
+                    this.item = item
+                    originalValue = item.getValueOf(attributeLocalId)
+                    frontalItemValue.onNext(Nullable(originalValue))
+
+                    onInformationMounted.onNext(attr.type)
+
+                })
+            }
+        }
+
+        override fun onCleared() {
+            loadingSubscription.set(null)
+            super.onCleared()
+        }
+    }
 }
