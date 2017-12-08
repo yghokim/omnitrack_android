@@ -6,7 +6,7 @@ import io.realm.RealmObject
 import io.realm.annotations.Index
 import io.realm.annotations.PrimaryKey
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.utils.ValueWithTimestamp
+import kr.ac.snu.hcil.omnitrack.utils.AnyValueWithTimestamp
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 
 /**
@@ -30,7 +30,7 @@ open class OTItemBuilderDAO : RealmObject() {
 
     var data = RealmList<OTItemBuilderFieldValueEntry>()
 
-    fun setValue(attributeLocalId: String, value: ValueWithTimestamp?, realm: Realm) {
+    fun setValue(attributeLocalId: String, value: AnyValueWithTimestamp?, realm: Realm) {
         val match = data.find { it.attributeLocalId == attributeLocalId }
         if (match != null) {
             if (value == null) {

@@ -1,10 +1,11 @@
 package kr.ac.snu.hcil.omnitrack.utils
 
-import io.reactivex.Single
-import io.reactivex.SingleSource
-import io.reactivex.SingleTransformer
+import android.support.annotation.Keep
 
-data class ValueWithTimestamp(var value: Any?, var timestamp: Long?) {
+@Keep
+open class ValueWithTimestamp<T>(open var value: T?, open var timestamp: Long?)
+
+data class AnyValueWithTimestamp(override var value: Any?, override var timestamp: Long?) : ValueWithTimestamp<Any>(value, timestamp) {
 
     constructor(nullable: Nullable<out Any>):this(nullable.datum, if(nullable.datum==null)null else System.currentTimeMillis())
 
@@ -13,7 +14,7 @@ data class ValueWithTimestamp(var value: Any?, var timestamp: Long?) {
     }
 
     override fun equals(other: Any?): Boolean {
-        return if (other === this) true else if (other is ValueWithTimestamp) {
+        return if (other === this) true else if (other is AnyValueWithTimestamp) {
             other.timestamp == timestamp && other.value == value
         } else false
     }

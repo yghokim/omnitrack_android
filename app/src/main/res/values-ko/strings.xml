@@ -132,6 +132,7 @@
     <string name="msg_reminder_empty">리마인더가 없습니다.\n리마인더를 설정하면 기록을 잊지 않도록\n원하는 때에 알림을 보낼 수 있습니다.</string>
     <string name="msg_field_empty">현재 이 트래커는 필드가 없습니다.\n필드 없는 트래커는 타임스탬프만을 기록할 것입니다.</string>
 
+    <string name="msg_change_screen_name">필명 변경</string>
     <string name="msg_format_change_name">%1$s 이름 변경</string>
     <string name="msg_change_field_name">필드 이름 변경</string>
 
