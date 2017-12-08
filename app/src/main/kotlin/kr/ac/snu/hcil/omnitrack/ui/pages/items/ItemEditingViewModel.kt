@@ -5,7 +5,7 @@ import io.reactivex.Maybe
 import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.utils.ValueWithTimestamp
+import kr.ac.snu.hcil.omnitrack.utils.AnyValueWithTimestamp
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 
 /**
@@ -36,7 +36,7 @@ class ItemEditingViewModel(app: Application) : ItemEditionViewModelBase(app) {
 
     override fun startAutoComplete() {
         originalUnmanagedItemDao.fieldValueEntries.forEach {
-            setValueOfAttribute(it.key, ValueWithTimestamp(it.value?.let { TypeStringSerializationHelper.deserialize(it) }, null))
+            setValueOfAttribute(it.key, AnyValueWithTimestamp(it.value?.let { TypeStringSerializationHelper.deserialize(it) }, null))
         }
     }
 

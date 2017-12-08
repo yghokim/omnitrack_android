@@ -18,7 +18,8 @@ open class OTUserDAO : RealmObject() {
 
     var thisDeviceLocalKey: String = ""
 
-    var informationSynchronizedAt: Long? = null
+    var nameSynchronizedAt: Long? = null
+    var nameUpdatedAt: Long = System.currentTimeMillis()
 
     fun toPojo(): OTUserInfoPOJO {
         return OTUserInfoPOJO(uid, name, photoServerPath, email, consentApproved, thisDeviceLocalKey)

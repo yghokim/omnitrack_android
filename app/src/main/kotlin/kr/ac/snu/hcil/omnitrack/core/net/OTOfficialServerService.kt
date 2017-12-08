@@ -6,6 +6,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTUserRolePOJO
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncResultEntry
+import kr.ac.snu.hcil.omnitrack.utils.ValueWithTimestamp
 import retrofit2.http.*
 
 /**
@@ -33,4 +34,7 @@ interface OTOfficialServerService {
 
     @POST("api/usage_logs/batch/insert")
     fun uploadUsageLogs(@Body logs: List<String>): Single<List<Long>>
+
+    @PUT("api/user/name")
+    fun putUserName(@Body nameAndTimestamp: ValueWithTimestamp<String>): Single<ISynchronizationServerSideAPI.InformationUpdateResult>
 }

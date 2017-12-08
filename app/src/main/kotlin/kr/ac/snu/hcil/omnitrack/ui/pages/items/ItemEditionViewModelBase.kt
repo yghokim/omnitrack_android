@@ -14,9 +14,9 @@ import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.RealmViewModel
+import kr.ac.snu.hcil.omnitrack.utils.AnyValueWithTimestamp
 import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
-import kr.ac.snu.hcil.omnitrack.utils.ValueWithTimestamp
 import javax.inject.Inject
 
 /**
@@ -131,11 +131,11 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
         val isRequiredObservable: Observable<Boolean> = BehaviorSubject.create<Boolean>()
         val stateObservable: Observable<OTItemBuilderWrapperBase.EAttributeValueState> = BehaviorSubject.create<OTItemBuilderWrapperBase.EAttributeValueState>()
 
-        val valueObservable = BehaviorSubject.createDefault<Nullable<ValueWithTimestamp>>(Nullable(null) as Nullable<ValueWithTimestamp>)
+        val valueObservable = BehaviorSubject.createDefault<Nullable<AnyValueWithTimestamp>>(Nullable(null) as Nullable<AnyValueWithTimestamp>)
 
         val validationObservable: Observable<Boolean> = BehaviorSubject.createDefault<Boolean>(true)
 
-        var value: ValueWithTimestamp?
+        var value: AnyValueWithTimestamp?
             get() = valueObservable.value?.datum
             set(value) {
                 if (valueObservable.value?.datum != value) {
@@ -191,7 +191,7 @@ abstract class ItemEditionViewModelBase(app: Application) : RealmViewModel(app),
 
     abstract fun isViewModelsDirty(): Boolean
 
-    protected open fun setValueOfAttribute(attributeLocalId: String, valueWithTimestamp: ValueWithTimestamp) {
+    protected open fun setValueOfAttribute(attributeLocalId: String, valueWithTimestamp: AnyValueWithTimestamp) {
         val match = currentAttributeViewModelList.find { it.attributeLocalId == attributeLocalId }
         if (match != null) {
             match.value = valueWithTimestamp

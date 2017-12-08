@@ -5,11 +5,15 @@ import android.content.Intent
 import android.support.v7.widget.AppCompatImageButton
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.text.InputType
 import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
 import android.widget.PopupMenu
+import com.afollestad.materialdialogs.MaterialDialog
 import com.bumptech.glide.Glide
+import com.firebase.jobdispatcher.FirebaseJobDispatcher
+import com.firebase.jobdispatcher.Job
 import dagger.Lazy
 import dagger.internal.Factory
 import de.hdodenhof.circleimageview.CircleImageView
@@ -24,7 +28,9 @@ import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTUserDAO
 import kr.ac.snu.hcil.omnitrack.core.di.Backend
+import kr.ac.snu.hcil.omnitrack.core.di.InformationUpload
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
+import kr.ac.snu.hcil.omnitrack.services.OTInformationUploadService
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.viewholders.RecyclerViewMenuAdapter
 import kr.ac.snu.hcil.omnitrack.ui.pages.AboutActivity
@@ -49,6 +55,12 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu
     @Inject
     lateinit var eventLogger: Lazy<IEventLogger>
 
+    @Inject
+    lateinit var jobDispatcher: FirebaseJobDispatcher
+
+    @field:[Inject InformationUpload]
+    lateinit var informationUploadJobProvider: Job.Builder
+
     private lateinit var realm: Realm
 
     private val userWatchDisposable = SerialDisposable()
@@ -59,6 +71,16 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu
     private val menuList: RecyclerView = view.findViewById(R.id.ui_menu_list)
 
     private val subscriptions = CompositeDisposable()
+
+
+    private val screenNameDialogBuilder: MaterialDialog.Builder by lazy {
+        MaterialDialog.Builder(parentActivity)
+                .title(R.string.msg_change_screen_name)
+                .inputType(InputType.TYPE_CLASS_TEXT)
+                .inputRangeRes(1, 40, R.color.colorRed)
+                .cancelable(true)
+                .negativeText(R.string.msg_cancel)
+    }
 
     init {
 
@@ -118,6 +140,30 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu
                     view.ui_user_email.text = user.email
                     Glide.with(parentActivity).load(user.photoServerPath).into(photoView)
                 })
+
+
+        view.ui_button_edit_screen_name.setOnClickListener {
+            screenNameDialogBuilder.input(null, view.ui_user_name.text, false) { dialog, input ->
+                val newScreenName = input.trim().toString()
+                if (newScreenName.isNotBlank()) {
+                    if (authManager.userId != null) {
+                        realmFactory.get().use { realm ->
+                            val user = realm.where(OTUserDAO::class.java).equalTo("uid", authManager.userId ?: "").findFirst()
+                            if (user != null) {
+                                if (user.name != newScreenName) {
+                                    realm.executeTransaction {
+                                        user.name = newScreenName
+                                        user.nameUpdatedAt = System.currentTimeMillis()
+                                        user.nameSynchronizedAt = null
+                                    }
+                                    jobDispatcher.mustSchedule(informationUploadJobProvider.setTag(OTInformationUploadService.INFORMATION_USERNAME).build())
+                                }
+                            }
+                        }
+                    }
+                }
+            }.show()
+        }
     }
 
     fun onDestroy() {

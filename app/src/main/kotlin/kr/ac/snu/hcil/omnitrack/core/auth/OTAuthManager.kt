@@ -293,7 +293,8 @@ class OTAuthManager(val app: OTApp,
                                 user.photoServerPath = result.payloads["picture"] ?: ""
                                 user.name = result.payloads["name"] ?: ""
                                 user.consentApproved = result.payloads["consentApproved"]?.toBoolean() ?: false
-                                user.informationSynchronizedAt = System.currentTimeMillis()
+                                user.nameUpdatedAt = result.payloads["nameUpdatedAt"]?.toLong() ?: System.currentTimeMillis()
+                                user.nameSynchronizedAt = user.nameUpdatedAt
                             }
                         }
                     }

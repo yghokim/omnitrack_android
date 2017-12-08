@@ -8,6 +8,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTUserRolePOJO
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncResultEntry
+import kr.ac.snu.hcil.omnitrack.utils.ValueWithTimestamp
 import retrofit2.Retrofit
 
 /**
@@ -54,5 +55,9 @@ class OTOfficialServerApiController(retrofit: Retrofit) : ISynchronizationServer
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-
+    override fun putUserName(name: String, timestamp: Long): Single<ISynchronizationServerSideAPI.InformationUpdateResult> {
+        return service.putUserName(ValueWithTimestamp(name, timestamp))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
 }

@@ -38,9 +38,9 @@ import kr.ac.snu.hcil.omnitrack.ui.components.common.container.LockableFrameLayo
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.pages.ConnectionIndicatorStubProxy
+import kr.ac.snu.hcil.omnitrack.utils.AnyValueWithTimestamp
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
-import kr.ac.snu.hcil.omnitrack.utils.ValueWithTimestamp
 import org.jetbrains.anko.notificationManager
 import java.util.*
 import kotlin.properties.Delegates
@@ -509,7 +509,7 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
                 internalSubscriptions.add(
                         inputView.valueChanged.observable.subscribe { (sender, args) ->
                             val now = System.currentTimeMillis()
-                            attributeViewModel.value = ValueWithTimestamp(args, now)
+                            attributeViewModel.value = AnyValueWithTimestamp(args, now)
                             builderRestoredSnackbar.dismiss()
                         }
                 )

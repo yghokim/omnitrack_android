@@ -9,7 +9,7 @@ import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels.OTItemBuilderDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels.OTItemBuilderFieldValueEntry
-import kr.ac.snu.hcil.omnitrack.utils.ValueWithTimestamp
+import kr.ac.snu.hcil.omnitrack.utils.AnyValueWithTimestamp
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 
 /**
@@ -55,7 +55,7 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
         return Pair(ItemMode.New, builderCreationModeObservable.value)
     }
 
-    override fun setValueOfAttribute(attributeLocalId: String, valueWithTimestamp: ValueWithTimestamp) {
+    override fun setValueOfAttribute(attributeLocalId: String, valueWithTimestamp: AnyValueWithTimestamp) {
         itemBuilderDao.setValue(attributeLocalId, valueWithTimestamp, realm)
         super.setValueOfAttribute(attributeLocalId, valueWithTimestamp)
     }
