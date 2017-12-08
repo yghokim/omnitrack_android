@@ -136,16 +136,18 @@
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/frontalBackground"
-            android:paddingBottom="5dp">
+            android:background="@color/frontalBackground">
 
             <android.support.v7.widget.AppCompatImageButton
                 android:id="@+id/ui_navigate_left"
-                style="@style/Base.Widget.AppCompat.Button.Borderless"
-                android:layout_width="0dp"
+                android:layout_width="@dimen/button_height_normal"
                 android:layout_height="@dimen/button_height_normal"
                 android:layout_marginBottom="5dp"
+
+                android:layout_marginLeft="50dp"
                 android:layout_marginTop="5dp"
+                android:background="@drawable/transparent_button_background"
+                android:tint="@color/buttonIconColorDark"
                 app:layout_constraintHorizontal_chainStyle="spread_inside"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toLeftOf="@id/ui_current_time"
@@ -183,10 +185,11 @@
 
             <android.support.v7.widget.AppCompatImageButton
                 android:id="@+id/ui_navigate_right"
-                style="@style/Base.Widget.AppCompat.Button.Borderless"
-                android:layout_width="0dp"
+                android:layout_width="@dimen/button_height_normal"
                 android:layout_height="@dimen/button_height_normal"
+                android:layout_marginRight="50dp"
                 android:background="@drawable/transparent_button_background"
+                android:tint="@color/buttonIconColorDark"
                 app:layout_constraintHorizontal_chainStyle="spread_inside"
                 app:layout_constraintLeft_toRightOf="@id/ui_current_time"
                 app:layout_constraintRight_toRightOf="parent"
