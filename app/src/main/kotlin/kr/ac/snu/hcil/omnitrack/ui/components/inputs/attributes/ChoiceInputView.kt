@@ -78,7 +78,7 @@ class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttribut
     var multiSelectionMode: Boolean by Delegates.observable(false) {
         prop, old, new ->
         if (old != new) {
-            if (new == false && selectedIds.size > 1) {
+            if (!new && selectedIds.size > 1) {
                 val first = selectedIds.first()
                 selectedIds.clear()
                 selectedIds.add(first)

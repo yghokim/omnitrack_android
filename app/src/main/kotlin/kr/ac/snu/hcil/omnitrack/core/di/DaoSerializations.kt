@@ -5,17 +5,22 @@ import dagger.Component
 import dagger.Lazy
 import dagger.Module
 import dagger.Provides
+import dagger.internal.Factory
 import io.realm.Realm
-import kr.ac.snu.hcil.omnitrack.core.database.local.*
+import kr.ac.snu.hcil.omnitrack.core.database.local.DaoSerializationManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTItemDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.typeadapters.*
-import javax.inject.Provider
+import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerSystemManager
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
 /**
  * Created by younghokim on 2017-11-02.
  */
-@Module
+@Module(includes = arrayOf(TriggerSystemModule::class))
 class DaoSerializationModule {
 
     @Provides
@@ -39,12 +44,12 @@ class DaoSerializationModule {
     @Provides
     @Singleton
     @ForTrigger
-    fun provideTriggerAdapter(@ForGeneric gson: Lazy<Gson>, realmProvider: Provider<Realm>): ServerCompatibleTypeAdapter<OTTriggerDAO> = TriggerTypeAdapter(false, gson, realmProvider)
+    fun provideTriggerAdapter(@ForGeneric gson: Lazy<Gson>, @Backend realmProvider: Factory<Realm>, triggerSystemManager: Lazy<OTTriggerSystemManager>): ServerCompatibleTypeAdapter<OTTriggerDAO> = TriggerTypeAdapter(false, gson, realmProvider, triggerSystemManager)
 
     @Provides
     @Singleton
     @ForServerTrigger
-    fun provideServerTriggerAdapter(@ForGeneric gson: Lazy<Gson>, realmProvider: Provider<Realm>): ServerCompatibleTypeAdapter<OTTriggerDAO> = TriggerTypeAdapter(true, gson, realmProvider)
+    fun provideServerTriggerAdapter(@ForGeneric gson: Lazy<Gson>, @Backend realmProvider: Factory<Realm>, triggerSystemManager: Lazy<OTTriggerSystemManager>): ServerCompatibleTypeAdapter<OTTriggerDAO> = TriggerTypeAdapter(true, gson, realmProvider, triggerSystemManager)
 
     @Provides
     @Singleton

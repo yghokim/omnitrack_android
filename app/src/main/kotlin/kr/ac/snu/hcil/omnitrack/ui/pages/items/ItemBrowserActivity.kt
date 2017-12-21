@@ -16,39 +16,43 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.*
-import android.widget.ArrayAdapter
-import android.widget.PopupMenu
-import android.widget.TextView
-import android.widget.ToggleButton
+import android.widget.*
 import butterknife.bindView
+import com.github.salomonbrys.kotson.set
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.SerialDisposable
+import kotlinx.android.synthetic.main.activity_item_browser.*
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTTimeAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.net.OTLocalMediaCacheManager
 import kr.ac.snu.hcil.omnitrack.services.OTTableExportService
 import kr.ac.snu.hcil.omnitrack.ui.DragItemTouchHelperCallback
+import kr.ac.snu.hcil.omnitrack.ui.IActivityLifeCycle
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.DismissingBottomSheetDialogFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.common.ExtendedSpinner
-import kr.ac.snu.hcil.omnitrack.ui.components.common.FallbackRecyclerView
+import kr.ac.snu.hcil.omnitrack.ui.components.common.container.FallbackRecyclerView
 import kr.ac.snu.hcil.omnitrack.ui.components.common.viewholders.RecyclerViewMenuAdapter
-import kr.ac.snu.hcil.omnitrack.ui.components.decorations.DrawableListBottomSpaceItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalDividerItemDecoration
-import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
+import kr.ac.snu.hcil.omnitrack.ui.components.decorations.TopBottomHorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.AttributeEditDialogFragment
 import kr.ac.snu.hcil.omnitrack.utils.*
 import kr.ac.snu.hcil.omnitrack.utils.io.FileHelper
 import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import org.jetbrains.anko.support.v4.act
+import org.jetbrains.anko.verticalMargin
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.Inject
 import kotlin.properties.Delegates
 
 class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_browser), ExtendedSpinner.OnItemSelectedListener, View.OnClickListener, AttributeEditDialogFragment.Listener {
@@ -103,8 +107,11 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
         itemListView.emptyView = emptyListMessageView
         itemListView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        itemListView.addItemDecoration(HorizontalImageDividerItemDecoration(context = this))
-        itemListView.addItemDecoration(DrawableListBottomSpaceItemDecoration(R.drawable.expanded_view_inner_shadow_top, 0))
+
+        val shadowDecoration = TopBottomHorizontalImageDividerItemDecoration(context = this)
+        itemListView.addItemDecoration(shadowDecoration)
+
+        (itemListView.layoutParams as CoordinatorLayout.LayoutParams).verticalMargin = -shadowDecoration.upperDividerHeight
 
         itemListViewAdapter = ItemListViewAdapter()
 
@@ -120,11 +127,6 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
         })
 
-
-        /*ItemTouchHelper(DragItemTouchHelperCallback(itemListViewAdapter, this, false, true))
-                .attachToRecyclerView(itemListView)*/
-
-
         sortOrderButton.setOnCheckedChangeListener { compoundButton, b ->
             if (b) {
                 sortOrderButton.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ascending, 0)
@@ -136,8 +138,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
         sortOrderButton.setOnClickListener(this)
 
-        val snackBarContainer: CoordinatorLayout = findViewById(R.id.ui_snackbar_container)
-        removalSnackbar = Snackbar.make(snackBarContainer, resources.getText(R.string.msg_item_removed_message), Snackbar.LENGTH_INDEFINITE)
+        removalSnackbar = Snackbar.make(ui_root, resources.getText(R.string.msg_item_removed_message), Snackbar.LENGTH_INDEFINITE)
         removalSnackbar.setAction(resources.getText(R.string.msg_undo)) { view ->
             itemListViewAdapter.undoRemoval()
         }.addCallback(object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
@@ -216,11 +217,19 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                     item.setValueOf(attributeLocalId, value?.let { TypeStringSerializationHelper.serialize(it) })
 
                     creationSubscriptions.add(
-                            item.save(*(item.itemDao.fieldValueEntries.map { it.key } - attributeLocalId).toTypedArray()).subscribe { (resultCode, itemId) ->
-                                if (resultCode != RealmDatabaseManager.SAVE_RESULT_FAIL) {
-                                    println("item was modified successfully.")
-                                }
-                            }
+                            item.save(*(item.itemDao.fieldValueEntries.map { it.key } - attributeLocalId).toTypedArray()).observeOn(AndroidSchedulers.mainThread())
+                                    .subscribe { (resultCode, itemId) ->
+                                        if (resultCode != BackendDbManager.SAVE_RESULT_FAIL) {
+                                            println("item was modified successfully.")
+                                            if (itemId != null) {
+                                                eventLogger.get().logItemEditEvent(itemId) { content ->
+                                                    content[IEventLogger.CONTENT_IS_INDIVIDUAL] = true
+                                                    content[IEventLogger.CONTENT_KEY_PROPERTY] = attributeLocalId
+                                                    content[IEventLogger.CONTENT_KEY_NEWVALUE] = value?.let { TypeStringSerializationHelper.serialize(it) }
+                                                }
+                                            }
+                                        }
+                                    }
                     )
                     itemListViewAdapter.notifyItemChanged(items.indexOf(item))
                 }
@@ -562,6 +571,10 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                         val itemValue = getParent().getItemValueOf(attribute.localId)
                         if (itemValue != null) {
                             val newValueView = attribute.getHelper().getViewForItemList(attribute, this@ItemBrowserActivity, valueView)
+                            if (newValueView is IActivityLifeCycle && newValueView !== valueView) {
+                                newValueView.onCreate(null)
+                            }
+                            newValueView.setOnClickListener(this)
                             changeNewValueView(newValueView)
 
                             valueApplySubscription.set(attribute.getHelper().applyValueToViewForItemList(attribute, itemValue, valueView).subscribe({
@@ -634,6 +647,9 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
             }
         }
 
+        @Inject
+        lateinit var localCacheManager: OTLocalMediaCacheManager
+
         private lateinit var viewModel: ItemListViewModel
 
         private var listView: RecyclerView by Delegates.notNull()
@@ -653,6 +669,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
         override fun onActivityCreated(savedInstanceState: Bundle?) {
             super.onActivityCreated(savedInstanceState)
+            (act.application as OTApp).networkComponent.inject(this)
             viewModel = ViewModelProviders.of(activity!!).get(ItemListViewModel::class.java)
 
             dialogSubscriptions.add(
@@ -703,28 +720,32 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
         }
 
         private fun refreshPurgeButton() {
-            val cacheSize = this.viewModel.trackerDao.getTotalCacheFileSize(act)
-            if (cacheSize > 0L) {
-                purgeMenuItem.isEnabled = true
-                purgeMenuItem.description = "${(cacheSize / (1024 * 102.4f) + .5f).toInt() / 10f} Mb"
-            } else {
-                purgeMenuItem.isEnabled = false
-                purgeMenuItem.description = getString(R.string.msg_no_cache)
-            }
-            menuAdapter.notifyItemChanged(0)
+            dialogSubscriptions.add(
+                    localCacheManager.calcTotalCacheFileSize(this.viewModel.trackerId)
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe { cacheSize ->
+                                if (cacheSize > 0L) {
+                                    purgeMenuItem.isEnabled = true
+                                    purgeMenuItem.description = "${(cacheSize / (1024 * 102.4f) + .5f).toInt() / 10f} Mb"
+                                } else {
+                                    purgeMenuItem.isEnabled = false
+                                    purgeMenuItem.description = getString(R.string.msg_no_cache)
+                                }
+                                menuAdapter.notifyItemChanged(0)
+                            }
+            )
         }
 
         override fun setupDialogAndContentView(dialog: Dialog, contentView: View) {
 
             purgeMenuItem = RecyclerViewMenuAdapter.MenuItem(R.drawable.clear_cache, OTApp.getString(R.string.msg_purge_cache), null, isEnabled = false, onClick = {
-                val cacheDir = viewModel.trackerDao.getItemCacheDir(act, false)
-                    println("purge cache dir files")
-                    /*
-                    RxProgressDialog.Builder(FileHelper.removeAllFilesIn(cacheDir).toObservable()).create(this@SettingsDialogFragment.activity).show().subscribe {
-                        refreshPurgeButton()
-                    }*/
-                    FileHelper.deleteDirectory(cacheDir)
-                    refreshPurgeButton()
+                dialogSubscriptions.add(
+                        localCacheManager.purgeSynchronizedCacheFiles(viewModel.trackerId).subscribe { count ->
+                            Toast.makeText(act, "Removed ${count} files", Toast.LENGTH_LONG).show()
+                            refreshPurgeButton()
+                        }
+                )
+
             })
 
             deletionMenuItem = RecyclerViewMenuAdapter.MenuItem(R.drawable.trashcan, OTApp.getString(R.string.msg_remove_all_the_items_permanently), null, isEnabled = false, onClick = {

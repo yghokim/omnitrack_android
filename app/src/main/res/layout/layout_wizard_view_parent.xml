@@ -16,7 +16,7 @@
         android:layout_marginTop="30dp"
         android:gravity="center" />
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.common.ManualViewPager
+    <kr.ac.snu.hcil.omnitrack.ui.components.common.container.ManualViewPager
         android:id="@+id/ui_wizard_pager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -26,7 +26,6 @@
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="@dimen/button_height_tall"
-        android:layout_alignParentBottom="true"
         android:orientation="horizontal">
 
         <Button
@@ -34,8 +33,6 @@
             style="@style/Base.Widget.AppCompat.Button.Borderless.Colored"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true"
             android:layout_weight="1"
             android:text="@string/msg_cancel"
             android:textColor="@color/colorRed.Light" />
@@ -57,8 +54,6 @@
             android:id="@+id/ui_button_ok"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true"
             android:layout_weight="1"
             android:background="@drawable/transparent_button_background"
             android:text="@string/msg_ok"

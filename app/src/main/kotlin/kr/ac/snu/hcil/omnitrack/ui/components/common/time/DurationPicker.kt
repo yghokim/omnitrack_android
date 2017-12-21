@@ -70,10 +70,10 @@ class DurationPicker : FrameLayout, View.OnClickListener {
 
 
                     var elapsedHours = different / TimeHelper.hoursInMilli.toInt()
-                    different = different % TimeHelper.hoursInMilli.toInt()
+                    different %= TimeHelper.hoursInMilli.toInt()
 
                     var elapsedMinutes = different / TimeHelper.minutesInMilli.toInt()
-                    different = different % TimeHelper.minutesInMilli.toInt()
+                    different %= TimeHelper.minutesInMilli.toInt()
 
                     var elapsedSeconds = different / TimeHelper.secondsInMilli.toInt()
 

@@ -11,13 +11,15 @@ import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import com.github.salomonbrys.kotson.set
 import com.jaredrummler.materialspinner.MaterialSpinner
 import kotlinx.android.synthetic.main.activity_attribute_detail.*
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTAttributeHelper
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.WizardView
@@ -355,8 +357,14 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
     }*/
 
     private fun saveChanges() {
+        val dirtySignature = viewModel.makeDirtySignature()
         viewModel.applyChanges()
         viewModel.attributeDAO?.let {
+            if (dirtySignature != null) {
+                eventLogger.get().logAttributeChangeEvent(IEventLogger.SUB_EDIT, viewModel.attributeDAO?.localId ?: "", viewModel.attributeDAO?.trackerId) { content ->
+                    content[IEventLogger.CONTENT_KEY_NEWVALUE] = dirtySignature
+                }
+            }
             setResult(Activity.RESULT_OK, Intent().putExtra(INTENT_EXTRA_SERIALIZED_ATTRIBUTE_DAO, (application as OTApp).daoSerializationComponent.manager().get().serializeAttribute(it)))
         }
     }

@@ -6,7 +6,10 @@
     <string name="time_am">AM</string>
     <string name="time_pm">PM</string>
 
-    <string name="dateformat_ymd">MMM d, EEEE, yyyy</string>
+    <string name="dateformat_dow_and_year">EEEE, yyyy</string>
+
+
+    <string name="dateformat_ymd">MMM d, EEE, yyyy</string>
     <string name="dateformat_minute">hh:mm a, MMM d, yyyy</string>
 
     <string name="dateformat_day_of_week_short">E</string>

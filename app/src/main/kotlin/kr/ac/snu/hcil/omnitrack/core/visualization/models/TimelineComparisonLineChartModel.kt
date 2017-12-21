@@ -5,10 +5,11 @@ import io.realm.Realm
 import io.realm.Sort
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTItemDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.visualization.CompoundAttributeChartModel
+import kr.ac.snu.hcil.omnitrack.core.visualization.INativeChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.ILineChartOnTime
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.scales.QuantizedTimeScale
@@ -22,7 +23,7 @@ import java.util.*
  * Created by Young-Ho Kim on 2016-09-08.
  */
 class TimelineComparisonLineChartModel(attributes: List<OTAttributeDAO>, parent: OTTrackerDAO, realm: Realm)
-    : CompoundAttributeChartModel<ILineChartOnTime.TimeSeriesTrendData>(attributes, parent, realm), ILineChartOnTime {
+    : CompoundAttributeChartModel<ILineChartOnTime.TimeSeriesTrendData>(attributes, parent, realm), ILineChartOnTime, INativeChartModel {
 
     override val name: String = OTApp.instance.resourcesWrapped.getString(R.string.msg_vis_numeric_line_timeline_title)
 
@@ -42,7 +43,7 @@ class TimelineComparisonLineChartModel(attributes: List<OTAttributeDAO>, parent:
                 .makeItemsQuery(parent.objectId, getTimeScope(), realm)
                 .findAllSortedAsync("timestamp", Sort.ASCENDING)
                 .asFlowable()
-                .filter { it.isLoaded == true && it.isValid }.firstOrError().map { items ->
+                .filter { it.isLoaded && it.isValid }.firstOrError().map { items ->
 
             var currentItemPointer = 0
 

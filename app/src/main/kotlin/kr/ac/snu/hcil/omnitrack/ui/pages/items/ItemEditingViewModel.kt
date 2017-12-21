@@ -3,9 +3,9 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.items
 import android.app.Application
 import io.reactivex.Maybe
 import io.reactivex.Single
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.utils.ValueWithTimestamp
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTItemDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.utils.AnyValueWithTimestamp
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 
 /**
@@ -20,6 +20,13 @@ class ItemEditingViewModel(app: Application) : ItemEditionViewModelBase(app) {
             val itemDao = dbManager.get().makeSingleItemQuery(itemId, realm).findFirst()
             if (itemDao != null) {
                 originalUnmanagedItemDao = realm.copyFromRealm(itemDao)
+                subscriptions.add(
+                        itemDao.asFlowable<OTItemDAO>().subscribe { dao ->
+                            if (!dao.isValid) {
+                                hasItemRemovedOutside.onNext(itemId)
+                            }
+                        }
+                )
 
                 return Pair(ItemMode.Edit, null)
             } else return null
@@ -29,7 +36,7 @@ class ItemEditingViewModel(app: Application) : ItemEditionViewModelBase(app) {
 
     override fun startAutoComplete() {
         originalUnmanagedItemDao.fieldValueEntries.forEach {
-            setValueOfAttribute(it.key, ValueWithTimestamp(it.value?.let { TypeStringSerializationHelper.deserialize(it) }, null))
+            setValueOfAttribute(it.key, AnyValueWithTimestamp(it.value?.let { TypeStringSerializationHelper.deserialize(it) }, null))
         }
     }
 
@@ -56,7 +63,7 @@ class ItemEditingViewModel(app: Application) : ItemEditionViewModelBase(app) {
 
     override fun applyEditingToDatabase(): Maybe<String> {
         return if (isValid) {
-            return isBusyObservable.filter { it == false }.firstOrError().flatMapMaybe {
+            return isBusyObservable.filter { !it }.firstOrError().flatMapMaybe {
                 if (isViewModelsDirty()) {
                     return@flatMapMaybe Maybe.defer {
                         val originalItemFieldKeys = originalUnmanagedItemDao.fieldValueEntries.map { it.key }.toMutableList()

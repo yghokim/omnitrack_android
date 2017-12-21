@@ -68,6 +68,6 @@
         android:id="@+id/ui_allow_intermediate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/property_rating_options_allow_intermediate" />
+        android:text="@string/property_rating_options_allow_fractional" />
 
 </LinearLayout>

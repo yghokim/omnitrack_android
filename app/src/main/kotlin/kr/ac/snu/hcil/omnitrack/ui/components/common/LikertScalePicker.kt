@@ -12,6 +12,7 @@ import android.view.MotionEvent
 import android.view.View
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.datatypes.Fraction
 import kr.ac.snu.hcil.omnitrack.utils.dipSize
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kotlin.properties.Delegates
@@ -59,7 +60,7 @@ class LikertScalePicker : View, GestureDetector.OnGestureListener {
         }
     }
 
-    var allowIntermediate: Boolean by Delegates.observable(true) {
+    var isFractional: Boolean by Delegates.observable(true) {
         prop, old, new ->
         if (old != new) {
             invalidate()
@@ -73,6 +74,41 @@ class LikertScalePicker : View, GestureDetector.OnGestureListener {
             valueChanged.invoke(this, new)
         }
     }
+
+    var fractionValue: Fraction?
+        get() {
+            val currentValue = value
+            if (currentValue == null) {
+                return null
+            } else {
+                val under = if (isFractional) {
+                    (rightMost - leftMost) * 10
+                } else {
+                    rightMost - leftMost
+                }
+                var upper = currentValue - leftMost
+                if (isFractional) upper *= 10
+
+                return Fraction(Math.round(upper).toShort(), under.toShort())
+            }
+        }
+        set(fraction) {
+            if (fraction == null) {
+                value = null
+            } else {
+                val under = if (isFractional) {
+                    (rightMost - leftMost) * 10
+                } else {
+                    rightMost - leftMost
+                }
+                var upper = Math.round((fraction.toFloat() * under))
+                if (fraction.upper > 0) {
+                    upper = Math.max(upper, 1)
+                }
+
+                value = (((upper.toFloat() / under) * (rightMost - leftMost) + leftMost) * 10 + .5f).toInt() / 10f
+            }
+        }
 
     val valueChanged = Event<Float?>()
 
@@ -256,7 +292,7 @@ class LikertScalePicker : View, GestureDetector.OnGestureListener {
 
             canvas.drawCircle(valuePosition, _lineY, valueIndicatorRadius, valueIndicatorPaint)
 
-            val valueText = value.toString()
+            val valueText = String.format("%.1f", value)
             valueTextPaint.getTextBounds(valueText, 0, valueText.length, boundRect)
             val valueCenter = getWrappedCenterPoint(valuePosition, boundRect.width() / 2 + valueBoxHorizontalPadding)
             boxRect.set(valueCenter - boundRect.width() / 2 - valueBoxHorizontalPadding, 0f, valueCenter + boundRect.width() / 2 + valueBoxHorizontalPadding, valueTextSize + 2 * valueBoxVerticalPadding)
@@ -279,7 +315,7 @@ class LikertScalePicker : View, GestureDetector.OnGestureListener {
     }
 
     fun getSnappedValue(original: Float): Float {
-        return if (allowIntermediate) {
+        return if (isFractional) {
             (original * 10 + .5f).toInt() / 10f
         } else {
             Math.round(original).toFloat()

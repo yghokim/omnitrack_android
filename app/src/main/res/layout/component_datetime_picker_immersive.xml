@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:parentTag="android.support.constraint.ConstraintLayout">
+
+    <android.support.v7.widget.AppCompatImageButton
+        android:id="@+id/ui_button_prev_date"
+        style="@style/Base.Widget.AppCompat.Button.Borderless"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/button_height_tall"
+        android:layout_marginEnd="8dp"
+        android:tint="@color/textColorLight"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/ui_date_indicator_container"
+        app:srcCompat="@drawable/left_dark" />
+
+    <LinearLayout
+        android:id="@+id/ui_date_indicator_container"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/button_height_tall"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingEnd="@dimen/activity_horizontal_margin"
+
+        android:paddingStart="@dimen/activity_horizontal_margin"
+        app:layout_constraintBottom_toBottomOf="@+id/ui_button_prev_date"
+        app:layout_constraintLeft_toRightOf="@+id/ui_button_prev_date"
+        app:layout_constraintRight_toLeftOf="@+id/ui_button_next_date"
+        app:layout_constraintTop_toTopOf="@+id/ui_button_prev_date">
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/ui_date_semantic_indicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:textAllCaps="true"
+            tools:text="Today" />
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/ui_date_indicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            tools:text="Sunday, 2017" />
+    </LinearLayout>
+
+    <android.support.v7.widget.AppCompatImageButton
+        android:id="@+id/ui_button_next_date"
+        style="@style/Base.Widget.AppCompat.Button.Borderless"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/button_height_tall"
+        android:tint="@color/textColorLight"
+        app:layout_constraintLeft_toRightOf="@+id/ui_date_indicator_container"
+        app:layout_constraintRight_toRightOf="parent"
+        app:srcCompat="@drawable/right_dark" />
+
+    <com.shawnlin.numberpicker.NumberPicker
+        android:id="@+id/ui_picker_hour"
+        style="@style/NumberPickerStyleImmersive"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="12dp"
+        app:layout_constraintEnd_toStartOf="@+id/ui_picker_minute"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintHorizontal_weight="0.4"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ui_button_next_date"
+        app:np_formatter="%02d"
+        app:np_max="12"
+        app:np_min="1"
+        app:np_value="12" />
+
+
+    <com.shawnlin.numberpicker.NumberPicker
+        android:id="@+id/ui_picker_minute"
+        style="@style/NumberPickerStyleImmersive"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        app:layout_constraintEnd_toStartOf="@+id/ui_picker_ampm"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintHorizontal_weight="0.4"
+        app:layout_constraintStart_toEndOf="@+id/ui_picker_hour"
+
+        app:layout_constraintTop_toTopOf="@+id/ui_picker_hour"
+        app:np_formatter="%02d"
+        app:np_max="59"
+        app:np_min="0"
+        app:np_value="0" />
+
+    <com.shawnlin.numberpicker.NumberPicker
+        android:id="@+id/ui_picker_ampm"
+        style="@style/NumberPickerStyleImmersive"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintHorizontal_weight="0.2"
+        app:layout_constraintStart_toEndOf="@+id/ui_picker_minute"
+        app:layout_constraintTop_toTopOf="@id/ui_picker_minute"
+        app:np_max="1"
+        app:np_min="0"
+        app:np_value="0"
+        app:np_wrapSelectorWheel="false" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:background="@drawable/gradient_accent_mild"
+        app:layout_constraintTop_toBottomOf="@+id/ui_picker_hour">
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/ui_relative_from_now_indicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:textColor="#fff"
+            android:textSize="14sp"
+            tools:text="30 minutes later" />
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/ui_button_ok"
+            style="@style/Base.Widget.AppCompat.Button.Borderless"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/button_height_normal"
+            android:layout_gravity="right"
+            android:paddingEnd="@dimen/activity_horizontal_margin"
+            android:paddingStart="@dimen/activity_horizontal_margin"
+            android:text="Set Time"
+            android:textColor="#FFF"
+            android:textSize="16sp"
+
+            android:textStyle="bold" />
+    </FrameLayout>
+
+</merge>

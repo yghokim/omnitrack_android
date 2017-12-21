@@ -22,6 +22,7 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+
     <style name="AppTheme.Dialog.DimmedBackground" parent="AppTheme.NoActionBar">
 
         <item name="android:windowBackground">@android:color/transparent</item>
@@ -494,6 +495,48 @@
         <item name="android:background">?android:selectableItemBackground</item>
         <item name="android:paddingRight">@dimen/activity_horizontal_margin</item>
         <item name="android:paddingLeft">@dimen/activity_horizontal_margin</item>
+    </style>
+
+    <style name="TimeRangePickerSubButtonStyle">
+        <item name="android:textSize">14sp</item>
+        <item name="fb_textColor">@color/textColorLight</item>
+        <item name="fb_defaultColor">@color/editTextFormBackground</item>
+        <item name="fb_focusColor">@color/colorPointed.Light</item>
+        <item name="fb_radius">8dp</item>
+        <item name="android:minHeight">@dimen/button_height_small</item>
+    </style>
+
+    <style name="TinyCircularFancyButtonStyle">
+
+        <item name="android:layout_width">@dimen/button_height_tiny</item>
+        <item name="android:layout_height">@dimen/button_height_tiny</item>
+        <item name="fb_defaultColor">@color/colorAccent.Light</item>
+        <item name="fb_radius">300dp</item>
+        <item name="fb_focusColor">@color/colorRed</item>
+        <item name="fb_iconPaddingLeft">0dp</item>
+        <item name="fb_iconPaddingRight">0dp</item>
+        <item name="fb_iconResource">@drawable/ic_arrow_downward_black_24dp</item>
+        <item name="drawableTint">#FFF</item>
+    </style>
+
+    <style name="TinyCircularFancyButtonStyle.blackAndWhite" parent="TinyCircularFancyButtonStyle">
+        <item name="fb_defaultColor">@color/editTextFormBackground</item>
+        <item name="fb_focusColor">@color/colorPointed.Light</item>
+        <item name="fb_iconResource">@drawable/ic_arrow_downward_black_24dp</item>
+        <item name="drawableTint">@color/textColorLight</item>
+    </style>
+
+    <style name="NumberPickerStyleImmersive">
+        <item name="np_selectedTextColor">@color/colorPointed</item>
+        <item name="android:textColor">@color/textColorLight</item>
+        <item name="np_dividerThickness">1dp</item>
+        <item name="np_wheelItemCount">5</item>
+        <item name="np_dividerColor">@color/textColorLightLight</item>
+        <item name="np_selectedTextSize">25sp</item>
+        <item name="android:textSize">20sp</item>
+        <item name="np_textColor">@color/textColorMidLight</item>
+        <item name="np_typeface">fonts/Roboto-Thin.ttf</item>
+        <item name="np_wrapSelectorWheel">true</item>
     </style>
 
     <style name="AppTheme.NoActionBar.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />

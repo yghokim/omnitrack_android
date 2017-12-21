@@ -1,15 +1,16 @@
 package kr.ac.snu.hcil.omnitrack.utils
 
+import android.os.Handler
 import android.os.SystemClock
-import com.badoo.mobile.util.WeakHandler
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 
 /**
  * Created by Young-Ho Kim on 2016-08-30.
  */
+//TODO remove this class
 class Ticker(var unit: Int = 1000) {
 
-    val handler: WeakHandler
+    val handler: Handler
     val ticker: Runnable
 
     var tickerStopped = true
@@ -18,7 +19,7 @@ class Ticker(var unit: Int = 1000) {
     val tick = Event<Long>()
 
     init {
-        handler = WeakHandler()
+        handler = Handler()
         ticker = object : Runnable {
             override fun run() {
                 if (tickerStopped) return
@@ -35,7 +36,7 @@ class Ticker(var unit: Int = 1000) {
     }
 
     fun start() {
-        if (tickerStopped == true) {
+        if (tickerStopped) {
             tickerStopped = false
             ticker.run()
         }

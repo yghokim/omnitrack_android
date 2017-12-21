@@ -5,8 +5,7 @@ import android.os.Bundle
 import com.firebase.jobdispatcher.*
 import dagger.Module
 import dagger.Provides
-import kr.ac.snu.hcil.omnitrack.services.OTSynchronizationService
-import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckService
+import kr.ac.snu.hcil.omnitrack.services.*
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
@@ -69,6 +68,24 @@ class ScheduledJobModule {
                 ).build()
     }
 
+
+    @Provides
+    @Singleton
+    @BinaryStorageServer
+    fun provideBinaryUploadJob(builder: Job.Builder): Job {
+        return builder.setService(OTBinaryUploadService::class.java)
+                .setRecurring(false)
+                .setTag(OTBinaryUploadService.TAG)
+                .setLifetime(Lifetime.FOREVER)
+                .setReplaceCurrent(true)
+                .setTrigger(Trigger.executionWindow(0, 30))
+                .setRetryStrategy(RetryStrategy.DEFAULT_EXPONENTIAL)
+                .setConstraints(
+                        Constraint.ON_ANY_NETWORK
+                )
+                .build()
+    }
+
     @Provides
     @Singleton
     @ServerSyncOneShot
@@ -86,6 +103,31 @@ class ScheduledJobModule {
                 ).build()
     }
 
+    @Provides
+    @Singleton
+    @UsageLogger
+    fun providesUsageLogUploadJob(builder: Job.Builder): Job {
+        return builder.setService(OTUsageLogUploadService::class.java)
+                .setTag(OTUsageLogUploadService.TAG)
+                .setLifetime(Lifetime.FOREVER)
+                .setReplaceCurrent(true)
+                .setTrigger(Trigger.executionWindow(5, 30))
+                .setRetryStrategy(RetryStrategy.DEFAULT_EXPONENTIAL)
+                .addConstraint(Constraint.ON_ANY_NETWORK)
+                .build()
+    }
+
+    @Provides
+    @Singleton
+    @InformationUpload
+    fun providesInformationUploadJobBuilder(builder: Job.Builder): Job.Builder {
+        return builder.setService(OTInformationUploadService::class.java)
+                .setLifetime(Lifetime.FOREVER)
+                .setReplaceCurrent(true)
+                .setTrigger(Trigger.executionWindow(0, 20))
+                .setRetryStrategy(RetryStrategy.DEFAULT_EXPONENTIAL)
+                .addConstraint(Constraint.ON_ANY_NETWORK)
+    }
 
 }
 
@@ -97,3 +139,7 @@ class ScheduledJobModule {
 
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME) annotation class ServerSyncOneShot
+
+
+@Qualifier
+@Retention(AnnotationRetention.RUNTIME) annotation class InformationUpload

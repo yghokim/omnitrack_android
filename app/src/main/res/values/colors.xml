@@ -30,6 +30,7 @@
 
     <color name="textColorMidLight">#9c9c9c</color>
     <color name="textColorLight">#aaaaaa</color>
+    <color name="textColorLightLight">#c6c6c6</color>
 
     <color name="colorPointed">#16afa3</color>
     <color name="colorPointed.Light">#65bfb8</color>

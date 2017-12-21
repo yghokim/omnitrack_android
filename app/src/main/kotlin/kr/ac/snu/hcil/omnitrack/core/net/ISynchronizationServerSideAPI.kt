@@ -1,5 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.core.net
 
+import android.support.annotation.Keep
 import com.google.gson.JsonObject
 import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.core.OTUserRolePOJO
@@ -12,8 +13,14 @@ import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncResultEntry
  */
 interface ISynchronizationServerSideAPI {
 
-    data class DeviceInfoResult(var result: String, var deviceLocalKey: String?)
 
+    @Keep
+    data class DeviceInfoResult(var result: String, var deviceLocalKey: String?, val payloads: Map<String, String>? = null)
+
+    @Keep
+    data class InformationUpdateResult(var success: Boolean, var finalValue: String, val payloads: Map<String, String>? = null)
+
+    @Keep
     data class DirtyRowBatchParameter(val type: ESyncDataType, val rows: Array<String>)
 
     fun getUserRoles(): Single<List<OTUserRolePOJO>>
@@ -22,6 +29,8 @@ interface ISynchronizationServerSideAPI {
 
     fun putDeviceInfo(info: OTDeviceInfo): Single<DeviceInfoResult>
     fun removeDeviceInfo(userId: String, deviceId: String): Single<Boolean>
+
+    fun putUserName(name: String, timestamp: Long): Single<InformationUpdateResult>
 
     //=================================================================================================================================
     //server returns server-side changes after designated timestamp.

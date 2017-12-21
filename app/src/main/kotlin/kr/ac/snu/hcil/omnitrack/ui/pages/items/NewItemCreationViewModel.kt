@@ -3,17 +3,14 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.items
 import android.app.Application
 import io.reactivex.Maybe
 import io.reactivex.Single
-import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemBuilderDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemBuilderFieldValueEntry
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.utils.ValueWithTimestamp
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels.OTItemBuilderDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels.OTItemBuilderFieldValueEntry
+import kr.ac.snu.hcil.omnitrack.utils.AnyValueWithTimestamp
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
-import javax.inject.Inject
-import javax.inject.Provider
 
 /**
  * Created by Young-Ho on 10/9/2017.
@@ -22,8 +19,6 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
 
     private lateinit var itemBuilderDao: OTItemBuilderDAO
     private lateinit var builderWrapper: OTItemBuilderWrapperBase
-
-    @Inject lateinit var realmProvider: Provider<Realm>
 
     override fun onInject(app: OTApp) {
         app.applicationComponent.inject(this)
@@ -60,7 +55,7 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
         return Pair(ItemMode.New, builderCreationModeObservable.value)
     }
 
-    override fun setValueOfAttribute(attributeLocalId: String, valueWithTimestamp: ValueWithTimestamp) {
+    override fun setValueOfAttribute(attributeLocalId: String, valueWithTimestamp: AnyValueWithTimestamp) {
         itemBuilderDao.setValue(attributeLocalId, valueWithTimestamp, realm)
         super.setValueOfAttribute(attributeLocalId, valueWithTimestamp)
     }
@@ -110,7 +105,7 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
             if (isValid) {
                 println("save builder")
                 refreshDaoValues()
-                isBusyObservable.filter { it == false }.firstOrError().map { isBusy ->
+                isBusyObservable.filter { !it }.firstOrError().map { isBusy ->
                     if (!isBusy) {
                         var highestBuilderEntryId = realm.where(OTItemBuilderFieldValueEntry::class.java).max("id")?.toLong() ?: 0L
                         itemBuilderDao.data.forEach {
@@ -130,7 +125,7 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
 
     override fun applyEditingToDatabase(): Maybe<String> {
         if (isValid) {
-            return isBusyObservable.filter { it == false }.firstOrError().flatMapMaybe {
+            return isBusyObservable.filter { !it }.firstOrError().flatMapMaybe {
                 refreshDaoValues()
                 val item = builderWrapper.saveToItem(null, ItemLoggingSource.Manual)
 
@@ -143,7 +138,7 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
 
     override fun clearHistory() {
         subscriptions.add(
-                isBusyObservable.filter { it == false }.subscribe {
+                isBusyObservable.filter { !it }.subscribe {
                     realm.executeTransaction {
                         val daos = realm.where(OTItemBuilderDAO::class.java).equalTo("id", itemBuilderDao.id).findAll()
                         daos.forEach {

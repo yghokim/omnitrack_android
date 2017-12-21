@@ -4,7 +4,9 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.PowerManager
+import dagger.Lazy
 import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerSystemManager
 import java.util.concurrent.TimeUnit
@@ -24,6 +26,9 @@ class RebootReceiver : BroadcastReceiver() {
     @Inject
     protected lateinit var shortcutPanelManager: OTShortcutPanelManager
 
+    @Inject
+    protected lateinit var eventLogger: Lazy<IEventLogger>
+
     override fun onReceive(context: Context, intent: Intent) {
         println("OMNITRACK: reboot receiver called - ${intent.action}")
 
@@ -33,6 +38,8 @@ class RebootReceiver : BroadcastReceiver() {
         val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
         val wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG)
         wl.acquire(3000)
+
+        eventLogger.get().logEvent(IEventLogger.NAME_DEVICE_EVENT, "AfterBoot")
 
         triggerManager.onSystemRebooted()
         shortcutPanelManager.refreshNotificationShortcutViewsObservable(context).timeout(2, TimeUnit.SECONDS).doAfterTerminate {

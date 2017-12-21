@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
+import java.util.regex.Pattern
 
 def keystorePropertiesFile = rootProject.file("keystore.properties")
 def keystoreProperties = new Properties()
@@ -10,23 +11,10 @@ keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 android {
     signingConfigs {
         sign_test {
-            try {
-                storePassword RELEASE_STORE_PASSWORD
-                keyAlias RELEASE_ALIAS
-                keyPassword RELEASE_KEY_PASSWORD
-
-                try {
-                    storeFile file(RELEASE_KEYSTORE_LOCATION)
-                }
-                catch (ex) {
-                    throw new Exception("Wrong Keystore Location")
-                }
-
-            }
-            catch (ex) {
-                ex.printStackTrace()
-                println 'Failed to load variables.'
-            }
+            storeFile file(RELEASE_KEYSTORE_LOCATION)
+            keyAlias RELEASE_ALIAS
+            keyPassword RELEASE_KEY_PASSWORD
+            storePassword RELEASE_STORE_PASSWORD
         }
     }
 
@@ -36,12 +24,26 @@ android {
         applicationId "kr.ac.snu.hcil.omnitrack"
         minSdkVersion 19
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 20
-        versionName "2.0.0.0 beta"
         //multidex support
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
+
+        def googleMapsKey = keystoreProperties.getProperty("GOOGLE_MAPS_API_KEY").toString()
+        println(googleMapsKey)
+        manifestPlaceholders = [GOOGLE_MAPS_API_KEY: googleMapsKey.replaceAll("\"", "").trim()]
     }
+
+
+    applicationVariants.all { variant ->
+        println("variant name: ${variant.name}")
+        if(variant.name.toLowerCase().contains("release"))
+        {
+            variant.generateBuildConfig.dependsOn("refreshVersionsByIncreasingVersionCode")
+        }
+        else
+            variant.generateBuildConfig.dependsOn("refreshVersionsNotRelease")
+    }
+
     dexOptions {
         javaMaxHeapSize "4g"
     }
@@ -52,6 +54,7 @@ android {
 
     buildTypes {
         release {
+            debuggable true
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -60,7 +63,6 @@ android {
         debug {
             applicationIdSuffix '.debug'
             versionNameSuffix '-Debug'
-
         }
     }
     buildTypes.each {
@@ -128,7 +130,7 @@ dependencies {
     implementation "android.arch.lifecycle:extensions:1.0.0"
     kapt "android.arch.lifecycle:compiler:1.0.0"
 
-    kapt 'com.android.databinding:compiler:3.0.0'
+    kapt 'com.android.databinding:compiler:3.0.1'
 
     implementation "org.jetbrains.anko:anko:0.10.2"
 
@@ -161,8 +163,7 @@ dependencies {
     implementation 'org.apmem.tools:layouts:1.10@aar'
     implementation 'com.beloo.widget:ChipsLayoutManager:0.3.7@aar'
     implementation 'com.github.ybq:Android-SpinKit:1.1.0'
-    implementation 'com.badoo.mobile:android-weak-handler:1.1'
-    implementation 'com.squareup.okhttp3:okhttp:3.9.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.9.1'
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
     implementation 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
@@ -175,13 +176,13 @@ dependencies {
     implementation 'com.heinrichreimersoftware:material-intro:1.6.2'
     implementation 'com.jaredrummler:material-spinner:1.2.1'
     implementation 'de.hdodenhof:circleimageview:2.2.0'
-    implementation 'com.github.bumptech.glide:glide:4.2.0'
-    kapt 'com.github.bumptech.glide:compiler:4.2.0'
+    implementation 'com.github.bumptech.glide:glide:4.3.1'
+    kapt 'com.github.bumptech.glide:compiler:4.3.1'
     implementation 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.4@aar'
-    implementation 'com.wonderkiln:camerakit:0.11.2'
-    implementation 'com.github.mukeshsolanki:country-picker-android:1.1.9'
+    implementation 'com.wonderkiln:camerakit:0.12.0'
+    implementation 'com.github.mukeshsolanki:country-picker-android:1.2.0'
     implementation 'com.patloew.rxlocation:rxlocation:1.0.3'
-    implementation 'uk.co.samuelwall:material-tap-target-prompt:2.3.0'
+    implementation 'uk.co.samuelwall:material-tap-target-prompt:2.4.0'
     implementation 'com.wdullaer:materialdatetimepicker:3.4.0'
     implementation 'com.jakewharton.threetenabp:threetenabp:1.0.5'
 
@@ -193,7 +194,9 @@ dependencies {
     implementation 'com.larswerkman:lobsterpicker:1.0.1'
     implementation 'uk.co.chrisjenx:calligraphy:2.3.0'
     implementation 'com.github.VictorAlbertos:RxActivityResult:0.4.5-2.x'
+    implementation 'com.github.salomonbrys.kotson:kotson:2.5.0'
     implementation 'org.nield:kotlin-statistics:1.0.0'
+    implementation 'com.shawnlin:number-picker:2.4.4'
 }
 
 repositories {
@@ -218,3 +221,51 @@ repositories {
 
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'realm-android'
+
+ext.refreshVersion = {
+    increase->
+        println("refresh versions.")
+        def versionPropsFile = rootProject.file("version.properties")
+        Properties versionProperties = new Properties()
+        versionProperties.load(new FileInputStream(versionPropsFile))
+        def releaseIncrease = increase ? 1 : 0
+
+        def patternVersionNumber = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)\\.(\\d+)(\\s[a-zA-Z0-9]+)?")
+        def matcherVersionNumber = patternVersionNumber.matcher(versionProperties["versionName"])
+        matcherVersionNumber.find()
+        def majorVersion = Integer.parseInt(matcherVersionNumber.group(1))
+        def minorVersion = Integer.parseInt(matcherVersionNumber.group(2))
+        def pointVersion = Integer.parseInt(matcherVersionNumber.group(3))
+        def buildVersion = Integer.parseInt(matcherVersionNumber.group(4))
+        def suffix = matcherVersionNumber.group(5)
+
+        def versionName = majorVersion + "." + minorVersion + "." + (pointVersion + releaseIncrease) + "." + (buildVersion + 1) + suffix
+        def versionCode = versionProperties["versionCode"].toInteger() + releaseIncrease
+        versionProperties.setProperty("versionName", versionName)
+        versionProperties.setProperty("versionCode", versionCode.toString())
+        versionProperties.store(versionPropsFile.newWriter(), "auto-incremented version information.")
+
+        android.defaultConfig.versionName = versionName
+        android.defaultConfig.versionCode = versionCode
+        android.applicationVariants.all {
+            variant->
+                variant.mergedFlavor.versionCode = versionCode
+                variant.mergedFlavor.versionName = versionName
+        }
+        println("new versionName: ${versionName}, versionCode: ${versionCode}")
+
+        android.applicationVariants.all {
+            variant->
+                variant.outputs.all{ output ->
+                    outputFileName = "${variant.name}-${versionName}.apk"
+                }
+        }
+}
+
+task("refreshVersionsNotRelease") << {
+    refreshVersion(false)
+}
+
+task("refreshVersionsByIncreasingVersionCode") << {
+    refreshVersion(true)
+}

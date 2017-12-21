@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <kr.ac.snu.hcil.omnitrack.ui.components.visualization.ChartCanvasView
+    <kr.ac.snu.hcil.omnitrack.ui.components.visualization.NativeChartCanvasCore
         android:id="@+id/ui_chart"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />

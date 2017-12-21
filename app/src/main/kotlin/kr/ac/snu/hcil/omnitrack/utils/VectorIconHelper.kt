@@ -11,16 +11,21 @@ import android.support.v7.content.res.AppCompatResources
 import android.util.LruCache
 import io.realm.Realm
 import io.realm.RealmConfiguration
+import io.realm.annotations.RealmModule
 import java.io.File
 import java.io.FileOutputStream
 
 /**
  * Created by Young-Ho on 5/23/2017.
  */
+
+@RealmModule(classes = arrayOf(VectorIconBitmapCache::class))
+class VectorIconCacheRealmModule
+
 object VectorIconHelper {
 
     private val realmConfiguration: RealmConfiguration by lazy {
-        RealmConfiguration.Builder().name("vectorIconCache").deleteRealmIfMigrationNeeded().build()
+        RealmConfiguration.Builder().name("vectorIconCache").modules(VectorIconCacheRealmModule()).deleteRealmIfMigrationNeeded().build()
     }
 
     private val memCache = object : LruCache<String, Bitmap>(20) {
@@ -109,9 +114,10 @@ object VectorIconHelper {
                         ex.printStackTrace()
                     }
                 }
-
                 bitmap
             }
+
+            realm.close()
 
             memCache.put(cacheKey, finalBitmap)
 

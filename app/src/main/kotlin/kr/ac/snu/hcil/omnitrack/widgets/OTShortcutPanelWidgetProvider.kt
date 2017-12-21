@@ -68,7 +68,7 @@ class OTShortcutPanelWidgetProvider : AppWidgetProvider() {
                 CLICK_COMMAND_INSTANT_LOGGING -> {
                     val trackerId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
                     if (trackerId != null) {
-                        context.startService(OTItemLoggingService.makeLoggingIntent(context, ItemLoggingSource.Shortcut, trackerId))
+                        context.startService(OTItemLoggingService.makeLoggingIntent(context, ItemLoggingSource.Shortcut, true, trackerId))
                     }
                 }
             }

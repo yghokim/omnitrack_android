@@ -5,6 +5,7 @@ import android.app.KeyguardManager
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.location.Address
 import android.location.Geocoder
@@ -19,6 +20,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TimePicker
 import com.google.android.gms.maps.model.LatLng
+import com.google.gson.JsonElement
+import com.google.gson.JsonObject
 import io.reactivex.Completable
 import io.reactivex.disposables.Disposables
 import io.reactivex.subjects.BehaviorSubject
@@ -57,7 +60,7 @@ fun dipSize(value: Int): Float {
 }
 
 fun Boolean.toInt(): Int {
-    return if (this == true) 1 else 0
+    return if (this) 1 else 0
 }
 
 fun Int.toBoolean(): Boolean {
@@ -143,13 +146,7 @@ fun isNumericPrimitive(value: Any?): Boolean {
 }
 
 fun convertNumericToDouble(value: Any): Double {
-    if (value is Int) {
-        return value.toDouble()
-    } else if (value is Long) {
-        return value.toDouble()
-    } else if (value is Float) {
-        return value.toDouble()
-    } else if (value is Double) {
+    if (value is Number) {
         return value.toDouble()
     } else return value.toString().toDouble()
 }
@@ -335,4 +332,34 @@ fun Realm.executeTransactionAsObservable(transaction: (Realm) -> Unit): Completa
     }
 }
 
+fun JsonObject.getElementCompat(key: String): JsonElement? {
+    val value = this[key]
+    if (value?.isJsonNull != false) {
+        return null
+    } else return value
+}
 
+fun JsonObject.getStringCompat(key: String): String? {
+    val element = getElementCompat(key)
+    return try {
+        element?.asString
+    } catch (ex: UnsupportedOperationException) {
+        element?.toString()
+    }
+}
+
+fun JsonObject.getBooleanCompat(key: String): Boolean? {
+    return getElementCompat(key)?.asBoolean
+}
+
+fun JsonObject.getIntCompat(key: String): Int? {
+    return getElementCompat(key)?.asInt
+}
+
+fun JsonObject.getLongCompat(key: String): Long? {
+    return getElementCompat(key)?.asLong
+}
+
+fun argbIntToCssString(color: Int): String {
+    return "rgba(${Color.red(color)}, ${Color.green(color)}, ${Color.blue(color)}, ${Color.alpha(color).toFloat() / 255})"
+}

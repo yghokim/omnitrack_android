@@ -24,7 +24,7 @@ class CategoricalBarChartDrawer : AChartDrawer() {
         set(value) {
             if (field != value) {
                 field = value
-                if (value == true) {
+                if (value) {
                     verticalAxisScale.tickFormat = object : IAxisScale.ITickFormat<Float> {
                         override fun format(value: Float, index: Int): String {
                             return value.toInt().toString()

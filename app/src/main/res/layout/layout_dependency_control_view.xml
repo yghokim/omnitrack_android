@@ -68,7 +68,7 @@
                 android:text="Mandatory"
                 android:textAllCaps="true"
                 android:textColor="@android:color/white"
-                android:textSize="10dp" />
+                android:textSize="10sp" />
         </FrameLayout>
 
         <com.github.ybq.android.spinkit.SpinKitView

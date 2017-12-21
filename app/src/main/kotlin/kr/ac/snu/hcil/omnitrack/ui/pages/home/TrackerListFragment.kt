@@ -35,16 +35,17 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.tbruyelle.rxpermissions2.RxPermissions
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import kotlinx.android.synthetic.main.tracker_list_element.view.*
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
-import kr.ac.snu.hcil.omnitrack.core.OTTracker
+import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
-import kr.ac.snu.hcil.omnitrack.ui.components.common.FallbackRecyclerView
 import kr.ac.snu.hcil.omnitrack.ui.components.common.TooltipHelper
+import kr.ac.snu.hcil.omnitrack.ui.components.common.container.FallbackRecyclerView
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.TopBottomHorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.tutorial.TutorialManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemBrowserActivity
@@ -87,6 +88,8 @@ class TrackerListFragment : OTFragment() {
     private lateinit var statHeaderColorSpan: ForegroundColorSpan
 
     private lateinit var statContentStyleSpan: StyleSpan
+
+    private var pendingNewTrackerId: String? = null
 
     private val emptyTrackerDialog: MaterialDialog.Builder by lazy {
         MaterialDialog.Builder(context!!)
@@ -162,15 +165,48 @@ class TrackerListFragment : OTFragment() {
         trackerListAdapter.currentlyExpandedIndex = savedInstanceState?.getInt(STATE_EXPANDED_TRACKER_INDEX, -1) ?: -1
     }
 
+    override fun onInject(application: OTApp) {
+        (act.application as OTApp).applicationComponent.inject(this)
+    }
+
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        (act.application as OTApp).applicationComponent.inject(this)
-
         viewModel = ViewModelProviders.of(this).get(TrackerListViewModel::class.java)
         viewModel.userId = authManager.userId
+    }
 
-        createViewSubscriptions.add(
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View? {
+        val rootView = inflater.inflate(R.layout.fragment_home_trackers, container, false)
+
+        addTrackerFloatingButton = rootView.findViewById(R.id.fab)
+        addTrackerFloatingButton.setOnClickListener { view ->
+            newTrackerNameDialog.input(null, viewModel.generateNewTrackerName(), false) {
+                    dialog, text ->
+                startActivityForResult(TrackerDetailActivity.makeNewTrackerIntent(text.toString(), act), REQUEST_CODE_NEW_TRACKER)
+
+                }.show()
+                //Toast.makeText(context,String.format(resources.getString(R.string.sentence_new_tracker_added), newTracker.name), Toast.LENGTH_LONG).show()
+        }
+
+        listView = rootView.findViewById(R.id.ui_tracker_list_view)
+        emptyMessageView = rootView.findViewById(R.id.ui_empty_list_message)
+        listView.emptyView = emptyMessageView
+        trackerListLayoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        listView.layoutManager = trackerListLayoutManager
+
+        val shadowDecoration = TopBottomHorizontalImageDividerItemDecoration(context = act, heightMultiplier = resources.getFraction(R.fraction.tracker_list_separator_height_ratio, 1, 1))
+        listView.addItemDecoration(shadowDecoration)
+        (listView.layoutParams as CoordinatorLayout.LayoutParams).verticalMargin = -shadowDecoration.upperDividerHeight
+        listView.adapter = trackerListAdapter
+
+        return rootView
+    }
+
+    override fun onStart() {
+        super.onStart()
+        startSubscriptions.add(
                 viewModel.trackerViewModels.subscribe { trackerViewModelList ->
 
                     val rxPermissions = RxPermissions(act)
@@ -201,40 +237,17 @@ class TrackerListFragment : OTFragment() {
                     currentTrackerViewModelList.clear()
                     currentTrackerViewModelList.addAll(trackerViewModelList)
                     diffResult.dispatchUpdatesTo(trackerListAdapter)
+
+                    if (pendingNewTrackerId != null) {
+                        val position = currentTrackerViewModelList.indexOfFirst { it.objectId == pendingNewTrackerId }
+                        if (position != -1) {
+                            listView.smoothScrollToPosition(position)
+                        }
+                        pendingNewTrackerId = null
+                    }
                 }
         )
-    }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.fragment_home_trackers, container, false)
-
-        addTrackerFloatingButton = rootView.findViewById(R.id.fab)
-        addTrackerFloatingButton.setOnClickListener { view ->
-            newTrackerNameDialog.input(null, viewModel.generateNewTrackerName(), false) {
-                    dialog, text ->
-                startActivityForResult(TrackerDetailActivity.makeNewTrackerIntent(text.toString(), act), REQUEST_CODE_NEW_TRACKER)
-
-                }.show()
-                //Toast.makeText(context,String.format(resources.getString(R.string.sentence_new_tracker_added), newTracker.name), Toast.LENGTH_LONG).show()
-        }
-
-        listView = rootView.findViewById(R.id.ui_tracker_list_view)
-        emptyMessageView = rootView.findViewById(R.id.ui_empty_list_message)
-        listView.emptyView = emptyMessageView
-        trackerListLayoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        listView.layoutManager = trackerListLayoutManager
-
-        val shadowDecoration = TopBottomHorizontalImageDividerItemDecoration(R.drawable.horizontal_separator_pattern_upper, R.drawable.horizontal_separator_pattern_under, act, resources.getFraction(R.fraction.tracker_list_separator_height_ratio, 1, 1))
-        listView.addItemDecoration(shadowDecoration)
-        (listView.layoutParams as CoordinatorLayout.LayoutParams).verticalMargin = -shadowDecoration.upperDividerHeight
-        listView.adapter = trackerListAdapter
-
-        return rootView
-    }
-
-    override fun onStart() {
-        super.onStart()
         TutorialManager.checkAndShowTargetPrompt(TutorialManager.FLAG_TRACKER_LIST_ADD_TRACKER, true, this.act, addTrackerFloatingButton,
                 R.string.msg_tutorial_add_tracker_primary,
                 R.string.msg_tutorial_add_tracker_secondary,
@@ -257,10 +270,7 @@ class TrackerListFragment : OTFragment() {
                 if (data != null) {
                     if (data.hasExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)) {
                         val newTrackerId = data.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
-
-                        /* TODO logging
-                        EventLoggingManager.logTrackerChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_TRACKER_ADD, newTracker)
-                        */
+                        pendingNewTrackerId = newTrackerId
                     }
                 }
             }
@@ -268,10 +278,10 @@ class TrackerListFragment : OTFragment() {
     }
 
     private fun handleTrackerClick(tracker: OTTrackerDAO) {
-        if (tracker.makeAttributesQuery(false, false).findAll().count() == 0) {
+        if (tracker.makeAttributesQuery(false, false).count() == 0L) {
             emptyTrackerDialog
                     .onPositive { materialDialog, dialogAction ->
-                        activity?.startService(OTItemLoggingService.makeLoggingIntent(act, ItemLoggingSource.Manual, tracker.objectId!!))
+                        activity?.startService(OTItemLoggingService.makeLoggingIntent(act, ItemLoggingSource.Manual, true, tracker.objectId!!))
                         //OTBackgroundLoggingService.log(context, tracker, OTItem.ItemLoggingSource.Manual, notify = false).subscribe()
                     }
                     .onNeutral { materialDialog, dialogAction ->
@@ -282,26 +292,6 @@ class TrackerListFragment : OTFragment() {
             startActivity(ItemDetailActivity.makeNewItemPageIntent(tracker.objectId!!, act))
         }
     }
-
-    private fun handleTrackerLongClick(tracker: OTTracker) {
-        /*
-        val builder = AlertDialog.Builder(context)
-        builder.setTitle(tracker.name)
-        builder.setItems(popupMessages){
-            dialog, which ->
-            when(which) {
-                CHANGE_TRACKER_SETTINGS -> {
-                    val intent = Intent(context, TrackerDetailActivity::class.java)
-                    intent.putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, tracker.objectId)
-                    startActivityOnDelay(intent)
-
-                }
-                REMOVE_TRACKER -> DialogHelper.makeYesNoDialogBuilder(context, tracker.name, getString(R.string.msg_confirm_remove_tracker), {->user.trackers.remove(tracker)}).show()
-            }
-        }
-        builder.show()*/
-    }
-
 
     inner class TrackerListAdapter : RecyclerView.Adapter<TrackerListAdapter.ViewHolder>() {
 
@@ -474,8 +464,7 @@ class TrackerListFragment : OTFragment() {
                             onYes = { dialog ->
                         viewModel.removeTracker(trackerViewModel)
                         listView.invalidateItemDecorations()
-                        //TODO logging tracker removal
-                        //EventLoggingManager.logTrackerChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_TRACKER_REMOVE, tracker)
+                                eventLogger.get().logTrackerChangeEvent(IEventLogger.SUB_REMOVE, trackerViewModel.objectId)
                     }).show()
                 } else if (view === chartViewButton) {
                     startActivityOnDelay(ChartViewActivity.makeIntent(trackerId!!, this@TrackerListFragment.act))
@@ -550,6 +539,16 @@ class TrackerListFragment : OTFragment() {
                         viewModel.trackerColor.subscribe {
                             colorInt ->
                             color.setBackgroundColor(colorInt)
+                        }
+                )
+
+                subscriptions.add(
+                        viewModel.isBookmarked.subscribe { isBookmarked ->
+                            if (isBookmarked) {
+                                itemView.ui_bookmark_indicator.visibility = View.VISIBLE
+                            } else {
+                                itemView.ui_bookmark_indicator.visibility = View.GONE
+                            }
                         }
                 )
 

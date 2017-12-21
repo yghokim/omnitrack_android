@@ -5,7 +5,7 @@ import android.os.Bundle
 import io.reactivex.Single
 import kotlinx.android.synthetic.main.fragment_tracker_detail_triggers.*
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.ATriggerListFragment
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.ATriggerListViewModel
 import java.util.*
@@ -25,7 +25,7 @@ class ReminderListFragment : ATriggerListFragment<ATriggerListViewModel>() {
     override fun initializeNewViewModel(savedInstanceState: Bundle?): Single<ATriggerListViewModel> {
         return Single.defer {
             parentViewModel = ViewModelProviders.of(activity!!).get(TrackerDetailViewModel::class.java)
-            return@defer parentViewModel.isInitializedObservable.filter { it == true }.firstOrError().map { isInitialized ->
+            return@defer parentViewModel.isInitializedObservable.filter { it }.firstOrError().map { isInitialized ->
                 val trackerId = parentViewModel.trackerId
                 if (trackerId != null) // editmode
                 {

@@ -12,20 +12,23 @@ import android.support.v4.content.LocalBroadcastManager
 import android.util.AttributeSet
 import dagger.Lazy
 import gun0912.tedbottompicker.TedBottomPicker
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.SerialDisposable
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.SynchronizedUri
-import kr.ac.snu.hcil.omnitrack.core.net.IBinaryDownloadAPI
+import kr.ac.snu.hcil.omnitrack.core.datatypes.OTServerFile
+import kr.ac.snu.hcil.omnitrack.core.net.OTLocalMediaCacheManager
 import kr.ac.snu.hcil.omnitrack.ui.components.common.ImagePicker
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.CameraPickDialogFragment
 import kr.ac.snu.hcil.omnitrack.utils.getActivity
+import org.jetbrains.anko.runOnUiThread
 import javax.inject.Inject
 
 /**
  * Created by Young-Ho Kim on 2016-07-22.
  */
-class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttributeInputView<SynchronizedUri>(R.layout.input_image, context, attrs), ImagePicker.ImagePickerCallback {
+class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttributeInputView<OTServerFile>(R.layout.input_image, context, attrs), ImagePicker.ImagePickerCallback {
 
     companion object {
         const val REQUEST_CODE_CAMERA = 2
@@ -40,42 +43,39 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
     }
 
     @Inject
-    lateinit var binaryDownloader: Lazy<IBinaryDownloadAPI>
+    lateinit var localCacheManager: Lazy<OTLocalMediaCacheManager>
 
     override val typeId: Int = VIEW_TYPE_IMAGE
 
-    override var value: SynchronizedUri? = null
+    override var value: OTServerFile? = null
         set(rawValue) {
-            println("image rawvalue: ${rawValue}")
-            val value = if (rawValue?.isEmpty == true) null else rawValue
+            println("image serverUri rawvalue: ${rawValue}")
+            val value = if (rawValue?.serverPath?.isBlank() == true) null else rawValue
             if (field != value) {
-                subscriptions.clear()
                 field = value
-                if (value?.isLocalUriValid == true) {
+                if (value == null) {
                     picker.uriChanged.suspend = true
-                    picker.imageUri = value.localUri
+                    picker.imageUri = Uri.EMPTY
                     picker.uriChanged.suspend = false
-                } else if (value?.isSynchronized == true) {
-                    picker.isEnabled = false
-                    subscriptions.add(
-                            binaryDownloader.get().downloadFileTo(value.serverUri.path, value.localUri).subscribe({
-                                uri ->
+                } else {
+                    loadingSubscription.set(
+                            localCacheManager.get().getCachedUri(value).observeOn(AndroidSchedulers.mainThread()).doOnSubscribe {
+                                context.runOnUiThread {
+                                    //TODO mode: Loading
+                                    picker.isEnabled = false
+                                }
+                            }.subscribe({ (refreshed, localUri) ->
                                 picker.uriChanged.suspend = true
-                                picker.imageUri = uri
+                                picker.imageUri = localUri
                                 picker.uriChanged.suspend = false
                                 picker.isEnabled = true
                             }, {
-                                error ->
-                                error?.printStackTrace()
                                 picker.uriChanged.suspend = true
                                 picker.imageUri = Uri.EMPTY
                                 picker.uriChanged.suspend = false
                                 picker.isEnabled = true
                             })
-
                     )
-                } else {
-                    picker.imageUri = Uri.EMPTY
                 }
 
                 onValueChanged(value)
@@ -83,6 +83,7 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
         }
 
     val picker: ImagePicker = findViewById(R.id.ui_image_picker)
+    private val loadingSubscription = SerialDisposable()
     private val subscriptions = CompositeDisposable()
 
     private val eventReceiver: BroadcastReceiver by lazy {
@@ -106,12 +107,23 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
     }
 
     init {
+        (context.applicationContext as OTApp).networkComponent.inject(this)
+
         picker.callback = this
 
         picker.uriChanged += {
             sender, uri ->
             println("picker uri changed to $uri")
-            value = SynchronizedUri(uri)
+            if (uri == Uri.EMPTY) {
+                value = null
+            } else if (!uri.equals(value?.let { localCacheManager.get().getCachedUriImmediately(it.serverPath) } ?: Uri.EMPTY)) {
+                val newServerPath = localCacheManager.get().generateRandomServerPath(uri)
+                val newServerFile = OTServerFile.fromLocalFile(newServerPath, uri, context)
+                subscriptions.add(
+                        localCacheManager.get().insertOrUpdateNewLocalMedia(uri, newServerFile).subscribe { serverFile ->
+                            value = serverFile
+                        })
+            }
         }
     }
 
@@ -158,6 +170,12 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         LocalBroadcastManager.getInstance(context).unregisterReceiver(eventReceiver)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        loadingSubscription.set(null)
+        subscriptions.clear()
     }
 
     fun resizeImage(source: Uri, dest: Uri) {

@@ -1,3 +1,6 @@
 [submodule "TedBottomPicker"]
 	path = TedBottomPicker
 	url = https://github.com/muclipse/TedBottomPicker.git
+[submodule "omnitrack_visualization_core"]
+	path = omnitrack_visualization_core
+	url = https://github.com/muclipse/omnitrack_visualization_core

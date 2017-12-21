@@ -21,20 +21,19 @@ import android.widget.TextView
 import android.widget.Toast
 import butterknife.bindView
 import com.afollestad.materialdialogs.MaterialDialog
+import com.github.salomonbrys.kotson.set
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.attribute_list_element.view.*
 import kotlinx.android.synthetic.main.fragment_tracker_detail_structure.*
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.attributes.AttributePresetInfo
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
-import kr.ac.snu.hcil.omnitrack.ui.components.common.AdapterLinearLayout
-import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
+import kr.ac.snu.hcil.omnitrack.ui.components.common.container.AdapterLinearLayout
+import kr.ac.snu.hcil.omnitrack.ui.components.common.container.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.BooleanPropertyView
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ColorPalettePropertyView
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.properties.ModalTextPropertyView
 import kr.ac.snu.hcil.omnitrack.ui.components.tutorial.TutorialManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.ConnectionIndicatorStubProxy
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeDetailActivity
@@ -62,9 +61,6 @@ class TrackerDetailStructureTabFragment : OTFragment() {
 
     lateinit private var attributeListItemTouchHelper: ItemTouchHelper
 
-    private lateinit var namePropertyView: ModalTextPropertyView
-    private lateinit var colorPropertyView: ColorPalettePropertyView
-    private lateinit var isOnShortcutPropertyView: BooleanPropertyView
     //private lateinit var fab: FloatingActionButton
 
     private lateinit var contentContainer: ViewGroup
@@ -109,15 +105,15 @@ class TrackerDetailStructureTabFragment : OTFragment() {
         this.viewModel = ViewModelProviders.of(activity!!).get(TrackerDetailViewModel::class.java)
 
         //set UI
-        namePropertyView.value = this.viewModel.name
-        namePropertyView.showEditedOnTitle = viewModel.isNameDirty
+        nameProperty.value = this.viewModel.name
+        nameProperty.showEditedOnTitle = viewModel.isNameDirty
 
-        isOnShortcutPropertyView.value = this.viewModel.isBookmarked
-        isOnShortcutPropertyView.showEditedOnTitle = this.viewModel.isBookmarkedDirty
+        isOnShortcutProperty.setToggleMode(this.viewModel.isBookmarked, false)
+        isOnShortcutProperty.showEditedOnTitle = this.viewModel.isBookmarkedDirty
 
         applyColorTheme(this.viewModel.color, false)
-        colorPropertyView.value = this.viewModel.color
-        colorPropertyView.showEditedOnTitle = this.viewModel.isColorDirty
+        colorProperty.value = this.viewModel.color
+        colorProperty.showEditedOnTitle = this.viewModel.isColorDirty
 
         currentAttributeViewModelList.clear()
 
@@ -138,25 +134,41 @@ class TrackerDetailStructureTabFragment : OTFragment() {
         )
 
         creationSubscriptions.add(
-                namePropertyView.valueChanged.observable.subscribe { result ->
+                nameProperty.valueChanged.observable.subscribe { result ->
                     this.viewModel.name = result.second
-                    namePropertyView.showEditedOnTitle = viewModel.isNameDirty
+                    if (viewModel.isNameDirty) {
+                        nameProperty.showEditedOnTitle = true
+
+                        eventLogger.get().logTrackerChangeEvent(IEventLogger.SUB_EDIT, viewModel.trackerId) { content ->
+                            content[IEventLogger.CONTENT_KEY_PROPERTY] = "color"
+                            content[IEventLogger.CONTENT_KEY_NEWVALUE] = result.second
+                        }
+                    } else nameProperty.showEditedOnTitle = false
                 }
         )
 
         creationSubscriptions.add(
-                colorPropertyView.valueChanged.observable.subscribe { result ->
-                    println("viewModel color set to ${colorPropertyView.value}")
-                    this.viewModel.color = colorPropertyView.value
-                    applyColorTheme(colorPropertyView.value, true)
-                    colorPropertyView.showEditedOnTitle = viewModel.isColorDirty
+                colorProperty.valueChanged.observable.subscribe { result ->
+                    println("viewModel color set to ${colorProperty.value}")
+                    this.viewModel.color = colorProperty.value
+                    applyColorTheme(colorProperty.value, true)
+                    if (viewModel.isColorDirty) {
+                        colorProperty.showEditedOnTitle = true
+                        eventLogger.get().logTrackerChangeEvent(IEventLogger.SUB_EDIT, viewModel.trackerId) { content ->
+                            content[IEventLogger.CONTENT_KEY_PROPERTY] = "color"
+                            content[IEventLogger.CONTENT_KEY_NEWVALUE] = result.second
+                        }
+                    } else colorProperty.showEditedOnTitle = false
                 }
         )
 
         creationSubscriptions.add(
-                isOnShortcutPropertyView.valueChanged.observable.subscribe { result ->
+                isOnShortcutProperty.valueChanged.observable.subscribe { result ->
                     this.viewModel.isBookmarked = result.second
-                    isOnShortcutPropertyView.showEditedOnTitle = viewModel.isBookmarkedDirty
+                    if (viewModel.isBookmarkedDirty) {
+                        isOnShortcutProperty.showEditedOnTitle = true
+                        eventLogger.get().logTrackerOnShortcutChangeEvent(viewModel.trackerId, result.second)
+                    } else isOnShortcutProperty.showEditedOnTitle = false
                 }
         )
 
@@ -180,29 +192,23 @@ class TrackerDetailStructureTabFragment : OTFragment() {
 
         contentContainer = rootView.findViewById(R.id.ui_content_container)
 
-        namePropertyView = rootView.findViewById(R.id.nameProperty)
-        //namePropertyView.addNewValidator("Name cannot be empty.", ShortTextPropertyView.NOT_EMPTY_VALIDATOR)
-
-        colorPropertyView = rootView.findViewById(R.id.colorProperty)
-
-        isOnShortcutPropertyView = rootView.findViewById(R.id.isOnShortcutProperty)
         /*
-        isOnShortcutPropertyView.valueChanged += {
-            sender, isOnShortcut ->
-            if (tracker?.isOnShortcut != isOnShortcut) {
-                tracker?.isOnShortcut = isOnShortcut
+            isOnShortcutPropertyView.valueChanged += {
+                sender, isOnShortcut ->
+                if (tracker?.isOnShortcut != isOnShortcut) {
+                    tracker?.isOnShortcut = isOnShortcut
 
-                tracker?.let {
-                    EventLoggingManager.logTrackerOnShortcutChangeEvent(it, isOnShortcut)
-                }
+                    tracker?.let {
+                        EventLoggingManager.logTrackerOnShortcutChangeEvent(it, isOnShortcut)
+                    }
 
-                if (tracker?.isOnShortcut == true) {
-                    toastForAdded.show()
-                } else {
-                    toastForRemoved.show()
+                    if (tracker?.isOnShortcut == true) {
+                        toastForAdded.show()
+                    } else {
+                        toastForRemoved.show()
+                    }
                 }
-            }
-        }*/
+            }*/
 
         attributeListView = rootView.findViewById(R.id.ui_attribute_list)
         attributeListView.setViewIntervalDistance(dipRound(8))
@@ -363,12 +369,12 @@ class TrackerDetailStructureTabFragment : OTFragment() {
             private val connectionIndicatorStubProxy: ConnectionIndicatorStubProxy
 
             var preview: AAttributeInputView<out Any>? = null
-                get
                 set(value) {
                     if (field !== value) {
                         previewContainer.removeAllViews()
                         if (value != null) {
                             previewContainer.addView(value, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+                            value.onCreate(null)
                         }
 
                         field = value
@@ -400,10 +406,12 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                                     currentAttributeViewModelList[adapterPosition].name
                             ),
                             R.string.msg_remove, R.string.msg_cancel, {
-                        viewModel.removeAttribute(currentAttributeViewModelList[adapterPosition])
+                        val removedViewModel = currentAttributeViewModelList[adapterPosition]
+                        viewModel.removeAttribute(removedViewModel)
                         showRemovalSnackbar()
-                        // if (removed != null) {
-                        //     EventLoggingManager.logAttributeChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_ATTRIBUTE_REMOVE, removed!!.typeId, removed!!.objectId, viewModel.trackerId ?: "null") //}
+
+                        eventLogger.get().logAttributeChangeEvent(IEventLogger.SUB_REMOVE, removedViewModel.attributeDAO.localId, viewModel.trackerId)
+
                     }, onNo = null).show()
                 } else if (view === columnNameButton) {
 
@@ -508,8 +516,10 @@ class TrackerDetailStructureTabFragment : OTFragment() {
         val newAttributeName = DefaultNameGenerator.generateName(typeInfo.name, currentAttributeViewModelList.map { it.nameObservable.value }, true)
         this.viewModel.addNewAttribute(newAttributeName, typeInfo.typeId, typeInfo.processor)
         scrollToBottomReserved = true
-
-        //EventLoggingManager.logAttributeChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_ATTRIBUTE_ADD, newAttribute.typeId, newAttribute.objectId, tracker.objectId)
+        eventLogger.get().logAttributeChangeEvent(IEventLogger.SUB_ADD, "", viewModel.trackerId) { content ->
+            content["type"] = typeInfo.typeId
+            content["name"] = newAttributeName
+        }
     }
 
 }

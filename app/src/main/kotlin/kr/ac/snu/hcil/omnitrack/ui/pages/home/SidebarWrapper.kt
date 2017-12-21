@@ -1,23 +1,36 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.home
 
+import android.arch.lifecycle.LifecycleObserver
 import android.content.Intent
-import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.AppCompatImageButton
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.text.InputType
 import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
 import android.widget.PopupMenu
-import android.widget.TextView
+import com.afollestad.materialdialogs.MaterialDialog
 import com.bumptech.glide.Glide
+import com.firebase.jobdispatcher.FirebaseJobDispatcher
+import com.firebase.jobdispatcher.Job
 import dagger.Lazy
+import dagger.internal.Factory
 import de.hdodenhof.circleimageview.CircleImageView
+import io.reactivex.BackpressureStrategy
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.SerialDisposable
+import io.realm.Realm
+import kotlinx.android.synthetic.main.layout_home_sidebar.view.*
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTUserDAO
+import kr.ac.snu.hcil.omnitrack.core.di.Backend
+import kr.ac.snu.hcil.omnitrack.core.di.InformationUpload
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
+import kr.ac.snu.hcil.omnitrack.services.OTInformationUploadService
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.viewholders.RecyclerViewMenuAdapter
 import kr.ac.snu.hcil.omnitrack.ui.pages.AboutActivity
@@ -28,7 +41,10 @@ import javax.inject.Inject
 /**
  * Created by Young-Ho Kim on 2017-01-31.
  */
-class SidebarWrapper(val view: View, val parentActivity: AppCompatActivity) : PopupMenu.OnMenuItemClickListener {
+class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu.OnMenuItemClickListener, LifecycleObserver {
+
+    @field:[Inject Backend]
+    lateinit var realmFactory: Factory<Realm>
 
     @Inject
     lateinit var authManager: OTAuthManager
@@ -36,13 +52,35 @@ class SidebarWrapper(val view: View, val parentActivity: AppCompatActivity) : Po
     @Inject
     lateinit var syncManager: Lazy<OTSyncManager>
 
+    @Inject
+    lateinit var eventLogger: Lazy<IEventLogger>
+
+    @Inject
+    lateinit var jobDispatcher: FirebaseJobDispatcher
+
+    @field:[Inject InformationUpload]
+    lateinit var informationUploadJobProvider: Job.Builder
+
+    private lateinit var realm: Realm
+
+    private val userWatchDisposable = SerialDisposable()
+
     private val photoView: CircleImageView = view.findViewById(R.id.ui_user_photo)
-    private val nameView: TextView = view.findViewById(R.id.ui_user_name)
     private val profileMenuButton: AppCompatImageButton = view.findViewById(R.id.ui_button_profile_menu)
 
     private val menuList: RecyclerView = view.findViewById(R.id.ui_menu_list)
 
     private val subscriptions = CompositeDisposable()
+
+
+    private val screenNameDialogBuilder: MaterialDialog.Builder by lazy {
+        MaterialDialog.Builder(parentActivity)
+                .title(R.string.msg_change_screen_name)
+                .inputType(InputType.TYPE_CLASS_TEXT)
+                .inputRangeRes(1, 40, R.color.colorRed)
+                .cancelable(true)
+                .negativeText(R.string.msg_cancel)
+    }
 
     init {
 
@@ -77,9 +115,10 @@ class SidebarWrapper(val view: View, val parentActivity: AppCompatActivity) : Po
                 DialogHelper.makeNegativePhrasedYesNoDialogBuilder(parentActivity, "OmniTrack", parentActivity.getString(R.string.msg_profile_unlink_account_confirm), R.string.msg_logout, onYes = {
                     authManager.signOut()
                     OTApp.instance.unlinkUser()
-                    if (parentActivity is OTActivity) {
-                        parentActivity.goSignIn()
-                    }
+
+                    eventLogger.get().logEvent(IEventLogger.NAME_AUTH, IEventLogger.SUB_SIGNED_OUT)
+
+                    parentActivity.goSignIn()
                 }).show()
                 return true
             }
@@ -90,21 +129,60 @@ class SidebarWrapper(val view: View, val parentActivity: AppCompatActivity) : Po
     }
 
     fun onCreate() {
-        subscriptions.add(
-                authManager.userNameObservable.subscribe { (name) ->
-                    nameView.text = name
-                }
-        )
+        realm = realmFactory.get()
 
-        subscriptions.add(
-                authManager.userImageUrlObservable.subscribe { uri ->
-                    Glide.with(parentActivity).load(uri).into(photoView)
+        userWatchDisposable.set(
+                parentActivity.signedInUserObservable.toFlowable(BackpressureStrategy.LATEST).flatMap { userId ->
+                    realm = realmFactory.get()
+                    return@flatMap realm.where(OTUserDAO::class.java).equalTo("uid", userId).findFirstAsync().asFlowable<OTUserDAO>().filter { it.isValid && it.isLoaded }
+                }.subscribe { user ->
+                    view.ui_user_name.text = user.name
+                    view.ui_user_email.text = user.email
+                    Glide.with(parentActivity).load(user.photoServerPath).into(photoView)
+                })
+
+
+        view.ui_button_edit_screen_name.setOnClickListener {
+            screenNameDialogBuilder.input(null, view.ui_user_name.text, false) { dialog, input ->
+                val newScreenName = input.trim().toString()
+                if (newScreenName.isNotBlank()) {
+                    if (authManager.userId != null) {
+                        realmFactory.get().use { realm ->
+                            val user = realm.where(OTUserDAO::class.java).equalTo("uid", authManager.userId ?: "").findFirst()
+                            if (user != null) {
+                                if (user.name != newScreenName) {
+                                    realm.executeTransaction {
+                                        user.name = newScreenName
+                                        user.nameUpdatedAt = System.currentTimeMillis()
+                                        user.nameSynchronizedAt = null
+                                    }
+                                    jobDispatcher.mustSchedule(informationUploadJobProvider.setTag(OTInformationUploadService.INFORMATION_USERNAME).build())
+                                }
+                            }
+                        }
+                    }
                 }
-        )
+            }.show()
+        }
     }
 
     fun onDestroy() {
+        userWatchDisposable.set(null)
         subscriptions.clear()
+
+        if (this::realm.isInitialized) {
+            if (!realm.isClosed) {
+                realm.close()
+            }
+        }
+    }
+
+    fun onShowSidebar() {
+        println("sidebar showed")
+    }
+
+    fun onHideSidebar() {
+        println("sidebar hidden")
     }
 
     inner class SidebarMenuAdapter : RecyclerViewMenuAdapter() {

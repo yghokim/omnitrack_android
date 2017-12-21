@@ -2,8 +2,8 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.home
 
 import android.app.Application
 import io.realm.RealmQuery
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTTriggerDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.AManagedTriggerListViewModel
 
 /**
@@ -22,7 +22,7 @@ class LoggingTriggerListViewModel(app: Application) : AManagedTriggerListViewMod
     }
 
     override fun hookTriggerQuery(originalQuery: RealmQuery<OTTriggerDAO>): RealmQuery<OTTriggerDAO> {
-        return originalQuery.equalTo(RealmDatabaseManager.FIELD_USER_ID, userId).equalTo("actionType", OTTriggerDAO.ACTION_TYPE_LOG)
+        return originalQuery.equalTo(BackendDbManager.FIELD_USER_ID, userId).equalTo("actionType", OTTriggerDAO.ACTION_TYPE_LOG)
 
     }
 }

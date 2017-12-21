@@ -4,8 +4,11 @@
     <string name="msg_vis_categorical_distribution_title_format">%1$s 분포</string>
 
     <string name="msg_vis_logging_heatmap_title_format">일일 시간대별 기록</string>
+    <string name="msg_vis_logging_heatmap_title_format_with_time_attr">[%2$s] 기준 일일 시간대별 기록</string>
 
     <string name="msg_vis_daily_count_title_format">일일 %1$s 기록</string>
 
     <string name="msg_vis_numeric_line_timeline_title">Numeric Fields on Timeline</string>
+
+    <string name="msg_vis_format_time_number_plot_title">[%2$s]에 따른 [%1$s]</string>
 </resources>

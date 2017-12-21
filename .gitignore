@@ -8,6 +8,7 @@
 /captures
 app/app.iml
 app/app-release.apk
+app/release
 google-services.json
 gradle.properties
 keystore.properties

@@ -8,8 +8,12 @@ import io.realm.Realm
 import io.realm.Sort
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTItemDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
 import kr.ac.snu.hcil.omnitrack.core.visualization.Granularity
+import kr.ac.snu.hcil.omnitrack.core.visualization.INativeChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.TrackerChartModel
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.Axis
@@ -24,9 +28,23 @@ import kr.ac.snu.hcil.omnitrack.utils.dipSize
 /**
  * Created by younghokim on 2017. 5. 8..
  */
-class DailyCountChartModel(tracker: OTTrackerDAO, realm: Realm) : TrackerChartModel<Pair<Long, Int>>(tracker, realm) {
+class DailyCountChartModel(tracker: OTTrackerDAO, realm: Realm, timeAttribute: OTAttributeDAO? = null) : TrackerChartModel<Pair<Long, Int>>(tracker, realm), INativeChartModel {
 
-    override val name: String = String.format(OTApp.instance.getString(R.string.msg_vis_daily_count_title_format), tracker.name)
+    override val name: String
+        get() {
+            return if (timeAttributeLocalId != null) {
+                String.format(OTApp.instance.getString(R.string.msg_vis_daily_count_title_format_with_time_attr), tracker.name, timeAttributeName)
+            } else String.format(OTApp.instance.getString(R.string.msg_vis_daily_count_title_format), tracker.name)
+        }
+
+    val timeAttributeLocalId: String? = timeAttribute?.localId
+    val timeAttributeName: String? = timeAttribute?.name
+
+    private fun getTimestampOfItem(item: OTItemDAO): Long? {
+        return if (timeAttributeLocalId == null) {
+            item.timestamp
+        } else (item.getValueOf(timeAttributeLocalId) as? TimePoint)?.timestamp
+    }
 
     init{
         OTApp.instance.applicationComponent.inject(this)
@@ -39,15 +57,21 @@ class DailyCountChartModel(tracker: OTTrackerDAO, realm: Realm) : TrackerChartMo
         xScale.setDomain(getTimeScope().from, getTimeScope().to)
         xScale.quantize(currentGranularity)
 
-        return dbManager
-                .makeItemsQuery(tracker.objectId, getTimeScope(), realm)
-                .findAllSortedAsync("timestamp", Sort.ASCENDING)
-                .asFlowable()
-                .filter { it.isLoaded == true && it.isValid }
-                .firstOrError()
-                .map { items ->
+        println("reload data for tracker ${tracker.objectId} - DailyCount")
+        return if (timeAttributeLocalId != null) {
+
+            Single.just(dbManager.getItemsQueriedWithTimeAttribute(tracker.objectId, getTimeScope(),
+                    timeAttributeLocalId, realm).sortedBy { (it.getValueOf(timeAttributeLocalId) as TimePoint).timestamp })
+        } else {
+            dbManager
+                    .makeItemsQuery(tracker.objectId, getTimeScope(), realm)
+                    .findAllSortedAsync("timestamp", Sort.ASCENDING)
+                    .asFlowable()
+                    .filter { it.isLoaded == true }
+                    .firstOrError()
+        }.map { items ->
                     DataHelper.ConvertSortedListToBinWithLong((xScale.binPointsOnDomain + getTimeScope().to).toTypedArray(),
-                            items, { item -> item.timestamp }).map { bin -> Pair(bin.x0, bin.values.size) }
+                            items, { item -> getTimestampOfItem(item) ?: 0L }).map { bin -> Pair(bin.x0, bin.values.size) }
                 }
     }
 

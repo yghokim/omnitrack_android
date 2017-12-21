@@ -1,60 +1,20 @@
 package kr.ac.snu.hcil.omnitrack.core.net
 
 import com.google.gson.JsonObject
-import dagger.Lazy
 import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import kr.ac.snu.hcil.omnitrack.BuildConfig
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.OTUserRolePOJO
-import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncResultEntry
-import okhttp3.Interceptor
-import okhttp3.OkHttpClient
-import okhttp3.Response
+import kr.ac.snu.hcil.omnitrack.utils.ValueWithTimestamp
 import retrofit2.Retrofit
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
-import retrofit2.converter.gson.GsonConverterFactory
-import java.io.IOException
-import javax.inject.Inject
 
 /**
  * Created by younghokim on 2017. 9. 28..
  */
-class OTOfficialServerApiController (app: OTApp) : ISynchronizationServerSideAPI, IUserReportServerAPI {
-
-    @Inject
-    lateinit var authManager: Lazy<OTAuthManager>
-
-    init{
-        app.applicationComponent.inject(this)
-    }
-
-    private val retrofit: Retrofit by lazy {
-
-        val client = OkHttpClient.Builder().addInterceptor(object : Interceptor {
-            @Throws(IOException::class)
-            override fun intercept(chain: Interceptor.Chain): Response {
-                val bearer = "Bearer " + authManager.get().getAuthToken().blockingGet()
-                val newRequest = chain.request().newBuilder()
-                        .addHeader("Authorization", bearer)
-                        .build()
-
-                println("chaining for official server: ${chain.request().url()}, token: ${bearer}")
-
-                return chain.proceed(newRequest)
-            }
-        }).build()
-
-        Retrofit.Builder()
-                .client(client)
-                .baseUrl(BuildConfig.OMNITRACK_SYNCHRONIZATION_SERVER_URL)
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-    }
+class OTOfficialServerApiController(retrofit: Retrofit) : ISynchronizationServerSideAPI, IUserReportServerAPI, IUsageLogUploadAPI {
 
     private val service: OTOfficialServerService by lazy {
         retrofit.create(OTOfficialServerService::class.java)
@@ -89,4 +49,15 @@ class OTOfficialServerApiController (app: OTApp) : ISynchronizationServerSideAPI
         return service.postLocalDataChanges(batch).subscribeOn(Schedulers.io())
     }
 
+    override fun uploadLocalUsageLogs(serializedLogs: List<String>): Single<List<Long>> {
+        return service.uploadUsageLogs(serializedLogs)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    override fun putUserName(name: String, timestamp: Long): Single<ISynchronizationServerSideAPI.InformationUpdateResult> {
+        return service.putUserName(ValueWithTimestamp(name, timestamp))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
 }

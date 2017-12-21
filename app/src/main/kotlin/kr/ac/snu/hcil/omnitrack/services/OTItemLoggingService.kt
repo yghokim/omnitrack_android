@@ -1,9 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.services
 
-import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
+import dagger.internal.Factory
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.realm.Realm
@@ -11,9 +11,10 @@ import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemBuilderDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTItemDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels.OTItemBuilderDAO
+import kr.ac.snu.hcil.omnitrack.core.di.Backend
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
@@ -23,26 +24,30 @@ import org.jetbrains.anko.notificationManager
 import org.jetbrains.anko.runOnUiThread
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
-import javax.inject.Provider
 
 /**
  * Created by Young-Ho on 10/17/2017.
  */
-class OTItemLoggingService : Service() {
+class OTItemLoggingService : WakefulService(TAG) {
 
     companion object {
+
+        const val TAG = "OTItemLoggingService"
+
         private const val ACTION_LOG = "${BuildConfig.APPLICATION_ID}.services.action.LOG"
         private const val ACTION_REMOVE_ITEM = "${BuildConfig.APPLICATION_ID}.services.action.REMOVE_ITEM"
         private const val INTENT_EXTRA_LOGGING_SOURCE = "loggingSource"
+        private const val INTENT_EXTRA_NOTIFY = "notify"
 
         private const val NOTIFICATION_FOREGROUND_ID = 3123
         private const val NOTIFICATION_TAG = "${BuildConfig.APPLICATION_ID}.notification.tag.ITEM_LOGGING_SERVICE"
         private val notificationIdSeed = AtomicInteger(0)
 
-        fun makeLoggingIntent(context: Context, loggingSource: ItemLoggingSource, vararg trackerIds: String): Intent {
+        fun makeLoggingIntent(context: Context, loggingSource: ItemLoggingSource, notify: Boolean, vararg trackerIds: String): Intent {
             return Intent(context, OTItemLoggingService::class.java).apply {
                 this.action = ACTION_LOG
                 this.putExtra(INTENT_EXTRA_LOGGING_SOURCE, loggingSource.name)
+                this.putExtra(INTENT_EXTRA_NOTIFY, notify)
                 this.putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER_ARRAY, trackerIds)
             }
         }
@@ -57,14 +62,13 @@ class OTItemLoggingService : Service() {
         private val currentCommandCount = AtomicInteger(0)
     }
 
-    @Inject
     lateinit var realm: Realm
 
-    @Inject
-    lateinit var realmProvider: Provider<Realm>
+    @field:[Inject Backend]
+    lateinit var realmProvider: Factory<Realm>
 
     @Inject
-    lateinit var dbManager: RealmDatabaseManager
+    lateinit var dbManager: BackendDbManager
 
     @Inject
     lateinit var syncManager: OTSyncManager
@@ -78,13 +82,13 @@ class OTItemLoggingService : Service() {
     override fun onCreate() {
         super.onCreate()
         (application as OTApp).applicationComponent.inject(this)
+        realm = realmProvider.get()
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         subscriptions.clear()
         realm.close()
-        println("ItemLoggingService onDestroy")
+        super.onDestroy()
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int =
@@ -97,6 +101,7 @@ class OTItemLoggingService : Service() {
     private fun handleLogAction(intent: Intent, startId: Int): Int {
         val trackerIds = intent.getStringArrayExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER_ARRAY)
         val loggingSource = ItemLoggingSource.valueOf(intent.getStringExtra(INTENT_EXTRA_LOGGING_SOURCE))
+        val notify = intent.getBooleanExtra(INTENT_EXTRA_NOTIFY, true)
         if (trackerIds?.size ?: 0 >= 1) // intent contains one or more trackers
         {
             val singles = trackerIds.mapNotNull { trackerId ->
@@ -130,12 +135,12 @@ class OTItemLoggingService : Service() {
                                         )
                             }
                         }.doOnSuccess { (result, itemId) ->
-                            if (result != RealmDatabaseManager.SAVE_RESULT_FAIL) {
+                            if (result != BackendDbManager.SAVE_RESULT_FAIL) {
                                 val table = ArrayList<Pair<String, CharSequence?>>()
                                 val item = pushedItemDao
                                 val tracker = unManagedTrackerDao
                                 if (item != null && tracker != null) {
-                                    tracker.attributes.filter{it.isHidden==false && it.isInTrashcan==false}.forEach {
+                                    tracker.attributes.filter { !it.isHidden && !it.isInTrashcan }.forEach {
                                         val value = item.getValueOf(it.localId)
                                         if (value != null) {
                                             table.add(Pair(it.name, it.getHelper().formatAttributeValue(it, value)))
@@ -149,10 +154,12 @@ class OTItemLoggingService : Service() {
 
                                 syncManager.registerSyncQueue(ESyncDataType.ITEM, SyncDirection.UPLOAD)
 
-                                this.runOnUiThread {
-                                    val builder = OTTrackingNotificationFactory.makeLoggingSuccessNotificationBuilder(this, trackerId, trackerName, itemId!!, System.currentTimeMillis(), table, notificationId, NOTIFICATION_TAG)
+                                if (notify) {
+                                    this.runOnUiThread {
+                                        val successfulNotiBuilder = OTTrackingNotificationFactory.makeLoggingSuccessNotificationBuilder(this, trackerId, trackerName, itemId!!, System.currentTimeMillis(), table, notificationId, NOTIFICATION_TAG)
 
-                                    this.notificationManager.notify(kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService.NOTIFICATION_TAG, notificationId, builder.build())
+                                        this.notificationManager.notify(kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService.NOTIFICATION_TAG, notificationId, successfulNotiBuilder.build())
+                                    }
                                 }
                             } else {
                                 OTTaskNotificationManager.dismissNotification(this, notificationId, kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService.NOTIFICATION_TAG)

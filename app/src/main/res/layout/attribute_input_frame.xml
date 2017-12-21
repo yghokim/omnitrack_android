@@ -115,11 +115,9 @@
             android:id="@+id/ui_content_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_toEndOf="@+id/sidebar"
             android:orientation="vertical">
 
-            <kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
+            <kr.ac.snu.hcil.omnitrack.ui.components.common.container.LockableFrameLayout
                 android:id="@+id/ui_input_view_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -133,7 +131,7 @@
                     android:visibility="gone"
                     app:SpinKit_Color="@color/colorPointed"
                     app:SpinKit_Style="ThreeBounce" />
-            </kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout>
+            </kr.ac.snu.hcil.omnitrack.ui.components.common.container.LockableFrameLayout>
 
             <ViewStub
                 android:id="@+id/ui_connection_indicator_stub"

@@ -176,9 +176,6 @@ public class FancyButton extends LinearLayout {
      * @return : TextView
      */
     private TextView setupTextView() {
-        if (mText == null) {
-            mText = "Fancy Button";
-        }
 
         TextView textView = new TextView(mContext);
         textView.setText(mText);
@@ -190,6 +187,11 @@ public class FancyButton extends LinearLayout {
         if (!isInEditMode() && !mUseSystemFont) {
             textView.setTypeface(mTextTypeFace); //we can pass null in first arg
         }
+
+        if (mText == null || mText.equals("")) {
+            textView.setVisibility(View.GONE);
+        }
+
         return textView;
     }
 

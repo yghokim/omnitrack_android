@@ -11,9 +11,10 @@ import io.realm.Sort
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTItemDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
@@ -164,7 +165,9 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
     }
 
     inner class ItemViewModel(val itemDao: OTItemDAO) : IReadonlyObjectId {
-        override val objectId: String? get() = itemDao.objectId
+        override val objectId: String? get() = _objectId
+
+        private var _objectId: String? = null
         val isSynchronized: Boolean get() = itemDao.synchronizedAt != null
 
         fun getItemValueOf(attributeLocalId: String): Any? = itemDao.getValueOf(attributeLocalId)
@@ -188,17 +191,27 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
             }
 
         init {
+            _objectId = itemDao.objectId
             timestamp = itemDao.timestamp
             loggingSource = itemDao.loggingSource
         }
 
         fun setValueOf(attributeLocalId: String, serializedValue: String?) {
             realm.executeTransaction {
+                itemDao.synchronizedAt = null
                 itemDao.setValueOf(attributeLocalId, serializedValue)
             }
         }
 
-        fun save(vararg changedLocalIds: String): Single<Pair<Int, String?>> =
-                dbManager.get().saveItemObservable(itemDao, false, changedLocalIds.toList().toTypedArray(), realm)
+        fun save(vararg changedLocalIds: String): Single<Pair<Int, String?>> {
+
+            return dbManager.get().saveItemObservable(itemDao, false, changedLocalIds.toList().toTypedArray(), realm)
+                    .doAfterSuccess { (resultCode, _) ->
+                        if (resultCode != BackendDbManager.SAVE_RESULT_FAIL) {
+                            syncManager.registerSyncQueue(ESyncDataType.ITEM, SyncDirection.UPLOAD)
+                        }
+                    }
+        }
+
     }
 }

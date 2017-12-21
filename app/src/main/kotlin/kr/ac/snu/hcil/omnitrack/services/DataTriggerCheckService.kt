@@ -1,8 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.services
 
 import com.google.android.gms.gcm.*
-import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.core.triggers.OTDataTriggerManager
 
 class DataTriggerCheckService : GcmTaskService() {
 
@@ -25,7 +23,7 @@ class DataTriggerCheckService : GcmTaskService() {
 
         when (params.tag) {
             TAG_DATA_TRIGGER_CHECK -> {
-                OTDataTriggerManager.checkMeasures(OTApp.instance)
+                //OTDataTriggerManager.checkMeasures(OTApp.instance)
 
                 return GcmNetworkManager.RESULT_SUCCESS
             }

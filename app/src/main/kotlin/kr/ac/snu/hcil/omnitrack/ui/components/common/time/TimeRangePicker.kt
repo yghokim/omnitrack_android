@@ -1,19 +1,21 @@
 package kr.ac.snu.hcil.omnitrack.ui.components.common.time
 
+import android.app.Dialog
 import android.content.Context
+import android.support.constraint.ConstraintLayout
 import android.util.AttributeSet
-import android.view.LayoutInflater
 import android.view.View
-import android.widget.Button
-import android.widget.FrameLayout
-import android.widget.TextView
+import android.view.View.OnClickListener
+import com.afollestad.materialdialogs.MaterialDialog
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog
-import com.wdullaer.materialdatetimepicker.time.TimePickerDialog
+import kotlinx.android.synthetic.main.component_time_range_picker.view.*
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kr.ac.snu.hcil.omnitrack.utils.getActivity
+import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
 import java.text.SimpleDateFormat
 import java.util.*
@@ -22,17 +24,13 @@ import kotlin.properties.Delegates
 /**
  * Created by Young-Ho on 8/7/2016.
  */
-class TimeRangePicker : FrameLayout, View.OnClickListener {
+class TimeRangePicker : ConstraintLayout, View.OnClickListener {
 
     enum class Granularity {
         DATE, TIME
     }
 
     private var suspendInvalidate: Boolean = false
-
-    private var fromButton: Button
-    private var toButton: Button
-    private var durationIndicator: TextView
 
     val timeRangeChanged = Event<TimeSpan>()
 
@@ -49,7 +47,8 @@ class TimeRangePicker : FrameLayout, View.OnClickListener {
                 field = processed
 
                 suspendInvalidate = true
-                to = Math.max(processed, to)
+                //to = Math.max(processed, to)
+                to = processed
                 suspendInvalidate = false
                 invalidateViewSettings()
             }
@@ -77,6 +76,34 @@ class TimeRangePicker : FrameLayout, View.OnClickListener {
 
     private lateinit var format: SimpleDateFormat
 
+
+    private val dateTimeDialogPicker: ImmersiveDateTimePicker by lazy {
+        ImmersiveDateTimePicker(context)
+    }
+    private val datetimeDialog: Dialog by lazy {
+        val builder = MaterialDialog.Builder(context)
+        builder.customView(dateTimeDialogPicker, false)
+        builder.autoDismiss(true)
+        val dialog = builder.build()
+        dateTimeDialogPicker.setOnApplyButtonClickedListener(OnClickListener {
+            val beforeFrom = from
+            val beforeTo = to
+
+            if (dateTimeDialogPicker.tag == "from") {
+                from = dateTimeDialogPicker.value
+            } else if (dateTimeDialogPicker.tag == "to") {
+                to = dateTimeDialogPicker.value
+            }
+
+            if (beforeFrom != from || beforeTo != to) {
+                timeRangeChanged.invoke(this@TimeRangePicker, getTimeSpan())
+            }
+            dialog.dismiss()
+        })
+
+        return@lazy dialog
+    }
+
     fun getTimeSpan(): TimeSpan {
         return TimeSpan.fromPoints(from, to)
     }
@@ -95,24 +122,29 @@ class TimeRangePicker : FrameLayout, View.OnClickListener {
         }
     }
 
-    constructor(context: Context?) : super(context)
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
+    constructor(context: Context) : super(context) {
+        init(context, null)
+    }
 
-    init {
-        val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        addView(inflater.inflate(R.layout.component_time_range_picker, this, false))
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
+        init(context, attrs)
+    }
 
+    private fun init(context: Context, attrs: AttributeSet?) {
+        inflateContent(R.layout.component_time_range_picker, true)
 
-        fromButton = findViewById(R.id.ui_button_from)
-        toButton = findViewById(R.id.ui_button_to)
+        ui_button_from.setOnClickListener(this)
+        ui_button_to.setOnClickListener(this)
 
-        fromButton.setOnClickListener(this)
-        toButton.setOnClickListener(this)
+        ui_button_preset_1.setOnClickListener(this)
+        ui_button_preset_2.setOnClickListener(this)
+        ui_button_preset_now.setOnClickListener(this)
 
-        durationIndicator = findViewById(R.id.ui_interval_indicator)
+        ui_button_up.setOnClickListener(this)
+        ui_button_down.setOnClickListener(this)
 
-        InterfaceHelper.removeButtonTextDecoration(fromButton)
-        InterfaceHelper.removeButtonTextDecoration(toButton)
+        InterfaceHelper.removeButtonTextDecoration(ui_button_from)
+        InterfaceHelper.removeButtonTextDecoration(ui_button_to)
 
         invalidateDateFormat()
         invalidateViewSettings()
@@ -140,21 +172,29 @@ class TimeRangePicker : FrameLayout, View.OnClickListener {
 
     private fun invalidateViewSettings() {
         if (!suspendInvalidate) {
-            fromButton.text = format.format(Date(from))
-            toButton.text = format.format(Date(to))
-            durationIndicator.text = TimeHelper.durationToText(to - from, true, context)
+            ui_button_from.text = format.format(Date(from))
+            ui_button_to.text = format.format(Date(to))
+            ui_interval_indicator.text = TimeHelper.durationToText(to - from, true, context)
+
+            if (granularity == Granularity.DATE) {
+                ui_button_preset_1.text = OTApp.getString(R.string.time_range_picker_1_day)
+                ui_button_preset_2.text = OTApp.getString(R.string.time_range_picker_1_week)
+            } else if (granularity == Granularity.TIME) {
+                ui_button_preset_1.text = OTApp.getString(R.string.time_range_picker_30_mins)
+                ui_button_preset_2.text = OTApp.getString(R.string.time_range_picker_1_hour)
+            }
         }
     }
 
 
     override fun onClick(button: View) {
-        if (button is Button) {
+        if (button === ui_button_from || button === ui_button_to) {
             val activity = getActivity()
             if (activity != null) {
 
-                val timestamp = if (button === fromButton) {
+                val timestamp = if (button === ui_button_from) {
                     from
-                } else if (button === toButton) {
+                } else if (button === ui_button_to) {
                     to
                 } else {
                     0
@@ -184,9 +224,9 @@ class TimeRangePicker : FrameLayout, View.OnClickListener {
                         val beforeFrom = from
                         val beforeTo = to
 
-                        if (button === fromButton) {
+                        if (button === ui_button_from) {
                             from = timestamp
-                        } else if (button === toButton) {
+                        } else if (button === ui_button_to) {
                             to = timestamp
                         }
 
@@ -195,77 +235,61 @@ class TimeRangePicker : FrameLayout, View.OnClickListener {
                         }
                     }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH))
                             .show(activity.fragmentManager, "DatePickerDialog")
-                    /*
-                    CalendarPickerDialogFragment.getInstance(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).showDialog(activity.supportFragmentManager) {
-                        timestamp: Long, year: Int, month: Int, day: Int ->
 
-                        val beforeFrom = from
-                        val beforeTo = to
-
-                        if (button === fromButton) {
-                            from = timestamp
-                        } else if (button === toButton) {
-                            to = timestamp
-                        }
-
-                        if (beforeFrom != from || beforeTo != to) {
-                            timeRangeChanged.invoke(this@TimeRangePicker, getTimeSpan())
-                        }
-                    }*/
                 } else {
-                    //datetime picking
-                    val datePickerDialog = DatePickerDialog.newInstance({ dialog, year, monthOfYear, dayOfMonth ->
-                        cal.set(Calendar.YEAR, year)
-                        cal.set(Calendar.MONTH, monthOfYear)
-                        cal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+                    dateTimeDialogPicker.value = cal.timeInMillis
+                    dateTimeDialogPicker.tag = if (button === ui_button_from) {
+                        "from"
+                    } else if (button === ui_button_to) {
+                        "to"
+                    } else null
 
-                        val timePickerDialog = TimePickerDialog.newInstance({ dialog, hourOfDay, minute, second ->
-                            cal.set(Calendar.HOUR_OF_DAY, hourOfDay)
-                            cal.set(Calendar.MINUTE, minute)
-                            cal.set(Calendar.SECOND, 0)
-                            cal.set(Calendar.MILLISECOND, 0)
-                            val timestamp = cal.timeInMillis
-
-                            val beforeFrom = from
-                            val beforeTo = to
-
-                            if (button === fromButton) {
-                                from = timestamp
-                            } else if (button === toButton) {
-                                to = timestamp
-                            }
-
-                            if (beforeFrom != from || beforeTo != to) {
-                                timeRangeChanged.invoke(this@TimeRangePicker, getTimeSpan())
-                            }
-
-                        }, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), false)
-                        timePickerDialog.enableSeconds(false)
-                        timePickerDialog.show(activity.fragmentManager, "TimePicker")
-
-                    }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH))
-                    datePickerDialog.setOkText(R.string.msg_next)
-                    datePickerDialog.show(activity.fragmentManager, "DatePicker")
-
-                    /*
-                    DateTimePickerDialogFragment.getInstance(timestamp).showDialog(activity.supportFragmentManager) {
-                        timestamp ->
-
-                        val beforeFrom = from
-                        val beforeTo = to
-
-                        if (button === fromButton) {
-                            from = timestamp
-                        } else if (button === toButton) {
-                            to = timestamp
-                        }
-
-                        if (beforeFrom != from || beforeTo != to) {
-                            timeRangeChanged.invoke(this@TimeRangePicker, getTimeSpan())
-                        }
-                    }*/
+                    if (!datetimeDialog.isShowing) {
+                        datetimeDialog.show()
+                    }
                 }
             }
+        } else if (button === ui_button_preset_1) {
+            when (granularity) {
+                Granularity.DATE -> {
+                    to += TimeHelper.daysInMilli * 1
+                }
+                Granularity.TIME -> {
+                    to += TimeHelper.minutesInMilli * 30
+                }
+            }
+            timeRangeChanged.invoke(this@TimeRangePicker, getTimeSpan())
+        } else if (button === ui_button_preset_2) {
+            when (granularity) {
+                Granularity.DATE -> {
+                    to += TimeHelper.daysInMilli * 7
+                }
+                Granularity.TIME -> {
+                    to += TimeHelper.hoursInMilli * 1
+                }
+            }
+            timeRangeChanged.invoke(this@TimeRangePicker, getTimeSpan())
+        } else if (button === ui_button_preset_now) {
+            val beforeFrom = from
+            val beforeTo = to
+            to = System.currentTimeMillis()
+
+            if (beforeFrom != from || beforeTo != to)
+                timeRangeChanged.invoke(this@TimeRangePicker, getTimeSpan())
+        } else if (button === ui_button_up) {
+            val beforeFrom = from
+            val beforeTo = to
+            from = to
+
+            if (beforeFrom != from || beforeTo != to)
+                timeRangeChanged.invoke(this@TimeRangePicker, getTimeSpan())
+        } else if (button === ui_button_down) {
+            val beforeFrom = from
+            val beforeTo = to
+            to = from
+
+            if (beforeFrom != from || beforeTo != to)
+                timeRangeChanged.invoke(this@TimeRangePicker, getTimeSpan())
         }
     }
 }

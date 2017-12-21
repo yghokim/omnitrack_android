@@ -1,9 +1,15 @@
 package kr.ac.snu.hcil.omnitrack.ui.activities
 
-import android.os.Bundle
+import android.content.Context
 import android.support.v4.app.Fragment
+import com.github.salomonbrys.kotson.set
+import com.google.gson.JsonObject
+import dagger.Lazy
 import io.reactivex.disposables.CompositeDisposable
-import kr.ac.snu.hcil.omnitrack.core.database.EventLoggingManager
+import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
+import org.jetbrains.anko.support.v4.act
+import javax.inject.Inject
 
 /**
  * Created by younghokim on 2016. 11. 15..
@@ -12,8 +18,21 @@ open class OTFragment : Fragment() {
 
     private var shownAt: Long? = null
 
+    protected val startSubscriptions = CompositeDisposable()
     protected val creationSubscriptions = CompositeDisposable()
     protected val createViewSubscriptions = CompositeDisposable()
+
+    @Inject
+    protected lateinit var eventLogger: Lazy<IEventLogger>
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        onInject((context.applicationContext as OTApp))
+    }
+
+    protected open fun onInject(application: OTApp) {
+        application.applicationComponent.inject(this)
+    }
 
     override fun onDestroy() {
         super.onDestroy()
@@ -31,6 +50,11 @@ open class OTFragment : Fragment() {
         if (userVisibleHint) {
             logSession(true)
         }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        startSubscriptions.clear()
     }
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
@@ -51,18 +75,15 @@ open class OTFragment : Fragment() {
 
             val elapsed = System.currentTimeMillis() - shownAt!!
 
-            val contentObject = Bundle()
-            contentObject.putBoolean("caused_by_activity_pause", activityPausing)
-            contentObject.putString("parent_activity", activity?.javaClass?.simpleName)
-            onSessionLogContent(contentObject)
-
             val now = System.currentTimeMillis()
-            EventLoggingManager.logSession(this, elapsed, now, null, contentObject)
-
-            println("finished fragment ${this.javaClass.simpleName}. uptime: $elapsed, $contentObject")
+            eventLogger.get().logSession(this.javaClass.name, IEventLogger.SUB_SESSION_TYPE_FRAGMENT, elapsed, now, null) { content ->
+                content["caused_by_activity_pause"] = activityPausing
+                content["parent"] = act.localClassName
+                onSessionLogContent(content)
+            }
         }
     }
 
-    protected open fun onSessionLogContent(contentObject: Bundle) {
+    protected open fun onSessionLogContent(contentObject: JsonObject) {
     }
 }

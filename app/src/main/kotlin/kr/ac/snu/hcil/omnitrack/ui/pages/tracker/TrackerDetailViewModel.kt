@@ -14,13 +14,14 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTTriggerDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
+import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.RealmViewModel
 import kr.ac.snu.hcil.omnitrack.utils.*
 import org.jetbrains.anko.collections.forEachWithIndex
@@ -33,11 +34,18 @@ import kotlin.collections.HashSet
  */
 class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
+    companion object {
+        const val TAG = "TrackerDetailViewModel"
+    }
+
     @Inject
     protected lateinit var attributeManager: Lazy<OTAttributeManager>
 
     @Inject
     protected lateinit var authManager: Lazy<OTAuthManager>
+
+    @Inject
+    protected lateinit var shortcutPanelManager: Lazy<OTShortcutPanelManager>
 
     @Inject
     protected lateinit var syncManager: OTSyncManager
@@ -54,9 +62,11 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
 
     private var initialSnapshotDao: OTTrackerDAO? = null
 
-    val trackerId: String? get() = this.trackerDao?.objectId
+    var trackerId: String? = null
+        private set
 
     //Observables========================================
+    val hasTrackerRemovedOutside = BehaviorSubject.create<String>()
     val trackerIdObservable = BehaviorSubject.createDefault<Nullable<String>>(Nullable(null))
 
     val reminderCountObservable = BehaviorSubject.createDefault<Int>(0)
@@ -131,63 +141,66 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
             lastRemovedAttributeId = null
             subscriptions.clear()
             if (trackerId != null) {
+                this.trackerId = trackerId
                 val dao = dbManager.get().getTrackerQueryWithId(trackerId, realm).findFirstAsync()
 
                 subscriptions.add(
-                        dao.asFlowable<OTTrackerDAO>().filter { it.isValid && it.isLoaded }.subscribe { snapshot ->
-                            if (initialSnapshotDao == null)
-                                initialSnapshotDao = realm.copyFromRealm(snapshot)
+                        dao.asFlowable<OTTrackerDAO>().filter { it.isLoaded }.subscribe { snapshot ->
+                            if (snapshot.isValid) {
+                                if (initialSnapshotDao == null)
+                                    initialSnapshotDao = realm.copyFromRealm(snapshot)
 
-                            nameObservable.onNextIfDifferAndNotNull(snapshot.name)
-                            isBookmarkedObservable.onNextIfDifferAndNotNull(snapshot.isBookmarked)
-                            colorObservable.onNextIfDifferAndNotNull(snapshot.color)
+                                nameObservable.onNextIfDifferAndNotNull(snapshot.name)
+                                isBookmarkedObservable.onNextIfDifferAndNotNull(snapshot.isBookmarked)
+                                colorObservable.onNextIfDifferAndNotNull(snapshot.color)
 
-                            if (trackerDao != dao) {
-                                subscriptions.add(
-                                        snapshot.makeAttributesQuery(false, null).findAllAsync().asChangesetObservable().subscribe { changes ->
-                                            val changeset = changes.changeset
-                                            if (changeset == null) {
-                                                //initial
-                                                clearCurrentAttributeList()
-                                                currentAttributeViewModelList.addAll(changes.collection.map { AttributeInformationViewModel(it, realm, attributeManager.get()) })
-                                            } else {
-                                                currentAttributeViewModelList.removeAll(
-                                                        changeset.deletions.map { currentAttributeViewModelList[it].apply { this.unregister() } }
-                                                )
-
-                                                changeset.insertions.forEach {
-                                                    currentAttributeViewModelList.add(it,
-                                                            AttributeInformationViewModel(changes.collection[it]!!, realm, attributeManager.get())
-                                                    )
-                                                }
-                                            }
-
-                                            attributeViewModelListObservable.onNext(currentAttributeViewModelList)
-                                        }
-                                )
-
-
-                                snapshot.liveTriggersQuery?.let {
+                                if (trackerDao != dao) {
                                     subscriptions.add(
-                                            it.equalTo("actionType", OTTriggerDAO.ACTION_TYPE_REMIND)
-                                                    .findAllAsync()
-                                                    .asFlowable()
-                                                    .subscribe {
-                                                        reminderCountObservable.onNextIfDifferAndNotNull(it.size)
-                                                    }
-                                    )
-                                }
+                                            snapshot.makeAttributesQuery(false, null).findAllAsync().asChangesetObservable().subscribe { changes ->
+                                                val changeset = changes.changeset
+                                                if (changeset == null) {
+                                                    //initial
+                                                    clearCurrentAttributeList()
+                                                    currentAttributeViewModelList.addAll(changes.collection.map { AttributeInformationViewModel(it, realm, attributeManager.get()) })
+                                                } else {
+                                                    currentAttributeViewModelList.removeAll(
+                                                            changeset.deletions.map { currentAttributeViewModelList[it].apply { this.unregister() } }
+                                                    )
 
-                                trackerDao = dao
+                                                    changeset.insertions.forEach {
+                                                        currentAttributeViewModelList.add(it,
+                                                                AttributeInformationViewModel(changes.collection[it]!!, realm, attributeManager.get())
+                                                        )
+                                                    }
+                                                }
+
+                                                attributeViewModelListObservable.onNext(currentAttributeViewModelList)
+                                            }
+                                    )
+
+
+                                    snapshot.liveTriggersQuery?.let {
+                                        subscriptions.add(
+                                                it.equalTo("actionType", OTTriggerDAO.ACTION_TYPE_REMIND)
+                                                        .findAllAsync()
+                                                        .asFlowable()
+                                                        .subscribe {
+                                                            reminderCountObservable.onNextIfDifferAndNotNull(it.size)
+                                                        }
+                                        )
+                                    }
+
+                                    trackerDao = dao
+                                }
+                            } else if (trackerDao != null) {
+                                //the tracker was removed outside
+                                hasTrackerRemovedOutside.onNext(trackerId)
                             }
                         }
                 )
 
-                subscriptions.add(
-                        dbManager.get().makeShortcutPanelRefreshObservable(authManager.get().userId!!, realm).subscribe { list ->
-                            println("shortcut refresh")
-                        }
-                )
+
+                shortcutPanelManager.get().registerShortcutRefreshSubscription(authManager.get().userId!!, TAG)
 
                 /*
                 attributeRealmResults?.removeChangeListener(attributeListChangedListener)
@@ -266,7 +279,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
                 if (lastRemovedAttributeId != null) {
                     val trackerId = trackerId
                     return@defer realm.executeTransactionAsObservable { realm ->
-                        val removedItem = realm.where(OTAttributeDAO::class.java).equalTo(RealmDatabaseManager.FIELD_OBJECT_ID, lastRemovedAttributeId!!).findFirst()
+                        val removedItem = realm.where(OTAttributeDAO::class.java).equalTo(BackendDbManager.FIELD_OBJECT_ID, lastRemovedAttributeId!!).findFirst()
                         if (removedItem != null) {
                             removedItem.isInTrashcan = false
 
@@ -365,11 +378,11 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
         super.onCleared()
         clearCurrentAttributeList()
         removedAttributes.clear()
+        shortcutPanelManager.get().unregisterShortcutRefreshSubscription(TAG)
     }
 
     class AttributeInformationViewModel(_attributeDAO: OTAttributeDAO, val realm: Realm, val attributeManager: OTAttributeManager) : IReadonlyObjectId, RealmChangeListener<OTAttributeDAO> {
-        override val objectId: String?
-            get() = attributeDAO.objectId
+        override val objectId: String? = _attributeDAO.objectId
 
         var attributeDAO: OTAttributeDAO = _attributeDAO
             private set

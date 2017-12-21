@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.tracker
 
 import android.animation.Animator
 import android.app.Activity
+import android.app.Dialog
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
@@ -22,9 +23,11 @@ import android.widget.ImageView
 import android.widget.TextView
 import at.markushi.ui.RevealColorView
 import butterknife.bindView
+import com.github.salomonbrys.kotson.set
+import com.google.gson.JsonObject
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttribute
+import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
@@ -53,12 +56,6 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
                         this.putExtra(INTENT_KEY_NEW_TRACKER_PRESET_NAME, presetName)
                     }
         }
-
-        fun makeIntent(trackerId: String, focusAttribute: OTAttribute<out Any>, context: Context): Intent {
-            val intent = makeIntent(trackerId, context)
-            intent.putExtra(INTENT_KEY_FOCUS_ATTRIBUTE_ID, focusAttribute.objectId)
-            return intent
-        }
     }
 
     private var isEditMode = true
@@ -76,9 +73,17 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
 
     private lateinit var viewModel: TrackerDetailViewModel
 
-    override fun onSessionLogContent(contentObject: Bundle) {
+    private val removedOutsideAlert: Dialog by lazy {
+        DialogHelper.makeSimpleAlertBuilder(this,
+                String.format(OTApp.getString(R.string.msg_format_removed_outside_return_home), OTApp.getString(R.string.msg_text_tracker)))
+        {
+            finish()
+        }.build()
+    }
+
+    override fun onSessionLogContent(contentObject: JsonObject) {
         super.onSessionLogContent(contentObject)
-        contentObject.putBoolean("isEditMode", isEditMode)
+        contentObject["isEditMode"] = isEditMode
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -147,6 +152,12 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
                 }
         )
 
+        creationSubscriptions.add(
+                viewModel.hasTrackerRemovedOutside.subscribe { id ->
+                    removedOutsideAlert.show()
+                }
+        )
+
         /*
         if (intent.hasExtra(INTENT_KEY_FOCUS_ATTRIBUTE_ID)) {
             //val attributeId = intent.getStringExtra(INTENT_KEY_FOCUS_ATTRIBUTE_ID)
@@ -197,6 +208,7 @@ class TrackerDetailActivity : MultiButtonActionBarActivity(R.layout.activity_tra
         //add
         if (!viewModel.isEditMode) {
             val newTrackerId = viewModel.applyChanges()
+            eventLogger.get().logTrackerChangeEvent(IEventLogger.SUB_ADD, newTrackerId)
             setResult(RESULT_OK, Intent().putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER, newTrackerId))
         }
         finish()

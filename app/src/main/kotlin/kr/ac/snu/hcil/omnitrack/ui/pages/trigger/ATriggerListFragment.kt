@@ -2,6 +2,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 
 import android.animation.ValueAnimator
 import android.app.Activity
+import android.content.BroadcastReceiver
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -11,6 +12,7 @@ import android.graphics.ColorMatrixColorFilter
 import android.os.Bundle
 import android.support.design.widget.CoordinatorLayout
 import android.support.v4.content.ContextCompat
+import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AlertDialog
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.LinearLayoutManager
@@ -22,6 +24,7 @@ import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager
 import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration
+import com.github.salomonbrys.kotson.set
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -31,10 +34,11 @@ import kotlinx.android.synthetic.main.layout_attached_tracker_list.view.*
 import kotlinx.android.synthetic.main.trigger_list_element.view.*
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.EventLoggingManager
-import kr.ac.snu.hcil.omnitrack.core.database.OTTriggerInformationHelper
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerInformationHelper
+import kr.ac.snu.hcil.omnitrack.core.triggers.TriggerFireBroadcastReceiver
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.TopBottomHorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.AManagedTriggerListViewModel
@@ -61,6 +65,14 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
         const val VIEWTYPE_GHOST = 1
 
         val switchColorFilter: ColorFilter by lazy { ColorMatrixColorFilter(ColorMatrix().apply { this.setSaturation(0.1f) }) }
+    }
+
+    private val triggerFireBroadcastReceiver: BroadcastReceiver by lazy {
+        object : TriggerFireBroadcastReceiver() {
+            override fun onTriggerFired(triggerId: String, triggerTime: Long) {
+                currentTriggerViewModelList.find { it.dao.objectId == triggerId }?.onFired(triggerTime)
+            }
+        }
     }
 
     protected lateinit var viewModel: ViewModelType
@@ -139,6 +151,16 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
         val rootView = inflater.inflate(R.layout.fragment_tracker_detail_triggers, container, false)
 
         return rootView
+    }
+
+    override fun onStart() {
+        super.onStart()
+        LocalBroadcastManager.getInstance(act).registerReceiver(triggerFireBroadcastReceiver, TriggerFireBroadcastReceiver.makeIntentFilter())
+    }
+
+    override fun onStop() {
+        super.onStop()
+        LocalBroadcastManager.getInstance(act).unregisterReceiver(triggerFireBroadcastReceiver)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -232,7 +254,7 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
             itemView.setOnClickListener(this)
             itemView.ui_trigger_switch.setOnClickListener(this)
             itemView.ui_trigger_switch.setOnCheckedChangeListener { sender, switched ->
-                InterfaceHelper.setViewColorFilter(itemView.ui_left, !switched, switchColorFilter, 0.65f)
+                toggleColorFilter(switched)
             }
             itemView.ui_button_remove.setOnClickListener(this)
 
@@ -254,9 +276,14 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
                         ?.let {
                             subscriptions.add(
                                     it.observeOn(AndroidSchedulers.mainThread()).subscribe({
-                                        val params = EventLoggingManager.makeTriggerChangeEventParams(attachedViewModel?.objectId ?: "")
-                                        attachedViewModel?.triggerSwitch?.value?.let { params.putBoolean("switch", it) }
-                                        EventLoggingManager.logEvent(EventLoggingManager.EVENT_NAME_CHANGE_TRIGGER_SWITCH, params)
+                                        eventLogger.get().logTriggerChangeEvent(
+                                                IEventLogger.SUB_EDIT, attachedViewModel?.objectId
+                                        ) { content ->
+                                            content[IEventLogger.CONTENT_KEY_PROPERTY] = "switch"
+                                            attachedViewModel?.triggerSwitch?.value?.let {
+                                                content[IEventLogger.CONTENT_KEY_NEWVALUE] = it
+                                            }
+                                        }
                                         println("trigger switch was successfully changed.")
                                     }, { ex ->
                                         println("toggle trigger switch failed: ${ex.message}")
@@ -276,8 +303,9 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
                         R.string.msg_remove, R.string.msg_cancel, {
                     attachedViewModel?.objectId?.let {
                         viewModel.removeTrigger(it)
-                        EventLoggingManager.logTriggerChangeEvent(EventLoggingManager.EVENT_NAME_CHANGE_TRIGGER_REMOVE, it)
-
+                        eventLogger.get().logTriggerChangeEvent(
+                                IEventLogger.SUB_REMOVE, attachedViewModel?.objectId
+                        )
                     }
                 }, onNo = null).show()
 
@@ -304,13 +332,19 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
             subscriptions.add(
                     triggerViewModel.triggerSwitch.subscribe {
                         itemView.ui_trigger_switch.isChecked = it
-                        InterfaceHelper.setViewColorFilter(itemView.ui_left, !it, switchColorFilter, 0.65f)
+                        toggleColorFilter(it)
                     }
             )
 
             subscriptions.add(
                     triggerViewModel.attachedTrackers.subscribe { newList ->
                         refreshAttachedTrackerList(newList)
+                    }
+            )
+
+            subscriptions.add(
+                    triggerViewModel.scriptUsed.subscribe { used ->
+                        itemView.ui_script_wappen.visibility = if (used) View.VISIBLE else View.INVISIBLE
                     }
             )
 
@@ -392,11 +426,29 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
             }
         }
 
+        private fun toggleColorFilter(switchOn: Boolean) {
+            arrayOf(itemView.ui_wappen_type, itemView.ui_left, itemView.ui_script_wappen)
+                    .forEach {
+                        if (it != null) {
+                            InterfaceHelper.setViewColorFilter(it, !switchOn, switchColorFilter, 0.65f)
+                        }
+                    }
+        }
+
         private fun refreshHeaderView(headerView: View) {
             if (currentHeaderView !== headerView) {
                 itemView.ui_header_view_container.removeAllViewsInLayout()
                 itemView.ui_header_view_container.addView(headerView)
                 currentHeaderView = headerView
+
+                attachedViewModel?.getConditionViewModel()?.let {
+                    val conditionType = attachedViewModel?.triggerConditionType?.value
+                    if (conditionType != null) {
+                        OTTriggerViewFactory.getConditionViewProvider(conditionType)?.connectViewModelToDisplayView(
+                                it, headerView, subscriptions
+                        )
+                    }
+                }
             }
         }
 

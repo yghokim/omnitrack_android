@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    tools:parentTag="android.support.constraint.ConstraintLayout">
 
     <ImageView
         android:id="@+id/ui_image_view"
@@ -12,46 +14,51 @@
         android:background="#05000000"
         android:padding="8dp"
         android:scaleType="fitCenter"
-        android:visibility="gone" />
+        android:visibility="gone"
+        tools:src="@drawable/service_thumb_fitbit" />
 
     <android.support.v7.widget.AppCompatImageButton
         android:id="@+id/ui_button_cancel"
         android:layout_width="@dimen/button_height_small"
         android:layout_height="@dimen/button_height_small"
-        android:layout_gravity="top|right"
         android:background="@drawable/button_background_color_pointed"
         android:tint="#fff"
         android:visibility="gone"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ex" />
 
-    <LinearLayout
-        android:id="@+id/ui_button_container"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:orientation="horizontal"
-        android:paddingBottom="50dp"
-        android:paddingTop="50dp">
 
-        <android.support.v7.widget.AppCompatImageButton
-            android:id="@+id/ui_button_camera"
-            style="@style/whitePlusButtonStyle"
-            android:layout_width="@dimen/button_height_tall"
-            android:layout_height="@dimen/button_height_tall"
+    <android.support.v7.widget.AppCompatImageButton
+        android:id="@+id/ui_button_camera"
+        style="@style/whitePlusButtonStyle"
+        android:layout_width="@dimen/button_height_tall"
+        android:layout_height="@dimen/button_height_tall"
 
-            android:padding="16dp"
-            android:tint="@color/buttonIconColorDark"
-            app:srcCompat="@drawable/camera" />
+        android:layout_marginBottom="50dp"
+        android:layout_marginTop="50dp"
+        android:padding="16dp"
 
-        <android.support.v7.widget.AppCompatImageButton
-            android:id="@+id/ui_button_gallery"
-            style="@style/whitePlusButtonStyle"
-            android:layout_width="@dimen/button_height_tall"
-            android:layout_height="@dimen/button_height_tall"
-            android:layout_marginLeft="@dimen/button_height_tall"
+        android:tint="@color/buttonIconColorDark"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/ui_button_gallery"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/camera" />
 
-            android:padding="16dp"
-            android:tint="@color/buttonIconColorDark"
-            app:srcCompat="@drawable/gallery" />
-    </LinearLayout>
+    <android.support.v7.widget.AppCompatImageButton
+        android:id="@+id/ui_button_gallery"
+        style="@style/whitePlusButtonStyle"
+        android:layout_width="@dimen/button_height_tall"
+        android:layout_height="@dimen/button_height_tall"
+        android:layout_marginLeft="@dimen/button_height_tall"
+
+        android:padding="16dp"
+        android:tint="@color/buttonIconColorDark"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/ui_button_camera"
+        app:layout_constraintRight_toRightOf="parent"
+
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/gallery" />
 </merge>

@@ -2,25 +2,25 @@ package kr.ac.snu.hcil.omnitrack.core.attributes.helpers
 
 import io.reactivex.Single
 import io.realm.Realm
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.FallbackPolicyResolver
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.NumericSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyManager
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.NumberInputView
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.NumberStyle
+import kr.ac.snu.hcil.omnitrack.utils.convertNumericToDouble
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 
 /**
  * Created by Young-Ho on 10/7/2017.
  */
-class OTNumberAttributeHelper : OTAttributeHelper() {
+class OTNumberAttributeHelper : OTAttributeHelper(), ISingleNumberAttributeHelper {
 
     companion object {
         const val NUMBERSTYLE = "style"
@@ -82,5 +82,9 @@ class OTNumberAttributeHelper : OTAttributeHelper() {
         if (inputView is NumberInputView) {
             inputView.numberStyle = getNumberStyle(attribute) ?: NumberStyle()
         }
+    }
+
+    override fun convertValueToSingleNumber(value: Any, attribute: OTAttributeDAO): Double {
+        return convertNumericToDouble(value)
     }
 }

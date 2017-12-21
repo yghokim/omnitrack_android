@@ -14,25 +14,25 @@ import android.widget.RadioButton
 import android.widget.Toast
 import com.afollestad.materialdialogs.MaterialDialog
 import dagger.Lazy
+import dagger.internal.Factory
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTFileInvolvedAttributeHelper
-import kr.ac.snu.hcil.omnitrack.core.database.EventLoggingManager
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.di.Backend
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTTaskNotificationManager
-import kr.ac.snu.hcil.omnitrack.utils.VectorIconHelper
 import kr.ac.snu.hcil.omnitrack.utils.io.StringTableSheet
 import org.jetbrains.anko.notificationManager
 import java.io.File
 import java.io.FileOutputStream
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
-import javax.inject.Provider
 
 /**
  * Created by Young-Ho on 3/9/2017.
@@ -104,17 +104,24 @@ class OTTableExportService : WakefulService(TAG) {
 
     }
 
-    @Inject
     lateinit var realm: Realm
 
+    @field:[Inject Backend]
+    lateinit var realmProvider: Factory<Realm>
+
+
     @Inject
-    lateinit var dbManager: Lazy<RealmDatabaseManager>
+    lateinit var dbManager: Lazy<BackendDbManager>
+
+    @Inject
+    lateinit var logger: Lazy<IEventLogger>
 
     private val subscriptions = CompositeDisposable()
 
     override fun onCreate() {
         super.onCreate()
         (application as OTApp).applicationComponent.inject(this)
+        realm = realmProvider.get()
     }
 
     override fun onDestroy() {
@@ -150,7 +157,7 @@ class OTTableExportService : WakefulService(TAG) {
             fun finish(successful: Boolean) {
                 println("export observable completed")
 
-                EventLoggingManager.logExport(trackerId)
+                logger.get().logExport(trackerId)
 
                 cacheDirectory?.let {
                     if (it.exists()) {
@@ -179,7 +186,6 @@ class OTTableExportService : WakefulService(TAG) {
                                     .setWhen(System.currentTimeMillis())
                                     .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
                                     .setSmallIcon(R.drawable.icon_simple_check)
-                                    .setLargeIcon(VectorIconHelper.getConvertedBitmap(this, R.drawable.icon_simple_check))
                                     .addAction(0, getString(R.string.msg_open), PendingIntent.getActivity(this, notificationId,
                                             Intent.createChooser(Intent(Intent.ACTION_VIEW).putExtra(Intent.EXTRA_STREAM, exportUri).setDataAndType(exportUri, mimeType).apply { this.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION },
                                                     getString(R.string.msg_open_exported_file)), PendingIntent.FLAG_CANCEL_CURRENT))

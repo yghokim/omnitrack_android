@@ -4,14 +4,16 @@ import io.reactivex.Completable
 import io.reactivex.subjects.BehaviorSubject
 import io.realm.*
 import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.core.database.OTTriggerInformationHelper
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
+import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerInformationHelper
+import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerSystemManager
 import kr.ac.snu.hcil.omnitrack.core.triggers.actions.OTTriggerAction
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.ATriggerCondition
+import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.OTTriggerViewFactory
 import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.utils.executeTransactionAsObservable
 import kr.ac.snu.hcil.omnitrack.utils.onNextIfDifferAndNotNull
@@ -21,10 +23,13 @@ import javax.inject.Inject
 /**
  * Created by younghokim on 2017. 10. 24..
  */
-open class TriggerViewModel(app: OTApp, val dao: OTTriggerDAO, val realm: Realm) : IReadonlyObjectId, RealmChangeListener<OTTriggerDAO>, OrderedRealmCollectionChangeListener<RealmResults<OTTrackerDAO>> {
+open class TriggerViewModel(val app: OTApp, val dao: OTTriggerDAO, val realm: Realm) : IReadonlyObjectId, RealmChangeListener<OTTriggerDAO>, OrderedRealmCollectionChangeListener<RealmResults<OTTrackerDAO>> {
 
     @Inject
     protected lateinit var syncManager: OTSyncManager
+
+    @Inject
+    protected lateinit var triggerSystemManager: OTTriggerSystemManager
 
     override val objectId: String?
         get() = dao.objectId
@@ -42,10 +47,20 @@ open class TriggerViewModel(app: OTApp, val dao: OTTriggerDAO, val realm: Realm)
 
     val configSummary: BehaviorSubject<CharSequence> = BehaviorSubject.create()
 
+    val scriptUsed = BehaviorSubject.createDefault(false)
+
     private var attachedTrackersRealmResults: RealmResults<OTTrackerDAO>? = null
     private val currentAttachedTrackerInfoList = ArrayList<OTTrackerDAO.SimpleTrackerInfo>()
     val attachedTrackers = BehaviorSubject.createDefault<List<OTTrackerDAO.SimpleTrackerInfo>>(currentAttachedTrackerInfoList)
 
+
+    private var currentConditionViewModel: ATriggerConditionViewModel? = null
+        set(value) {
+            if (field != value) {
+                field?.onDispose()
+                field = value
+            }
+        }
 
     init {
         app.applicationComponent.inject(this)
@@ -59,17 +74,31 @@ open class TriggerViewModel(app: OTApp, val dao: OTTriggerDAO, val realm: Realm)
         }
     }
 
+    fun getConditionViewModel(): ATriggerConditionViewModel? {
+        return currentConditionViewModel
+    }
+
+    fun onFired(triggerTime: Long) {
+        println("trigger fired at ${triggerTime}")
+        currentConditionViewModel?.afterTriggerFired(triggerTime)
+    }
+
     private fun applyDaoToFront() {
         dao.initialize(true)
         triggerActionType.onNext(dao.actionType)
         dao.action?.let { triggerAction.onNext(it) }
+        if (currentConditionViewModel?.conditionType != dao.conditionType) {
+            currentConditionViewModel = OTTriggerViewFactory.getConditionViewProvider(dao.conditionType)?.getTriggerConditionViewModel(dao, app)
+        }
+        currentConditionViewModel?.refreshDaoToFront(dao)
+
         triggerConditionType.onNext(dao.conditionType)
         dao.condition?.let { triggerCondition.onNext(it) }
 
         configIconResId.onNextIfDifferAndNotNull(OTTriggerInformationHelper.getConfigIconResId(dao))
-        configDescResId.onNextIfDifferAndNotNull(OTTriggerInformationHelper.getConfigDescRestId(dao))
+        configDescResId.onNextIfDifferAndNotNull(OTTriggerInformationHelper.getConfigDescResId(dao))
         configSummary.onNextIfDifferAndNotNull(OTTriggerInformationHelper.getConfigSummaryText(dao))
-
+        scriptUsed.onNextIfDifferAndNotNull(dao.checkScript && dao.additionalScript?.isNotBlank() == true)
         triggerSwitch.onNextIfDifferAndNotNull(dao.isOn)
 
         if (!dao.isManaged) {
@@ -114,6 +143,10 @@ open class TriggerViewModel(app: OTApp, val dao: OTTriggerDAO, val realm: Realm)
             dao.serializedAction = newDao.serializedAction
             dao.trackers.clear()
             dao.trackers.addAll(newDao.trackers)
+
+            dao.checkScript = newDao.checkScript
+            dao.additionalScript = newDao.additionalScript
+
             applyDaoToFront()
         }
     }
@@ -133,15 +166,18 @@ open class TriggerViewModel(app: OTApp, val dao: OTTriggerDAO, val realm: Realm)
                     Completable.complete()
                 } else {
                     if (dao.isManaged) {
-                        //TODO handle trigger on
                         val validationError = dao.isValidToTurnOn()
                         if (validationError == null) {
                             val id = dao.objectId
                             realm.executeTransactionAsObservable { realm ->
                                 realm.where(OTTriggerDAO::class.java).equalTo("objectId", id).findFirst()
-                                        ?.isOn = true
+                                        ?.apply {
+                                            isOn = true
+                                            synchronizedAt = null
+                                        }
                             }.doOnComplete {
                                 triggerSwitch.onNextIfDifferAndNotNull(true)
+                                triggerSystemManager.handleTriggerOn(dao)
                             }.doAfterTerminate {
                                 syncManager.registerSyncQueue(ESyncDataType.TRIGGER, SyncDirection.UPLOAD)
                             }
@@ -162,15 +198,18 @@ open class TriggerViewModel(app: OTApp, val dao: OTTriggerDAO, val realm: Realm)
                     }
                 }
             } else {
-                //TODO handle trigger off in system
-                if (dao.isOn == true) {
+                if (dao.isOn) {
                     if (dao.isManaged) {
                         val id = dao.objectId
                         realm.executeTransactionAsObservable { realm ->
                             realm.where(OTTriggerDAO::class.java).equalTo("objectId", id).findFirst()
-                                    ?.isOn = false
+                                    ?.apply {
+                                        isOn = false
+                                        synchronizedAt = null
+                                    }
                         }.doOnComplete {
                             triggerSwitch.onNextIfDifferAndNotNull(false)
+                            triggerSystemManager.handleTriggerOff(dao)
                         }.doAfterTerminate {
                             syncManager.registerSyncQueue(ESyncDataType.TRIGGER, SyncDirection.UPLOAD)
                         }
@@ -188,6 +227,7 @@ open class TriggerViewModel(app: OTApp, val dao: OTTriggerDAO, val realm: Realm)
     fun unregister() {
         dao.removeChangeListener(this)
         attachedTrackersRealmResults?.removeChangeListener(this)
+        currentConditionViewModel?.onDispose()
     }
 
 }

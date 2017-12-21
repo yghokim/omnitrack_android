@@ -49,7 +49,7 @@
         -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key" />
+            android:value="${GOOGLE_MAPS_API_KEY}" />
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version"
@@ -156,9 +156,6 @@
         <service
             android:name=".services.OTTableExportService"
             android:exported="false" />
-        <service
-            android:name=".services.OTFirebaseUploadService"
-            android:exported="false" />
 
         <service
             android:name=".widgets.OTShortcutPanelWidgetService"
@@ -181,11 +178,33 @@
 
         <service
             android:name=".services.OTSynchronizationService"
-            android:exported="false" />
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE" />
+            </intent-filter>
+        </service>
 
         <service
             android:name=".services.OTItemLoggingService"
             android:exported="false" />
+        <service android:name=".services.OTReminderService" />
+        <service
+            android:name=".services.OTBinaryUploadService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE" />
+            </intent-filter>
+        </service>
+        <service
+            android:name=".services.OTUsageLogUploadService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE" />
+            </intent-filter>
+        </service>
+        <service android:name=".services.OTBinaryLocalCacheService" />
+        <service android:name=".services.OTInformationUploadService" />
+
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"

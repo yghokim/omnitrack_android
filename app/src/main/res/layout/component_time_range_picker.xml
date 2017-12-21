@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    tools:background="@color/frontalBackground"
+    tools:padding="@dimen/activity_horizontal_margin"
+    tools:parentTag="android.support.constraint.ConstraintLayout">
 
     <View
         android:id="@+id/ui_process_bullet_from"
         style="@style/timeRangePickerBulletStyle"
         android:layout_marginBottom="0dp"
-        android:layout_marginLeft="8dp"
         android:layout_marginTop="0dp"
         app:layout_constraintBottom_toBottomOf="@+id/ui_button_from"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -19,7 +19,6 @@
         android:id="@+id/ui_process_bullet_to"
         style="@style/timeRangePickerBulletStyle"
         android:layout_marginBottom="0dp"
-        android:layout_marginLeft="8dp"
         android:layout_marginTop="0dp"
         app:layout_constraintBottom_toBottomOf="@+id/ui_button_to"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -45,19 +44,17 @@
         android:id="@+id/ui_button_from"
         style="@style/timeRangePickerButtonStyle"
         android:layout_width="0dp"
-        android:layout_marginBottom="8dp"
 
         android:layout_marginLeft="8dp"
         android:layout_marginRight="0dp"
 
-        android:layout_marginTop="8dp"
         android:textStyle="normal"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toRightOf="@+id/ui_process_bullet_from"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_default="spread"
-        tools:text="8:00:00 AM, Aug 5, 2016" />
+        tools:text="8:00 AM, Aug 5, 2016" />
 
 
     <TextView
@@ -65,25 +62,75 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
-        android:layout_marginRight="0dp"
-        android:layout_marginTop="12dp"
         android:textColor="@color/textColorLight"
         android:textStyle="bold"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintBottom_toTopOf="@+id/ui_button_to"
         app:layout_constraintLeft_toRightOf="@+id/view"
         app:layout_constraintTop_toBottomOf="@+id/ui_button_from"
         tools:text="8 hrs 40 mins 2 secs" />
+
+    <kr.ac.snu.hcil.omnitrack.ui.components.common.TintFancyButton
+        android:id="@+id/ui_button_down"
+        style="@style/TinyCircularFancyButtonStyle.blackAndWhite"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toStartOf="@id/ui_button_up"
+        app:layout_constraintTop_toBottomOf="@+id/ui_button_from" />
+
+    <kr.ac.snu.hcil.omnitrack.ui.components.common.TintFancyButton
+        android:id="@+id/ui_button_up"
+        style="@style/TinyCircularFancyButtonStyle.blackAndWhite"
+        app:fb_iconResource="@drawable/ic_arrow_upward_black_24dp"
+        app:layout_constraintBottom_toBottomOf="@+id/ui_button_down"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/ui_button_down"
+
+        tools:layout_editor_absoluteY="32dp" />
 
     <Button
         android:id="@+id/ui_button_to"
         style="@style/timeRangePickerButtonStyle"
         android:layout_width="0dp"
+        android:layout_marginBottom="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="0dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="8dp"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toRightOf="@+id/ui_process_bullet_to"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ui_interval_indicator"
-        tools:text="8:00:00 AM, Aug 5, 2016" />
-</android.support.constraint.ConstraintLayout>
+        app:layout_constraintTop_toBottomOf="@+id/ui_button_down"
+        tools:text="8:00 AM, Aug 5, 2016" />
+
+    <mehdi.sakout.fancybuttons.FancyButton
+        android:id="@+id/ui_button_preset_1"
+        style="@style/TimeRangePickerSubButtonStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="@string/time_range_picker_30_mins"
+        app:layout_constraintLeft_toLeftOf="@+id/ui_button_to"
+        app:layout_constraintRight_toLeftOf="@+id/ui_button_preset_2"
+        app:layout_constraintTop_toBottomOf="@+id/ui_button_to" />
+
+    <mehdi.sakout.fancybuttons.FancyButton
+        android:id="@+id/ui_button_preset_2"
+        style="@style/TimeRangePickerSubButtonStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="12dp"
+        android:text="@string/time_range_picker_1_hour"
+        app:layout_constraintLeft_toRightOf="@+id/ui_button_preset_1"
+        app:layout_constraintRight_toLeftOf="@+id/ui_button_preset_now"
+        app:layout_constraintTop_toTopOf="@+id/ui_button_preset_1" />
+
+    <mehdi.sakout.fancybuttons.FancyButton
+        android:id="@+id/ui_button_preset_now"
+        style="@style/TimeRangePickerSubButtonStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="12dp"
+        android:text="@string/msg_time_range_picker_to_now"
+        app:layout_constraintLeft_toRightOf="@+id/ui_button_preset_2"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/ui_button_preset_1" />
+</merge>

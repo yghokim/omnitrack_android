@@ -8,8 +8,8 @@ import io.realm.OrderedRealmCollectionChangeListener
 import io.realm.RealmResults
 import io.realm.Sort
 import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
@@ -35,12 +35,12 @@ class OrderedTrackerListViewModel(app: Application) : UserAttachedViewModel(app)
 
     val onTrackerInfoChanged = PublishSubject.create<String>()
 
-    private lateinit var initialOrder: Array<String>
+    private lateinit var initialOrder: MutableList<String>
 
     val isDirty: Boolean
         get() {
             if (currentOrderedTrackerViewModels.filterIndexed { index, model -> model.dao.position != index }.isNotEmpty()) {
-                return !Arrays.equals(initialOrder, currentOrderedTrackerViewModels.map { it.dao.objectId!! }.toTypedArray())
+                return !Arrays.equals(initialOrder.toTypedArray(), currentOrderedTrackerViewModels.map { it.dao.objectId!! }.toTypedArray())
 
             } else return false
         }
@@ -52,7 +52,7 @@ class OrderedTrackerListViewModel(app: Application) : UserAttachedViewModel(app)
     override fun onUserAttached(newUserId: String) {
         super.onUserAttached(newUserId)
         trackerQueryResults = dbManager.get().makeTrackersOfUserQuery(newUserId, realm)
-                .findAllSortedAsync(arrayOf("position", RealmDatabaseManager.FIELD_USER_CREATED_AT), arrayOf(Sort.ASCENDING, Sort.DESCENDING))
+                .findAllSortedAsync(arrayOf("position", BackendDbManager.FIELD_USER_CREATED_AT), arrayOf(Sort.ASCENDING, Sort.DESCENDING))
 
         trackerQueryResults?.addChangeListener(this)
     }
@@ -61,13 +61,13 @@ class OrderedTrackerListViewModel(app: Application) : UserAttachedViewModel(app)
         if(changeSet == null)
         {
             //initial
-            initialOrder = snapshot.map { it.objectId!! }.toTypedArray()
+            initialOrder = snapshot.map { it.objectId!! }.toMutableList()
 
             currentOrderedTrackerViewModels.clear()
             currentOrderedTrackerViewModels.addAll(snapshot.map{OrderedTrackerViewModel(it)})
-            orderedTrackerViewModels.onNext(currentOrderedTrackerViewModels)
         }
         else{
+            initialOrder.removeAll(changeSet.deletions.map { currentOrderedTrackerViewModels[it].objectId })
             currentOrderedTrackerViewModels.removeAll(changeSet.deletions.map { currentOrderedTrackerViewModels[it] })
             changeSet.insertions.forEach {
                 currentOrderedTrackerViewModels.add(it, OrderedTrackerViewModel(snapshot[it]!!))
@@ -77,6 +77,7 @@ class OrderedTrackerListViewModel(app: Application) : UserAttachedViewModel(app)
                 onTrackerInfoChanged.onNext(currentOrderedTrackerViewModels[it].objectId!!)
             }
         }
+        orderedTrackerViewModels.onNext(currentOrderedTrackerViewModels)
     }
 
     override fun onUserDisposed() {
@@ -89,7 +90,7 @@ class OrderedTrackerListViewModel(app: Application) : UserAttachedViewModel(app)
         orderedTrackerViewModels.onNext(currentOrderedTrackerViewModels)
     }
 
-    fun applyOrders(){
+    fun applyOrders(): Boolean {
         if (isDirty) {
             realm.executeTransaction {
                 currentOrderedTrackerViewModels.forEachIndexed { index, viewModel ->
@@ -100,13 +101,12 @@ class OrderedTrackerListViewModel(app: Application) : UserAttachedViewModel(app)
                 }
             }
             syncManager.registerSyncQueue(ESyncDataType.TRACKER, SyncDirection.UPLOAD)
-        }
-
+            return true
+        } else return false
     }
 
     class OrderedTrackerViewModel(internal val dao: OTTrackerDAO) : IReadonlyObjectId {
-        override val objectId: String?
-            get() = dao.objectId
+        override val objectId: String? = dao.objectId
         val name: String get() = dao.name
         val color: Int get() = dao.color
     }

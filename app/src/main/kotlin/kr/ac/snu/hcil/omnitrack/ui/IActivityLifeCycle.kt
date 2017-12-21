@@ -16,6 +16,9 @@ interface IActivityLifeCycle {
 
     fun onResume()
 
+    fun onStart()
+    fun onStop()
+
     fun onPause()
 
     fun onDestroy()

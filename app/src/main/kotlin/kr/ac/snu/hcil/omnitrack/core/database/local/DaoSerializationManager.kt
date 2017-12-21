@@ -1,6 +1,10 @@
 package kr.ac.snu.hcil.omnitrack.core.database.local
 
 import dagger.Lazy
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTItemDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.database.local.typeadapters.ServerCompatibleTypeAdapter
 import kr.ac.snu.hcil.omnitrack.core.di.*
 import javax.inject.Inject

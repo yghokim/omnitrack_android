@@ -14,20 +14,22 @@ import android.support.v4.graphics.ColorUtils
 import android.view.View
 import android.widget.RemoteViews
 import dagger.Lazy
+import dagger.internal.Factory
 import io.reactivex.Completable
+import io.reactivex.disposables.SerialDisposable
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.di.Backend
 import kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemDetailActivity
 import kr.ac.snu.hcil.omnitrack.utils.VectorIconHelper
 import javax.inject.Inject
-import javax.inject.Provider
 import javax.inject.Singleton
 
 /**
@@ -36,8 +38,8 @@ import javax.inject.Singleton
 @Singleton
 class OTShortcutPanelManager @Inject constructor(
         val authManager: Lazy<OTAuthManager>,
-        val dbManager: Lazy<RealmDatabaseManager>,
-        val backendRealmProvider: Provider<Realm>
+        val dbManager: Lazy<BackendDbManager>,
+        @Backend val backendRealmProvider: Factory<Realm>
 ) {
 
     companion object {
@@ -46,6 +48,12 @@ class OTShortcutPanelManager @Inject constructor(
 
         const val MAX_NUM_SHORTCUTS = 5
     }
+
+    private val shortcutRefreshSubscriberTags = HashSet<String>()
+    private val shortcutRefreshSubscription = SerialDisposable()
+
+    val isWatchingForShortcutRefresh: Boolean get() = shortcutRefreshSubscription.get() != null && !shortcutRefreshSubscription.isDisposed
+
     val showPanels: Boolean
         get() {
             return PreferenceManager.getDefaultSharedPreferences(OTApp.instance).getBoolean("pref_show_shortcut_panel", false)
@@ -104,7 +112,7 @@ class OTShortcutPanelManager @Inject constructor(
                     element.setViewVisibility(R.id.ui_background_image, View.INVISIBLE)
                 }
 
-                val instantLoggingIntent = PendingIntent.getService(context, i, OTItemLoggingService.makeLoggingIntent(context, ItemLoggingSource.Shortcut, trackers[i].objectId!!), PendingIntent.FLAG_UPDATE_CURRENT)
+                val instantLoggingIntent = PendingIntent.getService(context, i, OTItemLoggingService.makeLoggingIntent(context, ItemLoggingSource.Shortcut, true, trackers[i].objectId!!), PendingIntent.FLAG_UPDATE_CURRENT)
                 val openItemActivityIntent = PendingIntent.getActivity(context, i, ItemDetailActivity.makeNewItemPageIntent(trackers[i].objectId!!, context), PendingIntent.FLAG_UPDATE_CURRENT)
 
                 element.setOnClickPendingIntent(R.id.ui_button_instant, instantLoggingIntent)
@@ -115,6 +123,33 @@ class OTShortcutPanelManager @Inject constructor(
         }
 
         return rv
+    }
+
+    @Synchronized
+    fun registerShortcutRefreshSubscription(userId: String, tag: String): Boolean {
+        shortcutRefreshSubscriberTags.add(tag)
+        if (!isWatchingForShortcutRefresh) {
+            val realm = backendRealmProvider.get()
+            shortcutRefreshSubscription.set(
+                    dbManager.get().makeShortcutPanelRefreshObservable(userId, realm).doAfterTerminate { realm.close() }
+                            .subscribe({}, {}, {})
+            )
+            return true
+        } else return false
+    }
+
+    @Synchronized
+    fun unregisterShortcutRefreshSubscription(tag: String): Boolean {
+        if (isWatchingForShortcutRefresh) {
+            if (shortcutRefreshSubscriberTags.remove(tag)) {
+                if (shortcutRefreshSubscriberTags.isEmpty()) {
+                    println("shortcut watch tags are empty. unsubscribe the subscription.")
+                    shortcutRefreshSubscription.dispose()
+                    return true
+                }
+            }
+        }
+        return false
     }
 
     fun refreshNotificationShortcutViewsObservable(context: Context): Completable {

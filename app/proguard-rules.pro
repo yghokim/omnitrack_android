@@ -24,6 +24,8 @@
     public static ** valueOf(java.lang.String);
 }
 
+-keepnames class * extends kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
+
 -dontwarn okio.**
 
 -dontwarn org.apache.commons.math3.**
@@ -91,6 +93,8 @@
 
 -dontwarn com.google.errorprone.annotations.*
 -dontwarn com.beloo.widget.chipslayoutmanager.Orientation
+
+-dontwarn kr.ac.snu.hcil.omnitrack.core.visualization.models.DurationHeatMapModel
 
 # for DexGuard only
 #-keepresourcexmlelements manifest/application/meta-data@value=GlideModule

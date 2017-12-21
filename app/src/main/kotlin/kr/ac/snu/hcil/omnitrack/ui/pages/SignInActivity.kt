@@ -11,10 +11,12 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.tbruyelle.rxpermissions2.RxPermissions
+import dagger.Lazy
 import io.reactivex.disposables.CompositeDisposable
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.ExperimentConsentManager
+import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
@@ -26,6 +28,9 @@ class SignInActivity : AppCompatActivity() {
     protected lateinit var authManager: OTAuthManager
     @Inject
     protected lateinit var consentManager: ExperimentConsentManager
+
+    @Inject
+    protected lateinit var eventLogger: Lazy<IEventLogger>
 
     /** The Google OnClick listener, since we must override it to get permissions on Marshmallow and above.  */
     private var googleOnClickListener: View.OnClickListener? = null
@@ -112,10 +117,11 @@ class SignInActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         authManager.handleActivityResult(requestCode, resultCode, data)
-        consentManager.handleActivityResult(true, requestCode, resultCode, data)
+        consentManager.handleActivityResult(requestCode, resultCode, data)
     }
 
     private fun goHomeActivity() {
+        eventLogger.get().logEvent(IEventLogger.NAME_AUTH, IEventLogger.SUB_SIGNED_IN)
         Log.d(LOG_TAG, "Launching Main Activity...")
         startActivity(Intent(this@SignInActivity, HomeActivity::class.java)
                 .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -148,7 +154,7 @@ class SignInActivity : AppCompatActivity() {
 
             consentManager.startProcess(this@SignInActivity, authManager.userId!!, object : ExperimentConsentManager.ResultListener {
                 override fun onConsentApproved() {
-
+                    eventLogger.get().logEvent(IEventLogger.NAME_AUTH, IEventLogger.SUB_CONSENT_APPROVED)
                     goHomeActivity()
                 }
 
@@ -159,6 +165,7 @@ class SignInActivity : AppCompatActivity() {
 
                 override fun onConsentDenied() {
                     println("consent was denied")
+                    eventLogger.get().logEvent(IEventLogger.NAME_AUTH, IEventLogger.SUB_CONSENT_DENIED)
                     toIdleMode()
                 }
 

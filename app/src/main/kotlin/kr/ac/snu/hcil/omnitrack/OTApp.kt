@@ -19,7 +19,6 @@ import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
 import kr.ac.snu.hcil.omnitrack.core.di.*
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
-import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTriggerAlarmManager
 import kr.ac.snu.hcil.omnitrack.utils.LocaleHelper
 import org.jetbrains.anko.telephonyManager
 import rx_activity_result2.RxActivityResult
@@ -41,12 +40,8 @@ class OTApp : MultiDexApplication() {
             private set
 
         const val PREFIX_ACTION = "${BuildConfig.APPLICATION_ID}.action"
+        const val PREFIX_PREF_KEY = "${BuildConfig.APPLICATION_ID}.preference"
 
-        const val SHARED_PREFERENCES_USER_NAME = "omnitrack_app_system"
-
-        const val ACCOUNT_DATASET_EXPERIMENT = "experiment"
-        const val ACCOUNT_DATASET_EXPERIMENT_KEY_EMAIL = "email"
-        const val ACCOUNT_DATASET_EXPERIMENT_KEY_IS_CONSENT_APPROVED = "consent_approved"
         const val ACCOUNT_DATASET_EXPERIMENT_KEY_GENDER = "gender"
         const val ACCOUNT_DATASET_EXPERIMENT_KEY_OCCUPATION = "occupation"
         const val ACCOUNT_DATASET_EXPERIMENT_KEY_AGE_GROUP = "age_group"
@@ -82,6 +77,7 @@ class OTApp : MultiDexApplication() {
         const val BROADCAST_ACTION_USER_SIGNED_IN = "$PREFIX_ACTION.USER_SIGNED_IN"
         const val BROADCAST_ACTION_USER_SIGNED_OUT = "$PREFIX_ACTION.USER_SIGNED_OUT"
 
+        const val BROADCAST_ACTION_TRIGGER_FIRED = "$PREFIX_ACTION.TRIGGER_FIRED"
 
         const val BROADCAST_ACTION_TIME_TRIGGER_ALARM = "$PREFIX_ACTION.ALARM"
         const val BROADCAST_ACTION_EVENT_TRIGGER_CHECK_ALARM = "$PREFIX_ACTION.EVENT_TRIGGER_ALARM"
@@ -99,9 +95,7 @@ class OTApp : MultiDexApplication() {
 
         const val BROADCAST_ACTION_TRACKER_ON_BOOKMARK = "$PREFIX_ACTION.TRACKER_ON_BOOKMARK"
 
-        const val PREFERENCE_KEY_FIREBASE_INSTANCE_ID = "firebase_instance_id"
-
-        const val PREFERENCE_KEY_DEVICE_LOCAL_KEY = "device_local_key"
+        const val PREFERENCE_KEY_FIREBASE_INSTANCE_ID = "$PREFIX_PREF_KEY.firebase_instance_id"
 
 
         fun getString(resId: Int): String {
@@ -123,9 +117,9 @@ class OTApp : MultiDexApplication() {
 
     val deviceId: String by lazy {
         val deviceUUID: UUID
-        val cached: String? = applicationComponent.defaultPreferences().getString("cached_device_id", "")
-        if (!cached.isNullOrBlank()) {
-            deviceUUID = UUID.fromString(cached)
+        val cached: String = applicationComponent.defaultPreferences().getString("cached_device_id", "")
+        if (cached.isNotBlank()) {
+            return@lazy cached
         } else {
             val androidUUID = Settings.Secure.getString(this.contentResolver, Settings.Secure.ANDROID_ID)
             if (!androidUUID.isNullOrBlank()) {
@@ -145,17 +139,16 @@ class OTApp : MultiDexApplication() {
                     throw ex
                 }
             }
-        }
+            val finalId = "$deviceUUID;${BuildConfig.APPLICATION_ID}"
 
-        applicationComponent.defaultPreferences().edit().putString("cached_device_id", deviceUUID.toString()).apply()
-        deviceUUID.toString()
+            applicationComponent.defaultPreferences().edit().putString("cached_device_id", finalId).apply()
+            finalId
+        }
     }
 
     val isAppInForeground: Boolean get() {
         return numActivitiesActive.get() > 0
     }
-
-    private var initialRun = false
 
     private val numActivitiesActive = AtomicInteger(0)
 
@@ -171,12 +164,20 @@ class OTApp : MultiDexApplication() {
         AuthModule(this)
     }
 
+    private val loggingModule: UsageLoggingModule by lazy {
+        UsageLoggingModule()
+    }
+
     private val backendDatabaseModule: BackendDatabaseModule by lazy {
         BackendDatabaseModule()
     }
 
     private val scheduledJobModule: ScheduledJobModule by lazy {
         ScheduledJobModule()
+    }
+
+    private val networkModule: NetworkModule by lazy {
+        NetworkModule()
     }
 
     private val synchronizationModule: SynchronizationModule by lazy {
@@ -195,18 +196,23 @@ class OTApp : MultiDexApplication() {
         DaggerApplicationComponent.builder()
                 .applicationModule(appModule)
                 .authModule(authModule)
-                .networkModule(NetworkModule(this))
+                .networkModule(networkModule)
                 .backendDatabaseModule(backendDatabaseModule)
                 .scheduledJobModule(scheduledJobModule)
                 .triggerSystemModule(triggerSystemModule)
+                .synchronizationModule(synchronizationModule)
+                .usageLoggingModule(loggingModule)
                 .informationHelpersModule(InformationHelpersModule())
+                .scriptingModule(ScriptingModule())
                 .build()
     }
 
     val daoSerializationComponent: DaoSerializationComponent by lazy {
         DaggerDaoSerializationComponent.builder()
+                .applicationModule(appModule)
                 .daoSerializationModule(daoSerializationModule)
                 .backendDatabaseModule(backendDatabaseModule)
+                .triggerSystemModule(triggerSystemModule)
                 .build()
     }
 
@@ -217,16 +223,28 @@ class OTApp : MultiDexApplication() {
                 .build()
     }
 
+    val triggerSystemComponent: TriggerSystemComponent by lazy {
+        DaggerTriggerSystemComponent.builder()
+                .applicationModule(appModule)
+                .backendDatabaseModule(backendDatabaseModule)
+                .triggerSystemModule(triggerSystemModule)
+                .networkModule(networkModule)
+                .daoSerializationModule(daoSerializationModule)
+                .authModule(authModule)
+                .build()
+    }
+
+    val networkComponent: NetworkComponent by lazy {
+        DaggerNetworkComponent.builder()
+                .networkModule(networkModule)
+                .applicationModule(appModule)
+                .authModule(authModule)
+                .build()
+    }
+
     val colorPalette: IntArray by lazy {
         this.resources.getStringArray(R.array.colorPaletteArray).map { Color.parseColor(it) }.toIntArray()
     }
-
-    val googleApiKey: String by lazy {
-        this.resources.getString(R.string.google_maps_key)
-    }
-
-    lateinit var timeTriggerAlarmManager: OTTimeTriggerAlarmManager
-        private set
 
     override fun attachBaseContext(base: Context) {
         LocaleHelper.init(base)
@@ -274,7 +292,6 @@ class OTApp : MultiDexApplication() {
         logger.writeSystemLog("Application creates.", "OTApp")
 
         //=================================================================
-        timeTriggerAlarmManager = OTTimeTriggerAlarmManager()
 
         OTExternalService.init()
         for (service in OTExternalService.availableServices) {
@@ -320,8 +337,7 @@ class OTApp : MultiDexApplication() {
         //TODO start service in job controller
         //startService(this.binaryUploadServiceController.makeResumeUploadIntent())
 
-
-        //OTVersionCheckService.setupServiceAlarm(this)
+        triggerSystemComponent.getTriggerAlarmController().get().activateOnSystem()
 
         println("creation took ${SystemClock.elapsedRealtime() - startedAt}")
     }
@@ -376,7 +392,7 @@ class OTApp : MultiDexApplication() {
 
         diaryTracker.attributes += OTAttribute.createAttribute(diaryTracker, "기분", OTAttributeManager.TYPE_RATING).apply {
             this.setPropertyValue(OTRatingAttribute.PROPERTY_OPTIONS, kr.ac.snu.hcil.omnitrack.utils.RatingOptions().apply {
-                this.allowIntermediate = true
+                this.isFractional = true
                 this.leftLabel = "매우 나쁨"
                 this.middleLabel = "보통"
                 this.rightLabel = "매우 좋음"
@@ -400,7 +416,7 @@ class OTApp : MultiDexApplication() {
 
         stressTracker.attributes += OTAttribute.createAttribute(stressTracker, "기분", OTAttributeManager.TYPE_RATING).apply {
             this.setPropertyValue(OTRatingAttribute.PROPERTY_OPTIONS, kr.ac.snu.hcil.omnitrack.utils.RatingOptions().apply {
-                this.allowIntermediate = true
+                this.isFractional = true
                 this.leftLabel = "매우 나쁨"
                 this.middleLabel = "보통"
                 this.rightLabel = "매우 좋음"

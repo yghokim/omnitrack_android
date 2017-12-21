@@ -7,6 +7,7 @@ import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.MotionEvent
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.datatypes.Fraction
 import kr.ac.snu.hcil.omnitrack.utils.applyTint
 import kr.ac.snu.hcil.omnitrack.utils.events.Event
 import kotlin.properties.Delegates
@@ -39,7 +40,7 @@ class StarRatingSlider : HorizontalLinearDrawableView, GestureDetector.OnGesture
         }
     }
 
-    var allowIntermediate: Boolean by Delegates.observable(true) {
+    var isFractional: Boolean by Delegates.observable(true) {
         prop, old, new ->
         if (old != new) {
             refresh()
@@ -53,6 +54,41 @@ class StarRatingSlider : HorizontalLinearDrawableView, GestureDetector.OnGesture
             scoreChanged.invoke(this, new)
         }
     }
+
+    var fractionValue: Fraction?
+        get() {
+            val currentValue = score
+            if (currentValue == null) {
+                return null
+            } else {
+                val under = if (isFractional) {
+                    levels * 2
+                } else {
+                    levels
+                }
+                var upper = currentValue
+                if (isFractional) upper *= 2
+
+                return Fraction(Math.round(upper).toShort(), under.toShort())
+            }
+        }
+        set(fraction) {
+            if (fraction == null) {
+                score = null
+            } else {
+                val under = if (isFractional) {
+                    levels * 2
+                } else {
+                    levels
+                }
+                var upper = Math.round((fraction.toFloat() * under))
+                if (fraction.upper > 0) {
+                    upper = Math.max(upper, 1)
+                }
+
+                score = ((upper.toFloat() / under) * levels * 10 + .5f).toInt() / 10f
+            }
+        }
 
     private val starAdapter: ADrawableAdapter = StarAdapter()
 
@@ -120,7 +156,7 @@ class StarRatingSlider : HorizontalLinearDrawableView, GestureDetector.OnGesture
     private fun handleTouchEvent(event: MotionEvent) {
         val adapter = adapter!!
         if (event.x < paddingLeft) {
-            score = if (allowIntermediate) {
+            score = if (isFractional) {
                 0.5f
             } else 1f
         } else if (event.x > paddingLeft + currentCellWidth * adapter.numDrawables) {
@@ -132,7 +168,7 @@ class StarRatingSlider : HorizontalLinearDrawableView, GestureDetector.OnGesture
 
                 if (left <= event.x && right >= event.x) {
                     val fraction = (event.x - left) / currentCellWidth
-                    score = Math.max(if (allowIntermediate) {
+                    score = Math.max(if (isFractional) {
                         0.5f
                     } else 1f, i + discreteFraction(fraction))
                     break
@@ -166,7 +202,7 @@ class StarRatingSlider : HorizontalLinearDrawableView, GestureDetector.OnGesture
     }
 
     private fun discreteFraction(fraction: Float): Float {
-        if (allowIntermediate) {
+        if (isFractional) {
 
             if (fraction < 0.75f && fraction >= 0.25f) {
                 return 0.5f

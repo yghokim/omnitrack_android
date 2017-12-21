@@ -8,17 +8,16 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTChoiceAttributeHelper
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.visualization.AttributeChartModel
+import kr.ac.snu.hcil.omnitrack.core.visualization.IWebBasedChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.ICategoricalBarChart
-import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
-import kr.ac.snu.hcil.omnitrack.ui.components.visualization.drawers.CategoricalBarChartDrawer
 import java.util.*
 
 /**
  * Created by younghokim on 16. 9. 7..
  */
-class ChoiceCategoricalBarChartModel(attribute: OTAttributeDAO, realm: Realm) : AttributeChartModel<ICategoricalBarChart.Point>(attribute, realm), ICategoricalBarChart {
+class ChoiceCategoricalBarChartModel(attribute: OTAttributeDAO, realm: Realm) : AttributeChartModel<ICategoricalBarChart.Point>(attribute, realm), ICategoricalBarChart, IWebBasedChartModel {
 
     private val counterDictCache = SparseIntArray() // entry id : count
     private val categoriesCache = HashSet<Int>()
@@ -37,12 +36,13 @@ class ChoiceCategoricalBarChartModel(attribute: OTAttributeDAO, realm: Realm) : 
 
     override fun reloadData(): Single<List<ICategoricalBarChart.Point>> {
         val trackerId = attribute.trackerId
+        println("reload data for tracker ${trackerId} - ChoiceCategorical")
         if (trackerId != null) {
             return dbManager
                     .makeItemsQuery(trackerId, getTimeScope(), realm)
                     .findAllSortedAsync("timestamp", Sort.ASCENDING)
                     .asFlowable()
-                    .filter { it.isLoaded == true }
+                    .filter { it.isLoaded && it.isValid }
                     .firstOrError().map {
                 items ->
 
@@ -57,7 +57,7 @@ class ChoiceCategoricalBarChartModel(attribute: OTAttributeDAO, realm: Realm) : 
                         .forEach {
                             if (it != null && it.isNotEmpty()) {
                                 for (id in it) {
-                                    if (categoriesCache.contains(id) == false) {
+                                    if (!categoriesCache.contains(id)) {
                                         categoriesCache.add(id)
                                         counterDictCache.put(id, 1)
                                     } else {
@@ -93,11 +93,21 @@ class ChoiceCategoricalBarChartModel(attribute: OTAttributeDAO, realm: Realm) : 
         }
     }
 
+    override fun getDataInJsonString(): String {
+        return "{\"data\":[${cachedData.joinToString(", ") { it.toJsonString() }}]}"
+    }
+
+    override fun getChartTypeCommand(): String {
+        return "horizontal-bar"
+    }
+
+
+    /*
     override fun getChartDrawer(): AChartDrawer {
         val drawer = CategoricalBarChartDrawer()
         drawer.integerValues = true
 
         return drawer
-    }
+    }*/
 
 }

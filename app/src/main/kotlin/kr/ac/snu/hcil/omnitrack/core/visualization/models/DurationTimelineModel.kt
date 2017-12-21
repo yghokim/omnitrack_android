@@ -12,9 +12,10 @@ import io.realm.Realm
 import io.realm.Sort
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.visualization.AttributeChartModel
+import kr.ac.snu.hcil.omnitrack.core.visualization.INativeChartModel
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.AChartDrawer
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.Axis
 import kr.ac.snu.hcil.omnitrack.ui.components.visualization.components.IAxisScale
@@ -30,7 +31,7 @@ import java.util.*
 /**
  * Created by Young-Ho on 9/9/2016.
  */
-class DurationTimelineModel(attribute: OTAttributeDAO, realm: Realm) : AttributeChartModel<DurationTimelineModel.AggregatedDuration>(attribute, realm) {
+class DurationTimelineModel(attribute: OTAttributeDAO, realm: Realm) : AttributeChartModel<DurationTimelineModel.AggregatedDuration>(attribute, realm), INativeChartModel {
 
     data class AggregatedDuration(val time: Long, val count: Int, val avgFrom: Float, val avgTo: Float, val earliest: Float = avgFrom, val latest: Float = avgTo)
 
@@ -54,7 +55,7 @@ class DurationTimelineModel(attribute: OTAttributeDAO, realm: Realm) : Attribute
             dbManager.makeItemsQuery(attribute.trackerId, TimeSpan.fromPoints(from, to), realm)
                     .findAllSortedAsync("timestamp", Sort.ASCENDING)
                     .asFlowable()
-                    .filter { it.isLoaded == true }.firstElement().flatMap<AggregatedDuration?> {
+                    .filter { it.isLoaded }.firstElement().flatMap<AggregatedDuration?> {
                 items ->
                 println("items during ${TimeSpan.fromPoints(from, to)}; count: ${items.size}")
                 if (items.isNotEmpty()) {

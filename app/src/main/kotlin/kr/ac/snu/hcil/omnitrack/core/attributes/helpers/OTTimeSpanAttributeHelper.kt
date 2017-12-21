@@ -4,7 +4,6 @@ import android.content.Context
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.realm.Realm
-import io.realm.Sort
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.FallbackPolicyResolver
@@ -13,11 +12,9 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.logics.TimeSpanIntervalSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.TimeSpanPivotalSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyManager
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTItemValueEntryDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTItemValueEntryDAO
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
-import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
-import kr.ac.snu.hcil.omnitrack.core.visualization.models.DurationTimelineModel
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.common.time.TimeRangePicker
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
@@ -133,9 +130,11 @@ class OTTimeSpanAttributeHelper : OTAttributeHelper() {
                         val previousNotNullEntry = try {
                             realm.where(OTItemValueEntryDAO::class.java)
                                     .equalTo("key", attribute.localId)
-                                    .equalTo("item.trackerId", attribute.trackerId)
-                                    .equalTo("item.removed", false)
-                                    .findAllSorted("item.timestamp", Sort.DESCENDING).filter { it.value != null }.first()
+                                    .equalTo("items.trackerId", attribute.trackerId)
+                                    .equalTo("items.removed", false)
+                                    .isNotNull("value")
+                                    .beginsWith("value", "${TypeStringSerializationHelper.TYPENAME_TIMESPAN.length}${TypeStringSerializationHelper.TYPENAME_TIMESPAN}")
+                                    .findAll().sortedByDescending { (it.items?.firstOrNull()?.getValueOf(attribute.localId) as TimeSpan).to }.firstOrNull()
                         } catch (ex: NoSuchElementException) {
                             null
                         }
@@ -182,9 +181,10 @@ class OTTimeSpanAttributeHelper : OTAttributeHelper() {
         } ?: ""
     }
 
+    /*
     override fun makeRecommendedChartModels(attribute: OTAttributeDAO, realm: Realm): Array<ChartModel<*>> {
         return arrayOf(DurationTimelineModel(attribute, realm))
-    }
+    }*/
 
     override fun onAddColumnToTable(attribute: OTAttributeDAO, out: MutableList<String>) {
         out.add("${getAttributeUniqueName(attribute)}_start_epoch")

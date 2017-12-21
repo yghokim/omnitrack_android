@@ -136,12 +136,12 @@ class NumberStylePropertyView(context: Context, attrs: AttributeSet?) : APropert
     }
 
     override fun getSerializedValue(): String? {
-        return NumberStyle.parser.toJson(value)
+        return NumberStyle.typeAdapter.toJson(value)
     }
 
     override fun setSerializedValue(serialized: String): Boolean {
         try {
-            value = NumberStyle.parser.fromJson(serialized, NumberStyle::class.java)
+            value = NumberStyle.typeAdapter.fromJson(serialized)
             return true
         } catch(e: Exception) {
             try {

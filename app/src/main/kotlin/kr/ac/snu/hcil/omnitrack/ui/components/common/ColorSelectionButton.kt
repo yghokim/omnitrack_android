@@ -8,12 +8,12 @@ import android.graphics.Paint
 import android.graphics.RectF
 import android.graphics.drawable.Drawable
 import android.support.v4.content.res.ResourcesCompat
+import android.support.v7.widget.AppCompatButton
 import android.util.AttributeSet
 import android.view.animation.DecelerateInterpolator
-import android.widget.Button
 import kr.ac.snu.hcil.omnitrack.R
 
-class ColorSelectionButton : Button, ValueAnimator.AnimatorUpdateListener {
+class ColorSelectionButton : AppCompatButton, ValueAnimator.AnimatorUpdateListener {
 
     var color: Int = Color.RED
         set(value) {
@@ -81,7 +81,7 @@ class ColorSelectionButton : Button, ValueAnimator.AnimatorUpdateListener {
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
 
-        if (changed == true) {
+        if (changed) {
 
             contentSize = Math.min(width, height).toFloat()
             if (width >= height) {
@@ -131,14 +131,14 @@ class ColorSelectionButton : Button, ValueAnimator.AnimatorUpdateListener {
     override fun setSelected(selected: Boolean) {
         if (isSelected != selected) {
             if (selected) {
-                if (toUnselectionRoundingAnimator?.isRunning ?: false) {
+                if (toUnselectionRoundingAnimator?.isRunning == true) {
                     toUnselectionRoundingAnimator?.end()
                 }
 
                 toSelectionRadiusAnimator?.start()
                 toSelectionRoundingAnimator?.start()
             } else {
-                if (toSelectionRoundingAnimator?.isRunning ?: false) {
+                if (toSelectionRoundingAnimator?.isRunning == true) {
                     toSelectionRoundingAnimator?.end()
                 }
 

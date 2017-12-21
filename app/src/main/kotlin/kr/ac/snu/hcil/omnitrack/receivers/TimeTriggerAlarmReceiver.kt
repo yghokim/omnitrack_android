@@ -1,17 +1,18 @@
 package kr.ac.snu.hcil.omnitrack.receivers
 
-import android.app.IntentService
+import android.app.Service
 import android.content.BroadcastReceiver
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.os.IBinder
 import android.os.PowerManager
 import android.util.SparseArray
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
-import kr.ac.snu.hcil.omnitrack.core.triggers.OTTimeTriggerAlarmManager
-import java.util.*
+import kr.ac.snu.hcil.omnitrack.core.triggers.ITriggerAlarmController
+import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerAlarmManager
+import javax.inject.Inject
 
 /**
  * Created by Young-Ho Kim on 2016-10-11.
@@ -39,7 +40,7 @@ class TimeTriggerAlarmReceiver : BroadcastReceiver() {
                 val wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
                         "wake:" + comp.flattenToShortString())
                 wl.setReferenceCounted(false)
-                wl.acquire() // remove timeout
+                wl.acquire(100000) // remove timeout
                 mActiveWakeLocks.put(id, wl)
                 return comp
             }
@@ -78,20 +79,64 @@ class TimeTriggerAlarmReceiver : BroadcastReceiver() {
         }
     }
 
-    class TimeTriggerWakefulHandlingService : IntentService("TimeTriggerHandlingService") {
+    class TimeTriggerWakefulHandlingService : Service() {
+        override fun onBind(p0: Intent?): IBinder {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
 
-        override fun onHandleIntent(intent: Intent) {
-            val alarmId = intent.getIntExtra(OTTimeTriggerAlarmManager.INTENT_EXTRA_ALARM_ID, -1)
-            val triggerTime = intent.getLongExtra(OTTimeTriggerAlarmManager.INTENT_EXTRA_TRIGGER_TIME, System.currentTimeMillis())
+        @Inject
+        protected lateinit var triggerAlarmController: ITriggerAlarmController
 
+        override fun onCreate() {
+            super.onCreate()
+            (application as OTApp).triggerSystemComponent.inject(this)
+        }
 
-            println("Wakeful Service handleIntent, trigger time: ${LoggingDbHelper.TIMESTAMP_FORMAT.format(Date(triggerTime))}")
+        override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+
+            val alarmId = intent.getIntExtra(OTTriggerAlarmManager.INTENT_EXTRA_ALARM_ID, -1)
+
+            OTApp.logger.writeSystemLog("Wakeful Trigger Alarm Service handleIntent", TAG)
+
+            triggerAlarmController.onAlarmFired(alarmId).doAfterTerminate {
+                completeWakefulIntent(intent)
+                OTApp.logger.writeSystemLog("Released wake lock for AlarmReceiver.", TAG)
+                stopSelf(startId)
+            }.subscribe({
+                println("successfully handled fired alarm: ${alarmId}")
+                OTApp.logger.writeSystemLog("successfully handled fired alarm: ${alarmId}", TAG)
+            }, { err ->
+                println("trigger alarm handling error")
+                err.printStackTrace()
+            })
+
+            return START_NOT_STICKY
+        }
+
+        fun onHandleIntent(intent: Intent) {
+            val alarmId = intent.getIntExtra(OTTriggerAlarmManager.INTENT_EXTRA_ALARM_ID, -1)
+
+            OTApp.logger.writeSystemLog("Wakeful Trigger Alarm Service handleIntent", TAG)
+
+            triggerAlarmController.onAlarmFired(alarmId).doAfterTerminate {
+            }.subscribe({
+                println("successfully handled fired alarm: ${alarmId}")
+                OTApp.logger.writeSystemLog("successfully handled fired alarm: ${alarmId}", TAG)
+                completeWakefulIntent(intent)
+                println("relaesed wake lock for AlarmReceiver.")
+            }, { err ->
+                println("trigger alarm handling error")
+                err.printStackTrace()
+                completeWakefulIntent(intent)
+                println("relaesed wake lock for AlarmReceiver.")
+            })
+
 
             /*TODO trigger alarm service handling
             OTApp.instance.currentUserObservable.first().flatMap {
                 user ->
                 println("Returned user")
-                val triggerSchedules = OTApp.instance.timeTriggerAlarmManager.handleAlarmAndGetTriggerInfo(user, alarmId, triggerTime, System.currentTimeMillis())
+                val triggerSchedules = OTApp.instance.triggerAlarmManager.handleFiredAlarmAndGetTriggerInfo(user, alarmId, triggerTime, System.currentTimeMillis())
                 println("Handled system alarm and retrieved corresponding trigger schedules - ${triggerSchedules?.size}")
 
                 OTApp.logger.writeSystemLog("Handled system alarm and retrieved corresponding trigger schedules: ${triggerSchedules?.size}", TAG)
@@ -119,7 +164,7 @@ class TimeTriggerAlarmReceiver : BroadcastReceiver() {
 
                         println("every trigger was done. finish the wakeup")
 
-                        OTNotificationTriggerAction.notifyPopupQueue(this)
+                        OTReminderAction.notifyPopupQueue(this)
                     }
                 } else {
                     Observable.just(null)

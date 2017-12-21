@@ -14,17 +14,18 @@ import android.widget.EditText
 import android.widget.RadioGroup
 import android.widget.TextView
 import butterknife.bindView
+import dagger.internal.Factory
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.di.Backend
 import kr.ac.snu.hcil.omnitrack.ui.activities.AppWidgetConfigurationActivity
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.WritablePair
 import kr.ac.snu.hcil.omnitrack.widgets.OTShortcutPanelWidgetUpdateService
 import javax.inject.Inject
-import javax.inject.Provider
 
 /**
  * Created by Young-Ho Kim on 2017-04-05.
@@ -42,14 +43,18 @@ class ShortcutPanelWidgetConfigActivity : AppWidgetConfigurationActivity(R.layou
     private var trackerSelectionAdapter: TrackerSelectionAdapter = TrackerSelectionAdapter()
 
     @Inject
-    lateinit var dbManager: RealmDatabaseManager
+    lateinit var dbManager: BackendDbManager
 
-    @Inject
     lateinit var realm: Realm
+
+
+    @field:[Inject Backend]
+    lateinit var realmProvider: Factory<Realm>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         (application as OTApp).applicationComponent.inject(this)
+        realm = realmProvider.get()
     }
 
     override fun onCreateWithWidget(appWidgetId: Int) {
@@ -135,7 +140,7 @@ class ShortcutPanelWidgetConfigActivity : AppWidgetConfigurationActivity(R.layou
         }, editor)
 
         trackerList?.let {
-            OTShortcutPanelWidgetUpdateService.setSelectedTrackerIds(appWidgetId, it.filter { it.second == true }.map { it.first.objectId!! }.toSet(), editor)
+            OTShortcutPanelWidgetUpdateService.setSelectedTrackerIds(appWidgetId, it.filter { it.second }.map { it.first.objectId!! }.toSet(), editor)
         }
         editor.apply()
 

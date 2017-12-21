@@ -1,6 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels
 
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTriggerDAO
 import java.io.Serializable
 
 /**

@@ -11,13 +11,12 @@ import android.text.style.TypefaceSpan
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.Chronometer
 import android.widget.LinearLayout
 import android.widget.TextView
 import butterknife.bindView
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.utils.Ticker
 import kr.ac.snu.hcil.omnitrack.utils.time.TimeHelper
-import java.util.*
 import java.util.regex.Pattern
 import kotlin.properties.Delegates
 
@@ -25,24 +24,45 @@ import kotlin.properties.Delegates
  * Created by Young-Ho on 8/25/2016.
  */
 class TimeTriggerDisplayView : LinearLayout {
-
+/*
     companion object {
-        private val ticker: Ticker by lazy {
-            val instance = Ticker()
-            instance.tick += {
-                sender, time ->
-                for (view in shownInstances) {
-                    view.refreshNextTriggerTimeTextWithNow(time)
+        private val tickerSubscription = SerialDisposable()
+
+        private val shownInstances = HashSet<TimeTriggerDisplayView>()
+
+        private fun registerViewInstance(view: TimeTriggerDisplayView)
+        {
+            if(!shownInstances.contains(view))
+            {
+                shownInstances.add(view)
+                if(tickerSubscription.get() == null || tickerSubscription.isDisposed == true)
+                {
+                    tickerSubscription.set(
+                            Observable.interval(1, TimeUnit.SECONDS)
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .subscribe {
+                                        sequence->
+                                        for (instance in shownInstances) {
+                                            instance.refreshNextTriggerTimeTextWithNow(System.currentTimeMillis())
+                                        }
+                                    }
+                    )
                 }
             }
-            instance
         }
 
-        private var shownInstances = HashSet<TimeTriggerDisplayView>()
-    }
+        private fun unregisterViewInstance(view: TimeTriggerDisplayView)
+        {
+            if(shownInstances.remove(view) && shownInstances.isEmpty())
+            {
+                tickerSubscription.dispose()
+                tickerSubscription.set(null)
+            }
+        }
+    }*/
 
     private val mainView: TextView by bindView(R.id.ui_value)
-    private val nextTriggerView: TextView by bindView(R.id.ui_next_trigger)
+    private val nextTriggerView: Chronometer by bindView(R.id.ui_next_trigger)
 
     init {
         orientation = VERTICAL
@@ -51,17 +71,22 @@ class TimeTriggerDisplayView : LinearLayout {
         inflater.inflate(R.layout.trigger_display_time, this, true)
 
         nextTriggerView.visibility = GONE
+        nextTriggerView.setOnChronometerTickListener { chronometer ->
+            refreshNextTriggerTimeTextWithNow(System.currentTimeMillis())
+        }
     }
 
-    var nextTriggerTime: Long by Delegates.observable(0L) {
+    var nextTriggerTime: Long? by Delegates.observable(null as Long?) {
         prop, old, new ->
 
         if (old != new) {
-            if (new != 0L) {
+            if (new != null) {
                 nextTriggerView.text = DateUtils.getRelativeTimeSpanString(new, System.currentTimeMillis(), 0, DateUtils.FORMAT_ABBREV_ALL)
                 nextTriggerView.visibility = View.VISIBLE
+                nextTriggerView.start()
             } else {
                 nextTriggerView.visibility = View.GONE
+                nextTriggerView.stop()
             }
         }
     }
@@ -71,8 +96,8 @@ class TimeTriggerDisplayView : LinearLayout {
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
     fun refreshNextTriggerTimeTextWithNow(now: Long) {
-        if (nextTriggerTime != 0L)
-            nextTriggerView.text = DateUtils.getRelativeTimeSpanString(nextTriggerTime, now, 0, DateUtils.FORMAT_ABBREV_ALL)
+        if (nextTriggerTime != null)
+            nextTriggerView.text = DateUtils.getRelativeTimeSpanString(nextTriggerTime!!, now, 0, DateUtils.FORMAT_ABBREV_ALL)
     }
 
     fun setAlarmInformation(hour: Int, minute: Int, amPm: Int) {
@@ -110,24 +135,15 @@ class TimeTriggerDisplayView : LinearLayout {
 
         mainView.text = text
     }
-
+/*
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        shownInstances.add(this)
-        println("${shownInstances.size} instances")
-        if (shownInstances.size > 0) {
-            ticker.start()
-        }
+        registerViewInstance(this)
     }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        shownInstances.remove(this)
-        println("${shownInstances.size} instances")
-        if (shownInstances.size == 0) {
-            println("stop ticker")
-            ticker.stop()
-        }
-    }
+        unregisterViewInstance(this)
+    }*/
 
 }

@@ -52,7 +52,7 @@ class ShortTextPropertyView(context: Context, attrs: AttributeSet?) : APropertyV
 
     override fun onValidated(result: Boolean) {
         super.onValidated(result)
-        if (result == false) {
+        if (!result) {
             valueView.error = validationErrorMessageList.joinToString("\n")
         } else {
             valueView.error = null

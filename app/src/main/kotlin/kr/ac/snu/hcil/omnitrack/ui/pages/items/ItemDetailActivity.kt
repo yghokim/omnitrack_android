@@ -17,22 +17,30 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import butterknife.bindView
+import com.afollestad.materialdialogs.MaterialDialog
 import com.airbnb.lottie.LottieAnimationView
+import com.github.salomonbrys.kotson.set
+import com.google.gson.JsonObject
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import kotlinx.android.synthetic.main.activity_new_item.*
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
+import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
+import kr.ac.snu.hcil.omnitrack.services.OTReminderService
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.LoadingIndicatorBar
-import kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
+import kr.ac.snu.hcil.omnitrack.ui.components.common.container.LockableFrameLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.decorations.HorizontalImageDividerItemDecoration
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.ui.pages.ConnectionIndicatorStubProxy
+import kr.ac.snu.hcil.omnitrack.utils.AnyValueWithTimestamp
+import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
-import kr.ac.snu.hcil.omnitrack.utils.ValueWithTimestamp
 import org.jetbrains.anko.notificationManager
 import java.util.*
 import kotlin.properties.Delegates
@@ -95,11 +103,17 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
 
     private var itemSaved: Boolean = false
 
-    override fun onSessionLogContent(contentObject: Bundle) {
+    private val invalidOutsideDialogBuilder: MaterialDialog.Builder by lazy {
+        DialogHelper.makeSimpleAlertBuilder(this, "") {
+            finish()
+        }
+    }
+
+    override fun onSessionLogContent(contentObject: JsonObject) {
         super.onSessionLogContent(contentObject)
-        contentObject.putString("mode", mode.name)
+        contentObject["mode"] = mode.name
         if (isFinishing) {
-            contentObject.putBoolean("item_saved", itemSaved)
+            contentObject["item_saved"] = itemSaved
         }
     }
 
@@ -129,7 +143,7 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
 
         loadingIndicatorBar.setMessage(R.string.msg_indicator_message_item_autocomplete)
 
-        builderRestoredSnackbar = Snackbar.make(findViewById(R.id.ui_snackbar_container), resources.getText(R.string.msg_builder_restored), Snackbar.LENGTH_INDEFINITE)
+        builderRestoredSnackbar = Snackbar.make(ui_root, resources.getText(R.string.msg_builder_restored), Snackbar.LENGTH_INDEFINITE)
         builderRestoredSnackbar.setAction(resources.getText(R.string.msg_clear_form)) { view ->
 
             creationSubscriptions.add(
@@ -161,7 +175,7 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
         )
 
         creationSubscriptions.add(
-                viewModel.onInitialized.observeOn(AndroidSchedulers.mainThread()).subscribe { (itemMode, builderCreationMode) ->
+                viewModel.lastInitializedState.observeOn(AndroidSchedulers.mainThread()).subscribe { (itemMode, builderCreationMode) ->
 
                     println("ItemEditingViewModel initialized: itemMode - ${itemMode}, builderMode - ${builderCreationMode}")
                     this.mode = itemMode
@@ -199,6 +213,19 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
                 }
         )
 
+        creationSubscriptions.add(
+                viewModel.hasTrackerRemovedOutside.subscribe {
+                    invalidOutsideDialogBuilder.content(R.string.msg_format_removed_outside_return_home, OTApp.getString(R.string.msg_text_tracker))
+                    invalidOutsideDialogBuilder.show()
+                }
+        )
+
+        creationSubscriptions.add(
+                viewModel.hasItemRemovedOutside.subscribe {
+                    invalidOutsideDialogBuilder.content(R.string.msg_format_removed_outside_return_home, OTApp.getString(R.string.msg_text_item))
+                    invalidOutsideDialogBuilder.show()
+                }
+        )
 
         val trackerId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
         viewModel.init(trackerId, intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM))
@@ -210,10 +237,6 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
         super.onPause()
 
         for (inputView in attributeListAdapter.inputViews) {
-            inputView.onPause()
-        }
-
-        for (inputView in attributeListAdapter.inputViews) {
             inputView.clearFocus()
         }
 
@@ -223,10 +246,6 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
     override fun onDestroy() {
         super.onDestroy()
         println("onDestroy ItemDetailActivity")
-
-        for (inputView in attributeListAdapter.inputViews) {
-            inputView.onDestroy()
-        }
 
         /*
         ItemBuilder Caching Policy:
@@ -243,13 +262,6 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
         super.onLowMemory()
         for (inputView in attributeListAdapter.inputViews) {
             inputView.onLowMemory()
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        for (inputView in attributeListAdapter.inputViews) {
-            inputView.onResume()
         }
     }
 
@@ -308,9 +320,24 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
                         viewModel.applyEditingToDatabase()
                     }
                 }.subscribe({ result ->
-                        viewModel.clearHistory()
+                    viewModel.clearHistory()
+                    if (viewModel.mode == ItemEditionViewModelBase.ItemMode.New) {
+                        startService(OTReminderService.makeUserLoggedIntent(this, viewModel.trackerDao?.objectId!!, System.currentTimeMillis()))
+                    }
+
+                    when (viewModel.mode) {
+                        ItemEditionViewModelBase.ItemMode.New -> {
+                            itemSaved = true
+                            eventLogger.get().logItemAddedEvent(result, ItemLoggingSource.Manual)
+                        }
+                        ItemEditionViewModelBase.ItemMode.Edit ->
+                            eventLogger.get().logItemEditEvent(result) { content ->
+                                content[IEventLogger.CONTENT_IS_INDIVIDUAL] = false
+                            }
+                    }
+
                     setResult(RESULT_OK, Intent().putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_ITEM, result))
-                        finish()
+                    finish()
                 }, { ex ->
                     if (ex is RequiredFieldsNotCompleteException) {
                         val incompleteFields = currentAttributeViewModelList.mapIndexed { index, attributeInputViewModel -> Pair(index, attributeInputViewModel) }.filter { ex.inCompleteFieldLocalIds.contains(it.second.attributeLocalId) }
@@ -401,7 +428,7 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
 
             private var currentValidationState: Boolean by Delegates.observable(true) { property, old, new ->
                 if (old != new) {
-                    if (new == true) {
+                    if (new) {
 
                         //validation
                         if (validationIndicator.progress != 1f || validationIndicator.progress != 0f) {
@@ -482,7 +509,7 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
                 internalSubscriptions.add(
                         inputView.valueChanged.observable.subscribe { (sender, args) ->
                             val now = System.currentTimeMillis()
-                            attributeViewModel.value = ValueWithTimestamp(args, now)
+                            attributeViewModel.value = AnyValueWithTimestamp(args, now)
                             builderRestoredSnackbar.dismiss()
                         }
                 )

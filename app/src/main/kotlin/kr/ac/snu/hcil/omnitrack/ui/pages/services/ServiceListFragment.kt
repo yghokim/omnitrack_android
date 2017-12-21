@@ -1,6 +1,6 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.services
 
-import android.content.res.ColorStateList
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.AppCompatButton
@@ -33,6 +33,12 @@ class ServiceListFragment : OTFragment() {
     private lateinit var listView: RecyclerView
 
     private lateinit var adapter: Adapter
+
+    private val activateColor: Int by lazy { ContextCompat.getColor(act, R.color.colorPointed) }
+
+    private val deactivateColor: Int by lazy { ContextCompat.getColor(act, R.color.colorRed_Light) }
+
+    private val onActivatingColor: Int by lazy { ContextCompat.getColor(act, R.color.material_grey_100) }
 
     private val internetRequiredAlertBuilder: MaterialDialog.Builder by lazy {
         DialogHelper.makeSimpleAlertBuilder(act, act.getString(R.string.msg_external_service_activation_requires_internet))
@@ -114,19 +120,6 @@ class ServiceListFragment : OTFragment() {
 
             val serviceStateSubscription = SerialDisposable()
 
-            private val activateColor: ColorStateList by lazy {
-                ColorStateList.valueOf(ContextCompat.getColor(act, R.color.colorPointed))
-            }
-
-            private val deactivateColor: ColorStateList by lazy {
-                ColorStateList.valueOf(ContextCompat.getColor(act, R.color.colorRed_Light))
-            }
-
-            private val onActivatingColor: ColorStateList by lazy {
-                ColorStateList.valueOf(ContextCompat.getColor(act, R.color.material_grey_100))
-            }
-
-
             var holderState: OTExternalService.ServiceState = OTExternalService.ServiceState.DEACTIVATED
                 set(value) {
                     if (field != value) {
@@ -148,7 +141,7 @@ class ServiceListFragment : OTFragment() {
                 measureFactoryListView.addItemDecoration(HorizontalDividerItemDecoration(ContextCompat.getColor(act, R.color.separator_Light), dipRound(0.6f)))
 
                 activationButton = view.findViewById(R.id.ui_button_activate)
-                activationButton.supportBackgroundTintList = activateColor
+                activationButton.background.setColorFilter(activateColor, PorterDuff.Mode.MULTIPLY)
                 activationButton.setOnClickListener {
                     val service = getService(adapterPosition)
 
@@ -156,6 +149,7 @@ class ServiceListFragment : OTFragment() {
                     when (service.state) {
                         OTExternalService.ServiceState.ACTIVATED -> {
                             service.deactivate()
+                            eventLogger.get().logServiceActivationChangeEvent(service.identifier, false)
                         }
                         OTExternalService.ServiceState.ACTIVATING -> {
 
@@ -173,6 +167,8 @@ class ServiceListFragment : OTFragment() {
                                 creationSubscriptions.add(
                                         service.startActivationActivityAsync(act).subscribe({
                                             success ->
+                                            if (success)
+                                                eventLogger.get().logServiceActivationChangeEvent(service.identifier, true)
                                         }, { })
                                 )
                                 //}
@@ -188,19 +184,19 @@ class ServiceListFragment : OTFragment() {
                     OTExternalService.ServiceState.ACTIVATED -> {
                         progressBar.visibility = View.GONE
                         activationButton.setText(R.string.msg_deactivate)
-                        activationButton.supportBackgroundTintList = deactivateColor
+                        activationButton.background.setColorFilter(deactivateColor, PorterDuff.Mode.MULTIPLY)
                         activationButton.isEnabled = true
                     }
                     OTExternalService.ServiceState.ACTIVATING -> {
                         progressBar.visibility = View.VISIBLE
-                        activationButton.supportBackgroundTintList = onActivatingColor
+                        activationButton.background.setColorFilter(onActivatingColor, PorterDuff.Mode.MULTIPLY)
                         activationButton.setText(R.string.msg_service_activating)
                         activationButton.isEnabled = false
                     }
                     OTExternalService.ServiceState.DEACTIVATED -> {
                         progressBar.visibility = View.GONE
                         activationButton.setText(R.string.msg_activate)
-                        activationButton.supportBackgroundTintList = activateColor
+                        activationButton.background.setColorFilter(activateColor, PorterDuff.Mode.MULTIPLY)
                         activationButton.isEnabled = true
                     }
                 }

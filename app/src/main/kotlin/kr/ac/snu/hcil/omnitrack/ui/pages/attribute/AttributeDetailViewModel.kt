@@ -1,12 +1,14 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.attribute
 
 import android.app.Application
+import com.github.salomonbrys.kotson.jsonObject
+import com.google.gson.JsonObject
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.RealmViewModel
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import java.util.*
@@ -160,6 +162,35 @@ class AttributeDetailViewModel(app: Application) : RealmViewModel(app) {
 
     fun isChanged(): Boolean {
         return isNameDirty || isRequiredDirty || isDefaultValuePolicyDirty || isDefaultValuePresetDirty || hasAnyPropertyChanged() || isConnectionDirty
+    }
+
+    fun makeDirtySignature(): JsonObject? {
+        val changes = ArrayList<Pair<String, *>>()
+        if (isNameDirty) {
+            changes.add("name" to name)
+        }
+
+        if (isRequiredDirty) {
+            changes.add("isRequired" to isRequired)
+        }
+
+        if (isDefaultValuePolicyDirty) {
+            changes.add("fallbackValuePolicy" to defaultValuePolicy)
+        }
+
+        if (isDefaultValuePresetDirty) {
+            changes.add("fallbackPreset" to defaultValuePreset)
+        }
+
+        if (hasAnyPropertyChanged()) {
+            changes.add("properties" to true)
+        }
+
+        if (isConnectionDirty) {
+            changes.add("connection" to connection?.getSerializedString())
+        }
+
+        return if (changes.isNotEmpty()) jsonObject(changes) else null
     }
 
     fun applyChanges() {

@@ -114,7 +114,7 @@
 
         </LinearLayout>
 
-        <kr.ac.snu.hcil.omnitrack.ui.components.common.LockableFrameLayout
+        <kr.ac.snu.hcil.omnitrack.ui.components.common.container.LockableFrameLayout
             android:id="@+id/ui_preview_container"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

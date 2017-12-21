@@ -38,6 +38,7 @@
 
     <string name="msg_text_tracker">Tracker</string>
     <string name="msg_text_field">Field</string>
+    <string name="msg_text_item">Item Log</string>
 
     <string name="msg_confirm_log">Log Item</string>
 
@@ -53,6 +54,8 @@
     <string name="msg_trigger_empty">No triggers yet.\nAdd a trigger to log tracker items automatically.</string>
     <string name="msg_reminder_empty">No reminders yet.\nAdd a reminder to notice you not to forget tracking.</string>
     <string name="msg_field_empty">Currently this tracker contains no fields.\nIt will log timestamp only.</string>
+
+    <string name="msg_change_screen_name">Change your screen name</string>
 
     <string name="msg_format_change_name">Change %1$s name</string>
 
@@ -86,6 +89,7 @@
     <string name="msg_sort_descending">Descending</string>
     <string name="msg_sort_ascending">Ascending</string>
 
+    <string name="msg_format_reminder_noti_title">Please log the %1$s entry</string>
 
     <string name="msg_basic_information">Basic Information</string>
     <string name="msg_attributes">Fields</string>
@@ -157,6 +161,8 @@
     <string name="sentence_new_tracker_added">Tracker \'%1$s\' was added</string>
 
     <string name="action_settings">Settings</string>
+
+    <string name="msg_format_removed_outside_return_home">The %1$s was removed outside. This screen will be closed.</string>
 
     <string name="msg_connection_wizard_title_source_selection">Choose a data source</string>
     <string name="msg_connection_wizard_title_time_query">Configure time query</string>
@@ -287,7 +293,7 @@
     <string name="msg_profile_unlink_account_confirm">Any unsynchronized data will be lost.\nDo you want to unlink your account with this device?</string>
     <string name="msg_signup_complete">Sign up process is complete</string>
     <string name="msg_signup_complete_description">You can now start tracking!</string>
-    <string name="msg_purge_cache">Clear all cached media files</string>
+    <string name="msg_purge_cache">Clear cached media files that are alread synchronized</string>
     <string name="msg_remove_all_the_items_permanently">Remove all the items permanently</string>
     <string name="msg_no_cache">No cache</string>
     <string name="msg_tab_to_take_a_photo">Tab to take a photo</string>
@@ -561,6 +567,14 @@
     <string name="msg_reorder">Reorder</string>
     <string name="msg_edit_tracker_order">Edit Tracker Order</string>
     <string name="msg_format_confirm_remove_trigger">Do you really want to remove the %1$s?</string>
+    <string name="msg_use_validation_script">Use Validation Script</string>
+
+    <string name="time_range_picker_30_mins">+ 30 mins</string>
+    <string name="time_range_picker_1_hour">+ 1 hour</string>
+    <string name="time_range_picker_1_day">+ 1 day</string>
+    <string name="time_range_picker_1_week">+ 1 week</string>
+    <string name="msg_time_range_picker_to_now">To Now</string>
+    <string name="tag_map_control_panel">map_control_panel</string>
 
     <string-array name="supported_language_names">
         <item>English</item>

@@ -1,27 +1,29 @@
 package kr.ac.snu.hcil.omnitrack.core.di
 
 import android.content.SharedPreferences
+import com.udojava.evalex.Expression
 import dagger.Component
 import dagger.Lazy
 import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
+import kr.ac.snu.hcil.omnitrack.core.analytics.OTUsageLoggingManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTAudioRecordAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTFileInvolvedAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTImageAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
+import kr.ac.snu.hcil.omnitrack.core.calculation.expression.expressions.RealmLazyFunction
 import kr.ac.snu.hcil.omnitrack.core.net.OTOfficialServerApiController
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.core.visualization.models.*
 import kr.ac.snu.hcil.omnitrack.receivers.RebootReceiver
-import kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService
-import kr.ac.snu.hcil.omnitrack.services.OTSynchronizationService
-import kr.ac.snu.hcil.omnitrack.services.OTTableExportService
+import kr.ac.snu.hcil.omnitrack.services.*
 import kr.ac.snu.hcil.omnitrack.services.messaging.OTFirebaseInstanceIdService
+import kr.ac.snu.hcil.omnitrack.services.messaging.OTFirebaseMessagingService
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
-import kr.ac.snu.hcil.omnitrack.ui.components.common.sound.AudioItemListView
+import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.AttributeEditDialogFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AudioRecordInputView
-import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.ImageInputView
 import kr.ac.snu.hcil.omnitrack.ui.pages.SendReportActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.configs.ShortcutPanelWidgetConfigActivity
@@ -57,7 +59,9 @@ import javax.inject.Singleton
         DaoSerializationModule::class,
         ScheduledJobModule::class,
         SynchronizationModule::class,
-        TriggerSystemModule::class
+        TriggerSystemModule::class,
+        ScriptingModule::class,
+        UsageLoggingModule::class
 ))
 interface ApplicationComponent {
 
@@ -65,10 +69,16 @@ interface ApplicationComponent {
 
     fun shortcutPanelManager(): Lazy<OTShortcutPanelManager>
 
+    fun getSupportedScriptFunctions(): Array<Expression.LazyFunction>
+
+    fun getLoggingManager(): Lazy<IEventLogger>
+
     fun inject(application: OTApp)
     fun inject(realmViewModel: RealmViewModel)
 
     fun inject(triggerViewModel: ATriggerListViewModel)
+
+    fun inject(loggingManager: OTUsageLoggingManager)
 
     fun inject(service: OTShortcutPanelWidgetService)
     fun inject(service: OTShortcutPanelWidgetUpdateService)
@@ -76,6 +86,8 @@ interface ApplicationComponent {
     fun inject(activity: OTActivity)
 
     fun inject(activity: SignInActivity)
+
+    fun inject(fragment: OTFragment)
 
     fun inject(fragment: AttributeEditDialogFragment)
 
@@ -97,11 +109,7 @@ interface ApplicationComponent {
 
     fun inject(attributeManager: OTAttributeManager.Companion)
 
-    fun inject(audioItemListView: AudioItemListView)
-
     fun inject(audioRecordInputView: AudioRecordInputView)
-
-    fun inject(imageInputView: ImageInputView)
 
     fun inject(activity: ShortcutPanelWidgetConfigActivity)
 
@@ -133,6 +141,16 @@ interface ApplicationComponent {
     fun inject(viewModel: TriggerDetailViewModel)
     fun inject(viewModel: TriggerViewModel)
     fun inject(viewModel: NewItemCreationViewModel)
+
     fun inject(page: TrackerSelectionPage)
     fun inject(page: FieldSelectionPage)
+
+    fun inject(viewModel: TimeSeriesPlotModel)
+    fun inject(viewModel: DurationHeatMapModel)
+
+    fun inject(expression: RealmLazyFunction)
+
+    fun inject(service: OTFirebaseMessagingService)
+    fun inject(service: OTUsageLogUploadService)
+    fun inject(service: OTInformationUploadService)
 }

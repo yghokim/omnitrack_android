@@ -15,12 +15,14 @@ import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import butterknife.bindView
+import kotlinx.android.synthetic.main.layout_home_sidebar.*
 import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.tutorial.TutorialManager
 import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
+import kr.ac.snu.hcil.omnitrack.ui.pages.diagnostics.SystemLogActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.services.ServiceListFragment
 import kr.ac.snu.hcil.omnitrack.utils.net.NetworkHelper
 import kr.ac.snu.hcil.omnitrack.widgets.OTShortcutPanelWidgetUpdateService
@@ -72,8 +74,13 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
 
             override fun onTabSelected(tab: TabLayout.Tab) {
                 if (tab.position != TAB_INDEX_TRACKERS) {
-                    rightActionBarButton?.visibility = View.INVISIBLE
+                    if (BuildConfig.DEBUG) {
+                        rightActionBarButton?.setImageResource(R.drawable.settings_dark)
+                    } else {
+                        rightActionBarButton?.visibility = View.INVISIBLE
+                    }
                 } else
+                    rightActionBarButton?.setImageResource(R.drawable.icon_reorder_dark)
                     rightActionBarButton?.visibility = View.VISIBLE
             }
 
@@ -89,7 +96,7 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
         //Setup sliding menu
         drawerLayout.addDrawerListener(this)
 
-        sidebar = SidebarWrapper(findViewById(R.id.ui_sidebar), this)
+        sidebar = SidebarWrapper(ui_sidebar, this)
         sidebar.onCreate()
 
         creationSubscriptions.add(
@@ -133,10 +140,10 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
 
     override fun onToolbarLeftButtonClicked() {
         //       slidingMenu.toggle(true)
-        if (drawerLayout.isDrawerOpen(Gravity.LEFT)) {
-            drawerLayout.closeDrawer(Gravity.LEFT)
+        if (drawerLayout.isDrawerOpen(Gravity.START)) {
+            drawerLayout.closeDrawer(Gravity.START)
         } else {
-            drawerLayout.openDrawer(Gravity.LEFT)
+            drawerLayout.openDrawer(Gravity.START)
         }
     }
 
@@ -145,6 +152,8 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
             val intent = Intent(this, TrackerReorderActivity::class.java)
             startActivity(intent)
             overridePendingTransition(R.anim.anim_slide_up, R.anim.anim_noop)
+        } else if (BuildConfig.DEBUG) {
+            startActivity(Intent(this, SystemLogActivity::class.java))
         }
     }
 
@@ -155,6 +164,7 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
 
 
     override fun onDrawerClosed(drawerView: View) {
+        sidebar.onHideSidebar()
     }
 
     override fun onDrawerStateChanged(newState: Int) {
@@ -164,6 +174,7 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
     }
 
     override fun onDrawerOpened(drawerView: View) {
+        sidebar.onShowSidebar()
     }
 
 
@@ -172,6 +183,14 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
             super.onBackPressed()
         } else {
             mViewPager.setCurrentItem(0, true)
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        if (drawerLayout.isDrawerOpen(ui_sidebar)) {
+            sidebar.onShowSidebar()
         }
     }
 

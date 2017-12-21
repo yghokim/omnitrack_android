@@ -14,10 +14,9 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.FallbackPolicyResolver
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
-import kr.ac.snu.hcil.omnitrack.ui.components.common.MapImageView
+import kr.ac.snu.hcil.omnitrack.ui.components.common.LiteMapView
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
@@ -28,7 +27,7 @@ import java.util.concurrent.TimeUnit
  */
 class OTLocationAttributeHelper : OTAttributeHelper() {
 
-    private val permissions = arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION)
+    private val permissions = arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
 
     override val supportedFallbackPolicies: LinkedHashMap<Int, FallbackPolicyResolver>
         get() = super.supportedFallbackPolicies.apply{
@@ -69,7 +68,7 @@ class OTLocationAttributeHelper : OTAttributeHelper() {
 
     override fun getTypeSmallIconResourceId(attribute: OTAttributeDAO): Int = R.drawable.icon_small_location
 
-    override fun getRequiredPermissions(attribute: OTAttributeDAO): Array<String>? = permissions
+    override fun getRequiredPermissions(attribute: OTAttributeDAO?): Array<String>? = permissions
 
     override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_LATITUDE_LONGITUDE
 
@@ -91,12 +90,12 @@ class OTLocationAttributeHelper : OTAttributeHelper() {
     }
 
     override fun getViewForItemList(attribute: OTAttributeDAO, context: Context, recycledView: View?): View {
-        return recycledView as? MapImageView ?: MapImageView(context)
+        return recycledView as? LiteMapView ?: LiteMapView(context)
     }
 
     override fun applyValueToViewForItemList(attribute: OTAttributeDAO, value: Any?, view: View): Single<Boolean> {
         return Single.defer {
-            if (view is MapImageView && value != null) {
+            if (view is LiteMapView && value != null) {
                 if (value is LatLng) {
                     view.location = value
                     Single.just(true)

@@ -10,7 +10,8 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.NumericSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyManager
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.datatypes.Fraction
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.common.StarRatingSlider
 import kr.ac.snu.hcil.omnitrack.ui.components.common.StarScoreView
@@ -24,7 +25,7 @@ import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelpe
 /**
  * Created by Young-Ho on 10/7/2017.
  */
-class OTRatingAttributeHelper : OTAttributeHelper() {
+class OTRatingAttributeHelper : OTAttributeHelper(), ISingleNumberAttributeHelper {
 
     companion object {
         const val PROPERTY_OPTIONS = "options"
@@ -34,24 +35,8 @@ class OTRatingAttributeHelper : OTAttributeHelper() {
         override fun getFallbackValue(attribute: OTAttributeDAO, realm: Realm): Single<Nullable<out Any>> {
             return Single.defer {
                 val ratingOptions = getRatingOptions(attribute)
-                when (ratingOptions.type) {
-                    RatingOptions.DisplayType.Likert -> {
-                        if (ratingOptions.allowIntermediate) {
-                            return@defer Single.just((ratingOptions.rightMost + ratingOptions.leftMost) / 2.0f)
-                        } else {
-
-                            return@defer Single.just(((ratingOptions.rightMost + ratingOptions.leftMost) / 2).toFloat())
-                        }
-                    }
-                    RatingOptions.DisplayType.Star -> {
-                        if (ratingOptions.allowIntermediate) {
-                            return@defer Single.just(ratingOptions.starLevels.maxScore / 2.0f)
-                        } else {
-                            return@defer Single.just((ratingOptions.starLevels.maxScore / 2).toFloat())
-                        }
-                    }
-                }
-            }.map { value -> Nullable(value) }
+                return@defer Single.just(Nullable(Fraction.fromRatioAndUnder(0.5f, ratingOptions.getMaximumPrecisionIntegerRangeLength())))
+            }
         }
 
     }
@@ -66,7 +51,7 @@ class OTRatingAttributeHelper : OTAttributeHelper() {
         return R.drawable.icon_small_star //TODO Options
     }
 
-    override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_FLOAT
+    override val typeNameForSerialization: String = TypeStringSerializationHelper.TYPENAME_FRACTION
 
     override fun getSupportedSorters(attribute: OTAttributeDAO): Array<AFieldValueSorter> {
         return arrayOf(NumericSorter(attribute.name, attribute.localId))
@@ -103,17 +88,17 @@ class OTRatingAttributeHelper : OTAttributeHelper() {
     override fun refreshInputViewUI(inputView: AAttributeInputView<out Any>, attribute: OTAttributeDAO) {
         val options = getRatingOptions(attribute)
         if (inputView is StarRatingInputView) {
-            inputView.ratingView.allowIntermediate = options.allowIntermediate
-            inputView.ratingView.levels = options.starLevels.maxScore
-            inputView.ratingView.score = options.starLevels.maxScore / 2.0f
+            inputView.ratingView.isFractional = options.isFractional
+            inputView.ratingView.levels = options.stars
+            //inputView.ratingView.score = options.stars.maxScore / 2.0f
         } else if (inputView is LikertScaleInputView) {
-            inputView.scalePicker.allowIntermediate = options.allowIntermediate
+            inputView.scalePicker.isFractional = options.isFractional
             inputView.scalePicker.leftMost = options.leftMost
             inputView.scalePicker.rightMost = options.rightMost
             inputView.scalePicker.leftLabel = options.leftLabel
             inputView.scalePicker.rightLabel = options.rightLabel
             inputView.scalePicker.middleLabel = options.middleLabel
-            inputView.scalePicker.value = ((options.rightMost + options.leftMost) shr 1).toFloat()
+            //inputView.scalePicker.value = ((options.rightMost + options.leftMost) shr 1).toFloat()
         }
     }
 
@@ -126,8 +111,8 @@ class OTRatingAttributeHelper : OTAttributeHelper() {
     override fun formatAttributeValue(attribute: OTAttributeDAO, value: Any): CharSequence {
         val ratingOptions = getRatingOptions(attribute)
         return when (ratingOptions.type) {
-            RatingOptions.DisplayType.Star -> value.toString() + " / ${ratingOptions.starLevels.maxScore}"
-            RatingOptions.DisplayType.Likert -> value.toString()
+            RatingOptions.DisplayType.Star -> "${ratingOptions.convertFractionToRealScore(value as Fraction)} / ${ratingOptions.stars}"
+            RatingOptions.DisplayType.Likert -> ratingOptions.convertFractionToRealScore(value as Fraction).toString()
         }
     }
 
@@ -139,7 +124,7 @@ class OTRatingAttributeHelper : OTAttributeHelper() {
         when (ratingOptions.type) {
             RatingOptions.DisplayType.Star -> {
 
-                if (ratingOptions.starLevels <= RatingOptions.StarLevel.Level5) {
+                if (ratingOptions.stars <= 5) {
                     val target = recycledView as? StarRatingSlider ?: StarRatingSlider(context)
 
                     target.isLightMode = true
@@ -161,15 +146,24 @@ class OTRatingAttributeHelper : OTAttributeHelper() {
     override fun applyValueToViewForItemList(attribute: OTAttributeDAO, value: Any?, view: View): Single<Boolean> {
         return Single.defer {
             val ratingOptions = getRatingOptions(attribute)
-            if (view is StarRatingSlider && value is Float) {
-                view.score = value
-                view.allowIntermediate = ratingOptions.allowIntermediate
-                view.levels = ratingOptions.starLevels.maxScore
+            if (view is StarRatingSlider && value is Fraction) {
+                view.score = ratingOptions.convertFractionToRealScore(value)
+                view.isFractional = ratingOptions.isFractional
+                view.levels = ratingOptions.stars
                 Single.just(true)
-            } else if (view is StarScoreView && value is Float) {
-                view.setScore(value, ratingOptions.starLevels.maxScore.toFloat())
+            } else if (view is StarScoreView && value is Fraction) {
+                view.setScore(ratingOptions.convertFractionToRealScore(value), ratingOptions.stars.toFloat())
                 Single.just(true)
             } else super.applyValueToViewForItemList(attribute, value, view)
+        }
+    }
+
+
+    override fun convertValueToSingleNumber(value: Any, attribute: OTAttributeDAO): Double {
+        if (value is Number) return value.toDouble()
+        else {
+            val ratingOptions = getRatingOptions(attribute)
+            return ratingOptions.convertFractionToRealScore(value as Fraction).toDouble()
         }
     }
 }

@@ -13,10 +13,9 @@
         app:fontPath="fonts/Roboto-Thin.ttf"
         tools:ignore="MissingPrefix" />
 
-    <TextView
+    <Chronometer
         android:id="@+id/ui_next_trigger"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="6dp"
-        android:text="Next Trigger: 30 seconds later" />
+        android:layout_marginBottom="6dp" />
 </merge>

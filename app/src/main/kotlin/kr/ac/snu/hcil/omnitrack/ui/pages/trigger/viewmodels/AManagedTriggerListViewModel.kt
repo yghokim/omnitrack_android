@@ -4,8 +4,8 @@ import android.app.Application
 import io.realm.RealmQuery
 import io.realm.RealmResults
 import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTTriggerDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
@@ -43,7 +43,7 @@ abstract class AManagedTriggerListViewModel(app: Application) : ATriggerListView
     protected fun init() {
         onDispose()
 
-        currentTriggerRealmResults = hookTriggerQuery(realm.where(OTTriggerDAO::class.java).equalTo(RealmDatabaseManager.FIELD_REMOVED_BOOLEAN, false))
+        currentTriggerRealmResults = hookTriggerQuery(realm.where(OTTriggerDAO::class.java).equalTo(BackendDbManager.FIELD_REMOVED_BOOLEAN, false))
                 .findAllAsync()
 
         currentTriggerRealmResults?.addChangeListener { snapshot, changeSet ->
