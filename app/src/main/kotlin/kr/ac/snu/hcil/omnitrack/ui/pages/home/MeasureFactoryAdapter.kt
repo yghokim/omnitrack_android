@@ -1,5 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.home
 
+import android.app.AlertDialog
+import android.content.Context
 import android.support.v7.widget.AppCompatImageButton
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -10,13 +12,15 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
+import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.WizardView
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.TrackerPickerDialogBuilder
+import kr.ac.snu.hcil.omnitrack.ui.pages.services.ServiceWizardView
 import kr.ac.snu.hcil.omnitrack.utils.inflateContent
 
 /**
  * Created by younghokim on 2016. 10. 4..
  */
-class MeasureFactoryAdapter : RecyclerView.Adapter<MeasureFactoryAdapter.MeasureFactoryViewHolder>() {
+class MeasureFactoryAdapter(private val context: Context) : RecyclerView.Adapter<MeasureFactoryAdapter.MeasureFactoryViewHolder>() {
 
     var service: OTExternalService? = null
         set(value) {
@@ -75,6 +79,24 @@ class MeasureFactoryAdapter : RecyclerView.Adapter<MeasureFactoryAdapter.Measure
                     })
                     dialog.show()
                 }*/
+                val wizardView = ServiceWizardView(this@MeasureFactoryAdapter.context, measureFactory)
+
+                val wizardDialog = AlertDialog.Builder(this@MeasureFactoryAdapter.context)
+                        .setView(wizardView)
+                        .create()
+
+                wizardView.setWizardListener(object : WizardView.IWizardListener {
+                    override fun onComplete(wizard: WizardView) {
+                        println("new connection refreshed.")
+                        wizardDialog.dismiss()
+                    }
+
+                    override fun onCanceled(wizard: WizardView) {
+                        wizardDialog.dismiss()
+                    }
+                })
+
+                wizardDialog.show()
 
             }
         }

@@ -221,6 +221,10 @@
     <string name="msg_service_is_not_activated_format">%1$s is not activated.</string>
     <string name="msg_service_is_activated_format">%1$s is activated.</string>
 
+    <string name="msg_service_wizard_title_tracker_selection">Choose a tracker</string>
+    <string name="msg_service_wizard_title_field_selection">Choose a field</string>
+    <string name="msg_service_wizard_title_query_range_selection">Choose a query range</string>
+
 
     <string name="msg_tracking_source_unspecified">Source Unspecified</string>
     <string name="msg_tracking_source_trigger">Logged by Trigger</string>

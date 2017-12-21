@@ -41,6 +41,19 @@
             android:textColor="@color/colorRed.Light" />
 
         <Button
+            android:id="@+id/ui_button_previous"
+            style="@style/Base.Widget.AppCompat.Button.Borderless.Colored"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true"
+            android:visibility="gone"
+            android:layout_weight="1"
+            android:text="@string/msg_cancel"
+            android:textColor="@color/colorRed.Light" />
+
+
+        <Button
             android:id="@+id/ui_button_ok"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"

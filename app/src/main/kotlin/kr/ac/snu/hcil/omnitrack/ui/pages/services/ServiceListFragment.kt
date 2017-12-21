@@ -110,7 +110,7 @@ class ServiceListFragment : OTFragment() {
 
             val measureFactoryListView: RecyclerView
 
-            val measureFactoryAdapter = MeasureFactoryAdapter()
+            val measureFactoryAdapter = MeasureFactoryAdapter(context!!)
 
             val serviceStateSubscription = SerialDisposable()
 

@@ -3,11 +3,13 @@ package kr.ac.snu.hcil.omnitrack.ui.components.common.wizard
 import android.content.Context
 import android.support.v4.view.ViewPager
 import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
 import kr.ac.snu.hcil.omnitrack.R
+import java.util.*
 
 /**
  * Created by Young-Ho Kim on 2016-08-30.
@@ -24,11 +26,12 @@ abstract class WizardView : FrameLayout, AWizardViewPagerAdapter.IWizardPageList
     private val viewPager: ViewPager
 
     private val cancelButton: View
+    private val prevButton: View
     private val okButton: View
 
+    private val pagePositionHistory: Stack<Int> = Stack()
 
     private lateinit var adapter: AWizardViewPagerAdapter
-
 
     private var listener: IWizardListener? = null
 
@@ -50,9 +53,11 @@ abstract class WizardView : FrameLayout, AWizardViewPagerAdapter.IWizardPageList
         viewPager.addOnPageChangeListener(this)
 
         cancelButton = findViewById(R.id.ui_button_cancel)
+        prevButton = findViewById(R.id.ui_button_previous)
         okButton = findViewById(R.id.ui_button_ok)
 
         cancelButton.setOnClickListener(this)
+        prevButton.setOnClickListener(this)
         okButton.setOnClickListener(this)
 
     }
@@ -60,14 +65,22 @@ abstract class WizardView : FrameLayout, AWizardViewPagerAdapter.IWizardPageList
     fun setAdapter(value: AWizardViewPagerAdapter) {
         this.adapter = value
         viewPager.adapter = value
-
         value.setListener(this)
         onPageSelected(0)
     }
 
     override fun onClick(view: View) {
         if (view === cancelButton) {
+            pagePositionHistory.clear()
             listener?.onCanceled(this)
+        } else if (view === prevButton) {
+            val currPagePosition = pagePositionHistory.pop()
+            val prevPagePosition = pagePositionHistory.pop()
+            val currPage = adapter.getPageAt(currPagePosition)
+            currPage.onLeave()
+            onLeavePage(currPage, currPagePosition)
+            adapter.getPageAt(prevPagePosition)
+            viewPager.setCurrentItem(prevPagePosition, true)
         } else if (view === okButton) {
             complete()
         }
@@ -91,8 +104,6 @@ abstract class WizardView : FrameLayout, AWizardViewPagerAdapter.IWizardPageList
         if (nextPosition != -1) {
 
             adapter.getPageAt(nextPosition).onEnter()
-            onEnterPage(adapter.getPageAt(nextPosition), nextPosition)
-
             viewPager.setCurrentItem(nextPosition, true)
         } else {
             listener?.onComplete(this)
@@ -103,15 +114,26 @@ abstract class WizardView : FrameLayout, AWizardViewPagerAdapter.IWizardPageList
         val currentPage = adapter.getPageAt(viewPager.currentItem)
         currentPage.onLeave()
         onLeavePage(currentPage, viewPager.currentItem)
+        pagePositionHistory.clear()
 
         listener?.onComplete(this)
     }
 
+
     open fun onEnterPage(page: AWizardPage, position: Int) {
+        pagePositionHistory.push(position)
         if (page.isCompleteButtonAvailable) {
             okButton.visibility = View.VISIBLE
         } else {
             okButton.visibility = View.INVISIBLE
+        }
+
+        if (page.canGoBack) {
+            cancelButton.visibility = GONE
+            prevButton.visibility = VISIBLE
+        } else {
+            cancelButton.visibility = VISIBLE
+            prevButton.visibility = GONE
         }
     }
 

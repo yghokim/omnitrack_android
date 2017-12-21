@@ -29,6 +29,8 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.home.*
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemEditionViewModelBase
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemListViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.NewItemCreationViewModel
+import kr.ac.snu.hcil.omnitrack.ui.pages.services.FieldSelectionPage
+import kr.ac.snu.hcil.omnitrack.ui.pages.services.TrackerSelectionPage
 import kr.ac.snu.hcil.omnitrack.ui.pages.settings.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.tracker.FieldPresetSelectionBottomSheetFragment
 import kr.ac.snu.hcil.omnitrack.ui.pages.tracker.TrackerDetailViewModel
@@ -131,4 +133,6 @@ interface ApplicationComponent {
     fun inject(viewModel: TriggerDetailViewModel)
     fun inject(viewModel: TriggerViewModel)
     fun inject(viewModel: NewItemCreationViewModel)
+    fun inject(page: TrackerSelectionPage)
+    fun inject(page: FieldSelectionPage)
 }
