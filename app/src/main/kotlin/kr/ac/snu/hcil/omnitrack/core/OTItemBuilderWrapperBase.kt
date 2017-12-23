@@ -6,9 +6,10 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTItemDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels.OTItemBuilderDAO
+import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTItemDAO
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.OTItemBuilderDAO
 import kr.ac.snu.hcil.omnitrack.utils.AnyValueWithTimestamp
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
@@ -17,7 +18,7 @@ import javax.inject.Provider
 /**
  * Created by Young-Ho Kim on 16. 7. 25
  */
-class OTItemBuilderWrapperBase(val dao: OTItemBuilderDAO, val realm: Realm) {
+class OTItemBuilderWrapperBase(val dao: OTItemBuilderDAO, val configuredContext: ConfiguredContext, val realm: Realm) {
 
     enum class EAttributeValueState {
         Processing, GettingExternalValue, Idle
@@ -74,19 +75,19 @@ class OTItemBuilderWrapperBase(val dao: OTItemBuilderDAO, val realm: Realm) {
                         connection.getRequestedValue(this).flatMap { data ->
                             if (data.datum == null) {
                                 println("ValueConnection result was null. send fallback value")
-                                return@flatMap attr.getFallbackValue(realm).toFlowable()
+                                return@flatMap attr.getFallbackValue(configuredContext, realm).toFlowable()
                             } else {
                                 println("Received valueConnection result - ${data.datum}")
                                 return@flatMap Flowable.just(data)
                             }
-                        }.onErrorResumeNext { err: Throwable -> err.printStackTrace(); attr.getFallbackValue(realm).toFlowable() }.map { nullable: Nullable<out Any> -> Pair(attrLocalId, AnyValueWithTimestamp(nullable)) }.subscribeOn(Schedulers.io()).doOnSubscribe {
+                        }.onErrorResumeNext { err: Throwable -> err.printStackTrace(); attr.getFallbackValue(configuredContext, realm).toFlowable() }.map { nullable: Nullable<out Any> -> Pair(attrLocalId, AnyValueWithTimestamp(nullable)) }.subscribeOn(Schedulers.io()).doOnSubscribe {
 
                             onAttributeStateChangedListener?.onAttributeStateChanged(attrLocalId, EAttributeValueState.GettingExternalValue)
                         }.toObservable()
                     } else {
 
                         println("No connection. use fallback value: ${attrLocalId}")
-                        return@mapIndexed attr.getFallbackValue(realm).map { nullable ->
+                        return@mapIndexed attr.getFallbackValue(configuredContext, realm).map { nullable ->
                             println("No connection. received fallback value: ${attrLocalId}, ${nullable.datum}")
                             Pair(attrLocalId, AnyValueWithTimestamp(nullable))
                         }.doOnSubscribe {

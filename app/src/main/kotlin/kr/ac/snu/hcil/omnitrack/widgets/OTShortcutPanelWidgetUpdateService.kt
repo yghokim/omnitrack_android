@@ -16,12 +16,12 @@ import android.widget.RemoteViews
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
+import kr.ac.snu.hcil.omnitrack.core.configuration.OTConfigurationController
 import kr.ac.snu.hcil.omnitrack.ui.pages.SignInActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.configs.ShortcutPanelWidgetConfigActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 import kr.ac.snu.hcil.omnitrack.utils.VectorIconHelper
 import javax.inject.Inject
-import javax.inject.Provider
 
 /**
  * Created by Young-Ho Kim on 2017-04-04.
@@ -49,43 +49,50 @@ class OTShortcutPanelWidgetUpdateService : Service() {
 
         const val MINIMUM_HEIGHT_SHOW_HEADER = 110
 
+        const val DELIMITER = ';'
+
         fun getPreferences(context: Context): SharedPreferences {
             return context.applicationContext.getSharedPreferences("shortcutPanelWidget", Context.MODE_PRIVATE)
         }
 
-        fun removeVariables(widgetId: Int, editor: SharedPreferences.Editor) {
+        fun makePrefKey(keyPrefix: String, widgetId: Int, configId: String): String {
+            return "${keyPrefix}$DELIMITER${widgetId}$DELIMITER${configId}"
+        }
+
+        fun removeVariables(widgetId: Int, configId: String, editor: SharedPreferences.Editor) {
             editor
-                    .remove("${EXTRA_MODE}_${widgetId}")
-                    .remove("${EXTRA_TITLE}_${widgetId}")
+                    .remove(makePrefKey(EXTRA_MODE, widgetId, configId))
+                    .remove(makePrefKey(EXTRA_TITLE, widgetId, configId))
+                    .remove(makePrefKey(EXTRA_SELECTED_TRACKER_IDS, widgetId, configId))
         }
 
-        fun getMode(widgetId: Int, pref: SharedPreferences): String {
-            return pref.getString("${EXTRA_MODE}_${widgetId}", MODE_ALL)
+        fun getMode(widgetId: Int, configId: String, pref: SharedPreferences): String {
+            return pref.getString(makePrefKey(EXTRA_MODE, widgetId, configId), MODE_ALL)
         }
 
-        fun setMode(widgetId: Int, mode: String, editor: SharedPreferences.Editor) {
-            editor.putString("${EXTRA_MODE}_${widgetId}", mode)
+        fun setMode(widgetId: Int, configId: String, mode: String, editor: SharedPreferences.Editor) {
+            editor.putString(makePrefKey(EXTRA_MODE, widgetId, configId), mode)
         }
 
-        fun getTitle(widgetId: Int, pref: SharedPreferences): String {
-            return pref.getString("${EXTRA_TITLE}_${widgetId}", "OmniTrack")
+        fun getTitle(widgetId: Int, configId: String, pref: SharedPreferences): String {
+            return pref.getString(makePrefKey(EXTRA_TITLE, widgetId, configId), "OmniTrack")
         }
 
-        fun setTitle(widgetId: Int, title: String, editor: SharedPreferences.Editor) {
-            editor.putString("${EXTRA_TITLE}_${widgetId}", title)
+        fun setTitle(widgetId: Int, configId: String, title: String, editor: SharedPreferences.Editor) {
+            editor.putString(makePrefKey(EXTRA_TITLE, widgetId, configId), title)
         }
 
-        fun getSelectedTrackerIds(widgetId: Int, pref: SharedPreferences): Set<String>? {
-            return pref.getStringSet("${EXTRA_SELECTED_TRACKER_IDS}_${widgetId}", HashSet<String>())
+        fun getSelectedTrackerIds(widgetId: Int, configId: String, pref: SharedPreferences): Set<String>? {
+            return pref.getStringSet(makePrefKey(EXTRA_SELECTED_TRACKER_IDS, widgetId, configId), HashSet<String>())
         }
 
-        fun setSelectedTrackerIds(widgetId: Int, value: Set<String>, editor: SharedPreferences.Editor) {
-            editor.putStringSet("${EXTRA_SELECTED_TRACKER_IDS}_${widgetId}", value)
+        fun setSelectedTrackerIds(widgetId: Int, configId: String, value: Set<String>, editor: SharedPreferences.Editor) {
+            editor.putStringSet(makePrefKey(EXTRA_SELECTED_TRACKER_IDS, widgetId, configId), value)
         }
 
-        fun makeRemoteViewsForNormalMode(context: Context, widgetId: Int, options: Bundle?): RemoteViews {
+        fun makeRemoteViewsForNormalMode(context: Context, widgetId: Int, configId: String, options: Bundle?): RemoteViews {
             val pref = getPreferences(context)
-            val title = getTitle(widgetId, pref)
+            val title = getTitle(widgetId, configId, pref)
 
             val rv = RemoteViews(context.packageName, R.layout.remoteview_widget_shortcut_body)
             rv.setViewVisibility(R.id.ui_progress_bar, View.INVISIBLE)
@@ -98,12 +105,14 @@ class OTShortcutPanelWidgetUpdateService : Service() {
 
             val intent = Intent(context, OTShortcutPanelWidgetService::class.java)
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
+            intent.putExtra(OTApp.INTENT_EXTRA_CONFIGURATION_ID, configId)
             intent.data = Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME))
 
             rv.setRemoteAdapter(R.id.ui_list, intent)
 
             rv.setPendingIntentTemplate(R.id.ui_list, PendingIntent.getBroadcast(context, widgetId,
-                    Intent(OTShortcutPanelWidgetProvider.ACTION_TRACKER_CLICK_EVENT), PendingIntent.FLAG_UPDATE_CURRENT))
+                    Intent(OTShortcutPanelWidgetProvider.ACTION_TRACKER_CLICK_EVENT)
+                            .putExtra(OTApp.INTENT_EXTRA_CONFIGURATION_ID, configId), PendingIntent.FLAG_UPDATE_CURRENT))
 
             /*
             rv.setOnClickPendingIntent(R.id.ui_button_sync,
@@ -163,81 +172,82 @@ class OTShortcutPanelWidgetUpdateService : Service() {
             return rv
         }
 
-        fun makeNotifyDatesetChangedIntentToAllWidgets(context: Context): Intent {
+        fun makeNotifyDatesetChangedIntentToAllWidgets(context: Context, configId: String): Intent {
             val widgetIds = OTShortcutPanelWidgetProvider.getAppWidgetIds(context, null)
             val intent = Intent(context, OTShortcutPanelWidgetUpdateService::class.java)
             intent.action = ACTION_NOTIFY_DATA_CHANGED
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, widgetIds)
+            intent.putExtra(OTApp.INTENT_EXTRA_CONFIGURATION_ID, configId)
             return intent
         }
     }
 
-    @Inject
-    protected lateinit var currentSignedInLevel: Provider<OTAuthManager.SignedInLevel>
-
     override fun onBind(p0: Intent?): IBinder? {
         return null
     }
+
+    @Inject
+    lateinit var configController: OTConfigurationController
 
     override fun onCreate() {
         super.onCreate()
         (application as OTApp).applicationComponent.inject(this)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-    }
-
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
 
         println("Widget update service action: ${intent.action}")
+        val configId = intent.getStringExtra(OTApp.INTENT_EXTRA_CONFIGURATION_ID)
+        if (configId != null) {
+            val currentSignedInLevel = configController.getConfiguredContextOf(configId)?.configuredAppComponent?.getAuthManager()?.currentSignedInLevel
+                    ?: OTAuthManager.SignedInLevel.NONE
+            val appWidgetIds = intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS) ?: intArrayOf()
+            if (appWidgetIds.isNotEmpty()) {
+                println("widget ids: ${appWidgetIds.joinToString(", ")}")
+                val appWidgetManager = AppWidgetManager.getInstance(this)
+                when (intent.action) {
+                    ACTION_INITIALIZE -> {
+                        if (currentSignedInLevel > OTAuthManager.SignedInLevel.NONE) {
 
-        val appWidgetIds = intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS) ?: intArrayOf()
-        if (appWidgetIds.isNotEmpty()) {
-            println("widget ids: ${appWidgetIds.joinToString(", ")}")
-            val appWidgetManager = AppWidgetManager.getInstance(this)
-            when (intent.action) {
-                ACTION_INITIALIZE -> {
-                    if (currentSignedInLevel.get() > OTAuthManager.SignedInLevel.NONE) {
-
-                        for (id in appWidgetIds) {
-                            val options = appWidgetManager.getAppWidgetOptions(id)
-                            val rv = makeRemoteViewsForNormalMode(this, id, options)
-                            appWidgetManager.updateAppWidget(id, rv)
-                            appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.ui_list)
+                            for (id in appWidgetIds) {
+                                val options = appWidgetManager.getAppWidgetOptions(id)
+                                val rv = makeRemoteViewsForNormalMode(this, id, configId, options)
+                                appWidgetManager.updateAppWidget(id, rv)
+                                appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.ui_list)
+                            }
+                        } else {
+                            for (id in appWidgetIds) {
+                                val rv = makeRemoteViewsForSignIn(this)
+                                appWidgetManager.updateAppWidget(id, rv)
+                            }
                         }
-                    } else {
+                    }
+
+                    ACTION_TO_SIGN_IN_MODE -> {
+                        val rv = makeRemoteViewsForSignIn(this)
+                        appWidgetManager.updateAppWidget(appWidgetIds, rv)
+                    }
+
+                    ACTION_TO_MAIN_MODE -> {
                         for (id in appWidgetIds) {
-                            val rv = makeRemoteViewsForSignIn(this)
+                            val rv = makeRemoteViewsForNormalMode(this, id, configId, appWidgetManager.getAppWidgetOptions(id))
                             appWidgetManager.updateAppWidget(id, rv)
                         }
                     }
-                }
 
-                ACTION_TO_SIGN_IN_MODE -> {
-                    val rv = makeRemoteViewsForSignIn(this)
-                    appWidgetManager.updateAppWidget(appWidgetIds, rv)
-                }
-
-                ACTION_TO_MAIN_MODE -> {
-                    for (id in appWidgetIds) {
-                        val rv = makeRemoteViewsForNormalMode(this, id, appWidgetManager.getAppWidgetOptions(id))
-                        appWidgetManager.updateAppWidget(id, rv)
+                    ACTION_NOTIFY_DATA_CHANGED -> {
+                        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.ui_list)
                     }
-                }
 
-                ACTION_NOTIFY_DATA_CHANGED -> {
-                    appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.ui_list)
-                }
+                    ACTION_RESIZED -> {
+                        if (currentSignedInLevel > OTAuthManager.SignedInLevel.NONE) {
+                            for (id in appWidgetIds) {
+                                val options = appWidgetManager.getAppWidgetOptions(id)
+                                val rv = RemoteViews(this.packageName, R.layout.remoteview_widget_shortcut_body)
+                                applyOptionsToRemoteViews(rv, options)
 
-                ACTION_RESIZED -> {
-                    if (currentSignedInLevel.get() > OTAuthManager.SignedInLevel.NONE) {
-                        for (id in appWidgetIds) {
-                            val options = appWidgetManager.getAppWidgetOptions(id)
-                            val rv = RemoteViews(this.packageName, R.layout.remoteview_widget_shortcut_body)
-                            applyOptionsToRemoteViews(rv, options)
-
-                            appWidgetManager.partiallyUpdateAppWidget(id, rv)
+                                appWidgetManager.partiallyUpdateAppWidget(id, rv)
+                            }
                         }
                     }
                 }

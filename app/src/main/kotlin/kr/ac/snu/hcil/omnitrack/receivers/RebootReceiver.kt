@@ -32,7 +32,7 @@ class RebootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         println("OMNITRACK: reboot receiver called - ${intent.action}")
 
-        (context.applicationContext as OTApp).applicationComponent.inject(this)
+        (context.applicationContext as OTApp).currentConfiguredContext.configuredAppComponent.inject(this)
 
         val result = goAsync()
         val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager

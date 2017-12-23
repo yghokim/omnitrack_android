@@ -9,11 +9,12 @@ import io.reactivex.subjects.BehaviorSubject
 import io.realm.*
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTItemDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
+import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTItemDAO
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
@@ -51,8 +52,8 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
     val trackerViewModels: Observable<List<TrackerInformationViewModel>>
         get() = trackerViewModelListSubject
 
-    override fun onInject(app: OTApp) {
-        app.applicationComponent.inject(this)
+    override fun onInject(configuredContext: ConfiguredContext) {
+        configuredContext.configuredAppComponent.inject(this)
     }
 
     override fun onChange(snapshot: RealmResults<OTTrackerDAO>, changeSet: OrderedCollectionChangeSet?) {
@@ -90,7 +91,7 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
         val set = HashSet<String>()
         for (tracker in currentTrackerViewModelList) {
             tracker.trackerDao.attributes
-                    .mapNotNull { it.getHelper().getRequiredPermissions(it) }
+                    .mapNotNull { it.getHelper(configuredContext).getRequiredPermissions(it) }
                     .forEach { set.addAll(it) }
         }
         return set
@@ -104,7 +105,7 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
         super.onUserAttached(newUserId)
         trackersRealmResults?.removeAllChangeListeners()
         clearTrackerViewModelList()
-        trackersRealmResults = dbManager.get().makeTrackersOfUserQuery(newUserId, realm).findAllSortedAsync(arrayOf("position", BackendDbManager.FIELD_USER_CREATED_AT), arrayOf(Sort.ASCENDING, Sort.DESCENDING))
+        trackersRealmResults = dbManager.get().makeTrackersOfUserQuery(newUserId, realm).sort(arrayOf("position", BackendDbManager.FIELD_USER_CREATED_AT), arrayOf(Sort.ASCENDING, Sort.DESCENDING)).findAllAsync()
         trackersRealmResults?.addChangeListener(this)
 
         shortcutPanelManager.get().registerShortcutRefreshSubscription(newUserId, TAG)

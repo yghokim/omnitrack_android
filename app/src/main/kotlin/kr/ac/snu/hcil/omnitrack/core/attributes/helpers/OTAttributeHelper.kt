@@ -12,9 +12,11 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.FallbackPolicyResolver
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyHelper
+import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTItemValueEntryDAO
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTItemValueEntryDAO
+import kr.ac.snu.hcil.omnitrack.core.di.Configured
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.inputs.attributes.AAttributeInputView
@@ -32,7 +34,8 @@ import kotlin.collections.set
 /**
  * Created by Young-Ho on 10/7/2017.
  */
-abstract class OTAttributeHelper {
+@Configured
+abstract class OTAttributeHelper(protected val configuredContext: ConfiguredContext) {
     companion object {
         val FALLBACK_POLICY_RESOLVER_EMPTY_VALUE = object: FallbackPolicyResolver(R.string.msg_empty_value){
             override fun getFallbackValue(attribute: OTAttributeDAO, realm: Realm): Single<Nullable<out Any>> {
@@ -48,7 +51,8 @@ abstract class OTAttributeHelper {
                                 .equalTo("key", attribute.localId)
                                 .equalTo("item.trackerId", attribute.trackerId)
                                 .equalTo("item.removed", false)
-                                .findAllSorted("item.timestamp", Sort.DESCENDING).filter { it.value != null }.first()
+                                .sort("item.timestamp", Sort.DESCENDING)
+                                .findAll().filter { it.value != null }.first()
                     } catch (ex: NoSuchElementException) {
                         null
                     }

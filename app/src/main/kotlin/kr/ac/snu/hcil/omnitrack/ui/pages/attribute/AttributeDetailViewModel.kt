@@ -7,11 +7,13 @@ import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTAttributeHelper
+import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.ui.viewmodels.RealmViewModel
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import java.util.*
+import javax.inject.Inject
 
 /**
  * Created by Young-Ho on 10/8/2017.
@@ -30,7 +32,7 @@ class AttributeDetailViewModel(app: Application) : RealmViewModel(app) {
 
     val isValid: Boolean get() = attributeDAO?.isValid == true
 
-    val attributeHelper: OTAttributeHelper? get() = attributeDAO?.let { OTAttributeManager.getAttributeHelper(it.type) }
+    val attributeHelper: OTAttributeHelper? get() = attributeDAO?.let { attributeManager.getAttributeHelper(it.type) }
 
     val isInDatabase: Boolean get() = attributeDAO?.isManaged == true
 
@@ -110,6 +112,13 @@ class AttributeDetailViewModel(app: Application) : RealmViewModel(app) {
                 connectionObservable.onNext(Nullable(value))
             }
         }
+
+    @Inject
+    lateinit var attributeManager: OTAttributeManager
+
+    override fun onInject(configuredContext: ConfiguredContext) {
+        configuredContext.configuredAppComponent.inject(this)
+    }
 
     fun init(attributeDao: OTAttributeDAO) {
         if (!isInitialized) {

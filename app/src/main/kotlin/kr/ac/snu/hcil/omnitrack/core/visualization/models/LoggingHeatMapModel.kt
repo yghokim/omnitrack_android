@@ -9,9 +9,10 @@ import io.realm.Realm
 import io.realm.Sort
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTItemDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTItemDAO
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
 import kr.ac.snu.hcil.omnitrack.core.visualization.INativeChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.TrackerChartModel
@@ -33,7 +34,7 @@ import java.util.*
  */
 
 
-class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm, timeAttribute: OTAttributeDAO? = null) : TrackerChartModel<ITimeBinnedHeatMap.CounterVector>(tracker, realm), ITimeBinnedHeatMap, INativeChartModel {
+class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm, configuredContext: ConfiguredContext, timeAttribute: OTAttributeDAO? = null) : TrackerChartModel<ITimeBinnedHeatMap.CounterVector>(tracker, realm), ITimeBinnedHeatMap, INativeChartModel {
 
     val hoursInYBin = 2
 
@@ -41,7 +42,7 @@ class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm, timeAttribute: OT
     val timeAttributeName: String? = timeAttribute?.name
 
     init {
-        OTApp.instance.applicationComponent.inject(this)
+        configuredContext.configuredAppComponent.inject(this)
     }
 
     private fun getTimestampOfItem(item: OTItemDAO): Long? {
@@ -75,7 +76,8 @@ class LoggingHeatMapModel(tracker: OTTrackerDAO, realm: Realm, timeAttribute: OT
         } else {
             dbManager
                     .makeItemsQuery(tracker.objectId, getTimeScope(), realm)
-                    .findAllSortedAsync("timestamp", Sort.ASCENDING)
+                    .sort("timestamp", Sort.ASCENDING)
+                    .findAllAsync()
                     .asFlowable()
                     .filter { it.isLoaded }
                     .firstOrError()

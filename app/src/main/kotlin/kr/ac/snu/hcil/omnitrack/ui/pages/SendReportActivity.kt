@@ -9,6 +9,7 @@ import com.google.gson.Gson
 import dagger.Lazy
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.activity_send_report.*
+import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
@@ -39,7 +40,7 @@ class SendReportActivity : MultiButtonActionBarActivity(R.layout.activity_send_r
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        (application as OTApp).applicationComponent.inject(this)
+        (application as OTApp).currentConfiguredContext.configuredAppComponent.inject(this)
 
         rightActionBarTextButton?.visibility = View.VISIBLE
         rightActionBarTextButton?.setText(R.string.msg_send)
@@ -126,10 +127,9 @@ class SendReportActivity : MultiButtonActionBarActivity(R.layout.activity_send_r
             inquiry["type"] = selectedReportType
             inquiry["content"] = reportContent
 
-            val deviceInfo = OTDeviceInfo()
 
-            inquiry["os"] = deviceInfo.os
-            inquiry["appVersion"] = deviceInfo.appVersion
+            inquiry["os"] = OTDeviceInfo.OS
+            inquiry["appVersion"] = BuildConfig.VERSION_NAME
 
             val inquiryJson = Gson().toJsonTree(inquiry).asJsonObject
             println("inquiry json: ${inquiryJson}")

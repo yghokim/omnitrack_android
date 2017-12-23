@@ -12,11 +12,13 @@ import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
 import io.realm.Sort
 import kr.ac.snu.hcil.omnitrack.OTApp
+import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
-import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTriggerDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels.OTTriggerAlarmInstance
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels.OTTriggerSchedule
+import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.OTTriggerAlarmInstance
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.OTTriggerSchedule
+import kr.ac.snu.hcil.omnitrack.core.di.Configured
 import kr.ac.snu.hcil.omnitrack.core.triggers.conditions.OTTimeTriggerCondition
 import kr.ac.snu.hcil.omnitrack.receivers.TimeTriggerAlarmReceiver
 import kr.ac.snu.hcil.omnitrack.utils.ConcurrentUniqueLongGenerator
@@ -30,7 +32,8 @@ import java.util.*
 /**
  * Created by younghokim on 16. 8. 29..
  */
-class OTTriggerAlarmManager(val context: Context, val realmProvider: Factory<Realm>) : ITriggerAlarmController {
+@Configured
+class OTTriggerAlarmManager(val context: Context, val configuredContext: ConfiguredContext, val realmProvider: Factory<Realm>) : ITriggerAlarmController {
     companion object {
 
         const val TAG = "TimeTriggerAlarmManager"
@@ -166,8 +169,8 @@ class OTTriggerAlarmManager(val context: Context, val realmProvider: Factory<Rea
                                             //simple alarm. fire
 
                                             OTApp.logger.writeSystemLog("Fire time trigger. schedule id: ${schedule.id}", TAG)
-                                            if (trigger.validateScriptIfExist(context)) {
-                                                trigger.performFire(triggerTime, context)
+                                            if (trigger.validateScriptIfExist(configuredContext)) {
+                                                trigger.performFire(triggerTime, configuredContext)
                                             } else Completable.complete()
                                         }
                                         else -> {
@@ -307,7 +310,8 @@ class OTTriggerAlarmManager(val context: Context, val realmProvider: Factory<Rea
                     .equalTo("trigger.${BackendDbManager.FIELD_OBJECT_ID}", triggerId)
                     .equalTo(OTTriggerSchedule.FIELD_FIRED, false)
                     .equalTo(OTTriggerSchedule.FIELD_SKIPPED, false)
-                    .findAllSorted(OTTriggerSchedule.FIELD_INTRINSIC_ALARM_TIME, Sort.ASCENDING)
+                    .sort(OTTriggerSchedule.FIELD_INTRINSIC_ALARM_TIME, Sort.ASCENDING)
+                    .findAll()
                     .asFlowable()
                     .filter { it.isLoaded && it.isValid }
                     .map { list ->
@@ -355,7 +359,8 @@ class OTTriggerAlarmManager(val context: Context, val realmProvider: Factory<Rea
         val realm = realmProvider.get()
         val latestPastSchedule = realm.where(OTTriggerSchedule::class.java)
                 .equalTo("trigger.${BackendDbManager.FIELD_OBJECT_ID}", trigger.objectId)
-                .findAllSorted(OTTriggerSchedule.FIELD_INTRINSIC_ALARM_TIME, Sort.DESCENDING)
+                .sort(OTTriggerSchedule.FIELD_INTRINSIC_ALARM_TIME, Sort.DESCENDING)
+                .findAll()
                 .find { it.fired || it.skipped }
 
         if (latestPastSchedule == null) {

@@ -13,11 +13,12 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
+import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
-import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
@@ -131,8 +132,8 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
         syncManager.registerSyncQueue(ESyncDataType.TRACKER, SyncDirection.UPLOAD)
     }
 
-    override fun onInject(app: OTApp) {
-        app.applicationComponent.inject(this)
+    override fun onInject(configuredContext: ConfiguredContext) {
+        configuredContext.configuredAppComponent.inject(this)
     }
 
     fun init(trackerId: String?) {
@@ -222,7 +223,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
         newDao.name = name
         newDao.type = type
         newDao.trackerId = trackerId
-        newDao.initialize()
+        newDao.initialize(configuredContext)
         processor?.invoke(newDao, realm)
 
         if (trackerDao != null) {
@@ -546,7 +547,7 @@ class TrackerDetailViewModel(app: Application) : RealmViewModel(app) {
                 }
             }
 
-            val helper = OTAttributeManager.getAttributeHelper(editedDao.type)
+            val helper = attributeManager.getAttributeHelper(editedDao.type)
             icon = helper.getTypeSmallIconResourceId(editedDao)
             if (changed) {
                 onPropertyChanged.onNext(System.currentTimeMillis())

@@ -30,8 +30,9 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTTimeAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
-import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
+import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.net.OTLocalMediaCacheManager
 import kr.ac.snu.hcil.omnitrack.services.OTTableExportService
 import kr.ac.snu.hcil.omnitrack.ui.DragItemTouchHelperCallback
@@ -69,6 +70,9 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
         }
     }
 
+    @Inject
+    lateinit var attributeManager: OTAttributeManager
+
     private lateinit var viewModel: ItemListViewModel
 
     private val items = ArrayList<ItemListViewModel.ItemViewModel>()
@@ -91,6 +95,10 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
         }
 
     private val startSubscriptions = CompositeDisposable()
+
+    override fun onInject(app: OTApp) {
+        app.currentConfiguredContext.configuredAppComponent.inject(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -492,7 +500,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
                 override fun getItemViewType(position: Int): Int {
                     if (this@ItemElementViewHolder.adapterPosition != -1 && getParent().getItemValueOf(viewModel.attributes[position].localId) != null)
-                        return viewModel.attributes[position].getHelper().getViewForItemListContainerType()
+                        return viewModel.attributes[position].getHelper(configuredContext).getViewForItemListContainerType()
                     else return 5
                 }
 
@@ -570,14 +578,14 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
                         val itemValue = getParent().getItemValueOf(attribute.localId)
                         if (itemValue != null) {
-                            val newValueView = attribute.getHelper().getViewForItemList(attribute, this@ItemBrowserActivity, valueView)
+                            val newValueView = attribute.getHelper(configuredContext).getViewForItemList(attribute, this@ItemBrowserActivity, valueView)
                             if (newValueView is IActivityLifeCycle && newValueView !== valueView) {
                                 newValueView.onCreate(null)
                             }
                             newValueView.setOnClickListener(this)
                             changeNewValueView(newValueView)
 
-                            valueApplySubscription.set(attribute.getHelper().applyValueToViewForItemList(attribute, itemValue, valueView).subscribe({
+                            valueApplySubscription.set(attribute.getHelper(configuredContext).applyValueToViewForItemList(attribute, itemValue, valueView).subscribe({
 
                             }, {
                             }))
@@ -650,6 +658,12 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
         @Inject
         lateinit var localCacheManager: OTLocalMediaCacheManager
 
+        @Inject
+        lateinit var attributeManager: OTAttributeManager
+
+        @Inject
+        lateinit var configuredContext: ConfiguredContext
+
         private lateinit var viewModel: ItemListViewModel
 
         private var listView: RecyclerView by Delegates.notNull()
@@ -669,7 +683,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
         override fun onActivityCreated(savedInstanceState: Bundle?) {
             super.onActivityCreated(savedInstanceState)
-            (act.application as OTApp).networkComponent.inject(this)
+            (act.application as OTApp).currentConfiguredContext.configuredAppComponent.inject(this)
             viewModel = ViewModelProviders.of(activity!!).get(ItemListViewModel::class.java)
 
             dialogSubscriptions.add(
@@ -759,7 +773,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
 
                 viewModel.trackerDao.let {
 
-                    val configDialog = OTTableExportService.makeConfigurationDialog(act, it) { includeFile, tableFileType ->
+                    val configDialog = OTTableExportService.makeConfigurationDialog(act, configuredContext, it) { includeFile, tableFileType ->
                         exportConfigIncludeFile = includeFile
                         exportConfigTableFileType = tableFileType
 

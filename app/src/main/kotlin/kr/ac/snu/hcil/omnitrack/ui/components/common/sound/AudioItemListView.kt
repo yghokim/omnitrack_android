@@ -81,7 +81,7 @@ class AudioItemListView : ConstraintLayout {
         durationView = findViewById(R.id.ui_duration_view)
         unitView = findViewById(R.id.ui_unit_text)
 
-        (context.applicationContext as OTApp).networkComponent.inject(this)
+        (context.applicationContext as OTApp).currentConfiguredContext.configuredAppComponent.inject(this)
     }
 
     override fun onDetachedFromWindow() {

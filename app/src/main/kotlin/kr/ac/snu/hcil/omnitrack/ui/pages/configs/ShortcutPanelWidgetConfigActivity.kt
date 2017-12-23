@@ -18,9 +18,9 @@ import dagger.internal.Factory
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.core.di.Backend
+import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.di.configured.Backend
 import kr.ac.snu.hcil.omnitrack.ui.activities.AppWidgetConfigurationActivity
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.WritablePair
@@ -53,7 +53,7 @@ class ShortcutPanelWidgetConfigActivity : AppWidgetConfigurationActivity(R.layou
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        (application as OTApp).applicationComponent.inject(this)
+        (application as OTApp).currentConfiguredContext.configuredAppComponent.inject(this)
         realm = realmProvider.get()
     }
 
@@ -89,7 +89,7 @@ class ShortcutPanelWidgetConfigActivity : AppWidgetConfigurationActivity(R.layou
         }
 
         val pref = OTShortcutPanelWidgetUpdateService.getPreferences(this)
-        when (OTShortcutPanelWidgetUpdateService.getMode(appWidgetId, pref)) {
+        when (OTShortcutPanelWidgetUpdateService.getMode(appWidgetId, configuredContext.configuration.id, pref)) {
             OTShortcutPanelWidgetUpdateService.MODE_ALL ->
                 modeRadioGroup.check(R.id.ui_radio_mode_all)
             OTShortcutPanelWidgetUpdateService.MODE_SELECTIVE ->
@@ -97,7 +97,7 @@ class ShortcutPanelWidgetConfigActivity : AppWidgetConfigurationActivity(R.layou
             OTShortcutPanelWidgetUpdateService.MODE_SHORTCUT ->
                 modeRadioGroup.check(R.id.ui_radio_mode_shortcut)
         }
-        titleForm.setText(OTShortcutPanelWidgetUpdateService.getTitle(appWidgetId, pref), TextView.BufferType.EDITABLE)
+        titleForm.setText(OTShortcutPanelWidgetUpdateService.getTitle(appWidgetId, configuredContext.configuration.id, pref), TextView.BufferType.EDITABLE)
 
         trackerSelectionList.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         trackerSelectionList.adapter = trackerSelectionAdapter
@@ -107,7 +107,7 @@ class ShortcutPanelWidgetConfigActivity : AppWidgetConfigurationActivity(R.layou
         creationSubscriptions.add(
                 signedInUserObservable.subscribe({
                     userId ->
-                    val selectedTrackerIds = OTShortcutPanelWidgetUpdateService.getSelectedTrackerIds(appWidgetId, OTShortcutPanelWidgetUpdateService.getPreferences(this))
+                    val selectedTrackerIds = OTShortcutPanelWidgetUpdateService.getSelectedTrackerIds(appWidgetId, configuredContext.configuration.id, OTShortcutPanelWidgetUpdateService.getPreferences(this))
                     trackerList = dbManager.makeTrackersOfUserQuery(userId, realm).findAll().map {
                         WritablePair(it.getSimpleInfo(), selectedTrackerIds?.contains(it.objectId) == true)
                     }
@@ -131,8 +131,8 @@ class ShortcutPanelWidgetConfigActivity : AppWidgetConfigurationActivity(R.layou
         val pref = OTShortcutPanelWidgetUpdateService.getPreferences(this)
         val editor = pref.edit()
 
-        OTShortcutPanelWidgetUpdateService.setTitle(appWidgetId, titleForm.text.toString(), editor)
-        OTShortcutPanelWidgetUpdateService.setMode(appWidgetId, when (modeRadioGroup.checkedRadioButtonId) {
+        OTShortcutPanelWidgetUpdateService.setTitle(appWidgetId, configuredContext.configuration.id, titleForm.text.toString(), editor)
+        OTShortcutPanelWidgetUpdateService.setMode(appWidgetId, configuredContext.configuration.id, when (modeRadioGroup.checkedRadioButtonId) {
             R.id.ui_radio_mode_all -> OTShortcutPanelWidgetUpdateService.MODE_ALL
             R.id.ui_radio_mode_selective -> OTShortcutPanelWidgetUpdateService.MODE_SELECTIVE
             R.id.ui_radio_mode_shortcut -> OTShortcutPanelWidgetUpdateService.MODE_SHORTCUT
@@ -140,13 +140,14 @@ class ShortcutPanelWidgetConfigActivity : AppWidgetConfigurationActivity(R.layou
         }, editor)
 
         trackerList?.let {
-            OTShortcutPanelWidgetUpdateService.setSelectedTrackerIds(appWidgetId, it.filter { it.second }.map { it.first.objectId!! }.toSet(), editor)
+            OTShortcutPanelWidgetUpdateService.setSelectedTrackerIds(appWidgetId, configuredContext.configuration.id, it.filter { it.second }.map { it.first.objectId!! }.toSet(), editor)
         }
         editor.apply()
 
 
         val intent = Intent(this, OTShortcutPanelWidgetUpdateService::class.java).setAction(OTShortcutPanelWidgetUpdateService.ACTION_INITIALIZE)
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, intArrayOf(appWidgetId))
+        intent.putExtra(OTApp.INTENT_EXTRA_CONFIGURATION_ID, configuredContext.configuration.id)
 
         startService(intent)
 

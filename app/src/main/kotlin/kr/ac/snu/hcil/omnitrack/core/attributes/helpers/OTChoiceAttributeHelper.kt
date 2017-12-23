@@ -11,7 +11,8 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ChoiceSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTChoiceEntryListPropertyHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyManager
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.models.ChoiceCategoricalBarChartModel
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
@@ -25,7 +26,7 @@ import java.util.*
 /**
  * Created by Young-Ho on 10/7/2017.
  */
-class OTChoiceAttributeHelper : OTAttributeHelper() {
+class OTChoiceAttributeHelper(configuredContext: ConfiguredContext) : OTAttributeHelper(configuredContext) {
 
     companion object {
         const val PROPERTY_MULTISELECTION = "multiSelection"
@@ -148,7 +149,7 @@ class OTChoiceAttributeHelper : OTAttributeHelper() {
     }
 
     override fun makeRecommendedChartModels(attribute: OTAttributeDAO, realm: Realm): Array<ChartModel<*>> {
-        return arrayOf(ChoiceCategoricalBarChartModel(attribute, realm))
+        return arrayOf(ChoiceCategoricalBarChartModel(attribute, realm, configuredContext))
     }
 
     private fun getChoiceTexts(attribute: OTAttributeDAO, value: IntArray): List<String> {

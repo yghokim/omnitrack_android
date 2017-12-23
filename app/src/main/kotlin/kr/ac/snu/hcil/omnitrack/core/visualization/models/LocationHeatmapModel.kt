@@ -4,7 +4,7 @@ import com.google.android.gms.maps.model.LatLng
 import io.reactivex.Single
 import io.realm.Realm
 import io.realm.Sort
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
 
@@ -30,7 +30,8 @@ class LocationHeatmapModel(val trackerId: String, locationAttribute: OTAttribute
         } else {
             dbManager
                     .makeItemsQuery(trackerId, getTimeScope(), realm)
-                    .findAllSortedAsync("timestamp", Sort.ASCENDING)
+                    .sort("timestamp", Sort.ASCENDING)
+                    .findAllAsync()
                     .asFlowable()
                     .filter { it.isLoaded == true }
                     .firstOrError()

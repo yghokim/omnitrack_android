@@ -1,18 +1,18 @@
 package kr.ac.snu.hcil.omnitrack.core.calculation.expression.expressions
 
 import com.udojava.evalex.Expression
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.calculation.expression.ExpressionConstants
 import kr.ac.snu.hcil.omnitrack.core.calculation.expression.ExpressionConstants.Companion.EXPRESSION_ZERO
 import kr.ac.snu.hcil.omnitrack.core.calculation.expression.LongLazyNumber
-import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
+import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
+import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 
 /**
  * Created by younghokim on 2017. 11. 14..
  */
-class LatestItemTimestampExpression(app: OTApp) : RealmLazyFunction(app, ExpressionConstants.COMMAND_TRACKER_LATEST_ITEM_TIME, 2) {
+class LatestItemTimestampExpression(configuredContext: ConfiguredContext) : RealmLazyFunction(configuredContext, ExpressionConstants.COMMAND_TRACKER_LATEST_ITEM_TIME, 2) {
 
     override fun lazyEval(lazyParams: MutableList<Expression.LazyNumber>?): Expression.LazyNumber {
         realmProvider.get().use { realm ->

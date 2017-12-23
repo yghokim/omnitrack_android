@@ -5,9 +5,10 @@ import io.realm.Realm
 import io.realm.Sort
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTItemDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTItemDAO
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.visualization.CompoundAttributeChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.INativeChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.ILineChartOnTime
@@ -22,13 +23,13 @@ import java.util.*
 /**
  * Created by Young-Ho Kim on 2016-09-08.
  */
-class TimelineComparisonLineChartModel(attributes: List<OTAttributeDAO>, parent: OTTrackerDAO, realm: Realm)
+class TimelineComparisonLineChartModel(attributes: List<OTAttributeDAO>, parent: OTTrackerDAO, realm: Realm, configuredContext: ConfiguredContext)
     : CompoundAttributeChartModel<ILineChartOnTime.TimeSeriesTrendData>(attributes, parent, realm), ILineChartOnTime, INativeChartModel {
 
     override val name: String = OTApp.instance.resourcesWrapped.getString(R.string.msg_vis_numeric_line_timeline_title)
 
     init{
-        OTApp.instance.applicationComponent.inject(this)
+        configuredContext.configuredAppComponent.inject(this)
     }
 
     override fun reloadData(): Single<List<ILineChartOnTime.TimeSeriesTrendData>> {
@@ -41,7 +42,8 @@ class TimelineComparisonLineChartModel(attributes: List<OTAttributeDAO>, parent:
 
         return dbManager
                 .makeItemsQuery(parent.objectId, getTimeScope(), realm)
-                .findAllSortedAsync("timestamp", Sort.ASCENDING)
+                .sort("timestamp", Sort.ASCENDING)
+                .findAllAsync()
                 .asFlowable()
                 .filter { it.isLoaded && it.isValid }.firstOrError().map { items ->
 

@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.widgets.OTShortcutPanelWidgetUpdateService
 
 /**
  * Created by Young-Ho Kim on 16. 7. 28
@@ -34,7 +33,6 @@ class OTSystemReceiver : BroadcastReceiver() {
             }
 
             OTApp.BROADCAST_ACTION_ITEM_REMOVED -> {
-                context.startService(OTShortcutPanelWidgetUpdateService.makeNotifyDatesetChangedIntentToAllWidgets(context))
             }
 
             OTApp.BROADCAST_ACTION_COMMAND_REMOVE_ITEM -> {

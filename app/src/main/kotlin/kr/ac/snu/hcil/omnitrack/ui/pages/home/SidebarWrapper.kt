@@ -26,9 +26,10 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTUserDAO
-import kr.ac.snu.hcil.omnitrack.core.di.Backend
-import kr.ac.snu.hcil.omnitrack.core.di.InformationUpload
+import kr.ac.snu.hcil.omnitrack.core.configuration.OTConfiguration
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTUserDAO
+import kr.ac.snu.hcil.omnitrack.core.di.configured.Backend
+import kr.ac.snu.hcil.omnitrack.core.di.configured.InformationUpload
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.services.OTInformationUploadService
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
@@ -61,6 +62,9 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu
     @field:[Inject InformationUpload]
     lateinit var informationUploadJobProvider: Job.Builder
 
+    @Inject
+    lateinit var configuration: OTConfiguration
+
     private lateinit var realm: Realm
 
     private val userWatchDisposable = SerialDisposable()
@@ -84,7 +88,9 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu
 
     init {
 
-        (parentActivity.application as OTApp).applicationComponent.inject(this)
+        (parentActivity.application as OTApp).applicationComponent.configurationController().currentConfiguredContext
+                .configuredAppComponent.inject(this)
+
         /*
         val signOutButton = view.findViewById(R.id.ui_button_sign_out)
         signOutButton.setOnClickListener {
@@ -156,7 +162,9 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu
                                         user.nameUpdatedAt = System.currentTimeMillis()
                                         user.nameSynchronizedAt = null
                                     }
-                                    jobDispatcher.mustSchedule(informationUploadJobProvider.setTag(OTInformationUploadService.INFORMATION_USERNAME).build())
+                                    jobDispatcher.mustSchedule(informationUploadJobProvider.setTag(
+                                            OTInformationUploadService.makeTag(authManager.userId ?: "", configuration.id, OTInformationUploadService.INFORMATION_USERNAME)
+                                    ).build())
                                 }
                             }
                         }
