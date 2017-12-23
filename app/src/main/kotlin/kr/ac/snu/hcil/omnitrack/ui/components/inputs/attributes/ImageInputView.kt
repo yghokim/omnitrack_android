@@ -107,7 +107,7 @@ class ImageInputView(context: Context, attrs: AttributeSet? = null) : AAttribute
     }
 
     init {
-        (context.applicationContext as OTApp).networkComponent.inject(this)
+        (context.applicationContext as OTApp).currentConfiguredContext.configuredAppComponent.inject(this)
 
         picker.callback = this
 

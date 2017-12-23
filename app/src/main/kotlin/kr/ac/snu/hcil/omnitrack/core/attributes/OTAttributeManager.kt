@@ -10,16 +10,17 @@ import dagger.Lazy
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.*
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
+import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
+import kr.ac.snu.hcil.omnitrack.core.di.Configured
 import kr.ac.snu.hcil.omnitrack.utils.ConcurrentUniqueLongGenerator
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import javax.inject.Inject
-import javax.inject.Singleton
 
 /**
  * Created by Young-Ho on 10/7/2017.
  */
-@Singleton
-class OTAttributeManager @Inject constructor(val authManager: Lazy<OTAuthManager>) {
+@Configured
+class OTAttributeManager @Inject constructor(val configuredContext: ConfiguredContext, val authManager: Lazy<OTAuthManager>) {
 
     companion object {
         const val VIEW_FOR_ITEM_LIST_CONTAINER_TYPE_MULTILINE = 0
@@ -36,28 +37,29 @@ class OTAttributeManager @Inject constructor(val authManager: Lazy<OTAuthManager
         const val TYPE_IMAGE = 8
         const val TYPE_AUDIO = 9
 
-        private val attributeCharacteristicsTable = SparseArray<OTAttributeHelper>()
+    }
 
-        fun getAttributeHelper(type: Int): OTAttributeHelper {
-            val characteristics = attributeCharacteristicsTable[type]
-            if (characteristics == null) {
-                val fallback = when (type) {
-                    TYPE_NUMBER -> OTNumberAttributeHelper()
-                    TYPE_TIME -> OTTimeAttributeHelper()
-                    TYPE_TIMESPAN -> OTTimeSpanAttributeHelper()
-                    TYPE_SHORT_TEXT -> OTShortTextAttributeHelper()
-                    TYPE_LONG_TEXT -> OTLongTextAttributeHelper()
-                    TYPE_LOCATION -> OTLocationAttributeHelper()
-                    TYPE_CHOICE -> OTChoiceAttributeHelper()
-                    TYPE_RATING -> OTRatingAttributeHelper()
-                    TYPE_IMAGE -> OTImageAttributeHelper()
-                    TYPE_AUDIO -> OTAudioRecordAttributeHelper()
-                    else -> throw Exception("Unsupported type key: ${type}")
-                }
-                this.attributeCharacteristicsTable.setValueAt(type, fallback)
-                return fallback
-            } else return characteristics
-        }
+    private val attributeCharacteristicsTable = SparseArray<OTAttributeHelper>()
+
+    fun getAttributeHelper(type: Int): OTAttributeHelper {
+        val characteristics = attributeCharacteristicsTable[type]
+        if (characteristics == null) {
+            val fallback = when (type) {
+                TYPE_NUMBER -> OTNumberAttributeHelper(configuredContext)
+                TYPE_TIME -> OTTimeAttributeHelper(configuredContext)
+                TYPE_TIMESPAN -> OTTimeSpanAttributeHelper(configuredContext)
+                TYPE_SHORT_TEXT -> OTShortTextAttributeHelper(configuredContext)
+                TYPE_LONG_TEXT -> OTLongTextAttributeHelper(configuredContext)
+                TYPE_LOCATION -> OTLocationAttributeHelper(configuredContext)
+                TYPE_CHOICE -> OTChoiceAttributeHelper(configuredContext)
+                TYPE_RATING -> OTRatingAttributeHelper(configuredContext)
+                TYPE_IMAGE -> OTImageAttributeHelper(configuredContext)
+                TYPE_AUDIO -> OTAudioRecordAttributeHelper(configuredContext)
+                else -> throw Exception("Unsupported type key: ${type}")
+            }
+            this.attributeCharacteristicsTable.setValueAt(type, fallback)
+            return fallback
+        } else return characteristics
     }
 
     private val attributeLocalIdGenerator = ConcurrentUniqueLongGenerator()
@@ -71,7 +73,7 @@ class OTAttributeManager @Inject constructor(val authManager: Lazy<OTAuthManager
     }
 
     fun showPermissionCheckDialog(activity: Activity, typeId: Int, typeName: String, onGranted: (Boolean) -> Unit, onDenied: (() -> Unit)? = null): MaterialDialog? {
-        val requiredPermissions = OTAttributeManager.getAttributeHelper(typeId).getRequiredPermissions(null)
+        val requiredPermissions = getAttributeHelper(typeId).getRequiredPermissions(null)
         if (requiredPermissions != null) {
             val notGrantedPermissions = requiredPermissions.filter { ContextCompat.checkSelfPermission(activity, it) != PackageManager.PERMISSION_GRANTED }
             if (notGrantedPermissions.isNotEmpty()) {

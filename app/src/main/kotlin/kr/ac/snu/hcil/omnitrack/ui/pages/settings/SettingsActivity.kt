@@ -17,8 +17,8 @@ import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
-import kr.ac.snu.hcil.omnitrack.core.di.Backend
+import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
+import kr.ac.snu.hcil.omnitrack.core.di.configured.Backend
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
 import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckService
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
@@ -130,7 +130,7 @@ class SettingsActivity : MultiButtonActionBarActivity(R.layout.activity_multibut
         override fun onActivityCreated(savedInstanceState: Bundle?) {
             super.onActivityCreated(savedInstanceState)
 
-            (act.application as OTApp).applicationComponent.inject(this)
+            (act.application as OTApp).currentConfiguredContext.configuredAppComponent.inject(this)
             languageOnCreation = LocaleHelper.getLanguageCode(activity)
         }
 

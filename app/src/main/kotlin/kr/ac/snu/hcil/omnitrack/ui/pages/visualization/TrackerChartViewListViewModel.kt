@@ -4,6 +4,7 @@ import android.app.Application
 import android.support.v7.util.DiffUtil
 import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
+import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.TrackerHelper
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.Granularity
@@ -63,7 +64,7 @@ class TrackerChartViewListViewModel(app: Application) : RealmViewModel(app) {
             clearChartViewModels(false)
             val trackerDao = dbManager.get().getTrackerQueryWithId(trackerId, realm).findFirst()
             if (trackerDao != null) {
-                currentChartViewModelList.addAll(TrackerHelper.makeRecommendedChartModels(trackerDao, realm))
+                currentChartViewModelList.addAll(TrackerHelper.makeRecommendedChartModels(trackerDao, realm, getApplication<OTApp>().currentConfiguredContext))
                 chartViewModelListSubject.onNext(currentChartViewModelList)
             }
 

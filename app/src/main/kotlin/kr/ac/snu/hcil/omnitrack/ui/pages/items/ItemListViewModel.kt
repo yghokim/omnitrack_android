@@ -8,13 +8,13 @@ import io.realm.OrderedCollectionChangeSet
 import io.realm.OrderedRealmCollectionChangeListener
 import io.realm.RealmResults
 import io.realm.Sort
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.attributes.logics.ItemComparator
-import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTItemDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
+import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTItemDAO
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
@@ -74,8 +74,8 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
 
     val onItemContentChanged = PublishSubject.create<Array<OrderedCollectionChangeSet.Range>>()
 
-    override fun onInject(app: OTApp) {
-        app.applicationComponent.inject(this)
+    override fun onInject(configuredContext: ConfiguredContext) {
+        configuredContext.configuredAppComponent.inject(this)
     }
 
     fun init(trackerId: String) {
@@ -103,7 +103,7 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
         currentSorterSet.clear()
         currentSorterSet.add(ItemComparator.TIMESTAMP_SORTER)
         attributes.forEach {
-            currentSorterSet += it.getHelper().getSupportedSorters(it)
+            currentSorterSet += it.getHelper(configuredContext).getSupportedSorters(it)
         }
 
         sorterSetObservable.onNext(currentSorterSet)
@@ -112,7 +112,8 @@ class ItemListViewModel(app: Application) : RealmViewModel(app), OrderedRealmCol
         currentItemQueryResults?.removeAllChangeListeners()
         currentItemQueryResults = dbManager.get()
                 .makeItemsQuery(trackerDao.objectId, null, null, realm)
-                .findAllSortedAsync("timestamp", Sort.DESCENDING)
+                .sort("timestamp", Sort.DESCENDING)
+                .findAllAsync()
         currentItemQueryResults?.addChangeListener(this)
     }
 

@@ -3,11 +3,7 @@ package kr.ac.snu.hcil.omnitrack.receivers
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.firebase.jobdispatcher.FirebaseJobDispatcher
-import com.firebase.jobdispatcher.Job
 import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.core.di.InformationUpload
-import kr.ac.snu.hcil.omnitrack.services.OTInformationUploadService
 import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckService
 import javax.inject.Inject
 
@@ -18,13 +14,9 @@ class PackageReceiver : BroadcastReceiver() {
 
     @Inject lateinit var versionCheckServiceController: OTVersionCheckService.Controller
 
-    @field:[Inject InformationUpload]
-    lateinit var informationUploadJobProvider: Job.Builder
-    @Inject lateinit var dispatcher: FirebaseJobDispatcher
-
     override fun onReceive(context: Context, intent: Intent) {
 
-        (context.applicationContext as OTApp).scheduledJobComponent.inject(this)
+        (context.applicationContext as OTApp).jobDispatcherComponent.inject(this)
 
         println("package broadcast receiver")
         when (intent.action) {
@@ -49,7 +41,7 @@ class PackageReceiver : BroadcastReceiver() {
                     versionCheckServiceController.turnOnService()
                 }else versionCheckServiceController.turnOffService()
 
-                dispatcher.mustSchedule(informationUploadJobProvider.setTag(OTInformationUploadService.INFORMATION_DEVICE).build())
+                //dispatcher.mustSchedule(informationUploadJobProvider.setTag(OTInformationUploadService.INFORMATION_DEVICE).build())
 
                 /*
                 OTApp.instance.currentUserObservable.observeOn(Schedulers.immediate()).subscribe({

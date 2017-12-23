@@ -3,7 +3,7 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.home
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import io.reactivex.Single
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.ATriggerListFragment
 
 /**

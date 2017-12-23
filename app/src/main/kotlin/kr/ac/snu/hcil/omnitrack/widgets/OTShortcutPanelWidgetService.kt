@@ -12,8 +12,10 @@ import android.widget.RemoteViewsService
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
+import kr.ac.snu.hcil.omnitrack.core.configuration.OTConfigurationController
+import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.utils.VectorIconHelper
 import java.text.SimpleDateFormat
 import java.util.*
@@ -32,9 +34,7 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
     }
 
     @Inject
-    protected lateinit var dbManager: BackendDbManager
-    @Inject
-    protected lateinit var authManager: OTAuthManager
+    lateinit var configController: OTConfigurationController
 
     override fun onCreate() {
         super.onCreate()
@@ -42,10 +42,16 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
     }
 
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {
-        return PanelWidgetElementFactory(this.applicationContext, intent, dbManager, authManager)
+        val configId = intent.getStringExtra(OTApp.INTENT_EXTRA_CONFIGURATION_ID)
+        return PanelWidgetElementFactory(this.applicationContext, configController.getConfiguredContextOf(configId)!!, intent)
     }
 
-    class PanelWidgetElementFactory(val context: Context, intent: Intent, val dbManager: BackendDbManager, val authManager: OTAuthManager) : RemoteViewsFactory {
+    class PanelWidgetElementFactory(val context: Context, val configuredContext: ConfiguredContext, intent: Intent) : RemoteViewsFactory {
+
+        @Inject
+        protected lateinit var dbManager: BackendDbManager
+        @Inject
+        protected lateinit var authManager: OTAuthManager
 
         private val widgetId: Int
 
@@ -55,7 +61,7 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
 
         init {
             widgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
-
+            configuredContext.configuredAppComponent.inject(this)
         }
 
         override fun onCreate() {
@@ -72,7 +78,7 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
         override fun onDataSetChanged() {
             val userId = authManager.userId
             val pref = OTShortcutPanelWidgetUpdateService.getPreferences(context)
-            mode = OTShortcutPanelWidgetUpdateService.getMode(widgetId, pref)
+            mode = OTShortcutPanelWidgetUpdateService.getMode(widgetId, configuredContext.configuration.id, pref)
             trackers.clear()
             val realm = dbManager.makeNewRealmInstance()
             if(userId!=null) {
@@ -80,7 +86,7 @@ class OTShortcutPanelWidgetService : RemoteViewsService() {
                     OTShortcutPanelWidgetUpdateService.MODE_ALL -> trackers.addAll(dbManager.makeTrackersOfUserQuery(userId, realm).findAll().map { it.getSimpleInfo() })
                     OTShortcutPanelWidgetUpdateService.MODE_SHORTCUT -> trackers.addAll(dbManager.makeTrackersOfUserQuery(userId, realm).equalTo("isBookmarked", true).findAll().map { it.getSimpleInfo() })
                     OTShortcutPanelWidgetUpdateService.MODE_SELECTIVE -> {
-                        val selectedTrackerIds = OTShortcutPanelWidgetUpdateService.getSelectedTrackerIds(widgetId, pref)?.toTypedArray()
+                        val selectedTrackerIds = OTShortcutPanelWidgetUpdateService.getSelectedTrackerIds(widgetId, configuredContext.configuration.id, pref)?.toTypedArray()
                         if (selectedTrackerIds?.isNotEmpty() == true) {
                             trackers.addAll(dbManager.makeTrackersOfUserQuery(userId, realm).`in`("objectId", selectedTrackerIds).findAll().map { it.getSimpleInfo() })
                         }

@@ -9,7 +9,8 @@ import com.bumptech.glide.request.target.Target
 import io.reactivex.Single
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager.Companion.VIEW_FOR_ITEM_LIST_CONTAINER_TYPE_MULTILINE
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.datatypes.OTServerFile
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
 import kr.ac.snu.hcil.omnitrack.ui.components.common.PlaceHolderImageView
@@ -21,7 +22,7 @@ import java.util.*
 /**
  * Created by Young-Ho on 10/7/2017.
  */
-class OTImageAttributeHelper : OTFileInvolvedAttributeHelper() {
+class OTImageAttributeHelper(configuredContext: ConfiguredContext) : OTFileInvolvedAttributeHelper(configuredContext) {
 
     override fun getInputViewType(previewMode: Boolean, attribute: OTAttributeDAO): Int = AAttributeInputView.VIEW_TYPE_IMAGE
 

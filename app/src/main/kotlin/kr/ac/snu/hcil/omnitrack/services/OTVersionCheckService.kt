@@ -19,7 +19,8 @@ import kr.ac.snu.hcil.omnitrack.BuildConfig
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.database.RemoteConfigManager
-import kr.ac.snu.hcil.omnitrack.core.di.VersionCheck
+import kr.ac.snu.hcil.omnitrack.core.di.global.Default
+import kr.ac.snu.hcil.omnitrack.core.di.global.VersionCheck
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
 import kr.ac.snu.hcil.omnitrack.utils.VectorIconHelper
 import org.jetbrains.anko.notificationManager
@@ -40,7 +41,7 @@ class OTVersionCheckService : JobService() {
     }
 
     @Singleton
-    class Controller @Inject constructor(val pref: Lazy<SharedPreferences>, val dispatcher: Lazy<FirebaseJobDispatcher>, @VersionCheck val job: Lazy<Job>){
+    class Controller @Inject constructor(@Default val pref: Lazy<SharedPreferences>, val dispatcher: Lazy<FirebaseJobDispatcher>, @VersionCheck val job: Lazy<Job>) {
 
         val versionCheckSwitchTurnedOn: Boolean
             get() = pref.get().getBoolean(PREF_CHECK_UPDATES, false)
@@ -57,12 +58,12 @@ class OTVersionCheckService : JobService() {
 
     private val checkSubscription = SerialDisposable()
 
-    @Inject
+    @field:[Inject Default]
     lateinit var systemPreferences: SharedPreferences
 
     override fun onCreate() {
         super.onCreate()
-        (application as OTApp).scheduledJobComponent.inject(this)
+        (application as OTApp).jobDispatcherComponent.inject(this)
     }
 
     override fun onStartJob(job: JobParameters): Boolean {

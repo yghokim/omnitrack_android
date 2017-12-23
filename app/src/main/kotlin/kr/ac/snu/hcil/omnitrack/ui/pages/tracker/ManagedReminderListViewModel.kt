@@ -4,8 +4,8 @@ import android.app.Application
 import io.realm.RealmQuery
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.AManagedTriggerListViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels.TriggerInterfaceOptions
 
@@ -25,7 +25,7 @@ class ManagedReminderListViewModel(app: Application) : AManagedTriggerListViewMo
     private lateinit var currentDefaultTriggerInterfaceOptions: TriggerInterfaceOptions
 
     init {
-        getApplication<OTApp>().applicationComponent.inject(this)
+        getApplication<OTApp>().currentConfiguredContext.configuredAppComponent.inject(this)
     }
 
     fun init(trackerId: String) {

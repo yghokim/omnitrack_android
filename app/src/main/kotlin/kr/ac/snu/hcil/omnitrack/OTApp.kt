@@ -14,9 +14,9 @@ import android.support.v7.app.AppCompatDelegate
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.squareup.leakcanary.LeakCanary
 import io.realm.Realm
-import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
+import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
-import kr.ac.snu.hcil.omnitrack.core.di.*
+import kr.ac.snu.hcil.omnitrack.core.di.global.*
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
 import kr.ac.snu.hcil.omnitrack.utils.LocaleHelper
@@ -57,6 +57,8 @@ class OTApp : MultiDexApplication() {
         const val INTENT_EXTRA_OBJECT_ID_USER = "userObjectId"
         const val INTENT_EXTRA_OBJECT_ID_TRIGGER = "triggerObjectId"
         const val INTENT_EXTRA_OBJECT_ID_ITEM = "itemDbId"
+
+        val INTENT_EXTRA_CONFIGURATION_ID = "${BuildConfig.APPLICATION_ID}.extra.configurationId"
 
         const val INTENT_EXTRA_TRIGGER_TIME = "triggerTime"
 
@@ -160,91 +162,47 @@ class OTApp : MultiDexApplication() {
         ApplicationModule(this)
     }
 
-    private val authModule: AuthModule by lazy {
-        AuthModule(this)
+    private val appLevelDatabaseModule: AppDatabaseModule by lazy {
+        AppDatabaseModule()
     }
 
-    private val loggingModule: UsageLoggingModule by lazy {
-        UsageLoggingModule()
+    private val serializationModule: SerializationModule by lazy {
+        SerializationModule()
     }
 
-    private val backendDatabaseModule: BackendDatabaseModule by lazy {
-        BackendDatabaseModule()
+    private val systemIdentifierFactoryModule: SystemIdentifierFactoryModule by lazy {
+        SystemIdentifierFactoryModule()
     }
 
-    private val scheduledJobModule: ScheduledJobModule by lazy {
-        ScheduledJobModule()
-    }
-
-    private val networkModule: NetworkModule by lazy {
-        NetworkModule()
-    }
-
-    private val synchronizationModule: SynchronizationModule by lazy {
-        SynchronizationModule()
-    }
-
-    private val triggerSystemModule: TriggerSystemModule by lazy {
-        TriggerSystemModule()
-    }
-
-    private val daoSerializationModule: DaoSerializationModule by lazy {
-        DaoSerializationModule()
+    private val jobDispatcherModule: JobDispatcherModule by lazy {
+        JobDispatcherModule()
     }
 
     val applicationComponent: ApplicationComponent by lazy {
         DaggerApplicationComponent.builder()
                 .applicationModule(appModule)
-                .authModule(authModule)
-                .networkModule(networkModule)
-                .backendDatabaseModule(backendDatabaseModule)
-                .scheduledJobModule(scheduledJobModule)
-                .triggerSystemModule(triggerSystemModule)
-                .synchronizationModule(synchronizationModule)
-                .usageLoggingModule(loggingModule)
-                .informationHelpersModule(InformationHelpersModule())
-                .scriptingModule(ScriptingModule())
+                .appDatabaseModule(appLevelDatabaseModule)
+                .jobDispatcherModule(jobDispatcherModule)
+                .serializationModule(serializationModule)
+                .systemIdentifierFactoryModule(systemIdentifierFactoryModule)
                 .build()
     }
 
-    val daoSerializationComponent: DaoSerializationComponent by lazy {
-        DaggerDaoSerializationComponent.builder()
+    val jobDispatcherComponent: JobDispatcherComponent by lazy {
+        DaggerJobDispatcherComponent.builder()
+                .jobDispatcherModule(jobDispatcherModule)
                 .applicationModule(appModule)
-                .daoSerializationModule(daoSerializationModule)
-                .backendDatabaseModule(backendDatabaseModule)
-                .triggerSystemModule(triggerSystemModule)
-                .build()
-    }
-
-    val scheduledJobComponent: ScheduledJobComponent by lazy{
-        DaggerScheduledJobComponent.builder()
-                .scheduledJobModule(scheduledJobModule)
-                .applicationModule(appModule)
-                .build()
-    }
-
-    val triggerSystemComponent: TriggerSystemComponent by lazy {
-        DaggerTriggerSystemComponent.builder()
-                .applicationModule(appModule)
-                .backendDatabaseModule(backendDatabaseModule)
-                .triggerSystemModule(triggerSystemModule)
-                .networkModule(networkModule)
-                .daoSerializationModule(daoSerializationModule)
-                .authModule(authModule)
-                .build()
-    }
-
-    val networkComponent: NetworkComponent by lazy {
-        DaggerNetworkComponent.builder()
-                .networkModule(networkModule)
-                .applicationModule(appModule)
-                .authModule(authModule)
                 .build()
     }
 
     val colorPalette: IntArray by lazy {
         this.resources.getStringArray(R.array.colorPaletteArray).map { Color.parseColor(it) }.toIntArray()
     }
+
+    val currentConfiguredContext: ConfiguredContext
+        get() {
+            return this.applicationComponent.configurationController().currentConfiguredContext
+        }
 
     override fun attachBaseContext(base: Context) {
         LocaleHelper.init(base)
@@ -277,10 +235,6 @@ class OTApp : MultiDexApplication() {
         } else {
             LeakCanary.install(this)
         }
-
-        applicationComponent.inject(this)
-        applicationComponent.inject(OTAttributeManager.Companion)
-
 
         instance = this
         println("set application instance.")
@@ -337,13 +291,17 @@ class OTApp : MultiDexApplication() {
         //TODO start service in job controller
         //startService(this.binaryUploadServiceController.makeResumeUploadIntent())
 
-        triggerSystemComponent.getTriggerAlarmController().get().activateOnSystem()
+        applicationComponent.configurationController().currentConfiguredContext.activateOnSystem()
 
         println("creation took ${SystemClock.elapsedRealtime() - startedAt}")
     }
 
     fun unlinkUser() {
-        applicationComponent.shortcutPanelManager().get().disposeShortcutPanel()
+        applicationComponent.
+                configurationController().
+                currentConfiguredContext.
+                configuredAppComponent.
+                shortcutPanelManager().disposeShortcutPanel()
         applicationComponent.defaultPreferences().edit().remove(INTENT_EXTRA_OBJECT_ID_USER).apply()
     }
 

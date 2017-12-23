@@ -1,11 +1,11 @@
 package kr.ac.snu.hcil.omnitrack.core.triggers.actions
 
-import android.content.Context
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import io.reactivex.Completable
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
+import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService
 
 /**
@@ -47,13 +47,14 @@ class OTBackgroundLoggingTriggerAction : OTTriggerAction() {
 
     var notify: Boolean = true
 
-    override fun performAction(triggerTime: Long, context: Context): Completable {
+    override fun performAction(triggerTime: Long, configuredContext: ConfiguredContext): Completable {
         return Completable.defer {
             if (trigger.liveTrackerCount > 0) {
-                context.startService(
+                configuredContext.applicationContext.startService(
                         OTItemLoggingService
-                                .makeLoggingIntent(context,
+                                .makeLoggingIntent(configuredContext.applicationContext,
                                         ItemLoggingSource.Trigger,
+                                        configuredContext.configuration.id,
                                         notify,
                                         *(trigger.liveTrackersQuery.findAll().map { it.objectId!! }.toTypedArray()))
                 )

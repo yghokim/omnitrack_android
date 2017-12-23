@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.triggers
 
 import dagger.Lazy
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 import javax.inject.Singleton
 
 /**

@@ -4,10 +4,10 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
-import android.preference.PreferenceManager
 import android.support.v4.app.NotificationCompat
 import android.support.v4.app.TaskStackBuilder
 import android.support.v4.graphics.ColorUtils
@@ -22,23 +22,27 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.core.di.Backend
+import kr.ac.snu.hcil.omnitrack.core.configuration.OTConfiguration
+import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.di.Configured
+import kr.ac.snu.hcil.omnitrack.core.di.configured.Backend
+import kr.ac.snu.hcil.omnitrack.core.di.global.Default
 import kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.HomeActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemDetailActivity
 import kr.ac.snu.hcil.omnitrack.utils.VectorIconHelper
 import javax.inject.Inject
-import javax.inject.Singleton
 
 /**
  * Created by Young-Ho Kim on 9/4/2016
  */
-@Singleton
+@Configured
 class OTShortcutPanelManager @Inject constructor(
         val authManager: Lazy<OTAuthManager>,
         val dbManager: Lazy<BackendDbManager>,
+        val configuration: OTConfiguration,
+        @Default val pref: SharedPreferences,
         @Backend val backendRealmProvider: Factory<Realm>
 ) {
 
@@ -56,7 +60,7 @@ class OTShortcutPanelManager @Inject constructor(
 
     val showPanels: Boolean
         get() {
-            return PreferenceManager.getDefaultSharedPreferences(OTApp.instance).getBoolean("pref_show_shortcut_panel", false)
+            return pref.getBoolean("pref_show_shortcut_panel", false)
         }
 
     private val notificationManager: NotificationManager by lazy {
@@ -112,7 +116,7 @@ class OTShortcutPanelManager @Inject constructor(
                     element.setViewVisibility(R.id.ui_background_image, View.INVISIBLE)
                 }
 
-                val instantLoggingIntent = PendingIntent.getService(context, i, OTItemLoggingService.makeLoggingIntent(context, ItemLoggingSource.Shortcut, true, trackers[i].objectId!!), PendingIntent.FLAG_UPDATE_CURRENT)
+                val instantLoggingIntent = PendingIntent.getService(context, i, OTItemLoggingService.makeLoggingIntent(context, ItemLoggingSource.Shortcut, configuration.id, true, trackers[i].objectId!!), PendingIntent.FLAG_UPDATE_CURRENT)
                 val openItemActivityIntent = PendingIntent.getActivity(context, i, ItemDetailActivity.makeNewItemPageIntent(trackers[i].objectId!!, context), PendingIntent.FLAG_UPDATE_CURRENT)
 
                 element.setOnClickPendingIntent(R.id.ui_button_instant, instantLoggingIntent)

@@ -4,7 +4,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.IBinder
 import android.support.v4.app.NotificationCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.AppCompatCheckBox
@@ -22,11 +21,13 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTFileInvolvedAttributeHelper
-import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.core.di.Backend
+import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
+import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.di.configured.Backend
 import kr.ac.snu.hcil.omnitrack.core.system.OTNotificationManager
 import kr.ac.snu.hcil.omnitrack.core.system.OTTaskNotificationManager
+import kr.ac.snu.hcil.omnitrack.utils.ConfigurableWakefulService
 import kr.ac.snu.hcil.omnitrack.utils.io.StringTableSheet
 import org.jetbrains.anko.notificationManager
 import java.io.File
@@ -37,7 +38,7 @@ import javax.inject.Inject
 /**
  * Created by Young-Ho on 3/9/2017.
  */
-class OTTableExportService : WakefulService(TAG) {
+class OTTableExportService : ConfigurableWakefulService(TAG) {
 
     enum class TableFileType(val extension: String) { CSV("csv"), EXCEL("xls")
     }
@@ -67,12 +68,12 @@ class OTTableExportService : WakefulService(TAG) {
             return intent
         }
 
-        fun makeConfigurationDialog(context: Context, tracker: OTTrackerDAO, onConfigured: (includeFiles: Boolean, tableFileType: TableFileType) -> Unit): MaterialDialog.Builder {
+        fun makeConfigurationDialog(context: Context, configuredContext: ConfiguredContext, tracker: OTTrackerDAO, onConfigured: (includeFiles: Boolean, tableFileType: TableFileType) -> Unit): MaterialDialog.Builder {
 
             val view = LayoutInflater.from(context).inflate(R.layout.dialog_export_configuration, null, false)
 
             val includeFilesCheckbox = view.findViewById<AppCompatCheckBox>(R.id.ui_include_external_files)
-            if (tracker.isExternalFilesInvolved) {
+            if (tracker.isExternalFilesInvolved(configuredContext)) {
                 includeFilesCheckbox.isEnabled = true
                 includeFilesCheckbox.isChecked = true
             } else {
@@ -104,261 +105,258 @@ class OTTableExportService : WakefulService(TAG) {
 
     }
 
-    lateinit var realm: Realm
+    inner class ConfiguredTask(startId: Int, configuredContext: ConfiguredContext) : AConfiguredTask(startId, configuredContext) {
 
-    @field:[Inject Backend]
-    lateinit var realmProvider: Factory<Realm>
+        lateinit var realm: Realm
+
+        @field:[Inject Backend]
+        lateinit var realmProvider: Factory<Realm>
 
 
-    @Inject
-    lateinit var dbManager: Lazy<BackendDbManager>
+        @Inject
+        lateinit var dbManager: Lazy<BackendDbManager>
 
-    @Inject
-    lateinit var logger: Lazy<IEventLogger>
+        @Inject
+        lateinit var logger: Lazy<IEventLogger>
 
-    private val subscriptions = CompositeDisposable()
+        private val subscriptions = CompositeDisposable()
 
-    override fun onCreate() {
-        super.onCreate()
-        (application as OTApp).applicationComponent.inject(this)
-        realm = realmProvider.get()
-    }
+        override fun dispose() {
+            subscriptions.clear()
+            realm.close()
+        }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        subscriptions.clear()
-        realm.close()
-    }
+        override fun onStartCommand(intent: Intent, flags: Int): Int {
+            realm = realmProvider.get()
+            println("table export service started.")
+            val trackerId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
+            val exportUriString = intent.getStringExtra(EXTRA_EXPORT_URI)
+            if (trackerId != null && exportUriString != null) {
+                val exportUri = Uri.parse(exportUriString)
 
-    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        println("table export service started.")
-        val trackerId = intent.getStringExtra(OTApp.INTENT_EXTRA_OBJECT_ID_TRACKER)
-        val exportUriString = intent.getStringExtra(EXTRA_EXPORT_URI)
-        if (trackerId != null && exportUriString != null) {
-            val exportUri = Uri.parse(exportUriString)
+                Toast.makeText(this@OTTableExportService, R.string.msg_export_title_progress, Toast.LENGTH_SHORT).show()
+                val notification = OTTaskNotificationManager.makeTaskProgressNotificationBuilder(this@OTTableExportService, getString(R.string.msg_export_title_progress), "downloading", OTTaskNotificationManager.PROGRESS_INDETERMINATE).build()
+                startForeground(NOTIFY_ID, notification)
 
-            Toast.makeText(this, R.string.msg_export_title_progress, Toast.LENGTH_SHORT).show()
-            val notification = OTTaskNotificationManager.makeTaskProgressNotificationBuilder(this, getString(R.string.msg_export_title_progress), "downloading", OTTaskNotificationManager.PROGRESS_INDETERMINATE).build()
-            startForeground(NOTIFY_ID, notification)
+                var loadedTracker: OTTrackerDAO? = null
 
-            var loadedTracker: OTTrackerDAO? = null
+                val externalFilesInvolved: Boolean = intent.getBooleanExtra(EXTRA_EXPORT_CONFIG_INCLUDE_FILE, false)
+                val tableType = TableFileType.valueOf(intent.getStringExtra(EXTRA_EXPORT_CONFIG_TABLE_FILE_TYPE))
 
-            val externalFilesInvolved: Boolean = intent.getBooleanExtra(EXTRA_EXPORT_CONFIG_INCLUDE_FILE, false)
-            val tableType = TableFileType.valueOf(intent.getStringExtra(EXTRA_EXPORT_CONFIG_TABLE_FILE_TYPE))
+                println("include external files:${externalFilesInvolved}")
+                println("table file type: ${tableType}")
 
-            println("include external files:${externalFilesInvolved}")
-            println("table file type: ${tableType}")
+                var cacheDirectory: File? = null
 
-            var cacheDirectory: File? = null
+                val table = StringTableSheet()
+                var involvedFileList: MutableList<String>? = null
 
-            val table = StringTableSheet()
-            var involvedFileList: MutableList<String>? = null
+                fun finish(successful: Boolean) {
+                    println("export observable completed")
 
-            fun finish(successful: Boolean) {
-                println("export observable completed")
+                    logger.get().logExport(trackerId)
 
-                logger.get().logExport(trackerId)
-
-                cacheDirectory?.let {
-                    if (it.exists()) {
-                        if (it.deleteRecursively()) {
-                            println("export cache files successfully removed.")
+                    cacheDirectory?.let {
+                        if (it.exists()) {
+                            if (it.deleteRecursively()) {
+                                println("export cache files successfully removed.")
+                            }
                         }
                     }
-                }
 
-                OTTaskNotificationManager.dismissNotification(this, NOTIFY_ID, TAG)
+                    OTTaskNotificationManager.dismissNotification(this@OTTableExportService, NOTIFY_ID, TAG)
 
-                if (successful && loadedTracker != null) {
+                    if (successful && loadedTracker != null) {
 
-                    val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(if (externalFilesInvolved) {
-                        "zip"
-                    } else {
-                        tableType.extension
-                    })
-
-                    val notificationId = makeUniqueNotificationId()
-
-                    val notification =
-                            NotificationCompat.Builder(this, OTNotificationManager.CHANNEL_ID_SYSTEM)
-                                    .setContentTitle(String.format(getString(R.string.msg_export_success_notification_message), loadedTracker?.name))
-                                    .setShowWhen(true)
-                                    .setWhen(System.currentTimeMillis())
-                                    .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
-                                    .setSmallIcon(R.drawable.icon_simple_check)
-                                    .addAction(0, getString(R.string.msg_open), PendingIntent.getActivity(this, notificationId,
-                                            Intent.createChooser(Intent(Intent.ACTION_VIEW).putExtra(Intent.EXTRA_STREAM, exportUri).setDataAndType(exportUri, mimeType).apply { this.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION },
-                                                    getString(R.string.msg_open_exported_file)), PendingIntent.FLAG_CANCEL_CURRENT))
-                                    .addAction(0, getString(R.string.msg_share),
-                                            PendingIntent.getActivity(this, notificationId,
-                                                    Intent.createChooser(Intent(Intent.ACTION_SEND).setDataAndType(exportUri, mimeType).putExtra(Intent.EXTRA_STREAM, exportUri).apply { this.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION },
-                                                            getString(R.string.msg_share_exported_file)), PendingIntent.FLAG_UPDATE_CURRENT)
-                                            )
-                                    .build()
-                    notificationManager.notify(TAG, notificationId, notification)
-                }
-                stopSelf(startId)
-            }
-
-            subscriptions.add(
-                    Single.defer<Boolean> {
-                        val tracker = dbManager.get().getUnManagedTrackerDao(trackerId, realm)
-                        val attributes = tracker?.attributes?.filter { it.isHidden == false && it.isInTrashcan == false }?: emptyList()
-                        loadedTracker = tracker
-                        if (tracker == null) {
-                            return@defer Single.just(true)
+                        val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(if (externalFilesInvolved) {
+                            "zip"
                         } else {
-                            if (externalFilesInvolved) {
-                                cacheDirectory = this.cacheDir.resolve("export_${System.currentTimeMillis()}")
-                                cacheDirectory?.let {
-                                    if (!it.exists())
-                                        cacheDirectory?.mkdirs()
-                                }
+                            tableType.extension
+                        })
 
-                                involvedFileList = ArrayList<String>()
-                            }
+                        val notificationId = makeUniqueNotificationId()
 
-                            table.columns.add("index")
-                            table.columns.add("logged_at")
-                            table.columns.add("source")
+                        val notification =
+                                NotificationCompat.Builder(this@OTTableExportService, OTNotificationManager.CHANNEL_ID_SYSTEM)
+                                        .setContentTitle(String.format(getString(R.string.msg_export_success_notification_message), loadedTracker?.name))
+                                        .setShowWhen(true)
+                                        .setWhen(System.currentTimeMillis())
+                                        .setColor(ContextCompat.getColor(this@OTTableExportService, R.color.colorPrimary))
+                                        .setSmallIcon(R.drawable.icon_simple_check)
+                                        .addAction(0, getString(R.string.msg_open), PendingIntent.getActivity(this@OTTableExportService, notificationId,
+                                                Intent.createChooser(Intent(Intent.ACTION_VIEW).putExtra(Intent.EXTRA_STREAM, exportUri).setDataAndType(exportUri, mimeType).apply { this.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION },
+                                                        getString(R.string.msg_open_exported_file)), PendingIntent.FLAG_CANCEL_CURRENT))
+                                        .addAction(0, getString(R.string.msg_share),
+                                                PendingIntent.getActivity(this@OTTableExportService, notificationId,
+                                                        Intent.createChooser(Intent(Intent.ACTION_SEND).setDataAndType(exportUri, mimeType).putExtra(Intent.EXTRA_STREAM, exportUri).apply { this.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION },
+                                                                getString(R.string.msg_share_exported_file)), PendingIntent.FLAG_UPDATE_CURRENT)
+                                        )
+                                        .build()
+                        notificationManager.notify(TAG, notificationId, notification)
+                    }
+                    finishSelf()
+                }
 
-                            attributes.forEach {
-                                it.getHelper().onAddColumnToTable(it, table.columns)
-                            }
-
-
-                            val items = dbManager.get().makeItemsQuery(trackerId, null, null, realm).findAll()
-                            items.withIndex().forEach { itemWithIndex ->
-                                val item = itemWithIndex.value
-                                val row = ArrayList<String?>()
-                                row.add(itemWithIndex.index.toString())
-                                row.add(item.timestamp.toString())
-                                row.add(item.loggingSource.name)
-                                attributes.forEach { attribute ->
-                                    attribute.getHelper().onAddValueToTable(attribute, item.getValueOf(attribute.localId), row, itemWithIndex.index.toString())
-                                }
-                                table.rows.add(row)
-                            }
-
-                            if (!externalFilesInvolved) {
+                subscriptions.add(
+                        Single.defer<Boolean> {
+                            val tracker = dbManager.get().getUnManagedTrackerDao(trackerId, realm)
+                            val attributes = tracker?.attributes?.filter { it.isHidden == false && it.isInTrashcan == false } ?: emptyList()
+                            loadedTracker = tracker
+                            if (tracker == null) {
                                 return@defer Single.just(true)
                             } else {
-                                val tablePath = cacheDirectory?.resolve("table.${tableType.extension}")
-                                if (tablePath != null) {
-                                    val fileOutputStream = FileOutputStream(tablePath)
-                                    when (tableType) {
-                                        TableFileType.CSV -> {
-                                            table.storeCsvToStream(fileOutputStream)
-                                            fileOutputStream.close()
-                                }
-                                        TableFileType.EXCEL -> {
-                                            table.storeExcelToStream(fileOutputStream)
-                                        }
-                            }
+                                if (externalFilesInvolved) {
+                                    cacheDirectory = this@OTTableExportService.cacheDir.resolve("export_${System.currentTimeMillis()}")
+                                    cacheDirectory?.let {
+                                        if (!it.exists())
+                                            cacheDirectory?.mkdirs()
+                                    }
 
-                                    involvedFileList?.add(tablePath.path)
+                                    involvedFileList = ArrayList<String>()
                                 }
 
-                                val storeObservables = ArrayList<Single<Uri>>()
-                                attributes.filter { it.getHelper().isExternalFile(it) && it.getHelper() is OTFileInvolvedAttributeHelper }.forEach { attr ->
-                                    val helper = attr.getHelper() as OTFileInvolvedAttributeHelper
-                                    items.withIndex().forEach { itemWithIndex ->
-                                        val itemValue = itemWithIndex.value.getValueOf(attr.localId)
-                                        if (itemValue != null && helper.isValueContainingFileInfo(attr, itemValue)) {
-                                            val cacheFilePath = cacheDirectory?.resolve(helper.makeRelativeFilePathFromValue(attr, itemValue, itemWithIndex.index.toString()))
-                                            if (cacheFilePath != null) {
-                                                val cacheFileLocation = cacheFilePath.parentFile
-                                                if (!cacheFileLocation.exists()) {
-                                                    cacheFileLocation.mkdirs()
+                                table.columns.add("index")
+                                table.columns.add("logged_at")
+                                table.columns.add("source")
+
+                                attributes.forEach {
+                                    it.getHelper(configuredContext).onAddColumnToTable(it, table.columns)
+                                }
+
+
+                                val items = dbManager.get().makeItemsQuery(trackerId, null, null, realm).findAll()
+                                items.withIndex().forEach { itemWithIndex ->
+                                    val item = itemWithIndex.value
+                                    val row = ArrayList<String?>()
+                                    row.add(itemWithIndex.index.toString())
+                                    row.add(item.timestamp.toString())
+                                    row.add(item.loggingSource.name)
+                                    attributes.forEach { attribute ->
+                                        attribute.getHelper(configuredContext).onAddValueToTable(attribute, item.getValueOf(attribute.localId), row, itemWithIndex.index.toString())
+                                    }
+                                    table.rows.add(row)
+                                }
+
+                                if (!externalFilesInvolved) {
+                                    return@defer Single.just(true)
+                                } else {
+                                    val tablePath = cacheDirectory?.resolve("table.${tableType.extension}")
+                                    if (tablePath != null) {
+                                        val fileOutputStream = FileOutputStream(tablePath)
+                                        when (tableType) {
+                                            TableFileType.CSV -> {
+                                                table.storeCsvToStream(fileOutputStream)
+                                                fileOutputStream.close()
+                                            }
+                                            TableFileType.EXCEL -> {
+                                                table.storeExcelToStream(fileOutputStream)
+                                            }
                                         }
 
-                                                if (!cacheFilePath.exists()) {
-                                                    cacheFilePath.createNewFile()
+                                        involvedFileList?.add(tablePath.path)
+                                    }
+
+                                    val storeObservables = ArrayList<Single<Uri>>()
+                                    attributes.filter { it.getHelper(configuredContext).isExternalFile(it) && it.getHelper(configuredContext) is OTFileInvolvedAttributeHelper }.forEach { attr ->
+                                        val helper = attr.getHelper(configuredContext) as OTFileInvolvedAttributeHelper
+                                        items.withIndex().forEach { itemWithIndex ->
+                                            val itemValue = itemWithIndex.value.getValueOf(attr.localId)
+                                            if (itemValue != null && helper.isValueContainingFileInfo(attr, itemValue)) {
+                                                val cacheFilePath = cacheDirectory?.resolve(helper.makeRelativeFilePathFromValue(attr, itemValue, itemWithIndex.index.toString()))
+                                                if (cacheFilePath != null) {
+                                                    val cacheFileLocation = cacheFilePath.parentFile
+                                                    if (!cacheFileLocation.exists()) {
+                                                        cacheFileLocation.mkdirs()
+                                                    }
+
+                                                    if (!cacheFilePath.exists()) {
+                                                        cacheFilePath.createNewFile()
+                                                    }
+                                                    storeObservables.add(helper.storeValueFile(attr, itemValue, Uri.parse(cacheFilePath.path)).onErrorReturn { ex -> Uri.EMPTY })
+                                                }
+                                            }
                                         }
-                                                storeObservables.add(helper.storeValueFile(attr, itemValue, Uri.parse(cacheFilePath.path)).onErrorReturn { ex -> Uri.EMPTY })
+                                    }
+
+                                    if (storeObservables.isNotEmpty()) {
+                                        return@defer Single.zip(storeObservables) { uris ->
+                                            println("uris")
+                                            uris.filter { it != Uri.EMPTY }.map { it.toString() }
+                                        }.doOnSuccess { uris ->
+                                            involvedFileList?.addAll(uris)
+                                        }.map { true }
+                                    } else {
+                                        return@defer Single.just(true)
                                     }
                                 }
                             }
-                        }
+                        }.onErrorReturn { err ->
+                            err.printStackTrace()
+                            false
+                        }.subscribe({
+                            println("file making task finished")
 
-                                if (storeObservables.isNotEmpty()) {
-                                    return@defer Single.zip(storeObservables) { uris ->
-                                        println("uris")
-                                        uris.filter { it != Uri.EMPTY }.map { it.toString() }
-                                    }.doOnSuccess { uris ->
-                                        involvedFileList?.addAll(uris)
-                                    }.map { true }
-                                } else {
-                                    return@defer Single.just(true)
-                                }
-                            }
-                        }
-                    }.onErrorReturn { err ->
-                        err.printStackTrace()
-                        false
-                    }.subscribe({
-                        println("file making task finished")
+                            val successful: Boolean = if (externalFilesInvolved) {
+                                involvedFileList?.let { list ->
+                                    println("Involved files: ")
+                                    for (path in list) {
+                                        println(path)
+                                    }
 
-                        val successful: Boolean = if (externalFilesInvolved) {
-                            involvedFileList?.let { list ->
-                                println("Involved files: ")
-                                for (path in list) {
-                                    println(path)
-                                }
-
+                                    try {
+                                        val outputStream = contentResolver.openOutputStream(exportUri)
+                                        kr.ac.snu.hcil.omnitrack.utils.io.ZipUtil.zip(cacheDirectory!!.absolutePath, outputStream)
+                                    } catch (ex: Exception) {
+                                        //fail
+                                        ex.printStackTrace()
+                                        false
+                                    }
+                                } == true
+                            } else {
                                 try {
+                                    println("store table itself to output")
                                     val outputStream = contentResolver.openOutputStream(exportUri)
-                                    kr.ac.snu.hcil.omnitrack.utils.io.ZipUtil.zip(cacheDirectory!!.absolutePath, outputStream)
-                                } catch(ex: Exception) {
+                                    when (tableType) {
+                                        TableFileType.EXCEL -> {
+                                            table.storeExcelToStream(outputStream)
+                                        }
+                                        TableFileType.CSV -> {
+                                            table.storeCsvToStream(outputStream)
+                                            outputStream.close()
+                                        }
+                                    }
+                                    true
+                                } catch (ex: Exception) {
                                     //fail
                                     ex.printStackTrace()
                                     false
                                 }
-                            } == true
-                        } else {
-                            try {
-                                println("store table itself to output")
-                                val outputStream = contentResolver.openOutputStream(exportUri)
-                                when (tableType) {
-                                    TableFileType.EXCEL -> {
-                                        table.storeExcelToStream(outputStream)
-                                    }
-                                    TableFileType.CSV -> {
-                                        table.storeCsvToStream(outputStream)
-                                        outputStream.close()
-                                    }
-                                }
-                                true
-                            } catch(ex: Exception) {
-                                //fail
-                                ex.printStackTrace()
-                                false
                             }
-                        }
 
 
-                        if (successful) {
-                            println("created table successfully.")
-                            println(table)
+                            if (successful) {
+                                println("created table successfully.")
+                                println(table)
 
-                            finish(true)
-                        } else {
-                            finish(false)
-                        }
-                    }, { ex -> ex.printStackTrace(); finish(false) })
-            )
+                                finish(true)
+                            } else {
+                                finish(false)
+                            }
+                        }, { ex -> ex.printStackTrace(); finish(false) })
+                )
 
 
 
-            return START_REDELIVER_INTENT
-        } else {
-            stopSelf(startId)
-            return START_NOT_STICKY
+                return START_REDELIVER_INTENT
+            } else {
+                finishSelf()
+                return START_NOT_STICKY
+            }
         }
+
     }
 
-
-    override fun onBind(p0: Intent?): IBinder? {
-        return null
+    override fun makeConfiguredTask(startId: Int, configuredContext: ConfiguredContext): AConfiguredTask {
+        return ConfiguredTask(startId, configuredContext)
     }
 }

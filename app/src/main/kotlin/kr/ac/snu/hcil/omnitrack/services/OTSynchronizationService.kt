@@ -1,97 +1,106 @@
 package kr.ac.snu.hcil.omnitrack.services
 
 import com.firebase.jobdispatcher.JobParameters
-import com.firebase.jobdispatcher.JobService
 import dagger.Lazy
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.PublishSubject
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
+import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncQueueDbHelper
 import kr.ac.snu.hcil.omnitrack.core.system.OTShortcutPanelManager
+import kr.ac.snu.hcil.omnitrack.utils.ConfigurableJobService
 import javax.inject.Inject
 
 /**
  * Created by younghokim on 2017. 9. 26..
  */
-class OTSynchronizationService : JobService() {
-
+class OTSynchronizationService : ConfigurableJobService() {
     companion object {
         val TAG = OTSynchronizationService::class.java.simpleName
-
         const val EXTRA_KEY_ONESHOT = "isOneShot"
     }
 
-    @Inject
-    lateinit var syncManager: Lazy<OTSyncManager>
+    inner class ConfiguredTask(val configuredContext: ConfiguredContext) : IConfiguredTask {
 
-    @Inject
-    lateinit var authManager: Lazy<OTAuthManager>
+        @Inject
+        lateinit var syncManager: Lazy<OTSyncManager>
 
-    @Inject
-    lateinit var shortcutPanelManager: Lazy<OTShortcutPanelManager>
+        @Inject
+        lateinit var authManager: Lazy<OTAuthManager>
 
-    @Inject
-    lateinit var syncQueueDbHelper: Lazy<SyncQueueDbHelper>
+        @Inject
+        lateinit var shortcutPanelManager: Lazy<OTShortcutPanelManager>
 
-    private val subscriptions = CompositeDisposable()
+        @Inject
+        lateinit var syncQueueDbHelper: Lazy<SyncQueueDbHelper>
 
-    override fun onCreate() {
-        super.onCreate()
-        (application as OTApp).applicationComponent.inject(this)
-        val userId = authManager.get().userId
-        if (userId != null) {
-            shortcutPanelManager.get().registerShortcutRefreshSubscription(userId, TAG)
+        private val subscriptions = CompositeDisposable()
+
+        init {
+            configuredContext.configuredAppComponent.inject(this)
         }
-    }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        shortcutPanelManager.get().unregisterShortcutRefreshSubscription(TAG)
-    }
+        override fun dispose() {
+            subscriptions.clear()
+        }
 
-    override fun onStopJob(job: JobParameters): Boolean {
-        //accidental finish
-        subscriptions.clear()
-        return true
-    }
+        private fun fetchPendingQueueData(internalSubject: PublishSubject<SyncQueueDbHelper.AggregatedSyncQueue>): Boolean {
+            val pendingQueue = syncQueueDbHelper.get().getAggregatedData()
+            if (pendingQueue != null) {
+                internalSubject.onNext(pendingQueue)
+                println("synchQueue data is pending. update internal subject.")
+                return true
+            } else {
+                internalSubject.onComplete()
+                println("synchQueue is empty. complete the internal subject.")
+                return false
+            }
+        }
 
-    private fun fetchPendingQueueData(internalSubject: PublishSubject<SyncQueueDbHelper.AggregatedSyncQueue>): Boolean {
-        val pendingQueue = syncQueueDbHelper.get().getAggregatedData()
-        if (pendingQueue != null) {
-            internalSubject.onNext(pendingQueue)
-            println("synchQueue data is pending. update internal subject.")
+        override fun onStartJob(job: JobParameters): Boolean {
+            println("start synchronization... ${job.extras}")
+
+            if (authManager.get().isUserSignedIn() && configuredContext.isActive) {
+                shortcutPanelManager.get().registerShortcutRefreshSubscription(authManager.get().userId ?: "", "$TAG/${configuredContext.configuration.id}")
+            }
+
+            val internalSubject = PublishSubject.create<SyncQueueDbHelper.AggregatedSyncQueue>()
+
+            subscriptions.add(
+                    internalSubject.doAfterNext { batchData ->
+                        syncQueueDbHelper.get().purgeEntries(batchData.ids)
+                        fetchPendingQueueData(internalSubject)
+                    }.concatMap { batchData ->
+                        syncManager.get().makeSynchronizationTask(batchData).toSingle { batchData }.toObservable()
+                    }
+                            .subscribe({ batchData ->
+                                println(batchData)
+                            }, { err ->
+                                err.printStackTrace()
+                                onStopped()
+                                jobFinished(job, true)
+                            }, {
+                                onStopped()
+                                jobFinished(job, false)
+                            })
+            )
+
+            return fetchPendingQueueData(internalSubject)
+        }
+
+        override fun onStopJob(job: JobParameters): Boolean {
+            onStopped()
             return true
-        } else {
-            internalSubject.onComplete()
-            println("synchQueue is empty. complete the internal subject.")
-            return false
         }
+
+        fun onStopped() {
+            shortcutPanelManager.get().unregisterShortcutRefreshSubscription("$TAG/${configuredContext.configuration.id}")
+        }
+
     }
 
-    override fun onStartJob(job: JobParameters): Boolean {
-        println("start synchronization... ${job.extras}")
-        val internalSubject = PublishSubject.create<SyncQueueDbHelper.AggregatedSyncQueue>()
-
-        subscriptions.add(
-                internalSubject.doAfterNext { batchData ->
-                    syncQueueDbHelper.get().purgeEntries(batchData.ids)
-                    fetchPendingQueueData(internalSubject)
-                }.concatMap { batchData ->
-                    syncManager.get().makeSynchronizationTask(batchData).toSingle { batchData }.toObservable()
-                }
-                        .subscribe({ batchData ->
-                            println(batchData)
-                        }, { err ->
-                            err.printStackTrace()
-                            jobFinished(job, true)
-                        }, {
-                            jobFinished(job, false)
-                        })
-        )
-
-        return fetchPendingQueueData(internalSubject)
+    override fun makeNewTask(configuredContext: ConfiguredContext): IConfiguredTask {
+        return ConfiguredTask(configuredContext)
     }
-
 }

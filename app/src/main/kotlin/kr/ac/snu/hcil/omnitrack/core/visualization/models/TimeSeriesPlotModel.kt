@@ -6,16 +6,18 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.ISingleNumberAttributeHelper
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimePoint
 import kr.ac.snu.hcil.omnitrack.core.visualization.IWebBasedChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.TrackerChartModel
+import javax.inject.Inject
 
 /**
  * Created by younghokim on 2017. 11. 24..
  */
-class TimeSeriesPlotModel(tracker: OTTrackerDAO, protected val timeAttribute: OTAttributeDAO, protected val yAttribute: OTAttributeDAO, realm: Realm) : TrackerChartModel<Pair<Long, Double>>(tracker, realm), IWebBasedChartModel {
+class TimeSeriesPlotModel(tracker: OTTrackerDAO, protected val timeAttribute: OTAttributeDAO, protected val yAttribute: OTAttributeDAO, realm: Realm, configuredContext: ConfiguredContext) : TrackerChartModel<Pair<Long, Double>>(tracker, realm), IWebBasedChartModel {
 
     private val timeAttributeLocalId = timeAttribute.localId
     private val yValueAttributeLocalId = yAttribute.localId
@@ -28,13 +30,16 @@ class TimeSeriesPlotModel(tracker: OTTrackerDAO, protected val timeAttribute: OT
             return String.format(OTApp.getString(R.string.msg_vis_format_time_number_plot_title), yAttributeName, timeAttributeName)
         }
 
+    @Inject
+    protected lateinit var attributeManager: OTAttributeManager
+
     init {
-        OTApp.instance.applicationComponent.inject(this)
+        configuredContext.configuredAppComponent.inject(this)
     }
 
     override fun reloadData(): Single<List<Pair<Long, Double>>> {
         return Single.defer {
-            val yAttributeHelper = yAttribute.let { OTAttributeManager.getAttributeHelper(it.type) }
+            val yAttributeHelper = yAttribute.let { attributeManager.getAttributeHelper(it.type) }
             if (yAttributeHelper is ISingleNumberAttributeHelper) {
                 val items = dbManager.getItemsQueriedWithTimeAttribute(tracker.objectId, getTimeScope(), timeAttributeLocalId, realm)
                 return@defer Single.just(

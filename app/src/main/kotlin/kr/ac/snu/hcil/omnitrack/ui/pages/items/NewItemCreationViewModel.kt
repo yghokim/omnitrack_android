@@ -3,12 +3,12 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.items
 import android.app.Application
 import io.reactivex.Maybe
 import io.reactivex.Single
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.OTItemBuilderWrapperBase
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels.OTItemBuilderDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels.OTItemBuilderFieldValueEntry
+import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.OTItemBuilderDAO
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.OTItemBuilderFieldValueEntry
 import kr.ac.snu.hcil.omnitrack.utils.AnyValueWithTimestamp
 import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 
@@ -20,8 +20,8 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
     private lateinit var itemBuilderDao: OTItemBuilderDAO
     private lateinit var builderWrapper: OTItemBuilderWrapperBase
 
-    override fun onInject(app: OTApp) {
-        app.applicationComponent.inject(this)
+    override fun onInject(configuredContext: ConfiguredContext) {
+        configuredContext.configuredAppComponent.inject(this)
     }
 
     override fun onInit(trackerDao: OTTrackerDAO, itemId: String?): Pair<ItemMode, BuilderCreationMode?>? {
@@ -43,7 +43,7 @@ class NewItemCreationViewModel(app: Application) : ItemEditionViewModelBase(app)
             builderCreationModeObservable.onNext(BuilderCreationMode.NewBuilder)
         }
 
-        this.builderWrapper = OTItemBuilderWrapperBase(this.itemBuilderDao, realm)
+        this.builderWrapper = OTItemBuilderWrapperBase(this.itemBuilderDao, configuredContext, realm)
 
         for (key in this.builderWrapper.keys) {
             val value = this.builderWrapper.getValueInformationOf(key)

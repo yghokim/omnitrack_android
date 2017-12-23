@@ -20,13 +20,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TimePicker
 import com.google.android.gms.maps.model.LatLng
+import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
+import com.google.gson.reflect.TypeToken
 import io.reactivex.Completable
 import io.reactivex.disposables.Disposables
 import io.reactivex.subjects.BehaviorSubject
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
+import java.lang.reflect.Type
 import java.math.BigDecimal
 import java.util.*
 
@@ -164,6 +167,45 @@ fun toBigDecimal(value: Any): BigDecimal {
     } else if (value is BigDecimal) {
         return value
     } else throw Exception("value is not number primitive.")
+}
+
+fun String.toNumber(): Number {
+    try {
+        return this.toShort()
+    } catch (ex: Exception) {
+        ex.printStackTrace()
+        try {
+            return this.toInt()
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            try {
+                return this.toLong()
+            } catch (ex: Exception) {
+                ex.printStackTrace()
+                try {
+                    return this.toFloat()
+                } catch (ex: Exception) {
+                    ex.printStackTrace()
+                    try {
+                        return this.toDouble()
+                    } catch (ex: Exception) {
+                        ex.printStackTrace()
+                        return this.toBigDecimal()
+                    }
+                }
+            }
+        }
+    }
+}
+
+private val hashMapType: Type by lazy { object : TypeToken<HashMap<String, Any>>() {}.type }
+
+fun Gson.parseToMap(jsonString: String): MutableMap<String, Any?> {
+    return this.fromJson(jsonString, kr.ac.snu.hcil.omnitrack.utils.hashMapType)
+}
+
+fun HashMap<String, Any?>.toJson(gson: Gson): String {
+    return gson.toJson(this, hashMapType)
 }
 
 fun List<*>.move(fromPosition: Int, toPosition: Int): Boolean {

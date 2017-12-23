@@ -12,7 +12,7 @@ import io.realm.Realm
 import io.realm.Sort
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.datatypes.TimeSpan
 import kr.ac.snu.hcil.omnitrack.core.visualization.AttributeChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.INativeChartModel
@@ -35,10 +35,6 @@ class DurationTimelineModel(attribute: OTAttributeDAO, realm: Realm) : Attribute
 
     data class AggregatedDuration(val time: Long, val count: Int, val avgFrom: Float, val avgTo: Float, val earliest: Float = avgFrom, val latest: Float = avgTo)
 
-    init{
-        OTApp.instance.applicationComponent.inject(this)
-    }
-
     override fun reloadData(): Single<List<AggregatedDuration>> {
 
         val xScale = QuantizedTimeScale()
@@ -53,7 +49,8 @@ class DurationTimelineModel(attribute: OTAttributeDAO, realm: Realm) : Attribute
 
 
             dbManager.makeItemsQuery(attribute.trackerId, TimeSpan.fromPoints(from, to), realm)
-                    .findAllSortedAsync("timestamp", Sort.ASCENDING)
+                    .sort("timestamp", Sort.ASCENDING)
+                    .findAllAsync()
                     .asFlowable()
                     .filter { it.isLoaded }.firstElement().flatMap<AggregatedDuration?> {
                 items ->
