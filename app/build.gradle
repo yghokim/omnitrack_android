@@ -8,6 +8,13 @@ def keystorePropertiesFile = rootProject.file("keystore.properties")
 def keystoreProperties = new Properties()
 keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
+//load google-services.json
+File googleServicesFile = rootProject.file("google-services.json")
+def googleServices = new groovy.json.JsonSlurper().parseText(googleServicesFile.text)
+println(googleServices.project_info)
+def gcmSenderId = googleServices.project_info.project_number
+def firebaseProjectId = googleServices.project_info.project_id
+
 android {
     signingConfigs {
         sign_test {
@@ -66,12 +73,35 @@ android {
     }
     buildTypes.each {
         buildType->
-        buildType.buildConfigField 'String', 'OMNITRACK_SYNCHRONIZATION_SERVER_URL', OMNITRACK_SYNCHRONIZATION_SERVER_URL
-        buildType.buildConfigField 'String', 'OMNITRACK_MEDIA_STORAGE_SERVER_URL', OMNITRACK_MEDIA_STORAGE_SERVER_URL
+            def finalApplicationId = buildType.applicationIdSuffix ==null ? defaultConfig.applicationId : defaultConfig.applicationId + buildType.applicationIdSuffix
 
-        keystoreProperties.keySet().forEach{
-            buildType.buildConfigField 'String', it.toString(), keystoreProperties.getProperty(it)
-        }
+            buildType.buildConfigField 'String', 'OMNITRACK_SYNCHRONIZATION_SERVER_URL', OMNITRACK_SYNCHRONIZATION_SERVER_URL
+            buildType.buildConfigField 'String', 'OMNITRACK_MEDIA_STORAGE_SERVER_URL', OMNITRACK_MEDIA_STORAGE_SERVER_URL
+
+            keystoreProperties.keySet().forEach{
+                buildType.buildConfigField 'String', it.toString(), keystoreProperties.getProperty(it)
+            }
+
+            //type-specific properties
+            File variantKeystorePropertiesFile = rootProject.file("keystore.${buildType.name}.properties")
+            if(variantKeystorePropertiesFile.exists()) {
+                def variantKeystoreProperties = new Properties()
+                variantKeystoreProperties.load(new FileInputStream(variantKeystorePropertiesFile))
+                variantKeystoreProperties.keySet().forEach{
+                    buildType.buildConfigField 'String', it.toString(), variantKeystoreProperties.getProperty(it)
+                }
+            }
+
+            def googleServiceClient = googleServices.client.find{it.client_info.android_client_info.package_name == finalApplicationId}
+            def googleAuthClientId = googleServiceClient.oauth_client[0].client_id
+            def firebaseApiKey = googleServiceClient.api_key[0].current_key
+            def mobileSdkAppId = googleServiceClient.client_info.mobilesdk_app_id
+
+            buildType.buildConfigField 'String', 'FIREBASE_API_KEY', "\"$firebaseApiKey\""
+            buildType.buildConfigField 'String', 'FIREBASE_CLOUD_MESSAGING_SENDER_ID', "\"$gcmSenderId\""
+            buildType.buildConfigField 'String', 'FIREBASE_PROJECT_ID', "\"$firebaseProjectId\""
+            buildType.buildConfigField 'String', 'FIREBASE_AUTH_CLIENT_ID', "\"$googleAuthClientId\""
+            buildType.buildConfigField 'String', 'FIREBASE_CLIENT_ID', "\"$mobileSdkAppId\""
     }
 
     sourceSets {
@@ -120,13 +150,14 @@ dependencies {
     implementation "com.google.android.gms:play-services-gcm:$rootProject.ext.google_play_version"
     implementation "com.google.android.gms:play-services-plus:$rootProject.ext.google_play_version"
     implementation "com.google.android.gms:play-services-auth:$rootProject.ext.google_play_version"
+    implementation "com.google.firebase:firebase-core:$rootProject.ext.google_play_version"
     implementation "com.google.firebase:firebase-auth:$rootProject.ext.google_play_version"
-    implementation "com.google.firebase:firebase-database:$rootProject.ext.google_play_version"
-    implementation "com.google.firebase:firebase-storage:$rootProject.ext.google_play_version"
-    implementation "com.google.firebase:firebase-config:$rootProject.ext.google_play_version"
     implementation "com.google.firebase:firebase-messaging:$rootProject.ext.google_play_version"
-    implementation "com.google.firebase:firebase-crash:$rootProject.ext.google_play_version"
-    implementation 'com.firebase:firebase-jobdispatcher:0.8.4'
+    implementation "com.google.firebase:firebase-config:$rootProject.ext.google_play_version"
+    implementation('com.crashlytics.sdk.android:crashlytics:2.7.1@aar') {
+        transitive = true
+    }
+    implementation 'com.firebase:firebase-jobdispatcher:0.8.5'
 
     implementation "android.arch.lifecycle:extensions:1.0.0"
     kapt "android.arch.lifecycle:compiler:1.0.0"
@@ -155,7 +186,7 @@ dependencies {
     implementation 'com.android.support.constraint:constraint-layout:1.1.0-beta3'
     implementation 'com.google.android:flexbox:0.3.1'
     implementation "com.google.code.gson:gson:$rootProject.ext.gson_version"
-    implementation 'io.reactivex.rxjava2:rxjava:2.1.6'
+    implementation 'io.reactivex.rxjava2:rxjava:2.1.7'
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
 
 
@@ -177,10 +208,10 @@ dependencies {
     implementation 'com.heinrichreimersoftware:material-intro:1.6.2'
     implementation 'com.jaredrummler:material-spinner:1.2.3'
     implementation 'de.hdodenhof:circleimageview:2.2.0'
-    implementation 'com.github.bumptech.glide:glide:4.3.1'
-    kapt 'com.github.bumptech.glide:compiler:4.3.1'
+    implementation "com.github.bumptech.glide:glide:$rootProject.ext.glide_version"
+    kapt "com.github.bumptech.glide:compiler:$rootProject.ext.glide_version"
     implementation 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.4@aar'
-    implementation 'com.wonderkiln:camerakit:0.12.0'
+    implementation 'com.wonderkiln:camerakit:0.13.1'
     implementation 'com.github.mukeshsolanki:country-picker-android:1.2.0'
     implementation 'com.patloew.rxlocation:rxlocation:1.0.3'
     implementation 'uk.co.samuelwall:material-tap-target-prompt:2.4.0'
