@@ -11,8 +11,10 @@ import android.provider.Settings
 import android.support.multidex.MultiDex
 import android.support.multidex.MultiDexApplication
 import android.support.v7.app.AppCompatDelegate
+import com.crashlytics.android.Crashlytics
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.squareup.leakcanary.LeakCanary
+import io.fabric.sdk.android.Fabric
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.LoggingDbHelper
@@ -224,7 +226,7 @@ class OTApp : MultiDexApplication() {
     override fun onCreate() {
         super.onCreate()
         val startedAt = SystemClock.elapsedRealtime()
-
+        Fabric.with(this, Crashlytics())
         AndroidThreeTen.init(this)
         RxActivityResult.register(this)
         Realm.init(this)

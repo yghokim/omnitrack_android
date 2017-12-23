@@ -1,3 +1,4 @@
+/*
 package kr.ac.snu.hcil.omnitrack.core.net
 
 import android.net.Uri
@@ -102,4 +103,4 @@ class OTFirebaseStorageCore : IBinaryStorageCore {
         }
     }
 
-}
+}*/
