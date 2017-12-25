@@ -3,9 +3,9 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels
 import io.reactivex.Completable
 import io.reactivex.subjects.BehaviorSubject
 import io.realm.*
-import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
@@ -23,7 +23,7 @@ import javax.inject.Inject
 /**
  * Created by younghokim on 2017. 10. 24..
  */
-open class TriggerViewModel(val app: OTApp, val dao: OTTriggerDAO, val realm: Realm) : IReadonlyObjectId, RealmChangeListener<OTTriggerDAO>, OrderedRealmCollectionChangeListener<RealmResults<OTTrackerDAO>> {
+open class TriggerViewModel(val configuredContext: ConfiguredContext, val dao: OTTriggerDAO, val realm: Realm) : IReadonlyObjectId, RealmChangeListener<OTTriggerDAO>, OrderedRealmCollectionChangeListener<RealmResults<OTTrackerDAO>> {
 
     @Inject
     protected lateinit var syncManager: OTSyncManager
@@ -63,7 +63,7 @@ open class TriggerViewModel(val app: OTApp, val dao: OTTriggerDAO, val realm: Re
         }
 
     init {
-        app.applicationComponent.inject(this)
+        configuredContext.configuredAppComponent.inject(this)
 
         applyDaoToFront()
         println("trigger user id: ${dao.userId}")
@@ -88,7 +88,7 @@ open class TriggerViewModel(val app: OTApp, val dao: OTTriggerDAO, val realm: Re
         triggerActionType.onNext(dao.actionType)
         dao.action?.let { triggerAction.onNext(it) }
         if (currentConditionViewModel?.conditionType != dao.conditionType) {
-            currentConditionViewModel = OTTriggerViewFactory.getConditionViewProvider(dao.conditionType)?.getTriggerConditionViewModel(dao, app)
+            currentConditionViewModel = OTTriggerViewFactory.getConditionViewProvider(dao.conditionType)?.getTriggerConditionViewModel(dao, configuredContext)
         }
         currentConditionViewModel?.refreshDaoToFront(dao)
 

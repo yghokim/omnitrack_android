@@ -9,8 +9,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels.LocalMediaCacheEntry
+import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.LocalMediaCacheEntry
 import kr.ac.snu.hcil.omnitrack.core.datatypes.OTServerFile
 import kr.ac.snu.hcil.omnitrack.utils.io.FileHelper
 import java.io.File

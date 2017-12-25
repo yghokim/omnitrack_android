@@ -1,3 +1,4 @@
+/*
 package kr.ac.snu.hcil.omnitrack.core.net
 
 import android.net.Uri
@@ -7,7 +8,7 @@ import com.google.firebase.storage.*
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.disposables.Disposables
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels.UploadTaskInfo
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.UploadTaskInfo
 import java.io.File
 
 /**
@@ -102,4 +103,4 @@ class OTFirebaseStorageCore : IBinaryStorageCore {
         }
     }
 
-}
+}*/

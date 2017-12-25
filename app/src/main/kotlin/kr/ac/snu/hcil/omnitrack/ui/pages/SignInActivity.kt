@@ -42,7 +42,7 @@ class SignInActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        (application as OTApp).applicationComponent.inject(this)
+        (application as OTApp).currentConfiguredContext.configuredAppComponent.inject(this)
 
         setContentView(R.layout.activity_sign_in)
 

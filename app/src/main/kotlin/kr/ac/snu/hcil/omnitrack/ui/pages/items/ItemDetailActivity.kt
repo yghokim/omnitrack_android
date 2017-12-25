@@ -117,6 +117,10 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
         }
     }
 
+    override fun onInject(app: OTApp) {
+        app.currentConfiguredContext.configuredAppComponent.inject(this)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setActionBarButtonMode(MultiButtonActionBarActivity.Mode.SaveCancel)
@@ -147,7 +151,7 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
         builderRestoredSnackbar.setAction(resources.getText(R.string.msg_clear_form)) { view ->
 
             creationSubscriptions.add(
-                    (viewModel.trackerDao?.makePermissionAssertObservable(this) ?: Observable.just(true))
+                    (viewModel.trackerDao?.makePermissionAssertObservable(this, configuredContext) ?: Observable.just(true))
                             .subscribe({ approved ->
                                 if (approved) {
                                     viewModel.clearHistory()
@@ -274,7 +278,7 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
 
                 if (viewModel.isViewModelsDirty()) {
                     true
-                } else if (currentAttributeViewModelList.filter { it.attributeDAO.getHelper().isAttributeValueVolatile(it.attributeDAO) }.isNotEmpty()) {
+                } else if (currentAttributeViewModelList.filter { it.attributeDAO.getHelper(configuredContext).isAttributeValueVolatile(it.attributeDAO) }.isNotEmpty()) {
                     true
                 } else viewModel.builderCreationModeObservable.value == ItemEditionViewModelBase.BuilderCreationMode.Restored
             } else {
@@ -322,7 +326,7 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
                 }.subscribe({ result ->
                     viewModel.clearHistory()
                     if (viewModel.mode == ItemEditionViewModelBase.ItemMode.New) {
-                        startService(OTReminderService.makeUserLoggedIntent(this, viewModel.trackerDao?.objectId!!, System.currentTimeMillis()))
+                        startService(OTReminderService.makeUserLoggedIntent(this, configuredContext.configuration.id, viewModel.trackerDao?.objectId!!, System.currentTimeMillis()))
                     }
 
                     when (viewModel.mode) {
@@ -382,7 +386,7 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
         }
 
         override fun getItemViewType(position: Int): Int {
-            return getItem(position).attributeDAO.getInputViewType(false)
+            return getItem(position).attributeDAO.getInputViewType(configuredContext, false)
         }
 
         override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
@@ -489,7 +493,7 @@ class ItemDetailActivity : MultiButtonActionBarActivity(R.layout.activity_new_it
 
                 internalSubscriptions.clear()
 
-                attributeViewModel.attributeDAO.getHelper().refreshInputViewUI(inputView, attributeViewModel.attributeDAO)
+                attributeViewModel.attributeDAO.getHelper(configuredContext).refreshInputViewUI(inputView, attributeViewModel.attributeDAO)
                 internalSubscriptions.add(
                         attributeViewModel.columnNameObservable.subscribe { name ->
                             columnNameView.text = name

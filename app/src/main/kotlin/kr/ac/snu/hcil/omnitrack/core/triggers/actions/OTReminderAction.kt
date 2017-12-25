@@ -15,7 +15,8 @@ import com.google.gson.stream.JsonWriter
 import io.reactivex.Completable
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.services.OTReminderService
 import kr.ac.snu.hcil.omnitrack.ui.activities.ReminderPopupActivity
 import kr.ac.snu.hcil.omnitrack.utils.isDeviceLockedCompat
@@ -163,7 +164,7 @@ class OTReminderAction : OTTriggerAction() {
         }
 
 
-    override fun performAction(triggerTime: Long, context: Context): Completable {
+    override fun performAction(triggerTime: Long, configuredContext: ConfiguredContext): Completable {
         return Completable.defer {
             println("trigger fired - send notification")
             /*
@@ -193,7 +194,7 @@ class OTReminderAction : OTTriggerAction() {
                 }
             }*/
             if (trigger.liveTrackerCount > 0) {
-                context.startService(OTReminderService.makeRemindIntent(context, trigger.objectId!!, triggerTime))
+                configuredContext.applicationContext.startService(OTReminderService.makeRemindIntent(configuredContext.applicationContext, configuredContext.configuration.id, trigger.objectId!!, triggerTime))
             }
 
             return@defer Completable.complete()

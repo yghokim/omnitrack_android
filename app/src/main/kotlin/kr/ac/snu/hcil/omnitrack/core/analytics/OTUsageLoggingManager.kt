@@ -22,8 +22,9 @@ import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger.Companion.SUB_ADD
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger.Companion.SUB_EDIT
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger.Companion.SUB_REMOVE
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.helpermodels.UsageLog
-import kr.ac.snu.hcil.omnitrack.core.di.UsageLogger
+import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.helpermodels.UsageLog
+import kr.ac.snu.hcil.omnitrack.core.di.configured.UsageLogger
 import kr.ac.snu.hcil.omnitrack.utils.ConcurrentUniqueLongGenerator
 import javax.inject.Inject
 import javax.inject.Provider
@@ -31,7 +32,7 @@ import javax.inject.Provider
 /**
  * Created by younghokim on 2017. 11. 28..
  */
-class OTUsageLoggingManager(app: OTApp) : IEventLogger {
+class OTUsageLoggingManager(configuredContext: ConfiguredContext) : IEventLogger {
 
     @field:[Inject UsageLogger]
     lateinit var realmFactory: Factory<Realm>
@@ -46,7 +47,7 @@ class OTUsageLoggingManager(app: OTApp) : IEventLogger {
     lateinit var uploadJob: Provider<Job>
 
     init {
-        app.applicationComponent.inject(this)
+        configuredContext.configuredAppComponent.inject(this)
     }
 
     private var logIdGenerator = ConcurrentUniqueLongGenerator()

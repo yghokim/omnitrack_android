@@ -1,7 +1,7 @@
 package kr.ac.snu.hcil.omnitrack.core.auth
 
+import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.content.pm.ApplicationInfo
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
@@ -27,10 +27,12 @@ import io.reactivex.disposables.Disposables
 import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTUserDAO
-import kr.ac.snu.hcil.omnitrack.core.di.Backend
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTUserDAO
+import kr.ac.snu.hcil.omnitrack.core.di.Configured
+import kr.ac.snu.hcil.omnitrack.core.di.configured.Backend
+import kr.ac.snu.hcil.omnitrack.core.di.configured.ForGeneralAuth
 import kr.ac.snu.hcil.omnitrack.core.net.ISynchronizationServerSideAPI
 import kr.ac.snu.hcil.omnitrack.utils.getActivity
 import javax.inject.Inject
@@ -38,9 +40,14 @@ import javax.inject.Inject
 /**
  * Created by Young-Ho Kim on 2017-02-03.
  */
-class OTAuthManager(val app: OTApp,
-                    private val sharedPreferences: SharedPreferences,
-                    private val synchronizationServerController: Lazy<ISynchronizationServerSideAPI>) {
+@Configured
+class OTAuthManager @Inject constructor(
+        private val context: Context,
+        private val configuredContext: ConfiguredContext,
+        private val firebaseAuth: FirebaseAuth,
+        @Backend private val realmFactory: Factory<Realm>,
+        @ForGeneralAuth private val googleSignInOptions: Lazy<GoogleSignInOptions>,
+        private val synchronizationServerController: Lazy<ISynchronizationServerSideAPI>) {
 
     companion object {
         const val LOG_TAG = "OMNITRACK Auth Manager"
@@ -57,33 +64,26 @@ class OTAuthManager(val app: OTApp,
         fun onCancel()
     }
 
-    private val mFirebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
-
     private val mGoogleApiClient: GoogleApiClient
-
-    private val mGoogleSignInOptions: GoogleSignInOptions by lazy {
-        GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestProfile()
-                .requestEmail()
-                .requestIdToken(app.getString(R.string.default_web_client_id))
-                .build()
-    }
 
     //is signIn process in progress
     private var mIntentInProgress = false
     private var mResultsHandler: SignInResultsHandler? = null
 
+    /*
     @field:[Inject Backend]
     lateinit var realmFactory: Factory<Realm>
 
-    init {
-        app.applicationComponent.inject(this)
+    @field:[Inject ForGeneralAuth]
+    lateinit var googleSignInOptions: Lazy<GoogleSignInOptions>
+    */
 
+    init {
         Log.d(LOG_TAG, "Initializing Google SDK...")
 
         // Build GoogleApiClient with access to basic profile
-        mGoogleApiClient = GoogleApiClient.Builder(app)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, mGoogleSignInOptions)
+        mGoogleApiClient = GoogleApiClient.Builder(context)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, googleSignInOptions.get())
                 .build()
         mGoogleApiClient.connect()
     }
@@ -149,13 +149,13 @@ class OTAuthManager(val app: OTApp,
     */
     val userId: String?
         get() {
-            val id = mFirebaseAuth.currentUser?.uid
+            val id = firebaseAuth.currentUser?.uid
             println("user id: $id")
             return id
         }
 
     fun isUserSignedIn(): Boolean {
-        return mFirebaseAuth.currentUser != null
+        return firebaseAuth.currentUser != null
     }
 
     val currentSignedInLevel: SignedInLevel get() {
@@ -182,7 +182,7 @@ class OTAuthManager(val app: OTApp,
 
     fun getAuthToken(): Maybe<String> {
         return Maybe.create { disposable ->
-            val user = mFirebaseAuth.currentUser
+            val user = firebaseAuth.currentUser
             if (user != null) {
                 val task = user.getIdToken(true).addOnCompleteListener { result ->
                     if (result.isSuccessful) {
@@ -222,7 +222,7 @@ class OTAuthManager(val app: OTApp,
                 resultsHandler.onSuccess()
             } else {
                 Log.d(LOG_TAG, "Reload Firebase User to check connection.")
-                mFirebaseAuth.currentUser!!.reload().addOnCompleteListener {
+                firebaseAuth.currentUser!!.reload().addOnCompleteListener {
                     task ->
                     if (task.isSuccessful) {
                         resultsHandler.onSuccess()
@@ -264,9 +264,9 @@ class OTAuthManager(val app: OTApp,
                     subscriber.onNext(signedInLevel)
                 }
             }
-            mFirebaseAuth.addAuthStateListener(listener)
+            firebaseAuth.addAuthStateListener(listener)
 
-            subscriber.setDisposable(Disposables.fromAction { mFirebaseAuth.removeAuthStateListener(listener) })
+            subscriber.setDisposable(Disposables.fromAction { firebaseAuth.removeAuthStateListener(listener) })
         }
     }
 
@@ -323,24 +323,26 @@ class OTAuthManager(val app: OTApp,
                 //Signed in successfully.
                 println("signed in google account: ${result.signInAccount}")
                 firebaseAuthWithGoogle(result.signInAccount!!).flatMap { authResult ->
-                    synchronizationServerController.get().putDeviceInfo(OTDeviceInfo()).
-                            flatMap { result ->
-                                handlePutDeviceInfoResult(result)
-                            }
-                            .toObservable()
-                            .map { success ->
-                                println("refreshed device info.")
-                                if (success) {
-                                    authResult
-                                } else throw Exception("Failed to push device info to server.")
-                            }
+                    OTDeviceInfo.makeDeviceInfo(configuredContext.firebaseComponent).flatMapObservable { deviceInfo ->
+                        synchronizationServerController.get().putDeviceInfo(deviceInfo).
+                                flatMap { result ->
+                                    handlePutDeviceInfoResult(result)
+                                }
+                                .toObservable()
+                                .map { success ->
+                                    println("refreshed device info.")
+                                    if (success) {
+                                        authResult
+                                    } else throw Exception("Failed to push device info to server.")
+                                }
+                    }
                 }.observeOn(AndroidSchedulers.mainThread()).subscribe({ authResult ->
                     println("sign in succeeded.")
                     notifySignedIn(authResult.user)
                     resultHandler?.onSuccess()
                 }, {
                     ex ->
-                    mFirebaseAuth.signOut()
+                    firebaseAuth.signOut()
                     Auth.GoogleSignInApi.signOut(mGoogleApiClient)
                     resultHandler?.onError(ex)
                 })
@@ -357,7 +359,7 @@ class OTAuthManager(val app: OTApp,
         return Observable.create<AuthResult> { subscriber ->
             Log.d(LOG_TAG, "firebaseAuthWithGooogle:" + acct.id)
             val credential = GoogleAuthProvider.getCredential(acct.idToken, null)
-            mFirebaseAuth.signInWithCredential(credential)
+            firebaseAuth.signInWithCredential(credential)
                     .addOnCompleteListener { task: Task<AuthResult> ->
                         Log.d(LOG_TAG, "signInWithCredential:onComplete:" + task.isSuccessful)
                         // If sign in fails, display a message to the user. If sign in succeeds
@@ -379,7 +381,7 @@ class OTAuthManager(val app: OTApp,
     }
 
     fun deleteUser(resultsHandler: SignInResultsHandler) {
-        mFirebaseAuth.currentUser?.delete()?.addOnCompleteListener {
+        firebaseAuth.currentUser?.delete()?.addOnCompleteListener {
             task ->
             if (task.isSuccessful) {
                 resultsHandler.onSuccess()
@@ -392,17 +394,21 @@ class OTAuthManager(val app: OTApp,
 
     fun signOut() {
         clearUserInfo()
-        mFirebaseAuth.signOut()
+        firebaseAuth.signOut()
         Auth.GoogleSignInApi.signOut(mGoogleApiClient)
         notifySignedOut()
     }
 
     private fun notifySignedIn(user: FirebaseUser) {
-        OTApp.instance.sendBroadcast(Intent(OTApp.BROADCAST_ACTION_USER_SIGNED_IN).putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_USER, userId))
+        OTApp.instance.sendBroadcast(Intent(OTApp.BROADCAST_ACTION_USER_SIGNED_IN)
+                .putExtra(OTApp.INTENT_EXTRA_CONFIGURATION_ID, configuredContext.configuration.id)
+                .putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_USER, userId))
     }
 
     private fun notifySignedOut() {
-        OTApp.instance.sendBroadcast(Intent(OTApp.BROADCAST_ACTION_USER_SIGNED_OUT).putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_USER, userId))
+        OTApp.instance.sendBroadcast(Intent(OTApp.BROADCAST_ACTION_USER_SIGNED_OUT)
+                .putExtra(OTApp.INTENT_EXTRA_CONFIGURATION_ID, configuredContext.configuration.id)
+                .putExtra(OTApp.INTENT_EXTRA_OBJECT_ID_USER, userId))
     }
 
     fun clearUserInfo() {

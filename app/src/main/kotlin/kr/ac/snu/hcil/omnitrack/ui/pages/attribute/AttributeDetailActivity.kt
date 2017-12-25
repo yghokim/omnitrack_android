@@ -13,13 +13,16 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import com.github.salomonbrys.kotson.set
 import com.jaredrummler.materialspinner.MaterialSpinner
+import dagger.Lazy
 import kotlinx.android.synthetic.main.activity_attribute_detail.*
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTAttributeHelper
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
+import kr.ac.snu.hcil.omnitrack.core.database.configured.DaoSerializationManager
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.externals.OTExternalService
 import kr.ac.snu.hcil.omnitrack.ui.activities.MultiButtonActionBarActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.WizardView
@@ -31,6 +34,7 @@ import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 import kr.ac.snu.hcil.omnitrack.utils.setPaddingLeft
 import kr.ac.snu.hcil.omnitrack.utils.setPaddingRight
 import java.util.*
+import javax.inject.Inject
 
 class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_attribute_detail), View.OnClickListener {
 
@@ -38,14 +42,19 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
         const val INTENT_EXTRA_SERIALIZED_ATTRIBUTE_DAO = "serializedAttributeDao"
         const val INTENT_EXTRA_APPLY_TO_DB = "applyToDb"
 
-        fun makeIntent(context: Context, dao: OTAttributeDAO, applyToDb: Boolean): Intent {
+        fun makeIntent(context: Context, configuredContext: ConfiguredContext, dao: OTAttributeDAO, applyToDb: Boolean): Intent {
 
             val intent = Intent(context, AttributeDetailActivity::class.java)
-            intent.putExtra(INTENT_EXTRA_SERIALIZED_ATTRIBUTE_DAO, OTApp.instance.daoSerializationComponent.manager().get().serializeAttribute(dao))
+            intent.putExtra(INTENT_EXTRA_SERIALIZED_ATTRIBUTE_DAO, configuredContext.daoSerializationComponent.manager().serializeAttribute(dao))
             intent.putExtra(INTENT_EXTRA_APPLY_TO_DB, applyToDb)
             return intent
         }
     }
+
+    @Inject
+    lateinit var attributeManager: OTAttributeManager
+    @Inject
+    lateinit var serializationManager: Lazy<DaoSerializationManager>
 
     private lateinit var viewModel: AttributeDetailViewModel
 
@@ -59,6 +68,10 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
 
     private val propertyViewList = ArrayList<ReadOnlyPair<String, View>>()
 
+    override fun onInject(app: OTApp) {
+        app.currentConfiguredContext.configuredAppComponent.inject(this)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -68,7 +81,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
             val applyToDb = intent.getBooleanExtra(INTENT_EXTRA_APPLY_TO_DB, false)
 
             if (!serializedAttributeDao.isNullOrBlank()) {
-                val attributeDao = (application as OTApp).daoSerializationComponent.manager().get().parseAttribute(serializedAttributeDao)
+                val attributeDao = serializationManager.get().parseAttribute(serializedAttributeDao)
                 viewModel.init(attributeDao)
             }
         }
@@ -180,7 +193,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
                 viewModel.typeObservable.subscribe { type ->
                     println("type changed: ${type}")
                     try {
-                        val attrHelper = OTAttributeManager.getAttributeHelper(type)
+                        val attrHelper = attributeManager.getAttributeHelper(type)
                         ui_list.removeAllViewsInLayout()
 
                         val layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
@@ -365,7 +378,7 @@ class AttributeDetailActivity : MultiButtonActionBarActivity(R.layout.activity_a
                     content[IEventLogger.CONTENT_KEY_NEWVALUE] = dirtySignature
                 }
             }
-            setResult(Activity.RESULT_OK, Intent().putExtra(INTENT_EXTRA_SERIALIZED_ATTRIBUTE_DAO, (application as OTApp).daoSerializationComponent.manager().get().serializeAttribute(it)))
+            setResult(Activity.RESULT_OK, Intent().putExtra(INTENT_EXTRA_SERIALIZED_ATTRIBUTE_DAO, serializationManager.get().serializeAttribute(it)))
         }
     }
 

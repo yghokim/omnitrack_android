@@ -22,6 +22,7 @@ import android.widget.Toast
 import butterknife.bindView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.github.salomonbrys.kotson.set
+import dagger.Lazy
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.attribute_list_element.view.*
 import kotlinx.android.synthetic.main.fragment_tracker_detail_structure.*
@@ -30,6 +31,8 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.attributes.AttributePresetInfo
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
+import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
+import kr.ac.snu.hcil.omnitrack.core.database.configured.DaoSerializationManager
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.common.container.AdapterLinearLayout
 import kr.ac.snu.hcil.omnitrack.ui.components.common.container.LockableFrameLayout
@@ -42,6 +45,7 @@ import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import kr.ac.snu.hcil.omnitrack.utils.IReadonlyObjectId
 import kr.ac.snu.hcil.omnitrack.utils.dipRound
 import org.jetbrains.anko.support.v4.act
+import javax.inject.Inject
 
 /**
  * Created by Young-Ho Kim on 16. 7. 29
@@ -98,6 +102,16 @@ class TrackerDetailStructureTabFragment : OTFragment() {
         }
 
         newAttributePanel
+    }
+
+    @Inject
+    lateinit var serializationManager: Lazy<DaoSerializationManager>
+
+    @Inject
+    lateinit var attributeManager: OTAttributeManager
+
+    override fun onInject(configuredContext: ConfiguredContext) {
+        configuredContext.configuredAppComponent.inject(this)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -279,7 +293,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
 
     fun openAttributeDetailActivity(position: Int) {
         val attrViewModel = currentAttributeViewModelList[position]
-        startActivityForResult(AttributeDetailActivity.makeIntent(act, attrViewModel.makeFrontalChangesToDao(), false), REQUEST_CODE_ATTRIBUTE_DETAIL)
+        startActivityForResult(AttributeDetailActivity.makeIntent(act, configuredContext, attrViewModel.makeFrontalChangesToDao(), false), REQUEST_CODE_ATTRIBUTE_DETAIL)
     }
 
     fun scrollToBottom() {
@@ -290,7 +304,7 @@ class TrackerDetailStructureTabFragment : OTFragment() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE_ATTRIBUTE_DETAIL && resultCode == RESULT_OK && data != null) {
             println("JSON: ${data.getStringExtra(AttributeDetailActivity.INTENT_EXTRA_SERIALIZED_ATTRIBUTE_DAO)}")
-            val editedDao = (act.application as OTApp).daoSerializationComponent.manager().get().parseAttribute(data.getStringExtra(AttributeDetailActivity.INTENT_EXTRA_SERIALIZED_ATTRIBUTE_DAO))
+            val editedDao = serializationManager.get().parseAttribute(data.getStringExtra(AttributeDetailActivity.INTENT_EXTRA_SERIALIZED_ATTRIBUTE_DAO))
             println(editedDao)
             val correspondingViewModel = currentAttributeViewModelList.find { it.attributeDAO.objectId == editedDao.objectId }
             if (correspondingViewModel != null) {
@@ -495,13 +509,13 @@ class TrackerDetailStructureTabFragment : OTFragment() {
                 viewHolderSubscriptions.add(
                         attributeViewModel.typeObservable.subscribe { args ->
 
-                            preview = OTAttributeManager.getAttributeHelper(args).getInputView(act, true, attributeViewModel.makeFrontalChangesToDao(), preview)
+                            preview = attributeManager.getAttributeHelper(args).getInputView(act, true, attributeViewModel.makeFrontalChangesToDao(), preview)
                         }
                 )
 
                 viewHolderSubscriptions.add(
                         attributeViewModel.onPropertyChanged.subscribe {
-                            preview = OTAttributeManager.getAttributeHelper(attributeViewModel.typeObservable.value).getInputView(act, true, attributeViewModel.makeFrontalChangesToDao(), preview)
+                            preview = attributeManager.getAttributeHelper(attributeViewModel.typeObservable.value).getInputView(act, true, attributeViewModel.makeFrontalChangesToDao(), preview)
                         }
                 )
 

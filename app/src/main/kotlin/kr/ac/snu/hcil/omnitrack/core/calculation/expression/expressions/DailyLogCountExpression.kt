@@ -1,9 +1,9 @@
 package kr.ac.snu.hcil.omnitrack.core.calculation.expression.expressions
 
 import com.udojava.evalex.Expression
-import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.core.calculation.expression.ExpressionConstants
 import kr.ac.snu.hcil.omnitrack.core.calculation.expression.LongLazyNumber
+import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 
 /**
  * Created by Young-Ho on 11/14/2017.
@@ -14,7 +14,7 @@ import kr.ac.snu.hcil.omnitrack.core.calculation.expression.LongLazyNumber
  * second: offset from today (integer)
  * third: attr Local Id of the TimePoint of TimeSpan column.
  */
-class DailyLogCountExpression(app: OTApp) : RealmLazyFunction(app, ExpressionConstants.COMMAND_TRACKER_LOG_COUNT_DAILY, 3) {
+class DailyLogCountExpression(configuredContext: ConfiguredContext) : RealmLazyFunction(configuredContext, ExpressionConstants.COMMAND_TRACKER_LOG_COUNT_DAILY, 3) {
 
     override fun lazyEval(lazyParams: MutableList<Expression.LazyNumber>?): Expression.LazyNumber {
         val trackerId = lazyParams?.get(0)?.string

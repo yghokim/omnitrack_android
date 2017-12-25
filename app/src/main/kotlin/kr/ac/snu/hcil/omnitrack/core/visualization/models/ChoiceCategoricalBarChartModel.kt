@@ -8,16 +8,18 @@ import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTChoiceAttributeHelper
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.visualization.AttributeChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.IWebBasedChartModel
 import kr.ac.snu.hcil.omnitrack.core.visualization.interfaces.ICategoricalBarChart
 import java.util.*
+import javax.inject.Inject
 
 /**
  * Created by younghokim on 16. 9. 7..
  */
-class ChoiceCategoricalBarChartModel(attribute: OTAttributeDAO, realm: Realm) : AttributeChartModel<ICategoricalBarChart.Point>(attribute, realm), ICategoricalBarChart, IWebBasedChartModel {
+class ChoiceCategoricalBarChartModel(attribute: OTAttributeDAO, realm: Realm, configuredContext: ConfiguredContext) : AttributeChartModel<ICategoricalBarChart.Point>(attribute, realm), ICategoricalBarChart, IWebBasedChartModel {
 
     private val counterDictCache = SparseIntArray() // entry id : count
     private val categoriesCache = HashSet<Int>()
@@ -25,8 +27,11 @@ class ChoiceCategoricalBarChartModel(attribute: OTAttributeDAO, realm: Realm) : 
     override val name: String
         get() = String.format(OTApp.instance.resourcesWrapped.getString(R.string.msg_vis_categorical_distribution_title_format), super.name)
 
+    @Inject
+    protected lateinit var attributeManager: OTAttributeManager
+
     init{
-        OTApp.instance.applicationComponent.inject(this)
+        configuredContext.configuredAppComponent.inject(this)
     }
 
     override fun recycle() {
@@ -40,7 +45,8 @@ class ChoiceCategoricalBarChartModel(attribute: OTAttributeDAO, realm: Realm) : 
         if (trackerId != null) {
             return dbManager
                     .makeItemsQuery(trackerId, getTimeScope(), realm)
-                    .findAllSortedAsync("timestamp", Sort.ASCENDING)
+                    .sort("timestamp", Sort.ASCENDING)
+                    .findAllAsync()
                     .asFlowable()
                     .filter { it.isLoaded && it.isValid }
                     .firstOrError().map {
@@ -72,7 +78,7 @@ class ChoiceCategoricalBarChartModel(attribute: OTAttributeDAO, realm: Realm) : 
                 synchronized(data) {
                     data.clear()
                     for (categoryId in categoriesCache) {
-                        val entry = (OTAttributeManager.getAttributeHelper(OTAttributeManager.TYPE_CHOICE) as OTChoiceAttributeHelper).getChoiceEntries(attribute)?.findWithId(categoryId)
+                        val entry = (attributeManager.getAttributeHelper(OTAttributeManager.TYPE_CHOICE) as OTChoiceAttributeHelper).getChoiceEntries(attribute)?.findWithId(categoryId)
                         println("entry: ${entry?.text}, count: ${counterDictCache[categoryId]}")
                         if (entry != null) {
                             println("entry add")

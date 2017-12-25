@@ -3,9 +3,9 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.trigger.viewmodels
 import android.app.Application
 import io.realm.RealmQuery
 import io.realm.RealmResults
-import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
+import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
@@ -35,8 +35,8 @@ abstract class AManagedTriggerListViewModel(app: Application) : ATriggerListView
         return originalQuery
     }
 
-    override fun onInject(app: OTApp) {
-        app.applicationComponent.inject(this)
+    override fun onInject(configuredContext: ConfiguredContext) {
+        configuredContext.configuredAppComponent.inject(this)
     }
 
 
@@ -51,7 +51,7 @@ abstract class AManagedTriggerListViewModel(app: Application) : ATriggerListView
                 //initial set
                 currentTriggerViewModels.clear()
                 currentTriggerViewModels.addAll(
-                        snapshot.map { TriggerViewModel(getApplication<OTApp>(), it, realm) }
+                        snapshot.map { TriggerViewModel(configuredContext, it, realm) }
                 )
             } else {
                 //changes
@@ -62,7 +62,7 @@ abstract class AManagedTriggerListViewModel(app: Application) : ATriggerListView
 
                 //deal with additions
                 changeSet.insertions.forEach { i ->
-                    currentTriggerViewModels.add(i, TriggerViewModel(getApplication<OTApp>(), snapshot[i]!!, realm))
+                    currentTriggerViewModels.add(i, TriggerViewModel(configuredContext, snapshot[i]!!, realm))
                 }
 
                 //deal with refresh

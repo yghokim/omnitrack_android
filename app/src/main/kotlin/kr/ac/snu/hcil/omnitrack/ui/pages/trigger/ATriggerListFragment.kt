@@ -35,8 +35,8 @@ import kotlinx.android.synthetic.main.trigger_list_element.view.*
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.triggers.OTTriggerInformationHelper
 import kr.ac.snu.hcil.omnitrack.core.triggers.TriggerFireBroadcastReceiver
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
@@ -86,7 +86,7 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
             println("trigger type selected - $type")
             //viewModel.saveTrigger(makeNewDefaultTrigger(type))
             val defaultTrigger = makeNewDefaultTrigger(type)
-            startActivityForResult(TriggerDetailActivity.makeNewTriggerIntent(context!!, defaultTrigger, viewModel.defaultTriggerInterfaceOptions), DETAIL_REQUEST_CODE)
+            startActivityForResult(TriggerDetailActivity.makeNewTriggerIntent(context!!, configuredContext, defaultTrigger, viewModel.defaultTriggerInterfaceOptions), DETAIL_REQUEST_CODE)
             triggerTypeDialog.dismiss()
         }.create()
     }
@@ -128,7 +128,7 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
             val conditionTypes = viewModel.defaultTriggerInterfaceOptions.supportedConditionTypes
             if (conditionTypes?.size == 1) {
                 //immediately create a trigger.
-                startActivityForResult(TriggerDetailActivity.makeNewTriggerIntent(context!!, makeNewDefaultTrigger(conditionTypes.first()), viewModel.defaultTriggerInterfaceOptions), DETAIL_REQUEST_CODE)
+                startActivityForResult(TriggerDetailActivity.makeNewTriggerIntent(context!!, configuredContext, makeNewDefaultTrigger(conditionTypes.first()), viewModel.defaultTriggerInterfaceOptions), DETAIL_REQUEST_CODE)
             } else {
                 //show dialog
                 triggerTypeDialog.show()
@@ -192,7 +192,7 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
         if (requestCode == DETAIL_REQUEST_CODE && resultCode == Activity.RESULT_OK && data != null) {
             if (data.hasExtra(TriggerDetailActivity.INTENT_EXTRA_TRIGGER_DAO)) {
                 val resultDao =
-                        (act.application as OTApp).daoSerializationComponent.manager().get().parseTrigger(data.getStringExtra(TriggerDetailActivity.INTENT_EXTRA_TRIGGER_DAO))
+                        (act.application as OTApp).currentConfiguredContext.daoSerializationComponent.manager().parseTrigger(data.getStringExtra(TriggerDetailActivity.INTENT_EXTRA_TRIGGER_DAO))
                 viewModel.addNewTrigger(resultDao)
             }
         }
@@ -266,7 +266,7 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
                 val intent = if (viewModel is AManagedTriggerListViewModel) {
                     TriggerDetailActivity.makeEditTriggerIntent(context!!, attachedViewModel!!.objectId!!, viewModel.defaultTriggerInterfaceOptions)
                 } else if (viewModel is OfflineTriggerListViewModel) {
-                    TriggerDetailActivity.makeEditTriggerIntent(context!!, attachedViewModel!!.dao, viewModel.defaultTriggerInterfaceOptions)
+                    TriggerDetailActivity.makeEditTriggerIntent(context!!, configuredContext, attachedViewModel!!.dao, viewModel.defaultTriggerInterfaceOptions)
                 } else throw UnsupportedOperationException()
 
                 startActivityForResult(intent, DETAIL_REQUEST_CODE)
@@ -351,7 +351,7 @@ abstract class ATriggerListFragment<ViewModelType : ATriggerListViewModel> : OTF
             subscriptions.add(
                     triggerViewModel.triggerCondition.subscribe { condition ->
                         println("condition changed")
-                        val displayView = OTTriggerViewFactory.getConditionViewProvider(triggerViewModel.triggerConditionType.value)?.getTriggerDisplayView(currentHeaderView, triggerViewModel.dao, context!!)
+                        val displayView = OTTriggerViewFactory.getConditionViewProvider(triggerViewModel.triggerConditionType.value)?.getTriggerDisplayView(currentHeaderView, triggerViewModel.dao, act, configuredContext)
                         if (displayView != null) {
                             refreshHeaderView(displayView)
                         } else {

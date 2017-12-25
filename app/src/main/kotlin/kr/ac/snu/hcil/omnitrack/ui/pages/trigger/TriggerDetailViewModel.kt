@@ -1,13 +1,15 @@
 package kr.ac.snu.hcil.omnitrack.ui.pages.trigger
 
 import android.app.Application
+import dagger.Lazy
 import io.reactivex.subjects.BehaviorSubject
 import io.realm.OrderedCollectionChangeSet
 import io.realm.OrderedRealmCollectionChangeListener
 import io.realm.RealmResults
-import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTriggerDAO
+import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
+import kr.ac.snu.hcil.omnitrack.core.database.configured.DaoSerializationManager
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTriggerDAO
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.OTSyncManager
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
@@ -30,6 +32,8 @@ class TriggerDetailViewModel(app: Application) : RealmViewModel(app), OrderedRea
 
     @Inject
     protected lateinit var syncManager: OTSyncManager
+    @Inject
+    protected lateinit var serializationManager: Lazy<DaoSerializationManager>
 
     var triggerId: String? = null
         private set
@@ -55,8 +59,8 @@ class TriggerDetailViewModel(app: Application) : RealmViewModel(app), OrderedRea
     private val currentAttachedTrackerInfoList = java.util.ArrayList<OTTrackerDAO.SimpleTrackerInfo>()
     val attachedTrackers = BehaviorSubject.createDefault<List<OTTrackerDAO.SimpleTrackerInfo>>(currentAttachedTrackerInfoList)
 
-    override fun onInject(app: OTApp) {
-        app.applicationComponent.inject(this)
+    override fun onInject(configuredContext: ConfiguredContext) {
+        configuredContext.configuredAppComponent.inject(this)
     }
 
     fun initEdit(triggerId: String, userId: String) {
@@ -102,7 +106,7 @@ class TriggerDetailViewModel(app: Application) : RealmViewModel(app), OrderedRea
     }
 
     fun getSerializedDao(): String? {
-        return originalTriggerDao?.let { getApplication<OTApp>().daoSerializationComponent.manager().get().serializeTrigger(it) }
+        return originalTriggerDao?.let { serializationManager.get().serializeTrigger(it) }
     }
 
     fun validateConfiguration(): List<CharSequence>? {

@@ -23,6 +23,8 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.ExperimentConsentManager
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
+import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
+import kr.ac.snu.hcil.omnitrack.core.di.global.Default
 import kr.ac.snu.hcil.omnitrack.services.OTVersionCheckService
 import kr.ac.snu.hcil.omnitrack.ui.components.common.time.DurationPicker
 import kr.ac.snu.hcil.omnitrack.ui.components.dialogs.VersionCheckDialogFragment
@@ -101,7 +103,11 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
     @Inject
     protected lateinit var authManager: OTAuthManager
     @Inject
+    protected lateinit var configuredContext: ConfiguredContext
+
+    @field:[Inject Default]
     protected lateinit var systemPreferences: SharedPreferences
+
     @Inject
     protected lateinit var eventLogger: Lazy<IEventLogger>
 
@@ -153,7 +159,7 @@ abstract class OTActivity(val checkRefreshingCredential: Boolean = false, val ch
     }
 
     protected open fun onInject(app: OTApp) {
-        app.applicationComponent.inject(this)
+        app.currentConfiguredContext.configuredAppComponent.inject(this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

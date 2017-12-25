@@ -7,6 +7,7 @@ import android.support.v4.app.TaskStackBuilder
 import android.support.v4.content.ContextCompat
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.ItemDetailActivity
 import kr.ac.snu.hcil.omnitrack.utils.TextHelper
@@ -18,7 +19,7 @@ object OTTrackingNotificationFactory {
 
     private val TAG = "TrackingReminder"
 
-    fun makeLoggingSuccessNotificationBuilder(context: Context, trackerId: String, trackerName: String, itemId: String, loggedTime: Long, table: List<Pair<String, CharSequence?>>?, notificationId: Int, tag: String): NotificationCompat.Builder {
+    fun makeLoggingSuccessNotificationBuilder(context: Context, configuredContext: ConfiguredContext, trackerId: String, trackerName: String, itemId: String, loggedTime: Long, table: List<Pair<String, CharSequence?>>?, notificationId: Int, tag: String): NotificationCompat.Builder {
         val stackBuilder = TaskStackBuilder.create(context)
         // Adds the back stack for the Intent (but not the Intent itself)
         stackBuilder.addParentStack(ItemDetailActivity::class.java)
@@ -32,7 +33,7 @@ object OTTrackingNotificationFactory {
         val resultPendingIntent = stackBuilder.getPendingIntent(0,
                 PendingIntent.FLAG_UPDATE_CURRENT)
 
-        val itemRemoveIntent = OTItemLoggingService.makeRemoveItemIntent(context, itemId)
+        val itemRemoveIntent = OTItemLoggingService.makeRemoveItemIntent(context, itemId, configuredContext.configuration.id)
                 .putExtra(OTApp.INTENT_EXTRA_NOTIFICATION_ID, notificationId)
                 .putExtra(OTApp.INTENT_EXTRA_NOTIFICATON_TAG, tag)
 

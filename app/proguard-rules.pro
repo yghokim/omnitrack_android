@@ -88,6 +88,9 @@
   public *;
 }
 
+#For CameraKit >= 0.13.0
+-dontwarn com.google.android.gms.**
+
 -keep public class com.google.android.gms.location.DetectedActivity
 -dontwarn com.google.android.gms.location.DetectedActivity
 

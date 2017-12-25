@@ -11,6 +11,7 @@ app/app-release.apk
 app/release
 google-services.json
 gradle.properties
+keystore.debug.properties
 keystore.properties
 *.iml
 

@@ -55,6 +55,10 @@
             android:value="@integer/google_play_services_version"
             tools:replace="android:value" />
 
+        <meta-data
+            android:name="firebase_crashlytics_collection_enabled"
+            android:value="false" />
+
         <!--
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -66,6 +70,11 @@
                 android:resource="@xml/file_paths" />
         </provider>
         -->
+        <provider
+            android:name="com.google.firebase.provider.FirebaseInitProvider"
+            android:authorities="${applicationId}.firebaseinitprovider"
+            android:exported="false"
+            tools:node="remove" />
 
         <receiver android:name=".receivers.OTSystemReceiver">
             <intent-filter>

@@ -81,7 +81,7 @@ class TimeTriggerAlarmReceiver : BroadcastReceiver() {
 
     class TimeTriggerWakefulHandlingService : Service() {
         override fun onBind(p0: Intent?): IBinder {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            TODO()
         }
 
         @Inject
@@ -89,7 +89,7 @@ class TimeTriggerAlarmReceiver : BroadcastReceiver() {
 
         override fun onCreate() {
             super.onCreate()
-            (application as OTApp).triggerSystemComponent.inject(this)
+            (application as OTApp).currentConfiguredContext.triggerSystemComponent.inject(this)
         }
 
         override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {

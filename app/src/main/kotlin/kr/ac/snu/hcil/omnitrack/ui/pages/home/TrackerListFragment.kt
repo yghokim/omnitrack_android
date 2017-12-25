@@ -41,7 +41,8 @@ import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.ItemLoggingSource
 import kr.ac.snu.hcil.omnitrack.core.analytics.IEventLogger
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
 import kr.ac.snu.hcil.omnitrack.services.OTItemLoggingService
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTFragment
 import kr.ac.snu.hcil.omnitrack.ui.components.common.TooltipHelper
@@ -165,8 +166,8 @@ class TrackerListFragment : OTFragment() {
         trackerListAdapter.currentlyExpandedIndex = savedInstanceState?.getInt(STATE_EXPANDED_TRACKER_INDEX, -1) ?: -1
     }
 
-    override fun onInject(application: OTApp) {
-        (act.application as OTApp).applicationComponent.inject(this)
+    override fun onInject(configuredContext: ConfiguredContext) {
+        configuredContext.configuredAppComponent.inject(this)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -281,7 +282,7 @@ class TrackerListFragment : OTFragment() {
         if (tracker.makeAttributesQuery(false, false).count() == 0L) {
             emptyTrackerDialog
                     .onPositive { materialDialog, dialogAction ->
-                        activity?.startService(OTItemLoggingService.makeLoggingIntent(act, ItemLoggingSource.Manual, true, tracker.objectId!!))
+                        activity?.startService(OTItemLoggingService.makeLoggingIntent(act, ItemLoggingSource.Manual, configuredContext.configuration.id, true, tracker.objectId!!))
                         //OTBackgroundLoggingService.log(context, tracker, OTItem.ItemLoggingSource.Manual, notify = false).subscribe()
                     }
                     .onNeutral { materialDialog, dialogAction ->
