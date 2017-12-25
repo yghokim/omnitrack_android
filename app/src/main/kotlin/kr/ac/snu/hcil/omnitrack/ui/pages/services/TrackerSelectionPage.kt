@@ -5,18 +5,19 @@ import android.support.v7.widget.AppCompatImageView
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import dagger.Lazy
+import dagger.internal.Factory
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.di.Backend
 import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.AWizardPage
 import org.jetbrains.anko.padding
 import javax.inject.Inject
@@ -37,11 +38,11 @@ class TrackerSelectionPage(override val parent : ServiceWizardView) : AWizardPag
 
     var selectedTrackerId: String? = null
 
-    @Inject
-    protected lateinit var realm: Realm
+    @field:[Inject Backend]
+    lateinit var realmProvider: Factory<Realm>
 
     @Inject
-    protected lateinit var dbManager: Lazy<RealmDatabaseManager>
+    protected lateinit var dbManager: Lazy<BackendDbManager>
 
     @Inject
     protected lateinit var authManager: OTAuthManager
@@ -53,9 +54,11 @@ class TrackerSelectionPage(override val parent : ServiceWizardView) : AWizardPag
 
     init {
         val userId = authManager.userId!!
+        val realm = realmProvider.get()
         trackers = dbManager.get().makeTrackersOfUserQuery(userId, realm).findAll().map {
             it.getSimpleInfo()
         }
+
     }
 
     override fun onLeave() {

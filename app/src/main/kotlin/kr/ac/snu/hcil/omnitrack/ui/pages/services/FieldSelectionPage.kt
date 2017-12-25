@@ -10,13 +10,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import dagger.Lazy
+import dagger.internal.Factory
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.attributes.OTAttributeManager
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.core.database.local.RealmDatabaseManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.di.Backend
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.AWizardPage
 import org.jetbrains.anko.padding
@@ -38,10 +40,12 @@ class FieldSelectionPage (override val parent : ServiceWizardView) : AWizardPage
     lateinit var currentMeasureFactory: OTMeasureFactory
 
     @Inject
-    protected lateinit var realm: Realm
+    protected lateinit var dbManager: Lazy<BackendDbManager>
 
-    @Inject
-    protected lateinit var dbManager: Lazy<RealmDatabaseManager>
+    @field:[Inject Backend]
+    lateinit var realmProvider: Factory<Realm>
+
+    lateinit var attributeDAO: OTAttributeDAO
 
     init {
         val component = (parent.context.applicationContext as OTApp).applicationComponent
@@ -56,7 +60,7 @@ class FieldSelectionPage (override val parent : ServiceWizardView) : AWizardPage
         currentMeasureFactory = parent.currentMeasureFactory
 
         fields = ArrayList(0)
-        val dao = dbManager.get().getTrackerQueryWithId(trackerId, realm).findFirstAsync()
+        val dao = dbManager.get().getTrackerQueryWithId(trackerId, realmProvider.get()).findFirstAsync()
 
         dao.asFlowable<OTTrackerDAO>().filter { it.isValid && it.isLoaded }.subscribe { snapshot ->
             fields.addAll(snapshot.attributes)
@@ -122,16 +126,20 @@ class FieldSelectionPage (override val parent : ServiceWizardView) : AWizardPage
         init {
             itemView.setOnClickListener(this)
         }
+
         val icon: AppCompatImageView = itemView.findViewById(R.id.ui_attribute_type)
         val textView: TextView = itemView.findViewById(R.id.text)
+        lateinit var attributeDAO: OTAttributeDAO
 
         override fun onClick(view: View?) {
-
+            this@FieldSelectionPage.attributeDAO = attributeDAO
+            requestGoNextPage(ServiceWizardView.PAGE_QUERY_RANGE_SELECTION)
         }
 
         fun bind(attributeDAO: OTAttributeDAO) {
             val helper = OTAttributeManager.getAttributeHelper(attributeDAO.type)
             icon.setImageResource(helper.getTypeSmallIconResourceId(attributeDAO))
+            this.attributeDAO = attributeDAO
             textView.text = attributeDAO.name
         }
     }

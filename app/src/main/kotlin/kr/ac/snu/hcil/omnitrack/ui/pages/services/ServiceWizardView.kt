@@ -3,7 +3,8 @@ package kr.ac.snu.hcil.omnitrack.ui.pages.services
 import android.content.Context
 import android.util.AttributeSet
 import android.util.Log
-import kr.ac.snu.hcil.omnitrack.core.database.local.OTAttributeDAO
+import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
+import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTAttributeDAO
 import kr.ac.snu.hcil.omnitrack.core.externals.OTMeasureFactory
 import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.AWizardPage
 import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.AWizardViewPagerAdapter
@@ -20,16 +21,22 @@ class ServiceWizardView: WizardView {
         const val PAGE_QUERY_RANGE_SELECTION = 2
     }
 
+    val connection = OTConnection()
+
     var trackerId: String? = null
+    lateinit var attributeDAO: OTAttributeDAO
     val currentMeasureFactory: OTMeasureFactory
 
     constructor(context: Context?, measureFactory: OTMeasureFactory) : super(context) {
         currentMeasureFactory = measureFactory
-        Log.i("Omnitrack", currentMeasureFactory.javaClass.name)
+        connection.source = measureFactory.makeMeasure()
+        Log.i("Omnitrack", measureFactory.javaClass.name)
         setAdapter(Adapter())
     }
+
     constructor(context: Context?, measureFactory: OTMeasureFactory, attrs: AttributeSet?) : super(context, attrs) {
         currentMeasureFactory = measureFactory
+        connection.source = measureFactory.makeMeasure()
         setAdapter(Adapter())
     }
 
@@ -37,6 +44,12 @@ class ServiceWizardView: WizardView {
         when (position) {
             PAGE_TRACKER_SELECTION ->
                     trackerId = (page as TrackerSelectionPage).selectedTrackerId
+            PAGE_FIELD_SELECTION ->
+                    attributeDAO = (page as FieldSelectionPage).attributeDAO
+            PAGE_QUERY_RANGE_SELECTION -> {
+                (page as QueryRangeSelectionPage).applyConfiguration(connection)
+                attributeDAO.serializedConnection = connection.getSerializedString()
+            }
         }
     }
 
