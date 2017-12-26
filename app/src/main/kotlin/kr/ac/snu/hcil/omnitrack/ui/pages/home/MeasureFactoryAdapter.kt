@@ -88,6 +88,8 @@ class MeasureFactoryAdapter(private val context: Context) : RecyclerView.Adapter
                 wizardView.setWizardListener(object : WizardView.IWizardListener {
                     override fun onComplete(wizard: WizardView) {
                         println("new connection refreshed.")
+
+
                         wizardDialog.dismiss()
                     }
 

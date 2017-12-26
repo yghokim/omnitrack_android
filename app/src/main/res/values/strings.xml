@@ -15,9 +15,9 @@
     </string>
 
     <plurals name="field">
-        <item quantity="zero">0 fields</item>
+        <item quantity="zero">0 attributes</item>
         <item quantity="one">a field</item>
-        <item quantity="other">%d fields</item>
+        <item quantity="other">%d attributes</item>
     </plurals>
 
     <string name="msg_sort">Sort by</string>
@@ -44,7 +44,7 @@
 
     <string name="msg_go_to_add_field">Go to edit tracker</string>
 
-    <string name="msg_confirm_empty_tracker_log">This tracker has no fields. Do you want to log present time only?</string>
+    <string name="msg_confirm_empty_tracker_log">This tracker has no attributes. Do you want to log present time only?</string>
 
     <string name="msg_confirm_remove_tracker">Remove this tracker?</string>
 
@@ -53,7 +53,7 @@
     <string name="msg_tracker_empty">No trackers yet. \nStart tracking by adding a new tracker.</string>
     <string name="msg_trigger_empty">No triggers yet.\nAdd a trigger to log tracker items automatically.</string>
     <string name="msg_reminder_empty">No reminders yet.\nAdd a reminder to notice you not to forget tracking.</string>
-    <string name="msg_field_empty">Currently this tracker contains no fields.\nIt will log timestamp only.</string>
+    <string name="msg_field_empty">Currently this tracker contains no attributes.\nIt will log timestamp only.</string>
 
     <string name="msg_change_screen_name">Change your screen name</string>
 
@@ -62,6 +62,7 @@
     <string name="msg_change_field_name">Change field name</string>
 
     <string name="msg_new_tracker_name">Input tracker name</string>
+    <string name="msg_new_field_name">Input field name</string>
 
     <string name="msg_confirm_order">Apply the revised order to the list?</string>
     <string name="msg_discard_apply">Discard</string>
@@ -416,8 +417,8 @@
 
     <string name="msg_contacts_permission_rationale">The permissions are needed only to help you select a Google account.</string>
     <string name="msg_contacts_permission_denied_message">We can\'t sign you in without allowing the permission :(</string>
-    <string name="msg_permission_request_of_tracker">One or more trackers contain fields which require additional permissions.</string>
-    <string name="msg_format_permission_request_of_tracker_single">%1$s tracker contains fields which require additional permissions.</string>
+    <string name="msg_permission_request_of_tracker">One or more trackers contain attributes which require additional permissions.</string>
+    <string name="msg_format_permission_request_of_tracker_single">%1$s tracker contains attributes which require additional permissions.</string>
 
     <string name="msg_format_permission_request_of_field">You need to allow additional permissions to use %1$s field</string>
     <string name="msg_sign_in">Sign In</string>

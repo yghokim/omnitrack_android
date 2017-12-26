@@ -95,6 +95,7 @@ abstract class WizardView : FrameLayout, AWizardViewPagerAdapter.IWizardPageList
     override fun onPageSelected(position: Int) {
         titleView.text = adapter.getPageTitle(position)
         onEnterPage(adapter.getPageAt(position), position)
+        adapter.getPageAt(position).onEnter()
     }
 
     override fun onGoNextRequested(currentPosition: Int, nextPosition: Int) {
@@ -102,8 +103,6 @@ abstract class WizardView : FrameLayout, AWizardViewPagerAdapter.IWizardPageList
         onLeavePage(adapter.getPageAt(currentPosition), currentPosition)
 
         if (nextPosition != -1) {
-
-            adapter.getPageAt(nextPosition).onEnter()
             viewPager.setCurrentItem(nextPosition, true)
         } else {
             listener?.onComplete(this)

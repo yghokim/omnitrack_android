@@ -19,7 +19,7 @@
 -keepattributes Signature, *Annotation*
 
 -keepclassmembers class * extends java.lang.Enum {
-    <fields>;
+    <attributes>;
     public static **[] values();
     public static ** valueOf(java.lang.String);
 }

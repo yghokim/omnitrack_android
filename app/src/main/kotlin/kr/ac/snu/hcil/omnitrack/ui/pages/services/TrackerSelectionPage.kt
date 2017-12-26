@@ -4,22 +4,26 @@ import android.content.Context
 import android.support.v7.widget.AppCompatImageView
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.text.InputType
 import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import com.afollestad.materialdialogs.MaterialDialog
 import dagger.Lazy
 import dagger.internal.Factory
 import io.realm.Realm
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
 import kr.ac.snu.hcil.omnitrack.core.auth.OTAuthManager
-import kr.ac.snu.hcil.omnitrack.core.database.local.BackendDbManager
-import kr.ac.snu.hcil.omnitrack.core.database.local.models.OTTrackerDAO
-import kr.ac.snu.hcil.omnitrack.core.di.Backend
+import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTTrackerDAO
+import kr.ac.snu.hcil.omnitrack.core.di.configured.Backend
 import kr.ac.snu.hcil.omnitrack.ui.components.common.wizard.AWizardPage
 import org.jetbrains.anko.padding
+import java.util.*
 import javax.inject.Inject
 
 /**
@@ -30,13 +34,15 @@ class TrackerSelectionPage(override val parent : ServiceWizardView) : AWizardPag
     companion object {
         const val TAG = "TrackerSelectionPage"
     }
+
     override val canGoBack: Boolean = false
     override val canGoNext: Boolean = true
     override val getTitleResourceId: Int = R.string.msg_service_wizard_title_tracker_selection
 
-    private val trackers: List<OTTrackerDAO.SimpleTrackerInfo>
+    private var trackers: MutableList<OTTrackerDAO> = ArrayList()
+    private var trackerListView: RecyclerView? = null
 
-    var selectedTrackerId: String? = null
+    lateinit var selectedTrackerDAO: OTTrackerDAO
 
     @field:[Inject Backend]
     lateinit var realmProvider: Factory<Realm>
@@ -48,16 +54,8 @@ class TrackerSelectionPage(override val parent : ServiceWizardView) : AWizardPag
     protected lateinit var authManager: OTAuthManager
 
     init {
-        val component = (parent.context.applicationContext as OTApp).applicationComponent
+        val component = (parent.context.applicationContext as OTApp).currentConfiguredContext.configuredAppComponent
         component.inject(this)
-    }
-
-    init {
-        val userId = authManager.userId!!
-        val realm = realmProvider.get()
-        trackers = dbManager.get().makeTrackersOfUserQuery(userId, realm).findAll().map {
-            it.getSimpleInfo()
-        }
 
     }
 
@@ -65,13 +63,23 @@ class TrackerSelectionPage(override val parent : ServiceWizardView) : AWizardPag
     }
 
     override fun onEnter() {
+        val userId = authManager.userId!!
+        val realm = realmProvider.get()
+        trackers = dbManager.get().makeTrackersOfUserQuery(userId, realm).findAll()
+        realm.close()
+        trackerListView?.adapter?.notifyDataSetChanged()
+    }
+
+    private fun refreshTrackerList() {
+        onEnter()
     }
 
     override fun makeViewInstance(context: Context): View {
-        return TrackerListWizardPanel(context)
+        trackerListView = TrackerListView(context)
+        return trackerListView!!
     }
 
-    inner class TrackerListWizardPanel : RecyclerView {
+    inner class TrackerListView : RecyclerView {
 
         constructor(context: Context?) : super(context)
         constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
@@ -81,7 +89,6 @@ class TrackerSelectionPage(override val parent : ServiceWizardView) : AWizardPag
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
             adapter = TrackerListAdapter()
         }
-
     }
 
     inner class TrackerListAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -115,13 +122,19 @@ class TrackerSelectionPage(override val parent : ServiceWizardView) : AWizardPag
         }
 
         override fun onClick(view: View?) {
+            val trackerDefaultName = OTApp.getString(R.string.msg_new_tracker_prefix)
+            newTrackerNameDialog.input(null, trackerDefaultName, false) {
+                _, text ->
+                addNewTracker(text.toString())
+                refreshTrackerList()
+            }.show()
         }
     }
 
     private inner class TrackerListViewHolder(parent: ViewGroup?) :
             RecyclerView.ViewHolder(LayoutInflater.from(parent?.context).inflate(R.layout.simple_colored_circle_and_text, parent, false)), View.OnClickListener {
 
-        var trackerId: String? = null
+        var trackerDao: OTTrackerDAO? = null
         val circle: AppCompatImageView = itemView.findViewById(R.id.colored_circle)
         val textView: TextView = itemView.findViewById(R.id.text)
 
@@ -130,14 +143,35 @@ class TrackerSelectionPage(override val parent : ServiceWizardView) : AWizardPag
         }
 
         override fun onClick(view: View?) {
-            selectedTrackerId = trackerId
-            requestGoNextPage(ServiceWizardView.PAGE_FIELD_SELECTION)
+            selectedTrackerDAO = trackerDao!!
+            requestGoNextPage(ServiceWizardView.PAGE_ATTRIBUTE_SELECTION)
         }
 
-        fun bind(trackerInfo: OTTrackerDAO.SimpleTrackerInfo) {
-            trackerId = trackerInfo.objectId
-            circle.setColorFilter(trackerInfo.color)
-            textView.text = trackerInfo.name
+        fun bind(trackerDao: OTTrackerDAO) {
+            this.trackerDao = trackerDao
+            circle.setColorFilter(trackerDao.color)
+            textView.text = trackerDao.name
+        }
+    }
+
+    private val newTrackerNameDialog: MaterialDialog.Builder by lazy {
+        MaterialDialog.Builder(parent.context!!)
+                .title(R.string.msg_new_tracker_name)
+                .inputType(InputType.TYPE_CLASS_TEXT)
+                .setSyncWithKeyboard(true)
+                .inputRangeRes(1, 20, R.color.colorRed)
+                .cancelable(true)
+                .negativeText(R.string.msg_cancel)
+    }
+
+    private fun addNewTracker(name: String) {
+        val realm = realmProvider.get()
+        realm.executeTransaction {
+            val trackerDao = realm.createObject(OTTrackerDAO::class.java, UUID.randomUUID().toString())
+            trackerDao.userId = authManager.userId
+            trackerDao.name = name
+            trackerDao.isBookmarked = false
+            trackerDao.color = OTApp.instance.colorPalette[0]
         }
     }
 

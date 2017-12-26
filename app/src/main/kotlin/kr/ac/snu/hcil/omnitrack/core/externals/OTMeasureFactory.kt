@@ -99,6 +99,8 @@ abstract class OTMeasureFactory(val factoryTypeName: String) : INameDescriptionR
 
     abstract fun isAttachableTo(attribute: OTAttributeDAO): Boolean
 
+    abstract fun getAttributeType(): Int
+
     abstract val isRangedQueryAvailable: Boolean
     abstract val isDemandingUserInput: Boolean
     abstract val minimumGranularity: OTTimeRangeQuery.Granularity
