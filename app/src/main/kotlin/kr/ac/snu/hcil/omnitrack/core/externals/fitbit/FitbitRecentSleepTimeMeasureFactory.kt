@@ -21,7 +21,6 @@ import java.util.*
  * Created by younghokim on 16. 9. 3..
  */
 object FitbitRecentSleepTimeMeasureFactory : OTMeasureFactory("slp") {
-
     override fun getExampleAttributeConfigurator(): IExampleAttributeConfigurator {
         return CONFIGURATOR_FOR_TIMESPAN_ATTRIBUTE
     }

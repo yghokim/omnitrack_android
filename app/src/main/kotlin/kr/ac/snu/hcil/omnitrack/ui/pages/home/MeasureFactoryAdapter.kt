@@ -34,7 +34,6 @@ class MeasureFactoryAdapter(private val context: Context) : RecyclerView.Adapter
         return service?.measureFactories?.size ?: 0
     }
 
-
     override fun onBindViewHolder(holder: MeasureFactoryViewHolder, position: Int) {
         if (service != null) {
             holder.bind(service!!.measureFactories[position])
@@ -88,8 +87,6 @@ class MeasureFactoryAdapter(private val context: Context) : RecyclerView.Adapter
                 wizardView.setWizardListener(object : WizardView.IWizardListener {
                     override fun onComplete(wizard: WizardView) {
                         println("new connection refreshed.")
-
-
                         wizardDialog.dismiss()
                     }
 
@@ -97,9 +94,7 @@ class MeasureFactoryAdapter(private val context: Context) : RecyclerView.Adapter
                         wizardDialog.dismiss()
                     }
                 })
-
                 wizardDialog.show()
-
             }
         }
 
@@ -136,5 +131,4 @@ class MeasureFactoryAdapter(private val context: Context) : RecyclerView.Adapter
             }*/
         }
     }
-
 }

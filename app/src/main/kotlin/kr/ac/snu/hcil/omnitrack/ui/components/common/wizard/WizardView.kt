@@ -3,7 +3,6 @@ package kr.ac.snu.hcil.omnitrack.ui.components.common.wizard
 import android.content.Context
 import android.support.v4.view.ViewPager
 import android.util.AttributeSet
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
@@ -15,7 +14,6 @@ import java.util.*
  * Created by Young-Ho Kim on 2016-08-30.
  */
 abstract class WizardView : FrameLayout, AWizardViewPagerAdapter.IWizardPageListener, ViewPager.OnPageChangeListener, View.OnClickListener {
-
 
     interface IWizardListener {
         fun onComplete(wizard: WizardView)
@@ -38,7 +36,6 @@ abstract class WizardView : FrameLayout, AWizardViewPagerAdapter.IWizardPageList
     fun setWizardListener(listener: IWizardListener) {
         this.listener = listener
     }
-
 
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
