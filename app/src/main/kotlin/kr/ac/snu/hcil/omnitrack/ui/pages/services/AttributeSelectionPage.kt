@@ -6,7 +6,6 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.InputType
 import android.util.AttributeSet
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -79,10 +78,6 @@ class AttributeSelectionPage(override val parent : ServiceWizardView) : AWizardP
             attributes.addAll(validAttributes)
             attributes.removeAll { !currentMeasureFactory.isAttachableTo(it) }
             attributeListView?.adapter?.notifyDataSetChanged()
-            Log.i("TAG", "${attributes.size}")
-            attributes.forEach {
-                attribute -> Log.i("TAG", attribute.name)
-            }
         }
     }
 
