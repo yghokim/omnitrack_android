@@ -10,6 +10,6 @@
     <string name="msg_vis_daily_count_title_format">Daily %1$s count</string>
     <string name="msg_vis_daily_count_title_format_with_time_attr">Daily %1$s count in terms of [%2$s]</string>
 
-    <string name="msg_vis_numeric_line_timeline_title">Numeric attributes on timeline</string>
+    <string name="msg_vis_numeric_line_timeline_title">Numeric fields on timeline</string>
     <string name="msg_vis_format_time_number_plot_title">[%1$s] over [%2$s]</string>
 </resources>

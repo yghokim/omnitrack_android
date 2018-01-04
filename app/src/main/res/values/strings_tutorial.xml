@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="msg_tutorial_add_attribute_primary">Add attributes to your tracker</string>
+    <string name="msg_tutorial_add_attribute_primary">Add fields to your tracker</string>
     <string name="msg_tutorial_add_attribute_secondary">Tap the Plus button to append a new field of various types</string>
 
     <string name="msg_tutorial_add_tracker_primary">Add your first tracker</string>

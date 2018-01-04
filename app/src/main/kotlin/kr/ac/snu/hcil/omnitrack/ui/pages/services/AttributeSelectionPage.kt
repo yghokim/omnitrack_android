@@ -87,11 +87,11 @@ class AttributeSelectionPage(override val parent : ServiceWizardView) : AWizardP
     }
 
     override fun makeViewInstance(context: Context): View {
-        attributeListView = FieldListWizardPanel(context)
+        attributeListView = AttributeListWizardPanel(context)
         return attributeListView!!
     }
 
-    inner class FieldListWizardPanel: RecyclerView {
+    inner class AttributeListWizardPanel : RecyclerView {
 
         constructor(context: Context?) : super(context)
         constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
@@ -99,23 +99,23 @@ class AttributeSelectionPage(override val parent : ServiceWizardView) : AWizardP
         init {
             padding = context.resources.getDimensionPixelSize(R.dimen.activity_horizontal_margin)
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-            adapter = FieldListAdapter()
+            adapter = AttributeListAdapter()
         }
     }
 
-    inner class FieldListAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    inner class AttributeListAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): RecyclerView.ViewHolder {
             return when (viewType) {
-                0 -> FieldAttachViewHolder(parent)
-                1 -> FieldListViewHolder(parent)
+                0 -> AttributeAttachViewHolder(parent)
+                1 -> AttributeListViewHolder(parent)
                 else -> throw IllegalArgumentException()
             }
         }
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder?, position: Int) {
             if (position >= 1) {
-                (holder as FieldListViewHolder).bind(attributes[position - 1])
+                (holder as AttributeListViewHolder).bind(attributes[position - 1])
             }
         }
 
@@ -125,7 +125,7 @@ class AttributeSelectionPage(override val parent : ServiceWizardView) : AWizardP
 
     }
 
-    private inner class FieldAttachViewHolder(parent: ViewGroup?) :
+    private inner class AttributeAttachViewHolder(parent: ViewGroup?) :
             RecyclerView.ViewHolder(LayoutInflater.from(parent?.context).inflate(R.layout.layout_attached_attribute_list_add, parent, false)), View.OnClickListener {
 
         init {
@@ -144,7 +144,7 @@ class AttributeSelectionPage(override val parent : ServiceWizardView) : AWizardP
         }
     }
 
-    private inner class FieldListViewHolder(parent: ViewGroup?) :
+    private inner class AttributeListViewHolder(parent: ViewGroup?) :
             RecyclerView.ViewHolder(LayoutInflater.from(parent?.context).inflate(R.layout.simple_icon_and_text, parent, false)), View.OnClickListener {
 
         init {
