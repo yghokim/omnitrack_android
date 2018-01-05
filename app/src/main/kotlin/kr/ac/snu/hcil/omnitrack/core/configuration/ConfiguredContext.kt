@@ -59,6 +59,10 @@ class ConfiguredContext(val configuration: OTConfiguration, val applicationCompo
         DaoSerializationModule()
     }
 
+    private val researchModule: ResearchModule by lazy {
+        ResearchModule()
+    }
+
 
     val configuredAppComponent: ConfiguredAppComponent by lazy {
         applicationComponent.configuredAppComponentBuilder()
@@ -106,6 +110,16 @@ class ConfiguredContext(val configuration: OTConfiguration, val applicationCompo
                 .plus(configuredModule)
                 .plus(triggerSystemModule)
                 .plus(backendDatabaseModule)
+                .build()
+    }
+
+    val researchComponent: ResearchComponent by lazy {
+        applicationComponent.researchComponentBuilder()
+                .plus(configuredModule)
+                .plus(researchModule)
+                .plus(networkModule)
+                .plus(authModule)
+                .plus(firebaseModule)
                 .build()
     }
 

@@ -18,6 +18,7 @@ import kr.ac.snu.hcil.omnitrack.core.database.global.OTAttachedConfigurationDao
 import kr.ac.snu.hcil.omnitrack.core.di.global.AppLevelDatabase
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncDirection
+import java.lang.Exception
 import javax.inject.Inject
 
 /**
@@ -54,15 +55,18 @@ class OTFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
-        println("received Firebase Cloud message")
+        val senderId = remoteMessage.from
         val receiverToken = remoteMessage.to
-        if (receiverToken != null) {
+
+        println("OTFirebaseMessagingService: received Firebase Cloud message. Sender: $senderId | Receiver: $receiverToken")
+        if (senderId != null) {
             subscriptions.add(
                     Completable.defer {
                         realmFactory.get().use { realm ->
                             val dao = realm.where(OTAttachedConfigurationDao::class.java)
-                                    .equalTo(OTAttachedConfigurationDao.FIELD_INSTANCE_ID, receiverToken).findFirst()
+                                    .equalTo(OTAttachedConfigurationDao.FIELD_GCM_SENDER_ID, senderId).findFirst()
                             if (dao != null) {
+                                println("OTFirebaseMessagingService: Found corresponding configuration context sent from: ${senderId}")
                                 val configuredContext = configController.getConfiguredContextOf(dao.staticConfiguration())
                                 if (configuredContext != null) {
                                     val data = remoteMessage.data
@@ -78,6 +82,8 @@ class OTFirebaseMessagingService : FirebaseMessagingService() {
                                         }
                                     }
                                 }
+                            } else {
+                                println("OTFirebaseMessagingService: Did not find any corresponding configuration with sender Id")
                             }
                         }
                         return@defer Completable.complete()

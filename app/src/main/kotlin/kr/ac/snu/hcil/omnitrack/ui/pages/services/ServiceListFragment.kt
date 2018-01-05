@@ -48,7 +48,7 @@ class ServiceListFragment : OTFragment() {
                               savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.fragment_home_services, container, false)
 
-        listView = rootView.findViewById(R.id.ui_list)
+        listView = rootView.findViewById(R.id.ui_recyclerview_with_fallback)
 
         listView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         //listView.addItemDecoration(HorizontalDividerItemDecoration(0, 20))

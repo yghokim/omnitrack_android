@@ -35,6 +35,7 @@ import kr.ac.snu.hcil.omnitrack.services.OTInformationUploadService
 import kr.ac.snu.hcil.omnitrack.ui.activities.OTActivity
 import kr.ac.snu.hcil.omnitrack.ui.components.common.viewholders.RecyclerViewMenuAdapter
 import kr.ac.snu.hcil.omnitrack.ui.pages.AboutActivity
+import kr.ac.snu.hcil.omnitrack.ui.pages.research.ResearchActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.settings.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.utils.DialogHelper
 import javax.inject.Inject
@@ -65,7 +66,7 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu
     @Inject
     lateinit var configuration: OTConfiguration
 
-    private lateinit var realm: Realm
+    private lateinit var backendRealm: Realm
 
     private val userWatchDisposable = SerialDisposable()
 
@@ -135,12 +136,12 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu
     }
 
     fun onCreate() {
-        realm = realmFactory.get()
+        backendRealm = realmFactory.get()
 
         userWatchDisposable.set(
                 parentActivity.signedInUserObservable.toFlowable(BackpressureStrategy.LATEST).flatMap { userId ->
-                    realm = realmFactory.get()
-                    return@flatMap realm.where(OTUserDAO::class.java).equalTo("uid", userId).findFirstAsync().asFlowable<OTUserDAO>().filter { it.isValid && it.isLoaded }
+                    backendRealm = realmFactory.get()
+                    return@flatMap backendRealm.where(OTUserDAO::class.java).equalTo("uid", userId).findFirstAsync().asFlowable<OTUserDAO>().filter { it.isValid && it.isLoaded }
                 }.subscribe { user ->
                     view.ui_user_name.text = user.name
                     view.ui_user_email.text = user.email
@@ -178,9 +179,9 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu
         userWatchDisposable.set(null)
         subscriptions.clear()
 
-        if (this::realm.isInitialized) {
-            if (!realm.isClosed) {
-                realm.close()
+        if (this::backendRealm.isInitialized) {
+            if (!backendRealm.isClosed) {
+                backendRealm.close()
             }
         }
     }
@@ -210,7 +211,13 @@ class SidebarWrapper(val view: View, val parentActivity: OTActivity) : PopupMenu
                     //OTApp.instance.syncManager.performSynchronizationOf(ESyncDataType.ITEM)
                     syncManager.get().queueFullSync()
                     syncManager.get().reserveSyncServiceNow()
+                }, true),
+
+                RecyclerViewMenuAdapter.MenuItem(R.drawable.icon_plask, "Research", null, {
+                    val intent = Intent(parentActivity, ResearchActivity::class.java)
+                    parentActivity.startActivity(intent)
                 }, true)
+
         )
 
         init {

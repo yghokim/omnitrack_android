@@ -31,7 +31,7 @@ object NewTriggerConditionTypeSelectionDialogHelper {
     fun builder(context: Context, triggerActionTypeName: Int, supportedConditionTypes: Array<Byte>? = null, listener: (Byte) -> Unit): AlertDialog.Builder {
 
         val view = LayoutInflater.from(context).inflate(R.layout.simple_layout_with_recycler_view, null)
-        val listView: RecyclerView = view.findViewById(R.id.ui_list)
+        val listView: RecyclerView = view.findViewById(R.id.ui_recyclerview_with_fallback)
 
         listView.layoutManager = GridLayoutManager(context, 2)
         listView.adapter = Adapter(supportedConditionTypes, listener)

@@ -18,6 +18,9 @@ open class OTAttachedConfigurationDao : RealmObject() {
     var firebaseInstanceId: String? = null
     var firebaseInstanceIdCreatedAt: Long? = null
 
+    @Index
+    var firebaseCloudMessagingSenderId: String? = null
+
     @Required
     var dataJson: String = "{}"
 
@@ -36,13 +39,7 @@ open class OTAttachedConfigurationDao : RealmObject() {
 
     companion object {
         const val FIELD_INSTANCE_ID = "firebaseInstanceId"
+        const val FIELD_GCM_SENDER_ID = "firebaseCloudMessagingSenderId"
         const val FIELD_ID = "id"
-
-        fun fromConfiguration(configuration: OTConfiguration): OTAttachedConfigurationDao {
-            val dao = OTAttachedConfigurationDao()
-            dao.id = configuration.id
-            dao.dataJson = configuration.toJson()
-            return dao
-        }
     }
 }

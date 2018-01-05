@@ -39,10 +39,10 @@ class TrackerReorderActivity: MultiButtonActionBarActivity(R.layout.activity_mul
         setActionBarButtonMode(Mode.SaveCancel)
         contentView?.setBackgroundColor(ContextCompat.getColor(this, R.color.outerBackground))
 
-        ui_list.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        ui_recyclerview_with_fallback.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         touchHelper = ItemTouchHelper(DragItemTouchHelperCallback(adapter, this, true, false, true))
-        touchHelper.attachToRecyclerView(ui_list)
-        ui_list.adapter = adapter
+        touchHelper.attachToRecyclerView(ui_recyclerview_with_fallback)
+        ui_recyclerview_with_fallback.adapter = adapter
 
         viewModel = ViewModelProviders.of(this).get(OrderedTrackerListViewModel::class.java)
 

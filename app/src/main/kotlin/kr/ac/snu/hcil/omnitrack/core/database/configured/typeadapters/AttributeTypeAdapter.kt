@@ -42,6 +42,14 @@ class AttributeTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>) : Server
                     BackendDbManager.FIELD_IS_HIDDEN -> dao.isHidden = reader.nextBoolean()
                     BackendDbManager.FIELD_IS_IN_TRASHCAN -> dao.isInTrashcan = reader.nextBoolean()
 
+                    "lockedProperties" -> {
+                        dao.serializedLockedPropertyInfo = gson.get().fromJson<JsonObject>(reader, JsonObject::class.java).toString()
+                    }
+
+                    "flags" -> {
+                        dao.serializedCreationFlags = gson.get().fromJson<JsonObject>(reader, JsonObject::class.java).toString()
+                    }
+
                     "connection" -> {
                         dao.serializedConnection = gson.get().fromJson<JsonObject>(reader, JsonObject::class.java).toString()
                     }
@@ -91,6 +99,9 @@ class AttributeTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>) : Server
         writer.name(BackendDbManager.FIELD_POSITION).value(value.position)
         writer.name("fallbackPolicy").value(value.fallbackValuePolicy)
         writer.name("fallbackPreset").value(value.fallbackPresetSerializedValue)
+
+        writer.name("flags").jsonValue(value.serializedCreationFlags)
+        writer.name("lockedProperties").jsonValue(value.serializedLockedPropertyInfo)
 
         writer.name(BackendDbManager.FIELD_IS_HIDDEN).value(value.isHidden)
         writer.name(BackendDbManager.FIELD_IS_IN_TRASHCAN).value(value.isInTrashcan)

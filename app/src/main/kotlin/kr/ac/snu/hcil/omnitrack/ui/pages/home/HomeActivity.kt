@@ -42,7 +42,7 @@ class HomeActivity : MultiButtonActionBarActivity(R.layout.activity_home), Drawe
     /**
      * The [ViewPager] that will host the section contents.
      */
-    private val mViewPager: ViewPager by bindView(R.id.container)
+    private val mViewPager: ViewPager by bindView(R.id.main_viewpager)
 
     private val drawerLayout: DrawerLayout by bindView(R.id.ui_drawer_layout)
 

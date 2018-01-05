@@ -52,7 +52,15 @@ class TriggerTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>, val realmP
                     reader.skipValue()
                 }
                 "checkScript" -> dao.checkScript = reader.nextBoolean()
-                "lockedProperties" -> dao.serializedLockedPropertyInfo = gson.get().fromJson<JsonObject>(reader, JsonObject::class.java).toString()
+
+                "lockedProperties" -> {
+                    dao.serializedLockedPropertyInfo = gson.get().fromJson<JsonObject>(reader, JsonObject::class.java).toString()
+                }
+
+                "flags" -> {
+                    dao.serializedCreationFlags = gson.get().fromJson<JsonObject>(reader, JsonObject::class.java).toString()
+                }
+
                 "trackers" -> {
                     reader.beginArray()
                     while (reader.hasNext()) {
@@ -95,6 +103,9 @@ class TriggerTypeAdapter(isServerMode: Boolean, val gson: Lazy<Gson>, val realmP
         if (!isServerMode)
             writer.name(BackendDbManager.FIELD_SYNCHRONIZED_AT).value(value.synchronizedAt)
 
+
+        writer.name("flags").jsonValue(value.serializedCreationFlags)
+        writer.name("lockedProperties").jsonValue(value.serializedLockedPropertyInfo)
 
         writer.name(BackendDbManager.FIELD_REMOVED_BOOLEAN).value(value.removed)
         writer.name(BackendDbManager.FIELD_UPDATED_AT_LONG).value(value.userUpdatedAt)

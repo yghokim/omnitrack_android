@@ -1,11 +1,13 @@
 package kr.ac.snu.hcil.omnitrack.core.net
 
 import com.google.gson.JsonObject
+import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kr.ac.snu.hcil.omnitrack.core.OTUserRolePOJO
 import kr.ac.snu.hcil.omnitrack.core.database.OTDeviceInfo
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.research.ExperimentInfo
 import kr.ac.snu.hcil.omnitrack.core.synchronization.ESyncDataType
 import kr.ac.snu.hcil.omnitrack.core.synchronization.SyncResultEntry
 import kr.ac.snu.hcil.omnitrack.utils.ValueWithTimestamp
@@ -14,7 +16,7 @@ import retrofit2.Retrofit
 /**
  * Created by younghokim on 2017. 9. 28..
  */
-class OTOfficialServerApiController(retrofit: Retrofit) : ISynchronizationServerSideAPI, IUserReportServerAPI, IUsageLogUploadAPI {
+class OTOfficialServerApiController(retrofit: Retrofit) : ISynchronizationServerSideAPI, IUserReportServerAPI, IUsageLogUploadAPI, IResearchServerAPI {
 
     private val service: OTOfficialServerService by lazy {
         retrofit.create(OTOfficialServerService::class.java)
@@ -57,6 +59,31 @@ class OTOfficialServerApiController(retrofit: Retrofit) : ISynchronizationServer
 
     override fun putUserName(name: String, timestamp: Long): Single<ISynchronizationServerSideAPI.InformationUpdateResult> {
         return service.putUserName(ValueWithTimestamp(name, timestamp))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    override fun approveExperimentInvitation(invitationCode: String): Single<ExperimentCommandResult> {
+        return service.approveExperimentInvitation(invitationCode)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    override fun rejectExperimentInvitation(invitationCode: String): Completable {
+        return service.rejectExperimentInvitation(invitationCode)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    override fun dropOutFromExperiment(experimentId: String, reason: CharSequence?): Single<ExperimentCommandResult> {
+        return service.dropOutFromExperiment(experimentId, DropoutBody(reason?.toString()))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+
+    override fun retrieveJoinedExperiments(after: Long): Single<List<ExperimentInfo>> {
+        return service.getJoinedExperiments(after)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }

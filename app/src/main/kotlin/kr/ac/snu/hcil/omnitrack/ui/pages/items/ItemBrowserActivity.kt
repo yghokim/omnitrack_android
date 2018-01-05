@@ -394,7 +394,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
             val monthView: TextView by bindView(R.id.ui_text_month)
             val dayView: TextView by bindView(R.id.ui_text_day)
 
-            val valueListView: RecyclerView by bindView(R.id.ui_list)
+            val valueListView: RecyclerView by bindView(R.id.ui_recyclerview_with_fallback)
 
             val moreButton: View by bindView(R.id.ui_button_more)
 
@@ -821,7 +821,7 @@ class ItemBrowserActivity : MultiButtonActionBarActivity(R.layout.activity_item_
                 }
             })
 
-            listView = contentView.findViewById(R.id.ui_list)
+            listView = contentView.findViewById(R.id.ui_recyclerview_with_fallback)
 
             listView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
             listView.adapter = menuAdapter

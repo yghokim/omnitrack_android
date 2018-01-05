@@ -9,10 +9,7 @@ import android.preference.PreferenceManager
 import dagger.Module
 import dagger.Provides
 import kr.ac.snu.hcil.omnitrack.OTApp
-import kr.ac.snu.hcil.omnitrack.core.di.configured.ConfiguredAppComponent
-import kr.ac.snu.hcil.omnitrack.core.di.configured.FirebaseComponent
-import kr.ac.snu.hcil.omnitrack.core.di.configured.ScheduledJobComponent
-import kr.ac.snu.hcil.omnitrack.core.di.configured.TriggerSystemComponent
+import kr.ac.snu.hcil.omnitrack.core.di.configured.*
 import java.io.ByteArrayInputStream
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
@@ -31,7 +28,9 @@ import javax.inject.Singleton
     ConfiguredAppComponent::class,
     FirebaseComponent::class,
     ScheduledJobComponent::class,
-    TriggerSystemComponent::class])
+    TriggerSystemComponent::class,
+    ResearchComponent::class
+])
 class ApplicationModule(private val mApp: OTApp) {
 
     @Provides

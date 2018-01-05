@@ -37,6 +37,7 @@ class OTSyncManager @Inject constructor(
     }
 
     fun reserveSyncServiceNow() {
+        println("reserve data synchronization from server.")
         dispatcher.get().mustSchedule(oneShotJobProvider.get())
     }
 
