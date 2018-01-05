@@ -2,14 +2,17 @@ package kr.ac.snu.hcil.omnitrack.core.database.configured.models
 
 import android.app.Activity
 import android.support.annotation.ColorInt
+import com.google.gson.JsonObject
 import com.google.gson.JsonSyntaxException
 import com.tbruyelle.rxpermissions2.RxPermissions
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.realm.*
+import io.realm.annotations.Ignore
 import io.realm.annotations.Index
 import io.realm.annotations.LinkingObjects
 import io.realm.annotations.PrimaryKey
+import kr.ac.snu.hcil.omnitrack.core.CreationFlagsHelper
 import kr.ac.snu.hcil.omnitrack.core.attributes.helpers.OTAttributeHelper
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
@@ -86,6 +89,16 @@ open class OTTrackerDAO : RealmObject() {
 
     val liveTriggersQuery: RealmQuery<OTTriggerDAO>? get() = triggers?.where()?.equalTo(BackendDbManager.FIELD_REMOVED_BOOLEAN, false)
 
+    @Ignore
+    private var _parsedCreationFlags: JsonObject? = null
+
+    fun getParsedCreationFlags(): JsonObject {
+        if (_parsedCreationFlags == null) {
+            _parsedCreationFlags = CreationFlagsHelper.parseCreationFlags(serializedCreationFlags)
+        }
+        return _parsedCreationFlags!!
+    }
+
     fun isExternalFilesInvolved(configuredContext: ConfiguredContext): Boolean {
         return getLiveAttributesSync().find { it.getHelper(configuredContext).isExternalFile(it) } != null
     }
@@ -126,6 +139,8 @@ open class OTTrackerDAO : RealmObject() {
     fun getSimpleInfo(): SimpleTrackerInfo {
         return SimpleTrackerInfo(objectId, name, color)
     }
+
+
 }
 
 

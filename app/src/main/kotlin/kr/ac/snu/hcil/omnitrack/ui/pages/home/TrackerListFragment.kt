@@ -114,8 +114,8 @@ class TrackerListFragment : OTFragment() {
                 .negativeText(R.string.msg_cancel)
     }
 
-    private val collapsedHeight = OTApp.instance.resourcesWrapped.getDimensionPixelSize(R.dimen.tracker_list_element_collapsed_height)
-    private val expandedHeight = OTApp.instance.resourcesWrapped.getDimensionPixelSize(R.dimen.tracker_list_element_expanded_height)
+    private val collapsedHeight = 0
+    private val expandedHeight = OTApp.instance.resourcesWrapped.getDimensionPixelSize(R.dimen.button_height_normal)
 
     private val currentTrackerViewModelList = ArrayList<TrackerListViewModel.TrackerInformationViewModel>()
 
@@ -407,12 +407,8 @@ class TrackerListFragment : OTFragment() {
                 addUpdateListener {
                     val progress = (animatedValue as Float)
                     expandedView.alpha = progress
-                    val lp = itemView.layoutParams.apply { height = (collapsedHeight + (expandedHeight - collapsedHeight) * progress).toInt() }
-                    itemView.layoutParams = lp
+                    expandedView.layoutParams.apply { height = (collapsedHeight + (expandedHeight - collapsedHeight) * progress).toInt() }
                     itemView.requestLayout()
-
-                    expandedView.layoutParams.height = (0.5f + (expandedViewHeight) * progress).toInt()
-                    expandedView.requestLayout()
                 }
             }
 
@@ -444,12 +440,8 @@ class TrackerListFragment : OTFragment() {
                 addUpdateListener {
                     val progress = (animatedValue as Float)
                     expandedView.alpha = progress
-                    val lp = itemView.layoutParams.apply { height = (collapsedHeight + (expandedHeight - collapsedHeight) * progress).toInt() }
-                    itemView.layoutParams = lp
+                    expandedView.layoutParams.apply { height = (collapsedHeight + (expandedHeight - collapsedHeight) * progress).toInt() }
                     itemView.requestLayout()
-
-                    expandedView.layoutParams.height = (0.5f + (expandedViewHeight) * progress).toInt()
-                    expandedView.requestLayout()
                 }
             }
 
@@ -534,6 +526,17 @@ class TrackerListFragment : OTFragment() {
                         viewModel.trackerName.subscribe {
                             nameText ->
                             name.text = nameText
+                        }
+                )
+
+                subscriptions.add(
+                        viewModel.isForExperiment.subscribe { isForExperiment ->
+                            if (isForExperiment) {
+                                itemView.ui_experiment_info.visibility = View.VISIBLE
+                                itemView.ui_experiment_info.ui_experiment_name.text = "Research"
+                            } else {
+                                itemView.ui_experiment_info.visibility = View.GONE
+                            }
                         }
                 )
 
@@ -632,8 +635,7 @@ class TrackerListFragment : OTFragment() {
                 } else {
                     expandedView.visibility = View.GONE
                     expandButton.setImageResource(R.drawable.more_horiz_scarse)
-                    val lp = itemView.layoutParams.apply { height = collapsedHeight }
-                    itemView.layoutParams = lp
+                    expandedView.layoutParams.apply { height = collapsedHeight }
                     collapsed = true
                 }
             }
@@ -645,8 +647,7 @@ class TrackerListFragment : OTFragment() {
                 } else {
                     expandedView.visibility = View.VISIBLE
                     expandButton.setImageResource(R.drawable.up_dark)
-                    val lp = itemView.layoutParams.apply { height = expandedHeight }
-                    itemView.layoutParams = lp
+                    expandedView.layoutParams.apply { height = expandedHeight }
                     collapsed = false
                 }
             }

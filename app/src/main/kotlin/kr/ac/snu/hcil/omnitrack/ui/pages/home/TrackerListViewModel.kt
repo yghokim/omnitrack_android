@@ -9,6 +9,7 @@ import io.reactivex.subjects.BehaviorSubject
 import io.realm.*
 import kr.ac.snu.hcil.omnitrack.OTApp
 import kr.ac.snu.hcil.omnitrack.R
+import kr.ac.snu.hcil.omnitrack.core.CreationFlagsHelper
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
@@ -163,6 +164,8 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
         val trackerName: BehaviorSubject<String> = BehaviorSubject.create()
         val trackerColor: BehaviorSubject<Int> = BehaviorSubject.create()
 
+        val isForExperiment: BehaviorSubject<Boolean> = BehaviorSubject.create()
+
         val activeNotificationCount: BehaviorSubject<Int> = BehaviorSubject.createDefault(0)
 
         val trackerEditable: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(true)
@@ -252,6 +255,7 @@ class TrackerListViewModel(app: Application) : UserAttachedViewModel(app), Order
             trackerColor.onNextIfDifferAndNotNull(snapshot.color)
             trackerName.onNextIfDifferAndNotNull(snapshot.name)
             isBookmarked.onNextIfDifferAndNotNull(snapshot.isBookmarked)
+            isForExperiment.onNextIfDifferAndNotNull(CreationFlagsHelper.isForExperiment(snapshot.getParsedCreationFlags()))
 
             /* TODO editable flags
             if (trackerEditable.value != snapshot.isEditable) {

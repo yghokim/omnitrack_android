@@ -30,6 +30,7 @@
         <item name="android:textSize">@dimen/tracker_list_element_information_text_contentSize
         </item>
         <item name="android:textColor">@color/textColorLight</item>
+        <item name="android:paddingBottom">@dimen/tracker_list_information_bottom_padding</item>
     </style>
 
 </resources>
