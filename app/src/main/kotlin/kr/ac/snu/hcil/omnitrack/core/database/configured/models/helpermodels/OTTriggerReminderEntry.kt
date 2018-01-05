@@ -12,8 +12,15 @@ open class OTTriggerReminderEntry : RealmObject() {
     @PrimaryKey
     var id: Long = 0
 
+    /**
+     * Notification level enum
+     */
     var levelOrdinal: Int = 0
 
+    /**
+     * an Id of system-wise entity for this reminder.
+     * for Simple notification, this is an alarmId.
+     */
     @Index
     var systemIntrinsicId: Int = -1
 

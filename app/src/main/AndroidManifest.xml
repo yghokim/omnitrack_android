@@ -302,6 +302,11 @@
         <activity android:name=".ui.pages.home.TrackerReorderActivity"
             android:label="@string/msg_edit_tracker_order"/>
 
+        <activity
+            android:name=".ui.pages.research.ResearchActivity"
+            android:label="@string/msg_title_research"
+            android:parentActivityName=".ui.pages.home.HomeActivity" />
+
     </application>
 
 </manifest>

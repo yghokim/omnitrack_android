@@ -160,6 +160,9 @@ open class OTAttributeDAO : RealmObject() {
     var userCreatedAt: Long = System.currentTimeMillis()
     var userUpdatedAt: Long = System.currentTimeMillis()
 
+    var serializedCreationFlags: String = "{}"
+    var serializedLockedPropertyInfo: String = "{}"
+
     fun getParsedConnection(): OTConnection? {
         return try {
             serializedConnection?.let { OTConnection.fromJson(it) }

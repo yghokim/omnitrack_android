@@ -294,8 +294,8 @@ class BackendDbManager @Inject constructor(
     fun removeTrigger(dao: OTTriggerDAO, permanently: Boolean, realm: Realm) {
         realm.executeTransactionIfNotIn { realm ->
             if (permanently) {
-                dao.deleteFromRealm()
                 triggerSystemManager.tryCheckOutFromSystem(dao)
+                dao.deleteFromRealm()
             } else {
                 dao.synchronizedAt = null
                 dao.userUpdatedAt = System.currentTimeMillis()

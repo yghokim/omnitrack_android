@@ -39,7 +39,7 @@ class RecentItemValuePickerBottomSheetFragment: DismissingBottomSheetDialogFragm
     private lateinit var loadingIndicator: ProgressBar
 
     override fun setupDialogAndContentView(dialog: Dialog, contentView: View) {
-        this.listView = contentView.findViewById(R.id.ui_list)
+        this.listView = contentView.findViewById(R.id.ui_recyclerview_with_fallback)
         this.loadingIndicator = contentView.findViewById(R.id.ui_loading_indicator)
         this.viewContainer = contentView.findViewById(R.id.ui_view_container)
 

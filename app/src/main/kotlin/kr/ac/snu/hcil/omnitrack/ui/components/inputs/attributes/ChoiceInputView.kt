@@ -23,7 +23,7 @@ import kotlin.properties.Delegates
  */
 class ChoiceInputView(context: Context, attrs: AttributeSet? = null) : AAttributeInputView<IntArray>(R.layout.input_choice, context, attrs) {
 
-    private val listView: RecyclerView = findViewById(R.id.ui_list)
+    private val listView: RecyclerView = findViewById(R.id.ui_recyclerview_with_fallback)
     private val adapter: Adapter
 
     private val selectedIds = ArrayList<Int>()

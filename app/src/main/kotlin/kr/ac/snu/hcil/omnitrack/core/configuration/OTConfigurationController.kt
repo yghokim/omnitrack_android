@@ -34,6 +34,7 @@ class OTConfigurationController @Inject constructor(
                 currentConfiguration = OTConfiguration()
                 realm.executeTransaction {
                     val dao = realm.createObject(OTAttachedConfigurationDao::class.java, currentConfiguration.id)
+                    dao.firebaseCloudMessagingSenderId = currentConfiguration.firebaseCloudMessagingSenderId
                     dao.dataJson = currentConfiguration.toJson()
                 }
             } else {

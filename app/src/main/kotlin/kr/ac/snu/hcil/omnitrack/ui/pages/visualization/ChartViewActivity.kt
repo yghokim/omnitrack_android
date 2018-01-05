@@ -76,7 +76,7 @@ class ChartViewActivity : MultiButtonActionBarActivity(R.layout.activity_chart_v
             viewModel.granularity = supportedGranularity[index]
         }
 
-        listView = findViewById(R.id.ui_list)
+        listView = findViewById(R.id.ui_recyclerview_with_fallback)
         listView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         listView.addItemDecoration(HorizontalImageDividerItemDecoration(R.drawable.horizontal_separator_pattern, this))
 
