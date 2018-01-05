@@ -195,6 +195,12 @@ class OTApp : MultiDexApplication() {
                 .build()
     }
 
+    val serializationComponent: SerializationComponent by lazy {
+        DaggerSerializationComponent.builder()
+                .serializationModule(serializationModule)
+                .build()
+    }
+
     val colorPalette: IntArray by lazy {
         this.resources.getStringArray(R.array.colorPaletteArray).map { Color.parseColor(it) }.toIntArray()
     }

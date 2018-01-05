@@ -3,8 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/tracker_list_element_expanded_height"
-    android:background="@drawable/frontal_color_selectable_element_background">
+    android:layout_height="wrap_content"
+    android:background="@drawable/frontal_color_selectable_element_background"
+    android:minHeight="@dimen/tracker_list_element_collapsed_height">
 
     <View
         android:id="@+id/color_bar"
@@ -14,6 +15,36 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/ui_experiment_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center_vertical"
+        android:visibility="gone"
+        app:layout_constraintLeft_toRightOf="@+id/color_bar"
+
+        app:layout_constraintStart_toStartOf="@+id/ui_title_container"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible">
+
+        <android.support.v7.widget.AppCompatImageView
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            android:tint="@color/colorPointed.Light"
+            app:srcCompat="@drawable/icon_plask" />
+
+        <TextView
+            android:id="@+id/ui_experiment_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:textColor="@color/colorPointed.Light"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            tools:text="Productivity Diary Study" />
+    </LinearLayout>
 
     <com.google.android.flexbox.FlexboxLayout
         android:id="@+id/ui_title_container"
@@ -27,7 +58,7 @@
         app:flexWrap="nowrap"
         app:layout_constraintLeft_toRightOf="@+id/color_bar"
         app:layout_constraintRight_toLeftOf="@+id/ui_expand_button"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/ui_experiment_info">
 
         <TextView
             android:id="@+id/name"
@@ -105,16 +136,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:layout_marginBottom="@dimen/tracker_list_information_bottom_padding"
+        android:layout_marginTop="16dp"
         android:gravity="bottom"
         android:minWidth="100dp"
+
+
         android:paddingRight="@dimen/tracker_list_stat_paddingRight"
 
-        app:layout_constraintBottom_toBottomOf="@id/ui_expand_button"
+        app:layout_constraintBottom_toTopOf="@id/ui_expanded_view"
         app:layout_constraintLeft_toLeftOf="@+id/ui_title_container"
-        tools:text="never logged"
-
-        />
+        app:layout_constraintTop_toBottomOf="@+id/alarm_icon"
+        app:layout_constraintVertical_bias="1"
+        tools:text="Last Night\n09:00 AM" />
 
     <TextView
         android:id="@+id/ui_today_logging_count"
@@ -122,11 +155,10 @@
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_gravity="bottom"
-        android:layout_marginBottom="@dimen/tracker_list_information_bottom_padding"
         android:gravity="bottom"
         android:minWidth="75dp"
         android:paddingRight="@dimen/tracker_list_stat_paddingRight"
-        app:layout_constraintBottom_toBottomOf="@id/ui_expand_button"
+        app:layout_constraintBottom_toBottomOf="@id/ui_last_logging_time"
         app:layout_constraintLeft_toRightOf="@+id/ui_last_logging_time"
         tools:text="today\n43" />
 
@@ -136,10 +168,9 @@
         style="@style/trackerListInformationTextViewStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/tracker_list_information_bottom_padding"
         android:gravity="bottom"
 
-        app:layout_constraintBottom_toBottomOf="@id/ui_expand_button"
+        app:layout_constraintBottom_toBottomOf="@id/ui_last_logging_time"
         app:layout_constraintLeft_toRightOf="@id/ui_today_logging_count"
         tools:text="total\n34" />
 
@@ -147,13 +178,14 @@
     <android.support.v7.widget.AppCompatImageButton
         android:id="@+id/ui_expand_button"
         android:layout_width="45dp"
-        android:layout_height="@dimen/tracker_list_element_collapsed_height"
+        android:layout_height="0dp"
         android:background="@drawable/left_separator"
         android:padding="8dp"
         android:scaleType="fitCenter"
         android:tint="@color/textColorMidLight"
-        app:layout_constraintRight_toRightOf="parent"
 
+        app:layout_constraintBottom_toTopOf="@+id/ui_expanded_view"
+        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/more_horiz_scarse" />
 
@@ -161,16 +193,17 @@
     <LinearLayout
         android:id="@+id/ui_expanded_view"
         android:layout_width="0dp"
-        android:layout_height="@dimen/button_height_normal"
-        android:layout_alignParentBottom="true"
+        android:layout_height="50dp"
+        android:layout_marginTop="@dimen/tracker_list_information_bottom_padding"
         android:layout_toEndOf="@+id/color_bar"
         android:background="@drawable/main_gradient"
         android:orientation="horizontal"
-        android:textAlignment="viewEnd"
 
+        android:textAlignment="viewEnd"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toRightOf="@+id/color_bar"
-        app:layout_constraintRight_toRightOf="parent">
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_goneMarginTop="@dimen/tracker_list_information_bottom_padding">
 
         <kr.ac.snu.hcil.omnitrack.ui.components.common.VerticalCenterAlignedIconTextButton
             android:id="@+id/ui_button_edit"
