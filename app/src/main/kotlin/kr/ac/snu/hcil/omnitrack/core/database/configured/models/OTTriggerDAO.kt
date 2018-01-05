@@ -161,6 +161,8 @@ open class OTTriggerDAO : RealmObject() {
     var userUpdatedAt: Long = System.currentTimeMillis()
     var userCreatedAt: Long = System.currentTimeMillis()
 
+    var serializedCreationFlags: String = "{}"
+
     fun initialize(forceRefresh: Boolean = false) {
         if (forceRefresh) {
             _action = null

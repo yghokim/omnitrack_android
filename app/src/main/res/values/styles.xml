@@ -526,6 +526,18 @@
         <item name="drawableTint">@color/textColorLight</item>
     </style>
 
+    <style name="FancyButtonStyle">
+        <item name="fb_defaultColor">@color/colorPointed.Light</item>
+        <item name="fb_focusColor">@color/colorPointed</item>
+        <item name="fb_radius">8dp</item>
+        <item name="fb_textColor">#FFF</item>
+    </style>
+
+    <style name="FancyButtonStyle.Red" parent="FancyButtonStyle">
+        <item name="fb_defaultColor">@color/colorRed.Light</item>
+        <item name="fb_focusColor">@color/colorRed</item>
+    </style>
+
     <style name="NumberPickerStyleImmersive">
         <item name="np_selectedTextColor">@color/colorPointed</item>
         <item name="android:textColor">@color/textColorLight</item>

@@ -74,6 +74,10 @@ class TrackerTypeAdapter(isServerMode: Boolean, val attributeTypeAdapter: Lazy<S
         if (!isServerMode)
             writer.name(BackendDbManager.FIELD_SYNCHRONIZED_AT).value(value.synchronizedAt)
 
+
+        writer.name("flags").jsonValue(value.serializedCreationFlags)
+        writer.name("lockedProperties").jsonValue(value.serializedLockedPropertyInfo)
+
         writer.name(BackendDbManager.FIELD_POSITION).value(value.position)
         writer.name(BackendDbManager.FIELD_NAME).value(value.name)
         writer.name("color").value(value.color)

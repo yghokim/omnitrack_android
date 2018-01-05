@@ -4,7 +4,7 @@
     android:layout_height="match_parent">
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/ui_list"
+        android:id="@+id/ui_recyclerview_with_fallback"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 </FrameLayout>

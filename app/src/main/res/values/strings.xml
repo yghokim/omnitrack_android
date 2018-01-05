@@ -79,6 +79,9 @@
     <string name="msg_tab_tracker_detail_structure">Structure</string>
     <string name="msg_tab_tracker_detail_reminders">Reminders</string>
 
+    <string name="msg_tab_experiments">Experiments</string>
+    <string name="msg_tab_invitations">Invitations</string>
+
     <string name="msg_edit">Edit</string>
     <string name="msg_data_list">Item List</string>
     <string name="msg_remove">Remove</string>
@@ -327,6 +330,10 @@
 
     <string name="msg_background_logging_notification_title_format">Logging %1$s item</string>
 
+    <string name="msg_format_experiment_joined_at">Joined on %1$s</string>
+
+    <string name="msg_format_experiment_dropped_at">Dropped on %1$s</string>
+
     <string-array name="gender_entries">
         <item>Male</item>
         <item>Female</item>
@@ -571,11 +578,16 @@
     <string name="time_range_picker_1_week">+ 1 week</string>
     <string name="msg_time_range_picker_to_now">To Now</string>
     <string name="tag_map_control_panel">map_control_panel</string>
+    <string name="msg_title_research">Research</string>
+    <string name="msg_empty_experiments">No experiments you\'ve joined.</string>
 
     <string-array name="supported_language_names">
         <item>English</item>
         <item>Korean</item>
     </string-array>
+
+    <string name="msg_insert_invitation_code">Insert invitation code</string>
+    <string name="msg_experiment_withdraw">Withdraw</string>
 
 
 </resources>
