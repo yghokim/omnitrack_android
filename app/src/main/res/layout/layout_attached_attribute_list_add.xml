@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.AppCompatButton xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/Base.Widget.AppCompat.Button.Borderless.Colored"
+    android:layout_width="wrap_content"
+    android:layout_height="@dimen/button_height_small"
+    android:layout_marginBottom="8dp"
+    android:layout_marginEnd="16dp"
+    android:background="@drawable/button_background_formlike"
+    android:paddingEnd="12dp"
+    android:paddingStart="12dp"
+    android:paddingTop="5dp"
+    android:text="@string/msg_trigger_assign_attribute" />

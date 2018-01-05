@@ -24,6 +24,8 @@ object JawboneDistanceMeasureFactory : OTMeasureFactory("dist") {
         return attribute.type == OTAttributeManager.TYPE_NUMBER
     }
 
+    override fun getAttributeType() = OTAttributeManager.TYPE_NUMBER
+
     override val isRangedQueryAvailable: Boolean = true
     override val minimumGranularity: OTTimeRangeQuery.Granularity = OTTimeRangeQuery.Granularity.Minute
     override val isDemandingUserInput: Boolean = false

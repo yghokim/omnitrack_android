@@ -31,6 +31,8 @@ object MisfitSleepMeasureFactory : OTMeasureFactory("slp") {
         return attribute.type == OTAttributeManager.TYPE_TIMESPAN
     }
 
+    override fun getAttributeType(): Int = OTAttributeManager.TYPE_TIMESPAN
+
     override val isRangedQueryAvailable: Boolean = true
     override val minimumGranularity: OTTimeRangeQuery.Granularity = OTTimeRangeQuery.Granularity.Day
     override val isDemandingUserInput: Boolean = false

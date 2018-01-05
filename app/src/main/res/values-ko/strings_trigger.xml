@@ -29,6 +29,7 @@
     <string name="msg_trigger_attached_trackers">등록된 트래커</string>
 
     <string name="msg_trigger_assign_tracker">+ 트래커 등록</string>
+    <string name="msg_trigger_assign_attribute">+ 필드 추가</string>
 
     <string name="msg_trigger_event_measure_selection">측정 모듈</string>
     <string name="msg_trigger_event_comparison_method">트리거 발동 임계값</string>

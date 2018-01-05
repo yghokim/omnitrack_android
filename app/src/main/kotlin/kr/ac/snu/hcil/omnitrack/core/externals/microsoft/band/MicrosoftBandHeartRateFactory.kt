@@ -48,6 +48,8 @@ class MicrosoftBandHeartRateFactory : OTMeasureFactory("heart") {
         return attribute.type == OTAttributeManager.TYPE_NUMBER
     }
 
+    override fun getAttributeType() = OTAttributeManager.TYPE_NUMBER
+
     override val isRangedQueryAvailable: Boolean = false
     override val minimumGranularity: OTTimeRangeQuery.Granularity = OTTimeRangeQuery.Granularity.Hour
     override val isDemandingUserInput: Boolean = false

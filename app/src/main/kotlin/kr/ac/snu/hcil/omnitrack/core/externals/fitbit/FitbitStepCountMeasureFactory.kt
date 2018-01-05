@@ -32,6 +32,8 @@ object FitbitStepCountMeasureFactory : OTMeasureFactory("step") {
         return attribute.type == OTAttributeManager.TYPE_NUMBER
     }
 
+    override fun getAttributeType() = OTAttributeManager.TYPE_NUMBER
+
     override val isRangedQueryAvailable: Boolean = true
     override val minimumGranularity: OTTimeRangeQuery.Granularity = OTTimeRangeQuery.Granularity.Hour
     override val isDemandingUserInput: Boolean = false

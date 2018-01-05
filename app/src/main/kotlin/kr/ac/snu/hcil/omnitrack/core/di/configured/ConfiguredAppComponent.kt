@@ -33,7 +33,10 @@ import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeDetailActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.attribute.AttributeDetailViewModel
 import kr.ac.snu.hcil.omnitrack.ui.pages.configs.ShortcutPanelWidgetConfigActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.home.*
+import kr.ac.snu.hcil.omnitrack.ui.pages.services.AttributeSelectionPage
+import kr.ac.snu.hcil.omnitrack.ui.pages.services.TrackerSelectionPage
 import kr.ac.snu.hcil.omnitrack.ui.pages.items.*
+import kr.ac.snu.hcil.omnitrack.ui.pages.services.ServiceWizardView
 import kr.ac.snu.hcil.omnitrack.ui.pages.settings.SettingsActivity
 import kr.ac.snu.hcil.omnitrack.ui.pages.tracker.FieldPresetSelectionBottomSheetFragment
 import kr.ac.snu.hcil.omnitrack.ui.pages.tracker.TrackerDetailStructureTabFragment
@@ -169,6 +172,11 @@ interface ConfiguredAppComponent {
     fun inject(viewModel: TriggerDetailViewModel)
     fun inject(viewModel: TriggerViewModel)
     fun inject(viewModel: NewItemCreationViewModel)
+
+    fun inject(wizardView: ServiceWizardView)
+    fun inject(page: TrackerSelectionPage)
+    fun inject(page: AttributeSelectionPage)
+
     fun inject(viewModel: TimeSeriesPlotModel)
     fun inject(viewModel: DurationHeatMapModel)
     fun inject(viewModel: AttributeDetailViewModel)
