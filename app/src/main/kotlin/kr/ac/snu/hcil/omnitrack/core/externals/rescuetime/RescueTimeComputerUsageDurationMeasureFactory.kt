@@ -49,6 +49,8 @@ object RescueTimeComputerUsageDurationMeasureFactory : OTMeasureFactory("cud") {
         return attribute.type == OTAttributeManager.TYPE_NUMBER
     }
 
+    override fun getAttributeType() = OTAttributeManager.TYPE_NUMBER
+
     override val minimumGranularity: OTTimeRangeQuery.Granularity = OTTimeRangeQuery.Granularity.Hour
     override val isRangedQueryAvailable: Boolean = true
     override val isDemandingUserInput: Boolean = false

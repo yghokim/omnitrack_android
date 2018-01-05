@@ -29,6 +29,8 @@ object FitbitRecentSleepTimeMeasureFactory : OTMeasureFactory("slp") {
         return attribute.type == OTAttributeManager.TYPE_TIMESPAN
     }
 
+    override fun getAttributeType() = OTAttributeManager.TYPE_TIMESPAN
+
     override val isRangedQueryAvailable: Boolean = true
     override val minimumGranularity: OTTimeRangeQuery.Granularity = OTTimeRangeQuery.Granularity.Hour
     override val isDemandingUserInput: Boolean = false

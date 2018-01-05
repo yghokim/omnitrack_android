@@ -53,6 +53,8 @@ object GoogleFitStepsFactory : GoogleFitService.GoogleFitMeasureFactory("step") 
         return attribute.type == OTAttributeManager.TYPE_NUMBER
     }
 
+    override fun getAttributeType() = OTAttributeManager.TYPE_NUMBER
+
     override fun makeMeasure(): OTMeasure {
         return Measure()
     }

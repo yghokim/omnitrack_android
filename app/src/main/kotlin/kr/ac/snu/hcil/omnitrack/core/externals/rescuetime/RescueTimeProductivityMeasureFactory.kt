@@ -44,6 +44,8 @@ object RescueTimeProductivityMeasureFactory : OTMeasureFactory("prd") {
         return attribute.type == OTAttributeManager.TYPE_NUMBER
     }
 
+    override fun getAttributeType() = OTAttributeManager.TYPE_NUMBER
+
     override val isRangedQueryAvailable: Boolean = true
 
     override val minimumGranularity: OTTimeRangeQuery.Granularity = OTTimeRangeQuery.Granularity.Hour
