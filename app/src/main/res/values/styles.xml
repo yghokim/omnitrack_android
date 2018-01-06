@@ -530,6 +530,8 @@
         <item name="fb_defaultColor">@color/colorPointed.Light</item>
         <item name="fb_focusColor">@color/colorPointed</item>
         <item name="fb_radius">8dp</item>
+        <item name="android:paddingStart">8dp</item>
+        <item name="android:paddingEnd">8dp</item>
         <item name="fb_textColor">#FFF</item>
     </style>
 

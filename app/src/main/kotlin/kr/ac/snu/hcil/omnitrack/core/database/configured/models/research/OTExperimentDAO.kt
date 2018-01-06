@@ -43,7 +43,7 @@ data class ExperimentInfo(val id: String, val name: String, val joinedAt: Long, 
 
         override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
             val oldItem = oldList[oldItemPosition]
-            val newItem = newList[oldItemPosition]
+            val newItem = newList[newItemPosition]
 
             return oldItem.joinedAt == newItem.joinedAt &&
                     oldItem.name == newItem.name &&
