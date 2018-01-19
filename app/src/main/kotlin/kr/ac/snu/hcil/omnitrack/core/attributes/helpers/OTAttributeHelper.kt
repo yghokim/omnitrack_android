@@ -14,8 +14,9 @@ import kr.ac.snu.hcil.omnitrack.core.attributes.logics.AFieldValueSorter
 import kr.ac.snu.hcil.omnitrack.core.attributes.properties.OTPropertyHelper
 import kr.ac.snu.hcil.omnitrack.core.configuration.ConfiguredContext
 import kr.ac.snu.hcil.omnitrack.core.connection.OTConnection
+import kr.ac.snu.hcil.omnitrack.core.database.configured.BackendDbManager
 import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTAttributeDAO
-import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTItemValueEntryDAO
+import kr.ac.snu.hcil.omnitrack.core.database.configured.models.OTItemDAO
 import kr.ac.snu.hcil.omnitrack.core.di.Configured
 import kr.ac.snu.hcil.omnitrack.core.visualization.ChartModel
 import kr.ac.snu.hcil.omnitrack.statistics.NumericCharacteristics
@@ -25,7 +26,6 @@ import kr.ac.snu.hcil.omnitrack.utils.InterfaceHelper
 import kr.ac.snu.hcil.omnitrack.utils.Nullable
 import kr.ac.snu.hcil.omnitrack.utils.ReadOnlyPair
 import kr.ac.snu.hcil.omnitrack.utils.TextHelper
-import kr.ac.snu.hcil.omnitrack.utils.serialization.TypeStringSerializationHelper
 import java.util.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.LinkedHashMap
@@ -45,24 +45,43 @@ abstract class OTAttributeHelper(protected val configuredContext: ConfiguredCont
 
         val FALLBACK_POLICY_RESOLVER_PREVIOUS_VALUE = object: FallbackPolicyResolver(R.string.msg_attribute_fallback_policy_last, isValueVolatile = true){
             override fun getFallbackValue(attribute: OTAttributeDAO, realm: Realm): Single<Nullable<out Any>> {
+
                 return Single.defer {
-                    val previousNotNullEntry = try {
-                        realm.where(OTItemValueEntryDAO::class.java)
+                    var previousValue: Any? = null
+                    try {
+                        /*
+                        previousValue= realm.where(OTItemValueEntryDAO::class.java)
                                 .equalTo("key", attribute.localId)
-                                .equalTo("item.trackerId", attribute.trackerId)
-                                .equalTo("item.removed", false)
-                                .sort("item.timestamp", Sort.DESCENDING)
-                                .findAll().filter { it.value != null }.first()
-                    } catch (ex: NoSuchElementException) {
-                        null
+                                .equalTo("items.trackerId", attribute.trackerId)
+                                .equalTo("items.removed", false)
+                                .sort("items.timestamp", Sort.DESCENDING)
+                                .findAll().filter { it.value != null }.first()?.value?.let{
+                            TypeStringSerializationHelper.deserialize(it)
+                        }*/
+
+
+                        val list = realm.where(OTItemDAO::class.java)
+                                .equalTo(BackendDbManager.FIELD_TRACKER_ID, attribute.trackerId)
+                                .equalTo("fieldValueEntries.key", attribute.localId)
+                                .equalTo(BackendDbManager.FIELD_REMOVED_BOOLEAN, false)
+                                .sort("timestamp", Sort.DESCENDING)
+                                .findAll()
+                        if (list.count() > 0) {
+                            for (item in list) {
+                                val value = item.getValueOf(attribute.localId)
+                                if (value != null) {
+                                    previousValue = value
+                                    break
+                                }
+                            }
+                        } else previousValue = null
+
+                    } catch (ex: Exception) {
+                        ex.printStackTrace()
+                        previousValue = null
                     }
 
-                    println("previous not null entry: ${previousNotNullEntry}")
-
-                    return@defer if (previousNotNullEntry != null) {
-                        Single.just<Nullable<out Any>>(
-                                Nullable(previousNotNullEntry.value?.let { TypeStringSerializationHelper.deserialize(it) }))
-                    } else Single.just<Nullable<out Any>>(Nullable(null))
+                    return@defer Single.just<Nullable<out Any>>(Nullable(previousValue))
                 }.subscribeOn(AndroidSchedulers.mainThread())
             }
         }
